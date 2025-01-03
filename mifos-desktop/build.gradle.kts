@@ -17,42 +17,42 @@ plugins {
 }
 
 kotlin {
-    jvm("desktop") {
+    jvm {
         withJava()
     }
 
     jvmToolchain(17)
 
     sourceSets {
-        val desktopMain by getting {
-            dependencies {
-                implementation(projects.core.common)
-                implementation(projects.core.data)
-                implementation(projects.core.model)
-                implementation(projects.core.datastore)
+        jvmMain.dependencies {
+            implementation(projects.core.common)
+            implementation(projects.core.data)
+            implementation(projects.core.model)
+            implementation(projects.core.datastore)
 
-                implementation(projects.mifosShared)
+            implementation(projects.mifosShared)
 
-                implementation(libs.kotlinx.coroutines.swing)
-                implementation(compose.desktop.currentOs)
-                implementation(libs.jb.kotlin.stdlib)
-                implementation(libs.kotlin.reflect)
-            }
+            implementation(libs.kotlinx.coroutines.swing)
+            implementation(compose.desktop.currentOs)
+            implementation(libs.jb.kotlin.stdlib)
+            implementation(libs.kotlin.reflect)
+
+            implementation(libs.koin.core)
         }
     }
 }
 
-val packageName: String = libs.versions.packageName.get()
+val appName: String = libs.versions.packageName.get()
 val packageNameSpace: String = libs.versions.packageNamespace.get()
-val packageVersion: String = libs.versions.packageVersion.get()
+val appVersion: String = libs.versions.packageVersion.get()
 
 compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
-            packageName = this@Build_gradle.packageName
-            packageVersion = this@Build_gradle.packageVersion
+            packageName = appName
+            packageVersion = appVersion
             description = "Desktop Application"
             copyright = "© 2024 Mifos Initiative. All rights reserved."
             vendor = "Mifos Initiative"
@@ -61,7 +61,7 @@ compose.desktop {
 
             macOS {
                 bundleID = packageNameSpace
-                dockName = this@Build_gradle.packageName
+                dockName = appName
                 iconFile.set(project.file("icons/ic_launcher.icns"))
                 notarization {
                     val providers = project.providers
@@ -72,7 +72,7 @@ compose.desktop {
             }
 
             windows {
-                menuGroup = this@Build_gradle.packageName
+                menuGroup = appName
                 shortcut = true
                 dirChooser = true
                 perUserInstall = true

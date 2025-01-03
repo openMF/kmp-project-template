@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":mifos-desktop:desktopRun" />
+          <option value=":mifos-desktop:jvmRun" />
         </list>
       </option>
       <option name="vmOptions" />

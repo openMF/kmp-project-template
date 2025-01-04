@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":mifos-desktop:jvmRun" />
+          <option value=":mifos-desktop:jvmRun -DmainClass=MainKt --quiet" />
         </list>
       </option>
       <option name="vmOptions" />

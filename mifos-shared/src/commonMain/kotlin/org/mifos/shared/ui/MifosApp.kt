@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/mobile-wallet/blob/master/LICENSE.md
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.shared.ui
 
@@ -57,7 +57,6 @@ import org.mifos.core.designsystem.component.MifosNavigationBarItem
 import org.mifos.core.designsystem.component.MifosNavigationRail
 import org.mifos.core.designsystem.component.MifosNavigationRailItem
 import org.mifos.core.designsystem.icon.AppIcons
-import org.mifos.feature.profile.navigateToProfile
 import org.mifos.feature.settings.navigateToNotification
 import org.mifos.feature.settings.navigateToSettings
 import org.mifos.shared.navigation.MifosNavHost
@@ -295,11 +294,11 @@ private fun Modifier.notificationDot(): Modifier =
                 // however, its parameters are private, so we must depend on them implicitly
                 // (NavigationBarTokens.ActiveIndicatorWidth = 64.dp)
                 center =
-                    center +
-                            Offset(
-                                64.dp.toPx() * .45f,
-                                32.dp.toPx() * -.45f - 6.dp.toPx(),
-                            ),
+                center +
+                    Offset(
+                        64.dp.toPx() * .45f,
+                        32.dp.toPx() * -.45f - 6.dp.toPx(),
+                    ),
             )
         }
     }

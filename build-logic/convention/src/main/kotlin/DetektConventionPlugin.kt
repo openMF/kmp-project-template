@@ -4,7 +4,10 @@ import org.gradle.api.Project
 import org.mifos.configureDetekt
 import org.mifos.detektGradle
 
-class MifosDetektConventionPlugin : Plugin<Project> {
+/**
+ * Plugin that applies the Detekt plugin and configures it.
+ */
+class DetektConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             applyPlugins()

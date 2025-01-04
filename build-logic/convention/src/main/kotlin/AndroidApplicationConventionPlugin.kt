@@ -9,6 +9,9 @@ import org.mifos.configureBadgingTasks
 import org.mifos.configureKotlinAndroid
 import org.mifos.configurePrintApksTask
 
+/**
+ * Plugin that applies the Android application plugin and configures it.
+ */
 class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
@@ -16,9 +19,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
                 apply("com.dropbox.dependency-guard")
-                apply("mifos.detekt.plugin")
-                apply("mifos.spotless.plugin")
-                apply("mifos.git.hooks")
+                apply("org.mifos.detekt.plugin")
+                apply("org.mifos.spotless.plugin")
+                apply("org.mifos.git.hooks")
             }
 
             extensions.configure<ApplicationExtension> {

@@ -9,15 +9,18 @@ import org.mifos.configureKotlinAndroid
 import org.mifos.configureKotlinMultiplatform
 import org.mifos.libs
 
+/**
+ * Plugin that applies the Android library and Kotlin multiplatform plugins and configures them.
+ */
 class KMPLibraryConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.multiplatform")
-                apply("mifospay.kmp.koin")
-                apply("mifos.detekt.plugin")
-                apply("mifos.spotless.plugin")
+                apply("org.mifos.kmp.koin")
+                apply("org.mifos.detekt.plugin")
+                apply("org.mifos.spotless.plugin")
             }
 
             configureKotlinMultiplatform()

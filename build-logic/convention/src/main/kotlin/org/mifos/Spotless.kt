@@ -3,8 +3,13 @@ package org.mifos
 import com.diffplug.gradle.spotless.SpotlessExtension
 import org.gradle.api.Project
 
-val ktlintVersion = "1.0.1"
+const val ktlintVersion = "1.0.1"
 
+/**
+ * Configures the Spotless plugin with the [extension] configuration.
+ * This includes setting up the `ktlint` formatter and the license header.
+ * @see SpotlessExtension
+ */
 internal fun Project.configureSpotless(extension: SpotlessExtension) = extension.apply {
     kotlin {
         target("**/*.kt")

@@ -4,14 +4,27 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 import org.mifos.libs
 
+/**
+ * Plugin that applies the CMP feature plugin and configures it.
+ * This plugin applies the following plugins:
+ * - org.mifos.kmp.library - Kotlin Multiplatform Library
+ * - org.mifos.kmp.koin - Koin for Kotlin Multiplatform
+ * - org.jetbrains.kotlin.plugin.compose - Kotlin Compose
+ * - org.jetbrains.compose - Compose Multiplatform
+ * - org.mifos.detekt.plugin - Detekt Plugin
+ * - org.mifos.spotless.plugin - Spotless Plugin
+ *
+ */
 class CMPFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             pluginManager.apply {
-                apply("mifospay.kmp.library")
-                apply("mifospay.kmp.koin")
+                apply("org.mifos.kmp.library")
+                apply("org.mifos.kmp.koin")
                 apply("org.jetbrains.kotlin.plugin.compose")
                 apply("org.jetbrains.compose")
+                apply("org.mifos.detekt.plugin")
+                apply("org.mifos.spotless.plugin")
             }
 
             dependencies {

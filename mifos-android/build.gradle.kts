@@ -5,15 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/mobile-wallet/blob/master/LICENSE.md
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-import org.mifos.MifosBuildType
+import org.mifos.AppBuildType
 import org.mifos.dynamicVersion
 
 plugins {
-    alias(libs.plugins.mifospay.android.application)
-    alias(libs.plugins.mifospay.android.application.compose)
-    alias(libs.plugins.mifospay.android.application.flavors)
+    alias(libs.plugins.android.application.convention)
+    alias(libs.plugins.android.application.compose.convention)
+    alias(libs.plugins.android.application.flavors.convention)
     id("com.google.devtools.ksp")
 }
 
@@ -41,14 +41,14 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = MifosBuildType.DEBUG.applicationIdSuffix
+            applicationIdSuffix = AppBuildType.DEBUG.applicationIdSuffix
         }
 
         // Disabling proguard for now until
         // https://github.com/openMF/mobile-wallet/issues/1815 this issue is resolved
         release {
             isMinifyEnabled = false
-            applicationIdSuffix = MifosBuildType.RELEASE.applicationIdSuffix
+            applicationIdSuffix = AppBuildType.RELEASE.applicationIdSuffix
             isShrinkResources = false
             isDebuggable = false
             isJniDebuggable = false

@@ -5,17 +5,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/mobile-wallet/blob/master/LICENSE.md
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.core.data.di
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import org.mifos.core.data.utils.NetworkMonitor
-import org.mifos.core.data.utils.TimeZoneMonitor
 import org.mifos.core.data.util.ConnectivityManagerNetworkMonitor
 import org.mifos.core.data.util.TimeZoneBroadcastMonitor
+import org.mifos.core.data.utils.NetworkMonitor
+import org.mifos.core.data.utils.TimeZoneMonitor
 
 class AndroidPlatformDependentDataModule(
     private val context: Context,

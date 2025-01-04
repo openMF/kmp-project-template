@@ -14,19 +14,25 @@ enum class FlavorDimension {
 // purposes, or from a production backend server which supplies up-to-date, real content.
 // These two product flavors reflect this behaviour.
 @Suppress("EnumEntryName")
-enum class MifosFlavor(val dimension: FlavorDimension, val applicationIdSuffix: String? = null) {
+enum class AppFlavor(val dimension: FlavorDimension, val applicationIdSuffix: String? = null) {
     demo(FlavorDimension.contentType, applicationIdSuffix = ".demo"),
     prod(FlavorDimension.contentType)
 }
 
+/**
+ * Configure product flavors for the app module
+ * @param commonExtension the common extension for the app module
+ * @param flavorConfigurationBlock the configuration block for each flavor
+ * @see AppFlavor
+ */
 fun configureFlavors(
     commonExtension: CommonExtension<*, *, *, *, *, *>,
-    flavorConfigurationBlock: ProductFlavor.(flavor: MifosFlavor) -> Unit = {}
+    flavorConfigurationBlock: ProductFlavor.(flavor: AppFlavor) -> Unit = {},
 ) {
     commonExtension.apply {
         flavorDimensions += FlavorDimension.contentType.name
         productFlavors {
-            MifosFlavor.values().forEach {
+            AppFlavor.values().forEach {
                 create(it.name) {
                     dimension = it.dimension.name
                     flavorConfigurationBlock(this, it)

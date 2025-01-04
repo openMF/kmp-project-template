@@ -24,8 +24,16 @@ import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.process.ExecOperations
 import java.io.File
+import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * Generates the badging information of the APK.
+ * This task is cacheable, meaning that if the inputs and outputs have not changed,
+ * the task will be considered up-to-date and will not run.
+ * This task is also incremental, meaning that if the inputs have not changed,
+ *
+ */
 @CacheableTask
 abstract class GenerateBadgingTask : DefaultTask() {
 
@@ -97,7 +105,11 @@ fun Project.configureBadgingTasks(
     // Registers a callback to be called, when a new variant is configured
     componentsExtension.onVariants { variant ->
         // Registers a new task to verify the app bundle.
-        val capitalizedVariantName = variant.name.capitalized()
+        val capitalizedVariantName = variant.name.let {
+            if (it.isEmpty()) it else it[0].titlecase(
+                Locale.getDefault(),
+            ) + it.substring(1)
+        }
         val generateBadgingTaskName = "generate${capitalizedVariantName}Badging"
         val generateBadging =
             tasks.register<GenerateBadgingTask>(generateBadgingTaskName) {

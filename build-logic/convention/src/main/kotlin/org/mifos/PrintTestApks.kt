@@ -20,6 +20,14 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
+/**
+ * Configures the `printTestApks` task for the [project].
+ * This task will print the location of the androidTest APKs.
+ * This is useful when running tests on a device or emulator.
+ * The task will only be created if there are androidTest sources.
+ * @see PrintApkLocationTask
+ * @see HasAndroidTest
+ */
 internal fun Project.configurePrintApksTask(extension: AndroidComponentsExtension<*, *, *>) {
     extension.onVariants { variant ->
         if (variant is HasAndroidTest) {
@@ -37,7 +45,7 @@ internal fun Project.configurePrintApksTask(extension: AndroidComponentsExtensio
             if (artifact != null && testSources != null) {
                 tasks.register(
                     "${variant.name}PrintTestApk",
-                    PrintApkLocationTask::class.java
+                    PrintApkLocationTask::class.java,
                 ) {
                     apkFolder.set(artifact)
                     builtArtifactsLoader.set(loader)

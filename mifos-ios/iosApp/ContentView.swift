@@ -4,7 +4,7 @@ import ComposeApp
 
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        MifosViewControllerKt.MifosViewController()
+        MifosViewControllerKt.mifosViewController()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

@@ -6,6 +6,13 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.named
 
+/**
+ * Configures the Detekt plugin with the [extension] configuration.
+ * This includes setting the JVM target to 17 and enabling all reports.
+ * Additionally, it adds the `detekt-formatting` and `twitter-detekt-compose` plugins.
+ * @see DetektExtension
+ * @see Detekt
+ */
 internal fun Project.configureDetekt(extension: DetektExtension) = extension.apply {
     tasks.named<Detekt>("detekt") {
         jvmTarget = "17"

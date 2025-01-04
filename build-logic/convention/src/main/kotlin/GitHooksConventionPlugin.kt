@@ -6,7 +6,10 @@ import org.gradle.api.tasks.Exec
 import org.gradle.kotlin.dsl.register
 import java.util.Locale
 
-class MifosGitHooksConventionPlugin : Plugin<Project> {
+/**
+ * Plugin that installs the pre-commit git hooks from the scripts directory.
+ */
+class GitHooksConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // Define a function to check if the OS is Linux or MacOS
         fun isLinuxOrMacOs(): Boolean {

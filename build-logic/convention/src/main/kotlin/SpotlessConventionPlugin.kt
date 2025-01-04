@@ -3,7 +3,10 @@ import org.gradle.api.Project
 import org.mifos.configureSpotless
 import org.mifos.spotlessGradle
 
-class MifosSpotlessConventionPlugin : Plugin<Project> {
+/**
+ * Plugin that applies the Spotless plugin and configures it.
+ */
+class SpotlessConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             applyPlugins()

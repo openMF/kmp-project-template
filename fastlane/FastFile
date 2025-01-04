@@ -174,15 +174,15 @@ platform :ios do
     # automatic code signing
     update_code_signing_settings(
       use_automatic_signing: true,
-      path: "mifospay-ios/iosApp.xcodeproj"
+      path: "mifos-ios/iosApp.xcodeproj"
     )
     build_ios_app(
-      project: "mifospay-ios/iosApp.xcodeproj",
+      project: "mifos-ios/iosApp.xcodeproj",
       scheme: "iosApp",
       # Set configuration to debug for now
       configuration: options[:configuration],
       skip_codesigning: "true",
-      output_directory: "mifospay-ios/build",
+      output_directory: "mifos-ios/build",
       skip_archive: "true"
     )
   end
@@ -195,7 +195,7 @@ platform :ios do
       service_credentials_file: options[:serviceCredsFile]
     )
     increment_build_number(
-      xcodeproj: "mifospay-ios/iosApp.xcodeproj",
+      xcodeproj: "mifos-ios/iosApp.xcodeproj",
       build_number: latest_release[:buildVersion].to_i + 1
     )
   end

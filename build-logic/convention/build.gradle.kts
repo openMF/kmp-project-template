@@ -4,7 +4,7 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "org.mifospay.buildlogic"
+group = "org.mifos.buildlogic"
 
 // Configure the build-logic plugins to target JDK 19
 // This matches the JDK used to build the project, and is not related to what is running on device.
@@ -42,53 +42,53 @@ gradlePlugin {
     plugins {
         // Android Plugins
         register("androidApplicationCompose") {
-            id = "mifospay.android.application.compose"
+            id = "org.mifos.android.application.compose"
             implementationClass = "AndroidApplicationComposeConventionPlugin"
         }
         register("androidApplication") {
-            id = "mifospay.android.application"
+            id = "org.mifos.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
         }
 
         register("androidFlavors") {
-            id = "mifospay.android.application.flavors"
+            id = "org.mifos.android.application.flavors"
             implementationClass = "AndroidApplicationFlavorsConventionPlugin"
         }
 
         // KMP & CMP Plugins
         register("cmpFeature") {
-            id = "mifospay.cmp.feature"
+            id = "org.mifos.cmp.feature"
             implementationClass = "CMPFeatureConventionPlugin"
         }
 
         register("kmpKoin") {
-            id = "mifospay.kmp.koin"
+            id = "org.mifos.kmp.koin"
             implementationClass = "KMPKoinConventionPlugin"
         }
         register("kmpLibrary") {
-            id = "mifospay.kmp.library"
+            id = "org.mifos.kmp.library"
             implementationClass = "KMPLibraryConventionPlugin"
         }
 
         // Static Analysis & Formatting Plugins
         register("detekt") {
-            id = "mifos.detekt.plugin"
-            implementationClass = "MifosDetektConventionPlugin"
+            id = "org.mifos.detekt.plugin"
+            implementationClass = "DetektConventionPlugin"
             description = "Configures detekt for the project"
         }
         register("spotless") {
-            id = "mifos.spotless.plugin"
-            implementationClass = "MifosSpotlessConventionPlugin"
+            id = "org.mifos.spotless.plugin"
+            implementationClass = "SpotlessConventionPlugin"
             description = "Configures spotless for the project"
         }
         register("ktlint") {
-            id = "mifos.ktlint.plugin"
-            implementationClass = "MifosKtlintConventionPlugin"
+            id = "org.mifos.ktlint.plugin"
+            implementationClass = "KtlintConventionPlugin"
             description = "Configures kotlinter for the project"
         }
         register("gitHooks") {
-            id = "mifos.git.hooks"
-            implementationClass = "MifosGitHooksConventionPlugin"
+            id = "org.mifos.git.hooks"
+            implementationClass = "GitHooksConventionPlugin"
             description = "Installs git hooks for the project"
         }
     }

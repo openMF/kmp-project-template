@@ -6,6 +6,12 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
+/**
+ * Configure the Kotlin Multiplatform plugin with the default hierarchy template and additional targets.
+ * This includes JVM, Android, iOS, JS and WASM targets.
+ * @see KotlinMultiplatformExtension
+ * @see configure
+ */
 @OptIn(ExperimentalWasmDsl::class, ExperimentalKotlinGradlePluginApi::class)
 internal fun Project.configureKotlinMultiplatform() {
     extensions.configure<KotlinMultiplatformExtension> {

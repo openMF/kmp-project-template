@@ -11,7 +11,7 @@
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import org.mifos.shared.MifosPaySharedApp
+import org.mifos.shared.MifosSharedApp
 import org.mifos.shared.di.initKoin
 
 fun main() {
@@ -23,7 +23,7 @@ fun main() {
             state = windowState,
             title = "MifosAppTemplate",
         ) {
-            MifosPaySharedApp()
+            MifosSharedApp()
         }
     }
 }

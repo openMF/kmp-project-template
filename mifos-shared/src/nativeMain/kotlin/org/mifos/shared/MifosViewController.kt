@@ -17,5 +17,5 @@ fun mifosViewController() = ComposeUIViewController(
         initKoin()
     },
 ) {
-    MifosPaySharedApp()
+    MifosSharedApp()
 }

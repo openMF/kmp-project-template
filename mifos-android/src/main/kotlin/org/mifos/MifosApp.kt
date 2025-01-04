@@ -15,12 +15,12 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 import org.mifos.shared.di.KoinModules
 
-class MifosPayApp : Application() {
+class MifosApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
         startKoin {
-            androidContext(this@MifosPayApp)
+            androidContext(this@MifosApp)
             androidLogger()
             modules(KoinModules.allModules)
         }

@@ -19,7 +19,7 @@ import org.koin.android.ext.android.inject
 import org.mifos.core.data.utils.NetworkMonitor
 import org.mifos.core.data.utils.TimeZoneMonitor
 import org.mifos.core.ui.utils.ShareUtils
-import org.mifos.shared.MifosPaySharedApp
+import org.mifos.shared.MifosSharedApp
 
 class MainActivity : ComponentActivity() {
     private val networkMonitor: NetworkMonitor by inject()
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         ShareUtils.setActivityProvider { return@setActivityProvider this }
 
         setContent {
-            MifosPaySharedApp(
+            MifosSharedApp(
                 networkMonitor = networkMonitor,
                 timeZoneMonitor = timeZoneMonitor,
             )

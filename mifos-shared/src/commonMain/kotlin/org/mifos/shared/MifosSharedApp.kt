@@ -20,12 +20,12 @@ import org.mifos.shared.navigation.MifosNavGraph.MAIN_GRAPH
 import org.mifos.shared.navigation.RootNavGraph
 
 @Composable
-fun MifosPaySharedApp(
+fun MifosSharedApp(
     networkMonitor: NetworkMonitor = koinInject(),
     timeZoneMonitor: TimeZoneMonitor = koinInject(),
     modifier: Modifier = Modifier,
 ) {
-    MifosPayApp(
+    MifosApp(
         networkMonitor = networkMonitor,
         timeZoneMonitor = timeZoneMonitor,
         modifier = modifier,
@@ -33,7 +33,7 @@ fun MifosPaySharedApp(
 }
 
 @Composable
-private fun MifosPayApp(
+private fun MifosApp(
     networkMonitor: NetworkMonitor,
     timeZoneMonitor: TimeZoneMonitor,
     modifier: Modifier = Modifier,

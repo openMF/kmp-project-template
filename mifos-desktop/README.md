@@ -14,9 +14,9 @@ graph LR
     :core:model["model"]
     :core:datastore["datastore"]
   end
-  :mifospay-desktop --> :core:common
-  :mifospay-desktop --> :core:data
-  :mifospay-desktop --> :core:model
-  :mifospay-desktop --> :core:datastore
-  :mifospay-desktop --> :mifospay-shared
+  :mifos-desktop --> :core:common
+  :mifos-desktop --> :core:data
+  :mifos-desktop --> :core:model
+  :mifos-desktop --> :core:datastore
+  :mifos-desktop --> :mifos-shared
 ```

@@ -41,8 +41,12 @@ platform :android do
     # Generate Release Note
     releaseNotes = generateReleaseNotes()
 
+    # Ensure directory structure exists
+    buildConfigDir = "metadata/android/en-GB/changelogs"
+    FileUtils.mkdir_p(buildConfigDir) unless File.directory?(buildConfigDir)
+
     # Write the generated release notes to default.txt
-    buildConfigPath = "metadata/android/en-GB/changelogs/default.txt"
+    buildConfigPath = "#{buildConfigDir}/default.txt"
     File.write(buildConfigPath, releaseNotes)
 
     buildAndSignApp(
@@ -57,7 +61,7 @@ platform :android do
 
   desc "Publish Release Play Store artifacts to Firebase App Distribution"
   lane :deploy_on_firebase do |options|
-    options[:apkFile] ||= "mifospay-android/build/outputs/apk/prod/release/mifospay-android-prod-release.apk"
+    options[:apkFile] ||= "mifos-android/build/outputs/apk/prod/release/mifos-android-prod-release.apk"
     options[:serviceCredsFile] ||= "secrets/firebaseAppDistributionServiceCredentialsFile.json"
     options[:groups] ||= "mifos-wallet-testers"
 
@@ -76,7 +80,7 @@ platform :android do
 
   desc "Deploy internal tracks to Google Play"
   lane :deploy_internal do |options|
-    options[:aabFile] ||= "mifospay-android/build/outputs/bundle/prodRelease/mifospay-android-prod-release.aab"
+    options[:aabFile] ||= "mifos-android/build/outputs/bundle/prodRelease/mifos-android-prod-release.aab"
     upload_to_play_store(
       track: 'internal',
       aab: options[:aabFile],
@@ -191,7 +195,7 @@ platform :ios do
     options[:serviceCredsFile] ||= "secrets/firebaseAppDistributionServiceCredentialsFile.json"
 
     latest_release = firebase_app_distribution_get_latest_release(
-      app: "1:728434912738:ios:86a7badfaed88b841a1dbb",
+      app: "1:728434912738:ios:89827912hs89021sk920",
       service_credentials_file: options[:serviceCredsFile]
     )
     increment_build_number(
@@ -209,7 +213,7 @@ platform :ios do
     build_ios()
     releaseNotes = generateReleaseNotes()
     release = firebase_app_distribution(
-      app: "1:728434912738:ios:86a7badfaed88b841a1dbb",
+      app: "1:728434912738:ios:89827912hs89021sk920",
       service_credentials_file: options[:serviceCredsFile],
       release_notes_file: "#{releaseNotes}",
       groups: options[:groups]

@@ -10,12 +10,12 @@
 package org.mifos.shared.utils
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import kmp_project_template.mifos_shared.generated.resources.Res
-import kmp_project_template.mifos_shared.generated.resources.app_name
-import kmp_project_template.mifos_shared.generated.resources.home
-import kmp_project_template.mifos_shared.generated.resources.profile
 import org.jetbrains.compose.resources.StringResource
 import org.mifos.core.designsystem.icon.AppIcons
+import org.mifos.shared.generated.resources.Res
+import org.mifos.shared.generated.resources.app_name
+import org.mifos.shared.generated.resources.home
+import org.mifos.shared.generated.resources.profile
 
 /**
  * Type for the top level destinations in the application. Each of these destinations

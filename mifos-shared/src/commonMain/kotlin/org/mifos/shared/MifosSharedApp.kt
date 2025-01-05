@@ -25,7 +25,7 @@ fun MifosSharedApp(
     timeZoneMonitor: TimeZoneMonitor = koinInject(),
     modifier: Modifier = Modifier,
 ) {
-    MifosApp(
+    SharedApp(
         networkMonitor = networkMonitor,
         timeZoneMonitor = timeZoneMonitor,
         modifier = modifier,
@@ -33,7 +33,7 @@ fun MifosSharedApp(
 }
 
 @Composable
-private fun MifosApp(
+private fun SharedApp(
     networkMonitor: NetworkMonitor,
     timeZoneMonitor: TimeZoneMonitor,
     modifier: Modifier = Modifier,

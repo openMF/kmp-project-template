@@ -17,16 +17,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import org.mifos.designsystem.generated.resources.Res
-import org.mifos.designsystem.generated.resources.outfit_black
-import org.mifos.designsystem.generated.resources.outfit_bold
-import org.mifos.designsystem.generated.resources.outfit_extra_bold
-import org.mifos.designsystem.generated.resources.outfit_extra_light
-import org.mifos.designsystem.generated.resources.outfit_light
-import org.mifos.designsystem.generated.resources.outfit_medium
-import org.mifos.designsystem.generated.resources.outfit_regular
-import org.mifos.designsystem.generated.resources.outfit_semi_bold
-import org.mifos.designsystem.generated.resources.outfit_thin
+import org.mifos.core.designsystem.generated.resources.Res
+import org.mifos.core.designsystem.generated.resources.outfit_black
+import org.mifos.core.designsystem.generated.resources.outfit_bold
+import org.mifos.core.designsystem.generated.resources.outfit_extra_bold
+import org.mifos.core.designsystem.generated.resources.outfit_extra_light
+import org.mifos.core.designsystem.generated.resources.outfit_light
+import org.mifos.core.designsystem.generated.resources.outfit_medium
+import org.mifos.core.designsystem.generated.resources.outfit_regular
+import org.mifos.core.designsystem.generated.resources.outfit_semi_bold
+import org.mifos.core.designsystem.generated.resources.outfit_thin
 
 @Composable
 private fun fontFamily(): FontFamily {

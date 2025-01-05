@@ -1,167 +1,214 @@
 # KMP Multi-Module Project Generator
 
-A bash script to customize and rename Kotlin Multiplatform projects. This tool helps you quickly adapt the template project structure with your own package name and project settings.
-
-## Features
-
-- Renames all modules with your project name
-- Updates package names throughout the codebase
-- Handles Kotlin Multiplatform specific source sets
-- Updates Gradle build files and settings
-- Renames files and composable functions
-- Updates run configurations
-- Handles convention plugins
-- Updates import statements
-- Preserves project structure and functionality
-
-## Prerequisites
-
-- Bash version 4 or higher
-- Unix-like environment (Linux/macOS)
-- For macOS users: You may need to install a newer version of bash using Homebrew:
-  ```bash
-  brew install bash
-  ```
-
-## Usage
-
-1. Copy the `customizer.sh` script to your project root directory
-2. Make it executable:
-   ```bash
-   chmod +x customizer.sh
-   ```
-3. Run the script with your desired package name and project name:
-   ```bash
-   ./customizer.sh com.example.myapp MyProject
-   ```
-
-### Parameters
-
-- `package_name`: Your desired package name (e.g., com.example.myapp)
-- `project_name`: Your project name in PascalCase (e.g., MyProject)
-- `application_name`: (Optional) Custom application class name
-
-### Example
-
-```bash
-./customizer.sh com.company.awesomeapp AwesomeApp
-```
-
-This will:
-1. Rename all modules from `mifos-*` to `awesomeapp-*`
-2. Update package from `org.mifos` to `com.company.awesomeapp`
-3. Rename files like `MifosApp.kt` to `AwesomeApp.kt`
-4. Update all relevant configurations and references
-
-## What Gets Updated
-
-1. **Module Names**
-    - `mifos-shared` → `yourproject-shared`
-    - `mifos-android` → `yourproject-android`
-    - `mifos-desktop` → `yourproject-desktop`
-    - `mifos-web` → `yourproject-web`
-
-2. **Package Names**
-    - Updates all package declarations
-    - Updates all import statements
-    - Updates AndroidManifest.xml
-
-3. **Build Files**
-    - settings.gradle.kts
-    - build.gradle.kts files
-    - Convention plugins
-    - Version catalog entries
-
-4. **Run Configurations**
-    - Updates configuration names
-    - Updates module references
-    - Renames configuration files
-
-5. **Source Files**
-    - Renames files with "Mifos" prefix
-    - Updates composable function names
-    - Updates class names and references
+## Overview
+The Kotlin Multiplatform Multi-module Template generator enables the development of cross-platform applications,
+supporting Android, iOS, Desktop, and Web. It allows for the sharing of business logic and UI components across these platforms
+while preserving native platform features and capabilities.
 
 ## Project Structure
-```mermaid
-graph TD
-    A[Project Root] --> B[build-logic]
-    A --> C[mifos-shared]
-    A --> D[mifos-android]
-    A --> E[mifos-desktop]
-    A --> F[mifos-web]
-    A --> G[.idea]
-    
-    B --> B1[convention plugins]
-    B --> B2[build-logic.versions.toml]
-    
-    C --> C1[src/commonMain]
-    C --> C2[src/commonTest]
-    
-    D --> D1[src/androidMain]
-    D --> D2[src/androidTest]
-    
-    E --> E1[src/desktopMain]
-    E --> E2[src/desktopTest]
-    
-    F --> F1[src/webMain]
-    F --> F2[src/webTest]
-    
-    G --> G1[runConfigurations]
-    G1 --> G2[mifos-android.run.xml]
-    G1 --> G3[mifos-desktop.run.xml]
-    
-    classDef module fill:#e1f5fe,stroke:#FFFFFF
-    classDef config fill:#fff3e0,stroke:#FFFFFF
-    classDef source fill:#e8f5e9,stroke:#1b5e20
-    
-    class B,C,D,E,F module
-    class B1,B2,G1,G2,G3 config
-    class C1,C2,D1,D2,E1,E2,F1,F2 source
+
+### Core Modules
+- **buildLogic/**: Contains shared Gradle build configurations and custom plugins
+- **core/**: Contains the main business logic modules
+   - `analytics`: Analytics and logging utilities
+   - `common`: Shared code across all platforms
+   - `model`: Data models and structures
+   - `data`: Data layer implementation
+   - `network`: Network communication and API clients
+   - `domain`: Business logic and use cases
+   - `ui`: Shared UI components using Compose Multiplatform
+   - `designsystem`: App-wide design system components
+   - `datastore`: Local data storage implementation
+
+### Feature Modules
+- **feature/**: Contains feature-specific modules
+   - `home`: Home screen and related functionality
+   - `profile`: User profile management
+   - `settings`: Application settings
+
+### Platform-Specific Modules
+- **mifospay-android/**: Android application implementation
+- **mifospay-ios/**: iOS application implementation
+- **mifospay-desktop/**: Desktop application implementation
+- **mifospay-web/**: Web application implementation
+- **mifospay-shared/**: Shared Kotlin Multiplatform code
+
+## Project Customization Script
+
+### Overview
+The project includes a bash script (`customizer.sh`) that helps in customizing the project for different implementations. This script automates the process of renaming packages, updating configurations, and maintaining consistency across the project structure.
+
+### Prerequisites
+- Bash version 4 or higher
+- Unix-like environment (macOS, Linux)
+
+### Usage
+
+```bash
+bash customizer.sh <package-name> <project-name> [application-name]
 ```
 
-## File Modified By Script
-```mermaid
-graph LR
-    A[Script Start] --> B[Update Package Names]
-    B --> C[Rename Modules]
-    C --> D[Update Build Files]
-    D --> E[Update Source Files]
-    E --> F[Update Configurations]
-    
-    subgraph "Package Names"
-        B1[Kotlin Files]
-        B2[Android Manifest]
-        B3[Import Statements]
-    end
-    
-    subgraph "Build Files"
-        D1[settings.gradle.kts]
-        D2[build.gradle.kts]
-        D3[Convention Plugins]
-        D4[Version Catalogs]
-    end
-    
-    subgraph "Source Files"
-        E1[Rename Mifos*.kt]
-        E2[Update Composables]
-        E3[Update References]
-    end
-    
-    subgraph "Configurations"
-        F1[Run Configs]
-        F2[Workspace]
-        F3[IDE Settings]
-    end
-    
-    B --> B1 & B2 & B3
-    D --> D1 & D2 & D3 & D4
-    E --> E1 & E2 & E3
-    F --> F1 & F2 & F3
-    
-    classDef step fill:#e1f5fe,stroke:#01579b
-    classDef file fill:#e8f5e9,stroke:#1b5e20
-    
-    class A,B,C,D,E,F step
-    class B1,B2,B3,D1,D2,D3,D4,E1,E2,E3,F1,F2,F3 file
+#### Parameters
+- `package-name`: New package name (e.g., com.example.myapp)
+- `project-name`: New project name
+- `application-name`: (Optional) Custom application name (defaults to project-name)
+
+#### Example
+```bash
+bash customizer.sh com.example.myapp MyKMPApp
 ```
+
+## License and Copyright Updates
+
+### Updating License and Copyright Information
+
+After running the customizer script to change package names and project structure, you'll need to update the license and copyright information across the project. This process involves:
+
+1. **Locate License Files**
+    - Navigate to the `spotless` directory
+    - Find the license header templates
+    - Update the copyright year and organization information
+<br/><br/>  
+2. **Apply Changes**
+    - Run the Spotless plugin to update all files:
+      ```bash
+      ./gradlew spotlessApply
+      ```
+    - This will automatically update the license headers in all source files
+    - Verify the changes in a few files to ensure correct application
+
+### Script Features
+
+#### 1. Package Updates
+- Updates base package name across all modules
+- Modifies Compose Resources configuration
+- Updates Android Manifest package name
+- Handles iOS bundle identifier updates
+
+#### 2. Project Naming
+- Renames project-wide references
+- Updates application class names
+- Maintains consistency in capitalization and naming conventions
+
+#### 3. Module Management
+- Renames modules with new project prefix
+- Updates module references in Gradle files
+- Maintains correct module dependencies
+- Updates import statements across the project
+
+#### 4. Configuration Updates
+- Updates convention plugin IDs
+- Modifies run configurations
+- Updates build settings
+- Handles iOS-specific configurations
+
+#### 5. Code Updates
+- Renames files with project-specific prefixes
+- Updates package declarations and imports
+- Maintains typesafe accessors for Gradle
+
+### Important Notes
+
+1. **Backup**: The script creates backup files during execution (*.bak) and cleans them up after successful completion
+2. **Error Handling**: The script uses `set -e` to stop execution on any error
+3. **Platform Support**: Handles configurations for all supported platforms (Android, iOS, Desktop, Web)
+4. **Directory Structure**: Maintains the KMP project structure while updating references
+
+### Best Practices
+
+1. **Before Running the Script**
+   - Create a backup of your project
+   - Ensure you have the correct permissions
+   - Verify bash version compatibility
+
+2. **After Running the Script**
+   - Verify the changes in your IDE
+   - Run a test build for each platform
+   - Check if all module references are correctly updated
+
+3. **Common Issues**
+   - Package name formatting
+   - Module dependency resolution
+   - Platform-specific configuration updates
+
+## Development Guidelines
+
+### Adding New Features
+1. Create a new feature module in the `feature/` directory
+2. Follow the existing module structure
+3. Use shared components from `core/` modules
+4. Implement platform-specific code in respective modules
+
+### Shared Code Guidelines
+1. Use `expect/actual` declarations for platform-specific implementations
+2. Leverage Compose Multiplatform for UI components
+3. Keep business logic in shared modules
+4. Use KMP-compatible dependencies
+
+### Building and Running
+1. Use appropriate run configurations for each platform
+2. Ensure all required SDKs are installed
+3. Follow platform-specific build instructions
+
+### Project Structure
+```mermaid
+
+graph TD
+    A[Project Root] --> B[buildLogic]
+    A --> C[core]
+    A --> D[feature]
+    A --> E[Platform Modules]
+    C --> C1[common]
+    C --> C2[model]
+    C --> C3[data]
+    C --> C4[network]
+    C --> C5[domain]
+    C --> C6[ui]
+    C --> C7[designsystem]
+    C --> C8[datastore]
+    D --> D1[home]
+    D --> D2[profile]
+    D --> D3[settings]
+    E --> E1[mifospay-android]
+    E --> E2[mifospay-ios]
+    E --> E3[mifospay-desktop]
+    E --> E4[mifospay-web]
+    E --> E5[mifospay-shared]
+
+    subgraph Core Modules
+        C1
+        C2
+        C3
+        C4
+        C5
+        C6
+        C7
+        C8
+    end
+
+    subgraph Feature Modules
+        D1
+        D2
+        D3
+    end
+
+    subgraph Platform Implementation
+        E1
+        E2
+        E3
+        E4
+        E5
+    end
+```
+
+## Contributing
+1. Follow the project's coding standards
+2. Write tests for new features
+3. Document changes and additions
+4. Submit pull requests with clear descriptions
+
+## Troubleshooting
+1. Check build logs for errors
+2. Verify module dependencies
+3. Ensure correct SDK versions
+4. Check platform-specific configurations

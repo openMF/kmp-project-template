@@ -28,8 +28,8 @@ tasks=(
     "spotlessApply --no-configuration-cache"
     "dependencyGuardBaseline"
     "detekt"
-    ":mifospay-android:build"
-    ":mifospay-android:updateProdReleaseBadging"
+    ":mifos-android:build"
+    ":mifos-android:updateProdReleaseBadging"
 )
 
 for task in "${tasks[@]}"; do

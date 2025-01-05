@@ -70,12 +70,12 @@ update_plugin_ids() {
     fi
 
     # Rename package and imports in Kotlin files
-    echo "Renaming packages to $PACKAGE"
+    echo "🔄 Renaming packages to $PACKAGE"
     find ./ -type f -name "*.kt" -exec sed -i.bak "s/package org\.mifos/package $PACKAGE/g" {} \;
     find ./ -type f -name "*.kt" -exec sed -i.bak "s/import org\.mifos/import $PACKAGE/g" {} \;
 
     # Update Gradle files
-    echo "Updating Gradle files"
+    echo "🔄 Updating Gradle files"
     find ./ -type f -name "*.gradle.kts" -exec sed -i.bak "s/org\.mifos/$PACKAGE/g" {} \;
     # Then update only the root settings.gradle.kts file
     sed -i.bak "s/rootProject\.name = \".*\"/rootProject.name = \"$PROJECT_NAME\"/g" ./settings.gradle.kts
@@ -117,13 +117,7 @@ update_compose_resources() {
             fi
             ((count++))
         fi
-    done < <(find ./ -type f -name "*.gradle.kts")
-
-    if [ $count -eq 0 ]; then
-        echo "ℹ️ No files found containing Compose Resources configuration"
-    else
-        echo "✅ Updated packageOfResClass in $count file(s)"
-    fi
+    done
 }
 
 # Function to rename and update application class
@@ -192,7 +186,7 @@ process_module_dirs() {
 
 process_module_content() {
     # Process all modules
-    echo "Processing module contents..."
+    echo "🔄 Processing module contents..."
     for module in $(find . -type f -name "build.gradle.kts" -not -path "*/build/*" -exec dirname {} \;)
     do
         echo "Found module: $module"
@@ -326,6 +320,8 @@ cleanup_backup_files() {
     print_section "Final Cleanup"
     echo "🧹 Cleaning up backup files..."
     find . -name "*.bak" -type f -delete
+    echo "🧹 Cleaning up .git directory..."
+    rm -rf .git/
     echo "✅ Backup files cleaned up successfully"
 }
 

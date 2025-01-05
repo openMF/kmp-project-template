@@ -9,7 +9,7 @@
     See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->
 <resources>
-    <string name="app_name">Mifos App Template</string>
+    <string name="app_name">App Template</string>
     <string name="home">Home</string>
     <string name="profile">Profile</string>
     <string name="settings">Settings</string>

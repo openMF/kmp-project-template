@@ -84,4 +84,5 @@ android {
 compose.resources {
     publicResClass = true
     generateResClass = always
+    packageOfResClass = "org.mifos.shared.generated.resources"
 }

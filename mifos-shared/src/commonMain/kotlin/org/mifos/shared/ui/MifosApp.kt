@@ -47,8 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import kmp_project_template.mifos_shared.generated.resources.Res
-import kmp_project_template.mifos_shared.generated.resources.not_connected
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.core.data.utils.NetworkMonitor
 import org.mifos.core.data.utils.TimeZoneMonitor
@@ -59,6 +57,8 @@ import org.mifos.core.designsystem.component.MifosNavigationRailItem
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.feature.settings.navigateToNotification
 import org.mifos.feature.settings.navigateToSettings
+import org.mifos.shared.generated.resources.Res
+import org.mifos.shared.generated.resources.not_connected
 import org.mifos.shared.navigation.MifosNavHost
 import org.mifos.shared.utils.TopLevelDestination
 

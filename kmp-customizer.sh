@@ -52,26 +52,6 @@ escape_dots() {
 # Escape dots in package for sed commands
 ESCAPED_PACKAGE=$(escape_dots "$PACKAGE")
 
-# Function to update Compose Resources package
-update_compose_resources() {
-    print_section "Updating Compose Resources Configuration"
-
-    local count=0
-    while IFS= read -r file; do
-        if grep -q "packageOfResClass.*org\.mifos" "$file"; then
-            echo "📦 Processing: $file"
-            sed -i.bak "s/packageOfResClass = \"org\.mifos\.designsystem\.generated\.resources\"/packageOfResClass = \"$ESCAPED_PACKAGE.designsystem.generated.resources\"/g" "$file"
-            ((count++))
-        fi
-    done < <(find ./ -type f -name "*.gradle.kts")
-
-    if [ $count -eq 0 ]; then
-        echo "ℹ️ No files found containing Compose Resources configuration"
-    else
-        echo "✅ Updated packageOfResClass in $count file(s)"
-    fi
-}
-
 # Function to update plugin IDs
 update_plugin_ids() {
     print_section "Updating Plugin IDs"
@@ -88,20 +68,18 @@ update_plugin_ids() {
         echo "🔄 Updating plugin applications in plugin classes..."
         find ./build-logic -type f -name "*.kt" -exec sed -i.bak "s/apply(\"org\.mifos\./apply(\"$ESCAPED_PACKAGE./g" {} \;
     fi
-}
 
-# Function to update iOS configurations
-update_ios_config() {
-    print_section "Updating iOS Configuration"
+    # Rename package and imports in Kotlin files
+    echo "Renaming packages to $PACKAGE"
+    find ./ -type f -name "*.kt" -exec sed -i.bak "s/package org\.mifos/package $PACKAGE/g" {} \;
+    find ./ -type f -name "*.kt" -exec sed -i.bak "s/import org\.mifos/import $PACKAGE/g" {} \;
 
-    if [ -d "mifos-ios" ]; then
-        echo "🔄 Updating iOS project files..."
-        find ./mifos-ios -type f -name "*.xcodeproj" -exec sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = .*$/PRODUCT_BUNDLE_IDENTIFIER = $PACKAGE;/g" {} \;
-        find ./mifos-ios -type f -name "*.plist" -exec sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = .*$/PRODUCT_BUNDLE_IDENTIFIER = $PACKAGE;/g" {} \;
-        echo "✅ iOS configuration updated"
-    else
-        echo "ℹ️ No iOS directory found, skipping iOS configuration"
-    fi
+    # Update Gradle files
+    echo "Updating Gradle files"
+    find ./ -type f -name "*.gradle.kts" -exec sed -i.bak "s/org\.mifos/$PACKAGE/g" {} \;
+    # Then update only the root settings.gradle.kts file
+    sed -i.bak "s/rootProject\.name = \".*\"/rootProject.name = \"$PROJECT_NAME\"/g" ./settings.gradle.kts
+
 }
 
 # Function to update specific plugin patterns
@@ -123,6 +101,57 @@ update_plugin_patterns() {
         find ./ -type f -name "*.versions.toml" -exec sed -i.bak "s/org\.mifos\.$plugin_type/$ESCAPED_PACKAGE.$plugin_type/g" {} \;
         find ./ -type f -name "*.gradle.kts" -exec sed -i.bak "s/org\.mifos\.$plugin_type/$ESCAPED_PACKAGE.$plugin_type/g" {} \;
     done
+}
+
+update_compose_resources() {
+    print_section "Updating Compose Resources Configuration"
+
+    local count=0
+    while IFS= read -r file; do
+        if grep -q "packageOfResClass.*org\.mifos" "$file"; then
+            echo "📦 Processing: $file"
+            echo "Debug: Attempting to update $file with package $ESCAPED_PACKAGE"
+            if ! sed -i.bak "s/packageOfResClass = \"org\.mifos\.\([^\"]*\)\"/packageOfResClass = \"$ESCAPED_PACKAGE.\1\"/g" "$file"; then
+                echo "Error: sed command failed for $file"
+                return 1
+            fi
+            ((count++))
+        fi
+    done < <(find ./ -type f -name "*.gradle.kts")
+
+    if [ $count -eq 0 ]; then
+        echo "ℹ️ No files found containing Compose Resources configuration"
+    else
+        echo "✅ Updated packageOfResClass in $count file(s)"
+    fi
+}
+
+# Function to rename and update application class
+update_application_class() {
+    print_section "Updating Application Class"
+
+    if [[ $APPNAME != MyApplication ]]; then
+        echo "📝 Renaming application to $APPNAME"
+        find ./ -type f \( -name "*.kt" -or -name "*.gradle.kts" -or -name "*.xml" \) -exec sed -i.bak "s/MifosApp/$APPNAME/g" {} \;
+        find ./ -name "MifosApp.kt" | sed "p;s/MifosApp/$APPNAME/" | tr '\n' '\0' | xargs -0 -n 2 mv 2>/dev/null || true
+        echo "✅ Application class renamed successfully"
+    else
+        echo "ℹ️ Skipping application rename as name is default"
+    fi
+}
+
+# Function to update iOS configurations
+update_ios_config() {
+    print_section "Updating iOS Configuration"
+
+    if [ -d "mifos-ios" ]; then
+        echo "🔄 Updating iOS project files..."
+        find ./mifos-ios -type f -name "*.xcodeproj" -exec sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = .*$/PRODUCT_BUNDLE_IDENTIFIER = $PACKAGE;/g" {} \;
+        find ./mifos-ios -type f -name "*.plist" -exec sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = .*$/PRODUCT_BUNDLE_IDENTIFIER = $PACKAGE;/g" {} \;
+        echo "✅ iOS configuration updated"
+    else
+        echo "ℹ️ No iOS directory found, skipping iOS configuration"
+    fi
 }
 
 # Function to process module directories
@@ -175,19 +204,25 @@ process_module_content() {
 rename_files() {
     echo "🔄 Renaming files with Mifos prefix..."
     find . -type f -name "Mifos*.kt" | while read -r file; do
-      local newfile=$(echo "$file" | sed "s/Mifos/$PROJECT_NAME_CAPITALIZED/")
+      local newfile=$(echo "$file" | sed "s/MifosApp/$PROJECT_NAME_CAPITALIZED/g; s/Mifos/$PROJECT_NAME_CAPITALIZED/g")
       echo "📝 Renaming $file to $newfile"
       mv "$file" "$newfile"
     done
 
     # Update code elements that start with Mifos
     echo "🔄 Updating code elements with Mifos prefix..."
-    find ./ -type f -name "*.kt" -exec sed -i.bak "s/Mifos\([A-Z][a-zA-Z0-9]*\)/$PROJECT_NAME_CAPITALIZED\1/g" {} \;
-    find ./ -type f -name "*.kt" -exec sed -i.bak "s/mifos\([A-Z][a-zA-Z0-9]*\)/${PROJECT_NAME_LOWERCASE}\1/g" {} \;
+    find ./ -type f -name "*.kt" -exec sed -i.bak \
+        -e "s/MifosApp\([^A-Za-z0-9]\|$\)/$PROJECT_NAME_CAPITALIZED\1/g" \
+        -e "s/Mifos\([A-Z][a-zA-Z0-9]*\)/$PROJECT_NAME_CAPITALIZED\1/g" {} \;
+    find ./ -type f -name "*.kt" -exec sed -i.bak \
+        -e "s/mifosApp\([^A-Za-z0-9]\|$\)/${PROJECT_NAME_LOWERCASE}\1/g" \
+        -e "s/mifos\([A-Z][a-zA-Z0-9]*\)/${PROJECT_NAME_LOWERCASE}\1/g" {} \;
 
     # Update references to renamed files in imports
     echo "🔄 Updating import statements..."
-    find ./ -type f -name "*.kt" -exec sed -i.bak "s/import.*Mifos/import $PACKAGE.$PROJECT_NAME_CAPITALIZED/g" {} \;
+    find ./ -type f -name "*.kt" -exec sed -i.bak \
+        -e "s/import.*\.MifosApp/import $PACKAGE.$PROJECT_NAME_CAPITALIZED/g" \
+        -e "s/import.*\.Mifos/import $PACKAGE.$PROJECT_NAME_CAPITALIZED/g" {} \;
 }
 
 # Function to update module names in settings.gradle.kts
@@ -286,20 +321,6 @@ update_android_manifest() {
     fi
 }
 
-# Function to rename and update application class
-update_application_class() {
-    print_section "Updating Application Class"
-
-    if [[ $APPNAME != MyApplication ]]; then
-        echo "📝 Renaming application to $APPNAME"
-        find ./ -type f \( -name "*.kt" -or -name "*.gradle.kts" -or -name "*.xml" \) -exec sed -i.bak "s/MifosApp/$APPNAME/g" {} \;
-        find ./ -name "MifosApp.kt" | sed "p;s/MifosApp/$APPNAME/" | tr '\n' '\0' | xargs -0 -n 2 mv 2>/dev/null || true
-        echo "✅ Application class renamed successfully"
-    else
-        echo "ℹ️ Skipping application rename as name is default"
-    fi
-}
-
 # Function to clean up backup files
 cleanup_backup_files() {
     print_section "Final Cleanup"
@@ -352,9 +373,14 @@ main() {
 
     # Core updates
     update_plugin_ids
-    update_compose_resources
-    update_ios_config
     update_plugin_patterns
+    update_compose_resources
+    update_application_class
+    update_ios_config
+
+    # Process modules
+    process_module_content
+    rename_files
 
     # Module updates
     update_gradle_settings
@@ -362,13 +388,8 @@ main() {
     update_application_module_references
     update_run_configurations
 
-    # Process modules
-    process_module_content
-    rename_files
-
     # Final updates
     update_android_manifest
-    update_application_class
     cleanup_backup_files
 
     # Print summary

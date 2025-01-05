@@ -16,17 +16,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
-import kmp_project_template.core.designsystem.generated.resources.Res
-import kmp_project_template.core.designsystem.generated.resources.outfit_black
-import kmp_project_template.core.designsystem.generated.resources.outfit_bold
-import kmp_project_template.core.designsystem.generated.resources.outfit_extra_bold
-import kmp_project_template.core.designsystem.generated.resources.outfit_extra_light
-import kmp_project_template.core.designsystem.generated.resources.outfit_light
-import kmp_project_template.core.designsystem.generated.resources.outfit_medium
-import kmp_project_template.core.designsystem.generated.resources.outfit_regular
-import kmp_project_template.core.designsystem.generated.resources.outfit_semi_bold
-import kmp_project_template.core.designsystem.generated.resources.outfit_thin
 import org.jetbrains.compose.resources.Font
+import org.mifos.designsystem.generated.resources.Res
+import org.mifos.designsystem.generated.resources.outfit_black
+import org.mifos.designsystem.generated.resources.outfit_bold
+import org.mifos.designsystem.generated.resources.outfit_extra_bold
+import org.mifos.designsystem.generated.resources.outfit_extra_light
+import org.mifos.designsystem.generated.resources.outfit_light
+import org.mifos.designsystem.generated.resources.outfit_medium
+import org.mifos.designsystem.generated.resources.outfit_regular
+import org.mifos.designsystem.generated.resources.outfit_semi_bold
+import org.mifos.designsystem.generated.resources.outfit_thin
 
 @Composable
 private fun fontFamily(): FontFamily {

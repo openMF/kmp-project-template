@@ -1,74 +1,130 @@
-# KMP Multi-Module Project Generator
+<div style="display: flex; align-items: center;">
+  <img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="Project Logo" width="150" style="margin-right: 20px;" />
+    <div align="center">
+      <h1>KMP Multi-Module Project Generator</h1>
+      <p>
+        🚀 Kickstart your Kotlin Multiplatform project with a fully-configured multi-module setup
+      </p>
+    </div> 
+
+</div>
+
+<div align="left">
+
+![Kotlin](https://img.shields.io/badge/Kotlin-7f52ff?style=flat-square&logo=kotlin&logoColor=white)
+![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin%20Multiplatform-4c8d3f?style=flat-square&logo=kotlin&logoColor=white)
+![Compose Multiplatform](https://img.shields.io/badge/Jetpack%20Compose%20Multiplatform-000000?style=flat-square&logo=android&logoColor=white)
+![badge-android](http://img.shields.io/badge/platform-android-6EDB8D.svg?style=flat)
+![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
+![badge-desktop](http://img.shields.io/badge/platform-desktop-DB413D.svg?style=flat)
+![badge-js](http://img.shields.io/badge/platform-web-FDD835.svg?style=flat)
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/blob/development/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/releases/)
+[![GitHub issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/issues/)
+[![Pr Checks](https://github.com/openMF/kmp-project-template/actions/workflows/pr-check.yml/badge.svg)](https://github.com/openMF/kmp-project-template/actions/workflows/pr-check.yml)
+[![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white)](https://join.slack.com/t/mifos/shared_invite/zt-2wvi9t82t-DuSBdqdQVOY9fsqsLjkKPA)
+[![Jira](https://img.shields.io/badge/jira-%230A0FFF.svg?style=flat-square&logo=jira&logoColor=white)](https://mifosforge.jira.com/jira/software/c/projects/MM/issues/?filter=allissues&jql=project%20%3D%20%22MM%22%20ORDER%20BY%20created%20DESC)
+
+</div>
 
 ## Overview
-The Kotlin Multiplatform Multi-module Template generator enables the development of cross-platform applications,
-supporting Android, iOS, Desktop, and Web. It allows for the sharing of business logic and UI components across these platforms
-while preserving native platform features and capabilities.
 
-## Project Structure
+The Kotlin Multiplatform Multi-module Project generator simplifies the development of cross-platform
+applications for Android, iOS, Desktop(JVM), and Web.
 
-### Core Modules
-- **buildLogic/**: Contains shared Gradle build configurations and custom plugins
-- **core/**: Contains the main business logic modules
-   - `analytics`: Analytics and logging utilities
-   - `common`: Shared code across all platforms
-   - `model`: Data models and structures
-   - `data`: Data layer implementation
-   - `network`: Network communication and API clients
-   - `domain`: Business logic and use cases
-   - `ui`: Shared UI components using Compose Multiplatform
-   - `designsystem`: App-wide design system components
-   - `datastore`: Local data storage implementation
+Unlike other **wizards** that only generate a basic **Kotlin Multiplatform (KMP) or Compose
+Multiplatform (CMP) library**
+and require users to configure their projects manually—a challenging and time-consuming process.
 
-### Feature Modules
-- **feature/**: Contains feature-specific modules
-   - `home`: Home screen and related functionality
-   - `profile`: User profile management
-   - `settings`: Application settings
+This generator streamlines the setup. By simply running the `customizer.sh` bash script
+with your desired **package and project name**, the template generates an **entire, fully-configured
+project in just 2 minutes**.
 
-### Platform-Specific Modules
-- **mifospay-android/**: Android application implementation
-- **mifospay-ios/**: iOS application implementation
-- **mifospay-desktop/**: Desktop application implementation
-- **mifospay-web/**: Web application implementation
-- **mifospay-shared/**: Shared Kotlin Multiplatform code
+The resulting project is ready to **run seamlessly across multiple platforms**, combining shared
+business logic and UI components with native platform capabilities.
 
-## Project Customization Script
+This template goes beyond the basics, offering a production-ready setup out of the box. It includes:
 
-### Overview
-The project includes a bash script (`customizer.sh`) that helps in customizing the project for different implementations. This script automates the process of renaming packages, updating configurations, and maintaining consistency across the project structure.
+- **Multi-module Structure:** Organized core, feature, and platform-specific modules for easy
+  development.
+- **Shared UI Components:** Compose Multiplatform for shared UI components across platforms.
+- **Dependency Management:** Gradle Kotlin DSL for dependency management and build scripts.
+- **Static Analysis Tools:** Pre-configured Detekt and Spotless for code quality and style
+  consistency.
+- **Git Hooks:** Automated checks to ensure high-quality commits.
+- **CI/CD Workflows:** GitHub Actions for KMP build and publish pipelines, complete with PR checks.
+- **Fastlane**: Automated deployment and release management for Android and iOS platforms.
+- **Run configurations:** for Android, iOS, Desktop, and Web platforms.
+- **Dynamic Versioning:** Automatic versioning and release notes generation for each platform.
+
+The generated project is ready to run seamlessly across multiple platforms, combining shared
+business logic and UI components with native platform capabilities.
+
+### Project Customization Script
+
+The project includes a bash script (`customizer.sh`) that helps in customizing the project for
+different implementations. This script automates the process of renaming packages, updating
+configurations, and maintaining consistency across the project structure.
 
 ### Prerequisites
+
 - Bash version 4 or higher
-- Unix-like environment (macOS, Linux)
+- Unix-like environment (macOS, Linux) or Git Bash on Windows
 
 ### Usage
 
-```bash
-bash customizer.sh <package-name> <project-name> [application-name]
-```
+1. **Download the project:** Clone or download the repository to your local machine.
+
+    ```bash
+    git clone <repository-url>
+    cd <project-folder>
+    ```
+
+    2. **Run the setup script:** Execute the customizer.sh script with your desired package and
+       project name.
+
+        ```bash
+        ./customizer.sh <package-name> <project-name> [application-name]
+        ```
+       Example:
+
+       ```bash
+       ./customizer.sh org.delta MyKMPApp
+       ```
+
+3. **Generated project:** The script will generate a fully-configured, multi-module KMP project in
+   just 2 minutes.
+
+4. **Run and develop:** Open the project in your favorite IDE (e.g., IntelliJ IDEA), and start
+   building your cross-platform application.
 
 #### Parameters
+
 - `package-name`: New package name (e.g., com.example.myapp)
 - `project-name`: New project name
 - `application-name`: (Optional) Custom application name (defaults to project-name)
 
+With this setup, you’re ready to develop and deploy your application on Android, iOS, Desktop, and
+Web with ease!
+
 #### Example
+
 ```bash
 bash customizer.sh com.example.myapp MyKMPApp
 ```
 
-## License and Copyright Updates
-
 ### Updating License and Copyright Information
 
-After running the customizer script to change package names and project structure, you'll need to update the license and copyright information across the project. This process involves:
+After running the customizer script to change package names and project structure, you'll need to
+update the license and copyright information across the project. This process involves:
 
 1. **Locate License Files**
     - Navigate to the `spotless` directory
     - Find the license header templates
     - Update the copyright year and organization information
-<br/><br/>  
+      <br/><br/>
 2. **Apply Changes**
     - Run the Spotless plugin to update all files:
       ```bash
@@ -77,80 +133,59 @@ After running the customizer script to change package names and project structur
     - This will automatically update the license headers in all source files
     - Verify the changes in a few files to ensure correct application
 
-### Script Features
-
-#### 1. Package Updates
-- Updates base package name across all modules
-- Modifies Compose Resources configuration
-- Updates Android Manifest package name
-- Handles iOS bundle identifier updates
-
-#### 2. Project Naming
-- Renames project-wide references
-- Updates application class names
-- Maintains consistency in capitalization and naming conventions
-
-#### 3. Module Management
-- Renames modules with new project prefix
-- Updates module references in Gradle files
-- Maintains correct module dependencies
-- Updates import statements across the project
-
-#### 4. Configuration Updates
-- Updates convention plugin IDs
-- Modifies run configurations
-- Updates build settings
-- Handles iOS-specific configurations
-
-#### 5. Code Updates
-- Renames files with project-specific prefixes
-- Updates package declarations and imports
-- Maintains typesafe accessors for Gradle
-
-### Important Notes
-
-1. **Backup**: The script creates backup files during execution (*.bak) and cleans them up after successful completion
-2. **Error Handling**: The script uses `set -e` to stop execution on any error
-3. **Platform Support**: Handles configurations for all supported platforms (Android, iOS, Desktop, Web)
-4. **Directory Structure**: Maintains the KMP project structure while updating references
-
-### Best Practices
-
-1. **Before Running the Script**
-   - Create a backup of your project
-   - Ensure you have the correct permissions
-   - Verify bash version compatibility
-
-2. **After Running the Script**
-   - Verify the changes in your IDE
-   - Run a test build for each platform
-   - Check if all module references are correctly updated
-
-3. **Common Issues**
-   - Package name formatting
-   - Module dependency resolution
-   - Platform-specific configuration updates
-
-## Development Guidelines
-
 ### Adding New Features
+
 1. Create a new feature module in the `feature/` directory
 2. Follow the existing module structure
 3. Use shared components from `core/` modules
 4. Implement platform-specific code in respective modules
 
 ### Shared Code Guidelines
+
 1. Use `expect/actual` declarations for platform-specific implementations
 2. Leverage Compose Multiplatform for UI components
 3. Keep business logic in shared modules
 4. Use KMP-compatible dependencies
 
 ### Building and Running
+
 1. Use appropriate run configurations for each platform
 2. Ensure all required SDKs are installed
 3. Follow platform-specific build instructions
 
 ### Project Structure
+
+### Core Modules
+
+- **buildLogic/**: Contains shared Gradle build configurations and custom plugins
+- **core/**: Contains the main business logic modules
+    - `analytics`: Analytics and logging utilities
+    - `common`: Shared code across all platforms
+    - `model`: Data models and structures
+    - `data`: Data layer implementation
+    - `network`: Network communication and API clients
+    - `domain`: Business logic and use cases
+    - `ui`: Shared UI components using Compose Multiplatform
+    - `designsystem`: App-wide design system components
+    - `datastore`: Local data storage implementation
+
+### Feature Modules
+
+- **feature/**: Contains feature-specific modules
+    - `home`: Home screen and related functionality
+    - `profile`: User profile management
+    - `settings`: Application settings
+
+### Platform-Specific Modules
+
+- **cmp-android/**: Android application implementation
+- **cmp-ios/**: iOS application implementation
+- **cmp-desktop/**: Desktop application implementation
+- **cmp-web/**: Web application implementation
+- **cmp-shared/**: Shared Kotlin Multiplatform code
+
+### Project Modules
+
 ```mermaid
 
 graph TD
@@ -169,11 +204,11 @@ graph TD
     D --> D1[home]
     D --> D2[profile]
     D --> D3[settings]
-    E --> E1[mifospay-android]
-    E --> E2[mifospay-ios]
-    E --> E3[mifospay-desktop]
-    E --> E4[mifospay-web]
-    E --> E5[mifospay-shared]
+    E --> E1[cmp-android]
+    E --> E2[cmp-ios]
+    E --> E3[cmp-desktop]
+    E --> E4[cmp-web]
+    E --> E5[cmp-shared]
 
     subgraph Core Modules
         C1
@@ -201,13 +236,15 @@ graph TD
     end
 ```
 
-## Contributing
+### Contributing
+
 1. Follow the project's coding standards
 2. Write tests for new features
 3. Document changes and additions
 4. Submit pull requests with clear descriptions
 
-## Troubleshooting
+### Troubleshooting
+
 1. Check build logs for errors
 2. Verify module dependencies
 3. Ensure correct SDK versions

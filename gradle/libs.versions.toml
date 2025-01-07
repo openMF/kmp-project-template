@@ -77,8 +77,8 @@ jbCoreBundle = "1.0.1"
 jbSavedState = "1.2.2"
 
 # Desktop Version
-packageName = "MifosAppTemplate"
-packageNamespace = "org.mifos.desktop"
+packageName = "DesktopApp"
+packageNamespace = "cmp.desktop.app"
 packageVersion = "1.0.0"
 
 [libraries]

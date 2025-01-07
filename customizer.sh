@@ -117,31 +117,37 @@ update_compose_resources() {
             fi
             ((count++))
         fi
-    done
+    done < <(find ./ -type f -name "*.gradle.kts")
+
+    if [ $count -eq 0 ]; then
+        echo "ℹ️ No files found containing Compose Resources configuration"
+    else
+        echo "✅ Updated packageOfResClass in $count file(s)"
+    fi
 }
 
 # Function to rename and update application class
-update_application_class() {
-    print_section "Updating Application Class"
-
-    if [[ $APPNAME != MyApplication ]]; then
-        echo "📝 Renaming application to $APPNAME"
-        find ./ -type f \( -name "*.kt" -or -name "*.gradle.kts" -or -name "*.xml" \) -exec sed -i.bak "s/MifosApp/$APPNAME/g" {} \;
-        find ./ -name "MifosApp.kt" | sed "p;s/MifosApp/$APPNAME/" | tr '\n' '\0' | xargs -0 -n 2 mv 2>/dev/null || true
-        echo "✅ Application class renamed successfully"
-    else
-        echo "ℹ️ Skipping application rename as name is default"
-    fi
-}
+#update_application_class() {
+#    print_section "Updating Application Class"
+#
+#    if [[ $APPNAME != MyApplication ]]; then
+#        echo "📝 Renaming application to $APPNAME"
+#        find ./ -type f \( -name "*.kt" -or -name "*.gradle.kts" -or -name "*.xml" \) -exec sed -i.bak "s/MifosApp/$APPNAME/g" {} \;
+#        find ./ -name "MifosApp.kt" | sed "p;s/MifosApp/$APPNAME/" | tr '\n' '\0' | xargs -0 -n 2 mv 2>/dev/null || true
+#        echo "✅ Application class renamed successfully"
+#    else
+#        echo "ℹ️ Skipping application rename as name is default"
+#    fi
+#}
 
 # Function to update iOS configurations
 update_ios_config() {
     print_section "Updating iOS Configuration"
 
-    if [ -d "mifos-ios" ]; then
+    if [ -d "cmp-ios" ]; then
         echo "🔄 Updating iOS project files..."
-        find ./mifos-ios -type f -name "*.xcodeproj" -exec sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = .*$/PRODUCT_BUNDLE_IDENTIFIER = $PACKAGE;/g" {} \;
-        find ./mifos-ios -type f -name "*.plist" -exec sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = .*$/PRODUCT_BUNDLE_IDENTIFIER = $PACKAGE;/g" {} \;
+        find ./cmp-ios -type f -name "*.xcodeproj" -exec sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = .*$/PRODUCT_BUNDLE_IDENTIFIER = $PACKAGE;/g" {} \;
+        find ./cmp-ios -type f -name "*.plist" -exec sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = .*$/PRODUCT_BUNDLE_IDENTIFIER = $PACKAGE;/g" {} \;
         echo "✅ iOS configuration updated"
     else
         echo "ℹ️ No iOS directory found, skipping iOS configuration"
@@ -219,101 +225,101 @@ rename_files() {
         -e "s/import.*\.Mifos/import $PACKAGE.$PROJECT_NAME_CAPITALIZED/g" {} \;
 }
 
-# Function to update module names in settings.gradle.kts
-update_gradle_settings() {
-    print_section "Updating Gradle Settings"
-    echo "🔄 Updating module names in settings.gradle.kts"
-    local modules=("shared" "android" "desktop" "web" "ios")
-
-    for module in "${modules[@]}"; do
-        sed -i.bak "s/include(\":mifos-$module\")/include(\":$PROJECT_NAME_LOWERCASE-$module\")/g" settings.gradle.kts
-        echo "✅ Updated module: mifos-$module → $PROJECT_NAME_LOWERCASE-$module"
-    done
-}
+## Function to update module names in settings.gradle.kts
+#update_gradle_settings() {
+#    print_section "Updating Gradle Settings"
+#    echo "🔄 Updating module names in settings.gradle.kts"
+#    local modules=("shared" "android" "desktop" "web" "ios")
+#
+#    for module in "${modules[@]}"; do
+#        sed -i.bak "s/include(\":mifos-$module\")/include(\":$PROJECT_NAME_LOWERCASE-$module\")/g" settings.gradle.kts
+#        echo "✅ Updated module: mifos-$module → $PROJECT_NAME_LOWERCASE-$module"
+#    done
+#}
 
 # Function to rename module directories
-rename_application_module_directories() {
-    print_section "Renaming Modules"
-    local modules=("shared" "android" "desktop" "web" "ios")
-
-    for module in "${modules[@]}"; do
-        if [ -d "mifos-$module" ]; then
-            echo "📁 Renaming mifos-$module to $PROJECT_NAME_LOWERCASE-$module"
-            mv "mifos-$module" "$PROJECT_NAME_LOWERCASE-$module"
-            echo "✅ Application Module directory renamed successfully"
-        else
-            echo "ℹ️ Application Module mifos-$module not found, skipping"
-        fi
-    done
-}
-
-# Function to update build.gradle.kts module references
-update_application_module_references() {
-    print_section "Updating Module References"
-
-    local old_modules=()
-    local new_modules=()
-    local modules=("shared" "android" "desktop" "web")
-
-    for module in "${modules[@]}"; do
-        old_modules+=("$(kebab_to_camel "mifos-$module")")
-        new_modules+=("$(kebab_to_camel "$PROJECT_NAME_LOWERCASE-$module")")
-    done
-
-    for i in "${!old_modules[@]}"; do
-        echo "🔄 Updating references: ${old_modules[$i]} → ${new_modules[$i]}"
-        find ./ -type f -name "*.gradle.kts" -exec sed -i.bak "s/projects.${old_modules[$i]}/projects.${new_modules[$i]}/g" {} \;
-    done
-
-    echo "✅ Module references updated successfully"
-}
-
-# Function to update run configurations
-update_run_configurations() {
-    print_section "Updating Run Configurations"
-
-    echo "🔄 Updating run configuration files..."
-
-    # Update references in XML files
-    local replacements=(
-        "s/name=\"mifos-/name=\"$PROJECT_NAME_LOWERCASE-/g"
-        "s/module name=\"[^\"]*\.mifos-/module name=\"$PROJECT_NAME_LOWERCASE\.$PROJECT_NAME_LOWERCASE-/g"
-        "s/kmp-project-template\.mifos-/$PROJECT_NAME_LOWERCASE\.$PROJECT_NAME_LOWERCASE-/g"
-        "s/:mifos-desktop/:$PROJECT_NAME_LOWERCASE-desktop/g"
-        "s/:mifos-web/:$PROJECT_NAME_LOWERCASE-web/g"
-        "s/value=\":mifos-desktop:/value=\":$PROJECT_NAME_LOWERCASE-desktop:/g"
-        "s/value=\":mifos-web:/value=\":$PROJECT_NAME_LOWERCASE-web:/g"
-    )
-
-    for replacement in "${replacements[@]}"; do
-        find .run -type f -name "*.xml" -exec sed -i.bak "$replacement" {} \;
-    done
-
-    # Rename configuration files
-    for config_file in .run/mifos-*.run.xml; do
-        if [ -f "$config_file" ]; then
-            new_config_file=$(echo "$config_file" | sed "s/mifos-/$PROJECT_NAME_LOWERCASE-/")
-            echo "📝 Renaming run configuration: $config_file → $new_config_file"
-            mv "$config_file" "$new_config_file"
-        fi
-    done
-
-    echo "✅ Run configurations updated successfully"
-}
-
-# Function to update Android manifest
-update_android_manifest() {
-    print_section "Updating Android Manifest"
-    local manifest_path="$PROJECT_NAME_LOWERCASE-android/src/main/AndroidManifest.xml"
-
-    if [ -f "$manifest_path" ]; then
-        echo "📝 Updating package name in Android Manifest"
-        sed -i.bak "s/package=\".*\"/package=\"$PACKAGE\"/" "$manifest_path"
-        echo "✅ Android Manifest updated successfully"
-    else
-        echo "ℹ️ Android Manifest not found at $manifest_path, skipping update"
-    fi
-}
+#rename_application_module_directories() {
+#    print_section "Renaming Modules"
+#    local modules=("shared" "android" "desktop" "web" "ios")
+#
+#    for module in "${modules[@]}"; do
+#        if [ -d "mifos-$module" ]; then
+#            echo "📁 Renaming mifos-$module to $PROJECT_NAME_LOWERCASE-$module"
+#            mv "mifos-$module" "$PROJECT_NAME_LOWERCASE-$module"
+#            echo "✅ Application Module directory renamed successfully"
+#        else
+#            echo "ℹ️ Application Module mifos-$module not found, skipping"
+#        fi
+#    done
+#}
+#
+## Function to update build.gradle.kts module references
+#update_application_module_references() {
+#    print_section "Updating Module References"
+#
+#    local old_modules=()
+#    local new_modules=()
+#    local modules=("shared" "android" "desktop" "web")
+#
+#    for module in "${modules[@]}"; do
+#        old_modules+=("$(kebab_to_camel "mifos-$module")")
+#        new_modules+=("$(kebab_to_camel "$PROJECT_NAME_LOWERCASE-$module")")
+#    done
+#
+#    for i in "${!old_modules[@]}"; do
+#        echo "🔄 Updating references: ${old_modules[$i]} → ${new_modules[$i]}"
+#        find ./ -type f -name "*.gradle.kts" -exec sed -i.bak "s/projects.${old_modules[$i]}/projects.${new_modules[$i]}/g" {} \;
+#    done
+#
+#    echo "✅ Module references updated successfully"
+#}
+#
+## Function to update run configurations
+#update_run_configurations() {
+#    print_section "Updating Run Configurations"
+#
+#    echo "🔄 Updating run configuration files..."
+#
+#    # Update references in XML files
+#    local replacements=(
+#        "s/name=\"mifos-/name=\"$PROJECT_NAME_LOWERCASE-/g"
+#        "s/module name=\"[^\"]*\.mifos-/module name=\"$PROJECT_NAME_LOWERCASE\.$PROJECT_NAME_LOWERCASE-/g"
+#        "s/kmp-project-template\.mifos-/$PROJECT_NAME_LOWERCASE\.$PROJECT_NAME_LOWERCASE-/g"
+#        "s/:mifos-desktop/:$PROJECT_NAME_LOWERCASE-desktop/g"
+#        "s/:mifos-web/:$PROJECT_NAME_LOWERCASE-web/g"
+#        "s/value=\":mifos-desktop:/value=\":$PROJECT_NAME_LOWERCASE-desktop:/g"
+#        "s/value=\":mifos-web:/value=\":$PROJECT_NAME_LOWERCASE-web:/g"
+#    )
+#
+#    for replacement in "${replacements[@]}"; do
+#        find .run -type f -name "*.xml" -exec sed -i.bak "$replacement" {} \;
+#    done
+#
+#    # Rename configuration files
+#    for config_file in .run/mifos-*.run.xml; do
+#        if [ -f "$config_file" ]; then
+#            new_config_file=$(echo "$config_file" | sed "s/mifos-/$PROJECT_NAME_LOWERCASE-/")
+#            echo "📝 Renaming run configuration: $config_file → $new_config_file"
+#            mv "$config_file" "$new_config_file"
+#        fi
+#    done
+#
+#    echo "✅ Run configurations updated successfully"
+#}
+#
+## Function to update Android manifest
+#update_android_manifest() {
+#    print_section "Updating Android Manifest"
+#    local manifest_path="$PROJECT_NAME_LOWERCASE-android/src/main/AndroidManifest.xml"
+#
+#    if [ -f "$manifest_path" ]; then
+#        echo "📝 Updating package name in Android Manifest"
+#        sed -i.bak "s/package=\".*\"/package=\"$PACKAGE\"/" "$manifest_path"
+#        echo "✅ Android Manifest updated successfully"
+#    else
+#        echo "ℹ️ Android Manifest not found at $manifest_path, skipping update"
+#    fi
+#}
 
 # Function to clean up backup files
 cleanup_backup_files() {
@@ -352,10 +358,6 @@ print_final_summary(){
     echo "   - Renamed Mifos-prefixed files to $PROJECT_NAME_CAPITALIZED"
     echo "   - Updated package declarations and imports"
     echo "   - Updated typesafe accessors:"
-    echo "     • projects.$NEW_CAMEL_SHARED"
-    echo "     • projects.$NEW_CAMEL_ANDROID"
-    echo "     • projects.$NEW_CAMEL_DESKTOP"
-    echo "     • projects.$NEW_CAMEL_WEB"
     echo
     echo "🎉 Project customization completed successfully!"
 }
@@ -371,7 +373,7 @@ main() {
     update_plugin_ids
     update_plugin_patterns
     update_compose_resources
-    update_application_class
+#    update_application_class
     update_ios_config
 
     # Process modules
@@ -379,10 +381,10 @@ main() {
     rename_files
 
     # Module updates
-    update_gradle_settings
-    rename_application_module_directories
-    update_application_module_references
-    update_run_configurations
+#    update_gradle_settings
+#    rename_application_module_directories
+#    update_application_module_references
+#    update_run_configurations
 
     # Final updates
     update_android_manifest

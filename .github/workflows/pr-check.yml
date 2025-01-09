@@ -88,3 +88,4 @@ jobs:
       desktop_package_name: 'mifos-desktop' # <-- Change Your Desktop Package Name
       web_package_name: 'mifos-web' # <-- Change Your Web Package Name
       ios_package_name: 'mifos-ios' # <-- Change Your iOS Package Name
+      build_ios: false # <-- Enable/Disable iOS Build

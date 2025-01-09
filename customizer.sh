@@ -117,7 +117,13 @@ update_compose_resources() {
             fi
             ((count++))
         fi
-    done
+    done < <(find ./ -type f -name "*.gradle.kts")
+
+    if [ $count -eq 0 ]; then
+        echo "ℹ️ No files found containing Compose Resources configuration"
+    else
+        echo "✅ Updated packageOfResClass in $count file(s)"
+    fi
 }
 
 # Function to rename and update application class

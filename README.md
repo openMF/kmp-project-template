@@ -1,5 +1,5 @@
-<div style="display: flex; align-items: center;">
-  <img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="Project Logo" width="150" style="margin-right: 20px;" />
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="Project Logo" width="150" style="margin-right: 20px;" />
     <div align="center">
       <h1>KMP Multi-Module Project Generator</h1>
       <p>
@@ -9,7 +9,7 @@
 
 </div>
 
-<div align="left">
+<div align="center">
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-7f52ff?style=flat-square&logo=kotlin&logoColor=white)
 ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin%20Multiplatform-4c8d3f?style=flat-square&logo=kotlin&logoColor=white)

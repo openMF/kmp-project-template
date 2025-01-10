@@ -17,11 +17,13 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val packageNameSpace: String = libs.versions.androidPackageNamespace.get()
+
 android {
-    namespace = "cmp.android.app"
+    namespace = packageNameSpace
 
     defaultConfig {
-        applicationId = "cmp.android.app"
+        applicationId = packageNameSpace
         versionName = System.getenv("VERSION") ?: project.dynamicVersion
         versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
         vectorDrawables.useSupportLibrary = true
@@ -31,9 +33,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file(System.getenv("KEYSTORE_PATH") ?: "../keystores/release_keystore.keystore")
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "StorePassword"
-            keyAlias = System.getenv("KEYSTORE_ALIAS") ?: "Key"
-            keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: "KeyPassword"
+            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "Wizard@123"
+            keyAlias = System.getenv("KEYSTORE_ALIAS") ?: "kmp-project-template"
+            keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: "Wizard@123"
             enableV1Signing = true
             enableV2Signing = true
         }

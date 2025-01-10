@@ -1,19 +1,15 @@
-<div style="display: flex; align-items: center;">
-  <img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="Project Logo" width="150" style="margin-right: 20px;" />
-    <div align="center">
-      <h1>KMP Multi-Module Project Generator</h1>
-      <p>
-        🚀 Kickstart your Kotlin Multiplatform project with a fully-configured multi-module setup
-      </p>
-    </div> 
+<div align="center">
 
-</div>
+<img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="Project Logo" width="150" style="margin-right: 20px;" />
 
-<div align="left">
+<h1>KMP Multi-Module Project Generator</h1>
+
+<p> 🚀 Kickstart your Kotlin Multiplatform project with a fully-configured multi-module setup</p>
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-7f52ff?style=flat-square&logo=kotlin&logoColor=white)
 ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin%20Multiplatform-4c8d3f?style=flat-square&logo=kotlin&logoColor=white)
 ![Compose Multiplatform](https://img.shields.io/badge/Jetpack%20Compose%20Multiplatform-000000?style=flat-square&logo=android&logoColor=white)
+
 ![badge-android](http://img.shields.io/badge/platform-android-6EDB8D.svg?style=flat)
 ![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
 ![badge-desktop](http://img.shields.io/badge/platform-desktop-DB413D.svg?style=flat)
@@ -23,6 +19,7 @@
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/blob/development/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/releases/)
 [![GitHub issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/issues/)
+
 [![Pr Checks](https://github.com/openMF/kmp-project-template/actions/workflows/pr-check.yml/badge.svg)](https://github.com/openMF/kmp-project-template/actions/workflows/pr-check.yml)
 [![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white)](https://join.slack.com/t/mifos/shared_invite/zt-2wvi9t82t-DuSBdqdQVOY9fsqsLjkKPA)
 [![Jira](https://img.shields.io/badge/jira-%230A0FFF.svg?style=flat-square&logo=jira&logoColor=white)](https://mifosforge.jira.com/jira/software/c/projects/MM/issues/?filter=allissues&jql=project%20%3D%20%22MM%22%20ORDER%20BY%20created%20DESC)
@@ -30,6 +27,13 @@
 </div>
 
 ## Overview
+
+> \[!Note]
+>
+> This branch is designed for partial customized projects. Running the customizer.sh script doesn't rename any application module, instead it'll change all `core` and `feature` module namespaces, packages, and other related configurations accordingly.
+> and change your android and desktop application id and namespace in `libs.versions.toml` file.
+> 
+> For full customization, please use the `full-customizable` branch instead.
 
 The Kotlin Multiplatform Multi-module Project generator simplifies the development of cross-platform
 applications for Android, iOS, Desktop(JVM), and Web.
@@ -40,7 +44,7 @@ and require users to configure their projects manually—a challenging and time-
 
 This generator streamlines the setup. By simply running the `customizer.sh` bash script
 with your desired **package and project name**, the template generates an **entire, fully-configured
-project in just 2 minutes**.
+project in just few minutes**.
 
 The resulting project is ready to **run seamlessly across multiple platforms**, combining shared
 business logic and UI components with native platform capabilities.
@@ -82,17 +86,17 @@ configurations, and maintaining consistency across the project structure.
     cd <project-folder>
     ```
 
-    2. **Run the setup script:** Execute the customizer.sh script with your desired package and
-       project name.
+2. **Run the setup script:** Execute the customizer.sh script with your desired package and
+   project name.
 
-        ```bash
-        ./customizer.sh <package-name> <project-name> [application-name]
-        ```
-       Example:
+    ```bash
+    ./customizer.sh <package-name> <project-name> [application-name]
+    ```
+   Example:
 
-       ```bash
-       ./customizer.sh org.delta MyKMPApp
-       ```
+   ```bash
+   ./customizer.sh org.delta MyKMPApp
+   ```
 
 3. **Generated project:** The script will generate a fully-configured, multi-module KMP project in
    just 2 minutes.
@@ -105,15 +109,6 @@ configurations, and maintaining consistency across the project structure.
 - `package-name`: New package name (e.g., com.example.myapp)
 - `project-name`: New project name
 - `application-name`: (Optional) Custom application name (defaults to project-name)
-
-With this setup, you’re ready to develop and deploy your application on Android, iOS, Desktop, and
-Web with ease!
-
-#### Example
-
-```bash
-bash customizer.sh com.example.myapp MyKMPApp
-```
 
 ### Updating License and Copyright Information
 

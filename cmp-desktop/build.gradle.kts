@@ -37,9 +37,9 @@ kotlin {
     }
 }
 
-val appName: String = libs.versions.packageName.get()
-val packageNameSpace: String = libs.versions.packageNamespace.get()
-val appVersion: String = libs.versions.packageVersion.get()
+val appName: String = libs.versions.desktopPackageName.get()
+val packageNameSpace: String = libs.versions.desktopPackageNamespace.get()
+val appVersion: String = libs.versions.desktopPackageVersion.get()
 
 compose.desktop {
     application {

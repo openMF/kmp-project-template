@@ -77,9 +77,14 @@ jbCoreBundle = "1.0.1"
 jbSavedState = "1.2.2"
 
 # Desktop Version
-packageName = "MifosAppTemplate"
-packageNamespace = "org.mifos.desktop"
-packageVersion = "1.0.0"
+desktopPackageName = "DesktopApp"
+desktopPackageNamespace = "cmp.desktop.app"
+desktopPackageVersion = "1.0.0"
+
+# Android Version
+androidPackageName = "AndroidApp"
+androidPackageNamespace = "cmp.android.app"
+androidPackageVersion = "1.0.0"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }

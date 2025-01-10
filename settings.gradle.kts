@@ -35,10 +35,10 @@ rootProject.name = "kmp-project-template"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include(":mifos-shared")
-include(":mifos-android")
-include(":mifos-desktop")
-include(":mifos-web")
+include(":cmp-shared")
+include(":cmp-android")
+include(":cmp-desktop")
+include(":cmp-web")
 
 include(":core:data")
 include(":core:domain")

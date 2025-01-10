@@ -64,10 +64,10 @@ on:
   # Allow manual triggering of the workflow
   workflow_dispatch:
   # Schedule the workflow to run weekly
-  schedule:
-    # Runs at 04:00 UTC every Sunday
-    # Cron syntax: minute hour day-of-month month day-of-week
-    - cron: '0 4 * * 0'
+#  schedule:
+#    # Runs at 04:00 UTC every Sunday
+#    # Cron syntax: minute hour day-of-month month day-of-week
+#    - cron: '0 4 * * 0'
 
 concurrency:
   group: "weekly-release"
@@ -107,7 +107,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'multi-platform-build-and-publish.yml',
-              ref: 'dev', 
+              ref: 'full-customizable', 
               inputs: {
                 "release_type": "beta",
               },

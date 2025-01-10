@@ -14,6 +14,7 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-7f52ff?style=flat-square&logo=kotlin&logoColor=white)
 ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin%20Multiplatform-4c8d3f?style=flat-square&logo=kotlin&logoColor=white)
 ![Compose Multiplatform](https://img.shields.io/badge/Jetpack%20Compose%20Multiplatform-000000?style=flat-square&logo=android&logoColor=white)
+
 ![badge-android](http://img.shields.io/badge/platform-android-6EDB8D.svg?style=flat)
 ![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
 ![badge-desktop](http://img.shields.io/badge/platform-desktop-DB413D.svg?style=flat)
@@ -23,6 +24,7 @@
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/blob/development/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/releases/)
 [![GitHub issues](https://img.shields.io/github/issues/Naereen/StrapDown.js.svg)](https://github.com/openMF/kmp-project-template/issues/)
+
 [![Pr Checks](https://github.com/openMF/kmp-project-template/actions/workflows/pr-check.yml/badge.svg)](https://github.com/openMF/kmp-project-template/actions/workflows/pr-check.yml)
 [![Slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=slack&logoColor=white)](https://join.slack.com/t/mifos/shared_invite/zt-2wvi9t82t-DuSBdqdQVOY9fsqsLjkKPA)
 [![Jira](https://img.shields.io/badge/jira-%230A0FFF.svg?style=flat-square&logo=jira&logoColor=white)](https://mifosforge.jira.com/jira/software/c/projects/MM/issues/?filter=allissues&jql=project%20%3D%20%22MM%22%20ORDER%20BY%20created%20DESC)
@@ -31,9 +33,11 @@
 
 > \[!Note]
 >
-> This branch is designed for fully customized projects. Running the customizer.sh script will rename all application module prefixes (e.g., mifos-) with your project name and update the namespaces, packages, and other related configurations accordingly.
+> This branch is designed for fully customized projects. Running the customizer.sh script will
+> rename all application module prefixes (e.g., mifos-) with your project name and update the
+> namespaces, packages, and other related configurations accordingly.
 >
-> For partial customization, please use the `dev` branch instead.
+> For partial customization, please use the [dev](https://github.com/openMF/kmp-project-template/tree/dev) branch instead.
 
 > **For Example:**
 >
@@ -95,17 +99,17 @@ configurations, and maintaining consistency across the project structure.
     cd <project-folder>
     ```
 
-    2. **Run the setup script:** Execute the customizer.sh script with your desired package and
-       project name.
+2. **Run the setup script:** Execute the customizer.sh script with your desired package and
+   project name.
 
-        ```bash
-        ./customizer.sh <package-name> <project-name> [application-name]
-        ```
-       Example:
+    ```bash
+    ./customizer.sh <package-name> <project-name> [application-name]
+    ```
+   Example:
 
-       ```bash
-       ./customizer.sh org.delta MyKMPApp
-       ```
+   ```bash
+   ./customizer.sh org.delta MyKMPApp
+   ```
 
 3. **Generated project:** The script will generate a fully-configured, multi-module KMP project in
    just 2 minutes.

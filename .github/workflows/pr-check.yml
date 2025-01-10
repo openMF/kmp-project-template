@@ -68,7 +68,8 @@ name: PR Checks
 on:
   push:
     branches: [ dev ]  # Runs on pushes to dev branch
-  pull_request:       # Runs on all pull requests
+  pull_request:
+    branches: [ dev ]  # Runs on pushes to dev branch
 
 # Concurrency settings to prevent multiple simultaneous workflow runs
 concurrency:

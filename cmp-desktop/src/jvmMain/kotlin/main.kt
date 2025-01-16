@@ -29,6 +29,7 @@ fun main() {
             state = windowState,
             title = "MifosAppTemplate",
         ) {
+            // Set the content of the window.
             SharedApp()
         }
     }

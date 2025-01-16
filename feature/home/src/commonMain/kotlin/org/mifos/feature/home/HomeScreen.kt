@@ -20,6 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import org.mifos.core.designsystem.component.MifosScaffold
 
+/**
+ * Home Screen composable.
+ * @param modifier Modifier
+ * @return Composable
+ */
 @Composable
 internal fun HomeScreen(modifier: Modifier = Modifier) {
     HomeScreenContent(
@@ -27,6 +32,12 @@ internal fun HomeScreen(modifier: Modifier = Modifier) {
     )
 }
 
+/**
+ * Home Screen content.
+ *
+ * @param modifier Modifier
+ * @return Composable
+ */
 @Composable
 internal fun HomeScreenContent(modifier: Modifier) {
     MifosScaffold(modifier = modifier) {

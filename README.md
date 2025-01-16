@@ -112,6 +112,37 @@ The repository includes a GitHub workflow (`sync-cmp-dirs.yml`) that:
 - Creates pull requests for review when changes are detected
 - Includes detailed change logs in PR description
 
+#### Required Workflow Permissions Setup
+1. Go to your repository's **Settings**
+2. Navigate to **Actions** > **General** in the left sidebar
+3. Scroll down to **Workflow permissions**
+4. Enable the following permissions:
+  - ✅ Select "**Read and write permissions**"
+  - ✅ Check "**Allow GitHub Actions to create and approve pull requests**"
+5. Click "**Save**" to apply the changes
+
+Without these permissions, the sync workflow won't be able to create pull requests automatically. for more information, see [GitHub Docs](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
+
+To enable the permissions, navigate to repository `settings --> Actions --> General --> Workflow Permissions and enable the required permissions`.
+
+![Workflow Permissions](https://github.com/user-attachments/assets/ca16a700-8838-4d6f-9ac3-c681107a2ce0)
+
+## 🔄 Staying in Sync with Upstream
+
+### Manual Sync
+1. Use the provided `sync-cmp-dirs.sh` script to sync specific CMP directories
+2. Review changes before committing
+3. Push changes to your repository
+
+### Automated Sync
+1. Ensure workflow permissions are properly configured (see above)
+2. The GitHub workflow automatically syncs directories weekly
+3. Review and merge the generated pull requests
+4. Manual sync can be triggered from GitHub Actions tab
+
+[Rest of the previous content remains the same]
+
+
 ## 🚀 Quick Start
 
 ### Prerequisites

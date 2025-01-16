@@ -46,6 +46,10 @@ class MainActivity : ComponentActivity() {
 
         ShareUtils.setActivityProvider { return@setActivityProvider this }
 
+        /**
+         * Set the content view of the activity.
+         * @see setContent
+         */
         setContent {
             SharedApp(
                 networkMonitor = networkMonitor,

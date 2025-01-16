@@ -17,6 +17,14 @@ import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
+/**
+ * This module provides the default dispatchers for the application.
+ * The default dispatcher is used for all coroutines that are launched in the application.
+ * The IO dispatcher is used for all coroutines that perform IO operations.
+ * The Unconfined dispatcher is used for all coroutines that are not bound to any specific thread.
+ * The ApplicationScope is used to launch coroutines that are bound to the lifecycle of the application.
+ *
+ */
 enum class AppDispatchers {
     Default,
     IO,

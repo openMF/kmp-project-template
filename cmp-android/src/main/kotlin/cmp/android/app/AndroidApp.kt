@@ -15,10 +15,18 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 
+/**
+ * Android application class.
+ * This class is used to initialize Koin modules.
+ *
+ * @constructor Create empty Android app
+ * @see Application
+ */
 class AndroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // Start Koin
         startKoin {
             androidContext(this@AndroidApp)
             androidLogger()

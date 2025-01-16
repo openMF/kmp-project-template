@@ -21,10 +21,21 @@ import org.mifos.core.data.utils.NetworkMonitor
 import org.mifos.core.data.utils.TimeZoneMonitor
 import org.mifos.core.ui.utils.ShareUtils
 
+/**
+ * Main activity class.
+ * This class is used to set the content view of the activity.
+ *
+ * @constructor Create empty Main activity
+ * @see ComponentActivity
+ */
 class MainActivity : ComponentActivity() {
     private val networkMonitor: NetworkMonitor by inject()
     private val timeZoneMonitor: TimeZoneMonitor by inject()
 
+    /**
+     * Called when the activity is starting.
+     * This is where most initialization should go: calling [setContentView(int)] to inflate the activity's UI,
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

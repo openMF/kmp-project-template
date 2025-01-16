@@ -14,6 +14,12 @@ import androidx.compose.ui.window.rememberWindowState
 import cmp.shared.SharedApp
 import cmp.shared.di.initKoin
 
+/**
+ * Main function.
+ * This function is used to start the application.
+ * @see application
+ * @see rememberWindowState
+ */
 fun main() {
     application {
         initKoin()

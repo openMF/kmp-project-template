@@ -5,19 +5,22 @@ import org.jetbrains.skiko.wasm.onWasmReady
 import cmp.shared.SharedApp
 import cmp.shared.di.initKoin
 
-/**
- * Main function.
- * This function is used to start the application.
- * @see ComposeViewport
- * @see SharedApp
+/*
+ * The entry point of the WebAssembly Compose application.
+ *
+ * 1. Initializes the Koin dependency injection framework to set up dependencies.
+ * 2. Waits for the WebAssembly environment to be ready using `onWasmReady`.
+ * 3. Creates a Compose viewport linked to the document body, where the UI is rendered.
+ * 4. Invokes the `SharedApp` composable, which serves as the root of the app's UI.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    initKoin()
+
+    initKoin() // Set up Koin for dependency injection.
 
     onWasmReady {
         ComposeViewport(document.body!!) {
-            SharedApp()
+            SharedApp() // Render the root composable of the application.
         }
     }
 }

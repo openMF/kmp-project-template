@@ -62,4 +62,4 @@ jobs:
     uses: openMF/mifos-mobile-github-actions/.github/workflows/build-and-deploy-site.yaml@main
     secrets: inherit
     with:
-      web_package_name: 'mifos-web' # <-- Change with your web package name
+      web_package_name: 'cmp-web' # <-- Change with your web package name

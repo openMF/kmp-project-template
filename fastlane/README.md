@@ -31,34 +31,42 @@ Assemble debug APKs.
 
 Assemble Release APK
 
-### android bundlePlayStoreRelease
+### android bundleReleaseApks
 
 ```sh
-[bundle exec] fastlane android bundlePlayStoreRelease
+[bundle exec] fastlane android bundleReleaseApks
 ```
 
-Bundle Play Store release
+Bundle Release APK
 
-### android deploy_on_firebase
+### android deployReleaseApkOnFirebase
 
 ```sh
-[bundle exec] fastlane android deploy_on_firebase
+[bundle exec] fastlane android deployReleaseApkOnFirebase
 ```
 
-Publish Release Play Store artifacts to Firebase App Distribution
+Publish Release Artifacts to Firebase App Distribution
 
-### android deploy_internal
+### android deployDemoApkOnFirebase
 
 ```sh
-[bundle exec] fastlane android deploy_internal
+[bundle exec] fastlane android deployDemoApkOnFirebase
+```
+
+Publish Demo Artifacts to Firebase App Distribution
+
+### android deployInternal
+
+```sh
+[bundle exec] fastlane android deployInternal
 ```
 
 Deploy internal tracks to Google Play
 
-### android promote_to_beta
+### android promoteToBeta
 
 ```sh
-[bundle exec] fastlane android promote_to_beta
+[bundle exec] fastlane android promoteToBeta
 ```
 
 Promote internal tracks to beta on Google Play
@@ -77,15 +85,23 @@ Promote beta tracks to production on Google Play
 [bundle exec] fastlane android generateVersion
 ```
 
-Generate Version
+Generate Version for different platforms
 
-### android generateReleaseNotes
+### android generateReleaseNote
 
 ```sh
-[bundle exec] fastlane android generateReleaseNotes
+[bundle exec] fastlane android generateReleaseNote
 ```
 
 Generate release notes
+
+### android generateFullReleaseNote
+
+```sh
+[bundle exec] fastlane android generateFullReleaseNote
+```
+
+Generate release notes from specified tag or latest release tag
 
 ----
 
@@ -116,10 +132,10 @@ Build iOS application
 
 Upload iOS application to Firebase App Distribution
 
-### ios generateReleaseNotes
+### ios generateReleaseNote
 
 ```sh
-[bundle exec] fastlane ios generateReleaseNotes
+[bundle exec] fastlane ios generateReleaseNote
 ```
 
 Generate release notes

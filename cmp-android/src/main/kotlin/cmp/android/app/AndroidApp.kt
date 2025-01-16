@@ -28,10 +28,9 @@ class AndroidApp : Application() {
         super.onCreate()
 
         startKoin {
-            androidContext(this@AndroidApp)  // Provides the Android app context
-            androidLogger()  // Enables Koin's logging for debugging
-            modules(KoinModules.allModules)  // Loads the defined Koin modules
+            androidContext(this@AndroidApp) // Provides the Android app context
+            androidLogger() // Enables Koin's logging for debugging
+            modules(KoinModules.allModules) // Loads the defined Koin modules
         }
     }
 }
-

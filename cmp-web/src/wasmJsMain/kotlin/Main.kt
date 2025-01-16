@@ -4,6 +4,12 @@ import cmp.shared.SharedApp
 import cmp.shared.di.initKoin
 import org.jetbrains.compose.resources.configureWebResources
 
+/**
+ * Main function.
+ * This function is used to start the application.
+ * @see CanvasBasedWindow
+ * @see SharedApp
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     initKoin()

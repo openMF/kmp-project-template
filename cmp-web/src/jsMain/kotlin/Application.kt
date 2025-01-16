@@ -5,6 +5,12 @@ import org.jetbrains.skiko.wasm.onWasmReady
 import cmp.shared.SharedApp
 import cmp.shared.di.initKoin
 
+/**
+ * Main function.
+ * This function is used to start the application.
+ * @see ComposeViewport
+ * @see SharedApp
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     initKoin()

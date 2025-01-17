@@ -387,7 +387,7 @@ main() {
 #    update_run_configurations
 
     # Final updates
-    update_android_manifest
+#    update_android_manifest
     cleanup_backup_files
 
     # Print summary

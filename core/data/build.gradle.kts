@@ -26,12 +26,13 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            api(projects.core.common)
-            api(projects.core.datastore)
-            api(projects.core.model)
+            implementation(projects.core.common)
+            implementation(projects.core.datastore)
+            implementation(projects.core.model)
             implementation(projects.core.network)
             implementation(projects.core.analytics)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.coroutines.core)
         }
 
         androidMain.dependencies {

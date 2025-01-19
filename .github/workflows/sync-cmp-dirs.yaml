@@ -1,103 +1,134 @@
 name: Sync CMP Directories
 on:
-  # Manual trigger
   workflow_dispatch:
-  # Run weekly on Monday at 00:00 UTC
   schedule:
     - cron: '0 0 * * 1'
 
 jobs:
   sync-directories:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: dev
 
       - name: Setup Git config
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Add upstream remote
+      - name: Add upstream remote and fetch
         run: |
           git remote add upstream https://github.com/openMF/kmp-project-template.git || true
-          git fetch upstream
+          git fetch upstream || exit 1
 
-      - name: Create temporary branch
+      - name: Check upstream/dev exists
+        run: |
+          if ! git rev-parse --verify upstream/dev >/dev/null 2>&1; then
+            echo "Error: upstream/dev branch does not exist"
+            exit 1
+          fi
+
+      - name: Create and checkout temporary branch
         run: |
           TEMP_BRANCH="temp-sync-branch-${{ github.run_number }}"
-          git checkout -b $TEMP_BRANCH upstream/dev
+          git checkout -b "$TEMP_BRANCH" upstream/dev || exit 1
+          echo "TEMP_BRANCH=$TEMP_BRANCH" >> $GITHUB_ENV
 
-      - name: Sync CMP directories
+      - name: Sync directories
         run: |
-          DIRS=("cmp-android" "cmp-desktop" "cmp-ios" "cmp-web")
+          DIRS=(
+            "cmp-android"
+            "cmp-desktop"
+            "cmp-ios"
+            "cmp-web"
+            "cmp-shared"
+            "build-logic"
+            "fastlane"
+            "scripts"
+            "config"
+            ".github"
+            ".run"
+          )
+          
+          FILES=(
+            "Gemfile"
+            "Gemfile.lock"
+            "ci-prepush.bat"
+            "ci-prepush.sh"
+          )
+          
           git checkout dev
+          
+          # Sync directories
           for dir in "${DIRS[@]}"; do
-            if [ -d "$dir" ]; then
-              echo "Syncing $dir..."
-            else
+            if [ ! -d "$dir" ]; then
               echo "Creating $dir..."
               mkdir -p "$dir"
             fi
-            git checkout temp-sync-branch-${{ github.run_number }} -- "$dir"
+            echo "Syncing $dir..."
+            git checkout "${{ env.TEMP_BRANCH }}" -- "$dir" || exit 1
+          done
+          
+          # Sync files
+          for file in "${FILES[@]}"; do
+            echo "Syncing $file..."
+            git checkout "${{ env.TEMP_BRANCH }}" -- "$file" || true
           done
 
       - name: Clean up temporary branch
-        run: |
-          git branch -D temp-sync-branch-${{ github.run_number }}
+        if: always()
+        run: git branch -D "${{ env.TEMP_BRANCH }}" || true
 
       - name: Check for changes
         id: check_changes
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
-            echo "Has changes to commit"
             echo "has_changes=true" >> $GITHUB_OUTPUT
           else
-            echo "No changes to commit"
             echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
-
-      - name: Commit and push changes
-        if: steps.check_changes.outputs.has_changes == 'true'
-        run: |
-          git add cmp-android cmp-desktop cmp-ios cmp-web
-          git commit -m "chore: Sync CMP directories from upstream
-
-          Automated sync of CMP directories:
-          - cmp-android
-          - cmp-desktop
-          - cmp-ios
-          - cmp-web
-
-          Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          
-          git push origin dev
 
       - name: Create Pull Request
         if: steps.check_changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
-          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-          author: ${{ github.actor }} <${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>
-          title: "chore: Sync CMP directories from upstream"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: Sync directories and files from upstream"
+          title: "chore: Sync directories and files from upstream"
           body: |
-            Automated sync of CMP directories from upstream repository.
+            Automated sync of directories and files from upstream repository.
             
             Changes included in this sync:
+            
+            Directories:
             - cmp-android
             - cmp-desktop
             - cmp-ios
             - cmp-web
+            - build-logic
+            - fastlane
+            - scripts
+            - config
+            - .github
+            - .run
             
-            Please review the changes and merge if everything looks correct.
+            Files:
+            - Gemfile
+            - Gemfile.lock
+            - ci-prepush.bat
+            - ci-prepush.sh
             
             Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          branch: sync-cmp-dirs
-          commit-message: "chore: Sync CMP directories from upstream"
+          branch: sync-dirs-${{ github.run_number }}
           delete-branch: true
           labels: |
             sync
             automated pr
+          base: dev

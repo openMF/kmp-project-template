@@ -28,7 +28,9 @@ internal fun ProfileScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun ProfileScreenContent(modifier: Modifier) {
+internal fun ProfileScreenContent(
+    modifier: Modifier = Modifier,
+) {
     MifosScaffold(modifier = modifier) {
         Column(
             modifier = Modifier

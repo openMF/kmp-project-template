@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-ruby File.read(".ruby-version").strip
+ruby '3.3.5'
 
 gem "fastlane"
 

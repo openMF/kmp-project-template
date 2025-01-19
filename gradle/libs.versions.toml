@@ -35,6 +35,7 @@ ktlint = "12.1.1"
 detekt = "1.23.7"
 spotlessVersion = "6.25.0"
 twitter-detekt-compose = "0.0.26"
+moduleGraph = "2.7.3"
 
 # Kotlin KMP Dependencies
 kotlin = "2.1.0"
@@ -255,9 +256,9 @@ android-library = { id = "com.android.library", version.ref = "androidGradlePlug
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
-android-application-convention = { id = "org.mifos.android.application", version = "unspecified" }
-android-application-compose-convention = { id = "org.mifos.android.application.compose", version = "unspecified" }
-android-application-flavors-convention = { id = "org.mifos.android.application.flavors", version = "unspecified" }
+android-application-convention = { id = "org.convention.android.application", version = "unspecified" }
+android-application-compose-convention = { id = "org.convention.android.application.compose", version = "unspecified" }
+android-application-flavors-convention = { id = "org.convention.android.application.flavors", version = "unspecified" }
 
 # KMP & CMP Plugins
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -270,18 +271,18 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktrofit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 wire = { id = "com.squareup.wire", version.ref = "wire" }
 
-cmp-feature-convention = { id = "org.mifos.cmp.feature", version = "unspecified" }
-kmp-koin-convention = { id = "org.mifos.kmp.koin", version = "unspecified" }
-kmp-library-convention = { id = "org.mifos.kmp.library", version = "unspecified" }
+cmp-feature-convention = { id = "org.convention.cmp.feature", version = "unspecified" }
+kmp-koin-convention = { id = "org.convention.kmp.koin", version = "unspecified" }
+kmp-library-convention = { id = "org.convention.kmp.library", version = "unspecified" }
 
 # Utility Plugins
-detekt-convention = { id = "org.mifos.detekt.plugin", version = "unspecified" }
-git-hooks-convention = { id = "org.mifos.git.hooks", version = "unspecified" }
-ktlint-convention = { id = "org.mifos.ktlint.plugin", version = "unspecified" }
-spotless-convention = { id = "org.mifos.spotless.plugin", version = "unspecified" }
+detekt-convention = { id = "org.convention.detekt.plugin", version = "unspecified" }
+git-hooks-convention = { id = "org.convention.git.hooks", version = "unspecified" }
+ktlint-convention = { id = "org.convention.ktlint.plugin", version = "unspecified" }
+spotless-convention = { id = "org.convention.spotless.plugin", version = "unspecified" }
 
 dependencyGuard = { id = "com.dropbox.dependency-guard", version.ref = "dependencyGuard" }
-
+moduleGraph = { id = "com.jraska.module.graph.assertion", version.ref = "moduleGraph" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }

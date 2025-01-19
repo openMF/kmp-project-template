@@ -12,8 +12,7 @@ package cmp.shared
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import cmp.shared.navigation.NavGraphRoute.MAIN_GRAPH
-import cmp.shared.navigation.RootNavGraph
+import cmp.navigation.navigation.RootNavGraph
 import org.koin.compose.koinInject
 import org.mifos.core.data.utils.NetworkMonitor
 import org.mifos.core.data.utils.TimeZoneMonitor
@@ -21,9 +20,9 @@ import org.mifos.core.designsystem.theme.MifosTheme
 
 @Composable
 fun SharedApp(
+    modifier: Modifier = Modifier,
     networkMonitor: NetworkMonitor = koinInject(),
     timeZoneMonitor: TimeZoneMonitor = koinInject(),
-    modifier: Modifier = Modifier,
 ) {
     RootApp(
         networkMonitor = networkMonitor,
@@ -38,14 +37,11 @@ private fun RootApp(
     timeZoneMonitor: TimeZoneMonitor,
     modifier: Modifier = Modifier,
 ) {
-    val navController = rememberNavController()
-
     MifosTheme {
         RootNavGraph(
             networkMonitor = networkMonitor,
             timeZoneMonitor = timeZoneMonitor,
-            navHostController = navController,
-            startDestination = MAIN_GRAPH,
+            navHostController = rememberNavController(),
             modifier = modifier,
         )
     }

@@ -1,10 +1,10 @@
+:cmp-navigation
 :cmp-shared
 :core:analytics
 :core:common
 :core:data
 :core:datastore
 :core:designsystem
-:core:domain
 :core:model
 :core:network
 :core:ui
@@ -139,7 +139,6 @@ com.arkivanov.essenty:back-handler-android:2.1.0
 com.arkivanov.essenty:back-handler:2.1.0
 com.arkivanov.essenty:utils-internal-android:2.1.0
 com.arkivanov.essenty:utils-internal:2.1.0
-com.caverock:androidsvg-aar:1.4
 com.google.accompanist:accompanist-drawablepainter:0.36.0
 com.google.guava:listenablefuture:1.0
 com.russhwolf:multiplatform-settings-android:1.2.0
@@ -167,12 +166,6 @@ io.coil-kt.coil3:coil-compose-core-android:3.0.4
 io.coil-kt.coil3:coil-compose-core:3.0.4
 io.coil-kt.coil3:coil-core-android:3.0.4
 io.coil-kt.coil3:coil-core:3.0.4
-io.coil-kt.coil3:coil-network-core-android:3.0.4
-io.coil-kt.coil3:coil-network-core:3.0.4
-io.coil-kt.coil3:coil-network-ktor3-android:3.0.4
-io.coil-kt.coil3:coil-network-ktor3:3.0.4
-io.coil-kt.coil3:coil-svg-android:3.0.4
-io.coil-kt.coil3:coil-svg:3.0.4
 io.coil-kt.coil3:coil:3.0.4
 io.github.vinceglb:filekit-compose-android:0.8.7
 io.github.vinceglb:filekit-compose:0.8.7

@@ -18,6 +18,7 @@ object PasswordChecker {
     private const val MIN_ENTROPY_BITS = 60.0
     private const val MAX_PASSWORD_LENGTH = 128
 
+    @Suppress("ReturnCount")
     fun getPasswordStrengthResult(password: String): PasswordStrengthResult {
         when {
             password.isEmpty() -> return PasswordStrengthResult.Error("Password cannot be empty.")

@@ -20,10 +20,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
-            api(libs.coil.kt)
-            api(libs.coil.core)
-            api(libs.coil.svg)
-            api(libs.coil.network.ktor)
             api(libs.kermit.logging)
             api(libs.squareup.okio)
             api(libs.jb.kotlin.stdlib)

@@ -33,18 +33,21 @@ import androidx.compose.ui.unit.LayoutDirection
 
 @Stable
 @Composable
-fun Modifier.mirrorIfRtl(): Modifier =
+@Suppress("ModifierComposable")
+fun Modifier.mirrorIfRtl() = composed {
     if (LocalLayoutDirection.current == LayoutDirection.Rtl) {
         scale(scaleX = -1f, scaleY = 1f)
     } else {
         this
     }
+}
 
 @Stable
 @Composable
-fun Modifier.tabNavigation(): Modifier {
+@Suppress("ModifierComposable")
+fun Modifier.tabNavigation() = composed {
     val focusManager = LocalFocusManager.current
-    return onPreviewKeyEvent { keyEvent ->
+    onPreviewKeyEvent { keyEvent ->
         if (keyEvent.key == Key.Tab && keyEvent.type == KeyEventType.KeyDown) {
             focusManager.moveFocus(
                 if (keyEvent.isShiftPressed) {

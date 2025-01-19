@@ -26,10 +26,10 @@ kotlin {
         }
 
         commonMain.dependencies {
-            api(projects.core.analytics)
-            api(projects.core.designsystem)
-            api(projects.core.model)
-            api(projects.core.common)
+            implementation(projects.core.analytics)
+            implementation(projects.core.designsystem)
+            implementation(projects.core.model)
+            implementation(projects.core.common)
             implementation(libs.jb.composeViewmodel)
             implementation(libs.jb.lifecycleViewmodel)
             implementation(libs.jb.lifecycleViewmodelSavedState)

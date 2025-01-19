@@ -11,10 +11,6 @@
 plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.cmp.feature.convention)
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.kotlin.parcelize)
 }
 
 kotlin {
@@ -32,25 +28,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            // Core Modules
-            implementation(projects.core.domain)
+            // Navigation Modules
+            implementation(projects.cmpNavigation)
             api(projects.core.data)
-            api(projects.core.network)
-
-            implementation(projects.feature.home)
-            implementation(projects.feature.profile)
-            implementation(projects.feature.settings)
-
-            //put your multiplatform dependencies here
-            implementation(compose.material3)
-            implementation(compose.foundation)
-            implementation(compose.ui)
-            implementation(compose.components.uiToolingPreview)
             implementation(compose.components.resources)
-            implementation(libs.window.size)
-            implementation(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
         }
 
         desktopMain.dependencies {
@@ -63,22 +44,6 @@ kotlin {
 
 android {
     namespace = "cmp.shared"
-    compileSdk = 35
-
-    defaultConfig {
-        minSdk = 24
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
 }
 
 compose.resources {

@@ -182,6 +182,8 @@ process_module_dirs() {
 
                 echo "🗑️ Cleaning up old directory structure"
                 rm -rf "$kotlin_dir/org/mifos"
+                # Remove org directory if it's empty
+                rmdir "$kotlin_dir/org" 2>/dev/null || true
             fi
         fi
     done
@@ -326,8 +328,8 @@ cleanup_backup_files() {
     print_section "Final Cleanup"
     echo "🧹 Cleaning up backup files..."
     find . -name "*.bak" -type f -delete
-    echo "🧹 Cleaning up .git directory..."
-    rm -rf .git/
+#    echo "🧹 Cleaning up .git directory..."
+#    rm -rf .git/
     echo "✅ Backup files cleaned up successfully"
 }
 

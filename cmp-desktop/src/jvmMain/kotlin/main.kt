@@ -12,7 +12,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import cmp.shared.SharedApp
-import cmp.shared.di.initKoin
+import cmp.shared.utils.initKoin
 
 /**
  * Main function.

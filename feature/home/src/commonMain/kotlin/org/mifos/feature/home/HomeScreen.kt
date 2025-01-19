@@ -39,7 +39,9 @@ internal fun HomeScreen(modifier: Modifier = Modifier) {
  * @return Composable
  */
 @Composable
-internal fun HomeScreenContent(modifier: Modifier) {
+internal fun HomeScreenContent(
+    modifier: Modifier = Modifier,
+) {
     MifosScaffold(modifier = modifier) {
         Column(
             modifier = Modifier

@@ -20,6 +20,7 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.moduleGraph) apply true
     // Multiplatform plugins
     alias(libs.plugins.jetbrainsCompose) apply false
     alias(libs.plugins.compose.compiler) apply false
@@ -40,3 +41,24 @@ tasks.register("versionFile") {
 
     DynamicVersion.setDynamicVersion(file, project.version.toString())
 }
+
+// Task to print all the module paths in the project e.g. :core:data
+// Used by module graph generator script
+tasks.register("printModulePaths") {
+    subprojects {
+        if (subprojects.isEmpty()) {
+            println(this.path)
+        }
+    }
+}
+
+// Configuration for CMP module dependency graph
+moduleGraphAssert {
+    configurations += setOf("commonMainImplementation", "commonMainApi")
+    configurations += setOf("androidMainImplementation", "androidMainApi")
+    configurations += setOf("desktopMainImplementation", "desktopMainApi")
+    configurations += setOf("jsMainImplementation", "jsMainApi")
+    configurations += setOf("nativeMainImplementation", "nativeMainApi")
+    configurations += setOf("wasmJsMainImplementation", "wasmJsMainApi")
+}
+

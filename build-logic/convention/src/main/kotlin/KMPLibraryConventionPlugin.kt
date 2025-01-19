@@ -1,13 +1,13 @@
 
 import com.android.build.gradle.LibraryExtension
+import org.convention.configureFlavors
+import org.convention.configureKotlinAndroid
+import org.convention.configureKotlinMultiplatform
+import org.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.mifos.configureFlavors
-import org.mifos.configureKotlinAndroid
-import org.mifos.configureKotlinMultiplatform
-import org.mifos.libs
 
 /**
  * Plugin that applies the Android library and Kotlin multiplatform plugins and configures them.
@@ -18,9 +18,9 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.multiplatform")
-                apply("org.mifos.kmp.koin")
-                apply("org.mifos.detekt.plugin")
-                apply("org.mifos.spotless.plugin")
+                apply("org.convention.kmp.koin")
+                apply("org.convention.detekt.plugin")
+                apply("org.convention.spotless.plugin")
             }
 
             configureKotlinMultiplatform()

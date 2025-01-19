@@ -22,8 +22,8 @@ import org.mifos.core.designsystem.component.MifosScaffold
 
 @Composable
 internal fun NotificationScreen(
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onBackClick: () -> Unit,
 ) {
     NotificationScreenContent(
         modifier = modifier,
@@ -33,7 +33,7 @@ internal fun NotificationScreen(
 
 @Composable
 internal fun NotificationScreenContent(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
 ) {
     MifosScaffold(

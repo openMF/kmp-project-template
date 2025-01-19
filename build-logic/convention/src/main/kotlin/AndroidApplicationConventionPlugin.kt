@@ -1,13 +1,13 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.BaseExtension
+import org.convention.configureBadgingTasks
+import org.convention.configureKotlinAndroid
+import org.convention.configurePrintApksTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
-import org.mifos.configureBadgingTasks
-import org.mifos.configureKotlinAndroid
-import org.mifos.configurePrintApksTask
 
 /**
  * Plugin that applies the Android application plugin and configures it.
@@ -19,9 +19,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
                 apply("com.dropbox.dependency-guard")
-                apply("org.mifos.detekt.plugin")
-                apply("org.mifos.spotless.plugin")
-                apply("org.mifos.git.hooks")
+                apply("org.convention.detekt.plugin")
+                apply("org.convention.spotless.plugin")
+                apply("org.convention.git.hooks")
             }
 
             extensions.configure<ApplicationExtension> {

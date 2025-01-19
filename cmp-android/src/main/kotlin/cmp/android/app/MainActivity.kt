@@ -16,9 +16,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import cmp.shared.SharedApp
-import org.koin.android.ext.android.inject
-import org.mifos.core.data.utils.NetworkMonitor
-import org.mifos.core.data.utils.TimeZoneMonitor
 import org.mifos.core.ui.utils.ShareUtils
 
 /**
@@ -29,9 +26,6 @@ import org.mifos.core.ui.utils.ShareUtils
  * @see ComponentActivity
  */
 class MainActivity : ComponentActivity() {
-    private val networkMonitor: NetworkMonitor by inject()
-    private val timeZoneMonitor: TimeZoneMonitor by inject()
-
     /**
      * Called when the activity is starting.
      * This is where most initialization should go: calling [setContentView(int)] to inflate the activity's UI,
@@ -51,10 +45,7 @@ class MainActivity : ComponentActivity() {
          * @see setContent
          */
         setContent {
-            SharedApp(
-                networkMonitor = networkMonitor,
-                timeZoneMonitor = timeZoneMonitor,
-            )
+            SharedApp()
         }
     }
 }

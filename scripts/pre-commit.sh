@@ -1,5 +1,19 @@
 #!/bin/sh
 
+# Function to check the current branch
+check_current_branch() {
+    echo "\n🚀 Checking the current git branch..."
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ "$CURRENT_BRANCH" = "master" ] || [ "$CURRENT_BRANCH" = "dev" ]; then
+        echo "🛑 Hold it right there! Committing directly to the '$CURRENT_BRANCH' branch? That's a big no-no!"
+        echo "🚫 Direct commits to '$CURRENT_BRANCH' are like trying to use a wrench to write code—doesn't work! 😜"
+        echo "\nABORTING COMMIT: You must navigate to a feature branch or create a new one to save the day! 🦸‍♂️🦸‍♀️\n"
+        exit 1
+    else
+        echo "✅ Fantastic! You're on the '$CURRENT_BRANCH' branch, which is perfect for commits. Let's keep this awesome momentum going! 🚀✨"
+    fi
+}
+
 # Function to run Spotless checks
 run_spotless_checks() {
     echo "\n🚀 Spotless is now analyzing and formatting your code!"
@@ -71,6 +85,7 @@ print_success_message() {
 }
 
 # Main script execution
+check_current_branch
 run_spotless_checks
 run_detekt_checks
 run_dependency_guard

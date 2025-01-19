@@ -1,7 +1,7 @@
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.CanvasBasedWindow
 import cmp.shared.SharedApp
-import cmp.shared.di.initKoin
+import cmp.shared.utils.initKoin
 import org.jetbrains.compose.resources.configureWebResources
 
 /**

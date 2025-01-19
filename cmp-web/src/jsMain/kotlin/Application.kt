@@ -1,9 +1,9 @@
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
+import cmp.shared.SharedApp
+import cmp.shared.utils.initKoin
 import kotlinx.browser.document
 import org.jetbrains.skiko.wasm.onWasmReady
-import cmp.shared.SharedApp
-import cmp.shared.di.initKoin
 
 /*
  * The entry point of the WebAssembly Compose application.

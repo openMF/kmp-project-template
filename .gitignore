@@ -28,7 +28,7 @@ iosApp/Pods/*
 iosApp/iosApp.xcworkspace/*
 iosApp/iosApp.xcodeproj/*
 !iosApp/iosApp.xcodeproj/project.pbxproj
-mifos-shared/mifospay-shared.podspec
+cmp-shared/mifospay-shared.podspec
 
 # Eclipse project files
 .classpath
@@ -59,7 +59,7 @@ app/app.iml
 app/manifest-merger-release-report.txt
 
 # Exclude Google services from prod flavour
-mifos-android/src/prod/google-services.json
+cmp-android/src/prod/google-services.json
 
 #*.keystore
 
@@ -72,3 +72,6 @@ playStorePublishServiceCredentialsFile.json
 .bundle/
 vendor/
 secrets/
+
+# Sync Log File
+*.log

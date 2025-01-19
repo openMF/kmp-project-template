@@ -11,7 +11,7 @@ package org.mifos.shared
 
 import androidx.compose.ui.window.ComposeUIViewController
 import cmp.shared.SharedApp
-import cmp.shared.di.initKoin
+import cmp.shared.utils.initKoin
 
 fun viewController() = ComposeUIViewController(
     configure = {

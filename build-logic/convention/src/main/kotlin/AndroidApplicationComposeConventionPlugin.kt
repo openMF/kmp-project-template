@@ -1,9 +1,9 @@
 import com.android.build.api.dsl.ApplicationExtension
+import org.convention.configureAndroidCompose
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.getByType
-import org.mifos.configureAndroidCompose
 
 /**
  * Plugin that applies the Android application and Compose plugins and configures them.

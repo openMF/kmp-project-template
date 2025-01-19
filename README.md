@@ -86,62 +86,17 @@
 - **Error Handling**: Comprehensive error management
 
 ### 🔄 Sync Capabilities
-- **Automated Directory Sync**: Keep your CMP directories in sync with upstream
-- **GitHub Actions Integration**: Automated weekly sync workflow
-- **Manual Sync Script**: Easy-to-use bash script for manual syncing
-- **Selective Sync**: Only sync specific CMP directories:
-    - cmp-android
-    - cmp-desktop
-    - cmp-ios
-    - cmp-web
-- **Pull Request Generation**: Automated PRs for sync changes
-- **Change Validation**: Ensures only necessary updates are committed
-
-### Using the Sync Script
-
-#### Manual Sync
-```bash
-# Run the sync script
-./sync-cmp-dirs.sh
-```
-
-#### Automated GitHub Workflow
-The repository includes a GitHub workflow (`sync-cmp-dirs.yml`) that:
-- Runs automatically every Monday at midnight UTC
-- Can be triggered manually from GitHub Actions UI
-- Creates pull requests for review when changes are detected
-- Includes detailed change logs in PR description
-
-#### Required Workflow Permissions Setup
-1. Go to your repository's **Settings**
-2. Navigate to **Actions** > **General** in the left sidebar
-3. Scroll down to **Workflow permissions**
-4. Enable the following permissions:
-  - ✅ Select "**Read and write permissions**"
-  - ✅ Check "**Allow GitHub Actions to create and approve pull requests**"
-5. Click "**Save**" to apply the changes
-
-Without these permissions, the sync workflow won't be able to create pull requests automatically. for more information, see [GitHub Docs](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token).
-
-To enable the permissions, navigate to repository `settings --> Actions --> General --> Workflow Permissions and enable the required permissions`.
-
-![Workflow Permissions](https://github.com/user-attachments/assets/ca16a700-8838-4d6f-9ac3-c681107a2ce0)
-
-## 🔄 Staying in Sync with Upstream
-
-### Manual Sync
-1. Use the provided `sync-cmp-dirs.sh` script to sync specific CMP directories
-2. Review changes before committing
-3. Push changes to your repository
-
-### Automated Sync
-1. Ensure workflow permissions are properly configured (see above)
-2. The GitHub workflow automatically syncs directories weekly
-3. Review and merge the generated pull requests
-4. Manual sync can be triggered from GitHub Actions tab
-
-[Rest of the previous content remains the same]
-
+- **Enhanced Directory Sync**: Comprehensive sync system for all project components
+- **GitHub Actions Integration**: Automated weekly sync workflow with PR generation
+- **Advanced Sync Script**: Feature-rich bash script with safety measures
+- **Comprehensive Sync Coverage**: Syncs the following components:
+  - **Applications**: cmp-android, cmp-desktop, cmp-ios, cmp-web
+  - **Build System**: build-logic
+  - **Tools**: fastlane, scripts
+  - **Configuration**: config, .github, .run
+  - **Core Files**: Gemfile, Gemfile.lock, ci-prepush scripts
+- **Safety Features**: Automatic backups, error handling, and dry-run mode
+- **Change Validation**: Smart detection of necessary updates
 
 ## 🚀 Quick Start
 
@@ -169,6 +124,70 @@ cd kmp-project-template
 ```bash
 ./gradlew build
 ```
+
+### Fastlane Configuration
+- **Version Generation**: Supports git, Firebase, and Play Store-based versioning
+- **Release Notes Generation**: Simple and full release notes generation
+- **CI/CD Integration**: GitHub Actions and GitLab CI examples
+- **Best Practices**: Securely manage sensitive data in CI/CD
+- **Automated Deployment**: Firebase and Play Store deployment scripts
+- **Testing**: Automated testing and deployment in staging environment
+- **Dependency Management**: Keep Fastlane and plugins updated
+- **Staging Environment**: Test deployment scripts in a staging environment
+- **Configuration**: Update platform specific configurations in `fastlane-config` directory
+
+### Using the Sync System
+
+#### Manual Sync with Advanced Options
+```bash
+# Basic sync
+./sync-dirs.sh
+
+# Dry run to preview changes
+./sync-dirs.sh --dry-run
+
+# Force sync without prompts
+./sync-dirs.sh --force
+
+# Both dry run and force mode
+./sync-dirs.sh --dry-run --force
+```
+
+#### Script Features
+- **Backup System**: Automatic backup of existing files before modification
+- **Error Handling**: Comprehensive error detection and recovery
+- **Progress Indication**: Visual feedback during sync operations
+- **Logging**: Detailed logs of all operations
+- **Dry Run Mode**: Preview changes without applying them
+- **Force Mode**: Non-interactive operation for automation
+
+#### Automated GitHub Workflow
+The repository includes an enhanced GitHub workflow (`sync-dirs.yml`) that:
+- Runs automatically every Monday at midnight UTC
+- Supports manual triggering from GitHub Actions UI
+- Creates detailed pull requests for review
+- Includes comprehensive change logs
+- Handles all sync components safely
+- Maintains proper git history
+
+#### Required Workflow Permissions Setup
+1. Go to your repository's **Settings**
+2. Navigate to **Actions** > **General** in the left sidebar
+3. Scroll down to **Workflow permissions**
+4. Enable the following permissions:
+- ✅ Select "**Read and write permissions**"
+- ✅ Check "**Allow GitHub Actions to create and approve pull requests**"
+5. Click "**Save**" to apply the changes
+
+![Workflow Permissions](https://github.com/user-attachments/assets/ca16a700-8838-4d6f-9ac3-c681107a2ce0)
+
+### Best Practices for Sync Management
+1. **Regular Syncs**: Keep up with upstream changes through weekly automated syncs
+2. **Review Changes**: Always review generated PRs carefully
+3. **Backup First**: Use --dry-run before actual sync operations
+4. **Conflict Resolution**: Handle merge conflicts promptly
+5. **Version Control**: Maintain clean git history during syncs
+
 
 ## 📁 Project Structure
 
@@ -201,6 +220,7 @@ cmp-ios/         # iOS app
 cmp-desktop/     # Desktop app
 cmp-web/         # Web app
 cmp-shared/      # Shared code
+cmp-navigation/  # Navigation components
 ```
 
 ## 🔄 Module Dependencies
@@ -230,6 +250,7 @@ graph TD
     E --> E3[cmp-desktop]
     E --> E4[cmp-web]
     E --> E5[cmp-shared]
+    E --> E6[cmp-navigation]
 ```
 ## 🔄 Staying in Sync with Upstream
 

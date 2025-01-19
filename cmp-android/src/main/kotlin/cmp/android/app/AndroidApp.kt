@@ -10,10 +10,9 @@
 package cmp.android.app
 
 import android.app.Application
-import cmp.shared.di.KoinModules
+import cmp.shared.utils.initKoin
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.GlobalContext.startKoin
 
 /**
  * Android application class.
@@ -26,11 +25,9 @@ import org.koin.core.context.GlobalContext.startKoin
 class AndroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
-
-        startKoin {
+        initKoin {
             androidContext(this@AndroidApp) // Provides the Android app context
             androidLogger() // Enables Koin's logging for debugging
-            modules(KoinModules.allModules) // Loads the defined Koin modules
         }
     }
 }

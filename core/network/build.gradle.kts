@@ -30,7 +30,7 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            api(projects.core.common)
+            implementation(projects.core.common)
             implementation(projects.core.model)
             implementation(projects.core.datastore)
 

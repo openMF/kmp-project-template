@@ -7,8 +7,8 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-import org.mifos.AppBuildType
-import org.mifos.dynamicVersion
+import org.convention.AppBuildType
+import org.convention.dynamicVersion
 
 plugins {
     alias(libs.plugins.android.application.convention)
@@ -20,7 +20,7 @@ plugins {
 val packageNameSpace: String = libs.versions.androidPackageNamespace.get()
 
 android {
-    namespace = packageNameSpace
+    namespace = "cmp.android.app"
 
     defaultConfig {
         applicationId = packageNameSpace

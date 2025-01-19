@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import org.mifos.core.designsystem.icon.AppIcons
 
 @Composable
+@Suppress("LongParameterList")
 fun MifosOutlinedTextField(
     value: String,
     onValueChange: (String) -> Unit,
@@ -109,6 +110,7 @@ fun MifosOutlinedTextField(
 }
 
 @Composable
+@Suppress("LongParameterList")
 fun MifosTextField(
     value: String,
     onValueChange: (String) -> Unit,

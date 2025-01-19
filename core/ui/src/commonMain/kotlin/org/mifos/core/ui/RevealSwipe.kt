@@ -72,26 +72,27 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
+@Suppress("LongMethod", "CyclomaticComplexMethod", "MaxLineLength", "LongParameterList")
 @Composable
 fun RevealSwipe(
-    modifier: Modifier = Modifier,
-    enableSwipe: Boolean = true,
-    onContentClick: (() -> Unit)? = null,
-    onContentLongClick: ((DpOffset) -> Unit)? = null,
-    backgroundStartActionLabel: String?,
-    onBackgroundStartClick: () -> Boolean = { true },
-    backgroundEndActionLabel: String?,
-    onBackgroundEndClick: () -> Boolean = { true },
-    closeOnContentClick: Boolean = true,
-    closeOnBackgroundClick: Boolean = true,
     shape: CornerBasedShape,
-    alphaEasing: Easing = CubicBezierEasing(0.4f, 0.4f, 0.17f, 0.9f),
     backgroundCardStartColor: Color,
     backgroundCardEndColor: Color,
     card: @Composable BoxScope.(
         shape: Shape,
         content: @Composable ColumnScope.() -> Unit,
     ) -> Unit,
+    backgroundStartActionLabel: String?,
+    backgroundEndActionLabel: String?,
+    modifier: Modifier = Modifier,
+    enableSwipe: Boolean = true,
+    onContentClick: (() -> Unit)? = null,
+    onContentLongClick: ((DpOffset) -> Unit)? = null,
+    onBackgroundStartClick: () -> Boolean = { true },
+    onBackgroundEndClick: () -> Boolean = { true },
+    closeOnContentClick: Boolean = true,
+    closeOnBackgroundClick: Boolean = true,
+    alphaEasing: Easing = CubicBezierEasing(0.4f, 0.4f, 0.17f, 0.9f),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     state: RevealState = rememberRevealState(
         maxRevealDp = 75.dp,
@@ -138,6 +139,10 @@ fun RevealSwipe(
     var pressOffset by remember { mutableStateOf(DpOffset.Zero) }
 
     BaseRevealSwipe(
+        shape = shape,
+        backgroundCardStartColor = backgroundCardStartColor,
+        backgroundCardEndColor = backgroundCardEndColor,
+        card = card,
         modifier = modifier.semantics {
             customActions = buildList {
                 backgroundStartActionLabel?.let {
@@ -160,11 +165,7 @@ fun RevealSwipe(
         },
         enableSwipe = enableSwipe,
         animateBackgroundCardColor = enableSwipe,
-        shape = shape,
         alphaEasing = alphaEasing,
-        backgroundCardStartColor = backgroundCardStartColor,
-        backgroundCardEndColor = backgroundCardEndColor,
-        card = card,
         state = state,
         hiddenContentEnd = {
             Box(
@@ -205,7 +206,8 @@ fun RevealSwipe(
                 }
 
                 onContentClick == null && closeOnContentClick -> {
-                    // if no onContentClick handler passed, add click handler with no indication to enable close on content click
+                    // if no onContentClick handler passed,
+                    // add click handler with no indication to enable close on content click
                     Modifier.combinedClickable(
                         onClick = closeOnContentClickHandler,
                         onLongClick = {
@@ -272,17 +274,17 @@ fun RevealSwipe(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BaseRevealSwipe(
-    modifier: Modifier = Modifier,
-    enableSwipe: Boolean = true,
-    animateBackgroundCardColor: Boolean = true,
     shape: CornerBasedShape,
-    alphaEasing: Easing = CubicBezierEasing(0.4f, 0.4f, 0.17f, 0.9f),
     backgroundCardStartColor: Color,
     backgroundCardEndColor: Color,
     card: @Composable BoxScope.(
         shape: Shape,
         content: @Composable ColumnScope.() -> Unit,
     ) -> Unit,
+    modifier: Modifier = Modifier,
+    enableSwipe: Boolean = true,
+    animateBackgroundCardColor: Boolean = true,
+    alphaEasing: Easing = CubicBezierEasing(0.4f, 0.4f, 0.17f, 0.9f),
     state: RevealState = rememberRevealState(
         maxRevealDp = 75.dp,
         directions = setOf(

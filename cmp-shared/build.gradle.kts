@@ -30,7 +30,6 @@ kotlin {
         commonMain.dependencies {
             // Navigation Modules
             implementation(projects.cmpNavigation)
-            api(projects.core.data)
             implementation(compose.components.resources)
         }
 

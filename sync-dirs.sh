@@ -19,7 +19,39 @@ DEFAULT_UPSTREAM_URL="https://github.com/openMF/kmp-project-template.git"
 # Script options
 DRY_RUN=false
 FORCE=false
-LOG_FILE="sync-$(date +%Y%m%d-%H%M%S).log"
+LOG_FILE="sync-$(date +%d%m%Y-%H%M%S).log"
+
+# Directories and files to sync
+SYNC_DIRS=(
+    "cmp-android"
+    "cmp-desktop"
+    "cmp-ios"
+    "cmp-web"
+    "cmp-shared"
+    "build-logic"
+    "fastlane"
+    "scripts"
+    "config"
+    ".github"
+    ".run"
+)
+
+SYNC_FILES=(
+    "Gemfile"
+    "Gemfile.lock"
+    "ci-prepush.bat"
+    "ci-prepush.sh"
+)
+
+# Define exclusions for directories and files
+# Format: "path/to/exclude:type"
+# type can be 'dir' or 'file'
+declare -A EXCLUSIONS=(
+    ["cmp-android"]="src/main/res:dir dependencies:dir src/main/ic_launcher-playstore.png:file google-services.json:file"
+    ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
+    ["cmp-desktop"]="icons:dir"
+    ["cmp-ios"]="iosApp/Assets.xcassets:dir"
+)
 
 # Logging function
 log_message() {
@@ -31,6 +63,11 @@ log_message() {
 handle_error() {
     log_message "${RED}${CROSS} Error: $1${NC}"
     exit 1
+}
+
+# Print error message
+print_error() {
+    log_message "${RED}${CROSS} Error: $1${NC}"
 }
 
 # Simple progress indicator function
@@ -87,6 +124,195 @@ print_items() {
     echo
 }
 
+# Function to check if a path is excluded
+is_excluded() {
+    local check_dir=$1
+    local full_path=$2
+    local check_type=$3  # 'file' or 'dir'
+
+    # Remove ./ from the beginning of the path if it exists
+    full_path="${full_path#./}"
+
+    for dir in "${!EXCLUSIONS[@]}"; do
+        # Check if the path starts with the directory we're looking at
+        if [[ "$full_path" == "$dir"* ]]; then
+            local IFS=' '
+            read -ra EXCLUDE_ITEMS <<< "${EXCLUSIONS[$dir]}"
+
+            for item in "${EXCLUDE_ITEMS[@]}"; do
+                local IFS=':'
+                read -ra PARTS <<< "$item"
+                local exclude_path="$dir/${PARTS[0]}"
+                local exclude_type="${PARTS[1]}"
+
+                # Remove any duplicate slashes
+                exclude_path=$(echo "$exclude_path" | sed 's#/\+#/#g')
+                full_path=$(echo "$full_path" | sed 's#/\+#/#g')
+
+                if [ "$exclude_type" = "$check_type" ] && [ "$full_path" = "$exclude_path" ]; then
+                    return 0  # Path is excluded
+                fi
+            done
+        fi
+    done
+    return 1  # Path is not excluded
+}
+
+cleanup_temp_dirs() {
+    print_step "Cleaning up temporary directories..."
+    find . -type d -name "temp_*" -exec rm -rf {} +
+    show_progress
+}
+
+# Function to preserve excluded paths
+preserve_excluded_paths() {
+    local dir=$1
+    local destination=$2
+
+    if [ -n "${EXCLUSIONS[$dir]}" ]; then
+        local IFS=' '
+        read -ra EXCLUDE_ITEMS <<< "${EXCLUSIONS[$dir]}"
+
+        for item in "${EXCLUDE_ITEMS[@]}"; do
+            local IFS=':'
+            read -ra PARTS <<< "$item"
+            local exclude_path="${PARTS[0]}"
+            local exclude_type="${PARTS[1]}"
+            local full_source_path="$dir/$exclude_path"
+            local full_dest_path="$destination/$exclude_path"
+
+            if [ -e "$full_source_path" ]; then
+                print_step "Preserving excluded ${exclude_type}: ${BOLD}$exclude_path${NC}"
+                mkdir -p "$(dirname "$full_dest_path")"
+                cp -r "$full_source_path" "$(dirname "$full_dest_path")"
+            fi
+        done
+    fi
+}
+
+# Function to sync directory with exclusions
+sync_directory() {
+    local dir=$1
+    local temp_branch=$2
+
+    if [ -d "$dir" ]; then
+        print_step "Syncing ${BOLD}$dir${NC}..."
+
+        if [ "$DRY_RUN" = false ]; then
+            # Create temporary directory for original content
+            mkdir -p "temp_$dir"
+
+            # Store original directory for excluded items
+            if [ -d "$dir" ]; then
+                # First handle directory exclusions
+                if [ -n "${EXCLUSIONS[$dir]}" ]; then
+                    local IFS=' '
+                    read -ra EXCLUDE_ITEMS <<< "${EXCLUSIONS[$dir]}"
+
+                    for item in "${EXCLUDE_ITEMS[@]}"; do
+                        local IFS=':'
+                        read -ra PARTS <<< "$item"
+                        local exclude_path="$dir/${PARTS[0]}"
+                        local exclude_type="${PARTS[1]}"
+
+                        if [ "$exclude_type" = "dir" ] && [ -e "$exclude_path" ]; then
+                            print_step "Preserving excluded directory: ${BOLD}${PARTS[0]}${NC}"
+                            mkdir -p "$(dirname "temp_$exclude_path")"
+                            cp -r "$exclude_path" "$(dirname "temp_$exclude_path")"
+                        elif [ "$exclude_type" = "file" ] && [ -f "$exclude_path" ]; then
+                            print_step "Preserving excluded file: ${BOLD}${PARTS[0]}${NC}"
+                            mkdir -p "$(dirname "temp_$exclude_path")"
+                            cp "$exclude_path" "temp_$exclude_path"
+                        fi
+                    done
+                fi
+            fi
+
+            # Checkout from upstream
+            git checkout "$temp_branch" -- "$dir" || {
+                print_error "Failed to sync $dir"
+                rm -rf "temp_$dir"
+                return 1
+            }
+
+            # Restore excluded files and directories
+            if [ -n "${EXCLUSIONS[$dir]}" ]; then
+                local IFS=' '
+                read -ra EXCLUDE_ITEMS <<< "${EXCLUSIONS[$dir]}"
+
+                for item in "${EXCLUDE_ITEMS[@]}"; do
+                    local IFS=':'
+                    read -ra PARTS <<< "$item"
+                    local exclude_path="$dir/${PARTS[0]}"
+                    local exclude_type="${PARTS[1]}"
+                    local temp_path="temp_$exclude_path"
+
+                    if [ -e "$temp_path" ]; then
+                        print_step "Restoring excluded ${exclude_type}: ${BOLD}${PARTS[0]}${NC}"
+                        mkdir -p "$(dirname "$exclude_path")"
+                        if [ "$exclude_type" = "dir" ]; then
+                            rm -rf "$exclude_path"
+                            cp -r "$temp_path" "$(dirname "$exclude_path")"
+                        else
+                            cp "$temp_path" "$exclude_path"
+                        fi
+                    fi
+                done
+            fi
+        fi
+    else
+        print_warning "Directory ${BOLD}$dir${NC} not found. Creating it..."
+        if [ "$DRY_RUN" = false ]; then
+            mkdir -p "$dir"
+            git checkout "$temp_branch" -- "$dir" || {
+                handle_error "Failed to sync $dir"
+                cleanup_temp_dirs
+            }
+        fi
+    fi
+    show_progress
+}
+
+# Function to sync individual file with exclusions
+sync_file() {
+    local file=$1
+    local temp_branch=$2
+
+    # Check if file should be excluded
+    local dir=$(dirname "$file")
+    if is_excluded "$dir" "$file" "file"; then
+        print_step "Skipping excluded file: ${BOLD}$file${NC}"
+        return
+    fi
+
+    print_step "Syncing ${BOLD}$file${NC}..."
+    if [ "$DRY_RUN" = false ]; then
+        if [ -f "$file" ]; then
+            # Create directory for excluded files if it doesn't exist
+            mkdir -p "temp_files"
+            # Store original file if it exists
+            cp "$file" "temp_files/$(basename "$file")"
+        fi
+
+        if ! git checkout "$temp_branch" -- "$file"; then
+            if [ -f "temp_files/$(basename "$file")" ]; then
+                # Restore original file if checkout fails
+                cp "temp_files/$(basename "$file")" "$file"
+            fi
+            print_error "Failed to sync $file"
+            return 1
+        fi
+    fi
+    show_progress
+}
+
+# Function to get default branch name
+get_default_branch() {
+    local default_branch
+    default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+    echo "$default_branch"
+}
+
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -112,30 +338,23 @@ fi
 # Main script
 clear
 print_banner
-
-# Directories and files to sync
-SYNC_DIRS=(
-    "cmp-android"
-    "cmp-desktop"
-    "cmp-ios"
-    "cmp-web"
-    "cmp-shared"
-    "build-logic"
-    "fastlane"
-    "scripts"
-    "config"
-    ".github"
-    ".run"
-)
-
-SYNC_FILES=(
-    "Gemfile"
-    "Gemfile.lock"
-    "ci-prepush.bat"
-    "ci-prepush.sh"
-)
-
 print_items
+
+# Print configured exclusions
+echo -e "${BLUE}Configured Exclusions:${NC}"
+OLD_IFS="$IFS"  # Save original IFS
+for dir in "${!EXCLUSIONS[@]}"; do
+    echo -e "  ${BOLD}${dir}${NC}:"
+    IFS=' '
+    read -ra EXCLUDE_ITEMS <<< "${EXCLUSIONS[$dir]}"
+    for item in "${EXCLUDE_ITEMS[@]}"; do
+        IFS=':'
+        read -ra PARTS <<< "$item"
+        echo -e "    → ${PARTS[0]} (${PARTS[1]})"
+    done
+done
+IFS="$OLD_IFS"  # Restore original IFS
+echo
 
 # Check if upstream remote exists
 if ! git remote | grep -q '^upstream$'; then
@@ -163,18 +382,21 @@ if ! git fetch upstream; then
 fi
 show_progress
 
-# Check if upstream/dev exists
-if ! git rev-parse --verify upstream/dev >/dev/null 2>&1; then
-    handle_error "upstream/dev branch does not exist"
+# Get default branch if dev doesn't exist
+DEFAULT_BRANCH=$(get_default_branch)
+BASE_BRANCH="dev"
+if ! git rev-parse --verify "origin/dev" >/dev/null 2>&1; then
+    print_warning "dev branch not found, using default branch: ${BOLD}$DEFAULT_BRANCH${NC}"
+    BASE_BRANCH="$DEFAULT_BRANCH"
 fi
 
-# Create sync branch from current dev
+# Create sync branch
 SYNC_BRANCH=$(get_sync_branch_name)
 print_step "Creating sync branch: ${BOLD}$SYNC_BRANCH${NC}"
 
 if [ "$DRY_RUN" = false ]; then
-    # Create sync branch from current dev
-    if ! git checkout -b "$SYNC_BRANCH" dev; then
+    # Create sync branch from base branch
+    if ! git checkout -b "$SYNC_BRANCH" "$BASE_BRANCH"; then
         handle_error "Failed to create sync branch"
     fi
     show_progress
@@ -182,7 +404,7 @@ if [ "$DRY_RUN" = false ]; then
     # Create temporary branch for upstream changes
     TEMP_BRANCH="temp-${SYNC_BRANCH}"
     print_step "Creating temporary branch: ${BOLD}$TEMP_BRANCH${NC}"
-    if ! git checkout -b "$TEMP_BRANCH" upstream/dev; then
+    if ! git checkout -b "$TEMP_BRANCH" "upstream/$BASE_BRANCH"; then
         handle_error "Failed to create temporary branch"
     fi
     show_progress
@@ -195,55 +417,23 @@ if [ "$DRY_RUN" = false ]; then
     show_progress
 fi
 
+# Sync directories
 echo -e "\n${BLUE}${BOLD}Syncing directories...${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-
-# Sync directories
 for dir in "${SYNC_DIRS[@]}"; do
-    if [ -d "$dir" ]; then
-        print_step "Syncing ${BOLD}$dir${NC}..."
-        if [ "$DRY_RUN" = false ]; then
-            if [ -d "$dir" ]; then
-                cp -r "$dir" "$dir.backup"
-            fi
-            if ! git checkout "$TEMP_BRANCH" -- "$dir"; then
-                print_error "Failed to sync $dir"
-                [ -d "$dir.backup" ] && mv "$dir.backup" "$dir"
-                continue
-            fi
-            rm -rf "$dir.backup"
-        fi
-    else
-        print_warning "Directory ${BOLD}$dir${NC} not found. Creating it..."
-        if [ "$DRY_RUN" = false ]; then
-            mkdir -p "$dir"
-            git checkout "$TEMP_BRANCH" -- "$dir" || handle_error "Failed to sync $dir"
-        fi
-    fi
-    show_progress
+    sync_directory "$dir" "$TEMP_BRANCH"
 done
 
+# Sync files
 echo -e "\n${BLUE}${BOLD}Syncing files...${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
-
-# Sync individual files
 for file in "${SYNC_FILES[@]}"; do
-    print_step "Syncing ${BOLD}$file${NC}..."
-    if [ "$DRY_RUN" = false ]; then
-        if [ -f "$file" ]; then
-            cp "$file" "$file.backup"
-        fi
-        if ! git checkout "$TEMP_BRANCH" -- "$file"; then
-            print_error "Failed to sync $file"
-            [ -f "$file.backup" ] && mv "$file.backup" "$file"
-            continue
-        fi
-        rm -f "$file.backup"
-    fi
-    show_progress
+    sync_file "$file" "$TEMP_BRANCH"
 done
 
 if [ "$DRY_RUN" = false ]; then
+    cleanup_temp_dirs
+    rm -rf temp_files
     # Cleanup temporary branch
     print_step "Cleaning up temporary branch..."
     git branch -D "$TEMP_BRANCH" || handle_error "Failed to delete temporary branch"
@@ -268,22 +458,22 @@ This PR syncs the following items with upstream:
                 git push -u origin "$SYNC_BRANCH" || handle_error "Failed to push sync branch"
                 show_progress
                 echo -e "\n${GREEN}${BOLD}✨ Sync branch pushed successfully! ✨${NC}"
-                echo -e "${YELLOW}Please create a pull request from branch ${BOLD}$SYNC_BRANCH${NC}${YELLOW} to ${BOLD}dev${NC}${YELLOW} in your repository.${NC}\n"
+                echo -e "${YELLOW}Please create a pull request from branch ${BOLD}$SYNC_BRANCH${NC}${YELLOW} to ${BOLD}$BASE_BRANCH${NC}${YELLOW} in your repository.${NC}\n"
             else
                 echo -e "\n${YELLOW}Changes committed but not pushed. You can push later with:${NC}"
                 echo -e "${BOLD}git push -u origin $SYNC_BRANCH${NC}"
-                echo -e "${YELLOW}Then create a pull request from ${BOLD}$SYNC_BRANCH${NC}${YELLOW} to ${BOLD}dev${NC}\n"
+                echo -e "${YELLOW}Then create a pull request from ${BOLD}$SYNC_BRANCH${NC}${YELLOW} to ${BOLD}$BASE_BRANCH${NC}\n"
             fi
         else
             print_step "Pushing sync branch..."
             git push -u origin "$SYNC_BRANCH" || handle_error "Failed to push sync branch"
             show_progress
             echo -e "\n${GREEN}${BOLD}✨ Sync branch pushed successfully! ✨${NC}"
-            echo -e "${YELLOW}Please create a pull request from branch ${BOLD}$SYNC_BRANCH${NC}${YELLOW} to ${BOLD}dev${NC}${YELLOW} in your repository.${NC}\n"
+            echo -e "${YELLOW}Please create a pull request from branch ${BOLD}$SYNC_BRANCH${NC}${YELLOW} to ${BOLD}$BASE_BRANCH${NC}${YELLOW} in your repository.${NC}\n"
         fi
     else
         print_warning "No changes to commit"
-        git checkout dev
+        git checkout "$BASE_BRANCH"
         git branch -D "$SYNC_BRANCH"
     fi
 else

@@ -2,18 +2,15 @@ name: Cache Cleanup
 
 on:
   pull_request:
-    types: [closed]
+    types: [ closed ]
   workflow_dispatch:
 
 jobs:
   cleanup:
     name: Cache Cleanup
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cleanup Caches
-        uses: openMF/mifos-mobile-github-actions/.github/workflows/cache-cleanup.yaml@main
-        with:
-          cleanup_pr: ${{ github.event_name == 'pull_request' && github.event.repository.private == true }}
-          cleanup_all: ${{ github.event_name == 'workflow_dispatch' }}
-        secrets:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: openMF/mifos-mobile-github-actions/.github/workflows/cache-cleanup.yaml@main
+    with:
+      cleanup_pr: ${{ github.event_name == 'pull_request' && github.event.repository.private == true }}
+      cleanup_all: ${{ github.event_name == 'workflow_dispatch' }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

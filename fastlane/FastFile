@@ -46,6 +46,7 @@ platform :android do
   lane :deployReleaseApkOnFirebase do |options|
     signing_config = FastlaneConfig.get_android_signing_config(options)
     firebase_config = FastlaneConfig.get_firebase_config(:android, :prod)
+    build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
 
     # Generate version
     generateVersion = generateVersion(
@@ -65,7 +66,7 @@ platform :android do
     firebase_app_distribution(
       app: firebase_config[:appId],
       android_artifact_type: "APK",
-      android_artifact_path: FastlaneConfig::ANDROID_CONFIG[:prod_apk_path],
+      android_artifact_path: build_paths[:prod_apk_path],
       service_credentials_file: firebase_config[:serviceCredsFile],
       groups: firebase_config[:groups],
       release_notes: releaseNotes
@@ -76,6 +77,7 @@ platform :android do
   lane :deployDemoApkOnFirebase do |options|
     signing_config = FastlaneConfig.get_android_signing_config(options)
     firebase_config = FastlaneConfig.get_firebase_config(:android, :demo)
+    build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
 
     # Generate version
     generateVersion = generateVersion(
@@ -95,7 +97,7 @@ platform :android do
     firebase_app_distribution(
       app: firebase_config[:appId],
       android_artifact_type: "APK",
-      android_artifact_path: FastlaneConfig::ANDROID_CONFIG[:demo_apk_path],
+      android_artifact_path: build_paths[:demo_apk_path],
       service_credentials_file: firebase_config[:serviceCredsFile],
       groups: firebase_config[:groups],
       release_notes: releaseNotes
@@ -105,6 +107,7 @@ platform :android do
   desc "Deploy internal tracks to Google Play"
   lane :deployInternal do |options|
     signing_config = FastlaneConfig.get_android_signing_config(options)
+    build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
 
     # Generate version
     generateVersion = generateVersion(platform: "playstore")
@@ -125,7 +128,7 @@ platform :android do
 
     upload_to_play_store(
       track: 'internal',
-      aab: FastlaneConfig::ANDROID_CONFIG[:prod_aab_path],
+      aab: build_paths[:prod_aab_path],
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
@@ -320,24 +323,26 @@ platform :ios do
   lane :build_ios do |options|
     # Set default configuration if not provided
     options[:configuration] ||= "Debug"
+    ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
     update_code_signing_settings(
       use_automatic_signing: true,
-      path: FastlaneConfig::IOS_CONFIG[:project_path]
+      path: ios_config[:project_path]
     )
 
     build_ios_app(
-      project: FastlaneConfig::IOS_CONFIG[:project_path],
-      scheme: FastlaneConfig::IOS_CONFIG[:scheme],
+      project: ios_config[:project_path],
+      scheme: ios_config[:scheme],
       configuration: options[:configuration],
       skip_codesigning: "true",
-      output_directory: FastlaneConfig::IOS_CONFIG[:output_directory],
+      output_directory: ios_config[:output_directory],
       skip_archive: "true"
     )
   end
 
   lane :increment_version do |options|
     firebase_config = FastlaneConfig.get_firebase_config(:ios)
+    ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
     latest_release = firebase_app_distribution_get_latest_release(
       app: firebase_config[:appId],
@@ -345,7 +350,7 @@ platform :ios do
     )
 
     increment_build_number(
-      xcodeproj: FastlaneConfig::IOS_CONFIG[:project_path],
+      xcodeproj: ios_config[:project_path],
       build_number: latest_release[:buildVersion].to_i + 1
     )
   end

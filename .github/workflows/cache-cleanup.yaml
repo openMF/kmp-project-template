@@ -1,4 +1,4 @@
-name: Cache Cleanup
+name: Cleanup Cache
 
 on:
   pull_request:
@@ -7,10 +7,9 @@ on:
 
 jobs:
   cleanup:
-    name: Cache Cleanup
     uses: openMF/mifos-mobile-github-actions/.github/workflows/cache-cleanup.yaml@main
     with:
       cleanup_pr: ${{ github.event_name == 'pull_request' && github.event.repository.private == true }}
       cleanup_all: ${{ github.event_name == 'workflow_dispatch' }}
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      token: ${{ secrets.GITHUB_TOKEN }}

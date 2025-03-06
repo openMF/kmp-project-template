@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.datastore
+package org.mifos.corebase.datastore
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ObservableSettings
@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 @OptIn(ExperimentalSettingsApi::class)
 object SettingsFactory {
+
     fun createSuspendSettings(
         settings: Settings,
         dispatcher: CoroutineDispatcher,

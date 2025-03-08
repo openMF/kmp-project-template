@@ -30,6 +30,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.core)
             implementation(projects.core.model)
+            implementation(projects.core.common)
 
             api(projects.coreBase.datastore)
         }

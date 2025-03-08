@@ -9,16 +9,39 @@
  */
 package org.mifos.core.datastore
 
-import kotlinx.coroutines.flow.Flow
 import org.mifos.core.datastore.model.SampleUser
+import org.mifos.corebase.datastore.UserPreferencesDataStore
 
 class UserPreferencesRepositoryImpl(
     private val dataStore: UserPreferencesDataStore,
 ) : UserPreferencesRepository {
-    override val currentUser: Flow<SampleUser> =
-        dataStore.observeKeyFlow<SampleUser>(USER_KEY, SampleUser.DEFAULT, SampleUser.serializer())
+    override suspend fun saveUser(
+        key: String,
+        user: SampleUser,
+    ) {
+        dataStore.putValue(
+            key = key,
+            value = user,
+            serializer = SampleUser.serializer(),
+        )
+    }
 
-    override suspend fun saveUser(user: SampleUser) {
-        dataStore.putSerializableData(USER_KEY, user, SampleUser.serializer())
+    override suspend fun getUser(
+        key: String,
+        defaultValue: SampleUser,
+    ): SampleUser {
+        return dataStore.getValue(
+            key = key,
+            default = defaultValue,
+            serializer = SampleUser.serializer(),
+        )
+    }
+
+    override suspend fun getDoubleNumber(key: String, defaultValue: Double): Double {
+        return dataStore.getValue(key, defaultValue)
+    }
+
+    override suspend fun saveDoubleNumber(key: String, number: Double) {
+        dataStore.putValue(key, number)
     }
 }

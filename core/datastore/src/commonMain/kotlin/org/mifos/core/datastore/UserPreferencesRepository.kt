@@ -9,11 +9,13 @@
  */
 package org.mifos.core.datastore
 
-import kotlinx.coroutines.flow.Flow
 import org.mifos.core.datastore.model.SampleUser
 
 interface UserPreferencesRepository {
-    val currentUser: Flow<SampleUser>
 
-    suspend fun saveUser(user: SampleUser)
+    suspend fun saveUser(key: String, user: SampleUser)
+    suspend fun getUser(key: String, defaultValue: SampleUser): SampleUser
+
+    suspend fun getDoubleNumber(key: String, defaultValue: Double): Double
+    suspend fun saveDoubleNumber(key: String, number: Double)
 }

@@ -15,6 +15,7 @@ import org.gradle.kotlin.dsl.named
  */
 internal fun Project.configureDetekt(extension: DetektExtension) = extension.apply {
     tasks.named<Detekt>("detekt") {
+        mustRunAfter(":cmp-android:dependencyGuard")
         jvmTarget = "17"
         source(files(rootDir))
         include("**/*.kt")

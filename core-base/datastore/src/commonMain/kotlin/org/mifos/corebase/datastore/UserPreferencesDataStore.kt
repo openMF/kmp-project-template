@@ -79,6 +79,7 @@ class UserPreferencesDataStore(
      * @return The stored value or the default value if the key is not found.
      * @throws IllegalArgumentException If a custom type is requested without a serializer.
      */
+    @Suppress("UNCHECKED_CAST")
     @OptIn(ExperimentalSerializationApi::class, ExperimentalSettingsApi::class)
     suspend fun <T> getValue(
         key: String,

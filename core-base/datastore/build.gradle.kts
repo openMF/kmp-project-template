@@ -9,6 +9,7 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
+    id("kotlinx-serialization")
 }
 
 android {
@@ -23,6 +24,7 @@ kotlin {
             implementation(libs.multiplatform.settings.coroutines)
             implementation(libs.kotlinx.coroutines.core)
             implementation(projects.core.common)
+            implementation(libs.kotlinx.serialization.json)
         }
 
         commonTest.dependencies {

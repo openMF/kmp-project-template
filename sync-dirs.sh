@@ -28,6 +28,7 @@ SYNC_DIRS=(
     "cmp-ios"
     "cmp-web"
     "cmp-shared"
+    "core-base"
     "build-logic"
     "fastlane"
     "scripts"

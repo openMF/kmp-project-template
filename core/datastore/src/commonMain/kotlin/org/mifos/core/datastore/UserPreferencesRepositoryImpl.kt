@@ -9,39 +9,28 @@
  */
 package org.mifos.core.datastore
 
-import org.mifos.core.datastore.model.SampleUser
+import org.mifos.core.datastore.model.AppSettings
 import org.mifos.corebase.datastore.UserPreferencesDataStore
+
+private const val APP_SETTINGS_KEY = "app_settings"
 
 class UserPreferencesRepositoryImpl(
     private val dataStore: UserPreferencesDataStore,
 ) : UserPreferencesRepository {
-    override suspend fun saveUser(
-        key: String,
-        user: SampleUser,
-    ) {
+
+    override suspend fun updateSettings(settings: AppSettings) {
         dataStore.putValue(
-            key = key,
-            value = user,
-            serializer = SampleUser.serializer(),
+            key = APP_SETTINGS_KEY,
+            value = settings,
+            serializer = AppSettings.serializer(),
         )
     }
 
-    override suspend fun getUser(
-        key: String,
-        defaultValue: SampleUser,
-    ): SampleUser {
+    override suspend fun getSettings(defaultValue: AppSettings): AppSettings {
         return dataStore.getValue(
-            key = key,
+            key = APP_SETTINGS_KEY,
             default = defaultValue,
-            serializer = SampleUser.serializer(),
+            serializer = AppSettings.serializer(),
         )
-    }
-
-    override suspend fun getDoubleNumber(key: String, defaultValue: Double): Double {
-        return dataStore.getValue(key, defaultValue)
-    }
-
-    override suspend fun saveDoubleNumber(key: String, number: Double) {
-        dataStore.putValue(key, number)
     }
 }

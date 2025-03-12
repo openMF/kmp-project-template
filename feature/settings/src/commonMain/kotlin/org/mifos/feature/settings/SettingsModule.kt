@@ -7,11 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.datastore
+package org.mifos.feature.settings
 
-import org.mifos.core.datastore.model.AppSettings
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.module
 
-interface UserPreferencesRepository {
-    suspend fun updateSettings(settings: AppSettings)
-    suspend fun getSettings(defaultValue: AppSettings): AppSettings
+val SettingsModule = module {
+    viewModelOf(::SettingsViewmodel)
 }

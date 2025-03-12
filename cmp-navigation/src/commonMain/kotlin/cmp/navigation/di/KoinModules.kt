@@ -12,6 +12,8 @@ package cmp.navigation.di
 import org.koin.dsl.module
 import org.mifos.core.common.di.DispatchersModule
 import org.mifos.core.data.di.DataModule
+import org.mifos.core.datastore.di.DatastoreModule
+import org.mifos.feature.settings.SettingsModule
 
 object KoinModules {
     private val dataModule = module {
@@ -25,5 +27,7 @@ object KoinModules {
     val allModules = listOf(
         dataModule,
         dispatcherModule,
+        DatastoreModule,
+        SettingsModule,
     )
 }

@@ -7,11 +7,10 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.datastore
+package org.mifos.core.datastore.model
 
-import org.mifos.core.datastore.model.AppSettings
-
-interface UserPreferencesRepository {
-    suspend fun updateSettings(settings: AppSettings)
-    suspend fun getSettings(defaultValue: AppSettings): AppSettings
+enum class AppTheme(val themeName: String) {
+    SYSTEM_DEFAULT("System Default"),
+    LIGHT("Light"),
+    DARK("Dark"),
 }

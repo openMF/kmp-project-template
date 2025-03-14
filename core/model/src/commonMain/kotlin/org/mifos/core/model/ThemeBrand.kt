@@ -7,19 +7,16 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.datastore.model
+package org.mifos.core.model
 
-import kotlinx.serialization.Serializable
+enum class ThemeBrand(val brandName: String) {
+    DEFAULT("Default"),
+    ANDROID("Android"),
+    ;
 
-@Serializable
-data class AppSettings(
-    val theme: String,
-    val language: String,
-) {
     companion object {
-        val DEFAULT = AppSettings(
-            theme = AppTheme.SYSTEM_DEFAULT.themeName,
-            language = AppLanguage.ENGLISH.code,
-        )
+        fun fromString(value: String): ThemeBrand {
+            return entries.find { it.brandName.equals(value, ignoreCase = true) } ?: DEFAULT
+        }
     }
 }

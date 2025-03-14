@@ -7,10 +7,16 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.datastore.model
+package org.mifos.feature.settings
 
-enum class AppTheme(val themeName: String) {
-    SYSTEM_DEFAULT("System Default"),
-    LIGHT("Light"),
-    DARK("Dark"),
+expect fun getPlatform(): Platform
+
+enum class Platform {
+    Android,
+    Desktop,
+    IOS,
+    JS,
+    Wasm,
 }
+
+expect fun supportsDynamicTheming(): Boolean

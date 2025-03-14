@@ -11,28 +11,60 @@ package org.mifos.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.mifos.core.datastore.UserPreferencesRepository
-import org.mifos.core.datastore.model.AppSettings
+import org.mifos.core.model.DarkThemeConfig
+import org.mifos.core.model.ThemeBrand
 
 class SettingsViewmodel(
     private val settingsRepository: UserPreferencesRepository,
 ) : ViewModel() {
-    private val _settingsUiState = MutableStateFlow(AppSettings.DEFAULT)
-    val settingsUiState = _settingsUiState.asStateFlow()
-
-    private suspend fun getSettings() {
-        _settingsUiState.value = settingsRepository.getSettings(
-            defaultValue = AppSettings.DEFAULT,
+    val settingsUiState: StateFlow<SettingsUiState> = settingsRepository.userData
+        .map { userDate ->
+            SettingsUiState.Success(
+                settings = UserEditableSettings(
+                    brand = userDate.themeBrand,
+                    useDynamicColor = userDate.useDynamicColor,
+                    darkThemeConfig = userDate.darkThemeConfig,
+                ),
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = SettingsUiState.Loading,
         )
-    }
 
-    fun updateSettings(settings: AppSettings) {
+    fun updateThemeBrand(themeBrand: ThemeBrand) {
         viewModelScope.launch {
-            settingsRepository.updateSettings(settings)
-            getSettings()
+            settingsRepository.setThemeBrand(themeBrand)
         }
     }
+
+    fun updateDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
+        viewModelScope.launch {
+            settingsRepository.setDarkThemeConfig(darkThemeConfig)
+        }
+    }
+
+    fun updateDynamicColorPreference(useDynamicColor: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setDynamicColorPreference(useDynamicColor)
+        }
+    }
+}
+
+data class UserEditableSettings(
+    val brand: ThemeBrand,
+    val useDynamicColor: Boolean,
+    val darkThemeConfig: DarkThemeConfig,
+)
+
+sealed interface SettingsUiState {
+    data object Loading : SettingsUiState
+    data class Success(val settings: UserEditableSettings) : SettingsUiState
 }

@@ -19,6 +19,7 @@ kotlin {
         commonMain.dependencies {
             // Core Modules
             implementation(projects.core.data)
+            implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.core.datastore)
 

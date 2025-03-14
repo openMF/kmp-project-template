@@ -9,6 +9,8 @@
  */
 package cmp.navigation.di
 
+import cmp.navigation.AppViewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import org.mifos.core.common.di.DispatchersModule
 import org.mifos.core.data.di.DataModule
@@ -24,10 +26,15 @@ object KoinModules {
         includes(DispatchersModule)
     }
 
+    private val AppModule = module {
+        viewModelOf(::AppViewModel)
+    }
+
     val allModules = listOf(
         dataModule,
         dispatcherModule,
         DatastoreModule,
         SettingsModule,
+        AppModule,
     )
 }

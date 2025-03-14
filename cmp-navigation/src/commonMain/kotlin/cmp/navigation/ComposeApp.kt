@@ -9,11 +9,15 @@
  */
 package cmp.navigation
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import cmp.navigation.navigation.RootNavGraph
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.data.utils.NetworkMonitor
 import org.mifos.core.data.utils.TimeZoneMonitor
 import org.mifos.core.designsystem.theme.MifosTheme
@@ -24,7 +28,16 @@ fun ComposeApp(
     networkMonitor: NetworkMonitor = koinInject(),
     timeZoneMonitor: TimeZoneMonitor = koinInject(),
 ) {
-    MifosTheme {
+    val viewModel: AppViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+
+    MifosTheme(
+        darkTheme = uiState.shouldUseDarkTheme(isSystemInDarkTheme),
+        androidTheme = uiState.shouldUseAndroidTheme,
+        shouldDisplayDynamicTheming = uiState.shouldDisplayDynamicTheming,
+    ) {
         RootNavGraph(
             networkMonitor = networkMonitor,
             timeZoneMonitor = timeZoneMonitor,

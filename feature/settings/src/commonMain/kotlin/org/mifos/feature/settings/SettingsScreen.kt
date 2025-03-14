@@ -9,31 +9,59 @@
  */
 package org.mifos.feature.settings
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import kmp_project_template.feature.settings.generated.resources.Res
+import kmp_project_template.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
+import kmp_project_template.feature.settings.generated.resources.feature_settings_change_theme_text
+import org.jetbrains.compose.resources.stringResource
 import org.mifos.core.designsystem.component.MifosScaffold
+import org.mifos.core.designsystem.icon.AppIcons
 
 @Composable
 internal fun SettingsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
+
+    if (showSettingsDialog) {
+        SettingsDialog(
+            onDismiss = { showSettingsDialog = false },
+        )
+    }
+
     SettingsScreenContent(
         modifier = modifier.fillMaxSize(),
         onBackClick = onBackClick,
+        onThemeCardClick = {
+            showSettingsDialog = true
+        },
     )
 }
 
 @Composable
 internal fun SettingsScreenContent(
     onBackClick: () -> Unit,
+    onThemeCardClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MifosScaffold(
@@ -44,12 +72,48 @@ internal fun SettingsScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it),
+                .padding(it)
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
         ) {
             // SettingsScreenContent
-            Text(text = "Settings Screen", fontWeight = FontWeight.SemiBold)
+            ThemeCard(onClick = onThemeCardClick)
+        }
+    }
+}
+
+@Composable
+internal fun ThemeCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedCard(
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 1.dp,
+        ),
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = AppIcons.Sun,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .clip(shape = RoundedCornerShape(50.dp)),
+            )
+            Text(
+                text = stringResource(Res.string.feature_settings_change_theme_text),
+                modifier = Modifier.weight(1F),
+            )
+            IconButton(
+                onClick = onClick,
+            ) {
+                Icon(
+                    imageVector = AppIcons.ArrowRight,
+                    contentDescription = stringResource(Res.string.feature_settings_change_theme_placeholder_text),
+                )
+            }
         }
     }
 }

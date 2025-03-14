@@ -28,4 +28,6 @@
     <string name="feature_settings_dynamic_color_yes">Yes</string>
     <string name="feature_settings_dynamic_color_no">No</string>
     <string name="feature_settings_dismiss_dialog_button_text">OK</string>
+    <string name="feature_settings_change_theme_text">Change Theme</string>
+    <string name="feature_settings_change_theme_placeholder_text">Change Theme</string>
 </resources>

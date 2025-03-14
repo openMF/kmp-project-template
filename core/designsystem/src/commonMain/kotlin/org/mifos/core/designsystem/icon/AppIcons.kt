@@ -11,6 +11,7 @@ package org.mifos.core.designsystem.icon
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.ArrowOutward
 import androidx.compose.material.icons.filled.AttachMoney
@@ -54,6 +55,7 @@ import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material.icons.outlined.Wallet
+import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material.icons.rounded.AccountBalance
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Add
@@ -98,6 +100,7 @@ object AppIcons {
     val OutlinedShare = Icons.Outlined.Share
     val ArrowBack = Icons.AutoMirrored.Filled.ArrowBack
     val ArrowBack2 = Icons.Filled.ChevronLeft
+    val ArrowRight = Icons.AutoMirrored.Filled.KeyboardArrowRight
     val Cancel = Icons.Outlined.Cancel
     val AccountCircle = Icons.Outlined.AccountCircle
     val SendRightTilted = Icons.Default.ArrowOutward
@@ -126,4 +129,7 @@ object AppIcons {
     val Scan = Icons.Outlined.QrCodeScanner
     val RadioButtonUnchecked = Icons.Default.RadioButtonUnchecked
     val RadioButtonChecked = Icons.Filled.RadioButtonChecked
+
+//    val Theme = Icons.Filled.WbSunny
+    val Sun = Icons.Outlined.WbSunny
 }

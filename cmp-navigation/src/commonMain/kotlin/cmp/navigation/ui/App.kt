@@ -36,9 +36,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -62,8 +60,8 @@ import org.mifos.core.designsystem.component.MifosNavigationBarItem
 import org.mifos.core.designsystem.component.MifosNavigationRail
 import org.mifos.core.designsystem.component.MifosNavigationRailItem
 import org.mifos.core.designsystem.icon.AppIcons
-import org.mifos.feature.settings.SettingsDialog
 import org.mifos.feature.settings.navigateToNotification
+import org.mifos.feature.settings.navigateToSettings
 
 @Composable
 internal fun App(
@@ -81,8 +79,6 @@ internal fun App(
 
     val isOffline by appState.isOffline.collectAsStateWithLifecycle()
 
-    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
-
     // If user is not connected to the internet show a snack bar to inform them.
     val notConnectedMessage = stringResource(Res.string.not_connected)
     LaunchedEffect(isOffline) {
@@ -92,12 +88,6 @@ internal fun App(
                 duration = Indefinite,
             )
         }
-    }
-
-    if (showSettingsDialog) {
-        SettingsDialog(
-            onDismiss = { showSettingsDialog = false },
-        )
     }
 
     Scaffold(
@@ -144,8 +134,7 @@ internal fun App(
                     AppBar(
                         title = stringResource(destination.titleText),
                         onNavigateToSettings = {
-//                            appState.navController.navigateToSettings()
-                            showSettingsDialog = true
+                            appState.navController.navigateToSettings()
                         },
                         onNavigateToEditProfile = {},
                         onNavigateToNotification = {

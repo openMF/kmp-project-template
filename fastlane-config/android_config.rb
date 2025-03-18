@@ -1,7 +1,8 @@
 module FastlaneConfig
   module AndroidConfig
     STORE_CONFIG = {
-      default_store_file: "release_keystore.keystore",
+#       default_store_file: "release_keystore.keystore",
+      default_store_file: "keystores/release_keystore.keystore",
       default_store_password: "Wizard@123",
       default_key_alias: "kmp-project-template",
       default_key_password: "Wizard@123"

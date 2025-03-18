@@ -330,14 +330,25 @@ platform :ios do
       path: ios_config[:project_path]
     )
 
-    build_ios_app(
-      project: ios_config[:project_path],
-      scheme: ios_config[:scheme],
-      configuration: options[:configuration],
-      skip_codesigning: "true",
-      output_directory: ios_config[:output_directory],
-      skip_archive: "true"
+    gym(
+        project: ios_config[:project_path],
+        scheme: ios_config[:scheme],
+        configuration: options[:configuration],
+        output_directory: ios_config[:output_directory],
+        output_name: "iosApp.ipa",
+        export_method: "development",
+        clean: true,
+        silent: false,
+        skip_codesigning: false,
     )
+#     build_ios_app(
+#       project: ios_config[:project_path],
+#       scheme: ios_config[:scheme],
+#       configuration: options[:configuration],
+#       skip_codesigning: "true",
+#       output_directory: ios_config[:output_directory],
+#       skip_archive: "true"
+#     )
   end
 
   lane :increment_version do |options|

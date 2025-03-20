@@ -325,21 +325,26 @@ platform :ios do
     options[:configuration] ||= "Debug"
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
-    update_code_signing_settings(
-      use_automatic_signing: true,
-      path: ios_config[:project_path]
-    )
+#     update_code_signing_settings(
+#       use_automatic_signing: true,
+#       path: ios_config[:project_path]
+#     )
 
-    gym(
+    build_ios_app(
         project: ios_config[:project_path],
         scheme: ios_config[:scheme],
         configuration: options[:configuration],
         output_directory: ios_config[:output_directory],
         output_name: "iosApp.ipa",
-        export_method: "development",
+        export_method: "ad-hoc",
         clean: true,
         silent: false,
         skip_codesigning: false,
+        export_options: {
+                provisioningProfiles: {
+                  "cmp.iosL432S2FZP5" => "Mifos_AdHoc_Distribution_2025"
+                }
+        },
     )
 #     build_ios_app(
 #       project: ios_config[:project_path],

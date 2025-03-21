@@ -325,11 +325,6 @@ platform :ios do
     options[:configuration] ||= "Debug"
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
-#     update_code_signing_settings(
-#       use_automatic_signing: true,
-#       path: ios_config[:project_path]
-#     )
-
     build_ios_app(
         project: ios_config[:project_path],
         scheme: ios_config[:scheme],
@@ -346,14 +341,6 @@ platform :ios do
                 }
         },
     )
-#     build_ios_app(
-#       project: ios_config[:project_path],
-#       scheme: ios_config[:scheme],
-#       configuration: options[:configuration],
-#       skip_codesigning: "true",
-#       output_directory: ios_config[:output_directory],
-#       skip_archive: "true"
-#     )
   end
 
   lane :increment_version do |options|
@@ -361,14 +348,18 @@ platform :ios do
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
     latest_release = firebase_app_distribution_get_latest_release(
-      app: firebase_config[:appId],
-      service_credentials_file: options[:serviceCredsFile] || firebase_config[:serviceCredsFile]
+        app: firebase_config[:appId],
+        service_credentials_file: options[:serviceCredsFile] || firebase_config[:serviceCredsFile]
     )
 
-    increment_build_number(
-      xcodeproj: ios_config[:project_path],
-      build_number: latest_release[:buildVersion].to_i + 1
-    )
+    if latest_release
+        increment_build_number(
+          xcodeproj: ios_config[:project_path],
+          build_number: latest_release[:buildVersion].to_i + 1
+        )
+    else
+        UI.important("⚠️ No existing Firebase release found. Skipping build number increment.")
+    end
   end
 
   desc "Upload iOS application to Firebase App Distribution"

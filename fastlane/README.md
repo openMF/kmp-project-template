@@ -108,14 +108,6 @@ Generate full release notes from specified tag or latest release tag
 
 ## iOS
 
-### ios ensure_app_exists
-
-```sh
-[bundle exec] fastlane ios ensure_app_exists
-```
-
-Ensure app exists in Apple Developer Portal
-
 ### ios build_ios
 
 ```sh

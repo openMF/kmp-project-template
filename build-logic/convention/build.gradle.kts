@@ -62,6 +62,11 @@ gradlePlugin {
             implementationClass = "CMPFeatureConventionPlugin"
         }
 
+        register("cmpUiTesting") {
+            id = "org.convention.cmp.ui.testing"
+            implementationClass = "CMPUiTestingConventionPlugin"
+        }
+
         register("kmpKoin") {
             id = "org.convention.kmp.koin"
             implementationClass = "KMPKoinConventionPlugin"

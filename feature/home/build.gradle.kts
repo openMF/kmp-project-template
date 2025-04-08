@@ -9,11 +9,15 @@
  */
 plugins {
     alias(libs.plugins.cmp.feature.convention)
+    alias(libs.plugins.cmp.ui.testing.convention)
     alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
     namespace = "org.mifos.feature.home"
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
 }
 
 kotlin {

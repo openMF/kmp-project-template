@@ -282,6 +282,7 @@ ktrofit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 wire = { id = "com.squareup.wire", version.ref = "wire" }
 
 cmp-feature-convention = { id = "org.convention.cmp.feature", version = "unspecified" }
+cmp-ui-testing-convention = { id = "org.convention.cmp.ui.testing", version = "unspecified" }
 kmp-koin-convention = { id = "org.convention.kmp.koin", version = "unspecified" }
 kmp-library-convention = { id = "org.convention.kmp.library", version = "unspecified" }
 

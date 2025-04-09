@@ -326,11 +326,22 @@ platform :ios do
     options[:configuration] ||= "Debug"
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
+    create_keychain(
+        name: ios_config[:keychain_name],
+        password: ios_config[:keychain_password],
+        default_keychain: true,
+        unlock: true,
+        timeout: 3600
+    )
+
   # Use match to fetch the provisioning profile and certificate
     match(
         type: "adhoc",
         app_identifier: "org.mifos.kmp.template",
-        readonly: true # Use readonly mode to avoid creating new profiles on CI
+        readonly: true, # Use readonly mode to avoid creating new profiles on CI
+        git_basic_authorization: ios_config[:git_basic_authorization],
+        keychain_name: ios_config[:keychain_name],
+        keychain_password: ios_config[:keychain_password]
     )
 
     build_ios_app(

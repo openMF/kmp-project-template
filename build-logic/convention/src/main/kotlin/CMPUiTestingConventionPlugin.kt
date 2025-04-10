@@ -3,24 +3,14 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.dependencies
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
-@OptIn(ExperimentalKotlinGradlePluginApi::class, ExperimentalWasmDsl::class)
+@OptIn(ExperimentalWasmDsl::class)
 class CMPUiTestingConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            plugins.apply("org.jetbrains.kotlin.plugin.compose")
-            plugins.apply("org.jetbrains.compose")
-            plugins.apply("org.convention.kmp.library")
-
             extensions.configure<KotlinMultiplatformExtension>("kotlin") {
-                androidTarget {
-                    instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
-                }
-
                 wasmJs {
                     browser {
                         testTask {

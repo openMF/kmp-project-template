@@ -15,9 +15,6 @@ plugins {
 
 android {
     namespace = "org.mifos.feature.home"
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
 }
 
 kotlin {

@@ -5,6 +5,7 @@ import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 /**
  * Configure the Kotlin Multiplatform plugin with the default hierarchy template and additional targets.
@@ -29,6 +30,10 @@ internal fun Project.configureKotlinMultiplatform() {
         wasmJs() {
             browser()
             nodejs()
+        }
+
+        androidTarget {
+            instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         }
 
         compilerOptions {

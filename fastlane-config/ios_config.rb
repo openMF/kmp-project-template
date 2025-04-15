@@ -18,7 +18,10 @@ module FastlaneConfig
       match_type: "adhoc",
       app_identifier: "org.mifos.kmp.template",
       export_method: "ad-hoc",
-      provisioning_profile_name: "match AdHoc org.mifos.kmp.template"
+      provisioning_profile_name: "match AdHoc org.mifos.kmp.template",
+      git_url: "https://github.com/openMF/ios-provisioning-profile",
+      username: "hekmatullah.amin@icloud.com",
+      storage_mode: "git",
     }
   end
 end

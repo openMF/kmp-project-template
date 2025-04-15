@@ -1,8 +1,0 @@
-git_url("https://github.com/openMF/ios-provisioning-profile")
-
-app_identifier("org.mifos.kmp.template")
-username("hekmatullah.amin@icloud.com") # Your Apple ID
-
-storage_mode("git")
-
-type("adhoc") # The default type, can be: appstore, adhoc, enterprise or development

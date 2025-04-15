@@ -326,14 +326,14 @@ platform :ios do
 
     # Set default configuration if not provided
     options[:configuration] ||= "Debug"
-    match_git_basic_authorization = options[:match_git_basic_authorization] || ENV['MATCH_GIT_BASIC_AUTHORIZATION'] || ios_config[:match_git_basic_authorization]
-    match_password = options[:match_password] || ENV['MATCH_PASSWORD'] || ios_config[:match_password]
-    match_type = options[:match_type] || ENV['MATCH_TYPE'] || ios_config[:match_type]
-    keychain_name = options[:keychain_name] || ENV['KEYCHAIN_NAME'] || ios_config[:keychain_name]
-    keychain_password = options[:keychain_password] || ENV['KEYCHAIN_PASSWORD'] || ios_config[:keychain_password]
-    export_method = options[:export_method] || ENV['EXPORT_METHOD'] || ios_config[:export_method]
-    app_identifier = options[:app_identifier] || ENV['APP_IDENTIFIER'] || ios_config[:app_identifier]
-    provisioning_profile_name = options[:provisioning_profile_name] || ENV['PROVISIONING_PROFILE_NAME'] || ios_config[:provisioning_profile_name]
+    match_git_basic_authorization = options[:match_git_basic_authorization] || ios_config[:match_git_basic_authorization]
+    match_password = options[:match_password] || ios_config[:match_password]
+    match_type = options[:match_type] || ios_config[:match_type]
+    keychain_name = options[:keychain_name] || ios_config[:keychain_name]
+    keychain_password = options[:keychain_password] || ios_config[:keychain_password]
+    export_method = options[:export_method] || ios_config[:export_method]
+    app_identifier = options[:app_identifier] || ios_config[:app_identifier]
+    provisioning_profile_name = options[:provisioning_profile_name] || ios_config[:provisioning_profile_name]
 
     create_keychain(
       name: keychain_name,
@@ -351,7 +351,10 @@ platform :ios do
       readonly: true, # Use readonly mode to avoid creating new profiles on CI
       git_basic_authorization: match_git_basic_authorization,
       keychain_name: keychain_name,
-      keychain_password: keychain_password
+      keychain_password: keychain_password,
+      git_url: ios_config[:git_url],
+      username: ios_config[:username],
+      storage_mode: ios_config[:storage_mode]
     )
 
     build_ios_app(

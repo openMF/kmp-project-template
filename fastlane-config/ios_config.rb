@@ -9,10 +9,16 @@ module FastlaneConfig
     BUILD_CONFIG = {
       project_path: "cmp-ios/iosApp.xcodeproj",
       scheme: "iosApp",
+      output_name: "iosApp.ipa",
       output_directory: "cmp-ios/build",
-      git_basic_authorization: ENV["MATCH_GIT_BASIC_AUTHORIZATION"],
+      git_basic_authorization: "someBase64Code",
+      match_password: "somePassphrasePassword",
       keychain_name: "ci-signing.keychain",
-      keychain_password: ENV["KEYCHAIN_PASSWORD"]
+      keychain_password: "someCustomKeychainPassword",
+      match_type: "adhoc",
+      app_identifier: "org.mifos.kmp.template",
+      export_method: "ad-hoc",
+      provisioning_profile_name: "match AdHoc org.mifos.kmp.template"
     }
   end
 end

@@ -82,13 +82,19 @@ permissions:
 jobs:
   pr_checks:
     name: PR Checks
-    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check.yaml@v1.0.0
-    secrets: inherit
+    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check.yaml@main
     with:
       android_package_name: 'cmp-android' # <-- Change Your Android Package Name
       desktop_package_name: 'cmp-desktop' # <-- Change Your Desktop Package Name
       web_package_name: 'cmp-web' # <-- Change Your Web Package Name
       ios_package_name: 'cmp-ios' # <-- Change Your iOS Package Name
       build_ios: true # <-- Change to 'false' if you don't want to build iOS
-      match_git_authorization_token: ${{ secrets.MATCH_GIT_AUTHORIZATION_TOKEN }}
-      match_password: ${{ secrets.MATCH_PASSWORD }}
+      keychain_name: 'ci-signing.keychain'
+      match_type: 'adhoc'
+      export_method: 'ad-hoc'
+      app_identifier: 'org.mifos.kmp.template'
+      provisioning_profile_name: 'match AdHoc org.mifos.kmp.template'
+    secrets:
+      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}

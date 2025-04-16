@@ -353,6 +353,7 @@ platform :ios do
       keychain_name: keychain_name,
       keychain_password: keychain_password,
       git_url: ios_config[:git_url],
+      git_branch: ios_config[:git_branch]
       username: ios_config[:username],
       storage_mode: ios_config[:storage_mode]
     )

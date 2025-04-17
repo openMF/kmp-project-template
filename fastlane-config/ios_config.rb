@@ -11,7 +11,7 @@ module FastlaneConfig
       scheme: "iosApp",
       output_name: "iosApp.ipa",
       output_directory: "cmp-ios/build",
-      git_basic_authorization: "someBase64Code",
+      match_git_basic_authorization: "someBase64Code",
       match_password: "somePassphrasePassword",
       keychain_name: "ci-signing.keychain",
       keychain_password: "someCustomKeychainPassword",

@@ -319,24 +319,62 @@ platform :android do
 end
 
 platform :ios do
+
   desc "Build iOS application"
   lane :build_ios do |options|
-    # Set default configuration if not provided
-    options[:configuration] ||= "Debug"
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
-    update_code_signing_settings(
-      use_automatic_signing: true,
-      path: ios_config[:project_path]
+    # Set default configuration if not provided
+    options[:configuration] ||= "Debug"
+    match_git_basic_authorization = options[:match_git_basic_authorization] || ios_config[:match_git_basic_authorization]
+    match_password = options[:match_password] || ios_config[:match_password]
+    match_type = options[:match_type] || ios_config[:match_type]
+    keychain_name = options[:keychain_name] || ios_config[:keychain_name]
+    keychain_password = options[:keychain_password] || ios_config[:keychain_password]
+    export_method = options[:export_method] || ios_config[:export_method]
+    app_identifier = options[:app_identifier] || ios_config[:app_identifier]
+    provisioning_profile_name = options[:provisioning_profile_name] || ios_config[:provisioning_profile_name]
+
+    create_keychain(
+      name: keychain_name,
+      password: keychain_password,
+      default_keychain: true,
+      unlock: true,
+      timeout: 3600,
+      add_to_search_list: true
+    )
+
+    # Use match to fetch the provisioning profile and certificate
+    match(
+      type: match_type,
+      app_identifier: app_identifier,
+      readonly: true, # Use readonly mode to avoid creating new profiles on CI
+      git_basic_authorization: match_git_basic_authorization,
+      keychain_name: keychain_name,
+      keychain_password: keychain_password,
+      git_url: ios_config[:git_url],
+      username: ios_config[:username],
+      storage_mode: ios_config[:storage_mode]
     )
 
     build_ios_app(
       project: ios_config[:project_path],
       scheme: ios_config[:scheme],
       configuration: options[:configuration],
-      skip_codesigning: "true",
       output_directory: ios_config[:output_directory],
-      skip_archive: "true"
+      output_name: ios_config[:output_name],
+      export_method: export_method,
+      clean: true,
+      skip_codesigning: false,
+      export_options: {
+        provisioningProfiles: {
+          app_identifier => provisioning_profile_name
+        }
+      }
+    )
+
+    delete_keychain(
+      name: keychain_name
     )
   end
 
@@ -345,14 +383,18 @@ platform :ios do
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
     latest_release = firebase_app_distribution_get_latest_release(
-      app: firebase_config[:appId],
-      service_credentials_file: options[:serviceCredsFile] || firebase_config[:serviceCredsFile]
+        app: firebase_config[:appId],
+        service_credentials_file: options[:serviceCredsFile] || firebase_config[:serviceCredsFile]
     )
 
-    increment_build_number(
-      xcodeproj: ios_config[:project_path],
-      build_number: latest_release[:buildVersion].to_i + 1
-    )
+    if latest_release
+        increment_build_number(
+          xcodeproj: ios_config[:project_path],
+          build_number: latest_release[:buildVersion].to_i + 1
+        )
+    else
+        UI.important("⚠️ No existing Firebase release found. Skipping build number increment.")
+    end
   end
 
   desc "Upload iOS application to Firebase App Distribution"

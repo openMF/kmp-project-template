@@ -8,7 +8,7 @@ module FastlaneConfig
     }
 
     FIREBASE_CONFIG = {
-      firebase_prod_app_id: "1:728434912738:android:d853a78f14af0c381a1dbb",
+      firebase_prod_app_id: "1:728434912738:android:3902eb3363b0938f1a1dbb",
       firebase_demo_app_id: "1:728434912738:android:8392hjksak9032skja",
       firebase_service_creds_file: "secrets/firebaseAppDistributionServiceCredentialsFile.json",
       firebase_groups: "kmp-project-template-testers"

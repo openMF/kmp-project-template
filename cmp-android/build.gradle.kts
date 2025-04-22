@@ -105,8 +105,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.androidx.test.ext.junit)
 
-    testImplementation(kotlin("test"))
-    testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
 }
 

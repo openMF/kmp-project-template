@@ -29,6 +29,7 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.multiplatform.settings.test)
+            implementation(projects.testing)
         }
     }
 }

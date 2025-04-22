@@ -138,7 +138,6 @@ androidx-room-gradle-plugin = { module = "androidx.room:room-gradle-plugin", ver
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqliteBundled" }
-
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 androidx-tracing-ktx = { group = "androidx.tracing", name = "tracing-ktx", version.ref = "androidxTracing" }
 

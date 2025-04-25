@@ -89,12 +89,11 @@ jobs:
       web_package_name: 'cmp-web' # <-- Change Your Web Package Name
       ios_package_name: 'cmp-ios' # <-- Change Your iOS Package Name
       build_ios: true # <-- Change to 'false' if you don't want to build iOS
-      keychain_name: 'ci-signing.keychain'
+      git_url: 'git@github.com:openMF/ios-provisioning-profile.git'
+      git_branch: 'master'
       match_type: 'adhoc'
-      export_method: 'ad-hoc'
       app_identifier: 'org.mifos.kmp.template'
       provisioning_profile_name: 'match AdHoc org.mifos.kmp.template'
     secrets:
-      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-      KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      match_ssh_private_key: ${{ secrets.MATCH_SSH_PRIVATE_KEY }}
+      match_password: ${{ secrets.MATCH_PASSWORD }}

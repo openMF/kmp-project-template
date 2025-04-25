@@ -338,34 +338,40 @@ platform :ios do
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
       app_store_connect_api_key(
-        key_id: options[:key_id] || ios_config[:key_id],
-        issuer_id: options[:issuer_id] || ios_config[:issuer_id],
+        key_id: options[:appstore_key_id] || ios_config[:key_id],
+        issuer_id: options[:appstore_issuer_id] || ios_config[:issuer_id],
         key_filepath: options[:key_filepath] || ios_config[:key_filepath]
       )
   end
 
   private_lane :fetch_certificates_with_match do |options|
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
-
       match(
         type: options[:match_type] || ios_config[:match_type],
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
         readonly: true,
         git_url: options[:git_url] || ios_config[:git_url],
-        git_branch: options[git_branch] || ios_config[:git_branch],
-        git_basic_authorization: options[:match_git_basic_authorization] || ios_config[:match_git_basic_authorization],
-        api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+        git_branch: options[:git_branch] || ios_config[:git_branch],
+        git_private_key: options[:git_private_key] || ios_config[:match_git_private_key]
       )
   end
 
-  private_lane :build_ios_project do
+  private_lane :build_ios_project do |options|
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
+      app_identifier = options[:app_identifier] || ios_config[:app_identifier]
+      provisioning_profile_name = options[:provisioning_profile_name] || ios_config[:provisioning_profile_name]
 
       build_ios_app(
         scheme: ios_config[:scheme],
         project: ios_config[:project_path],
         output_name: ios_config[:output_name],
-        output_directory: ios_config[:output_directory]
+        output_directory: ios_config[:output_directory],
+        export_options: {
+            provisioningProfiles: {
+                app_identifier => provisioning_profile_name
+            }
+        },
+        xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" DEVELOPMENT_TEAM=L432S2FZP5 PROVISIONING_PROFILE_SPECIFIER=\"#{provisioning_profile_name}\""
       )
   end
 
@@ -376,9 +382,8 @@ platform :ios do
   desc "Build Ios application"
   lane :build_ios do |options|
       setup_ci_if_needed
-      load_api_key(options)
       fetch_certificates_with_match(options)
-      build_ios_project
+      build_ios_project(options)
   end
 
   desc "Increment build number from latest Firebase release"
@@ -417,16 +422,19 @@ platform :ios do
     increment_version(serviceCredsFile: firebase_config[:serviceCredsFile])
 
     build_ios(
-        match_type: "adhoc"
+        options.merge(
+            match_type: "adhoc",
+            provisioning_profile_name: "match AdHoc org.mifos.kmp.template"
+        )
     )
 
     releaseNotes = generateReleaseNote()
 
     firebase_app_distribution(
-      app: firebase_config[:appId],
-      service_credentials_file: firebase_config[:serviceCredsFile],
+      app: options[:firebase_app_id] || firebase_config[:appId],
+      service_credentials_file: options[:serviceCredsFile] || firebase_config[:serviceCredsFile],
       release_notes: releaseNotes,
-      groups: firebase_config[:groups]
+      groups: options[:groups] || firebase_config[:groups]
     )
   end
 
@@ -435,8 +443,13 @@ platform :ios do
 
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
+      setup_ci_if_needed
+      load_api_key(options)
+      fetch_certificates_with_match(
+        options.merge(match_type: "appstore")
+      )
+
       latest_build_number = latest_testflight_build_number(
-        username: options[:username] || ios_config[:username],
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
       )
@@ -446,8 +459,10 @@ platform :ios do
         build_number: latest_build_number + 1
       )
 
-      build_ios(
-        match_type: "appstore"
+      build_ios_project(
+        options.merge(
+            provisioning_profile_name: "match AppStore org.mifos.kmp.template"
+        )
       )
 
       pilot(

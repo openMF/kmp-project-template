@@ -2,10 +2,8 @@ package org.convention
 
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 /**
  * Configure the Kotlin Multiplatform plugin with the default hierarchy template and additional targets.
@@ -13,7 +11,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
  * @see KotlinMultiplatformExtension
  * @see configure
  */
-@OptIn(ExperimentalWasmDsl::class, ExperimentalKotlinGradlePluginApi::class)
+@OptIn(ExperimentalWasmDsl::class)
 internal fun Project.configureKotlinMultiplatform() {
     extensions.configure<KotlinMultiplatformExtension> {
         applyDefaultHierarchyTemplate()
@@ -27,13 +25,17 @@ internal fun Project.configureKotlinMultiplatform() {
             this.nodejs()
             binaries.executable()
         }
-        wasmJs() {
-            browser()
+        wasmJs {
+            browser {
+                testTask {
+                    useKarma {
+                        useChromium()
+                        // Add other browsers to test on, eg:-
+                        // useChrome()
+                    }
+                }
+            }
             nodejs()
-        }
-
-        androidTarget {
-            instrumentedTestVariant.sourceSetTree.set(KotlinSourceSetTree.test)
         }
 
         compilerOptions {

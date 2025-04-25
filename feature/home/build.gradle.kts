@@ -9,7 +9,6 @@
  */
 plugins {
     alias(libs.plugins.cmp.feature.convention)
-    alias(libs.plugins.cmp.ui.testing.convention)
     alias(libs.plugins.kotlin.parcelize)
 }
 
@@ -26,6 +25,9 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.kotlinx.serialization.json)
+        }
+        commonTest.dependencies {
+            implementation(projects.uiTesting)
         }
     }
 }

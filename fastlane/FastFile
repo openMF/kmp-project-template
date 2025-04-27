@@ -470,4 +470,35 @@ platform :ios do
         skip_waiting_for_build_processing: true
       )
   end
+
+  desc "Upload iOS Application to AppStore"
+  lane :release do |options|
+
+     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
+
+      setup_ci_if_needed
+
+      load_api_key(options)
+
+      fetch_certificates_with_match(
+        options.merge(
+            match_type: "appstore"
+        )
+      )
+
+      build_ios_project(
+        options.merge(
+            provisioning_profile_name: "match AppStore org.mifos.kmp.template"
+        )
+      )
+
+      deliver(
+        metadata_path: "./fastlane/metadata",
+        automatic_release: false,
+        api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+        skip_app_version_update: true,
+        force: true,
+        precheck_include_in_app_purchases: false
+      )
+  end
 end

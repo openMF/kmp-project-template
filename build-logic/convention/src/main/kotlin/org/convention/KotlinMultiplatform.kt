@@ -26,15 +26,7 @@ internal fun Project.configureKotlinMultiplatform() {
             binaries.executable()
         }
         wasmJs {
-            browser {
-                testTask {
-                    useKarma {
-                        useChromium()
-                        // Add other browsers to test on, eg:-
-                        // useChrome()
-                    }
-                }
-            }
+            browser()
             nodejs()
         }
 

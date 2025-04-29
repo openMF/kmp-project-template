@@ -19,7 +19,9 @@ module FastlaneConfig
       git_branch: "master",
       key_id: "HA469T6757",
       issuer_id: "8er9e361-9603-4c3e-b147-be3b1o816099",
-      key_filepath: "./secrets/Auth_Key.p8"
+      key_filepath: "./secrets/Auth_Key.p8",
+      version_number: "1.0.0",
+      metadata_path: "./fastlane/metadata"
     }
   end
 end

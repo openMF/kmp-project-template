@@ -340,7 +340,8 @@ platform :ios do
       app_store_connect_api_key(
         key_id: options[:appstore_key_id] || ios_config[:key_id],
         issuer_id: options[:appstore_issuer_id] || ios_config[:issuer_id],
-        key_filepath: options[:key_filepath] || ios_config[:key_filepath]
+        key_filepath: options[:key_filepath] || ios_config[:key_filepath],
+        duration: 1200
       )
   end
 
@@ -449,6 +450,11 @@ platform :ios do
         options.merge(match_type: "appstore")
       )
 
+      increment_version_number(
+        xcodeproj: ios_config[:project_path],
+        version_number: ios_config[:version_number]
+      )
+
       latest_build_number = latest_testflight_build_number(
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
@@ -477,13 +483,24 @@ platform :ios do
      ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
       setup_ci_if_needed
-
       load_api_key(options)
-
       fetch_certificates_with_match(
-        options.merge(
-            match_type: "appstore"
-        )
+        options.merge(match_type: "appstore")
+      )
+
+      increment_version_number(
+        xcodeproj: ios_config[:project_path],
+        version_number: ios_config[:version_number]
+      )
+
+      latest_build_number = latest_testflight_build_number(
+        app_identifier: options[:app_identifier] || ios_config[:app_identifier],
+        api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+      )
+
+      increment_build_number(
+        xcodeproj: ios_config[:project_path],
+        build_number: latest_build_number + 1
       )
 
       build_ios_project(
@@ -493,11 +510,12 @@ platform :ios do
       )
 
       deliver(
-        metadata_path: "./fastlane/metadata",
-        automatic_release: false,
+        metadata_path: options[:metadata_path] || ios_config[:metadata_path],
+        submit_for_review: true, # Set to true if you want to auto-submit for review
+        automatic_release: true, # Set to true if you want to auto-release once it approved
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
         skip_app_version_update: true,
-        force: true,
+        force: true, # Skips HTML report verification
         precheck_include_in_app_purchases: false
       )
   end

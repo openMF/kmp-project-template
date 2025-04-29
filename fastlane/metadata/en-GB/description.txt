@@ -2,13 +2,13 @@ The ultimate production-ready starter kit for building powerful, scalable, and m
 
 Features:
 
-- Cross-Platform: Native Android, iOS (SwiftUI integration), Desktop (Compose for Desktop), and Web (Compose Web).
+- Cross-Platform: Native Mobile, Desktop (Compose for Desktop), and Web (Compose Web).
 
 - Clean Architecture: Multi-module, feature-first modularization with a clear separation of concerns (domain, data, and presentation layers).
 
 - Shared Code and UI: Reusable Compose Multiplatform components across platforms, including a built-in design system with light/dark theme support.
 
-- Production-Grade Tools: Static analysis with Detekt, code formatting with Spotless, Git hooks for code quality, and automated testing setup.
+- Production-Grade Tools: Static analysis with Detekt, code formatting with Spotless, Git hooks for code quality.
 
 - CI/CD Integration: Automated builds, pull request validation, versioning, release notes generation, and deployment pipelines with GitHub Actions and Fastlane.
 

@@ -516,7 +516,26 @@ platform :ios do
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
         skip_app_version_update: true,
         force: true, # Skips HTML report verification
-        precheck_include_in_app_purchases: false
+        precheck_include_in_app_purchases: false,
+        app_rating_config_path: ios_config[:app_rating_config_path],
+        submission_information: {
+          add_id_info_uses_idfa: false,
+          add_id_info_limits_tracking: false,
+          add_id_info_serves_ads: false,
+          add_id_info_tracks_action: false,
+          add_id_info_tracks_install: false,
+          content_rights_has_rights: true,
+          content_rights_contains_third_party_content: false,
+          export_compliance_platform: 'ios',
+          export_compliance_compliance_required: false,
+          export_compliance_encryption_updated: false,
+          export_compliance_app_type: nil,
+          export_compliance_uses_encryption: false,
+          export_compliance_is_exempt: true,
+          export_compliance_contains_third_party_cryptography: false,
+          export_compliance_contains_proprietary_cryptography: false,
+          export_compliance_available_on_french_store: true
+        }
       )
   end
 end

@@ -11,18 +11,18 @@ module FastlaneConfig
       scheme: "iosApp",
       output_name: "iosApp.ipa",
       output_directory: "cmp-ios/build",
-      match_git_basic_authorization: "someBase64Code",
-      match_password: "somePassphrasePassword",
-      keychain_name: "ci-signing.keychain",
-      keychain_password: "someCustomKeychainPassword",
+      match_git_private_key: "./secrets/match_ci_key",
       match_type: "adhoc",
       app_identifier: "org.mifos.kmp.template",
-      export_method: "ad-hoc",
       provisioning_profile_name: "match AdHoc org.mifos.kmp.template",
-      git_url: "https://github.com/openMF/ios-provisioning-profile",
+      git_url: "git@github.com:openMF/ios-provisioning-profile.git",
       git_branch: "master",
-      username: "hekmatullah.amin@icloud.com",
-      storage_mode: "git",
+      key_id: "HA469T6757",
+      issuer_id: "8er9e361-9603-4c3e-b147-be3b1o816099",
+      key_filepath: "./secrets/Auth_Key.p8",
+      version_number: "1.0.0",
+      metadata_path: "./fastlane/metadata",
+      app_rating_config_path: "./fastlane/age_rating.json"
     }
   end
 end

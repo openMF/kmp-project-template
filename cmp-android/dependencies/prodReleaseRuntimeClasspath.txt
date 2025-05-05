@@ -1,6 +1,7 @@
 :cmp-navigation
 :cmp-shared
 :core-base:datastore
+:core-base:network
 :core:analytics
 :core:common
 :core:data

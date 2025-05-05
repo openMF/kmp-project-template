@@ -1,5 +1,15 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 plugins {
     alias(libs.plugins.kmp.library.convention)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -9,27 +19,33 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.ktor.client.core)
+            api(libs.ktor.client.core)
+            api(libs.ktor.client.logging)
+            api(libs.ktor.client.content.negotiation)
+            api(libs.ktor.serialization.kotlinx.json)
+            api(libs.ktor.client.auth)
+            api(libs.ktorfit.lib)
         }
 
         androidMain.dependencies {
-            implementation(libs.ktor.client.okhttp)
+            api(libs.ktor.client.okhttp)
+            api(libs.koin.android)
         }
 
         nativeMain.dependencies {
-            implementation(libs.ktor.client.darwin)
+            api(libs.ktor.client.darwin)
         }
 
         desktopMain.dependencies {
-            implementation(libs.ktor.client.okhttp)
+            api(libs.ktor.client.okhttp)
         }
 
         jsMain.dependencies {
-            implementation(libs.ktor.client.js)
+            api(libs.ktor.client.js)
         }
 
         wasmJsMain.dependencies {
-            implementation(libs.ktor.client.js)
+            api(libs.ktor.client.js)
         }
     }
 }

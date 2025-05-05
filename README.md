@@ -276,6 +276,17 @@ core/
 └── designsystem/ # Design system components
 ```
 
+### Core Base Modules
+
+The core-base package contains reusable foundational components shared across all apps built with this template:
+```
+core-base/
+├── database/    # Shared DB layer
+├── datastore/       # Preference storage using russhwolf/multiplatform-settings
+├── network/         # API communication module powered by Ktorfit
+```
+- View core-base/network README
+
 ### Feature Modules
 
 ```
@@ -363,6 +374,7 @@ We welcome contributions! Here's how you can help:
 - [Architecture Overview](docs/ARCHITECTURE.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Code Style Guide](docs/STYLE_GUIDE.md)
+- [Networking Module](core-base/network/README.md)
 
 ## 📫 Support
 

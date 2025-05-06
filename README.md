@@ -95,7 +95,7 @@
 - **Error Handling**: Comprehensive error management
 
 ### 🔄 Sync Capabilities
-
+> For more information checkout [Readme](./docs/SYNC_SCRIPT.md) for more details.
 - **Enhanced Directory Sync**: Comprehensive sync system for all project components
 - **GitHub Actions Integration**: Automated weekly sync workflow with PR generation
 - **Advanced Sync Script**: Feature-rich bash script with safety measures
@@ -107,6 +107,71 @@
     - **Core Files**: Gemfile, Gemfile.lock, ci-prepush scripts
 - **Safety Features**: Automatic backups, error handling, and dry-run mode
 - **Change Validation**: Smart detection of necessary updates
+
+### 🔐 Secrets Manager
+
+The repository includes a powerful keystore management script that automates the Android app signing process across development and CI/CD environments.
+
+#### Key Features
+
+- **Dual Keystore Generation**: Creates both debug (ORIGINAL) and release (UPLOAD) keystores
+- **Configuration Automation**: Automatically updates Gradle and Fastlane configurations
+- **GitHub Secrets Management**: Seamlessly integrates with CI/CD pipelines
+- **Secret Visualization**: View all managed secrets in a formatted table
+- **Multi-environment Support**: Works with GitHub environment secrets
+
+#### Usage
+
+```bash
+# Generate keystores and update configurations
+./keystore-manager.sh generate
+
+# View all secrets in a formatted table
+./keystore-manager.sh view
+
+# Add secrets to GitHub repository
+./keystore-manager.sh add --repo=username/repo
+
+# List all secrets in GitHub repository
+./keystore-manager.sh list --repo=username/repo
+
+# Delete a specific secret
+./keystore-manager.sh delete --repo=username/repo --name=SECRET_NAME
+
+# Delete all secrets defined in secrets.env
+./keystore-manager.sh delete-all --repo=username/repo
+
+# Delete all secrets including excluded ones
+./keystore-manager.sh delete-all --repo=username/repo --include-excluded
+```
+
+#### Files Updated by Script
+
+The script automatically updates several configuration files:
+
+- **secrets.env**: Stores keystore credentials and base64-encoded keystores
+- **fastlane-config/android_config.rb**: Updates Fastlane configuration
+- **cmp-android/build.gradle.kts**: Updates Gradle signing configuration
+
+#### Directory Structure
+
+```
+project/
+├── keystore-manager.sh        # The main script
+├── secrets.env                # Environment file with secrets
+└── keystores/                 # Directory containing keystore files
+    ├── original.keystore      # Debug/development keystore
+    └── upload.keystore        # Release/production keystore
+```
+
+#### Security Best Practices
+
+- Keystores are stored locally in the `keystores` directory
+- Only base64-encoded versions are added as GitHub secrets
+- Certificate information (company name, location) is excluded from GitHub
+- Sensitive values can be quoted to handle spaces and special characters
+
+For detailed information, run `./keystore-manager.sh help` or read the [Secrets Manager](./docs/SECRETS_MANAGER.md)
 
 ## 🚀 Quick Start
 

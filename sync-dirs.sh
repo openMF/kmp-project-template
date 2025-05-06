@@ -47,12 +47,33 @@ SYNC_FILES=(
 # Define exclusions for directories and files
 # Format: "path/to/exclude:type"
 # type can be 'dir' or 'file'
+# Use "root" key for files in the root directory
 declare -A EXCLUSIONS=(
     ["cmp-android"]="src/main/res:dir dependencies:dir src/main/ic_launcher-playstore.png:file google-services.json:file"
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
     ["cmp-desktop"]="icons:dir"
     ["cmp-ios"]="iosApp/Assets.xcassets:dir"
+    ["root"]="secrets.env:file"
 )
+
+# Display help information
+show_help() {
+    echo -e "${BOLD}Usage:${NC} ./sync-dirs.sh [options]"
+    echo
+    echo -e "${BOLD}Description:${NC}"
+    echo "  This script syncs directories and files from an upstream repository."
+    echo "  It preserves excluded files and directories as defined in the script."
+    echo
+    echo -e "${BOLD}Options:${NC}"
+    echo "  -h, --help      Display this help message and exit"
+    echo "  --dry-run       Show what would be done without making changes"
+    echo "  -f, --force     Skip confirmation prompts and proceed automatically"
+    echo
+    echo -e "${BOLD}Examples:${NC}"
+    echo "  ./sync-dirs.sh              # Run with interactive prompts"
+    echo "  ./sync-dirs.sh --dry-run    # Test run without changes"
+    echo "  ./sync-dirs.sh --force      # Run with no prompts"
+}
 
 # Logging function
 log_message() {
@@ -134,7 +155,30 @@ is_excluded() {
     # Remove ./ from the beginning of the path if it exists
     full_path="${full_path#./}"
 
+    # Check for root-level exclusions
+    if [ -n "${EXCLUSIONS["root"]}" ] && [[ "$check_type" == "file" ]]; then
+        local IFS=' '
+        read -ra ROOT_EXCLUDE_ITEMS <<< "${EXCLUSIONS["root"]}"
+
+        for item in "${ROOT_EXCLUDE_ITEMS[@]}"; do
+            local IFS=':'
+            read -ra PARTS <<< "$item"
+            local exclude_path="${PARTS[0]}"
+            local exclude_type="${PARTS[1]}"
+
+            if [ "$exclude_type" = "$check_type" ] && [ "$full_path" = "$exclude_path" ]; then
+                return 0  # Path is excluded
+            fi
+        done
+    fi
+
+    # Check directory-specific exclusions
     for dir in "${!EXCLUSIONS[@]}"; do
+        # Skip the root key as we've already checked it
+        if [ "$dir" = "root" ]; then
+            continue
+        fi
+
         # Check if the path starts with the directory we're looking at
         if [[ "$full_path" == "$dir"* ]]; then
             local IFS=' '
@@ -279,9 +323,8 @@ sync_file() {
     local file=$1
     local temp_branch=$2
 
-    # Check if file should be excluded
-    local dir=$(dirname "$file")
-    if is_excluded "$dir" "$file" "file"; then
+    # Check if file should be excluded (root-level or directory-specific)
+    if is_excluded "$(dirname "$file")" "$file" "file"; then
         print_step "Skipping excluded file: ${BOLD}$file${NC}"
         return
     fi
@@ -314,9 +357,60 @@ get_default_branch() {
     echo "$default_branch"
 }
 
+# Function to preserve root-level excluded files
+preserve_root_files() {
+    if [ -n "${EXCLUSIONS["root"]}" ] && [ "$DRY_RUN" = false ]; then
+        print_step "Preserving root-level excluded files..."
+        mkdir -p "temp_root"
+
+        local IFS=' '
+        read -ra ROOT_EXCLUDE_ITEMS <<< "${EXCLUSIONS["root"]}"
+
+        for item in "${ROOT_EXCLUDE_ITEMS[@]}"; do
+            local IFS=':'
+            read -ra PARTS <<< "$item"
+            local exclude_path="${PARTS[0]}"
+            local exclude_type="${PARTS[1]}"
+
+            if [ "$exclude_type" = "file" ] && [ -f "$exclude_path" ]; then
+                print_step "Preserving root file: ${BOLD}$exclude_path${NC}"
+                cp "$exclude_path" "temp_root/"
+            fi
+        done
+    fi
+}
+
+# Function to restore root-level excluded files
+restore_root_files() {
+    if [ -n "${EXCLUSIONS["root"]}" ] && [ "$DRY_RUN" = false ]; then
+        print_step "Restoring root-level excluded files..."
+
+        local IFS=' '
+        read -ra ROOT_EXCLUDE_ITEMS <<< "${EXCLUSIONS["root"]}"
+
+        for item in "${ROOT_EXCLUDE_ITEMS[@]}"; do
+            local IFS=':'
+            read -ra PARTS <<< "$item"
+            local exclude_path="${PARTS[0]}"
+            local exclude_type="${PARTS[1]}"
+
+            if [ "$exclude_type" = "file" ] && [ -f "temp_root/$(basename "$exclude_path")" ]; then
+                print_step "Restoring root file: ${BOLD}$exclude_path${NC}"
+                cp "temp_root/$(basename "$exclude_path")" "$exclude_path"
+            fi
+        done
+
+        rm -rf "temp_root"
+    fi
+}
+
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
         --dry-run)
             DRY_RUN=true
             shift
@@ -326,7 +420,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            handle_error "Unknown option: $1"
+            handle_error "Unknown option: $1. Use --help for usage information."
             ;;
     esac
 done
@@ -351,7 +445,11 @@ for dir in "${!EXCLUSIONS[@]}"; do
     for item in "${EXCLUDE_ITEMS[@]}"; do
         IFS=':'
         read -ra PARTS <<< "$item"
-        echo -e "    → ${PARTS[0]} (${PARTS[1]})"
+        if [ "$dir" = "root" ]; then
+            echo -e "    → ${PARTS[0]} (${PARTS[1]}) [root level]"
+        else
+            echo -e "    → ${PARTS[0]} (${PARTS[1]})"
+        fi
     done
 done
 IFS="$OLD_IFS"  # Restore original IFS
@@ -416,6 +514,9 @@ if [ "$DRY_RUN" = false ]; then
         handle_error "Failed to switch to sync branch"
     fi
     show_progress
+
+    # Preserve root-level excluded files
+    preserve_root_files
 fi
 
 # Sync directories
@@ -433,8 +534,12 @@ for file in "${SYNC_FILES[@]}"; do
 done
 
 if [ "$DRY_RUN" = false ]; then
+    # Restore root-level excluded files
+    restore_root_files
+
     cleanup_temp_dirs
     rm -rf temp_files
+
     # Cleanup temporary branch
     print_step "Cleaning up temporary branch..."
     git branch -D "$TEMP_BRANCH" || handle_error "Failed to delete temporary branch"

@@ -78,6 +78,7 @@ jobs:
             ["cmp-web"]="src/jsMain/resources src/wasmJsMain/resources"
             ["cmp-desktop"]="icons"
             ["cmp-ios"]="iosApp/Assets.xcassets"
+            ["root"]="secrets.env"
           )
           
           # Function to check if path should be excluded
@@ -85,6 +86,17 @@ jobs:
             local dir=$1
             local path=$2
           
+            # Check for root exclusions
+            if [[ "$dir" == "." && -n "${EXCLUSIONS["root"]}" ]]; then
+              local root_excluded_paths=(${EXCLUSIONS["root"]})
+              for excluded in "${root_excluded_paths[@]}"; do
+                if [[ "$path" == *"$excluded"* ]]; then
+                  return 0
+                fi
+              done
+            fi
+          
+            # Check directory-specific exclusions
             if [[ -n "${EXCLUSIONS[$dir]}" ]]; then
               local excluded_paths=(${EXCLUSIONS[$dir]})
               for excluded in "${excluded_paths[@]}"; do
@@ -131,8 +143,38 @@ jobs:
             fi
           }
           
+          # Function to preserve root-level excluded files
+          preserve_root_files() {
+            if [[ -n "${EXCLUSIONS["root"]}" ]]; then
+              local excluded_paths=(${EXCLUSIONS["root"]})
+              for excluded in "${excluded_paths[@]}"; do
+                if [[ -e "$excluded" ]]; then
+                  echo "Preserving root-level excluded file: $excluded"
+                  mkdir -p "temp_excluded/root"
+                  cp -r "$excluded" "temp_excluded/root/"
+                fi
+              done
+            fi
+          }
+          
+          # Function to restore root-level excluded files
+          restore_root_files() {
+            if [[ -n "${EXCLUSIONS["root"]}" ]]; then
+              local excluded_paths=(${EXCLUSIONS["root"]})
+              for excluded in "${excluded_paths[@]}"; do
+                if [[ -e "temp_excluded/root/$excluded" ]]; then
+                  echo "Restoring root-level excluded file: $excluded"
+                  cp -r "temp_excluded/root/$excluded" "./"
+                fi
+              done
+            fi
+          }
+          
           # Create temp directory for exclusions
           mkdir -p temp_excluded
+          
+          # Preserve root-level exclusions before sync
+          preserve_root_files
           
           # Switch to dev branch
           git checkout dev
@@ -156,21 +198,19 @@ jobs:
             restore_excluded "$dir"
           done
           
-          sync_files() {
-            # Sync files
-            for file in "${FILES[@]}"; do
-              local dir=$(dirname "$file")
-              if ! should_exclude "$dir" "$file"; then
-                echo "Syncing $file..."
-                git checkout "${{ env.TEMP_BRANCH }}" -- "$file" || true
-              else
-                echo "Skipping excluded file: $file"
-              fi
-            done
-          }
-
-          # Call the function if needed
-          sync_files
+          # Sync files
+          for file in "${FILES[@]}"; do
+            local dir=$(dirname "$file")
+            if ! should_exclude "$dir" "$file"; then
+              echo "Syncing $file..."
+              git checkout "${{ env.TEMP_BRANCH }}" -- "$file" || true
+            else
+              echo "Skipping excluded file: $file"
+            fi
+          done
+          
+          # Restore root-level excluded files
+          restore_root_files
           
           # Cleanup temp directory
           rm -rf temp_excluded
@@ -218,6 +258,9 @@ jobs:
             - Gemfile.lock
             - ci-prepush.bat
             - ci-prepush.sh
+            
+            Root-level exclusions:
+            - secrets.env
             
             Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           branch: sync-dirs-${{ github.run_number }}

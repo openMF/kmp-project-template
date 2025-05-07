@@ -9,5 +9,5 @@
     See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 </manifest>

@@ -12,10 +12,14 @@ package cmp.shared
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cmp.navigation.ComposeApp
+import template.core.base.platform.LocalManagerProvider
+import template.core.base.platform.context.LocalContext
 
 @Composable
 fun SharedApp(
     modifier: Modifier = Modifier,
 ) {
-    ComposeApp(modifier = modifier)
+    LocalManagerProvider(LocalContext.current) {
+        ComposeApp(modifier = modifier)
+    }
 }

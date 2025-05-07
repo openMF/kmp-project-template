@@ -15,10 +15,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
+import com.mohamedrejeb.calf.permissions.Permission
+import com.mohamedrejeb.calf.permissions.rememberPermissionState
+import kotlinx.coroutines.launch
+import org.mifos.core.designsystem.component.MifosButton
 import org.mifos.core.designsystem.component.MifosScaffold
+import template.core.base.platform.LocalAppReviewManager
+import template.core.base.platform.LocalAppUpdateManager
+import template.core.base.platform.LocalIntentManager
+import template.core.base.platform.intent.IntentManager
+import template.core.base.platform.review.AppReviewManager
+import template.core.base.platform.update.AppUpdateManager
 
 /**
  * Home Screen composable.
@@ -26,10 +38,10 @@ import org.mifos.core.designsystem.component.MifosScaffold
  * @return Composable
  */
 @Composable
-internal fun HomeScreen(modifier: Modifier = Modifier) {
-    HomeScreenContent(
-        modifier = modifier.fillMaxSize(),
-    )
+internal fun HomeScreen(
+    modifier: Modifier = Modifier,
+) {
+    HomeScreenContent(modifier = modifier)
 }
 
 /**
@@ -38,20 +50,60 @@ internal fun HomeScreen(modifier: Modifier = Modifier) {
  * @param modifier Modifier
  * @return Composable
  */
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun HomeScreenContent(
     modifier: Modifier = Modifier,
+    reviewManager: AppReviewManager = LocalAppReviewManager.current,
+    updateManager: AppUpdateManager = LocalAppUpdateManager.current,
+    intentManager: IntentManager = LocalIntentManager.current,
 ) {
-    MifosScaffold(modifier = modifier) {
+    val scope = rememberCoroutineScope()
+    val permissionState = rememberPermissionState(Permission.Notification)
+
+    MifosScaffold(
+        modifier = modifier.fillMaxSize(),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
         ) {
-            // HomeScreenContent
-            Text(text = "Home Screen", fontWeight = FontWeight.SemiBold)
+            MifosButton(
+                onClick = {
+                    reviewManager.promptForReview()
+                },
+            ) {
+                Text(text = "Prompt Review")
+            }
+
+            MifosButton(
+                onClick = {
+                    updateManager.checkForAppUpdate()
+                },
+            ) {
+                Text(text = "Check for Update")
+            }
+
+            MifosButton(
+                onClick = {
+                    scope.launch {
+                        permissionState.launchPermissionRequest()
+                    }
+                },
+            ) {
+                Text(text = "Check Permissions")
+            }
+
+            MifosButton(
+                onClick = {
+                    intentManager.shareText("Share Text")
+                },
+            ) {
+                Text(text = "Launch Intent")
+            }
         }
     }
 }

@@ -31,6 +31,7 @@ kotlin {
             // Navigation Modules
             implementation(projects.cmpNavigation)
             implementation(compose.components.resources)
+            implementation(projects.coreBase.platform)
         }
 
         desktopMain.dependencies {

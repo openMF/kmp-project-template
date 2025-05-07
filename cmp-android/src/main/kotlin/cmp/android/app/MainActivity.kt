@@ -17,6 +17,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import cmp.shared.SharedApp
 import org.mifos.core.ui.utils.ShareUtils
+import template.core.base.platform.update.AppUpdateManager
+import template.core.base.platform.update.AppUpdateManagerImpl
 
 /**
  * Main activity class.
@@ -26,12 +28,16 @@ import org.mifos.core.ui.utils.ShareUtils
  * @see ComponentActivity
  */
 class MainActivity : ComponentActivity() {
+
+    private lateinit var appUpdateManager: AppUpdateManager
+
     /**
      * Called when the activity is starting.
      * This is where most initialization should go: calling [setContentView(int)] to inflate the activity's UI,
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appUpdateManager = AppUpdateManagerImpl(this)
 
         installSplashScreen()
 
@@ -45,7 +51,18 @@ class MainActivity : ComponentActivity() {
          * @see setContent
          */
         setContent {
+//            val status = viewModel.networkStatus.collectAsStateWithLifecycle().value
+//
+//            if (status) {
+//                appUpdateManager.checkForAppUpdate()
+//            }
+
             SharedApp()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateManager.checkForResumeUpdateState()
     }
 }

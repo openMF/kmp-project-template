@@ -19,6 +19,9 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.coreBase.platform)
+            implementation(libs.calf.permissions)
+
             implementation(compose.ui)
             implementation(compose.foundation)
             implementation(compose.material3)

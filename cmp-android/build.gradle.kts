@@ -80,6 +80,7 @@ android {
 dependencies {
     implementation(projects.cmpShared)
     implementation(projects.core.ui)
+    implementation(projects.coreBase.platform)
 
     // Compose
     implementation(libs.androidx.core.ktx)
@@ -95,6 +96,9 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
+
+    implementation(libs.app.update.ktx)
+    implementation(libs.app.update)
 
     runtimeOnly(libs.androidx.compose.runtime)
     debugImplementation(libs.androidx.compose.ui.tooling)

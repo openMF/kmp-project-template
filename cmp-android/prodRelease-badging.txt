@@ -1,7 +1,8 @@
-package: name='cmp.android.app' versionCode='1' versionName='2025.5.2-beta.0.2' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
+package: name='cmp.android.app' versionCode='1' versionName='2025.5.2-beta.0.4' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
 sdkVersion:'26'
 targetSdkVersion:'34'
 uses-permission: name='android.permission.INTERNET'
+uses-permission: name='android.permission.POST_NOTIFICATIONS'
 uses-permission: name='android.permission.ACCESS_NETWORK_STATE'
 uses-permission: name='cmp.android.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
 application-label:'AndroidApp'
@@ -105,6 +106,7 @@ feature-group: label=''
   uses-feature: name='android.hardware.faketouch'
   uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'
 main
+other-activities
 other-receivers
 supports-screens: 'small' 'normal' 'large' 'xlarge'
 supports-any-density: 'true'

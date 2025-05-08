@@ -1493,7 +1493,6 @@
 |    |    |    |    +--- androidx.browser:browser:1.8.0 (*)
 |    |    |    |    +--- androidx.compose.runtime:runtime -> 1.7.6 (*)
 |    |    |    |    +--- org.jetbrains.compose.material3:material3:1.7.0-rc01 (*)
-|    |    |    |    +--- org.jetbrains.compose.components:components-resources:1.7.0-rc01 (*)
 |    |    |    |    +--- com.google.android.play:review:2.0.2
 |    |    |    |    |    +--- com.google.android.gms:play-services-basement:18.4.0
 |    |    |    |    |    |    +--- androidx.collection:collection:1.0.0 -> 1.4.4 (*)
@@ -1566,6 +1565,7 @@
 |    |    |    |    |              +--- org.jetbrains.compose.ui:ui:1.7.3 (*)
 |    |    |    |    |              +--- org.jetbrains.compose.ui:ui-text:1.7.3 (*)
 |    |    |    |    |              \--- org.jetbrains.compose.ui:ui-util:1.7.3 (*)
+|    |    |    |    +--- org.jetbrains.compose.components:components-resources:1.7.0-rc01 (*)
 |    |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.1.0 (*)
 |    |    |    +--- com.mohamedrejeb.calf:calf-permissions:0.7.1 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.7.0-rc01 -> 1.7.3 (*)

@@ -81,6 +81,7 @@ dependencies {
     implementation(projects.cmpShared)
     implementation(projects.core.ui)
     implementation(projects.coreBase.platform)
+    implementation(projects.coreBase.ui)
 
     // Compose
     implementation(libs.androidx.core.ktx)
@@ -99,6 +100,8 @@ dependencies {
 
     implementation(libs.app.update.ktx)
     implementation(libs.app.update)
+
+    implementation(libs.coil.kt)
 
     runtimeOnly(libs.androidx.compose.runtime)
     debugImplementation(libs.androidx.compose.ui.tooling)

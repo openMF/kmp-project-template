@@ -16,9 +16,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import cmp.shared.SharedApp
-import org.mifos.core.ui.utils.ShareUtils
 import template.core.base.platform.update.AppUpdateManager
 import template.core.base.platform.update.AppUpdateManagerImpl
+import template.core.base.ui.ShareUtils
 
 /**
  * Main activity class.
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         enableEdgeToEdge()
 
-        ShareUtils.setActivityProvider { return@setActivityProvider this }
+        template.core.base.ui.ShareUtils.setActivityProvider { return@setActivityProvider this }
 
         /**
          * Set the content view of the activity.

@@ -12,14 +12,19 @@ package cmp.shared
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cmp.navigation.ComposeApp
+import coil3.compose.LocalPlatformContext
 import template.core.base.platform.LocalManagerProvider
 import template.core.base.platform.context.LocalContext
+import template.core.base.ui.LocalImageLoaderProvider
+import template.core.base.ui.rememberImageLoader
 
 @Composable
 fun SharedApp(
     modifier: Modifier = Modifier,
 ) {
     LocalManagerProvider(LocalContext.current) {
-        ComposeApp(modifier = modifier)
+        LocalImageLoaderProvider(rememberImageLoader(LocalPlatformContext.current)) {
+            ComposeApp(modifier = modifier)
+        }
     }
 }

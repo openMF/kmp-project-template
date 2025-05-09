@@ -2,6 +2,7 @@
 :cmp-shared
 :core-base:datastore
 :core-base:platform
+:core-base:ui
 :core:analytics
 :core:common
 :core:data

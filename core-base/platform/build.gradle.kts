@@ -28,7 +28,6 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.runtime)
             implementation(libs.calf.permissions)
-            implementation(compose.components.resources)
         }
 
         androidMain.dependencies {
@@ -48,10 +47,4 @@ kotlin {
             implementation(libs.app.update)
         }
     }
-}
-
-compose.resources {
-    publicResClass = true
-    generateResClass = always
-    packageOfResClass = "platform.generated.resources"
 }

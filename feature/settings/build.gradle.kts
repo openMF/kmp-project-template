@@ -19,15 +19,17 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.datastore)
+            implementation(projects.core.model)
+            implementation(projects.coreBase.ui)
+
             implementation(compose.ui)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.kotlinx.serialization.json)
 
-            implementation(projects.core.datastore)
-            implementation(projects.core.model)
+            implementation(libs.kotlinx.serialization.json)
         }
     }
 }

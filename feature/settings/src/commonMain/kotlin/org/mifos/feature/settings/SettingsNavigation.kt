@@ -12,7 +12,7 @@ package org.mifos.feature.settings
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import org.mifos.core.ui.composableWithPushTransitions
+import template.core.base.ui.composableWithPushTransitions
 
 const val SETTINGS_ROUTE = "settings_route"
 const val NOTIFICATION_ROUTE = "notification_route"

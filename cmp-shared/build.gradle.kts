@@ -32,6 +32,9 @@ kotlin {
             implementation(projects.cmpNavigation)
             implementation(compose.components.resources)
             implementation(projects.coreBase.platform)
+            implementation(projects.coreBase.ui)
+
+            implementation(libs.coil.kt.compose)
         }
 
         desktopMain.dependencies {

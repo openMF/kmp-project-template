@@ -92,35 +92,35 @@ to child composables.
 
 ```kotlin
 interface IntentManager {
-    // Launch a platform-specific intent
-    fun startActivity(intent: Any)
+   // Launch a platform-specific intent
+   fun startActivity(intent: Any)
 
-    // Open a URI in an appropriate app
-    fun launchUri(uri: String)
+   // Open a URI in an appropriate app
+   fun launchUri(uri: String)
 
-    // Share text with platform sharing mechanism
-    fun shareText(text: String)
+   // Share text with platform sharing mechanism
+   fun shareText(text: String)
 
-    // Share a file with appropriate MIME type
-    fun shareFile(fileUri: String, mimeType: MimeType)
+   // Share a file with appropriate MIME type
+   fun shareFile(fileUri: String, mimeType: MimeType)
 
-    // Extract shared data from incoming intents
-    fun getShareDataFromIntent(intent: Any): ShareData?
+   // Extract shared data from incoming intents
+   fun getShareDataFromIntent(intent: Any): ShareData?
 
-    // Create an intent for document creation
-    fun createDocumentIntent(fileName: String): Any
+   // Create an intent for document creation
+   fun createDocumentIntent(fileName: String): Any
 
-    // Launch application settings
-    fun startApplicationDetailsSettingsActivity()
+   // Launch application settings
+   fun startApplicationDetailsSettingsActivity()
 
-    // Open default email application
-    fun startDefaultEmailApplication()
+   // Open default email application
+   fun startDefaultEmailApplication()
 
-    // Data wrapper for incoming shared content
-    sealed class ShareData {
-        data class TextSend(val subject: String?, val text: String) : ShareData()
-        // Extensible for future share types (images, files, etc.)
-    }
+   // Data wrapper for incoming shared content
+   sealed class ShareData {
+      data class TextSend(val subject: String?, val text: String) : ShareData()
+      // Extensible for future share types (images, files, etc.)
+   }
 }
 ```
 

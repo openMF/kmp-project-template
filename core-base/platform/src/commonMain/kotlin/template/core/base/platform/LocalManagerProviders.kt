@@ -17,6 +17,21 @@ import template.core.base.platform.intent.IntentManager
 import template.core.base.platform.review.AppReviewManager
 import template.core.base.platform.update.AppUpdateManager
 
+/**
+ * A composable function that provides platform-specific managers to the composition tree.
+ *
+ * This function initializes and provides various platform-specific managers
+ * (AppReviewManager, IntentManager, AppUpdateManager) to the composition through
+ * CompositionLocal providers. It acts as a central point for injecting
+ * platform-specific functionality into the Compose UI hierarchy.
+ *
+ * As an expect function, platform-specific implementations will be provided in
+ * each target platform's source set, allowing for platform-specific initialization
+ * while maintaining a consistent API across platforms.
+ *
+ * @param context The platform-specific AppContext to initialize the managers
+ * @param content The composable content where the managers will be available
+ */
 @Composable
 expect fun LocalManagerProvider(
     context: AppContext,

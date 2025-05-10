@@ -40,8 +40,18 @@ import template.core.base.platform.update.AppUpdateManager
 @Composable
 internal fun HomeScreen(
     modifier: Modifier = Modifier,
+    reviewManager: AppReviewManager = LocalAppReviewManager.current,
+    updateManager: AppUpdateManager = LocalAppUpdateManager.current,
+    intentManager: IntentManager = LocalIntentManager.current,
 ) {
-    HomeScreenContent(modifier = modifier)
+    HomeScreenContent(
+        modifier = modifier,
+        showReviewPrompt = reviewManager::promptForReview,
+        checkForUpdate = updateManager::checkForAppUpdate,
+        shareText = {
+            intentManager.shareText("Share Home Screen")
+        },
+    )
 }
 
 /**
@@ -53,10 +63,10 @@ internal fun HomeScreen(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun HomeScreenContent(
+    showReviewPrompt: () -> Unit,
+    checkForUpdate: () -> Unit,
     modifier: Modifier = Modifier,
-    reviewManager: AppReviewManager = LocalAppReviewManager.current,
-    updateManager: AppUpdateManager = LocalAppUpdateManager.current,
-    intentManager: IntentManager = LocalIntentManager.current,
+    shareText: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val permissionState = rememberPermissionState(Permission.Notification)
@@ -72,17 +82,13 @@ internal fun HomeScreenContent(
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
         ) {
             MifosButton(
-                onClick = {
-                    reviewManager.promptForReview()
-                },
+                onClick = showReviewPrompt,
             ) {
                 Text(text = "Prompt Review")
             }
 
             MifosButton(
-                onClick = {
-                    updateManager.checkForAppUpdate()
-                },
+                onClick = checkForUpdate,
             ) {
                 Text(text = "Check for Update")
             }
@@ -98,9 +104,7 @@ internal fun HomeScreenContent(
             }
 
             MifosButton(
-                onClick = {
-                    intentManager.shareText("Share Text")
-                },
+                onClick = shareText,
             ) {
                 Text(text = "Launch Intent")
             }

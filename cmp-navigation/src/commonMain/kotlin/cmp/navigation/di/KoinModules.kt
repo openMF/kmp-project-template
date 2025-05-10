@@ -30,11 +30,17 @@ object KoinModules {
         viewModelOf(::AppViewModel)
     }
 
+    private val featureModule = module {
+        includes(
+            SettingsModule,
+        )
+    }
+
     val allModules = listOf(
         dataModule,
         dispatcherModule,
         DatastoreModule,
-        SettingsModule,
+        featureModule,
         AppModule,
     )
 }

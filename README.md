@@ -53,6 +53,46 @@
 - **Feature-First Modularization**: Independent feature modules for better maintainability
 - **Shared UI Components**: Reusable Compose Multiplatform components
 - **Platform-Specific Optimizations**: Native capabilities while maximizing code sharing
+- **Advanced Source Set Hierarchy**: Sophisticated code sharing structure with logical platform
+  groupings
+
+  #### Source Set Hierarchy
+
+  Our project implements a carefully designed hierarchical source set structure that optimizes code
+  sharing across platforms:
+
+    - **common**: Base shared code for all platforms
+    - **nonAndroid**: Code shared between JVM, JS, and native platforms
+    - **jsCommon**: Code for JavaScript-based platforms (JS, WebAssembly)
+    - **nonJsCommon**: Code for non-JavaScript platforms (JVM, Android, Native)
+    - **jvmCommon**: Code for JVM-based platforms (JVM, Android)
+    - **nonJvmCommon**: Code for non-JVM platforms (JS, WebAssembly, Native)
+    - **jvmJs**: Code shared between JVM and JavaScript platforms
+    - **native**: Code for all native platforms with Apple-specific subgroups
+    - **nonNative**: Code for non-native platforms (JS, WebAssembly, JVM, Android)
+    - **Advanced Source Set Hierarchy**: Sophisticated code sharing structure with logical platform
+      groupings
+
+  > This hierarchical template is applied to both main and test source sets, establishing a
+  consistent structure throughout the project.
+
+  #### Hierarchical Structure
+
+  Our project implements a carefully designed hierarchical source set structure that optimizes code
+  sharing:
+
+    - **common**: Base shared code for all platforms
+    - **nonAndroid**: Code shared between JVM, JS, and native platforms
+    - **jsCommon**: Code for JavaScript-based platforms (JS, WebAssembly)
+    - **nonJsCommon**: Code for non-JavaScript platforms (JVM, Android, Native)
+    - **jvmCommon**: Code for JVM-based platforms (JVM, Android)
+    - **nonJvmCommon**: Code for non-JVM platforms (JS, WebAssembly, Native)
+    - **jvmJs**: Code shared between JVM and JavaScript platforms
+    - **native**: Code for all native platforms with Apple-specific subgroups
+    - **nonNative**: Code for non-native platforms (JS, WebAssembly, JVM, Android)
+
+  This hierarchical template is applied to both main and test source sets, establishing a consistent
+  structure throughout the project.
 
 ### 🛠️ Development Tools
 
@@ -95,7 +135,9 @@
 - **Error Handling**: Comprehensive error management
 
 ### 🔄 Sync Capabilities
+
 > For more information checkout [Readme](./docs/SYNC_SCRIPT.md) for more details.
+
 - **Enhanced Directory Sync**: Comprehensive sync system for all project components
 - **GitHub Actions Integration**: Automated weekly sync workflow with PR generation
 - **Advanced Sync Script**: Feature-rich bash script with safety measures
@@ -110,7 +152,8 @@
 
 ### 🔐 Secrets Manager
 
-The repository includes a powerful keystore management script that automates the Android app signing process across development and CI/CD environments.
+The repository includes a powerful keystore management script that automates the Android app signing
+process across development and CI/CD environments.
 
 #### Key Features
 
@@ -171,7 +214,8 @@ project/
 - Certificate information (company name, location) is excluded from GitHub
 - Sensitive values can be quoted to handle spaces and special characters
 
-For detailed information, run `./keystore-manager.sh help` or read the [Secrets Manager](./docs/SECRETS_MANAGER.md)
+For detailed information, run `./keystore-manager.sh help` or read
+the [Secrets Manager](./docs/SECRETS_MANAGER.md)
 
 ## 🚀 Quick Start
 
@@ -294,7 +338,7 @@ Token (PAT) with the required scopes and save it as a secret:
         - ✅ `write:packages` – To publish and write packages (if applicable).
 
 5. Click **Generate token**.
-6. Copy the token immediately and save it securely. You won’t be able to view it again.
+6. Copy the token immediately and save it securely. You won't be able to view it again.
 
 ---
 
@@ -326,7 +370,88 @@ Token (PAT) with the required scopes and save it as a secret:
 
 ## 📁 Project Structure
 
-### Core Modules
+### Module Structure
+
+### Source Set Hierarchy
+
+The project implements a sophisticated hierarchical structure for organizing Kotlin Multiplatform
+source sets:
+
+```mermaid
+graph TD
+    common[common] --> nonAndroid[nonAndroid]
+    common --> jsCommon[jsCommon]
+    common --> nonJsCommon[nonJsCommon]
+    common --> jvmCommon[jvmCommon]
+    common --> nonJvmCommon[nonJvmCommon]
+    common --> native[native]
+    common --> nonNative[nonNative]
+    common --> jvmJs[jvmJs]
+    nonAndroid --> jvm[JVM/desktop]
+    nonAndroid --> jsCommonFromNonAndroid[jsCommon]
+    nonAndroid --> nativeFromNonAndroid[native]
+    jsCommon --> js[JavaScript]
+    jsCommon --> wasmJs[WebAssembly JS]
+    nonJsCommon --> jvmCommonFromNonJs[jvmCommon]
+    nonJsCommon --> nativeFromNonJs[native]
+    jvmCommon --> android[Android]
+    jvmCommon --> jvmFromJvmCommon[JVM/desktop]
+    nonJvmCommon --> jsCommonFromNonJvm[jsCommon]
+    nonJvmCommon --> nativeFromNonJvm[native]
+    jvmJs --> jvmFromJvmJs[JVM/desktop]
+    jvmJs --> jsCommonFromJvmJs[jsCommon]
+    native --> apple[apple]
+    apple --> ios[ios]
+    apple --> macos[macOS]
+    ios --> iosArm64[iOS Arm64]
+    ios --> iosX64[iOS X64]
+    ios --> iosSimulatorArm64[iOS Simulator Arm64]
+    nonNative --> jsCommonFromNonNative[jsCommon]
+    nonNative --> jvmCommonFromNonNative[jvmCommon]
+    classDef actual fill: #1a73e8, stroke: #000, stroke-width: 2px, color: #ffffff
+    classDef group fill: #90a4ae, stroke: #000, stroke-width: 1px, color: #000000
+    classDef hidden display: none
+    class jvm actual
+    class android actual
+    class js actual
+    class wasmJs actual
+    class iosArm64 actual
+    class iosX64 actual
+    class iosSimulatorArm64 actual
+    class macos actual
+    class common group
+    class nonAndroid group
+    class jsCommon group
+    class nonJsCommon group
+    class jvmCommon group
+    class nonJvmCommon group
+    class jvmJs group
+    class native group
+    class apple group
+    class ios group
+    class nonNative group
+    class jsCommonFromNonAndroid hidden
+    class nativeFromNonAndroid hidden
+    class jvmCommonFromNonJs hidden
+    class nativeFromNonJs hidden
+    class jvmFromJvmCommon hidden
+    class jsCommonFromNonJvm hidden
+    class nativeFromNonJvm hidden
+    class jsCommonFromNonNative hidden
+    class jvmCommonFromNonNative hidden
+    class jvmFromJvmJs hidden
+    class jsCommonFromJvmJs hidden
+```
+
+This structure enables efficient code sharing between platforms with similar characteristics. Each
+source set group serves a specific purpose:
+
+- **Blue Nodes**: Intermediate source set groups (shared code)
+- **Blue with White Text**: Actual platform implementations
+
+### Project Directory Structure
+
+#### Core Modules
 
 ```
 core/
@@ -343,13 +468,16 @@ core/
 
 ### Core Base Modules
 
-The core-base package contains reusable foundational components shared across all apps built with this template:
+The core-base package contains reusable foundational components shared across all apps built with
+this template:
+
 ```
 core-base/
 ├── database/    # Shared DB layer
 ├── datastore/       # Preference storage using russhwolf/multiplatform-settings
 ├── network/         # API communication module powered by Ktorfit
 ```
+
 - View core-base/network README
 
 ### Feature Modules
@@ -370,6 +498,34 @@ cmp-desktop/     # Desktop app
 cmp-web/         # Web app
 cmp-shared/      # Shared code
 cmp-navigation/  # Navigation components
+```
+
+### Source Set Organization
+
+Each module follows the hierarchical source set structure:
+
+```
+src/
+├── commonMain/kotlin/          # Common code for all platforms
+├── nonAndroidMain/kotlin/      # Code for non-Android platforms
+├── jsCommonMain/kotlin/        # Code for JS-based platforms
+├── nonJsCommonMain/kotlin/     # Code for non-JS platforms
+├── jvmCommonMain/kotlin/       # Code for JVM-based platforms
+├── nonJvmCommonMain/kotlin/    # Code for non-JVM platforms
+├── jvmJsMain/kotlin/           # Code shared between JVM and JS platforms
+├── nativeMain/kotlin/          # Code for native platforms
+│   ├── apple/                  # Code for Apple platforms
+│   │   ├── ios/                # iOS-specific code
+│   │   └── macos/              # macOS-specific code
+├── nonNativeMain/kotlin/       # Code for non-native platforms
+├── desktopMain/kotlin/         # JVM-specific code
+├── androidMain/kotlin/         # Android-specific code
+├── iosMain/kotlin/             # General iOS code
+├── iosArm64Main/kotlin/        # iOS device-specific code
+├── iosX64Main/kotlin/          # iOS simulator (Intel) code
+├── iosSimulatorArm64Main/kotlin/ # iOS simulator (Arm64) code
+├── jsMain/kotlin/              # JavaScript-specific code
+└── wasmJsMain/kotlin/          # WebAssembly JS-specific code
 ```
 
 ## 🔄 Module Dependencies
@@ -440,6 +596,8 @@ We welcome contributions! Here's how you can help:
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [Code Style Guide](docs/STYLE_GUIDE.md)
 - [Networking Module](core-base/network/README.md)
+- [Source Set Hierarchy](docs/SOURCE_SET_HIERARCHY.md)
+- [Source Set Hierarchy](docs/SOURCE_SET_HIERARCHY.md)
 
 ## 📫 Support
 

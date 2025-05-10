@@ -1,6 +1,4 @@
-# Kotlin Multiplatform Project Hierarchy
-
-## Overview
+# Source Set Hierarchy in Kotlin Multiplatform
 
 This document provides a comprehensive guide to the hierarchical structure implemented in our Kotlin
 Multiplatform project. The hierarchy template establishes a logical organization of source sets,
@@ -35,7 +33,7 @@ platform similarities:
 | `nonJsCommon`  | Code for non-JavaScript platforms                | JVM, Android, Native          |
 | `jvmCommon`    | Code for JVM-based platforms                     | JVM, Android                  |
 | `nonJvmCommon` | Code for non-JVM platforms                       | JS, WebAssembly, Native       |
-| `jvmJs`        | Code shared between JVM and JavaScript platforms | JVM, JS, WebAssembly          |
+| `jvmJsCommon`  | Code shared between JVM and JavaScript platforms | JVM, JS, WebAssembly          |
 | `native`       | Code for all native platforms                    | iOS, macOS, etc.              |
 | `nonNative`    | Code for non-native platforms                    | JS, WebAssembly, JVM, Android |
 
@@ -183,6 +181,37 @@ This will:
 2. Configure all default targets (JVM, Android, iOS, JS, WebAssembly)
 3. Set up compiler options (including "-Xexpect-actual-classes")
 
+## How The Hierarchy Works
+
+The source set hierarchy defines inheritance relationships between source sets. When you place code
+in a particular source set, it becomes available to all dependent source sets.
+
+### Inheritance Example
+
+Code placed in `jvmCommon` is automatically available to both `android` and `jvm` (desktop) source
+sets:
+
+```kotlin
+// src/jvmCommonMain/kotlin/com/example/PlatformSpecific.kt
+class FileManager {
+    fun readLocalFile(path: String): String {
+        // JVM-specific file reading implementation
+        return java.io.File(path).readText()
+    }
+}
+```
+
+This code is now available in both Android and desktop JVM platforms, but not in JS or native
+platforms.
+
+### Making Smart Code Sharing Decisions
+
+1. **Start with common**: Always try to place code in the `common` source set first
+2. **Move down as needed**: If platform-specific APIs are required, move to the appropriate
+   intermediate source set
+3. **Use expect/actual sparingly**: For truly platform-specific implementations, use `expect` in
+   common and `actual` in platform source sets
+
 ## Practical Code Organization
 
 ### Example Directory Structure
@@ -197,7 +226,7 @@ src/
 ├── nonJsCommonMain/kotlin/     # Code for non-JS platforms
 ├── jvmCommonMain/kotlin/       # Code for JVM-based platforms
 ├── nonJvmCommonMain/kotlin/    # Code for non-JVM platforms
-├── jvmJsMain/kotlin/           # Code shared between JVM and JS platforms
+├── jvmJsCommonMain/kotlin/     # Code shared between JVM and JS platforms
 ├── nativeMain/kotlin/          # Code for native platforms
 │   ├── apple/                  # Code for Apple platforms
 │   │   ├── ios/                # iOS-specific code
@@ -261,6 +290,50 @@ Here's an example of how code sharing works with this hierarchy:
    }
    ```
 
+## Additional Source Set Examples
+
+### Sharing Network Code
+
+For network code that uses platform-specific APIs:
+
+```kotlin
+// src/commonMain/kotlin/com/example/network/NetworkClient.kt
+expect class NetworkClient() {
+    suspend fun fetchData(url: String): String
+}
+
+// src/jvmCommonMain/kotlin/com/example/network/NetworkClient.kt
+actual class NetworkClient {
+    actual suspend fun fetchData(url: String): String {
+        // JVM-specific implementation using java.net
+        return URL(url).readText()
+    }
+}
+
+// src/jsCommonMain/kotlin/com/example/network/NetworkClient.kt
+actual class NetworkClient {
+    actual suspend fun fetchData(url: String): String {
+        // JS-specific implementation using fetch API
+        return window.fetch(url).text()
+    }
+}
+```
+
+### Shared UI Logic with Platform-Specific UI
+
+```kotlin
+// src/commonMain/kotlin/com/example/ui/ViewModel.kt
+class ProfileViewModel {
+    // Common business logic for all platforms
+}
+
+// src/androidMain/kotlin/com/example/ui/ProfileScreen.kt
+// Android-specific Compose UI
+
+// src/iosMain/kotlin/com/example/ui/ProfileScreen.kt
+// iOS-specific SwiftUI integration
+```
+
 ## Dependencies Management
 
 When adding dependencies to your project, consider the appropriate source set:
@@ -303,12 +376,30 @@ or newer. It may be subject to change in future Kotlin releases.
 While this hierarchical structure optimizes code sharing, be mindful of potential build performance
 impacts with very complex hierarchies. Monitor build times and adjust if necessary.
 
+### Common Pitfalls
+
+1. **Excessive Source Sets**: Too many intermediate source sets can complicate the project and slow
+   down builds
+2. **Circular Dependencies**: Be careful not to create circular dependencies between source sets
+3. **Duplicated Implementations**: Multiple `actual` implementations for the same platform can cause
+   conflicts
+
+## Best Practices
+
+1. **Minimize Platform-Specific Code**: Try to write as much platform-agnostic code as possible
+2. **Choose the Right Source Set**: Place code in the most general source set that can support it
+3. **Keep Interfaces in Common**: Define interfaces in common code and implement them in
+   platform-specific code
+4. **Use Clear Module Boundaries**: Maintain separation of concerns between modules
+5. **Document Platform Requirements**: Clearly document when code requires specific platform
+   capabilities
+
 ## Conclusion
 
-This project hierarchy provides a powerful framework for organizing Kotlin Multiplatform code. By
-thoughtfully structuring source sets, you can maximize code sharing while maintaining the
-flexibility to provide platform-specific implementations when needed. The clear organization also
-makes the codebase more maintainable and easier to navigate.
+This hierarchical source set structure provides a powerful framework for organizing Kotlin
+Multiplatform code. By thoughtfully structuring source sets, you can maximize code sharing while
+maintaining the flexibility to provide platform-specific implementations when needed. The clear
+organization also makes the codebase more maintainable and easier to navigate.
 
 For more information, refer to
 the [Kotlin Multiplatform documentation](https://kotlinlang.org/docs/multiplatform.html)

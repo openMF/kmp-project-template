@@ -1,6 +1,7 @@
 # Secrets Manager
 
-A comprehensive bash script for managing Android keystores, automating the signing configuration, and handling GitHub secrets.
+A comprehensive bash script for managing Android keystores, automating the signing configuration,
+and handling GitHub secrets.
 
 ## Table of Contents
 
@@ -23,7 +24,8 @@ A comprehensive bash script for managing Android keystores, automating the signi
 
 ## Overview
 
-The Android Keystore Manager automates the process of creating, storing, and configuring Android app signing keys. It can:
+The Android Keystore Manager automates the process of creating, storing, and configuring Android app
+signing keys. It can:
 
 - Generate debug (ORIGINAL) and release (UPLOAD) keystores with custom information
 - Securely store keystore configurations and passwords
@@ -31,7 +33,8 @@ The Android Keystore Manager automates the process of creating, storing, and con
 - Manage GitHub secrets for CI/CD pipelines
 - Provide a clear view of all managed secrets
 
-This tool is especially useful for development teams that need to maintain consistent signing configurations across multiple environments and CI/CD pipelines.
+This tool is especially useful for development teams that need to maintain consistent signing
+configurations across multiple environments and CI/CD pipelines.
 
 ## Installation
 
@@ -46,7 +49,8 @@ This tool is especially useful for development teams that need to maintain consi
 
 ## Key Features
 
-- **Dual Keystore Management**: Creates and maintains both debug (ORIGINAL) and release (UPLOAD) keystores
+- **Dual Keystore Management**: Creates and maintains both debug (ORIGINAL) and release (UPLOAD)
+  keystores
 - **Automated Configuration**: Updates Gradle and fastlane configurations automatically
 - **GitHub Secrets Integration**: Easily manage secrets for CI/CD pipelines
 - **Secret Visualization**: View all secrets in a nicely formatted table
@@ -62,6 +66,7 @@ This tool is especially useful for development teams that need to maintain consi
 ```
 
 This command:
+
 1. Creates the `keystores` directory if it doesn't exist
 2. Generates both ORIGINAL (debug) and UPLOAD (release) keystores
 3. Updates `secrets.env` with base64-encoded keystores
@@ -74,7 +79,8 @@ This command:
 ./keystore-manager.sh view
 ```
 
-Displays all secrets from `secrets.env` in a nicely formatted table. For multiline values (like base64-encoded keystores), it shows `[MULTILINE VALUE]` instead of the actual content.
+Displays all secrets from `secrets.env` in a nicely formatted table. For multiline values (like
+base64-encoded keystores), it shows `[MULTILINE VALUE]` instead of the actual content.
 
 ### Adding Secrets to GitHub
 
@@ -82,7 +88,8 @@ Displays all secrets from `secrets.env` in a nicely formatted table. For multili
 ./keystore-manager.sh add --repo=username/repo
 ```
 
-Adds all secrets from `secrets.env` to the specified GitHub repository (excludes certificate information and local configuration values).
+Adds all secrets from `secrets.env` to the specified GitHub repository (excludes certificate
+information and local configuration values).
 
 You can target a specific GitHub environment:
 
@@ -112,7 +119,8 @@ Deletes a specific secret from the GitHub repository.
 ./keystore-manager.sh delete-all --repo=username/repo
 ```
 
-Deletes all secrets defined in `secrets.env` from the GitHub repository (excluding certificate information and local configuration values).
+Deletes all secrets defined in `secrets.env` from the GitHub repository (excluding certificate
+information and local configuration values).
 
 To also delete excluded secrets:
 
@@ -232,7 +240,8 @@ project/
     - Install JDK if needed: `sudo apt install default-jdk`
 
 2. **GitHub CLI (gh) is not installed**
-    - Install GitHub CLI: [https://cli.github.com/manual/installation](https://cli.github.com/manual/installation)
+    - Install GitHub
+      CLI: [https://cli.github.com/manual/installation](https://cli.github.com/manual/installation)
     - Log in with: `gh auth login`
 
 3. **Error with multiline values**
@@ -254,19 +263,24 @@ keytool -list -v -keystore keystores/original.keystore -storepass your_password
 ## FAQ
 
 **Q: What's the difference between ORIGINAL and UPLOAD keystores?**  
-A: ORIGINAL (debug) keystores are for development/testing, while UPLOAD (release) keystores are for production builds that get published to the Play Store.
+A: ORIGINAL (debug) keystores are for development/testing, while UPLOAD (release) keystores are for
+production builds that get published to the Play Store.
 
 **Q: Will my certificate information be uploaded to GitHub?**  
-A: No. Certificate information (COMPANY_NAME, DEPARTMENT, etc.) is excluded from GitHub secrets by default.
+A: No. Certificate information (COMPANY_NAME, DEPARTMENT, etc.) is excluded from GitHub secrets by
+default.
 
 **Q: How do I change the keystore passwords?**  
-A: Edit the values in `secrets.env` and run `./keystore-manager.sh generate` with the OVERWRITE option set to true.
+A: Edit the values in `secrets.env` and run `./keystore-manager.sh generate` with the OVERWRITE
+option set to true.
 
 **Q: Can I use this script in CI/CD pipelines?**  
-A: Yes, the script is designed to work in both interactive and automated environments. For CI/CD, you would typically use the `add` command to upload secrets.
+A: Yes, the script is designed to work in both interactive and automated environments. For CI/CD,
+you would typically use the `add` command to upload secrets.
 
 **Q: How are my keystore files secured?**  
-A: Keystore files are stored in the `keystores` directory and never directly uploaded to GitHub. Only base64-encoded versions are added as GitHub secrets.
+A: Keystore files are stored in the `keystores` directory and never directly uploaded to GitHub.
+Only base64-encoded versions are added as GitHub secrets.
 
 **Q: Do I need to manually update Gradle and fastlane configurations?**  
 A: No, the script automatically updates both configurations when you run the `generate` command.

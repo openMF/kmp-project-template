@@ -1,6 +1,8 @@
 # Fastlane Configuration
 
-This repository contains Fastlane configuration for automating iOS and Android app deployment processes. The setup includes support for Firebase App Distribution, Google Play Store deployment, and automated versioning.
+This repository contains Fastlane configuration for automating iOS and Android app deployment
+processes. The setup includes support for Firebase App Distribution, Google Play Store deployment,
+and automated versioning.
 
 ## Prerequisites
 
@@ -17,7 +19,8 @@ This repository contains Fastlane configuration for automating iOS and Android a
    ```bash
    bundle install
    ```
-3. Set up your environment variables or update your platform configurations in `fastlane-config/` directory.
+3. Set up your environment variables or update your platform configurations in `fastlane-config/`
+   directory.
 
 ## Configuration
 
@@ -26,6 +29,7 @@ This repository contains Fastlane configuration for automating iOS and Android a
 The following environment variables can be set to override default configurations:
 
 #### Android
+
 ```bash
 ANDROID_STORE_FILE="path/to/keystore"
 ANDROID_STORE_PASSWORD="your_store_password"
@@ -35,11 +39,13 @@ FIREBASE_ANDROID_APP_ID="your_firebase_app_id"
 ```
 
 #### iOS
+
 ```bash
 FIREBASE_IOS_APP_ID="your_firebase_app_id"
 ```
 
 #### Common
+
 ```bash
 FIREBASE_SERVICE_CREDS_FILE="path/to/service/creds.json"
 FIREBASE_GROUPS="your_test_groups"
@@ -47,7 +53,9 @@ FIREBASE_GROUPS="your_test_groups"
 
 ### Configuration File
 
-The `fastlane-config` directory contains default configurations for each platform that can be overridden by environment variables or lane parameters. Update these files with your project-specific values.
+The `fastlane-config` directory contains default configurations for each platform that can be
+overridden by environment variables or lane parameters. Update these files with your
+project-specific values.
 
 ## Available Lanes
 
@@ -122,6 +130,7 @@ Two types of release notes can be generated:
 ## CI/CD Integration
 
 ### GitHub Actions Example
+
 ```yaml
 jobs:
   deploy:
@@ -137,6 +146,7 @@ jobs:
 ```
 
 ### GitLab CI Example
+
 ```yaml
 deploy_firebase:
   script:

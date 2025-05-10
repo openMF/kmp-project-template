@@ -1,65 +1,146 @@
-# Project Sync Tools
+# Sync Capabilities
 
-This repository contains tools to synchronize project directories and files from an upstream repository while preserving local customizations. These tools help maintain consistency with an upstream template repository while allowing for project-specific modifications.
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Sync Directories Script](#sync-directories-script)
-    - [Features](#features)
-    - [Usage](#usage)
-    - [Options](#options)
-    - [Exclusion System](#exclusion-system)
-    - [Examples](#examples)
-- [GitHub Workflow](#github-workflow)
-    - [Workflow Features](#workflow-features)
-    - [Configuration](#configuration)
-    - [Scheduling](#scheduling)
-    - [Manual Trigger](#manual-trigger)
-- [Technical Details](#technical-details)
-    - [How Exclusions Work](#how-exclusions-work)
-    - [Branching Strategy](#branching-strategy)
+This document provides comprehensive information about the synchronization capabilities built into
+the KMP Multi-Module Project Generator. These tools help maintain consistency with the upstream
+template repository while allowing for project-specific customizations.
 
 ## Overview
 
-When working with a multi-module project based on a template, it's often necessary to stay in sync with upstream changes while maintaining project-specific customizations. These tools automate this process by:
+The project includes a robust synchronization system that allows you to:
 
-1. Fetching the latest changes from the upstream repository
-2. Applying these changes to your project
-3. Preserving specific files and directories that should not be overwritten
-4. Creating a separate branch with these changes for review
-5. Optionally creating a pull request (in the GitHub workflow)
+- Keep up with template improvements without losing your customizations
+- Automatically sync selected directories on a regular schedule
+- Apply syncs manually when needed
+- Preview changes before applying them
 
 ## Sync Directories Script
 
-The `sync-dirs.sh` script is a Bash utility that synchronizes directories and files from an upstream repository while preserving specified exclusions.
+The `sync-dirs.sh` script is a powerful utility that synchronizes directories and files from the
+upstream repository while preserving your local customizations.
 
-### Features
+### Key Features
 
-- Syncs multiple directories and files with a single command
-- Preserves specified files and directories from being overwritten
-- Supports exclusions at both directory and root levels
-- Creates a dedicated branch for synced changes
-- Interactive confirmation for pushing changes
-- Dry-run option to preview changes without applying them
+- **Comprehensive Sync Coverage**: Syncs the following components:
+    - **Applications**: cmp-android, cmp-desktop, cmp-ios, cmp-web
+    - **Build System**: build-logic
+    - **Tools**: fastlane, scripts
+    - **Configuration**: config, .github, .run
+    - **Core Files**: Gemfile, Gemfile.lock, ci-prepush scripts
+
+- **Safety System**:
+    - Automatic backup of existing files before modification
+    - Comprehensive error detection and recovery
+    - Progress indication during sync operations
+    - Detailed logs of all operations
+
+- **Customization Control**:
+    - Preserve specific files and directories from being overwritten
+    - Support for exclusions at both directory and root levels
+    - Project-specific modifications are maintained
+
+- **Advanced Options**:
+    - Dry-run mode to preview changes without applying them
+    - Force mode for non-interactive operation in automation
+    - Branch creation for review before merging
 
 ### Usage
 
 ```bash
-./sync-dirs.sh [options]
+# Basic sync
+./sync-dirs.sh
+
+# Dry run to preview changes
+./sync-dirs.sh --dry-run
+
+# Force sync without prompts
+./sync-dirs.sh --force
+
+# Both dry run and force mode
+./sync-dirs.sh --dry-run --force
 ```
 
 ### Options
 
-| Option        | Description                                   |
-|---------------|-----------------------------------------------|
-| `-h, --help`  | Display help information and exit             |
-| `--dry-run`   | Show what would be done without making changes|
+| Option        | Description                                         |
+|---------------|-----------------------------------------------------|
+| `-h, --help`  | Display help information and exit                   |
+| `--dry-run`   | Show what would be done without making changes      |
 | `-f, --force` | Skip confirmation prompts and proceed automatically |
+
+## GitHub Workflow Integration
+
+The repository includes an enhanced GitHub workflow (`sync-dirs.yml`) that automates the
+synchronization process in CI/CD environments.
+
+### Workflow Features
+
+- **Scheduled Execution**: Runs automatically every Monday at midnight UTC
+- **Manual Triggering**: Can be triggered manually from GitHub Actions UI
+- **Pull Request Generation**: Creates detailed pull requests for review
+- **Change Logging**: Includes comprehensive change logs
+- **Safety Measures**: Handles all sync components safely
+- **Git History**: Maintains proper git history
+
+### Required Workflow Permissions Setup
+
+To use the GitHub workflow effectively, you need to configure the proper permissions:
+
+1. Go to your repository's **Settings**
+2. Navigate to **Actions** > **General** in the left sidebar
+3. Scroll down to **Workflow permissions**
+4. Enable the following permissions:
+
+- ✅ Select "**Read and write permissions**"
+- ✅ Check "**Allow GitHub Actions to create and approve pull requests**"
+
+5. Click "**Save**" to apply the changes
+
+## Personal Access Token Setup
+
+To use the `sync-dirs.yml` workflow, you'll need to create a Personal Access Token (PAT) with the
+required scopes and save it as a secret.
+
+### Creating a PAT Token
+
+1. Log in to your GitHub account
+2. Go to [Developer Settings > Personal Access Tokens](https://github.com/settings/tokens)
+3. Click **Generate new token (classic)** or select **Fine-grained tokens**
+4. Fill in the following details:
+
+- **Note**: Add a meaningful name like `Sync Workflow Token`
+- **Expiration**: Choose an appropriate expiration period
+- **Scopes**:
+    - ✅ `repo` – Full control of private repositories
+    - ✅ `workflow` – To manage and trigger workflows
+    - ✅ `write:packages` – To publish and write packages (if applicable)
+
+5. Click **Generate token**
+6. Copy the token immediately and save it securely
+
+### Saving the PAT Token as a Secret
+
+#### For a Repository
+
+1. Navigate to the repository where the workflow resides
+2. Go to **Settings** > **Secrets and variables** > **Actions**
+3. Click **New repository secret**
+4. Enter the name `PAT_TOKEN` and paste the token as the value
+5. Click **Add secret**
+
+#### For an Organization
+
+1. Navigate to the organization settings
+2. Go to **Settings** > **Secrets and variables** > **Actions**
+3. Click **New organization secret**
+4. Enter the name `PAT_TOKEN` and paste the token as the value
+5. Choose the repositories where this secret will be available
+6. Click **Add secret**
+
+## Technical Implementation
 
 ### Exclusion System
 
-The script supports two types of exclusions:
+The sync script supports two types of exclusions:
 
 1. **Directory-level exclusions**: Files and directories within specific project directories
 2. **Root-level exclusions**: Files in the root of the project
@@ -76,99 +157,20 @@ declare -A EXCLUSIONS=(
 )
 ```
 
-Format for exclusions:
-- Directory exclusions: `path/to/exclude:dir`
-- File exclusions: `path/to/exclude:file`
-- Root-level files: Add to the "root" key
-
-### Examples
-
-**Basic usage:**
-```bash
-./sync-dirs.sh
-```
-
-**Dry run to preview changes:**
-```bash
-./sync-dirs.sh --dry-run
-```
-
-**Non-interactive execution:**
-```bash
-./sync-dirs.sh --force
-```
-
-**Display help:**
-```bash
-./sync-dirs.sh --help
-```
-
-## GitHub Workflow
-
-The repository includes a GitHub Actions workflow (`sync-cmp-directories.yml`) that automates the synchronization process in CI/CD environments.
-
-### Workflow Features
-
-- Automatically syncs directories and files from the upstream repository
-- Preserves excluded files and directories
-- Creates a pull request with the changes
-- Can be scheduled or manually triggered
-- Detailed PR description with all synchronized items
-
-### Configuration
-
-The workflow is configured to:
-
-1. Check out your repository
-2. Set up Git configuration
-3. Add and fetch from the upstream repository
-4. Create temporary branches for the sync process
-5. Sync directories and files while preserving exclusions
-6. Create a pull request with the changes
-
-### Scheduling
-
-By default, the workflow is scheduled to run weekly:
-
-```yaml
-schedule:
-  - cron: '0 0 * * 1'  # Runs at 00:00 on Monday
-```
-
-### Manual Trigger
-
-The workflow can also be triggered manually with optional parameters:
-
-```yaml
-workflow_dispatch:
-  inputs:
-    upstream:
-      description: 'Upstream repository to sync directories from'
-      default: 'https://github.com/openMF/kmp-project-template.git'
-      required: true
-      type: string
-```
-
-## Technical Details
-
-### How Exclusions Work
-
-Both tools use a similar approach to handle exclusions:
-
-1. **Preservation Phase**: Before syncing, excluded files and directories are copied to a temporary location
-2. **Sync Phase**: Changes from the upstream repository are applied
-3. **Restoration Phase**: Excluded files and directories are restored from the temporary location
-
-For root-level exclusions, the process is similar but adapted to handle files in the project root.
-
 ### Branching Strategy
 
 The sync process uses a dedicated branching strategy:
 
-1. A new branch is created based on your main development branch (default: `dev`)
+1. A new branch is created based on your main development branch
 2. A temporary branch is created from the upstream repository
 3. Changes are synchronized from the temporary branch to the sync branch
 4. The temporary branch is deleted after the sync
 5. The sync branch can be pushed for review and merged
 
-This approach keeps the sync changes isolated and provides an opportunity for review before merging.
+## Best Practices for Sync Management
+
+1. **Regular Syncs**: Schedule automated syncs weekly to stay current with upstream changes
+2. **Review Changes**: Always review generated PRs carefully before merging
+3. **Backup First**: Use `--dry-run` to preview changes before actual sync operations
+4. **Conflict Resolution**: Handle merge conflicts promptly to prevent drift
+5. **Version Control**: Maintain clean git history during syncs

@@ -14,7 +14,7 @@ plugins {
 }
 
 android {
-    namespace = "template.corebase.designsystem"
+    namespace = "template.core.base.designsystem"
 }
 
 kotlin {

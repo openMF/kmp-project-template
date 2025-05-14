@@ -15,6 +15,19 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
+/**
+ * Applies the CMP (Custom Mifos Platform) theme to the composable hierarchy.
+ *
+ * This function configures the Material3 [MaterialTheme] using the provided [ColorPalette].
+ * Depending on the [isDarkMode] flag, it will use either a light or dark color scheme, and optionally apply
+ * dynamic colors if supported and enabled via the [dynamicColor] flag. The actual color scheme used can
+ * be modified through the [selectColorScheme] expect function to allow platform-specific implementations.
+ *
+ * @param colorPalette The custom color palette used to configure the color scheme.
+ * @param isDarkMode Whether the theme should use a dark color scheme. Defaults to `false`.
+ * @param dynamicColor Whether dynamic colors should be enabled (e.g., on Android 12+). Defaults to `true`.
+ * @param content The composable content to which the theme will be applied.
+ */
 @Composable
 fun CMPTheme(
     colorPalette: ColorPalette,
@@ -113,6 +126,18 @@ fun CMPTheme(
     )
 }
 
+/**
+ * Platform-specific function to modify or override the selected [ColorScheme].
+ *
+ * This allows platforms such as Android, iOS, Web or desktop to provide custom logic for
+ * selecting a final [ColorScheme] based on the current dark mode setting or whether
+ * dynamic color support is enabled.
+ *
+ * @param isDarkMode Whether the dark theme is enabled.
+ * @param dynamicColor Whether dynamic colors should be used (if supported by the platform).
+ * @param colorScheme The base color scheme derived from the given [ColorPalette].
+ * @return A [ColorScheme] to be used with [MaterialTheme].
+ */
 @Composable
 expect fun selectColorScheme(
     isDarkMode: Boolean,

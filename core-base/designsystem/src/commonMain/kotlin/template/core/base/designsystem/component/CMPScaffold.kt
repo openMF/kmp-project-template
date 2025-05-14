@@ -26,6 +26,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+/**
+ * A composable scaffold layout for the CMP design system that extends the Material3 [Scaffold] by
+ * optionally supporting pull-to-refresh functionality.
+ *
+ * Use this as a base layout structure with customizable top bar, bottom bar, FAB, and optional
+ * pull-to-refresh support via [rememberPullToRefreshStateData].
+ *
+ * @param modifier Modifier applied to the scaffold container. *(Default: [Modifier])*
+ * @param topBar Composable displayed at the top of the screen. *(Optional; Default: empty lambda)*
+ * @param bottomBar Composable displayed at the bottom of the screen. *(Optional; Default: empty lambda)*
+ * @param snackbarHost Composable used to display snackbars. *(Optional; Default: empty lambda)*
+ * @param floatingActionButton Composable FAB displayed in the scaffold. *(Optional; Default: empty lambda)*
+ * @param floatingActionButtonPosition Position of the FAB. *(Default: [FabPosition.End])*
+ * @param containerColor Background color of the scaffold. *(Default: [MaterialTheme.colorScheme.background])*
+ * @param contentColor Foreground content color. *(Default: [contentColorFor(containerColor)])*
+ * @param contentWindowInsets Insets to apply around the scaffold content.
+ * (Default: [ScaffoldDefaults.contentWindowInsets])*
+ * @param rememberPullToRefreshStateData Optional state used to enable pull-to-refresh functionality.
+ * When non-null, wraps the content in a [PullToRefreshBox]. *(Optional)*
+ * @param content The main content of the scaffold.
+ * Receives [PaddingValues] that should be respected to avoid overlap with bars or FAB.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CMPScaffold(
@@ -68,11 +90,23 @@ fun CMPScaffold(
     }
 }
 
+/**
+ * Data class representing the pull-to-refresh state and behavior.
+ *
+ * @param isRefreshing Indicates whether the content is currently being refreshed.
+ * @param onRefresh Callback triggered when a pull-to-refresh gesture is performed.
+ */
 data class PullToRefreshStateData(
     val isRefreshing: Boolean,
     val onRefresh: () -> Unit,
 )
 
+/**
+ * Remembers and returns a [PullToRefreshStateData] instance.
+ *
+ * @param isRefreshing Whether the refresh animation should be shown. *(Default: `false`)*
+ * @param onRefresh Callback to execute on pull-to-refresh. *(Default: empty lambda)*
+ */
 @Composable
 fun rememberPullToRefreshStateData(
     isRefreshing: Boolean = false,

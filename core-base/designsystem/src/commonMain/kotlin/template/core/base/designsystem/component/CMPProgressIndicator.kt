@@ -14,19 +14,33 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.Dp
-import kotlinx.coroutines.launch
 import template.core.base.designsystem.component.variant.ProgressIndicatorVariant
 
+/**
+ * A unified, customizable progress indicator for the CMP design system that supports both
+ * determinate and indeterminate variants in linear and circular styles.
+ *
+ * The rendered indicator depends on the [variant] value, which maps to Material3's
+ * [LinearProgressIndicator] and [CircularProgressIndicator] implementations.
+ *
+ * @param modifier Modifier applied to the progress indicator container. *(Default: [Modifier])*
+ * @param color The color of the progress bar or circle. *(Optional; defaults to variant's theme color)*
+ * @param trackColor The color of the background track behind the progress. *(Optional)*
+ * @param strokeCap The shape of the line ends for linear indicators or circular arcs. *(Optional)*
+ * @param circularStrokeWidth The stroke width for circular indicators. *(Optional)*
+ * @param gapSize The visual gap between segments for linear and circular indicators. *(Optional)*
+ * @param determinateLinearDrawStopIndicator Optional custom drawing logic for the
+ * stop indicator in [ProgressIndicatorVariant.DETERMINATE_LINEAR]. *(Optional)*
+ * @param progress Current progress value, expected between `0f` and `1f`.
+ * Required for [ProgressIndicatorVariant.DETERMINATE_LINEAR] and [ProgressIndicatorVariant.DETERMINATE_CIRCULAR].*
+ * @param variant Determines the style and behavior of the indicator.
+ * (Default: [ProgressIndicatorVariant.INDETERMINATE_CIRCULAR])*
+ */
 @Composable
 fun CMPProgressIndicator(
     modifier: Modifier = Modifier,
@@ -36,15 +50,9 @@ fun CMPProgressIndicator(
     circularStrokeWidth: Dp? = null,
     gapSize: Dp? = null,
     determinateLinearDrawStopIndicator: (DrawScope.() -> Unit)? = null,
-    updateDeterminateProgress: suspend ((Float) -> Unit) -> Unit = {},
+    progress: Float? = null,
     variant: ProgressIndicatorVariant = ProgressIndicatorVariant.INDETERMINATE_CIRCULAR,
 ) {
-    var currentProgress by remember { mutableStateOf(0f) }
-    var loading by remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
-
-    if (!loading) return
-
     when (variant) {
         ProgressIndicatorVariant.DETERMINATE_LINEAR -> DeterminateLinearIndicator(
             modifier = modifier,
@@ -52,7 +60,7 @@ fun CMPProgressIndicator(
             trackColor = trackColor,
             strokeCap = strokeCap,
             gapSize = gapSize,
-            progress = currentProgress,
+            progress = progress ?: 0F,
             drawStopIndicator = determinateLinearDrawStopIndicator,
         )
 
@@ -63,7 +71,7 @@ fun CMPProgressIndicator(
             strokeCap = strokeCap,
             strokeWidth = circularStrokeWidth,
             gapSize = gapSize,
-            progress = currentProgress,
+            progress = progress ?: 0F,
         )
 
         ProgressIndicatorVariant.INDETERMINATE_LINEAR -> IndeterminateLinearIndicator(
@@ -82,20 +90,19 @@ fun CMPProgressIndicator(
             strokeWidth = circularStrokeWidth,
         )
     }
-
-    if (
-        variant == ProgressIndicatorVariant.DETERMINATE_LINEAR ||
-        variant == ProgressIndicatorVariant.DETERMINATE_CIRCULAR
-    ) {
-        scope.launch {
-            updateDeterminateProgress { progress ->
-                currentProgress = progress
-            }
-            loading = false
-        }
-    }
 }
 
+/**
+ * Internal implementation of a determinate linear progress indicator with optional custom stop indicator.
+ *
+ * @param color Foreground progress color. *(Optional)*
+ * @param trackColor Background track color. *(Optional)*
+ * @param strokeCap The shape of the line ends. *(Optional)*
+ * @param gapSize Gap between progress segments. *(Optional)*
+ * @param progress Current progress value between 0 and 1.
+ * @param drawStopIndicator Optional custom drawing logic for the stop indicator. *(Optional)*
+ * @param modifier Modifier applied to the indicator. *(Default: [Modifier])*
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DeterminateLinearIndicator(
@@ -128,6 +135,17 @@ private fun DeterminateLinearIndicator(
     )
 }
 
+/**
+ * Internal implementation of a determinate circular progress indicator.
+ *
+ * @param color Foreground progress color. *(Optional)*
+ * @param trackColor Background track color. *(Optional)*
+ * @param strokeCap Arc cap style. *(Optional)*
+ * @param strokeWidth Width of the arc stroke. *(Optional)*
+ * @param gapSize Gap in the circular arc. *(Optional)*
+ * @param progress Current progress value between 0 and 1.
+ * @param modifier Modifier applied to the indicator. *(Default: [Modifier])*
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DeterminateCircularIndicator(
@@ -150,6 +168,15 @@ private fun DeterminateCircularIndicator(
     )
 }
 
+/**
+ * Internal implementation of an indeterminate linear progress indicator.
+ *
+ * @param color Foreground color. *(Optional)*
+ * @param trackColor Track color. *(Optional)*
+ * @param strokeCap End shape of the line segments. *(Optional)*
+ * @param gapSize Gap between animated segments. *(Optional)*
+ * @param modifier Modifier applied to the indicator. *(Default: [Modifier])*
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun IndeterminateLinearIndicator(
@@ -168,6 +195,15 @@ private fun IndeterminateLinearIndicator(
     )
 }
 
+/**
+ * Internal implementation of an indeterminate circular progress indicator.
+ *
+ * @param color Foreground arc color. *(Optional)*
+ * @param trackColor Background arc color. *(Optional)*
+ * @param strokeCap Cap style for arc ends. *(Optional)*
+ * @param strokeWidth Stroke width of the arc. *(Optional)*
+ * @param modifier Modifier applied to the indicator. *(Default: [Modifier])*
+ */
 @Composable
 private fun IndeterminateCircularIndicator(
     color: Color?,

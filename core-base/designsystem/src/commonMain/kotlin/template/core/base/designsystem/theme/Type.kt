@@ -28,6 +28,15 @@ import kmp_project_template.core_base.designsystem.generated.resources.outfit_se
 import kmp_project_template.core_base.designsystem.generated.resources.outfit_thin
 import org.jetbrains.compose.resources.Font
 
+/**
+ * Provides a default [FontFamily] composed of various font weights from the Outfit font family.
+ *
+ * This function allows for optional override by supplying a custom [fontFamily], but defaults to a complete
+ * Outfit font stack defined via Compose Multiplatform Resources.
+ *
+ * @param fontFamily An optional custom [FontFamily] to use instead of the default. *(Default: Outfit family)*
+ * @return A [FontFamily] that includes all relevant weights for consistent typography.
+ */
 @Composable
 fun fontFamily(fontFamily: FontFamily? = null): FontFamily {
     return fontFamily ?: FontFamily(
@@ -43,7 +52,21 @@ fun fontFamily(fontFamily: FontFamily? = null): FontFamily {
     )
 }
 
-// Set of Material typography styles to start with
+/**
+ * Returns the default [Typography] styles used across the CMP design system.
+ *
+ * These styles are based on the Material 3 type scale and are customized using the Outfit font family.
+ * Each [TextStyle] is tuned for readability, aesthetic spacing, and consistent design across screen sizes.
+ *
+ * @return A [Typography] instance with customized font weights, sizes, line heights, and letter spacing.
+ *
+ * ### Typographic Use Cases:
+ * - `displayLarge`, `displayMedium`, `displaySmall`: For large headlines or promotional content.
+ * - `headline*`: For section headers or key screen titles.
+ * - `title*`: For dialog titles, cards, or smaller section headings.
+ * - `body*`: For paragraphs, standard UI text, or descriptions.
+ * - `label*`: For buttons, navigation, tags, and other compact UI components.
+ */
 @Composable
 internal fun appTypography() = Typography(
     displayLarge = TextStyle(

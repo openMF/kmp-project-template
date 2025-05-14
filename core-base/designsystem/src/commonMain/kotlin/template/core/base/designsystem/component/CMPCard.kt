@@ -23,6 +23,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import template.core.base.designsystem.component.variant.CardVariant
 
+/**
+ * A flexible and theme-aware card component for the CMP design system.
+ *
+ * This composable abstracts over Material3 [Card], [ElevatedCard], and [OutlinedCard],
+ * and selects the appropriate variant based on [CardVariant].
+ *
+ * @param modifier Modifier applied to the card container. *(Default: [Modifier])*
+ * @param onClick Lambda triggered when the card is clicked. *(Default: `{}`)*
+ * @param enabled Whether the card is enabled and responds to click events. *(Default: `true`)*
+ * @param variant Determines the visual style of the card. *(Default: [CardVariant.FILLED])*
+ * @param shape The shape of the card. *(Optional; defaults to the variant's shape via [CardDefaults])*
+ * @param colors The color configuration of the card. *(Optional; defaults to the variant's colors via [CardDefaults])*
+ * @param elevation Elevation of the card surface. *(Optional; defaults to the variant's elevation via [CardDefaults])*
+ * @param borderStroke Border stroke for the card.
+ * (Optional; defaults to [CardDefaults.outlinedCardBorder] when [variant] is [CardVariant.OUTLINED], `null` otherwise)*
+ * @param interactionSource The [MutableInteractionSource] to observe user interaction states. *(Optional)*
+ * @param content The content of the card, scoped to a [ColumnScope] for vertical layout flexibility.
+ */
 @Composable
 fun CMPCard(
     modifier: Modifier = Modifier,

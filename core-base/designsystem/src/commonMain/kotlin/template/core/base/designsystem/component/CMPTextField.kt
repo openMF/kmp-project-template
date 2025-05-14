@@ -25,6 +25,44 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import template.core.base.designsystem.component.variant.TextFieldVariant
 
+/**
+ * A customizable and theme-aware text input field for the CMP design system.
+ *
+ * This composable wraps Material3's [TextField] and [OutlinedTextField] and selects the appropriate
+ * style based on the [variant] parameter. It supports full customization for icons, labels,
+ * placeholders, and advanced keyboard behaviors.
+ *
+ * @param value The current text value inside the text field.
+ * @param onValueChange Callback invoked when the input text changes.
+ * @param modifier Modifier applied to the text field. *(Default: [Modifier])*
+ * @param enabled Whether the text field is enabled for input. *(Default: `true`)*
+ * @param readOnly Whether the text field is read-only. *(Default: `false`)*
+ * @param textStyle The style to apply to the input text. *(Default: [LocalTextStyle.current])*
+ * @param label Optional label displayed inside the text field when it's empty and unfocused. *(Optional)*
+ * @param placeholder Optional hint text displayed when the field is empty and not focused. *(Optional)*
+ * @param leadingIcon Optional icon displayed at the start of the text field. *(Optional)*
+ * @param trailingIcon Optional icon displayed at the end of the text field. *(Optional)*
+ * @param prefix Optional composable displayed before the input text. *(Optional)*
+ * @param suffix Optional composable displayed after the input text. *(Optional)*
+ * @param supportingText Optional composable shown below the text field
+ * (e.g., for helper or error messages). *(Optional)*
+ * @param isError Whether the field is currently in an error state. *(Default: `false`)*
+ * @param visualTransformation Optional transformation applied to the input (e.g., for passwords).
+ * (Default: [VisualTransformation.None])*
+ * @param keyboardOptions Keyboard configuration for the input field. *(Default: [KeyboardOptions.Default])*
+ * @param keyboardActions Actions to handle keyboard events (e.g., "Done" or "Next").
+ * (Default: [KeyboardActions.Default])*
+ * @param singleLine Whether the input should be restricted to a single line. *(Default: `false`)*
+ * @param maxLines Maximum number of visible lines.
+ * (Default: `1` if [singleLine] is `true`, otherwise [Int.MAX_VALUE])*
+ * @param minLines Minimum number of visible lines. *(Default: `1`)*
+ * @param interactionSource Optional [MutableInteractionSource] to observe focus and pressed states. *(Optional)*
+ * @param shape The shape of the text field container.
+ * (Optional; defaults to variant’s shape via [TextFieldDefaults] or [OutlinedTextFieldDefaults])*
+ * @param colors Color configuration for the text field.
+ * (Optional; defaults to variant’s colors via [TextFieldDefaults] or [OutlinedTextFieldDefaults])*
+ * @param variant The visual style of the text field. *(Default: [TextFieldVariant.FILLED])*
+ */
 @Suppress("LongParameterList")
 @Composable
 fun CMPTextField(

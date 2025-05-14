@@ -26,6 +26,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import template.core.base.designsystem.component.variant.ButtonVariant
 
+/**
+ * A versatile and theme-aware button component for the CMP design system.
+ *
+ * This composable wraps five Material3 button
+ * types—[Button], [FilledTonalButton], [ElevatedButton], [OutlinedButton], and [TextButton]—
+ * and exposes a unified API via the [variant] parameter to support consistent styling and flexibility.
+ *
+ * The appropriate button is chosen based on the [ButtonVariant] provided.
+ *
+ * @param onClick Callback to be invoked when the button is clicked.
+ * @param modifier Modifier applied to the button. *(Default: [Modifier])*
+ * @param enabled Whether the button is enabled and clickable. *(Default: `true`)*
+ * @param variant The style variant of the button to use. *(Default: [ButtonVariant.FILLED])*
+ * @param colors Color configuration for the button.
+ * (Optional; defaults to the variant's default via [ButtonDefaults])*
+ * @param elevation Elevation of the button.
+ * (Optional; defaults to the variant's elevation or `null` for flat types like text/outlined)*
+ * @param border Border stroke for the button. *(Optional; only applied in outlined default via [ButtonDefaults])*
+ * @param shape The shape of the button's container.
+ * (Optional; defaults to the variant's shape via [ButtonDefaults])*
+ * @param interactionSource The [MutableInteractionSource] representing interaction state. *(Optional)*
+ * @param contentPadding Padding values for the button content.
+ * (Optional; defaults to the variant's padding via [ButtonDefaults])*
+ * @param content Composable content inside the button, scoped to a [RowScope] for alignment flexibility.
+ */
 @Suppress("CyclomaticComplexMethod")
 @Composable
 fun CMPButton(

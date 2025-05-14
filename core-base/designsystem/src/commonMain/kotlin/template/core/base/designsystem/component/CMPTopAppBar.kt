@@ -24,6 +24,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import template.core.base.designsystem.component.variant.TopAppBarVariant
 
+/**
+ * A flexible and theme-aware top app bar for the CMP design system.
+ *
+ * This composable wraps the various Material3 top app bar implementations—[TopAppBar], [CenterAlignedTopAppBar],
+ * [MediumTopAppBar], and [LargeTopAppBar]—and selects the appropriate one based on the [variant] parameter.
+ *
+ * @param title Composable displayed as the title in the app bar.
+ * @param modifier Modifier applied to the top app bar. *(Default: [Modifier])*
+ * @param navigationIcon Composable shown as the leading icon (e.g., back or menu button).
+ * (Optional; Default: empty lambda)*
+ * @param actions Composables displayed as trailing icons/actions in the app bar. *(Optional; Default: empty lambda)*
+ * @param expandedHeight The expanded height of the top app bar.
+ * (Optional; defaults to the variant's expanded height via [TopAppBarDefaults])*
+ * @param collapsedHeight The collapsed height for scrollable variants.
+ * (Optional; applicable only to [TopAppBarVariant.MEDIUM] and [TopAppBarVariant.LARGE])*
+ * @param windowInsets Insets to apply around the app bar (e.g., status bar padding).
+ * (Default: [TopAppBarDefaults.windowInsets])*
+ * @param colors Color configuration for the top app bar.
+ * (Optional; defaults to the variant’s color scheme via [TopAppBarDefaults])*
+ * @param scrollBehavior Scroll behavior applied to the app bar (e.g., pinned, collapse on scroll).
+ * (Optional; defaults to sensible variant-specific behaviors)*
+ * @param variant Determines the style and structure of the top app bar. *(Default: [TopAppBarVariant.SMALL])*
+ */
 @Suppress("CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

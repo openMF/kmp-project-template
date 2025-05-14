@@ -137,15 +137,8 @@ private fun CMPProgressIndicatorPreview() {
         Spacer(modifier = Modifier.height(15.dp))
         for (variant in ProgressIndicatorVariant.entries) {
             Spacer(modifier = Modifier.height(5.dp))
-            CMPProgressIndicator(variant = variant, updateDeterminateProgress = loadProgress)
+            CMPProgressIndicator(variant = variant)
         }
-    }
-}
-
-val loadProgress: suspend ((Float) -> Unit) -> Unit = { update ->
-    for (i in 1..100) {
-        delay(200) // simulate loading
-        update(i / 100f)
     }
 }
 

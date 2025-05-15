@@ -444,7 +444,7 @@ module FastlaneConfig
       firebase_prod_app_id: "1:728433984912738:android:3902eb32kjaska3363b0938f1a1dbb",
       firebase_demo_app_id: "1:72843493212738:android:8392hjks3298ak9032skja",
       firebase_service_creds_file: "secrets/firebaseAppDistributionServiceCredentialsFile.json",
-      firebase_groups: "kmp-project-template-testers"
+      firebase_groups: "mifos-mobile-apps"
     }
 
     BUILD_PATHS = {

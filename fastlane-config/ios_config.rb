@@ -3,7 +3,7 @@ module FastlaneConfig
     FIREBASE_CONFIG = {
       firebase_app_id: "1:728434912738:ios:1d81f8e53ca7a6f31a1dbb",
       firebase_service_creds_file: "secrets/firebaseAppDistributionServiceCredentialsFile.json",
-      firebase_groups: "mifos-mobile-testers"
+      firebase_groups: "mifos-mobile-apps"
     }
 
     BUILD_CONFIG = {

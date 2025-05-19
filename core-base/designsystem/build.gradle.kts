@@ -28,6 +28,11 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(libs.jb.lifecycleViewmodel)
+            implementation(libs.window.size)
+            api(compose.material3AdaptiveNavigationSuite)
+            api(libs.jetbrains.compose.material3.adaptive)
+//            api(libs.jetbrains.compose.material3.adaptive.layout)
+//            api(libs.jetbrains.compose.material3.adaptive.navigation)
         }
     }
 }

@@ -31,6 +31,8 @@ import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
+import androidx.compose.material3.adaptive.layout.PaneExpansionState
+import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -66,7 +68,10 @@ fun <T> AdaptiveNavigableListDetailPaneScaffold(
         SharedTransitionScope,
         AnimatedVisibilityScope,
     ) -> Unit,
-    extraPaneContent: @Composable () -> Unit = {},
+    modifier: Modifier = Modifier,
+    extraPaneContent: @Composable (ThreePaneScaffoldScope.() -> Unit)? = null,
+    paneExpansionDragHandle: @Composable (ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? = null,
+    paneExpansionState: PaneExpansionState? = null,
 ) {
     var selectedItemIndex: Int? by rememberSaveable { mutableStateOf(null) }
     val navigator = rememberListDetailPaneScaffoldNavigator()
@@ -128,9 +133,10 @@ fun <T> AdaptiveNavigableListDetailPaneScaffold(
                         }
                     }
                 },
-                extraPane = {
-                    extraPaneContent()
-                },
+                extraPane = extraPaneContent,
+                modifier = modifier,
+                paneExpansionDragHandle = paneExpansionDragHandle,
+                paneExpansionState = paneExpansionState,
             )
         }
     }

@@ -71,7 +71,7 @@ kermit = "2.0.5"
 fileKit = "0.8.7"
 uiBackhandler = "1.8.0"
 wire = "5.0.0"
-material3adaptive = "1.0.1"
+material3adaptive = "1.1.0"
 
 # Jetbrains CMP
 windowsSizeClass = "0.5.0"

@@ -11,13 +11,19 @@
 
 package template.core.base.designsystem.component
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountBox
@@ -36,6 +42,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,6 +50,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +59,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import template.core.base.designsystem.adaptivelayout.AdaptiveNavigableListDetailPaneScaffold
 import template.core.base.designsystem.adaptivelayout.AdaptiveNavigationSuiteScaffold
 import template.core.base.designsystem.component.variant.BottomAppBarVariant
 import template.core.base.designsystem.component.variant.ButtonVariant
@@ -316,3 +325,96 @@ enum class AppDestinations(
     SHOPPING("Shopping", Icons.Default.ShoppingCart, "shopping"),
     PROFILE("Profile", Icons.Default.AccountBox, "profile"),
 }
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Preview
+@Composable
+private fun AdaptiveNavigableListDetailsScaffoldPreview() {
+    AdaptiveNavigableListDetailPaneScaffold(
+        items = sampleWords,
+        listPaneItem = { word, isListAndDetailVisible, isListVisible, sharedTransitionScope, animatedVisibilityScope ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                val imageModifier = Modifier.padding(horizontal = 8.dp)
+                if (!isListAndDetailVisible && isListVisible) {
+                    with(sharedTransitionScope) {
+                        val state = rememberSharedContentState(key = word.word)
+                        imageModifier.then(
+                            Modifier.sharedElement(
+                                state,
+                                animatedVisibilityScope = animatedVisibilityScope,
+                            ),
+                        )
+                    }
+                }
+
+                Image(
+                    imageVector = word.icon,
+                    contentDescription = word.word,
+                    modifier = imageModifier,
+                )
+                Text(
+                    text = word.word,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                )
+            }
+        },
+        detailPaneContent = {
+                definedWord, isListAndDetailVisible, isDetailVisible,
+                sharedTransitionScope, animatedVisibilityScope,
+            ->
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .padding(vertical = 16.dp),
+            ) {
+                val imageModifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .then(
+                        if (!isListAndDetailVisible && isDetailVisible) {
+                            with(sharedTransitionScope) {
+                                val state = rememberSharedContentState(key = definedWord.word)
+                                Modifier.sharedElement(
+                                    state,
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                )
+                            }
+                        } else {
+                            Modifier
+                        },
+                    )
+
+                Image(
+                    imageVector = definedWord.icon,
+                    contentDescription = definedWord.word,
+                    modifier = imageModifier,
+                )
+                Text(
+                    text = definedWord.word,
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+                Text(
+                    text = definedWord.definition,
+                )
+            }
+        },
+    )
+}
+
+// Create some simple sample data
+private val loremIpsum = """
+        |Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dui nunc mattis enim ut tellus elementum sagittis. Nunc sed augue lacus viverra vitae. Sit amet dictum sit amet justo donec. Fringilla urna porttitor rhoncus dolor purus non enim praesent elementum. Dictum non consectetur a erat nam at lectus urna. Tellus mauris a diam maecenas sed enim ut sem viverra. Commodo ullamcorper a lacus vestibulum sed arcu non. Lorem mollis aliquam ut porttitor leo a diam sollicitudin tempor. Pellentesque habitant morbi tristique senectus et netus et malesuada. Vitae suscipit tellus mauris a diam maecenas sed. Neque ornare aenean euismod elementum nisi quis. Quam vulputate dignissim suspendisse in est ante in nibh mauris. Tellus in metus vulputate eu scelerisque felis imperdiet proin fermentum. Orci ac auctor augue mauris augue neque gravida.
+        |
+        |Tempus quam pellentesque nec nam aliquam. Praesent semper feugiat nibh sed. Adipiscing elit duis tristique sollicitudin nibh sit. Netus et malesuada fames ac turpis egestas sed tempus urna. Quis varius quam quisque id diam vel quam. Urna duis convallis convallis tellus id interdum velit laoreet. Id eu nisl nunc mi ipsum. Fermentum dui faucibus in ornare. Nunc lobortis mattis aliquam faucibus. Vulputate mi sit amet mauris commodo quis. Porta nibh venenatis cras sed. Vitae tortor condimentum lacinia quis vel eros donec. Eu non diam phasellus vestibulum.
+""".trimMargin()
+private val sampleWords = listOf(
+    "Apple" to Icons.Filled.Call,
+    "Banana" to Icons.Filled.Home,
+).map { (word, icon) -> DefinedWord(word, icon) }
+
+data class DefinedWord(
+    val word: String,
+    val icon: ImageVector,
+    val definition: String = loremIpsum,
+)

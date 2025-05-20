@@ -69,6 +69,7 @@ qroseVersion = "1.0.1"
 okioVersion = "3.10.2"
 kermit = "2.0.5"
 fileKit = "0.8.7"
+uiBackhandler = "1.8.0"
 wire = "5.0.0"
 material3adaptive = "1.0.1"
 
@@ -262,6 +263,7 @@ multiplatform-settings-test = { group = "com.russhwolf", name = "multiplatform-s
 moko-permission = { group = "dev.icerock.moko", name = "permissions", version.ref = "mokoPermission" }
 moko-permission-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "mokoPermission" }
 
+ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
 window-size = { group = "dev.chrisbanes.material3", name = "material3-window-size-class-multiplatform", version.ref = "windowsSizeClass" }
 
 [bundles]

@@ -31,8 +31,9 @@ kotlin {
             implementation(libs.window.size)
             api(compose.material3AdaptiveNavigationSuite)
             api(libs.jetbrains.compose.material3.adaptive)
-//            api(libs.jetbrains.compose.material3.adaptive.layout)
-//            api(libs.jetbrains.compose.material3.adaptive.navigation)
+            api(libs.jetbrains.compose.material3.adaptive.layout)
+            api(libs.jetbrains.compose.material3.adaptive.navigation)
+            implementation(libs.ui.backhandler)
         }
     }
 }

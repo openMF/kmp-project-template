@@ -13,6 +13,7 @@ The CMP Design System is a robust, theme-aware UI component library built with J
     - CMPTopAppBar
 - Theming
 - Preferences and ViewModel
+- Adaptive Layouts
 
 ## CMPAlertDialog
 A customizable dialog with support for both Material3 AlertDialog and BasicAlertDialog.
@@ -532,4 +533,145 @@ fun App(appViewModel: AppViewModel = viewModel()) {
         }
     }
 }
+```
+
+## Adaptive Layouts
+The CMP Design System includes adaptive layout scaffolds that automatically adjust to different screen sizes and postures using Material3 adaptive layouts. These composables encapsulate navigation and pane behaviors for list-detail and supporting pane experiences.
+
+### AdaptiveNavigableListDetailPaneScaffold
+A generic, adaptive list-detail scaffold supporting animated transitions, selection, and responsive layout behavior. It uses ListDetailPaneScaffold internally and manages pane navigation automatically.
+
+### Properties
+| Property                 | Required | Optional | Description                                                                 |
+|--------------------------|----------|----------|-----------------------------------------------------------------------------|
+| items                    | ✅       |          | List of items to show in the list pane. Must implement `PaneScaffoldItem`. |
+| listPaneItem             | ✅       |          | Composable for list item UI (inside selectable surface).                   |
+| detailPaneContent        | ✅       |          | Composable to render selected item details.                                |
+| modifier                 |          | ✅       | Modifier for the scaffold. Default: `Modifier`.                            |
+| extraPaneContent         |          | ✅       | Optional third pane composable.                                            |
+| paneExpansionDragHandle  |          | ✅       | Optional drag handle composable for resizing.                              |
+| paneExpansionState       |          | ✅       | State holder for pane expansion.                                           |
+| cardShape                |          | ✅       | Shape of the item card.                                                    |
+| cardElevation            |          | ✅       | Elevation of the item card.                                                |
+| cardColors               |          | ✅       | Custom card colors.                                                        |
+| cardBorder               |          | ✅       | Custom card border stroke.                                                 |
+
+### Example
+```yaml
+AdaptiveNavigableListDetailPaneScaffold(
+    items = myItems,
+    listPaneItem = { item, isListAndDetailVisible, isListVisible, sharedTransitionScope, visibilityScope ->
+        Text(text = item.title)
+    },
+    detailPaneContent = { item, isListAndDetailVisible, isDetailVisible, sharedTransitionScope, visibilityScope ->
+        Text(text = item.details)
+    }
+)
+```
+
+**Notes**
+- If you're using AdaptiveNavigableListDetailPaneScaffold, your item class must implement:
+```yaml
+interface PaneScaffoldItem<T> {
+    val id: T
+}
+```
+
+### AdaptiveListDetailPaneScaffold
+Simplified adaptive layout using ListDetailPaneScaffold, with external navigation via ThreePaneScaffoldNavigator. Suitable when you need more control over navigation or want to plug in your own navigator.
+
+### Properties
+| Property                 | Required | Optional | Description                                                                 |
+|--------------------------|----------|----------|-----------------------------------------------------------------------------|
+| mainPaneContent          | ✅       |          | Composable for list/main pane. Accepts a lambda to navigate to detail.     |
+| detailPaneContent        | ✅       |          | Composable for detail pane. Accepts a lambda to navigate back.             |
+| modifier                 |          | ✅       | Modifier for the scaffold. Default: `Modifier`.                            |
+| navigator                |          | ✅       | Optional navigation controller. Defaults to internal state.                |
+| extraPaneContent         |          | ✅       | Optional third pane composable.                                            |
+| paneExpansionDragHandle  |          | ✅       | Optional drag handle composable.                                           |
+| paneExpansionState       |          | ✅       | Optional state controller for pane expansion.                              |
+
+### Example
+```yaml
+AdaptiveListDetailPaneScaffold(
+    mainPaneContent = { navigateToDetail ->
+        Button(onClick = navigateToDetail) {
+            Text("Open Detail")
+        }
+    },
+    detailPaneContent = { navigateBack ->
+        Button(onClick = navigateBack) {
+            Text("Go Back")
+        }
+    }
+)
+```
+
+### AdaptiveNavigableSupportingPaneScaffold
+Scaffold for a two-pane layout with a main and supporting pane. Designed for workflows where users select or trigger an action in the main pane that reveals additional UI in the supporting pane.
+
+### Properties
+| Property                 | Required | Optional | Description                                                                 |
+|--------------------------|----------|----------|-----------------------------------------------------------------------------|
+| mainPaneContent          | ✅       |          | Composable content for the main pane. Receives a lambda to navigate.       |
+| supportingPaneContent    | ✅       |          | Composable content for the supporting pane. Receives a lambda to go back.  |
+| modifier                 |          | ✅       | Modifier for the scaffold. Default: `Modifier`.                            |
+| scaffoldNavigator        |          | ✅       | Optional external navigator controller.                                     |
+| extraPaneContent         |          | ✅       | Optional third pane composable.                                            |
+| paneExpansionDragHandle  |          | ✅       | Optional drag handle for resizing.                                         |
+| paneExpansionState       |          | ✅       | Optional custom expansion state.                                           |
+
+### Example
+```yaml
+AdaptiveNavigableSupportingPaneScaffold(
+    mainPaneContent = { navigateToSupporting ->
+        Button(onClick = navigateToSupporting) {
+            Text("Open Details")
+        }
+    },
+    supportingPaneContent = { navigateBack ->
+        Button(onClick = navigateBack) {
+            Text("Back")
+        }
+    }
+)
+```
+
+### AdaptiveNavigationSuiteScaffold
+A responsive scaffold that adapts its navigation UI (e.g., bottom bar, rail, drawer) based on the current screen size and device posture.
+
+It wraps NavigationSuiteScaffold and automatically selects the optimal layout using WindowSizeClass and WindowAdaptiveInfo. This is ideal for apps targeting phones, tablets, and foldables using a single composable.
+
+### Properties
+| Property                 | Required | Optional | Description                                                                 |
+|--------------------------|----------|----------|-----------------------------------------------------------------------------|
+| navigationSuiteItems     | ✅       |          | Defines destinations or actions using [NavigationSuiteScope].               |
+| modifier                 |          | ✅       | Modifier for the scaffold. Default: `Modifier`.                             |
+| layoutType               |          | ✅       | Force a specific layout (e.g., Drawer, Rail, BottomBar).                    |
+| navigationSuiteColors    |          | ✅       | Navigation UI color config. Default: `NavigationSuiteDefaults.colors()`.    |
+| containerColor           |          | ✅       | Background color. Default: `NavigationSuiteScaffoldDefaults.containerColor`.|
+| contentColor             |          | ✅       | Content color. Default: `NavigationSuiteScaffoldDefaults.contentColor`.     |
+| content                  | ✅       |          | Main content displayed beside or below the navigation UI.                   |
+
+### Example
+```yaml
+AdaptiveNavigationSuiteScaffold(
+    navigationSuiteItems = {
+        NavigationSuiteItem(
+            icon = { Icon(Icons.Default.Home, contentDescription = null) },
+            label = { Text("Home") },
+            selected = true,
+            onClick = { /* Navigate */ }
+        )
+        NavigationSuiteItem(
+            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+            label = { Text("Settings") },
+            selected = false,
+            onClick = { /* Navigate */ }
+        )
+    },
+    content = {
+        Text("Hello from Adaptive Navigation Scaffold!")
+    }
+)
 ```

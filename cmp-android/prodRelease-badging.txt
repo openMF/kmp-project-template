@@ -1,4 +1,4 @@
-package: name='cmp.android.app' versionCode='1' versionName='2025.5.3-beta.0.1' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
+package: name='cmp.android.app' versionCode='1' versionName='2025.5.4-beta.0.3' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
 sdkVersion:'26'
 targetSdkVersion:'34'
 uses-permission: name='android.permission.INTERNET'

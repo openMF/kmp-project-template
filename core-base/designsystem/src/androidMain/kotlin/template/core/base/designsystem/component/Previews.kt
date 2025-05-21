@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -65,9 +66,11 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import template.core.base.designsystem.adaptivelayout.AdaptiveListDetailPaneScaffold
 import template.core.base.designsystem.adaptivelayout.AdaptiveNavigableListDetailPaneScaffold
 import template.core.base.designsystem.adaptivelayout.AdaptiveNavigableSupportingPaneScaffold
 import template.core.base.designsystem.adaptivelayout.AdaptiveNavigationSuiteScaffold
+import template.core.base.designsystem.adaptivelayout.PaneScaffoldItem
 import template.core.base.designsystem.component.variant.BottomAppBarVariant
 import template.core.base.designsystem.component.variant.ButtonVariant
 import template.core.base.designsystem.component.variant.CardVariant
@@ -294,6 +297,8 @@ fun CMPScaffoldPreview() {
 @PreviewScreenSizes
 @Composable
 fun AdaptiveNavigationSuiteScaffoldPreview() {
+    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+
     AdaptiveNavigationSuiteScaffold(
         navigationSuiteItems = {
             AppDestinations.entries.forEach {
@@ -307,18 +312,39 @@ fun AdaptiveNavigationSuiteScaffoldPreview() {
                     label = {
                         Text(text = it.label)
                     },
-                    onClick = {},
+                    onClick = { currentDestination = it },
                     selected = false,
                     modifier = Modifier,
                 )
             }
         },
     ) {
-        Text(
-            text = "Home",
-            modifier = Modifier.fillMaxSize(),
-            textAlign = TextAlign.Center,
-        )
+        // Destination content.
+        when (currentDestination) {
+            AppDestinations.HOME -> Text(
+                "Home",
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center,
+            )
+
+            AppDestinations.FAVORITES -> Text(
+                "Favorites",
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center,
+            )
+
+            AppDestinations.SHOPPING -> Text(
+                "Shopping",
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center,
+            )
+
+            AppDestinations.PROFILE -> Text(
+                "Profile",
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 
@@ -334,9 +360,9 @@ enum class AppDestinations(
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3AdaptiveApi::class)
-@Preview
+@PreviewScreenSizes
 @Composable
-private fun AdaptiveNavigableListDetailsScaffoldPreview() {
+fun AdaptiveNavigableListDetailsScaffoldPreview() {
     // Create some simple sample data
     val loremIpsum = """
         |Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Dui nunc mattis enim ut tellus elementum sagittis. Nunc sed augue lacus viverra vitae. Sit amet dictum sit amet justo donec. Fringilla urna porttitor rhoncus dolor purus non enim praesent elementum. Dictum non consectetur a erat nam at lectus urna. Tellus mauris a diam maecenas sed enim ut sem viverra. Commodo ullamcorper a lacus vestibulum sed arcu non. Lorem mollis aliquam ut porttitor leo a diam sollicitudin tempor. Pellentesque habitant morbi tristique senectus et netus et malesuada. Vitae suscipit tellus mauris a diam maecenas sed. Neque ornare aenean euismod elementum nisi quis. Quam vulputate dignissim suspendisse in est ante in nibh mauris. Tellus in metus vulputate eu scelerisque felis imperdiet proin fermentum. Orci ac auctor augue mauris augue neque gravida.
@@ -345,15 +371,16 @@ private fun AdaptiveNavigableListDetailsScaffoldPreview() {
     """.trimMargin()
 
     data class DefinedWord(
+        override val id: Int,
         val word: String,
         val icon: ImageVector,
         val definition: String = loremIpsum,
-    )
+    ) : PaneScaffoldItem<Int>
 
     val sampleWords = listOf(
-        "Apple" to Icons.Filled.Call,
-        "Banana" to Icons.Filled.Home,
-    ).map { (word, icon) -> DefinedWord(word, icon) }
+        DefinedWord(1, "Apple", Icons.Filled.Call),
+        DefinedWord(2, "Banana", Icons.Filled.Home),
+    )
 
     AdaptiveNavigableListDetailPaneScaffold(
         items = sampleWords,
@@ -365,7 +392,7 @@ private fun AdaptiveNavigableListDetailsScaffoldPreview() {
                         val state = rememberSharedContentState(key = word.word)
                         imageModifier.then(
                             Modifier.sharedElement(
-                                state,
+                                sharedContentState = state,
                                 animatedVisibilityScope = animatedVisibilityScope,
                             ),
                         )
@@ -503,6 +530,41 @@ fun AdaptiveNavigableSupportingPaneScaffoldPreview() {
                         modifier = Modifier
                             .padding(16.dp),
                     )
+                }
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
+@Preview(showBackground = true)
+@Composable
+private fun AdaptiveListDetailPaneScaffoldPreview() {
+    val items = listOf("Apple", "Banana", "Cherry", "Date", "Elderberry")
+
+    AdaptiveListDetailPaneScaffold(
+        mainPaneContent = { navigateToDetail ->
+            LazyColumn {
+                itemsIndexed(items) { index, item ->
+                    Text(
+                        text = item,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { navigateToDetail() }
+                            .padding(16.dp),
+                    )
+                }
+            }
+        },
+        detailPaneContent = { navigateBack ->
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Detail View",
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(onClick = { navigateBack() }) {
+                    Text("Go Back")
                 }
             }
         },

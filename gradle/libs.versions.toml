@@ -1,17 +1,17 @@
 [versions]
 # Android
 androidDesugarJdkLibs = "2.1.5"
-androidGradlePlugin = "8.7.3"
-androidTools = "31.7.3"
+androidGradlePlugin = "8.9.2"
+androidTools = "31.9.2"
 
 # AndroidX Dependencies
 androidx-test-ext-junit = "1.2.1"
 androidxActivity = "1.10.1"
 androidxBrowser = "1.8.0"
-androidxComposeBom = "2024.12.01"
+androidxComposeBom = "2025.05.01"
 androidxComposeCompiler = "1.5.15"
-androidxComposeMaterial3Adaptive = "1.0.0"
-androidxComposeRuntimeTracing = "1.7.6"
+androidxComposeMaterial3Adaptive = "1.1.0"
+androidxComposeRuntimeTracing = "1.8.2"
 androidxCoreSplashscreen = "1.0.1"
 androidxLifecycle = "2.8.7"
 androidxMetrics = "1.0.0-beta02"
@@ -36,50 +36,49 @@ integrity = "1.4.0"
 
 # Static Analysis & Code Formatting
 ktlint = "12.1.1"
-detekt = "1.23.7"
+detekt = "1.23.8"
 spotlessVersion = "6.25.0"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.7.3"
 
 # Kotlin KMP Dependencies
-kotlin = "2.1.0"
+kotlin = "2.1.20"
 kotlinInject = "0.7.2"
-kotlinxCoroutines = "1.10.1"
-kotlinxDatetime = "0.6.1"
+kotlinxCoroutines = "1.10.2"
+kotlinxDatetime = "0.6.2"
 kotlinxImmutable = "0.3.8"
-kotlinxSerializationJson = "1.7.3"
-ksp = "2.1.0-1.0.29"
+kotlinxSerializationJson = "1.8.1"
+ksp = "2.1.20-2.0.1"
 
 # Ktor & Ktorfit
-ktorVersion = "3.0.3"
-ktorfit = "2.2.0"
-ktorfitKsp = "2.2.0-1.0.29"
+ktorVersion = "3.1.3"
+ktorfit = "2.5.1"
 
 # Koin CMP Dependencies
-koin = "4.0.1-RC1"
+koin = "4.0.4"
 koinAnnotationsVersion = "1.4.0-RC4"
 
 # CMP Libraries
-compose-plugin = "1.7.0-rc01"
-coil = "3.0.4"
-backHandlerVersion = "2.1.0"
+compose-plugin = "1.8.1"
+coil = "3.1.0"
+backHandlerVersion = "2.5.0"
 constraintLayout = "0.4.0"
 multiplatformSettings = "1.3.0"
 mokoPermission = "0.18.0"
 qroseVersion = "1.0.1"
-okioVersion = "3.9.1"
-kermit = "2.0.4"
+okioVersion = "3.10.2"
+kermit = "2.0.5"
 fileKit = "0.8.7"
 wire = "5.0.0"
 
 # Jetbrains CMP
 windowsSizeClass = "0.5.0"
 uiDesktopVersion = "1.7.0"
-composeJB = "1.7.3"
-composeLifecycle = "2.8.3"
-composeNavigation = "2.8.0-alpha10"
+composeJB = "1.8.1"
+composeLifecycle = "2.9.0"
+composeNavigation = "2.9.0-beta02"
 jbCoreBundle = "1.0.1"
-jbSavedState = "1.2.2"
+jbSavedState = "1.3.0"
 
 # Desktop Version
 desktopPackageName = "DesktopApp"
@@ -87,13 +86,11 @@ desktopPackageNamespace = "cmp.desktop.app"
 desktopPackageVersion = "1.0.0"
 
 # Android Version
-androidPackageName = "AndroidApp"
 androidPackageNamespace = "cmp.android.app"
-androidPackageVersion = "1.0.0"
 
 #Room
-room = "2.7.0-rc01"
-sqliteBundled = "2.5.0-rc01"
+room = "2.7.1"
+sqliteBundled = "2.5.1"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -118,7 +115,6 @@ androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adap
 androidx-compose-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
-
 
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-compose-runtime-tracing = { group = "androidx.compose.runtime", name = "runtime-tracing", version.ref = "androidxComposeRuntimeTracing" }
@@ -232,7 +228,7 @@ ktor-client-winhttp = { group = "io.ktor", name = "ktor-client-winhttp", version
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
 ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref = "ktorVersion" }
 
-ktorfit-ksp = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-ksp", version.ref = "ktorfitKsp" }
+ktorfit-ksp = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-ksp", version.ref = "ktorfit" }
 ktorfit-converters-flow = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-converters-flow", version.ref = "ktorfit" }
 ktorfit-lib = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-lib", version.ref = "ktorfit" }
 

@@ -10,8 +10,8 @@
 package org.mifos.core.database.entity
 
 import kotlinx.serialization.Serializable
-import org.mifos.corebase.Entity
-import org.mifos.corebase.PrimaryKey
+import template.core.base.database.Entity
+import template.core.base.database.PrimaryKey
 
 @Entity(
     tableName = "samples",

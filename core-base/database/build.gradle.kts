@@ -23,7 +23,7 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.corebase.database"
+    namespace = "template.core.base.database"
 }
 
 kotlin {
@@ -37,6 +37,10 @@ kotlin {
         }
 
         nativeMain.dependencies {
+            implementation(libs.androidx.room.runtime)
+        }
+
+        nonJsCommonMain.dependencies {
             implementation(libs.androidx.room.runtime)
         }
     }

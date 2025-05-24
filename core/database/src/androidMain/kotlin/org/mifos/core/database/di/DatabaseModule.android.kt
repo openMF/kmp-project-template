@@ -16,7 +16,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import org.mifos.core.common.di.AppDispatchers
 import org.mifos.core.database.AppDatabase
-import org.mifos.corebase.AppDatabaseFactory
+import template.core.base.database.AppDatabaseFactory
 import kotlin.coroutines.CoroutineContext
 
 actual val platformModule: Module = module {

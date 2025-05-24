@@ -21,6 +21,7 @@ bin/
 gen/
 out/
 build/
+build-cache/
 .externalNativeBuild
 .cxx
 iosApp/Podfile.lock

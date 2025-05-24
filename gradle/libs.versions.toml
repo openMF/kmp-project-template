@@ -10,7 +10,6 @@ androidxActivity = "1.10.1"
 androidxBrowser = "1.8.0"
 androidxComposeBom = "2025.05.01"
 androidxComposeCompiler = "1.5.15"
-androidxComposeMaterial3Adaptive = "1.1.0"
 androidxComposeRuntimeTracing = "1.8.2"
 androidxCoreSplashscreen = "1.0.1"
 androidxLifecycle = "2.8.7"
@@ -71,7 +70,6 @@ kermit = "2.0.5"
 fileKit = "0.8.7"
 uiBackhandler = "1.8.0"
 wire = "5.0.0"
-material3adaptive = "1.1.0"
 
 # Jetbrains CMP
 windowsSizeClass = "0.5.0"
@@ -81,6 +79,7 @@ composeLifecycle = "2.9.0"
 composeNavigation = "2.9.0-beta02"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.3.0"
+material3adaptive = "1.1.0"
 
 # Desktop Version
 desktopPackageName = "DesktopApp"
@@ -113,9 +112,6 @@ androidx-compose-foundation-layout = { group = "androidx.compose.foundation", na
 
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-compose-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "androidxComposeMaterial3Adaptive" }
-androidx-compose-material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "androidxComposeMaterial3Adaptive" }
-androidx-compose-material3-adaptive-navigation = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "androidxComposeMaterial3Adaptive" }
 androidx-compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }

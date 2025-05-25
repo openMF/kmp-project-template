@@ -12,14 +12,13 @@ package org.mifos.core.datastore.di
 import org.koin.dsl.module
 import org.mifos.core.datastore.UserPreferencesRepository
 import org.mifos.core.datastore.UserPreferencesRepositoryImpl
-import org.mifos.corebase.datastore.di.CoreDatastoreModule
+import template.core.base.datastore.di.CoreDatastoreModule
+import template.core.base.datastore.factory.DataStoreFactory
 
 val DatastoreModule = module {
     includes(CoreDatastoreModule)
 
     single<UserPreferencesRepository> {
-        UserPreferencesRepositoryImpl(
-            dataStore = get(),
-        )
+        UserPreferencesRepositoryImpl(preferencesStore = DataStoreFactory.create())
     }
 }

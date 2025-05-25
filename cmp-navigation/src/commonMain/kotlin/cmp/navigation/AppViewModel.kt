@@ -14,7 +14,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import org.mifos.core.datastore.UserPreferencesRepository
 import org.mifos.core.model.DarkThemeConfig
@@ -25,11 +24,6 @@ class AppViewModel(
     settingsRepository: UserPreferencesRepository,
 ) : ViewModel() {
     val uiState: StateFlow<AppUiState> = settingsRepository.userData
-        .onStart {
-            settingsRepository.getThemeBrand(ThemeBrand.DEFAULT)
-            settingsRepository.getDarkThemeConfig(DarkThemeConfig.FOLLOW_SYSTEM)
-            settingsRepository.getDynamicColorPreference(false)
-        }
         .map { userDate ->
             AppUiState.Success(userDate)
         }

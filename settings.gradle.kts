@@ -14,7 +14,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+    repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
         google {
             content {
@@ -37,7 +37,6 @@ buildCache {
     local {
         isEnabled = true
         directory = File(rootDir, "build-cache")
-        removeUnusedEntriesAfterDays = 15
     }
 }
 

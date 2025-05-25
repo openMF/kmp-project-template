@@ -17,9 +17,7 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        withJava()
-    }
+    jvm()
 
     jvmToolchain(17)
 

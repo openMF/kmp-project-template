@@ -12,9 +12,7 @@ androidxComposeBom = "2025.05.01"
 androidxComposeCompiler = "1.5.15"
 androidxComposeRuntimeTracing = "1.8.2"
 androidxCoreSplashscreen = "1.0.1"
-androidxLifecycle = "2.8.7"
 androidxMetrics = "1.0.0-beta02"
-androidxNavigation = "2.8.5"
 androidxProfileinstaller = "1.4.1"
 androidxTracing = "1.3.0"
 appcompatVersion = "1.7.0"
@@ -36,7 +34,8 @@ integrity = "1.4.0"
 # Static Analysis & Code Formatting
 ktlint = "12.1.1"
 detekt = "1.23.8"
-spotlessVersion = "6.25.0"
+spotlessVersion = "7.0.2"
+turbine = "1.2.0"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.7.3"
 
@@ -68,18 +67,17 @@ qroseVersion = "1.0.1"
 okioVersion = "3.10.2"
 kermit = "2.0.5"
 fileKit = "0.8.7"
-uiBackhandler = "1.8.0"
+uiBackhandler = "1.8.1"
 wire = "5.0.0"
 
 # Jetbrains CMP
 windowsSizeClass = "0.5.0"
-uiDesktopVersion = "1.7.0"
 composeJB = "1.8.1"
 composeLifecycle = "2.9.0"
 composeNavigation = "2.9.0-beta02"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.3.0"
-material3adaptive = "1.1.0"
+material3adaptive = "1.1.1"
 
 # Desktop Version
 desktopPackageName = "DesktopApp"
@@ -144,6 +142,7 @@ ktlint-gradlePlugin = { group = "org.jlleitschuh.gradle", name = "ktlint-gradle"
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 spotless-gradle = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotlessVersion" }
 detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 twitter-detekt-compose = { group = "com.twitter.compose.rules", name = "detekt", version.ref = "twitter-detekt-compose" }
 
 google-oss-licenses = { group = "com.google.android.gms", name = "play-services-oss-licenses", version.ref = "googleOss" }
@@ -168,6 +167,7 @@ jb-kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", ver
 jb-kotlin-stdlib-js = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-js", version.ref = "kotlin" }
 jb-kotlin-dom = { group = "org.jetbrains.kotlin", name = "kotlin-dom-api-compat", version.ref = "kotlin" }
 jb-composeRuntime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeJB" }
+jb-lifecycle-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "composeLifecycle" }
 jb-composeViewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "composeLifecycle" }
 jb-lifecycleViewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "composeLifecycle" }
 jb-lifecycleViewmodelSavedState = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate", version.ref = "composeLifecycle" }

@@ -13,7 +13,7 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.corebase.datastore"
+    namespace = "template.core.base.datastore"
 }
 
 kotlin {
@@ -29,6 +29,8 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.multiplatform.settings.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
         }
     }
 }

@@ -23,9 +23,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,6 +36,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.designsystem.theme.MifosTheme
 
 @Suppress("LongMethod", "CyclomaticComplexMethod", "MagicNumber")
@@ -138,7 +136,7 @@ private fun MinimumCharacterCount(
         } else {
             MaterialTheme.colorScheme.surfaceDim
         },
-        label = "minmumCharacterCountColor",
+        label = "minimumCharacterCountColor",
     )
     Row(
         modifier = modifier,
@@ -146,9 +144,9 @@ private fun MinimumCharacterCount(
     ) {
         AnimatedContent(
             targetState = if (minimumRequirementMet) {
-                Icons.Default.CheckCircle
+                AppIcons.CheckCircle
             } else {
-                Icons.Default.Close
+                AppIcons.Close
             },
             label = "iconForMinimumCharacterCount",
         ) {

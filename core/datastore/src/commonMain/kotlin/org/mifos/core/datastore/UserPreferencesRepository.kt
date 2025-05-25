@@ -14,14 +14,37 @@ import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.ThemeBrand
 import org.mifos.core.model.UserData
 
+/**
+ * Repository interface for managing user preferences with reactive capabilities.
+ *
+ * This interface provides reactive access to user preferences including theme settings,
+ * dark mode configuration, and dynamic color preferences.
+ */
 interface UserPreferencesRepository {
+
+    /**
+     * Reactive stream of current user data combining all preferences.
+     * Emits whenever any preference changes.
+     */
     val userData: Flow<UserData>
 
-    suspend fun setThemeBrand(themeBrand: ThemeBrand)
-    suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
-    suspend fun setDynamicColorPreference(useDynamicColor: Boolean)
+    // Theme Brand Operations
+    suspend fun setThemeBrand(themeBrand: ThemeBrand): Result<Unit>
+    suspend fun getThemeBrand(): Result<ThemeBrand>
+    fun observeThemeBrand(): Flow<ThemeBrand>
 
-    suspend fun getThemeBrand(themeBrand: ThemeBrand)
-    suspend fun getDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
-    suspend fun getDynamicColorPreference(useDynamicColor: Boolean)
+    // Dark Theme Configuration Operations
+    suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig): Result<Unit>
+    suspend fun getDarkThemeConfig(): Result<DarkThemeConfig>
+    fun observeDarkThemeConfig(): Flow<DarkThemeConfig>
+
+    // Dynamic Color Preference Operations
+    suspend fun setDynamicColorPreference(useDynamicColor: Boolean): Result<Unit>
+    suspend fun getDynamicColorPreference(): Result<Boolean>
+    fun observeDynamicColorPreference(): Flow<Boolean>
+
+    // Batch Operations
+    suspend fun resetToDefaults(): Result<Unit>
+    suspend fun exportPreferences(): Result<UserData>
+    suspend fun importPreferences(userData: UserData): Result<Unit>
 }

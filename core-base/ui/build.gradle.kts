@@ -29,18 +29,6 @@ android {
 }
 
 kotlin {
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    applyHierarchyTemplate {
-        common {
-            group("nonAndroid"){
-                withNative()
-                withJvm()
-                withJs()
-                withWasmJs()
-            }
-        }
-    }
-
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.metrics)
@@ -49,23 +37,33 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation(compose.ui)
+            implementation(compose.material3)
+            implementation(compose.foundation)
+            implementation(compose.material)
+            implementation(compose.components.resources)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.components.uiToolingPreview)
+
             implementation(libs.jb.composeViewmodel)
+            implementation(libs.jb.lifecycle.compose)
             implementation(libs.jb.lifecycleViewmodel)
-            implementation(libs.jb.lifecycleViewmodelSavedState)
             implementation(libs.jb.composeNavigation)
+            implementation(libs.jb.lifecycleViewmodelSavedState)
 
             implementation(libs.coil.kt)
             implementation(libs.coil.kt.compose)
 
-            implementation(compose.material3)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-
-            implementation(libs.filekit.compose)
             implementation(libs.filekit.core)
+            implementation(libs.filekit.compose)
         }
         androidInstrumentedTest.dependencies {
             implementation(libs.bundles.androidx.compose.ui.test)
+        }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.common)
+            implementation(compose.desktop.currentOs)
         }
     }
 }

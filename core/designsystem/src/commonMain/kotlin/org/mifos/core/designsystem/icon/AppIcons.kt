@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
@@ -71,6 +72,7 @@ import androidx.compose.material.icons.rounded.Wallet
 import androidx.compose.ui.graphics.vector.ImageVector
 
 object AppIcons {
+    val CheckCircle: ImageVector = Icons.Filled.CheckCircle
     val OutlinedInfo = Icons.Outlined.Info
     val OutlinedLock = Icons.Outlined.Lock
     val OutlinedNotifications = Icons.Outlined.Notifications

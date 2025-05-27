@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.mifos.core.designsystem.component.MifosTab
+import template.core.base.designsystem.component.KptTab
 
 @Suppress("MultipleEmitters")
 @Composable
@@ -44,7 +44,7 @@ fun MifosScrollableTabRow(
         divider = {},
     ) {
         tabContents.forEachIndexed { index, currentTab ->
-            MifosTab(
+            KptTab(
                 text = currentTab.tabName,
                 selected = pagerState.currentPage == index,
                 selectedColor = selectedContentColor,

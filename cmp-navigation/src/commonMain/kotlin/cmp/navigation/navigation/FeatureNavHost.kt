@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import org.mifos.feature.home.HOME_ROUTE
-import org.mifos.feature.home.homeScreen
+import org.mifos.feature.home.HOME_GRAPH
+import org.mifos.feature.home.homeGraph
 import org.mifos.feature.profile.profileScreen
 import org.mifos.feature.settings.notificationScreen
 import org.mifos.feature.settings.settingsScreen
@@ -26,11 +26,11 @@ internal fun FeatureNavHost(
 ) {
     NavHost(
         route = NavGraphRoute.MAIN_GRAPH,
-        startDestination = HOME_ROUTE,
+        startDestination = HOME_GRAPH,
         navController = navController,
         modifier = modifier,
     ) {
-        homeScreen()
+        homeGraph(navController = navController)
 
         profileScreen()
 

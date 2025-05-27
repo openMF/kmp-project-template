@@ -22,6 +22,9 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 
 /**
  * A responsive scaffold that adapts the navigation UI (drawer, rail, or bottom bar)
@@ -47,6 +50,8 @@ import androidx.compose.ui.graphics.Color
  * @param contentColor The color applied to content within the scaffold.
  *(Default: [NavigationSuiteScaffoldDefaults.contentColor])*
  *
+ * @param testTag Optional testTag for the root NavigationSuiteScaffold.
+ *
  * @param content The main content of the screen displayed beside or below the navigation UI.
  */
 
@@ -59,6 +64,7 @@ fun AdaptiveNavigationSuiteScaffold(
     navigationSuiteColors: NavigationSuiteColors = NavigationSuiteDefaults.colors(),
     containerColor: Color = NavigationSuiteScaffoldDefaults.containerColor,
     contentColor: Color = NavigationSuiteScaffoldDefaults.contentColor,
+    testTag: String? = null,
     content: @Composable () -> Unit,
 ) {
     val adaptiveInfo = currentWindowAdaptiveInfo()
@@ -72,12 +78,12 @@ fun AdaptiveNavigationSuiteScaffold(
         }
 
     NavigationSuiteScaffold(
-        navigationSuiteItems = navigationSuiteItems,
+        modifier = modifier.then(Modifier.testTag(testTag ?: "KptAdaptiveNavigationSuiteScaffold")),
         layoutType = customNavSuiteType,
         navigationSuiteColors = navigationSuiteColors,
         containerColor = containerColor,
         contentColor = contentColor,
-        modifier = modifier,
+        navigationSuiteItems = navigationSuiteItems,
         content = content,
     )
 }

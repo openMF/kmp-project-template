@@ -50,9 +50,10 @@ import kmp_project_template.feature.settings.generated.resources.feature_setting
 import kmp_project_template.feature.settings.generated.resources.feature_settings_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.core.designsystem.component.MifosTextButton
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.ThemeBrand
+import template.core.base.designsystem.component.KptButton
+import template.core.base.designsystem.component.variant.ButtonVariant
 
 @Composable
 fun SettingsDialog(
@@ -113,8 +114,9 @@ fun SettingsDialog(
             }
         },
         confirmButton = {
-            MifosTextButton(
+            KptButton(
                 onClick = onDismiss,
+                variant = ButtonVariant.TEXT,
                 modifier = Modifier.padding(horizontal = 8.dp),
             ) {
                 Text(

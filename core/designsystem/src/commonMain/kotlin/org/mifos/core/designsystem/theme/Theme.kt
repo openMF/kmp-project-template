@@ -249,9 +249,7 @@ private val highContrastDarkColorScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDarkHighContrast,
 )
 
-/**
- * Light Android theme color scheme
- */
+/** Light Android theme color scheme */
 val LightAndroidColorScheme = lightColorScheme(
     primary = Green40,
     onPrimary = Color.White,
@@ -280,9 +278,7 @@ val LightAndroidColorScheme = lightColorScheme(
     outline = GreenGray50,
 )
 
-/**
- * Dark Android theme color scheme
- */
+/** Dark Android theme color scheme */
 val DarkAndroidColorScheme = darkColorScheme(
     primary = Green80,
     onPrimary = Green20,
@@ -324,11 +320,13 @@ fun MifosTheme(
         else -> colorScheme(darkTheme, shouldDisplayDynamicTheming)
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = appTypography(),
-        content = content,
-    )
+    MifosDesignSystemProvider {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = appTypography(),
+            content = content,
+        )
+    }
 }
 
 @Composable

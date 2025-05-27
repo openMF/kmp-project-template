@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import org.mifos.core.designsystem.component.MifosScaffold
+import template.core.base.designsystem.component.KptScaffold
 
 @Composable
 internal fun NotificationScreen(
@@ -36,9 +36,9 @@ internal fun NotificationScreenContent(
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
 ) {
-    MifosScaffold(
-        backPress = onBackClick,
-        topBarTitle = "Notification",
+    KptScaffold(
+        onNavigationIconClick = onBackClick,
+        title = "Notification",
         modifier = modifier,
     ) {
         Column(

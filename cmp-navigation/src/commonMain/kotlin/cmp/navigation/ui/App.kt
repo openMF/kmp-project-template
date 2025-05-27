@@ -37,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
@@ -55,10 +54,10 @@ import cmp.navigation.utils.TopLevelDestination
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.core.data.utils.NetworkMonitor
 import org.mifos.core.data.utils.TimeZoneMonitor
-import org.mifos.core.designsystem.component.MifosNavigationBar
-import org.mifos.core.designsystem.component.MifosNavigationBarItem
-import org.mifos.core.designsystem.component.MifosNavigationRail
-import org.mifos.core.designsystem.component.MifosNavigationRailItem
+import org.mifos.core.designsystem.components.MifosNavigationBar
+import org.mifos.core.designsystem.components.MifosNavigationBarItem
+import org.mifos.core.designsystem.components.MifosNavigationRail
+import org.mifos.core.designsystem.components.MifosNavigationRailItem
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.feature.settings.navigateToNotification
 import org.mifos.feature.settings.navigateToSettings

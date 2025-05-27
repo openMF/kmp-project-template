@@ -80,14 +80,14 @@ import template.core.base.designsystem.component.variant.TopAppBarVariant
 
 @Composable
 @Preview(showBackground = true)
-fun CMPButtonPreview() {
+fun KptButtonPreview() {
     Column {
         for (variant in ButtonVariant.entries) {
-            CMPButton(
+            KptButton(
                 onClick = {},
                 variant = variant,
             ) {
-                Text(text = "CMP")
+                Text(text = "Kpt")
             }
         }
     }
@@ -95,15 +95,15 @@ fun CMPButtonPreview() {
 
 @Composable
 @Preview(showBackground = true)
-fun CMPCardPreview() {
+fun KptCardPreview() {
     Column {
         for (variant in CardVariant.entries) {
             Spacer(modifier = Modifier.height(5.dp))
-            CMPCard(
+            KptCard(
                 variant = variant,
                 content = {
                     Text(
-                        text = "CMP",
+                        text = "Kpt",
                         modifier = Modifier.padding(16.dp),
                     )
                 },
@@ -114,19 +114,19 @@ fun CMPCardPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun CMPTextFieldPreview() {
+fun KptTextFieldPreview() {
     Column {
         for (variant in TextFieldVariant.entries) {
             Spacer(modifier = Modifier.height(5.dp))
-            CMPTextField(value = "TextField", onValueChange = {}, variant = variant)
+            KptTextField(value = "TextField", onValueChange = {}, variant = variant)
         }
     }
 }
 
 @Preview
 @Composable
-fun CMPAlertDialogPreview() {
-    CMPAlertDialog(
+fun KptAlertDialogPreview() {
+    KptAlertDialog(
         onDismissRequest = {},
         confirmButton = {},
     )
@@ -135,17 +135,17 @@ fun CMPAlertDialogPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CMPBottomSheetPreview() {
+fun KptBottomSheetPreview() {
     Column {
         Button(onClick = {}) {
-            Text(text = "CMP")
+            Text(text = "Kpt")
         }
-        CMPBottomSheet(
+        KptBottomSheet(
             onDismiss = {},
             modifier = Modifier.fillMaxHeight(),
         ) { hideSheet ->
-            CMPButton(onClick = hideSheet) {
-                Text(text = "CMP")
+            KptButton(onClick = hideSheet) {
+                Text(text = "Kpt")
             }
         }
     }
@@ -153,10 +153,10 @@ fun CMPBottomSheetPreview() {
 
 @Preview
 @Composable
-fun CMPProgressIndicatorPreview() {
+fun KptProgressIndicatorPreview() {
     var input by remember { mutableStateOf("") }
     Column {
-        CMPTextField(
+        KptTextField(
             value = input,
             onValueChange = { input = it },
             variant = TextFieldVariant.OUTLINED,
@@ -164,7 +164,7 @@ fun CMPProgressIndicatorPreview() {
         Spacer(modifier = Modifier.height(15.dp))
         for (variant in ProgressIndicatorVariant.entries) {
             Spacer(modifier = Modifier.height(5.dp))
-            CMPProgressIndicator(variant = variant)
+            KptProgressIndicator(variant = variant)
         }
     }
 }
@@ -172,11 +172,11 @@ fun CMPProgressIndicatorPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun CMPTopAppBarPreview() {
+fun KptTopAppBarPreview() {
     Column {
         for (variant in TopAppBarVariant.entries) {
-            CMPTopAppBar(
-                title = { Text(text = "CMP") },
+            KptTopAppBar(
+                title = { Text(text = "Kpt") },
                 variant = variant,
                 navigationIcon = {
                     IconButton(onClick = { /* do something */ }) {
@@ -211,10 +211,10 @@ fun CMPTopAppBarPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun CMPBottomAppBarPreview() {
+fun KptBottomAppBarPreview() {
     Column {
         for (variant in BottomAppBarVariant.entries) {
-            CMPBottomAppBar(
+            KptBottomAppBar(
                 actions = {
                     IconButton(onClick = { /* do something */ }) {
                         Icon(Icons.Filled.Check, contentDescription = "Localized description")
@@ -260,14 +260,14 @@ fun CMPBottomAppBarPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun CMPScaffoldPreview() {
+fun KptScaffoldPreview() {
     var isRefreshing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    CMPScaffold(
+    KptScaffold(
         topBar = {
-            CMPTopAppBar(
-                title = { Text(text = "CMP") },
+            KptTopAppBar(
+                title = { Text(text = "Kpt") },
             )
         },
         rememberPullToRefreshStateData = rememberPullToRefreshStateData(

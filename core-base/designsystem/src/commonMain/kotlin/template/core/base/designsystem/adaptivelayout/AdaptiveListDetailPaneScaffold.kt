@@ -20,6 +20,7 @@ import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaf
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import kotlinx.coroutines.launch
 
 /**
@@ -67,6 +68,7 @@ import kotlinx.coroutines.launch
  * @param extraPaneContent Optional content for a third pane, shown when screen size allows.
  * @param paneExpansionDragHandle Optional drag handle composable for resizing panes interactively.
  * @param paneExpansionState Optional override for the scaffold's expansion state.
+ * @param testTag Optional testTag for the root ListDetailPaneScaffold.
  *
  * @see androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
  * @see androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
@@ -82,6 +84,7 @@ fun AdaptiveListDetailPaneScaffold(
     extraPaneContent: @Composable ThreePaneScaffoldPaneScope.() -> Unit = {},
     paneExpansionDragHandle: @Composable (ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? = null,
     paneExpansionState: PaneExpansionState? = null,
+    testTag: String? = null,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -105,7 +108,7 @@ fun AdaptiveListDetailPaneScaffold(
             }
         },
         extraPane = extraPaneContent,
-        modifier = modifier,
+        modifier = modifier.then(Modifier.testTag(testTag ?: "KptAdaptiveListDetailPaneScaffold")),
         paneExpansionDragHandle = paneExpansionDragHandle,
         paneExpansionState = paneExpansionState,
     )

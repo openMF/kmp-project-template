@@ -10,24 +10,26 @@
 package template.core.base.designsystem.component.variant
 
 /**
- * Defines the visual style variants available for [CMPTextField] in the CMP design system.
+ * Defines the visual style variants available for
+ * [template.core.base.designsystem.component.KptTextField]
+ * in the CMP design system.
  *
- * Each variant maps to a specific Material3 text field component and affects the appearance
- * of borders, background, and elevation.
+ * Each variant maps to a specific Material3 text field component and
+ * affects the appearance of borders, background, and elevation.
  */
 enum class TextFieldVariant {
 
     /**
-     * A filled text field with a background and no border outline.
-     * Corresponds to [androidx.compose.material3.TextField].
-     * Recommended for most form inputs and primary text entry.
+     * A filled text field with a background and no border outline. Corresponds
+     * to [androidx.compose.material3.TextField]. Recommended for most form
+     * inputs and primary text entry.
      */
     FILLED,
 
     /**
      * An outlined text field with a visible border and transparent background.
-     * Corresponds to [androidx.compose.material3.OutlinedTextField].
-     * Suitable for use cases where less visual weight or contrast is desired.
+     * Corresponds to [androidx.compose.material3.OutlinedTextField]. Suitable
+     * for use cases where less visual weight or contrast is desired.
      */
     OUTLINED,
 }

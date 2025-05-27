@@ -15,6 +15,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import org.mifos.core.designsystem.generated.resources.Res
@@ -89,20 +90,25 @@ internal fun appTypography() = Typography(
         letterSpacing = 0.sp,
         lineHeightStyle = LineHeightStyle(
             alignment = LineHeightStyle.Alignment.Bottom,
-            trim = LineHeightStyle.Trim.None,
+            trim = Trim.None,
         ),
     ),
     titleLarge = TextStyle(
         fontFamily = fontFamily(),
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        lineHeight = 30.24.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp,
+        lineHeightStyle = LineHeightStyle(
+            alignment = LineHeightStyle.Alignment.Bottom,
+            trim = Trim.LastLineBottom,
+        ),
     ),
     titleMedium = TextStyle(
         fontFamily = fontFamily(),
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
-        lineHeight = 28.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.1.sp,
     ),
     titleSmall = TextStyle(
@@ -121,7 +127,7 @@ internal fun appTypography() = Typography(
         letterSpacing = 0.5.sp,
         lineHeightStyle = LineHeightStyle(
             alignment = LineHeightStyle.Alignment.Center,
-            trim = LineHeightStyle.Trim.None,
+            trim = Trim.None,
         ),
     ),
     bodyMedium = TextStyle(
@@ -142,9 +148,13 @@ internal fun appTypography() = Typography(
     labelLarge = TextStyle(
         fontFamily = fontFamily(),
         fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
+        fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,
+        lineHeightStyle = LineHeightStyle(
+            alignment = LineHeightStyle.Alignment.Center,
+            trim = Trim.LastLineBottom,
+        ),
     ),
     // Used for Navigation items
     labelMedium = TextStyle(
@@ -155,7 +165,7 @@ internal fun appTypography() = Typography(
         letterSpacing = 0.5.sp,
         lineHeightStyle = LineHeightStyle(
             alignment = LineHeightStyle.Alignment.Center,
-            trim = LineHeightStyle.Trim.LastLineBottom,
+            trim = Trim.LastLineBottom,
         ),
     ),
     // Used for Tag
@@ -167,7 +177,7 @@ internal fun appTypography() = Typography(
         letterSpacing = 0.sp,
         lineHeightStyle = LineHeightStyle(
             alignment = LineHeightStyle.Alignment.Center,
-            trim = LineHeightStyle.Trim.LastLineBottom,
+            trim = Trim.LastLineBottom,
         ),
     ),
 )

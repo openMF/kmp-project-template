@@ -23,8 +23,8 @@ import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
 import com.mohamedrejeb.calf.permissions.Permission
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
-import org.mifos.core.designsystem.component.MifosButton
-import org.mifos.core.designsystem.component.MifosScaffold
+import template.core.base.designsystem.component.KptButton
+import template.core.base.designsystem.component.KptScaffold
 import template.core.base.platform.LocalAppReviewManager
 import template.core.base.platform.LocalAppUpdateManager
 import template.core.base.platform.LocalIntentManager
@@ -39,6 +39,7 @@ import template.core.base.platform.update.AppUpdateManager
  */
 @Composable
 internal fun HomeScreen(
+    navigateToShowcase: () -> Unit,
     modifier: Modifier = Modifier,
     reviewManager: AppReviewManager = LocalAppReviewManager.current,
     updateManager: AppUpdateManager = LocalAppUpdateManager.current,
@@ -51,6 +52,7 @@ internal fun HomeScreen(
         shareText = {
             intentManager.shareText("Share Home Screen")
         },
+        navigateToShowcase = navigateToShowcase
     )
 }
 
@@ -67,11 +69,12 @@ internal fun HomeScreenContent(
     checkForUpdate: () -> Unit,
     modifier: Modifier = Modifier,
     shareText: () -> Unit,
+    navigateToShowcase: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val permissionState = rememberPermissionState(Permission.Notification)
 
-    MifosScaffold(
+    KptScaffold(
         modifier = modifier.fillMaxSize(),
     ) {
         Column(
@@ -81,19 +84,19 @@ internal fun HomeScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
         ) {
-            MifosButton(
+            KptButton(
                 onClick = showReviewPrompt,
             ) {
                 Text(text = "Prompt Review")
             }
 
-            MifosButton(
+            KptButton(
                 onClick = checkForUpdate,
             ) {
                 Text(text = "Check for Update")
             }
 
-            MifosButton(
+            KptButton(
                 onClick = {
                     scope.launch {
                         permissionState.launchPermissionRequest()
@@ -103,10 +106,16 @@ internal fun HomeScreenContent(
                 Text(text = "Check Permissions")
             }
 
-            MifosButton(
+            KptButton(
                 onClick = shareText,
             ) {
                 Text(text = "Launch Intent")
+            }
+
+            KptButton(
+                onClick = navigateToShowcase,
+            ) {
+                Text(text = "Designsystem Components")
             }
         }
     }

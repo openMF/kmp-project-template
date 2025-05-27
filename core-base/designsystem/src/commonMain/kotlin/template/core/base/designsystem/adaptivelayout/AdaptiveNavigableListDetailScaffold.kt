@@ -47,6 +47,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -85,6 +88,7 @@ import kotlinx.coroutines.launch
  * @param cardElevation Optional elevation to override the default card elevation for list items. *(Optional)*
  * @param cardColors Optional colors to override default card colors for list items. *(Optional)*
  * @param cardBorder Optional border to override default list item card border behavior. *(Optional)*
+ * @param testTag Optional testTag for the root of the scaffold layout.
  *
  * @see ListDetailPaneScaffold for platform-level behavior and layout management.
  * @see SelectionVisibilityState for selection handling behavior.
@@ -122,6 +126,7 @@ fun <T : PaneScaffoldItem<*>> AdaptiveNavigableListDetailPaneScaffold(
     cardElevation: CardElevation? = null,
     cardColors: CardColors? = null,
     cardBorder: BorderStroke? = null,
+    testTag: String? = null,
 ) {
     var selectedItemIndex: Int? by rememberSaveable { mutableStateOf(null) }
     val navigator = rememberListDetailPaneScaffoldNavigator()
@@ -168,6 +173,7 @@ fun <T : PaneScaffoldItem<*>> AdaptiveNavigableListDetailPaneScaffold(
                             cardElevation = cardElevation,
                             cardColors = cardColors,
                             cardBorder = cardBorder,
+                            testTag = testTag,
                         )
                     }
                 },
@@ -186,7 +192,7 @@ fun <T : PaneScaffoldItem<*>> AdaptiveNavigableListDetailPaneScaffold(
                     }
                 },
                 extraPane = extraPaneContent,
-                modifier = modifier,
+                modifier = modifier.then(Modifier.testTag(testTag ?: "KptAdaptiveListDetailScaffold")),
                 paneExpansionDragHandle = paneExpansionDragHandle,
                 paneExpansionState = paneExpansionState,
             )
@@ -217,6 +223,7 @@ fun <T : PaneScaffoldItem<*>> AdaptiveNavigableListDetailPaneScaffold(
  * @param cardElevation Optional elevation override for the item card.
  * @param cardColors Optional colors override for the item card.
  * @param cardBorder Optional border override for the item card.
+ * @param testTag Optional testTag for the root of the list content.
  *
  * @see SelectionVisibilityState for controlling selection behavior.
  */
@@ -244,17 +251,12 @@ private fun <T : PaneScaffoldItem<*>> ListContent(
     cardElevation: CardElevation? = null,
     cardColors: CardColors? = null,
     cardBorder: BorderStroke? = null,
+    testTag: String? = null,
 ) {
     LazyColumn(
         contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = modifier
-            .then(
-                when (selectionState) {
-                    SelectionVisibilityState.NoSelection -> Modifier
-                    is SelectionVisibilityState.ShowSelection -> Modifier.selectableGroup()
-                },
-            ),
+        modifier = modifier.then(Modifier.testTag(testTag ?: "KptAdaptiveListDetailList")),
     ) {
         itemsIndexed(
             items = items,
@@ -311,7 +313,8 @@ private fun <T : PaneScaffoldItem<*>> ListContent(
                 shape = cardShape ?: CardDefaults.shape,
                 modifier = Modifier
                     .then(interactionModifier)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag("KptAdaptiveListDetailItem_$index"),
             ) {
                 listPaneItem(
                     item,

@@ -13,13 +13,50 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 
 const val HOME_ROUTE = "home_route"
+private const val DESIGN_SYSTEM_SHOWCASE_ROUTE = "designsystem_showcase_route"
+const val HOME_GRAPH = "home_graph"
 
-fun NavController.navigateToHome(navOptions: NavOptions? = null) = navigate(HOME_ROUTE, navOptions)
+fun NavController.navigateToHome(navOptions: NavOptions? = null) = navigate(HOME_GRAPH, navOptions)
 
-fun NavGraphBuilder.homeScreen() {
+private fun NavGraphBuilder.homeScreen(
+    navigateToShowcase: () -> Unit,
+) {
     composable(route = HOME_ROUTE) {
-        HomeScreen()
+        HomeScreen(
+            navigateToShowcase = navigateToShowcase,
+        )
+    }
+}
+
+private fun NavGraphBuilder.designSystemShowcaseScreen(
+    navigateBack: () -> Unit,
+) {
+    composable(route = DESIGN_SYSTEM_SHOWCASE_ROUTE) {
+        DesignSystemCatalogScreen(
+            navigateBack = navigateBack,
+        )
+    }
+}
+
+fun NavGraphBuilder.homeGraph(
+    navController: NavController,
+    startDestination: String = HOME_ROUTE,
+) {
+    navigation(
+        route = HOME_GRAPH,
+        startDestination = startDestination,
+    ) {
+        homeScreen(
+            navigateToShowcase = {
+                navController.navigate(DESIGN_SYSTEM_SHOWCASE_ROUTE)
+            },
+        )
+
+        designSystemShowcaseScreen(
+            navigateBack = navController::navigateUp,
+        )
     }
 }

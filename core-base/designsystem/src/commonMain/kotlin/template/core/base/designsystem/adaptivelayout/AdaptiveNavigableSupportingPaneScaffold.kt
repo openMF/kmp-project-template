@@ -24,6 +24,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 
 /**
  * A composable layout for adaptive UIs that implements a navigable two-pane structure
@@ -52,53 +55,52 @@ import kotlinx.coroutines.launch
  *
  * @param paneExpansionState Optional [PaneExpansionState] to control and observe pane expansion behavior.
  * If not provided, a state will be remembered internally based on scaffold layout state.
+ *
+ * @param testTag Optional testTag for the root SupportingPaneScaffold. If not provided, a default tag is used.
  */
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AdaptiveNavigableSupportingPaneScaffold(
-    mainPaneContent: @Composable ThreePaneScaffoldPaneScope.(() -> Unit) -> Unit,
-    supportingPaneContent: @Composable ThreePaneScaffoldPaneScope.(() -> Unit) -> Unit,
+    mainPaneContent: @Composable ThreePaneScaffoldPaneScope.(navigateToSupporting: () -> Unit) -> Unit,
+    supportingPaneContent: @Composable ThreePaneScaffoldPaneScope.(navigateBack: () -> Unit) -> Unit,
     modifier: Modifier = Modifier,
-    scaffoldNavigator: ThreePaneScaffoldNavigator<Any>? = null,
+    scaffoldNavigator: ThreePaneScaffoldNavigator<Any> = rememberSupportingPaneScaffoldNavigator(),
     extraPaneContent: @Composable ThreePaneScaffoldPaneScope.() -> Unit = {},
     paneExpansionDragHandle: @Composable (ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? = null,
     paneExpansionState: PaneExpansionState? = null,
+    testTag: String? = null,
 ) {
-    val finalScaffoldNavigator = scaffoldNavigator ?: rememberSupportingPaneScaffoldNavigator()
     val scope = rememberCoroutineScope()
 
-    BackHandler(enabled = finalScaffoldNavigator.canNavigateBack()) {
+    BackHandler(enabled = scaffoldNavigator.canNavigateBack()) {
         scope.launch {
-            finalScaffoldNavigator.navigateBack()
+            scaffoldNavigator.navigateBack()
         }
     }
 
     SupportingPaneScaffold(
-        directive = finalScaffoldNavigator.scaffoldDirective,
-        scaffoldState = finalScaffoldNavigator.scaffoldState,
+        directive = scaffoldNavigator.scaffoldDirective,
+        value = scaffoldNavigator.scaffoldValue,
         mainPane = {
             mainPaneContent {
                 scope.launch {
-                    finalScaffoldNavigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
+                    scaffoldNavigator.navigateTo(SupportingPaneScaffoldRole.Supporting)
                 }
             }
         },
         supportingPane = {
             supportingPaneContent {
                 scope.launch {
-                    if (finalScaffoldNavigator.canNavigateBack()) {
-                        finalScaffoldNavigator.navigateBack()
+                    if (scaffoldNavigator.canNavigateBack()) {
+                        scaffoldNavigator.navigateBack()
                     }
                 }
             }
         },
-        modifier = modifier,
-        extraPane = {
-            extraPaneContent()
-        },
+        extraPane = extraPaneContent,
+        modifier = modifier.then(Modifier.testTag(testTag ?: "KptAdaptiveNavigableSupportingPaneScaffold")),
         paneExpansionDragHandle = paneExpansionDragHandle,
-        paneExpansionState = paneExpansionState
-            ?: rememberPaneExpansionState(finalScaffoldNavigator.scaffoldValue),
+        paneExpansionState = paneExpansionState,
     )
 }

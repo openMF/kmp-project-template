@@ -22,11 +22,6 @@ android {
 
 kotlin {
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.androidx.compose.ui.tooling.preview)
-            implementation(libs.androidx.activity.compose)
-            implementation(projects.core.model)
-        }
         androidInstrumentedTest.dependencies {
             implementation(libs.androidx.compose.ui.test)
         }
@@ -34,17 +29,18 @@ kotlin {
             implementation(libs.androidx.compose.ui.test)
         }
         commonMain.dependencies {
-            implementation(libs.coil.kt.compose)
+            api(projects.coreBase.designsystem)
+
+            implementation(compose.ui)
+            implementation(compose.uiUtil)
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
-            implementation(compose.ui)
-            implementation(compose.uiUtil)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            api(libs.back.handler)
-            api(libs.window.size)
+
+            implementation(libs.coil.kt.compose)
         }
     }
 }

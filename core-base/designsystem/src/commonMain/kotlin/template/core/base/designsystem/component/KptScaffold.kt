@@ -135,7 +135,6 @@ fun KptScaffold(
                 KptTopAppBar(
                     title = title,
                     onNavigationIconClick = onNavigationIconClick,
-                    actions = actions,
                 )
             }
         },

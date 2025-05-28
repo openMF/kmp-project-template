@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -86,15 +85,13 @@ internal fun HomeScreenContent(
         ) {
             KptButton(
                 onClick = showReviewPrompt,
-            ) {
-                Text(text = "Prompt Review")
-            }
+                text = "Prompt Review"
+            )
 
             KptButton(
                 onClick = checkForUpdate,
-            ) {
-                Text(text = "Check for Update")
-            }
+                text = "Check for Update"
+            )
 
             KptButton(
                 onClick = {
@@ -102,21 +99,18 @@ internal fun HomeScreenContent(
                         permissionState.launchPermissionRequest()
                     }
                 },
-            ) {
-                Text(text = "Check Permissions")
-            }
+                text = "Check Permissions"
+            )
 
             KptButton(
                 onClick = shareText,
-            ) {
-                Text(text = "Launch Intent")
-            }
+                text = "Launch Intent"
+            )
 
             KptButton(
                 onClick = navigateToShowcase,
-            ) {
-                Text(text = "Designsystem Components")
-            }
+                text = "Designsystem Components"
+            )
         }
     }
 }

@@ -52,8 +52,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.ThemeBrand
+import template.core.base.designsystem.component.ButtonVariant
 import template.core.base.designsystem.component.KptButton
-import template.core.base.designsystem.component.variant.ButtonVariant
 
 @Composable
 fun SettingsDialog(
@@ -116,7 +116,7 @@ fun SettingsDialog(
         confirmButton = {
             KptButton(
                 onClick = onDismiss,
-                variant = ButtonVariant.TEXT,
+                variant = ButtonVariant.Text,
                 modifier = Modifier.padding(horizontal = 8.dp),
             ) {
                 Text(

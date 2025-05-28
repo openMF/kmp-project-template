@@ -20,6 +20,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +35,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import template.core.base.designsystem.config.KptTestTags
+import template.core.base.designsystem.core.KptComponent
 
 /**
  * A composable wrapper around Material3 [ModalBottomSheet] that provides a
@@ -70,11 +71,11 @@ import template.core.base.designsystem.config.KptTestTags
  * @param properties Additional platform-specific configuration options.
  *    (Default: [ModalBottomSheetDefaults.properties])*
  * @param testTag Tag for UI testing. *(Optional)*
- * @param contentDescription Content description for accessibility.
- *    *(Optional)*
  * @param sheetContent The content of the bottom sheet. This lambda
  *    receives a `hideSheet()` callback that should be used to
  *    programmatically hide the sheet.
+ * @param contentDescription Content description for accessibility.
+ *    *(Optional)*
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,31 +99,74 @@ fun KptBottomSheet(
     var showBottomSheet by remember { mutableStateOf(true) }
 
     if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showBottomSheet = false
-                onDismiss()
-            },
-            sheetState = sheetState,
-            sheetMaxWidth = sheetMaxWidth,
-            shape = shape,
-            containerColor = containerColor,
-            contentColor = contentColor,
-            tonalElevation = tonalElevation,
-            scrimColor = scrimColor,
-            dragHandle = dragHandle,
-            contentWindowInsets = contentWindowInsets,
-            properties = properties,
-            modifier = modifier.testTag(testTag ?: "KptBottomSheet"),
-        ) {
-            sheetContent {
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                    if (!sheetState.isVisible) {
-                        showBottomSheet = false
-                        onDismiss()
+        KptBottomSheet(
+            configuration = BottomSheetConfiguration(
+                testTag = testTag,
+                contentDescription = null,
+                modifier = modifier
+                    .semantics { this.contentDescription = contentDescription },
+                onDismissRequest = onDismiss,
+                sheetState = sheetState,
+                shape = shape,
+                containerColor = containerColor,
+                contentColor = contentColor,
+                tonalElevation = tonalElevation,
+                scrimColor = scrimColor,
+                dragHandle = dragHandle,
+                contentWindowInsets = contentWindowInsets,
+                properties = properties,
+                content = {
+                    sheetContent {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
+                                onDismiss()
+                            }
+                        }
                     }
-                }
-            }
-        }
+                },
+            ),
+        )
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun KptBottomSheet(configuration: BottomSheetConfiguration) {
+    ModalBottomSheet(
+        onDismissRequest = configuration.onDismissRequest,
+        modifier = configuration.modifier.testTag(configuration.testTag ?: "KptBottomSheet"),
+        sheetState = configuration.sheetState ?: rememberModalBottomSheetState(),
+        sheetMaxWidth = BottomSheetDefaults.SheetMaxWidth,
+        shape = configuration.shape ?: BottomSheetDefaults.ExpandedShape,
+        containerColor = configuration.containerColor ?: BottomSheetDefaults.ContainerColor,
+        contentColor = configuration.contentColor ?: contentColorFor(
+            configuration.containerColor ?: BottomSheetDefaults.ContainerColor,
+        ),
+        tonalElevation = configuration.tonalElevation,
+        scrimColor = configuration.scrimColor ?: BottomSheetDefaults.ScrimColor,
+        dragHandle = configuration.dragHandle,
+        contentWindowInsets = configuration.contentWindowInsets,
+        properties = configuration.properties,
+        content = configuration.content,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Immutable
+data class BottomSheetConfiguration(
+    override val testTag: String? = null,
+    override val contentDescription: String? = null,
+    override val modifier: Modifier = Modifier,
+    val onDismissRequest: () -> Unit,
+    val sheetState: SheetState? = null,
+    val shape: androidx.compose.ui.graphics.Shape? = null,
+    val containerColor: Color? = null,
+    val contentColor: Color? = null,
+    val tonalElevation: androidx.compose.ui.unit.Dp = 0.dp,
+    val scrimColor: Color? = null,
+    val dragHandle: (@Composable () -> Unit)? = null,
+    val contentWindowInsets: @Composable () -> WindowInsets = { BottomSheetDefaults.windowInsets },
+    val properties: ModalBottomSheetProperties = ModalBottomSheetDefaults.properties,
+    val content: @Composable ColumnScope.() -> Unit,
+) : KptComponent

@@ -66,11 +66,13 @@ import template.core.base.designsystem.theme.KptTheme
 @Composable
 fun KptProgressIndicator(configuration: KptProgressIndicatorConfiguration) {
     val finalModifier = configuration.modifier
-        .testTag(configuration.testTag ?: KptTestTags.ProgressIndicator)
+        .testTag(configuration.testTag ?: KptTestTags.PROGRESS_INDICATOR)
         .let { mod ->
             if (configuration.contentDescription != null) {
                 mod.semantics { contentDescription = configuration.contentDescription }
-            } else mod
+            } else {
+                mod
+            }
         }
 
     val primaryColor = configuration.color ?: KptTheme.colorScheme.primary
@@ -83,7 +85,7 @@ fun KptProgressIndicator(configuration: KptProgressIndicatorConfiguration) {
                 modifier = finalModifier.height(configuration.strokeWidth),
                 color = primaryColor,
                 trackColor = secondaryColor,
-                strokeCap = configuration.strokeCap
+                strokeCap = configuration.strokeCap,
             )
         }
 
@@ -92,14 +94,14 @@ fun KptProgressIndicator(configuration: KptProgressIndicatorConfiguration) {
                 modifier = finalModifier.height(configuration.strokeWidth),
                 color = primaryColor,
                 trackColor = secondaryColor,
-                strokeCap = configuration.strokeCap
+                strokeCap = configuration.strokeCap,
             )
         }
 
         ProgressIndicatorVariant.CircularDeterminate -> {
             Box(
                 modifier = finalModifier.size(configuration.size),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(
                     progress = { configuration.progress },
@@ -107,7 +109,7 @@ fun KptProgressIndicator(configuration: KptProgressIndicatorConfiguration) {
                     color = primaryColor,
                     strokeWidth = configuration.strokeWidth,
                     trackColor = secondaryColor,
-                    strokeCap = configuration.strokeCap
+                    strokeCap = configuration.strokeCap,
                 )
 
                 if (configuration.showProgress) {
@@ -116,7 +118,7 @@ fun KptProgressIndicator(configuration: KptProgressIndicatorConfiguration) {
                     Text(
                         text = progressText,
                         style = KptTheme.typography.labelSmall,
-                        color = KptTheme.colorScheme.onSurface
+                        color = KptTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -128,7 +130,7 @@ fun KptProgressIndicator(configuration: KptProgressIndicatorConfiguration) {
                 color = primaryColor,
                 strokeWidth = configuration.strokeWidth,
                 trackColor = secondaryColor,
-                strokeCap = configuration.strokeCap
+                strokeCap = configuration.strokeCap,
             )
         }
 
@@ -154,7 +156,7 @@ fun KptProgressIndicator(configuration: KptProgressIndicatorConfiguration) {
 private fun DotsProgressIndicator(
     configuration: KptProgressIndicatorConfiguration,
     modifier: Modifier,
-    color: Color
+    color: Color,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "dots_progress")
     val dotSize = configuration.size / 8
@@ -163,7 +165,7 @@ private fun DotsProgressIndicator(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(spacing),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(3) { index ->
             val scale by infiniteTransition.animateFloat(
@@ -172,16 +174,16 @@ private fun DotsProgressIndicator(
                 animationSpec = infiniteRepeatable(
                     animation = tween(configuration.animationDuration / 3, easing = LinearEasing),
                     repeatMode = RepeatMode.Reverse,
-                    initialStartOffset = StartOffset(index * configuration.animationDuration / 3)
+                    initialStartOffset = StartOffset(index * configuration.animationDuration / 3),
                 ),
-                label = "dot_scale_$index"
+                label = "dot_scale_$index",
             )
 
             Box(
                 modifier = Modifier
                     .size(dotSize)
                     .scale(scale)
-                    .background(color, CircleShape)
+                    .background(color, CircleShape),
             )
         }
     }
@@ -191,7 +193,7 @@ private fun DotsProgressIndicator(
 private fun WaveProgressIndicator(
     configuration: KptProgressIndicatorConfiguration,
     modifier: Modifier,
-    color: Color
+    color: Color,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "wave_progress")
     val barWidth = configuration.size / 8
@@ -200,7 +202,7 @@ private fun WaveProgressIndicator(
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(barSpacing),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(5) { index ->
             val height by infiniteTransition.animateFloat(
@@ -209,9 +211,9 @@ private fun WaveProgressIndicator(
                 animationSpec = infiniteRepeatable(
                     animation = tween(configuration.animationDuration / 2, easing = LinearEasing),
                     repeatMode = RepeatMode.Reverse,
-                    initialStartOffset = StartOffset(index * configuration.animationDuration / 10)
+                    initialStartOffset = StartOffset(index * configuration.animationDuration / 10),
                 ),
-                label = "bar_height_$index"
+                label = "bar_height_$index",
             )
 
             Box(
@@ -219,7 +221,7 @@ private fun WaveProgressIndicator(
                     .width(barWidth)
                     .height(height.dp)
                     .clip(RoundedCornerShape(barWidth / 2))
-                    .background(color)
+                    .background(color),
             )
         }
     }
@@ -229,7 +231,7 @@ private fun WaveProgressIndicator(
 private fun PulseProgressIndicator(
     configuration: KptProgressIndicatorConfiguration,
     modifier: Modifier,
-    color: Color
+    color: Color,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse_progress")
     val scale by infiniteTransition.animateFloat(
@@ -237,9 +239,9 @@ private fun PulseProgressIndicator(
         targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
             animation = tween(configuration.animationDuration, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "pulse_scale"
+        label = "pulse_scale",
     )
 
     val alpha by infiniteTransition.animateFloat(
@@ -247,9 +249,9 @@ private fun PulseProgressIndicator(
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(configuration.animationDuration, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
+            repeatMode = RepeatMode.Reverse,
         ),
-        label = "pulse_alpha"
+        label = "pulse_alpha",
     )
 
     Box(
@@ -257,7 +259,7 @@ private fun PulseProgressIndicator(
             .size(configuration.size)
             .scale(scale)
             .alpha(alpha)
-            .background(color, CircleShape)
+            .background(color, CircleShape),
     )
 }
 
@@ -265,7 +267,7 @@ private fun PulseProgressIndicator(
 private fun RingProgressIndicator(
     configuration: KptProgressIndicatorConfiguration,
     modifier: Modifier,
-    color: Color
+    color: Color,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "ring_progress")
     val rotation by infiniteTransition.animateFloat(
@@ -273,13 +275,13 @@ private fun RingProgressIndicator(
         targetValue = 360f,
         animationSpec = infiniteRepeatable(
             animation = tween(configuration.animationDuration, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
+            repeatMode = RepeatMode.Restart,
         ),
-        label = "ring_rotation"
+        label = "ring_rotation",
     )
 
     Canvas(
-        modifier = modifier.size(configuration.size)
+        modifier = modifier.size(configuration.size),
     ) {
         val strokeWidth = configuration.strokeWidth.toPx()
         val radius = (size.minDimension - strokeWidth) / 2
@@ -290,7 +292,7 @@ private fun RingProgressIndicator(
             color = configuration.trackColor ?: Color.Gray.copy(alpha = 0.3f),
             radius = radius,
             center = center,
-            style = Stroke(strokeWidth, cap = configuration.strokeCap)
+            style = Stroke(strokeWidth, cap = configuration.strokeCap),
         )
 
         // Draw animated segment
@@ -302,7 +304,7 @@ private fun RingProgressIndicator(
             useCenter = false,
             topLeft = Offset(center.x - radius, center.y - radius),
             size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2),
-            style = Stroke(strokeWidth, cap = configuration.strokeCap)
+            style = Stroke(strokeWidth, cap = configuration.strokeCap),
         )
     }
 }
@@ -313,7 +315,7 @@ fun KptCircularProgressIndicator(
     modifier: Modifier = Modifier,
     color: Color? = null,
     size: Dp = 40.dp,
-    strokeWidth: Dp = 4.dp
+    strokeWidth: Dp = 4.dp,
 ) {
     KptProgressIndicator(
         KptProgressIndicatorConfiguration(
@@ -321,8 +323,8 @@ fun KptCircularProgressIndicator(
             variant = ProgressIndicatorVariant.CircularIndeterminate,
             color = color,
             size = size,
-            strokeWidth = strokeWidth
-        )
+            strokeWidth = strokeWidth,
+        ),
     )
 }
 
@@ -334,7 +336,7 @@ fun KptCircularProgressIndicator(
     color: Color? = null,
     size: Dp = 40.dp,
     strokeWidth: Dp = 4.dp,
-    showProgressText: Boolean = false
+    showProgressText: Boolean = false,
 ) {
     KptProgressIndicator(
         KptProgressIndicatorConfiguration(
@@ -344,8 +346,8 @@ fun KptCircularProgressIndicator(
             color = color,
             size = size,
             strokeWidth = strokeWidth,
-            showProgress = showProgressText
-        )
+            showProgress = showProgressText,
+        ),
     )
 }
 
@@ -355,7 +357,7 @@ fun KptLinearProgressIndicator(
     modifier: Modifier = Modifier,
     color: Color? = null,
     trackColor: Color? = null,
-    strokeWidth: Dp = 4.dp
+    strokeWidth: Dp = 4.dp,
 ) {
     KptProgressIndicator(
         KptProgressIndicatorConfiguration(
@@ -363,8 +365,8 @@ fun KptLinearProgressIndicator(
             variant = ProgressIndicatorVariant.LinearIndeterminate,
             color = color,
             trackColor = trackColor,
-            strokeWidth = strokeWidth
-        )
+            strokeWidth = strokeWidth,
+        ),
     )
 }
 
@@ -375,7 +377,7 @@ fun KptLinearProgressIndicator(
     modifier: Modifier = Modifier,
     color: Color? = null,
     trackColor: Color? = null,
-    strokeWidth: Dp = 4.dp
+    strokeWidth: Dp = 4.dp,
 ) {
     KptProgressIndicator(
         KptProgressIndicatorConfiguration(
@@ -384,8 +386,8 @@ fun KptLinearProgressIndicator(
             progress = progress,
             color = color,
             trackColor = trackColor,
-            strokeWidth = strokeWidth
-        )
+            strokeWidth = strokeWidth,
+        ),
     )
 }
 
@@ -395,7 +397,7 @@ fun KptLoadingDots(
     modifier: Modifier = Modifier,
     color: Color? = null,
     size: Dp = 40.dp,
-    animationDuration: Int = 1000
+    animationDuration: Int = 1000,
 ) {
     KptProgressIndicator(
         KptProgressIndicatorConfiguration(
@@ -403,8 +405,8 @@ fun KptLoadingDots(
             variant = ProgressIndicatorVariant.Dots,
             color = color,
             size = size,
-            animationDuration = animationDuration
-        )
+            animationDuration = animationDuration,
+        ),
     )
 }
 
@@ -414,7 +416,7 @@ fun KptLoadingWave(
     modifier: Modifier = Modifier,
     color: Color? = null,
     size: Dp = 40.dp,
-    animationDuration: Int = 1000
+    animationDuration: Int = 1000,
 ) {
     KptProgressIndicator(
         KptProgressIndicatorConfiguration(
@@ -422,8 +424,8 @@ fun KptLoadingWave(
             variant = ProgressIndicatorVariant.Wave,
             color = color,
             size = size,
-            animationDuration = animationDuration
-        )
+            animationDuration = animationDuration,
+        ),
     )
 }
 
@@ -433,7 +435,7 @@ fun KptLoadingPulse(
     modifier: Modifier = Modifier,
     color: Color? = null,
     size: Dp = 40.dp,
-    animationDuration: Int = 1000
+    animationDuration: Int = 1000,
 ) {
     KptProgressIndicator(
         KptProgressIndicatorConfiguration(
@@ -441,8 +443,8 @@ fun KptLoadingPulse(
             variant = ProgressIndicatorVariant.Pulse,
             color = color,
             size = size,
-            animationDuration = animationDuration
-        )
+            animationDuration = animationDuration,
+        ),
     )
 }
 
@@ -453,22 +455,22 @@ fun KptProgressWithLabel(
     label: String,
     modifier: Modifier = Modifier,
     color: Color? = null,
-    variant: ProgressIndicatorVariant = ProgressIndicatorVariant.LinearDeterminate
+    variant: ProgressIndicatorVariant = ProgressIndicatorVariant.LinearDeterminate,
 ) {
     Column(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = label,
-                style = KptTheme.typography.bodyMedium
+                style = KptTheme.typography.bodyMedium,
             )
             Text(
                 text = "${(progress * 100).toInt()}%",
                 style = KptTheme.typography.bodySmall,
-                color = KptTheme.colorScheme.onSurfaceVariant
+                color = KptTheme.colorScheme.onSurfaceVariant,
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -477,8 +479,8 @@ fun KptProgressWithLabel(
                 variant = variant,
                 progress = progress,
                 color = color,
-                modifier = Modifier.fillMaxWidth()
-            )
+                modifier = Modifier.fillMaxWidth(),
+            ),
         )
     }
 }
@@ -490,31 +492,31 @@ fun KptUploadProgress(
     fileName: String,
     fileSize: String,
     onCancel: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = fileName,
                         style = KptTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
                     )
                     Text(
                         text = fileSize,
                         style = KptTheme.typography.bodySmall,
-                        color = KptTheme.colorScheme.onSurfaceVariant
+                        color = KptTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 IconButton(onClick = onCancel) {
                     Icon(
                         imageVector = androidx.compose.material.icons.Icons.Default.Close,
-                        contentDescription = "Cancel upload"
+                        contentDescription = "Cancel upload",
                     )
                 }
             }
@@ -522,7 +524,7 @@ fun KptUploadProgress(
             KptProgressWithLabel(
                 progress = progress,
                 label = "Uploading...",
-                variant = ProgressIndicatorVariant.LinearDeterminate
+                variant = ProgressIndicatorVariant.LinearDeterminate,
             )
         }
     }
@@ -534,42 +536,42 @@ fun KptDownloadProgress(
     progress: Float,
     downloadSpeed: String,
     timeRemaining: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = "Downloading...",
-                style = KptTheme.typography.bodyMedium
+                style = KptTheme.typography.bodyMedium,
             )
             Text(
                 text = "${(progress * 100).toInt()}%",
                 style = KptTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
         KptLinearProgressIndicator(
             progress = progress,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = downloadSpeed,
                 style = KptTheme.typography.bodySmall,
-                color = KptTheme.colorScheme.onSurfaceVariant
+                color = KptTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = timeRemaining,
                 style = KptTheme.typography.bodySmall,
-                color = KptTheme.colorScheme.onSurfaceVariant
+                color = KptTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -598,7 +600,7 @@ fun KptProgressIndicator(
             strokeCap = strokeCap ?: StrokeCap.Round,
             strokeWidth = circularStrokeWidth ?: 4.dp,
             testTag = testTag,
-            contentDescription = contentDescription
-        )
+            contentDescription = contentDescription,
+        ),
     )
 }

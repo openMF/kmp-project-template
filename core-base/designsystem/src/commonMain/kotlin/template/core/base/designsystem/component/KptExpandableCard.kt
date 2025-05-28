@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.component
 
 import androidx.compose.foundation.layout.Column
@@ -24,10 +33,10 @@ fun KptExpandableCard(
     onExpandedChange: (Boolean) -> Unit = {},
     icon: ImageVector? = null,
     subtitle: String? = null,
-    expandedContent: @Composable () -> Unit
+    expandedContent: @Composable () -> Unit,
 ) {
     Card(
-        modifier = modifier.testTag("KptExpandableCard")
+        modifier = modifier.testTag("KptExpandableCard"),
     ) {
         Column {
             ListItem(
@@ -38,19 +47,19 @@ fun KptExpandableCard(
                     IconButton(onClick = { onExpandedChange(!expanded) }) {
                         Icon(
                             if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                            contentDescription = if (expanded) "Collapse" else "Expand"
+                            contentDescription = if (expanded) "Collapse" else "Expand",
                         )
                     }
-                }
+                },
             )
 
             androidx.compose.animation.AnimatedVisibility(
                 visible = expanded,
                 enter = androidx.compose.animation.expandVertically() + androidx.compose.animation.fadeIn(),
-                exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
+                exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut(),
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 ) {
                     expandedContent()
                 }

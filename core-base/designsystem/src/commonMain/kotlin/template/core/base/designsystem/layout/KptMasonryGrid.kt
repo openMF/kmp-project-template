@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.layout
 
 import androidx.compose.runtime.Composable
@@ -13,16 +22,16 @@ fun KptMasonryGrid(
     columns: Int,
     modifier: Modifier = Modifier,
     spacing: Dp = KptTheme.spacing.sm,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Layout(
         modifier = modifier.testTag("KptMasonryGrid"),
-        content = content
+        content = content,
     ) { measurables, constraints ->
         val columnWidth = (constraints.maxWidth - spacing.roundToPx() * (columns - 1)) / columns
         val itemConstraints = constraints.copy(
             minWidth = columnWidth,
-            maxWidth = columnWidth
+            maxWidth = columnWidth,
         )
 
         val placeables = measurables.fastMap { it.measure(itemConstraints) }

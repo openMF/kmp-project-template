@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
-sealed interface CardVariant: ComponentVariant {
+sealed interface CardVariant : ComponentVariant {
     override val name: String
 
     data object Filled : CardVariant {
@@ -70,10 +70,10 @@ data class KptCardConfiguration(
     val header: (@Composable () -> Unit)? = null,
     val footer: (@Composable () -> Unit)? = null,
     val content: @Composable ColumnScope.() -> Unit,
-): KptComponent
+) : KptComponent
 
 @ComponentDsl
-class KptCardBuilder: ComponentConfigurationScope {
+class KptCardBuilder : ComponentConfigurationScope {
     override var modifier: Modifier = Modifier
     var onClick: (() -> Unit)? = null
     override var enabled: Boolean = true

@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.component
 
 import androidx.compose.material.icons.Icons
@@ -37,7 +46,7 @@ fun KptDatePicker(configuration: DatePickerConfiguration) {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return configuration.dateValidator(utcTimeMillis)
             }
-        }
+        },
     )
 
     LaunchedEffect(datePickerState.selectedDateMillis) {
@@ -51,7 +60,7 @@ fun KptDatePicker(configuration: DatePickerConfiguration) {
         title = configuration.title?.let { { Text(it) } },
         headline = configuration.headline?.let { { Text(it) } },
         showModeToggle = configuration.showModeToggle,
-        colors = configuration.colors ?: DatePickerDefaults.colors()
+        colors = configuration.colors ?: DatePickerDefaults.colors(),
     )
 }
 
@@ -63,13 +72,13 @@ fun KptDatePickerDialog(
     modifier: Modifier = Modifier,
     selectedDate: Long? = null,
     title: String = "Select Date",
-    dateValidator: (Long) -> Boolean = { true }
+    dateValidator: (Long) -> Boolean = { true },
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDate,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean = dateValidator(utcTimeMillis)
-        }
+        },
     )
 
     DatePickerDialog(
@@ -115,7 +124,7 @@ fun KptDatePickerField(
             IconButton(onClick = { showDatePicker = true }) {
                 Icon(Icons.Default.DateRange, contentDescription = "Select date")
             }
-        }
+        },
     )
 
     if (showDatePicker) {
@@ -125,7 +134,7 @@ fun KptDatePickerField(
                 showDatePicker = false
             },
             onDismiss = { showDatePicker = false },
-            selectedDate = selectedDate
+            selectedDate = selectedDate,
         )
     }
 }

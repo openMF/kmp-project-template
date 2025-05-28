@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.component
 
 import androidx.compose.foundation.BorderStroke
@@ -28,8 +37,16 @@ import template.core.base.designsystem.core.ComponentDsl
 import template.core.base.designsystem.core.KptComponent
 import template.core.base.designsystem.theme.KptTheme
 
+/**
+ * Composable function to display a KPT Chip based on the provided [ChipConfiguration].
+ *
+ * This function supports different chip variants (Assist, Filter, Input, Suggestion) and applies
+ * the configuration for label, icons, colors, elevation, border, shape, and interaction source.
+ *
+ * @param configuration The configuration for the chip, including variant, label, icons, etc.
+ */
 @Composable
-fun KptChip(configuration: ChipConfiguration){
+fun KptChip(configuration: ChipConfiguration) {
     val finalModifier = configuration.modifier
         .testTag(configuration.testTag ?: "KptChip")
 
@@ -86,7 +103,8 @@ fun KptChip(configuration: ChipConfiguration){
                 }
             },
             colors = configuration.selectableColors ?: FilterChipDefaults.filterChipColors(),
-            elevation = configuration.selectableElevation ?: FilterChipDefaults.filterChipElevation(),
+            elevation = configuration.selectableElevation
+                ?: FilterChipDefaults.filterChipElevation(),
             border = configuration.border ?: FilterChipDefaults.filterChipBorder(
                 configuration.enabled,
                 configuration.selected,
@@ -142,6 +160,14 @@ fun KptChip(configuration: ChipConfiguration){
     }
 }
 
+/**
+ * Composable function to display a KPT Assist Chip.
+ *
+ * @param label The text label to display inside the chip.
+ * @param onClick The callback to be invoked when the chip is clicked.
+ * @param modifier The modifier to be applied to the chip.
+ * @param leadingIcon Optional leading icon to display in the chip.
+ */
 @Composable
 fun KptAssistChip(
     label: String,
@@ -160,6 +186,15 @@ fun KptAssistChip(
     )
 }
 
+/**
+ * Composable function to display a KPT Filter Chip.
+ *
+ * @param label The text label to display inside the chip.
+ * @param selected Whether the chip is selected.
+ * @param onClick The callback to be invoked when the chip is clicked.
+ * @param modifier The modifier to be applied to the chip.
+ * @param leadingIcon Optional leading icon to display in the chip.
+ */
 @Composable
 fun KptFilterChip(
     label: String,
@@ -180,10 +215,37 @@ fun KptFilterChip(
     )
 }
 
+/**
+ * DSL builder function for creating a [ChipConfiguration].
+ *
+ * @param block Lambda with receiver to configure the chip properties.
+ * @return The built [ChipConfiguration].
+ */
 fun kptChip(block: ChipBuilder.() -> Unit): ChipConfiguration {
     return ChipBuilder().apply(block).build()
 }
 
+/**
+ * Immutable configuration data class for KPT Chips.
+ *
+ * @property testTag Optional test tag for UI testing.
+ * @property contentDescription Optional content description for accessibility.
+ * @property modifier Modifier to be applied to the chip.
+ * @property onClick Callback to be invoked when the chip is clicked.
+ * @property enabled Whether the chip is enabled.
+ * @property variant The variant of the chip (Assist, Filter, Input, Suggestion).
+ * @property selected Whether the chip is selected (for selectable chips).
+ * @property label The text label to display inside the chip.
+ * @property leadingIcon Optional leading icon to display in the chip.
+ * @property trailingIcon Optional trailing icon to display in the chip.
+ * @property colors Optional colors for the chip.
+ * @property elevation Optional elevation for the chip.
+ * @property selectableColors Optional colors for selectable chips.
+ * @property selectableElevation Optional elevation for selectable chips.
+ * @property border Optional border for the chip.
+ * @property shape Optional shape for the chip.
+ * @property interactionSource Optional interaction source for the chip.
+ */
 @Immutable
 data class ChipConfiguration(
     override val testTag: String? = null,
@@ -205,6 +267,11 @@ data class ChipConfiguration(
     val interactionSource: MutableInteractionSource? = null,
 ) : KptComponent
 
+/**
+ * Builder class for constructing [ChipConfiguration] using a DSL approach.
+ *
+ * All properties are mutable and can be set within the [kptChip] DSL block.
+ */
 @ComponentDsl
 class ChipBuilder : ComponentConfigurationScope {
     override var testTag: String? = null
@@ -226,6 +293,9 @@ class ChipBuilder : ComponentConfigurationScope {
     var shape: Shape? = null
     var interactionSource: MutableInteractionSource? = null
 
+    /**
+     * Builds and returns a [ChipConfiguration] with the current builder properties.
+     */
     fun build(): ChipConfiguration = ChipConfiguration(
         testTag = testTag,
         contentDescription = contentDescription,

@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.form
 
 import androidx.compose.foundation.layout.Row
@@ -19,29 +28,29 @@ import template.core.base.designsystem.theme.KptTheme
 @Composable
 fun FormValidationSummary(
     formState: FormState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (formState.hasErrors) {
         Card(
             modifier = modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = KptTheme.colorScheme.errorContainer
-            )
+                containerColor = KptTheme.colorScheme.errorContainer,
+            ),
         ) {
             Row(
                 modifier = Modifier.padding(16.dp),
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
             ) {
                 Icon(
                     Icons.Default.Error,
                     contentDescription = null,
-                    tint = KptTheme.colorScheme.onErrorContainer
+                    tint = KptTheme.colorScheme.onErrorContainer,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     "Please correct the errors above",
                     style = KptTheme.typography.bodyMedium,
-                    color = KptTheme.colorScheme.onErrorContainer
+                    color = KptTheme.colorScheme.onErrorContainer,
                 )
             }
         }

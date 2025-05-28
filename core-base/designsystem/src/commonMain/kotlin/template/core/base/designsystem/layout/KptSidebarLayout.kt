@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.layout
 
 import androidx.compose.foundation.layout.Box
@@ -24,29 +33,29 @@ fun KptSidebarLayout(
     configuration: SidebarConfiguration = SidebarConfiguration(),
     sidebarVisible: Boolean = true,
     onSidebarVisibilityChange: (Boolean) -> Unit = {},
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxSize()
-            .testTag("KptSidebarLayout")
+            .testTag("KptSidebarLayout"),
     ) {
         if (configuration.position == SidebarPosition.Start && sidebarVisible) {
             Surface(
                 modifier = Modifier.width(configuration.width),
                 color = configuration.backgroundColor ?: KptTheme.colorScheme.surface,
-                content = sidebarContent
+                content = sidebarContent,
             )
 
             if (!configuration.overlay) {
                 VerticalDivider(
-                    color = configuration.dividerColor ?: KptTheme.colorScheme.outline
+                    color = configuration.dividerColor ?: KptTheme.colorScheme.outline,
                 )
             }
         }
 
         Box(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             content()
 
@@ -60,11 +69,11 @@ fun KptSidebarLayout(
                                 Alignment.CenterStart
                             } else {
                                 Alignment.CenterEnd
-                            }
+                            },
                         ),
                     color = configuration.backgroundColor ?: KptTheme.colorScheme.surface,
                     shadowElevation = 8.dp,
-                    content = sidebarContent
+                    content = sidebarContent,
                 )
             }
         }
@@ -72,14 +81,14 @@ fun KptSidebarLayout(
         if (configuration.position == SidebarPosition.End && sidebarVisible) {
             if (!configuration.overlay) {
                 VerticalDivider(
-                    color = configuration.dividerColor ?: KptTheme.colorScheme.outline
+                    color = configuration.dividerColor ?: KptTheme.colorScheme.outline,
                 )
             }
 
             Surface(
                 modifier = Modifier.width(configuration.width),
                 color = configuration.backgroundColor ?: KptTheme.colorScheme.surface,
-                content = sidebarContent
+                content = sidebarContent,
             )
         }
     }

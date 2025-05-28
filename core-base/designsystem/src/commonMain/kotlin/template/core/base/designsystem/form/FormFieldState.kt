@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.form
 
 import androidx.compose.runtime.Composable
@@ -10,7 +19,7 @@ import androidx.compose.runtime.setValue
 @Stable
 class FormFieldState(
     initialValue: String = "",
-    private val validator: Validator<String> = Validator()
+    private val validator: Validator<String> = Validator(),
 ) {
     var value by mutableStateOf(initialValue)
         private set
@@ -66,7 +75,7 @@ class FormFieldState(
 @Composable
 fun rememberFormFieldState(
     initialValue: String = "",
-    validator: Validator<String> = Validator()
+    validator: Validator<String> = Validator(),
 ): FormFieldState {
     return remember { FormFieldState(initialValue, validator) }
 }

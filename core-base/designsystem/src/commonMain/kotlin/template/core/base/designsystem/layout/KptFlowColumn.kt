@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.layout
 
 import androidx.compose.foundation.layout.Arrangement
@@ -17,11 +26,11 @@ fun KptFlowColumn(
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     maxItemsInEachColumn: Int = Int.MAX_VALUE,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Layout(
         modifier = modifier.testTag("KptFlowColumn"),
-        content = content
+        content = content,
     ) { measurables, constraints ->
         val sequences = mutableListOf<List<Placeable>>()
         val crossAxisSizes = mutableListOf<Int>()
@@ -40,8 +49,10 @@ fun KptFlowColumn(
             val placeable = measurable.measure(childConstraints)
 
             if (currentSequence.isNotEmpty() &&
-                (currentMainAxisSize + placeable.height > constraints.maxHeight ||
-                        currentSequence.size >= maxItemsInEachColumn)
+                (
+                    currentMainAxisSize + placeable.height > constraints.maxHeight ||
+                        currentSequence.size >= maxItemsInEachColumn
+                    )
             ) {
                 sequences += currentSequence.toList()
                 crossAxisSizes += currentCrossAxisSize
@@ -83,7 +94,7 @@ fun KptFlowColumn(
                 placeables.fastForEach { placeable ->
                     placeable.place(
                         x = childCrossAxisPosition,
-                        y = childMainAxisPosition
+                        y = childMainAxisPosition,
                     )
                     childMainAxisPosition += placeable.height
                 }

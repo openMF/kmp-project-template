@@ -71,11 +71,13 @@ import template.core.base.designsystem.core.KptBottomAppBarConfiguration
 @Composable
 fun KptBottomAppBar(configuration: KptBottomAppBarConfiguration) {
     val finalModifier = configuration.modifier
-        .testTag(configuration.testTag ?: KptTestTags.BottomAppBar)
+        .testTag(configuration.testTag ?: KptTestTags.BOTTOM_APP_BAR)
         .let { mod ->
             if (configuration.contentDescription != null) {
                 mod.semantics { contentDescription = configuration.contentDescription }
-            } else mod
+            } else {
+                mod
+            }
         }
 
     when (configuration.variant) {
@@ -131,7 +133,6 @@ fun KptBottomAppBar(configuration: KptBottomAppBarConfiguration) {
     }
 }
 
-// 1. Simple bottom app bar with FAB
 @Composable
 fun KptBottomAppBar(
     onFabClick: () -> Unit,
@@ -154,7 +155,6 @@ fun KptBottomAppBar(
     )
 }
 
-// 2. With single action
 @Composable
 fun KptBottomAppBar(
     actionIcon: ImageVector,
@@ -183,7 +183,6 @@ fun KptBottomAppBar(
     )
 }
 
-// 3. Navigation bottom app bar
 @Composable
 fun KptNavigationBottomAppBar(
     currentRoute: String,
@@ -208,14 +207,20 @@ fun KptNavigationBottomAppBar(
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = item.label,
-                                tint = if (selected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = if (selected) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
                             )
                             Text(
                                 text = item.label,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = if (selected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (selected) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
                             )
                         }
                     }
@@ -238,7 +243,6 @@ private fun defaultNavigationItems() = listOf(
     NavigationItem("profile", "Profile", Icons.Default.Person),
 )
 
-// 4. Social media bottom app bar
 @Composable
 fun KptSocialBottomAppBar(
     onLike: () -> Unit,
@@ -267,7 +271,6 @@ fun KptSocialBottomAppBar(
     )
 }
 
-// 5. Media player bottom app bar
 @Composable
 fun KptMediaPlayerBottomAppBar(
     isPlaying: Boolean,
@@ -303,7 +306,6 @@ fun KptMediaPlayerBottomAppBar(
     )
 }
 
-// 6. E-commerce bottom app bar
 @Composable
 fun KptEcommerceBottomAppBar(
     onAddToCart: () -> Unit,
@@ -345,7 +347,6 @@ fun KptEcommerceBottomAppBar(
     )
 }
 
-// 7. Chat bottom app bar
 @Composable
 fun KptChatBottomAppBar(
     onAttach: () -> Unit,
@@ -374,7 +375,6 @@ fun KptChatBottomAppBar(
     )
 }
 
-// 8. Original component compatibility
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KptBottomAppBar(
@@ -394,7 +394,7 @@ fun KptBottomAppBar(
     when (variant) {
         BottomAppBarVariant.WithActions -> BottomAppBar(
             actions = actions,
-            modifier = modifier.testTag(testTag ?: KptTestTags.BottomAppBar),
+            modifier = modifier.testTag(testTag ?: KptTestTags.BOTTOM_APP_BAR),
             floatingActionButton = floatingActionButton,
             containerColor = containerColor,
             contentColor = contentColor,
@@ -405,7 +405,7 @@ fun KptBottomAppBar(
         )
 
         BottomAppBarVariant.Custom -> BottomAppBar(
-            modifier = modifier.testTag(testTag ?: KptTestTags.BottomAppBar),
+            modifier = modifier.testTag(testTag ?: KptTestTags.BOTTOM_APP_BAR),
             containerColor = containerColor,
             contentColor = contentColor,
             tonalElevation = tonalElevation,

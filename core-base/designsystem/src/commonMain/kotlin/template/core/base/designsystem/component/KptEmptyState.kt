@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.component
 
 import androidx.compose.foundation.layout.Arrangement
@@ -21,30 +30,30 @@ fun KptEmptyState(
     title: String,
     description: String,
     modifier: Modifier = Modifier,
-    actionButton: (@Composable () -> Unit)? = null
+    actionButton: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = KptTheme.colorScheme.onSurfaceVariant
+            tint = KptTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(modifier = Modifier.height(KptTheme.spacing.md))
         Text(
             text = title,
             style = KptTheme.typography.headlineSmall,
-            color = KptTheme.colorScheme.onSurface
+            color = KptTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(KptTheme.spacing.sm))
         Text(
             text = description,
             style = KptTheme.typography.bodyMedium,
-            color = KptTheme.colorScheme.onSurfaceVariant
+            color = KptTheme.colorScheme.onSurfaceVariant,
         )
         if (actionButton != null) {
             Spacer(modifier = Modifier.height(KptTheme.spacing.lg))

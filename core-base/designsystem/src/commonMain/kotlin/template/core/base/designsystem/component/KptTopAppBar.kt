@@ -48,11 +48,13 @@ import template.core.base.designsystem.theme.KptTheme
 @Composable
 fun KptTopAppBar(configuration: KptTopAppBarConfiguration) {
     val finalModifier = configuration.modifier
-        .testTag(configuration.testTag ?: KptTestTags.TopAppBar)
+        .testTag(configuration.testTag ?: KptTestTags.TOP_APP_BAR)
         .let { mod ->
             if (configuration.contentDescription != null) {
                 mod.semantics { contentDescription = configuration.contentDescription }
-            } else mod
+            } else {
+                mod
+            }
         }
 
     val titleContent: @Composable () -> Unit = {
@@ -252,7 +254,9 @@ fun KptSearchAppBar(
                             Icon(Icons.Default.Clear, contentDescription = "Clear")
                         }
                     }
-                } else null,
+                } else {
+                    null
+                },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -374,4 +378,3 @@ fun KptLargeTopAppBar(
     onNavigationIconClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) = KptTopAppBar(title, modifier, TopAppBarVariant.Large)
-

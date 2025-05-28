@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -51,11 +60,13 @@ import template.core.base.designsystem.theme.KptTheme
 @Composable
 fun KptFloatingActionButton(configuration: KptFloatingActionButtonConfiguration) {
     val finalModifier = configuration.modifier
-        .testTag(configuration.testTag ?: KptTestTags.FloatingActionButton)
+        .testTag(configuration.testTag ?: KptTestTags.FLOATING_ACTION_BUTTON)
         .let { mod ->
             if (configuration.contentDescription != null) {
                 mod.semantics { contentDescription = configuration.contentDescription }
-            } else mod
+            } else {
+                mod
+            }
         }
 
     val finalContainerColor = when (configuration.state) {
@@ -116,7 +127,9 @@ fun KptFloatingActionButton(configuration: KptFloatingActionButtonConfiguration)
             icon = {
                 if (finalIcon != null) {
                     @androidx.compose.runtime.Composable { FabContent(configuration, finalIcon) }
-                } else null
+                } else {
+                    null
+                }
             },
             text = { Text(configuration.text ?: "Action") },
             modifier = finalModifier,

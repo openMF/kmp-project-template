@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.component
 
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,7 +27,7 @@ fun KptTimePicker(configuration: TimePickerConfiguration) {
     val timePickerState = rememberTimePickerState(
         initialHour = configuration.initialHour,
         initialMinute = configuration.initialMinute,
-        is24Hour = configuration.is24Hour
+        is24Hour = configuration.is24Hour,
     )
 
     LaunchedEffect(timePickerState.hour, timePickerState.minute) {
@@ -28,7 +37,7 @@ fun KptTimePicker(configuration: TimePickerConfiguration) {
     TimePicker(
         state = timePickerState,
         modifier = configuration.modifier.testTag(configuration.testTag ?: "KptTimePicker"),
-        colors = configuration.colors ?: TimePickerDefaults.colors()
+        colors = configuration.colors ?: TimePickerDefaults.colors(),
     )
 }
 

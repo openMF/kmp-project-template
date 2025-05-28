@@ -58,16 +58,31 @@ import template.core.base.designsystem.core.TextFieldVariant
 import template.core.base.designsystem.core.ValidationState
 import template.core.base.designsystem.theme.KptTheme
 
-// Main Enhanced Component
+/**
+ * KPT Design System Text Field composable. Supports outlined and filled variants, validation, icons, and more.
+ *
+ * Basic usage:
+ * ```kotlin
+ * KptTextField(
+ *   value = text,
+ *   onValueChange = { text = it },
+ *   label = "Name"
+ * )
+ * ```
+ *
+ * @param configuration The configuration for the text field.
+ */
 @Composable
 fun KptTextField(configuration: KptTextFieldConfiguration) {
     val finalModifier = configuration.modifier
         .fillMaxWidth()
-        .testTag(configuration.testTag ?: KptTestTags.TextField)
+        .testTag(configuration.testTag ?: KptTestTags.TEXT_FIELD)
         .let { mod ->
             if (configuration.contentDescription != null) {
                 mod.semantics { contentDescription = configuration.contentDescription }
-            } else mod
+            } else {
+                mod
+            }
         }
 
     val finalKeyboardOptions = configuration.keyboardOptions
@@ -91,7 +106,9 @@ fun KptTextField(configuration: KptTextFieldConfiguration) {
                 onValueChange = { newValue ->
                     val finalValue = if (configuration.maxLength != null) {
                         newValue.take(configuration.maxLength)
-                    } else newValue
+                    } else {
+                        newValue
+                    }
                     configuration.onValueChange(finalValue)
                 },
                 modifier = finalModifier,
@@ -125,7 +142,9 @@ fun KptTextField(configuration: KptTextFieldConfiguration) {
                 onValueChange = { newValue ->
                     val finalValue = if (configuration.maxLength != null) {
                         newValue.take(configuration.maxLength)
-                    } else newValue
+                    } else {
+                        newValue
+                    }
                     configuration.onValueChange(finalValue)
                 },
                 modifier = finalModifier,
@@ -234,7 +253,18 @@ private fun SupportingTextContent(configuration: KptTextFieldConfiguration) {
     }
 }
 
-// DSL Function
+/**
+ * DSL builder for KPT Text Field configuration.
+ *
+ * Example:
+ * ```kotlin
+ * val config = kptTextField {
+ *   value = ""
+ *   onValueChange = { /* ... */ }
+ *   label = "Custom"
+ * }
+ * ```
+ */
 fun kptTextField(block: KptTextFieldBuilder.() -> Unit): KptTextFieldConfiguration {
     return KptTextFieldBuilder().apply(block).build()
 }
@@ -293,7 +323,18 @@ private fun getLeadingIconForType(type: InputType): ImageVector? {
     }
 }
 
-// 1. Simple text field
+/**
+ * Simple text field with label.
+ *
+ * Example:
+ * ```kotlin
+ * KptTextField(
+ *   value = text,
+ *   onValueChange = { text = it },
+ *   label = "Name"
+ * )
+ * ```
+ */
 @Composable
 fun KptTextField(
     value: String,
@@ -315,7 +356,19 @@ fun KptTextField(
     )
 }
 
-// 2. With placeholder
+/**
+ * Text field with label and placeholder.
+ *
+ * Example:
+ * ```kotlin
+ * KptTextField(
+ *   value = text,
+ *   onValueChange = { text = it },
+ *   label = "Email",
+ *   placeholder = "Enter your email"
+ * )
+ * ```
+ */
 @Composable
 fun KptTextField(
     value: String,
@@ -337,7 +390,18 @@ fun KptTextField(
     )
 }
 
-// 3. Email field
+/**
+ * Email text field with validation.
+ *
+ * Example:
+ * ```kotlin
+ * KptEmailField(
+ *   value = email,
+ *   onValueChange = { email = it },
+ *   validationState = ValidationState.Valid
+ * )
+ * ```
+ */
 @Composable
 fun KptEmailField(
     value: String,
@@ -367,7 +431,18 @@ fun KptEmailField(
     )
 }
 
-// 4. Password field
+/**
+ * Password text field with visibility toggle.
+ *
+ * Example:
+ * ```kotlin
+ * KptPasswordField(
+ *   value = password,
+ *   onValueChange = { password = it },
+ *   showVisibilityToggle = true
+ * )
+ * ```
+ */
 @Composable
 fun KptPasswordField(
     value: String,
@@ -395,10 +470,14 @@ fun KptPasswordField(
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = if (showVisibilityToggle) {
                 if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
-            } else null,
+            } else {
+                null
+            },
             onTrailingIconClick = if (showVisibilityToggle) {
                 { passwordVisible = !passwordVisible }
-            } else null,
+            } else {
+                null
+            },
             keyboardActions = KeyboardActions(
                 onDone = { focusManager.clearFocus() },
             ),
@@ -406,7 +485,17 @@ fun KptPasswordField(
     )
 }
 
-// 5. Phone field
+/**
+ * Phone number text field.
+ *
+ * Example:
+ * ```kotlin
+ * KptPhoneField(
+ *   value = phone,
+ *   onValueChange = { phone = it }
+ * )
+ * ```
+ */
 @Composable
 fun KptPhoneField(
     value: String,
@@ -436,7 +525,18 @@ fun KptPhoneField(
     )
 }
 
-// 6. Search field
+/**
+ * Search text field with clear button and search action.
+ *
+ * Example:
+ * ```kotlin
+ * KptSearchField(
+ *   value = search,
+ *   onValueChange = { search = it },
+ *   onSearch = { /* handle search */ }
+ * )
+ * ```
+ */
 @Composable
 fun KptSearchField(
     value: String,
@@ -462,7 +562,17 @@ fun KptSearchField(
     )
 }
 
-// 7. Number field
+/**
+ * Number-only text field.
+ *
+ * Example:
+ * ```kotlin
+ * KptNumberField(
+ *   value = number,
+ *   onValueChange = { number = it }
+ * )
+ * ```
+ */
 @Composable
 fun KptNumberField(
     value: String,
@@ -492,7 +602,19 @@ fun KptNumberField(
     )
 }
 
-// 8. Multi-line text field
+/**
+ * Multi-line text field for longer input.
+ *
+ * Example:
+ * ```kotlin
+ * KptMultiLineTextField(
+ *   value = message,
+ *   onValueChange = { message = it },
+ *   minLines = 3,
+ *   maxLines = 6
+ * )
+ * ```
+ */
 @Composable
 fun KptMultiLineTextField(
     value: String,
@@ -522,7 +644,17 @@ fun KptMultiLineTextField(
     )
 }
 
-// 9. URL field
+/**
+ * URL text field with prefix and validation.
+ *
+ * Example:
+ * ```kotlin
+ * KptUrlField(
+ *   value = url,
+ *   onValueChange = { url = it }
+ * )
+ * ```
+ */
 @Composable
 fun KptUrlField(
     value: String,

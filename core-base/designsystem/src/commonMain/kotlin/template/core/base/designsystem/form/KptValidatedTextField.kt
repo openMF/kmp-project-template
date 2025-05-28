@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.form
 
 import androidx.compose.foundation.layout.Column
@@ -41,17 +50,21 @@ fun KptValidatedTextField(configuration: ValidatedTextFieldConfiguration) {
             label = { Text(configuration.label) },
             placeholder = if (configuration.placeholder.isNotEmpty()) {
                 { Text(configuration.placeholder) }
-            } else null,
+            } else {
+                null
+            },
             leadingIcon = configuration.leadingIcon,
             trailingIcon = if (configuration.fieldState.showError) {
                 {
                     Icon(
                         Icons.Default.Error,
                         contentDescription = "Error",
-                        tint = KptTheme.colorScheme.error
+                        tint = KptTheme.colorScheme.error,
                     )
                 }
-            } else null,
+            } else {
+                null
+            },
             isError = configuration.fieldState.showError,
             keyboardOptions = configuration.keyboardOptions,
             keyboardActions = configuration.keyboardActions,
@@ -63,7 +76,7 @@ fun KptValidatedTextField(configuration: ValidatedTextFieldConfiguration) {
             minLines = configuration.minLines,
             modifier = configuration.modifier
                 .fillMaxWidth()
-                .testTag(configuration.testTag ?: "KptValidatedTextField")
+                .testTag(configuration.testTag ?: "KptValidatedTextField"),
         )
 
         if (configuration.fieldState.showError && configuration.fieldState.error != null) {
@@ -71,7 +84,7 @@ fun KptValidatedTextField(configuration: ValidatedTextFieldConfiguration) {
                 text = configuration.fieldState.error!!,
                 color = KptTheme.colorScheme.error,
                 style = KptTheme.typography.bodySmall,
-                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp),
             )
         }
     }
@@ -82,11 +95,11 @@ fun KptEmailField(
     fieldState: FormFieldState = rememberFormFieldState(
         validator = Validator<String>()
             .addRule(RequiredRule())
-            .addRule(EmailRule())
+            .addRule(EmailRule()),
     ),
     modifier: Modifier = Modifier,
     label: String = "Email",
-    placeholder: String = "Enter your email address"
+    placeholder: String = "Enter your email address",
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -98,13 +111,13 @@ fun KptEmailField(
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Next,
             ),
             keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
-            modifier = modifier
-        )
+            modifier = modifier,
+        ),
     )
 }
 
@@ -113,11 +126,11 @@ fun KptPasswordField(
     fieldState: FormFieldState = rememberFormFieldState(
         validator = Validator<String>()
             .addRule(RequiredRule())
-            .addRule(PasswordRule())
+            .addRule(PasswordRule()),
     ),
     modifier: Modifier = Modifier,
     label: String = "Password",
-    placeholder: String = "Enter your password"
+    placeholder: String = "Enter your password",
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -135,13 +148,13 @@ fun KptPasswordField(
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
+                imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(
-                onDone = { focusManager.clearFocus() }
+                onDone = { focusManager.clearFocus() },
             ),
-            modifier = modifier
-        )
+            modifier = modifier,
+        ),
     )
 }
 
@@ -151,15 +164,17 @@ fun KptConfirmPasswordField(
     originalPasswordState: FormFieldState,
     modifier: Modifier = Modifier,
     label: String = "Confirm Password",
-    placeholder: String = "Confirm your password"
+    placeholder: String = "Confirm your password",
 ) {
     val confirmPasswordValidator = remember(originalPasswordState) {
         Validator<String>()
             .addRule(RequiredRule())
-            .addRule(MatchRule(
-                otherValue = { originalPasswordState.value },
-                errorMessage = "Passwords do not match"
-            ))
+            .addRule(
+                MatchRule(
+                    otherValue = { originalPasswordState.value },
+                    errorMessage = "Passwords do not match",
+                ),
+            )
     }
 
     // Update validator when original password changes
@@ -183,13 +198,13 @@ fun KptConfirmPasswordField(
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
+                imeAction = ImeAction.Done,
             ),
             keyboardActions = KeyboardActions(
-                onDone = { focusManager.clearFocus() }
+                onDone = { focusManager.clearFocus() },
             ),
-            modifier = modifier
-        )
+            modifier = modifier,
+        ),
     )
 }
 
@@ -198,11 +213,11 @@ fun KptPhoneField(
     fieldState: FormFieldState = rememberFormFieldState(
         validator = Validator<String>()
             .addRule(RequiredRule())
-            .addRule(PhoneRule())
+            .addRule(PhoneRule()),
     ),
     modifier: Modifier = Modifier,
     label: String = "Phone Number",
-    placeholder: String = "Enter your phone number"
+    placeholder: String = "Enter your phone number",
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -214,13 +229,13 @@ fun KptPhoneField(
             leadingIcon = { Icon(Icons.Default.Phone, contentDescription = null) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Phone,
-                imeAction = ImeAction.Next
+                imeAction = ImeAction.Next,
             ),
             keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
-            modifier = modifier
-        )
+            modifier = modifier,
+        ),
     )
 }
 

@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.VisualTransformation
 
 // Enhanced TextField Variant System
-sealed interface TextFieldVariant: ComponentVariant {
+sealed interface TextFieldVariant : ComponentVariant {
     override val name: String
 
     data object Filled : TextFieldVariant {
@@ -35,7 +35,13 @@ sealed interface TextFieldVariant: ComponentVariant {
 
 // Input Types
 enum class InputType {
-    Text, Email, Password, Phone, Number, Url, Search
+    Text,
+    Email,
+    Password,
+    Phone,
+    Number,
+    Url,
+    Search,
 }
 
 // Validation State
@@ -78,8 +84,8 @@ data class KptTextFieldConfiguration(
     override val testTag: String? = null,
     override val contentDescription: String? = null,
     val showCharacterCount: Boolean = false,
-    val clearable: Boolean = false
-): KptComponent
+    val clearable: Boolean = false,
+) : KptComponent
 
 @ComponentDsl
 class KptTextFieldBuilder : ComponentConfigurationScope {
@@ -146,6 +152,6 @@ class KptTextFieldBuilder : ComponentConfigurationScope {
         testTag = testTag,
         contentDescription = contentDescription,
         showCharacterCount = showCharacterCount,
-        clearable = clearable
+        clearable = clearable,
     )
 }

@@ -13,28 +13,15 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonElevation
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,15 +29,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import template.core.base.designsystem.config.KptTestTags
-import template.core.base.designsystem.theme.KptTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import template.core.base.designsystem.core.ButtonSize
+import template.core.base.designsystem.core.ButtonVariant
+import template.core.base.designsystem.core.IconPosition
+import template.core.base.designsystem.core.KptButton
+import template.core.base.designsystem.core.KptButtonConfiguration
 
-// 1. Basic overload with just text
+/**
+ * KPT Design System Button composable. Supports multiple variants, icons, loading state, and full-width options.
+ *
+ * Basic usage:
+ * ```kotlin
+ * KptButton(text = "Submit", onClick = { /* handle click */ })
+ * ```
+ *
+ * With icon:
+ * ```kotlin
+ * KptButton(text = "Add", icon = Icons.Default.Add, onClick = { /* handle click */ })
+ * ```
+ *
+ * @param text The text label of the button.
+ * @param onClick Callback invoked when the button is clicked.
+ * @param modifier Modifier for styling.
+ * @param enabled Whether the button is enabled.
+ * @param variant The button style variant.
+ */
 @Composable
 fun KptButton(
     text: String,
@@ -70,7 +74,27 @@ fun KptButton(
     )
 }
 
-// 2. With icon
+/**
+ * KPT Button with icon support.
+ *
+ * Example:
+ * ```kotlin
+ * KptButton(
+ *   text = "Add",
+ *   icon = Icons.Default.Add,
+ *   onClick = { /* handle click */ },
+ *   iconPosition = IconPosition.End
+ * )
+ * ```
+ *
+ * @param text The text label.
+ * @param icon The icon to display.
+ * @param onClick Click callback.
+ * @param modifier Modifier for styling.
+ * @param enabled Whether enabled.
+ * @param variant Button style.
+ * @param iconPosition Icon placement.
+ */
 @Composable
 fun KptButton(
     text: String,
@@ -94,7 +118,26 @@ fun KptButton(
     )
 }
 
-// 3. Loading button
+/**
+ * Button with loading indicator.
+ *
+ * Example:
+ * ```kotlin
+ * KptLoadingButton(
+ *   text = "Save",
+ *   loading = true,
+ *   onClick = { /* handle click */ }
+ * )
+ * ```
+ *
+ * @param text The text label.
+ * @param loading Whether to show loading spinner.
+ * @param onClick Click callback.
+ * @param modifier Modifier for styling.
+ * @param enabled Whether enabled.
+ * @param loadingText Optional text to show while loading.
+ * @param variant Button style.
+ */
 @Composable
 fun KptLoadingButton(
     text: String,
@@ -118,7 +161,21 @@ fun KptLoadingButton(
     )
 }
 
-// 4. Full width button
+/**
+ * Full-width button.
+ *
+ * Example:
+ * ```kotlin
+ * KptFullWidthButton(text = "Continue", onClick = { /* handle click */ })
+ * ```
+ *
+ * @param text The text label.
+ * @param onClick Click callback.
+ * @param modifier Modifier for styling.
+ * @param enabled Whether enabled.
+ * @param variant Button style.
+ * @param size Button size.
+ */
 @Composable
 fun KptFullWidthButton(
     text: String,
@@ -141,7 +198,14 @@ fun KptFullWidthButton(
     )
 }
 
-// 5. Specific variant convenience functions
+/**
+ * Filled button variant shortcut.
+ *
+ * Example:
+ * ```kotlin
+ * KptFilledButton(text = "Primary", onClick = { /* handle click */ })
+ * ```
+ */
 @Composable
 fun KptFilledButton(
     text: String,
@@ -162,6 +226,14 @@ fun KptFilledButton(
     )
 }
 
+/**
+ * Outlined button variant shortcut.
+ *
+ * Example:
+ * ```kotlin
+ * KptOutlinedButton(text = "Secondary", onClick = { /* handle click */ })
+ * ```
+ */
 @Composable
 fun KptOutlinedButton(
     text: String,
@@ -182,6 +254,14 @@ fun KptOutlinedButton(
     )
 }
 
+/**
+ * Text button variant shortcut.
+ *
+ * Example:
+ * ```kotlin
+ * KptTextButton(text = "Text", onClick = { /* handle click */ })
+ * ```
+ */
 @Composable
 fun KptTextButton(
     text: String,
@@ -202,6 +282,14 @@ fun KptTextButton(
     )
 }
 
+/**
+ * Tonal button variant shortcut.
+ *
+ * Example:
+ * ```kotlin
+ * KptTonalButton(text = "Tonal", onClick = { /* handle click */ })
+ * ```
+ */
 @Composable
 fun KptTonalButton(
     text: String,
@@ -222,6 +310,14 @@ fun KptTonalButton(
     )
 }
 
+/**
+ * Elevated button variant shortcut.
+ *
+ * Example:
+ * ```kotlin
+ * KptElevatedButton(text = "Elevated", onClick = { /* handle click */ })
+ * ```
+ */
 @Composable
 fun KptElevatedButton(
     text: String,
@@ -242,7 +338,14 @@ fun KptElevatedButton(
     )
 }
 
-// 6. Size-specific functions
+/**
+ * Small button shortcut.
+ *
+ * Example:
+ * ```kotlin
+ * KptSmallButton(text = "Small", onClick = { /* handle click */ })
+ * ```
+ */
 @Composable
 fun KptSmallButton(
     text: String,
@@ -261,6 +364,14 @@ fun KptSmallButton(
     )
 }
 
+/**
+ * Large button shortcut.
+ *
+ * Example:
+ * ```kotlin
+ * KptLargeButton(text = "Large", onClick = { /* handle click */ })
+ * ```
+ */
 @Composable
 fun KptLargeButton(
     text: String,
@@ -279,7 +390,23 @@ fun KptLargeButton(
     )
 }
 
-// 7. Original component compatibility (keeping old API working)
+/**
+ * Advanced KPT Button with full configuration.
+ *
+ * @param variant Button variant.
+ * @param onClick Click callback.
+ * @param modifier Modifier for styling.
+ * @param enabled Whether enabled.
+ * @param colors Button colors.
+ * @param elevation Elevation.
+ * @param border Border stroke.
+ * @param shape Shape.
+ * @param interactionSource Interaction source.
+ * @param contentPadding Padding.
+ * @param testTag Test tag.
+ * @param contentDescription Accessibility description.
+ * @param content Composable content.
+ */
 @Composable
 fun KptButton(
     variant: ButtonVariant,
@@ -315,7 +442,14 @@ fun KptButton(
     )
 }
 
-// 8. Action-specific buttons
+/**
+ * Submit button with loading state.
+ *
+ * Example:
+ * ```kotlin
+ * KptSubmitButton(loading = true, onClick = { /* handle submit */ })
+ * ```
+ */
 @Composable
 fun KptSubmitButton(
     loading: Boolean = false,
@@ -335,6 +469,14 @@ fun KptSubmitButton(
     )
 }
 
+/**
+ * Cancel button shortcut.
+ *
+ * Example:
+ * ```kotlin
+ * KptCancelButton(onClick = { /* handle cancel */ })
+ * ```
+ */
 @Composable
 fun KptCancelButton(
     onClick: () -> Unit,
@@ -348,6 +490,14 @@ fun KptCancelButton(
     )
 }
 
+/**
+ * Delete button with optional confirmation dialog.
+ *
+ * Example:
+ * ```kotlin
+ * KptDeleteButton(onClick = { /* handle delete */ }, confirmationRequired = true)
+ * ```
+ */
 @Composable
 fun KptDeleteButton(
     onClick: () -> Unit,
@@ -378,7 +528,7 @@ fun KptDeleteButton(
     if (showConfirmation) {
         KptConfirmationDialog(
             title = "Confirm Delete",
-            text = "Are you sure you want to delete this item?",
+            message = "Are you sure you want to delete this item?",
             onDismiss = { showConfirmation = false },
             onConfirm = {
                 onClick()
@@ -388,6 +538,14 @@ fun KptDeleteButton(
     }
 }
 
+/**
+ * Add button with icon or text+icon.
+ *
+ * Example:
+ * ```kotlin
+ * KptAddButton(onClick = { /* handle add */ }, iconOnly = true)
+ * ```
+ */
 @Composable
 fun KptAddButton(
     onClick: () -> Unit,
@@ -418,274 +576,118 @@ fun KptAddButton(
     }
 }
 
-// Enhanced Button Variant System
-sealed interface ButtonVariant {
-    val name: String
-
-    data object Filled : ButtonVariant {
-        override val name: String = "filled"
-    }
-
-    data object Tonal : ButtonVariant {
-        override val name: String = "tonal"
-    }
-
-    data object Elevated : ButtonVariant {
-        override val name: String = "elevated"
-    }
-
-    data object Outlined : ButtonVariant {
-        override val name: String = "outlined"
-    }
-
-    data object Text : ButtonVariant {
-        override val name: String = "text"
-    }
-
-    data class Custom(
-        override val name: String,
-        val renderer: @Composable (KptButtonConfiguration) -> Unit,
-    ) : ButtonVariant
-}
-
-// Button Size System
-sealed interface ButtonSize {
-    val contentPadding: PaddingValues
-    val minHeight: Dp
-
-    data object Small : ButtonSize {
-        override val contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-        override val minHeight = 32.dp
-    }
-
-    data object Medium : ButtonSize {
-        override val contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
-        override val minHeight = 40.dp
-    }
-
-    data object Large : ButtonSize {
-        override val contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
-        override val minHeight = 48.dp
-    }
-
-    data class Custom(
-        override val contentPadding: PaddingValues,
-        override val minHeight: Dp,
-    ) : ButtonSize
-}
-
-// Icon Position
-enum class IconPosition { Start, End, Top, Bottom }
-
-// Configuration class
-@Immutable
-data class KptButtonConfiguration(
-    val onClick: () -> Unit,
-    val modifier: Modifier = Modifier,
-    val enabled: Boolean = true,
-    val variant: ButtonVariant = ButtonVariant.Filled,
-    val size: ButtonSize = ButtonSize.Medium,
-    val colors: ButtonColors? = null,
-    val elevation: ButtonElevation? = null,
-    val border: BorderStroke? = null,
-    val shape: Shape? = null,
-    val interactionSource: MutableInteractionSource? = null,
-    val contentPadding: PaddingValues? = null,
-    val testTag: String? = null,
-    val contentDescription: String? = null,
-    val loading: Boolean = false,
-    val loadingText: String? = null,
-    val icon: ImageVector? = null,
-    val iconPosition: IconPosition = IconPosition.Start,
-    val fullWidth: Boolean = false,
-    val content: @Composable RowScope.() -> Unit,
-)
-
-// DSL Builder
-@DslMarker
-annotation class ButtonDsl
-
-@ButtonDsl
-class KptButtonBuilder {
-    var onClick: () -> Unit = {}
-    var modifier: Modifier = Modifier
-    var enabled: Boolean = true
-    var variant: ButtonVariant = ButtonVariant.Filled
-    var size: ButtonSize = ButtonSize.Medium
-    var colors: ButtonColors? = null
-    var elevation: ButtonElevation? = null
-    var border: BorderStroke? = null
-    var shape: Shape? = null
-    var interactionSource: MutableInteractionSource? = null
-    var contentPadding: PaddingValues? = null
-    var testTag: String? = null
-    var contentDescription: String? = null
-    var loading: Boolean = false
-    var loadingText: String? = null
-    var icon: ImageVector? = null
-    var iconPosition: IconPosition = IconPosition.Start
-    var fullWidth: Boolean = false
-    var content: @Composable RowScope.() -> Unit = {}
-
-    fun build(): KptButtonConfiguration = KptButtonConfiguration(
-        onClick = onClick,
-        modifier = modifier,
-        enabled = enabled,
-        variant = variant,
-        size = size,
-        colors = colors,
-        elevation = elevation,
-        border = border,
-        shape = shape,
-        interactionSource = interactionSource,
-        contentPadding = contentPadding,
-        testTag = testTag,
-        contentDescription = contentDescription,
-        loading = loading,
-        loadingText = loadingText,
-        icon = icon,
-        iconPosition = iconPosition,
-        fullWidth = fullWidth,
-        content = content,
-    )
-}
-
-// Main Enhanced Component
+// region: Previews
+@Preview
 @Composable
-fun KptButton(configuration: KptButtonConfiguration) {
-    val finalModifier = if (configuration.fullWidth) {
-        configuration.modifier.fillMaxWidth()
-    } else {
-        configuration.modifier
-    }.then(
-        Modifier
-            .heightIn(min = configuration.size.minHeight)
-            .testTag(configuration.testTag ?: KptTestTags.Button)
-            .let { mod ->
-                if (configuration.contentDescription != null) {
-                    mod.semantics { contentDescription = configuration.contentDescription }
-                } else mod
-            },
-    )
-
-    val finalContentPadding = configuration.contentPadding ?: configuration.size.contentPadding
-    val finalShape = configuration.shape ?: KptTheme.shapes.small
-
-    when (configuration.variant) {
-        ButtonVariant.Filled -> Button(
-            onClick = configuration.onClick,
-            modifier = finalModifier,
-            enabled = configuration.enabled && !configuration.loading,
-            colors = configuration.colors ?: ButtonDefaults.buttonColors(),
-            elevation = configuration.elevation ?: ButtonDefaults.buttonElevation(),
-            shape = finalShape,
-            border = configuration.border,
-            interactionSource = configuration.interactionSource,
-            contentPadding = finalContentPadding,
-        ) {
-            ButtonContent(configuration)
-        }
-
-        ButtonVariant.Tonal -> FilledTonalButton(
-            onClick = configuration.onClick,
-            modifier = finalModifier,
-            enabled = configuration.enabled && !configuration.loading,
-            colors = configuration.colors ?: ButtonDefaults.filledTonalButtonColors(),
-            elevation = configuration.elevation ?: ButtonDefaults.filledTonalButtonElevation(),
-            shape = finalShape,
-            border = configuration.border,
-            interactionSource = configuration.interactionSource,
-            contentPadding = finalContentPadding,
-        ) {
-            ButtonContent(configuration)
-        }
-
-        ButtonVariant.Elevated -> ElevatedButton(
-            onClick = configuration.onClick,
-            modifier = finalModifier,
-            enabled = configuration.enabled && !configuration.loading,
-            colors = configuration.colors ?: ButtonDefaults.elevatedButtonColors(),
-            elevation = configuration.elevation ?: ButtonDefaults.elevatedButtonElevation(),
-            shape = finalShape,
-            border = configuration.border,
-            interactionSource = configuration.interactionSource,
-            contentPadding = finalContentPadding,
-        ) {
-            ButtonContent(configuration)
-        }
-
-        ButtonVariant.Outlined -> OutlinedButton(
-            onClick = configuration.onClick,
-            modifier = finalModifier,
-            enabled = configuration.enabled && !configuration.loading,
-            colors = configuration.colors ?: ButtonDefaults.outlinedButtonColors(),
-            elevation = configuration.elevation,
-            shape = finalShape,
-            border = configuration.border
-                ?: ButtonDefaults.outlinedButtonBorder(configuration.enabled),
-            interactionSource = configuration.interactionSource,
-            contentPadding = finalContentPadding,
-        ) {
-            ButtonContent(configuration)
-        }
-
-        ButtonVariant.Text -> TextButton(
-            onClick = configuration.onClick,
-            modifier = finalModifier,
-            enabled = configuration.enabled && !configuration.loading,
-            colors = configuration.colors ?: ButtonDefaults.textButtonColors(),
-            elevation = configuration.elevation,
-            shape = finalShape,
-            border = configuration.border,
-            interactionSource = configuration.interactionSource,
-            contentPadding = finalContentPadding,
-        ) {
-            ButtonContent(configuration)
-        }
-
-        is ButtonVariant.Custom -> configuration.variant.renderer(configuration)
-    }
+fun PreviewKptButton() {
+    Surface { KptButton(text = "Submit", onClick = {}) }
 }
 
+@Preview
 @Composable
-private fun RowScope.ButtonContent(configuration: KptButtonConfiguration) {
-    if (configuration.loading) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(16.dp),
-            strokeWidth = 2.dp,
-            color = LocalContentColor.current,
+fun PreviewKptButtonWithIcon() {
+    Surface { KptButton(text = "Add", icon = Icons.Default.Add, onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptLoadingButton() {
+    Surface { KptLoadingButton(text = "Save", loading = true, onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptFullWidthButton() {
+    Surface { KptFullWidthButton(text = "Continue", onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptFilledButton() {
+    Surface { KptFilledButton(text = "Primary", onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptOutlinedButton() {
+    Surface { KptOutlinedButton(text = "Secondary", onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptTextButton() {
+    Surface { KptTextButton(text = "Text", onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptTonalButton() {
+    Surface { KptTonalButton(text = "Tonal", onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptElevatedButton() {
+    Surface { KptElevatedButton(text = "Elevated", onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptSmallButton() {
+    Surface { KptSmallButton(text = "Small", onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptLargeButton() {
+    Surface { KptLargeButton(text = "Large", onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptButtonAdvanced() {
+    Surface {
+        KptButton(
+            variant = ButtonVariant.Filled,
+            onClick = {},
+            content = { Text("Advanced") },
         )
-        if (configuration.loadingText != null) {
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(configuration.loadingText)
-        }
-    } else {
-        when (configuration.iconPosition) {
-            IconPosition.Start -> {
-                configuration.icon?.let { icon ->
-                    Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                configuration.content(this)
-            }
-
-            IconPosition.End -> {
-                configuration.content(this)
-                configuration.icon?.let { icon ->
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-                }
-            }
-
-            IconPosition.Top, IconPosition.Bottom -> {
-                // Handle in Column layout for vertical icons
-                configuration.content(this)
-            }
-        }
     }
 }
 
-// DSL Function
-fun kptButton(block: KptButtonBuilder.() -> Unit): KptButtonConfiguration {
-    return KptButtonBuilder().apply(block).build()
+@Preview
+@Composable
+fun PreviewKptSubmitButton() {
+    Surface { KptSubmitButton(loading = true, onClick = {}) }
 }
+
+@Preview
+@Composable
+fun PreviewKptCancelButton() {
+    Surface { KptCancelButton(onClick = {}) }
+}
+
+@Preview
+@Composable
+fun PreviewKptDeleteButton() {
+    Surface { KptDeleteButton(onClick = {}, confirmationRequired = false) }
+}
+
+@Preview
+@Composable
+fun PreviewKptDeleteButtonWithConfirmation() {
+    Surface { KptDeleteButton(onClick = {}, confirmationRequired = true) }
+}
+
+@Preview
+@Composable
+fun PreviewKptAddButtonIconOnly() {
+    Surface { KptAddButton(onClick = {}, iconOnly = true) }
+}
+
+@Preview
+@Composable
+fun PreviewKptAddButtonTextAndIcon() {
+    Surface { KptAddButton(onClick = {}, iconOnly = false) }
+}
+// endregion

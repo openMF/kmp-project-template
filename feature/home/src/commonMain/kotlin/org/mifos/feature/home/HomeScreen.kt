@@ -51,7 +51,7 @@ internal fun HomeScreen(
         shareText = {
             intentManager.shareText("Share Home Screen")
         },
-        navigateToShowcase = navigateToShowcase
+        navigateToShowcase = navigateToShowcase,
     )
 }
 
@@ -85,12 +85,12 @@ internal fun HomeScreenContent(
         ) {
             KptButton(
                 onClick = showReviewPrompt,
-                text = "Prompt Review"
+                text = "Prompt Review",
             )
 
             KptButton(
                 onClick = checkForUpdate,
-                text = "Check for Update"
+                text = "Check for Update",
             )
 
             KptButton(
@@ -99,17 +99,17 @@ internal fun HomeScreenContent(
                         permissionState.launchPermissionRequest()
                     }
                 },
-                text = "Check Permissions"
+                text = "Check Permissions",
             )
 
             KptButton(
                 onClick = shareText,
-                text = "Launch Intent"
+                text = "Launch Intent",
             )
 
             KptButton(
                 onClick = navigateToShowcase,
-                text = "Designsystem Components"
+                text = "Designsystem Catalog",
             )
         }
     }

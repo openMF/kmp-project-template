@@ -1,7 +1,16 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.form
 
 class RequiredRule(
-    override val errorMessage: String = "This field is required"
+    override val errorMessage: String = "This field is required",
 ) : ValidationRule<String> {
     override fun validate(value: String): ValidationResult {
         return if (value.isBlank()) {
@@ -14,7 +23,7 @@ class RequiredRule(
 
 class MinLengthRule(
     private val minLength: Int,
-    override val errorMessage: String = "Minimum $minLength characters required"
+    override val errorMessage: String = "Minimum $minLength characters required",
 ) : ValidationRule<String> {
     override fun validate(value: String): ValidationResult {
         return if (value.length < minLength) {
@@ -27,7 +36,7 @@ class MinLengthRule(
 
 class MaxLengthRule(
     private val maxLength: Int,
-    override val errorMessage: String = "Maximum $maxLength characters allowed"
+    override val errorMessage: String = "Maximum $maxLength characters allowed",
 ) : ValidationRule<String> {
     override fun validate(value: String): ValidationResult {
         return if (value.length > maxLength) {
@@ -39,10 +48,10 @@ class MaxLengthRule(
 }
 
 class EmailRule(
-    override val errorMessage: String = "Please enter a valid email address"
+    override val errorMessage: String = "Please enter a valid email address",
 ) : ValidationRule<String> {
     private val emailPattern = Regex(
-        "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+        "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
     )
 
     override fun validate(value: String): ValidationResult {
@@ -55,10 +64,10 @@ class EmailRule(
 }
 
 class PhoneRule(
-    override val errorMessage: String = "Please enter a valid phone number"
+    override val errorMessage: String = "Please enter a valid phone number",
 ) : ValidationRule<String> {
     private val phonePattern = Regex(
-        "^[+]?[1-9]?[0-9]{7,15}$"
+        "^[+]?[1-9]?[0-9]{7,15}$",
     )
 
     override fun validate(value: String): ValidationResult {
@@ -77,8 +86,12 @@ class PasswordRule(
     private val requireNumbers: Boolean = true,
     private val requireSpecialChars: Boolean = true,
     override val errorMessage: String = buildPasswordErrorMessage(
-        minLength, requireUppercase, requireLowercase, requireNumbers, requireSpecialChars
-    )
+        minLength,
+        requireUppercase,
+        requireLowercase,
+        requireNumbers,
+        requireSpecialChars,
+    ),
 ) : ValidationRule<String> {
     override fun validate(value: String): ValidationResult {
         if (value.length < minLength) {
@@ -110,7 +123,7 @@ class PasswordRule(
             requireUppercase: Boolean,
             requireLowercase: Boolean,
             requireNumbers: Boolean,
-            requireSpecialChars: Boolean
+            requireSpecialChars: Boolean,
         ): String {
             val requirements = mutableListOf<String>()
             requirements.add("at least $minLength characters")
@@ -126,7 +139,7 @@ class PasswordRule(
 
 class MatchRule(
     private val otherValue: () -> String,
-    override val errorMessage: String = "Values do not match"
+    override val errorMessage: String = "Values do not match",
 ) : ValidationRule<String> {
     override fun validate(value: String): ValidationResult {
         return if (value == otherValue()) {

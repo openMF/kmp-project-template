@@ -94,7 +94,7 @@ fun KptScaffold(
         topBar = topBar,
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
-        modifier = modifier.testTag(testTag ?: KptTestTags.Scaffold),
+        modifier = modifier.testTag(testTag ?: KptTestTags.SCAFFOLD),
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,
         containerColor = containerColor,
@@ -171,10 +171,10 @@ fun KptScaffold(
             }
         },
         modifier = modifier
-            .testTag(KptTestTags.Scaffold)
+            .testTag(KptTestTags.SCAFFOLD)
             .fillMaxSize()
             .navigationBarsPadding()
-            .imePadding()
+            .imePadding(),
     )
 }
 

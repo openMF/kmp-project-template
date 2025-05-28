@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package org.mifos.feature.home
 
 import androidx.compose.foundation.layout.Arrangement
@@ -9,49 +18,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.mifos.core.designsystem.icon.AppIcons
-import template.core.base.designsystem.component.DialogPresets
-import template.core.base.designsystem.component.KptAlertDialog
-import template.core.base.designsystem.component.KptLoadingDialog
+import template.core.base.designsystem.component.KptCard
 import template.core.base.designsystem.component.KptScaffold
 import template.core.base.designsystem.component.KptTopAppBar
-import template.core.base.designsystem.core.AlertDialogVariant
-import template.core.base.designsystem.core.DialogButton
-import template.core.base.designsystem.core.DialogContent
-import template.core.base.designsystem.core.KptAlertDialogConfiguration
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun DesignSystemCatalogScreen(
+fun DesignSystemCatalogScreen(
     navigateBack: () -> Unit,
+    onNavigateToComponent: (DesignSystemComponent) -> Unit,
 ) {
     KptScaffold(
         topBar = {
             KptTopAppBar(
-                title = "Design System Catalog",
+                title = "Designsystem Catalog",
                 onNavigationIconClick = navigateBack,
             )
         },
     ) {
-        var showDialog by remember { mutableStateOf<DialogType?>(null) }
-
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
@@ -59,225 +50,190 @@ internal fun DesignSystemCatalogScreen(
         ) {
             item {
                 Text(
-                    text = "Alert Dialog Catalog",
+                    text = "Design System Catalog",
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
-
-            items(items = DialogType.entries.toList()) { dialogType ->
-                DialogCatalogItem(
-                    dialogType = dialogType,
-                    onClick = { showDialog = dialogType },
-                )
-            }
-        }
-
-        // Show the selected dialog
-        when (showDialog) {
-            DialogType.BASIC -> BasicDialogExample { showDialog = null }
-            DialogType.CONFIRMATION -> ConfirmationDialogExample { showDialog = null }
-            DialogType.ERROR -> ErrorDialogExample { showDialog = null }
-            DialogType.WARNING -> WarningDialogExample { showDialog = null }
-            DialogType.SUCCESS -> SuccessDialogExample { showDialog = null }
-            DialogType.INFO -> InfoDialogExample { showDialog = null }
-            DialogType.LOADING -> LoadingDialogExample { showDialog = null }
-            DialogType.CUSTOM -> CustomDialogExample { showDialog = null }
-            null -> {} // No dialog shown
-        }
-    }
-}
-
-@Composable
-private fun DialogCatalogItem(
-    dialogType: DialogType,
-    onClick: () -> Unit,
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text(
-                    text = dialogType.title,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = dialogType.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-private enum class DialogType(
-    val title: String,
-    val description: String,
-) {
-    BASIC(
-        title = "Basic Dialog",
-        description = "Simple dialog with title and message",
-    ),
-    CONFIRMATION(
-        title = "Confirmation Dialog",
-        description = "Dialog with confirm/cancel actions",
-    ),
-    ERROR(
-        title = "Error Dialog",
-        description = "Shows error message with icon",
-    ),
-    WARNING(
-        title = "Warning Dialog",
-        description = "Warning message with proceed/cancel options",
-    ),
-    SUCCESS(
-        title = "Success Dialog",
-        description = "Success notification with positive action",
-    ),
-    INFO(
-        title = "Info Dialog",
-        description = "Information message with acknowledgement",
-    ),
-    LOADING(
-        title = "Loading Dialog",
-        description = "Shows progress indicator with optional message",
-    ),
-    CUSTOM(
-        title = "Custom Dialog",
-        description = "Fully customizable dialog content",
-    )
-}
-
-@Composable
-private fun BasicDialogExample(onDismiss: () -> Unit) {
-    KptAlertDialog(
-        configuration = KptAlertDialogConfiguration(
-            onDismissRequest = onDismiss,
-            content = DialogContent(
-                title = "Basic Dialog",
-                text = "This is a simple dialog with just title and message.",
-            ),
-            confirmButton = DialogButton(
-                onClick = { /* Handle confirm */ },
-                text = "OK",
-            ),
-        ),
-    )
-}
-
-@Composable
-private fun ConfirmationDialogExample(onDismiss: () -> Unit) {
-    KptAlertDialog(
-        configuration = DialogPresets.confirmation(
-            title = "Confirm Action",
-            text = "Are you sure you want to perform this action?",
-            onConfirm = { /* Handle confirm */ },
-            onDismiss = onDismiss,
-        ),
-    )
-}
-
-@Composable
-private fun ErrorDialogExample(onDismiss: () -> Unit) {
-    KptAlertDialog(
-        configuration = DialogPresets.error(
-            title = "Error Occurred",
-            text = "Something went wrong. Please try again later.",
-            onDismiss = onDismiss,
-        ),
-    )
-}
-
-@Composable
-private fun WarningDialogExample(onDismiss: () -> Unit) {
-    KptAlertDialog(
-        configuration = DialogPresets.warning(
-            title = "Warning",
-            text = "This action cannot be undone. Proceed with caution.",
-            onConfirm = { /* Handle proceed */ },
-            onDismiss = onDismiss,
-        ),
-    )
-}
-
-@Composable
-private fun SuccessDialogExample(onDismiss: () -> Unit) {
-    KptAlertDialog(
-        configuration = DialogPresets.success(
-            title = "Success!",
-            text = "Your action was completed successfully.",
-            onDismiss = onDismiss,
-        ),
-    )
-}
-
-@Composable
-private fun InfoDialogExample(onDismiss: () -> Unit) {
-    KptAlertDialog(
-        configuration = DialogPresets.info(
-            title = "Information",
-            text = "Here's some important information you should know.",
-            onDismiss = onDismiss,
-        ),
-    )
-}
-
-@Composable
-private fun LoadingDialogExample(onDismiss: () -> Unit) {
-    KptLoadingDialog(
-        title = "Processing",
-        text = "Please wait while we complete your request...",
-        onDismiss = onDismiss,
-        cancellable = true,
-    )
-}
-
-@Composable
-private fun CustomDialogExample(onDismiss: () -> Unit) {
-    KptAlertDialog(
-        configuration = KptAlertDialogConfiguration(
-            onDismissRequest = onDismiss,
-            variant = AlertDialogVariant.Basic,
-            content = DialogContent(
-                customContent = {
-                    Surface {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
+            items(items = DesignSystemComponent.entries) { component ->
+                KptCard(
+                    onClick = { onNavigateToComponent(component) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Icon(
-                                imageVector = AppIcons.Finance,
-                                contentDescription = null,
-                                modifier = Modifier.size(48.dp),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Custom Content",
-                                style = MaterialTheme.typography.titleLarge,
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "This dialog has completely custom content layout",
-                                style = MaterialTheme.typography.bodyMedium,
+                                text = component.title,
+                                style = MaterialTheme.typography.titleMedium,
                             )
                         }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = component.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
-                },
-            ),
-            confirmButton = DialogButton(
-                onClick = { /* Handle confirm */ },
-                text = "Got it",
-            ),
-        ),
-    )
+                }
+            }
+        }
+    }
+}
+
+// List all catalog screens here
+enum class DesignSystemComponent(
+    val title: String,
+    val description: String,
+    val route: String,
+) {
+    BUTTON(
+        title = "KptButton",
+        description = "Filled, Outlined, Text, Icon, Loading, Disabled buttons.",
+        route = "button_catalog_screen",
+    ),
+    CHIP(
+        title = "KptChip",
+        description = "Assist, Filter, Input, and Suggestion chips.",
+        route = "chip_catalog_screen",
+    ),
+    CARD(
+        title = "KptCard",
+        description = "Filled, Elevated, Outlined, Info, Stat, Media, ListItem, Error",
+        route = "card_catalog_screen",
+    ),
+    CHECKBOX(
+        title = "KptCheckbox",
+        description = "Basic, label, description, disabled, custom color checkboxes.",
+        route = "checkbox_catalog_screen",
+    ),
+    DATE_PICKER(
+        title = "KptDatePicker",
+        description = "Date picker, dialog, and field.",
+        route = "date_picker_catalog_screen",
+    ),
+    DIVIDER(
+        title = "KptDivider",
+        description = "Horizontal, vertical, custom thickness, custom color dividers.",
+        route = "divider_catalog_screen",
+    ),
+    EMPTY_STATE(
+        title = "KptEmptyState",
+        description = "Basic, with action, custom icon empty states.",
+        route = "empty_state_catalog_screen",
+    ),
+    EXPANDABLE_CARD(
+        title = "KptExpandableCard",
+        description = "Basic, with subtitle, with icon expandable cards.",
+        route = "expandable_card_catalog_screen",
+    ),
+    FAB(
+        title = "KptFloatingActionButton",
+        description = "Regular, extended, loading, success, error, small, large, add, edit, etc",
+        route = "fab_catalog_screen",
+    ),
+    LIST_ITEM(
+        title = "KptListItem",
+        description = "Basic, supporting content, leading/trailing icon, overline, etc.",
+        route = "list_item_catalog_screen",
+    ),
+    PROGRESS(
+        title = "KptProgressIndicator",
+        description = "Circular/linear, loading dots, wave, pulse, ring, progress with label, etc",
+        route = "progress_indicator_catalog_screen",
+    ),
+    RADIO_BUTTON(
+        title = "KptRadioButton",
+        description = "Basic, label, description, disabled, group radio buttons.",
+        route = "radio_button_catalog_screen",
+    ),
+    RADIO_GROUP(
+        title = "KptRadioGroup",
+        description = "Basic, with descriptions, disabled, custom arrangement radio groups.",
+        route = "radio_group_catalog_screen",
+    ),
+    SCAFFOLD(
+        title = "KptScaffold",
+        description = "Basic, with bottom bar, FAB, snackbar, pull-to-refresh.",
+        route = "scaffold_catalog_screen",
+    ),
+    SHIMMER(
+        title = "KptShimmerLoadingBox",
+        description = "Basic shimmer, custom shape, shimmer list item, list of shimmer items.",
+        route = "shimmer_loading_box_catalog_screen",
+    ),
+    SIMPLE_LIST_ITEM(
+        title = "KptSimpleListItem",
+        description = "Basic, supporting text, leading/trailing icon, clickable simple list items.",
+        route = "simple_list_item_catalog_screen",
+    ),
+    SLIDER(
+        title = "KptSlider",
+        description = "Basic, label, custom range/steps, disabled, label formatter.",
+        route = "slider_catalog_screen",
+    ),
+    SNACKBAR(
+        title = "KptSnackbarHost",
+        description = "Basic, with action, dismiss, custom duration snackbars.",
+        route = "snackbar_host_catalog_screen",
+    ),
+    SWITCH(
+        title = "KptSwitch",
+        description = "Basic, label, description, disabled, custom thumb switches.",
+        route = "switch_catalog_screen",
+    ),
+    TAB(
+        title = "KptTab",
+        description = "Basic tab row, custom colors, scrollable tab row.",
+        route = "tab_catalog_screen",
+    ),
+    TAB_LAYOUT(
+        title = "KptTabLayout",
+        description = "Basic, with icons, dynamic content tab layouts.",
+        route = "tab_layout_catalog_screen",
+    ),
+    TEXT_FIELD(
+        title = "KptTextField",
+        description = "Basic, outlined, filled, email, password, phone, search, etc.",
+        route = "text_field_catalog_screen",
+    ),
+    TIME_PICKER(
+        title = "KptTimePicker",
+        description = "Basic, 12/24-hour, custom initial time pickers.",
+        route = "time_picker_catalog_screen",
+    ),
+    TOP_APP_BAR(
+        title = "KptTopAppBar",
+        description = "Basic, navigation, subtitle, action, search, profile, settings, all variants.",
+        route = "top_app_bar_catalog_screen",
+    ),
+    SLIDE_TRANSITION(
+        title = "KptSlideTransition",
+        description = "Slide in from left, right, up, down transitions.",
+        route = "slide_transition_catalog_screen",
+    ),
+    BOTTOM_BAR(
+        title = "KptBottomAppBar",
+        description = "BottomAppBar",
+        route = "bottom_app_bar_catalog_screen",
+    ),
+    BOTTOM_SHEET(
+        title = "KptBottomSheet",
+        description = "BottomSheet",
+        route = "bottom_sheet_catalog_screen",
+    ),
+    ALERT_DIALOG(
+        title = "KptAlertDialog",
+        description = "Kpt Alert Dialog",
+        route = "alert_dialog_catalog_screen",
+    ),
+    ;
+
+    companion object {
+        val entries: List<DesignSystemComponent> = DesignSystemComponent.entries
+    }
 }

@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.form
 
 import androidx.compose.foundation.layout.Arrangement
@@ -62,28 +71,30 @@ fun RegistrationFormExample() {
     val emailField = rememberFormFieldState(
         validator = Validator<String>()
             .addRule(RequiredRule())
-            .addRule(EmailRule())
+            .addRule(EmailRule()),
     )
 
     val passwordField = rememberFormFieldState(
         validator = Validator<String>()
             .addRule(RequiredRule())
-            .addRule(PasswordRule())
+            .addRule(PasswordRule()),
     )
 
     val confirmPasswordField = rememberFormFieldState(
         validator = Validator<String>()
             .addRule(RequiredRule())
-            .addRule(MatchRule(
-                otherValue = { passwordField.value },
-                errorMessage = "Passwords do not match"
-            ))
+            .addRule(
+                MatchRule(
+                    otherValue = { passwordField.value },
+                    errorMessage = "Passwords do not match",
+                ),
+            ),
     )
 
     val phoneField = rememberFormFieldState(
         validator = Validator<String>()
             .addRule(RequiredRule())
-            .addRule(PhoneRule())
+            .addRule(PhoneRule()),
     )
 
     // Register fields with form state
@@ -98,11 +109,11 @@ fun RegistrationFormExample() {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
             "Create Account",
-            style = KptTheme.typography.headlineMedium
+            style = KptTheme.typography.headlineMedium,
         )
 
         KptEmailField(fieldState = emailField)
@@ -113,7 +124,7 @@ fun RegistrationFormExample() {
 
         KptConfirmPasswordField(
             fieldState = confirmPasswordField,
-            originalPasswordState = passwordField
+            originalPasswordState = passwordField,
         )
 
         FormValidationSummary(formState = formState)
@@ -127,14 +138,14 @@ fun RegistrationFormExample() {
                 }
             },
             enabled = formState.isValid,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Create Account")
         }
 
         TextButton(
             onClick = { formState.reset() },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text("Clear Form")
         }

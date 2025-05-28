@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 // Enhanced ProgressIndicator Variant System
-sealed interface ProgressIndicatorVariant: ComponentVariant {
+sealed interface ProgressIndicatorVariant : ComponentVariant {
     override val name: String
 
     data object LinearDeterminate : ProgressIndicatorVariant {
@@ -55,7 +55,9 @@ sealed interface ProgressIndicatorVariant: ComponentVariant {
 
 // Progress Style
 enum class ProgressStyle {
-    Rounded, Sharp, Gradient
+    Rounded,
+    Sharp,
+    Gradient,
 }
 
 // Configuration class
@@ -76,7 +78,7 @@ data class KptProgressIndicatorConfiguration(
     val style: ProgressStyle = ProgressStyle.Rounded,
     override val testTag: String? = null,
     override val contentDescription: String? = null,
-): KptComponent
+) : KptComponent
 
 // DSL Builder
 @DslMarker
@@ -126,4 +128,3 @@ fun kptProgressIndicator(
 ): KptProgressIndicatorConfiguration {
     return KptProgressIndicatorBuilder().apply(block).build()
 }
-

@@ -1,3 +1,12 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package template.core.base.designsystem.component
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,6 +28,17 @@ import androidx.compose.ui.platform.testTag
 import template.core.base.designsystem.core.KptComponent
 import template.core.base.designsystem.theme.KptTheme
 
+/**
+ * KptCheckbox is a customizable checkbox component that can optionally display a label and description.
+ *
+ * This composable wraps Material3's [Checkbox] and provides additional features such as a label, description,
+ * and custom styling through [CheckboxConfiguration].
+ *
+ * If a label is provided, the checkbox and label are displayed in a row, with the label and optional description
+ * shown in a column next to the checkbox. If no label is provided, only the checkbox is shown.
+ *
+ * @param configuration The [CheckboxConfiguration] object that defines the state, appearance, and behavior of the checkbox.
+ */
 @Composable
 fun KptCheckbox(configuration: CheckboxConfiguration) {
     if (configuration.label != null) {
@@ -67,6 +87,20 @@ fun KptCheckbox(configuration: CheckboxConfiguration) {
     }
 }
 
+/**
+ * Configuration for the [KptCheckbox] composable.
+ *
+ * @property checked Whether the checkbox is checked.
+ * @property onCheckedChange Callback to be invoked when the checked state changes.
+ * @property modifier Modifier to be applied to the checkbox or its container.
+ * @property testTag Optional test tag for UI testing.
+ * @property contentDescription Optional content description for accessibility.
+ * @property enabled Whether the checkbox is enabled and can be interacted with.
+ * @property colors Optional [CheckboxColors] to customize the checkbox appearance.
+ * @property interactionSource Optional [MutableInteractionSource] for observing interaction events.
+ * @property label Optional label text to display next to the checkbox.
+ * @property description Optional description text to display below the label.
+ */
 @Immutable
 data class CheckboxConfiguration(
     val checked: Boolean,

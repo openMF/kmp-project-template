@@ -9,6 +9,16 @@
  */
 package template.core.base.designsystem.core
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -91,22 +101,6 @@ data class DialogButton(
     val text: String,
 ) : Clickable
 
-@Immutable
-data class KptAlertDialogConfiguration(
-    override val testTag: String? = null,
-    override val contentDescription: String? = null,
-    override val modifier: Modifier = Modifier,
-    override val colors: DialogColors? = null,
-    override val shape: Shape? = null,
-    override val elevation: DialogElevation? = null,
-    val variant: AlertDialogVariant = AlertDialogVariant.Standard,
-    val onDismissRequest: () -> Unit,
-    val content: DialogContent = DialogContent(),
-    val confirmButton: DialogButton,
-    val dismissButton: DialogButton? = null,
-    val properties: DialogProperties = DialogProperties(),
-) : KptComponent, Styleable
-
 interface AlertDialogColorScheme {
     fun getColors(variant: AlertDialogVariant): DialogColors
     fun getIcon(variant: AlertDialogVariant): ImageVector?
@@ -170,4 +164,124 @@ class AlertDialogThemeStrategy(
             elevation = component.elevation,
         )
     }
+}
+
+// Enhanced configuration with new properties
+fun KptAlertDialogConfiguration.withLoading(
+    isLoading: Boolean = true,
+    loadingMessage: String? = null,
+): KptAlertDialogConfiguration = this.copy(
+    isLoading = isLoading,
+    loadingConfig = DialogLoadingConfig(message = loadingMessage),
+)
+
+fun KptAlertDialogConfiguration.withAnimation(
+    animationConfig: DialogAnimationConfig,
+): KptAlertDialogConfiguration = this.copy(
+    animationConfig = animationConfig,
+)
+
+// Extension to the existing configuration
+data class KptAlertDialogConfiguration(
+    override val testTag: String? = null,
+    override val contentDescription: String? = null,
+    override val modifier: Modifier = Modifier,
+    override val colors: DialogColors? = null,
+    override val shape: Shape? = null,
+    override val elevation: DialogElevation? = null,
+    val variant: AlertDialogVariant = AlertDialogVariant.Standard,
+    val onDismissRequest: () -> Unit,
+    val content: DialogContent = DialogContent(),
+    val confirmButton: DialogButton,
+    val dismissButton: DialogButton? = null,
+    val properties: DialogProperties = DialogProperties(),
+    val isLoading: Boolean = false,
+    val loadingConfig: DialogLoadingConfig = DialogLoadingConfig(),
+    val animationConfig: DialogAnimationConfig = DialogAnimationConfig.Default,
+) : KptComponent, Styleable
+
+// Animation configuration
+data class DialogAnimationConfig(
+    val enterTransition: androidx.compose.animation.EnterTransition,
+    val exitTransition: androidx.compose.animation.ExitTransition,
+    val durationMillis: Int = 300,
+) {
+    companion object {
+        val Default = DialogAnimationConfig(
+            enterTransition = fadeIn() + scaleIn(
+                initialScale = 0.9f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            ),
+            exitTransition = fadeOut() + scaleOut(targetScale = 0.9f),
+        )
+
+        val Slide = DialogAnimationConfig(
+            enterTransition = fadeIn() + androidx.compose.animation.slideInVertically(
+                initialOffsetY = { it / 4 },
+            ),
+            exitTransition = fadeOut() + androidx.compose.animation.slideOutVertically(
+                targetOffsetY = { it / 4 },
+            ),
+        )
+
+        val None = DialogAnimationConfig(
+            enterTransition = androidx.compose.animation.EnterTransition.None,
+            exitTransition = androidx.compose.animation.ExitTransition.None,
+            durationMillis = 0,
+        )
+    }
+}
+
+// Loading configuration
+data class DialogLoadingConfig(
+    val message: String? = null,
+    val showIconWithLoading: Boolean = false,
+    val allowDismissWhileLoading: Boolean = false,
+)
+
+// Dialog style presets
+object KptDialogStyles {
+
+    // Brand-specific error style
+    val BrandError = DialogColors(
+        containerColor = Color(0xFFFFEBEE),
+        iconContentColor = Color(0xFFD32F2F),
+        titleContentColor = Color(0xFFB71C1C),
+        textContentColor = Color(0xFF424242),
+    )
+
+    // Soft warning style
+    val SoftWarning = DialogColors(
+        containerColor = Color(0xFFFFF9C4),
+        iconContentColor = Color(0xFFF57C00),
+        titleContentColor = Color(0xFFE65100),
+        textContentColor = Color(0xFF5D4037),
+    )
+
+    // Premium success style
+    val PremiumSuccess = DialogColors(
+        containerColor = Color(0xFFE0F2F1),
+        iconContentColor = Color(0xFF00796B),
+        titleContentColor = Color(0xFF004D40),
+        textContentColor = Color(0xFF37474F),
+    )
+
+    // Dark mode style
+    val DarkMode = DialogColors(
+        containerColor = Color(0xFF121212),
+        iconContentColor = Color(0xFFBB86FC),
+        titleContentColor = Color(0xFFFFFFFF),
+        textContentColor = Color(0xFFE0E0E0),
+    )
+
+    // Minimal style
+    val Minimal = DialogColors(
+        containerColor = Color(0xFFFAFAFA),
+        iconContentColor = Color(0xFF757575),
+        titleContentColor = Color(0xFF212121),
+        textContentColor = Color(0xFF616161),
+    )
 }

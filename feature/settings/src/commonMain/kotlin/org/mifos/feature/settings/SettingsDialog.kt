@@ -52,8 +52,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.ThemeBrand
-import template.core.base.designsystem.component.ButtonVariant
 import template.core.base.designsystem.component.KptButton
+import template.core.base.designsystem.core.ButtonVariant
 
 @Composable
 fun SettingsDialog(

@@ -22,8 +22,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
-import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.testTag
+import kotlinx.coroutines.launch
 
 /**
  * A composable layout for adaptive UIs that implements a navigable two-pane structure

@@ -10,7 +10,7 @@
 package org.mifos.core.database.utils
 
 import kotlinx.serialization.json.Json
-import org.mifos.core.database.entity.SampleEntity
+import org.mifos.core.database.entity.TaskEntity
 import template.core.base.database.TypeConverter
 
 class ChargeTypeConverters {
@@ -26,12 +26,12 @@ class ChargeTypeConverters {
     }
 
     @TypeConverter
-    fun fromSampleEntity(value: SampleEntity?): String? {
-        return value?.let { Json.encodeToString(SampleEntity.serializer(), it) }
+    fun fromSampleEntity(value: TaskEntity?): String? {
+        return value?.let { Json.encodeToString(TaskEntity.serializer(), it) }
     }
 
     @TypeConverter
-    fun toSampleEntity(value: String?): SampleEntity? {
-        return value?.let { Json.decodeFromString(SampleEntity.serializer(), it) }
+    fun toSampleEntity(value: String?): TaskEntity? {
+        return value?.let { Json.decodeFromString(TaskEntity.serializer(), it) }
     }
 }

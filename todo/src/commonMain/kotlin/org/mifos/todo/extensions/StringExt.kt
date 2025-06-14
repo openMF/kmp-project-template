@@ -7,11 +7,12 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.database
+package org.mifos.todo.extensions
 
-import org.mifos.core.database.dao.TaskDao
-
-@Suppress("NO_ACTUAL_FOR_EXPECT")
-expect abstract class AppDatabase {
-    abstract val taskDao: TaskDao
-}
+/**
+ * Formats a day of the month into a 2-digit string.
+ * Example: "1" becomes "01", "10" stays "10".
+ *
+ * @return The formatted day as a 2-digit string.
+ */
+fun String.formatDay(): String = this.padStart(2, '0')

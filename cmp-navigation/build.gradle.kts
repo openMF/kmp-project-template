@@ -22,10 +22,13 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.core.datastore)
+            implementation(projects.core.database)
 
             implementation(projects.feature.home)
             implementation(projects.feature.profile)
             implementation(projects.feature.settings)
+
+            implementation(projects.todo)
 
             //put your multiplatform dependencies here
             implementation(compose.material3)

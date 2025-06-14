@@ -14,8 +14,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
-import org.mifos.core.database.dao.SampleDao
-import org.mifos.core.database.entity.SampleEntity
+import org.mifos.core.database.dao.TaskDao
+import org.mifos.core.database.entity.TaskEntity
 import org.mifos.core.database.utils.ChargeTypeConverters
 
 @Suppress("NO_ACTUAL_FOR_EXPECT")
@@ -25,7 +25,7 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
 
 @Database(
     entities = [
-        SampleEntity::class,
+        TaskEntity::class,
     ],
     version = AppDatabase.VERSION,
     exportSchema = true,
@@ -34,7 +34,7 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
 @TypeConverters(ChargeTypeConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
 actual abstract class AppDatabase : RoomDatabase() {
-    actual abstract val sampleDao: SampleDao
+    actual abstract val taskDao: TaskDao
 
     companion object {
         const val VERSION = 1

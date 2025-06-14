@@ -15,7 +15,7 @@ import org.mifos.core.database.AppDatabase
 
 val TestDatabaseModule = module {
     includes(testPlatformModule)
-    single { get<AppDatabase>().sampleDao }
+    single { get<AppDatabase>().taskDao }
 }
 
 @Suppress("NO_ACTUAL_FOR_EXPECT")

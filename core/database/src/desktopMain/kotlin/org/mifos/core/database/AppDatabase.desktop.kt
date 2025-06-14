@@ -12,13 +12,13 @@ package org.mifos.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import org.mifos.core.database.dao.SampleDao
-import org.mifos.core.database.entity.SampleEntity
+import org.mifos.core.database.dao.TaskDao
+import org.mifos.core.database.entity.TaskEntity
 import org.mifos.core.database.utils.ChargeTypeConverters
 
 @Database(
     entities = [
-        SampleEntity::class,
+        TaskEntity::class,
     ],
     version = AppDatabase.VERSION,
     exportSchema = true,
@@ -27,7 +27,7 @@ import org.mifos.core.database.utils.ChargeTypeConverters
 @TypeConverters(ChargeTypeConverters::class)
 actual abstract class AppDatabase : RoomDatabase() {
 
-    actual abstract val sampleDao: SampleDao
+    actual abstract val taskDao: TaskDao
 
     companion object {
         const val VERSION = 1

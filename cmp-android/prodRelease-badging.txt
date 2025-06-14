@@ -1,5 +1,5 @@
-package: name='cmp.android.app' versionCode='1' versionName='2025.5.4-beta.0.3' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
-sdkVersion:'26'
+package: name='cmp.android.app' versionCode='1' versionName='2025.5.5-beta.0.1' platformBuildVersionName='15' platformBuildVersionCode='35' compileSdkVersion='35' compileSdkVersionCodename='15'
+minSdkVersion:'26'
 targetSdkVersion:'34'
 uses-permission: name='android.permission.INTERNET'
 uses-permission: name='android.permission.POST_NOTIFICATIONS'
@@ -108,6 +108,7 @@ feature-group: label=''
 main
 other-activities
 other-receivers
+other-services
 supports-screens: 'small' 'normal' 'large' 'xlarge'
 supports-any-density: 'true'
 locales: '--_--' 'af' 'am' 'ar' 'as' 'az' 'be' 'bg' 'bn' 'bs' 'ca' 'cs' 'da' 'de' 'el' 'en-AU' 'en-CA' 'en-GB' 'en-IN' 'en-XC' 'es' 'es-US' 'et' 'eu' 'fa' 'fi' 'fr' 'fr-CA' 'gl' 'gu' 'hi' 'hr' 'hu' 'hy' 'in' 'is' 'it' 'iw' 'ja' 'ka' 'kk' 'km' 'kn' 'ko' 'ky' 'lo' 'lt' 'lv' 'mk' 'ml' 'mn' 'mr' 'ms' 'my' 'nb' 'ne' 'nl' 'or' 'pa' 'pl' 'pt' 'pt-BR' 'pt-PT' 'ro' 'ru' 'si' 'sk' 'sl' 'sq' 'sr' 'sr-Latn' 'sv' 'sw' 'ta' 'te' 'th' 'tl' 'tr' 'uk' 'ur' 'uz' 'vi' 'zh-CN' 'zh-HK' 'zh-TW' 'zu'

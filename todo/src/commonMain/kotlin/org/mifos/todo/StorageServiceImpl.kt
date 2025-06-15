@@ -10,59 +10,80 @@
 package org.mifos.todo
 
 import kotlinx.coroutines.flow.Flow
-import org.mifos.core.database.dao.TaskDao
-import org.mifos.core.database.entity.TaskEntity
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import template.core.base.datastore.cache.CacheManager
+import template.core.base.datastore.cache.LruCacheManager
 
-/**
- * Implementation of [StorageService] using Room database for storing and managing tasks.
- *
- * @param taskDao The [TaskDao] instance for performing database operations related to tasks.
- */
+private const val TASKS_KEY = "ALL_TASKS"
 class StorageServiceImpl(
-    private val taskDao: TaskDao,
+    private val cache: CacheManager<Int, TaskEntity> = LruCacheManager(),
+    private val taskListCache: CacheManager<String, List<TaskEntity>> = LruCacheManager(),
 ) : StorageService {
 
-    /**
-     * Retrieves a list of tasks for a specific date for the currently authenticated user.
-     *
-     * @param selectedDate The date for which to retrieve tasks, formatted as a string ["MM/dd/yyyy"].
-     * @return A [Flow] emitting a list of tasks matching the specified date.
-     */
-    override fun getSelectedDayTasks(selectedDate: String): Flow<List<TaskEntity>> {
-        return taskDao.getSelectedDayTasks(selectedDate)
+    private val tasksFlow = MutableStateFlow<List<TaskEntity>>(emptyList())
+
+    init {
+        // Load initial data into flow
+        val initial = getAllTasks()
+        tasksFlow.value = initial
+        initial.forEach { cache.put(it.id, it) }
     }
 
-    /**
-     * Retrieves a task by its unique identifier.
-     *
-     * @param taskId The unique identifier of the task.
-     * @return The [TaskEntity] if found, or `null` if the task does not exist.
-     */
-    override suspend fun getTask(taskId: Int): TaskEntity? =
-        taskDao.getTask(taskId)
+    private fun getAllTasks(): MutableList<TaskEntity> {
+        return (taskListCache.get(TASKS_KEY) ?: emptyList()).toMutableList()
+    }
 
-    /**
-     * Adds a new task to the database for the currently authenticated user.
-     *
-     * @param task The task to be added.
-     */
-    override suspend fun addTask(task: TaskEntity) =
-        taskDao.addTask(task)
+    private fun updateAllTasks(tasks: List<TaskEntity>) {
+        taskListCache.clear()
+        taskListCache.put(TASKS_KEY, tasks)
+        cache.clear()
+        tasks.forEach { cache.put(it.id, it) }
+        tasksFlow.value = tasks // notify observers
+    }
 
-    /**
-     * Updates an existing task in the database.
-     *
-     * @param task The task with updated details. The task must have a valid `id` field.
-     */
-    override suspend fun updateTask(task: TaskEntity) =
-        taskDao.updateTask(task)
+    override fun getSelectedDayTasks(selectedDate: String): Flow<List<TaskEntity>> {
+        return tasksFlow.map { tasks ->
+            tasks.filter { it.dueDate == selectedDate }
+        }
+    }
 
-    /**
-     * Deletes a task by its unique identifier from the database.
-     *
-     * @param taskId The unique identifier of the task to be deleted.
-     */
+    override suspend fun getTask(taskId: Int): TaskEntity? {
+        return cache.get(taskId) ?: getAllTasks().find { it.id == taskId }
+    }
+
+    override suspend fun addTask(task: TaskEntity) {
+        val tasks = getAllTasks()
+
+        // If id == 0, treat as new task and generate unique id
+        val actualTask = if (task.id == 0) {
+            val nextId = (tasks.maxOfOrNull { it.id } ?: 0) + 1
+            task.copy(id = nextId)
+        } else {
+            task
+        }
+
+        // Replace if exists
+        val updatedTasks = tasks.map {
+            if (it.id == actualTask.id) actualTask else it
+        }.let {
+            if (it.any { task -> task.id == actualTask.id }) {
+                it
+            } else {
+                it + actualTask
+            }
+        }
+
+        updateAllTasks(updatedTasks)
+    }
+
+    override suspend fun updateTask(task: TaskEntity) {
+        // Simply reuse addTask, which already handles replace-by-id logic
+        addTask(task)
+    }
+
     override suspend fun deleteTask(taskId: Int) {
-        taskDao.deleteTask(taskId)
+        val updatedTasks = getAllTasks().filterNot { it.id == taskId }
+        updateAllTasks(updatedTasks)
     }
 }

@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.core.database.entity.TaskEntity
+import org.mifos.todo.TaskEntity
 
 /**
  * A Composable screen that displays the list of tasks along with various controls such as:

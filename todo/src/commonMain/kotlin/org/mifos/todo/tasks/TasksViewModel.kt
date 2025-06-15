@@ -22,8 +22,8 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.plus
-import org.mifos.core.database.entity.TaskEntity
 import org.mifos.todo.StorageService
+import org.mifos.todo.TaskEntity
 import org.mifos.todo.TaskMinderViewModel
 import org.mifos.todo.extensions.formatDay
 

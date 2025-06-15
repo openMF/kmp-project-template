@@ -11,7 +11,6 @@ package org.mifos.todo
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -33,7 +32,7 @@ open class TaskMinderViewModel : ViewModel() {
     fun launchCatching(block: suspend CoroutineScope.() -> Unit) =
         viewModelScope.launch(
             context = CoroutineExceptionHandler { _, throwable ->
-                Logger.d(throwable.message.toString())
+                println(throwable.message.toString())
             },
             block = block,
         )

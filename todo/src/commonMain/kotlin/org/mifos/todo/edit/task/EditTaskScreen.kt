@@ -50,8 +50,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.core.database.entity.TaskEntity
 import org.mifos.todo.ActionToolbar
+import org.mifos.todo.TaskEntity
 
 /**
  * Composable for the Edit Task screen.

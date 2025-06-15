@@ -13,10 +13,10 @@ import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.mifos.core.database.entity.TaskEntity
 import org.mifos.todo.DateTimeFormatter
 import org.mifos.todo.EditTaskDestination
 import org.mifos.todo.StorageService
+import org.mifos.todo.TaskEntity
 import org.mifos.todo.TaskMinderViewModel
 import org.mifos.todo.extensions.toClockPattern
 

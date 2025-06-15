@@ -22,7 +22,7 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.components.resources)
             implementation(libs.kotlinx.datetime)
-            implementation(projects.core.database)
+            implementation(projects.coreBase.datastore)
             implementation(compose.materialIconsExtended)
         }
     }

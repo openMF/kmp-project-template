@@ -17,7 +17,7 @@ import org.mifos.todo.edit.task.EditTaskViewModel
 import org.mifos.todo.tasks.TasksViewModel
 
 val TodoModule = module {
-    single<StorageService> { StorageServiceImpl(get()) }
+    single<StorageService> { StorageServiceImpl() }
     viewModelOf(::TasksViewModel)
     viewModelOf(::EditTaskViewModel)
 }

@@ -10,7 +10,6 @@
 package org.mifos.todo
 
 import kotlinx.coroutines.flow.Flow
-import org.mifos.core.database.entity.TaskEntity
 
 /**
  * A service interface for managing tasks stored in a remote database.

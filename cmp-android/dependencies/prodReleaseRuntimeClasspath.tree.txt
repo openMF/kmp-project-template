@@ -1655,6 +1655,9 @@
 |    |    |    +--- org.jetbrains.compose.components:components-resources:1.8.1 (*)
 |    |    |    +--- org.jetbrains.compose.components:components-ui-tooling-preview:1.8.1 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1 (*)
+|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.6.2 (*)
+|    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- project :core-base:datastore (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.1.20 (*)
 |    |    +--- project :feature:profile
 |    |    |    +--- io.insert-koin:koin-bom:4.0.4 (*)

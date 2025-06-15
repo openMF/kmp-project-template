@@ -13,10 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import org.mifos.feature.home.HOME_ROUTE
-import org.mifos.feature.home.homeScreen
-import org.mifos.feature.profile.profileScreen
-import org.mifos.feature.settings.notificationScreen
+import androidx.navigation.compose.composable
+import org.mifos.feature.home.EditTaskDestination
+import org.mifos.feature.home.TasksDestination
+import org.mifos.feature.home.task.EditTaskScreen
+import org.mifos.feature.home.tasks.TasksScreen
+import org.mifos.feature.settings.navigateToSettings
 import org.mifos.feature.settings.settingsScreen
 
 @Composable
@@ -26,20 +28,41 @@ internal fun FeatureNavHost(
 ) {
     NavHost(
         route = NavGraphRoute.MAIN_GRAPH,
-        startDestination = HOME_ROUTE,
+//        startDestination = HOME_ROUTE,
+        startDestination = TasksDestination.route,
         navController = navController,
         modifier = modifier,
     ) {
-        homeScreen()
+        // Tasks Screen - Main screen showing a list of tasks
+        composable(route = TasksDestination.route) {
+            TasksScreen(
+                onAddNewTask = { navController.navigate("${EditTaskDestination.route}/${0}") },
+                onSettingsClick = { navController.navigateToSettings() },
+                onTaskClick = { navController.navigate("${EditTaskDestination.route}/${it.id}") },
+            )
+        }
 
-        profileScreen()
+        // Edit Task Screen - Screen to edit or add a new task
+        composable(
+            route = EditTaskDestination.routeWithArgs,
+            arguments = EditTaskDestination.arguments,
+        ) {
+            EditTaskScreen(
+                navigateBack = { navController.popBackStack() },
+                onTaskSaved = { navController.popBackStack() },
+            )
+        }
+
+//        homeScreen()
+//
+//        profileScreen()
 
         settingsScreen(
             onBackClick = navController::popBackStack,
         )
 
-        notificationScreen(
-            onBackClick = navController::popBackStack,
-        )
+//        notificationScreen(
+//            onBackClick = navController::popBackStack,
+//        )
     }
 }

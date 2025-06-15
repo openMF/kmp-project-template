@@ -15,6 +15,7 @@ import org.koin.dsl.module
 import org.mifos.core.common.di.DispatchersModule
 import org.mifos.core.data.di.DataModule
 import org.mifos.core.datastore.di.DatastoreModule
+import org.mifos.feature.home.di.HomeModule
 import org.mifos.feature.settings.SettingsModule
 
 object KoinModules {
@@ -32,6 +33,7 @@ object KoinModules {
 
     private val featureModule = module {
         includes(
+            HomeModule,
             SettingsModule,
         )
     }

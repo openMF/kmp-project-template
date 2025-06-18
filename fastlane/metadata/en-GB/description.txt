@@ -1,19 +1,10 @@
-The ultimate production-ready starter kit for building powerful, scalable, and maintainable Kotlin Multiplatform (KMP) apps!
+LiteDo is a clean, intuitive, and privacy-conscious to-do list app. Whether you want to stay organized with daily routines or track high-priority goals, this app helps you manage everything with simplicity and speed.
 
-Features:
+- Dark mode support
+- Priority levels (Low, Medium, High)
+- Date & Time picker
+- Theme customization
+- Easy edit and delete options
+- Minimal interface for maximum focus
 
-- Cross-Platform: Native Mobile, Desktop (Compose for Desktop), and Web (Compose Web).
-
-- Clean Architecture: Multi-module, feature-first modularization with a clear separation of concerns (domain, data, and presentation layers).
-
-- Shared Code and UI: Reusable Compose Multiplatform components across platforms, including a built-in design system with light/dark theme support.
-
-- Production-Grade Tools: Static analysis with Detekt, code formatting with Spotless, Git hooks for code quality.
-
-- CI/CD Integration: Automated builds, pull request validation, versioning, release notes generation, and deployment pipelines with GitHub Actions and Fastlane.
-
-- Optimized Data Management: Integrated DataStore for local storage, API client setup, caching strategies, and analytics-ready structure.
-
-- Advanced Sync System: Keep your project up-to-date with upstream templates using automated GitHub workflows and sync scripts.
-
-Whether you're launching a new multiplatform app or setting up a scalable architecture for long-term projects, KMP Multi-Module Project Generator gives you everything you need to start quickly and build confidently.
+No ads, no trackers — just a beautiful and useful task manager.

@@ -350,7 +350,7 @@ platform :ios do
       match(
         type: options[:match_type] || ios_config[:match_type],
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
-        readonly: true,
+        readonly: false,
         git_url: options[:git_url] || ios_config[:git_url],
         git_branch: options[:git_branch] || ios_config[:git_branch],
         git_private_key: options[:git_private_key] || ios_config[:match_git_private_key],
@@ -383,25 +383,25 @@ platform :ios do
   ###################
 
   desc "Build Ios application"
-    lane :build_ios do |options|
-        ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
-        build_ios_app(
+  lane :build_ios do |options|
+      ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
+      build_ios_app(
           scheme: ios_config[:scheme],
           project: ios_config[:project_path],
           output_name: ios_config[:output_name],
           output_directory: ios_config[:output_directory],
           skip_codesigning: true,
           skip_archive: true
-        )
-    end
+      )
+  end
 
-    desc "Build Signed Ios application"
-    lane :build_signed_ios do |options|
-        setup_ci_if_needed
-        load_api_key(options)
-        fetch_certificates_with_match(options)
-        build_ios_project(options)
-    end
+  desc "Build Signed Ios application"
+  lane :build_signed_ios do |options|
+      setup_ci_if_needed
+      load_api_key(options)
+      fetch_certificates_with_match(options)
+      build_ios_project(options)
+  end
 
   desc "Increment build number from latest Firebase release"
   lane :increment_version do |options|

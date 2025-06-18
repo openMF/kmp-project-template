@@ -438,7 +438,7 @@ platform :ios do
 
     increment_version(serviceCredsFile: firebase_config[:serviceCredsFile])
 
-    build_ios(
+    build_signed_ios(
         options.merge(
             match_type: "adhoc",
             provisioning_profile_name: "match AdHoc org.mifos.kmp.template"

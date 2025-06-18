@@ -9,9 +9,8 @@
   "alcoholTobaccoOrDrugUseOrReferences": "NONE",
   "gamblingSimulated": "NONE",
   "sexualContentOrNudity": "NONE",
-  "graphicSexualContentAndNudity": "NONE",
   "contests": "NONE",
+  "medicalOrTreatmentInformation": "NONE",
   "unrestrictedWebAccess": false,
-  "gambling": false,
-  "purchasableLootBoxes": false
+  "gambling": false
 }

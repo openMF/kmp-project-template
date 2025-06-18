@@ -543,6 +543,7 @@ platform :ios do
         force: true, # Skips HTML report verification
         precheck_include_in_app_purchases: false,
         overwrite_screenshots: true,
+        reject_if_possible: true,
         app_rating_config_path: ios_config[:app_rating_config_path],
         submission_information: {
           add_id_info_uses_idfa: false,

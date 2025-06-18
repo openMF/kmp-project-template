@@ -2,16 +2,16 @@
   "violenceCartoonOrFantasy": "NONE",
   "violenceRealistic": "NONE",
   "violenceRealisticProlongedGraphicOrSadistic": "NONE",
-  "sexualContentGraphicAndNudity": "NONE",
-  "sexualContentOrNudity": "NONE",
-  "matureOrSuggestiveThemes": "NONE",
   "profanityOrCrudeHumor": "NONE",
+  "matureOrSuggestiveThemes": "NONE",
   "horrorOrFearThemes": "NONE",
+  "sexualContentGraphicAndNudity": "NONE",
   "alcoholTobaccoOrDrugUseOrReferences": "NONE",
-  "medicalOrTreatmentInformation": "NONE",
   "gamblingSimulated": "NONE",
+  "sexualContentOrNudity": "NONE",
+  "graphicSexualContentAndNudity": "NONE",
   "contests": "NONE",
+  "unrestrictedWebAccess": false,
   "gambling": false,
-  "seventeenPlus": false,
-  "unrestrictedWebAccess": false
+  "purchasableLootBoxes": false
 }

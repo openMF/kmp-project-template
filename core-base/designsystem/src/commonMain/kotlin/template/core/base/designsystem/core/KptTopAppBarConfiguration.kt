@@ -17,7 +17,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 
-// Enhanced TopAppBar Variant System
 sealed interface TopAppBarVariant : ComponentVariant {
     override val name: String
 
@@ -63,7 +62,6 @@ data class TopAppBarAction(
     val enabled: Boolean = true,
 )
 
-// DSL Builder
 @DslMarker
 annotation class TopAppBarDsl
 
@@ -117,7 +115,6 @@ class KptTopAppBarBuilder {
     )
 }
 
-// DSL Function
 fun kptTopAppBar(block: KptTopAppBarBuilder.() -> Unit): KptTopAppBarConfiguration {
     return KptTopAppBarBuilder().apply(block).build()
 }

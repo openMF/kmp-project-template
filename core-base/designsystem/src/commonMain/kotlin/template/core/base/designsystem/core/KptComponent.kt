@@ -40,63 +40,51 @@ interface Themeable {
     val theme: ComponentTheme?
 }
 
-// Base component colors interface
 interface ComponentColors
 
-// Base component elevation interface
 interface ComponentElevation
 
-// Base component theme interface
 interface ComponentTheme
 
-// Strategy Pattern: Different theming strategies
 interface ThemeStrategy {
     fun applyTheme(component: KptComponent): ComponentTheme
 }
 
-// Factory Pattern: Component creation
 interface ComponentFactory<T : KptComponent> {
     fun create(configuration: ComponentConfiguration): T
 }
 
-// Builder Pattern: Complex component configuration
 interface ComponentConfiguration {
     fun build(): KptComponent
 }
 
-// Component state management
 @Stable
 interface ComponentState<T> {
     val value: T
     fun update(newValue: T)
 }
 
-// Enhanced variant system using sealed classes (Open/Closed Principle)
 sealed interface ComponentVariant {
     val name: String
     val isEnabled: Boolean get() = true
 }
 
-// Composition utilities
 interface ComponentComposer {
     @Composable
     fun compose(components: List<KptComponent>): Unit
 }
 
-// Animation support
 interface Animatable {
     val animationDuration: Long
     val animationEasing: androidx.compose.animation.core.Easing?
 }
 
-// Accessibility support
 interface AccessibilityProvider {
     val semantics: androidx.compose.ui.semantics.SemanticsPropertyReceiver.() -> Unit
     val contentDescription: String?
     val role: androidx.compose.ui.semantics.Role?
 }
 
-// Theme provider interface
 interface KptThemeProvider {
     val colors: KptColorScheme
     val typography: KptTypography
@@ -105,7 +93,6 @@ interface KptThemeProvider {
     val elevation: KptElevation
 }
 
-// Enhanced color system
 @Stable
 interface KptColorScheme {
     val primary: Color
@@ -134,7 +121,6 @@ interface KptColorScheme {
     val outlineVariant: Color
 }
 
-// Typography system
 @Stable
 interface KptTypography {
     val displayLarge: androidx.compose.ui.text.TextStyle
@@ -154,7 +140,6 @@ interface KptTypography {
     val labelSmall: androidx.compose.ui.text.TextStyle
 }
 
-// Shape system
 @Stable
 interface KptShapes {
     val extraSmall: Shape
@@ -164,7 +149,6 @@ interface KptShapes {
     val extraLarge: Shape
 }
 
-// Spacing system
 @Stable
 interface KptSpacing {
     val xs: Dp
@@ -175,7 +159,6 @@ interface KptSpacing {
     val xxl: Dp
 }
 
-// Elevation system
 @Stable
 interface KptElevation {
     val level0: Dp
@@ -186,19 +169,16 @@ interface KptElevation {
     val level5: Dp
 }
 
-// Dependency Inversion: Abstract dependencies
 interface ComponentRenderer<T : KptComponent> {
     @Composable
     fun render(component: T)
 }
 
-// Component registry for extensibility
 interface ComponentRegistry {
     fun <T : KptComponent> register(type: KClass<T>, renderer: ComponentRenderer<T>)
     fun <T : KptComponent> getRenderer(type: KClass<T>): ComponentRenderer<T>?
 }
 
-// Enhanced configuration DSL
 @DslMarker
 annotation class ComponentDsl
 

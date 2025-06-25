@@ -33,7 +33,6 @@ import template.core.base.designsystem.core.KptThemeProvider
 import template.core.base.designsystem.core.KptTypography
 import template.core.base.designsystem.core.ThemeStrategy
 
-// Theme implementation following SOLID principles
 @Immutable
 data class KptColorSchemeImpl(
     override val primary: Color = Color(0xFF6750A4),
@@ -194,14 +193,12 @@ data class KptThemeProviderImpl(
     override val elevation: KptElevation = KptElevationImpl(),
 ) : KptThemeProvider
 
-// CompositionLocal providers for theme
 val LocalKptColors = staticCompositionLocalOf<KptColorScheme> { KptColorSchemeImpl() }
 val LocalKptTypography = staticCompositionLocalOf<KptTypography> { KptTypographyImpl() }
 val LocalKptShapes = staticCompositionLocalOf<KptShapes> { KptShapesImpl() }
 val LocalKptSpacing = staticCompositionLocalOf<KptSpacing> { KptSpacingImpl() }
 val LocalKptElevation = staticCompositionLocalOf<KptElevation> { KptElevationImpl() }
 
-// Theme strategy implementations
 class LightThemeStrategy : ThemeStrategy {
     override fun applyTheme(component: KptComponent): ComponentTheme {
         return object : ComponentTheme {}
@@ -214,7 +211,6 @@ class DarkThemeStrategy : ThemeStrategy {
     }
 }
 
-// Theme builder with DSL
 @ComponentDsl
 class KptThemeBuilder {
     private var colors: KptColorScheme = KptColorSchemeImpl()
@@ -399,7 +395,6 @@ class KptElevationBuilder {
     )
 }
 
-// Theme composable with Material 3 integration
 @Composable
 fun KptTheme(
     theme: KptThemeProvider = KptThemeProviderImpl(),
@@ -418,7 +413,6 @@ fun KptTheme(
     }
 }
 
-// Convenience functions for accessing theme
 object KptTheme {
     val colorScheme: KptColorScheme
         @Composable get() = LocalKptColors.current
@@ -436,7 +430,6 @@ object KptTheme {
         @Composable get() = LocalKptElevation.current
 }
 
-// DSL function for creating themes
 fun kptTheme(block: KptThemeBuilder.() -> Unit): KptThemeProvider {
     return KptThemeBuilder().apply(block).build()
 }

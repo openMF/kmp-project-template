@@ -22,6 +22,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -52,8 +53,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.ThemeBrand
-import template.core.base.designsystem.component.KptButton
-import template.core.base.designsystem.core.ButtonVariant
 
 @Composable
 fun SettingsDialog(
@@ -114,9 +113,8 @@ fun SettingsDialog(
             }
         },
         confirmButton = {
-            KptButton(
+            Button(
                 onClick = onDismiss,
-                variant = ButtonVariant.Text,
                 modifier = Modifier.padding(horizontal = 8.dp),
             ) {
                 Text(

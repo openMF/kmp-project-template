@@ -32,8 +32,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.TimeZone
 import org.mifos.core.data.utils.NetworkMonitor
 import org.mifos.core.data.utils.TimeZoneMonitor
-import org.mifos.feature.home.HOME_ROUTE
-import org.mifos.feature.home.navigateToHome
+import org.mifos.feature.home.TasksDestination
 import org.mifos.feature.profile.PROFILE_ROUTE
 import org.mifos.feature.profile.navigateToProfile
 
@@ -77,7 +76,7 @@ internal class AppState(
 
     val currentTopLevelDestination: TopLevelDestination?
         @Composable get() = when (currentDestination?.route) {
-            HOME_ROUTE -> TopLevelDestination.HOME
+            TasksDestination.route -> TopLevelDestination.HOME
             PROFILE_ROUTE -> TopLevelDestination.PROFILE
             else -> null
         }
@@ -122,7 +121,7 @@ internal class AppState(
             }
 
             when (topLevelDestination) {
-                TopLevelDestination.HOME -> navController.navigateToHome(topLevelNavOptions)
+                TopLevelDestination.HOME -> navController.navigate(TasksDestination.route, topLevelNavOptions)
                 TopLevelDestination.PROFILE -> navController.navigateToProfile(topLevelNavOptions)
             }
         }

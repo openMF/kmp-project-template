@@ -37,7 +37,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
-import template.core.base.designsystem.config.KptTestTags
 import template.core.base.designsystem.core.KptTopAppBarConfiguration
 import template.core.base.designsystem.core.TopAppBarAction
 import template.core.base.designsystem.core.TopAppBarVariant
@@ -48,7 +47,7 @@ import template.core.base.designsystem.theme.KptTheme
 @Composable
 fun KptTopAppBar(configuration: KptTopAppBarConfiguration) {
     val finalModifier = configuration.modifier
-        .testTag(configuration.testTag ?: KptTestTags.TOP_APP_BAR)
+        .testTag(configuration.testTag ?: "KptTopAppBar")
         .let { mod ->
             if (configuration.contentDescription != null) {
                 mod.semantics { contentDescription = configuration.contentDescription }

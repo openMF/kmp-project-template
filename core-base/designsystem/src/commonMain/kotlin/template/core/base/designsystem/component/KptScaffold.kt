@@ -1,12 +1,3 @@
-/*
- * Copyright 2025 Mifos Initiative
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
- */
 package template.core.base.designsystem.component
 
 import androidx.compose.foundation.layout.Box
@@ -35,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import template.core.base.designsystem.config.KptTestTags
 
 /**
  * A composable scaffold layout for the KPT design system that extends
@@ -94,7 +84,7 @@ fun KptScaffold(
         topBar = topBar,
         bottomBar = bottomBar,
         snackbarHost = snackbarHost,
-        modifier = modifier.testTag(testTag ?: KptTestTags.SCAFFOLD),
+        modifier = modifier.testTag(testTag ?: "KptScaffold"),
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,
         containerColor = containerColor,
@@ -171,7 +161,7 @@ fun KptScaffold(
             }
         },
         modifier = modifier
-            .testTag(KptTestTags.SCAFFOLD)
+            .testTag("KptScaffold")
             .fillMaxSize()
             .navigationBarsPadding()
             .imePadding(),

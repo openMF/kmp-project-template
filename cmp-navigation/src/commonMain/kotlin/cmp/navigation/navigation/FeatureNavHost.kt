@@ -28,12 +28,10 @@ internal fun FeatureNavHost(
 ) {
     NavHost(
         route = NavGraphRoute.MAIN_GRAPH,
-//        startDestination = HOME_ROUTE,
         startDestination = TasksDestination.route,
         navController = navController,
         modifier = modifier,
     ) {
-        // Tasks Screen - Main screen showing a list of tasks
         composable(route = TasksDestination.route) {
             TasksScreen(
                 onAddNewTask = { navController.navigate("${EditTaskDestination.route}/${0}") },
@@ -42,7 +40,6 @@ internal fun FeatureNavHost(
             )
         }
 
-        // Edit Task Screen - Screen to edit or add a new task
         composable(
             route = EditTaskDestination.routeWithArgs,
             arguments = EditTaskDestination.arguments,
@@ -53,16 +50,8 @@ internal fun FeatureNavHost(
             )
         }
 
-//        homeScreen()
-//
-//        profileScreen()
-
         settingsScreen(
             onBackClick = navController::popBackStack,
         )
-
-//        notificationScreen(
-//            onBackClick = navController::popBackStack,
-//        )
     }
 }

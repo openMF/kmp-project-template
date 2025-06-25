@@ -9,31 +9,9 @@
  */
 package template.core.base.designsystem.layout
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Card
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
@@ -47,9 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
-import template.core.base.designsystem.component.KptExpandableCard
-import template.core.base.designsystem.component.KptTabLayout
-import template.core.base.designsystem.component.TabItem
 import template.core.base.designsystem.theme.KptTheme
 import kotlin.math.min
 
@@ -208,99 +183,3 @@ data class BreakpointConfiguration(
     val xlColumns: Int = 12,
 )
 
-// ===== USAGE EXAMPLES =====
-@Composable
-fun LayoutExamples() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Text("Layout Examples", style = KptTheme.typography.headlineMedium)
-
-        // Grid example
-        Text("Responsive Grid", style = KptTheme.typography.titleLarge)
-        KptGrid(
-            modifier = Modifier.height(200.dp),
-        ) {
-            repeat(6) { index ->
-                Card(
-                    modifier = Modifier
-                        .gridItem(span = if (index == 0) 2 else 1)
-                        .height(80.dp),
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text("Item ${index + 1}")
-                    }
-                }
-            }
-        }
-
-        // Flow layout example
-        Text("Flow Layout", style = KptTheme.typography.titleLarge)
-        KptFlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            val chipLabels =
-                listOf("Kotlin", "Compose", "Android", "iOS", "Design System", "Material 3")
-            chipLabels.forEach { label ->
-                FilterChip(
-                    onClick = { },
-                    label = { Text(label) },
-                    selected = false,
-                )
-            }
-        }
-
-        // Expandable card example
-        Text("Expandable Card", style = KptTheme.typography.titleLarge)
-        var expanded by remember { mutableStateOf(false) }
-        KptExpandableCard(
-            title = "Settings",
-            subtitle = "Application preferences",
-            icon = Icons.Default.Settings,
-            expanded = expanded,
-            onExpandedChange = { expanded = it },
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Dark Mode")
-                Switch(checked = false, onCheckedChange = { })
-                Text("Notifications")
-                Switch(checked = true, onCheckedChange = { })
-            }
-        }
-
-        // Tab layout example
-        Text("Tab Layout", style = KptTheme.typography.titleLarge)
-        var selectedTab by remember { mutableIntStateOf(0) }
-        KptTabLayout(
-            tabs = listOf(
-                TabItem("Home", Icons.Default.Home) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text("Home Content")
-                    }
-                },
-                TabItem("Profile", Icons.Default.Person) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text("Profile Content")
-                    }
-                },
-            ),
-            selectedTabIndex = selectedTab,
-            onTabSelected = { selectedTab = it },
-            modifier = Modifier.height(200.dp),
-        )
-    }
-}

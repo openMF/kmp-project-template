@@ -350,10 +350,12 @@ platform :ios do
       match(
         type: options[:match_type] || ios_config[:match_type],
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
-        readonly: true,
+        readonly: false,
         git_url: options[:git_url] || ios_config[:git_url],
         git_branch: options[:git_branch] || ios_config[:git_branch],
-        git_private_key: options[:git_private_key] || ios_config[:match_git_private_key]
+        git_private_key: options[:git_private_key] || ios_config[:match_git_private_key],
+        force_for_new_devices: true,
+        api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
       )
   end
 
@@ -382,7 +384,21 @@ platform :ios do
 
   desc "Build Ios application"
   lane :build_ios do |options|
+      ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
+      build_ios_app(
+          scheme: ios_config[:scheme],
+          project: ios_config[:project_path],
+          output_name: ios_config[:output_name],
+          output_directory: ios_config[:output_directory],
+          skip_codesigning: true,
+          skip_archive: true
+      )
+  end
+
+  desc "Build Signed Ios application"
+  lane :build_signed_ios do |options|
       setup_ci_if_needed
+      load_api_key(options)
       fetch_certificates_with_match(options)
       build_ios_project(options)
   end
@@ -422,7 +438,7 @@ platform :ios do
 
     increment_version(serviceCredsFile: firebase_config[:serviceCredsFile])
 
-    build_ios(
+    build_signed_ios(
         options.merge(
             match_type: "adhoc",
             provisioning_profile_name: "match AdHoc org.mifos.kmp.template"
@@ -503,6 +519,15 @@ platform :ios do
         build_number: latest_build_number + 1
       )
 
+      update_plist(
+        plist_path: ios_config[:plist_path],
+        block: proc do |plist|
+          plist['NSContactsUsageDescription'] = 'This app does not access your contacts. This message is required for compliance only.'
+          plist['NSLocationWhenInUseUsageDescription'] = 'This app does not access your location. This message is required for compliance only.'
+          plist['NSBluetoothAlwaysUsageDescription'] = 'This app does not use Bluetooth. This message is required for compliance only.'
+        end
+      )
+
       build_ios_project(
         options.merge(
             provisioning_profile_name: "match AppStore org.mifos.kmp.template"
@@ -517,6 +542,8 @@ platform :ios do
         skip_app_version_update: true,
         force: true, # Skips HTML report verification
         precheck_include_in_app_purchases: false,
+        overwrite_screenshots: true,
+        reject_if_possible: true,
         app_rating_config_path: ios_config[:app_rating_config_path],
         submission_information: {
           add_id_info_uses_idfa: false,

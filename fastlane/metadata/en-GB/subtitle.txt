@@ -1,1 +1,1 @@
-KMP Cross-Platform Template
+Fast & simple task manager

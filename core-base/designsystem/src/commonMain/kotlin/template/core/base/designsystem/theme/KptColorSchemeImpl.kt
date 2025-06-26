@@ -9,29 +9,24 @@
  */
 package template.core.base.designsystem.theme
 
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import template.core.base.designsystem.core.ComponentDsl
-import template.core.base.designsystem.core.ComponentTheme
 import template.core.base.designsystem.core.KptColorScheme
-import template.core.base.designsystem.core.KptComponent
 import template.core.base.designsystem.core.KptElevation
 import template.core.base.designsystem.core.KptShapes
 import template.core.base.designsystem.core.KptSpacing
 import template.core.base.designsystem.core.KptThemeProvider
 import template.core.base.designsystem.core.KptTypography
-import template.core.base.designsystem.core.ThemeStrategy
 
 @Immutable
 data class KptColorSchemeImpl(
@@ -59,6 +54,18 @@ data class KptColorSchemeImpl(
     override val onSurfaceVariant: Color = Color(0xFF49454F),
     override val outline: Color = Color(0xFF79747E),
     override val outlineVariant: Color = Color(0xFFCAC4D0),
+    override val scrim: Color = Color(0xFF000000),
+    override val inverseSurface: Color = Color(0xFF313033),
+    override val inverseOnSurface: Color = Color(0xFFF4EFF4),
+    override val inversePrimary: Color = Color(0xFFD0BCFF),
+    override val surfaceDim: Color = Color(0xFFDAD6DC),
+    override val surfaceBright: Color = Color(0xFFFFFBFE),
+    override val surfaceContainerLowest: Color = Color(0xFFFFFFFF),
+    override val surfaceContainerLow: Color = Color(0xFFF3EFF4),
+    override val surfaceContainer: Color = Color(0xFFE7E0EC),
+    override val surfaceContainerHigh: Color = Color(0xFFDAD6DC),
+    override val surfaceContainerHighest: Color = Color(0xFFCFC8D0),
+    override val surfaceTint: Color = Color(0xFF6750A4),
 ) : KptColorScheme
 
 @Immutable
@@ -157,11 +164,11 @@ data class KptTypographyImpl(
 
 @Immutable
 data class KptShapesImpl(
-    override val extraSmall: Shape = RoundedCornerShape(4.dp),
-    override val small: Shape = RoundedCornerShape(8.dp),
-    override val medium: Shape = RoundedCornerShape(12.dp),
-    override val large: Shape = RoundedCornerShape(16.dp),
-    override val extraLarge: Shape = RoundedCornerShape(28.dp),
+    override val extraSmall: CornerBasedShape = RoundedCornerShape(4.dp),
+    override val small: CornerBasedShape = RoundedCornerShape(8.dp),
+    override val medium: CornerBasedShape = RoundedCornerShape(12.dp),
+    override val large: CornerBasedShape = RoundedCornerShape(16.dp),
+    override val extraLarge: CornerBasedShape = RoundedCornerShape(28.dp),
 ) : KptShapes
 
 @Immutable
@@ -198,18 +205,6 @@ val LocalKptTypography = staticCompositionLocalOf<KptTypography> { KptTypography
 val LocalKptShapes = staticCompositionLocalOf<KptShapes> { KptShapesImpl() }
 val LocalKptSpacing = staticCompositionLocalOf<KptSpacing> { KptSpacingImpl() }
 val LocalKptElevation = staticCompositionLocalOf<KptElevation> { KptElevationImpl() }
-
-class LightThemeStrategy : ThemeStrategy {
-    override fun applyTheme(component: KptComponent): ComponentTheme {
-        return object : ComponentTheme {}
-    }
-}
-
-class DarkThemeStrategy : ThemeStrategy {
-    override fun applyTheme(component: KptComponent): ComponentTheme {
-        return object : ComponentTheme {}
-    }
-}
 
 @ComponentDsl
 class KptThemeBuilder {
@@ -342,11 +337,11 @@ class KptTypographyBuilder {
 
 @ComponentDsl
 class KptShapesBuilder {
-    var extraSmall: Shape = RoundedCornerShape(4.dp)
-    var small: Shape = RoundedCornerShape(8.dp)
-    var medium: Shape = RoundedCornerShape(12.dp)
-    var large: Shape = RoundedCornerShape(16.dp)
-    var extraLarge: Shape = RoundedCornerShape(28.dp)
+    var extraSmall: CornerBasedShape = RoundedCornerShape(4.dp)
+    var small: CornerBasedShape = RoundedCornerShape(8.dp)
+    var medium: CornerBasedShape = RoundedCornerShape(12.dp)
+    var large: CornerBasedShape = RoundedCornerShape(16.dp)
+    var extraLarge: CornerBasedShape = RoundedCornerShape(28.dp)
 
     fun build(): KptShapes = KptShapesImpl(
         extraSmall = extraSmall,
@@ -393,24 +388,6 @@ class KptElevationBuilder {
         level4 = level4,
         level5 = level5,
     )
-}
-
-@Composable
-fun KptTheme(
-    theme: KptThemeProvider = KptThemeProviderImpl(),
-    content: @Composable () -> Unit,
-) {
-    CompositionLocalProvider(
-        LocalKptColors provides theme.colors,
-        LocalKptTypography provides theme.typography,
-        LocalKptShapes provides theme.shapes,
-        LocalKptSpacing provides theme.spacing,
-        LocalKptElevation provides theme.elevation,
-    ) {
-        MaterialTheme {
-            content()
-        }
-    }
 }
 
 object KptTheme {

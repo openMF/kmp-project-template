@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import template.core.base.designsystem.component.KptScaffold
+import org.mifos.core.designsystem.components.KptScaffold
 
 @Composable
 internal fun ProfileScreen(modifier: Modifier = Modifier) {

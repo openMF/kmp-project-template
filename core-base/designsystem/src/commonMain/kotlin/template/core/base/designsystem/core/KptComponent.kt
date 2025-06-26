@@ -10,6 +10,7 @@
 package template.core.base.designsystem.core
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
@@ -99,6 +100,7 @@ interface KptColorScheme {
     val onPrimary: Color
     val primaryContainer: Color
     val onPrimaryContainer: Color
+    val inversePrimary: Color
     val secondary: Color
     val onSecondary: Color
     val secondaryContainer: Color
@@ -107,18 +109,29 @@ interface KptColorScheme {
     val onTertiary: Color
     val tertiaryContainer: Color
     val onTertiaryContainer: Color
-    val error: Color
-    val onError: Color
-    val errorContainer: Color
-    val onErrorContainer: Color
     val background: Color
     val onBackground: Color
     val surface: Color
     val onSurface: Color
     val surfaceVariant: Color
     val onSurfaceVariant: Color
+    val surfaceTint: Color
+    val inverseSurface: Color
+    val inverseOnSurface: Color
+    val error: Color
+    val onError: Color
+    val errorContainer: Color
+    val onErrorContainer: Color
     val outline: Color
     val outlineVariant: Color
+    val scrim: Color
+    val surfaceBright: Color
+    val surfaceDim: Color
+    val surfaceContainer: Color
+    val surfaceContainerHigh: Color
+    val surfaceContainerHighest: Color
+    val surfaceContainerLow: Color
+    val surfaceContainerLowest: Color
 }
 
 @Stable
@@ -142,11 +155,11 @@ interface KptTypography {
 
 @Stable
 interface KptShapes {
-    val extraSmall: Shape
-    val small: Shape
-    val medium: Shape
-    val large: Shape
-    val extraLarge: Shape
+    val extraSmall: CornerBasedShape
+    val small: CornerBasedShape
+    val medium: CornerBasedShape
+    val large: CornerBasedShape
+    val extraLarge: CornerBasedShape
 }
 
 @Stable

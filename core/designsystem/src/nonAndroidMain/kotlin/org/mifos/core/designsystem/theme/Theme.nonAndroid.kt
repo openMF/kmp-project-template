@@ -10,15 +10,17 @@
 package org.mifos.core.designsystem.theme
 
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 @Composable
-actual fun colorScheme(
+actual fun platformColorScheme(
     useDarkTheme: Boolean,
     dynamicColor: Boolean,
 ): ColorScheme {
-    return when {
-        useDarkTheme -> darkScheme
-        else -> lightScheme
+    return when (useDarkTheme) {
+        true -> darkColorScheme()
+        false -> lightColorScheme()
     }
 }

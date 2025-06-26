@@ -11,11 +11,14 @@ package org.mifos.core.designsystem.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import template.core.base.designsystem.KptMaterialTheme
+import template.core.base.designsystem.theme.KptThemeProviderImpl
+import template.core.base.designsystem.toKptColorScheme
+import template.core.base.designsystem.toKptTypography
 
 val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -93,27 +96,43 @@ val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+/**
+ * The main theme composable for the Mifos application.
+ *
+ * This composable uses KptMaterialTheme under the hood to provide seamless integration
+ * between KptTheme design tokens and Material3 theming system.
+ *
+ * @param darkTheme Whether to use dark theme. Defaults to system preference.
+ * @param useDynamicColor Whether to use dynamic color (Android 12+). Defaults to false.
+ * @param androidTheme Whether to use Android-specific theming. Defaults to false.
+ * @param useDynamicColor Whether dynamic theming should be displayed. Defaults to false.
+ * @param content The composable content that will have access to both KptTheme and MaterialTheme.
+ */
 @Composable
 fun MifosTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     androidTheme: Boolean = false,
-    // Dynamic color is available on Android 12+
-    shouldDisplayDynamicTheming: Boolean = true,
+    useDynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
-        androidTheme -> if (darkTheme) darkScheme else lightScheme
-        else -> colorScheme(darkTheme, shouldDisplayDynamicTheming)
-    }
+        useDynamicColor -> platformColorScheme(darkTheme, true)
+        androidTheme -> if (darkTheme) darkColorScheme() else lightColorScheme()
+        else -> if (darkTheme) darkScheme else lightScheme
+    }.toKptColorScheme()
 
-    MifosDesignSystemProvider {
-        MaterialTheme(
-            colorScheme = colorScheme,
-            typography = appTypography(),
-            content = content,
-        )
-    }
+    val mifosTypography = Typography().toKptTypography(fontFamily)
+
+    val themeProvider = KptThemeProviderImpl(
+        colors = colorScheme,
+        typography = mifosTypography,
+    )
+
+    KptMaterialTheme(
+        theme = themeProvider,
+        content = content,
+    )
 }
 
 @Composable
-expect fun colorScheme(useDarkTheme: Boolean, dynamicColor: Boolean): ColorScheme
+expect fun platformColorScheme(useDarkTheme: Boolean, dynamicColor: Boolean): ColorScheme

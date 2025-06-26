@@ -1,8 +1,16 @@
-package template.core.base.designsystem.component
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package org.mifos.core.designsystem.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -26,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import template.core.base.designsystem.component.KptTopAppBar
 
 /**
  * A composable scaffold layout for the KPT design system that extends
@@ -116,7 +125,6 @@ fun KptScaffold(
     floatingActionButtonContent: FloatingActionButtonContent? = null,
     pullToRefreshState: PullToRefreshStateData = rememberPullToRefreshStateData(),
     snackbarHost: @Composable () -> Unit = {},
-    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable (PaddingValues) -> Unit = {},
 ) {
     Scaffold(

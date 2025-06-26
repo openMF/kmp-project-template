@@ -36,7 +36,7 @@ fun ComposeApp(
     MifosTheme(
         darkTheme = uiState.shouldUseDarkTheme(isSystemInDarkTheme),
         androidTheme = uiState.shouldUseAndroidTheme,
-        shouldDisplayDynamicTheming = uiState.shouldDisplayDynamicTheming,
+        useDynamicColor = uiState.shouldDisplayDynamicTheming,
     ) {
         RootNavGraph(
             networkMonitor = networkMonitor,

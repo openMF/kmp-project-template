@@ -182,4 +182,3 @@ data class BreakpointConfiguration(
     val lgColumns: Int = 12,
     val xlColumns: Int = 12,
 )
-

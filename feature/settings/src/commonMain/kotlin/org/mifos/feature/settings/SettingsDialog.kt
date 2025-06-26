@@ -120,7 +120,6 @@ fun SettingsDialog(
                 Text(
                     text = stringResource(resource = Res.string.feature_settings_dismiss_dialog_button_text),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         },

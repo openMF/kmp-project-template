@@ -33,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import template.core.base.designsystem.theme.KptTheme
+import template.core.base.designsystem.KptTheme
 
 /**
  * A composable that briefly enlarges the content to create a bounce effect when triggered.

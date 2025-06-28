@@ -48,4 +48,3 @@ internal fun NavGraphBuilder.authenticatedGraph(
         )
     }
 }
-

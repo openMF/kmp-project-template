@@ -21,15 +21,19 @@ import org.mifos.corebase.network.NetworkError
 import org.mifos.corebase.network.NetworkResult
 
 /**
- * A custom [Converter.Factory] for Ktorfit that provides a suspend response converter which wraps
- * successful or error HTTP responses into a sealed [NetworkResult] type.
+ * A custom [Converter.Factory] for Ktorfit that provides a suspend
+ * response converter which wraps successful or error HTTP responses into a
+ * sealed [NetworkResult] type.
  *
- * This is useful for abstracting error handling logic across your network layer while providing
- * strong typing for both success and failure outcomes.
+ * This is useful for abstracting error handling logic across your network
+ * layer while providing strong typing for both success and failure
+ * outcomes.
  *
  * This converter handles:
- * - HTTP 2xx responses by deserializing the response body into the expected type.
- * - Known HTTP error codes like 400, 401, 404, etc., by mapping them to [NetworkError] types.
+ * - HTTP 2xx responses by deserializing the response body into the
+ *   expected type.
+ * - Known HTTP error codes like 400, 401, 404, etc., by mapping them to
+ *   [NetworkError] types.
  * - Deserialization issues via [SerializationException].
  * - Unknown failures via [KtorfitResult.Failure].
  *
@@ -45,11 +49,13 @@ import org.mifos.corebase.network.NetworkResult
 class ResultSuspendConverterFactory : Converter.Factory {
 
     /**
-     * Creates a [Converter.SuspendResponseConverter] that wraps an HTTP response into a [NetworkResult] type.
+     * Creates a [Converter.SuspendResponseConverter] that wraps an HTTP
+     * response into a [NetworkResult] type.
      *
      * @param typeData Metadata about the expected response type.
      * @param ktorfit The [Ktorfit] instance requesting this converter.
-     * @return A [Converter.SuspendResponseConverter] if the return type is `Result`, or `null` otherwise.
+     * @return A [Converter.SuspendResponseConverter] if the return type is
+     *    `Result`, or `null` otherwise.
      */
     override fun suspendResponseConverter(
         typeData: TypeData,
@@ -61,10 +67,12 @@ class ResultSuspendConverterFactory : Converter.Factory {
                 Converter.SuspendResponseConverter<HttpResponse, NetworkResult<Any, NetworkError>> {
 
                 /**
-                 * Converts a [KtorfitResult] into a [NetworkResult], handling success and various failure scenarios.
+                 * Converts a [KtorfitResult] into a [NetworkResult], handling success and
+                 * various failure scenarios.
                  *
                  * @param result The response wrapped in [KtorfitResult].
-                 * @return A [NetworkResult.Success] if the response is successful, or a [NetworkResult.Error] if an error occurred.
+                 * @return A [NetworkResult.Success] if the response is successful, or a
+                 *    [NetworkResult.Error] if an error occurred.
                  */
                 override suspend fun convert(result: KtorfitResult): NetworkResult<Any, NetworkError> {
                     return when (result) {

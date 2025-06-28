@@ -49,6 +49,3 @@ internal fun NavGraphBuilder.authenticatedGraph(
     }
 }
 
-private fun NavController.navigateUpToAuthenticatedNavbarRoot() {
-    this.popBackStack<AuthenticatedNavbarRoute>(inclusive = false)
-}

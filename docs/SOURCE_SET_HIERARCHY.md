@@ -36,6 +36,7 @@ platform similarities:
 | `jvmJsCommon`  | Code shared between JVM and JavaScript platforms | JVM, JS, WebAssembly          |
 | `native`       | Code for all native platforms                    | iOS, macOS, etc.              |
 | `nonNative`    | Code for non-native platforms                    | JS, WebAssembly, JVM, Android |
+| `mobile`       | Code for android and apple platforms             | Android, Apple                |
 
 ### Native Platform Subgroups
 

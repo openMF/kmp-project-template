@@ -17,19 +17,19 @@ import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.SerializationException
-import org.mifos.corebase.network.RemoteError
-import org.mifos.corebase.network.Result
+import org.mifos.corebase.network.NetworkError
+import org.mifos.corebase.network.NetworkResult
 
 /**
  * A custom [Converter.Factory] for Ktorfit that provides a suspend response converter which wraps
- * successful or error HTTP responses into a sealed [Result] type.
+ * successful or error HTTP responses into a sealed [NetworkResult] type.
  *
  * This is useful for abstracting error handling logic across your network layer while providing
  * strong typing for both success and failure outcomes.
  *
  * This converter handles:
  * - HTTP 2xx responses by deserializing the response body into the expected type.
- * - Known HTTP error codes like 400, 401, 404, etc., by mapping them to [RemoteError] types.
+ * - Known HTTP error codes like 400, 401, 404, etc., by mapping them to [NetworkError] types.
  * - Deserialization issues via [SerializationException].
  * - Unknown failures via [KtorfitResult.Failure].
  *
@@ -45,7 +45,7 @@ import org.mifos.corebase.network.Result
 class ResultSuspendConverterFactory : Converter.Factory {
 
     /**
-     * Creates a [Converter.SuspendResponseConverter] that wraps an HTTP response into a [Result] type.
+     * Creates a [Converter.SuspendResponseConverter] that wraps an HTTP response into a [NetworkResult] type.
      *
      * @param typeData Metadata about the expected response type.
      * @param ktorfit The [Ktorfit] instance requesting this converter.
@@ -55,22 +55,22 @@ class ResultSuspendConverterFactory : Converter.Factory {
         typeData: TypeData,
         ktorfit: Ktorfit,
     ): Converter.SuspendResponseConverter<HttpResponse, *>? {
-        if (typeData.typeInfo.type == Result::class) {
+        if (typeData.typeInfo.type == NetworkResult::class) {
             val successType = typeData.typeArgs.first().typeInfo
             return object :
-                Converter.SuspendResponseConverter<HttpResponse, Result<Any, RemoteError>> {
+                Converter.SuspendResponseConverter<HttpResponse, NetworkResult<Any, NetworkError>> {
 
                 /**
-                 * Converts a [KtorfitResult] into a [Result], handling success and various failure scenarios.
+                 * Converts a [KtorfitResult] into a [NetworkResult], handling success and various failure scenarios.
                  *
                  * @param result The response wrapped in [KtorfitResult].
-                 * @return A [Result.Success] if the response is successful, or a [Result.Error] if an error occurred.
+                 * @return A [NetworkResult.Success] if the response is successful, or a [NetworkResult.Error] if an error occurred.
                  */
-                override suspend fun convert(result: KtorfitResult): Result<Any, RemoteError> {
+                override suspend fun convert(result: KtorfitResult): NetworkResult<Any, NetworkError> {
                     return when (result) {
                         is KtorfitResult.Failure -> {
                             println("Failure: " + result.throwable.message)
-                            Result.Error(RemoteError.UNKNOWN)
+                            NetworkResult.Error(NetworkError.UNKNOWN)
                         }
 
                         is KtorfitResult.Success -> {
@@ -80,24 +80,24 @@ class ResultSuspendConverterFactory : Converter.Factory {
                                 in 200..209 -> {
                                     try {
                                         val data = result.response.body(successType) as Any
-                                        Result.Success(data)
+                                        NetworkResult.Success(data)
                                     } catch (e: NoTransformationFoundException) {
-                                        Result.Error(RemoteError.SERIALIZATION)
+                                        NetworkResult.Error(NetworkError.SERIALIZATION)
                                     } catch (e: SerializationException) {
                                         println("Serialization error: ${e.message}")
-                                        Result.Error(RemoteError.SERIALIZATION)
+                                        NetworkResult.Error(NetworkError.SERIALIZATION)
                                     }
                                 }
 
-                                400 -> Result.Error(RemoteError.BAD_REQUEST)
-                                401 -> Result.Error(RemoteError.UNAUTHORIZED)
-                                404 -> Result.Error(RemoteError.NOT_FOUND)
-                                408 -> Result.Error(RemoteError.REQUEST_TIMEOUT)
-                                429 -> Result.Error(RemoteError.TOO_MANY_REQUESTS)
-                                in 500..599 -> Result.Error(RemoteError.SERVER)
+                                400 -> NetworkResult.Error(NetworkError.BAD_REQUEST)
+                                401 -> NetworkResult.Error(NetworkError.UNAUTHORIZED)
+                                404 -> NetworkResult.Error(NetworkError.NOT_FOUND)
+                                408 -> NetworkResult.Error(NetworkError.REQUEST_TIMEOUT)
+                                429 -> NetworkResult.Error(NetworkError.TOO_MANY_REQUESTS)
+                                in 500..599 -> NetworkResult.Error(NetworkError.SERVER)
                                 else -> {
                                     println("Status code $status")
-                                    Result.Error(RemoteError.UNKNOWN)
+                                    NetworkResult.Error(NetworkError.UNKNOWN)
                                 }
                             }
                         }

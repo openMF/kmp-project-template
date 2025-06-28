@@ -33,8 +33,8 @@ import kmp_project_template.feature.settings.generated.resources.Res
 import kmp_project_template.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import kmp_project_template.feature.settings.generated.resources.feature_settings_change_theme_text
 import org.jetbrains.compose.resources.stringResource
-import org.mifos.core.designsystem.components.KptScaffold
 import org.mifos.core.designsystem.icon.AppIcons
+import org.mifos.core.ui.scaffold.KptScaffold
 
 @Composable
 internal fun SettingsScreen(
@@ -72,7 +72,6 @@ internal fun SettingsScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

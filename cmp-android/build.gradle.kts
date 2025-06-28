@@ -83,6 +83,15 @@ dependencies {
     implementation(projects.coreBase.platform)
     implementation(projects.coreBase.ui)
 
+    implementation(projects.core.ui)
+    implementation(projects.core.model)
+    implementation(projects.core.data)
+    implementation(projects.core.datastore)
+
+    implementation(projects.coreBase.ui)
+    implementation(projects.coreBase.platform)
+    implementation(projects.coreBase.datastore)
+
     // Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -98,10 +107,17 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
 
+    implementation(libs.kermit.koin)
+
     implementation(libs.app.update.ktx)
     implementation(libs.app.update)
 
     implementation(libs.coil.kt)
+
+    implementation(libs.filekit.core)
+    implementation(libs.filekit.compose)
+    implementation(libs.filekit.dialog.compose)
+    implementation(libs.filekit.coil)
 
     runtimeOnly(libs.androidx.compose.runtime)
     debugImplementation(libs.androidx.compose.ui.tooling)

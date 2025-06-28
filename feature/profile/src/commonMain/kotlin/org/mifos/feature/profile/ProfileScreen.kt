@@ -12,13 +12,12 @@ package org.mifos.feature.profile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import org.mifos.core.designsystem.components.KptScaffold
+import org.mifos.core.ui.scaffold.KptScaffold
 
 @Composable
 internal fun ProfileScreen(modifier: Modifier = Modifier) {
@@ -34,8 +33,7 @@ internal fun ProfileScreenContent(
     KptScaffold(modifier = modifier) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {

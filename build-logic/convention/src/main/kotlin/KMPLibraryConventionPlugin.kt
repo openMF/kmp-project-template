@@ -21,6 +21,8 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
                 apply("org.convention.kmp.koin")
                 apply("org.convention.detekt.plugin")
                 apply("org.convention.spotless.plugin")
+                apply("org.jetbrains.kotlin.plugin.serialization")
+                apply("org.jetbrains.kotlin.plugin.parcelize")
             }
 
             configureKotlinMultiplatform()
@@ -39,6 +41,7 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
             }
 
             dependencies {
+                add("commonMainImplementation", libs.findLibrary("kotlinx.serialization.json").get())
                 add("commonTestImplementation", libs.findLibrary("kotlin.test").get())
                 add("commonTestImplementation", libs.findLibrary("kotlinx.coroutines.test").get())
             }

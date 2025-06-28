@@ -9,49 +9,145 @@
  */
 package cmp.navigation
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import cmp.navigation.AppAction.Internal.DynamicColorsUpdate
+import cmp.navigation.AppAction.Internal.ScreenCaptureUpdate
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import org.mifos.core.datastore.UserPreferencesRepository
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.model.DarkThemeConfig
-import org.mifos.core.model.ThemeBrand
-import org.mifos.core.model.UserData
+import org.mifos.core.model.LanguageConfig
+import template.core.base.platform.garbage.GarbageCollectionManager
+import template.core.base.ui.BaseViewModel
 
 class AppViewModel(
-    settingsRepository: UserPreferencesRepository,
-) : ViewModel() {
-    val uiState: StateFlow<AppUiState> = settingsRepository.userData
-        .map { userDate ->
-            AppUiState.Success(userDate)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = AppUiState.Loading,
-        )
-}
+    private val settingsRepository: UserDataRepository,
+    private val garbageCollectionManager: GarbageCollectionManager,
+) : BaseViewModel<AppState, AppEvent, AppAction>(
+    initialState = AppState(
+        darkTheme = false,
+        isAndroidTheme = false,
+        isDynamicColorsEnabled = false,
+        isScreenCaptureAllowed = false,
+    ),
+) {
+    init {
+        settingsRepository
+            .observeDarkThemeConfig
+            .onEach { trySendAction(AppAction.Internal.ThemeUpdate(it)) }
+            .launchIn(viewModelScope)
 
-sealed interface AppUiState {
-    data object Loading : AppUiState
-    data class Success(val userData: UserData) : AppUiState {
-        override val shouldDisplayDynamicTheming = userData.useDynamicColor
-        override val shouldUseAndroidTheme = when (userData.themeBrand) {
-            ThemeBrand.DEFAULT -> false
-            ThemeBrand.ANDROID -> true
-        }
+        settingsRepository
+            .observeDynamicColorPreference
+            .onEach { trySendAction(DynamicColorsUpdate(it)) }
+            .launchIn(viewModelScope)
 
-        override fun shouldUseDarkTheme(isSystemInDarkTheme: Boolean): Boolean =
-            when (userData.darkThemeConfig) {
-                DarkThemeConfig.FOLLOW_SYSTEM -> isSystemInDarkTheme
-                DarkThemeConfig.LIGHT -> false
-                DarkThemeConfig.DARK -> true
-            }
+        settingsRepository
+            .observeScreenCapturePreference
+            .onEach { trySendAction(ScreenCaptureUpdate(it)) }
+            .launchIn(viewModelScope)
+
+        settingsRepository
+            .observeLanguage
+            .map { AppEvent.UpdateAppLocale(it.localeName) }
+            .onEach(::sendEvent)
+            .launchIn(viewModelScope)
     }
 
-    val shouldDisplayDynamicTheming: Boolean get() = true
-    val shouldUseAndroidTheme: Boolean get() = false
-    fun shouldUseDarkTheme(isSystemInDarkTheme: Boolean) = isSystemInDarkTheme
+    override fun handleAction(action: AppAction) {
+        when (action) {
+            is AppAction.AppSpecificLanguageUpdate -> handleAppSpecificLanguageUpdate(action)
+
+            is ScreenCaptureUpdate -> handleScreenCaptureUpdate(action)
+
+            is AppAction.Internal.ThemeUpdate -> handleAppThemeUpdated(action)
+
+            is DynamicColorsUpdate -> handleDynamicColorsUpdate(action)
+
+            is AppAction.Internal.CurrentUserStateChange -> handleCurrentUserStateChange()
+
+            is AppAction.Internal.UserUnlockStateChange -> handleUserUnlockStateChange()
+        }
+    }
+
+    private fun handleAppSpecificLanguageUpdate(action: AppAction.AppSpecificLanguageUpdate) {
+        viewModelScope.launch {
+            settingsRepository.setLanguage(action.appLanguage)
+        }
+    }
+
+    private fun handleScreenCaptureUpdate(action: ScreenCaptureUpdate) {
+        mutableStateFlow.update { it.copy(isScreenCaptureAllowed = action.isScreenCaptureEnabled) }
+    }
+
+    private fun handleAppThemeUpdated(action: AppAction.Internal.ThemeUpdate) {
+        mutableStateFlow.update {
+            it.copy(darkTheme = action.theme == DarkThemeConfig.DARK)
+        }
+        sendEvent(AppEvent.UpdateAppTheme(osValue = action.theme.osValue))
+    }
+
+    private fun handleDynamicColorsUpdate(action: DynamicColorsUpdate) {
+        mutableStateFlow.update { it.copy(isDynamicColorsEnabled = action.isDynamicColorsEnabled) }
+    }
+
+    private fun handleUserUnlockStateChange() {
+        recreateUiAndGarbageCollect()
+    }
+
+    private fun handleCurrentUserStateChange() {
+        recreateUiAndGarbageCollect()
+    }
+
+    private fun recreateUiAndGarbageCollect() {
+        sendEvent(AppEvent.Recreate)
+        garbageCollectionManager.tryCollect()
+    }
+}
+
+data class AppState(
+    val darkTheme: Boolean,
+    val isAndroidTheme: Boolean,
+    val isDynamicColorsEnabled: Boolean,
+    val isScreenCaptureAllowed: Boolean,
+)
+
+sealed interface AppEvent {
+    data object Recreate : AppEvent
+
+    data class ShowToast(val message: String) : AppEvent
+
+    data class UpdateAppLocale(
+        val localeName: String?,
+    ) : AppEvent
+
+    data class UpdateAppTheme(
+        val osValue: Int,
+    ) : AppEvent
+}
+
+sealed interface AppAction {
+    data class AppSpecificLanguageUpdate(val appLanguage: LanguageConfig) : AppAction
+
+    sealed class Internal : AppAction {
+
+        data object CurrentUserStateChange : Internal()
+
+        data class ScreenCaptureUpdate(
+            val isScreenCaptureEnabled: Boolean,
+        ) : Internal()
+
+        data class ThemeUpdate(
+            val theme: DarkThemeConfig,
+        ) : Internal()
+
+        data object UserUnlockStateChange : Internal()
+
+        data class DynamicColorsUpdate(
+            val isDynamicColorsEnabled: Boolean,
+        ) : Internal()
+    }
 }

@@ -9,10 +9,10 @@
  */
 package org.mifos.core.model
 
-enum class DarkThemeConfig(val configName: String) {
-    FOLLOW_SYSTEM("Follow System"),
-    LIGHT("Light"),
-    DARK("Dark"),
+enum class DarkThemeConfig(val configName: String, val osValue: Int) {
+    FOLLOW_SYSTEM("Follow System", -1),
+    LIGHT("Light", 1),
+    DARK("Dark", 2),
     ;
 
     companion object {

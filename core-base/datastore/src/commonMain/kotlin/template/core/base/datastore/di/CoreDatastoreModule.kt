@@ -10,9 +10,8 @@
 package template.core.base.datastore.di
 
 import com.russhwolf.settings.Settings
-import org.koin.core.qualifier.named
+import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module
-import org.mifos.core.common.di.AppDispatchers
 import template.core.base.datastore.contracts.ReactiveDataStore
 import template.core.base.datastore.factory.DataStoreFactory
 import template.core.base.datastore.reactive.PreferenceFlowOperators
@@ -37,7 +36,7 @@ val CoreDatastoreModule = module {
     single<ReactivePreferencesRepository> {
         DataStoreFactory()
             .settings(get())
-            .dispatcher(get(named(AppDispatchers.IO.name)))
+            .dispatcher(Dispatchers.Unconfined)
             .cacheSize(200)
             .build()
     }
@@ -46,7 +45,7 @@ val CoreDatastoreModule = module {
     single<ReactiveDataStore> {
         DataStoreFactory()
             .settings(get())
-            .dispatcher(get(named(AppDispatchers.IO.name)))
+            .dispatcher(Dispatchers.Main)
             .cacheSize(200)
             .buildDataStore()
     }

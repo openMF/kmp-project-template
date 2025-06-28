@@ -10,15 +10,16 @@
 package org.mifos.feature.home.task
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.toRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.mifos.feature.home.DateTimeFormatter
-import org.mifos.feature.home.EditTaskDestination
-import org.mifos.feature.home.StorageService
-import org.mifos.feature.home.TaskEntity
+import org.mifos.feature.home.AddEditTaskRoute
 import org.mifos.feature.home.TaskMinderViewModel
 import org.mifos.feature.home.extensions.toClockPattern
+import org.mifos.feature.home.model.TaskEntity
+import org.mifos.feature.home.service.StorageService
+import org.mifos.feature.home.utils.DateTimeFormatter
 
 /**
  * ViewModel for managing the task editing screen. This ViewModel is responsible for
@@ -48,7 +49,7 @@ class EditTaskViewModel(
 
     init {
         // Initializes the task by fetching it from the storage service if a task ID is provided
-        val taskId = savedStateHandle.get<Int>(EditTaskDestination.TASK_ID_ARG)
+        val taskId = savedStateHandle.toRoute<AddEditTaskRoute>().taskId
         if (taskId != null) {
             launchCatching {
                 _task.value = storageService.getTask(taskId) ?: TaskEntity()

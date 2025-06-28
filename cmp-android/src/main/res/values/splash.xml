@@ -18,9 +18,9 @@
     </style>
 
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:statusBarColor">#FFFDFDF5</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
     </style>
 </resources>

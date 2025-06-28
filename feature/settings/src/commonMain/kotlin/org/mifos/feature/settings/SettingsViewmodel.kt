@@ -16,12 +16,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.mifos.core.datastore.UserPreferencesRepository
+import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.ThemeBrand
 
 class SettingsViewmodel(
-    private val settingsRepository: UserPreferencesRepository,
+    private val settingsRepository: UserDataRepository,
 ) : ViewModel() {
     val settingsUiState: StateFlow<SettingsUiState> = settingsRepository.userData
         .map { userDate ->

@@ -68,7 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.feature.home.TaskEntity
+import org.mifos.feature.home.model.TaskEntity
 
 /**
  * A Composable screen that displays the list of tasks along with various controls such as:
@@ -85,8 +85,7 @@ import org.mifos.feature.home.TaskEntity
 @Composable
 fun TasksScreen(
     onSettingsClick: () -> Unit,
-    onAddNewTask: () -> Unit,
-    onTaskClick: (TaskEntity) -> Unit,
+    onAddEditNewTask: (id: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tasksViewModel: TasksViewModel = koinViewModel()
@@ -95,10 +94,12 @@ fun TasksScreen(
 
     TasksScreenContent(
         tasksUiState = tasksUiState,
-        onAddNewTask = onAddNewTask,
+        onAddNewTask = {
+            onAddEditNewTask(null)
+        },
         onSettingsClick = onSettingsClick,
         onTaskDelete = tasksViewModel::deleteTask,
-        onTaskClick = onTaskClick,
+        onTaskClick = onAddEditNewTask,
         onTaskCheckedChange = tasksViewModel::flagTask,
         tasks = tasks,
         onYearSelected = tasksViewModel::updateSelectedYear,
@@ -134,7 +135,7 @@ fun TasksScreenContent(
     onAddNewTask: () -> Unit,
     onSettingsClick: () -> Unit,
     onTaskDelete: (Int) -> Unit,
-    onTaskClick: (TaskEntity) -> Unit,
+    onTaskClick: (Int) -> Unit,
     onTaskCheckedChange: (TaskEntity) -> Unit,
     tasks: List<TaskEntity>,
     onYearSelected: (Int) -> Unit,
@@ -192,7 +193,9 @@ fun TasksScreenContent(
             TaskItemList(
                 tasks = tasks,
                 onTaskDelete = onTaskDelete,
-                onTaskClick = onTaskClick,
+                onTaskClick = {
+                    onTaskClick(it.id)
+                },
                 onTaskCheckedChange = onTaskCheckedChange,
                 modifier = Modifier.padding(
                     start = 10.dp,
@@ -268,10 +271,12 @@ fun YearPicker(
                 text = selectedYear.toString(),
                 modifier = Modifier,
             )
-            IconButton(onClick = {
-                intentionallyDismissed = true
-                expanded = !expanded
-            }) {
+            IconButton(
+                onClick = {
+                    intentionallyDismissed = true
+                    expanded = !expanded
+                },
+            ) {
                 Icon(
                     imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Select year",

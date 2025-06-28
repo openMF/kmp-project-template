@@ -9,8 +9,39 @@
  */
 package org.mifos.core.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserData(
-    val themeBrand: ThemeBrand = ThemeBrand.DEFAULT,
-    val darkThemeConfig: DarkThemeConfig = DarkThemeConfig.FOLLOW_SYSTEM,
-    val useDynamicColor: Boolean = false,
-)
+    val activeUserId: String,
+    val themeBrand: ThemeBrand,
+    val darkThemeConfig: DarkThemeConfig,
+    val useDynamicColor: Boolean,
+    val appLanguage: LanguageConfig,
+    val showOnboarding: Boolean,
+    val firstTimeUser: Boolean,
+    val isAuthenticated: Boolean,
+    val isUnlocked: Boolean,
+    val passcode: String,
+    val enableScreenCapture: Boolean,
+    val isPasscodeEnabled: Boolean,
+    val isBiometricsEnabled: Boolean,
+) {
+    companion object {
+        val DEFAULT = UserData(
+            activeUserId = "",
+            passcode = "1234",
+            themeBrand = ThemeBrand.DEFAULT,
+            darkThemeConfig = DarkThemeConfig.FOLLOW_SYSTEM,
+            useDynamicColor = false,
+            appLanguage = LanguageConfig.DEFAULT,
+            isAuthenticated = true,
+            isUnlocked = true,
+            isPasscodeEnabled = false,
+            isBiometricsEnabled = false,
+            showOnboarding = false,
+            firstTimeUser = false,
+            enableScreenCapture = false,
+        )
+    }
+}

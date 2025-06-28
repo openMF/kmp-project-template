@@ -20,11 +20,23 @@ import template.core.base.ui.rememberImageLoader
 
 @Composable
 fun SharedApp(
+    updateScreenCapture: (isScreenCaptureAllowed: Boolean) -> Unit,
+    handleRecreate: () -> Unit,
+    handleThemeMode: (osValue: Int) -> Unit,
+    handleAppLocale: (locale: String?) -> Unit,
     modifier: Modifier = Modifier,
+    onSplashScreenRemoved: () -> Unit,
 ) {
     LocalManagerProvider(LocalContext.current) {
         LocalImageLoaderProvider(rememberImageLoader(LocalPlatformContext.current)) {
-            ComposeApp(modifier = modifier)
+            ComposeApp(
+                updateScreenCapture = updateScreenCapture,
+                handleRecreate = handleRecreate,
+                handleThemeMode = handleThemeMode,
+                handleAppLocale = handleAppLocale,
+                onSplashScreenRemoved = onSplashScreenRemoved,
+                modifier = modifier,
+            )
         }
     }
 }

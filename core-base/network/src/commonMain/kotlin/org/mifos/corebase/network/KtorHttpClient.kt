@@ -28,6 +28,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import co.touchlab.kermit.Logger.Companion as KermitLogger
 
 expect fun httpClient(config: HttpClientConfig<*>.() -> Unit): HttpClient
 
@@ -148,11 +149,14 @@ fun setupDefaultHttpClient(
         sanitizeHeader { header ->
             header in sensitiveHeaders
         }
+        logger = object : Logger {
+            override fun log(message: String) {
+                KermitLogger.d(tag = "KtorClient", messageString = message)
+            }
+        }
     }
 
     install(ContentNegotiation) {
-        json(
-            jsonConfig,
-        )
+        json(jsonConfig)
     }
 }

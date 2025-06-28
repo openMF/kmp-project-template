@@ -9,8 +9,6 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
-    alias(libs.plugins.kotlin.parcelize)
-    id("kotlinx-serialization")
 }
 
 android {
@@ -31,14 +29,26 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.network)
             implementation(projects.core.analytics)
-            implementation(libs.kotlinx.serialization.json)
+
+            implementation(projects.coreBase.common)
+            implementation(projects.coreBase.network)
+
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.connectivity.core)
         }
 
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.tracing.ktx)
             implementation(libs.koin.android)
+        }
+
+        mobileMain.dependencies {
+            implementation(libs.connectivity.device)
+        }
+
+        jvmJsCommonMain.dependencies {
+            implementation(libs.connectivity.http)
         }
     }
 }

@@ -34,8 +34,8 @@ class AndroidApp : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         initKoin {
-            androidContext(this@AndroidApp) // Provides the Android app context
-            androidLogger() // Enables Koin's logging for debugging
+            androidContext(this@AndroidApp)
+            androidLogger()
         }
     }
 

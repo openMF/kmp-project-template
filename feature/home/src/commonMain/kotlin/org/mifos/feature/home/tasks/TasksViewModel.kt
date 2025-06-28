@@ -22,10 +22,10 @@ import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.plus
-import org.mifos.feature.home.StorageService
-import org.mifos.feature.home.TaskEntity
 import org.mifos.feature.home.TaskMinderViewModel
 import org.mifos.feature.home.extensions.formatDay
+import org.mifos.feature.home.model.TaskEntity
+import org.mifos.feature.home.service.StorageService
 
 /**
  * The ViewModel for managing the tasks UI state and interacting with the StorageService.

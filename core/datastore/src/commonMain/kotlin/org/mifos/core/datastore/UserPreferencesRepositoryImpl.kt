@@ -7,124 +7,175 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+@file:OptIn(ExperimentalSerializationApi::class, ExperimentalSettingsApi::class)
+
 package org.mifos.core.datastore
 
+import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.serialization.decodeValue
+import com.russhwolf.settings.serialization.decodeValueOrNull
+import com.russhwolf.settings.serialization.encodeValue
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.ExperimentalSerializationApi
 import org.mifos.core.model.DarkThemeConfig
+import org.mifos.core.model.LanguageConfig
 import org.mifos.core.model.ThemeBrand
 import org.mifos.core.model.UserData
-import template.core.base.datastore.repository.ReactivePreferencesRepository
+import template.core.base.common.manager.DispatcherManager
 
-/**
- * Implementation of UserPreferencesRepository using the reactive datastore.
- *
- * This implementation leverages the reactive capabilities of the datastore to provide
- * real-time updates to preferences and maintains a combined userData flow.
- */
+private const val USER_DATA_KEY = "user_data_key"
+
 class UserPreferencesRepositoryImpl(
-    private val preferencesStore: ReactivePreferencesRepository,
+    private val settings: Settings,
+    private val dispatcher: DispatcherManager,
 ) : UserPreferencesRepository {
 
-    companion object {
-        private const val THEME_BRAND_KEY = "theme_brand"
-        private const val DARK_THEME_CONFIG_KEY = "dark_theme_config"
-        private const val DYNAMIC_COLOR_KEY = "use_dynamic_color"
+    private val _userData = MutableStateFlow(
+        settings.decodeValue(
+            key = USER_DATA_KEY,
+            serializer = UserData.serializer(),
+            defaultValue = settings.decodeValueOrNull(
+                key = USER_DATA_KEY,
+                serializer = UserData.serializer(),
+            ) ?: UserData.DEFAULT,
+        ),
+    )
 
-        // Default values
-        private val DEFAULT_THEME_BRAND = ThemeBrand.DEFAULT
-        private val DEFAULT_DARK_THEME_CONFIG = DarkThemeConfig.FOLLOW_SYSTEM
-        private const val DEFAULT_DYNAMIC_COLOR = false
-    }
+    override val userData: StateFlow<UserData>
+        get() = _userData.asStateFlow()
 
-    /**
-     * Reactive userData flow that combines all user preferences.
-     * Automatically updates whenever any preference changes.
-     */
-    override val userData: Flow<UserData> = combine(
-        observeThemeBrand(),
-        observeDarkThemeConfig(),
-        observeDynamicColorPreference(),
-    ) { themeBrand, darkThemeConfig, useDynamicColor ->
-        UserData(
-            themeBrand = themeBrand,
-            darkThemeConfig = darkThemeConfig,
-            useDynamicColor = useDynamicColor,
-        )
-    }.distinctUntilChanged()
+    override val authToken: String?
+        get() = null
 
-    // Theme Brand Operations
-    override suspend fun setThemeBrand(themeBrand: ThemeBrand): Result<Unit> {
-        return preferencesStore.savePreference(THEME_BRAND_KEY, themeBrand.brandName)
-    }
+    override val passcode: String
+        get() = _userData.value.passcode
 
-    override suspend fun getThemeBrand(): Result<ThemeBrand> {
-        return preferencesStore.getPreference(THEME_BRAND_KEY, DEFAULT_THEME_BRAND.brandName)
-            .map { brandName -> ThemeBrand.fromString(brandName) }
-    }
+    override val observeLanguage: Flow<LanguageConfig>
+        get() = _userData.map { it.appLanguage }
 
-    override fun observeThemeBrand(): Flow<ThemeBrand> {
-        return preferencesStore.observePreference(THEME_BRAND_KEY, DEFAULT_THEME_BRAND.brandName)
-            .map { brandName -> ThemeBrand.fromString(brandName) }
-    }
+    override val observeDarkThemeConfig: Flow<DarkThemeConfig>
+        get() = _userData.map { it.darkThemeConfig }
 
-    // Dark Theme Configuration Operations
-    override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig): Result<Unit> {
-        return preferencesStore.savePreference(DARK_THEME_CONFIG_KEY, darkThemeConfig.name)
-    }
+    override val observeDynamicColorPreference: Flow<Boolean>
+        get() = _userData.map { it.useDynamicColor }
 
-    override suspend fun getDarkThemeConfig(): Result<DarkThemeConfig> {
-        return preferencesStore.getPreference(DARK_THEME_CONFIG_KEY, DEFAULT_DARK_THEME_CONFIG.name)
-            .map { configName -> DarkThemeConfig.fromString(configName) }
-    }
+    override val observeScreenCapturePreference: Flow<Boolean>
+        get() = _userData.map { it.enableScreenCapture }
 
-    override fun observeDarkThemeConfig(): Flow<DarkThemeConfig> {
-        return preferencesStore.observePreference(
-            DARK_THEME_CONFIG_KEY,
-            DEFAULT_DARK_THEME_CONFIG.name,
-        )
-            .map { configName -> DarkThemeConfig.fromString(configName) }
-    }
+    override suspend fun setLanguage(language: LanguageConfig) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(appLanguage = language)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
 
-    // Dynamic Color Preference Operations
-    override suspend fun setDynamicColorPreference(useDynamicColor: Boolean): Result<Unit> {
-        return preferencesStore.savePreference(DYNAMIC_COLOR_KEY, useDynamicColor)
-    }
+    override suspend fun setThemeBrand(themeBrand: ThemeBrand) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(themeBrand = themeBrand)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
 
-    override suspend fun getDynamicColorPreference(): Result<Boolean> {
-        return preferencesStore.getPreference(DYNAMIC_COLOR_KEY, DEFAULT_DYNAMIC_COLOR)
-    }
+    override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(darkThemeConfig = darkThemeConfig)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
 
-    override fun observeDynamicColorPreference(): Flow<Boolean> {
-        return preferencesStore.observePreference(DYNAMIC_COLOR_KEY, DEFAULT_DYNAMIC_COLOR)
-    }
+    override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(useDynamicColor = useDynamicColor)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
 
-    // Batch Operations
-    override suspend fun resetToDefaults(): Result<Unit> {
-        return runCatching {
-            setThemeBrand(DEFAULT_THEME_BRAND).getOrThrow()
-            setDarkThemeConfig(DEFAULT_DARK_THEME_CONFIG).getOrThrow()
-            setDynamicColorPreference(DEFAULT_DYNAMIC_COLOR).getOrThrow()
+    override suspend fun setIsAuthenticated(isAuthenticated: Boolean) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(isAuthenticated = isAuthenticated)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
+
+    override suspend fun setIsUnlocked(isUnlocked: Boolean) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(isUnlocked = isUnlocked)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
+
+    override suspend fun setIsPasscodeEnabled(isPasscodeEnabled: Boolean) =
+        withContext(dispatcher.io) {
+            val newPreference =
+                settings.getUserPreference().copy(isPasscodeEnabled = isPasscodeEnabled)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
+
+    override suspend fun setIsBiometricsEnabled(isBiometricsEnabled: Boolean) =
+        withContext(dispatcher.io) {
+            val newPreference =
+                settings.getUserPreference().copy(isBiometricsEnabled = isBiometricsEnabled)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
+
+    override suspend fun setShowOnboarding(showOnboarding: Boolean) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(showOnboarding = showOnboarding)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
+
+    override suspend fun setFirstTimeState(firstTimeState: Boolean) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(firstTimeUser = firstTimeState)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
+
+    override suspend fun setPasscode(passcode: String) {
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(passcode = passcode)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
         }
     }
 
-    override suspend fun exportPreferences(): Result<UserData> {
-        return runCatching {
-            UserData(
-                themeBrand = getThemeBrand().getOrThrow(),
-                darkThemeConfig = getDarkThemeConfig().getOrThrow(),
-                useDynamicColor = getDynamicColorPreference().getOrThrow(),
+    override suspend fun setScreenCapturePreference(isScreenCaptureEnabled: Boolean) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(
+                enableScreenCapture = isScreenCaptureEnabled,
             )
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
         }
-    }
 
-    override suspend fun importPreferences(userData: UserData): Result<Unit> {
-        return runCatching {
-            setThemeBrand(userData.themeBrand).getOrThrow()
-            setDarkThemeConfig(userData.darkThemeConfig).getOrThrow()
-            setDynamicColorPreference(userData.useDynamicColor).getOrThrow()
-        }
+    override suspend fun clearUserData() {
+        setIsAuthenticated(false)
+        // TODO:: Uncomment this line when Unlocked Screen is Present
+        // setIsUnlocked(false)
     }
+}
+
+private fun Settings.getUserPreference(): UserData {
+    return decodeValue(
+        key = USER_DATA_KEY,
+        serializer = UserData.serializer(),
+        defaultValue = UserData.DEFAULT,
+    )
+}
+
+private fun Settings.putUserPreference(preference: UserData) {
+    encodeValue(
+        key = USER_DATA_KEY,
+        serializer = UserData.serializer(),
+        value = preference,
+    )
 }

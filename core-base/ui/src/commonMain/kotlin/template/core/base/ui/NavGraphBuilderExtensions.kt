@@ -11,117 +11,94 @@ package template.core.base.ui
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.runtime.Composable
-import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import kotlin.jvm.JvmSuppressWildcards
+import kotlin.reflect.KType
 
 /**
- * Adds a composable to the navigation graph with slide up/down transitions.
- * Enters with a slide-up animation and exits during pop with a slide-down animation.
- *
- * @param route The route path used for navigation
- * @param arguments Optional navigation arguments for the route
- * @param deepLinks Optional deep links that can navigate to this composable
- * @param content The composable content to be rendered for this destination
+ * A wrapper around [NavGraphBuilder.composable] that supplies slide up/down transitions.
  */
-fun NavGraphBuilder.composableWithSlideTransitions(
-    route: String,
-    arguments: List<NamedNavArgument> = emptyList(),
+inline fun <reified T : Any> NavGraphBuilder.composableWithSlideTransitions(
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
-    this.composable(
-        route = route,
-        arguments = arguments,
+    this.composable<T>(
+        typeMap = typeMap,
         deepLinks = deepLinks,
         enterTransition = TransitionProviders.Enter.slideUp,
         exitTransition = TransitionProviders.Exit.stay,
         popEnterTransition = TransitionProviders.Enter.stay,
         popExitTransition = TransitionProviders.Exit.slideDown,
+        sizeTransform = null,
         content = content,
     )
 }
 
 /**
- * Adds a composable to the navigation graph with no transitions.
- * All transition states use the "stay" animation, resulting in no visible movement.
- *
- * @param route The route path used for navigation
- * @param arguments Optional navigation arguments for the route
- * @param deepLinks Optional deep links that can navigate to this composable
- * @param content The composable content to be rendered for this destination
+ * A wrapper around [NavGraphBuilder.composable] that supplies "stay" transitions.
  */
-fun NavGraphBuilder.composableWithStayTransitions(
-    route: String,
-    arguments: List<NamedNavArgument> = emptyList(),
+inline fun <reified T : Any> NavGraphBuilder.composableWithStayTransitions(
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
-    this.composable(
-        route = route,
-        arguments = arguments,
+    this.composable<T>(
+        typeMap = typeMap,
         deepLinks = deepLinks,
         enterTransition = TransitionProviders.Enter.stay,
         exitTransition = TransitionProviders.Exit.stay,
         popEnterTransition = TransitionProviders.Enter.stay,
         popExitTransition = TransitionProviders.Exit.stay,
+        sizeTransform = null,
         content = content,
     )
 }
 
 /**
- * Adds a composable to the navigation graph with horizontal push transitions.
- * Enters by pushing from the right (pushLeft) and exits during pop by pushing to the right.
+ * A wrapper around [NavGraphBuilder.composable] that supplies push transitions.
  *
- * @param route The route path used for navigation
- * @param arguments Optional navigation arguments for the route
- * @param deepLinks Optional deep links that can navigate to this composable
- * @param content The composable content to be rendered for this destination
+ * This is suitable for screens deeper within a hierarchy that uses push transitions; the root
+ * screen of such a hierarchy should use [composableWithRootPushTransitions].
  */
-fun NavGraphBuilder.composableWithPushTransitions(
-    route: String,
-    arguments: List<NamedNavArgument> = emptyList(),
+inline fun <reified T : Any> NavGraphBuilder.composableWithPushTransitions(
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
-    this.composable(
-        route = route,
-        arguments = arguments,
+    this.composable<T>(
+        typeMap = typeMap,
         deepLinks = deepLinks,
         enterTransition = TransitionProviders.Enter.pushLeft,
         exitTransition = TransitionProviders.Exit.stay,
         popEnterTransition = TransitionProviders.Enter.stay,
         popExitTransition = TransitionProviders.Exit.pushRight,
+        sizeTransform = null,
         content = content,
     )
 }
 
 /**
- * Adds a composable to the navigation graph with specialized root navigation transitions.
- * Stays in place when entering, pushes left when exiting, pushes right when popping enter,
- * and fades out when popping exit.
- *
- * @param route The route path used for navigation
- * @param arguments Optional navigation arguments for the route
- * @param deepLinks Optional deep links that can navigate to this composable
- * @param content The composable content to be rendered for this destination
+ * A wrapper around [NavGraphBuilder.composable] that supplies push transitions to the root screen
+ * in a nested graph that uses push transitions.
  */
-fun NavGraphBuilder.composableWithRootPushTransitions(
-    route: String,
-    arguments: List<NamedNavArgument> = emptyList(),
+inline fun <reified T : Any> NavGraphBuilder.composableWithRootPushTransitions(
+    typeMap: Map<KType, @JvmSuppressWildcards NavType<*>> = emptyMap(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
-    this.composable(
-        route = route,
-        arguments = arguments,
+    this.composable<T>(
+        typeMap = typeMap,
         deepLinks = deepLinks,
         enterTransition = TransitionProviders.Enter.stay,
         exitTransition = TransitionProviders.Exit.pushLeft,
         popEnterTransition = TransitionProviders.Enter.pushRight,
         popExitTransition = TransitionProviders.Exit.fadeOut,
+        sizeTransform = null,
         content = content,
     )
 }

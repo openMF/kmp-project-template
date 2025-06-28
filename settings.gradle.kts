@@ -76,11 +76,13 @@ include(":feature:settings")
 include(":core:database")
 
 include(":core-base:datastore")
+include(":core-base:common")
 include(":core-base:database")
 include(":core-base:network")
 include(":core-base:designsystem")
 include(":core-base:platform")
 include(":core-base:ui")
+include(":core-base:analytics")
 
 check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
     """

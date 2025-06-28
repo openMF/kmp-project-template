@@ -10,13 +10,16 @@
 package cmp.navigation.di
 
 import cmp.navigation.AppViewModel
+import cmp.navigation.authenticatednavbar.AuthenticatedNavbarNavigationViewModel
+import cmp.navigation.rootnav.RootNavViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import org.mifos.core.common.di.DispatchersModule
 import org.mifos.core.data.di.DataModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.feature.home.di.HomeModule
 import org.mifos.feature.settings.SettingsModule
+import template.core.base.common.di.CommonModule
+import template.core.base.platform.di.platformModule
 
 object KoinModules {
     private val dataModule = module {
@@ -24,11 +27,15 @@ object KoinModules {
     }
 
     private val dispatcherModule = module {
-        includes(DispatchersModule)
+        includes(CommonModule)
     }
 
     private val AppModule = module {
+        includes(platformModule)
+
         viewModelOf(::AppViewModel)
+        viewModelOf(::AuthenticatedNavbarNavigationViewModel)
+        viewModelOf(::RootNavViewModel)
     }
 
     private val featureModule = module {

@@ -9,40 +9,49 @@
  */
 package cmp.navigation
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.compose.rememberNavController
-import cmp.navigation.navigation.RootNavGraph
-import org.koin.compose.koinInject
+import cmp.navigation.rootnav.RootNavScreen
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.core.data.utils.NetworkMonitor
-import org.mifos.core.data.utils.TimeZoneMonitor
 import org.mifos.core.designsystem.theme.MifosTheme
+import template.core.base.ui.EventsEffect
 
 @Composable
 fun ComposeApp(
+    updateScreenCapture: (isScreenCaptureAllowed: Boolean) -> Unit,
+    handleRecreate: () -> Unit,
+    handleThemeMode: (osValue: Int) -> Unit,
+    handleAppLocale: (locale: String?) -> Unit,
+    onSplashScreenRemoved: () -> Unit,
     modifier: Modifier = Modifier,
-    networkMonitor: NetworkMonitor = koinInject(),
-    timeZoneMonitor: TimeZoneMonitor = koinInject(),
+    viewModel: AppViewModel = koinViewModel(),
 ) {
-    val viewModel: AppViewModel = koinViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
 
-    val isSystemInDarkTheme = isSystemInDarkTheme()
+    LaunchedEffect(uiState.isScreenCaptureAllowed) {
+        updateScreenCapture(uiState.isScreenCaptureAllowed)
+    }
+
+    EventsEffect(eventFlow = viewModel.eventFlow) { event ->
+        when (event) {
+            is AppEvent.ShowToast -> {}
+            is AppEvent.UpdateAppLocale -> handleAppLocale(event.localeName)
+            is AppEvent.UpdateAppTheme -> handleThemeMode(event.osValue)
+            is AppEvent.Recreate -> handleRecreate()
+        }
+    }
 
     MifosTheme(
-        darkTheme = uiState.shouldUseDarkTheme(isSystemInDarkTheme),
-        androidTheme = uiState.shouldUseAndroidTheme,
-        useDynamicColor = uiState.shouldDisplayDynamicTheming,
+        darkTheme = uiState.darkTheme,
+        androidTheme = uiState.isAndroidTheme,
+        useDynamicColor = uiState.isDynamicColorsEnabled,
     ) {
-        RootNavGraph(
-            networkMonitor = networkMonitor,
-            timeZoneMonitor = timeZoneMonitor,
-            navHostController = rememberNavController(),
+        RootNavScreen(
             modifier = modifier,
+            onSplashScreenRemoved = onSplashScreenRemoved,
         )
     }
 }

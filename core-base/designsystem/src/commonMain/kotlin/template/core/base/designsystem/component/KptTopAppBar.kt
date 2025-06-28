@@ -42,7 +42,6 @@ import template.core.base.designsystem.core.TopAppBarAction
 import template.core.base.designsystem.core.TopAppBarVariant
 import template.core.base.designsystem.theme.KptTheme
 
-// Main Enhanced Component
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KptTopAppBar(configuration: KptTopAppBarConfiguration) {
@@ -146,7 +145,6 @@ fun KptTopAppBar(configuration: KptTopAppBarConfiguration) {
     }
 }
 
-// 1. Simple top app bar
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -162,7 +160,6 @@ fun KptTopAppBar(
     )
 }
 
-// 2. With navigation
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -170,6 +167,7 @@ fun KptTopAppBar(
     modifier: Modifier = Modifier,
     navigationIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack,
     variant: TopAppBarVariant = TopAppBarVariant.Small,
+    actions: List<TopAppBarAction> = emptyList(),
 ) {
     KptTopAppBar(
         KptTopAppBarConfiguration(
@@ -178,11 +176,33 @@ fun KptTopAppBar(
             variant = variant,
             navigationIcon = navigationIcon,
             onNavigationIonClick = onNavigationIconClick,
+            actions = actions,
         ),
     )
 }
 
-// 3. With subtitle
+@Composable
+fun KptTopAppBar(
+    title: String,
+    showNavigationIcon: Boolean,
+    onNavigationIconClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack,
+    variant: TopAppBarVariant = TopAppBarVariant.Small,
+    actions: List<TopAppBarAction> = emptyList(),
+) {
+    KptTopAppBar(
+        KptTopAppBarConfiguration(
+            title = title,
+            modifier = modifier,
+            variant = variant,
+            navigationIcon = if (showNavigationIcon) navigationIcon else null,
+            onNavigationIonClick = onNavigationIconClick,
+            actions = actions,
+        ),
+    )
+}
+
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -204,7 +224,6 @@ fun KptTopAppBar(
     )
 }
 
-// 4. With single action
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -230,7 +249,6 @@ fun KptTopAppBar(
     )
 }
 
-// 5. Search app bar
 @Composable
 fun KptSearchAppBar(
     searchQuery: String,
@@ -276,7 +294,6 @@ fun KptSearchAppBar(
     )
 }
 
-// 6. Profile app bar
 @Composable
 fun KptProfileAppBar(
     title: String,
@@ -303,7 +320,6 @@ fun KptProfileAppBar(
     )
 }
 
-// 7. Settings app bar
 @Composable
 fun KptSettingsAppBar(
     title: String = "Settings",
@@ -333,7 +349,6 @@ fun KptSettingsAppBar(
     )
 }
 
-// 8. Specific variant convenience functions
 @Composable
 fun KptSmallTopAppBar(
     title: String,

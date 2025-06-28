@@ -52,6 +52,7 @@ import template.core.base.datastore.validation.PreferencesValidator
  *     .build()
  * ```
  */
+@Deprecated("Use Settings Library instead")
 class DataStoreFactory {
     private var settings: Settings? = null
     private var dispatcher: CoroutineDispatcher = Dispatchers.Default

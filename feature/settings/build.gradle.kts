@@ -9,7 +9,6 @@
  */
 plugins {
     alias(libs.plugins.cmp.feature.convention)
-    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -19,7 +18,7 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.core.datastore)
+            implementation(projects.core.data)
             implementation(projects.core.model)
             implementation(projects.coreBase.ui)
 
@@ -28,8 +27,6 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-
-            implementation(libs.kotlinx.serialization.json)
         }
     }
 }

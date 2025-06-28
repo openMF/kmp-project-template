@@ -56,6 +56,7 @@ kotlin {
 
             implementation(libs.filekit.core)
             implementation(libs.filekit.compose)
+            implementation(libs.filekit.coil)
         }
         androidInstrumentedTest.dependencies {
             implementation(libs.bundles.androidx.compose.ui.test)

@@ -20,17 +20,20 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.coreBase.platform)
-            implementation(libs.calf.permissions)
+            implementation(projects.coreBase.datastore)
+
 
             implementation(compose.ui)
-            implementation(compose.foundation)
             implementation(compose.material3)
+            implementation(compose.foundation)
             implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.kotlinx.serialization.json)
-            implementation(libs.kotlinx.datetime)
             implementation(compose.materialIconsExtended)
-            implementation(projects.coreBase.datastore)
+            implementation(compose.components.uiToolingPreview)
+
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.serialization.json)
+
+            implementation(libs.calf.permissions)
         }
     }
 }

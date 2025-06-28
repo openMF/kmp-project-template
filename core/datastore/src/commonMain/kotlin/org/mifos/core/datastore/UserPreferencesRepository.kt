@@ -10,41 +10,58 @@
 package org.mifos.core.datastore
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import org.mifos.core.model.DarkThemeConfig
+import org.mifos.core.model.LanguageConfig
 import org.mifos.core.model.ThemeBrand
 import org.mifos.core.model.UserData
 
 /**
- * Repository interface for managing user preferences with reactive capabilities.
+ * Repository interface for managing user preferences with reactive
+ * capabilities.
  *
- * This interface provides reactive access to user preferences including theme settings,
- * dark mode configuration, and dynamic color preferences.
+ * This interface provides reactive access to user preferences including
+ * theme settings, dark mode configuration, and dynamic color preferences.
  */
 interface UserPreferencesRepository {
 
-    /**
-     * Reactive stream of current user data combining all preferences.
-     * Emits whenever any preference changes.
-     */
-    val userData: Flow<UserData>
+    val userData: StateFlow<UserData>
 
-    // Theme Brand Operations
-    suspend fun setThemeBrand(themeBrand: ThemeBrand): Result<Unit>
-    suspend fun getThemeBrand(): Result<ThemeBrand>
-    fun observeThemeBrand(): Flow<ThemeBrand>
+    val authToken: String?
 
-    // Dark Theme Configuration Operations
-    suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig): Result<Unit>
-    suspend fun getDarkThemeConfig(): Result<DarkThemeConfig>
-    fun observeDarkThemeConfig(): Flow<DarkThemeConfig>
+    val passcode: String
 
-    // Dynamic Color Preference Operations
-    suspend fun setDynamicColorPreference(useDynamicColor: Boolean): Result<Unit>
-    suspend fun getDynamicColorPreference(): Result<Boolean>
-    fun observeDynamicColorPreference(): Flow<Boolean>
+    val observeLanguage: Flow<LanguageConfig>
 
-    // Batch Operations
-    suspend fun resetToDefaults(): Result<Unit>
-    suspend fun exportPreferences(): Result<UserData>
-    suspend fun importPreferences(userData: UserData): Result<Unit>
+    val observeDarkThemeConfig: Flow<DarkThemeConfig>
+
+    val observeDynamicColorPreference: Flow<Boolean>
+
+    val observeScreenCapturePreference: Flow<Boolean>
+
+    suspend fun setLanguage(language: LanguageConfig)
+
+    suspend fun setThemeBrand(themeBrand: ThemeBrand)
+
+    suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
+
+    suspend fun setDynamicColorPreference(useDynamicColor: Boolean)
+
+    suspend fun setIsAuthenticated(isAuthenticated: Boolean)
+
+    suspend fun setIsUnlocked(isUnlocked: Boolean)
+
+    suspend fun setIsPasscodeEnabled(isPasscodeEnabled: Boolean)
+
+    suspend fun setIsBiometricsEnabled(isBiometricsEnabled: Boolean)
+
+    suspend fun setShowOnboarding(showOnboarding: Boolean)
+
+    suspend fun setFirstTimeState(firstTimeState: Boolean)
+
+    suspend fun setPasscode(passcode: String)
+
+    suspend fun setScreenCapturePreference(isScreenCaptureEnabled: Boolean)
+
+    suspend fun clearUserData()
 }

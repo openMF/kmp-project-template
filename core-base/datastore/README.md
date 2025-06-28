@@ -1,4 +1,9 @@
-# Core Datastore Module
+# Core Datastore Module [Deprecated]
+
+> \[!Important]
+> This module serves as a demonstration of Architecture & SOLID Pattern principles with comprehensive unit testing. The
+> settings library already provides the same functionality, and under the hood it'd use that library, consider directly
+> using that and this will be removed soon from this project.
 
 A robust, type-safe, and reactive data storage solution for Kotlin Multiplatform projects, built on
 top of [Multiplatform Settings](https://github.com/russhwolf/multiplatform-settings). This module

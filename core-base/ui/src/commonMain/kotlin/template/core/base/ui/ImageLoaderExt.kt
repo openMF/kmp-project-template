@@ -18,6 +18,7 @@ import coil3.PlatformContext
 import coil3.memory.MemoryCache
 import coil3.request.ImageRequest
 import coil3.util.DebugLogger
+import io.github.vinceglb.filekit.coil.addPlatformFileSupport
 
 /**
  * CompositionLocal that provides access to an [ImageLoader] within the composition hierarchy.
@@ -52,6 +53,9 @@ internal fun rememberDefaultImageLoader(context: PlatformContext): ImageLoader {
                     .build()
             }
             .logger(DebugLogger())
+            .components {
+                addPlatformFileSupport()
+            }
             .build()
     }
 }

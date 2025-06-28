@@ -25,6 +25,7 @@ kotlin {
             api(libs.ktor.serialization.kotlinx.json)
             api(libs.ktor.client.auth)
             api(libs.ktorfit.lib)
+            api(libs.kermit.logging)
         }
 
         androidMain.dependencies {

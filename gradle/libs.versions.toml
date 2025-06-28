@@ -56,6 +56,8 @@ ktorfit = "2.5.1"
 koin = "4.0.4"
 koinAnnotationsVersion = "1.4.0-RC4"
 
+connectivity = "1.2.0"
+
 # CMP Libraries
 compose-plugin = "1.8.1"
 coil = "3.1.0"
@@ -66,7 +68,8 @@ mokoPermission = "0.18.0"
 qroseVersion = "1.0.1"
 okioVersion = "3.10.2"
 kermit = "2.0.5"
-fileKit = "0.8.7"
+fileKit = "0.8.8"
+fileKitDialog = "0.10.0-beta04"
 uiBackhandler = "1.8.1"
 wire = "5.0.0"
 
@@ -244,12 +247,16 @@ compose-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compile
 squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okioVersion" }
 back-handler = { group = "com.arkivanov.essenty", name = "back-handler", version.ref = "backHandlerVersion" }
 constraint-layout = { group = "tech.annexflow.compose", name = "constraintlayout-compose-multiplatform", version.ref = "constraintLayout" }
+qrose = { group = "io.github.alexzhirkevich", name = "qrose", version.ref = "qroseVersion" }
+
 filekit-core = { group = "io.github.vinceglb", name = "filekit-core", version.ref = "fileKit" }
 filekit-compose = { group = "io.github.vinceglb", name = "filekit-compose", version.ref = "fileKit" }
-qrose = { group = "io.github.alexzhirkevich", name = "qrose", version.ref = "qroseVersion" }
+filekit-dialog-compose = { group = "io.github.vinceglb", name = "filekit-dialogs-compose", version.ref = "fileKitDialog" }
+filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "fileKitDialog" }
 
 kermit-logging = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
 kermit-simple = { group = "co.touchlab", name = "kermit-simple", version.ref = "kermit" }
+kermit-koin = { group = "co.touchlab", name = "kermit-koin", version.ref = "kermit" }
 
 multiplatform-settings = { group = "com.russhwolf", name = "multiplatform-settings-no-arg", version.ref = "multiplatformSettings" }
 multiplatform-settings-coroutines = { group = "com.russhwolf", name = "multiplatform-settings-coroutines", version.ref = "multiplatformSettings" }
@@ -261,6 +268,13 @@ moko-permission-compose = { group = "dev.icerock.moko", name = "permissions-comp
 
 ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
 window-size = { group = "dev.chrisbanes.material3", name = "material3-window-size-class-multiplatform", version.ref = "windowsSizeClass" }
+
+connectivity-core = { module = "dev.jordond.connectivity:connectivity-core", version.ref = "connectivity" }
+connectivity-device = { module = "dev.jordond.connectivity:connectivity-device", version.ref = "connectivity" }
+connectivity-http = { module = "dev.jordond.connectivity:connectivity-http", version.ref = "connectivity" }
+connectivity-compose = { module = "dev.jordond.connectivity:connectivity-compose", version.ref = "connectivity" }
+connectivity-compose-device = { module = "dev.jordond.connectivity:connectivity-compose-device", version.ref = "connectivity" }
+connectivity-compose-http = { module = "dev.jordond.connectivity:connectivity-compose-http", version.ref = "connectivity" }
 
 [bundles]
 androidx-compose-ui-test = [

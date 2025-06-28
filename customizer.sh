@@ -165,7 +165,7 @@ update_root_project_name() {
 # Function to process module directories
 process_module_dirs() {
     local module_path=$1
-    local src_dirs=("main" "commonMain" "commonTest" "androidMain" "androidTest" "iosMain" "nativeMain" "iosTest" "desktopMain" "desktopTest" "jvmMain" "jvmTest" "jsMain" "jsTest" "wasmJsMain" "wasmJsTest")
+    local src_dirs=("main" "commonMain" "commonTest" "androidMain" "androidTest" "iosMain" "nativeMain" "iosTest" "desktopMain" "desktopTest" "jvmMain" "jvmTest" "jsMain" "jsTest" "wasmJsMain" "wasmJsTest" "nonAndroidMain" "jsCommonMain" "nonJsCommonMain" "jvmCommonMain" "nonJvmCommonMain" "jvmJsCommonMain" "nonNativeMain" "mobileMain")
 
     for src_dir in "${src_dirs[@]}"
     do

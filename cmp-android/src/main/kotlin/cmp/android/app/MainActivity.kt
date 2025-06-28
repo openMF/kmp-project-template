@@ -10,59 +10,94 @@
 package cmp.android.app
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import cmp.shared.SharedApp
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.init
+import org.koin.android.ext.android.inject
+import org.mifos.core.data.repository.NetworkMonitor
+import org.mifos.core.data.repository.UserDataRepository
 import template.core.base.platform.update.AppUpdateManager
 import template.core.base.platform.update.AppUpdateManagerImpl
 import template.core.base.ui.ShareUtils
+import java.util.Locale
 
 /**
- * Main activity class.
- * This class is used to set the content view of the activity.
+ * Main activity class. This class is used to set the content view of the
+ * activity.
  *
  * @constructor Create empty Main activity
  * @see ComponentActivity
  */
+@Suppress("UnusedPrivateProperty")
 class MainActivity : ComponentActivity() {
 
     private lateinit var appUpdateManager: AppUpdateManager
 
-    /**
-     * Called when the activity is starting.
-     * This is where most initialization should go: calling [setContentView(int)] to inflate the activity's UI,
-     */
+    private val userPreferencesRepository: UserDataRepository by inject()
+
+    private val networkMonitor: NetworkMonitor by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        var shouldShowSplashScreen = true
+        installSplashScreen().setKeepOnScreenCondition { shouldShowSplashScreen }
+
         super.onCreate(savedInstanceState)
         appUpdateManager = AppUpdateManagerImpl(this)
 
-        installSplashScreen()
+        val darkThemeConfigFlow = userPreferencesRepository.observeDarkThemeConfig
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        enableEdgeToEdge()
+        setupEdgeToEdge(darkThemeConfigFlow)
 
-        template.core.base.ui.ShareUtils.setActivityProvider { return@setActivityProvider this }
+        ShareUtils.setActivityProvider { return@setActivityProvider this }
+        FileKit.init(this)
 
-        /**
-         * Set the content view of the activity.
-         * @see setContent
-         */
         setContent {
-//            val status = viewModel.networkStatus.collectAsStateWithLifecycle().value
+//            val status = networkMonitor.isOnline.collectAsStateWithLifecycle(false).value
 //
 //            if (status) {
 //                appUpdateManager.checkForAppUpdate()
 //            }
-
-            SharedApp()
+            SharedApp(
+                updateScreenCapture = ::updateScreenCapture,
+                handleRecreate = ::handleRecreate,
+                handleThemeMode = {
+                    AppCompatDelegate.setDefaultNightMode(it)
+                },
+                handleAppLocale = {
+                    it?.let {
+                        AppCompatDelegate.setApplicationLocales(
+                            LocaleListCompat.forLanguageTags(it),
+                        )
+                        Locale.setDefault(Locale(it))
+                    }
+                },
+                onSplashScreenRemoved = {
+                    shouldShowSplashScreen = false
+                },
+            )
         }
     }
 
     override fun onResume() {
         super.onResume()
-        appUpdateManager.checkForResumeUpdateState()
+//        appUpdateManager.checkForResumeUpdateState()
+    }
+
+    private fun handleRecreate() {
+        recreate()
+    }
+
+    private fun updateScreenCapture(isScreenCaptureAllowed: Boolean) {
+        if (isScreenCaptureAllowed) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        } else {
+            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
     }
 }

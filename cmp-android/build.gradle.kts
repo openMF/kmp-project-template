@@ -7,6 +7,7 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+import com.android.build.api.instrumentation.InstrumentationScope
 import org.convention.AppBuildType
 import org.convention.dynamicVersion
 
@@ -74,6 +75,18 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+        }
+    }
+
+    // TODO:: Workaround for Ktor(3.2.0) R8/ProGuard Issue
+    androidComponents {
+        onVariants { variant ->
+            variant.instrumentation.transformClassesWith(
+                FieldSkippingClassVisitor.Factory::class.java,
+                scope = InstrumentationScope.ALL,
+            ) { params ->
+                params.classes.add("io.ktor.client.plugins.Messages")
+            }
         }
     }
 }

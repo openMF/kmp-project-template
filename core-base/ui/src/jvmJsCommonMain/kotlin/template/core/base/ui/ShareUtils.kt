@@ -16,10 +16,8 @@ actual object ShareUtils {
     }
 
     actual suspend fun shareImage(title: String, image: ImageBitmap) {
-      
     }
 
     actual suspend fun shareImage(title: String, byte: ByteArray) {
-
     }
 }

@@ -9,14 +9,18 @@
  */
 package org.mifos.core.common
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 fun formatDate(millis: Long): String {
-    val dateTime = Instant.fromEpochMilliseconds(millis).toLocalDateTime(TimeZone.currentSystemDefault())
-    val day = dateTime.dayOfMonth.toString().padStart(2, '0')
-    val month = dateTime.monthNumber.toString().padStart(2, '0')
+    val dateTime =
+        Instant.fromEpochMilliseconds(millis).toLocalDateTime(TimeZone.currentSystemDefault())
+    val day = dateTime.day.toString().padStart(2, '0')
+    val month = dateTime.month.number.toString().padStart(2, '0')
     val year = dateTime.year
     return "$day/$month/$year"
 }

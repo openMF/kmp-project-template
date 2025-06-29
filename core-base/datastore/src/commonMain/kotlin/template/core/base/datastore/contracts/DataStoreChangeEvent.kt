@@ -9,7 +9,8 @@
  */
 package template.core.base.datastore.contracts
 
-import kotlinx.datetime.Clock.System
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * Represents a change event that occurs in the data store.
@@ -29,6 +30,7 @@ import kotlinx.datetime.Clock.System
  * }
  * ```
  */
+@OptIn(ExperimentalTime::class)
 sealed class DataStoreChangeEvent {
     /**
      * The key associated with the change event. For [StoreCleared], this is typically "*".
@@ -40,7 +42,7 @@ sealed class DataStoreChangeEvent {
      */
     abstract val timestamp: Long
 
-    data class ValueAdded(
+    data class ValueAdded constructor(
         /**
          * Represents the addition of a new value to the data store.
          *
@@ -50,7 +52,7 @@ sealed class DataStoreChangeEvent {
          */
         override val key: String,
         val value: Any?,
-        override val timestamp: Long = System.now().toEpochMilliseconds(),
+        override val timestamp: Long = Clock.System.now().toEpochMilliseconds(),
     ) : DataStoreChangeEvent()
 
     data class ValueUpdated(
@@ -65,7 +67,7 @@ sealed class DataStoreChangeEvent {
         override val key: String,
         val oldValue: Any?,
         val newValue: Any?,
-        override val timestamp: Long = System.now().toEpochMilliseconds(),
+        override val timestamp: Long = Clock.System.now().toEpochMilliseconds(),
     ) : DataStoreChangeEvent()
 
     data class ValueRemoved(
@@ -78,7 +80,7 @@ sealed class DataStoreChangeEvent {
          */
         override val key: String,
         val oldValue: Any?,
-        override val timestamp: Long = System.now().toEpochMilliseconds(),
+        override val timestamp: Long = Clock.System.now().toEpochMilliseconds(),
     ) : DataStoreChangeEvent()
 
     data class StoreCleared(
@@ -89,6 +91,6 @@ sealed class DataStoreChangeEvent {
          * @property timestamp The timestamp of the event.
          */
         override val key: String = "*",
-        override val timestamp: Long = System.now().toEpochMilliseconds(),
+        override val timestamp: Long = Clock.System.now().toEpochMilliseconds(),
     ) : DataStoreChangeEvent()
 }

@@ -46,12 +46,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.feature.home.model.ActionToolbar
 import org.mifos.feature.home.model.TaskEntity
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * Composable for the Edit Task screen.
@@ -290,7 +291,7 @@ fun DateSelectionDialog(
  * @param onDismiss Lambda triggered when the user dismisses or cancels the dialog.
  * @param modifier A [Modifier] for custom styling or layout adjustments.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun TimeSelectionDialog(
     onConfirm: (Int, Int) -> Unit,

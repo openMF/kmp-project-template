@@ -21,27 +21,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
             api(libs.kermit.logging)
-            api(libs.squareup.okio)
-            api(libs.jb.kotlin.stdlib)
             api(libs.kotlinx.datetime)
-        }
-
-        androidMain.dependencies {
-            implementation(libs.kotlinx.coroutines.android)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlinx.coroutines.test)
-        }
-        iosMain.dependencies {
-            api(libs.kermit.simple)
-        }
-        desktopMain.dependencies {
-            implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.kotlin.reflect)
-        }
-        jsMain.dependencies {
-            api(libs.jb.kotlin.stdlib.js)
-            api(libs.jb.kotlin.dom)
         }
     }
 }

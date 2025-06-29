@@ -66,6 +66,12 @@ kotlin {
             implementation(compose.desktop.common)
             implementation(compose.desktop.currentOs)
         }
+
+        jvmJsCommonMain.dependencies {
+            implementation(libs.filekit.core)
+            implementation(libs.filekit.compose)
+            implementation(libs.filekit.coil)
+        }
     }
 }
 

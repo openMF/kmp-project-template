@@ -32,6 +32,10 @@ plugins {
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.moduleGraph) apply true
+    alias(libs.plugins.firebase.crashlytics) apply false
+    alias(libs.plugins.firebase.perf) apply false
+    alias(libs.plugins.gms) apply false
+    alias(libs.plugins.roborazzi) apply false
     // Multiplatform plugins
     alias(libs.plugins.jetbrainsCompose) apply false
     alias(libs.plugins.compose.compiler) apply false

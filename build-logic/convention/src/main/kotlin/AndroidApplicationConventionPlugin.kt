@@ -2,6 +2,7 @@ import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.gradle.BaseExtension
 import org.convention.configureBadgingTasks
+import org.convention.configureGradleManagedDevices
 import org.convention.configureKotlinAndroid
 import org.convention.configurePrintApksTask
 import org.gradle.api.Plugin
@@ -22,13 +23,16 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("org.convention.detekt.plugin")
                 apply("org.convention.spotless.plugin")
                 apply("org.convention.git.hooks")
+                apply("org.convention.android.application.lint")
+                apply("org.convention.android.application.firebase")
             }
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 34
+                defaultConfig.targetSdk = 36
                 @Suppress("UnstableApiUsage")
                 testOptions.animationsDisabled = true
+                configureGradleManagedDevices(this)
             }
             extensions.configure<ApplicationAndroidComponentsExtension> {
                 configurePrintApksTask(this)

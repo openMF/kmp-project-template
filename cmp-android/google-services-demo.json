@@ -1,0 +1,374 @@
+{
+  "project_info": {
+    "project_number": "673287123681",
+    "project_id": "mifos-mobile-apps",
+    "storage_bucket": "mifos-mobile-apps.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:3902eb3363b0938f1a1dbb",
+        "android_client_info": {
+          "package_name": "cmp.android.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:3902eb3363b0938f1a1dbb",
+        "android_client_info": {
+          "package_name": "cmp.android.app.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:3902eb3363b0938f1a1dbb",
+        "android_client_info": {
+          "package_name": "cmp.android.app.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:3902eb3363b0938f1a1dbb",
+        "android_client_info": {
+          "package_name": "cmp.android.app.demo.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:ecdb5b96f0e735661a1dbb",
+        "android_client_info": {
+          "package_name": "com.mifos.mifosxdroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:53d0930e402622611a1dbb",
+        "android_client_info": {
+          "package_name": "com.mifos.mifosxdroid.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:d853a78f14af0c381a1dbb",
+        "android_client_info": {
+          "package_name": "org.mifos.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:7845cce9777d9cf11a1dbb",
+        "android_client_info": {
+          "package_name": "org.mifos.mobile.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:49282a75468730891a1dbb",
+        "android_client_info": {
+          "package_name": "org.mifos.pisp.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:ef7156e455c6a1a41a1dbb",
+        "android_client_info": {
+          "package_name": "org.mifos.pisp.android.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:0490c291986f0a691a1dbb",
+        "android_client_info": {
+          "package_name": "org.mifospay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-d4hshajpu39bq9m5e55s5d2u5hplh5ie.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.mifospay",
+            "certificate_hash": "4teifalshhflaksjdklfy74jjjdjdiwi77hft537fvjgdrwokf2"
+          }
+        },
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673287123681:android:48ccd9153349f31e1a1dbb",
+        "android_client_info": {
+          "package_name": "org.mifospay.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673287123681-qm031urb7aopd1jofq12u3b8snlj2nel.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.mifospay.demo",
+            "certificate_hash": "4teifalshhflaksjdklfy74jjjdjdiwi77hft537fvjgdrwokf2"
+          }
+        },
+        {
+          "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaFh74576fuUExMFcPHa1Ga3DBKhj64gft4d70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673287123681-dej7329fhydh2uf6kfi11mi77tljrdns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

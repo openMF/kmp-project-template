@@ -20,6 +20,7 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            api(projects.coreBase.analytics)
             implementation(compose.runtime)
         }
     }

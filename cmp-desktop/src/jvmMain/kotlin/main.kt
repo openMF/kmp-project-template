@@ -43,7 +43,13 @@ fun main() {
             title = "DesktopApp",
         ) {
             // Sets the content of the window.
-            SharedApp()
+            SharedApp(
+                updateScreenCapture = {},
+                handleRecreate = {},
+                handleThemeMode = {},
+                handleAppLocale = {},
+                onSplashScreenRemoved = {}
+            )
         }
     }
 }

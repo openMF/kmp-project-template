@@ -14,6 +14,9 @@ plugins {
     alias(libs.plugins.android.application.convention)
     alias(libs.plugins.android.application.compose.convention)
     alias(libs.plugins.android.application.flavors.convention)
+    alias(libs.plugins.baselineprofile)
+    alias(libs.plugins.roborazzi)
+    alias(libs.plugins.aboutLibraries)
     id("com.google.devtools.ksp")
 }
 
@@ -46,12 +49,10 @@ android {
             applicationIdSuffix = AppBuildType.DEBUG.applicationIdSuffix
         }
 
-        // Disabling proguard for now until
-        // https://github.com/openMF/mobile-wallet/issues/1815 this issue is resolved
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             applicationIdSuffix = AppBuildType.RELEASE.applicationIdSuffix
-            isShrinkResources = false
+            isShrinkResources = true
             isDebuggable = false
             isJniDebuggable = false
             signingConfig = signingConfigs.getByName("release")
@@ -136,4 +137,13 @@ dependencyGuard {
         modules = true
         tree = true
     }
+}
+
+baselineProfile {
+    // Don't build on every iteration of a full assemble.
+    // Instead enable generation directly for the release build variant.
+    automaticGenerationDuringBuild = false
+
+    // Make use of Dex Layout Optimizations via Startup Profiles
+    dexLayoutOptimization = true
 }

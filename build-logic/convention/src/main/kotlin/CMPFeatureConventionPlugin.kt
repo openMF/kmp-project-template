@@ -32,7 +32,8 @@ class CMPFeatureConventionPlugin : Plugin<Project> {
                 add("commonMainImplementation", project(":core:designsystem"))
                 add("commonMainImplementation", project(":core-base:designsystem"))
                 add("commonMainImplementation", project(":core:data"))
-                add("commonMainImplementation", project(":core-base:common"))
+                add("commonMainImplementation", project(":core-base:designsystem"))
+                add("commonMainImplementation", project(":core:analytics"))
 
                 add("commonMainImplementation", libs.findLibrary("koin.compose").get())
                 add("commonMainImplementation", libs.findLibrary("koin.compose.viewmodel").get())

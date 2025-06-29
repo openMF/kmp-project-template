@@ -30,6 +30,8 @@ dependencies {
     compileOnly(libs.spotless.gradle)
     implementation(libs.truth)
     compileOnly(libs.androidx.room.gradle.plugin)
+    compileOnly(libs.firebase.crashlytics.gradlePlugin)
+    compileOnly(libs.firebase.performance.gradlePlugin)
 }
 
 tasks {
@@ -54,6 +56,16 @@ gradlePlugin {
         register("androidFlavors") {
             id = "org.convention.android.application.flavors"
             implementationClass = "AndroidApplicationFlavorsConventionPlugin"
+        }
+
+        register("androidFirebase") {
+            id = "org.convention.android.application.firebase"
+            implementationClass = "AndroidApplicationFirebaseConventionPlugin"
+        }
+
+        register("androidLint") {
+            id = "org.convention.android.application.lint"
+            implementationClass = "AndroidLintConventionPlugin"
         }
 
         // KMP & CMP Plugins

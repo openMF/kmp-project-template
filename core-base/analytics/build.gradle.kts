@@ -20,7 +20,30 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.koin.core)
             implementation(compose.runtime)
+            implementation(compose.ui)
+            implementation(libs.kermit.logging)
+        }
+
+        androidMain.dependencies {
+            api(libs.gitlive.firebase.analytics)
+        }
+
+        nonJsCommonMain.dependencies {
+            api(libs.gitlive.firebase.analytics)
+        }
+
+        nativeMain.dependencies {
+            api(libs.gitlive.firebase.analytics)
+        }
+
+        desktopMain.dependencies {
+            api(libs.gitlive.firebase.analytics)
+        }
+
+        mobileMain.dependencies {
+            api(libs.gitlive.firebase.crashlytics)
         }
     }
 }

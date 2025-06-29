@@ -4,6 +4,12 @@ androidDesugarJdkLibs = "2.1.5"
 androidGradlePlugin = "8.9.2"
 androidTools = "31.9.2"
 
+firebaseBom = "33.7.0"
+firebaseCrashlyticsPlugin = "3.0.4"
+firebasePerfPlugin = "1.4.2"
+androidxMacroBenchmark = "1.3.4"
+gmsPlugin = "4.4.2"
+
 # AndroidX Dependencies
 androidx-test-ext-junit = "1.2.1"
 androidxActivity = "1.10.1"
@@ -18,6 +24,9 @@ androidxTracing = "1.3.0"
 appcompatVersion = "1.7.0"
 calfPermissions = "0.7.1"
 coreKtxVersion = "1.16.0"
+
+robolectric = "4.15.1"
+roborazzi = "1.45.1"
 
 # Testing Dependencies
 junitVersion = "4.13.2"
@@ -49,14 +58,15 @@ kotlinxSerializationJson = "1.8.1"
 ksp = "2.1.20-2.0.1"
 
 # Ktor & Ktorfit
-ktorVersion = "3.1.3"
-ktorfit = "2.5.1"
+ktorVersion = "3.2.0"
+ktorfit = "2.5.2"
+ktorfitKsp = "2.5.1"
 
 # Koin CMP Dependencies
-koin = "4.0.4"
-koinAnnotationsVersion = "1.4.0-RC4"
+koin = "4.1.0"
+koinAnnotationsVersion = "2.1.0"
 
-connectivity = "1.2.0"
+connectivity = "2.1.0"
 
 # CMP Libraries
 compose-plugin = "1.8.1"
@@ -81,6 +91,8 @@ composeNavigation = "2.9.0-beta02"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.3.0"
 material3adaptive = "1.1.1"
+gitLive = "2.1.0"
+aboutLibraries = "12.2.3"
 
 # Desktop Version
 desktopPackageName = "DesktopApp"
@@ -134,6 +146,8 @@ androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profi
 
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-gradle-plugin = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
+firebase-crashlytics-gradlePlugin = { group = "com.google.firebase", name = "firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsPlugin" }
+firebase-performance-gradlePlugin = { group = "com.google.firebase", name = "perf-plugin", version.ref = "firebasePerfPlugin" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqliteBundled" }
@@ -233,7 +247,7 @@ ktor-client-winhttp = { group = "io.ktor", name = "ktor-client-winhttp", version
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
 ktor-server-auth = { group = "io.ktor", name = "ktor-server-auth", version.ref = "ktorVersion" }
 
-ktorfit-ksp = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-ksp", version.ref = "ktorfit" }
+ktorfit-ksp = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-ksp", version.ref = "ktorfitKsp" }
 ktorfit-converters-flow = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-converters-flow", version.ref = "ktorfit" }
 ktorfit-lib = { group = "de.jensklingenberg.ktorfit", name = "ktorfit-lib", version.ref = "ktorfit" }
 
@@ -276,6 +290,23 @@ connectivity-compose = { module = "dev.jordond.connectivity:connectivity-compose
 connectivity-compose-device = { module = "dev.jordond.connectivity:connectivity-compose-device", version.ref = "connectivity" }
 connectivity-compose-http = { module = "dev.jordond.connectivity:connectivity-compose-http", version.ref = "connectivity" }
 
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-cloud-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+firebase-performance = { group = "com.google.firebase", name = "firebase-perf" }
+
+gitlive-firebase-analytics = { module = "dev.gitlive:firebase-analytics", version.ref = "gitLive" }
+gitlive-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "gitLive" }
+
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
+roborazzi-accessibility-check = { group = "io.github.takahirom.roborazzi", name = "roborazzi-accessibility-check", version.ref = "roborazzi" }
+
+aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
+aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
+aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+
 [bundles]
 androidx-compose-ui-test = [
     "androidx-compose-ui-test",
@@ -303,10 +334,19 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktrofit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 wire = { id = "com.squareup.wire", version.ref = "wire" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
+firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebasePerfPlugin" }
+gms = { id = "com.google.gms.google-services", version.ref = "gmsPlugin" }
+roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
+baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }
+aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
 
 cmp-feature-convention = { id = "org.convention.cmp.feature", version = "unspecified" }
 kmp-koin-convention = { id = "org.convention.kmp.koin", version = "unspecified" }
 kmp-library-convention = { id = "org.convention.kmp.library", version = "unspecified" }
+
+android-application-firebase = { id = "org.convention.android.application.firebase" }
+android-lint = { id = "org.convention.android.application.lint" }
 
 # Utility Plugins
 detekt-convention = { id = "org.convention.detekt.plugin", version = "unspecified" }

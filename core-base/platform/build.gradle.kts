@@ -47,7 +47,6 @@ kotlin {
 
             implementation(libs.androidx.metrics)
             implementation(libs.androidx.browser)
-            implementation(libs.androidx.compose.runtime)
 
             implementation(compose.material3)
 

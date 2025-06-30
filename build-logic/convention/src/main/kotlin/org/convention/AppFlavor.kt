@@ -15,7 +15,7 @@ enum class FlavorDimension {
 // These two product flavors reflect this behaviour.
 @Suppress("EnumEntryName")
 enum class AppFlavor(val dimension: FlavorDimension, val applicationIdSuffix: String? = null) {
-    demo(FlavorDimension.contentType, applicationIdSuffix = ".demo"),
+    demo(FlavorDimension.contentType),
     prod(FlavorDimension.contentType)
 }
 

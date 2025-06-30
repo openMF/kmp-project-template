@@ -55,7 +55,8 @@ kotlin {
             implementation(libs.coil.kt.compose)
 
             implementation(libs.filekit.core)
-            implementation(libs.filekit.compose)
+            implementation(libs.filekit.dialogs)
+            implementation(libs.filekit.dialogs.compose)
             implementation(libs.filekit.coil)
         }
         androidInstrumentedTest.dependencies {
@@ -69,7 +70,8 @@ kotlin {
 
         jvmJsCommonMain.dependencies {
             implementation(libs.filekit.core)
-            implementation(libs.filekit.compose)
+            implementation(libs.filekit.dialogs)
+            implementation(libs.filekit.dialogs.compose)
             implementation(libs.filekit.coil)
         }
     }

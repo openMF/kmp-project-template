@@ -78,8 +78,7 @@ mokoPermission = "0.19.1"
 qroseVersion = "1.0.1"
 okioVersion = "3.13.0"
 kermit = "2.0.6"
-fileKit = "0.8.8"
-fileKitDialog = "0.10.0-beta04"
+fileKit = "0.10.0-beta04"
 uiBackhandler = "1.8.2"
 wire = "5.3.3"
 
@@ -264,9 +263,9 @@ constraint-layout = { group = "tech.annexflow.compose", name = "constraintlayout
 qrose = { group = "io.github.alexzhirkevich", name = "qrose", version.ref = "qroseVersion" }
 
 filekit-core = { group = "io.github.vinceglb", name = "filekit-core", version.ref = "fileKit" }
-filekit-compose = { group = "io.github.vinceglb", name = "filekit-compose", version.ref = "fileKit" }
-filekit-dialog-compose = { group = "io.github.vinceglb", name = "filekit-dialogs-compose", version.ref = "fileKitDialog" }
-filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "fileKitDialog" }
+filekit-dialogs = { group = "io.github.vinceglb", name = "filekit-dialogs", version.ref = "fileKit" }
+filekit-dialogs-compose = { group = "io.github.vinceglb", name = "filekit-dialogs-compose", version.ref = "fileKit" }
+filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "fileKit" }
 
 kermit-logging = { group = "co.touchlab", name = "kermit", version.ref = "kermit" }
 kermit-simple = { group = "co.touchlab", name = "kermit-simple", version.ref = "kermit" }

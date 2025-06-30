@@ -129,8 +129,8 @@ dependencies {
     implementation(libs.coil.kt)
 
     implementation(libs.filekit.core)
-    implementation(libs.filekit.compose)
-    implementation(libs.filekit.dialog.compose)
+    implementation(libs.filekit.dialogs)
+    implementation(libs.filekit.dialogs.compose)
     implementation(libs.filekit.coil)
 
     runtimeOnly(libs.androidx.compose.runtime)

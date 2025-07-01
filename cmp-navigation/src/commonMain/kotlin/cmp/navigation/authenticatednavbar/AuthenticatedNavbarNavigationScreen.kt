@@ -34,6 +34,7 @@ import cmp.navigation.generated.resources.Res
 import cmp.navigation.generated.resources.not_connected
 import cmp.navigation.ui.KptRootScaffold
 import cmp.navigation.ui.ScaffoldNavigationData
+import cmp.navigation.ui.logDestinationChanged
 import cmp.navigation.ui.rememberKptNavController
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -45,6 +46,7 @@ import org.mifos.feature.home.navigateToTasks
 import org.mifos.feature.home.tasksGraph
 import org.mifos.feature.profile.navigateToProfile
 import org.mifos.feature.profile.profileDestination
+import template.core.base.analytics.rememberAnalyticsHelper
 import template.core.base.ui.EventsEffect
 import template.core.base.ui.RootTransitionProviders
 
@@ -57,6 +59,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
     viewModel: AuthenticatedNavbarNavigationViewModel = koinViewModel(),
     navigateToSettingsScreen: () -> Unit,
 ) {
+    val analyticsHelper = rememberAnalyticsHelper()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val isOffline by viewModel.isOffline.collectAsStateWithLifecycle()
@@ -65,12 +68,14 @@ internal fun AuthenticatedNavbarNavigationScreen(
         navController.apply {
             when (event) {
                 AuthenticatedNavBarEvent.NavigateToHomeScreen -> {
+                    analyticsHelper.logDestinationChanged(event.tab.startDestinationRoute)
                     navigateToTabOrRoot(tabToNavigateTo = event.tab) {
                         navigateToTasks(navOptions = it)
                     }
                 }
 
                 AuthenticatedNavBarEvent.NavigateToProfileScreen -> {
+                    analyticsHelper.logDestinationChanged(event.tab.startDestinationRoute)
                     navigateToTabOrRoot(tabToNavigateTo = event.tab) {
                         navigateToProfile(navOptions = it)
                     }

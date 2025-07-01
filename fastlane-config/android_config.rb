@@ -9,7 +9,7 @@ module FastlaneConfig
 
     FIREBASE_CONFIG = {
       firebase_prod_app_id: "1:728434912738:android:3902eb3363b0938f1a1dbb",
-      firebase_demo_app_id: "1:728434912738:android:8392hjksak9032skja",
+      firebase_demo_app_id: "1:728434912738:android:4e72c77e967965ce1a1dbb",
       firebase_service_creds_file: "secrets/firebaseAppDistributionServiceCredentialsFile.json",
       firebase_groups: "mifos-mobile-apps"
     }

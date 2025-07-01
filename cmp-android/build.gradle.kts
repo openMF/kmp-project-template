@@ -96,6 +96,7 @@ dependencies {
     implementation(projects.core.ui)
     implementation(projects.coreBase.platform)
     implementation(projects.coreBase.ui)
+    implementation(projects.coreBase.analytics)
 
     implementation(projects.core.ui)
     implementation(projects.core.model)

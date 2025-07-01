@@ -23,7 +23,11 @@ kotlin {
             implementation(libs.koin.core)
             implementation(compose.runtime)
             implementation(compose.ui)
+            implementation(compose.foundation)
             implementation(libs.kermit.logging)
+            
+            // For timing and performance tracking
+            implementation(libs.kotlinx.datetime)
         }
 
         androidMain.dependencies {
@@ -44,6 +48,12 @@ kotlin {
 
         mobileMain.dependencies {
             api(libs.gitlive.firebase.crashlytics)
+        }
+        
+        // Test dependencies for all platforms
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

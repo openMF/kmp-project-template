@@ -13,6 +13,11 @@
 
     <application>
 
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="true"
+            tools:replace="android:value" />
+
         <!-- Enable Firebase analytics for `prod` builds -->
         <meta-data
             android:name="firebase_analytics_collection_deactivated"
@@ -21,7 +26,8 @@
 
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
-            android:value="true" />
+            android:value="true"
+            tools:replace="android:value" />
     </application>
 
 </manifest>

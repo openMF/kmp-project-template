@@ -116,6 +116,14 @@ Generate full release notes from specified tag or latest release tag
 
 Build Ios application
 
+### ios build_signed_ios
+
+```sh
+[bundle exec] fastlane ios build_signed_ios
+```
+
+Build Signed Ios application
+
 ### ios increment_version
 
 ```sh

@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.Navigator
 import androidx.navigation.compose.rememberNavController
 import co.touchlab.kermit.Logger
+import template.core.base.analytics.AnalyticsHelper
 
 @Composable
 fun rememberKptNavController(
@@ -27,3 +28,10 @@ fun rememberKptNavController(
             Logger.d("$name destination changed: ${destination.route}$graph")
         }
     }
+
+fun AnalyticsHelper.logDestinationChanged(route: String) {
+    logEvent(
+        type = "destination_changed",
+        params = mapOf("route" to route),
+    )
+}

@@ -26,21 +26,25 @@ import org.mifos.feature.home.TaskMinderViewModel
 import org.mifos.feature.home.extensions.formatDay
 import org.mifos.feature.home.model.TaskEntity
 import org.mifos.feature.home.service.StorageService
+import template.core.base.analytics.AnalyticsHelper
 
 /**
- * The ViewModel for managing the tasks UI state and interacting with the StorageService.
- * It provides logic for selecting dates, updating the tasks, and managing the UI state
- * related to tasks for a specific day, month, and year.
+ * The ViewModel for managing the tasks UI state and interacting with the
+ * StorageService. It provides logic for selecting dates, updating the
+ * tasks, and managing the UI state related to tasks for a specific day,
+ * month, and year.
  *
- * @property storageService The service responsible for fetching and updating tasks in the storage.
+ * @property storageService The service responsible for fetching and
+ *    updating tasks in the storage.
  */
 class TasksViewModel(
     private val storageService: StorageService,
+    private val analyticsHelper: AnalyticsHelper,
 ) : TaskMinderViewModel() {
 
     /**
-     * Flow representing the UI state for tasks. It includes the selected
-     * date and the list of weekdays and days in the month.
+     * Flow representing the UI state for tasks. It includes the selected date
+     * and the list of weekdays and days in the month.
      */
     private val shortWeekdayNames = mapOf(
         DayOfWeek.MONDAY to "Mon",
@@ -69,8 +73,9 @@ class TasksViewModel(
         )
 
     /**
-     * The list of tasks for the selected date. It uses `flatMapLatest` to fetch tasks based
-     * on the current selected month, day, and year from the UI state.
+     * The list of tasks for the selected date. It uses `flatMapLatest` to
+     * fetch tasks based on the current selected month, day, and year from the
+     * UI state.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     val tasks: StateFlow<List<TaskEntity>> =
@@ -99,14 +104,14 @@ class TasksViewModel(
      * @param year The new year to be selected.
      */
     fun updateSelectedYear(year: Int) {
+        analyticsHelper.logUpdateSelectedYear(year)
         _tasksUiState.value = _tasksUiState.value.copy(selectedYear = year)
         updateDaysInMonth()
     }
 
-    /**
-     * Selects the next month and updates the days in the selected month.
-     */
+    /** Selects the next month and updates the days in the selected month. */
     fun selectNextMonth() {
+        analyticsHelper.logSelectNextMonth(selectedMonthIndex + 1)
         if (selectedMonthIndex < 11) {
             _tasksUiState.value =
                 _tasksUiState.value.copy(selectedMonthIndex = selectedMonthIndex + 1)
@@ -114,10 +119,10 @@ class TasksViewModel(
         }
     }
 
-    /**
-     * Selects the previous month and updates the days in the selected month.
-     */
+    /** Selects the previous month and updates the days in the selected month. */
     fun selectPreviousMonth() {
+        analyticsHelper.logSelectPreviousMonth(selectedMonthIndex - 1)
+
         if (selectedMonthIndex > 0) {
             _tasksUiState.value =
                 _tasksUiState.value.copy(selectedMonthIndex = selectedMonthIndex - 1)
@@ -137,7 +142,8 @@ class TasksViewModel(
     /**
      * Gets the number of days in a given month and year.
      *
-     * @param month The month (0-based index) for which to get the number of days.
+     * @param month The month (0-based index) for which to get the number of
+     *    days.
      * @param year The year for which to get the number of days.
      * @return The number of days in the given month of the given year.
      */
@@ -148,11 +154,13 @@ class TasksViewModel(
     }
 
     /**
-     * Updates the list of weekdays and days in the selected month.
-     * It calculates the weekdays for all the days in the selected month and updates the UI state.
+     * Updates the list of weekdays and days in the selected month. It
+     * calculates the weekdays for all the days in the selected month and
+     * updates the UI state.
      */
     private fun updateDaysInMonth() {
-        val daysInCurrentMonth = getDaysInMonth(year = selectedYear, month = selectedMonthIndex) // month is 1-based
+        val daysInCurrentMonth =
+            getDaysInMonth(year = selectedYear, month = selectedMonthIndex) // month is 1-based
 
         val weekdaysAndDaysInSelectedMonth = mutableListOf<Pair<String, String>>()
 
@@ -168,11 +176,14 @@ class TasksViewModel(
     }
 
     /**
-     * Flags a task as completed or not completed by toggling its `completed` state.
+     * Flags a task as completed or not completed by toggling its `completed`
+     * state.
      *
      * @param task The task to flag as completed or not completed.
      */
     fun flagTask(task: TaskEntity) {
+        analyticsHelper.flagTask(task.id, task.completed)
+
         launchCatching {
             storageService.updateTask(task.copy(completed = !task.completed))
         }
@@ -184,8 +195,45 @@ class TasksViewModel(
      * @param taskId The ID of the task to be deleted.
      */
     fun deleteTask(taskId: Int) {
+        analyticsHelper.logDeleteTask(taskId)
+
         launchCatching {
             storageService.deleteTask(taskId)
         }
     }
+}
+
+private fun AnalyticsHelper.logDeleteTask(taskId: Int) {
+    logEvent(type = "delete_task", params = mapOf("task_id" to taskId.toString()))
+}
+
+private fun AnalyticsHelper.flagTask(taskId: Int, completed: Boolean) {
+    logEvent(
+        type = "flag_task",
+        params = mapOf(
+            "task_id" to taskId.toString(),
+            "completed" to completed.toString(),
+        ),
+    )
+}
+
+private fun AnalyticsHelper.logSelectNextMonth(month: Int) {
+    logEvent(
+        type = "select_next_month",
+        params = mapOf("month" to month.toString()),
+    )
+}
+
+private fun AnalyticsHelper.logSelectPreviousMonth(month: Int) {
+    logEvent(
+        type = "select_previous_month",
+        params = mapOf("month" to month.toString()),
+    )
+}
+
+private fun AnalyticsHelper.logUpdateSelectedYear(year: Int) {
+    logEvent(
+        type = "update_selected_year",
+        params = mapOf("year" to year.toString()),
+    )
 }

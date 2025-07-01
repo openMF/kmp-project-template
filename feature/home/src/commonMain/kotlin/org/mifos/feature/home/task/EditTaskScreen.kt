@@ -51,6 +51,7 @@ import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.feature.home.model.ActionToolbar
 import org.mifos.feature.home.model.TaskEntity
+import template.core.base.analytics.TrackScreenView
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -66,8 +67,8 @@ fun EditTaskScreen(
     navigateBack: () -> Unit,
     onTaskSaved: () -> Unit,
     modifier: Modifier = Modifier,
+    editTaskViewModel: EditTaskViewModel = koinViewModel(),
 ) {
-    val editTaskViewModel: EditTaskViewModel = koinViewModel()
     val task by editTaskViewModel.task.collectAsStateWithLifecycle()
     val isTaskSaved by editTaskViewModel.isTaskSaved.collectAsStateWithLifecycle()
 
@@ -96,21 +97,25 @@ fun EditTaskScreen(
         onSaveTask = onSaveTaskMemoized,
         modifier = modifier,
     )
+
+    val title = if (task.id != 0) "Edit Task Screen" else "Create New Task"
+    TrackScreenView(
+        screenName = title,
+        additionalParams = mapOf("task_id" to task.id.toString()),
+    )
 }
 
 /**
  * The core UI for editing task details.
  *
  * @param isEditing Indicates if the screen is in editing mode.
- * @param task The [Task] object containing current task details.
+ * @param task The [TaskEntity] object containing current task details.
  * @param onNavigateBack A lambda triggered when the user navigates back.
  * @param onDateChange Lambda to handle date changes in the task.
  * @param onTimeChange Lambda to handle time changes in the task.
  * @param onTitleChange Lambda to handle changes in the task title.
  * @param onDescriptionChange Lambda to handle changes in the task description.
  * @param onPriorityChange Lambda to handle priority changes in the task.
- * @param isAlertEnabled Whether the alert toggle is enabled for the task.
- * @param onAlertChange Lambda to handle alert enable/disable changes.
  * @param onSaveTask Lambda to handle task saving action.
  * @param modifier A [Modifier] for custom styling or layout adjustments.
  */

@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -69,32 +70,46 @@ import androidx.compose.ui.window.Popup
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.feature.home.model.TaskEntity
+import template.core.base.analytics.TrackScreenView
+import template.core.base.analytics.rememberAnalyticsHelper
+import template.core.base.ui.TrackScrollJank
 
 /**
- * A Composable screen that displays the list of tasks along with various controls such as:
+ * A Composable screen that displays the list of tasks along with various
+ * controls such as:
  * - A toolbar for navigating to settings.
  * - A floating action button to add new tasks.
- * - A year picker, month picker, and day picker to filter tasks based on date.
- * - A list of tasks with checkboxes to mark them as completed or incomplete.
+ * - A year picker, month picker, and day picker to filter tasks based on
+ *   date.
+ * - A list of tasks with checkboxes to mark them as completed or
+ *   incomplete.
  *
- * @param onSettingsClick A callback to navigate to the settings screen when the settings icon is clicked.
- * @param onAddNewTask A callback that triggers the action to add a new task when the floating action button is clicked.
+ * @param onSettingsClick A callback to navigate to the settings screen
+ *    when the settings icon is clicked.
+ * @param modifier Modifier for customizing the layout of this composable
+ *    screen.
+ * @param onAddNewTask A callback that triggers the action to add a new
+ *    task when the floating action button is clicked.
  * @param onTaskClick A callback to handle task click events.
- * @param modifier Modifier for customizing the layout of this composable screen.
  */
 @Composable
 fun TasksScreen(
     onSettingsClick: () -> Unit,
     onAddEditNewTask: (id: Int?) -> Unit,
     modifier: Modifier = Modifier,
+    tasksViewModel: TasksViewModel = koinViewModel(),
 ) {
-    val tasksViewModel: TasksViewModel = koinViewModel()
+    val analyticsHelper = rememberAnalyticsHelper()
     val tasks by tasksViewModel.tasks.collectAsStateWithLifecycle()
     val tasksUiState by tasksViewModel.tasksUiState.collectAsStateWithLifecycle()
 
     TasksScreenContent(
         tasksUiState = tasksUiState,
         onAddNewTask = {
+            analyticsHelper.logButtonClick(
+                buttonName = "AddButton::Fab",
+                screenName = "TasksScreen",
+            )
             onAddEditNewTask(null)
         },
         onSettingsClick = onSettingsClick,
@@ -108,6 +123,8 @@ fun TasksScreen(
         onSelectedDayInMonthChange = tasksViewModel::updateSelectDayInMonth,
         modifier = modifier,
     )
+
+    TrackScreenView(screenName = "tasks_screen")
 }
 
 /**
@@ -117,17 +134,26 @@ fun TasksScreen(
  * - Year, month, and day pickers to filter tasks by date.
  * - A list of tasks.
  *
- * @param tasksUiState UI state containing selected year, month, day, and tasks data.
- * @param onAddNewTask Callback triggered when the floating action button is clicked.
- * @param onSettingsClick Callback triggered when the settings icon is clicked.
+ * @param tasksUiState UI state containing selected year, month, day, and
+ *    tasks data.
+ * @param onAddNewTask Callback triggered when the floating action button
+ *    is clicked.
+ * @param onSettingsClick Callback triggered when the settings icon is
+ *    clicked.
  * @param onTaskClick Callback triggered when a task is clicked.
- * @param onTaskCheckedChange Callback triggered when the checkbox for a task is changed.
+ * @param onTaskCheckedChange Callback triggered when the checkbox for a
+ *    task is changed.
  * @param tasks List of tasks to display.
- * @param onYearSelected Callback triggered when a year is selected from the year picker.
- * @param onNextMonthClicked Callback triggered when the next month button is clicked.
- * @param onPreviousMonthClicked Callback triggered when the previous month button is clicked.
- * @param onSelectedDayInMonthChange Callback triggered when a day is selected from the day picker.
- * @param modifier Modifier for customizing the layout of this composable screen.
+ * @param onYearSelected Callback triggered when a year is selected from
+ *    the year picker.
+ * @param onNextMonthClicked Callback triggered when the next month button
+ *    is clicked.
+ * @param onPreviousMonthClicked Callback triggered when the previous month
+ *    button is clicked.
+ * @param onSelectedDayInMonthChange Callback triggered when a day is
+ *    selected from the day picker.
+ * @param modifier Modifier for customizing the layout of this composable
+ *    screen.
  */
 @Composable
 fun TasksScreenContent(
@@ -209,7 +235,8 @@ fun TasksScreenContent(
 /**
  * The toolbar for the Tasks screen containing a title and settings icon.
  *
- * @param onSettingsClicked Callback triggered when the settings icon is clicked.
+ * @param onSettingsClicked Callback triggered when the settings icon is
+ *    clicked.
  * @param modifier Modifier for customizing the layout of the toolbar.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -318,7 +345,8 @@ fun YearPicker(
  * @param years List of years to display.
  * @param selectedYear The currently selected year.
  * @param onYearSelected Callback triggered when a year is selected.
- * @param modifier Modifier for customizing the layout of the grid selector.
+ * @param modifier Modifier for customizing the layout of the grid
+ *    selector.
  */
 @Composable
 fun YearGridSelector(
@@ -359,8 +387,10 @@ fun YearGridSelector(
  * A month picker that allows users to navigate between months.
  *
  * @param selectedMonth The currently selected month.
- * @param onNextMonth Callback triggered when the next month button is clicked.
- * @param onPreviousMonth Callback triggered when the previous month button is clicked.
+ * @param onNextMonth Callback triggered when the next month button is
+ *    clicked.
+ * @param onPreviousMonth Callback triggered when the previous month button
+ *    is clicked.
  * @param modifier Modifier for customizing the layout of the month picker.
  */
 @Composable
@@ -400,13 +430,16 @@ fun MonthPicker(
 }
 
 /**
- * A composable that displays a day of the month along with its corresponding weekday.
- * It shows a border when the day is selected and can be clicked to change the selected day.
+ * A composable that displays a day of the month along with its
+ * corresponding weekday. It shows a border when the day is selected and
+ * can be clicked to change the selected day.
  *
  * @param weekday The name of the weekday (e.g., "Mon", "Tue").
  * @param dayOfMonth The day of the month (e.g., "1", "15").
- * @param selectedDayInMonth The day of the month that is currently selected.
- * @param onDayOfMonthClick A callback triggered when the user clicks on a day of the month.
+ * @param selectedDayInMonth The day of the month that is currently
+ *    selected.
+ * @param onDayOfMonthClick A callback triggered when the user clicks on a
+ *    day of the month.
  * @param modifier Modifier for customizing the layout of the item.
  */
 @Composable
@@ -460,13 +493,17 @@ fun WeekdayAndDayOfMonthItem(
 }
 
 /**
- * A composable that displays a horizontal list of days of the month, showing the weekday and day.
- * It allows the user to scroll through the days of the month and select a day.
+ * A composable that displays a horizontal list of days of the month,
+ * showing the weekday and day. It allows the user to scroll through the
+ * days of the month and select a day.
  *
  * @param selectedDayInMonth The currently selected day of the month.
- * @param onSelectedDayInMonthChange A callback triggered when a user selects a new day.
- * @param daysInMonth A list of pairs containing the weekday and the day of the month.
- * @param modifier Modifier for customizing the layout of the horizontal day picker.
+ * @param onSelectedDayInMonthChange A callback triggered when a user
+ *    selects a new day.
+ * @param daysInMonth A list of pairs containing the weekday and the day of
+ *    the month.
+ * @param modifier Modifier for customizing the layout of the horizontal
+ *    day picker.
  */
 @Composable
 fun HorizontalDayPicker(
@@ -492,12 +529,13 @@ fun HorizontalDayPicker(
 }
 
 /**
- * A composable that represents a task item, displaying the task's title, due time, and a checkbox
- * that marks the task as completed or not.
+ * A composable that represents a task item, displaying the task's title,
+ * due time, and a checkbox that marks the task as completed or not.
  *
  * @param task The task to display.
  * @param onTaskClick A callback triggered when the task item is clicked.
- * @param onTaskCheckedChange A callback triggered when the task's completion checkbox is changed.
+ * @param onTaskCheckedChange A callback triggered when the task's
+ *    completion checkbox is changed.
  * @param modifier Modifier for customizing the layout of the task item.
  */
 @Composable
@@ -593,6 +631,8 @@ fun TaskItemList(
     onTaskCheckedChange: (TaskEntity) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lazyListState = rememberLazyListState()
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         contentPadding = PaddingValues(vertical = 10.dp),
@@ -607,4 +647,6 @@ fun TaskItemList(
             )
         }
     }
+
+    TrackScrollJank(scrollableState = lazyListState, stateName = "Tasks::List")
 }

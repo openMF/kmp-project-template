@@ -22,6 +22,8 @@ import io.github.vinceglb.filekit.dialogs.init
 import org.koin.android.ext.android.inject
 import org.mifos.core.data.repository.NetworkMonitor
 import org.mifos.core.data.repository.UserDataRepository
+import template.core.base.analytics.AnalyticsHelper
+import template.core.base.analytics.lifecycleTracker
 import template.core.base.platform.update.AppUpdateManager
 import template.core.base.platform.update.AppUpdateManagerImpl
 import template.core.base.ui.ShareUtils
@@ -43,6 +45,9 @@ class MainActivity : ComponentActivity() {
 
     private val networkMonitor: NetworkMonitor by inject()
 
+    private val analyticsHelper: AnalyticsHelper by inject()
+    private val lifecycleTracker by lazy { analyticsHelper.lifecycleTracker() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         var shouldShowSplashScreen = true
         installSplashScreen().setKeepOnScreenCondition { shouldShowSplashScreen }
@@ -57,12 +62,17 @@ class MainActivity : ComponentActivity() {
         ShareUtils.setActivityProvider { return@setActivityProvider this }
         FileKit.init(this)
 
+        analyticsHelper.setUserId(deviceData)
+
         setContent {
 //            val status = networkMonitor.isOnline.collectAsStateWithLifecycle(false).value
 //
 //            if (status) {
 //                appUpdateManager.checkForAppUpdate()
 //            }
+
+            lifecycleTracker.markAppLaunchComplete()
+
             SharedApp(
                 updateScreenCapture = ::updateScreenCapture,
                 handleRecreate = ::handleRecreate,
@@ -87,6 +97,12 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
 //        appUpdateManager.checkForResumeUpdateState()
+        lifecycleTracker.markAppBackground()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        lifecycleTracker.markAppLaunchStart()
     }
 
     private fun handleRecreate() {

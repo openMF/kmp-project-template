@@ -35,17 +35,24 @@ import kmp_project_template.feature.settings.generated.resources.feature_setting
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.ui.scaffold.KptScaffold
+import template.core.base.analytics.AnalyticsHelper
+import template.core.base.analytics.TrackScreenView
+import template.core.base.analytics.rememberAnalyticsHelper
 
 @Composable
 internal fun SettingsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val analyticsHelper = rememberAnalyticsHelper()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showSettingsDialog) {
         SettingsDialog(
-            onDismiss = { showSettingsDialog = false },
+            onDismiss = {
+                analyticsHelper.logSettingsDialogVisible(false)
+                showSettingsDialog = false
+            },
         )
     }
 
@@ -53,9 +60,12 @@ internal fun SettingsScreen(
         modifier = modifier.fillMaxSize(),
         onBackClick = onBackClick,
         onThemeCardClick = {
+            analyticsHelper.logSettingsDialogVisible(true)
             showSettingsDialog = true
         },
     )
+
+    TrackScreenView(screenName = "SettingsScreen")
 }
 
 @Composable
@@ -115,4 +125,11 @@ internal fun ThemeCard(
             }
         }
     }
+}
+
+private fun AnalyticsHelper.logSettingsDialogVisible(visible: Boolean) {
+    logEvent(
+        type = "settings_dialog_visible",
+        params = mapOf("visible" to visible.toString()),
+    )
 }

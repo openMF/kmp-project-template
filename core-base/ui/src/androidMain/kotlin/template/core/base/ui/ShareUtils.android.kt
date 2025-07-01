@@ -40,7 +40,7 @@ actual object ShareUtils {
         activityProvider = provider
     }
 
-    actual fun shareText(text: String) {
+    actual suspend fun shareText(text: String) {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, text)

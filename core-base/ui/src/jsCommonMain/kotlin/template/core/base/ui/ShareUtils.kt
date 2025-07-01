@@ -12,34 +12,34 @@ package template.core.base.ui
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.saveImageToGallery
-import platform.UIKit.UIActivityViewController
-import platform.UIKit.UIApplication
+import io.github.vinceglb.filekit.download
+import kotlinx.coroutines.DelicateCoroutinesApi
 
+@OptIn(DelicateCoroutinesApi::class)
 actual object ShareUtils {
     actual suspend fun shareText(text: String) {
-        val currentViewController = UIApplication.sharedApplication().keyWindow?.rootViewController
-        val activityViewController = UIActivityViewController(listOf(text), null)
-        currentViewController?.presentViewController(
-            viewControllerToPresent = activityViewController,
-            animated = true,
-            completion = null,
+        FileKit.download(
+            bytes = text.encodeToByteArray(),
+            fileName = "shared_text.txt",
         )
     }
 
-    actual suspend fun shareImage(title: String, image: ImageBitmap) {
+    actual suspend fun shareImage(
+        title: String,
+        image: ImageBitmap,
+    ) {
         image.asSkiaBitmap().readPixels()?.let {
-            FileKit.saveImageToGallery(
+            FileKit.download(
                 bytes = it,
-                filename = "$title.png",
+                fileName = "$title.png",
             )
         }
     }
 
     actual suspend fun shareImage(title: String, byte: ByteArray) {
-        FileKit.saveImageToGallery(
+        FileKit.download(
             bytes = byte,
-            filename = "$title.png",
+            fileName = "$title.png",
         )
     }
 }

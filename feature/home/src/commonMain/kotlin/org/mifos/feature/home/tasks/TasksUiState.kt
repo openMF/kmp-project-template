@@ -9,12 +9,11 @@
  */
 package org.mifos.feature.home.tasks
 
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 /**
  * A data class representing the state of the task calendar screen.
@@ -31,7 +30,6 @@ import kotlin.time.ExperimentalTime
  * @param weekdaysAndDaysInMonth A list of pairs, where each pair consists of a weekday name (e.g., "Monday")
  * and the corresponding day of the month (e.g., "1"). Defaults to an empty list.
  */
-@OptIn(ExperimentalTime::class)
 data class TasksUiState(
     val selectedYear: Int = defaultYear,
     val selectedMonthIndex: Int = defaultMonthIndex,
@@ -52,7 +50,7 @@ data class TasksUiState(
         val defaultMonthIndex: Int = datetimeInSystemZone.month.number - 1
 
         // Default day in month, current day (as an Int for easier comparison)
-        val defaultDayInMonth: Int = datetimeInSystemZone.day
+        val defaultDayInMonth: Int = datetimeInSystemZone.dayOfMonth
     }
 
     // List of month names for lookup based on the month index

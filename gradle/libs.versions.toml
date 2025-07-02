@@ -50,13 +50,13 @@ twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
 
 # Kotlin KMP Dependencies
-kotlin = "2.2.0"
-kotlinInject = "0.8.0"
+kotlin = "2.1.20"
+kotlinInject = "0.7.2"
 kotlinxCoroutines = "1.10.2"
-kotlinxDatetime = "0.7.0"
-kotlinxImmutable = "0.4.0"
-kotlinxSerializationJson = "1.9.0"
-ksp = "2.2.0-2.0.2"
+kotlinxDatetime = "0.6.2"
+kotlinxImmutable = "0.3.8"
+kotlinxSerializationJson = "1.8.1"
+ksp = "2.1.20-2.0.1"
 
 # Ktor & Ktorfit
 ktorVersion = "3.2.0"

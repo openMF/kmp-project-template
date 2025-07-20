@@ -387,7 +387,8 @@ platform :ios do
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
       build_ios_app(
           scheme: ios_config[:scheme],
-          project: ios_config[:project_path],
+#           project: ios_config[:project_path],
+          workspace: "cmp-ios/iosApp.xcworkspace", # <-- use .xcworkspace instead
           output_name: ios_config[:output_name],
           output_directory: ios_config[:output_directory],
           skip_codesigning: true,

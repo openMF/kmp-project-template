@@ -96,6 +96,9 @@ jobs:
       - name: Install CocoaPods
         run: sudo gem install cocoapods
 
+      - name: Generate dummy framework for KMP
+        run: ./gradlew :cmp-shared:generateDummyFramework
+
       - name: Install CocoaPods dependencies
         working-directory: cmp-ios/iosApp
         run: pod install

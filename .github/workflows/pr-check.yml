@@ -70,6 +70,7 @@ on:
     branches: [ dev ]  # Runs on pushes to dev branch
   pull_request:
     branches: [ dev ]  # Runs on pushes to dev branch
+  workflow_dispatch:
 
 # Concurrency settings to prevent multiple simultaneous workflow runs
 concurrency:

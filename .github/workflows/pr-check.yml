@@ -93,6 +93,13 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Install CocoaPods dependencies
+        working-directory: cmp-ios/iosApp
+        run: pod install
+
       - name: Build iOS App
         uses: openMF/mifos-x-actionhub-build-ios-app@v1.0.2
 #  pr_checks:

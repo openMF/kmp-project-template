@@ -81,12 +81,27 @@ permissions:
   contents: write
 
 jobs:
-  pr_checks:
-    name: PR Checks
-    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check.yaml@v1.0.2
-    with:
-      android_package_name: 'cmp-android' # <-- Change Your Android Package Name
-      desktop_package_name: 'cmp-desktop' # <-- Change Your Desktop Package Name
-      web_package_name: 'cmp-web' # <-- Change Your Web Package Name
-      ios_package_name: 'cmp-ios' # <-- Change Your iOS Package Name
-      build_ios: true # <-- Change to 'false' if you don't want to build iOS
+  build_ios_app:
+    name: Build iOS App
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup latest Xcode version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build iOS App
+        if: ${{ inputs.build_ios }}
+        uses: openMF/mifos-x-actionhub-build-ios-app@v1.0.2
+#  pr_checks:
+#    name: PR Checks
+#    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check.yaml@v1.0.2
+#    with:
+#      android_package_name: 'cmp-android' # <-- Change Your Android Package Name
+#      desktop_package_name: 'cmp-desktop' # <-- Change Your Desktop Package Name
+#      web_package_name: 'cmp-web' # <-- Change Your Web Package Name
+#      ios_package_name: 'cmp-ios' # <-- Change Your iOS Package Name
+#      build_ios: true # <-- Change to 'false' if you don't want to build iOS

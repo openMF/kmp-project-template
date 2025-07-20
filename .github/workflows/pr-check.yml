@@ -94,7 +94,6 @@ jobs:
           xcode-version: latest-stable
 
       - name: Build iOS App
-        if: ${{ inputs.build_ios }}
         uses: openMF/mifos-x-actionhub-build-ios-app@v1.0.2
 #  pr_checks:
 #    name: PR Checks

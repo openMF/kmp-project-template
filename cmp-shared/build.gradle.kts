@@ -11,6 +11,7 @@
 plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.cmp.feature.convention)
+    alias(libs.plugins.kotlinCocoapods)
 }
 
 kotlin {
@@ -41,6 +42,19 @@ kotlin {
             // Desktop specific dependencies
             implementation(compose.desktop.currentOs)
             implementation(compose.desktop.common)
+        }
+    }
+
+    cocoapods {
+        summary = "KMP Shared Module"
+        homepage = "https://github.com/openMF/kmp-project-template"
+        version = "1.0"
+        ios.deploymentTarget = "16.0"
+        podfile = project.file("../cmp-ios/Podfile")
+
+        framework {
+            baseName = "ComposeApp"
+            isStatic = true
         }
     }
 }

@@ -146,6 +146,11 @@ dependencies {
     testImplementation(libs.koin.test.junit4)
 }
 
+// Find the task by name *after* it's been evaluated
+tasks.matching { it.name == "uploadCrashlyticsMappingFileProdRelease" }.configureEach {
+    dependsOn("updateProdReleaseBadging")
+}
+
 dependencyGuard {
     configuration("prodReleaseRuntimeClasspath") {
         modules = true

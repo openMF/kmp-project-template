@@ -16,7 +16,7 @@ import coil3.compose.LocalPlatformContext
 import template.core.base.platform.LocalManagerProvider
 import template.core.base.platform.context.LocalContext
 import template.core.base.ui.LocalImageLoaderProvider
-import template.core.base.ui.rememberImageLoader
+import template.core.base.ui.getDefaultImageLoader
 
 @Composable
 fun SharedApp(
@@ -28,7 +28,7 @@ fun SharedApp(
     onSplashScreenRemoved: () -> Unit,
 ) {
     LocalManagerProvider(LocalContext.current) {
-        LocalImageLoaderProvider(rememberImageLoader(LocalPlatformContext.current)) {
+        LocalImageLoaderProvider(getDefaultImageLoader(LocalPlatformContext.current)) {
             ComposeApp(
                 updateScreenCapture = updateScreenCapture,
                 handleRecreate = handleRecreate,

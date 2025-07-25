@@ -1,8 +1,8 @@
 [versions]
 # Android
 androidDesugarJdkLibs = "2.1.5"
-androidGradlePlugin = "8.11.0"
-androidTools = "31.11.0"
+androidGradlePlugin = "8.10.0"
+androidTools = "31.10.0"
 
 firebaseBom = "33.16.0"
 firebaseCrashlyticsPlugin = "3.0.4"

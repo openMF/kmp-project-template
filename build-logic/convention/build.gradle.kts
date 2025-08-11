@@ -32,6 +32,14 @@ dependencies {
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
+    
+    // Keystore management dependencies
+    implementation(libs.github.api)
+    implementation(libs.okhttp)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.module.kotlin)
+    implementation(libs.commons.codec)
 }
 
 tasks {
@@ -111,5 +119,14 @@ gradlePlugin {
             implementationClass = "KMPRoomConventionPlugin"
             description = "Configures Room for the project"
         }
+
+        // NEW ===============================
+
+        register("keystoreManagement") {
+            id = "org.convention.keystore.management"
+            implementationClass = "KeystoreManagementConventionPlugin"
+            description = "Configures keystore management tasks for the project"
+        }
+
     }
 }

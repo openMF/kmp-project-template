@@ -40,12 +40,26 @@ dependencies {
     implementation(libs.jackson.databind)
     implementation(libs.jackson.module.kotlin)
     implementation(libs.commons.codec)
+    
+    // Test dependencies for keystore management
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.jupiter.params)
+    testRuntimeOnly(libs.platform.junit.platform.launcher)
 }
 
 tasks {
     validatePlugins {
         enableStricterValidation = true
         failOnWarning = true
+    }
+    
+    // Configure JUnit 5 for testing keystore management functionality
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
 }
 

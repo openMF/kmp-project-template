@@ -2,6 +2,7 @@ package org.convention.keystore
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import java.io.File
@@ -9,6 +10,7 @@ import java.io.File
 /**
  * Base class for keystore management tasks following your existing convention patterns
  */
+@CacheableTask
 abstract class BaseKeystoreTask : DefaultTask() {
 
     @get:Input

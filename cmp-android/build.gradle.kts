@@ -18,6 +18,7 @@ plugins {
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.roborazzi)
     alias(libs.plugins.aboutLibraries)
+    alias(libs.plugins.keystore.management)
     id("com.google.devtools.ksp")
 }
 

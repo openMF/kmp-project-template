@@ -378,6 +378,7 @@ detekt-convention = { id = "org.convention.detekt.plugin", version = "unspecifie
 git-hooks-convention = { id = "org.convention.git.hooks", version = "unspecified" }
 ktlint-convention = { id = "org.convention.ktlint.plugin", version = "unspecified" }
 spotless-convention = { id = "org.convention.spotless.plugin", version = "unspecified" }
+keystore-management = { id = "org.convention.keystore.management", version = "unspecified" }
 
 dependencyGuard = { id = "com.dropbox.dependency-guard", version.ref = "dependencyGuard" }
 moduleGraph = { id = "com.jraska.module.graph.assertion", version.ref = "moduleGraph" }

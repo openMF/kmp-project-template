@@ -1,5 +1,5 @@
-
 import org.convention.keystore.KeystoreConfig
+import org.convention.keystore.KeystoreGenerationTask
 import org.convention.keystore.SecretsConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -18,24 +18,82 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
             keystoreExtension.keystoreConfig.convention(KeystoreConfig())
             keystoreExtension.secretsConfig.convention(SecretsConfig())
 
+            // Register the keystore generation task
+            tasks.register("generateKeystores", KeystoreGenerationTask::class.java) {
+                // Configure task with extension values
+                keystoreConfig.set(keystoreExtension.keystoreConfig)
+                secretsConfig.set(keystoreExtension.secretsConfig)
+                
+                // Load configuration from secrets.env if it exists
+                KeystoreGenerationTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
+            }
+
+            // Register convenience tasks for individual keystore types
+            tasks.register("generateOriginalKeystore", KeystoreGenerationTask::class.java) {
+                keystoreConfig.set(keystoreExtension.keystoreConfig)
+                secretsConfig.set(keystoreExtension.secretsConfig)
+                generateOriginal.set(true)
+                generateUpload.set(false)
+                
+                KeystoreGenerationTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
+            }
+
+            tasks.register("generateUploadKeystore", KeystoreGenerationTask::class.java) {
+                keystoreConfig.set(keystoreExtension.keystoreConfig)
+                secretsConfig.set(keystoreExtension.secretsConfig)
+                generateOriginal.set(false)
+                generateUpload.set(true)
+                
+                KeystoreGenerationTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
+            }
+
             // Add task group description
             tasks.register("keystoreHelp") {
                 group = "keystore"
                 description = "Shows available keystore management commands"
                 doLast {
                     logger.lifecycle("""
-                        |Keystore Management Plugin
+                        |Keystore Management Plugin - Available Tasks:
                         |
-                        |Available tasks:
+                        |Generation Tasks:
+                        |  - generateKeystores: Generate both ORIGINAL and UPLOAD keystores
+                        |  - generateOriginalKeystore: Generate only the ORIGINAL (debug) keystore
+                        |  - generateUploadKeystore: Generate only the UPLOAD (release) keystore
+                        |
+                        |Help Tasks:
                         |  - keystoreHelp: Shows this help message
                         |
-                        |Configuration example:
+                        |Configuration:
+                        |  The plugin automatically loads configuration from 'secrets.env' if it exists.
+                        |  You can also configure manually in build.gradle.kts:
+                        |
                         |  keystoreManagement {
                         |    keystoreConfig {
-                        |      companyName = "Your Company"
-                        |      organization = "Your Org"
+                        |      companyName = "Your Company Name"
+                        |      department = "Your Department"
+                        |      organization = "Your Organization"
+                        |      city = "Your City"
+                        |      state = "Your State"
+                        |      country = "US"
+                        |      keyAlgorithm = "RSA"
+                        |      keySize = 2048
+                        |      validity = 25
+                        |      overwriteExisting = false
+                        |    }
+                        |    secretsConfig {
+                        |      secretsEnvFile = file("secrets.env")
+                        |      preserveComments = true
+                        |      createBackup = true
                         |    }
                         |  }
+                        |
+                        |Usage Examples:
+                        |  ./gradlew generateKeystores          # Generate both keystores
+                        |  ./gradlew generateOriginalKeystore   # Generate debug keystore only
+                        |  ./gradlew generateUploadKeystore     # Generate release keystore only
+                        |
+                        |Note: This task replicates the functionality of keystore-manager.sh
+                        |      with better cross-platform compatibility and Gradle integration.
                     """.trimMargin())
                 }
             }

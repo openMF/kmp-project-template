@@ -1,3 +1,4 @@
+import org.convention.keystore.ConfigurationFileUpdatesTask
 import org.convention.keystore.KeystoreConfig
 import org.convention.keystore.KeystoreGenerationTask
 import org.convention.keystore.SecretsConfig
@@ -19,13 +20,39 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
             keystoreExtension.secretsConfig.convention(SecretsConfig())
 
             // Register the keystore generation task
-            tasks.register("generateKeystores", KeystoreGenerationTask::class.java) {
+            val generateKeystoresTask = tasks.register("generateKeystores", KeystoreGenerationTask::class.java) {
                 // Configure task with extension values
                 keystoreConfig.set(keystoreExtension.keystoreConfig)
                 secretsConfig.set(keystoreExtension.secretsConfig)
-                
+
                 // Load configuration from secrets.env if it exists
                 KeystoreGenerationTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
+            }
+
+            // Register configuration file updates task
+            val updateConfigFilesTask = tasks.register("updateConfigurationFiles", ConfigurationFileUpdatesTask::class.java) {
+                // Load configuration from secrets.env if it exists
+                ConfigurationFileUpdatesTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
+            }
+
+            // Register combined task that generates keystores and updates config files
+            tasks.register("generateKeystoresAndUpdateConfigs", KeystoreGenerationTask::class.java) {
+                keystoreConfig.set(keystoreExtension.keystoreConfig)
+                secretsConfig.set(keystoreExtension.secretsConfig)
+
+                KeystoreGenerationTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
+
+                // Configure the update task to run after this task
+                finalizedBy(updateConfigFilesTask)
+            }
+
+            // Configure the update task to use generated keystores
+            updateConfigFilesTask.configure {
+                // Set dependency on keystore generation
+                dependsOn(generateKeystoresTask)
+
+                // Configure to use upload keystore from generation task
+                ConfigurationFileUpdatesTask.createForUploadKeystore(this, generateKeystoresTask.get())
             }
 
             // Register convenience tasks for individual keystore types
@@ -34,7 +61,7 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
                 secretsConfig.set(keystoreExtension.secretsConfig)
                 generateOriginal.set(true)
                 generateUpload.set(false)
-                
+
                 KeystoreGenerationTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
             }
 
@@ -43,7 +70,7 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
                 secretsConfig.set(keystoreExtension.secretsConfig)
                 generateOriginal.set(false)
                 generateUpload.set(true)
-                
+
                 KeystoreGenerationTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
             }
 
@@ -59,6 +86,10 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
                         |  - generateKeystores: Generate both ORIGINAL and UPLOAD keystores
                         |  - generateOriginalKeystore: Generate only the ORIGINAL (debug) keystore
                         |  - generateUploadKeystore: Generate only the UPLOAD (release) keystore
+                        |  - generateKeystoresAndUpdateConfigs: Generate keystores and update config files
+                        |
+                        |Configuration Update Tasks:
+                        |  - updateConfigurationFiles: Update fastlane and gradle config files with keystore info
                         |
                         |Help Tasks:
                         |  - keystoreHelp: Shows this help message
@@ -88,9 +119,11 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
                         |  }
                         |
                         |Usage Examples:
-                        |  ./gradlew generateKeystores          # Generate both keystores
-                        |  ./gradlew generateOriginalKeystore   # Generate debug keystore only
-                        |  ./gradlew generateUploadKeystore     # Generate release keystore only
+                        |  ./gradlew generateKeystores                    # Generate both keystores
+                        |  ./gradlew generateOriginalKeystore             # Generate debug keystore only
+                        |  ./gradlew generateUploadKeystore               # Generate release keystore only
+                        |  ./gradlew generateKeystoresAndUpdateConfigs    # Generate keystores and update configs
+                        |  ./gradlew updateConfigurationFiles            # Update config files only
                         |
                         |Note: This task replicates the functionality of keystore-manager.sh
                         |      with better cross-platform compatibility and Gradle integration.

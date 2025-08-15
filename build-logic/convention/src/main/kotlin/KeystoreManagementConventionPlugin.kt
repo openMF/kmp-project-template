@@ -2,6 +2,7 @@ import org.convention.keystore.ConfigurationFileUpdatesTask
 import org.convention.keystore.KeystoreConfig
 import org.convention.keystore.KeystoreGenerationTask
 import org.convention.keystore.SecretsConfig
+import org.convention.keystore.SecretsEnvUpdateTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -35,6 +36,12 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
                 ConfigurationFileUpdatesTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
             }
 
+            // Register secrets.env update task (KMPPT-57)
+            val updateSecretsEnvTask = tasks.register("updateSecretsEnv", SecretsEnvUpdateTask::class.java) {
+                // Configure to use keystores from generation task
+                SecretsEnvUpdateTask.createFromKeystoreGeneration(this, generateKeystoresTask.get(), keystoreExtension.secretsConfig.get())
+            }
+
             // Register combined task that generates keystores and updates config files
             tasks.register("generateKeystoresAndUpdateConfigs", KeystoreGenerationTask::class.java) {
                 keystoreConfig.set(keystoreExtension.keystoreConfig)
@@ -42,8 +49,9 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
 
                 KeystoreGenerationTask.createWithSecretsConfig(this, keystoreExtension.secretsConfig.get())
 
-                // Configure the update task to run after this task
+                // Configure the update tasks to run after this task
                 finalizedBy(updateConfigFilesTask)
+                finalizedBy(updateSecretsEnvTask)
             }
 
             // Configure the update task to use generated keystores
@@ -90,6 +98,7 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
                         |
                         |Configuration Update Tasks:
                         |  - updateConfigurationFiles: Update fastlane and gradle config files with keystore info
+                        |  - updateSecretsEnv: Update secrets.env with base64-encoded keystores (KMPPT-57)
                         |
                         |Help Tasks:
                         |  - keystoreHelp: Shows this help message
@@ -124,6 +133,7 @@ class KeystoreManagementConventionPlugin : Plugin<Project> {
                         |  ./gradlew generateUploadKeystore               # Generate release keystore only
                         |  ./gradlew generateKeystoresAndUpdateConfigs    # Generate keystores and update configs
                         |  ./gradlew updateConfigurationFiles            # Update config files only
+                        |  ./gradlew updateSecretsEnv                    # Update secrets.env with base64 keystores
                         |
                         |Note: This task replicates the functionality of keystore-manager.sh
                         |      with better cross-platform compatibility and Gradle integration.

@@ -76,3 +76,4 @@ secrets/
 
 # Sync Log File
 *.log
+/build-logic/convention/secrets-backup/

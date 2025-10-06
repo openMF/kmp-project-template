@@ -28,7 +28,7 @@ on:
       publish:
         description: 'Publish documentation to docs repository'
         required: false
-        default: 'true'
+        default: true
         type: boolean
 
 env:
@@ -74,19 +74,30 @@ jobs:
       # Organize documentation
       - name: Organize Documentation Output
         run: |
-          mkdir -p docs-output
-          
+          mkdir -p docs-website/static/api
           # Copy Dokka documentation
           if [ -d "build/dokka" ]; then
             echo "Copying Dokka documentation..."
-            cp -r build/dokka/* docs-output/
+            cp -r build/dokka/* docs-website/static/api/
           fi
-          
           # Create .nojekyll for GitHub Pages
-          touch docs-output/.nojekyll
-          
+          touch docs-website/static/api/.nojekyll
           echo "Documentation organized successfully!"
-          ls -la docs-output/
+          ls -la docs-website/static/api/
+
+      # Commit and push Dokka docs to docs-website on dev branch
+      - name: Commit and Push Dokka Docs to docs-website
+        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs-website/static/api
+          if git diff --staged --quiet; then
+            echo "No documentation changes to commit."
+          else
+            git commit -m "docs: update Dokka API docs [skip ci]"
+            git push origin dev
+          fi
       
       # Upload documentation as artifact
       - name: Upload Documentation Artifact
@@ -96,63 +107,22 @@ jobs:
           path: docs-output/
           retention-days: 30
       
-      # Publish to GitHub Pages or docs repository
-      - name: Publish to Documentation Repository
-        if: |
-          github.event_name == 'push' && 
-          github.ref == 'refs/heads/main' &&
-          (github.event.inputs.publish != 'false')
-        env:
-          DOCS_DEPLOY_TOKEN: ${{ secrets.DOCS_DEPLOY_TOKEN }}
-        run: |
-          if [ -z "$DOCS_DEPLOY_TOKEN" ]; then
-            echo "⚠️  DOCS_DEPLOY_TOKEN not set. Skipping documentation publishing."
-            echo "To enable publishing, add DOCS_DEPLOY_TOKEN to repository secrets."
-            exit 0
-          fi
-          
-          # Configure git
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Clone docs repository
-          git clone "https://x-access-token:${DOCS_DEPLOY_TOKEN}@github.com/${DOCS_REPO}.git" docs-repo
-          cd docs-repo
-          git checkout "${DOCS_BRANCH}" || git checkout -b "${DOCS_BRANCH}"
-          
-          # Clear existing docs and copy new ones
-          rm -rf *
-          cp -r ../docs-output/* .
-          
-          # Create .nojekyll for GitHub Pages
-          touch .nojekyll
-          
-          # Commit and push
-          git add .
-          if git diff --staged --quiet; then
-            echo "No documentation changes to publish"
-          else
-            git commit -m "📚 Update documentation from ${GITHUB_REPOSITORY}@${GITHUB_SHA::7}"
-            git push origin "${DOCS_BRANCH}"
-            echo "✅ Documentation published successfully!"
-          fi
-      
       # Summary
       - name: Generate Summary
         if: always()
         run: |
-          echo "### 📚 Documentation Generation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "### Documentation Generation Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Dokka (Kotlin API Docs) | ✅ Generated |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dokka (Kotlin API Docs) | Generated |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** \`${GITHUB_SHA::7}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`${GITHUB_REF_NAME}\`" >> $GITHUB_STEP_SUMMARY
           
           if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "📦 Documentation artifact uploaded and available for 30 days" >> $GITHUB_STEP_SUMMARY
+            echo "Documentation artifact uploaded and available for 30 days" >> $GITHUB_STEP_SUMMARY
           fi
 
   # Optional: Validate documentation links
@@ -172,13 +142,13 @@ jobs:
       - name: Check Documentation Size
         run: |
           SIZE=$(du -sh docs-output/ | cut -f1)
-          echo "📊 Documentation size: $SIZE"
+          echo "Documentation size: $SIZE"
           echo "### Documentation Validation" >> $GITHUB_STEP_SUMMARY
           echo "Documentation size: **$SIZE**" >> $GITHUB_STEP_SUMMARY
       
       - name: List Generated Files
         run: |
-          echo "### 📁 Generated Files" >> $GITHUB_STEP_SUMMARY
+          echo "### Generated Files" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           find docs-output/ -type f | head -20 >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY

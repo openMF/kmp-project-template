@@ -44,6 +44,97 @@ plugins {
     alias(libs.plugins.ktrofit) apply false
 
     alias(libs.plugins.room) apply false
+    alias(libs.plugins.dokka)
+}
+
+// Apply Dokka to subprojects
+subprojects {
+    apply(plugin = "org.jetbrains.dokka")
+}
+
+// Dokka Configuration
+tasks.withType<org.jetbrains.dokka.gradle.DokkaMultiModuleTask>().configureEach {
+    moduleName.set("KMP Project Documentation")
+    
+    outputDirectory.set(layout.buildDirectory.dir("docs/html"))
+    
+    val readmeFile = rootProject.file("README.md")
+    if (readmeFile.exists()) {
+        includes.from(readmeFile)
+    }
+}
+
+subprojects {
+    tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
+        moduleName.set(project.name)
+        
+        moduleVersion.set(project.version.toString())
+        
+        dokkaSourceSets.configureEach {
+            suppress.set(false)
+            
+            displayName.set(name)
+            
+            val readmeFile = project.file("README.md")
+            if (readmeFile.exists()) {
+                includes.from(readmeFile)
+            }
+            
+            sourceLink {
+                localDirectory.set(projectDir.resolve("src"))
+                remoteUrl.set(
+                    java.net.URI(
+                        "https://github.com/YOUR_USERNAME/YOUR_REPO/tree/main/${project.path.replace(":", "/")}/src"
+                    ).toURL()
+                )
+                remoteLineSuffix.set("#L")
+            }
+            
+            externalDocumentationLink {
+                url.set(java.net.URI("https://kotlinlang.org/api/kotlinx.coroutines/").toURL())
+                packageListUrl.set(
+                    java.net.URI("https://kotlinlang.org/api/kotlinx.coroutines/package-list").toURL()
+                )
+            }
+            
+            externalDocumentationLink {
+                url.set(java.net.URI("https://kotlinlang.org/api/kotlinx-serialization/").toURL())
+            }
+            
+            externalDocumentationLink {
+                url.set(java.net.URI("https://api.ktor.io/").toURL())
+            }
+            
+            platform.set(
+                when {
+                    name.contains("android", ignoreCase = true) -> 
+                        org.jetbrains.dokka.Platform.jvm
+                    name.contains("jvm", ignoreCase = true) -> 
+                        org.jetbrains.dokka.Platform.jvm
+                    name.contains("js", ignoreCase = true) -> 
+                        org.jetbrains.dokka.Platform.js
+                    name.contains("native", ignoreCase = true) || 
+                    name.contains("ios", ignoreCase = true) -> 
+                        org.jetbrains.dokka.Platform.native
+                    name.contains("common", ignoreCase = true) -> 
+                        org.jetbrains.dokka.Platform.common
+                    else -> org.jetbrains.dokka.Platform.common
+                }
+            )
+            
+            suppressInheritedMembers.set(false)
+            suppressObviousFunctions.set(true)
+            skipEmptyPackages.set(true)
+            reportUndocumented.set(false)
+            skipDeprecated.set(false)
+            jdkVersion.set(17)
+            
+            perPackageOption {
+                matchingRegex.set(".*\\.internal.*")
+                suppress.set(true)
+            }
+        }
+    }
 }
 
 object DynamicVersion {

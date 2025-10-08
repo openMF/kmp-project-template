@@ -87,6 +87,8 @@ const config: Config = {
           position: 'left',
           label: 'Tutorial',
         },
+        // Link to generated Dokka HTML index (synced into static/api)
+        {to: '/api/index.html', label: 'API', position: 'left'},
         {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/facebook/docusaurus',

@@ -1,0 +1,142 @@
+name: Build and Publish Versioned Docs
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '17'
+
+jobs:
+  release-docs:
+    name: Build and Publish Versioned Docs
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Generate Dokka Documentation
+        run: ./gradlew dokkaGenerate -x :cmp-web:dokkaGenerate --no-daemon --stacktrace
+
+      - name: Organize Versioned API Documentation
+        run: |
+          set -euo pipefail
+
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          VERSION="${TAG_NAME#v}"
+          if [ -z "$VERSION" ]; then
+            echo "VERSION could not be derived from tag; exiting."
+            exit 1
+          fi
+
+          mkdir -p docs-website/static/api
+          rm -rf "docs-website/static/api/${VERSION}"
+          mkdir -p "docs-website/static/api/${VERSION}"
+
+          echo "Copying Dokka into versioned per-module folders: ${VERSION}"
+          while IFS= read -r dokkaDir; do
+            moduleDir="$(dirname "$(dirname "$dokkaDir")")"
+            moduleName="$(basename "$moduleDir")"
+            mkdir -p "docs-website/static/api/${VERSION}/${moduleName}"
+            rsync -a --delete "$dokkaDir"/ "docs-website/static/api/${VERSION}/${moduleName}"/
+          done < <(find . -path "*/build/dokka/html" -type d)
+
+          if [ -d "build/dokka/html" ]; then
+            mkdir -p "docs-website/static/api/${VERSION}/root"
+            rsync -a --delete build/dokka/html/ "docs-website/static/api/${VERSION}/root/"
+          fi
+
+          # Update latest alias
+          mkdir -p docs-website/static/api/latest
+          rsync -a --delete "docs-website/static/api/${VERSION}/" "docs-website/static/api/latest/"
+
+          # Maintain versions.json (API)
+          VERSIONS_JSON="docs-website/static/api/versions.json"
+          tmp=$(mktemp)
+          if [ -f "$VERSIONS_JSON" ]; then
+            jq --arg v "$VERSION" '(. + [$v]) | unique | sort' "$VERSIONS_JSON" > "$tmp" || echo "[\"$VERSION\"]" > "$tmp"
+          else
+            echo "[\"$VERSION\"]" > "$tmp"
+          fi
+          mv "$tmp" "$VERSIONS_JSON"
+
+          # .nojekyll
+          touch "docs-website/static/api/${VERSION}/.nojekyll"
+          touch "docs-website/static/api/latest/.nojekyll"
+
+          echo "Versioned API docs prepared for ${VERSION}"
+
+      - name: Commit versioned API docs
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs-website/static/api
+          if git diff --staged --quiet; then
+            echo "No API documentation changes to commit."
+          else
+            git commit -m "docs: versioned API docs for ${TAG_NAME}"
+            git push
+          fi
+
+      - name: Build Docusaurus website
+        working-directory: docs-website
+        run: |
+          set -euo pipefail
+          if command -v corepack >/dev/null 2>&1; then corepack enable; fi
+          npm ci
+          npm run build
+
+      - name: Publish docs-website to GitHub Pages repository
+        env:
+          GH_PAGES_TOKEN: ${{ secrets.GH_PAGES_TOKEN }}
+        run: |
+          if [ -z "$GH_PAGES_TOKEN" ]; then
+            echo "GH_PAGES_TOKEN secret is not set; skipping publish."
+            exit 0
+          fi
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          echo "Cloning openmf/openmf.github.io..."
+          rm -rf /tmp/gh-pages
+          git clone --depth 1 https://x-access-token:${GH_PAGES_TOKEN}@github.com/openmf/openmf.github.io.git /tmp/gh-pages
+
+          echo "Syncing docs-website -> kmp-project-template/docs-website..."
+          mkdir -p /tmp/gh-pages/kmp-project-template/docs-website
+          rsync -av --delete docs-website/ /tmp/gh-pages/kmp-project-template/docs-website/
+
+          cd /tmp/gh-pages
+          if git diff --quiet; then
+            echo "No changes to publish to openmf.github.io."
+          else
+            git add -A
+            git commit -m "docs: publish kmp-project-template docs-website for ${TAG_NAME} from ${GITHUB_REPOSITORY}@${GITHUB_SHA::7}"
+            git push origin main
+            echo "Published docs to openmf.github.io/kmp-project-template/docs-website"
+          fi
+
+

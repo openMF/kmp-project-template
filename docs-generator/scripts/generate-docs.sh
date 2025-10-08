@@ -10,6 +10,7 @@
 #
 # Options:
 #   --clean        Clean previous documentation before generating
+#   --no-color     Disable colored output
 #   --help         Show this help message
 #
 # Environment Variables:
@@ -25,14 +26,26 @@
 set -e  # Exit on error
 
 # Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Check if colors are supported and not disabled
+if [ "$NO_COLOR" = false ] && [ -t 1 ] && command -v tput >/dev/null 2>&1 && [ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]; then
+    # Terminal supports colors
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    YELLOW='\033[1;33m'
+    BLUE='\033[0;34m'
+    NC='\033[0m' # No Color
+else
+    # No color support or disabled
+    RED=''
+    GREEN=''
+    YELLOW=''
+    BLUE=''
+    NC=''
+fi
 
 # Default options
 CLEAN=false
+NO_COLOR=false
 OUTPUT_DIR="${OUTPUT_DIR:-build/docs-output}"
 
 # Script directory and project root
@@ -112,7 +125,7 @@ generate_dokka() {
     
     cd "$PROJECT_ROOT"
     
-    if ./gradlew dokkaHtmlMultiModule --no-daemon --stacktrace; then
+    if ./gradlew dokkaGenerate -x :cmp-web:dokkaGenerate --no-configuration-cache --no-daemon --stacktrace; then
         print_success "Dokka documentation generated successfully"
     else
         print_error "Failed to generate Dokka documentation"

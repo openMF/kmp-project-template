@@ -42,8 +42,14 @@ Edit `docs-generator/dokka-config/dokka.gradle.kts` and replace:
 
 ### 4. Generate Documentation
 
+**Linux/macOS:**
 ```bash
 ./docs-generator/scripts/generate-docs.sh
+```
+
+**Windows:**
+```cmd
+docs-generator\scripts\generate-docs.bat
 ```
 
 Documentation output: `build/docs-output/`
@@ -62,13 +68,11 @@ docs-generator/
 
 ## Optional: Automated Publishing
 
-1. Create a separate docs repository
-2. Add `DOCS_DEPLOY_TOKEN` secret to your GitHub repo
-3. Update `DOCS_REPO` in `.github/workflows/docs-generate.yaml`
-4. Push to main - docs auto-publish!
+If you plan to publish to a separate documentation repository, add a custom workflow or script for that purpose. This template deploys via the `docs-website` project and GitHub Pages.
 
 ## Available Scripts
 
+**Linux/macOS:**
 ```bash
 # Generate documentation
 ./docs-generator/scripts/generate-docs.sh
@@ -76,11 +80,20 @@ docs-generator/
 # Generate with cleanup
 ./docs-generator/scripts/generate-docs.sh --clean
 
-# Publish to docs repository
-./docs-generator/scripts/push-to-docs-repo.sh
+# Sync docs to website static folder
+./docs-generator/scripts/sync-dokka-to-static-api.sh
+```
 
-# Dry run (see what would happen)
-./docs-generator/scripts/push-to-docs-repo.sh --dry-run
+**Windows:**
+```cmd
+# Generate documentation
+docs-generator\scripts\generate-docs.bat
+
+# Generate with cleanup
+docs-generator\scripts\generate-docs.bat --clean
+
+# Sync docs to website static folder
+docs-generator\scripts\sync-dokka-to-static-api.bat
 ```
 
 ## If You Don't Need Documentation

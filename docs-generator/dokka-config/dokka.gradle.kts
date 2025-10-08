@@ -130,6 +130,17 @@ subprojects {
                 matchingRegex.set(".*\\.internal.*")
                 suppress.set(true)
             }
+            // Exclude Compose Resources generated and API packages from Dokka
+            perPackageOption {
+                // org.jetbrains.compose.resources API
+                matchingRegex.set("org\\.jetbrains\\.compose\\.resources(\\..*)?")
+                suppress.set(true)
+            }
+            perPackageOption {
+                // common pattern used by compose.resources generated classes
+                matchingRegex.set(".*\\.generated\\.resources(\\..*)?")
+                suppress.set(true)
+            }
         }
     }
 }

@@ -13,7 +13,7 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.corebase.network"
+    namespace = "template.core.base.network"
 }
 
 kotlin {

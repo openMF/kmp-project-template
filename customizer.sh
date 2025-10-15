@@ -245,6 +245,45 @@ update_libs_versions_toml() {
     print_success "libs.versions.toml updated successfully"
 }
 
+update_google_services_json() {
+    print_section "Updating Google Services Configuration"
+
+    local google_services_file="cmp-android/google-services.json"
+
+    if [ ! -f "$google_services_file" ]; then
+        print_warning "google-services.json file not found at $google_services_file"
+        return 0
+    fi
+
+    print_processing "Updating package names in $google_services_file"
+
+    # Update all package_name occurrences for all 4 variants
+    if grep -q "cmp\.android\.app" "$google_services_file"; then
+        # Update base package name (release variant)
+        sed -i.bak "s/\"cmp\.android\.app\"/\"$ESCAPED_PACKAGE\"/g" "$google_services_file"
+        print_success "Updated release package: 'cmp.android.app' → '$PACKAGE'"
+        
+        # Update .debug variant
+        sed -i.bak "s/\"$ESCAPED_PACKAGE\.debug\"/\"$PACKAGE.debug\"/g" "$google_services_file"
+        print_success "Updated debug variant: '$PACKAGE.debug'"
+        
+        # Update .demo variant
+        sed -i.bak "s/\"$ESCAPED_PACKAGE\.demo\"/\"$PACKAGE.demo\"/g" "$google_services_file"
+        print_success "Updated demo variant: '$PACKAGE.demo'"
+        
+        # Update .demo.debug variant
+        sed -i.bak "s/\"$ESCAPED_PACKAGE\.demo\.debug\"/\"$PACKAGE.demo.debug\"/g" "$google_services_file"
+        print_success "Updated demo.debug variant: '$PACKAGE.demo.debug'"
+    else
+        print_warning "No 'cmp.android.app' package names found in google-services.json"
+    fi
+
+    print_success "Google Services configuration updated successfully"
+    print_info "All 4 app variants configured in google-services.json"
+    print_info "Note: Only Release and Demo are registered in Firebase (Debug variants share credentials)"
+    print_warning "Important: Remember to replace this file with your own Firebase configuration!"
+}
+
 # Function to process module directories
 process_module_dirs() {
     local module_path=$1
@@ -362,25 +401,35 @@ print_final_summary() {
     echo "   - Updated iOS bundle identifier"
     echo "   - Updated provisioning profile names"
     echo
-    echo -e "${CYAN}5. Module Updates:${NC}"
+    echo -e "${CYAN}5. Google Services (Firebase):${NC}"
+    echo "   - Updated Android package names in google-services.json"
+    echo "   - All 4 app variants configured:"
+    echo "     • Release: $PACKAGE"
+    echo "     • Debug: $PACKAGE.debug"
+    echo "     • Demo: $PACKAGE.demo"
+    echo "     • Demo Debug: $PACKAGE.demo.debug"
+    echo "   - Note: Debug variants share Firebase credentials with release variants"
+    echo
+    echo -e "${CYAN}6. Module Updates:${NC}"
     echo "   - Renamed all mifos-prefixed modules"
     echo "   - Updated module references in Gradle files"
     echo "   - Updated module imports and packages"
     echo
-    echo -e "${CYAN}6. Code Updates:${NC}"
+    echo -e "${CYAN}7. Code Updates:${NC}"
     echo "   - Renamed Mifos-prefixed files to $PROJECT_NAME_CAPITALIZED"
     echo "   - Updated package declarations and imports"
     echo "   - Updated typesafe accessors"
     echo
     echo -e "${YELLOW}${WARNING} Important Next Steps:${NC}"
-    echo "   1. Review and update fastlane-config/project_config.rb with your:"
+    echo "   1. Replace cmp-android/google-services.json with your own Firebase configuration"
+    echo "   2. Review and update fastlane-config/project_config.rb with your:"
     echo "      - Firebase App IDs"
     echo "      - App Store Connect credentials"
     echo "      - Code signing configuration"
     echo "      - Keystore passwords (if different)"
-    echo "   2. Place required secret files in the secrets/ directory"
-    echo "   3. Update build output paths if your module names changed"
-    echo "   4. Review gradle/libs.versions.toml for any additional customizations"
+    echo "   3. Place required secret files in the secrets/ directory"
+    echo "   4. Update build output paths if your module names changed"
+    echo "   5. Review gradle/libs.versions.toml for any additional customizations"
     echo
     echo -e "${GREEN}${ROCKET} Project customization completed successfully!${NC}"
 }
@@ -410,6 +459,7 @@ main() {
     update_root_project_name
     update_fastlane_config
     update_libs_versions_toml
+    update_google_services_json
     process_module_content
     rename_files
     cleanup_backup_files

@@ -119,7 +119,7 @@ abstract class SecretsEnvUpdateTask : BaseKeystoreTask() {
             secretsFile.parentFile?.mkdirs()
 
             // Write updated secrets.env file
-            writeSecretsFile(secretsFile, mergedSecrets, config)
+            writeSecretsFile(secretsFile, mergedSecrets)
 
             // Validate output if requested
             if (validateOutput.get()) {
@@ -389,7 +389,10 @@ abstract class SecretsEnvUpdateTask : BaseKeystoreTask() {
     /**
      * Writes the merged secrets to the secrets.env file with proper formatting
      */
-    private fun writeSecretsFile(secretsFile: File, secrets: ParsedSecretsData, config: SecretsConfig) {
+    private fun writeSecretsFile(
+        secretsFile: File,
+        secrets: ParsedSecretsData,
+    ) {
         try {
             secretsFile.printWriter().use { writer ->
                 // Write header comment if it's a new file or no comments exist

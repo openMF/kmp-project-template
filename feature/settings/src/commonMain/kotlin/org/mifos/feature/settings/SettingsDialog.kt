@@ -35,6 +35,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.core.model.DarkThemeConfig
+import org.mifos.core.model.ThemeBrand
 import org.mifos.feature.settings.generated.resources.Res
 import org.mifos.feature.settings.generated.resources.feature_settings_brand_android
 import org.mifos.feature.settings.generated.resources.feature_settings_brand_default
@@ -49,10 +53,6 @@ import org.mifos.feature.settings.generated.resources.feature_settings_dynamic_c
 import org.mifos.feature.settings.generated.resources.feature_settings_loading
 import org.mifos.feature.settings.generated.resources.feature_settings_theme
 import org.mifos.feature.settings.generated.resources.feature_settings_title
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.core.model.DarkThemeConfig
-import org.mifos.core.model.ThemeBrand
 
 @Composable
 fun SettingsDialog(

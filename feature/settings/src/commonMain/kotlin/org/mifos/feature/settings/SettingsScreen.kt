@@ -29,9 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import kmp_project_template.feature.settings.generated.resources.Res
-import kmp_project_template.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
-import kmp_project_template.feature.settings.generated.resources.feature_settings_change_theme_text
+import org.mifos.feature.settings.generated.resources.Res
+import org.mifos.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
+import org.mifos.feature.settings.generated.resources.feature_settings_change_theme_text
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.ui.scaffold.KptScaffold

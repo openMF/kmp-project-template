@@ -37,3 +37,9 @@ kotlin {
         }
     }
 }
+
+compose {
+    resources {
+        packageOfResClass = "org.mifos.feature.home.generated.resources"
+    }
+}

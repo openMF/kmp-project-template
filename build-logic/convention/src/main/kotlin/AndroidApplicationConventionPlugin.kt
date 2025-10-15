@@ -1,14 +1,10 @@
+
 import com.android.build.api.dsl.ApplicationExtension
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.gradle.BaseExtension
-import org.convention.configureBadgingTasks
 import org.convention.configureGradleManagedDevices
 import org.convention.configureKotlinAndroid
-import org.convention.configurePrintApksTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.getByType
 
 /**
  * Plugin that applies the Android application plugin and configures it.
@@ -33,10 +29,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 @Suppress("UnstableApiUsage")
                 testOptions.animationsDisabled = true
                 configureGradleManagedDevices(this)
-            }
-            extensions.configure<ApplicationAndroidComponentsExtension> {
-                configurePrintApksTask(this)
-                configureBadgingTasks(extensions.getByType<BaseExtension>(), this)
             }
         }
     }

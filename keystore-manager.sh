@@ -117,6 +117,7 @@ show_help() {
     echo ""
     echo "Commands:"
     echo "  generate - Generate Android keystores and update secrets.env (default)"
+    echo "  encode-secrets - Encode files from secrets/ directory and update secrets.env"
     echo "  view     - View all secrets in the secrets.env file as a formatted table"
     echo "  add      - Add secrets to a GitHub repository from secrets.env"
     echo "  list     - List all secrets in a GitHub repository"
@@ -132,6 +133,7 @@ show_help() {
     echo ""
     echo "Examples:"
     echo "  ./keystore-manager.sh generate"
+    echo "  ./keystore-manager.sh encode-secrets"
     echo "  ./keystore-manager.sh view"
     echo "  ./keystore-manager.sh add --repo=username/repo"
     echo "  ./keystore-manager.sh list --repo=username/repo"
@@ -280,6 +282,159 @@ encode_base64() {
         echo -e "${RED}Error: File not found: $file_path${NC}"
         return 1
     fi
+}
+
+# Function to create secrets directory if it doesn't exist
+create_secrets_dir() {
+    if [ ! -d "secrets" ]; then
+        echo -e "${BLUE}Creating 'secrets' directory...${NC}"
+        mkdir -p secrets
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Error: Failed to create 'secrets' directory.${NC}"
+            exit 1
+        fi
+    fi
+}
+
+# Function to encode secrets directory files and update secrets.env
+encode_secrets_directory_files() {
+    echo -e "${BLUE}==================================================================${NC}"
+    echo -e "${BLUE}Encoding files from secrets/ directory${NC}"
+    echo -e "${BLUE}==================================================================${NC}"
+
+    # Define mapping of file names to secret names
+    declare -A FILE_TO_SECRET_MAP
+    FILE_TO_SECRET_MAP["firebaseAppDistributionServiceCredentialsFile.json"]="FIREBASECREDS"
+    FILE_TO_SECRET_MAP["google-services.json"]="GOOGLESERVICES"
+    FILE_TO_SECRET_MAP["playStorePublishServiceCredentialsFile.json"]="PLAYSTORECREDS"
+    FILE_TO_SECRET_MAP["Auth_key.p8"]="APPSTORE_API_KEY"
+    FILE_TO_SECRET_MAP["match_ci_key"]="MATCH_GIT_PRIVATE_KEY"
+
+    local secrets_found=0
+    local secrets_encoded=0
+    declare -A ENCODED_SECRETS
+
+    # Check if secrets directory exists
+    if [ ! -d "secrets" ]; then
+        echo -e "${YELLOW}No 'secrets' directory found. Skipping secrets encoding.${NC}"
+        return 0
+    fi
+
+    # Scan secrets directory for known files
+    for file_name in "${!FILE_TO_SECRET_MAP[@]}"; do
+        local file_path="secrets/$file_name"
+        local secret_name="${FILE_TO_SECRET_MAP[$file_name]}"
+
+        if [ -f "$file_path" ]; then
+            secrets_found=$((secrets_found + 1))
+            echo -e "${BLUE}Found: $file_name${NC}"
+            echo -e "${BLUE}Encoding as: $secret_name${NC}"
+
+            local encoded=$(encode_base64 "$file_path")
+            if [ $? -eq 0 ]; then
+                ENCODED_SECRETS["$secret_name"]="$encoded"
+                secrets_encoded=$((secrets_encoded + 1))
+                echo -e "${GREEN}✓ Successfully encoded $file_name${NC}"
+            else
+                echo -e "${RED}✗ Failed to encode $file_name${NC}"
+            fi
+        fi
+    done
+
+    if [ $secrets_found -eq 0 ]; then
+        echo -e "${YELLOW}No known secret files found in secrets/ directory${NC}"
+        echo -e "${YELLOW}Looking for: firebaseAppDistributionServiceCredentialsFile.json, google-services.json, playStorePublishServiceCredentialsFile.json, Auth_key.p8, match_ci_key${NC}"
+        return 0
+    fi
+
+    if [ $secrets_encoded -eq 0 ]; then
+        echo -e "${RED}Failed to encode any secret files${NC}"
+        return 1
+    fi
+
+    # Update secrets.env file
+    echo -e "${BLUE}Updating secrets.env with encoded files...${NC}"
+    update_secrets_env_with_files
+
+    echo -e "${GREEN}Encoded $secrets_encoded out of $secrets_found secret files${NC}"
+    return 0
+}
+
+# Function to update secrets.env with encoded secret files
+update_secrets_env_with_files() {
+    if [ ! -f "$ENV_FILE" ]; then
+        echo -e "${YELLOW}secrets.env not found. Secret files will not be added.${NC}"
+        return 0
+    fi
+
+    # Access the ENCODED_SECRETS array from parent scope
+
+    local temp_file="secrets.env.tmp"
+    local in_multiline=false
+    local multiline_end=""
+    local current_key=""
+
+    # Read existing secrets.env and track which sections exist
+    declare -A existing_sections
+
+    while IFS= read -r line || [ -n "$line" ]; do
+        if [ "$in_multiline" = false ] && [[ "$line" == *"<<EOF" ]]; then
+            current_key=$(echo "$line" | cut -d '<' -f1 | xargs)
+            existing_sections["$current_key"]=1
+            multiline_end="EOF"
+            in_multiline=true
+        elif [ "$in_multiline" = true ] && [[ "$line" == "$multiline_end" ]]; then
+            in_multiline=false
+        fi
+    done < "$ENV_FILE"
+
+    # Copy existing file and update/append sections
+    cp "$ENV_FILE" "$temp_file"
+    in_multiline=false
+
+    # For each encoded secret, update or append
+    for secret_name in "${!ENCODED_SECRETS[@]}"; do
+        local encoded_value="${ENCODED_SECRETS[$secret_name]}"
+
+        if [ -n "${existing_sections[$secret_name]}" ]; then
+            # Update existing section
+            echo -e "${BLUE}Updating existing section: $secret_name${NC}"
+            local temp_file2="${temp_file}.2"
+            local in_target_section=false
+
+            while IFS= read -r line || [ -n "$line" ]; do
+                if [[ "$line" == "${secret_name}<<EOF" ]]; then
+                    in_target_section=true
+                    echo "$line" >> "$temp_file2"
+                    echo "$encoded_value" >> "$temp_file2"
+                    continue
+                fi
+
+                if [ "$in_target_section" = true ] && [[ "$line" == "EOF" ]]; then
+                    in_target_section=false
+                    echo "$line" >> "$temp_file2"
+                    continue
+                fi
+
+                if [ "$in_target_section" = false ]; then
+                    echo "$line" >> "$temp_file2"
+                fi
+            done < "$temp_file"
+
+            mv "$temp_file2" "$temp_file"
+        else
+            # Append new section
+            echo -e "${BLUE}Adding new section: $secret_name${NC}"
+            echo "" >> "$temp_file"
+            echo "${secret_name}<<EOF" >> "$temp_file"
+            echo "$encoded_value" >> "$temp_file"
+            echo "EOF" >> "$temp_file"
+        fi
+    done
+
+    # Replace original file
+    mv "$temp_file" "$ENV_FILE"
+    echo -e "${GREEN}secrets.env updated successfully${NC}"
 }
 
 # Function to create/update secrets.env file
@@ -696,6 +851,10 @@ generate_keystores() {
 
         # Update cmp-android/build.gradle.kts with UPLOAD keystore information
         update_gradle_config "$UPLOAD_KEYSTORE_NAME" "$UPLOAD_KEYSTORE_FILE_PASSWORD" "$UPLOAD_KEYSTORE_ALIAS" "$UPLOAD_KEYSTORE_ALIAS_PASSWORD"
+
+        # Encode and add files from secrets/ directory
+        echo ""
+        encode_secrets_directory_files
     fi
 
     # Summary
@@ -723,6 +882,8 @@ generate_keystores() {
     if [ $ORIGINAL_RESULT -eq 0 ] && [ $UPLOAD_RESULT -eq 0 ]; then
         echo -e "${GREEN}secrets.env has been updated with base64 encoded keystores${NC}"
         echo -e "${GREEN}fastlane-config/android_config.rb has been updated with UPLOAD keystore information${NC}"
+        echo -e "${GREEN}cmp-android/build.gradle.kts has been updated with UPLOAD keystore information${NC}"
+        echo -e "${BLUE}Note: If you have files in secrets/ directory, they have been encoded and added to secrets.env${NC}"
         return 0
     else
         return 1
@@ -1100,6 +1261,10 @@ fi
 case $COMMAND in
     generate)
         generate_keystores
+        ;;
+    encode-secrets)
+        create_secrets_dir
+        encode_secrets_directory_files
         ;;
     view)
         view_secrets

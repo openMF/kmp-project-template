@@ -324,12 +324,13 @@ platform :ios do
   # Shared Private Lane Helpers
   #############################
 
-  private_lane :setup_ci_if_needed do
+  private_lane :setup_ci_if_needed do |options|
       unless ENV['CI']
           UI.message("🖥️ Running locally, skipping CI-specific setup.")
       else
+          ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
           setup_ci(
-            provider: "circleci"
+            provider: options[:ci_provider] || ios_config[:ci_provider]
           )
       end
   end
@@ -363,6 +364,7 @@ platform :ios do
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
       app_identifier = options[:app_identifier] || ios_config[:app_identifier]
       provisioning_profile_name = options[:provisioning_profile_name] || ios_config[:provisioning_profile_name]
+      team_id = options[:team_id] || ios_config[:team_id]
 
       build_ios_app(
         scheme: ios_config[:scheme],
@@ -374,7 +376,7 @@ platform :ios do
                 app_identifier => provisioning_profile_name
             }
         },
-        xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" DEVELOPMENT_TEAM=L432S2FZP5 PROVISIONING_PROFILE_SPECIFIER=\"#{provisioning_profile_name}\""
+        xcargs: "CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=\"Apple Distribution\" DEVELOPMENT_TEAM=#{team_id} PROVISIONING_PROFILE_SPECIFIER=\"#{provisioning_profile_name}\""
       )
   end
 
@@ -435,13 +437,14 @@ platform :ios do
   desc "Upload iOS application to Firebase App Distribution"
   lane :deploy_on_firebase do |options|
     firebase_config = FastlaneConfig.get_firebase_config(:ios)
+    ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
     increment_version(serviceCredsFile: firebase_config[:serviceCredsFile])
 
     build_signed_ios(
         options.merge(
-            match_type: "adhoc",
-            provisioning_profile_name: "match AdHoc org.mifos.kmp.template"
+            match_type: ios_config[:match_type],
+            provisioning_profile_name: ios_config[:provisioning_profile_name]
         )
     )
 
@@ -483,7 +486,7 @@ platform :ios do
 
       build_ios_project(
         options.merge(
-            provisioning_profile_name: "match AppStore org.mifos.kmp.template"
+            provisioning_profile_name: ios_config[:provisioning_profile_appstore]
         )
       )
 
@@ -530,7 +533,7 @@ platform :ios do
 
       build_ios_project(
         options.merge(
-            provisioning_profile_name: "match AppStore org.mifos.kmp.template"
+            provisioning_profile_name: ios_config[:provisioning_profile_appstore]
         )
       )
 

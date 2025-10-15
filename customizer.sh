@@ -126,7 +126,7 @@ update_package_namespace() {
     while IFS= read -r file; do
         if grep -q "namespace = \"org\.mifos" "$file"; then
             print_processing "Updating namespace in: $file"
-            if ! sed -i.bak "s/namespace = \"org\.mifos\.[^\"]*\"/namespace = \"$ESCAPED_PACKAGE\"/g" "$file"; then
+            if ! sed -i.bak "s/namespace = \"org\.mifos\.\([^\"]*\)\"/namespace = \"$ESCAPED_PACKAGE.\1\"/g" "$file"; then
                 echo -e "${RED}Error: sed command failed for namespace in $file${NC}"
                 return 1
             fi
@@ -160,6 +160,89 @@ update_root_project_name() {
         fi
         print_success "Successfully updated rootProject.name to '$PROJECT_NAME'"
     fi
+}
+
+update_fastlane_config() {
+    print_section "Updating Fastlane Configuration"
+
+    local config_file="fastlane-config/project_config.rb"
+
+    if [ ! -f "$config_file" ]; then
+        print_warning "Fastlane config file not found at $config_file"
+        return 0
+    fi
+
+    print_processing "Updating project configuration in $config_file"
+
+    # Update PROJECT_NAME
+    if grep -q "PROJECT_NAME = " "$config_file"; then
+        sed -i.bak "s/PROJECT_NAME = \"[^\"]*\"/PROJECT_NAME = \"$PROJECT_NAME\"/g" "$config_file"
+        print_success "Updated PROJECT_NAME to '$PROJECT_NAME'"
+    fi
+
+    # Update ORGANIZATION_NAME (set it to PROJECT_NAME for consistency)
+    if grep -q "ORGANIZATION_NAME = " "$config_file"; then
+        sed -i.bak "s/ORGANIZATION_NAME = \"[^\"]*\"/ORGANIZATION_NAME = \"$PROJECT_NAME\"/g" "$config_file"
+        print_success "Updated ORGANIZATION_NAME to '$PROJECT_NAME'"
+    fi
+
+    # Update Android package_name - Use exact match to update only the first occurrence
+    if grep -q "package_name: \"[^\"]*\"" "$config_file"; then
+        sed -i.bak "0,/package_name: \"[^\"]*\"/s//package_name: \"$PACKAGE\"/" "$config_file"
+        print_success "Updated Android package_name to '$PACKAGE'"
+    fi
+
+    # Update iOS app_identifier
+    if grep -q "app_identifier: \"org\.mifos" "$config_file"; then
+        sed -i.bak "s/app_identifier: \"org\.mifos\.[^\"]*\"/app_identifier: \"$PACKAGE\"/g" "$config_file"
+        print_success "Updated iOS app_identifier to '$PACKAGE'"
+    fi
+
+    # Update iOS provisioning profile names
+    if grep -q "match AdHoc org\.mifos" "$config_file"; then
+        sed -i.bak "s/match AdHoc org\.mifos\.[^\"]*\"/match AdHoc $PACKAGE\"/g" "$config_file"
+        print_success "Updated iOS AdHoc provisioning profile"
+    fi
+
+    if grep -q "match AppStore org\.mifos" "$config_file"; then
+        sed -i.bak "s/match AppStore org\.mifos\.[^\"]*\"/match AppStore $PACKAGE\"/g" "$config_file"
+        print_success "Updated iOS AppStore provisioning profile"
+    fi
+
+    print_success "Fastlane configuration updated successfully"
+}
+
+update_libs_versions_toml() {
+    print_section "Updating libs.versions.toml"
+
+    local toml_file="gradle/libs.versions.toml"
+
+    if [ ! -f "$toml_file" ]; then
+        print_warning "libs.versions.toml file not found at $toml_file"
+        return 0
+    fi
+
+    print_processing "Updating package configurations in $toml_file"
+
+    # Update desktopPackageName
+    if grep -q "desktopPackageName = " "$toml_file"; then
+        sed -i.bak "s/desktopPackageName = \"[^\"]*\"/desktopPackageName = \"${PROJECT_NAME_CAPITALIZED}Desktop\"/g" "$toml_file"
+        print_success "Updated desktopPackageName to '${PROJECT_NAME_CAPITALIZED}Desktop'"
+    fi
+
+    # Update desktopPackageNamespace
+    if grep -q "desktopPackageNamespace = " "$toml_file"; then
+        sed -i.bak "s/desktopPackageNamespace = \"[^\"]*\"/desktopPackageNamespace = \"$PACKAGE\"/g" "$toml_file"
+        print_success "Updated desktopPackageNamespace to '$PACKAGE'"
+    fi
+
+    # Update androidPackageNamespace
+    if grep -q "androidPackageNamespace = " "$toml_file"; then
+        sed -i.bak "s/androidPackageNamespace = \"[^\"]*\"/androidPackageNamespace = \"$PACKAGE\"/g" "$toml_file"
+        print_success "Updated androidPackageNamespace to '$PACKAGE'"
+    fi
+
+    print_success "libs.versions.toml updated successfully"
 }
 
 # Function to process module directories
@@ -267,15 +350,37 @@ print_final_summary() {
     echo "   - Project name set to: $PROJECT_NAME"
     echo "   - Application name set to: $APPNAME"
     echo
-    echo -e "${CYAN}3. Module Updates:${NC}"
+    echo -e "${CYAN}3. Version Catalog (libs.versions.toml):${NC}"
+    echo "   - Updated desktopPackageName to: ${PROJECT_NAME_CAPITALIZED}Desktop"
+    echo "   - Updated desktopPackageNamespace to: $PACKAGE"
+    echo "   - Updated androidPackageNamespace to: $PACKAGE"
+    echo
+    echo -e "${CYAN}4. Fastlane Configuration:${NC}"
+    echo "   - Updated PROJECT_NAME to: $PROJECT_NAME"
+    echo "   - Updated ORGANIZATION_NAME to: $PROJECT_NAME"
+    echo "   - Updated Android package name"
+    echo "   - Updated iOS bundle identifier"
+    echo "   - Updated provisioning profile names"
+    echo
+    echo -e "${CYAN}5. Module Updates:${NC}"
     echo "   - Renamed all mifos-prefixed modules"
     echo "   - Updated module references in Gradle files"
     echo "   - Updated module imports and packages"
     echo
-    echo -e "${CYAN}4. Code Updates:${NC}"
+    echo -e "${CYAN}6. Code Updates:${NC}"
     echo "   - Renamed Mifos-prefixed files to $PROJECT_NAME_CAPITALIZED"
     echo "   - Updated package declarations and imports"
     echo "   - Updated typesafe accessors"
+    echo
+    echo -e "${YELLOW}${WARNING} Important Next Steps:${NC}"
+    echo "   1. Review and update fastlane-config/project_config.rb with your:"
+    echo "      - Firebase App IDs"
+    echo "      - App Store Connect credentials"
+    echo "      - Code signing configuration"
+    echo "      - Keystore passwords (if different)"
+    echo "   2. Place required secret files in the secrets/ directory"
+    echo "   3. Update build output paths if your module names changed"
+    echo "   4. Review gradle/libs.versions.toml for any additional customizations"
     echo
     echo -e "${GREEN}${ROCKET} Project customization completed successfully!${NC}"
 }
@@ -303,6 +408,8 @@ main() {
     update_compose_resources
     update_package_namespace
     update_root_project_name
+    update_fastlane_config
+    update_libs_versions_toml
     process_module_content
     rename_files
     cleanup_backup_files

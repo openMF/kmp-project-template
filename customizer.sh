@@ -180,32 +180,50 @@ update_fastlane_config() {
         print_success "Updated PROJECT_NAME to '$PROJECT_NAME'"
     fi
 
-    # Update ORGANIZATION_NAME (set it to PROJECT_NAME for consistency)
+    # Update ORGANIZATION_NAME
     if grep -q "ORGANIZATION_NAME = " "$config_file"; then
         sed -i.bak "s/ORGANIZATION_NAME = \"[^\"]*\"/ORGANIZATION_NAME = \"$PROJECT_NAME\"/g" "$config_file"
         print_success "Updated ORGANIZATION_NAME to '$PROJECT_NAME'"
     fi
 
-    # Update Android package_name - Use exact match to update only the first occurrence
-    if grep -q "package_name: \"[^\"]*\"" "$config_file"; then
-        sed -i.bak "0,/package_name: \"[^\"]*\"/s//package_name: \"$PACKAGE\"/" "$config_file"
+    # Update Android package_name in ANDROID hash (with original package pattern)
+    if grep -q 'package_name: "cmp\.android\.app"' "$config_file"; then
+        sed -i.bak 's/package_name: "cmp\.android\.app"/package_name: "'"$PACKAGE"'"/g' "$config_file"
+        print_success "Updated Android package_name to '$PACKAGE'"
+    elif grep -q 'package_name: "[^"]*"' "$config_file"; then
+        # Fallback: if original package not found, update any package_name in ANDROID section
+        sed -i.bak '/ANDROID = {/,/^[[:space:]]*}/ s/package_name: "[^"]*"/package_name: "'"$PACKAGE"'"/' "$config_file"
         print_success "Updated Android package_name to '$PACKAGE'"
     fi
 
-    # Update iOS app_identifier
-    if grep -q "app_identifier: \"org\.mifos" "$config_file"; then
-        sed -i.bak "s/app_identifier: \"org\.mifos\.[^\"]*\"/app_identifier: \"$PACKAGE\"/g" "$config_file"
+    # Update iOS app_identifier (look for any pattern, not just org.mifos)
+    if grep -q 'app_identifier: "com\.niyaj' "$config_file"; then
+        sed -i.bak 's/app_identifier: "com\.niyaj\.[^"]*"/app_identifier: "'"$PACKAGE"'"/g' "$config_file"
+        print_success "Updated iOS app_identifier to '$PACKAGE'"
+    elif grep -q 'app_identifier: "org\.mifos' "$config_file"; then
+        sed -i.bak 's/app_identifier: "org\.mifos\.[^"]*"/app_identifier: "'"$PACKAGE"'"/g' "$config_file"
+        print_success "Updated iOS app_identifier to '$PACKAGE'"
+    elif grep -q 'app_identifier: "[^"]*"' "$config_file"; then
+        # Fallback: update any app_identifier in IOS section
+        sed -i.bak '/IOS = {/,/^[[:space:]]*}/ s/app_identifier: "[^"]*"/app_identifier: "'"$PACKAGE"'"/' "$config_file"
         print_success "Updated iOS app_identifier to '$PACKAGE'"
     fi
 
-    # Update iOS provisioning profile names
-    if grep -q "match AdHoc org\.mifos" "$config_file"; then
-        sed -i.bak "s/match AdHoc org\.mifos\.[^\"]*\"/match AdHoc $PACKAGE\"/g" "$config_file"
+    # Update iOS provisioning profile names (AdHoc)
+    if grep -q '"match AdHoc com\.niyaj' "$config_file"; then
+        sed -i.bak 's/"match AdHoc com\.niyaj\.[^"]*"/"match AdHoc '"$PACKAGE"'"/g' "$config_file"
+        print_success "Updated iOS AdHoc provisioning profile"
+    elif grep -q '"match AdHoc org\.mifos' "$config_file"; then
+        sed -i.bak 's/"match AdHoc org\.mifos\.[^"]*"/"match AdHoc '"$PACKAGE"'"/g' "$config_file"
         print_success "Updated iOS AdHoc provisioning profile"
     fi
 
-    if grep -q "match AppStore org\.mifos" "$config_file"; then
-        sed -i.bak "s/match AppStore org\.mifos\.[^\"]*\"/match AppStore $PACKAGE\"/g" "$config_file"
+    # Update iOS provisioning profile names (AppStore)
+    if grep -q '"match AppStore com\.niyaj' "$config_file"; then
+        sed -i.bak 's/"match AppStore com\.niyaj\.[^"]*"/"match AppStore '"$PACKAGE"'"/g' "$config_file"
+        print_success "Updated iOS AppStore provisioning profile"
+    elif grep -q '"match AppStore org\.mifos' "$config_file"; then
+        sed -i.bak 's/"match AppStore org\.mifos\.[^"]*"/"match AppStore '"$PACKAGE"'"/g' "$config_file"
         print_success "Updated iOS AppStore provisioning profile"
     fi
 
@@ -257,29 +275,44 @@ update_google_services_json() {
 
     print_processing "Updating package names in $google_services_file"
 
-    # Update all package_name occurrences for all 4 variants
+    # Original package name to search for (escaped for sed)
+    local original_package="cmp\\.android\\.app"
+
+    # Check if the original package exists in the file
     if grep -q "cmp\.android\.app" "$google_services_file"; then
-        # Update base package name (release variant)
-        sed -i.bak "s/\"cmp\.android\.app\"/\"$ESCAPED_PACKAGE\"/g" "$google_services_file"
-        print_success "Updated release package: 'cmp.android.app' → '$PACKAGE'"
-        
-        # Update .debug variant
-        sed -i.bak "s/\"$ESCAPED_PACKAGE\.debug\"/\"$PACKAGE.debug\"/g" "$google_services_file"
-        print_success "Updated debug variant: '$PACKAGE.debug'"
-        
+        # Update variants in order from most specific to least specific
+        # This prevents partial matches from breaking the replacement
+
+        # Update .demo.debug variant (most specific)
+        if grep -q "\"cmp\.android\.app\.demo\.debug\"" "$google_services_file"; then
+            sed -i.bak "s/\"${original_package}\\.demo\\.debug\"/\"$PACKAGE.demo.debug\"/g" "$google_services_file"
+            print_success "Updated demo.debug variant: 'cmp.android.app.demo.debug' → '$PACKAGE.demo.debug'"
+        fi
+
         # Update .demo variant
-        sed -i.bak "s/\"$ESCAPED_PACKAGE\.demo\"/\"$PACKAGE.demo\"/g" "$google_services_file"
-        print_success "Updated demo variant: '$PACKAGE.demo'"
-        
-        # Update .demo.debug variant
-        sed -i.bak "s/\"$ESCAPED_PACKAGE\.demo\.debug\"/\"$PACKAGE.demo.debug\"/g" "$google_services_file"
-        print_success "Updated demo.debug variant: '$PACKAGE.demo.debug'"
+        if grep -q "\"cmp\.android\.app\.demo\"" "$google_services_file"; then
+            sed -i.bak "s/\"${original_package}\\.demo\"/\"$PACKAGE.demo\"/g" "$google_services_file"
+            print_success "Updated demo variant: 'cmp.android.app.demo' → '$PACKAGE.demo'"
+        fi
+
+        # Update .debug variant
+        if grep -q "\"cmp\.android\.app\.debug\"" "$google_services_file"; then
+            sed -i.bak "s/\"${original_package}\\.debug\"/\"$PACKAGE.debug\"/g" "$google_services_file"
+            print_success "Updated debug variant: 'cmp.android.app.debug' → '$PACKAGE.debug'"
+        fi
+
+        # Update base package name (release variant) - must be last
+        if grep -q "\"cmp\.android\.app\"" "$google_services_file"; then
+            sed -i.bak "s/\"${original_package}\"/\"$PACKAGE\"/g" "$google_services_file"
+            print_success "Updated release package: 'cmp.android.app' → '$PACKAGE'"
+        fi
+
+        print_success "Google Services configuration updated successfully"
+        print_info "All 4 app variants configured in google-services.json"
     else
         print_warning "No 'cmp.android.app' package names found in google-services.json"
     fi
 
-    print_success "Google Services configuration updated successfully"
-    print_info "All 4 app variants configured in google-services.json"
     print_info "Note: Only Release and Demo are registered in Firebase (Debug variants share credentials)"
     print_warning "Important: Remember to replace this file with your own Firebase configuration!"
 }

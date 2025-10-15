@@ -15,9 +15,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import org.mifos.corebase.network.NetworkError
-import org.mifos.corebase.network.NetworkResult
 import template.core.base.common.DataState
+import template.core.base.network.NetworkError
+import template.core.base.network.NetworkResult
 
 /** Custom exception class that wraps a RemoteError */
 class RemoteException(

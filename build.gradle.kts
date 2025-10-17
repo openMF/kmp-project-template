@@ -47,14 +47,45 @@ plugins {
     alias(libs.plugins.dokka)
 }
 
-subprojects {
-    apply(plugin = "org.jetbrains.dokka")
-}
 
 dokka {
     dokkaPublications.html {
         outputDirectory.set(layout.buildDirectory.dir("$rootDir/docs-website/static/api"))
     }
+}
+
+// Currently cmp-web throws some unresolved symbol errors
+// So it is not included in the dokka task
+
+dependencies {
+    dokka(project(":cmp-shared"))
+    dokka(project(":cmp-desktop"))
+    dokka(project(":cmp-android"))
+//    dokka(project(":cmp-web:"))
+    dokka(project(":cmp-navigation"))
+    dokka(project(":core:data"))
+    dokka(project(":core:domain"))
+    dokka(project(":core:datastore"))
+    dokka(project(":core:designsystem"))
+    dokka(project(":core:ui"))
+    dokka(project(":core:common"))
+    dokka(project(":core:network"))
+    dokka(project(":core:model"))
+    dokka(project(":core:analytics"))
+    dokka(project(":core:database:"))
+
+    dokka(project(":feature:home"))
+    dokka(project(":feature:profile"))
+    dokka(project(":feature:settings"))
+
+    dokka(project(":core-base:datastore"))
+    dokka(project(":core-base:common"))
+    dokka(project(":core-base:database"))
+    dokka(project(":core-base:network"))
+    dokka(project(":core-base:designsystem"))
+    dokka(project(":core-base:platform"))
+    dokka(project(":core-base:ui"))
+    dokka(project(":core-base:analytics"))
 }
 
 object DynamicVersion {

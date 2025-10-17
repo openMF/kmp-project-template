@@ -9,6 +9,7 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
+    alias(libs.plugins.dokka)
 }
 
 android {

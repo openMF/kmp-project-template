@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.cmp.feature.convention)
     alias(libs.plugins.kotlinCocoapods)
+    alias(libs.plugins.dokka)
 }
 
 kotlin {

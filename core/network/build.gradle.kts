@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.ktrofit)
     id("kotlinx-serialization")
     id("com.google.devtools.ksp")
+    alias(libs.plugins.dokka)
 }
 
 android {

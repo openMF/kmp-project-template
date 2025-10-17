@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.mifos.kmp.room)
+    alias(libs.plugins.dokka)
 }
 
 android {

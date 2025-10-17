@@ -20,6 +20,7 @@ import org.jetbrains.compose.compose
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    alias(libs.plugins.dokka)
 }
 
 android {

@@ -1,4 +1,6 @@
-# Firebase Setup Script
+# Firebase Setup Script(Incubating)
+
+> \[!Note] The script might not work as expected
 
 ## Overview
 

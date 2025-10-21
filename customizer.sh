@@ -61,6 +61,10 @@ print_processing() {
     echo -e "${PURPLE}${ROCKET} $1${NC}"
 }
 
+print_error() {
+    echo -e "${RED}${WARNING} $1${NC}"
+}
+
 if [[ $# -lt 2 ]]; then
     echo -e "${RED}${WARNING} Invalid arguments${NC}"
     echo -e "${CYAN}Usage: bash customizer.sh my.new.package MyNewProject [ApplicationName]${NC}"
@@ -153,12 +157,24 @@ update_root_project_name() {
 
     print_processing "Updating rootProject.name in $settings_file"
 
-    if grep -q "rootProject\.name\s*=\s*" "$settings_file"; then
-        if ! sed -i.bak "s/rootProject\.name\s*=\s*\"[^\"]*\"/rootProject.name = \"$PROJECT_NAME\"/" "$settings_file"; then
-            print_error "Failed to update rootProject.name in $settings_file"
-            return 1
+    # Check if the line already exists
+    if grep -qE '^\s*rootProject\.name\s*=' "$settings_file"; then
+        # Replace using BSD/GNU compatible sed
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS (BSD sed requires backup suffix)
+            sed -i '' -E "s|^\s*rootProject\.name\s*=.*|rootProject.name = \"$PROJECT_NAME\"|" "$settings_file"
+        else
+            # Linux/GNU sed
+            sed -i -E "s|^\s*rootProject\.name\s*=.*|rootProject.name = \"$PROJECT_NAME\"|" "$settings_file"
         fi
-        print_success "Successfully updated rootProject.name to '$PROJECT_NAME'"
+        print_success "Updated rootProject.name to \"$PROJECT_NAME\""
+    else
+        # Insert at the top of the file
+        tmpfile=$(mktemp)
+        echo "rootProject.name = \"$PROJECT_NAME\"" > "$tmpfile"
+        cat "$settings_file" >> "$tmpfile"
+        mv "$tmpfile" "$settings_file"
+        print_success "Inserted rootProject.name = \"$PROJECT_NAME\" at the top of $settings_file"
     fi
 }
 
@@ -356,7 +372,7 @@ process_module_dirs() {
 
 process_module_content() {
     print_section "Processing Modules"
-    local base_dirs=("core" "feature" "cmp-navigation")
+    local base_dirs=("core" "feature" "cmp-navigation" "cmp-android")
 
     print_processing "Processing module contents..."
     for base_dir in "${base_dirs[@]}"
@@ -373,6 +389,32 @@ process_module_content() {
             print_warning "Directory $base_dir not found"
         fi
     done
+}
+
+update_android_app_imports() {
+    print_section "Updating Imports in cmp-android/src/main/kotlin/cmp/android/app"
+
+    local target_dir="cmp-android/src/main/kotlin/cmp/android/app"
+
+    if [ ! -d "$target_dir" ]; then
+        print_warning "Directory not found: $target_dir"
+        return 0
+    fi
+
+    local count=0
+    while IFS= read -r file; do
+        if grep -q "import org\.mifos" "$file"; then
+            print_processing "Updating imports in: $file"
+            sed -i.bak "s/import org\.mifos/import $PACKAGE/g" "$file"
+            ((count++))
+        fi
+    done < <(find "$target_dir" -type f -name "*.kt")
+
+    if [ "$count" -eq 0 ]; then
+        print_warning "No org.mifos imports found in $target_dir"
+    else
+        print_success "Updated imports in $count file(s) under $target_dir"
+    fi
 }
 
 # Function to rename files
@@ -494,6 +536,7 @@ main() {
     update_libs_versions_toml
     update_google_services_json
     process_module_content
+    update_android_app_imports
     rename_files
     cleanup_backup_files
     print_final_summary

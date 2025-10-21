@@ -22,7 +22,7 @@
 
 </div>
 
-> [!Note]
+> \[!Note]
 >
 > This branch is designed for partial customized projects. Running the `customizer.sh` script
 > doesn't rename any application module, instead it'll change all `core` and `feature` module

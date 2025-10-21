@@ -106,7 +106,6 @@ dependencies {
 
     implementation(projects.coreBase.ui)
     implementation(projects.coreBase.platform)
-    implementation(projects.coreBase.datastore)
 
     // Compose
     implementation(libs.androidx.core.ktx)

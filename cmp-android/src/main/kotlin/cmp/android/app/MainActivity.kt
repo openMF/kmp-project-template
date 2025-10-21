@@ -14,8 +14,10 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.getValue
 import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.shared.SharedApp
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
@@ -65,11 +67,11 @@ class MainActivity : ComponentActivity() {
         analyticsHelper.setUserId(deviceData)
 
         setContent {
-//            val status = networkMonitor.isOnline.collectAsStateWithLifecycle(false).value
-//
-//            if (status) {
-//                appUpdateManager.checkForAppUpdate()
-//            }
+            val status by networkMonitor.isOnline.collectAsStateWithLifecycle(false)
+
+            if (status) {
+                appUpdateManager.checkForAppUpdate()
+            }
 
             lifecycleTracker.markAppLaunchComplete()
 
@@ -96,7 +98,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-//        appUpdateManager.checkForResumeUpdateState()
+        appUpdateManager.checkForResumeUpdateState()
         lifecycleTracker.markAppBackground()
     }
 

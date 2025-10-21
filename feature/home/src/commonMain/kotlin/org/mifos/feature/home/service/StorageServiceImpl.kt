@@ -12,9 +12,9 @@ package org.mifos.feature.home.service
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import org.mifos.feature.home.cache.CacheManager
+import org.mifos.feature.home.cache.LruCacheManager
 import org.mifos.feature.home.model.TaskEntity
-import template.core.base.datastore.cache.CacheManager
-import template.core.base.datastore.cache.LruCacheManager
 
 private const val TASKS_KEY = "ALL_TASKS"
 class StorageServiceImpl(

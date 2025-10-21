@@ -7,9 +7,8 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package template.core.base.datastore.cache
+package org.mifos.feature.home.cache
 
-import template.core.base.datastore.exceptions.CacheException
 
 /**
  * Least Recently Used (LRU) cache implementation for managing in-memory key-value pairs.

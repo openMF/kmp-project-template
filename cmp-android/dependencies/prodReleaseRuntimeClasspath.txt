@@ -2,7 +2,6 @@
 :cmp-shared
 :core-base:analytics
 :core-base:common
-:core-base:datastore
 :core-base:designsystem
 :core-base:network
 :core-base:platform

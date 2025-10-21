@@ -102,4 +102,3 @@ sealed class PreferencesException(message: String, cause: Throwable? = null) :
  */
 class CacheException(message: String, cause: Throwable? = null) :
     PreferencesException("Cache operation failed: $message", cause)
-

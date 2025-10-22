@@ -25,3 +25,7 @@ kotlin {
         }
     }
 }
+
+dokka {
+    moduleName.set("core-domain")
+}

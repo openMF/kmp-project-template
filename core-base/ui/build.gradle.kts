@@ -81,3 +81,7 @@ compose.resources {
     generateResClass = always
     packageOfResClass = "template.core.base.ui.generated.resources"
 }
+
+dokka {
+    moduleName.set("core-base-ui")
+}

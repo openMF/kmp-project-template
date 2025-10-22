@@ -57,3 +57,7 @@ compose.resources {
     generateResClass = always
     packageOfResClass = "org.mifos.core.ui.generated.resources"
 }
+
+dokka {
+    moduleName.set("core-ui")
+}

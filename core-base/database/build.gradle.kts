@@ -46,3 +46,7 @@ kotlin {
         }
     }
 }
+
+dokka {
+    moduleName.set("core-base-database")
+}

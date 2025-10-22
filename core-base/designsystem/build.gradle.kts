@@ -48,3 +48,7 @@ compose.resources {
     generateResClass = always
     packageOfResClass = "template.core.base.designsystem.generated.resources"
 }
+
+dokka {
+    moduleName.set("core-base-designsystem")
+}

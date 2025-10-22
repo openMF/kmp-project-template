@@ -50,3 +50,7 @@ kotlin {
         }
     }
 }
+
+dokka {
+    moduleName.set("core-base-network")
+}

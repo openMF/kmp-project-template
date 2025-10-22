@@ -51,3 +51,7 @@ compose.resources {
     generateResClass = always
     packageOfResClass = "org.mifos.core.designsystem.generated.resources"
 }
+
+dokka {
+    moduleName.set("core-designsystem")
+}

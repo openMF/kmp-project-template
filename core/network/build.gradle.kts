@@ -71,3 +71,7 @@ dependencies {
     add("kspIosArm64", libs.ktorfit.ksp)
     add("kspIosSimulatorArm64", libs.ktorfit.ksp)
 }
+
+dokka {
+    moduleName.set("core-network")
+}

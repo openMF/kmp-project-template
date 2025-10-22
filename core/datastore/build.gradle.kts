@@ -40,3 +40,7 @@ kotlin {
         }
     }
 }
+
+dokka {
+    moduleName.set("core-datastore")
+}

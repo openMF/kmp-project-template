@@ -47,7 +47,6 @@ plugins {
     alias(libs.plugins.dokka)
 }
 
-
 dokka {
     dokkaPublications.html {
         outputDirectory.set(layout.buildDirectory.dir("$rootDir/docs-website/static/api"))

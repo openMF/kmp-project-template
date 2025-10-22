@@ -26,3 +26,7 @@ kotlin {
         }
     }
 }
+
+dokka {
+    moduleName.set("core-model")
+}

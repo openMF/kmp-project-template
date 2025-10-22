@@ -28,3 +28,7 @@ kotlin {
         }
     }
 }
+
+dokka {
+    moduleName.set("core-analytics")
+}

@@ -53,3 +53,7 @@ kotlin {
         }
     }
 }
+
+dokka {
+    moduleName.set("core-data")
+}

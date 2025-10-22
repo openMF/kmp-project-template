@@ -18,8 +18,7 @@ plugins {
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.roborazzi)
     alias(libs.plugins.aboutLibraries)
-    alias(libs.plugins.keystore.management)
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 val packageNameSpace: String = libs.versions.androidPackageNamespace.get()
@@ -144,11 +143,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
 
     testImplementation(libs.koin.test.junit4)
-}
-
-// Find the task by name *after* it's been evaluated
-tasks.matching { it.name == "uploadCrashlyticsMappingFileProdRelease" }.configureEach {
-    dependsOn("updateProdReleaseBadging")
 }
 
 dependencyGuard {

@@ -1,6 +1,12 @@
 source "https://rubygems.org"
 
-ruby '3.3.5'
+ruby '3.3.6'
+
+# Add compatibility gems for Ruby 3.3+
+gem "abbrev"
+gem "base64"
+gem "mutex_m"
+gem "bigdecimal"
 
 gem "fastlane"
 

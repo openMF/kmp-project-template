@@ -1,5 +1,7 @@
-# Load project configuration
-require_relative '../fastlane-config/project_config'
+# Load project configuration using absolute path
+# require_relative doesn't work in AppFile due to eval context
+project_dir = File.expand_path('..', __dir__)
+require File.join(project_dir, 'fastlane-config', 'project_config')
 
 # Android configuration
 json_key_file(FastlaneConfig::ProjectConfig::ANDROID[:play_store_json_key])

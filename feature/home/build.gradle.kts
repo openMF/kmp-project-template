@@ -10,7 +10,6 @@
 plugins {
     alias(libs.plugins.cmp.feature.convention)
     alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.dokka)
 }
 
 android {

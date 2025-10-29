@@ -9,6 +9,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinHierarchyBuilder
+import org.jetbrains.dokka.gradle.DokkaTask
 
 /**
  * Get the `libs` version catalog.
@@ -37,3 +38,10 @@ inline fun Project.spotlessGradle(crossinline configure: SpotlessExtension.() ->
     extensions.configure<SpotlessExtension> {
         configure()
     }
+
+/**
+ * Configures the `dokka` plugin with the [configure] lambda for all DokkaTasks.
+ */
+fun Project.dokkaGradle(configure: DokkaTask.() -> Unit) {
+    tasks.withType(DokkaTask::class.java).configureEach(configure)
+}

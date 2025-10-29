@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -27,8 +26,4 @@ kotlin {
             implementation(compose.ui)
         }
     }
-}
-
-dokka {
-    moduleName.set("core-analytics")
 }

@@ -10,7 +10,6 @@
 plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -25,8 +24,4 @@ kotlin {
             api(libs.kotlinx.datetime)
         }
     }
-}
-
-dokka {
-    moduleName.set("core-common")
 }

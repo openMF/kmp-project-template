@@ -180,6 +180,7 @@ okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 platform-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatformLauncherVersion" }
 spotless-gradle = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version.ref = "spotlessVersion" }
 detekt-gradlePlugin = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version.ref = "detekt" }
+dokka-gradlePlugin = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", version.ref = "dokka" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 twitter-detekt-compose = { group = "com.twitter.compose.rules", name = "detekt", version.ref = "twitter-detekt-compose" }
 
@@ -379,6 +380,7 @@ git-hooks-convention = { id = "org.convention.git.hooks", version = "unspecified
 ktlint-convention = { id = "org.convention.ktlint.plugin", version = "unspecified" }
 spotless-convention = { id = "org.convention.spotless.plugin", version = "unspecified" }
 keystore-management = { id = "org.convention.keystore.management", version = "unspecified" }
+dokka-convention = { id = "org.convention.dokka.plugin", version = "unspecified"}
 
 dependencyGuard = { id = "com.dropbox.dependency-guard", version.ref = "dependencyGuard" }
 moduleGraph = { id = "com.jraska.module.graph.assertion", version.ref = "moduleGraph" }

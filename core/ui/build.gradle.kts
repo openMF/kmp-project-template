@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -56,8 +55,4 @@ compose.resources {
     publicResClass = true
     generateResClass = always
     packageOfResClass = "org.mifos.core.ui.generated.resources"
-}
-
-dokka {
-    moduleName.set("core-ui")
 }

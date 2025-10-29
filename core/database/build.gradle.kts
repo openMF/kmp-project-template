@@ -12,7 +12,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.mifos.kmp.room)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -44,8 +43,4 @@ kotlin {
             api(projects.coreBase.database)
         }
     }
-}
-
-dokka {
-    moduleName.set("core-database")
 }

@@ -9,7 +9,6 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -24,8 +23,4 @@ kotlin {
             implementation(projects.core.model)
         }
     }
-}
-
-dokka {
-    moduleName.set("core-domain")
 }

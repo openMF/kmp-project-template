@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -47,8 +46,4 @@ compose.resources {
     publicResClass = true
     generateResClass = always
     packageOfResClass = "template.core.base.designsystem.generated.resources"
-}
-
-dokka {
-    moduleName.set("core-base-designsystem")
 }

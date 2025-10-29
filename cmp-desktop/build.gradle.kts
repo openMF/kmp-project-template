@@ -85,3 +85,7 @@ compose.desktop {
         }
     }
 }
+
+dokka {
+    moduleName.set("cmp-desktop")
+}

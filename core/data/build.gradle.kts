@@ -9,7 +9,6 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -52,8 +51,4 @@ kotlin {
             implementation(libs.connectivity.http)
         }
     }
-}
-
-dokka {
-    moduleName.set("core-data")
 }

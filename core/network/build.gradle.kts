@@ -12,7 +12,6 @@ plugins {
     alias(libs.plugins.ktrofit)
     id("kotlinx-serialization")
     id("com.google.devtools.ksp")
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -70,8 +69,4 @@ dependencies {
     add("kspIosX64", libs.ktorfit.ksp)
     add("kspIosArm64", libs.ktorfit.ksp)
     add("kspIosSimulatorArm64", libs.ktorfit.ksp)
-}
-
-dokka {
-    moduleName.set("core-network")
 }

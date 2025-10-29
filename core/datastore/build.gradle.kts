@@ -9,7 +9,6 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
-    alias(libs.plugins.dokka)
 }
 
 android {
@@ -39,8 +38,4 @@ kotlin {
             implementation(libs.multiplatform.settings.coroutines)
         }
     }
-}
-
-dokka {
-    moduleName.set("core-datastore")
 }

@@ -162,3 +162,7 @@ baselineProfile {
     // Make use of Dex Layout Optimizations via Startup Profiles
     dexLayoutOptimization = true
 }
+
+dokka {
+   moduleName.set("cmp-android")
+}

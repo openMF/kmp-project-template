@@ -77,7 +77,6 @@ dependencies {
     dokka(project(":feature:profile"))
     dokka(project(":feature:settings"))
 
-    dokka(project(":core-base:datastore"))
     dokka(project(":core-base:common"))
     dokka(project(":core-base:database"))
     dokka(project(":core-base:network"))

@@ -60,7 +60,7 @@ dependencies {
     dokka(project(":cmp-shared"))
     dokka(project(":cmp-desktop"))
     dokka(project(":cmp-android"))
-//    dokka(project(":cmp-web:"))
+//    dokka(project(":cmp-web"))
     dokka(project(":cmp-navigation"))
     dokka(project(":core:data"))
     dokka(project(":core:domain"))
@@ -71,7 +71,7 @@ dependencies {
     dokka(project(":core:network"))
     dokka(project(":core:model"))
     dokka(project(":core:analytics"))
-    dokka(project(":core:database:"))
+    dokka(project(":core:database"))
 
     dokka(project(":feature:home"))
     dokka(project(":feature:profile"))

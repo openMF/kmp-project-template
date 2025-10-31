@@ -7,6 +7,7 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinHierarchyBuilder
 import org.jetbrains.dokka.gradle.DokkaTask
@@ -42,6 +43,7 @@ inline fun Project.spotlessGradle(crossinline configure: SpotlessExtension.() ->
 /**
  * Configures the `dokka` plugin with the [configure] lambda for all DokkaTasks.
  */
-fun Project.dokkaGradle(configure: DokkaTask.() -> Unit) {
-    tasks.withType(DokkaTask::class.java).configureEach(configure)
-}
+inline fun Project.dokkaGradle(crossinline configure: DokkaExtension.() -> Unit) =
+    extensions.configure<DokkaExtension> {
+        configure()
+    }

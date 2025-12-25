@@ -50,8 +50,6 @@ interface UserPreferencesRepository {
 
     suspend fun setTimeBasedThemeConfig(timeBasedTheme: TimeBasedTheme)
 
-    suspend fun updateTimeBasedTheme(theme: TimeBasedTheme)
-
     suspend fun setDynamicColorPreference(useDynamicColor: Boolean)
 
     suspend fun setIsAuthenticated(isAuthenticated: Boolean)

@@ -101,13 +101,6 @@ class UserPreferencesRepositoryImpl(
         }
     }
 
-    override suspend fun updateTimeBasedTheme(theme: TimeBasedTheme) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(timeBasedTheme = theme)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
     override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) =
         withContext(dispatcher.io) {
             val newPreference = settings.getUserPreference().copy(useDynamicColor = useDynamicColor)

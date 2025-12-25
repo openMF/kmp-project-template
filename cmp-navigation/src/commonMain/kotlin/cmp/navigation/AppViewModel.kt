@@ -17,9 +17,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.mifos.core.common.DateHelper
 import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.LanguageConfig
+import org.mifos.core.model.TimeBasedTheme
 import template.core.base.platform.garbage.GarbageCollectionManager
 import template.core.base.ui.BaseViewModel
 
@@ -32,9 +34,20 @@ class AppViewModel(
         isAndroidTheme = false,
         isDynamicColorsEnabled = false,
         isScreenCaptureAllowed = false,
+        timeBasedTheme = TimeBasedTheme(
+            hourStart = 18,
+            hourEnd = 0,
+            minStart = 6,
+            minEnd = 0,
+        ),
     ),
 ) {
     init {
+        settingsRepository
+            .observeTimeBasedThemeConfig
+            .onEach { trySendAction(AppAction.Internal.TimeBasedThemeUpdate(it)) }
+            .launchIn(viewModelScope)
+
         settingsRepository
             .observeDarkThemeConfig
             .onEach { trySendAction(AppAction.Internal.ThemeUpdate(it)) }
@@ -70,6 +83,8 @@ class AppViewModel(
             is AppAction.Internal.CurrentUserStateChange -> handleCurrentUserStateChange()
 
             is AppAction.Internal.UserUnlockStateChange -> handleUserUnlockStateChange()
+
+            is AppAction.Internal.TimeBasedThemeUpdate -> handleTimeBasedThemeUpdate(action)
         }
     }
 
@@ -84,8 +99,18 @@ class AppViewModel(
     }
 
     private fun handleAppThemeUpdated(action: AppAction.Internal.ThemeUpdate) {
+        val timeBased = state.timeBasedTheme
+        var darkTheme = action.theme == DarkThemeConfig.DARK
+        if (action.theme == DarkThemeConfig.BASED_ON_TIME) {
+            darkTheme = DateHelper.isDarkModeBasedOnTime(
+                timeBased.hourStart,
+                timeBased.minStart,
+                timeBased.hourEnd,
+                timeBased.minEnd,
+            )
+        }
         mutableStateFlow.update {
-            it.copy(darkTheme = action.theme == DarkThemeConfig.DARK)
+            it.copy(darkTheme = darkTheme)
         }
         sendEvent(AppEvent.UpdateAppTheme(osValue = action.theme.osValue))
     }
@@ -102,6 +127,14 @@ class AppViewModel(
         recreateUiAndGarbageCollect()
     }
 
+    private fun handleTimeBasedThemeUpdate(action: AppAction.Internal.TimeBasedThemeUpdate) {
+        mutableStateFlow.update {
+            it.copy(
+                timeBasedTheme = action.theme,
+            )
+        }
+    }
+
     private fun recreateUiAndGarbageCollect() {
         sendEvent(AppEvent.Recreate)
         garbageCollectionManager.tryCollect()
@@ -113,6 +146,7 @@ data class AppState(
     val isAndroidTheme: Boolean,
     val isDynamicColorsEnabled: Boolean,
     val isScreenCaptureAllowed: Boolean,
+    val timeBasedTheme: TimeBasedTheme,
 )
 
 sealed interface AppEvent {
@@ -142,6 +176,10 @@ sealed interface AppAction {
 
         data class ThemeUpdate(
             val theme: DarkThemeConfig,
+        ) : Internal()
+
+        data class TimeBasedThemeUpdate(
+            val theme: TimeBasedTheme,
         ) : Internal()
 
         data object UserUnlockStateChange : Internal()

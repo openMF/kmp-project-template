@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.ThemeBrand
+import org.mifos.core.model.TimeBasedTheme
 import template.core.base.analytics.AnalyticsHelper
 
 class SettingsViewmodel(
@@ -32,6 +33,7 @@ class SettingsViewmodel(
                     brand = userDate.themeBrand,
                     useDynamicColor = userDate.useDynamicColor,
                     darkThemeConfig = userDate.darkThemeConfig,
+                    timeBasedTheme = userDate.timeBasedTheme,
                 ),
             )
         }
@@ -55,6 +57,12 @@ class SettingsViewmodel(
         }
     }
 
+    fun updateTimeBasedThemeConfig(timeBasedTheme: TimeBasedTheme) {
+        viewModelScope.launch {
+            settingsRepository.setTimeBasedThemeConfig(timeBasedTheme)
+        }
+    }
+
     fun updateDynamicColorPreference(useDynamicColor: Boolean) {
         viewModelScope.launch {
             analyticsHelper.logDynamicColorPreferences(useDynamicColor)
@@ -67,6 +75,7 @@ data class UserEditableSettings(
     val brand: ThemeBrand,
     val useDynamicColor: Boolean,
     val darkThemeConfig: DarkThemeConfig,
+    val timeBasedTheme: TimeBasedTheme,
 )
 
 sealed interface SettingsUiState {

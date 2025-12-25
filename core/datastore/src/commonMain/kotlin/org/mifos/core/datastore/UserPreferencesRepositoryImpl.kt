@@ -26,6 +26,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.LanguageConfig
 import org.mifos.core.model.ThemeBrand
+import org.mifos.core.model.TimeBasedTheme
 import org.mifos.core.model.UserData
 import template.core.base.common.manager.DispatcherManager
 
@@ -62,6 +63,9 @@ class UserPreferencesRepositoryImpl(
     override val observeDarkThemeConfig: Flow<DarkThemeConfig>
         get() = _userData.map { it.darkThemeConfig }
 
+    override val observeTimeBasedThemeConfig: Flow<TimeBasedTheme>
+        get() = _userData.map { it.timeBasedTheme }
+
     override val observeDynamicColorPreference: Flow<Boolean>
         get() = _userData.map { it.useDynamicColor }
 
@@ -85,6 +89,21 @@ class UserPreferencesRepositoryImpl(
     override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) =
         withContext(dispatcher.io) {
             val newPreference = settings.getUserPreference().copy(darkThemeConfig = darkThemeConfig)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
+
+    override suspend fun setTimeBasedThemeConfig(timeBasedTheme: TimeBasedTheme) {
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(timeBasedTheme = timeBasedTheme)
+            settings.putUserPreference(newPreference)
+            _userData.value = newPreference
+        }
+    }
+
+    override suspend fun updateTimeBasedTheme(theme: TimeBasedTheme) =
+        withContext(dispatcher.io) {
+            val newPreference = settings.getUserPreference().copy(timeBasedTheme = theme)
             settings.putUserPreference(newPreference)
             _userData.value = newPreference
         }

@@ -19,7 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.feature.onboarding.components.OnBoardingScreenPage
 
-const val Total_Pages = 2
+const val TOTAL_PAGES = 2
 
 @Composable
 fun OnboardingScreen(
@@ -37,14 +37,14 @@ fun OnboardingScreen(
                 currentPage = currentPage,
                 title = "Welcome",
                 description = "Thank you for using our template for creating your project",
-                modifier=modifier.padding(it)
+                modifier = modifier.padding(it),
             )
             2 -> OnBoardingScreenPage(
                 onNext = viewmodel::onNextPage,
                 currentPage = currentPage,
                 title = "Get Started",
                 description = "You can now start using your project",
-                modifier=modifier.padding(it)
+                modifier = modifier.padding(it),
             )
         }
     }

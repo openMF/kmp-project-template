@@ -24,7 +24,7 @@ class OnboardingViewmodel(
     private val _currentPage = MutableStateFlow(1)
     val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
 
-    private val totalPages = Total_Pages
+    private val totalPages = TOTAL_PAGES
 
     fun onNextPage() {
         if (_currentPage.value < totalPages) {

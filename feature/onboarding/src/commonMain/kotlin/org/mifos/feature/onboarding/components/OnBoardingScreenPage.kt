@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import org.mifos.feature.onboarding.Total_Pages
+import org.mifos.feature.onboarding.TOTAL_PAGES
 
 @Composable
 fun OnBoardingScreenPage(
@@ -80,7 +80,7 @@ fun OnBoardingScreenPage(
             modifier = Modifier,
             onNext = onNext,
             currentPage = currentPage,
-            totalPages = Total_Pages,
+            totalPages = TOTAL_PAGES,
         )
     }
 }
@@ -90,7 +90,7 @@ fun OnboardingTextBlock(
     onNext: () -> Unit,
     currentPage: Int,
     modifier: Modifier = Modifier,
-    totalPages: Int = Total_Pages,
+    totalPages: Int = TOTAL_PAGES,
 ) {
     Row(
         modifier = modifier.fillMaxWidth().padding(vertical = 32.dp),

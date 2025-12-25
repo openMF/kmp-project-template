@@ -44,6 +44,7 @@ import org.mifos.core.ui.NavigationItem
 import org.mifos.feature.home.TasksDestination
 import org.mifos.feature.home.navigateToTasks
 import org.mifos.feature.home.tasksGraph
+import org.mifos.feature.onboarding.onboardingDestination
 import org.mifos.feature.profile.navigateToProfile
 import org.mifos.feature.profile.profileDestination
 import template.core.base.analytics.rememberAnalyticsHelper

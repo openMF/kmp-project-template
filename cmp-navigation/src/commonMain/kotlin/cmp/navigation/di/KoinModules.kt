@@ -17,6 +17,7 @@ import org.koin.dsl.module
 import org.mifos.core.data.di.DataModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.feature.home.di.HomeModule
+import org.mifos.feature.onboarding.OnboardingModule
 import org.mifos.feature.settings.SettingsModule
 import template.core.base.analytics.di.analyticsModule
 import template.core.base.common.di.CommonModule
@@ -43,6 +44,7 @@ object KoinModules {
         includes(
             HomeModule,
             SettingsModule,
+            OnboardingModule
         )
     }
 

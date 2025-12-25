@@ -89,6 +89,7 @@ fileKit = "0.8.8"
 fileKitDialog = "0.10.0-beta04"
 uiBackhandler = "1.8.2"
 wire = "5.3.3"
+compottie = "2.0.0-rc05"
 
 # Jetbrains CMP
 windowsSizeClass = "0.5.0"
@@ -112,6 +113,8 @@ androidPackageNamespace = "cmp.android.app"
 #Room
 room = "2.7.2"
 sqliteBundled = "2.5.2"
+espressoCore = "3.7.0"
+material = "1.13.0"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -319,6 +322,12 @@ firebase-cloud-messaging = { group = "com.google.firebase", name = "firebase-mes
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-performance = { group = "com.google.firebase", name = "firebase-perf" }
 
+compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
+compottie-lite = { module = "io.github.alexzhirkevich:compottie-lite", version.ref = "compottie" }
+compottie-dot = { module = "io.github.alexzhirkevich:compottie-dot", version.ref = "compottie" }
+compottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "compottie" }
+compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
+
 gitlive-firebase-analytics = { module = "dev.gitlive:firebase-analytics", version.ref = "gitLive" }
 gitlive-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "gitLive" }
 gitlive-firebase-performance = { module = "dev.gitlive:firebase-performance", version.ref = "gitLive" }
@@ -330,6 +339,8 @@ roborazzi-accessibility-check = { group = "io.github.takahirom.roborazzi", name 
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [bundles]
 androidx-compose-ui-test = [

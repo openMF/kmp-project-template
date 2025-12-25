@@ -40,7 +40,7 @@ data class UserData(
             isPasscodeEnabled = false,
             isBiometricsEnabled = false,
             showOnboarding = false,
-            firstTimeUser = false,
+            firstTimeUser = true,
             enableScreenCapture = false,
         )
     }

@@ -30,6 +30,9 @@ import cmp.navigation.splash.splashDestination
 import cmp.navigation.ui.rememberKptNavController
 import cmp.navigation.utils.toObjectNavigationRoute
 import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.feature.onboarding.OnBoardingRoute
+import org.mifos.feature.onboarding.navigateToOnBoarding
+import org.mifos.feature.onboarding.onboardingDestination
 import template.core.base.ui.NonNullEnterTransitionProvider
 import template.core.base.ui.NonNullExitTransitionProvider
 import template.core.base.ui.RootTransitionProviders
@@ -63,7 +66,7 @@ fun RootNavScreen(
         popExitTransition = { toExitTransition()(this) },
     ) {
         splashDestination()
-//        onboardingDestination()
+        onboardingDestination()
 //        authNavGraph(navController)
         authenticatedGraph(navController)
 //        userUnlockDestination()
@@ -71,7 +74,7 @@ fun RootNavScreen(
 
     val targetRoute = when (state) {
         // SetLanguageRoute
-        RootNavState.ShowOnboarding -> ""
+        RootNavState.ShowOnboarding -> OnBoardingRoute
         // AuthGraphRoute
         RootNavState.Auth -> ""
         RootNavState.Splash -> SplashRoute
@@ -117,7 +120,7 @@ fun RootNavScreen(
             // navController.navigateToAuthGraph(rootNavOptions)
             RootNavState.Auth -> {}
             // navController.navigateToSetLanguage(rootNavOptions)
-            RootNavState.ShowOnboarding -> {}
+            RootNavState.ShowOnboarding -> navController.navigateToOnBoarding(rootNavOptions)
             // navController.navigateToUserUnlock(rootNavOptions)
             RootNavState.UserLocked -> {}
             is RootNavState.UserUnlocked -> navController.navigateToAuthenticatedGraph(

@@ -1,11 +1,28 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package org.mifos.feature.onboarding.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,17 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.mifos.feature.onboarding.Total_Pages
-
 
 @Composable
 fun OnBoardingScreenPage(
@@ -39,12 +47,11 @@ fun OnBoardingScreenPage(
             .fillMaxSize()
             .padding(horizontal = 24.dp, vertical = 36.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-
         Box(
             modifier = Modifier.fillMaxWidth().weight(1f),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -56,7 +63,7 @@ fun OnBoardingScreenPage(
                     text = title,
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Text(
                     modifier = Modifier.fillMaxWidth(),
@@ -64,7 +71,7 @@ fun OnBoardingScreenPage(
                     style = MaterialTheme.typography.bodyLarge
                         .copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -73,7 +80,7 @@ fun OnBoardingScreenPage(
             modifier = Modifier,
             onNext = onNext,
             currentPage = currentPage,
-            totalPages = Total_Pages
+            totalPages = Total_Pages,
         )
     }
 }
@@ -88,7 +95,7 @@ fun OnboardingTextBlock(
     Row(
         modifier = modifier.fillMaxWidth().padding(vertical = 32.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row {
             repeat(totalPages) { index ->
@@ -115,7 +122,7 @@ fun OnboardingTextBlock(
             shape = MaterialTheme.shapes.medium,
         ) {
             Text(
-                text="Next"
+                text = "Next",
             )
         }
     }

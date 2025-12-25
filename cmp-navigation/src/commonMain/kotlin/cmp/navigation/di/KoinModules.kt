@@ -44,7 +44,7 @@ object KoinModules {
         includes(
             HomeModule,
             SettingsModule,
-            OnboardingModule
+            OnboardingModule,
         )
     }
 

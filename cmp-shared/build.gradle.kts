@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2024 Mifos Initiative
  *
@@ -57,11 +59,12 @@ kotlin {
             isStatic = true
         }
     }
+
+    androidLibrary {
+        namespace = "cmp.shared"
+    }
 }
 
-android {
-    namespace = "cmp.shared"
-}
 
 compose.resources {
     publicResClass = true

@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -12,11 +14,11 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-    namespace = "template.core.base.network"
-}
 
 kotlin {
+    androidLibrary {
+        namespace = "template.core.base.network"
+    }
     sourceSets {
         commonMain.dependencies {
             api(libs.ktor.client.core)

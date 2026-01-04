@@ -7,7 +7,7 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-import org.jetbrains.compose.compose
+import com.android.build.api.dsl.androidLibrary
 
 /*
  * Copyright 2025 Mifos Initiative
@@ -22,11 +22,12 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-android {
-    namespace = "template.core.base.database"
-}
-
 kotlin {
+
+    androidLibrary {
+        namespace = "template.core.base.database"
+    }
+
     sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.room.runtime)

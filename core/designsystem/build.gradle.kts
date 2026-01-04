@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -13,21 +15,43 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    namespace = "org.mifos.core.designsystem"
-}
 
 kotlin {
+//    android {
+//        defaultConfig {
+//            testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+//        }
+//        namespace = "org.mifos.core.designsystem"
+//
+//    }
+
+    androidLibrary {
+        namespace = "org.mifos.core.designsystem"
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
+    }
+
+
     sourceSets {
-        androidInstrumentedTest.dependencies {
-            implementation(libs.androidx.compose.ui.test)
+
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.androidx.compose.ui.test)
+            }
         }
-        androidUnitTest.dependencies {
-            implementation(libs.androidx.compose.ui.test)
+        val androidDeviceTest by getting {
+            dependencies {
+                implementation(libs.androidx.compose.ui.test)
+            }
         }
+//
+//        androidInstrumentedTest.dependencies {
+//            implementation(libs.androidx.compose.ui.test)
+//        }
+//        androidUnitTest.dependencies {
+//            implementation(libs.androidx.compose.ui.test)
+//        }
         commonMain.dependencies {
             api(projects.coreBase.designsystem)
 

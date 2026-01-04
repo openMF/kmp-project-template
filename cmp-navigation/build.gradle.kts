@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2024 Mifos Initiative
  *
@@ -42,11 +44,11 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
         }
     }
+    androidLibrary {
+        namespace = "cmp.navigation"
+    }
 }
 
-android {
-    namespace = "cmp.navigation"
-}
 
 compose.resources {
     publicResClass = true

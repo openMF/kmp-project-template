@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -13,11 +15,12 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.core.analytics"
-}
 
 kotlin {
+
+    androidLibrary {
+        namespace = "org.mifos.core.analytics"
+    }
     sourceSets {
         commonMain.dependencies {
             api(projects.coreBase.analytics)

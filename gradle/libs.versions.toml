@@ -1,7 +1,7 @@
 [versions]
 # Android
 androidDesugarJdkLibs = "2.1.5"
-androidGradlePlugin = "8.10.0"
+androidGradlePlugin = "8.13.0"
 androidTools = "31.10.0"
 
 commonsCodec = "1.19.0"
@@ -56,13 +56,13 @@ twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
 
 # Kotlin KMP Dependencies
-kotlin = "2.1.20"
+kotlin = "2.3.0"
 kotlinInject = "0.7.2"
 kotlinxCoroutines = "1.10.2"
 kotlinxDatetime = "0.6.2"
 kotlinxImmutable = "0.3.8"
 kotlinxSerializationJson = "1.8.1"
-ksp = "2.1.20-2.0.1"
+ksp = "2.3.4"
 
 # Ktor & Ktorfit
 ktorVersion = "3.2.0"
@@ -110,8 +110,10 @@ desktopPackageVersion = "1.0.0"
 androidPackageNamespace = "cmp.android.app"
 
 #Room
-room = "2.7.2"
-sqliteBundled = "2.5.2"
+room = "2.8.4"
+sqliteBundled = "2.6.2"
+
+buildKonfig = "0.17.1"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -341,10 +343,11 @@ androidx-compose-ui-test = [
 # Android & Kotlin Plugins
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
-
+codingfeline-buildKonfig = {id= "com.codingfeline.buildkonfig", version.ref="buildKonfig"}
 android-application-convention = { id = "org.convention.android.application", version = "unspecified" }
 android-application-compose-convention = { id = "org.convention.android.application.compose", version = "unspecified" }
 android-application-flavors-convention = { id = "org.convention.android.application.flavors", version = "unspecified" }

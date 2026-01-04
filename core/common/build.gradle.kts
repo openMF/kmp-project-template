@@ -1,3 +1,7 @@
+import com.android.build.api.dsl.androidLibrary
+import org.gradle.kotlin.dsl.commonMain
+import org.gradle.kotlin.dsl.dependencies
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -12,11 +16,10 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-android {
-    namespace = "org.mifos.core.common"
-}
-
 kotlin {
+    androidLibrary {
+        namespace = "org.mifos.core.common"
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)

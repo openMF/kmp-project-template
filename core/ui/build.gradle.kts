@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -13,11 +15,11 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.core.ui"
-}
-
 kotlin {
+
+    androidLibrary {
+        namespace = "org.mifos.core.ui"
+    }
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.metrics)
@@ -48,7 +50,7 @@ kotlin {
     }
 }
 dependencies {
-    debugImplementation(compose.uiTooling)
+    "androidRuntimeClasspath"(compose.uiTooling)
 }
 
 compose.resources {

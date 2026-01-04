@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -13,11 +15,11 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "template.core.base.designsystem"
-}
 
 kotlin {
+    androidLibrary {
+        namespace = "template.core.base.designsystem"
+    }
     sourceSets{
         androidMain.dependencies {
             implementation(libs.androidx.compose.ui.tooling)

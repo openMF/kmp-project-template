@@ -7,6 +7,7 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 /*
@@ -24,11 +25,11 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "template.core.base.ui"
-}
 
 kotlin {
+    androidLibrary {
+        namespace = "template.core.base.ui"
+    }
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.metrics)

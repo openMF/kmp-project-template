@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -13,11 +15,11 @@ plugins {
     id("kotlinx-serialization")
 }
 
-android {
-    namespace = "org.mifos.core.model"
-}
 
 kotlin {
+    androidLibrary {
+        namespace = "org.mifos.core.model"
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.common)

@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -14,20 +16,18 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
-android {
-    namespace = "org.mifos.core.network"
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    testOptions {
-        unitTests {
-            isReturnDefaultValues = true
-            isIncludeAndroidResources = true
-        }
-    }
-}
+
 
 kotlin {
+
+    androidLibrary {
+        namespace = "org.mifos.core.network"
+
+        optimization {
+            consumerKeepRules.files.add(project.file("consumer-rules.pro"))
+        }
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.common)

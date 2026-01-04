@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -11,11 +13,11 @@ plugins {
     alias(libs.plugins.cmp.feature.convention)
 }
 
-android {
-    namespace = "org.mifos.feature.settings"
-}
 
 kotlin {
+    androidLibrary {
+        namespace = "org.mifos.feature.settings"
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.data)

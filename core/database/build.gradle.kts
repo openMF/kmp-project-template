@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -14,11 +16,11 @@ plugins {
     alias(libs.plugins.mifos.kmp.room)
 }
 
-android {
-    namespace = "org.mifos.core.database"
-}
-
 kotlin {
+
+    androidLibrary {
+        namespace = "org.mifos.core.database"
+    }
     sourceSets {
         val desktopMain by getting
         androidMain.dependencies {

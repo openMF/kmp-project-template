@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -12,11 +14,11 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-android {
-    namespace = "org.mifos.feature.home"
-}
 
 kotlin {
+    androidLibrary {
+        namespace = "org.mifos.feature.home"
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(projects.coreBase.platform)

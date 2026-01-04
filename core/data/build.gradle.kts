@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.androidLibrary
+
 /*
  * Copyright 2025 Mifos Initiative
  *
@@ -11,17 +13,12 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-android {
-    namespace = "org.mifos.core.data"
-    testOptions {
-        unitTests {
-            isIncludeAndroidResources = true
-            isReturnDefaultValues = true
-        }
-    }
-}
 
 kotlin {
+    androidLibrary {
+        namespace = "org.mifos.core.data"
+
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.common)

@@ -1,10 +1,13 @@
 package org.convention
 
+import com.android.build.api.dsl.androidLibrary
+import com.android.build.gradle.internal.ide.kmp.KotlinAndroidSourceSetMarker.Companion.android
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 
 /**
  * Configure the Kotlin Multiplatform plugin with the default hierarchy template and additional targets.
@@ -17,8 +20,19 @@ internal fun Project.configureKotlinMultiplatform() {
     extensions.configure<KotlinMultiplatformExtension> {
         applyProjectHierarchyTemplate()
 
+        androidLibrary {
+            compileSdk = 36
+            minSdk = 26
+            dependencies.apply {
+                add("coreLibraryDesugaring", libs.findLibrary("android.desugarJdkLibs").get())
+            }
+            withHostTest{
+                isIncludeAndroidResources = true
+                isReturnDefaultValues = true
+            }
+        }
+
         jvm("desktop")
-        androidTarget()
         iosSimulatorArm64()
         iosX64()
         iosArm64()

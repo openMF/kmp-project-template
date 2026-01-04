@@ -7,7 +7,7 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-import org.gradle.kotlin.dsl.implementation
+import com.android.build.api.dsl.androidLibrary
 
 /*
  * Copyright 2025 Mifos Initiative
@@ -25,15 +25,17 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-android {
-    namespace = "template.core.base.platform"
-
-    buildFeatures {
-        buildConfig = true
-    }
-}
 
 kotlin {
+    androidLibrary {
+        namespace = "template.core.base.platform"
+
+//        buildFeatures {
+//            buildConfig = true
+//        }
+
+
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(compose.ui)

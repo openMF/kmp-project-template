@@ -24,8 +24,9 @@ class KMPRoomConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                // Adding ksp dependencies for multiple platforms
-                "implementation"(libs.findLibrary("androidx.room.ktx").get())
+                add("commonMainImplementation", libs.findLibrary("androidx.room.runtime").get())
+                add("commonMainImplementation", libs.findLibrary("androidx.sqlite.bundled").get())
+
                 listOf(
                     "kspDesktop",
                     "kspAndroid",

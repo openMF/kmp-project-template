@@ -29,7 +29,7 @@ class AndroidLintConventionPlugin : Plugin<Project> {
                 pluginManager.hasPlugin("com.android.application") ->
                     configure<ApplicationExtension> { lint(Lint::configure) }
 
-                pluginManager.hasPlugin("com.android.library") ->
+                pluginManager.hasPlugin("com.android.kotlin.multiplatform.library") ->
                     configure<LibraryExtension> { lint(Lint::configure) }
 
                 else -> {

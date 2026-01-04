@@ -160,12 +160,12 @@ class TasksViewModel(
      */
     private fun updateDaysInMonth() {
         val daysInCurrentMonth =
-            getDaysInMonth(year = selectedYear, month = selectedMonthIndex) // month is 1-based
+            getDaysInMonth(year = selectedYear, month = selectedMonthIndex + 1)
 
         val weekdaysAndDaysInSelectedMonth = mutableListOf<Pair<String, String>>()
 
         for (day in 1..daysInCurrentMonth) {
-            val date = LocalDate(selectedYear, selectedMonthIndex, day)
+            val date = LocalDate(selectedYear, selectedMonthIndex + 1, day)
             val weekday = shortWeekdayNames[date.dayOfWeek]
 
             weekdaysAndDaysInSelectedMonth.add(weekday!! to day.toString())

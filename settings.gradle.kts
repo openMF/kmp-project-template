@@ -73,6 +73,7 @@ include(":core:ui")
 include(":feature:home")
 include(":feature:profile")
 include(":feature:settings")
+include(":feature:onboarding")
 
 include(":core-base:analytics")
 include(":core-base:common")
@@ -89,3 +90,4 @@ check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
     https://developer.android.com/build/jdks#jdk-config-in-studio
     """.trimIndent()
 }
+

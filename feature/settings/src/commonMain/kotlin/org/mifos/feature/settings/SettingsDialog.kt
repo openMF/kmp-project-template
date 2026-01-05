@@ -29,6 +29,9 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -36,20 +39,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.core.common.DateHelper
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.ThemeBrand
+import org.mifos.core.model.TimeBasedTheme
 import org.mifos.feature.settings.generated.resources.Res
 import org.mifos.feature.settings.generated.resources.feature_settings_brand_android
 import org.mifos.feature.settings.generated.resources.feature_settings_brand_default
+import org.mifos.feature.settings.generated.resources.feature_settings_dark_mode_based_on_time
 import org.mifos.feature.settings.generated.resources.feature_settings_dark_mode_config_dark
 import org.mifos.feature.settings.generated.resources.feature_settings_dark_mode_config_light
 import org.mifos.feature.settings.generated.resources.feature_settings_dark_mode_config_system_default
+import org.mifos.feature.settings.generated.resources.feature_settings_dark_mode_label
 import org.mifos.feature.settings.generated.resources.feature_settings_dark_mode_preference
 import org.mifos.feature.settings.generated.resources.feature_settings_dismiss_dialog_button_text
 import org.mifos.feature.settings.generated.resources.feature_settings_dynamic_color_no
 import org.mifos.feature.settings.generated.resources.feature_settings_dynamic_color_preference
 import org.mifos.feature.settings.generated.resources.feature_settings_dynamic_color_yes
+import org.mifos.feature.settings.generated.resources.feature_settings_light_mode_label
 import org.mifos.feature.settings.generated.resources.feature_settings_loading
 import org.mifos.feature.settings.generated.resources.feature_settings_theme
 import org.mifos.feature.settings.generated.resources.feature_settings_title
@@ -57,7 +64,7 @@ import org.mifos.feature.settings.generated.resources.feature_settings_title
 @Composable
 fun SettingsDialog(
     onDismiss: () -> Unit,
-    viewModel: SettingsViewmodel = koinViewModel(),
+    viewModel: SettingsViewmodel,
 ) {
     val settingsUiState by viewModel.settingsUiState.collectAsStateWithLifecycle()
     SettingsDialog(
@@ -66,6 +73,7 @@ fun SettingsDialog(
         onChangeThemeBrand = viewModel::updateThemeBrand,
         onChangeDynamicColorPreference = viewModel::updateDynamicColorPreference,
         onChangeDarkThemeConfig = viewModel::updateDarkThemeConfig,
+        onChangeTimeBasedTheme = viewModel::updateTimeBasedThemeConfig,
     )
 }
 
@@ -74,11 +82,13 @@ fun SettingsDialog(
     settingsUiState: SettingsUiState,
     onDismiss: () -> Unit,
     onChangeThemeBrand: (themeBrand: ThemeBrand) -> Unit,
+    onChangeTimeBasedTheme: (timeBasedTheme: TimeBasedTheme) -> Unit,
     onChangeDynamicColorPreference: (useDynamicColor: Boolean) -> Unit,
     onChangeDarkThemeConfig: (darkThemeConfig: DarkThemeConfig) -> Unit,
     modifier: Modifier = Modifier,
     supportDynamicColor: Boolean = supportsDynamicTheming(),
 ) {
+    var timeBasedThemeDialogVisible by rememberSaveable { mutableStateOf(false) }
     AlertDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         modifier = modifier.fillMaxWidth(0.8f),
@@ -106,8 +116,28 @@ fun SettingsDialog(
                             supportDynamicColor = supportDynamicColor,
                             onChangeThemeBrand = onChangeThemeBrand,
                             onChangeDynamicColorPreference = onChangeDynamicColorPreference,
-                            onChangeDarkThemeConfig = onChangeDarkThemeConfig,
+                            onChangeDarkThemeConfig = {
+                                if (it == DarkThemeConfig.BASED_ON_TIME) {
+                                    timeBasedThemeDialogVisible = true
+                                } else {
+                                    onChangeDarkThemeConfig(it)
+                                }
+                            },
                         )
+
+                        if (timeBasedThemeDialogVisible) {
+                            TimeBasedThemeDialog(
+                                onDismiss = {
+                                    timeBasedThemeDialogVisible = false
+                                },
+                                initialTheme = settingsUiState.settings.timeBasedTheme,
+                                onConfirm = {
+                                    onChangeTimeBasedTheme(it)
+                                    onChangeDarkThemeConfig(DarkThemeConfig.BASED_ON_TIME)
+                                    timeBasedThemeDialogVisible = false
+                                },
+                            )
+                        }
                     }
                 }
             }
@@ -188,6 +218,28 @@ private fun ColumnScope.SettingsPanel(
             text = stringResource(resource = Res.string.feature_settings_dark_mode_config_dark),
             selected = settings.darkThemeConfig == DarkThemeConfig.DARK,
             onClick = { onChangeDarkThemeConfig(DarkThemeConfig.DARK) },
+        )
+        SettingsDialogThemeChooserRow(
+            text = stringResource(Res.string.feature_settings_dark_mode_based_on_time) +
+                "\n" + stringResource(Res.string.feature_settings_dark_mode_label) +
+                " [" +
+                DateHelper.formatTimeRange(
+                    settings.timeBasedTheme.hourStart,
+                    settings.timeBasedTheme.minStart,
+                    settings.timeBasedTheme.hourEnd,
+                    settings.timeBasedTheme.minEnd,
+                ) +
+                "]\n" +
+                stringResource(Res.string.feature_settings_light_mode_label) + " [" +
+                DateHelper.formatTimeRange(
+                    settings.timeBasedTheme.hourEnd,
+                    settings.timeBasedTheme.minEnd,
+                    settings.timeBasedTheme.hourStart,
+                    settings.timeBasedTheme.minStart,
+                ) +
+                "]",
+            selected = settings.darkThemeConfig == DarkThemeConfig.BASED_ON_TIME,
+            onClick = { onChangeDarkThemeConfig(DarkThemeConfig.BASED_ON_TIME) },
         )
     }
 }

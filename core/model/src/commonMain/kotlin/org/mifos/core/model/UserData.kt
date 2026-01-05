@@ -26,6 +26,7 @@ data class UserData(
     val enableScreenCapture: Boolean,
     val isPasscodeEnabled: Boolean,
     val isBiometricsEnabled: Boolean,
+    val timeBasedTheme: TimeBasedTheme,
 ) {
     companion object {
         val DEFAULT = UserData(
@@ -41,7 +42,13 @@ data class UserData(
             isBiometricsEnabled = false,
             showOnboarding = false,
             firstTimeUser = false,
-            enableScreenCapture = false,
+            enableScreenCapture = true,
+            timeBasedTheme = TimeBasedTheme(
+                hourStart = 18,
+                hourEnd = 6,
+                minStart = 0,
+                minEnd = 0,
+            ),
         )
     }
 }

@@ -18,4 +18,5 @@ fun DarkThemeConfig.isDarkMode(
         DarkThemeConfig.FOLLOW_SYSTEM -> isSystemDarkMode
         DarkThemeConfig.DARK -> true
         DarkThemeConfig.LIGHT -> false
+        DarkThemeConfig.BASED_ON_TIME -> false
     }

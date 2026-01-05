@@ -30,4 +30,15 @@
     <string name="feature_settings_dismiss_dialog_button_text">OK</string>
     <string name="feature_settings_change_theme_text">Change Theme</string>
     <string name="feature_settings_change_theme_placeholder_text">Change Theme</string>
+
+    <string name="feature_settings_dark_mode_based_on_time">Based on Time</string>
+    <string name="feature_settings_dark_mode_label">Dark mode</string>
+    <string name="feature_settings_light_mode_label">Light mode</string>
+
+    <string name="feature_settings_choose_dark_mode_time">Choose Dark Mode Time</string>
+    <string name="feature_settings_dark_mode_starts_at">Dark mode starts at</string>
+    <string name="feature_settings_dark_mode_ends_at">Dark mode ends at</string>
+    <string name="feature_settings_apply_theme">Apply Theme</string>
+    <string name="feature_settings_cancel">Cancel</string>
+    <string name="feature_settings_ok">Ok</string>
 </resources>

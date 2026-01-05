@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.LanguageConfig
 import org.mifos.core.model.ThemeBrand
+import org.mifos.core.model.TimeBasedTheme
 import org.mifos.core.model.UserData
 
 /**
@@ -35,6 +36,8 @@ interface UserPreferencesRepository {
 
     val observeDarkThemeConfig: Flow<DarkThemeConfig>
 
+    val observeTimeBasedThemeConfig: Flow<TimeBasedTheme>
+
     val observeDynamicColorPreference: Flow<Boolean>
 
     val observeScreenCapturePreference: Flow<Boolean>
@@ -44,6 +47,8 @@ interface UserPreferencesRepository {
     suspend fun setThemeBrand(themeBrand: ThemeBrand)
 
     suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
+
+    suspend fun setTimeBasedThemeConfig(timeBasedTheme: TimeBasedTheme)
 
     suspend fun setDynamicColorPreference(useDynamicColor: Boolean)
 

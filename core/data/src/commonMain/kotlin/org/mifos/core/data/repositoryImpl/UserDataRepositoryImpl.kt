@@ -16,6 +16,7 @@ import org.mifos.core.datastore.UserPreferencesRepository
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.LanguageConfig
 import org.mifos.core.model.ThemeBrand
+import org.mifos.core.model.TimeBasedTheme
 import org.mifos.core.model.UserData
 
 class UserDataRepositoryImpl(
@@ -36,6 +37,9 @@ class UserDataRepositoryImpl(
     override val observeDarkThemeConfig: Flow<DarkThemeConfig>
         get() = preferencesRepository.observeDarkThemeConfig
 
+    override val observeTimeBasedThemeConfig: Flow<TimeBasedTheme>
+        get() = preferencesRepository.observeTimeBasedThemeConfig
+
     override val observeDynamicColorPreference: Flow<Boolean>
         get() = preferencesRepository.observeDynamicColorPreference
 
@@ -48,6 +52,9 @@ class UserDataRepositoryImpl(
 
     override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) =
         preferencesRepository.setDarkThemeConfig(darkThemeConfig)
+
+    override suspend fun setTimeBasedThemeConfig(timeBasedThemeConfig: TimeBasedTheme) =
+        preferencesRepository.setTimeBasedThemeConfig(timeBasedThemeConfig)
 
     override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) =
         preferencesRepository.setDynamicColorPreference(useDynamicColor)

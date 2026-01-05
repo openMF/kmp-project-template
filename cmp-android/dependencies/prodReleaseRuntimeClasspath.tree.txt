@@ -2286,6 +2286,7 @@
 |    |    |    +--- org.jetbrains.androidx.core:core-bundle:1.0.1 (*)
 |    |    |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.0-beta03 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8 (*)
+|    |    |    +--- project :core:common (*)
 |    |    |    +--- project :core:model (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.8.2 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.8.2 (*)

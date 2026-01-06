@@ -63,5 +63,5 @@ data class TasksUiState(
      * For example, if [selectedMonthIndex] is 0, it returns "January".
      */
     val selectedMonth: String
-        get() = months[selectedMonthIndex-1]
+        get() = months[selectedMonthIndex - 1]
 }

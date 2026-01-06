@@ -404,7 +404,7 @@ fun MonthPicker(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth(),
     ) {
-        if (selectedMonth.lowercase()  != "january") {
+        if (selectedMonth.lowercase() != "january") {
             IconButton(onClick = onPreviousMonth) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowLeft,

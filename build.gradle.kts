@@ -13,14 +13,17 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
+        classpath(libs.buildkonfig.gradle.plugin)
         classpath(libs.google.oss.licenses.plugin) {
             exclude(group = "com.google.protobuf")
         }
     }
+
 }
 
 plugins {
     alias(libs.plugins.kotlinCocoapods) apply false
+    alias(libs.plugins.codingfeline.buildKonfig) apply false
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.android.kotlin.multiplatform.library) apply false
@@ -48,6 +51,8 @@ plugins {
 
     alias(libs.plugins.room) apply false
 }
+
+
 
 object DynamicVersion {
     fun setDynamicVersion(file: File, version: String) {

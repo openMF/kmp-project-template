@@ -47,9 +47,10 @@ kotlin {
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.tracing.ktx)
             implementation(libs.koin.android)
+            implementation(libs.connectivity.device)
         }
 
-        mobileMain.dependencies {
+        iosMain.dependencies {
             implementation(libs.connectivity.device)
         }
 

@@ -23,12 +23,9 @@ internal fun Project.configureKotlinMultiplatform() {
         androidLibrary {
             compileSdk = 36
             minSdk = 26
+            enableCoreLibraryDesugaring = true
             dependencies.apply {
                 add("coreLibraryDesugaring", libs.findLibrary("android.desugarJdkLibs").get())
-            }
-            withHostTest{
-                isIncludeAndroidResources = true
-                isReturnDefaultValues = true
             }
         }
 

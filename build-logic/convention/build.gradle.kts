@@ -4,6 +4,7 @@ plugins {
     `kotlin-dsl`
 }
 
+
 group = "org.convention.buildlogic"
 
 // Configure the build-logic plugins to target JDK 19

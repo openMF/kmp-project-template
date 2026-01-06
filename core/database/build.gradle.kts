@@ -22,7 +22,7 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.mifos.kmp.room)
+//    alias(libs.plugins.mifos.kmp.room)
 }
 
 kotlin {
@@ -32,20 +32,20 @@ kotlin {
     }
     sourceSets {
         val desktopMain by getting
-        androidMain.dependencies {
-            implementation(libs.koin.android)
-            implementation(libs.androidx.room.runtime)
-        }
+//        androidMain.dependencies {
+//            implementation(libs.koin.android)
+//            implementation(libs.androidx.room.runtime)
+//        }
+//
+//        nativeMain.dependencies {
+//            implementation(libs.androidx.room.runtime)
+//            implementation(libs.androidx.sqlite.bundled)
+//        }
 
-        nativeMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
-        }
-
-        desktopMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
-        }
+//        desktopMain.dependencies {
+//            implementation(libs.androidx.room.runtime)
+//            implementation(libs.androidx.sqlite.bundled)
+//        }
 
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)

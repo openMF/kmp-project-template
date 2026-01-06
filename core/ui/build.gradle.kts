@@ -28,6 +28,9 @@ kotlin {
 
     androidLibrary {
         namespace = "org.mifos.core.ui"
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
     }
     sourceSets {
         androidMain.dependencies {

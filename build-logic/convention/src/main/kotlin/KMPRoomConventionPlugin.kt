@@ -24,8 +24,14 @@ class KMPRoomConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                add("commonMainImplementation", libs.findLibrary("androidx.room.runtime").get())
-                add("commonMainImplementation", libs.findLibrary("androidx.sqlite.bundled").get())
+                add("androidMainImplementation", libs.findLibrary("androidx.room.runtime").get())
+                add("androidMainImplementation", libs.findLibrary("androidx.sqlite.bundled").get())
+                add("desktopMainImplementation", libs.findLibrary("androidx.room.runtime").get())
+                add("desktopMainImplementation", libs.findLibrary("androidx.sqlite.bundled").get())
+                add("nativeMainImplementation", libs.findLibrary("androidx.room.runtime").get())
+                add("nativeMainImplementation", libs.findLibrary("androidx.sqlite.bundled").get())
+                add("nonJsCommonMainImplementation", libs.findLibrary("androidx.room.runtime").get())
+                add("nonJsCommonMainImplementation", libs.findLibrary("androidx.sqlite.bundled").get())
 
                 listOf(
                     "kspDesktop",

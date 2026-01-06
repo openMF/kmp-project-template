@@ -20,6 +20,7 @@ import com.android.build.api.dsl.androidLibrary
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
+    alias(libs.plugins.mifos.kmp.room)
 }
 
 kotlin {
@@ -28,21 +29,21 @@ kotlin {
         namespace = "template.core.base.database"
     }
 
-    sourceSets {
-        androidMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-        }
-
-        desktopMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-        }
-
-        nativeMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-        }
-
-        nonJsCommonMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-        }
-    }
+//    sourceSets {
+//        androidMain.dependencies {
+//            implementation(libs.androidx.room.runtime)
+//        }
+//
+//        desktopMain.dependencies {
+//            implementation(libs.androidx.room.runtime)
+//        }
+//
+//        nativeMain.dependencies {
+//            implementation(libs.androidx.room.runtime)
+//        }
+//
+//        nonJsCommonMain.dependencies {
+//            implementation(libs.androidx.room.runtime)
+//        }
+//    }
 }

@@ -8,6 +8,8 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 import com.android.build.api.dsl.androidLibrary
+import com.codingfeline.buildkonfig.compiler.FieldSpec
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataTarget
 
 /*
  * Copyright 2025 Mifos Initiative
@@ -23,18 +25,24 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.codingfeline.buildKonfig)
 }
 
 
 kotlin {
+
+    targets.withType<KotlinMetadataTarget> {
+        compilations.all {
+            // force BuildKonfig to attach
+        }
+    }
+
     androidLibrary {
         namespace = "template.core.base.platform"
 
 //        buildFeatures {
 //            buildConfig = true
 //        }
-
-
     }
     sourceSets {
         commonMain.dependencies {
@@ -60,4 +68,17 @@ kotlin {
             implementation(libs.app.update)
         }
     }
+}
+
+
+buildkonfig {
+    packageName = "template.core.base.platform"
+
+    defaultConfigs {
+        buildConfigField(FieldSpec.Type.BOOLEAN, "DEBUG", "true", const = true)
+    }
+//    defaultConfigs("debug") {
+//        buildConfigField(FieldSpec.Type.BOOLEAN, "DEBUG", "true", const = true)
+//    }
+
 }

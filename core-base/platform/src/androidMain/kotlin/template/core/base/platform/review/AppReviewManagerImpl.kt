@@ -12,7 +12,8 @@ package template.core.base.platform.review
 import android.app.Activity
 import android.util.Log
 import com.google.android.play.core.review.ReviewManagerFactory
-import template.core.base.platform.BuildConfig
+import template.core.base.platform.BuildKonfig
+
 
 /**
  * Default implementation of the AppReviewManager interface for Android platforms.
@@ -56,7 +57,7 @@ class AppReviewManagerImpl(
             }
         }
 
-        if (BuildConfig.DEBUG) {
+        if (BuildKonfig.DEBUG) {
             Log.d("ReviewManager", "Prompting for review")
         }
     }

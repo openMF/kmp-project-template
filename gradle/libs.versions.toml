@@ -5,7 +5,7 @@ androidGradlePlugin = "8.13.0"
 androidTools = "31.10.0"
 
 commonsCodec = "1.19.0"
-firebaseBom = "33.16.0"
+firebaseBom = "34.7.0"
 firebaseCrashlyticsPlugin = "3.0.4"
 firebasePerfPlugin = "1.4.2"
 androidxMacroBenchmark = "1.3.4"
@@ -98,7 +98,7 @@ composeNavigation = "2.9.0-beta03"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.3.1"
 material3adaptive = "1.1.2"
-gitLive = "2.1.0"
+gitLive = "2.4.0"
 aboutLibraries = "12.2.3"
 
 # Desktop Version
@@ -114,6 +114,7 @@ room = "2.8.4"
 sqliteBundled = "2.6.2"
 
 buildKonfig = "0.17.1"
+firebaseCommonKtx = "22.0.1"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -157,6 +158,7 @@ androidx-metrics = { group = "androidx.metrics", name = "metrics-performance", v
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidxProfileinstaller" }
 
 androidx-room-gradle-plugin = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
+buildkonfig-gradle-plugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "buildKonfig" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commonsCodec" }
 firebase-crashlytics-gradlePlugin = { group = "com.google.firebase", name = "firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsPlugin" }
 firebase-performance-gradlePlugin = { group = "com.google.firebase", name = "perf-plugin", version.ref = "firebasePerfPlugin" }
@@ -332,6 +334,7 @@ roborazzi-accessibility-check = { group = "io.github.takahirom.roborazzi", name 
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
+firebase-common-ktx = { group = "com.google.firebase", name = "firebase-common-ktx", version.ref = "firebaseCommonKtx" }
 
 [bundles]
 androidx-compose-ui-test = [

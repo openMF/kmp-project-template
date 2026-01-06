@@ -1,4 +1,3 @@
-
 import org.convention.configureKotlin
 import org.convention.configureKotlinMultiplatform
 import org.convention.libs
@@ -21,6 +20,7 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
                 apply("org.jetbrains.kotlin.plugin.serialization")
                 apply("org.jetbrains.kotlin.plugin.parcelize")
             }
+
 
             configureKotlinMultiplatform()
 

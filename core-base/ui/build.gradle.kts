@@ -29,6 +29,9 @@ plugins {
 kotlin {
     androidLibrary {
         namespace = "template.core.base.ui"
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        }
     }
     sourceSets {
         androidMain.dependencies {

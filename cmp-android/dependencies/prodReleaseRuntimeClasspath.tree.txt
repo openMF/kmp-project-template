@@ -231,15 +231,14 @@
 |              +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.3.0 (c)
 |              \--- androidx.lifecycle:lifecycle-common-java8:2.9.1 (c)
 +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 (*)
-+--- com.google.firebase:firebase-bom:33.16.0
-|    +--- com.google.firebase:firebase-analytics:22.5.0 (c)
-|    +--- com.google.firebase:firebase-crashlytics:19.4.4 (c)
-|    +--- com.google.firebase:firebase-common:21.0.0 (c)
-|    +--- com.google.firebase:firebase-common-ktx:21.0.0 (c)
++--- com.google.firebase:firebase-bom:34.7.0
+|    +--- com.google.firebase:firebase-analytics:23.0.0 (c)
+|    +--- com.google.firebase:firebase-crashlytics:20.0.3 (c)
+|    +--- com.google.firebase:firebase-common:22.0.1 (c)
 |    +--- com.google.firebase:firebase-encoders:17.0.0 (c)
-|    \--- com.google.firebase:firebase-installations:18.0.0 (c)
-+--- com.google.firebase:firebase-analytics -> 22.5.0
-|    +--- com.google.android.gms:play-services-measurement:22.5.0
+|    \--- com.google.firebase:firebase-installations:19.0.1 (c)
++--- com.google.firebase:firebase-analytics -> 23.0.0
+|    +--- com.google.android.gms:play-services-measurement:23.0.0
 |    |    +--- androidx.collection:collection:1.0.0 -> 1.5.0 (*)
 |    |    +--- androidx.legacy:legacy-support-core-utils:1.0.0
 |    |    |    +--- androidx.annotation:annotation:1.0.0 -> 1.9.1 (*)
@@ -366,9 +365,9 @@
 |    |    |              +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
 |    |    |              \--- androidx.fragment:fragment-ktx:1.8.8 (c)
 |    |    +--- com.google.android.gms:play-services-basement:18.5.0 (*)
-|    |    +--- com.google.android.gms:play-services-measurement-base:22.5.0
+|    |    +--- com.google.android.gms:play-services-measurement-base:23.0.0
 |    |    |    \--- com.google.android.gms:play-services-basement:18.5.0 (*)
-|    |    +--- com.google.android.gms:play-services-measurement-impl:22.5.0
+|    |    +--- com.google.android.gms:play-services-measurement-impl:23.0.0
 |    |    |    +--- androidx.collection:collection:1.0.0 -> 1.5.0 (*)
 |    |    |    +--- androidx.core:core:1.9.0 -> 1.16.0 (*)
 |    |    |    +--- androidx.privacysandbox.ads:ads-adservices:1.1.0-beta11
@@ -395,7 +394,7 @@
 |    |    |    |    \--- com.google.android.gms:play-services-tasks:18.2.0
 |    |    |    |         \--- com.google.android.gms:play-services-basement:18.4.0 -> 18.5.0 (*)
 |    |    |    +--- com.google.android.gms:play-services-basement:18.5.0 (*)
-|    |    |    +--- com.google.android.gms:play-services-measurement-base:22.5.0 (*)
+|    |    |    +--- com.google.android.gms:play-services-measurement-base:23.0.0 (*)
 |    |    |    +--- com.google.android.gms:play-services-stats:17.0.2
 |    |    |    |    +--- androidx.legacy:legacy-support-core-utils:1.0.0 (*)
 |    |    |    |    \--- com.google.android.gms:play-services-basement:18.0.0 -> 18.5.0 (*)
@@ -407,78 +406,146 @@
 |    |    |         +--- org.checkerframework:checker-qual:3.12.0
 |    |    |         +--- com.google.errorprone:error_prone_annotations:2.11.0 -> 2.26.0
 |    |    |         \--- com.google.j2objc:j2objc-annotations:1.3
-|    |    +--- com.google.android.gms:play-services-measurement-sdk-api:22.5.0
+|    |    +--- com.google.android.gms:play-services-measurement-sdk-api:23.0.0
 |    |    |    +--- com.google.android.gms:play-services-basement:18.5.0 (*)
-|    |    |    \--- com.google.android.gms:play-services-measurement-base:22.5.0 (*)
+|    |    |    \--- com.google.android.gms:play-services-measurement-base:23.0.0 (*)
 |    |    \--- com.google.android.gms:play-services-stats:17.0.2 (*)
-|    +--- com.google.android.gms:play-services-measurement-api:22.5.0
+|    +--- com.google.android.gms:play-services-measurement-api:23.0.0
 |    |    +--- com.google.android.gms:play-services-ads-identifier:18.0.0 (*)
 |    |    +--- com.google.android.gms:play-services-basement:18.5.0 (*)
-|    |    +--- com.google.android.gms:play-services-measurement-base:22.5.0 (*)
-|    |    +--- com.google.android.gms:play-services-measurement-sdk-api:22.5.0 (*)
+|    |    +--- com.google.android.gms:play-services-measurement-base:23.0.0 (*)
+|    |    +--- com.google.android.gms:play-services-measurement-sdk-api:23.0.0 (*)
 |    |    +--- com.google.android.gms:play-services-tasks:18.2.0 (*)
-|    |    +--- com.google.firebase:firebase-common:21.0.0
-|    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4 -> 1.10.2
+|    |    +--- com.google.firebase:firebase-common:21.0.0 -> 22.0.1
+|    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0 -> 1.10.2
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.10.2 (*)
 |    |    |    |    +--- com.google.android.gms:play-services-tasks:16.0.1 -> 18.2.0 (*)
 |    |    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.3.0 (*)
-|    |    |    +--- com.google.firebase:firebase-components:18.0.0
-|    |    |    |    +--- com.google.firebase:firebase-annotations:16.2.0
+|    |    |    +--- com.google.firebase:firebase-components:19.0.0
+|    |    |    |    +--- com.google.firebase:firebase-annotations:17.0.0
 |    |    |    |    |    \--- javax.inject:javax.inject:1
 |    |    |    |    +--- androidx.annotation:annotation:1.5.0 -> 1.9.1 (*)
 |    |    |    |    \--- com.google.errorprone:error_prone_annotations:2.26.0
-|    |    |    +--- com.google.firebase:firebase-annotations:16.2.0 (*)
+|    |    |    +--- com.google.firebase:firebase-annotations:17.0.0 (*)
+|    |    |    +--- androidx.datastore:datastore-preferences:1.1.7
+|    |    |    |    \--- androidx.datastore:datastore-preferences-android:1.1.7
+|    |    |    |         +--- androidx.datastore:datastore:1.1.7
+|    |    |    |         |    \--- androidx.datastore:datastore-android:1.1.7
+|    |    |    |         |         +--- androidx.annotation:annotation:1.2.0 -> 1.9.1 (*)
+|    |    |    |         |         +--- androidx.datastore:datastore-core:1.1.7
+|    |    |    |         |         |    \--- androidx.datastore:datastore-core-android:1.1.7
+|    |    |    |         |         |         +--- androidx.annotation:annotation:1.7.0 -> 1.9.1 (*)
+|    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.22 -> 2.3.0
+|    |    |    |         |         |         |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 (*)
+|    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
+|    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.10.2 (*)
+|    |    |    |         |         |         +--- androidx.datastore:datastore:1.1.7 (c)
+|    |    |    |         |         |         +--- androidx.datastore:datastore-core-okio:1.1.7 (c)
+|    |    |    |         |         |         +--- androidx.datastore:datastore-preferences:1.1.7 (c)
+|    |    |    |         |         |         +--- androidx.datastore:datastore-preferences-core:1.1.7 (c)
+|    |    |    |         |         |         +--- androidx.datastore:datastore-preferences-proto:1.1.7 (c)
+|    |    |    |         |         |         \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-core-okio:1.1.7
+|    |    |    |         |         |    \--- androidx.datastore:datastore-core-okio-jvm:1.1.7
+|    |    |    |         |         |         +--- androidx.datastore:datastore-core:1.1.7 (*)
+|    |    |    |         |         |         +--- com.squareup.okio:okio:3.4.0 -> 3.13.0
+|    |    |    |         |         |         |    \--- com.squareup.okio:okio-jvm:3.13.0
+|    |    |    |         |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
+|    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
+|    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.10.2 (*)
+|    |    |    |         |         |         +--- androidx.datastore:datastore:1.1.7 (c)
+|    |    |    |         |         |         +--- androidx.datastore:datastore-core:1.1.7 (c)
+|    |    |    |         |         |         +--- androidx.datastore:datastore-preferences:1.1.7 (c)
+|    |    |    |         |         |         +--- androidx.datastore:datastore-preferences-core:1.1.7 (c)
+|    |    |    |         |         |         +--- androidx.datastore:datastore-preferences-proto:1.1.7 (c)
+|    |    |    |         |         |         \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.7 (c)
+|    |    |    |         |         +--- com.squareup.okio:okio:3.4.0 -> 3.13.0 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.10.2 (*)
+|    |    |    |         |         +--- androidx.datastore:datastore-core:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-core-okio:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-preferences:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-preferences-core:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-preferences-proto:1.1.7 (c)
+|    |    |    |         |         \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.7 (c)
+|    |    |    |         +--- androidx.datastore:datastore-preferences-core:1.1.7
+|    |    |    |         |    \--- androidx.datastore:datastore-preferences-core-android:1.1.7
+|    |    |    |         |         +--- androidx.datastore:datastore-core:1.1.7 (*)
+|    |    |    |         |         +--- androidx.datastore:datastore-core-okio:1.1.7 (*)
+|    |    |    |         |         +--- androidx.datastore:datastore-preferences-proto:1.1.7
+|    |    |    |         |         |    +--- androidx.datastore:datastore-preferences-external-protobuf:1.1.7
+|    |    |    |         |         |    |    +--- androidx.datastore:datastore:1.1.7 (c)
+|    |    |    |         |         |    |    +--- androidx.datastore:datastore-core:1.1.7 (c)
+|    |    |    |         |         |    |    +--- androidx.datastore:datastore-core-okio:1.1.7 (c)
+|    |    |    |         |         |    |    +--- androidx.datastore:datastore-preferences:1.1.7 (c)
+|    |    |    |         |         |    |    +--- androidx.datastore:datastore-preferences-core:1.1.7 (c)
+|    |    |    |         |         |    |    \--- androidx.datastore:datastore-preferences-proto:1.1.7 (c)
+|    |    |    |         |         |    +--- androidx.datastore:datastore:1.1.7 (c)
+|    |    |    |         |         |    +--- androidx.datastore:datastore-core:1.1.7 (c)
+|    |    |    |         |         |    +--- androidx.datastore:datastore-core-okio:1.1.7 (c)
+|    |    |    |         |         |    +--- androidx.datastore:datastore-preferences:1.1.7 (c)
+|    |    |    |         |         |    +--- androidx.datastore:datastore-preferences-core:1.1.7 (c)
+|    |    |    |         |         |    \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.7 (c)
+|    |    |    |         |         +--- com.squareup.okio:okio:3.4.0 -> 3.13.0 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
+|    |    |    |         |         +--- androidx.datastore:datastore:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-core:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-core-okio:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-preferences:1.1.7 (c)
+|    |    |    |         |         +--- androidx.datastore:datastore-preferences-proto:1.1.7 (c)
+|    |    |    |         |         \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.7 (c)
+|    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
+|    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.10.2 (*)
+|    |    |    |         +--- androidx.datastore:datastore:1.1.7 (c)
+|    |    |    |         +--- androidx.datastore:datastore-core:1.1.7 (c)
+|    |    |    |         +--- androidx.datastore:datastore-core-okio:1.1.7 (c)
+|    |    |    |         +--- androidx.datastore:datastore-preferences-core:1.1.7 (c)
+|    |    |    |         +--- androidx.datastore:datastore-preferences-proto:1.1.7 (c)
+|    |    |    |         \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.7 (c)
 |    |    |    +--- androidx.annotation:annotation:1.5.0 -> 1.9.1 (*)
 |    |    |    +--- androidx.concurrent:concurrent-futures:1.1.0 (*)
-|    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
+|    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.3.0 (*)
 |    |    |    +--- com.google.android.gms:play-services-basement:18.3.0 -> 18.5.0 (*)
 |    |    |    \--- com.google.android.gms:play-services-tasks:18.1.0 -> 18.2.0 (*)
-|    |    +--- com.google.firebase:firebase-common-ktx:21.0.0
-|    |    |    +--- com.google.firebase:firebase-common:21.0.0 (*)
-|    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22
-|    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
-|    |    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22
-|    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
-|    |    |    +--- com.google.firebase:firebase-components:18.0.0 (*)
-|    |    |    \--- com.google.firebase:firebase-annotations:16.2.0 (*)
-|    |    +--- com.google.firebase:firebase-components:18.0.0 (*)
-|    |    +--- com.google.firebase:firebase-installations:17.0.1 -> 18.0.0
-|    |    |    +--- com.google.android.gms:play-services-tasks:18.0.1 -> 18.2.0 (*)
-|    |    |    +--- com.google.firebase:firebase-annotations:16.2.0 (*)
-|    |    |    +--- com.google.firebase:firebase-common:21.0.0 (*)
-|    |    |    +--- com.google.firebase:firebase-common-ktx:21.0.0 (*)
-|    |    |    +--- com.google.firebase:firebase-components:18.0.0 (*)
+|    |    +--- com.google.firebase:firebase-components:18.0.0 -> 19.0.0 (*)
+|    |    +--- com.google.firebase:firebase-installations:17.0.1 -> 19.0.1
+|    |    |    +--- com.google.android.gms:play-services-tasks:18.1.0 -> 18.2.0 (*)
+|    |    |    +--- com.google.firebase:firebase-annotations:17.0.0 (*)
+|    |    |    +--- com.google.firebase:firebase-common:22.0.1 (*)
+|    |    |    +--- com.google.firebase:firebase-components:19.0.0 (*)
 |    |    |    +--- com.google.firebase:firebase-installations-interop:17.1.1 -> 17.2.0
 |    |    |    |    +--- com.google.android.gms:play-services-tasks:18.0.1 -> 18.2.0 (*)
-|    |    |    |    \--- com.google.firebase:firebase-annotations:16.2.0 (*)
-|    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
+|    |    |    |    \--- com.google.firebase:firebase-annotations:16.2.0 -> 17.0.0 (*)
+|    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.3.0 (*)
 |    |    +--- com.google.firebase:firebase-installations-interop:17.0.0 -> 17.2.0 (*)
 |    |    +--- com.google.firebase:firebase-measurement-connector:19.0.0 -> 20.0.1
 |    |    |    +--- com.google.android.gms:play-services-basement:18.0.0 -> 18.5.0 (*)
-|    |    |    \--- com.google.firebase:firebase-annotations:16.0.0 -> 16.2.0 (*)
+|    |    |    \--- com.google.firebase:firebase-annotations:16.0.0 -> 17.0.0 (*)
 |    |    +--- com.google.guava:guava:31.1-android (*)
-|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:1.8.0 -> 2.3.0 (*)
-|    \--- com.google.android.gms:play-services-measurement-sdk:22.5.0
+|    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.3.0 (*)
+|    \--- com.google.android.gms:play-services-measurement-sdk:23.0.0
 |         +--- androidx.collection:collection:1.0.0 -> 1.5.0 (*)
 |         +--- com.google.android.gms:play-services-basement:18.5.0 (*)
-|         +--- com.google.android.gms:play-services-measurement-base:22.5.0 (*)
-|         \--- com.google.android.gms:play-services-measurement-impl:22.5.0 (*)
-+--- com.google.firebase:firebase-crashlytics -> 19.4.4
-|    +--- com.google.firebase:firebase-sessions:2.1.2
-|    |    +--- com.google.firebase:firebase-common:21.0.0 (*)
-|    |    +--- com.google.firebase:firebase-common-ktx:21.0.0 (*)
-|    |    +--- com.google.firebase:firebase-components:18.0.0 (*)
+|         +--- com.google.android.gms:play-services-measurement-base:23.0.0 (*)
+|         \--- com.google.android.gms:play-services-measurement-impl:23.0.0 (*)
++--- com.google.firebase:firebase-crashlytics -> 20.0.3
+|    +--- com.google.firebase:firebase-sessions:3.0.3
+|    |    +--- com.google.firebase:firebase-common:22.0.1 (*)
+|    |    +--- com.google.firebase:firebase-components:19.0.0 (*)
 |    |    +--- com.google.firebase:firebase-installations-interop:17.2.0 (*)
-|    |    +--- com.google.firebase:firebase-annotations:16.2.0 (*)
+|    |    +--- com.google.firebase:firebase-annotations:17.0.0 (*)
 |    |    +--- com.google.firebase:firebase-encoders:17.0.0
 |    |    |    \--- androidx.annotation:annotation:1.1.0 -> 1.9.1 (*)
 |    |    +--- com.google.firebase:firebase-encoders-json:18.0.1
-|    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10 -> 1.8.22 (*)
+|    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10 -> 1.8.22
+|    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
+|    |    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22
+|    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
 |    |    |    +--- androidx.annotation:annotation:1.1.0 -> 1.9.1 (*)
 |    |    |    \--- com.google.firebase:firebase-encoders:17.0.0 (*)
-|    |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22 (*)
-|    |    +--- com.google.firebase:firebase-installations:18.0.0 (*)
+|    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.3.0 (*)
+|    |    +--- com.google.firebase:firebase-installations:18.0.0 -> 19.0.1 (*)
 |    |    +--- com.google.firebase:firebase-datatransport:19.0.0
 |    |    |    +--- androidx.annotation:annotation:1.1.0 -> 1.9.1 (*)
 |    |    |    +--- com.google.android.datatransport:transport-api:3.1.0 -> 3.2.0
@@ -501,95 +568,25 @@
 |    |    +--- com.google.android.datatransport:transport-api:3.2.0 (*)
 |    |    +--- javax.inject:javax.inject:1
 |    |    +--- androidx.annotation:annotation:1.5.0 -> 1.9.1 (*)
-|    |    \--- androidx.datastore:datastore-preferences:1.1.3
-|    |         \--- androidx.datastore:datastore-preferences-android:1.1.3
-|    |              +--- androidx.datastore:datastore:1.1.3
-|    |              |    \--- androidx.datastore:datastore-android:1.1.3
-|    |              |         +--- androidx.annotation:annotation:1.2.0 -> 1.9.1 (*)
-|    |              |         +--- androidx.datastore:datastore-core:1.1.3
-|    |              |         |    \--- androidx.datastore:datastore-core-android:1.1.3
-|    |              |         |         +--- androidx.annotation:annotation:1.7.0 -> 1.9.1 (*)
-|    |              |         |         +--- org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.22 -> 2.3.0
-|    |              |         |         |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 (*)
-|    |              |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
-|    |              |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.10.2 (*)
-|    |              |         |         +--- androidx.datastore:datastore:1.1.3 (c)
-|    |              |         |         +--- androidx.datastore:datastore-core-okio:1.1.3 (c)
-|    |              |         |         +--- androidx.datastore:datastore-preferences:1.1.3 (c)
-|    |              |         |         +--- androidx.datastore:datastore-preferences-core:1.1.3 (c)
-|    |              |         |         +--- androidx.datastore:datastore-preferences-external-protobuf:1.1.3 (c)
-|    |              |         |         \--- androidx.datastore:datastore-preferences-proto:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-core-okio:1.1.3
-|    |              |         |    \--- androidx.datastore:datastore-core-okio-jvm:1.1.3
-|    |              |         |         +--- androidx.datastore:datastore-core:1.1.3 (*)
-|    |              |         |         +--- com.squareup.okio:okio:3.4.0 -> 3.13.0
-|    |              |         |         |    \--- com.squareup.okio:okio-jvm:3.13.0
-|    |              |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
-|    |              |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
-|    |              |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.10.2 (*)
-|    |              |         |         +--- androidx.datastore:datastore:1.1.3 (c)
-|    |              |         |         +--- androidx.datastore:datastore-core:1.1.3 (c)
-|    |              |         |         +--- androidx.datastore:datastore-preferences:1.1.3 (c)
-|    |              |         |         +--- androidx.datastore:datastore-preferences-core:1.1.3 (c)
-|    |              |         |         +--- androidx.datastore:datastore-preferences-external-protobuf:1.1.3 (c)
-|    |              |         |         \--- androidx.datastore:datastore-preferences-proto:1.1.3 (c)
-|    |              |         +--- com.squareup.okio:okio:3.4.0 -> 3.13.0 (*)
-|    |              |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
-|    |              |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.10.2 (*)
-|    |              |         +--- androidx.datastore:datastore-core:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-core-okio:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-preferences:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-preferences-core:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-preferences-proto:1.1.3 (c)
-|    |              |         \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.3 (c)
-|    |              +--- androidx.datastore:datastore-preferences-core:1.1.3
-|    |              |    \--- androidx.datastore:datastore-preferences-core-jvm:1.1.3
-|    |              |         +--- androidx.datastore:datastore-core:1.1.3 (*)
-|    |              |         +--- androidx.datastore:datastore-core-okio:1.1.3 (*)
-|    |              |         +--- androidx.datastore:datastore-preferences-proto:1.1.3
-|    |              |         |    +--- androidx.datastore:datastore-preferences-external-protobuf:1.1.3
-|    |              |         |    |    +--- androidx.datastore:datastore:1.1.3 (c)
-|    |              |         |    |    +--- androidx.datastore:datastore-core:1.1.3 (c)
-|    |              |         |    |    +--- androidx.datastore:datastore-core-okio:1.1.3 (c)
-|    |              |         |    |    +--- androidx.datastore:datastore-preferences:1.1.3 (c)
-|    |              |         |    |    +--- androidx.datastore:datastore-preferences-core:1.1.3 (c)
-|    |              |         |    |    \--- androidx.datastore:datastore-preferences-proto:1.1.3 (c)
-|    |              |         |    +--- androidx.datastore:datastore:1.1.3 (c)
-|    |              |         |    +--- androidx.datastore:datastore-core:1.1.3 (c)
-|    |              |         |    +--- androidx.datastore:datastore-core-okio:1.1.3 (c)
-|    |              |         |    +--- androidx.datastore:datastore-preferences:1.1.3 (c)
-|    |              |         |    +--- androidx.datastore:datastore-preferences-core:1.1.3 (c)
-|    |              |         |    \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.3 (c)
-|    |              |         +--- com.squareup.okio:okio:3.4.0 -> 3.13.0 (*)
-|    |              |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
-|    |              |         +--- androidx.datastore:datastore:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-core:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-core-okio:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-preferences:1.1.3 (c)
-|    |              |         +--- androidx.datastore:datastore-preferences-proto:1.1.3 (c)
-|    |              |         \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.3 (c)
-|    |              +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.3.0 (*)
-|    |              +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.10.2 (*)
-|    |              +--- androidx.datastore:datastore:1.1.3 (c)
-|    |              +--- androidx.datastore:datastore-preferences-core:1.1.3 (c)
-|    |              +--- androidx.datastore:datastore-core:1.1.3 (c)
-|    |              +--- androidx.datastore:datastore-core-okio:1.1.3 (c)
-|    |              +--- androidx.datastore:datastore-preferences-proto:1.1.3 (c)
-|    |              \--- androidx.datastore:datastore-preferences-external-protobuf:1.1.3 (c)
+|    |    +--- androidx.datastore:datastore:1.1.7 (*)
+|    |    \--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3 -> 1.8.1
+|    |         \--- org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1
+|    |              +--- org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1 (*)
+|    |              +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.3.0 (*)
+|    |              \--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1 (*)
 |    +--- com.google.android.gms:play-services-tasks:18.1.0 -> 18.2.0 (*)
-|    +--- com.google.firebase:firebase-annotations:16.2.0 (*)
-|    +--- com.google.firebase:firebase-common:21.0.0 (*)
-|    +--- com.google.firebase:firebase-common-ktx:21.0.0 (*)
-|    +--- com.google.firebase:firebase-components:18.0.0 (*)
+|    +--- com.google.firebase:firebase-annotations:17.0.0 (*)
+|    +--- com.google.firebase:firebase-common:22.0.1 (*)
+|    +--- com.google.firebase:firebase-components:19.0.0 (*)
 |    +--- com.google.firebase:firebase-config-interop:16.0.1
 |    |    +--- com.google.firebase:firebase-encoders-json:18.0.1 (*)
 |    |    \--- com.google.firebase:firebase-encoders:17.0.0 (*)
 |    +--- com.google.firebase:firebase-encoders:17.0.0 (*)
 |    +--- com.google.firebase:firebase-encoders-json:18.0.1 (*)
-|    +--- com.google.firebase:firebase-installations:18.0.0 (*)
+|    +--- com.google.firebase:firebase-installations:18.0.0 -> 19.0.1 (*)
 |    +--- com.google.firebase:firebase-installations-interop:17.2.0 (*)
 |    +--- com.google.firebase:firebase-measurement-connector:20.0.1 (*)
-|    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22 (*)
+|    +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.3.0 (*)
 |    +--- com.google.android.datatransport:transport-api:3.2.0 (*)
 |    +--- com.google.android.datatransport:transport-backend-cct:3.3.0 (*)
 |    +--- com.google.android.datatransport:transport-runtime:3.3.0 (*)
@@ -1272,11 +1269,7 @@
 |    |         |    \--- io.insert-koin:koin-core-annotations-jvm:4.1.0
 |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.3.0 (*)
 |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.3.0 (*)
-|    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1
-|    |    \--- org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.8.1
-|    |         +--- org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1 (*)
-|    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.3.0 (*)
-|    |         \--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.1 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1 (*)
 |    +--- project :core:ui
 |    |    +--- androidx.metrics:metrics-performance:1.0.0-beta02
 |    |    |    +--- androidx.collection:collection:1.4.2 -> 1.5.0 (*)
@@ -1373,29 +1366,8 @@
 |    |    +--- project :core:analytics
 |    |    |    +--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0 (*)
 |    |    |    +--- project :core-base:analytics
-|    |    |    |    +--- dev.gitlive:firebase-analytics:2.1.0
-|    |    |    |    |    \--- dev.gitlive:firebase-analytics-android:2.1.0
-|    |    |    |    |         +--- com.google.firebase:firebase-analytics -> 22.5.0 (*)
-|    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0-RC.2 -> 1.10.2 (*)
-|    |    |    |    |         +--- com.google.firebase:firebase-bom:33.2.0 -> 33.16.0 (*)
-|    |    |    |    |         +--- dev.gitlive:firebase-app:2.1.0
-|    |    |    |    |         |    \--- dev.gitlive:firebase-app-android:2.1.0
-|    |    |    |    |         |         +--- com.google.firebase:firebase-common-ktx -> 21.0.0 (*)
-|    |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0-RC.2 -> 1.10.2 (*)
-|    |    |    |    |         |         +--- com.google.firebase:firebase-bom:33.2.0 -> 33.16.0 (*)
-|    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.3.0 (*)
-|    |    |    |    |         |         +--- dev.gitlive:firebase-common:2.1.0
-|    |    |    |    |         |         |    \--- dev.gitlive:firebase-common-android:2.1.0
-|    |    |    |    |         |         |         +--- com.google.firebase:firebase-common-ktx -> 21.0.0 (*)
-|    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0-RC.2 -> 1.10.2 (*)
-|    |    |    |    |         |         |         +--- com.google.firebase:firebase-bom:33.2.0 -> 33.16.0 (*)
-|    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.1 -> 1.8.1 (*)
-|    |    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.3.0 (*)
-|    |    |    |    |         |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC.2 -> 1.10.2 (*)
-|    |    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC.2 -> 1.10.2 (*)
-|    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.3.0 (*)
-|    |    |    |    |         +--- dev.gitlive:firebase-common:2.1.0 (*)
-|    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC.2 -> 1.10.2 (*)
+|    |    |    |    +--- com.google.firebase:firebase-bom:34.7.0 (*)
+|    |    |    |    +--- com.google.firebase:firebase-analytics -> 23.0.0 (*)
 |    |    |    |    +--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0 (*)
 |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 (*)
 |    |    |    |    +--- io.insert-koin:koin-bom:4.1.0 (*)
@@ -1843,6 +1815,32 @@
 |    |    |    +--- androidx.tracing:tracing:1.3.0 (*)
 |    |    |    \--- androidx.tracing:tracing:1.3.0 (c)
 |    |    +--- io.insert-koin:koin-android:4.1.0 (*)
+|    |    +--- dev.jordond.connectivity:connectivity-device:2.1.0
+|    |    |    \--- dev.jordond.connectivity:connectivity-device-android:2.1.0
+|    |    |         +--- dev.jordond.connectivity:connectivity-android:2.1.0
+|    |    |         |    \--- dev.jordond.connectivity:connectivity-android-android:2.1.0
+|    |    |         |         +--- dev.jordond.connectivity:connectivity-core:2.1.0
+|    |    |         |         |    \--- dev.jordond.connectivity:connectivity-core-android:2.1.0
+|    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 (*)
+|    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
+|    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
+|    |    |         |         |         \--- dev.drewhamilton.poko:poko-annotations:0.18.7
+|    |    |         |         |              \--- dev.drewhamilton.poko:poko-annotations-jvm:0.18.7
+|    |    |         |         |                   \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
+|    |    |         |         +--- dev.jordond.connectivity:connectivity-tools-android:2.1.0
+|    |    |         |         |    \--- dev.jordond.connectivity:connectivity-tools-android-android:2.1.0
+|    |    |         |         |         +--- dev.jordond.connectivity:connectivity-core:2.1.0 (*)
+|    |    |         |         |         +--- androidx.startup:startup-runtime:1.2.0 (*)
+|    |    |         |         |         +--- androidx.activity:activity-ktx:1.10.1 (*)
+|    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
+|    |    |         |         +--- androidx.core:core-ktx:1.16.0 (*)
+|    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
+|    |    |         |         \--- dev.drewhamilton.poko:poko-annotations:0.18.7 (*)
+|    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 (*)
+|    |    |         +--- dev.jordond.connectivity:connectivity-core:2.1.0 (*)
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
+|    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
+|    |    |         \--- dev.drewhamilton.poko:poko-annotations:0.18.7 (*)
 |    |    +--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0 (*)
 |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 (*)
 |    |    +--- io.insert-koin:koin-bom:4.1.0 (*)
@@ -2069,14 +2067,7 @@
 |    |    |    +--- io.insert-koin:koin-annotations:2.1.0 (*)
 |    |    |    \--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1 (*)
 |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
-|    |    \--- dev.jordond.connectivity:connectivity-core:2.1.0
-|    |         \--- dev.jordond.connectivity:connectivity-core-android:2.1.0
-|    |              +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 (*)
-|    |              +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
-|    |              +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
-|    |              \--- dev.drewhamilton.poko:poko-annotations:0.18.7
-|    |                   \--- dev.drewhamilton.poko:poko-annotations-jvm:0.18.7
-|    |                        \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.3.0 (*)
+|    |    \--- dev.jordond.connectivity:connectivity-core:2.1.0 (*)
 |    +--- project :core:analytics (*)
 |    +--- io.insert-koin:koin-compose:4.1.0 (*)
 |    +--- io.insert-koin:koin-compose-viewmodel:4.1.0 (*)

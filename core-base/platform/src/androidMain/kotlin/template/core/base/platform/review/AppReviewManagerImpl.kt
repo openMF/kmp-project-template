@@ -14,7 +14,6 @@ import android.util.Log
 import com.google.android.play.core.review.ReviewManagerFactory
 import template.core.base.platform.BuildKonfig
 
-
 /**
  * Default implementation of the AppReviewManager interface for Android platforms.
  *

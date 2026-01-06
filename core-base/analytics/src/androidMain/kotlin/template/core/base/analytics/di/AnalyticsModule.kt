@@ -9,13 +9,10 @@
  */
 package template.core.base.analytics.di
 
-import com.google.firebase.Firebase
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import template.core.base.analytics.AnalyticsHelper
-import template.core.base.analytics.BuildKonfig
 import template.core.base.analytics.StubAnalyticsHelper
 
 actual val analyticsModule: Module = module {

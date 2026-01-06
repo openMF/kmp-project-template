@@ -47,7 +47,7 @@ data class TasksUiState(
         val defaultYear: Int = datetimeInSystemZone.year
 
         // Default month index, current month (1-indexed)
-        val defaultMonthIndex: Int = datetimeInSystemZone.month.number - 1
+        val defaultMonthIndex: Int = datetimeInSystemZone.month.number
 
         // Default day in month, current day (as an Int for easier comparison)
         val defaultDayInMonth: Int = datetimeInSystemZone.dayOfMonth

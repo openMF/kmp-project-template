@@ -112,7 +112,7 @@ class TasksViewModel(
     /** Selects the next month and updates the days in the selected month. */
     fun selectNextMonth() {
         analyticsHelper.logSelectNextMonth(selectedMonthIndex + 1)
-        if (selectedMonthIndex < 11) {
+        if (selectedMonthIndex < 12) {
             _tasksUiState.value =
                 _tasksUiState.value.copy(selectedMonthIndex = selectedMonthIndex + 1)
             updateDaysInMonth()

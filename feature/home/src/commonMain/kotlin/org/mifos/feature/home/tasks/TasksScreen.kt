@@ -404,12 +404,14 @@ fun MonthPicker(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth(),
     ) {
-        IconButton(onClick = onPreviousMonth) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
-                contentDescription = "Navigate to previous month",
-                tint = MaterialTheme.colorScheme.primary,
-            )
+        if (selectedMonth.lowercase()  != "january") {
+            IconButton(onClick = onPreviousMonth) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
+                    contentDescription = "Navigate to previous month",
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
         Text(
             text = selectedMonth,
@@ -419,12 +421,14 @@ fun MonthPicker(
             modifier = Modifier.weight(1F),
             textAlign = TextAlign.Center,
         )
-        IconButton(onClick = onNextMonth) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                contentDescription = "Navigate to next month",
-                tint = MaterialTheme.colorScheme.primary,
-            )
+        if (selectedMonth.lowercase() != "december") {
+            IconButton(onClick = onNextMonth) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                    contentDescription = "Navigate to next month",
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }

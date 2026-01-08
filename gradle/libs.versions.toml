@@ -28,12 +28,12 @@ appcompatVersion = "1.7.1"
 calfPermissions = "0.9.0"
 coreKtxVersion = "1.17.0"
 
-jacksonCore = "2.19.2"
-junitJupiterApi = "5.13.4"
-junitPlatformLauncherVersion = "1.13.4"
+jacksonCore = "2.20.1"
+junitJupiterApi = "6.0.1"
+junitPlatformLauncherVersion = "6.0.1"
 okhttp = "4.12.0"
-robolectric = "4.15.1"
-roborazzi = "1.45.1"
+robolectric = "4.16"
+roborazzi = "1.54.0"
 
 # Testing Dependencies
 junitVersion = "4.13.2"

@@ -9,7 +9,6 @@
  */
 package org.mifos.feature.home.tasks
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
@@ -39,7 +38,7 @@ data class TasksUiState(
 
     companion object {
         // Default values based on the current date
-        private val currentMoment = Clock.System.now()
+        private val currentMoment = kotlin.time.Clock.System.now()
         private val datetimeInSystemZone: LocalDateTime =
             currentMoment.toLocalDateTime(TimeZone.currentSystemDefault())
 

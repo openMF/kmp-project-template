@@ -11,5 +11,18 @@ dependencyResolutionManagement {
     }
 }
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+
+    plugins {
+        id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    }
+}
+
+
 rootProject.name = "build-logic"
 include(":convention")

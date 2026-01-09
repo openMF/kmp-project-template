@@ -80,7 +80,7 @@ class TasksViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val tasks: StateFlow<List<TaskEntity>> =
         tasksUiState.map {
-            val selectedMonth = it.selectedMonthIndex.plus(1).toString().formatDay()
+            val selectedMonth = it.selectedMonthNumber.plus(1).toString().formatDay()
             "$selectedMonth/${it.selectedDayInMonth}/${it.selectedYear}"
         }.flatMapLatest { dateString ->
             storageService.getSelectedDayTasks(dateString)
@@ -91,7 +91,7 @@ class TasksViewModel(
                 initialValue = emptyList(),
             )
 
-    private val selectedMonthIndex get() = tasksUiState.value.selectedMonthIndex
+    private val selectedMonthIndex get() = tasksUiState.value.selectedMonthNumber
     private val selectedYear get() = tasksUiState.value.selectedYear
 
     init {
@@ -114,7 +114,7 @@ class TasksViewModel(
         analyticsHelper.logSelectNextMonth(selectedMonthIndex)
         if (selectedMonthIndex < 12) {
             _tasksUiState.value =
-                _tasksUiState.value.copy(selectedMonthIndex = selectedMonthIndex)
+                _tasksUiState.value.copy(selectedMonthNumber = selectedMonthIndex + 1)
             updateDaysInMonth()
         }
     }
@@ -125,7 +125,7 @@ class TasksViewModel(
 
         if (selectedMonthIndex > 0) {
             _tasksUiState.value =
-                _tasksUiState.value.copy(selectedMonthIndex = selectedMonthIndex - 1)
+                _tasksUiState.value.copy(selectedMonthNumber = selectedMonthIndex - 1)
             updateDaysInMonth()
         }
     }

@@ -13,7 +13,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 /**
  * A data class representing the state of the task calendar screen.
@@ -23,7 +23,7 @@ import kotlinx.datetime.Clock
  * facilitate displaying a calendar-like UI for task management.
  *
  * @param selectedYear The currently selected year. Defaults to the current year.
- * @param selectedMonthIndex The index of the currently selected month (1 for January, 2 for February, etc.).
+ * @param selectedMonthNumber The index of the currently selected month (1 for January, 2 for February, etc.).
  * Defaults to the current month.
  * @param selectedDayInMonth The currently selected day in the month, represented as a string.
  * Defaults to the current day of the month.
@@ -32,24 +32,24 @@ import kotlinx.datetime.Clock
  */
 data class TasksUiState(
     val selectedYear: Int = defaultYear,
-    val selectedMonthIndex: Int = defaultMonthIndex,
+    val selectedMonthNumber: Int = defaultMonthNumber,
     val selectedDayInMonth: String = defaultDayInMonth.toString(),
     val weekdaysAndDaysInMonth: List<Pair<String, String>> = emptyList(),
 ) {
 
     companion object {
         // Default values based on the current date
-        private val currentMoment = kotlinx.datetime.Clock.System.now()
+        private val currentMoment = Clock.System.now()
         private val datetimeInSystemZone: LocalDateTime =
             currentMoment.toLocalDateTime(TimeZone.currentSystemDefault())
 
         // Default year, current year
         val defaultYear: Int = datetimeInSystemZone.year
 
-        val defaultMonthIndex: Int = datetimeInSystemZone.month.number
+        val defaultMonthNumber: Int = datetimeInSystemZone.month.number
 
         // Default day in month, current day (as an Int for easier comparison)
-        val defaultDayInMonth: Int = datetimeInSystemZone.dayOfMonth
+        val defaultDayInMonth: Int = datetimeInSystemZone.day
     }
 
     // List of month names for lookup based on the month index
@@ -59,9 +59,9 @@ data class TasksUiState(
     )
 
     /**
-     * Returns the name of the selected month corresponding to [selectedMonthIndex].
-     * For example, if [selectedMonthIndex] is 0, it returns "January".
+     * Returns the name of the selected month corresponding to [selectedMonthNumber].
+     * For example, if [selectedMonthNumber] is 1, it returns "January".
      */
     val selectedMonth: String
-        get() = months[selectedMonthIndex - 1]
+        get() = months[selectedMonthNumber - 1]
 }

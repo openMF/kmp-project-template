@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.Clock
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.feature.home.model.ActionToolbar
 import org.mifos.feature.home.model.TaskEntity
@@ -302,7 +301,7 @@ fun TimeSelectionDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val currentTime = kotlinx.datetime.Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val timePickerState = rememberTimePickerState(
         initialHour = currentTime.hour,
         initialMinute = currentTime.minute,

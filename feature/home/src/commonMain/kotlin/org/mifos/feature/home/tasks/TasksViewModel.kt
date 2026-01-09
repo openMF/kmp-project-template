@@ -111,10 +111,10 @@ class TasksViewModel(
 
     /** Selects the next month and updates the days in the selected month. */
     fun selectNextMonth() {
-        analyticsHelper.logSelectNextMonth(selectedMonthIndex + 1)
+        analyticsHelper.logSelectNextMonth(selectedMonthIndex)
         if (selectedMonthIndex < 12) {
             _tasksUiState.value =
-                _tasksUiState.value.copy(selectedMonthIndex = selectedMonthIndex + 1)
+                _tasksUiState.value.copy(selectedMonthIndex = selectedMonthIndex)
             updateDaysInMonth()
         }
     }
@@ -160,12 +160,12 @@ class TasksViewModel(
      */
     private fun updateDaysInMonth() {
         val daysInCurrentMonth =
-            getDaysInMonth(year = selectedYear, month = selectedMonthIndex + 1)
+            getDaysInMonth(year = selectedYear, month = selectedMonthIndex)
 
         val weekdaysAndDaysInSelectedMonth = mutableListOf<Pair<String, String>>()
 
         for (day in 1..daysInCurrentMonth) {
-            val date = LocalDate(selectedYear, selectedMonthIndex + 1, day)
+            val date = LocalDate(selectedYear, selectedMonthIndex, day)
             val weekday = shortWeekdayNames[date.dayOfWeek]
 
             weekdaysAndDaysInSelectedMonth.add(weekday!! to day.toString())

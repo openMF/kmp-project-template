@@ -9,7 +9,7 @@
  */
 import com.android.build.api.dsl.androidLibrary
 import com.codingfeline.buildkonfig.compiler.FieldSpec
-import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
+
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataTarget
 
 /*
@@ -89,7 +89,7 @@ buildkonfig {
 
 // 1. Default (e.g. Debug/Dev)
     defaultConfigs {
-        buildConfigField(FieldSpec.Type.STRING, "FLAVOR", "dev")
+        buildConfigField(FieldSpec.Type.STRING, "FLAVOR", "demo")
         buildConfigField(FieldSpec.Type.BOOLEAN, "IS_DEMO_MODE", "true")
     }
 

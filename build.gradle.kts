@@ -13,7 +13,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath(libs.buildkonfig.gradle.plugin)
+
         classpath(libs.google.oss.licenses.plugin) {
             exclude(group = "com.google.protobuf")
         }

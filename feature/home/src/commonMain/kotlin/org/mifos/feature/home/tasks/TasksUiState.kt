@@ -13,6 +13,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.Clock
 
 /**
  * A data class representing the state of the task calendar screen.
@@ -38,7 +39,7 @@ data class TasksUiState(
 
     companion object {
         // Default values based on the current date
-        private val currentMoment = kotlin.time.Clock.System.now()
+        private val currentMoment = kotlinx.datetime.Clock.System.now()
         private val datetimeInSystemZone: LocalDateTime =
             currentMoment.toLocalDateTime(TimeZone.currentSystemDefault())
 

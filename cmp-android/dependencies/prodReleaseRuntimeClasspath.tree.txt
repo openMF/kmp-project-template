@@ -1418,9 +1418,9 @@
 |    |    |    |    |         |    \--- co.touchlab:kermit-core-android:2.0.8
 |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.2.0 -> 2.3.0 (*)
 |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.2.0 -> 2.3.0 (*)
-|    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.6.0
-|    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.6.0
-|    |    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.21 -> 2.3.0 (*)
+|    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1
+|    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.7.1
+|    |    |    |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.3.0 (*)
 |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 (*)
 |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    |    +--- io.insert-koin:koin-core:4.1.1 (*)
@@ -1668,7 +1668,7 @@
 |    |    |    \--- project :core:common
 |    |    |         +--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.0 (*)
 |    |    |         +--- co.touchlab:kermit:2.0.8 (*)
-|    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.6.0 (*)
+|    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
 |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 (*)
 |    |    |         +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    |         +--- io.insert-koin:koin-core:4.1.1 (*)
@@ -1883,7 +1883,7 @@
 |    |    |    |    +--- co.touchlab:kermit:2.0.8 (*)
 |    |    |    |    +--- com.squareup.okio:okio:3.16.4 (*)
 |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 (*)
-|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.6.0 (*)
+|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
 |    |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    |    |    +--- io.insert-koin:koin-core:4.1.1 (*)
 |    |    |    |    +--- io.insert-koin:koin-annotations:2.3.1 (*)
@@ -2221,7 +2221,7 @@
 |    |    |    +--- org.jetbrains.compose.components:components-resources:1.9.3 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    |    +--- org.jetbrains.compose.components:components-ui-tooling-preview:1.9.3 (*)
-|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.6.0 (*)
+|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
 |    |    |    \--- com.mohamedrejeb.calf:calf-permissions:0.9.0 (*)
 |    |    +--- project :feature:profile
 |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)

@@ -75,10 +75,10 @@ buildkonfig {
     packageName = "template.core.base.platform"
 
     defaultConfigs {
+        buildConfigField(FieldSpec.Type.BOOLEAN, "DEBUG", "false", const = true)
+    }
+    defaultConfigs("debug") {
         buildConfigField(FieldSpec.Type.BOOLEAN, "DEBUG", "true", const = true)
     }
-//    defaultConfigs("debug") {
-//        buildConfigField(FieldSpec.Type.BOOLEAN, "DEBUG", "true", const = true)
-//    }
 
 }

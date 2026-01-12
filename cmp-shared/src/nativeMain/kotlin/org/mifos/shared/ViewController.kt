@@ -15,8 +15,8 @@ import cmp.shared.utils.initKoin
 import platform.Foundation.NSUserDefaults
 import platform.QuartzCore.CALayer
 import platform.UIKit.UIApplication
-import platform.UIKit.UIUserInterfaceStyle
 import platform.UIKit.UITextField
+import platform.UIKit.UIUserInterfaceStyle
 
 private var secureTextField: UITextField? = null
 

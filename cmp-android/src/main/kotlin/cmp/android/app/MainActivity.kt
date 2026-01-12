@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.getValue
 import androidx.core.os.LocaleListCompat
@@ -39,7 +40,7 @@ import java.util.Locale
  * @see ComponentActivity
  */
 @Suppress("UnusedPrivateProperty")
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var appUpdateManager: AppUpdateManager
 

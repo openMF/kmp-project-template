@@ -52,10 +52,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -512,9 +514,23 @@ fun HorizontalDayPicker(
     daysInMonth: List<Pair<String, String>>,
     modifier: Modifier = Modifier,
 ) {
+    val lazyRowState = rememberLazyListState()
+
+    LaunchedEffect(selectedDayInMonth, daysInMonth) {
+        val matchingDay = daysInMonth.firstOrNull { it.second == selectedDayInMonth }
+        val index = if (matchingDay != null) {
+            (daysInMonth.indexOf(matchingDay) - 2).coerceAtLeast(0)
+        } else {
+            0
+        }
+        lazyRowState.animateScrollToItem(index)
+    }
+
+
     LazyRow(
         contentPadding = PaddingValues(10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
+        state = lazyRowState,
         modifier = modifier,
     ) {
         items(daysInMonth) { (weekday, dayOfMonth) ->

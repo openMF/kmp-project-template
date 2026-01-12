@@ -31,7 +31,6 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.spotless) apply false
-    alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.moduleGraph) apply true
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.firebase.perf) apply false

@@ -32,20 +32,20 @@ dependencies {
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
-    
+
     // Keystore management dependencies
-    implementation(libs.github.api)
-    implementation(libs.okhttp)
-    implementation(libs.jackson.core)
-    implementation(libs.jackson.databind)
-    implementation(libs.jackson.module.kotlin)
-    implementation(libs.commons.codec)
-    
-    // Test dependencies for keystore management
-    testImplementation(libs.junit.jupiter.api)
-    testImplementation(libs.junit.jupiter.engine)
-    testImplementation(libs.junit.jupiter.params)
-    testRuntimeOnly(libs.platform.junit.platform.launcher)
+//    implementation(libs.github.api)
+//    implementation(libs.okhttp)
+//    implementation(libs.jackson.core)
+//    implementation(libs.jackson.databind)
+//    implementation(libs.jackson.module.kotlin)
+//    implementation(libs.commons.codec)
+//
+//    // Test dependencies for keystore management
+//    testImplementation(libs.junit.jupiter.api)
+//    testImplementation(libs.junit.jupiter.engine)
+//    testImplementation(libs.junit.jupiter.params)
+//    testRuntimeOnly(libs.platform.junit.platform.launcher)
 }
 
 tasks {
@@ -53,7 +53,7 @@ tasks {
         enableStricterValidation = true
         failOnWarning = true
     }
-    
+
     // Configure JUnit 5 for testing keystore management functionality
     test {
         useJUnitPlatform()
@@ -136,11 +136,11 @@ gradlePlugin {
 
         // NEW ===============================
 
-        register("keystoreManagement") {
-            id = "org.convention.keystore.management"
-            implementationClass = "KeystoreManagementConventionPlugin"
-            description = "Configures keystore management tasks for the project"
-        }
+//        register("keystoreManagement") {
+//            id = "org.convention.keystore.management"
+//            implementationClass = "KeystoreManagementConventionPlugin"
+//            description = "Configures keystore management tasks for the project"
+//        }
 
     }
 }

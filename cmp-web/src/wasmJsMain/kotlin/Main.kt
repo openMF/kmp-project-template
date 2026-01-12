@@ -1,5 +1,7 @@
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.CanvasBasedWindow
+import androidx.compose.ui.window.ComposeViewport
+import androidx.compose.ui.window.ComposeViewportConfiguration
 import cmp.shared.SharedApp
 import cmp.shared.utils.initKoin
 import org.jetbrains.compose.resources.configureWebResources
@@ -36,9 +38,8 @@ fun main() {
      * Creates a Canvas-based window for rendering the Compose UI.
      * This window uses the canvas element with the ID "ComposeTarget" and has the title "WebApp".
      */
-    CanvasBasedWindow(
-        title = "WebApp", // Window title
-        canvasElementId = "ComposeTarget", // The canvas element where the Compose UI will be rendered
+    ComposeViewport(
+        viewportContainerId = "ComposeTarget", // The canvas element where the Compose UI will be rendered
     ) {
         /*
          * Invokes the root composable of the application.
@@ -49,7 +50,7 @@ fun main() {
             handleRecreate = {},
             handleThemeMode = {},
             handleAppLocale = {},
-            onSplashScreenRemoved = {}
+            onSplashScreenRemoved = {},
         )
     }
 }

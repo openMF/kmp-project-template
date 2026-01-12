@@ -9,7 +9,6 @@
  */
 package org.mifos.feature.home.utils
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
@@ -38,10 +37,10 @@ object DateTimeFormatter {
      * - Be cautious with locale-specific differences in date representations.
      */
     fun convertMillisToDate(millis: Long): String {
-        val instant = Instant.Companion.fromEpochMilliseconds(millis)
-        val localDate = instant.toLocalDateTime(TimeZone.Companion.currentSystemDefault()).date
+        val instant = kotlin.time.Instant.fromEpochMilliseconds(millis)
+        val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
         return "${localDate.month.number.toString().padStart(2, '0')}/" +
-            "${localDate.dayOfMonth.toString().padStart(2, '0')}/" +
+            "${localDate.day.toString().padStart(2, '0')}/" +
             "${localDate.year}"
     }
 }

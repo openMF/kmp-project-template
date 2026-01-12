@@ -46,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
@@ -302,7 +301,7 @@ fun TimeSelectionDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     val timePickerState = rememberTimePickerState(
         initialHour = currentTime.hour,
         initialMinute = currentTime.minute,

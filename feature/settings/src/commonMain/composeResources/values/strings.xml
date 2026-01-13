@@ -30,4 +30,7 @@
     <string name="feature_settings_dismiss_dialog_button_text">OK</string>
     <string name="feature_settings_change_theme_text">Change Theme</string>
     <string name="feature_settings_change_theme_placeholder_text">Change Theme</string>
+    <string name="feature_settings_change_language_text">Change Language</string>
+    <string name="feature_settings_change_language_placeholder_text">Change Language</string>
+    <string name="feature_settings_language_preference">Language</string>
 </resources>

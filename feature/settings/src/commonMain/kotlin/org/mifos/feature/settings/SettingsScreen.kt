@@ -9,6 +9,7 @@
  */
 package org.mifos.feature.settings
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +34,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.ui.scaffold.KptScaffold
 import org.mifos.feature.settings.generated.resources.Res
+import org.mifos.feature.settings.generated.resources.feature_settings_change_language_placeholder_text
+import org.mifos.feature.settings.generated.resources.feature_settings_change_language_text
 import org.mifos.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import org.mifos.feature.settings.generated.resources.feature_settings_change_theme_text
 import template.core.base.analytics.AnalyticsHelper
@@ -46,12 +49,22 @@ internal fun SettingsScreen(
 ) {
     val analyticsHelper = rememberAnalyticsHelper()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
+    var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showSettingsDialog) {
         SettingsDialog(
             onDismiss = {
                 analyticsHelper.logSettingsDialogVisible(false)
                 showSettingsDialog = false
+            },
+        )
+    }
+
+    if (showLanguageDialog) {
+        LanguageDialog(
+            onDismiss = {
+                analyticsHelper.logLanguageDialogVisible(false)
+                showLanguageDialog = false
             },
         )
     }
@@ -63,6 +76,10 @@ internal fun SettingsScreen(
             analyticsHelper.logSettingsDialogVisible(true)
             showSettingsDialog = true
         },
+        onLanguageCardClick = {
+            analyticsHelper.logLanguageDialogVisible(true)
+            showLanguageDialog = true
+        },
     )
 
     TrackScreenView(screenName = "SettingsScreen")
@@ -72,6 +89,7 @@ internal fun SettingsScreen(
 internal fun SettingsScreenContent(
     onBackClick: () -> Unit,
     onThemeCardClick: () -> Unit,
+    onLanguageCardClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     KptScaffold(
@@ -84,9 +102,11 @@ internal fun SettingsScreenContent(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // SettingsScreenContent
             ThemeCard(onClick = onThemeCardClick)
+            LanguageCard(onClick = onLanguageCardClick)
         }
     }
 }
@@ -102,6 +122,7 @@ internal fun ThemeCard(
             defaultElevation = 1.dp,
         ),
         modifier = modifier.fillMaxWidth(),
+        onClick = onClick,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -127,9 +148,53 @@ internal fun ThemeCard(
     }
 }
 
+@Composable
+internal fun LanguageCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedCard(
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 1.dp,
+        ),
+        modifier = modifier.fillMaxWidth(),
+        onClick = onClick,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = AppIcons.Language,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .clip(shape = RoundedCornerShape(50.dp)),
+            )
+            Text(
+                text = stringResource(Res.string.feature_settings_change_language_text),
+                modifier = Modifier.weight(1F),
+            )
+            IconButton(
+                onClick = onClick,
+            ) {
+                Icon(
+                    imageVector = AppIcons.ArrowRight,
+                    contentDescription = stringResource(Res.string.feature_settings_change_language_placeholder_text),
+                )
+            }
+        }
+    }
+}
+
 private fun AnalyticsHelper.logSettingsDialogVisible(visible: Boolean) {
     logEvent(
         type = "settings_dialog_visible",
+        params = mapOf("visible" to visible.toString()),
+    )
+}
+
+private fun AnalyticsHelper.logLanguageDialogVisible(visible: Boolean) {
+    logEvent(
+        type = "language_dialog_visible",
         params = mapOf("visible" to visible.toString()),
     )
 }

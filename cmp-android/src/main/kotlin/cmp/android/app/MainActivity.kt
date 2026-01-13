@@ -82,12 +82,26 @@ class MainActivity : AppCompatActivity() {
                 handleThemeMode = {
                     AppCompatDelegate.setDefaultNightMode(it)
                 },
-                handleAppLocale = {
-                    it?.let {
-                        AppCompatDelegate.setApplicationLocales(
-                            LocaleListCompat.forLanguageTags(it),
-                        )
-                        Locale.setDefault(Locale(it))
+                handleAppLocale = { localeTag ->
+                    val currentLocales = AppCompatDelegate.getApplicationLocales()
+                    val newLocales = if (localeTag != null) {
+                        LocaleListCompat.forLanguageTags(localeTag)
+                    } else {
+                        // System Default: clear app-specific locale
+                        LocaleListCompat.getEmptyLocaleList()
+                    }
+
+                    // Only update if the locale has actually changed
+                    if (currentLocales != newLocales) {
+                        AppCompatDelegate.setApplicationLocales(newLocales)
+                        // Update Locale.setDefault for non-UI formatting
+                        if (localeTag != null) {
+                            // Use forLanguageTag to properly parse locales like "en-GB", "pt-BR"
+                            Locale.setDefault(Locale.forLanguageTag(localeTag))
+                        } else {
+                            // Reset to system default locale
+                            Locale.setDefault(Locale.getDefault(Locale.Category.DISPLAY))
+                        }
                     }
                 },
                 onSplashScreenRemoved = {

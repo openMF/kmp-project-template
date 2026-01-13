@@ -72,6 +72,7 @@ import androidx.compose.material.icons.rounded.Wallet
 import androidx.compose.ui.graphics.vector.ImageVector
 
 object AppIcons {
+    val Language: ImageVector = Icons.Default.ArrowOutward
     val CheckCircle: ImageVector = Icons.Filled.CheckCircle
     val OutlinedInfo = Icons.Outlined.Info
     val OutlinedLock = Icons.Outlined.Lock

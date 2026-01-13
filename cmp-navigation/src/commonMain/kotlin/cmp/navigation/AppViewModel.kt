@@ -12,6 +12,7 @@ package cmp.navigation
 import androidx.lifecycle.viewModelScope
 import cmp.navigation.AppAction.Internal.DynamicColorsUpdate
 import cmp.navigation.AppAction.Internal.ScreenCaptureUpdate
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -52,6 +53,7 @@ class AppViewModel(
 
         settingsRepository
             .observeLanguage
+            .distinctUntilChanged()
             .map { AppEvent.UpdateAppLocale(it.localeName) }
             .onEach(::sendEvent)
             .launchIn(viewModelScope)

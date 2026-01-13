@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.model.DarkThemeConfig
+import org.mifos.core.model.LanguageConfig
 import org.mifos.core.model.ThemeBrand
 import template.core.base.analytics.AnalyticsHelper
 
@@ -32,6 +33,7 @@ class SettingsViewmodel(
                     brand = userDate.themeBrand,
                     useDynamicColor = userDate.useDynamicColor,
                     darkThemeConfig = userDate.darkThemeConfig,
+                    language = userDate.appLanguage,
                 ),
             )
         }
@@ -61,12 +63,20 @@ class SettingsViewmodel(
             settingsRepository.setDynamicColorPreference(useDynamicColor)
         }
     }
+
+    fun updateLanguage(language: LanguageConfig) {
+        viewModelScope.launch {
+            analyticsHelper.logLanguageChanged(language)
+            settingsRepository.setLanguage(language)
+        }
+    }
 }
 
 data class UserEditableSettings(
     val brand: ThemeBrand,
     val useDynamicColor: Boolean,
     val darkThemeConfig: DarkThemeConfig,
+    val language: LanguageConfig,
 )
 
 sealed interface SettingsUiState {
@@ -97,6 +107,15 @@ private fun AnalyticsHelper.logThemeChanged(themeConfig: DarkThemeConfig) {
         type = "dark_theme_config_changed",
         params = mapOf(
             "dark_theme_config" to themeConfig.name,
+        ),
+    )
+}
+
+private fun AnalyticsHelper.logLanguageChanged(language: LanguageConfig) {
+    logEvent(
+        type = "language_changed",
+        params = mapOf(
+            "language" to (language.localeName ?: "system_default"),
         ),
     )
 }

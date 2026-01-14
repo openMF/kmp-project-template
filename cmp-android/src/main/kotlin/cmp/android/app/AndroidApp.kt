@@ -10,6 +10,8 @@
 package cmp.android.app
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import cmp.shared.utils.initKoin
 import coil3.ImageLoader
 import coil3.PlatformContext
@@ -17,8 +19,13 @@ import coil3.SingletonImageLoader
 import coil3.disk.DiskCache
 import coil3.disk.directory
 import coil3.request.CachePolicy
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.mifos.core.data.repository.UserDataRepository
 import template.core.base.ui.getDefaultImageLoader
 
 /**
@@ -29,12 +36,47 @@ import template.core.base.ui.getDefaultImageLoader
  * @constructor Create empty Android app
  * @see Application
  */
-class AndroidApp : Application(), SingletonImageLoader.Factory {
+class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
+
+    private val userDataRepository: UserDataRepository by inject()
+
     override fun onCreate() {
         super.onCreate()
         initKoin {
             androidContext(this@AndroidApp)
             androidLogger()
+        }
+
+        // Restore the user's saved language preference to AppCompatDelegate.
+        // This ensures the app always launches with the user's chosen language,
+        // regardless of system settings or device language.
+        restoreSavedLanguage()
+    }
+
+    /**
+     * Restores the user's saved language preference from the repository to AppCompatDelegate.
+     *
+     * This runs BEFORE any Activities are created, ensuring the app launches with the
+     * correct language. The app's saved preference always takes precedence.
+     */
+    private fun restoreSavedLanguage() {
+        runBlocking {
+            val userData = userDataRepository.userData.first()
+            val savedLanguage = userData.appLanguage
+
+            // Convert the saved LanguageConfig to LocaleListCompat
+            val desiredLocales = if (savedLanguage.localeName != null) {
+                LocaleListCompat.forLanguageTags(savedLanguage.localeName)
+            } else {
+                // System default
+                LocaleListCompat.getEmptyLocaleList()
+            }
+
+            // Only update if the current locale differs from saved preference
+            val currentLocales = AppCompatDelegate.getApplicationLocales()
+            if (currentLocales != desiredLocales) {
+                AppCompatDelegate.setApplicationLocales(desiredLocales)
+            }
         }
     }
 

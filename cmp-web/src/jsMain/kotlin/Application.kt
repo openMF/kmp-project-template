@@ -60,7 +60,7 @@ fun main() {
                         }
                         // Reload page to apply language changes (required for web)
                         // Note: This will reload the page, and locale selection depends on browser settings
-                        window.location.reload()
+                        // window.location.reload()
                     },
                     onSplashScreenRemoved = {}
                 )

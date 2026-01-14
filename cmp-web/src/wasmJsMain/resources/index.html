@@ -7,6 +7,7 @@
     <title>CMP Web App</title>
     <link rel="shortcut icon" href="./favicon.ico">
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link href="styles.css" rel="stylesheet" type="text/css"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name='description' content='A Kotlin Multiplatform Multi Module Project Template.'>
 
@@ -38,9 +39,13 @@
     <meta name="twitter:image"
           content="https://github.com/user-attachments/assets/2f70b317-51a4-4b1e-b48a-880adecbb323">
 
+    <script src="skiko.js"></script>
     <script type="application/javascript" src="cmp-wasm.js"></script>
 </head>
 <body>
-<canvas id="ComposeTarget"></canvas>
+<div id="ComposeTargetContainer">
+    <canvas id="ComposeTarget"></canvas>
+</div>
+
 </body>
 </html>

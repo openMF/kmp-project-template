@@ -9,6 +9,7 @@
  */
 package cmp.android.app
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -99,8 +100,10 @@ class MainActivity : AppCompatActivity() {
                             // Use forLanguageTag to properly parse locales like "en-GB", "pt-BR"
                             Locale.setDefault(Locale.forLanguageTag(localeTag))
                         } else {
-                            // Reset to system default locale
-                            Locale.setDefault(Locale.getDefault(Locale.Category.DISPLAY))
+                            // Reset to true system default locale from device configuration
+                            // Use Resources.getSystem() to get device locale unaffected by app overrides
+                            val systemLocale = Resources.getSystem().configuration.locales[0]
+                            Locale.setDefault(systemLocale)
                         }
                     }
                 },

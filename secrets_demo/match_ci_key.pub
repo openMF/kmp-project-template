@@ -1,0 +1,8 @@
+ssh-ed25519 REPLACE_THIS_WITH_YOUR_ACTUAL_SSH_PUBLIC_KEY fastlane-match
+
+# This is the public key corresponding to match_ci_key
+# Add this as a deploy key to your Match repository:
+#   1. Go to your Match repository on GitHub
+#   2. Settings → Deploy keys → Add deploy key
+#   3. Paste the content of this file
+#   4. Check "Allow write access" (Match needs to push certificates)

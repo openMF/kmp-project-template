@@ -460,8 +460,8 @@ platform :ios do
 
   desc "Upload beta build to TestFlight"
   lane :beta do |options|
-
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
+      testflight_config = FastlaneConfig::IosConfig::TESTFLIGHT_CONFIG
 
       setup_ci_if_needed
       load_api_key(options)
@@ -469,11 +469,13 @@ platform :ios do
         options.merge(match_type: "appstore")
       )
 
+      # Increment version number
       increment_version_number(
         xcodeproj: ios_config[:project_path],
-        version_number: ios_config[:version_number]
+        version_number: options[:version_number] || ios_config[:version_number]
       )
 
+      # Get latest TestFlight build number and increment
       latest_build_number = latest_testflight_build_number(
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
@@ -484,22 +486,76 @@ platform :ios do
         build_number: latest_build_number + 1
       )
 
+      # Build signed IPA
       build_ios_project(
         options.merge(
             provisioning_profile_name: ios_config[:provisioning_profile_appstore]
         )
       )
 
+      # Generate release notes from git commits
+      releaseNotes = generateReleaseNote()
+
+      # Prepare localized build info with changelog
+      localized_build_info = {
+        "default" => {
+          whats_new: releaseNotes
+        },
+        "en-US" => {
+          whats_new: releaseNotes
+        }
+      }
+
+      # Upload to TestFlight with comprehensive metadata
       pilot(
+        # API Key
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
-        skip_waiting_for_build_processing: true
+
+        # Beta App Review Information (for Apple reviewers)
+        beta_app_review_info: testflight_config[:beta_app_review_info],
+
+        # Beta App Configuration
+        beta_app_feedback_email: testflight_config[:beta_app_feedback_email],
+        beta_app_description: testflight_config[:beta_app_description],
+        demo_account_required: testflight_config[:demo_account_required],
+
+        # Distribution Settings
+        distribute_external: testflight_config[:distribute_external],
+        notify_external_testers: testflight_config[:notify_external_testers],
+        groups: testflight_config[:groups],  # Tester groups to distribute to
+
+        # Submission Settings
+        skip_submission: testflight_config[:skip_submission],
+        skip_waiting_for_build_processing: testflight_config[:skip_waiting_for_build_processing],
+        submit_beta_review: testflight_config[:submit_beta_review],
+
+        # Build Management
+        expire_previous_builds: testflight_config[:expire_previous_builds],
+        reject_build_waiting_for_review: testflight_config[:reject_build_waiting_for_review],
+
+        # Processing Wait Settings
+        wait_processing_interval: testflight_config[:wait_processing_interval],
+        wait_processing_timeout_duration: testflight_config[:wait_processing_timeout_duration],
+
+        # Encryption Compliance
+        uses_non_exempt_encryption: testflight_config[:uses_non_exempt_encryption],
+
+        # Release notes for this build
+        changelog: releaseNotes,
+
+        # Localized information
+        localized_app_info: testflight_config[:localized_app_info],
+        localized_build_info: localized_build_info
       )
+
+      UI.success("✅ Successfully uploaded to TestFlight!")
+      UI.success("📝 Release Notes: #{releaseNotes}")
   end
 
-  desc "Upload iOS Application to AppStore"
+  desc "Upload iOS Application to App Store"
   lane :release do |options|
-
      ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
+     appstore_config = FastlaneConfig::IosConfig::APPSTORE_CONFIG
 
       setup_ci_if_needed
       load_api_key(options)
@@ -507,11 +563,13 @@ platform :ios do
         options.merge(match_type: "appstore")
       )
 
+      # Increment version number
       increment_version_number(
         xcodeproj: ios_config[:project_path],
-        version_number: ios_config[:version_number]
+        version_number: options[:version_number] || ios_config[:version_number]
       )
 
+      # Get latest TestFlight build number and increment
       latest_build_number = latest_testflight_build_number(
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
@@ -522,6 +580,7 @@ platform :ios do
         build_number: latest_build_number + 1
       )
 
+      # Update Info.plist with required privacy strings
       update_plist(
         plist_path: ios_config[:plist_path],
         block: proc do |plist|
@@ -531,41 +590,56 @@ platform :ios do
         end
       )
 
+      # Build signed IPA
       build_ios_project(
         options.merge(
             provisioning_profile_name: ios_config[:provisioning_profile_appstore]
         )
       )
 
+      # Generate release notes from git commits
+      releaseNotes = generateReleaseNote()
+
+      # Upload binary and release notes to App Store
+      # Note: Metadata (description, screenshots, age rating) is already configured in App Store Connect
+      # We only upload the IPA, release notes, and submit for review
       deliver(
-        metadata_path: options[:metadata_path] || ios_config[:metadata_path],
-        submit_for_review: true, # Set to true if you want to auto-submit for review
-        automatic_release: true, # Set to true if you want to auto-release once it approved
+        # API Key
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
-        skip_app_version_update: true,
-        force: true, # Skips HTML report verification
-        precheck_include_in_app_purchases: false,
-        overwrite_screenshots: true,
-        reject_if_possible: true,
-        app_rating_config_path: ios_config[:app_rating_config_path],
-        submission_information: {
-          add_id_info_uses_idfa: false,
-          add_id_info_limits_tracking: false,
-          add_id_info_serves_ads: false,
-          add_id_info_tracks_action: false,
-          add_id_info_tracks_install: false,
-          content_rights_has_rights: true,
-          content_rights_contains_third_party_content: false,
-          export_compliance_platform: 'ios',
-          export_compliance_compliance_required: false,
-          export_compliance_encryption_updated: false,
-          export_compliance_app_type: nil,
-          export_compliance_uses_encryption: false,
-          export_compliance_is_exempt: true,
-          export_compliance_contains_third_party_cryptography: false,
-          export_compliance_contains_proprietary_cryptography: false,
-          export_compliance_available_on_french_store: true
-        }
+
+        # Release notes for this version
+        release_notes: {
+          "default" => releaseNotes,
+          "en-US" => releaseNotes
+        },
+
+        # Skip uploading metadata and screenshots (already in App Store Connect)
+        skip_metadata: options[:skip_metadata] || true,
+        skip_screenshots: options[:skip_screenshots] || true,
+        skip_binary_upload: options[:skip_binary_upload] || false,
+
+        # App Review Information (contact details for Apple reviewers)
+        app_review_information: appstore_config[:app_review_information],
+
+        # Submission settings
+        submit_for_review: options[:submit_for_review] || appstore_config[:submit_for_review],
+        automatic_release: options[:automatic_release] || appstore_config[:automatic_release],
+        phased_release: options[:phased_release] || appstore_config[:phased_release],
+
+        # Version and build management
+        skip_app_version_update: appstore_config[:skip_app_version_update],
+        reject_if_possible: appstore_config[:reject_if_possible],
+
+        # Processing settings
+        force: appstore_config[:force],
+        precheck_include_in_app_purchases: appstore_config[:precheck_include_in_app_purchases],
+        run_precheck_before_submit: appstore_config[:run_precheck_before_submit],
+
+        # Submission information (compliance, ads, etc.)
+        submission_information: appstore_config[:submission_information]
       )
+
+      UI.success("✅ Successfully deployed to App Store!")
+      UI.success("📝 Release Notes: #{releaseNotes}")
   end
 end

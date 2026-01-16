@@ -143,39 +143,33 @@ bash scripts/setup_apn_key.sh
 
 ### GitHub Actions CI/CD
 
-This project uses a centralized iOS configuration system for GitHub Actions workflows.
+The project uses a centralized configuration system for iOS deployment workflows.
 
 **Configuration Files:**
 
-- `fastlane-config/project_config.rb` - App-specific configuration (bundle ID, Firebase app ID)
-- `secrets/shared_keys.env` - Team-wide secrets (Team ID, API keys, Match repo)
+- `fastlane-config/project_config.rb` - Application-specific configuration
+- `secrets/shared_keys.env` - Team-wide credentials and secrets
 
-**Local vs CI:**
+**Configuration Loading:**
 
-- **Local**: Deployment scripts read from `secrets/shared_keys.env`
-- **CI/CD**: Workflows extract configuration from `project_config.rb` + GitHub Secrets
+- Local deployments read from `secrets/shared_keys.env`
+- CI/CD workflows extract configuration from `project_config.rb` and GitHub Secrets
 
-**Setup GitHub Actions:**
+**Setup:**
 
-1. **Configure GitHub Secrets** -
-   See [Migration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md#required-github-secrets)
-2. **Update `project_config.rb`** - Customize for your app (already done by customizer.sh)
-3. **Run workflow** - Configuration extracted automatically!
+1. Configure GitHub Secrets as documented in the iOS Configuration Guide
+2. Update `project_config.rb` with application-specific values
+3. Execute workflows
 
-**No hardcoded values in workflow files!** 🎉
+Configuration is read from `fastlane-config/project_config.rb` for both local and CI deployments.
 
-All iOS configuration is read from `fastlane-config/project_config.rb`, providing a single source of
-truth for both local and CI deployments.
-
-See [GitHub Actions iOS Migration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) for complete setup
-instructions.
+See [iOS Configuration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) for detailed setup instructions.
 
 ### Documentation
 
-- 📖 [Complete iOS Setup Guide](docs/IOS_SETUP.md) - Detailed setup instructions
-- 📖 [iOS Deployment Guide](docs/IOS_DEPLOYMENT.md) - Deployment workflows and best practices
-- 📖 [GitHub Actions Migration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) - CI/CD configuration
-  guide
+- [Complete iOS Setup Guide](docs/IOS_SETUP.md) - Detailed setup instructions
+- [iOS Deployment Guide](docs/IOS_DEPLOYMENT.md) - Deployment workflows and best practices
+- [GitHub Actions Configuration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) - CI/CD setup and configuration
 
 ## 📁 Project Structure
 

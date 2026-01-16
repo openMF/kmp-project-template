@@ -101,28 +101,17 @@ concurrency:
 jobs:
   multi_platform_build_and_publish:
     name: Multi-Platform Build and Publish
-    # v2.0.0: Config-aware iOS deployment - reads from fastlane-config/project_config.rb
-    uses: openMF/mifos-x-actionhub/.github/workflows/multi-platform-build-and-publish.yaml@v2.0.0
+    uses: openMF/mifos-x-actionhub/.github/workflows/multi-platform-build-and-publish.yaml@v1.0.8
     with:
       release_type: ${{ inputs.release_type }}
       target_branch: ${{ inputs.target_branch }}
-      android_package_name: 'cmp-android' # <-- Change this to your android package name
-      ios_package_name: 'cmp-ios' # <-- Change this to your ios package name
-      desktop_package_name: 'cmp-desktop' # <-- Change this to your desktop package name
-      web_package_name: 'cmp-web'   # <-- Change this to your web package name
-      tester_groups: 'mifos-mobile-apps' # <-- Change this to your Firebase tester group
-      # iOS Configuration (v2.0.0) - Read from fastlane-config/project_config.rb
-      # The workflow automatically extracts these values:
-      # - app_identifier (from IOS[:app_identifier])
-      # - git_url (from IOS_SHARED[:code_signing][:match_git_url])
-      # - git_branch (from IOS_SHARED[:code_signing][:match_git_branch])
-      # - match_type (from IOS_SHARED[:code_signing][:match_type])
-      # - provisioning_profile_name (from IOS_SHARED[:code_signing][:provisioning_profiles])
-      # - firebase_app_id (from IOS[:firebase][:app_id])
-      # No need to pass these as workflow inputs - they're handled automatically!
+      android_package_name: 'cmp-android'
+      ios_package_name: 'cmp-ios'
+      desktop_package_name: 'cmp-desktop'
+      web_package_name: 'cmp-web'
       metadata_path: './fastlane/metadata'
-      use_cocoapods: true         # <-- Set to true if using CocoaPods integration for KMP
-      shared_module: ':cmp-shared' # <-- Gradle path to your shared KMP module (e.g., :shared)
+      use_cocoapods: true
+      shared_module: ':cmp-shared'
       distribute_ios_firebase: ${{ inputs.distribute_ios_firebase }}
       distribute_ios_testflight: ${{ inputs.distribute_ios_testflight }}
       distribute_ios_appstore: ${{ inputs.distribute_ios_appstore }}

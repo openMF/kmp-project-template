@@ -380,6 +380,54 @@ platform :ios do
       )
   end
 
+  private_lane :get_version_from_gradle do |options|
+      ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
+
+      # Generate version.txt from gradle
+      gradle(tasks: ["versionFile"])
+      full_version = File.read("../version.txt").strip rescue ios_config[:version_number]
+
+      # Sanitize for App Store if needed
+      # App Store requires: MAJOR.MINOR.PATCH (1-3 period-separated integers)
+      if options[:sanitize_for_appstore]
+          # Extract commit count from version
+          # Format: 2026.1.1-beta.0.9 → Extract year, month, and commit count
+          # Transform to: 2026.1.9 (Year.Month.CommitCount)
+
+          base_version = full_version.split('-')[0].split('+')[0]  # Get 2026.1.1
+          parts = base_version.split('.')
+
+          # Extract commit count from pre-release identifier
+          # -beta.0.9 → extract 9
+          # -rc.0.15 → extract 15
+          commit_count = "0"
+          if full_version.include?('-')
+              pre_release = full_version.split('-')[1].split('+')[0]  # Get "beta.0.9"
+              commit_parts = pre_release.split('.')
+              commit_count = commit_parts[-1] if commit_parts.length > 0  # Get last number (9)
+          end
+
+          # Construct App Store version: Year.Month.CommitCount
+          if parts.length >= 2
+              version = "#{parts[0]}.#{parts[1]}.#{commit_count}"
+          else
+              # Fallback if version format is unexpected
+              version = base_version
+          end
+
+          UI.important("📱 Full version from Gradle: #{full_version}")
+          UI.important("📱 App Store compatible version: #{version}")
+          UI.important("   ├─ Year: #{parts[0] if parts.length > 0}")
+          UI.important("   ├─ Month: #{parts[1] if parts.length > 1}")
+          UI.important("   └─ Commit Count: #{commit_count}")
+
+          version
+      else
+          UI.important("📱 Version from Gradle: #{full_version}")
+          full_version
+      end
+  end
+
   ###################
   # Main Public lanes
   ###################
@@ -410,9 +458,8 @@ platform :ios do
     firebase_config = FastlaneConfig.get_firebase_config(:ios)
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
-    # Generate version from gradle (reads from version.txt)
-    gradle(tasks: ["versionFile"])
-    version = File.read("../version.txt").strip rescue ios_config[:version_number]
+    # Get version from gradle - Firebase accepts full semantic version with pre-release identifiers
+    version = get_version_from_gradle(sanitize_for_appstore: false)
 
     # Set version number to match Android version
     increment_version_number(
@@ -479,11 +526,10 @@ platform :ios do
         options.merge(match_type: "appstore")
       )
 
-      # Generate version from gradle (reads from version.txt)
-      gradle(tasks: ["versionFile"])
-      version = File.read("../version.txt").strip rescue ios_config[:version_number]
+      # Get version from gradle (sanitized for App Store)
+      version = get_version_from_gradle(sanitize_for_appstore: true)
 
-      # Increment version number to match Android version
+      # Increment version number (sanitized for App Store)
       increment_version_number(
         xcodeproj: ios_config[:project_path],
         version_number: options[:version_number] || version
@@ -577,11 +623,10 @@ platform :ios do
         options.merge(match_type: "appstore")
       )
 
-      # Generate version from gradle (reads from version.txt)
-      gradle(tasks: ["versionFile"])
-      version = File.read("../version.txt").strip rescue ios_config[:version_number]
+      # Get version from gradle (sanitized for App Store)
+      version = get_version_from_gradle(sanitize_for_appstore: true)
 
-      # Increment version number to match Android version
+      # Increment version number (sanitized for App Store)
       increment_version_number(
         xcodeproj: ios_config[:project_path],
         version_number: options[:version_number] || version

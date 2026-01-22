@@ -41,7 +41,28 @@ print_section "📱 iOS Version Configuration Check"
 # Check version.txt (Gradle-generated)
 if [ -f "version.txt" ]; then
     VERSION_TXT=$(cat version.txt)
+
+    # Extract App Store version: Year.Month.CommitCount
+    # From: 2026.1.1-beta.0.9 → To: 2026.1.9
+    BASE_VERSION=$(echo "$VERSION_TXT" | cut -d'-' -f1 | cut -d'+' -f1)
+    YEAR=$(echo "$BASE_VERSION" | cut -d'.' -f1)
+    MONTH=$(echo "$BASE_VERSION" | cut -d'.' -f2)
+
+    # Extract commit count from pre-release identifier
+    if echo "$VERSION_TXT" | grep -q '\-'; then
+        PRE_RELEASE=$(echo "$VERSION_TXT" | cut -d'-' -f2 | cut -d'+' -f1)
+        COMMIT_COUNT=$(echo "$PRE_RELEASE" | rev | cut -d'.' -f1 | rev)
+    else
+        COMMIT_COUNT="0"
+    fi
+
+    APPSTORE_VERSION="${YEAR}.${MONTH}.${COMMIT_COUNT}"
+
     print_success "Gradle version.txt: $VERSION_TXT"
+    if [ "$VERSION_TXT" != "$APPSTORE_VERSION" ]; then
+        print_info "App Store sanitized version: $APPSTORE_VERSION"
+        echo "  (Format: Year.Month.CommitCount - commit count extracted from pre-release)"
+    fi
 else
     echo "⚠️  version.txt not found. Run: ./gradlew versionFile"
 fi
@@ -90,10 +111,21 @@ echo
 print_section "📊 Summary"
 echo "When you deploy iOS:"
 echo "  1. Fastlane runs: gradle(tasks: [\"versionFile\"])"
-echo "  2. Reads version from: version.txt ($VERSION_TXT)"
-echo "  3. Updates Xcode MARKETING_VERSION to: $VERSION_TXT"
+echo "  2. Reads version from: version.txt"
+if [ -n "$VERSION_TXT" ] && [ -n "$APPSTORE_VERSION" ]; then
+    echo "     • Full version: $VERSION_TXT"
+    if [ "$VERSION_TXT" != "$APPSTORE_VERSION" ]; then
+        echo "     • TestFlight/App Store version: $APPSTORE_VERSION (sanitized)"
+    fi
+else
+    echo "     • Version: (version.txt not found)"
+fi
+echo "  3. Updates Xcode MARKETING_VERSION accordingly"
 echo "  4. Auto-increments CURRENT_PROJECT_VERSION from TestFlight/Firebase"
 echo "  5. Info.plist uses: \$(MARKETING_VERSION) and \$(CURRENT_PROJECT_VERSION)"
+echo
+echo "Note: Firebase accepts full semantic versions with pre-release identifiers"
+echo "      TestFlight/App Store require sanitized versions (MAJOR.MINOR.PATCH only)"
 echo
 
 print_info "To update version for next release:"

@@ -89,8 +89,8 @@ secrets/AuthKey*.p8
 secrets/APNAuthKey.p8
 secrets/match_ci_key
 secrets/match_ci_key.pub
-fastlane/metadata
-fastlane/screenshots
+fastlane/metadata/
+fastlane/screenshots/
 fastlane/age_rating.json
 # Ruby stuff we don't care about
 .bundle/

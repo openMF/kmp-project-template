@@ -663,6 +663,24 @@ platform :ios do
       # Generate release notes from git commits
       releaseNotes = generateReleaseNote()
 
+      # Write release notes to metadata file (required when creating new versions)
+      release_notes_path = File.join(ios_config[:metadata_path], "en-US", "release_notes.txt")
+      FileUtils.mkdir_p(File.dirname(release_notes_path))
+      File.write(release_notes_path, releaseNotes)
+      UI.message("📝 Wrote release notes to: #{release_notes_path}")
+
+      # Log what metadata will be uploaded
+      UI.important("📋 Metadata files that will be uploaded:")
+      metadata_files = Dir.glob(File.join(ios_config[:metadata_path], "en-US", "*.txt"))
+      if metadata_files.empty?
+        UI.error("⚠️  No metadata files found!")
+      else
+        metadata_files.each do |file|
+          UI.message("   - #{File.basename(file)}")
+        end
+      end
+      UI.important("ℹ️  Other metadata (description, screenshots, etc.) will be copied from previous version")
+
       # Upload binary and release notes to App Store
       # Note: Metadata (description, screenshots, age rating) is already configured in App Store Connect
       # We only upload the IPA, release notes, copyright, and submit for review
@@ -673,16 +691,17 @@ platform :ios do
         # Copyright (required by precheck)
         copyright: "#{Time.now.year} #{FastlaneConfig::ProjectConfig::ORGANIZATION_NAME}",
 
-        # Release notes for this version
-        release_notes: {
-          "default" => releaseNotes,
-          "en-US" => releaseNotes
-        },
+        # Metadata path (contains release_notes.txt with "What's New")
+        metadata_path: ios_config[:metadata_path],
 
-        # Skip uploading metadata and screenshots (already in App Store Connect)
-        skip_metadata: options[:skip_metadata] || true,
-        skip_screenshots: options[:skip_screenshots] || true,
+        # Skip uploading other metadata and screenshots (already in App Store Connect)
+        # But we DO upload release_notes.txt for "What's New" requirement
+        skip_metadata: false,  # Must be false to upload release_notes.txt
+        skip_screenshots: true,
         skip_binary_upload: options[:skip_binary_upload] || false,
+
+        # Only overwrite specific fields we provide (don't clear existing metadata)
+        overwrite_screenshots: false,
 
         # App Review Information (contact details for Apple reviewers)
         app_review_information: appstore_config[:app_review_information],

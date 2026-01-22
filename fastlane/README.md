@@ -130,7 +130,7 @@ Build Signed Ios application
 [bundle exec] fastlane ios increment_version
 ```
 
-Increment build number from latest Firebase release
+Increment build number from latest Firebase release and set version number
 
 ### ios generateReleaseNote
 
@@ -162,7 +162,7 @@ Upload beta build to TestFlight
 [bundle exec] fastlane ios release
 ```
 
-Upload iOS Application to AppStore
+Upload iOS Application to App Store
 
 ----
 

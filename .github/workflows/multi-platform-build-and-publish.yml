@@ -101,24 +101,17 @@ concurrency:
 jobs:
   multi_platform_build_and_publish:
     name: Multi-Platform Build and Publish
-    uses: openMF/mifos-x-actionhub/.github/workflows/multi-platform-build-and-publish.yaml@v1.0.3
+    uses: openMF/mifos-x-actionhub/.github/workflows/multi-platform-build-and-publish.yaml@v1.0.8
     with:
       release_type: ${{ inputs.release_type }}
       target_branch: ${{ inputs.target_branch }}
-      android_package_name: 'cmp-android' # <-- Change this to your android package name
-      ios_package_name: 'cmp-ios' # <-- Change this to your ios package name
-      desktop_package_name: 'cmp-desktop' # <-- Change this to your desktop package name
-      web_package_name: 'cmp-web'   # <-- Change this to your web package name
-      tester_groups: 'mifos-mobile-apps' # <-- Change this to your Firebase tester group
-      app_identifier: 'org.mifos.kmp.template'
-      git_url: 'git@github.com:openMF/ios-provisioning-profile.git'
-      git_branch: 'master'
-      match_type: 'adhoc'
-      provisioning_profile_name: 'match AdHoc org.mifos.kmp.template'
-      firebase_app_id: '1:728434912738:ios:1d81f8e53ca7a6f31a1dbb'
+      android_package_name: 'cmp-android'
+      ios_package_name: 'cmp-ios'
+      desktop_package_name: 'cmp-desktop'
+      web_package_name: 'cmp-web'
       metadata_path: './fastlane/metadata'
-      use_cocoapods: true         # <-- Set to true if using CocoaPods integration for KMP
-      shared_module: ':cmp-shared' # <-- Gradle path to your shared KMP module (e.g., :shared)
+      use_cocoapods: true
+      shared_module: ':cmp-shared'
       distribute_ios_firebase: ${{ inputs.distribute_ios_firebase }}
       distribute_ios_testflight: ${{ inputs.distribute_ios_testflight }}
       distribute_ios_appstore: ${{ inputs.distribute_ios_appstore }}

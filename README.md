@@ -72,6 +72,105 @@ cd kmp-project-template
 ./gradlew build
 ```
 
+## 🍎 iOS Deployment
+
+This template includes production-ready iOS deployment infrastructure with support for Firebase App
+Distribution, TestFlight, and App Store releases.
+
+### Prerequisites
+
+- **macOS** with Xcode installed
+- **Apple Developer Account** ($99/year)
+- **Match Repository** for code signing certificates
+- **App Store Connect API Key**
+
+### Quick Setup
+
+Run the comprehensive iOS setup wizard:
+
+```bash
+bash scripts/setup_ios_complete.sh
+```
+
+The wizard will guide you through:
+
+- ✅ Team ID configuration
+- ✅ App Store Connect API key setup
+- ✅ Fastlane Match repository configuration
+- ✅ Certificate synchronization
+- ✅ TestFlight & App Store review contact information
+
+### Deployment Scripts
+
+Three deployment targets are available:
+
+| Target         | Purpose              | Script                              |
+|----------------|----------------------|-------------------------------------|
+| **Firebase**   | Internal testing, QA | `bash scripts/deploy_firebase.sh`   |
+| **TestFlight** | Beta testing         | `bash scripts/deploy_testflight.sh` |
+| **App Store**  | Production release   | `bash scripts/deploy_appstore.sh`   |
+
+**Example:**
+
+```bash
+# Deploy to Firebase for internal testing
+bash scripts/deploy_firebase.sh
+
+# Deploy to TestFlight for beta testing
+bash scripts/deploy_testflight.sh
+
+# Deploy to App Store for production
+bash scripts/deploy_appstore.sh
+```
+
+### Configuration Architecture
+
+The project uses a **shared vs app-specific** configuration pattern:
+
+- **Shared Config (IOS_SHARED)**: Team ID, API keys, Match repo - same for all apps
+- **App-Specific Config (IOS)**: Bundle ID, Firebase app ID - changes per app
+
+When you run `customizer.sh`, it updates only app-specific values while preserving shared
+infrastructure.
+
+### Optional: Push Notifications
+
+If your app uses Firebase Cloud Messaging:
+
+```bash
+bash scripts/setup_apn_key.sh
+```
+
+### GitHub Actions CI/CD
+
+The project uses a centralized configuration system for iOS deployment workflows.
+
+**Configuration Files:**
+
+- `fastlane-config/project_config.rb` - Application-specific configuration
+- `secrets/shared_keys.env` - Team-wide credentials and secrets
+
+**Configuration Loading:**
+
+- Local deployments read from `secrets/shared_keys.env`
+- CI/CD workflows extract configuration from `project_config.rb` and GitHub Secrets
+
+**Setup:**
+
+1. Configure GitHub Secrets as documented in the iOS Configuration Guide
+2. Update `project_config.rb` with application-specific values
+3. Execute workflows
+
+Configuration is read from `fastlane-config/project_config.rb` for both local and CI deployments.
+
+See [iOS Configuration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) for detailed setup instructions.
+
+### Documentation
+
+- [Complete iOS Setup Guide](docs/IOS_SETUP.md) - Detailed setup instructions
+- [iOS Deployment Guide](docs/IOS_DEPLOYMENT.md) - Deployment workflows and best practices
+- [GitHub Actions Configuration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) - CI/CD setup and configuration
+
 ## 📁 Project Structure
 
 The project follows a modular architecture:
@@ -96,7 +195,8 @@ architecture:
 - [ ] [Sync Script](docs/SYNC_SCRIPT.md) - Information about keeping in sync with upstream changes
 - [ ] [Secrets Manager](docs/SECRETS_MANAGER.md) - Documentation for the keystore and secrets
   management system
-- [ ] [Fastlane Configuration](docs/FASTLANE_CONFIGURATION.md) - Guide to automating deployments with fastlane
+- [ ] [Fastlane Configuration](docs/FASTLANE_CONFIGURATION.md) - Guide to automating deployments
+  with fastlane
 
 > Documentation is continuously improving. Check back for updates or contribute to enhancing our
 > docs!

@@ -5,7 +5,7 @@
 /.idea/libraries
 .DS_Store
 /build
-/captures 
+/captures
 .externalNativeBuild
 .idea
 /*.iml
@@ -72,15 +72,26 @@ keystores/*.jks
 
 version.txt
 fastlane/report.xml
-firebaseAppDistributionServiceCredentialsFile.json
-playStorePublishServiceCredentialsFile.json
+secrets/firebaseAppDistributionServiceCredentialsFile.json
+secrets/playStorePublishServiceCredentialsFile.json
 
 # Secrets and Configuration - NEVER COMMIT THESE!
 secrets.env
 secrets/
 !secrets/.gitkeep
+!secrets/*.template
 PROJECT_SETUP_INFO.txt
 
+# iOS Secrets - NEVER COMMIT THESE!
+secrets/shared_keys.env
+secrets/.match_password
+secrets/AuthKey*.p8
+secrets/APNAuthKey.p8
+secrets/match_ci_key
+secrets/match_ci_key.pub
+fastlane/metadata/
+fastlane/screenshots/
+fastlane/age_rating.json
 # Ruby stuff we don't care about
 .bundle/
 vendor/

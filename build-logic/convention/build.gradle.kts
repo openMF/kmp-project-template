@@ -32,20 +32,6 @@ dependencies {
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
-
-    // Keystore management dependencies
-//    implementation(libs.github.api)
-//    implementation(libs.okhttp)
-//    implementation(libs.jackson.core)
-//    implementation(libs.jackson.databind)
-//    implementation(libs.jackson.module.kotlin)
-//    implementation(libs.commons.codec)
-//
-//    // Test dependencies for keystore management
-//    testImplementation(libs.junit.jupiter.api)
-//    testImplementation(libs.junit.jupiter.engine)
-//    testImplementation(libs.junit.jupiter.params)
-//    testRuntimeOnly(libs.platform.junit.platform.launcher)
 }
 
 tasks {
@@ -105,6 +91,11 @@ gradlePlugin {
             implementationClass = "KMPLibraryConventionPlugin"
         }
 
+        register("kmpCoreBaseLibrary") {
+            id = "org.convention.kmp.core.base.library"
+            implementationClass = "KMPCoreBaseLibraryConventionPlugin"
+        }
+
         // Static Analysis & Formatting Plugins
         register("detekt") {
             id = "org.convention.detekt.plugin"
@@ -127,20 +118,12 @@ gradlePlugin {
             description = "Installs git hooks for the project"
         }
 
-//        Room Plugin
+        //  Room Plugin
         register("KMPRoom"){
             id = "mifos.kmp.room"
             implementationClass = "KMPRoomConventionPlugin"
             description = "Configures Room for the project"
         }
-
-        // NEW ===============================
-
-//        register("keystoreManagement") {
-//            id = "org.convention.keystore.management"
-//            implementationClass = "KeystoreManagementConventionPlugin"
-//            description = "Configures keystore management tasks for the project"
-//        }
 
     }
 }

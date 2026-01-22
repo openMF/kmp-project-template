@@ -212,38 +212,57 @@ update_fastlane_config() {
         print_success "Updated Android package_name to '$PACKAGE'"
     fi
 
-    # Update iOS app_identifier (look for any pattern, not just org.mifos)
-    if grep -q 'app_identifier: "com\.niyaj' "$config_file"; then
-        sed -i.bak 's/app_identifier: "com\.niyaj\.[^"]*"/app_identifier: "'"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS app_identifier to '$PACKAGE'"
-    elif grep -q 'app_identifier: "org\.mifos' "$config_file"; then
-        sed -i.bak 's/app_identifier: "org\.mifos\.[^"]*"/app_identifier: "'"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS app_identifier to '$PACKAGE'"
-    elif grep -q 'app_identifier: "[^"]*"' "$config_file"; then
-        # Fallback: update any app_identifier in IOS section
-        sed -i.bak '/IOS = {/,/^[[:space:]]*}/ s/app_identifier: "[^"]*"/app_identifier: "'"$PACKAGE"'"/' "$config_file"
-        print_success "Updated iOS app_identifier to '$PACKAGE'"
+    # Update iOS app_identifier ONLY in IOS section (NOT IOS_SHARED)
+    # CRITICAL: Use section-bounded sed to avoid modifying IOS_SHARED
+    # Pattern: /^[[:space:]]*IOS[[:space:]]*=[[:space:]]*{/,/^[[:space:]]*}/
+    # This matches from "IOS = {" to the next closing "}" at the same indentation level
+    if grep -q 'app_identifier:' "$config_file"; then
+        sed -i.bak '/^[[:space:]]*IOS[[:space:]]*=[[:space:]]*{/,/^[[:space:]]*}/ s/app_identifier: "[^"]*"/app_identifier: "'"$PACKAGE"'"/' "$config_file"
+        print_success "Updated iOS app_identifier to '$PACKAGE' (in IOS section only)"
     fi
 
-    # Update iOS provisioning profile names (AdHoc)
-    if grep -q '"match AdHoc com\.niyaj' "$config_file"; then
-        sed -i.bak 's/"match AdHoc com\.niyaj\.[^"]*"/"match AdHoc '"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS AdHoc provisioning profile"
-    elif grep -q '"match AdHoc org\.mifos' "$config_file"; then
-        sed -i.bak 's/"match AdHoc org\.mifos\.[^"]*"/"match AdHoc '"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS AdHoc provisioning profile"
-    fi
+    # Note: iOS provisioning profile names are now dynamically generated in IOS_SHARED
+    # They reference IOS[:app_identifier], so no manual update needed
+    # See fastlane-config/project_config.rb line ~105:
+    #   provisioning_profiles: {
+    #     adhoc: "match AdHoc #{IOS[:app_identifier]}",
+    #     appstore: "match AppStore #{IOS[:app_identifier]}"
+    #   }
 
-    # Update iOS provisioning profile names (AppStore)
-    if grep -q '"match AppStore com\.niyaj' "$config_file"; then
-        sed -i.bak 's/"match AppStore com\.niyaj\.[^"]*"/"match AppStore '"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS AppStore provisioning profile"
-    elif grep -q '"match AppStore org\.mifos' "$config_file"; then
-        sed -i.bak 's/"match AppStore org\.mifos\.[^"]*"/"match AppStore '"$PACKAGE"'"/g' "$config_file"
-        print_success "Updated iOS AppStore provisioning profile"
+    # VALIDATION: Ensure IOS_SHARED section still has ENV reads
+    # Extract IOS_SHARED section and check for ENV reads
+    if sed -n '/^[[:space:]]*IOS_SHARED[[:space:]]*=/,/^[[:space:]]*}/p' "$config_file" | grep -q "ENV\["; then
+        print_success "iOS shared config preserved (IOS_SHARED intact with ENV reads)"
+    else
+        print_warning "⚠️  Warning: IOS_SHARED section may have been modified!"
+        print_warning "Please verify fastlane-config/project_config.rb manually"
+        print_warning "IOS_SHARED should contain ENV[] reads for shared config"
     fi
 
     print_success "Fastlane configuration updated successfully"
+}
+
+update_ios_bundle_identifier() {
+    print_section "Updating iOS Bundle Identifier in Xcode"
+
+    local project_file="cmp-ios/iosApp.xcodeproj/project.pbxproj"
+
+    if [ ! -f "$project_file" ]; then
+        print_warning "Xcode project not found at $project_file, skipping"
+        return 0
+    fi
+
+    print_processing "Updating PRODUCT_BUNDLE_IDENTIFIER in $project_file"
+
+    # Update PRODUCT_BUNDLE_IDENTIFIER in all build configurations
+    # This updates the bundle ID for all targets and configurations
+    sed -i.bak "s/PRODUCT_BUNDLE_IDENTIFIER = [^;]*/PRODUCT_BUNDLE_IDENTIFIER = $ESCAPED_PACKAGE/g" "$project_file"
+
+    if [ $? -eq 0 ]; then
+        print_success "Updated Xcode bundle identifier to '$PACKAGE'"
+    else
+        print_warning "Failed to update Xcode bundle identifier"
+    fi
 }
 
 update_libs_versions_toml() {
@@ -533,6 +552,7 @@ main() {
     update_package_namespace
     update_root_project_name
     update_fastlane_config
+    update_ios_bundle_identifier
     update_libs_versions_toml
     update_google_services_json
     process_module_content

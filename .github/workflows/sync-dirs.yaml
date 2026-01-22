@@ -59,14 +59,13 @@ jobs:
 
           # Declare directories and files to sync
           DIRS=(
-            "cmp-android"
             "cmp-desktop"
-            "cmp-ios"
             "cmp-web"
             "cmp-shared"
             "core-base"
             "build-logic"
             "fastlane"
+            "fastlane-config"
             "scripts"
             "config"
             ".github"
@@ -82,10 +81,10 @@ jobs:
 
           # Define exclusions
           declare -A EXCLUSIONS=(
-            ["cmp-android"]="src/main/res dependencies src/main/ic_launcher-playstore.png google-services.json"
             ["cmp-web"]="src/jsMain/resources src/wasmJsMain/resources"
-            ["cmp-desktop"]="icons"
-            ["cmp-ios"]="iosApp/Assets.xcassets"
+            ["cmp-desktop"]="icons build.gradle.kts"
+            ["fastlane-config"]="project_config.rb extract_config.rb"
+            [".github"]="workflows/sync-dirs.yaml"
             ["root"]="secrets.env"
           )
 
@@ -273,17 +272,16 @@ jobs:
             Changes included in this sync:
 
             **Directories:**
-            - cmp-android (excluding src/main/res, dependencies, ic_launcher-playstore.png, google-services.json)
-            - cmp-desktop (excluding icons)
-            - cmp-ios (excluding iosApp/Assets.xcassets)
+            - cmp-desktop (excluding icons, build.gradle.kts)
             - cmp-web (excluding src/jsMain/resources, src/wasmJsMain/resources)
             - cmp-shared
             - core-base
             - build-logic
             - fastlane
+            - fastlane-config (excluding project_config.rb, extract_config.rb)
             - scripts
             - config
-            - .github
+            - .github (excluding workflows/sync-dirs.yaml)
             - .run
 
             **Files:**

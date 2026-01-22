@@ -1,0 +1,7 @@
+-----BEGIN OPENSSH PRIVATE KEY-----
+REPLACE_THIS_WITH_YOUR_ACTUAL_SSH_PRIVATE_KEY_FOR_MATCH_REPOSITORY
+Generate with: ssh-keygen -t ed25519 -C "fastlane-match" -f secrets/match_ci_key -N ""
+Or run: bash scripts/setup_ios_complete.sh to generate automatically
+Add the public key (match_ci_key.pub) as a deploy key in your Match repository
+Keep this file secure and NEVER commit to git.
+-----END OPENSSH PRIVATE KEY-----

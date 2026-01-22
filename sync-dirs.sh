@@ -23,14 +23,13 @@ LOG_FILE="sync-$(date +%d%m%Y-%H%M%S).log"
 
 # Directories and files to sync
 SYNC_DIRS=(
-    "cmp-android"
     "cmp-desktop"
-    "cmp-ios"
     "cmp-web"
     "cmp-shared"
     "core-base"
     "build-logic"
     "fastlane"
+    "fastlane-config"
     "scripts"
     "config"
     ".github"
@@ -49,10 +48,10 @@ SYNC_FILES=(
 # type can be 'dir' or 'file'
 # Use "root" key for files in the root directory
 declare -A EXCLUSIONS=(
-    ["cmp-android"]="src/main/res:dir dependencies:dir src/main/ic_launcher-playstore.png:file google-services.json:file"
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
-    ["cmp-desktop"]="icons:dir"
-    ["cmp-ios"]="iosApp/Assets.xcassets:dir"
+    ["cmp-desktop"]="icons:dir build.gradle.kts:file"
+    ["fastlane-config"]="project_config.rb:file extract_config.rb:file"
+    [".github"]="workflows/sync-dirs.yaml:file"
     ["root"]="secrets.env:file"
 )
 

@@ -342,12 +342,54 @@ run_keystore_generation() {
     print_info "You can view your secrets with: bash keystore-manager.sh view"
     
     echo
-    read -p "Press Enter to continue to final summary..."
+    read -p "Press Enter to continue..."
+}
+
+# Step 4: Optional iOS Setup
+run_ios_setup() {
+    print_step "4" "iOS Setup (Optional)"
+
+    echo -e "${CYAN}iOS deployment requires:${NC}"
+    echo "  • macOS with Xcode"
+    echo "  • Apple Developer Account (\$99/year)"
+    echo "  • App Store Connect API key"
+    echo "  • Match repository for code signing"
+    echo
+    echo -e "${YELLOW}You can configure iOS now or run the setup wizard later:${NC}"
+    echo -e "  ${BLUE}bash scripts/setup_ios_complete.sh${NC}"
+    echo
+
+    read -p "Configure iOS deployment now? [y/N]: " -n 1 -r
+    echo
+
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        print_info "Skipping iOS setup"
+        print_info "Run later: bash scripts/setup_ios_complete.sh"
+        return 0
+    fi
+
+    # Check if setup script exists
+    if [ ! -f "$SCRIPT_DIR/scripts/setup_ios_complete.sh" ]; then
+        print_warning "iOS setup script not found at scripts/setup_ios_complete.sh"
+        return 0
+    fi
+
+    # Make executable
+    chmod +x "$SCRIPT_DIR/scripts/setup_ios_complete.sh"
+
+    print_info "Launching iOS setup wizard..."
+    echo
+
+    # Run iOS setup
+    bash "$SCRIPT_DIR/scripts/setup_ios_complete.sh" || {
+        print_warning "iOS setup encountered issues"
+        print_info "You can run it manually later: bash scripts/setup_ios_complete.sh"
+    }
 }
 
 # Print final summary and next steps
 print_final_summary() {
-    print_step "4" "Setup Complete - Next Steps"
+    print_step "5" "Setup Complete - Next Steps"
     
     echo -e "${GREEN}${ROCKET} Congratulations! Your KMP project setup is complete!${NC}"
     echo
@@ -499,13 +541,16 @@ main() {
     
     # Step 1: Customization
     run_customizer
-    
+
     # Step 2: Firebase setup
     run_firebase_setup
-    
+
     # Step 3: Keystore generation
     run_keystore_generation
-    
+
+    # Step 4: iOS setup (optional)
+    run_ios_setup
+
     # Save configuration
     save_configuration
     

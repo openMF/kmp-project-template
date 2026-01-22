@@ -665,10 +665,13 @@ platform :ios do
 
       # Upload binary and release notes to App Store
       # Note: Metadata (description, screenshots, age rating) is already configured in App Store Connect
-      # We only upload the IPA, release notes, and submit for review
+      # We only upload the IPA, release notes, copyright, and submit for review
       deliver(
         # API Key
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+
+        # Copyright (required by precheck)
+        copyright: "#{Time.now.year} #{FastlaneConfig::ProjectConfig::ORGANIZATION_NAME}",
 
         # Release notes for this version
         release_notes: {
@@ -690,7 +693,7 @@ platform :ios do
         phased_release: options[:phased_release] || appstore_config[:phased_release],
 
         # Version and build management
-        skip_app_version_update: appstore_config[:skip_app_version_update],
+        skip_app_version_update: options[:skip_app_version_update] || appstore_config[:skip_app_version_update],
         reject_if_possible: appstore_config[:reject_if_possible],
 
         # Processing settings

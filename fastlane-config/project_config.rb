@@ -11,7 +11,7 @@ module FastlaneConfig
     # Core Project Information
     # ============================================================================
     PROJECT_NAME = "kmp-project-template"
-    ORGANIZATION_NAME = "Mifos"
+    ORGANIZATION_NAME = "Mifos Initiative"
 
     # ============================================================================
     # Android Configuration
@@ -188,7 +188,7 @@ module FastlaneConfig
         phased_release: false, # Phased release over 7 days (set to true if desired)
 
         # Version and build management
-        skip_app_version_update: true, # Don't update app version (we handle it separately)
+        skip_app_version_update: false, # Let Fastlane create versions in App Store Connect
         reject_if_possible: true, # Reject previous submission if possible
 
         # Processing settings

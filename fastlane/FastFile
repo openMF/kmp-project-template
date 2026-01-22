@@ -469,10 +469,14 @@ platform :ios do
         options.merge(match_type: "appstore")
       )
 
-      # Increment version number
+      # Generate version from gradle (reads from version.txt)
+      gradle(tasks: ["versionFile"])
+      version = File.read("../version.txt").strip rescue ios_config[:version_number]
+
+      # Increment version number to match Android version
       increment_version_number(
         xcodeproj: ios_config[:project_path],
-        version_number: options[:version_number] || ios_config[:version_number]
+        version_number: options[:version_number] || version
       )
 
       # Get latest TestFlight build number and increment
@@ -563,10 +567,14 @@ platform :ios do
         options.merge(match_type: "appstore")
       )
 
-      # Increment version number
+      # Generate version from gradle (reads from version.txt)
+      gradle(tasks: ["versionFile"])
+      version = File.read("../version.txt").strip rescue ios_config[:version_number]
+
+      # Increment version number to match Android version
       increment_version_number(
         xcodeproj: ios_config[:project_path],
-        version_number: options[:version_number] || ios_config[:version_number]
+        version_number: options[:version_number] || version
       )
 
       # Get latest TestFlight build number and increment

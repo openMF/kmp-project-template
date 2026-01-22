@@ -8,7 +8,7 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 plugins {
-    alias(libs.plugins.kmp.library.convention)
+    alias(libs.plugins.kmp.core.base.library.convention)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
 }
@@ -25,7 +25,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.foundation)
             implementation(libs.kermit.logging)
-            
+
             // For timing and performance tracking
             implementation(libs.kotlinx.datetime)
         }
@@ -49,7 +49,7 @@ kotlin {
         mobileMain.dependencies {
             api(libs.gitlive.firebase.crashlytics)
         }
-        
+
         // Test dependencies for all platforms
         commonTest.dependencies {
             implementation(libs.kotlin.test)

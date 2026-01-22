@@ -89,8 +89,8 @@ module FastlaneConfig
 
       # App Store Connect API (SHARED)
       app_store_connect: {
-        key_id: ENV['APPSTORE_KEY_ID'] || "HA469T6757",
-        issuer_id: ENV['APPSTORE_ISSUER_ID'] || "8er9e361-9603-4c3e-b147-be3b1o816099",
+        key_id: ENV['APPSTORE_KEY_ID'] || "ZVQ6W6P822",
+        issuer_id: ENV['APPSTORE_ISSUER_ID'] || "7ab9e361-9603-4c3e-b147-be3b0f816099",
         key_filepath: ENV['APPSTORE_KEY_PATH'] || "./secrets/AuthKey.p8"
       },
 

@@ -91,6 +91,11 @@ gradlePlugin {
             implementationClass = "KMPLibraryConventionPlugin"
         }
 
+        register("kmpCoreBaseLibrary") {
+            id = "org.convention.kmp.core.base.library"
+            implementationClass = "KMPCoreBaseLibraryConventionPlugin"
+        }
+
         // Static Analysis & Formatting Plugins
         register("detekt") {
             id = "org.convention.detekt.plugin"

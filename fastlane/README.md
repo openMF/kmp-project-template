@@ -162,7 +162,7 @@ Upload beta build to TestFlight
 [bundle exec] fastlane ios release
 ```
 
-Upload iOS Application to AppStore
+Upload iOS Application to App Store
 
 ----
 

@@ -8,8 +8,7 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 plugins {
-    alias(libs.plugins.kmp.library.convention)
-    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kmp.core.base.library.convention)
 }
 
 android {

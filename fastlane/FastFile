@@ -405,10 +405,20 @@ platform :ios do
       build_ios_project(options)
   end
 
-  desc "Increment build number from latest Firebase release"
+  desc "Increment build number from latest Firebase release and set version number"
   lane :increment_version do |options|
     firebase_config = FastlaneConfig.get_firebase_config(:ios)
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
+
+    # Generate version from gradle (reads from version.txt)
+    gradle(tasks: ["versionFile"])
+    version = File.read("../version.txt").strip rescue ios_config[:version_number]
+
+    # Set version number to match Android version
+    increment_version_number(
+      xcodeproj: ios_config[:project_path],
+      version_number: version
+    )
 
     latest_release = firebase_app_distribution_get_latest_release(
       app: firebase_config[:appId],

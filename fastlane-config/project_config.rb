@@ -116,7 +116,7 @@ module FastlaneConfig
           contact_email: ENV['TESTFLIGHT_CONTACT_EMAIL'] || "team@mifos.org",
           contact_first_name: ENV['TESTFLIGHT_FIRST_NAME'] || "Mifos",
           contact_last_name: ENV['TESTFLIGHT_LAST_NAME'] || "Initiative",
-          contact_phone: ENV['TESTFLIGHT_PHONE'] || "+1234567890",
+          contact_phone: ENV['TESTFLIGHT_PHONE'] || "9078675309",
           demo_account_name: ENV['TESTFLIGHT_DEMO_EMAIL'] || "",
           demo_account_password: ENV['TESTFLIGHT_DEMO_PASSWORD'] || "",
           notes: "Thank you for reviewing our app!"
@@ -175,7 +175,7 @@ module FastlaneConfig
         app_review_information: {
           first_name: ENV['APPSTORE_REVIEW_FIRST_NAME'] || "Mifos",
           last_name: ENV['APPSTORE_REVIEW_LAST_NAME'] || "Initiative",
-          phone_number: ENV['APPSTORE_REVIEW_PHONE'] || "+1234567890",
+          phone_number: ENV['APPSTORE_REVIEW_PHONE'] || "9078675309",
           email_address: ENV['APPSTORE_REVIEW_EMAIL'] || "team@mifos.org",
           demo_user: ENV['APPSTORE_DEMO_EMAIL'] || "",
           demo_password: ENV['APPSTORE_DEMO_PASSWORD'] || "",

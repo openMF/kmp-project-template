@@ -310,13 +310,25 @@ def content_hash(text: str) -> str:
 
 
 def get_snapshot_path(source_xml: Path, repo_root: Path) -> Path:
-    """Get snapshot file path for a source file."""
+    """Get snapshot file path at module level."""
+    parts = source_xml.parts
+
+    if "src" in parts:
+        src_index = parts.index("src")
+        # Module root is everything before "src"
+        module_root = Path(*parts[:src_index])
+        # Relative path from module root (including "src")
+        relative_parts = parts[src_index:]
+        safe_name = "_".join(relative_parts)
+        return module_root / ".translation_snapshots" / f"{safe_name}.json"
+
+    # Fallback: use repo root
     try:
         relative = source_xml.relative_to(repo_root)
-        safe_name = str(relative).replace("/", "_").replace("\\", "_").replace(":", "_")
+        safe_name = str(relative).replace("/", "_").replace("\\", "_")
     except ValueError:
         safe_name = source_xml.name
-    return repo_root / SNAPSHOT_DIR_NAME / f"{safe_name}.json"
+    return repo_root / ".translation_snapshots" / f"{safe_name}.json"
 
 
 def load_snapshot(snapshot_path: Path) -> Dict[str, str]:
@@ -831,7 +843,7 @@ def _fix_xliff_namespaces_in_file(target_xml: Path) -> None:
     If a copy of the MPL was not distributed with this file,
     You can obtain one at https://mozilla.org/MPL/2.0/.
 
-    See https://github.com/openMF/mobile-mobile/blob/master/LICENSE.md
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->'''
 
     # Add copyright header if missing (check for "Copyright" in a comment)

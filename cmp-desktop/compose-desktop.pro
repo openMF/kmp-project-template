@@ -162,3 +162,5 @@
 -keepclassmembers public class **$$serializer {
     private ** descriptor;
 }
+
+-keep class * extends androidx.room.RoomDatabase { <init>(); }

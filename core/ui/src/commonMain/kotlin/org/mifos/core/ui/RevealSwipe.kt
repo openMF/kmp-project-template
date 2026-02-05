@@ -501,7 +501,7 @@ enum class RevealValue {
  * Create and [remember] a [RevealState] with the default animation clock.
  *
  * @param initialValue The initial value of the state.
- * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
+ * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Composable
 fun rememberRevealState(
@@ -533,6 +533,7 @@ fun rememberRevealState(
     }
 }
 
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalFoundationApi::class)
 data class RevealState(
     val maxRevealDp: Dp = 75.dp,

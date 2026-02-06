@@ -506,7 +506,7 @@ expect annotation class TypeConverters(
      *
      * @return The list of classes that contains the converter methods.
      */
-    vararg val value: KClass<*> = [],
+    vararg val value: KClass<*>,
 
     /**
      * Configure whether Room can use various built in converters for common types. See

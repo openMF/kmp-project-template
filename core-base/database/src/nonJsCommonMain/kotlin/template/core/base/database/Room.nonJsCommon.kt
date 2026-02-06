@@ -132,12 +132,6 @@ actual typealias Relation = Relation
 actual typealias Junction = Junction
 
 /**
- * Typealias for the Room `@TypeConverter` annotation.
- * Used to mark methods as type converters.
- */
-actual typealias TypeConverter = TypeConverter
-
-/**
  * Typealias for the Room `@TypeConverters` annotation.
  * Used to specify which type converters to use.
  */

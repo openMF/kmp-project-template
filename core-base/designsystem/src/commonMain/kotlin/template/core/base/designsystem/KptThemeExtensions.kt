@@ -295,7 +295,7 @@ fun KptColorScheme.toMaterial3ColorScheme(): ColorScheme {
         onSurface = onSurface,
         surfaceVariant = surfaceVariant,
         onSurfaceVariant = onSurfaceVariant,
-        surfaceTint = primary,
+        surfaceTint = surfaceTint,
         inverseSurface = inverseSurface,
         inverseOnSurface = inverseOnSurface,
         error = error,

@@ -324,7 +324,7 @@ expect annotation class Transaction()
  * data class User(
  *     @PrimaryKey(autoGenerate = true)
  *     val id: Long = 0,
- *     @ColumnInfo(name = "user_name", collate = ColumnInfo.NOCASE)
+ *     @ColumnInfo(name = "user_name", collate = CollationSequence.NOCASE)
  *     val name: String,
  *     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
  *     val createdAt: String
@@ -500,7 +500,18 @@ expect annotation class Junction(
 )
 @Retention(AnnotationRetention.BINARY)
 expect annotation class TypeConverters(
-    val value: Array<KClass<*>>,
+    /**
+     * The list of type converter classes. If converter methods are not static, Room will create an
+     * instance of these classes.
+     *
+     * @return The list of classes that contains the converter methods.
+     */
+    vararg val value: KClass<*> = [],
+
+    /**
+     * Configure whether Room can use various built in converters for common types. See
+     * [BuiltInTypeConverters] for details.
+     */
     val builtInTypeConverters: BuiltInTypeConverters,
 )
 
@@ -510,41 +521,21 @@ expect annotation class TypeConverters(
  * This annotation allows you to enable or disable Room's built-in type converters
  * for specific types like enums and UUID. Use it within @TypeConverters annotation.
  *
- * @param enums State of the built-in enum converter (INHERITED, ENABLED, DISABLED)
- * @param uuid State of the built-in UUID converter (INHERITED, ENABLED, DISABLED)
- * @param byteBuffer State of the built-in ByteBuffer converter (INHERITED, ENABLED, DISABLED)
+ * Note: For advanced configuration, reference androidx.room.BuiltInTypeConverters.State directly.
+ * The default constructor uses INHERITED for all converters (enabled by default).
  *
  * Example:
  * ```kotlin
  * @TypeConverters(
  *     value = [CustomConverters::class],
- *     builtInTypeConverters = BuiltInTypeConverters(
- *         enums = BuiltInTypeConverters.State.ENABLED,
- *         uuid = BuiltInTypeConverters.State.ENABLED
- *     )
+ *     builtInTypeConverters = BuiltInTypeConverters()
  * )
  * ```
  */
 @Suppress("NO_ACTUAL_FOR_EXPECT")
 @Target(allowedTargets = [])
 @Retention(AnnotationRetention.BINARY)
-expect annotation class BuiltInTypeConverters(
-    val enums: State,
-    val uuid: State,
-    val byteBuffer: State,
-) {
-    /**
-     * State values for built-in type converters.
-     */
-    enum class State {
-        /** Inherit the converter state from the parent scope */
-        INHERITED,
-        /** Enable the built-in converter */
-        ENABLED,
-        /** Disable the built-in converter */
-        DISABLED,
-    }
-}
+expect annotation class BuiltInTypeConverters()
 
 /**
  * Cross-platform annotation for marking a class as a Room database.
@@ -578,9 +569,9 @@ expect annotation class BuiltInTypeConverters(
 @Retention(AnnotationRetention.BINARY)
 expect annotation class Database(
     val entities: Array<KClass<*>>,
+    val views: Array<KClass<*>>,
     val version: Int,
     val exportSchema: Boolean,
-    val views: Array<KClass<*>>,
     val autoMigrations: Array<AutoMigration>,
 )
 

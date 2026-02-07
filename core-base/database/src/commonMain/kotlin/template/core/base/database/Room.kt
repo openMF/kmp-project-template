@@ -464,6 +464,38 @@ expect annotation class Junction(
 )
 
 /**
+ * Cross-platform annotation for marking methods as database type converters.
+ *
+ * Type converters enable Room to store and retrieve complex data types that are not
+ * natively supported by SQLite. This annotation marks methods that convert between
+ * custom types and primitive types that SQLite can understand.
+ *
+ * Example:
+ * ```kotlin
+ * object DateConverters {
+ *     @TypeConverter
+ *     fun fromTimestamp(value: Long?): Date? {
+ *         return value?.let { Date(it) }
+ *     }
+ *
+ *     @TypeConverter
+ *     fun dateToTimestamp(date: Date?): Long? {
+ *         return date?.time
+ *     }
+ * }
+ *
+ * // Register in database
+ * @Database(...)
+ * @TypeConverters(DateConverters::class)
+ * abstract class MyDatabase : RoomDatabase()
+ * ```
+ */
+@Suppress("NO_ACTUAL_FOR_EXPECT")
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.BINARY)
+expect annotation class TypeConverter()
+
+/**
  * Cross-platform annotation for specifying which type converters to use.
  *
  * This annotation tells Room which type converter classes to use for an entity,

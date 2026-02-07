@@ -10,8 +10,15 @@
 package org.mifos.core.database
 
 import org.mifos.core.database.dao.SampleDao
+import org.mifos.core.database.utils.ChargeTypeConverters
+import template.core.base.database.BuiltInTypeConverters
+import template.core.base.database.TypeConverters
 
 @Suppress("NO_ACTUAL_FOR_EXPECT")
+@TypeConverters(
+    ChargeTypeConverters::class,
+    builtInTypeConverters = BuiltInTypeConverters(),
+)
 expect abstract class AppDatabase {
     abstract val sampleDao: SampleDao
 }

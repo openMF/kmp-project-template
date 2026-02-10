@@ -468,3 +468,6 @@ mifos-kmp-room = { id = "mifos.kmp.room" }
 # to codegen per-platform launchers (Android Application/Activity, iOS
 # MainViewController + xcodegen, JVM main, wasmJs main + index.html).
 worker-app = { id = "io.github.mobilebytelabs.worker-app", version.ref = "worker-version" }
+
+# Supabase Config Plugin
+kmp-supabase-config = { id = "org.convention.kmp.supabase.config", version = "unspecified" }

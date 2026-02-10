@@ -1,6 +1,5 @@
 
 import com.android.build.gradle.LibraryExtension
-import org.convention.configureFlavors
 import org.convention.configureKotlinAndroid
 import org.convention.configureKotlinMultiplatform
 import org.convention.libs
@@ -30,7 +29,9 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
                 defaultConfig.targetSdk = 36
-                configureFlavors(this)
+                // Note: Do NOT add configureFlavors here - KMP libraries should not have
+                // product flavors as it causes "android, android, android, android" resolution
+                // errors. Flavors should only be on the application module.
                 // The resource prefix is derived from the module name,
                 // so resources inside ":core:module1" must be prefixed with "core_module1_"
                 resourcePrefix = path

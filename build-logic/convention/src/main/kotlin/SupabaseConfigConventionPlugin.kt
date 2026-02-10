@@ -13,7 +13,7 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.mifos.kmp.template.libs
+import org.convention.libs
 
 /**
  * Convention plugin that generates Supabase credentials from a JSON secrets file.

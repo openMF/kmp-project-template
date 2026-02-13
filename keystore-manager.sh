@@ -307,8 +307,8 @@ encode_secrets_directory_files() {
     FILE_TO_SECRET_MAP["firebaseAppDistributionServiceCredentialsFile.json"]="FIREBASECREDS"
     FILE_TO_SECRET_MAP["google-services.json"]="GOOGLESERVICES"
     FILE_TO_SECRET_MAP["playStorePublishServiceCredentialsFile.json"]="PLAYSTORECREDS"
-    FILE_TO_SECRET_MAP["Auth_key.p8"]="APPSTORE_API_KEY"
-    FILE_TO_SECRET_MAP["match_ci_key"]="MATCH_GIT_PRIVATE_KEY"
+    FILE_TO_SECRET_MAP["AuthKey.p8"]="APPSTORE_AUTH_KEY"
+    FILE_TO_SECRET_MAP["match_ci_key"]="MATCH_SSH_PRIVATE_KEY"
 
     local secrets_found=0
     local secrets_encoded=0

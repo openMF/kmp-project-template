@@ -14,6 +14,23 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
+# Print helper functions
+print_success() {
+    echo -e "${GREEN}✓ $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}✗ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠ $1${NC}"
+}
+
+print_info() {
+    echo -e "${CYAN}ℹ $1${NC}"
+}
+
 # Default environment file path
 ENV_FILE="secrets.env"
 
@@ -44,6 +61,9 @@ EXCLUDED_GITHUB_KEYS=(
     "ST"
     "C"
 )
+
+# Global associative array for iOS string secrets
+declare -g -A IOS_STRING_SECRETS
 
 # Function to strip quotes from values
 strip_quotes() {
@@ -118,6 +138,7 @@ show_help() {
     echo "Commands:"
     echo "  generate - Generate Android keystores and update secrets.env (default)"
     echo "  encode-secrets - Encode files from secrets/ directory and update secrets.env"
+    echo "  sync     - Validate secrets.env format and completeness"
     echo "  view     - View all secrets in the secrets.env file as a formatted table"
     echo "  add      - Add secrets to a GitHub repository from secrets.env"
     echo "  list     - List all secrets in a GitHub repository"
@@ -134,6 +155,7 @@ show_help() {
     echo "Examples:"
     echo "  ./keystore-manager.sh generate"
     echo "  ./keystore-manager.sh encode-secrets"
+    echo "  ./keystore-manager.sh sync"
     echo "  ./keystore-manager.sh view"
     echo "  ./keystore-manager.sh add --repo=username/repo"
     echo "  ./keystore-manager.sh list --repo=username/repo"
@@ -272,10 +294,10 @@ encode_base64() {
     local file_path=$1
     if [ -f "$file_path" ]; then
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            # macOS
-            base64 "$file_path"
+            # macOS requires -i flag for input file
+            base64 -i "$file_path"
         else
-            # Linux
+            # Linux accepts positional argument and -w 0 for no wrapping
             base64 -w 0 "$file_path"
         fi
     else
@@ -296,6 +318,62 @@ create_secrets_dir() {
     fi
 }
 
+# Parse iOS string secrets from shared_keys.env
+parse_shared_keys_env() {
+    local SHARED_KEYS_FILE="secrets/shared_keys.env"
+
+    # Skip if file doesn't exist (Android-only setup)
+    if [[ ! -f "$SHARED_KEYS_FILE" ]]; then
+        print_info "shared_keys.env not found - skipping iOS secrets (Android-only project)"
+        return 0
+    fi
+
+    print_info "Parsing iOS secrets from shared_keys.env..."
+
+    # Read MATCH_PASSWORD from .match_password file if it exists
+    local MATCH_PWD=""
+    if [[ -f "secrets/.match_password" ]]; then
+        MATCH_PWD=$(head -n1 secrets/.match_password 2>/dev/null | tr -d '\n\r')
+        print_success "Loaded MATCH_PASSWORD from .match_password file"
+    else
+        print_warning "secrets/.match_password not found - MATCH_PASSWORD will be empty"
+    fi
+
+    # Extract values from shared_keys.env
+    # Format: export KEY="value"
+    local APPSTORE_KEY_ID=$(grep '^export APPSTORE_KEY_ID=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
+    local APPSTORE_ISSUER_ID=$(grep '^export APPSTORE_ISSUER_ID=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
+    local NOTARIZATION_TEAM_ID=$(grep '^export TEAM_ID=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
+    local NOTARIZATION_APPLE_ID=$(grep '^export NOTARIZATION_APPLE_ID=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
+    local NOTARIZATION_PASSWORD=$(grep '^export NOTARIZATION_PASSWORD=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
+
+    # Validate critical values
+    if [[ -z "$APPSTORE_KEY_ID" ]]; then
+        print_warning "APPSTORE_KEY_ID is empty - App Store Connect API key may not be configured"
+    fi
+    if [[ -z "$APPSTORE_ISSUER_ID" ]]; then
+        print_warning "APPSTORE_ISSUER_ID is empty - App Store Connect API issuer may not be configured"
+    fi
+
+    # Populate global associative array (declared at top of script)
+    IOS_STRING_SECRETS["APPSTORE_KEY_ID"]="$APPSTORE_KEY_ID"
+    IOS_STRING_SECRETS["APPSTORE_ISSUER_ID"]="$APPSTORE_ISSUER_ID"
+    IOS_STRING_SECRETS["MATCH_PASSWORD"]="$MATCH_PWD"
+    IOS_STRING_SECRETS["NOTARIZATION_APPLE_ID"]="$NOTARIZATION_APPLE_ID"
+    IOS_STRING_SECRETS["NOTARIZATION_PASSWORD"]="$NOTARIZATION_PASSWORD"
+    IOS_STRING_SECRETS["NOTARIZATION_TEAM_ID"]="$NOTARIZATION_TEAM_ID"
+
+    # Print summary
+    local count=0
+    for key in "${!IOS_STRING_SECRETS[@]}"; do
+        if [[ -n "${IOS_STRING_SECRETS[$key]}" ]]; then
+            count=$((count + 1))
+        fi
+    done
+
+    print_success "Found $count of 6 iOS string secrets"
+}
+
 # Function to encode secrets directory files and update secrets.env
 encode_secrets_directory_files() {
     echo -e "${BLUE}==================================================================${NC}"
@@ -307,8 +385,8 @@ encode_secrets_directory_files() {
     FILE_TO_SECRET_MAP["firebaseAppDistributionServiceCredentialsFile.json"]="FIREBASECREDS"
     FILE_TO_SECRET_MAP["google-services.json"]="GOOGLESERVICES"
     FILE_TO_SECRET_MAP["playStorePublishServiceCredentialsFile.json"]="PLAYSTORECREDS"
-    FILE_TO_SECRET_MAP["Auth_key.p8"]="APPSTORE_API_KEY"
-    FILE_TO_SECRET_MAP["match_ci_key"]="MATCH_GIT_PRIVATE_KEY"
+    FILE_TO_SECRET_MAP["AuthKey.p8"]="APPSTORE_AUTH_KEY"
+    FILE_TO_SECRET_MAP["match_ci_key"]="MATCH_SSH_PRIVATE_KEY"
 
     local secrets_found=0
     local secrets_encoded=0
@@ -343,7 +421,7 @@ encode_secrets_directory_files() {
 
     if [ $secrets_found -eq 0 ]; then
         echo -e "${YELLOW}No known secret files found in secrets/ directory${NC}"
-        echo -e "${YELLOW}Looking for: firebaseAppDistributionServiceCredentialsFile.json, google-services.json, playStorePublishServiceCredentialsFile.json, Auth_key.p8, match_ci_key${NC}"
+        echo -e "${YELLOW}Looking for: firebaseAppDistributionServiceCredentialsFile.json, google-services.json, playStorePublishServiceCredentialsFile.json, AuthKey.p8, match_ci_key${NC}"
         return 0
     fi
 
@@ -435,6 +513,412 @@ update_secrets_env_with_files() {
     # Replace original file
     mv "$temp_file" "$ENV_FILE"
     echo -e "${GREEN}secrets.env updated successfully${NC}"
+}
+
+# Update iOS string secrets in secrets.env
+update_ios_string_secrets() {
+    local SECRETS_FILE="secrets.env"
+
+    # Check if secrets.env exists
+    if [[ ! -f "$SECRETS_FILE" ]]; then
+        print_warning "secrets.env not found. Creating new file..."
+        touch "$SECRETS_FILE"
+    fi
+
+    # Skip if no iOS secrets extracted
+    if [[ ${#IOS_STRING_SECRETS[@]} -eq 0 ]]; then
+        print_info "No iOS secrets to update"
+        return 0
+    fi
+
+    print_info "Updating iOS string secrets in secrets.env..."
+
+    # Check if iOS Configuration section exists
+    if grep -q "^# iOS Configuration" "$SECRETS_FILE" 2>/dev/null; then
+        print_info "iOS section exists - updating individual keys..."
+        update_ios_section
+    else
+        print_info "iOS section doesn't exist - appending new section..."
+        append_ios_section
+    fi
+}
+
+# Helper function to update existing iOS section
+update_ios_section() {
+    local SECRETS_FILE="secrets.env"
+
+    for key in "${!IOS_STRING_SECRETS[@]}"; do
+        local value="${IOS_STRING_SECRETS[$key]}"
+
+        # Check if key exists in file
+        if grep -q "^${key}=" "$SECRETS_FILE"; then
+            # Update existing key
+            if [[ -n "$value" ]]; then
+                # Replace with new value (escape special characters)
+                local escaped_value=$(printf '%s\n' "$value" | sed 's/[&/\]/\\&/g')
+                sed -i.bak "s|^${key}=.*|${key}=\"${escaped_value}\"|" "$SECRETS_FILE"
+                print_success "Updated $key"
+            else
+                # Keep existing value if new value is empty
+                print_info "Preserving existing $key (new value empty)"
+            fi
+        else
+            # Key doesn't exist - add it after iOS section header
+            local section_line=$(grep -n "^# iOS Configuration" "$SECRETS_FILE" | cut -d: -f1)
+            if [[ -n "$section_line" ]]; then
+                # Insert after the separator line following the header (portable approach)
+                local insert_line=$((section_line + 2))
+                local escaped_value=$(printf '%s\n' "$value" | sed 's/[&/\]/\\&/g')
+                {
+                    head -n $((insert_line - 1)) "$SECRETS_FILE"
+                    echo "${key}=\"${escaped_value}\""
+                    tail -n +${insert_line} "$SECRETS_FILE"
+                } > "${SECRETS_FILE}.tmp" && mv "${SECRETS_FILE}.tmp" "$SECRETS_FILE"
+                print_success "Added $key to iOS section"
+            fi
+        fi
+    done
+
+    # Remove backup file
+    rm -f "${SECRETS_FILE}.bak"
+}
+
+# Helper function to append new iOS section
+append_ios_section() {
+    local SECRETS_FILE="secrets.env"
+
+    # Append new iOS section
+    cat >> "$SECRETS_FILE" << EOF
+
+# ==============================================================================
+# iOS Configuration
+# ==============================================================================
+
+# App Store Connect API Keys
+APPSTORE_KEY_ID="${IOS_STRING_SECRETS[APPSTORE_KEY_ID]}"
+APPSTORE_ISSUER_ID="${IOS_STRING_SECRETS[APPSTORE_ISSUER_ID]}"
+
+# Fastlane Match
+MATCH_PASSWORD="${IOS_STRING_SECRETS[MATCH_PASSWORD]}"
+
+# macOS Notarization (for Desktop app distribution)
+NOTARIZATION_APPLE_ID="${IOS_STRING_SECRETS[NOTARIZATION_APPLE_ID]}"
+NOTARIZATION_PASSWORD="${IOS_STRING_SECRETS[NOTARIZATION_PASSWORD]}"
+NOTARIZATION_TEAM_ID="${IOS_STRING_SECRETS[NOTARIZATION_TEAM_ID]}"
+EOF
+
+    print_success "Appended iOS Configuration section"
+}
+
+# Add Desktop signing placeholders to secrets.env
+add_desktop_placeholders() {
+    local SECRETS_FILE="secrets.env"
+
+    # Check if file exists
+    if [[ ! -f "$SECRETS_FILE" ]]; then
+        print_error "File $SECRETS_FILE does not exist"
+        return 1
+    fi
+
+    # Check if Desktop Signing section exists
+    if grep -q "^# Desktop Signing" "$SECRETS_FILE" 2>/dev/null; then
+        print_info "Desktop Signing section already exists - skipping"
+        return 0
+    fi
+
+    print_info "Adding Desktop Signing placeholder section..."
+
+    # Append Desktop section
+    if ! cat >> "$SECRETS_FILE" << 'EOF'
+
+# ==============================================================================
+# Desktop Signing (Optional)
+# ==============================================================================
+# These are optional for Desktop app distribution outside app stores.
+# Populate when setting up code signing for Windows/macOS/Linux desktop apps.
+
+# Windows Signing
+WINDOWS_SIGNING_KEY=""
+WINDOWS_SIGNING_PASSWORD=""
+WINDOWS_SIGNING_CERTIFICATE=""
+
+# macOS Signing (Desktop app, not iOS)
+MACOS_SIGNING_KEY=""
+MACOS_SIGNING_PASSWORD=""
+MACOS_SIGNING_CERTIFICATE=""
+
+# Linux Signing
+LINUX_SIGNING_KEY=""
+LINUX_SIGNING_PASSWORD=""
+LINUX_SIGNING_CERTIFICATE=""
+EOF
+    then
+        print_error "Failed to append Desktop Signing section"
+        return 1
+    fi
+
+    print_success "Added Desktop Signing placeholder section"
+}
+
+# Validate secrets.env format and completeness
+validate_sync_result() {
+    local SECRETS_FILE="secrets.env"
+    local exit_code=0
+
+    print_info "Validating secrets.env..."
+
+    # Check if file exists
+    if [[ ! -f "$SECRETS_FILE" ]]; then
+        print_error "File $SECRETS_FILE does not exist"
+        return 1
+    fi
+
+    # Track validation issues
+    local format_errors=()
+    local missing_secrets=()
+    local invalid_base64=()
+
+    # ============================================================================
+    # 1. Check file format
+    # ============================================================================
+
+    print_info "Checking file format..."
+
+    # Check for GitHub Secrets Environment File header (generated by update_secrets_env)
+    if ! grep -q "^# GitHub Secrets Environment File" "$SECRETS_FILE"; then
+        format_errors+=("Missing GitHub Secrets Environment File header")
+    fi
+
+    # Check for iOS Configuration section header (if iOS project)
+    if [[ -f "secrets/shared_keys.env" ]]; then
+        if ! grep -q "^# iOS Configuration" "$SECRETS_FILE"; then
+            format_errors+=("Missing iOS configuration section header (iOS project detected)")
+        fi
+    fi
+
+    # Validate heredoc blocks are properly formatted
+    local in_heredoc=false
+    local heredoc_key=""
+    local heredoc_delimiter=""
+    local line_num=0
+
+    while IFS= read -r line; do
+        line_num=$((line_num + 1))
+
+        # Check for heredoc start
+        if [[ "$line" =~ ^([A-Z_]+)\<\<([A-Z]+)$ ]]; then
+            if [[ "$in_heredoc" = true ]]; then
+                format_errors+=("Line $line_num: Nested heredoc detected (unclosed $heredoc_key)")
+            fi
+            heredoc_key="${BASH_REMATCH[1]}"
+            heredoc_delimiter="${BASH_REMATCH[2]}"
+            in_heredoc=true
+        # Check for heredoc end
+        elif [[ "$in_heredoc" = true ]] && [[ "$line" == "$heredoc_delimiter" ]]; then
+            in_heredoc=false
+            heredoc_key=""
+            heredoc_delimiter=""
+        fi
+    done < "$SECRETS_FILE"
+
+    # Check if any heredoc was left unclosed
+    if [[ "$in_heredoc" = true ]]; then
+        format_errors+=("Unclosed heredoc block: $heredoc_key (missing $heredoc_delimiter)")
+    fi
+
+    # Check for duplicate keys using process substitution
+    local duplicates
+    duplicates=$(while IFS= read -r line; do
+        # Extract keys from both regular and heredoc formats
+        if [[ "$line" =~ ^([A-Z_]+)= ]] || [[ "$line" =~ ^([A-Z_]+)\<\< ]]; then
+            echo "${BASH_REMATCH[1]}"
+        fi
+    done < "$SECRETS_FILE" | sort | uniq -d)
+
+    if [[ -n "$duplicates" ]]; then
+        while IFS= read -r dup_key; do
+            if [[ -n "$dup_key" ]]; then
+                format_errors+=("Duplicate key found: $dup_key")
+            fi
+        done <<< "$duplicates"
+    fi
+
+    # Report format errors
+    if [[ ${#format_errors[@]} -gt 0 ]]; then
+        print_error "Format validation failed:"
+        for error in "${format_errors[@]}"; do
+            echo -e "  ${RED}- $error${NC}"
+        done
+        if [[ $exit_code -eq 0 ]]; then exit_code=1; fi
+    else
+        print_success "File format is valid"
+    fi
+
+    # ============================================================================
+    # 2. Check required secrets
+    # ============================================================================
+
+    print_info "Checking required secrets..."
+
+    # Define required Android secrets
+    local required_android=(
+        "KEYSTORE_PASSWORD"
+        "KEYALIAS"
+        "KEY_PASSWORD"
+        "GOOGLESERVICES"
+        "PLAYSTORECREDS"
+        "FIREBASECREDS"
+    )
+
+    # Map alternative key names used in this project
+    declare -A key_aliases
+    key_aliases["KEYSTORE_PASSWORD"]="ORIGINAL_KEYSTORE_FILE_PASSWORD|UPLOAD_KEYSTORE_FILE_PASSWORD"
+    key_aliases["KEYALIAS"]="ORIGINAL_KEYSTORE_ALIAS|UPLOAD_KEYSTORE_ALIAS"
+    key_aliases["KEY_PASSWORD"]="ORIGINAL_KEYSTORE_ALIAS_PASSWORD|UPLOAD_KEYSTORE_ALIAS_PASSWORD"
+
+    # Check Android secrets
+    for secret in "${required_android[@]}"; do
+        local found=false
+
+        # Check direct key name
+        if grep -q "^${secret}=" "$SECRETS_FILE" || grep -q "^${secret}<<" "$SECRETS_FILE"; then
+            found=true
+        # Check alternative names
+        elif [[ -n "${key_aliases[$secret]}" ]]; then
+            IFS='|' read -ra alternatives <<< "${key_aliases[$secret]}"
+            for alt in "${alternatives[@]}"; do
+                if grep -q "^${alt}=" "$SECRETS_FILE" || grep -q "^${alt}<<" "$SECRETS_FILE"; then
+                    found=true
+                    break
+                fi
+            done
+        fi
+
+        if [[ "$found" = false ]]; then
+            missing_secrets+=("Android: $secret")
+        fi
+    done
+
+    # Check iOS secrets if iOS project detected
+    if [[ -f "secrets/shared_keys.env" ]]; then
+        local required_ios=(
+            "APPSTORE_KEY_ID"
+            "APPSTORE_ISSUER_ID"
+            "APPSTORE_AUTH_KEY"
+            "MATCH_PASSWORD"
+            "MATCH_SSH_PRIVATE_KEY"
+        )
+
+        for secret in "${required_ios[@]}"; do
+            if ! grep -q "^${secret}=" "$SECRETS_FILE" && ! grep -q "^${secret}<<" "$SECRETS_FILE"; then
+                missing_secrets+=("iOS: $secret")
+            fi
+        done
+    fi
+
+    # Report missing secrets
+    if [[ ${#missing_secrets[@]} -gt 0 ]]; then
+        print_error "Missing required secrets:"
+        for secret in "${missing_secrets[@]}"; do
+            echo -e "  ${RED}- $secret${NC}"
+        done
+        if [[ $exit_code -eq 0 ]]; then exit_code=2; fi
+    else
+        print_success "All required secrets are present"
+    fi
+
+    # ============================================================================
+    # 3. Validate base64 encoding
+    # ============================================================================
+
+    print_info "Validating base64 encoding for file secrets..."
+
+    # Define file secrets that should be base64 encoded
+    local file_secrets=(
+        "GOOGLESERVICES"
+        "PLAYSTORECREDS"
+        "FIREBASECREDS"
+        "APPSTORE_AUTH_KEY"
+        "MATCH_SSH_PRIVATE_KEY"
+        "ORIGINAL_KEYSTORE_FILE"
+        "UPLOAD_KEYSTORE_FILE"
+    )
+
+    # Extract and validate base64 values
+    for secret in "${file_secrets[@]}"; do
+        # Check if secret exists in file
+        if ! grep -q "^${secret}<<" "$SECRETS_FILE"; then
+            # Skip validation if secret doesn't exist (will be caught by required secrets check)
+            continue
+        fi
+
+        # Extract the base64 value between heredoc markers
+        local value=""
+        local in_block=false
+        local block_delimiter=""
+
+        while IFS= read -r line; do
+            if [[ "$line" =~ ^${secret}\<\<([A-Z]+)$ ]]; then
+                in_block=true
+                block_delimiter="${BASH_REMATCH[1]}"
+                value=""
+            elif [[ "$in_block" = true ]] && [[ "$line" == "$block_delimiter" ]]; then
+                break
+            elif [[ "$in_block" = true ]]; then
+                value+="$line"
+            fi
+        done < "$SECRETS_FILE"
+
+        # Validate base64 encoding
+        if [[ -n "$value" ]]; then
+            # Try to decode the base64 value (handle macOS vs Linux)
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                if ! printf '%s' "$value" | base64 -D > /dev/null 2>&1; then
+                    invalid_base64+=("$secret")
+                fi
+            else
+                if ! printf '%s' "$value" | base64 -d > /dev/null 2>&1; then
+                    invalid_base64+=("$secret")
+                fi
+            fi
+        fi
+    done
+
+    # Report invalid base64
+    if [[ ${#invalid_base64[@]} -gt 0 ]]; then
+        print_error "Invalid base64 encoding detected:"
+        for secret in "${invalid_base64[@]}"; do
+            echo -e "  ${RED}- $secret${NC}"
+        done
+        if [[ $exit_code -eq 0 ]]; then exit_code=3; fi
+    else
+        print_success "All file secrets have valid base64 encoding"
+    fi
+
+    # ============================================================================
+    # Final summary
+    # ============================================================================
+
+    echo ""
+    if [[ $exit_code -eq 0 ]]; then
+        print_success "All validations passed"
+    else
+        local error_summary=""
+        if [[ ${#format_errors[@]} -gt 0 ]]; then
+            error_summary+="Format errors"
+        fi
+        if [[ ${#missing_secrets[@]} -gt 0 ]]; then
+            [[ -n "$error_summary" ]] && error_summary+=", "
+            error_summary+="Missing required secrets"
+        fi
+        if [[ ${#invalid_base64[@]} -gt 0 ]]; then
+            [[ -n "$error_summary" ]] && error_summary+=", "
+            error_summary+="Invalid base64 encoding"
+        fi
+        print_error "Validation failed: $error_summary"
+    fi
+
+    return $exit_code
 }
 
 # Function to create/update secrets.env file
@@ -1308,6 +1792,64 @@ case $COMMAND in
     encode-secrets)
         create_secrets_dir
         encode_secrets_directory_files
+        ;;
+    sync)
+        echo -e "${BLUE}==================================================================${NC}"
+        echo -e "${BLUE}              Synchronizing Secrets to secrets.env                 ${NC}"
+        echo -e "${BLUE}==================================================================${NC}"
+        echo
+
+        # Create backup
+        if [[ -f "secrets.env" ]]; then
+            cp secrets.env secrets.env.backup
+            print_info "Created backup: secrets.env.backup"
+        fi
+
+        # Step 1: Parse shared_keys.env (iOS string secrets)
+        echo
+        print_info "[1/5] Parsing shared_keys.env for iOS string secrets..."
+        parse_shared_keys_env
+
+        # Step 2: Encode file-based secrets from secrets/ directory
+        echo
+        print_info "[2/5] Encoding file-based secrets to base64..."
+        encode_secrets_directory_files
+
+        # Step 3: Update secrets.env with iOS string secrets
+        echo
+        print_info "[3/5] Updating secrets.env with iOS string secrets..."
+        update_ios_string_secrets
+
+        # Step 4: Add Desktop placeholder section
+        echo
+        print_info "[4/5] Adding Desktop signing placeholders..."
+        add_desktop_placeholders
+
+        # Step 5: Validate result
+        echo
+        print_info "[5/5] Validating secrets.env..."
+        echo
+        if validate_sync_result; then
+            echo
+            print_success "Secrets synchronized successfully to secrets.env"
+
+            # Show summary
+            echo
+            print_info "Summary:"
+            total_string=$(grep -cE "^[A-Z_]+=" secrets.env 2>/dev/null || echo "0")
+            total_file=$(grep -c "<<EOF" secrets.env 2>/dev/null || echo "0")
+            echo "  Total string secrets: $total_string"
+            echo "  Total file secrets:   $total_file"
+            echo
+            print_info "Next steps:"
+            echo "  1. Review secrets.env"
+            echo "  2. Upload to GitHub: ./keystore-manager.sh add --repo=owner/repo"
+        else
+            echo
+            print_error "Validation failed - check errors above"
+            print_info "Backup available at: secrets.env.backup"
+            exit 1
+        fi
         ;;
     view)
         view_secrets

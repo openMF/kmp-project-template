@@ -103,3 +103,4 @@ vendor/
 
 # Backup files created by scripts
 *.bak
+.claude

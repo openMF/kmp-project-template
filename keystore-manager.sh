@@ -31,14 +31,17 @@ print_info() {
     echo -e "${CYAN}ℹ $1${NC}"
 }
 
-# Default environment file path
-ENV_FILE="secrets.env"
+# Default environment file paths (secrets/ is preferred, root is legacy)
+SECRETS_DIR_ENV_FILE="secrets/secrets.env"
+ROOT_ENV_FILE="secrets.env"
+ENV_FILE=""  # Will be resolved after argument parsing
 
 # Default values
 COMMAND="generate"
 REPO=""
 ENV=""
 SECRET_NAME=""
+ENV_FILE_OVERRIDE=""  # User-specified --env-file path
 
 # Keys that should not be sent to GitHub
 EXCLUDED_GITHUB_KEYS=(
@@ -75,6 +78,48 @@ strip_quotes() {
     value="${value#\'}"
     value="${value%\'}"
     echo "$value"
+}
+
+# Resolve which secrets.env file to use
+# Priority: --env-file override > secrets/secrets.env > root secrets.env
+resolve_env_file() {
+    # If user specified --env-file, use that
+    if [[ -n "$ENV_FILE_OVERRIDE" ]]; then
+        ENV_FILE="$ENV_FILE_OVERRIDE"
+        return 0
+    fi
+
+    local secrets_dir_exists=false
+    local root_exists=false
+
+    [[ -f "$SECRETS_DIR_ENV_FILE" ]] && secrets_dir_exists=true
+    [[ -f "$ROOT_ENV_FILE" ]] && root_exists=true
+
+    # Both exist - ask user to choose
+    if [[ "$secrets_dir_exists" = true ]] && [[ "$root_exists" = true ]]; then
+        echo -e "${YELLOW}Found secrets.env in two locations:${NC}"
+        echo -e "  ${CYAN}[1]${NC} secrets/secrets.env  (recommended)"
+        echo -e "  ${CYAN}[2]${NC} secrets.env          (legacy/root)"
+        echo ""
+        read -r -p "Which file should be used? [1/2] (default: 1): " choice
+        case "$choice" in
+            2)
+                ENV_FILE="$ROOT_ENV_FILE"
+                print_info "Using root: $ROOT_ENV_FILE"
+                ;;
+            *)
+                ENV_FILE="$SECRETS_DIR_ENV_FILE"
+                print_info "Using secrets dir: $SECRETS_DIR_ENV_FILE"
+                ;;
+        esac
+    elif [[ "$secrets_dir_exists" = true ]]; then
+        ENV_FILE="$SECRETS_DIR_ENV_FILE"
+    elif [[ "$root_exists" = true ]]; then
+        ENV_FILE="$ROOT_ENV_FILE"
+    else
+        # Neither exists - default to secrets/ (will be created by generate/sync)
+        ENV_FILE="$SECRETS_DIR_ENV_FILE"
+    fi
 }
 
 # Load variables from secrets.env if it exists (simple variables only)
@@ -148,9 +193,11 @@ show_help() {
     echo "  help     - Show this help message"
     echo ""
     echo "Options:"
-    echo "  --repo=username/repo - GitHub repository name"
-    echo "  --env=environment    - GitHub environment name"
-    echo "  --name=SECRET_NAME   - Secret name (for delete command)"
+    echo "  --repo=username/repo      - GitHub repository name"
+    echo "  --env=environment         - GitHub environment name"
+    echo "  --name=SECRET_NAME        - Secret name (for delete command)"
+    echo "  --env-file=path           - Override secrets.env file path"
+    echo "                              (default: secrets/secrets.env, fallback: secrets.env)"
     echo ""
     echo "Examples:"
     echo "  ./keystore-manager.sh generate"
@@ -374,6 +421,115 @@ parse_shared_keys_env() {
     print_success "Found $count of 6 iOS string secrets"
 }
 
+# Global associative array for macOS password secrets
+declare -g -A MACOS_PASSWORD_SECRETS
+
+# Parse macOS password secrets from dotfiles in secrets/
+parse_macos_password_files() {
+    print_info "Parsing macOS password files from secrets/..."
+
+    local count=0
+
+    # Read KEYCHAIN_PASSWORD from .keychain_password file
+    if [[ -f "secrets/.keychain_password" ]]; then
+        local val
+        val=$(head -n1 secrets/.keychain_password 2>/dev/null | tr -d '\n\r')
+        if [[ -n "$val" ]]; then
+            MACOS_PASSWORD_SECRETS["KEYCHAIN_PASSWORD"]="$val"
+            count=$((count + 1))
+            print_success "Loaded KEYCHAIN_PASSWORD from .keychain_password file"
+        else
+            print_warning ".keychain_password file is empty"
+        fi
+    else
+        print_info "secrets/.keychain_password not found - KEYCHAIN_PASSWORD will remain as-is"
+    fi
+
+    # Read CERTIFICATES_PASSWORD from .certificates_password file
+    if [[ -f "secrets/.certificates_password" ]]; then
+        local val
+        val=$(head -n1 secrets/.certificates_password 2>/dev/null | tr -d '\n\r')
+        if [[ -n "$val" ]]; then
+            MACOS_PASSWORD_SECRETS["CERTIFICATES_PASSWORD"]="$val"
+            count=$((count + 1))
+            print_success "Loaded CERTIFICATES_PASSWORD from .certificates_password file"
+        else
+            print_warning ".certificates_password file is empty"
+        fi
+    else
+        print_info "secrets/.certificates_password not found - CERTIFICATES_PASSWORD will remain as-is"
+    fi
+
+    print_success "Found $count of 2 macOS password secrets"
+}
+
+# Update macOS password secrets in secrets.env
+# Always ensures KEYCHAIN_PASSWORD and CERTIFICATES_PASSWORD exist in the file.
+# Populates from password files if available, otherwise adds empty placeholders.
+update_macos_password_secrets() {
+    local SECRETS_FILE="$ENV_FILE"
+
+    if [[ ! -f "$SECRETS_FILE" ]]; then
+        print_info "No secrets file to update macOS passwords in"
+        return 0
+    fi
+
+    print_info "Updating macOS password secrets in $SECRETS_FILE..."
+
+    # Keys we must ensure exist
+    local required_keys=("KEYCHAIN_PASSWORD" "CERTIFICATES_PASSWORD")
+
+    for key in "${required_keys[@]}"; do
+        # Get value from parsed password files (may be empty)
+        local value="${MACOS_PASSWORD_SECRETS[$key]:-}"
+
+        if grep -q "^${key}=" "$SECRETS_FILE" 2>/dev/null; then
+            # Key exists - update only if we have a non-empty value
+            if [[ -n "$value" ]]; then
+                local escaped_value
+                escaped_value=$(printf '%s\n' "$value" | sed 's/[&/\]/\\&/g')
+                sed -i.bak "s|^${key}=.*|${key}=\"${escaped_value}\"|" "$SECRETS_FILE"
+                print_success "Updated $key"
+            else
+                print_info "Preserving existing $key (no password file found)"
+            fi
+        else
+            # Key doesn't exist - add after macOS App Store section header (or end of file)
+            local escaped_value=""
+            [[ -n "$value" ]] && escaped_value=$(printf '%s\n' "$value" | sed 's/[&/\]/\\&/g')
+
+            local section_line
+            section_line=$(grep -n "^# macOS App Store" "$SECRETS_FILE" 2>/dev/null | head -1 | cut -d: -f1)
+            if [[ -n "$section_line" ]]; then
+                # Find end of comments block after section header
+                local insert_line=$((section_line + 1))
+                local total_lines
+                total_lines=$(wc -l < "$SECRETS_FILE")
+                # Skip past comment lines to find insertion point
+                while [[ $insert_line -le $total_lines ]]; do
+                    local line_content
+                    line_content=$(sed -n "${insert_line}p" "$SECRETS_FILE")
+                    if [[ "$line_content" != \#* ]] && [[ -n "$line_content" ]]; then
+                        break
+                    fi
+                    insert_line=$((insert_line + 1))
+                done
+                {
+                    head -n $((insert_line - 1)) "$SECRETS_FILE"
+                    echo "${key}=\"${escaped_value}\""
+                    tail -n +${insert_line} "$SECRETS_FILE"
+                } > "${SECRETS_FILE}.tmp" && mv "${SECRETS_FILE}.tmp" "$SECRETS_FILE"
+                print_success "Added $key to macOS App Store section"
+            else
+                echo "${key}=\"${escaped_value}\"" >> "$SECRETS_FILE"
+                print_success "Appended $key to end of file"
+            fi
+        fi
+    done
+
+    rm -f "${SECRETS_FILE}.bak"
+}
+
 # Function to encode secrets directory files and update secrets.env
 encode_secrets_directory_files() {
     echo -e "${BLUE}==================================================================${NC}"
@@ -387,6 +543,11 @@ encode_secrets_directory_files() {
     FILE_TO_SECRET_MAP["playStorePublishServiceCredentialsFile.json"]="PLAYSTORECREDS"
     FILE_TO_SECRET_MAP["AuthKey.p8"]="APPSTORE_AUTH_KEY"
     FILE_TO_SECRET_MAP["match_ci_key"]="MATCH_SSH_PRIVATE_KEY"
+    # macOS App Store certificates and provisioning profiles
+    FILE_TO_SECRET_MAP["mac_app_distribution.p12"]="MAC_APP_DISTRIBUTION_CERTIFICATE_B64"
+    FILE_TO_SECRET_MAP["mac_installer_distribution.p12"]="MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64"
+    FILE_TO_SECRET_MAP["mac_embedded.provisionprofile"]="MAC_EMBEDDED_PROVISION_B64"
+    FILE_TO_SECRET_MAP["mac_runtime.provisionprofile"]="MAC_RUNTIME_PROVISION_B64"
 
     local secrets_found=0
     local secrets_encoded=0
@@ -431,7 +592,7 @@ encode_secrets_directory_files() {
     fi
 
     # Update secrets.env file
-    echo -e "${BLUE}Updating secrets.env with encoded files...${NC}"
+    echo -e "${BLUE}Updating $ENV_FILE with encoded files...${NC}"
     update_secrets_env_with_files
 
     echo -e "${GREEN}Encoded $secrets_encoded out of $secrets_found secret files${NC}"
@@ -441,13 +602,13 @@ encode_secrets_directory_files() {
 # Function to update secrets.env with encoded secret files
 update_secrets_env_with_files() {
     if [ ! -f "$ENV_FILE" ]; then
-        echo -e "${YELLOW}secrets.env not found. Secret files will not be added.${NC}"
+        echo -e "${YELLOW}$ENV_FILE not found. Secret files will not be added.${NC}"
         return 0
     fi
 
     # Access the ENCODED_SECRETS array from parent scope
 
-    local temp_file="secrets.env.tmp"
+    local temp_file="${ENV_FILE}.tmp"
     local in_multiline=false
     local multiline_end=""
     local current_key=""
@@ -512,16 +673,17 @@ update_secrets_env_with_files() {
 
     # Replace original file
     mv "$temp_file" "$ENV_FILE"
-    echo -e "${GREEN}secrets.env updated successfully${NC}"
+    echo -e "${GREEN}$ENV_FILE updated successfully${NC}"
 }
 
 # Update iOS string secrets in secrets.env
 update_ios_string_secrets() {
-    local SECRETS_FILE="secrets.env"
+    local SECRETS_FILE="$ENV_FILE"
 
     # Check if secrets.env exists
     if [[ ! -f "$SECRETS_FILE" ]]; then
-        print_warning "secrets.env not found. Creating new file..."
+        print_warning "$SECRETS_FILE not found. Creating new file..."
+        mkdir -p "$(dirname "$SECRETS_FILE")"
         touch "$SECRETS_FILE"
     fi
 
@@ -531,7 +693,7 @@ update_ios_string_secrets() {
         return 0
     fi
 
-    print_info "Updating iOS string secrets in secrets.env..."
+    print_info "Updating iOS string secrets in $SECRETS_FILE..."
 
     # Check if iOS Configuration section exists
     if grep -q "^# iOS Configuration" "$SECRETS_FILE" 2>/dev/null; then
@@ -545,7 +707,7 @@ update_ios_string_secrets() {
 
 # Helper function to update existing iOS section
 update_ios_section() {
-    local SECRETS_FILE="secrets.env"
+    local SECRETS_FILE="$ENV_FILE"
 
     for key in "${!IOS_STRING_SECRETS[@]}"; do
         local value="${IOS_STRING_SECRETS[$key]}"
@@ -585,7 +747,7 @@ update_ios_section() {
 
 # Helper function to append new iOS section
 append_ios_section() {
-    local SECRETS_FILE="secrets.env"
+    local SECRETS_FILE="$ENV_FILE"
 
     # Append new iOS section
     cat >> "$SECRETS_FILE" << EOF
@@ -612,7 +774,7 @@ EOF
 
 # Add Desktop signing placeholders to secrets.env
 add_desktop_placeholders() {
-    local SECRETS_FILE="secrets.env"
+    local SECRETS_FILE="$ENV_FILE"
 
     # Check if file exists
     if [[ ! -f "$SECRETS_FILE" ]]; then
@@ -623,13 +785,11 @@ add_desktop_placeholders() {
     # Check if Desktop Signing section exists
     if grep -q "^# Desktop Signing" "$SECRETS_FILE" 2>/dev/null; then
         print_info "Desktop Signing section already exists - skipping"
-        return 0
-    fi
+    else
+        print_info "Adding Desktop Signing placeholder section..."
 
-    print_info "Adding Desktop Signing placeholder section..."
-
-    # Append Desktop section
-    if ! cat >> "$SECRETS_FILE" << 'EOF'
+        # Append Desktop section
+        if ! cat >> "$SECRETS_FILE" << 'EOF'
 
 # ==============================================================================
 # Desktop Signing (Optional)
@@ -652,20 +812,53 @@ LINUX_SIGNING_KEY=""
 LINUX_SIGNING_PASSWORD=""
 LINUX_SIGNING_CERTIFICATE=""
 EOF
-    then
-        print_error "Failed to append Desktop Signing section"
-        return 1
+        then
+            print_error "Failed to append Desktop Signing section"
+            return 1
+        fi
+
+        print_success "Added Desktop Signing placeholder section"
     fi
 
-    print_success "Added Desktop Signing placeholder section"
+    # Add macOS App Store section if not present
+    if grep -q "^# macOS App Store" "$SECRETS_FILE" 2>/dev/null; then
+        print_info "macOS App Store section already exists - skipping"
+    else
+        print_info "Adding macOS App Store placeholder section..."
+
+        if ! cat >> "$SECRETS_FILE" << 'EOF'
+
+# ==============================================================================
+# macOS App Store (Required for macOS TestFlight & App Store deployment)
+# ==============================================================================
+# Keychain and certificate passwords for CI code signing.
+# Place .p12 and .provisionprofile files in secrets/ directory, then run sync.
+#
+# Password files (read automatically by sync):
+#   secrets/.keychain_password              → KEYCHAIN_PASSWORD
+#   secrets/.certificates_password          → CERTIFICATES_PASSWORD
+#
+# Certificate/profile files (base64 encoded by sync):
+#   secrets/mac_app_distribution.p12        → MAC_APP_DISTRIBUTION_CERTIFICATE_B64
+#   secrets/mac_installer_distribution.p12  → MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64
+#   secrets/mac_embedded.provisionprofile   → MAC_EMBEDDED_PROVISION_B64
+#   secrets/mac_runtime.provisionprofile    → MAC_RUNTIME_PROVISION_B64
+EOF
+        then
+            print_error "Failed to append macOS App Store section"
+            return 1
+        fi
+
+        print_success "Added macOS App Store placeholder section"
+    fi
 }
 
 # Validate secrets.env format and completeness
 validate_sync_result() {
-    local SECRETS_FILE="secrets.env"
+    local SECRETS_FILE="$ENV_FILE"
     local exit_code=0
 
-    print_info "Validating secrets.env..."
+    print_info "Validating $SECRETS_FILE..."
 
     # Check if file exists
     if [[ ! -f "$SECRETS_FILE" ]]; then
@@ -842,6 +1035,10 @@ validate_sync_result() {
         "MATCH_SSH_PRIVATE_KEY"
         "ORIGINAL_KEYSTORE_FILE"
         "UPLOAD_KEYSTORE_FILE"
+        "MAC_APP_DISTRIBUTION_CERTIFICATE_B64"
+        "MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64"
+        "MAC_EMBEDDED_PROVISION_B64"
+        "MAC_RUNTIME_PROVISION_B64"
     )
 
     # Extract and validate base64 values
@@ -930,10 +1127,10 @@ update_secrets_env() {
 
     # Check if secrets.env exists
     if [ -f "$ENV_FILE" ]; then
-        echo -e "${BLUE}Updating existing secrets.env file${NC}"
+        echo -e "${BLUE}Updating existing $ENV_FILE${NC}"
 
         # Create a temporary file
-        local temp_file="secrets.env.tmp"
+        local temp_file="${ENV_FILE}.tmp"
 
         # Process the file line by line
         local in_original_block=false
@@ -1000,14 +1197,17 @@ update_secrets_env() {
         # Replace the original file
         mv "$temp_file" "$ENV_FILE"
     else
-        echo -e "${BLUE}Creating new secrets.env file${NC}"
+        echo -e "${BLUE}Creating new $ENV_FILE${NC}"
+
+        # Ensure directory exists
+        mkdir -p "$(dirname "$ENV_FILE")"
 
         # Create a new secrets.env file
         cat > "$ENV_FILE" <<EOL
 # GitHub Secrets Environment File
 # Format: KEY=VALUE
 # Use <<EOF and EOF to denote multiline values
-# Run this command to format these secrets dos2unix secrets.env
+# Run this command to format these secrets: dos2unix $ENV_FILE
 
 ORIGINAL_KEYSTORE_FILE_PASSWORD=${ORIGINAL_KEYSTORE_FILE_PASSWORD:-Keystore_password}
 ORIGINAL_KEYSTORE_ALIAS=${ORIGINAL_KEYSTORE_ALIAS:-Keystore_Alias}
@@ -1025,7 +1225,7 @@ EOF
 EOL
     fi
 
-    echo -e "${GREEN}secrets.env file has been updated with base64 encoded keystores${NC}"
+    echo -e "${GREEN}$ENV_FILE has been updated with base64 encoded keystores${NC}"
 }
 
 # Function to update fastlane-config/project_config.rb with keystore information
@@ -1407,10 +1607,10 @@ generate_keystores() {
     echo -e "${BLUE}If you lose them, you will not be able to update your application on the Play Store.${NC}"
 
     if [ $ORIGINAL_RESULT -eq 0 ] && [ $UPLOAD_RESULT -eq 0 ]; then
-        echo -e "${GREEN}secrets.env has been updated with base64 encoded keystores${NC}"
+        echo -e "${GREEN}$ENV_FILE has been updated with base64 encoded keystores${NC}"
         echo -e "${GREEN}fastlane-config/project_config.rb has been updated with UPLOAD keystore information${NC}"
         echo -e "${GREEN}cmp-android/build.gradle.kts has been updated with UPLOAD keystore information${NC}"
-        echo -e "${BLUE}Note: If you have files in secrets/ directory, they have been encoded and added to secrets.env${NC}"
+        echo -e "${BLUE}Note: If you have files in secrets/ directory, they have been encoded and added to $ENV_FILE${NC}"
         return 0
     else
         return 1
@@ -1435,14 +1635,14 @@ add_secrets_to_github() {
 
     check_gh_cli
 
-    echo -e "${BLUE}Adding secrets to ${repo} from secrets.env${NC}"
+    echo -e "${BLUE}Adding secrets to ${repo} from $ENV_FILE${NC}"
     if [ -n "$env" ]; then
         echo -e "${BLUE}Environment: ${env}${NC}"
     fi
 
     # Check if secrets.env exists
     if [ ! -f "$ENV_FILE" ]; then
-        echo -e "${RED}Error: secrets.env file not found. Please run the 'generate' command first.${NC}"
+        echo -e "${RED}Error: $ENV_FILE not found. Please run the 'generate' or 'sync' command first.${NC}"
         exit 1
     fi
 
@@ -1767,11 +1967,18 @@ for i in "$@"; do
         SECRET_NAME="${i#*=}"
         shift
         ;;
+        --env-file=*)
+        ENV_FILE_OVERRIDE="${i#*=}"
+        shift
+        ;;
         *)
         # Unknown option
         ;;
     esac
 done
+
+# Resolve which env file to use
+resolve_env_file
 
 # Load variables safely from secrets.env if it exists
 # Only show the loading message for the view command
@@ -1795,59 +2002,72 @@ case $COMMAND in
         ;;
     sync)
         echo -e "${BLUE}==================================================================${NC}"
-        echo -e "${BLUE}              Synchronizing Secrets to secrets.env                 ${NC}"
+        echo -e "${BLUE}              Synchronizing Secrets to $ENV_FILE                 ${NC}"
         echo -e "${BLUE}==================================================================${NC}"
         echo
 
+        # Ensure secrets directory exists
+        mkdir -p "$(dirname "$ENV_FILE")"
+
         # Create backup
-        if [[ -f "secrets.env" ]]; then
-            cp secrets.env secrets.env.backup
-            print_info "Created backup: secrets.env.backup"
+        if [[ -f "$ENV_FILE" ]]; then
+            cp "$ENV_FILE" "${ENV_FILE}.backup"
+            print_info "Created backup: ${ENV_FILE}.backup"
         fi
 
         # Step 1: Parse shared_keys.env (iOS string secrets)
         echo
-        print_info "[1/5] Parsing shared_keys.env for iOS string secrets..."
+        print_info "[1/7] Parsing shared_keys.env for iOS string secrets..."
         parse_shared_keys_env
 
-        # Step 2: Encode file-based secrets from secrets/ directory
+        # Step 2: Parse macOS password files
         echo
-        print_info "[2/5] Encoding file-based secrets to base64..."
+        print_info "[2/7] Parsing macOS password files..."
+        parse_macos_password_files
+
+        # Step 3: Encode file-based secrets from secrets/ directory
+        echo
+        print_info "[3/7] Encoding file-based secrets to base64..."
         encode_secrets_directory_files
 
-        # Step 3: Update secrets.env with iOS string secrets
+        # Step 4: Update secrets.env with iOS string secrets
         echo
-        print_info "[3/5] Updating secrets.env with iOS string secrets..."
+        print_info "[4/7] Updating $ENV_FILE with iOS string secrets..."
         update_ios_string_secrets
 
-        # Step 4: Add Desktop placeholder section
+        # Step 5: Add Desktop & macOS App Store placeholders (before populating passwords)
         echo
-        print_info "[4/5] Adding Desktop signing placeholders..."
+        print_info "[5/7] Adding Desktop & macOS App Store placeholders..."
         add_desktop_placeholders
 
-        # Step 5: Validate result
+        # Step 6: Update macOS password secrets (after placeholders ensure keys exist)
         echo
-        print_info "[5/5] Validating secrets.env..."
+        print_info "[6/7] Updating $ENV_FILE with macOS password secrets..."
+        update_macos_password_secrets
+
+        # Step 7: Validate result
+        echo
+        print_info "[7/7] Validating $ENV_FILE..."
         echo
         if validate_sync_result; then
             echo
-            print_success "Secrets synchronized successfully to secrets.env"
+            print_success "Secrets synchronized successfully to $ENV_FILE"
 
             # Show summary
             echo
             print_info "Summary:"
-            total_string=$(grep -cE "^[A-Z_]+=" secrets.env 2>/dev/null || echo "0")
-            total_file=$(grep -c "<<EOF" secrets.env 2>/dev/null || echo "0")
+            total_string=$(grep -cE "^[A-Z_]+=" "$ENV_FILE" 2>/dev/null || echo "0")
+            total_file=$(grep -c "<<EOF" "$ENV_FILE" 2>/dev/null || echo "0")
             echo "  Total string secrets: $total_string"
             echo "  Total file secrets:   $total_file"
             echo
             print_info "Next steps:"
-            echo "  1. Review secrets.env"
+            echo "  1. Review $ENV_FILE"
             echo "  2. Upload to GitHub: ./keystore-manager.sh add --repo=owner/repo"
         else
             echo
             print_error "Validation failed - check errors above"
-            print_info "Backup available at: secrets.env.backup"
+            print_info "Backup available at: ${ENV_FILE}.backup"
             exit 1
         fi
         ;;

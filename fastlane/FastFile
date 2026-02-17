@@ -560,20 +560,41 @@ platform :ios do
       )
 
       # Get version from gradle (sanitized for App Store)
-      version = get_version_from_gradle(sanitize_for_appstore: true)
+      gradle_version = get_version_from_gradle(sanitize_for_appstore: true)
 
-      # Increment version number (sanitized for App Store)
-      increment_version_number(
-        xcodeproj: ios_config[:project_path],
-        version_number: options[:version_number] || version
-      )
-
-      # Get latest TestFlight build number and increment
+      # Get latest TestFlight build number and version FIRST
+      # so we can ensure our version is always higher
       latest_build_number = latest_testflight_build_number(
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
       )
+      latest_version = Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
 
+      # Determine final version: must be higher than latest TestFlight version
+      version = options[:version_number] || gradle_version
+      if latest_version && !latest_version.to_s.empty?
+        begin
+          if Gem::Version.new(version) <= Gem::Version.new(latest_version)
+            # Bump: increment patch of latest TestFlight version
+            parts = latest_version.split('.')
+            parts[-1] = (parts[-1].to_i + 1).to_s
+            bumped = parts.join('.')
+            UI.important("⚠️ Gradle version #{version} <= TestFlight #{latest_version}, bumping to #{bumped}")
+            version = bumped
+          end
+        rescue ArgumentError => e
+          UI.error("Version comparison failed: #{e.message}, using gradle version #{version}")
+        end
+      end
+      UI.important("📱 Final App Store version: #{version}")
+
+      # Set version in Xcode project
+      increment_version_number(
+        xcodeproj: ios_config[:project_path],
+        version_number: version
+      )
+
+      # Increment build number
       increment_build_number(
         xcodeproj: ios_config[:project_path],
         build_number: latest_build_number + 1
@@ -664,20 +685,40 @@ platform :ios do
       )
 
       # Get version from gradle (sanitized for App Store)
-      version = get_version_from_gradle(sanitize_for_appstore: true)
+      gradle_version = get_version_from_gradle(sanitize_for_appstore: true)
 
-      # Increment version number (sanitized for App Store)
-      increment_version_number(
-        xcodeproj: ios_config[:project_path],
-        version_number: options[:version_number] || version
-      )
-
-      # Get latest TestFlight build number and increment
+      # Get latest TestFlight build number and version FIRST
+      # so we can ensure our version is always higher
       latest_build_number = latest_testflight_build_number(
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
       )
+      latest_version = Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
 
+      # Determine final version: must be higher than latest TestFlight version
+      version = options[:version_number] || gradle_version
+      if latest_version && !latest_version.to_s.empty?
+        begin
+          if Gem::Version.new(version) <= Gem::Version.new(latest_version)
+            parts = latest_version.split('.')
+            parts[-1] = (parts[-1].to_i + 1).to_s
+            bumped = parts.join('.')
+            UI.important("⚠️ Gradle version #{version} <= TestFlight #{latest_version}, bumping to #{bumped}")
+            version = bumped
+          end
+        rescue ArgumentError => e
+          UI.error("Version comparison failed: #{e.message}, using gradle version #{version}")
+        end
+      end
+      UI.important("📱 Final App Store version: #{version}")
+
+      # Set version in Xcode project
+      increment_version_number(
+        xcodeproj: ios_config[:project_path],
+        version_number: version
+      )
+
+      # Increment build number
       increment_build_number(
         xcodeproj: ios_config[:project_path],
         build_number: latest_build_number + 1

@@ -48,7 +48,7 @@ kotlin {
     cocoapods {
         summary = "KMP Shared Module"
         homepage = "https://github.com/openMF/kmp-project-template"
-        version = "1.0"
+        version = project.version.toString().substringBefore("-").substringBefore("+")
         ios.deploymentTarget = "16.0"
         podfile = project.file("../cmp-ios/Podfile")
 

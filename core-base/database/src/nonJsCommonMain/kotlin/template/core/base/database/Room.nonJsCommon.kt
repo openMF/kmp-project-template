@@ -29,6 +29,8 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Update
 import androidx.room.Upsert
+import androidx.room.BuiltInTypeConverters
+import androidx.room.AutoMigration
 
 /**
  * Multiplatform typealiases for Room database annotations and interfaces.
@@ -147,7 +149,7 @@ actual typealias TypeConverters = TypeConverters
  * Typealias for the Room `BuiltInTypeConverters` annotation.
  * Used to configure built-in type converters.
  */
-actual typealias BuiltInTypeConverters = androidx.room.BuiltInTypeConverters
+actual typealias BuiltInTypeConverters = BuiltInTypeConverters
 
 /**
  * Typealias for the Room `@Database` annotation.
@@ -159,7 +161,7 @@ actual typealias Database = Database
  * Typealias for the Room `@AutoMigration` annotation.
  * Used to define automatic migrations between database versions.
  */
-actual typealias AutoMigration = androidx.room.AutoMigration
+actual typealias AutoMigration = AutoMigration
 
 /**
  * Typealias for the Room `@Ignore` annotation.

@@ -113,7 +113,11 @@ jobs:
       use_cocoapods: true
       shared_module: ':cmp-shared'
       distribute_ios_firebase: ${{ inputs.distribute_ios_firebase }}
-      distribute_ios_testflight: ${{ inputs.distribute_ios_testflight }}
+      # When App Store is enabled, skip TestFlight — deliver() already uploads
+      # the IPA to App Store Connect which makes the build available in TestFlight.
+      # Running both in parallel causes version conflicts since the upstream
+      # reusable workflow has no job dependency between the two.
+      distribute_ios_testflight: ${{ inputs.distribute_ios_testflight && !inputs.distribute_ios_appstore }}
       distribute_ios_appstore: ${{ inputs.distribute_ios_appstore }}
     secrets:
       original_keystore_file: ${{ secrets.ORIGINAL_KEYSTORE_FILE }}

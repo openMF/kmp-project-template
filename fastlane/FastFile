@@ -802,7 +802,10 @@ platform :ios do
         run_precheck_before_submit: appstore_config[:run_precheck_before_submit],
 
         # Submission information (compliance, ads, etc.)
-        submission_information: appstore_config[:submission_information]
+        submission_information: appstore_config[:submission_information],
+
+        # Age rating declarations (lootBox, parentalControls, advertising, etc.)
+        app_rating_config_path: ios_config[:app_rating_config_path]
       )
 
       UI.success("✅ Successfully deployed to App Store!")

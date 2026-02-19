@@ -611,11 +611,12 @@ platform :ios do
       releaseNotes = generateReleaseNote()
 
       # Prepare localized build info with changelog
+      locale = ios_config[:primary_locale]
       localized_build_info = {
         "default" => {
           whats_new: releaseNotes
         },
-        "en-US" => {
+        locale => {
           whats_new: releaseNotes
         }
       }
@@ -745,14 +746,15 @@ platform :ios do
       releaseNotes = generateReleaseNote()
 
       # Write release notes to metadata file (required when creating new versions)
-      release_notes_path = File.join(ios_config[:metadata_path], "en-US", "release_notes.txt")
+      locale = ios_config[:primary_locale]
+      release_notes_path = File.join(ios_config[:metadata_path], locale, "release_notes.txt")
       FileUtils.mkdir_p(File.dirname(release_notes_path))
       File.write(release_notes_path, releaseNotes)
       UI.message("📝 Wrote release notes to: #{release_notes_path}")
 
       # Log what metadata will be uploaded
       UI.important("📋 Metadata files that will be uploaded:")
-      metadata_files = Dir.glob(File.join(ios_config[:metadata_path], "en-US", "*.txt"))
+      metadata_files = Dir.glob(File.join(ios_config[:metadata_path], locale, "*.txt"))
       if metadata_files.empty?
         UI.error("⚠️  No metadata files found!")
       else

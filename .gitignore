@@ -92,7 +92,6 @@ secrets/match_ci_key.pub
 fastlane/metadata/
 fastlane/fastlane/metadata/
 fastlane/screenshots/
-fastlane/age_rating.json
 # Ruby stuff we don't care about
 .bundle/
 vendor/

@@ -208,6 +208,103 @@ class StringEntry:
                 result[key] = value
         return result
 
+@dataclass
+class StringArrayEntry:
+    """A string-array resource entry with ordered items."""
+    key: str
+    items: List[str]
+    attributes: Dict[str, str] = field(default_factory=dict)
+
+    def flat_entries(self) -> List[StringEntry]:
+        """Flatten into individual StringEntry objects for translation."""
+        return [
+            StringEntry(
+                key=f"{self.key}__item_{i}",
+                text=text,
+                attributes=self.attributes,
+            )
+            for i, text in enumerate(self.items)
+            if text and text.strip()
+        ]
+
+    def content_for_hash(self) -> str:
+        """Combined content for snapshot hashing."""
+        return "||".join(self.items)
+
+
+@dataclass
+class PluralsEntry:
+    """A plurals resource entry with quantity variants."""
+    key: str
+    items: Dict[str, str]  # quantity -> text
+    attributes: Dict[str, str] = field(default_factory=dict)
+
+    def flat_entries(self) -> List[StringEntry]:
+        """Flatten into individual StringEntry objects for translation."""
+        return [
+            StringEntry(
+                key=f"{self.key}__plural_{quantity}",
+                text=text,
+                attributes=self.attributes,
+            )
+            for quantity, text in self.items.items()
+            if text and text.strip()
+        ]
+
+    def content_for_hash(self) -> str:
+        """Combined content for snapshot hashing."""
+        return "||".join(f"{q}={t}" for q, t in sorted(self.items.items()))
+
+
+@dataclass
+class SourceResources:
+    """All translatable resources from a single source file."""
+    strings: List[StringEntry] = field(default_factory=list)
+    string_arrays: List[StringArrayEntry] = field(default_factory=list)
+    plurals: List[PluralsEntry] = field(default_factory=list)
+
+    @property
+    def total_count(self) -> int:
+        return (
+            len(self.strings)
+            + sum(len(a.items) for a in self.string_arrays)
+            + sum(len(p.items) for p in self.plurals)
+        )
+
+    @property
+    def is_empty(self) -> bool:
+        return not self.strings and not self.string_arrays and not self.plurals
+
+    def all_flat_entries(self) -> List[StringEntry]:
+        """All translatable items flattened into StringEntry list."""
+        entries: List[StringEntry] = list(self.strings)
+        for arr in self.string_arrays:
+            entries.extend(arr.flat_entries())
+        for plu in self.plurals:
+            entries.extend(plu.flat_entries())
+        return entries
+
+    def all_keys_for_snapshot(self) -> Dict[str, str]:
+        """Build key -> hash mapping for snapshot tracking."""
+        data: Dict[str, str] = {}
+        for s in self.strings:
+            data[s.key] = content_hash(s.text)
+        for a in self.string_arrays:
+            data[f"__array__{a.key}"] = content_hash(a.content_for_hash())
+        for p in self.plurals:
+            data[f"__plurals__{p.key}"] = content_hash(p.content_for_hash())
+        return data
+
+@dataclass
+class ExistingKeys:
+    """Track which keys already exist in a target file."""
+    strings: Set[str] = field(default_factory=set)
+    string_arrays: Set[str] = field(default_factory=set)
+    plurals: Set[str] = field(default_factory=set)
+
+    @property
+    def all_string_keys(self) -> Set[str]:
+        return self.strings
 
 @dataclass
 class FrozenText:
@@ -346,80 +443,81 @@ def load_snapshot(snapshot_path: Path) -> Dict[str, str]:
         return {}
 
 
-def save_snapshot(snapshot_path: Path, entries: List[StringEntry]) -> None:
-    """Save minimal snapshot: key -> hash only."""
+def save_snapshot_full(
+    snapshot_path: Path, source_resources: SourceResources
+) -> None:
+    """Save snapshot for all resource types."""
     try:
         snapshot_path.parent.mkdir(parents=True, exist_ok=True)
-
-        data = {entry.key: content_hash(entry.text) for entry in entries}
-
-        # Compact JSON format to minimize size
+        data = source_resources.all_keys_for_snapshot()
         snapshot_path.write_text(
-            json.dumps(data, sort_keys=True, separators=(',', ':')),
-            encoding='utf-8'
+            json.dumps(data, sort_keys=True, separators=(",", ":")),
+            encoding="utf-8",
         )
-        logger.debug(f"Saved snapshot: {snapshot_path}")
     except (IOError, OSError) as e:
         logger.warning(f"Failed to save snapshot {snapshot_path}: {e}")
 
 
-def find_changed_entries(
-    source_entries: List[StringEntry],
+def find_changed_resources(
+    source_resources: SourceResources,
     snapshot: Dict[str, str],
-    existing_keys: Set[str],
+    existing_keys: ExistingKeys,
 ) -> List[StringEntry]:
     """
-    Find entries where source text changed since last translation.
-
-    Only returns entries that:
-    1. Exist in the snapshot (were previously processed)
-    2. Have different content hash now
-    3. Already exist in target file (need re-translation, not new)
+    Find ALL changed entries (strings, array items, plural items)
+    returned as flat StringEntry list for translation.
     """
     changed: List[StringEntry] = []
 
-    for entry in source_entries:
-        # Skip if not in snapshot (new key, handled separately)
+    # Regular strings
+    for entry in source_resources.strings:
         if entry.key not in snapshot:
             continue
-
-        # Skip if not already translated
-        if entry.key not in existing_keys:
+        if entry.key not in existing_keys.strings:
             continue
-
-        stored_hash = snapshot[entry.key]
-        current_hash = content_hash(entry.text)
-
-        if stored_hash != current_hash:
+        if snapshot[entry.key] != content_hash(entry.text):
             changed.append(entry)
-            logger.debug(
-                f"  Detected change in '{entry.key}': "
-                f"hash {stored_hash[:8]}... → {current_hash[:8]}..."
-            )
+
+    # String arrays
+    for arr in source_resources.string_arrays:
+        snap_key = f"__array__{arr.key}"
+        if snap_key not in snapshot:
+            continue
+        if arr.key not in existing_keys.string_arrays:
+            continue
+        if snapshot[snap_key] != content_hash(arr.content_for_hash()):
+            changed.extend(arr.flat_entries())
+
+    # Plurals
+    for plu in source_resources.plurals:
+        snap_key = f"__plurals__{plu.key}"
+        if snap_key not in snapshot:
+            continue
+        if plu.key not in existing_keys.plurals:
+            continue
+        if snapshot[snap_key] != content_hash(plu.content_for_hash()):
+            changed.extend(plu.flat_entries())
 
     return changed
 
 
-def _snapshot_needs_update(snapshot: Dict[str, str], source_entries: List[StringEntry]) -> bool:
-    """Check if snapshot needs to be updated based on source changes."""
-    # No snapshot exists
+def _snapshot_needs_update_full(
+    snapshot: Dict[str, str],
+    source_resources: SourceResources,
+) -> bool:
+    """Check if snapshot needs update based on ALL resource types."""
     if not snapshot:
         return True
 
-    current_keys: Set[str] = set()
-    for entry in source_entries:
-        current_keys.add(entry.key)
-        current_hash = content_hash(entry.text)
-        stored_hash = snapshot.get(entry.key)
+    current_data = source_resources.all_keys_for_snapshot()
 
-        # New key or changed content
-        if stored_hash != current_hash:
-            return True
-
-    # Check for removed keys
-    snapshot_keys = set(snapshot.keys())
-    if snapshot_keys - current_keys:
+    # Check for any difference
+    if set(current_data.keys()) != set(snapshot.keys()):
         return True
+
+    for key, current_hash in current_data.items():
+        if snapshot.get(key) != current_hash:
+            return True
 
     return False
 
@@ -569,45 +667,100 @@ def get_element_full_text(elem: ET._Element) -> str:
 # ============================================================================
 
 
-def read_source_strings(source_xml: Path) -> List[StringEntry]:
-    """Read translatable strings from source XML, preserving attributes."""
+def read_source_resources(source_xml: Path) -> SourceResources:
+    """Read ALL translatable resources from source XML."""
     tree = ET.parse(str(source_xml), parser=XML_PARSER)
     root = tree.getroot()
-    entries: List[StringEntry] = []
+    resources = SourceResources()
 
-    for node in root.iter("string"):
-        name = node.get("name")
-        if not name:
+    for node in root:
+        if is_comment(node):
             continue
-        if node.get("translatable", "true").lower() == "false":
-            continue
-        raw_text = get_element_full_text(node)
-        if not raw_text or not raw_text.strip():
-            continue
-        preserved: Dict[str, str] = {}
-        for attr_key, attr_val in node.attrib.items():
-            if attr_key in ("name", "translatable"):
+
+        # ── <string> ──────────────────────────────────────────
+        if node.tag == "string":
+            name = node.get("name")
+            if not name:
                 continue
-            if attr_key in PROPAGATE_ATTRIBUTES:
-                preserved[attr_key] = attr_val
-            elif attr_key.startswith(f"{{{TOOLS_NAMESPACE}}}"):
-                preserved[attr_key] = attr_val
-        entries.append(StringEntry(key=name, text=raw_text, attributes=preserved))
+            if node.get("translatable", "true").lower() == "false":
+                continue
+            raw_text = get_element_full_text(node)
+            if not raw_text or not raw_text.strip():
+                continue
+            preserved = _extract_propagated_attrs(node)
+            resources.strings.append(
+                StringEntry(key=name, text=raw_text, attributes=preserved)
+            )
 
-    return entries
+        # ── <string-array> ────────────────────────────────────
+        elif node.tag == "string-array":
+            name = node.get("name")
+            if not name:
+                continue
+            if node.get("translatable", "true").lower() == "false":
+                continue
+            items: List[str] = []
+            for item_node in node.iter("item"):
+                item_text = get_element_full_text(item_node)
+                items.append(item_text or "")
+            if not any(t.strip() for t in items):
+                continue
+            preserved = _extract_propagated_attrs(node)
+            resources.string_arrays.append(
+                StringArrayEntry(key=name, items=items, attributes=preserved)
+            )
+
+        # ── <plurals> ─────────────────────────────────────────
+        elif node.tag == "plurals":
+            name = node.get("name")
+            if not name:
+                continue
+            if node.get("translatable", "true").lower() == "false":
+                continue
+            quantity_map: Dict[str, str] = {}
+            for item_node in node.iter("item"):
+                quantity = item_node.get("quantity")
+                if quantity:
+                    item_text = get_element_full_text(item_node)
+                    if item_text:
+                        quantity_map[quantity] = item_text
+            if not quantity_map:
+                continue
+            preserved = _extract_propagated_attrs(node)
+            resources.plurals.append(
+                PluralsEntry(key=name, items=quantity_map, attributes=preserved)
+            )
+
+    return resources
 
 
-def read_existing_keys(target_xml: Path) -> Set[str]:
-    """Read existing string keys from target file."""
+def _extract_propagated_attrs(node: ET._Element) -> Dict[str, str]:
+    """Extract attributes to propagate from a source node."""
+    preserved: Dict[str, str] = {}
+    for attr_key, attr_val in node.attrib.items():
+        if attr_key in ("name", "translatable"):
+            continue
+        if attr_key in PROPAGATE_ATTRIBUTES:
+            preserved[attr_key] = attr_val
+        elif attr_key.startswith(f"{{{TOOLS_NAMESPACE}}}"):
+            preserved[attr_key] = attr_val
+    return preserved
+
+
+def read_existing_keys_full(target_xml: Path) -> ExistingKeys:
+    """Read existing resource keys from target file (all types)."""
+    result = ExistingKeys()
     if not target_xml.exists():
-        return set()
+        return result
     try:
         tree = ET.parse(str(target_xml), parser=XML_PARSER)
         root = tree.getroot()
-        return set(root.xpath("./string/@name"))
+        result.strings = set(root.xpath("./string/@name"))
+        result.string_arrays = set(root.xpath("./string-array/@name"))
+        result.plurals = set(root.xpath("./plurals/@name"))
+        return result
     except ET.XMLSyntaxError:
-        return set()
-
+        return result
 
 # ============================================================================
 # XML Writing Functions
@@ -656,152 +809,143 @@ def set_mixed_string_value(
     escape_android_text_nodes(node)
 
 
-def write_translations(
+def write_translations_full(
     target_xml: Path,
-    translations: Dict[str, str],
-    source_entries: List[StringEntry],
+    translations: Dict[str, str],  # flat key -> translated text
+    source_resources: SourceResources,
     source_xml: Path,
     validate: bool = True,
     warn_unknown_tags: bool = True,
 ) -> int:
     """
-    Write translations to target XML, preserving EXACT source structure.
+    Write translations including string-arrays and plurals.
 
-    For NEW files: Deep copies source, replaces content, removes untranslated strings
-    For EXISTING files: Merges new translations while preserving structure
+    The `translations` dict uses flat keys:
+      - "key"                  -> string translation
+      - "key__item_0"          -> string-array item
+      - "key__plural_one"      -> plurals quantity variant
     """
     target_xml.parent.mkdir(parents=True, exist_ok=True)
 
-    # Parse source with all whitespace and comments preserved
     source_tree = ET.parse(str(source_xml), parser=XML_PARSER)
     source_root = source_tree.getroot()
 
-    # Check if target already exists
     if target_xml.exists():
         try:
             existing_tree = ET.parse(str(target_xml), parser=XML_PARSER)
             existing_root = existing_tree.getroot()
-            existing_keys = set(existing_root.xpath("./string/@name"))
-
-            return _merge_into_existing(
-                target_xml, existing_root, translations, source_entries,
-                source_root, existing_keys, validate, warn_unknown_tags
+            return _merge_all_into_existing(
+                target_xml, existing_root, translations,
+                source_resources, source_root, validate, warn_unknown_tags
             )
         except ET.XMLSyntaxError as e:
             logger.warning(f"Corrupted '{target_xml}', recreating: {e}")
 
-    # Create new file from source structure
-    return _create_from_source(
-        target_xml, translations, source_entries,
+    return _create_from_source_full(
+        target_xml, translations, source_resources,
         source_root, validate, warn_unknown_tags
     )
 
 
-def _create_from_source(
+def _create_from_source_full(
     target_xml: Path,
     translations: Dict[str, str],
-    source_entries: List[StringEntry],
+    source_resources: SourceResources,
     source_root: ET._Element,
     validate: bool,
     warn_unknown_tags: bool,
 ) -> int:
-    """
-    Create new translation file by deep copying source and replacing text.
-    Preserves all comments, whitespace, and exact ordering.
-    """
-    # Deep copy preserves everything
+    """Create new file from source, filling in all resource types."""
     root = copy.deepcopy(source_root)
 
-    # Build set of keys that have translations
-    translated_keys: Set[str] = set(translations.keys())
+    # Build lookup sets
+    translated_string_keys: Set[str] = set()
+    translated_array_keys: Set[str] = set()
+    translated_plural_keys: Set[str] = set()
 
-    # Build sections: list of (comment_elements, string_elements)
-    # Each section starts with zero or more comments followed by strings
-    sections: List[Tuple[List[ET._Element], List[ET._Element]]] = []
-    current_comments: List[ET._Element] = []
-    current_strings: List[ET._Element] = []
+    for flat_key in translations:
+        if "__item_" in flat_key:
+            base_key = flat_key.rsplit("__item_", 1)[0]
+            translated_array_keys.add(base_key)
+        elif "__plural_" in flat_key:
+            base_key = flat_key.rsplit("__plural_", 1)[0]
+            translated_plural_keys.add(base_key)
+        else:
+            translated_string_keys.add(flat_key)
+
+    elements_to_remove: List[ET._Element] = []
+    written = 0
 
     for elem in list(root):
         if is_comment(elem):
-            if current_strings:
-                # Save previous section and start new one
-                sections.append((current_comments, current_strings))
-                current_comments = []
-                current_strings = []
-            current_comments.append(elem)
-        elif elem.tag == "string":
-            current_strings.append(elem)
-
-    if current_comments or current_strings:
-        sections.append((current_comments, current_strings))
-
-    written = 0
-    elements_to_remove: List[ET._Element] = []
-
-    # Process each section
-    for comments, strings in sections:
-        # Check if this section has any translated strings
-        section_has_translation = False
-        for string_elem in strings:
-            name = string_elem.get("name")
-            if name and name in translated_keys:
-                section_has_translation = True
-                break
-            # Non-translatable strings don't count
-            if string_elem.get("translatable", "true").lower() == "false":
-                section_has_translation = True  # Keep non-translatable
-                break
-
-        if not section_has_translation:
-            # Remove entire section (comments + strings)
-            elements_to_remove.extend(comments)
-            elements_to_remove.extend(strings)
             continue
 
-        # Process strings in this section
-        for string_elem in strings:
-            name = string_elem.get("name")
+        name = elem.get("name")
+        if not name:
+            continue
 
-            if not name:
-                elements_to_remove.append(string_elem)
-                continue
+        # Keep non-translatable as-is
+        if elem.get("translatable", "true").lower() == "false":
+            continue
 
-            # Keep non-translatable strings unchanged
-            if string_elem.get("translatable", "true").lower() == "false":
-                continue
-
-            if name in translations:
-                # Update with translation
+        if elem.tag == "string":
+            if name in translated_string_keys:
                 value = translations[name]
-
-                # Clear content
-                string_elem.text = None
-                for child in list(string_elem):
-                    string_elem.remove(child)
-
-                set_mixed_string_value(string_elem, value, key=name, warn_unknown_tags=warn_unknown_tags)
+                elem.text = None
+                for child in list(elem):
+                    elem.remove(child)
+                set_mixed_string_value(
+                    elem, value, key=name,
+                    warn_unknown_tags=warn_unknown_tags,
+                )
                 written += 1
             else:
-                # No translation - remove this string
-                elements_to_remove.append(string_elem)
+                elements_to_remove.append(elem)
 
-    # Remove elements while preserving whitespace
+        elif elem.tag == "string-array":
+            if name in translated_array_keys:
+                item_nodes = list(elem.iter("item"))
+                for i, item_node in enumerate(item_nodes):
+                    flat_key = f"{name}__item_{i}"
+                    if flat_key in translations:
+                        value = translations[flat_key]
+                        item_node.text = None
+                        for child in list(item_node):
+                            item_node.remove(child)
+                        set_mixed_string_value(
+                            item_node, value, key=flat_key,
+                            warn_unknown_tags=warn_unknown_tags,
+                        )
+                        written += 1
+            else:
+                elements_to_remove.append(elem)
+
+        elif elem.tag == "plurals":
+            if name in translated_plural_keys:
+                for item_node in elem.iter("item"):
+                    quantity = item_node.get("quantity")
+                    if quantity:
+                        flat_key = f"{name}__plural_{quantity}"
+                        if flat_key in translations:
+                            value = translations[flat_key]
+                            item_node.text = None
+                            for child in list(item_node):
+                                item_node.remove(child)
+                            set_mixed_string_value(
+                                item_node, value, key=flat_key,
+                                warn_unknown_tags=warn_unknown_tags,
+                            )
+                            written += 1
+            else:
+                elements_to_remove.append(elem)
+
     for elem in elements_to_remove:
         _remove_element_preserve_whitespace(root, elem)
 
-    # Clean up redundant namespace declarations
     ET.cleanup_namespaces(root)
-
-    # Write file
     tree = ET.ElementTree(root)
-    tree.write(
-        str(target_xml),
-        encoding="utf-8",
-        xml_declaration=True,
-        pretty_print=False,
-    )
-
-    # Post-process to fix any xliff namespace prefix issues (ns0, ns1 -> xliff)
+    tree.write(str(target_xml), encoding="utf-8",
+               xml_declaration=True, pretty_print=False)
     _fix_xliff_namespaces_in_file(target_xml)
 
     if validate:
@@ -902,141 +1046,244 @@ def _remove_element_preserve_whitespace(root: ET._Element, elem: ET._Element) ->
     parent.remove(elem)
 
 
-def _merge_into_existing(
+def _merge_all_into_existing(
     target_xml: Path,
     existing_root: ET._Element,
     translations: Dict[str, str],
-    source_entries: List[StringEntry],
+    source_resources: SourceResources,
     source_root: ET._Element,
-    existing_keys: Set[str],
     validate: bool,
     warn_unknown_tags: bool,
 ) -> int:
-    """Merge new translations into existing file, preserving source order and comments."""
+    """
+    Merge new/updated translations into existing file for ALL resource types.
 
-    # Build source structure: sections with their comments and strings
-    source_sections: List[Tuple[List[str], List[str]]] = []  # (comment_texts, string_names)
-    current_comments: List[str] = []
-    current_strings: List[str] = []
+    Handles:
+    - <string> entries (new + updated)
+    - <string-array> entries (new + updated items)
+    - <plurals> entries (new + updated quantities)
+    """
+    # ── Build lookup maps ──────────────────────────────────────
 
-    # Also track string -> section mapping and string -> preceding whitespace
-    string_to_section: Dict[str, int] = {}
-    string_tail: Dict[str, str] = {}
-    comment_tails: Dict[int, str] = {}  # section_index -> tail after last comment
+    # Flat key -> which resource type and base key
+    array_items_map: Dict[str, Tuple[str, int]] = {}      # flat_key -> (array_name, index)
+    plural_items_map: Dict[str, Tuple[str, str]] = {}     # flat_key -> (plural_name, quantity)
+    string_keys: Set[str] = set()
 
-    for elem in source_root:
-        if is_comment(elem):
-            if current_strings:
-                source_sections.append((current_comments, current_strings))
-                current_comments = []
-                current_strings = []
-            current_comments.append(elem.text or "")
-            if elem.tail:
-                comment_tails[len(source_sections)] = elem.tail
-        elif elem.tag == "string":
-            name = elem.get("name")
-            if name:
-                current_strings.append(name)
-                string_to_section[name] = len(source_sections)
-                string_tail[name] = elem.tail or "\n    "
+    for flat_key in translations:
+        if "__item_" in flat_key:
+            parts = flat_key.rsplit("__item_", 1)
+            array_items_map[flat_key] = (parts[0], int(parts[1]))
+        elif "__plural_" in flat_key:
+            parts = flat_key.rsplit("__plural_", 1)
+            plural_items_map[flat_key] = (parts[0], parts[1])
+        else:
+            string_keys.add(flat_key)
 
-    if current_comments or current_strings:
-        source_sections.append((current_comments, current_strings))
+    # Group array items by array name
+    array_translations: Dict[str, Dict[int, str]] = {}    # array_name -> {index: text}
+    for flat_key, (arr_name, idx) in array_items_map.items():
+        if arr_name not in array_translations:
+            array_translations[arr_name] = {}
+        array_translations[arr_name][idx] = translations[flat_key]
 
-    # Build flat source order
-    source_order: List[str] = []
-    for comments, strings in source_sections:
-        source_order.extend(strings)
+    # Group plural items by plural name
+    plural_translations: Dict[str, Dict[str, str]] = {}   # plural_name -> {quantity: text}
+    for flat_key, (plu_name, quantity) in plural_items_map.items():
+        if plu_name not in plural_translations:
+            plural_translations[plu_name] = {}
+        plural_translations[plu_name][quantity] = translations[flat_key]
 
-    # Get existing elements map
-    existing_elems: Dict[str, ET._Element] = {}
+    # ── Get existing elements ──────────────────────────────────
+
+    existing_string_elems: Dict[str, ET._Element] = {}
+    existing_array_elems: Dict[str, ET._Element] = {}
+    existing_plural_elems: Dict[str, ET._Element] = {}
+
     for elem in existing_root:
         if is_comment(elem):
             continue
+        name = elem.get("name")
+        if not name:
+            continue
         if elem.tag == "string":
-            name = elem.get("name")
-            if name:
-                existing_elems[name] = elem
+            existing_string_elems[name] = elem
+        elif elem.tag == "string-array":
+            existing_array_elems[name] = elem
+        elif elem.tag == "plurals":
+            existing_plural_elems[name] = elem
 
-    entry_map = {e.key: e for e in source_entries}
+    # ── Build source ordering ──────────────────────────────────
+
+    source_order: List[Tuple[str, str]] = []  # (tag, name) preserving source order
+    source_comments: Dict[int, List[str]] = {}  # index -> preceding comment texts
+    current_comments: List[str] = []
+
+    for elem in source_root:
+        if is_comment(elem):
+            current_comments.append(elem.text or "")
+            continue
+        name = elem.get("name")
+        if name and elem.tag in ("string", "string-array", "plurals"):
+            idx = len(source_order)
+            if current_comments:
+                source_comments[idx] = list(current_comments)
+                current_comments = []
+            source_order.append((elem.tag, name))
+
+    # ── Source entry map for attributes ────────────────────────
+
+    entry_map = {e.key: e for e in source_resources.strings}
+    array_entry_map = {a.key: a for a in source_resources.string_arrays}
+    plural_entry_map = {p.key: p for p in source_resources.plurals}
+
     written = 0
 
-    # Track which sections we've added comments for
-    added_section_comments: Set[int] = set()
+    # ── 1. Process regular strings ─────────────────────────────
 
-    # Process translations (both new and updated)
-    for key, value in translations.items():
+    for key in string_keys:
+        value = translations[key]
         entry = entry_map.get(key)
-        if not entry:
-            continue
 
-        # Check if this is an UPDATE to existing string
-        if key in existing_elems:
-            # Update existing element in place
-            node = existing_elems[key]
+        if key in existing_string_elems:
+            # Update existing
+            node = existing_string_elems[key]
             node.text = None
             for child in list(node):
                 node.remove(child)
             set_mixed_string_value(node, value, key=key, warn_unknown_tags=warn_unknown_tags)
             written += 1
+        elif entry:
+            # Add new string
+            attrs = entry.get_propagated_attributes()
+            node = ET.Element("string", **attrs)
+            set_mixed_string_value(node, value, key=key, warn_unknown_tags=warn_unknown_tags)
+            node.tail = "\n    "
+            _insert_at_source_position(
+                existing_root, node, "string", key,
+                source_order, existing_string_elems,
+                existing_array_elems, existing_plural_elems,
+            )
+            existing_string_elems[key] = node
+            written += 1
+
+    # ── 2. Process string-arrays ───────────────────────────────
+
+    for arr_name, item_translations in array_translations.items():
+        arr_entry = array_entry_map.get(arr_name)
+        if not arr_entry:
             continue
 
-        # This is a NEW string - add it
-        section_idx = string_to_section.get(key, 0)
+        if arr_name in existing_array_elems:
+            # Update existing array items
+            arr_elem = existing_array_elems[arr_name]
+            item_nodes = list(arr_elem.iter("item"))
 
-        # Find insertion point
-        key_idx = source_order.index(key) if key in source_order else len(source_order)
-        insert_before: Optional[ET._Element] = None
-        for next_key in source_order[key_idx + 1:]:
-            if next_key in existing_elems:
-                insert_before = existing_elems[next_key]
-                break
-
-        # Add section comments if not already added
-        if section_idx not in added_section_comments:
-            comments, _ = source_sections[section_idx] if section_idx < len(source_sections) else ([], [])
-            if comments:
-                for comment_text in comments:
-                    comment = ET.Comment(comment_text)
-                    comment.tail = "\n    "
-
-                    if insert_before is not None:
-                        # Add blank line before section
-                        prev = insert_before.getprevious()
-                        if prev is not None and not is_comment(prev):
-                            prev.tail = "\n\n    "
-                        insert_before.addprevious(comment)
-                    else:
-                        # Append at end
-                        children = list(existing_root)
-                        if children:
-                            last = children[-1]
-                            if not is_comment(last):
-                                last.tail = "\n\n    "
-                        existing_root.append(comment)
-
-                added_section_comments.add(section_idx)
-
-        # Create string element
-        attrs = entry.get_propagated_attributes()
-        node = ET.Element("string", **attrs)
-
-        set_mixed_string_value(node, value, key=key, warn_unknown_tags=warn_unknown_tags)
-
-        # Set tail from source
-        node.tail = string_tail.get(key, "\n    ")
-
-        # Insert element
-        if insert_before is not None:
-            insert_before.addprevious(node)
+            for idx, value in item_translations.items():
+                if idx < len(item_nodes):
+                    # Update existing item
+                    item_node = item_nodes[idx]
+                    item_node.text = None
+                    for child in list(item_node):
+                        item_node.remove(child)
+                    set_mixed_string_value(
+                        item_node, value,
+                        key=f"{arr_name}[{idx}]",
+                        warn_unknown_tags=warn_unknown_tags,
+                    )
+                    written += 1
         else:
-            existing_root.append(node)
+            # Create new string-array from source structure
+            source_arr_elem = None
+            for elem in source_root:
+                if elem.tag == "string-array" and elem.get("name") == arr_name:
+                    source_arr_elem = elem
+                    break
 
-        existing_keys.add(key)
-        existing_elems[key] = node
-        written += 1
+            if source_arr_elem is not None:
+                new_arr = copy.deepcopy(source_arr_elem)
+                item_nodes = list(new_arr.iter("item"))
 
-    # Fix final element tail
+                for idx, value in item_translations.items():
+                    if idx < len(item_nodes):
+                        item_node = item_nodes[idx]
+                        item_node.text = None
+                        for child in list(item_node):
+                            item_node.remove(child)
+                        set_mixed_string_value(
+                            item_node, value,
+                            key=f"{arr_name}[{idx}]",
+                            warn_unknown_tags=warn_unknown_tags,
+                        )
+                        written += 1
+
+                new_arr.tail = "\n\n    "
+                _insert_at_source_position(
+                    existing_root, new_arr, "string-array", arr_name,
+                    source_order, existing_string_elems,
+                    existing_array_elems, existing_plural_elems,
+                )
+                existing_array_elems[arr_name] = new_arr
+
+    # ── 3. Process plurals ─────────────────────────────────────
+
+    for plu_name, qty_translations in plural_translations.items():
+        plu_entry = plural_entry_map.get(plu_name)
+        if not plu_entry:
+            continue
+
+        if plu_name in existing_plural_elems:
+            # Update existing plural items
+            plu_elem = existing_plural_elems[plu_name]
+
+            for item_node in plu_elem.iter("item"):
+                quantity = item_node.get("quantity")
+                if quantity and quantity in qty_translations:
+                    value = qty_translations[quantity]
+                    item_node.text = None
+                    for child in list(item_node):
+                        item_node.remove(child)
+                    set_mixed_string_value(
+                        item_node, value,
+                        key=f"{plu_name}[{quantity}]",
+                        warn_unknown_tags=warn_unknown_tags,
+                    )
+                    written += 1
+        else:
+            # Create new plurals from source structure
+            source_plu_elem = None
+            for elem in source_root:
+                if elem.tag == "plurals" and elem.get("name") == plu_name:
+                    source_plu_elem = elem
+                    break
+
+            if source_plu_elem is not None:
+                new_plu = copy.deepcopy(source_plu_elem)
+
+                for item_node in new_plu.iter("item"):
+                    quantity = item_node.get("quantity")
+                    if quantity and quantity in qty_translations:
+                        value = qty_translations[quantity]
+                        item_node.text = None
+                        for child in list(item_node):
+                            item_node.remove(child)
+                        set_mixed_string_value(
+                            item_node, value,
+                            key=f"{plu_name}[{quantity}]",
+                            warn_unknown_tags=warn_unknown_tags,
+                        )
+                        written += 1
+
+                new_plu.tail = "\n\n    "
+                _insert_at_source_position(
+                    existing_root, new_plu, "plurals", plu_name,
+                    source_order, existing_string_elems,
+                    existing_array_elems, existing_plural_elems,
+                )
+                existing_plural_elems[plu_name] = new_plu
+
+    # ── Fix final element tail ─────────────────────────────────
+
     children = list(existing_root)
     if children:
         for child in reversed(children):
@@ -1045,10 +1292,10 @@ def _merge_into_existing(
                     child.tail = "\n"
                 break
 
-    if written > 0:
-        # Clean up redundant namespace declarations
-        ET.cleanup_namespaces(existing_root)
+    # ── Write file ─────────────────────────────────────────────
 
+    if written > 0:
+        ET.cleanup_namespaces(existing_root)
         tree = ET.ElementTree(existing_root)
         tree.write(
             str(target_xml),
@@ -1056,8 +1303,6 @@ def _merge_into_existing(
             xml_declaration=True,
             pretty_print=False,
         )
-
-        # Post-process to fix any xliff namespace prefix issues (ns0, ns1 -> xliff)
         _fix_xliff_namespaces_in_file(target_xml)
 
         if validate:
@@ -1069,6 +1314,62 @@ def _merge_into_existing(
     return written
 
 
+def _insert_at_source_position(
+    root: ET._Element,
+    new_elem: ET._Element,
+    tag: str,
+    name: str,
+    source_order: List[Tuple[str, str]],
+    existing_strings: Dict[str, ET._Element],
+    existing_arrays: Dict[str, ET._Element],
+    existing_plurals: Dict[str, ET._Element],
+) -> None:
+    """
+    Insert element at the correct position matching source file ordering.
+    Falls back to appending at end if no reference point found.
+    """
+    # Find this element's position in source order
+    try:
+        my_idx = next(
+            i for i, (t, n) in enumerate(source_order)
+            if t == tag and n == name
+        )
+    except StopIteration:
+        # Not found in source order, append at end
+        root.append(new_elem)
+        return
+
+    # Look forward in source order for an existing element to insert before
+    for future_tag, future_name in source_order[my_idx + 1:]:
+        ref_elem = None
+        if future_tag == "string":
+            ref_elem = existing_strings.get(future_name)
+        elif future_tag == "string-array":
+            ref_elem = existing_arrays.get(future_name)
+        elif future_tag == "plurals":
+            ref_elem = existing_plurals.get(future_name)
+
+        if ref_elem is not None:
+            ref_elem.addprevious(new_elem)
+            return
+
+    # Look backward for an element to insert after
+    for past_tag, past_name in reversed(source_order[:my_idx]):
+        ref_elem = None
+        if past_tag == "string":
+            ref_elem = existing_strings.get(past_name)
+        elif past_tag == "string-array":
+            ref_elem = existing_arrays.get(past_name)
+        elif past_tag == "plurals":
+            ref_elem = existing_plurals.get(past_name)
+
+        if ref_elem is not None:
+            ref_elem.addnext(new_elem)
+            return
+
+    # Nothing found, append at end
+    root.append(new_elem)
+
 # ============================================================================
 # File Discovery
 # ============================================================================
@@ -1077,10 +1378,13 @@ def _merge_into_existing(
 def find_source_files(repo_root: Path, exclude_dirs: FrozenSet[str]) -> List[Path]:
     """Find all source strings.xml files in the repository."""
     paths: List[Path] = []
-    patterns = [
-        "src/*/res/values/strings.xml",
-        "src/*/composeResources/values/strings.xml",
-    ]
+    resource_filenames = ("strings.xml", "arrays.xml")
+    patterns = []
+
+    for fname in resource_filenames:
+            patterns.append(f"src/*/res/values/{fname}")
+            patterns.append(f"src/*/composeResources/values/{fname}")
+
     for pat in patterns:
         for p in repo_root.rglob(pat):
             if any(part in exclude_dirs for part in p.parts):
@@ -1099,7 +1403,7 @@ def get_target_path(source_xml: Path, locale: str) -> Path:
         raise ValueError(f"Invalid locale: {locale}")
     values_dir = source_xml.parent
     parent = values_dir.parent
-    return parent / f"values-{locale}" / "strings.xml"
+    return parent / f"values-{locale}" / source_xml.name
 
 
 def get_module_name(source_path: Path) -> str:
@@ -1142,6 +1446,11 @@ CRITICAL RULES — FOLLOW EXACTLY:
 
 4. KEYS:
    - Every input key must appear exactly once in the output.
+   - Keys may contain __item_N (array items) or __plural_QUANTITY
+   - (plural forms) suffixes — translate the TEXT only, never the key.
+
+5. PLURALS: For __plural_one, __plural_other, __plural_few, etc.,
+   use the grammatically correct plural form for the target language.
 
 5. WHITESPACE:
    - Preserve leading and trailing spaces if present in the original.
@@ -1328,33 +1637,50 @@ def process_locale(
     config: Config,
     translator: Optional[GeminiTranslator],
     snapshot: Dict[str, str],
-    source_entries: List[StringEntry],
+    source_resources: SourceResources,
 ) -> LocaleResult:
     """Process translations for a single source file and locale."""
     target_xml = get_target_path(source_xml, locale)
     result = LocaleResult(locale=locale, source_path=source_xml, target_path=target_xml)
 
-    result.total_source = len(source_entries)
+    result.total_source = source_resources.total_count
 
-    if not source_entries:
+
+    if source_resources.is_empty:
         logger.warning(f"No translatable strings in {source_xml}")
         return result
 
-    existing_keys = read_existing_keys(target_xml)
-    result.already_translated = len(existing_keys & {e.key for e in source_entries})
+
+    all_flat = source_resources.all_flat_entries()
+    all_flat_keys = {e.key for e in all_flat}
+
+    existing = read_existing_keys_full(target_xml)
+
+    existing_flat_keys: Set[str] = set(existing.strings)
+
+    for arr in source_resources.string_arrays:
+        if arr.key in existing.string_arrays:
+            for fe in arr.flat_entries():
+                existing_flat_keys.add(fe.key)
+    for plu in source_resources.plurals:
+        if plu.key in existing.plurals:
+            for fe in plu.flat_entries():
+                existing_flat_keys.add(fe.key)
+
+    result.already_translated = len(existing_flat_keys & all_flat_keys)
 
     # Find missing entries (new keys not yet translated)
-    missing_entries = [e for e in source_entries if e.key not in existing_keys]
+    missing_entries  = [e for e in all_flat if e.key not in existing_flat_keys]
 
-    # Find changed entries (source text modified since last translation)
-    changed_entries = find_changed_entries(source_entries, snapshot, existing_keys)
-    result.changed_count = len(changed_entries)
+    # Changed entries
+    changed_entries  = find_changed_resources(source_resources, snapshot, existing)
+    result.changed_count = len(changed_entries )
 
     # Combine both lists
     entries_to_translate = missing_entries + changed_entries
 
     if not entries_to_translate:
-        logger.info(f"  [{locale}] All {result.total_source} strings up to date")
+        logger.info(f"  [{locale}] All {result.total_source} items up to date")
         return result
 
     # Log what needs translation
@@ -1432,10 +1758,10 @@ def process_locale(
 
     if translations:
         try:
-            written = write_translations(
+            written = write_translations_full(
                 target_xml=target_xml,
                 translations=translations,
-                source_entries=entries_to_translate,
+                source_resources=source_resources,
                 source_xml=source_xml,
                 validate=config.validate_output,
                 warn_unknown_tags=config.warn_unknown_tags,
@@ -1472,10 +1798,12 @@ def process_all(config: Config) -> ProcessingResult:
         snapshot = load_snapshot(snapshot_path)
 
         # Read source entries once per source file
-        source_entries = read_source_strings(source_xml)
+        source_resources = read_source_resources(source_xml)
 
         # Determine if snapshot needs update
-        snapshot_needs_update = _snapshot_needs_update(snapshot, source_entries)
+        snapshot_needs_update = _snapshot_needs_update_full(
+            snapshot, source_resources
+        )
 
         if snapshot_needs_update and snapshot:
             logger.debug(f"  Source strings changed since last snapshot")
@@ -1485,7 +1813,7 @@ def process_all(config: Config) -> ProcessingResult:
 
         for locale in config.locales:
             locale_result = process_locale(
-                source_xml, locale, config, translator, snapshot, source_entries
+                source_xml, locale, config, translator, snapshot, source_resources
             )
             result.locale_results.append(locale_result)
 
@@ -1511,7 +1839,7 @@ def process_all(config: Config) -> ProcessingResult:
                 save_reason = "Created"
 
         if should_save_snapshot:
-            save_snapshot(snapshot_path, source_entries)
+            save_snapshot_full(snapshot_path, source_resources)
             logger.info(f"  {save_reason} snapshot: {snapshot_path.name}")
 
     return result

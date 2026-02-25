@@ -1,5 +1,6 @@
 dependencyResolutionManagement {
     repositories {
+        mavenLocal() // For local development with kmp-product-flavors
         google()
         mavenCentral()
         gradlePluginPortal()

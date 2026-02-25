@@ -54,6 +54,7 @@ spotlessVersion = "7.0.2"
 turbine = "1.2.1"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
+kmpProductFlavors = "1.0.0"
 
 # Kotlin KMP Dependencies
 kotlin = "2.2.21"
@@ -251,6 +252,7 @@ kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+kmpProductFlavors-gradlePlugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
 
 ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktorVersion" }
 ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktorVersion" }

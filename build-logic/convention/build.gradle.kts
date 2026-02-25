@@ -32,6 +32,8 @@ dependencies {
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
+    // KMP Product Flavors - for cross-platform flavor support
+    implementation(libs.kmpProductFlavors.gradlePlugin)
 }
 
 tasks {
@@ -89,6 +91,11 @@ gradlePlugin {
         register("kmpLibrary") {
             id = "org.convention.kmp.library"
             implementationClass = "KMPLibraryConventionPlugin"
+        }
+        register("kmpFlavors") {
+            id = "org.convention.kmp.flavors"
+            implementationClass = "KMPFlavorsConventionPlugin"
+            description = "Configures KMP Product Flavors for cross-platform flavor support"
         }
 
         register("kmpCoreBaseLibrary") {

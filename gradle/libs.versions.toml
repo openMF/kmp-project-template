@@ -369,6 +369,7 @@ aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "abo
 cmp-feature-convention = { id = "org.convention.cmp.feature", version = "unspecified" }
 kmp-koin-convention = { id = "org.convention.kmp.koin", version = "unspecified" }
 kmp-library-convention = { id = "org.convention.kmp.library", version = "unspecified" }
+kmp-flavors-convention = { id = "org.convention.kmp.flavors", version = "unspecified" }
 kmp-core-base-library-convention = { id = "org.convention.kmp.core.base.library", version = "unspecified" }
 
 android-application-firebase = { id = "org.convention.android.application.firebase" }

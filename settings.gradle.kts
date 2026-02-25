@@ -1,7 +1,6 @@
 pluginManagement {
     includeBuild("build-logic")
     repositories {
-        mavenLocal() // For local development with kmp-product-flavors
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -17,7 +16,6 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
-        mavenLocal() // For local development with kmp-product-flavors
         google {
             content {
                 includeGroupByRegex("com\\.android.*")

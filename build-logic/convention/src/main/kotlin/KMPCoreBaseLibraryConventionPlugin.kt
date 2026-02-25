@@ -11,6 +11,9 @@ import org.gradle.kotlin.dsl.dependencies
 
 /**
  * Plugin that applies the Android library and Kotlin multiplatform plugins and configures them.
+ *
+ * This plugin includes KMP Product Flavors support for cross-platform flavor configuration
+ * that aligns with Android application flavors (demo/prod).
  */
 class KMPCoreBaseLibraryConventionPlugin: Plugin<Project> {
     override fun apply(target: Project) {
@@ -19,6 +22,7 @@ class KMPCoreBaseLibraryConventionPlugin: Plugin<Project> {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.convention.kmp.koin")
+                apply("org.convention.kmp.flavors") // KMP cross-platform flavors
                 apply("org.convention.detekt.plugin")
                 apply("org.jetbrains.kotlin.plugin.serialization")
                 apply("org.jetbrains.kotlin.plugin.parcelize")

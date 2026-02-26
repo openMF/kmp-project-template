@@ -1954,10 +1954,6 @@ def process_all(config: Config) -> ProcessingResult:
             elif snapshot_needs_update:
                 should_save_snapshot = True
                 save_reason = "Synced"
-        elif config.mode == "check":
-            if not snapshot:
-                should_save_snapshot = True
-                save_reason = "Created"
 
         if should_save_snapshot:
             save_snapshot_full(snapshot_path, source_resources)

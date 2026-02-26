@@ -104,6 +104,8 @@ SNAPSHOT_DIR_NAME = ".translation_snapshots"
 PLACEHOLDER_PATTERNS = [
     r"%%",
     r"%n",
+    r"\\n",
+    r"\\t",
     r"%(?:\d+\$)?[-+# 0,(]*\d*(?:\.\d+)?[sdbBhHoOxXeEfgGaAcC]",
     r"%(?:\d+\$)?[-+# 0,(]*\d*(?:\.\d+)?t[HIklMSLNpzZsQBbhAaCYyjmdeRTrDFc]",
 ]
@@ -412,14 +414,11 @@ def get_snapshot_path(source_xml: Path, repo_root: Path) -> Path:
 
     if "src" in parts:
         src_index = parts.index("src")
-        # Module root is everything before "src"
         module_root = Path(*parts[:src_index])
-        # Relative path from module root (including "src")
         relative_parts = parts[src_index:]
         safe_name = "_".join(relative_parts)
         return module_root / ".translation_snapshots" / f"{safe_name}.json"
 
-    # Fallback: use repo root
     try:
         relative = source_xml.relative_to(repo_root)
         safe_name = str(relative).replace("/", "_").replace("\\", "_")
@@ -511,7 +510,6 @@ def _snapshot_needs_update_full(
 
     current_data = source_resources.all_keys_for_snapshot()
 
-    # Check for any difference
     if set(current_data.keys()) != set(snapshot.keys()):
         return True
 
@@ -847,6 +845,107 @@ def write_translations_full(
     )
 
 
+def _cleanup_orphaned_translations(
+    target_xml: Path,
+    source_resources: SourceResources,
+) -> int:
+    """
+    Remove entries from target file that no longer exist in source.
+    Returns count of removed entries.
+    """
+    if not target_xml.exists():
+        return 0
+
+    try:
+        tree = ET.parse(str(target_xml), parser=XML_PARSER)
+        root = tree.getroot()
+    except ET.XMLSyntaxError:
+        return 0
+
+    source_string_keys: Set[str] = {e.key for e in source_resources.strings}
+    source_array_keys: Set[str] = {a.key for a in source_resources.string_arrays}
+    source_plural_keys: Set[str] = {p.key for p in source_resources.plurals}
+
+
+    elements_to_remove: List[ET._Element] = []
+    removed_names: List[str] = []
+
+    for elem in list(root):
+        if is_comment(elem):
+            continue
+
+        name = elem.get("name")
+        if not name:
+            continue
+
+        if elem.tag == "string":
+            if name not in source_string_keys:
+                elements_to_remove.append(elem)
+                removed_names.append(f"string:{name}")
+
+        elif elem.tag == "string-array":
+            if name not in source_array_keys:
+                elements_to_remove.append(elem)
+                removed_names.append(f"string-array:{name}")
+
+        elif elem.tag == "plurals":
+            if name not in source_plural_keys:
+                elements_to_remove.append(elem)
+                removed_names.append(f"plurals:{name}")
+
+    if not elements_to_remove:
+        return 0
+
+    for elem in elements_to_remove:
+        _remove_element_and_orphaned_comments(root, elem)
+
+    _normalize_resource_whitespace(root)
+
+    children = list(root)
+    if children:
+        for child in reversed(children):
+            if not is_comment(child):
+                if not child.tail or not child.tail.endswith("\n"):
+                    child.tail = "\n"
+                break
+
+    ET.cleanup_namespaces(root)
+    tree = ET.ElementTree(root)
+    tree.write(
+        str(target_xml),
+        encoding="utf-8",
+        xml_declaration=True,
+        pretty_print=False,
+    )
+    _fix_xliff_namespaces_in_file(target_xml)
+
+    for name in removed_names:
+        logger.info(f"    ✕ Removed orphaned: {name}")
+
+    return len(elements_to_remove)
+
+def _remove_element_and_orphaned_comments(
+    root: ET._Element, elem: ET._Element
+) -> None:
+    """
+    Remove element AND any preceding comments that would become orphaned.
+
+    Example: if removing the last string under <!-- Section --> comment,
+    remove the comment too.
+    """
+    parent = elem.getparent()
+    if parent is None:
+        return
+
+    prev = elem.getprevious()
+
+    _remove_element_preserve_whitespace(root, elem)
+
+    if prev is not None and is_comment(prev):
+        next_sibling = prev.getnext()
+        if next_sibling is None or is_comment(next_sibling):
+            _remove_element_preserve_whitespace(root, prev)
+
 def _create_from_source_full(
     target_xml: Path,
     translations: Dict[str, str],
@@ -884,7 +983,6 @@ def _create_from_source_full(
         if not name:
             continue
 
-        # Keep non-translatable as-is
         if elem.get("translatable", "true").lower() == "false":
             continue
 
@@ -942,6 +1040,8 @@ def _create_from_source_full(
     for elem in elements_to_remove:
         _remove_element_preserve_whitespace(root, elem)
 
+    _normalize_resource_whitespace(root)
+
     ET.cleanup_namespaces(root)
     tree = ET.ElementTree(root)
     tree.write(str(target_xml), encoding="utf-8",
@@ -979,6 +1079,18 @@ def _fix_xliff_namespaces_in_file(target_xml: Path) -> None:
         content
     )
 
+    content = re.sub(
+            r'(-->)\s*(<resources)',
+            r'\1\n\2',
+            content
+        )
+
+    content = re.sub(
+            r'(\?>)\s*(<resources)',
+            r'\1\n\2',
+            content
+        )
+
     # Copyright header template
     copyright_header = '''<!--
     Copyright 2026 Mifos Initiative
@@ -990,60 +1102,66 @@ def _fix_xliff_namespaces_in_file(target_xml: Path) -> None:
     See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->'''
 
-    # Add copyright header if missing (check for "Copyright" in a comment)
     if '<!-- ' not in content or 'Copyright' not in content:
-        # Insert copyright header after XML declaration
         content = re.sub(
             r'(<\?xml[^?]*\?>)\s*(<resources)',
             rf'\1\n{copyright_header}\n\2',
             content
         )
 
-    # Find all ns# prefixes that might be used for xliff
     ns_pattern = re.compile(r'xmlns:(ns\d+)="urn:oasis:names:tc:xliff:document:1\.2"')
     ns_matches = ns_pattern.findall(content)
 
     for ns_prefix in set(ns_matches):
-        # Replace the prefix in tags
         content = content.replace(f'<{ns_prefix}:', '<xliff:')
         content = content.replace(f'</{ns_prefix}:', '</xliff:')
-        # Remove inline namespace declarations
         content = re.sub(
             rf'\s*xmlns:{ns_prefix}="urn:oasis:names:tc:xliff:document:1\.2"',
             '',
             content
         )
 
-    # Ensure xliff namespace is declared at root if xliff: tags are present
     if 'xliff:' in content and 'xmlns:xliff=' not in content:
-        # Add xliff namespace declaration to the resources tag
         content = content.replace(
             '<resources',
             '<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2"',
             1
         )
 
-    # Only rewrite if changes were made
     if content != original_content:
         target_xml.write_text(content, encoding='utf-8')
 
 
 def _remove_element_preserve_whitespace(root: ET._Element, elem: ET._Element) -> None:
-    """Remove element while preserving surrounding whitespace structure."""
+    """Remove element and clean up associated whitespace to prevent empty line buildup."""
     parent = elem.getparent()
     if parent is None:
         return
 
     prev = elem.getprevious()
+    next_sib = elem.getnext()
 
-    # Transfer tail to previous sibling or parent.text
-    if elem.tail:
-        if prev is not None:
-            prev.tail = (prev.tail or "") + elem.tail
+    if prev is not None:
+        if next_sib is not None:
+            prev.tail = "\n    "
         else:
-            parent.text = (parent.text or "") + elem.tail
+            prev.tail = "\n"
+    else:
+        if next_sib is not None:
+            parent.text = "\n    "
+        else:
+            parent.text = "\n"
 
     parent.remove(elem)
+
+
+def _normalize_resource_whitespace(root: ET._Element) -> None:
+    """Collapse multiple consecutive blank lines in element tail/text whitespace."""
+    if root.text:
+        root.text = re.sub(r'\n{3,}', '\n\n', root.text)
+    for child in root:
+        if child.tail:
+            child.tail = re.sub(r'\n{3,}', '\n\n', child.tail)
 
 
 def _merge_all_into_existing(
@@ -1065,9 +1183,8 @@ def _merge_all_into_existing(
     """
     # ── Build lookup maps ──────────────────────────────────────
 
-    # Flat key -> which resource type and base key
-    array_items_map: Dict[str, Tuple[str, int]] = {}      # flat_key -> (array_name, index)
-    plural_items_map: Dict[str, Tuple[str, str]] = {}     # flat_key -> (plural_name, quantity)
+    array_items_map: Dict[str, Tuple[str, int]] = {}
+    plural_items_map: Dict[str, Tuple[str, str]] = {}
     string_keys: Set[str] = set()
 
     for flat_key in translations:
@@ -1080,15 +1197,13 @@ def _merge_all_into_existing(
         else:
             string_keys.add(flat_key)
 
-    # Group array items by array name
-    array_translations: Dict[str, Dict[int, str]] = {}    # array_name -> {index: text}
+    array_translations: Dict[str, Dict[int, str]] = {}
     for flat_key, (arr_name, idx) in array_items_map.items():
         if arr_name not in array_translations:
             array_translations[arr_name] = {}
         array_translations[arr_name][idx] = translations[flat_key]
 
-    # Group plural items by plural name
-    plural_translations: Dict[str, Dict[str, str]] = {}   # plural_name -> {quantity: text}
+    plural_translations: Dict[str, Dict[str, str]] = {}
     for flat_key, (plu_name, quantity) in plural_items_map.items():
         if plu_name not in plural_translations:
             plural_translations[plu_name] = {}
@@ -1115,8 +1230,8 @@ def _merge_all_into_existing(
 
     # ── Build source ordering ──────────────────────────────────
 
-    source_order: List[Tuple[str, str]] = []  # (tag, name) preserving source order
-    source_comments: Dict[int, List[str]] = {}  # index -> preceding comment texts
+    source_order: List[Tuple[str, str]] = []
+    source_comments: Dict[int, List[str]] = {}
     current_comments: List[str] = []
 
     for elem in source_root:
@@ -1146,7 +1261,6 @@ def _merge_all_into_existing(
         entry = entry_map.get(key)
 
         if key in existing_string_elems:
-            # Update existing
             node = existing_string_elems[key]
             node.text = None
             for child in list(node):
@@ -1154,7 +1268,6 @@ def _merge_all_into_existing(
             set_mixed_string_value(node, value, key=key, warn_unknown_tags=warn_unknown_tags)
             written += 1
         elif entry:
-            # Add new string
             attrs = entry.get_propagated_attributes()
             node = ET.Element("string", **attrs)
             set_mixed_string_value(node, value, key=key, warn_unknown_tags=warn_unknown_tags)
@@ -1175,13 +1288,11 @@ def _merge_all_into_existing(
             continue
 
         if arr_name in existing_array_elems:
-            # Update existing array items
             arr_elem = existing_array_elems[arr_name]
             item_nodes = list(arr_elem.iter("item"))
 
             for idx, value in item_translations.items():
                 if idx < len(item_nodes):
-                    # Update existing item
                     item_node = item_nodes[idx]
                     item_node.text = None
                     for child in list(item_node):
@@ -1193,7 +1304,6 @@ def _merge_all_into_existing(
                     )
                     written += 1
         else:
-            # Create new string-array from source structure
             source_arr_elem = None
             for elem in source_root:
                 if elem.tag == "string-array" and elem.get("name") == arr_name:
@@ -1233,7 +1343,6 @@ def _merge_all_into_existing(
             continue
 
         if plu_name in existing_plural_elems:
-            # Update existing plural items
             plu_elem = existing_plural_elems[plu_name]
 
             for item_node in plu_elem.iter("item"):
@@ -1250,7 +1359,6 @@ def _merge_all_into_existing(
                     )
                     written += 1
         else:
-            # Create new plurals from source structure
             source_plu_elem = None
             for elem in source_root:
                 if elem.tag == "plurals" and elem.get("name") == plu_name:
@@ -1328,18 +1436,15 @@ def _insert_at_source_position(
     Insert element at the correct position matching source file ordering.
     Falls back to appending at end if no reference point found.
     """
-    # Find this element's position in source order
     try:
         my_idx = next(
             i for i, (t, n) in enumerate(source_order)
             if t == tag and n == name
         )
     except StopIteration:
-        # Not found in source order, append at end
         root.append(new_elem)
         return
 
-    # Look forward in source order for an existing element to insert before
     for future_tag, future_name in source_order[my_idx + 1:]:
         ref_elem = None
         if future_tag == "string":
@@ -1350,10 +1455,10 @@ def _insert_at_source_position(
             ref_elem = existing_plurals.get(future_name)
 
         if ref_elem is not None:
+            new_elem.tail = "\n    "
             ref_elem.addprevious(new_elem)
             return
 
-    # Look backward for an element to insert after
     for past_tag, past_name in reversed(source_order[:my_idx]):
         ref_elem = None
         if past_tag == "string":
@@ -1364,10 +1469,34 @@ def _insert_at_source_position(
             ref_elem = existing_plurals.get(past_name)
 
         if ref_elem is not None:
+            new_elem.tail = ref_elem.tail
+            ref_elem.tail = "\n    "
             ref_elem.addnext(new_elem)
             return
 
-    # Nothing found, append at end
+    _append_with_indent(root, new_elem)
+
+def _append_with_indent(root: ET._Element, new_elem: ET._Element) -> None:
+    """Append element to root with proper indentation."""
+    children = list(root)
+    if children:
+        last_child = None
+        for child in reversed(children):
+            if not is_comment(child):
+                last_child = child
+                break
+
+        if last_child is not None:
+            new_elem.tail = last_child.tail
+            last_child.tail = "\n    "
+        else:
+            new_elem.tail = "\n"
+    else:
+        # First child
+        if not root.text or not root.text.strip() == "":
+            root.text = "\n    "
+        new_elem.tail = "\n"
+
     root.append(new_elem)
 
 # ============================================================================
@@ -1650,6 +1779,10 @@ def process_locale(
         logger.warning(f"No translatable strings in {source_xml}")
         return result
 
+    if config.mode == "apply":
+        removed_count = _cleanup_orphaned_translations(target_xml, source_resources)
+        if removed_count > 0:
+            logger.info(f"  [{locale}] Removed {removed_count} orphaned translation(s)")
 
     all_flat = source_resources.all_flat_entries()
     all_flat_keys = {e.key for e in all_flat}
@@ -1669,21 +1802,17 @@ def process_locale(
 
     result.already_translated = len(existing_flat_keys & all_flat_keys)
 
-    # Find missing entries (new keys not yet translated)
     missing_entries  = [e for e in all_flat if e.key not in existing_flat_keys]
 
-    # Changed entries
     changed_entries  = find_changed_resources(source_resources, snapshot, existing)
     result.changed_count = len(changed_entries )
 
-    # Combine both lists
     entries_to_translate = missing_entries + changed_entries
 
     if not entries_to_translate:
         logger.info(f"  [{locale}] All {result.total_source} items up to date")
         return result
 
-    # Log what needs translation
     log_parts = []
     if missing_entries:
         log_parts.append(f"{len(missing_entries)} new")
@@ -1695,7 +1824,6 @@ def process_locale(
         f"strings need translation ({', '.join(log_parts)})"
     )
 
-    # Log changed strings details
     if changed_entries and config.mode == "apply":
         for entry in changed_entries:
             logger.info(f"    ↻ {entry.key} (source text changed)")
@@ -1793,14 +1921,11 @@ def process_all(config: Config) -> ProcessingResult:
     for source_xml in sources:
         logger.info(f"\nProcessing: {source_xml}")
 
-        # Load snapshot once per source file
         snapshot_path = get_snapshot_path(source_xml, config.repo_root)
         snapshot = load_snapshot(snapshot_path)
 
-        # Read source entries once per source file
         source_resources = read_source_resources(source_xml)
 
-        # Determine if snapshot needs update
         snapshot_needs_update = _snapshot_needs_update_full(
             snapshot, source_resources
         )
@@ -1808,7 +1933,6 @@ def process_all(config: Config) -> ProcessingResult:
         if snapshot_needs_update and snapshot:
             logger.debug(f"  Source strings changed since last snapshot")
 
-        # Track if any translations were made for this source file
         source_had_translations = False
 
         for locale in config.locales:
@@ -1820,7 +1944,6 @@ def process_all(config: Config) -> ProcessingResult:
             if locale_result.newly_translated > 0:
                 source_had_translations = True
 
-        # Determine if we should save snapshot
         should_save_snapshot = False
         save_reason = ""
 
@@ -1832,8 +1955,6 @@ def process_all(config: Config) -> ProcessingResult:
                 should_save_snapshot = True
                 save_reason = "Synced"
         elif config.mode == "check":
-            # In check mode, create snapshot if it doesn't exist
-            # This enables change detection for future runs
             if not snapshot:
                 should_save_snapshot = True
                 save_reason = "Created"

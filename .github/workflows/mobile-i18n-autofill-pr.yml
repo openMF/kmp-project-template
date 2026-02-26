@@ -1,13 +1,32 @@
 name: Mobile i18n Autofill (bot PR)
 
 on:
+  workflow_dispatch:
+    inputs:
+      locales:
+        description: 'Comma-separated locale codes to translate'
+        required: false
+        default: 'ar,bn,de,en,es,fa,fr,gu,hi,hu,id,km,kn,ml,mr,ms,my,pl,pt,ru,si,sw,te,ur'
+        type: string
+      model:
+        description: 'Gemini model to use for translation'
+        required: false
+        default: 'gemma-3-27b-it'
+        type: string
+      batch-size:
+        description: 'Number of strings per translation batch'
+        required: false
+        default: '15'
+        type: string
+      repo-root:
+        description: 'Module root to scope translation (e.g. ./feature/settings)'
+        required: false
+        default: '.'
+        type: string
+
   pull_request:
+    types: [labeled]
     branches: [dev]
-    paths:
-      - 'cmp-android/**'
-      - 'feature/**'
-      - '.github/workflows/mobile-i18n-autofill-pr.yml'
-      - 'translate.py'
 
 permissions:
   contents: write
@@ -15,15 +34,24 @@ permissions:
 
 jobs:
   i18n-autofill:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.label.name == 'needs-translation'
     runs-on: ubuntu-latest
+
+    env:
+      LOCALES: ${{ inputs.locales || 'ar,bn,de,en,es,fa,fr,gu,hi,hu,id,km,kn,ml,mr,ms,my,pl,pt,ru,si,sw,te,ur' }}
+      MODEL: ${{ inputs.model || 'gemma-3-27b-it' }}
+      BATCH_SIZE: ${{ inputs.batch-size || '15' }}
+      REPO_ROOT: ${{ inputs.repo-root || '.' }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK 21
@@ -48,9 +76,10 @@ jobs:
         run: |
           python translate.py \
             --mode apply \
-            --locales "ar,bn,de,en,es,fa,fr,gu,hi,hu,id,km,kn,ml,mr,ms,my,pl,pt,ru,si,sw,te,ur" \
-            --model "gemma-3-27b-it" \
-            --batch-size 15
+            --repo-root "$REPO_ROOT" \
+            --locales "$LOCALES" \
+            --model "$MODEL" \
+            --batch-size $BATCH_SIZE
 
       - name: Validate Android resources compile
         run: |
@@ -61,12 +90,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           
-          git add cmp-android/ feature/
+          git add cmp-android/ cmp-navigation/ feature/
           
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-generate mobile i18n translations"
-            # Since we checked out the fork, 'origin' is now the fork repo.
-            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+            git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
           else
             echo "No changes to commit."
           fi

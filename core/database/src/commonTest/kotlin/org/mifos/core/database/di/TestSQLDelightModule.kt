@@ -11,11 +11,13 @@ package org.mifos.core.database.di
 
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import org.mifos.core.database.MifosSQLDelightDatabase
 import org.mifos.core.database.repository.SQLDelightSampleRepositoryImpl
 import org.mifos.core.database.repository.SampleRepository
 
 val TestSQLDelightModule = module {
     includes(testSQLDelightPlatformModule)
+    single<MifosSQLDelightDatabase> { MifosSQLDelightDatabase(get()) }
     single<SampleRepository> { SQLDelightSampleRepositoryImpl(get()) }
 }
 

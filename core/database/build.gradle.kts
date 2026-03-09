@@ -1,4 +1,15 @@
 /*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+import org.gradle.kotlin.dsl.invoke
+
+/*
  * Copyright 2025 Mifos Initiative
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,13 +30,57 @@ android {
     namespace = "org.mifos.core.database"
 }
 
+fun isInstalled(binary: String) = try {
+    Runtime.getRuntime().exec(arrayOf("which", binary)).waitFor() == 0
+} catch (e: Exception) {
+    false
+}
+
 kotlin {
+    js(IR) {
+        browser {
+            testTask {
+                useKarma {
+                    when {
+                        isInstalled("brave") || isInstalled("brave-browser") -> useChrome()
+                        isInstalled("firefox") -> useFirefox()
+                        else -> useChrome()
+                    }
+                }
+                if (isInstalled("brave") && !isInstalled("google-chrome")) {
+                    environment("CHROME_BIN", "brave")
+                }
+            }
+        }
+    }
+    wasmJs {
+        browser {
+            testTask {
+                useKarma {
+                    when {
+                        isInstalled("brave") || isInstalled("brave-browser") -> useChrome()
+                        isInstalled("firefox") -> useFirefox()
+                        else -> useChrome()
+                    }
+                }
+                if (isInstalled("brave") && !isInstalled("google-chrome")) {
+                    environment("CHROME_BIN", "brave")
+                }
+            }
+        }
+    }
     sourceSets {
         val desktopMain by getting
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqldelight.runtime)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.androidx.core)
+            implementation(libs.sqldelight.sqlite.driver)
+            implementation(libs.robolectric)
+            implementation(libs.androidx.test.ext.junit)
         }
 
         nativeMain.dependencies {
@@ -51,6 +106,9 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             api(projects.core.common)
             api(projects.coreBase.database)
+        }
+        commonTest.dependencies {
+            implementation(libs.turbine)
         }
     }
 }

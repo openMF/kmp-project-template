@@ -19,12 +19,11 @@ import org.mifos.core.data.repository.UserLogoutManager
 import org.mifos.core.data.repositoryImpl.NetworkMonitorImpl
 import org.mifos.core.data.repositoryImpl.UserDataRepositoryImpl
 import org.mifos.core.data.repositoryImpl.UserLogoutManagerImpl
-import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import template.core.base.common.di.CommonModule
 
 val DataModule = module {
-    includes(platformModule, CommonModule, DatastoreModule, DatabaseModule)
+    includes(platformModule, CommonModule, DatastoreModule)
 
     singleOf(::NetworkMonitorImpl) bind NetworkMonitor::class
     singleOf(::UserDataRepositoryImpl) bind UserDataRepository::class

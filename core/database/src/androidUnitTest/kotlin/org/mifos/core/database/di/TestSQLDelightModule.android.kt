@@ -9,19 +9,21 @@
  */
 package org.mifos.core.database.di
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.database.MifosSQLDelightDatabase
 
 actual val testSQLDelightPlatformModule: Module = module {
-    factory<SqlDriver> {
+    single<SqlDriver> {
+        val context = ApplicationProvider.getApplicationContext<Context>()
         AndroidSqliteDriver(
             MifosSQLDelightDatabase.Schema.synchronous(),
-            androidContext(),
+            context,
             null,
         )
     }

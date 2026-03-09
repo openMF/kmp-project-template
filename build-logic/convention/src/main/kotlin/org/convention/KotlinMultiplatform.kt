@@ -23,7 +23,8 @@ internal fun Project.configureKotlinMultiplatform() {
         iosX64()
         iosArm64()
         js(IR) {
-            this.nodejs()
+            browser()
+            nodejs()
             binaries.executable()
         }
         wasmJs() {

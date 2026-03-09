@@ -17,10 +17,10 @@ import org.koin.dsl.module
 import org.mifos.core.database.MifosSQLDelightDatabase
 
 actual val testSQLDelightPlatformModule: Module = module {
-    factory<SqlDriver> {
+    single<SqlDriver> {
         NativeSqliteDriver(
             MifosSQLDelightDatabase.Schema.synchronous(),
-            DB_FILE_NAME,
+            ":memory:",
         )
     }
 }

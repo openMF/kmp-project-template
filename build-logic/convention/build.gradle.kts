@@ -30,6 +30,7 @@ dependencies {
     compileOnly(libs.spotless.gradle)
     implementation(libs.truth)
     compileOnly(libs.androidx.room.gradle.plugin)
+    compileOnly(libs.sqldelight.gradlePlugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
 }
@@ -125,5 +126,10 @@ gradlePlugin {
             description = "Configures Room for the project"
         }
 
+        register("KMPSQLDelight") {
+            id = "mifos.kmp.sqldelight"
+            implementationClass = "KMPSQLDelightConventionPlugin"
+            description = "Configures SQLDelight for the project"
+        }
     }
 }

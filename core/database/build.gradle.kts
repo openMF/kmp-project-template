@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.mifos.kmp.room)
+    alias(libs.plugins.mifos.kmp.sqldelight)
 }
 
 android {
@@ -24,18 +25,27 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.androidx.room.runtime)
+            implementation(libs.sqldelight.runtime)
         }
 
         nativeMain.dependencies {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.sqldelight.runtime)
         }
 
         desktopMain.dependencies {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
-        }
+            implementation(libs.sqldelight.runtime)
 
+        }
+        jsCommonMain.dependencies {
+            implementation(libs.sqldelight.runtime)
+            implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.2.1"))
+            implementation(npm("sql.js", "1.10.3"))
+            implementation(devNpm("copy-webpack-plugin", "12.0.2"))
+        }
         commonMain.dependencies {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)

@@ -1,0 +1,13 @@
+CREATE TABLE  sample(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+selectAll:
+SELECT * FROM sample;
+
+insertSample:
+INSERT OR REPLACE INTO sample (name) VALUES (:name);
+
+deleteById:
+DELETE FROM sample WHERE id = :id;

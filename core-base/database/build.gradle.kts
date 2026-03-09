@@ -7,6 +7,7 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+import org.gradle.declarative.dsl.schema.FqName.Empty.packageName
 import org.jetbrains.compose.compose
 
 /*
@@ -28,6 +29,7 @@ android {
 
 kotlin {
     sourceSets {
+
         androidMain.dependencies {
             implementation(libs.androidx.room.runtime)
         }
@@ -39,7 +41,6 @@ kotlin {
         nativeMain.dependencies {
             implementation(libs.androidx.room.runtime)
         }
-
         nonJsCommonMain.dependencies {
             implementation(libs.androidx.room.runtime)
         }

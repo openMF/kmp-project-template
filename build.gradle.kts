@@ -44,6 +44,7 @@ plugins {
     alias(libs.plugins.ktrofit) apply false
 
     alias(libs.plugins.room) apply false
+    alias(libs.plugins.sqldelight) apply false
 }
 
 object DynamicVersion {

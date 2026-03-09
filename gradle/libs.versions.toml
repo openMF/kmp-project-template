@@ -111,6 +111,8 @@ androidPackageNamespace = "cmp.android.app"
 room = "2.8.4"
 sqliteBundled = "2.6.2"
 
+sqldelight = "2.2.1"
+
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
@@ -329,6 +331,18 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
 
+# SQLDelight — Core
+sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
+sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
+sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
+sqldelight-gradlePlugin = { group = "app.cash.sqldelight", name = "gradle-plugin", version.ref = "sqldelight" }
+
+# SQLDelight — Platform Drivers
+sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+sqldelight-web-worker-driver = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
+
 [bundles]
 androidx-compose-ui-test = [
     "androidx-compose-ui-test",
@@ -388,3 +402,7 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 #Room Plugin
 room = { id = "androidx.room", version.ref = "room" }
 mifos-kmp-room = { id = "mifos.kmp.room", version = "unspecified" }
+
+#SQLDelight Plugins
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
+mifos-kmp-sqldelight = { id = "mifos.kmp.sqldelight", version = "unspecified" }

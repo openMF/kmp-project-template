@@ -10,12 +10,21 @@
 package org.mifos.core.database.di
 
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.mifos.core.database.AppDatabase
+import org.mifos.core.database.repository.SQLDelightSampleRepositoryImpl
+import org.mifos.core.database.repository.SampleRepository
+
 
 val DatabaseModule = module {
-    includes(platformModule)
+    includes(
+        platformModule,
+        sqlDelightModule,
+    )
     single { get<AppDatabase>().sampleDao }
+    singleOf(::SQLDelightSampleRepositoryImpl).bind<SampleRepository>()
 }
 
 expect val platformModule: Module

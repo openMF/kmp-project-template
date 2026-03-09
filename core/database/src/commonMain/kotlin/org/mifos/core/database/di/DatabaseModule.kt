@@ -17,7 +17,6 @@ import org.mifos.core.database.AppDatabase
 import org.mifos.core.database.repository.SQLDelightSampleRepositoryImpl
 import org.mifos.core.database.repository.SampleRepository
 
-
 val DatabaseModule = module {
     includes(
         platformModule,

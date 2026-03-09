@@ -19,7 +19,6 @@ import org.mifos.core.database.di.TestSQLDelightModule
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-
 @RunWith(AndroidJUnit4::class)
 class SQLDelightRepositoryAndroidTest : SQLDelightRepositoryTest() {
 

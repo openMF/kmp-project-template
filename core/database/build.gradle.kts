@@ -30,8 +30,11 @@ android {
     namespace = "org.mifos.core.database"
 }
 
+val isWindows = System.getProperty("os.name").lowercase().contains("win")
+
 fun isInstalled(binary: String) = try {
-    Runtime.getRuntime().exec(arrayOf("which", binary)).waitFor() == 0
+    val command = if (isWindows) arrayOf("where", binary) else arrayOf("which", binary)
+    Runtime.getRuntime().exec(command).waitFor() == 0
 } catch (e: Exception) {
     false
 }
@@ -41,14 +44,28 @@ kotlin {
         browser {
             testTask {
                 useKarma {
+                    // Update this block to use your preferred browser for running tests.
                     when {
+                        isInstalled("google-chrome") || isInstalled("chrome") -> useChrome()
+                        isInstalled("chromium") || isInstalled("chromium-browser") -> useChrome()
                         isInstalled("brave") || isInstalled("brave-browser") -> useChrome()
+                        isInstalled("microsoft-edge") || isInstalled("microsoft-edge-stable") || isInstalled("msedge") -> useChrome()
                         isInstalled("firefox") -> useFirefox()
+                        isInstalled("opera") -> useOpera()
+                        isInstalled("safari") -> useSafari()
                         else -> useChrome()
                     }
                 }
-                if (isInstalled("brave") && !isInstalled("google-chrome")) {
-                    environment("CHROME_BIN", "brave")
+                if (!isInstalled("google-chrome") && !isInstalled("chrome")) {
+                    when {
+                        isInstalled("chromium") -> environment("CHROME_BIN", "chromium")
+                        isInstalled("chromium-browser") -> environment("CHROME_BIN", "chromium-browser")
+                        isInstalled("brave") -> environment("CHROME_BIN", "brave")
+                        isInstalled("brave-browser") -> environment("CHROME_BIN", "brave-browser")
+                        isInstalled("microsoft-edge") -> environment("CHROME_BIN", "microsoft-edge")
+                        isInstalled("microsoft-edge-stable") -> environment("CHROME_BIN", "microsoft-edge-stable")
+                        isInstalled("msedge") -> environment("CHROME_BIN", "msedge")
+                    }
                 }
             }
         }
@@ -57,14 +74,28 @@ kotlin {
         browser {
             testTask {
                 useKarma {
+                    // Update this block to use your preferred browser for running tests.
                     when {
-                        isInstalled("brave") || isInstalled("brave-browser") -> useChrome()
+                        isInstalled("google-chrome") || isInstalled("chrome") -> useChrome()
+                        isInstalled("chromium") || isInstalled("chromium-browser") -> useChrome()
+                        isInstalled("microsoft-edge") || isInstalled("microsoft-edge-stable") || isInstalled("msedge") -> useChrome()
                         isInstalled("firefox") -> useFirefox()
+                        isInstalled("brave") || isInstalled("brave-browser") -> useChrome()
+                        isInstalled("opera") -> useOpera()
+                        isInstalled("safari") -> useSafari()
                         else -> useChrome()
                     }
                 }
-                if (isInstalled("brave") && !isInstalled("google-chrome")) {
-                    environment("CHROME_BIN", "brave")
+                if (!isInstalled("google-chrome") && !isInstalled("chrome")) {
+                    when {
+                        isInstalled("chromium") -> environment("CHROME_BIN", "chromium")
+                        isInstalled("chromium-browser") -> environment("CHROME_BIN", "chromium-browser")
+                        isInstalled("brave") -> environment("CHROME_BIN", "brave")
+                        isInstalled("brave-browser") -> environment("CHROME_BIN", "brave-browser")
+                        isInstalled("microsoft-edge") -> environment("CHROME_BIN", "microsoft-edge")
+                        isInstalled("microsoft-edge-stable") -> environment("CHROME_BIN", "microsoft-edge-stable")
+                        isInstalled("msedge") -> environment("CHROME_BIN", "msedge")
+                    }
                 }
             }
         }

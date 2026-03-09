@@ -103,8 +103,6 @@ abstract class SQLDelightRepositoryTest {
         repository.insertSample("Alice")
         repository.insertSample("Alice")
 
-        // INSERT OR REPLACE with AUTOINCREMENT — no UNIQUE constraint on name,
-        // so both rows are kept as distinct entries with different ids.
         repository.getAllSamples().test {
             assertEquals(2, awaitItem().size)
             cancelAndIgnoreRemainingEvents()

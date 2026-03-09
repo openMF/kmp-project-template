@@ -19,9 +19,7 @@ import org.mifos.core.database.di.TestSQLDelightModule
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-// Overrides the Koin startup from the common base class to inject the Android
-// application context required by AndroidSqliteDriver. All test cases are
-// inherited from SQLDelightRepositoryTest (commonTest).
+
 @RunWith(AndroidJUnit4::class)
 class SQLDelightRepositoryAndroidTest : SQLDelightRepositoryTest() {
 

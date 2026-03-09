@@ -21,7 +21,7 @@ class KMPSQLDelightConventionPlugin : Plugin<Project> {
                     schemaOutputDirectory.set(
                         file("$projectDir/schemas")
                     )
-                    verifyMigrations.set(false)
+                    verifyMigrations.set(true)
                 }
             }
 

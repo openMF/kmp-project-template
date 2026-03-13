@@ -106,6 +106,8 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
+            implementation(libs.sqldelight.primitive.adapters)
         }
         androidUnitTest.dependencies {
             implementation(libs.androidx.core)
@@ -118,15 +120,22 @@ kotlin {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
+            implementation(libs.sqldelight.primitive.adapters)
         }
 
         desktopMain.dependencies {
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
+            implementation(libs.sqldelight.primitive.adapters)
 
         }
         jsMain.dependencies {
+            implementation(libs.kotlinx.coroutines.js)
+            implementation(libs.sqldelight.coroutines)
+            implementation(libs.sqldelight.primitive.adapters)
             implementation(libs.sqldelight.runtime)
             implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.2.1"))
             implementation(npm("sql.js", "1.10.3"))
@@ -134,6 +143,7 @@ kotlin {
         }
         wasmJsMain.dependencies {
             implementation(libs.sqldelight.runtime)
+            implementation(libs.sqldelight.coroutines)
             implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.2.1"))
             implementation(npm("sql.js", "1.10.3"))
             implementation(devNpm("copy-webpack-plugin", "12.0.2"))

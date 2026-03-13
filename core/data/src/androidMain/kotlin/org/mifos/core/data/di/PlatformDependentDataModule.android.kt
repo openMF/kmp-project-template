@@ -22,7 +22,5 @@ import template.core.base.common.di.CommonModule
 actual val platformModule: Module = module {
     includes(CommonModule)
 
-    single<Context> { androidContext() }
-
     singleOf(::TimeZoneMonitorImpl) bind TimeZoneMonitor::class
 }

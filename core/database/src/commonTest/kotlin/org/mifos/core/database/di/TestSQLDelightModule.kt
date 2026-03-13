@@ -9,6 +9,9 @@
  */
 package org.mifos.core.database.di
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.database.MifosSQLDelightDatabase
@@ -17,6 +20,7 @@ import org.mifos.core.database.repository.SampleRepository
 
 val TestSQLDelightModule = module {
     includes(testSQLDelightPlatformModule)
+    single<CoroutineScope> {CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     single<MifosSQLDelightDatabase> { MifosSQLDelightDatabase(get()) }
     single<SampleRepository> { SQLDelightSampleRepositoryImpl(get()) }
 }

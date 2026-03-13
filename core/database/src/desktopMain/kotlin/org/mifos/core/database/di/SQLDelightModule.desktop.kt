@@ -15,6 +15,7 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.database.MifosSQLDelightDatabase
+import java.io.File
 import java.util.Properties
 
 actual val driverModule: Module = module {
@@ -22,6 +23,10 @@ actual val driverModule: Module = module {
         JdbcSqliteDriver(
             "jdbc:sqlite:$DB_FILE_NAME",
             properties = Properties().apply { put("foreign_keys", "true") },
-        ).also { MifosSQLDelightDatabase.Schema.synchronous() }
+        ).also { driver ->
+            if (!File(DB_FILE_NAME).exists() || File(DB_FILE_NAME).length() == 0L) {
+                MifosSQLDelightDatabase.Schema.create(driver)
+            }
+        }
     }
 }

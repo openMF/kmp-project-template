@@ -12,20 +12,19 @@ package org.mifos.core.database.di
 import app.cash.sqldelight.async.coroutines.awaitCreate
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.worker.createDefaultWebWorkerDriver
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.dsl.module
 import org.mifos.core.database.MifosSQLDelightDatabase
 
-internal var schemaInitJob: Job? = null
 
 actual val testSQLDelightPlatformModule = module {
     single<SqlDriver> {
-        createDefaultWebWorkerDriver().also { driver ->
-            schemaInitJob = MainScope().launch {
-                MifosSQLDelightDatabase.Schema.awaitCreate(driver)
-            }
+        val scope = get<CoroutineScope>()
+        val driver = createDefaultWebWorkerDriver()
+        scope.launch {
+            MifosSQLDelightDatabase.Schema.awaitCreate(driver)
         }
+        driver
     }
 }

@@ -17,8 +17,6 @@ import kotlinx.coroutines.launch
 import org.koin.dsl.module
 import org.mifos.core.database.MifosSQLDelightDatabase
 
-
-
 @OptIn(ExperimentalWasmJsInterop::class)
 actual val testSQLDelightPlatformModule = module {
     single<SqlDriver> {

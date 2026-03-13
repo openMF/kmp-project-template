@@ -20,7 +20,7 @@ import org.mifos.core.database.repository.SampleRepository
 
 val TestSQLDelightModule = module {
     includes(testSQLDelightPlatformModule)
-    single<CoroutineScope> {CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     single<MifosSQLDelightDatabase> { MifosSQLDelightDatabase(get()) }
     single<SampleRepository> { SQLDelightSampleRepositoryImpl(get()) }
 }

@@ -9,8 +9,6 @@
  */
 package org.mifos.core.data.di
 
-import android.content.Context
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind

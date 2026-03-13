@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import org.koin.dsl.module
 import org.mifos.core.database.MifosSQLDelightDatabase
 
-
 actual val testSQLDelightPlatformModule = module {
     single<SqlDriver> {
         val scope = get<CoroutineScope>()

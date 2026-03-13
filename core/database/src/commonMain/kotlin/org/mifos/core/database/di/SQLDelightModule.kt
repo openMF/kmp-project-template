@@ -20,7 +20,7 @@ const val DB_FILE_NAME = "mifos-sqldelight-database.db"
 
 val sqlDelightModule: Module = module {
     includes(driverModule)
-    single<CoroutineScope> {CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
     single<MifosSQLDelightDatabase> {
         MifosSQLDelightDatabase(get())
     }

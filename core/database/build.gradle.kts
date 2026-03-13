@@ -126,7 +126,13 @@ kotlin {
             implementation(libs.sqldelight.runtime)
 
         }
-        jsCommonMain.dependencies {
+        jsMain.dependencies {
+            implementation(libs.sqldelight.runtime)
+            implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.2.1"))
+            implementation(npm("sql.js", "1.10.3"))
+            implementation(devNpm("copy-webpack-plugin", "12.0.2"))
+        }
+        wasmJsMain.dependencies {
             implementation(libs.sqldelight.runtime)
             implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.2.1"))
             implementation(npm("sql.js", "1.10.3"))
@@ -143,3 +149,15 @@ kotlin {
         }
     }
 }
+tasks.register("checkSourceSets") {
+    doLast {
+        kotlin.sourceSets.forEach { ss ->
+            println("SourceSet: ${ss.name}")
+            ss.dependsOn.forEach { dep ->
+                println("  dependsOn: ${dep.name}")
+            }
+        }
+    }
+}
+kotlin.sourceSets.all { println("SourceSet: $name") }
+println("jsMain depends on: " + kotlin.sourceSets.getByName("jsMain").dependsOn.map { it.name })

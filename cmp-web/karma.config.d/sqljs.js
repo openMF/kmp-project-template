@@ -1,20 +1,32 @@
 const path = require("path");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
+const os = require("os");
+const wasm = require.resolve("sql.js/dist/sql-wasm.wasm").replace(/\\/g, "/");
 
-config.set({
-    webpack: {
-        plugins: [
-            new CopyWebpackPlugin({
-                patterns: [
-                    {
-                        from: path.resolve(
-                            __dirname,
-                            "../node_modules/sql.js/dist/sql-wasm.wasm"
-                        ),
-                        to: path.resolve(__dirname, "../kotlin/"),
-                    },
-                ],
-            }),
-        ],
-    },
+config.files.push({
+  pattern: wasm,
+  served: true,
+  watched: false,
+  included: false,
+  nocache: false,
 });
+
+if (!config.proxies) {
+  config.proxies = {};
+}
+config.proxies["/sql-wasm.wasm"] = `/absolute${wasm}`
+
+// Adapted from: https://github.com/ryanclark/karma-webpack/issues/498#issuecomment-790040818
+const output = {
+  path: path.join(os.tmpdir(), '_karma_webpack_') + Math.floor(Math.random() * 1000000),
+}
+config.set({
+  webpack: {...config.webpack, output}
+});
+config.files.push({
+  pattern: `${output.path}/**/*`,
+  watched: false,
+  included: false,
+});
+
+// TODO: Figure out why on earth this is necessary. Presumably a karma-webpack bug???
+delete config.webpack.optimization;

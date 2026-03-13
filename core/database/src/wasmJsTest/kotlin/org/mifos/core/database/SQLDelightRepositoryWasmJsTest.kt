@@ -9,4 +9,13 @@
  */
 package org.mifos.core.database
 
-class SQLDelightRepositoryWasmJsTest : SQLDelightRepositoryTest()
+import kotlinx.coroutines.test.runTest
+import org.mifos.core.database.di.schemaInitJob
+import kotlin.test.BeforeTest
+
+class SQLDelightRepositoryWasmJsTest : SQLDelightRepositoryTest() {
+    @BeforeTest
+    fun awaitSchemaCreation() = runTest {
+        schemaInitJob?.join()
+    }
+}

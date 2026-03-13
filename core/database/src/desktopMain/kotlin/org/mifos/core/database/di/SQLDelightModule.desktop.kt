@@ -9,6 +9,7 @@
  */
 package org.mifos.core.database.di
 
+import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import org.koin.core.module.Module
@@ -21,6 +22,6 @@ actual val driverModule: Module = module {
         JdbcSqliteDriver(
             "jdbc:sqlite:$DB_FILE_NAME",
             properties = Properties().apply { put("foreign_keys", "true") },
-        ).also { MifosSQLDelightDatabase.Schema.create(it) }
+        ).also { MifosSQLDelightDatabase.Schema.synchronous() }
     }
 }

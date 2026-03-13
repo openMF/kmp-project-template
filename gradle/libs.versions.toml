@@ -5,7 +5,7 @@ androidGradlePlugin = "8.12.3"
 androidTools = "31.12.3"
 
 commonsCodec = "1.20.0"
-core = "1.7.0"
+androidxCore = "1.7.0"
 firebaseBom = "34.7.0"
 firebaseCrashlyticsPlugin = "3.0.6"
 firebasePerfPlugin = "2.0.2"
@@ -113,7 +113,6 @@ room = "2.8.4"
 sqliteBundled = "2.6.2"
 
 sqldelight = "2.2.1"
-coreKtx = "1.7.0"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -136,7 +135,7 @@ androidx-compose-material-iconsExtended = { group = "androidx.compose.material",
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 
-androidx-core = { module = "androidx.test:core", version.ref = "core" }
+androidx-core = { module = "androidx.test:core", version.ref = "androidxCore" }
 androidx-work-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidxWork" }
 androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "androidxWork" }
 
@@ -345,7 +344,6 @@ sqldelight-android-driver = { module = "app.cash.sqldelight:android-driver", ver
 sqldelight-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-sqlite-driver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-web-worker-driver = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtx" }
 
 [bundles]
 androidx-compose-ui-test = [

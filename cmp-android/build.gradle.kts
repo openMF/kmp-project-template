@@ -18,7 +18,6 @@ plugins {
     alias(libs.plugins.baselineprofile)
     alias(libs.plugins.roborazzi)
     alias(libs.plugins.aboutLibraries)
-    alias(libs.plugins.keystore.management)
     alias(libs.plugins.ksp)
     alias(libs.plugins.dokka)
 }

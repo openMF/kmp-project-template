@@ -2,7 +2,6 @@ package org.convention
 
 import org.gradle.api.Project
 import org.jetbrains.dokka.gradle.DokkaExtension
-import org.jetbrains.dokka.gradle.DokkaTask
 
 /**
  * Configures Dokka and suppresses non-allowed modules.

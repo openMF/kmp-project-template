@@ -49,7 +49,7 @@ plugins {
 
 dokka {
     dokkaPublications.html {
-        outputDirectory.set(layout.buildDirectory.dir("$rootDir/docs-website/static/api"))
+        outputDirectory.set(layout.buildDirectory.dir("$rootDir/docs/docs-api/"))
     }
 }
 

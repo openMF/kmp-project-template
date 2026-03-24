@@ -44,6 +44,7 @@ plugins {
     alias(libs.plugins.ktrofit) apply false
 
     alias(libs.plugins.room) apply false
+    alias(libs.plugins.baselineprofile) apply false
 }
 
 object DynamicVersion {

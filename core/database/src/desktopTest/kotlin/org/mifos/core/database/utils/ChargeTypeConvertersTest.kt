@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.core.database.utils
 
@@ -19,7 +19,7 @@ class ChargeTypeConvertersTest {
     private val converters = ChargeTypeConverters()
 
     @Test
-    fun intList_roundTrip_preservesData() {
+    fun intListRoundTripPreservesData() {
         val original = arrayListOf<Int?>(1, 2, 3, null, 5)
         val json = converters.toIntList(original)
         val restored = converters.fromIntList(json)
@@ -27,7 +27,7 @@ class ChargeTypeConvertersTest {
     }
 
     @Test
-    fun intList_emptyList_roundTrips() {
+    fun intListEmptyListRoundTrips() {
         val original = arrayListOf<Int?>()
         val json = converters.toIntList(original)
         val restored = converters.fromIntList(json)
@@ -35,7 +35,7 @@ class ChargeTypeConvertersTest {
     }
 
     @Test
-    fun intList_allNulls_roundTrips() {
+    fun intListAllNullsRoundTrips() {
         val original = arrayListOf<Int?>(null, null, null)
         val json = converters.toIntList(original)
         val restored = converters.fromIntList(json)
@@ -43,7 +43,7 @@ class ChargeTypeConvertersTest {
     }
 
     @Test
-    fun sampleEntity_roundTrip_preservesData() {
+    fun sampleEntityRoundTripPreservesData() {
         val original = SampleEntity(id = 42, name = "Test Entity")
         val json = converters.fromSampleEntity(original)
         val restored = converters.toSampleEntity(json)
@@ -51,13 +51,13 @@ class ChargeTypeConvertersTest {
     }
 
     @Test
-    fun sampleEntity_nullInput_returnsNull() {
+    fun sampleEntityNullInputReturnsNull() {
         assertNull(converters.fromSampleEntity(null))
         assertNull(converters.toSampleEntity(null))
     }
 
     @Test
-    fun sampleEntity_defaultValues_roundTrips() {
+    fun sampleEntityDefaultValuesRoundTrips() {
         val original = SampleEntity()
         val json = converters.fromSampleEntity(original)
         val restored = converters.toSampleEntity(json)

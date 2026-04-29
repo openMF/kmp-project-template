@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.core.database
 
@@ -27,7 +27,7 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun inMemoryDatabase_canBeCreated() {
+    fun inMemoryDatabaseCanBeCreated() {
         database = Room.inMemoryDatabaseBuilder<AppDatabase>()
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
@@ -37,7 +37,7 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun database_exposeSampleDao() {
+    fun databaseExposeSampleDao() {
         database = Room.inMemoryDatabaseBuilder<AppDatabase>()
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
@@ -47,12 +47,12 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun databaseVersion_isOne() {
+    fun databaseVersionIsOne() {
         assertEquals(1, AppDatabase.VERSION)
     }
 
     @Test
-    fun databaseName_isCorrect() {
+    fun databaseNameIsCorrect() {
         assertEquals("mifos_database.db", AppDatabase.DATABASE_NAME)
     }
 }

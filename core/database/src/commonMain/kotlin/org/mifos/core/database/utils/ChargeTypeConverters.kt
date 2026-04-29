@@ -9,9 +9,9 @@
  */
 package org.mifos.core.database.utils
 
+import androidx.room3.TypeConverter
 import kotlinx.serialization.json.Json
 import org.mifos.core.database.entity.SampleEntity
-import androidx.room3.TypeConverter
 
 /**
  * Room 3 [TypeConverter] collection for JSON-backed column types.

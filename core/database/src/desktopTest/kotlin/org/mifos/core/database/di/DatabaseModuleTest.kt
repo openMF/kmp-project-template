@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.core.database.di
 
@@ -35,19 +35,19 @@ class DatabaseModuleTest : KoinTest {
     }
 
     @Test
-    fun testDatabaseModule_providesAppDatabase() {
+    fun databaseModuleProvidesAppDatabase() {
         val database: AppDatabase = get()
         assertNotNull(database)
     }
 
     @Test
-    fun testDatabaseModule_providesSampleDao() {
+    fun databaseModuleProvidesSampleDao() {
         val dao: SampleDao = get()
         assertNotNull(dao)
     }
 
     @Test
-    fun testDatabaseModule_sampleDaoComesFromDatabase() {
+    fun sampleDaoComesFromDatabase() {
         val database: AppDatabase = get()
         val dao: SampleDao = get()
         assertNotNull(database.sampleDao)

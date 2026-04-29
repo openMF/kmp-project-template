@@ -9,12 +9,12 @@
  */
 package org.mifos.core.database.dao
 
-import kotlinx.coroutines.flow.Flow
-import org.mifos.core.database.entity.SampleEntity
 import androidx.room3.Dao
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
+import kotlinx.coroutines.flow.Flow
+import org.mifos.core.database.entity.SampleEntity
 
 /**
  * Data-access object for the `samples` table.

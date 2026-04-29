@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.core.database.dao
 
@@ -42,7 +42,7 @@ class SampleDaoTest {
     }
 
     @Test
-    fun getAllSamples_emptyDatabase_returnsEmptyList() = runTest {
+    fun getAllSamplesFromEmptyDatabaseReturnsEmptyList() = runTest {
         sampleDao.getAllSamples().test {
             val result = awaitItem()
             assertTrue(result.isEmpty())
@@ -51,7 +51,7 @@ class SampleDaoTest {
     }
 
     @Test
-    fun insertSample_singleEntity_returnedByGetAll() = runTest {
+    fun insertSingleEntityReturnedByGetAll() = runTest {
         val entity = SampleEntity(id = 1, name = "Test Sample")
 
         sampleDao.insertSample(listOf(entity))
@@ -66,7 +66,7 @@ class SampleDaoTest {
     }
 
     @Test
-    fun insertSample_multipleEntities_allReturnedByGetAll() = runTest {
+    fun insertMultipleEntitiesAllReturnedByGetAll() = runTest {
         val entities = listOf(
             SampleEntity(id = 1, name = "First"),
             SampleEntity(id = 2, name = "Second"),
@@ -86,7 +86,7 @@ class SampleDaoTest {
     }
 
     @Test
-    fun insertSample_duplicateId_replacesExisting() = runTest {
+    fun insertDuplicateIdReplacesExisting() = runTest {
         val original = SampleEntity(id = 1, name = "Original")
         val replacement = SampleEntity(id = 1, name = "Replaced")
 
@@ -102,7 +102,7 @@ class SampleDaoTest {
     }
 
     @Test
-    fun insertSample_emptyList_noEffect() = runTest {
+    fun insertEmptyListHasNoEffect() = runTest {
         sampleDao.insertSample(emptyList())
 
         sampleDao.getAllSamples().test {
@@ -113,7 +113,7 @@ class SampleDaoTest {
     }
 
     @Test
-    fun getAllSamples_emitsUpdatesOnInsert() = runTest {
+    fun getAllSamplesEmitsUpdatesOnInsert() = runTest {
         sampleDao.getAllSamples().test {
             // Initial empty state
             assertEquals(0, awaitItem().size)

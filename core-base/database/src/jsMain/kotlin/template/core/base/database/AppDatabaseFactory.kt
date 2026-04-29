@@ -12,8 +12,21 @@ package template.core.base.database
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 
+/**
+ * JS (Kotlin/JS) factory for creating Room 3 database instances.
+ *
+ * Uses the browser's Origin Private File System (OPFS) for persistence via the
+ * `sqlite-web` driver. The [databaseName] is used as the OPFS file name.
+ */
 class AppDatabaseFactory {
 
+    /**
+     * Creates a [RoomDatabase.Builder] for the given database type.
+     *
+     * @param T The concrete [RoomDatabase] subclass.
+     * @param databaseName OPFS file name for the database.
+     * @return A pre-configured builder.
+     */
     inline fun <reified T : RoomDatabase> createDatabase(
         databaseName: String,
     ): RoomDatabase.Builder<T> {

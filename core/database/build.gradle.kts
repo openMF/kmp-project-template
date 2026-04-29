@@ -30,5 +30,12 @@ kotlin {
             api(projects.core.common)
             api(projects.coreBase.database)
         }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+            implementation(libs.koin.test)
+        }
     }
 }

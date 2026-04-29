@@ -13,8 +13,25 @@ import androidx.room3.Room
 import androidx.room3.RoomDatabase
 import java.io.File
 
+/**
+ * Desktop (JVM) factory for creating Room 3 database instances.
+ *
+ * Resolves the database path to the OS-appropriate application data directory:
+ * - **Windows**: `%APPDATA%/MifosDatabase/`
+ * - **macOS**: `~/Library/Application Support/MifosDatabase/`
+ * - **Linux**: `~/.local/share/MifosDatabase/`
+ */
 class AppDatabaseFactory {
 
+    /**
+     * Creates a [RoomDatabase.Builder] for the given database type.
+     *
+     * Automatically creates parent directories if they don't exist.
+     *
+     * @param T The concrete [RoomDatabase] subclass.
+     * @param databaseName On-disk file name for the database.
+     * @return A pre-configured builder.
+     */
     inline fun <reified T : RoomDatabase> createDatabase(
         databaseName: String,
     ): RoomDatabase.Builder<T> {
@@ -25,6 +42,12 @@ class AppDatabaseFactory {
         )
     }
 
+    /**
+     * Resolves the full filesystem path for the database file.
+     *
+     * Visibility is `@PublishedApi internal` because it is called from the
+     * `inline` [createDatabase] function but should not be part of the public API.
+     */
     @PublishedApi
     internal fun getDatabasePath(databaseName: String): File {
         val os = System.getProperty("os.name").lowercase()

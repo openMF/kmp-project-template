@@ -13,6 +13,17 @@ import kotlinx.serialization.Serializable
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 
+/**
+ * Persistent entity for the `samples` table.
+ *
+ * Uses Room 3 annotations from `androidx.room3` — works on all KMP targets.
+ * The class is also [@Serializable][Serializable] so it can be used with
+ * [ChargeTypeConverters][org.mifos.core.database.utils.ChargeTypeConverters]
+ * for JSON serialization in type-converter columns.
+ *
+ * @property id Auto-generated primary key.
+ * @property name Human-readable sample name.
+ */
 @Entity(tableName = "samples")
 @Serializable
 data class SampleEntity(

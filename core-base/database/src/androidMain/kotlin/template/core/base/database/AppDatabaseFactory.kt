@@ -13,10 +13,25 @@ import android.content.Context
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 
+/**
+ * Android-specific factory for creating Room 3 database instances.
+ *
+ * Uses the application [Context] to resolve the platform database directory.
+ *
+ * @param context Android application context used for database path resolution.
+ */
 class AppDatabaseFactory(
     private val context: Context,
 ) {
 
+    /**
+     * Creates a [RoomDatabase.Builder] for the given database type.
+     *
+     * @param T The concrete [RoomDatabase] subclass (e.g., `AppDatabase`).
+     * @param databaseName On-disk file name for the database.
+     * @return A pre-configured builder — callers should chain `.setDriver()`,
+     *   `.setQueryCoroutineContext()`, and `.build()`.
+     */
     inline fun <reified T : RoomDatabase> createDatabase(
         databaseName: String,
     ): RoomDatabase.Builder<T> {

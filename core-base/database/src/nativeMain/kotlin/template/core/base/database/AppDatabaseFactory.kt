@@ -16,8 +16,21 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
+/**
+ * Native (iOS/macOS) factory for creating Room 3 database instances.
+ *
+ * Stores the database in the app's `NSDocumentDirectory`, which is the standard
+ * location for user-generated data on Apple platforms.
+ */
 class AppDatabaseFactory {
 
+    /**
+     * Creates a [RoomDatabase.Builder] for the given database type.
+     *
+     * @param T The concrete [RoomDatabase] subclass.
+     * @param databaseName On-disk file name for the database.
+     * @return A pre-configured builder.
+     */
     inline fun <reified T : RoomDatabase> createDatabase(
         databaseName: String,
     ): RoomDatabase.Builder<T> {
@@ -27,6 +40,11 @@ class AppDatabaseFactory {
         )
     }
 
+    /**
+     * Returns the absolute path to the app's document directory on Apple platforms.
+     *
+     * @throws IllegalArgumentException if the document directory cannot be resolved.
+     */
     @OptIn(ExperimentalForeignApi::class)
     fun documentDirectory(): String {
         val documentDirectory = NSFileManager.defaultManager.URLForDirectory(

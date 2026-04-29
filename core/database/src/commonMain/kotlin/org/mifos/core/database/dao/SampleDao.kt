@@ -16,12 +16,31 @@ import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.Query
 
+/**
+ * Data-access object for the `samples` table.
+ *
+ * All functions are either `suspend` (one-shot write operations) or return a [Flow]
+ * (observable reads), as required by Room 3 for multiplatform compatibility.
+ */
 @Dao
 interface SampleDao {
 
+    /**
+     * Observes all rows in the `samples` table.
+     *
+     * @return A [Flow] that emits the full list of [SampleEntity] whenever the table changes.
+     */
     @Query("SELECT * FROM samples")
     fun getAllSamples(): Flow<List<SampleEntity>>
 
+    /**
+     * Inserts or replaces a batch of [SampleEntity] rows.
+     *
+     * Uses [OnConflictStrategy.REPLACE] so that rows with duplicate primary keys are
+     * overwritten rather than causing a constraint violation.
+     *
+     * @param charge The list of entities to upsert.
+     */
     @Insert(entity = SampleEntity::class, onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSample(charge: List<SampleEntity>)
 }

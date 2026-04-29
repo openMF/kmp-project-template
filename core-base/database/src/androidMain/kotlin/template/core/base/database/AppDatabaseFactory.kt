@@ -21,7 +21,7 @@ import androidx.room3.RoomDatabase
  * @param context Android application context used for database path resolution.
  */
 class AppDatabaseFactory(
-    private val context: Context,
+    @PublishedApi internal val context: Context,
 ) {
 
     /**

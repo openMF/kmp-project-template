@@ -20,20 +20,8 @@ android {
 
 kotlin {
     sourceSets {
-        val desktopMain by getting
         androidMain.dependencies {
             implementation(libs.koin.android)
-            implementation(libs.androidx.room.runtime)
-        }
-
-        nativeMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
-        }
-
-        desktopMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
         }
 
         commonMain.dependencies {

@@ -56,13 +56,13 @@ twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
 
 # Kotlin KMP Dependencies
-kotlin = "2.2.21"
+kotlin = "2.3.20"
 kotlinInject = "0.7.2"
 kotlinxCoroutines = "1.10.2"
 kotlinxDatetime = "0.7.1"
 kotlinxImmutable = "0.4.0"
 kotlinxSerializationJson = "1.9.0"
-ksp = "2.2.21-2.0.4"
+ksp = "2.3.6"
 
 # Ktor & Ktorfit
 ktorVersion = "3.3.3"
@@ -75,7 +75,7 @@ koinAnnotationsVersion = "2.1.0"
 connectivity = "2.3.0"
 
 # CMP Libraries
-compose-plugin = "1.9.3"
+compose-plugin = "1.10.3"
 coil = "3.3.0"
 backHandlerVersion = "2.5.0"
 constraintLayout = "0.6.0"
@@ -85,12 +85,12 @@ qroseVersion = "1.0.1"
 okioVersion = "3.16.4"
 kermit = "2.0.8"
 fileKit = "0.12.0"
-uiBackhandler = "1.9.3"
+uiBackhandler = "1.10.3"
 wire = "5.4.0"
 
 # Jetbrains CMP
 windowsSizeClass = "0.5.0"
-composeJB = "1.9.3"
+composeJB = "1.10.3"
 composeLifecycle = "2.9.6"
 composeNavigation = "2.9.1"
 jbCoreBundle = "1.0.1"
@@ -107,9 +107,10 @@ desktopPackageVersion = "1.0.0"
 # Android Version
 androidPackageNamespace = "cmp.android.app"
 
-#Room
-room = "2.8.4"
+#Room 3
+room = "3.0.0-alpha03"
 sqliteBundled = "2.6.2"
+sqliteWeb = "2.6.2"
 
 [libraries]
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -152,15 +153,15 @@ androidx-metrics = { group = "androidx.metrics", name = "metrics-performance", v
 
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidxProfileinstaller" }
 
-androidx-room-gradle-plugin = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
+androidx-room-gradle-plugin = { module = "androidx.room3:room3-gradle-plugin", version.ref = "room" }
 commons-codec = { module = "commons-codec:commons-codec", version.ref = "commonsCodec" }
 firebase-crashlytics-gradlePlugin = { group = "com.google.firebase", name = "firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsPlugin" }
 firebase-performance-gradlePlugin = { group = "com.google.firebase", name = "perf-plugin", version.ref = "firebasePerfPlugin" }
 
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room" }
 androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqliteBundled" }
+androidx-sqlite-web = { module = "androidx.sqlite:sqlite-web", version.ref = "sqliteWeb" }
 
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 androidx-tracing-ktx = { group = "androidx.tracing", name = "tracing-ktx", version.ref = "androidxTracing" }
@@ -385,6 +386,6 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 
-#Room Plugin
-room = { id = "androidx.room", version.ref = "room" }
+#Room 3 Plugin
+room = { id = "androidx.room3", version.ref = "room" }
 mifos-kmp-room = { id = "mifos.kmp.room", version = "unspecified" }

@@ -9,20 +9,16 @@
  */
 package template.core.base.database
 
-import android.content.Context
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 
-class AppDatabaseFactory(
-    private val context: Context,
-) {
+class AppDatabaseFactory {
 
     inline fun <reified T : RoomDatabase> createDatabase(
         databaseName: String,
     ): RoomDatabase.Builder<T> {
         return Room.databaseBuilder<T>(
-            context = context.applicationContext,
-            name = context.getDatabasePath(databaseName).absolutePath,
+            name = databaseName,
         )
     }
 }

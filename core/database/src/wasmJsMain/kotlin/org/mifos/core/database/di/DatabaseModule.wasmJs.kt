@@ -9,8 +9,19 @@
  */
 package org.mifos.core.database.di
 
+import kotlinx.coroutines.Dispatchers
+import org.koin.core.module.Module
 import org.koin.dsl.module
+import org.mifos.core.database.AppDatabase
+import template.core.base.database.AppDatabaseFactory
 
-actual val platformModule = module {
-    // EMPTY — no DB on WasmJs
+actual val platformModule: Module = module {
+    single {
+        AppDatabaseFactory()
+            .createDatabase<AppDatabase>(
+                databaseName = AppDatabase.DATABASE_NAME,
+            )
+            .setQueryCoroutineContext(Dispatchers.Default)
+            .build()
+    }
 }

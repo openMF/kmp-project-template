@@ -11,10 +11,10 @@ package org.mifos.core.database.dao
 
 import kotlinx.coroutines.flow.Flow
 import org.mifos.core.database.entity.SampleEntity
-import template.core.base.database.Dao
-import template.core.base.database.Insert
-import template.core.base.database.OnConflictStrategy
-import template.core.base.database.Query
+import androidx.room3.Dao
+import androidx.room3.Insert
+import androidx.room3.OnConflictStrategy
+import androidx.room3.Query
 
 @Dao
 interface SampleDao {

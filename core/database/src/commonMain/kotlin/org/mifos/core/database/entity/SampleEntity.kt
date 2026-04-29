@@ -10,17 +10,10 @@
 package org.mifos.core.database.entity
 
 import kotlinx.serialization.Serializable
-import template.core.base.database.Entity
-import template.core.base.database.PrimaryKey
+import androidx.room3.Entity
+import androidx.room3.PrimaryKey
 
-@Entity(
-    tableName = "samples",
-    indices = [],
-    inheritSuperIndices = false,
-    primaryKeys = [],
-    foreignKeys = [],
-    ignoredColumns = [],
-)
+@Entity(tableName = "samples")
 @Serializable
 data class SampleEntity(
     @PrimaryKey(autoGenerate = true)

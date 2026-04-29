@@ -11,7 +11,7 @@ package org.mifos.core.database.utils
 
 import kotlinx.serialization.json.Json
 import org.mifos.core.database.entity.SampleEntity
-import template.core.base.database.TypeConverter
+import androidx.room3.TypeConverter
 
 class ChargeTypeConverters {
 

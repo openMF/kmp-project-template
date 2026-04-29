@@ -9,25 +9,18 @@
  */
 package org.mifos.core.database.di
 
-import android.content.Context
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
-import kotlinx.coroutines.CoroutineDispatcher
+import androidx.room3.Room
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.Module
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import org.mifos.core.common.di.AppDispatchers
 import org.mifos.core.database.AppDatabase
-import kotlin.coroutines.CoroutineContext
 
 actual val testPlatformModule: Module = module {
-    val context = ApplicationProvider.getApplicationContext<Context>()
     factory<AppDatabase> {
-        Room.inMemoryDatabaseBuilder(
-            context = context,
-            AppDatabase::class.java,
-        )
-            .setQueryCoroutineContext(get<CoroutineDispatcher>(named(AppDispatchers.IO.name)) as CoroutineContext)
+        Room.inMemoryDatabaseBuilder<AppDatabase>()
+            .setDriver(BundledSQLiteDriver())
+            .setQueryCoroutineContext(Dispatchers.IO)
             .build()
     }
 }

@@ -62,7 +62,7 @@ kmp-project-template/
 **Frameworks:**
 - Compose Multiplatform (UI framework for all platforms)
 - Ktor (networking)
-- Room (database)
+- Room 3 (database)
 - Koin (dependency injection)
 
 **CI/CD:**

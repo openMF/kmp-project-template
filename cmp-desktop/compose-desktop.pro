@@ -163,4 +163,4 @@
     private ** descriptor;
 }
 
--keep class * extends androidx.room.RoomDatabase { <init>(); }
+-keep class * extends androidx.room3.RoomDatabase { <init>(); }

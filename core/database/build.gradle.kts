@@ -20,20 +20,8 @@ android {
 
 kotlin {
     sourceSets {
-        val desktopMain by getting
         androidMain.dependencies {
             implementation(libs.koin.android)
-            implementation(libs.androidx.room.runtime)
-        }
-
-        nativeMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
-        }
-
-        desktopMain.dependencies {
-            implementation(libs.androidx.room.runtime)
-            implementation(libs.androidx.sqlite.bundled)
         }
 
         commonMain.dependencies {
@@ -41,6 +29,13 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             api(projects.core.common)
             api(projects.coreBase.database)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+            implementation(libs.koin.test)
         }
     }
 }

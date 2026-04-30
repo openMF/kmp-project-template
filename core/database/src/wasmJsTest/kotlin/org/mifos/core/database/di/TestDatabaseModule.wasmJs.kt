@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 Mifos Initiative
+ * Copyright 2025 Mifos Initiative
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,18 +9,15 @@
  */
 package org.mifos.core.database.di
 
+import androidx.room3.Room
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.database.AppDatabase
-import template.core.base.database.AppDatabaseFactory
 
-actual val platformModule: Module = module {
-    single {
-        AppDatabaseFactory()
-            .createDatabase<AppDatabase>(
-                databaseName = AppDatabase.DATABASE_NAME,
-            )
+actual val testPlatformModule: Module = module {
+    factory<AppDatabase> {
+        Room.inMemoryDatabaseBuilder<AppDatabase>()
             .setQueryCoroutineContext(Dispatchers.Default)
             .build()
     }

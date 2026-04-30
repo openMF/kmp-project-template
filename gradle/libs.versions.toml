@@ -107,6 +107,9 @@ desktopPackageVersion = "1.0.0"
 # Android Version
 androidPackageNamespace = "cmp.android.app"
 
+# Store 5
+store = "5.1.0-alpha08"
+
 #Room 3
 room = "3.0.0-alpha03"
 sqliteBundled = "2.6.2"
@@ -325,6 +328,9 @@ gitlive-firebase-performance = { module = "dev.gitlive:firebase-performance", ve
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
 roborazzi-accessibility-check = { group = "io.github.takahirom.roborazzi", name = "roborazzi-accessibility-check", version.ref = "roborazzi" }
+
+store5 = { group = "org.mobilenativefoundation.store", name = "store5", version.ref = "store" }
+store5-cache = { group = "org.mobilenativefoundation.store", name = "cache5", version.ref = "store" }
 
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }

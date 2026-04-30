@@ -80,6 +80,7 @@ include(":core-base:database")
 include(":core-base:designsystem")
 include(":core-base:network")
 include(":core-base:platform")
+include(":core-base:store")
 include(":core-base:ui")
 
 check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {

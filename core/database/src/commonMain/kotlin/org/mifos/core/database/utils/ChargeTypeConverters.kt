@@ -32,7 +32,7 @@ private const val ENC_PREFIX = "ENC:"
 class ChargeTypeConverters {
 
     companion object {
-        @Volatile
+        @kotlin.concurrent.Volatile
         private var encryptor: FieldEncryptor? = null
 
         /**

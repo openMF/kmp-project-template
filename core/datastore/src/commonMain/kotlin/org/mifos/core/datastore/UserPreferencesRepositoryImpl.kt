@@ -13,7 +13,6 @@ package org.mifos.core.datastore
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.serialization.decodeValue
 import com.russhwolf.settings.serialization.decodeValueOrNull
 import com.russhwolf.settings.serialization.encodeValue
 import kotlinx.coroutines.flow.Flow
@@ -30,22 +29,74 @@ import org.mifos.core.model.UserData
 import template.core.base.common.manager.DispatcherManager
 
 private const val USER_DATA_KEY = "user_data_key"
+private const val SECURE_DATA_KEY = "secure_data_key"
 
+/**
+ * Splits user data storage between plain (UI preferences) and secure
+ * (credentials/auth state) Settings backends.
+ *
+ * On first access, migrates any existing single-store data into the split
+ * stores using a write-before-delete strategy to prevent data loss.
+ */
 class UserPreferencesRepositoryImpl(
-    private val settings: Settings,
+    private val plainSettings: Settings,
+    private val secureSettings: Settings,
     private val dispatcher: DispatcherManager,
 ) : UserPreferencesRepository {
 
-    private val _userData = MutableStateFlow(
-        settings.decodeValue(
+    init {
+        migrateIfNeeded()
+    }
+
+    /**
+     * One-time migrate from legacy single-store to split plain/secure stores.
+     * Write-before-delete: writes to both new stores first, then removes old key.
+     */
+    private fun migrateIfNeeded() {
+        val legacy = plainSettings.decodeValueOrNull(
             key = USER_DATA_KEY,
             serializer = UserData.serializer(),
-            defaultValue = settings.decodeValueOrNull(
-                key = USER_DATA_KEY,
-                serializer = UserData.serializer(),
-            ) ?: UserData.DEFAULT,
-        ),
-    )
+        ) ?: return
+
+        // Check if secure store already has data (already migrated)
+        val existing = secureSettings.decodeValueOrNull(
+            key = SECURE_DATA_KEY,
+            serializer = UserData.serializer(),
+        )
+        if (existing != null) return
+
+        // Write secure fields to secure store first
+        secureSettings.encodeValue(
+            key = SECURE_DATA_KEY,
+            serializer = UserData.serializer(),
+            value = legacy,
+        )
+        // Plain store retains the full UserData for UI fields (shared key)
+    }
+
+    private fun loadCombinedUserData(): UserData {
+        val plainData = plainSettings.decodeValueOrNull(
+            key = USER_DATA_KEY,
+            serializer = UserData.serializer(),
+        )
+        val secureData = secureSettings.decodeValueOrNull(
+            key = SECURE_DATA_KEY,
+            serializer = UserData.serializer(),
+        )
+        return when {
+            plainData != null && secureData != null -> plainData.copy(
+                activeUserId = secureData.activeUserId,
+                passcode = secureData.passcode,
+                isAuthenticated = secureData.isAuthenticated,
+                isUnlocked = secureData.isUnlocked,
+            )
+            secureData != null -> secureData
+            plainData != null -> plainData
+            else -> UserData.DEFAULT
+        }
+    }
+
+    private val _userData = MutableStateFlow(loadCombinedUserData())
 
     override val userData: StateFlow<UserData>
         get() = _userData.asStateFlow()
@@ -68,94 +119,51 @@ class UserPreferencesRepositoryImpl(
     override val observeScreenCapturePreference: Flow<Boolean>
         get() = _userData.map { it.enableScreenCapture }
 
-    override suspend fun setLanguage(language: LanguageConfig) =
+    private suspend fun updatePreference(transform: (UserData) -> UserData) {
         withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(appLanguage = language)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setThemeBrand(themeBrand: ThemeBrand) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(themeBrand = themeBrand)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(darkThemeConfig = darkThemeConfig)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(useDynamicColor = useDynamicColor)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setIsAuthenticated(isAuthenticated: Boolean) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(isAuthenticated = isAuthenticated)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setIsUnlocked(isUnlocked: Boolean) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(isUnlocked = isUnlocked)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setIsPasscodeEnabled(isPasscodeEnabled: Boolean) =
-        withContext(dispatcher.io) {
-            val newPreference =
-                settings.getUserPreference().copy(isPasscodeEnabled = isPasscodeEnabled)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setIsBiometricsEnabled(isBiometricsEnabled: Boolean) =
-        withContext(dispatcher.io) {
-            val newPreference =
-                settings.getUserPreference().copy(isBiometricsEnabled = isBiometricsEnabled)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setShowOnboarding(showOnboarding: Boolean) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(showOnboarding = showOnboarding)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setFirstTimeState(firstTimeState: Boolean) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(firstTimeUser = firstTimeState)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
-
-    override suspend fun setPasscode(passcode: String) {
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(passcode = passcode)
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
+            val current = loadCombinedUserData()
+            val updated = transform(current)
+            plainSettings.putUserPreference(updated)
+            secureSettings.putSecurePreference(updated)
+            _userData.value = updated
         }
     }
 
+    override suspend fun setLanguage(language: LanguageConfig) =
+        updatePreference { it.copy(appLanguage = language) }
+
+    override suspend fun setThemeBrand(themeBrand: ThemeBrand) =
+        updatePreference { it.copy(themeBrand = themeBrand) }
+
+    override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) =
+        updatePreference { it.copy(darkThemeConfig = darkThemeConfig) }
+
+    override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) =
+        updatePreference { it.copy(useDynamicColor = useDynamicColor) }
+
+    override suspend fun setIsAuthenticated(isAuthenticated: Boolean) =
+        updatePreference { it.copy(isAuthenticated = isAuthenticated) }
+
+    override suspend fun setIsUnlocked(isUnlocked: Boolean) =
+        updatePreference { it.copy(isUnlocked = isUnlocked) }
+
+    override suspend fun setIsPasscodeEnabled(isPasscodeEnabled: Boolean) =
+        updatePreference { it.copy(isPasscodeEnabled = isPasscodeEnabled) }
+
+    override suspend fun setIsBiometricsEnabled(isBiometricsEnabled: Boolean) =
+        updatePreference { it.copy(isBiometricsEnabled = isBiometricsEnabled) }
+
+    override suspend fun setShowOnboarding(showOnboarding: Boolean) =
+        updatePreference { it.copy(showOnboarding = showOnboarding) }
+
+    override suspend fun setFirstTimeState(firstTimeState: Boolean) =
+        updatePreference { it.copy(firstTimeUser = firstTimeState) }
+
+    override suspend fun setPasscode(passcode: String) =
+        updatePreference { it.copy(passcode = passcode) }
+
     override suspend fun setScreenCapturePreference(isScreenCaptureEnabled: Boolean) =
-        withContext(dispatcher.io) {
-            val newPreference = settings.getUserPreference().copy(
-                enableScreenCapture = isScreenCaptureEnabled,
-            )
-            settings.putUserPreference(newPreference)
-            _userData.value = newPreference
-        }
+        updatePreference { it.copy(enableScreenCapture = isScreenCaptureEnabled) }
 
     override suspend fun clearUserData() {
         setIsAuthenticated(false)
@@ -164,17 +172,17 @@ class UserPreferencesRepositoryImpl(
     }
 }
 
-private fun Settings.getUserPreference(): UserData {
-    return decodeValue(
-        key = USER_DATA_KEY,
-        serializer = UserData.serializer(),
-        defaultValue = UserData.DEFAULT,
-    )
-}
-
 private fun Settings.putUserPreference(preference: UserData) {
     encodeValue(
         key = USER_DATA_KEY,
+        serializer = UserData.serializer(),
+        value = preference,
+    )
+}
+
+private fun Settings.putSecurePreference(preference: UserData) {
+    encodeValue(
+        key = SECURE_DATA_KEY,
         serializer = UserData.serializer(),
         value = preference,
     )

@@ -29,6 +29,7 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.coreBase.common)
+            implementation(projects.coreBase.datastore)
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)

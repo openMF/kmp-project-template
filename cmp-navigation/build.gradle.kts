@@ -27,6 +27,7 @@ kotlin {
             implementation(projects.core.datastore)
             implementation(projects.coreBase.common)
             implementation(projects.coreBase.platform)
+            implementation(projects.coreBase.security)
 
             implementation(projects.feature.home)
             implementation(projects.feature.profile)

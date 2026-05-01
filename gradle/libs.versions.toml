@@ -39,6 +39,10 @@ roborazzi = "1.52.0"
 junitVersion = "4.13.2"
 truth = "1.4.5"
 
+# Security Dependencies
+androidxSecurityCrypto = "1.1.0-alpha06"
+bouncycastle = "1.78.1"
+
 # Utility Dependencies
 dependencyGuard = "0.5.0"
 googleOss = "17.3.0"
@@ -152,6 +156,8 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "androidxSecurityCrypto" }
+
 androidx-metrics = { group = "androidx.metrics", name = "metrics-performance", version.ref = "androidxMetrics" }
 
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "androidxProfileinstaller" }
@@ -200,6 +206,7 @@ truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
 app-update = { module = "com.google.android.play:app-update", version.ref = "appUpdate" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
 integrity = { module = "com.google.android.play:integrity", version.ref = "integrity" }
+bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 review = { module = "com.google.android.play:review", version.ref = "review" }
 review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "review" }
 

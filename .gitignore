@@ -103,3 +103,11 @@ vendor/
 # Backup files created by scripts
 *.bak
 .claude
+
+# Room schema exports — auto-generated, rebuild from source
+**/schemas/
+
+# Security — NEVER commit encryption keys or secure storage
+*.key
+*.pem
+.mifos-secure/

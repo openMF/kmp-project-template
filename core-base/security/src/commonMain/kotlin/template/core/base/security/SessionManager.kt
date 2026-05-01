@@ -33,7 +33,7 @@ class SessionManager(
     private val _isSessionActive = MutableStateFlow(false)
     val isSessionActive: StateFlow<Boolean> = _isSessionActive.asStateFlow()
 
-    @Volatile
+    @kotlin.concurrent.Volatile
     private var lastActivityTime: Long = clock()
 
     /** Start a new session. */
@@ -77,4 +77,5 @@ class SessionManager(
     }
 }
 
-internal expect fun currentTimeMillis(): Long
+internal fun currentTimeMillis(): Long =
+    kotlin.time.Clock.System.now().toEpochMilliseconds()

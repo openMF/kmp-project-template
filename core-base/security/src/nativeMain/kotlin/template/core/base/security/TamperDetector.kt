@@ -9,9 +9,12 @@
  */
 package template.core.base.security
 
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.toKString
 import platform.Foundation.NSFileManager
 import platform.posix.getenv
 
+@OptIn(ExperimentalForeignApi::class)
 actual class TamperDetector actual constructor() {
 
     actual fun isDeviceCompromised(): Boolean {

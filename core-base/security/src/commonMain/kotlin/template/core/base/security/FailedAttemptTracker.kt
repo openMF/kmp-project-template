@@ -24,7 +24,7 @@ class FailedAttemptTracker(
     private val secureWiper: SecureWiper,
     private val onLockout: () -> Unit = {},
 ) {
-    @Volatile
+    @kotlin.concurrent.Volatile
     private var failedCount: Int = 0
 
     val currentFailedCount: Int get() = failedCount

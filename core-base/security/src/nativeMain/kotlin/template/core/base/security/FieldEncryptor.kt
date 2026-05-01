@@ -9,6 +9,7 @@
  */
 package template.core.base.security
 
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
@@ -29,7 +30,7 @@ import platform.posix.size_tVar
 
 private const val GCM_IV_LENGTH = 12
 
-@OptIn(ExperimentalForeignApi::class)
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
 
     actual fun encrypt(plaintext: String): String {
@@ -47,7 +48,7 @@ actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
         val nsData = NSData.create(
             base64EncodedString = ciphertext,
             options = 0u,
-        ) ?: throw SecurityException("Invalid Base64 ciphertext")
+        ) ?: error("Invalid Base64 ciphertext")
         val bytes = ByteArray(nsData.length.toInt())
         bytes.usePinned { pinned ->
             platform.posix.memcpy(pinned.addressOf(0), nsData.bytes, nsData.length)
@@ -64,7 +65,7 @@ actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
 
     actual fun decrypt(data: ByteArray): ByteArray {
         val key = keyProvider.getKey()
-            ?: throw SecurityException("Encryption key not found — data unrecoverable")
+            ?: error("Encryption key not found — data unrecoverable")
         val iv = data.copyOfRange(0, GCM_IV_LENGTH)
         val ciphertext = data.copyOfRange(GCM_IV_LENGTH, data.size)
         return ccCrypt(kCCDecrypt, key, iv, ciphertext)
@@ -87,8 +88,8 @@ actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
                     outBuffer.usePinned { outPin ->
                         platform.CoreCrypto.CCCrypt(
                             op = op,
-                            alg = kCCAlgorithmAES.toUInt(),
-                            options = kCCOptionPKCS7Padding.toUInt(),
+                            alg = kCCAlgorithmAES,
+                            options = kCCOptionPKCS7Padding,
                             key = keyPin.addressOf(0),
                             keyLength = key.size.toULong(),
                             iv = ivPin.addressOf(0),
@@ -104,7 +105,7 @@ actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
         }
 
         if (status != kCCSuccess) {
-            throw SecurityException("CCCrypt failed with status: $status")
+            error("CCCrypt failed with status: $status")
         }
 
         outBuffer.copyOfRange(0, outLength.value.toInt())

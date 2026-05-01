@@ -23,7 +23,7 @@ actual class SecureRandom {
         bytes.usePinned { pinned ->
             val status = SecRandomCopyBytes(kSecRandomDefault, size.toULong(), pinned.addressOf(0))
             if (status != errSecSuccess) {
-                throw SecurityException("SecRandomCopyBytes failed: $status")
+                error("SecRandomCopyBytes failed: $status")
             }
         }
         return bytes

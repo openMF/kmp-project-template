@@ -28,6 +28,7 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.androidx.security.crypto)
+            implementation(libs.koin.android)
         }
 
         commonTest.dependencies {

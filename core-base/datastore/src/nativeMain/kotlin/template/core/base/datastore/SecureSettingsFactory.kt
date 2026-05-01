@@ -9,11 +9,13 @@
  */
 package template.core.base.datastore
 
+import com.russhwolf.settings.ExperimentalSettingsImplementation
 import com.russhwolf.settings.KeychainSettings
 import com.russhwolf.settings.Settings
 
 actual class SecureSettingsFactory {
+    @OptIn(ExperimentalSettingsImplementation::class)
     actual fun create(): Settings {
-        return KeychainSettings(serviceName = "org.mifos.secure")
+        return KeychainSettings(service = "org.mifos.secure")
     }
 }

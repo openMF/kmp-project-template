@@ -18,7 +18,7 @@ package template.core.base.security
 class SensitiveString(private val chars: CharArray) : AutoCloseable {
 
     /** Read the value. Call [close] when done. */
-    fun value(): String = String(chars)
+    fun value(): String = chars.concatToString()
 
     /** Zero out the backing array, making the value unrecoverable. */
     override fun close() {

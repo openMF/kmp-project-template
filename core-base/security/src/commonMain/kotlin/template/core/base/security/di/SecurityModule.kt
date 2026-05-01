@@ -11,8 +11,13 @@ package template.core.base.security.di
 
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import template.core.base.security.BiometricAuthenticator
+import template.core.base.security.FailedAttemptTracker
+import template.core.base.security.SecureWiper
 import template.core.base.security.SecurityConfig
 import template.core.base.security.SecurityPolicy
+import template.core.base.security.SessionManager
+import template.core.base.security.TamperDetector
 
 /**
  * Creates the security Koin module. Receives [SecurityConfig] as a function
@@ -23,6 +28,11 @@ fun securityModule(config: SecurityConfig) = module {
 
     single { config }
     single { SecurityPolicy.default() }
+    single { TamperDetector() }
+    single { SecureWiper() }
+    single { BiometricAuthenticator() }
+    single { FailedAttemptTracker(get(), get()) }
+    single { SessionManager(get()) }
 }
 
 expect val platformSecurityModule: Module

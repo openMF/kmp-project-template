@@ -1,0 +1,17 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package template.core.base.security
+
+import platform.Foundation.NSDate
+import platform.Foundation.timeIntervalSince1970
+
+@Suppress("MagicNumber")
+internal actual fun currentTimeMillis(): Long =
+    (NSDate().timeIntervalSince1970 * 1_000).toLong()

@@ -69,10 +69,10 @@ class SecureAuthManagerTest {
     }
 
     @Test
-    fun onAuthSuccessAfterFailuresResetsCount() {
+    fun onAuthSuccessAfterLockoutResetsCountAndClearsLockout() {
         val manager = createManager()
-        repeat(2) { manager.onAuthFailure() }
-        assertEquals(2, manager.failedCount)
+        repeat(3) { manager.onAuthFailure() }
+        assertTrue(manager.isLockedOut)
         manager.onAuthSuccess()
         assertEquals(0, manager.failedCount)
         assertFalse(manager.isLockedOut)

@@ -13,13 +13,27 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
- * Web field encryptor using SubtleCrypto API.
+ * Web/JS [FieldEncryptor] stub — **NO-OP: data is NOT encrypted.**
  *
- * Note: Web encryption keys are stored via IndexedDB CryptoKey (non-extractable).
- * XSS risk is accepted — web is inherently less secure than native.
+ * [encrypt] and [decrypt] return an unmodified copy of the input.
+ * This exists solely to satisfy the `expect`/`actual` contract on JS/WasmJS targets
+ * where the SubtleCrypto API is async-only and cannot be called synchronously.
+ *
+ * **Do NOT rely on this for data confidentiality.** Callers on web targets should
+ * assume all field values are stored in plaintext.
+ *
+ * Full SubtleCrypto integration is deferred to Phase 4 (T18).
  */
+@Suppress("ReturnCount")
 @OptIn(ExperimentalEncodingApi::class)
 actual class FieldEncryptor {
+
+    init {
+        co.touchlab.kermit.Logger.w("FieldEncryptor") {
+            "Web FieldEncryptor is a NO-OP stub — data is NOT encrypted. " +
+                "See Phase 4 (T18) for SubtleCrypto integration."
+        }
+    }
 
     actual fun encrypt(plaintext: String): String {
         val data = plaintext.encodeToByteArray()
@@ -33,12 +47,12 @@ actual class FieldEncryptor {
     }
 
     actual fun encrypt(data: ByteArray): ByteArray {
-        // Web SubtleCrypto requires async APIs — synchronous fallback uses XOR obfuscation
-        // Full SubtleCrypto integration deferred to Phase 4 (T18)
+        // NO-OP: returns unmodified copy. SubtleCrypto is async-only on web.
         return data.copyOf()
     }
 
     actual fun decrypt(data: ByteArray): ByteArray {
+        // NO-OP: returns unmodified copy.
         return data.copyOf()
     }
 }

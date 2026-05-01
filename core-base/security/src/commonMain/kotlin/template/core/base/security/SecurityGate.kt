@@ -18,6 +18,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -65,6 +66,10 @@ fun SecurityGate(
     val isSessionActive by sessionManager.isSessionActive.collectAsState()
     securityState.isSessionActive = isSessionActive
 
+    // Track whether the session was previously active to detect active→inactive transitions.
+    // This prevents biometric prompts on cold start when no session has been started yet.
+    val wasSessionActive = remember { mutableStateOf(false) }
+
     // One-time tamper check at startup
     LaunchedEffect(Unit) {
         val compromised = tamperDetector.isDeviceCompromised()
@@ -74,14 +79,15 @@ fun SecurityGate(
         }
     }
 
-    // Auto biometric re-auth when session expires
+    // Auto biometric re-auth when session transitions from active to inactive
     LaunchedEffect(isSessionActive) {
-        if (!isSessionActive && biometric.isAvailable()) {
+        if (wasSessionActive.value && !isSessionActive && biometric.isAvailable()) {
             val result = biometric.authenticate("Session expired. Verify identity.")
             if (result is BiometricResult.Success) {
                 sessionManager.startSession()
             }
         }
+        wasSessionActive.value = isSessionActive
     }
 
     // Session timeout check on lifecycle resume
@@ -101,6 +107,7 @@ fun SecurityGate(
         modifier = modifier.pointerInput(Unit) {
             awaitEachGesture {
                 awaitFirstDown(pass = PointerEventPass.Initial)
+                sessionManager.checkTimeout()
                 sessionManager.touch()
             }
         },

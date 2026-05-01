@@ -28,7 +28,11 @@ import platform.Foundation.base64EncodedStringWithOptions
 import platform.Foundation.create
 import platform.posix.size_tVar
 
-private const val GCM_IV_LENGTH = 12
+/**
+ * IV length for AES-CBC mode. CommonCrypto's `CCCrypt` with `kCCOptionPKCS7Padding`
+ * uses CBC (not GCM). AES-CBC requires a 16-byte IV matching the block size.
+ */
+private const val CBC_IV_LENGTH = 16
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
@@ -58,7 +62,7 @@ actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
 
     actual fun encrypt(data: ByteArray): ByteArray {
         val key = keyProvider.getKey() ?: keyProvider.generateKey()
-        val iv = SecureRandom().nextBytes(GCM_IV_LENGTH)
+        val iv = SecureRandom().nextBytes(CBC_IV_LENGTH)
         val encrypted = ccCrypt(kCCEncrypt, key, iv, data)
         return iv + encrypted
     }
@@ -66,8 +70,8 @@ actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
     actual fun decrypt(data: ByteArray): ByteArray {
         val key = keyProvider.getKey()
             ?: error("Encryption key not found — data unrecoverable")
-        val iv = data.copyOfRange(0, GCM_IV_LENGTH)
-        val ciphertext = data.copyOfRange(GCM_IV_LENGTH, data.size)
+        val iv = data.copyOfRange(0, CBC_IV_LENGTH)
+        val ciphertext = data.copyOfRange(CBC_IV_LENGTH, data.size)
         return ccCrypt(kCCDecrypt, key, iv, ciphertext)
     }
 

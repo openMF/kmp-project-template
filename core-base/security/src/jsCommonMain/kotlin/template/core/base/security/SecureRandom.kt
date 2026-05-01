@@ -9,6 +9,16 @@
  */
 package template.core.base.security
 
+/**
+ * Web/JS [SecureRandom] stub.
+ *
+ * **WARNING: NOT cryptographically secure.** Uses [kotlin.random.Random] which is a PRNG,
+ * not a CSPRNG. This implementation exists only to satisfy the [FieldEncryptor] no-op stub
+ * on JS/WasmJS targets. Do NOT use for real cryptographic key generation.
+ *
+ * Full WebCrypto (`crypto.getRandomValues`) integration is deferred to Phase 4 (T18).
+ */
+@Suppress("MagicNumber")
 actual class SecureRandom {
     actual fun nextBytes(size: Int): ByteArray {
         return kotlin.random.Random.nextBytes(size)

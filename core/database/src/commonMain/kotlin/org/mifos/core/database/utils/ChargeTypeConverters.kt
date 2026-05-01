@@ -10,6 +10,7 @@
 package org.mifos.core.database.utils
 
 import androidx.room3.TypeConverter
+import co.touchlab.kermit.Logger
 import kotlinx.serialization.json.Json
 import org.mifos.core.database.entity.SampleEntity
 
@@ -26,7 +27,12 @@ class ChargeTypeConverters {
     /** Deserializes a JSON string to a nullable-int list. */
     @TypeConverter
     fun fromIntList(value: String): ArrayList<Int?> {
-        return Json.decodeFromString(value)
+        return try {
+            Json.decodeFromString(value)
+        } catch (e: Exception) {
+            Logger.d("ChargeTypeConverters") { "Failed to decode int list: ${e.message}" }
+            arrayListOf()
+        }
     }
 
     /** Serializes a nullable-int list to a JSON string. */
@@ -44,6 +50,13 @@ class ChargeTypeConverters {
     /** Deserializes a JSON string to a [SampleEntity], or `null` if the string is `null`. */
     @TypeConverter
     fun toSampleEntity(value: String?): SampleEntity? {
-        return value?.let { Json.decodeFromString(SampleEntity.serializer(), it) }
+        return value?.let {
+            try {
+                Json.decodeFromString(SampleEntity.serializer(), it)
+            } catch (e: Exception) {
+                Logger.d("ChargeTypeConverters") { "Failed to decode SampleEntity: ${e.message}" }
+                null
+            }
+        }
     }
 }

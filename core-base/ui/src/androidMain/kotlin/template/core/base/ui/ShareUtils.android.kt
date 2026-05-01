@@ -12,8 +12,11 @@ package template.core.base.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
@@ -170,6 +173,15 @@ actual object ShareUtils {
         val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         val clip = android.content.ClipData.newPlainText("Copied Text", text)
         clipboardManager.setPrimaryClip(clip)
+
+        val isDebuggable = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+        if (!isDebuggable) {
+            Handler(Looper.getMainLooper()).postDelayed({
+                clipboardManager.setPrimaryClip(
+                    android.content.ClipData.newPlainText("", ""),
+                )
+            }, 60_000L)
+        }
     }
 
     actual suspend fun shareApp(storeLink: String, message: String) {

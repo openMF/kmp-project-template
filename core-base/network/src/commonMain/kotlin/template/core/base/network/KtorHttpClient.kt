@@ -48,6 +48,7 @@ expect fun httpClient(config: HttpClientConfig<*>.() -> Unit): HttpClient
  * ```
  *
  * @param baseUrl The base URL to be applied to all requests unless explicitly overridden.
+ * @param isReleaseBuild When true, restricts logging to headers-only and disables pretty-printed JSON.
  * @param authRequiredUrl A list of hostnames that require authentication.
  * @param defaultHeaders Headers that are applied to every request.
  * @param requestTimeout Timeout in milliseconds for entire request lifecycle.
@@ -66,16 +67,17 @@ expect fun httpClient(config: HttpClientConfig<*>.() -> Unit): HttpClient
  */
 fun setupDefaultHttpClient(
     baseUrl: String,
+    isReleaseBuild: Boolean = false,
     authRequiredUrl: List<String> = emptyList(),
     defaultHeaders: Map<String, String> = emptyMap(),
     requestTimeout: Long = 60_000L,
     socketTimeout: Long = 60_000L,
     httpLogger: Logger = Logger.DEFAULT,
-    httpLogLevel: LogLevel = LogLevel.ALL,
+    httpLogLevel: LogLevel = if (isReleaseBuild) LogLevel.HEADERS else LogLevel.ALL,
     loggableHosts: List<String> = emptyList(),
     sensitiveHeaders: List<String> = listOf(HttpHeaders.Authorization),
     jsonConfig: Json = Json {
-        prettyPrint = true
+        prettyPrint = !isReleaseBuild
         isLenient = true
         ignoreUnknownKeys = true
         explicitNulls = false

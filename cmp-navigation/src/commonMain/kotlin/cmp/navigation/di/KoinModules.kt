@@ -22,6 +22,7 @@ import org.mifos.feature.settings.SettingsModule
 import template.core.base.analytics.di.analyticsModule
 import template.core.base.common.di.CommonModule
 import template.core.base.platform.di.platformModule
+import template.core.base.security.di.SecurityModule
 
 object KoinModules {
     private val dataModule = module {
@@ -48,6 +49,7 @@ object KoinModules {
     }
 
     val allModules = listOf(
+        SecurityModule,
         dataModule,
         DatabaseModule,
         dispatcherModule,

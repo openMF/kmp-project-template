@@ -20,7 +20,7 @@ import template.core.base.security.FieldEncryptor
 
 actual val platformModule: Module = module {
     single {
-        getOrNull<FieldEncryptor>()?.let { ChargeTypeConverters.install(it) }
+        ChargeTypeConverters.install(get<FieldEncryptor>())
         AppDatabaseFactory()
             .createDatabase<AppDatabase>(
                 databaseName = AppDatabase.DATABASE_NAME,

@@ -12,7 +12,10 @@ package template.core.base.security.di
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import template.core.base.security.BiometricAuthenticator
+import template.core.base.security.DeepLinkValidator
 import template.core.base.security.FailedAttemptTracker
+import template.core.base.security.SecureAuthManager
+import template.core.base.security.SecureNavHandler
 import template.core.base.security.SecureWiper
 import template.core.base.security.SecurityConfig
 import template.core.base.security.SecurityPolicy
@@ -20,19 +23,26 @@ import template.core.base.security.SessionManager
 import template.core.base.security.TamperDetector
 
 /**
- * Creates the security Koin module. Receives [SecurityConfig] as a function
- * parameter to avoid init-order issues — each app module passes its own config.
+ * Zero-config security Koin module. Auto-detects build type via
+ * platform-specific [template.core.base.security.isReleaseBuild] and
+ * registers all security components with sensible defaults.
+ *
+ * Consumer apps do NOT need to call this — it is auto-included in
+ * [cmp.navigation.di.KoinModules.allModules].
  */
-fun securityModule(config: SecurityConfig) = module {
+val SecurityModule = module {
     includes(platformSecurityModule)
 
-    single { config }
+    single { SecurityConfig() }
     single { SecurityPolicy.default() }
     single { TamperDetector() }
     single { SecureWiper() }
     single { BiometricAuthenticator() }
     single { FailedAttemptTracker(get(), get()) }
     single { SessionManager(get()) }
+    single { DeepLinkValidator() }
+    single { SecureNavHandler(get()) }
+    single { SecureAuthManager(get(), get(), get()) }
 }
 
 expect val platformSecurityModule: Module

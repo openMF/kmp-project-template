@@ -22,7 +22,7 @@ package template.core.base.security
  * @param clipboardWipeSeconds Delay before clipboard auto-clears in release.
  */
 data class SecurityConfig(
-    val isReleaseBuild: Boolean,
+    val isReleaseBuild: Boolean = isReleaseBuild(),
     val maxFailedAttempts: Int = 10,
     val sessionTimeoutMinutes: Int = 30,
     val clipboardWipeSeconds: Int = 60,

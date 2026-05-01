@@ -9,6 +9,8 @@
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -24,6 +26,10 @@ kotlin {
             implementation(project(":core-base:common"))
             implementation(libs.kotlinx.coroutines.core)
             api(libs.koin.core)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(libs.jb.lifecycle.compose)
+            implementation(libs.koin.compose)
         }
 
         androidMain.dependencies {

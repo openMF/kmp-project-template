@@ -3,9 +3,11 @@
 :core-base:analytics
 :core-base:common
 :core-base:database
+:core-base:datastore
 :core-base:designsystem
 :core-base:network
 :core-base:platform
+:core-base:security
 :core-base:ui
 :core:analytics
 :core:common
@@ -173,6 +175,7 @@ androidx.savedstate:savedstate-compose-android:1.4.0
 androidx.savedstate:savedstate-compose:1.4.0
 androidx.savedstate:savedstate-ktx:1.4.0
 androidx.savedstate:savedstate:1.4.0
+androidx.security:security-crypto:1.1.0-alpha06
 androidx.slidingpanelayout:slidingpanelayout:1.2.0
 androidx.sqlite:sqlite-android:2.7.0-alpha03
 androidx.sqlite:sqlite-async-android:2.7.0-alpha03
@@ -227,6 +230,8 @@ com.google.android.play:core-common:2.0.4
 com.google.android.play:review-ktx:2.0.2
 com.google.android.play:review:2.0.2
 com.google.code.findbugs:jsr305:3.0.2
+com.google.code.gson:gson:2.8.9
+com.google.crypto.tink:tink-android:1.8.0
 com.google.errorprone:error_prone_annotations:2.26.0
 com.google.firebase:firebase-analytics:23.0.0
 com.google.firebase:firebase-annotations:17.0.0

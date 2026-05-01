@@ -25,6 +25,7 @@ kotlin {
             api(libs.ktor.client.auth)
             api(libs.ktorfit.lib)
             api(libs.kermit.logging)
+            implementation(projects.coreBase.security)
         }
 
         androidMain.dependencies {

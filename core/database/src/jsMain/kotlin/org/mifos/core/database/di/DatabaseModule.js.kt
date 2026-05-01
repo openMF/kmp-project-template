@@ -13,10 +13,13 @@ import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.database.AppDatabase
+import org.mifos.core.database.utils.ChargeTypeConverters
 import template.core.base.database.AppDatabaseFactory
+import template.core.base.security.FieldEncryptor
 
 actual val platformModule: Module = module {
     single {
+        getOrNull<FieldEncryptor>()?.let { ChargeTypeConverters.install(it) }
         AppDatabaseFactory()
             .createDatabase<AppDatabase>(
                 databaseName = AppDatabase.DATABASE_NAME,

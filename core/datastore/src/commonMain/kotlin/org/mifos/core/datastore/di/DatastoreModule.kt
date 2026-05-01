@@ -10,17 +10,22 @@
 package org.mifos.core.datastore.di
 
 import com.russhwolf.settings.Settings
-import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.mifos.core.datastore.UserPreferencesRepository
 import org.mifos.core.datastore.UserPreferencesRepositoryImpl
 import template.core.base.common.di.CommonModule
+import template.core.base.datastore.di.DatastoreBaseModule
 
 val DatastoreModule = module {
-    includes(CommonModule)
+    includes(CommonModule, DatastoreBaseModule)
 
-    single<Settings> { Settings() }
-
-    singleOf(::UserPreferencesRepositoryImpl) bind UserPreferencesRepository::class
+    single {
+        UserPreferencesRepositoryImpl(
+            plainSettings = get<Settings>(named("plain")),
+            secureSettings = get<Settings>(named("secure")),
+            dispatcher = get(),
+        )
+    } bind UserPreferencesRepository::class
 }

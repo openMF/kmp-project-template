@@ -27,7 +27,10 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
+import template.core.base.security.CertificatePinConfig
 import co.touchlab.kermit.Logger.Companion as KermitLogger
 
 expect fun httpClient(config: HttpClientConfig<*>.() -> Unit): HttpClient
@@ -62,9 +65,12 @@ expect fun httpClient(config: HttpClientConfig<*>.() -> Unit): HttpClient
  * @param digestCredentialsProvider Provider for Digest authentication credentials.
  * @param bearerTokensProvider Provider for Bearer token authentication.
  * @param bearerRefreshProvider Optional refresh logic for Bearer tokens (only used if Bearer auth is configured).
+ * @param certificatePinConfig TLS certificate pin configuration. Pins are applied by platform
+ *   engines that support it (OkHttp on Android/Desktop). Other platforms ignore this parameter.
  *
  * @return A configuration lambda to be passed into the Ktor [HttpClient].
  */
+@Suppress("UnusedParameter")
 fun setupDefaultHttpClient(
     baseUrl: String,
     isReleaseBuild: Boolean = false,
@@ -86,7 +92,10 @@ fun setupDefaultHttpClient(
     digestCredentialsProvider: (() -> DigestAuthCredentials)? = null,
     bearerTokensProvider: (() -> BearerTokens)? = null,
     bearerRefreshProvider: (() -> BearerTokens)? = null,
+    certificatePinConfig: CertificatePinConfig = CertificatePinConfig.default(),
 ): HttpClientConfig<*>.() -> Unit = {
+    val refreshMutex = Mutex()
+
     when {
         bearerTokensProvider != null -> {
             install(Auth) {
@@ -94,7 +103,14 @@ fun setupDefaultHttpClient(
                     loadTokens { bearerTokensProvider() }
                     if (bearerRefreshProvider != null) {
                         refreshTokens {
-                            bearerRefreshProvider()
+                            refreshMutex.withLock {
+                                val currentTokens = bearerTokensProvider()
+                                if (currentTokens != oldTokens) {
+                                    currentTokens
+                                } else {
+                                    bearerRefreshProvider()
+                                }
+                            }
                         }
                     }
                     sendWithoutRequest { request ->

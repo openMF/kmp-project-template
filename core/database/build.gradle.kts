@@ -30,6 +30,7 @@ kotlin {
             implementation(libs.kermit.logging)
             api(projects.core.common)
             api(projects.coreBase.database)
+            implementation(projects.coreBase.security)
         }
 
         commonTest.dependencies {

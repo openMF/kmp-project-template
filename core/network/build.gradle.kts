@@ -30,8 +30,10 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.core.common)
-            implementation(projects.core.model)
+            api(projects.core.common)
+            api(projects.core.model)
+            api(projects.coreBase.network)
+
             implementation(projects.core.datastore)
 
             implementation(libs.kotlinx.serialization.json)

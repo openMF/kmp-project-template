@@ -9,25 +9,71 @@
  */
 package org.mifos.core.data.di
 
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitorProvider
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.mifos.core.data.repository.CryptoRepository
+import org.mifos.core.data.repository.CurrencyRepository
 import org.mifos.core.data.repository.NetworkMonitor
+import org.mifos.core.data.repository.StoreCacheManager
 import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.data.repository.UserLogoutManager
-import org.mifos.core.data.repositoryImpl.NetworkMonitorImpl
+import org.mifos.core.data.repositoryImpl.CryptoRepositoryImpl
+import org.mifos.core.data.repositoryImpl.CurrencyRepositoryImpl
+import org.mifos.core.data.repositoryImpl.StoreCacheManagerImpl
 import org.mifos.core.data.repositoryImpl.UserDataRepositoryImpl
 import org.mifos.core.data.repositoryImpl.UserLogoutManagerImpl
+import org.mifos.core.data.store.provideCoinDetailStore
+import org.mifos.core.data.store.provideCoinMarketsStore
+import org.mifos.core.data.store.provideExchangeRatesStore
+import org.mifos.core.data.store.provideRateHistoryStore
+import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
+import org.mifos.core.network.di.NetworkModule
 import template.core.base.common.di.CommonModule
 
 val DataModule = module {
-    includes(platformModule, CommonModule, DatastoreModule)
+    includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
 
-    singleOf(::NetworkMonitorImpl) bind NetworkMonitor::class
+    single<NetworkMonitor> { NetworkMonitorProvider.install() }
     singleOf(::UserDataRepositoryImpl) bind UserDataRepository::class
-    singleOf(::UserLogoutManagerImpl) bind UserLogoutManager::class
+
+    // Store cache manager — clears all caches on logout
+    single<StoreCacheManager> {
+        StoreCacheManagerImpl(
+            exchangeRatesStore = get(ApplicationStoreRegistry.ExchangeRates),
+            rateHistoryStore = get(ApplicationStoreRegistry.RateHistory),
+            coinMarketsStore = get(ApplicationStoreRegistry.CoinMarkets),
+            coinDetailStore = get(ApplicationStoreRegistry.CoinDetail),
+            bookkeeperDao = get(),
+        )
+    }
+
+    single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
+
+    // Fintech Stores (internal — exposed only through repositories)
+    single(ApplicationStoreRegistry.ExchangeRates) { provideExchangeRatesStore(get(), get(), get()) }
+    single(ApplicationStoreRegistry.RateHistory) { provideRateHistoryStore(get(), get(), get()) }
+    single(ApplicationStoreRegistry.CoinMarkets) { provideCoinMarketsStore(get(), get(), get()) }
+    single(ApplicationStoreRegistry.CoinDetail) { provideCoinDetailStore(get(), get(), get()) }
+
+    // Fintech Repositories
+    single<CurrencyRepository> {
+        CurrencyRepositoryImpl(
+            exchangeRatesStore = get(ApplicationStoreRegistry.ExchangeRates),
+            rateHistoryStore = get(ApplicationStoreRegistry.RateHistory),
+            networkMonitor = get(),
+        )
+    }
+    single<CryptoRepository> {
+        CryptoRepositoryImpl(
+            coinMarketsStore = get(ApplicationStoreRegistry.CoinMarkets),
+            coinDetailStore = get(ApplicationStoreRegistry.CoinDetail),
+            networkMonitor = get(),
+        )
+    }
 }
 
 expect val platformModule: Module

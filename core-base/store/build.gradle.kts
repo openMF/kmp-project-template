@@ -20,6 +20,8 @@ kotlin {
         commonMain.dependencies {
             api(libs.store5)
             api(libs.store5.cache)
+            api(libs.cmp.network.monitor)
+            api(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
             implementation(project(":core-base:common"))
         }

@@ -69,6 +69,22 @@ tasks.register("printModulePaths") {
     }
 }
 
+// Force consistent versions across all subprojects to fix KLIB resolver duplicate warnings
+// The conflict is between org.jetbrains.androidx.* (CMP) and androidx.* (Google) transitive deps
+subprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            // Replace Google androidx.lifecycle with JetBrains fork for non-Android targets
+            if (requested.group == "org.jetbrains.androidx.lifecycle") {
+                useVersion("2.9.6")
+            }
+            if (requested.group == "org.jetbrains.androidx.savedstate") {
+                useVersion("1.3.6")
+            }
+        }
+    }
+}
+
 // Configuration for CMP module dependency graph
 moduleGraphAssert {
     configurations += setOf("commonMainImplementation", "commonMainApi")

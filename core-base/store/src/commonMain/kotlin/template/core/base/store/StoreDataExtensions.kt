@@ -80,6 +80,20 @@ fun <Key : Any, Output : Any> Store<Key, Output>.localData(
 }
 
 /**
+ * Like [streamDataWithErrors] but without requiring a fallback value.
+ * Emits StoreData with isEmpty=true when error arrives before any data.
+ * Used by ScreenDataStream where DecisionEngine handles the no-data case.
+ */
+fun <Key : Any, Output : Any> Store<Key, Output>.streamDataNoFallback(
+    key: Key,
+    refresh: Boolean = true,
+    isEmpty: (Output) -> Boolean = { false },
+): Flow<StoreData<Output>> {
+    return stream(StoreReadRequest.cached(key, refresh))
+        .mapToStoreDataNoFallback(isEmpty)
+}
+
+/**
  * Maps [StoreData] content while preserving all metadata.
  */
 fun <T, R> StoreData<T>.map(transform: (T) -> R): StoreData<R> {
@@ -88,6 +102,7 @@ fun <T, R> StoreData<T>.map(transform: (T) -> R): StoreData<R> {
         origin = origin,
         isRefreshing = isRefreshing,
         fetchedAt = fetchedAt,
+        fetchedAtInstant = fetchedAtInstant,
         error = error,
         isEmpty = isEmpty,
     )
@@ -98,4 +113,17 @@ fun <T, R> StoreData<T>.map(transform: (T) -> R): StoreData<R> {
  */
 fun <T, R> Flow<StoreData<T>>.mapData(transform: (T) -> R): Flow<StoreData<R>> {
     return map { it.map(transform) }
+}
+
+/**
+ * Bypasses in-memory cache, reads from SourceOfTruth + optional network refresh.
+ * Useful when you know in-memory state may be stale but disk is authoritative.
+ */
+fun <Key : Any, Output : Any> Store<Key, Output>.skipMemoryData(
+    key: Key,
+    refresh: Boolean = true,
+    isEmpty: (Output) -> Boolean = { false },
+): Flow<StoreData<Output>> {
+    return stream(StoreReadRequest.skipMemory(key, refresh))
+        .mapToStoreDataNoFallback(isEmpty)
 }

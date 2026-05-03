@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import org.mifos.core.data.model.LogoutEvent
 import org.mifos.core.data.model.LogoutReason
+import org.mifos.core.data.repository.StoreCacheManager
 import org.mifos.core.data.repository.UserLogoutManager
 import org.mifos.core.data.util.bufferedMutableSharedFlow
 import org.mifos.core.datastore.UserPreferencesRepository
@@ -24,6 +25,7 @@ import template.core.base.common.manager.DispatcherManager
 
 class UserLogoutManagerImpl(
     private val repository: UserPreferencesRepository,
+    private val storeCacheManager: StoreCacheManager,
     dispatcherManager: DispatcherManager,
 ) : UserLogoutManager {
 
@@ -57,8 +59,8 @@ class UserLogoutManagerImpl(
 
     private fun clearUserData() {
         scope.launch {
-            // repository.clearAccountData()
             repository.clearUserData()
+            storeCacheManager.clearAll()
         }
     }
 }

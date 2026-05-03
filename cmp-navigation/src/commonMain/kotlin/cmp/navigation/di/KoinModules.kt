@@ -17,6 +17,9 @@ import org.koin.dsl.module
 import org.mifos.core.data.di.DataModule
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
+import org.mifos.feature.crypto.di.CryptoModule
+import org.mifos.feature.currencyrates.di.CurrencyRatesModule
+import org.mifos.feature.emicalculator.di.EmiCalculatorModule
 import org.mifos.feature.home.di.HomeModule
 import org.mifos.feature.settings.SettingsModule
 import template.core.base.analytics.di.analyticsModule
@@ -43,6 +46,9 @@ object KoinModules {
 
     private val featureModule = module {
         includes(
+            CryptoModule,
+            CurrencyRatesModule,
+            EmiCalculatorModule,
             HomeModule,
             SettingsModule,
         )

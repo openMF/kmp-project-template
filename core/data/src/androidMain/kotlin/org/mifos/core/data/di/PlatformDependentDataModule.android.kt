@@ -9,8 +9,6 @@
  */
 package org.mifos.core.data.di
 
-import android.content.Context
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -21,8 +19,6 @@ import template.core.base.common.di.CommonModule
 
 actual val platformModule: Module = module {
     includes(CommonModule)
-
-    single<Context> { androidContext() }
 
     singleOf(::TimeZoneMonitorImpl) bind TimeZoneMonitor::class
 }

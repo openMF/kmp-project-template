@@ -17,8 +17,8 @@ import cmp.navigation.utils.toObjectNavigationRoute
 import org.jetbrains.compose.resources.StringResource
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.ui.NavigationItem
-import org.mifos.feature.home.TasksDestination
-import org.mifos.feature.home.TasksRoute
+import org.mifos.feature.home.HomeDestination
+import org.mifos.feature.home.HomeRoute
 import org.mifos.feature.profile.ProfileRoute
 
 sealed class AuthenticatedNavBarTabItem : NavigationItem {
@@ -33,9 +33,9 @@ sealed class AuthenticatedNavBarTabItem : NavigationItem {
         override val contentDescriptionRes: StringResource
             get() = Res.string.home
         override val graphRoute: String
-            get() = TasksDestination.toObjectNavigationRoute()
+            get() = HomeDestination.toObjectNavigationRoute()
         override val startDestinationRoute: String
-            get() = TasksRoute.toObjectNavigationRoute()
+            get() = HomeRoute.toObjectNavigationRoute()
         override val testTag: String
             get() = "HomeTab"
     }

@@ -36,7 +36,8 @@ class StoreDataMapperCachedTest {
             assertEquals("cached", item.data)
             assertEquals(DataOrigin.CACHE, item.origin)
             assertFalse(item.isRefreshing)
-            assertTrue(item.isStale)
+            // CACHE fallback sets fetchedAt so staleness UI has a timestamp
+            assertNotNull(item.fetchedAt)
             awaitComplete()
         }
     }
@@ -67,7 +68,8 @@ class StoreDataMapperCachedTest {
             val cached = awaitItem()
             assertEquals("cached", cached.data)
             assertTrue(cached.isRefreshing)
-            assertTrue(cached.isStale)
+            // CACHE fallback sets fetchedAt for staleness UI timestamp
+            assertEquals(DataOrigin.CACHE, cached.origin)
 
             val fresh = awaitItem()
             assertEquals("fresh", fresh.data)
@@ -298,3 +300,105 @@ class StoreDataBridgeTest {
         assertNull(state.data)
     }
 }
+
+// --- mapToStoreDataNoFallback tests ---
+
+class StoreDataMapperNoFallbackTest {
+
+    @Test
+    fun nullDataFromSotIsSkipped() = runTest {
+        @Suppress("UNCHECKED_CAST")
+        val nullData = StoreReadResponse.Data(
+            null as String?,
+            StoreReadResponseOrigin.SourceOfTruth,
+        ) as StoreReadResponse<String>
+
+        flowOf(
+            StoreReadResponse.Loading(StoreReadResponseOrigin.SourceOfTruth),
+            nullData,
+            StoreReadResponse.Data("fetched", StoreReadResponseOrigin.Fetcher()),
+        ).mapToStoreDataNoFallback().test {
+            val item = awaitItem()
+            assertEquals("fetched", item.data)
+            assertEquals(DataOrigin.NETWORK, item.origin)
+            assertFalse(item.isRefreshing)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun errorBeforeData_emitsEmptyWithError() = runTest {
+        flowOf(
+            StoreReadResponse.Loading(StoreReadResponseOrigin.SourceOfTruth),
+            StoreReadResponse.Error.Exception(
+                RuntimeException("network"),
+                StoreReadResponseOrigin.Fetcher(),
+            ),
+        ).mapToStoreDataNoFallback<String>().test {
+            val item = awaitItem()
+            assertTrue(item.isEmpty)
+            assertNotNull(item.error)
+            assertEquals("network", item.error?.message)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun errorAfterData_emitsDataWithError() = runTest {
+        flowOf(
+            StoreReadResponse.Data("cached", StoreReadResponseOrigin.SourceOfTruth),
+            StoreReadResponse.Error.Exception(
+                RuntimeException("refresh failed"),
+                StoreReadResponseOrigin.Fetcher(),
+            ),
+        ).mapToStoreDataNoFallback().test {
+            val first = awaitItem()
+            assertEquals("cached", first.data)
+            val second = awaitItem()
+            assertEquals("cached", second.data)
+            assertNotNull(second.error)
+            assertFalse(second.isEmpty)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun loadingWithPreviousData_emitsRefreshing() = runTest {
+        flowOf(
+            StoreReadResponse.Data("initial", StoreReadResponseOrigin.Fetcher()),
+            StoreReadResponse.Loading(StoreReadResponseOrigin.Fetcher()),
+        ).mapToStoreDataNoFallback().test {
+            val first = awaitItem()
+            assertEquals("initial", first.data)
+            assertFalse(first.isRefreshing)
+            val second = awaitItem()
+            assertEquals("initial", second.data)
+            assertTrue(second.isRefreshing)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun cacheData_setsFetchedAtInstant() = runTest {
+        flowOf(
+            StoreReadResponse.Data("cached", StoreReadResponseOrigin.SourceOfTruth),
+        ).mapToStoreDataNoFallback().test {
+            val item = awaitItem()
+            assertNotNull(item.fetchedAtInstant)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun networkData_setsFetchedAtInstant() = runTest {
+        flowOf(
+            StoreReadResponse.Data("fresh", StoreReadResponseOrigin.Fetcher()),
+        ).mapToStoreDataNoFallback().test {
+            val item = awaitItem()
+            assertNotNull(item.fetchedAtInstant)
+            assertEquals(DataOrigin.NETWORK, item.origin)
+            awaitComplete()
+        }
+    }
+}
+

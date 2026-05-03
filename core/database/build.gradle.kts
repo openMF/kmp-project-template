@@ -29,6 +29,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kermit.logging)
             api(projects.core.common)
+            implementation(projects.core.model)
             api(projects.coreBase.database)
             implementation(projects.coreBase.security)
         }

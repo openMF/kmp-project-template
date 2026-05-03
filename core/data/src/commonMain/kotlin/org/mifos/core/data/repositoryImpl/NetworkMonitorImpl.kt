@@ -9,12 +9,11 @@
  */
 package org.mifos.core.data.repositoryImpl
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import org.mifos.core.data.repository.NetworkMonitor
-import org.mifos.core.data.util.connectivityProvider
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitorProvider
 
-class NetworkMonitorImpl : NetworkMonitor {
-    override val isOnline: Flow<Boolean>
-        get() = connectivityProvider.statusUpdates.map { it.isConnected }
-}
+/**
+ * Singleton NetworkMonitor backed by cmp-network-monitor.
+ * Auto-initializes on first access via NetworkMonitorProvider.
+ */
+class NetworkMonitorImpl : NetworkMonitor by NetworkMonitorProvider.install()

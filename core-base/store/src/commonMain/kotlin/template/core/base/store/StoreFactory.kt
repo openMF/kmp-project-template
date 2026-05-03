@@ -10,6 +10,7 @@
 package template.core.base.store
 
 import org.mobilenativefoundation.store.core5.ExperimentalStoreApi
+import org.mobilenativefoundation.store.store5.MemoryPolicy
 import org.mobilenativefoundation.store.store5.Bookkeeper
 import org.mobilenativefoundation.store.store5.Converter
 import org.mobilenativefoundation.store.store5.Fetcher
@@ -39,12 +40,14 @@ object StoreFactory {
      * @param fetcher Network data source that fetches fresh data for a given key.
      * @param sourceOfTruth Local persistence layer (reader emits cached data, writer persists).
      * @param validator Optional cache validity check (e.g., TTL-based expiration).
+     * @param memoryPolicy Optional in-memory cache eviction policy (max items, expiration).
      * @return A configured [Store] ready for streaming reads.
      */
     fun <Key : Any, Input : Any, Output : Any> createStore(
         fetcher: Fetcher<Key, Input>,
         sourceOfTruth: SourceOfTruth<Key, Input, Output>,
         validator: Validator<Output>? = null,
+        memoryPolicy: MemoryPolicy<Key, Output>? = null,
     ): Store<Key, Output> {
         var builder = StoreBuilder.from(
             fetcher = fetcher,
@@ -52,6 +55,9 @@ object StoreFactory {
         )
         if (validator != null) {
             builder = builder.validator(validator)
+        }
+        if (memoryPolicy != null) {
+            builder = builder.cachePolicy(memoryPolicy)
         }
         return builder.build()
     }

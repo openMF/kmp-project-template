@@ -37,6 +37,9 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation(projects.coreBase.store)
+            implementation(libs.cmp.network.monitor.compose)
+
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)

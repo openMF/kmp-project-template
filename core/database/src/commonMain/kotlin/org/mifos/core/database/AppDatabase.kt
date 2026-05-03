@@ -14,9 +14,20 @@ import androidx.room3.Database
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
 import androidx.room3.TypeConverters
+import org.mifos.core.database.dao.BookkeeperDao
+import org.mifos.core.database.dao.CoinDetailDao
+import org.mifos.core.database.dao.CoinMarketDao
+import org.mifos.core.database.dao.ExchangeRatesDao
+import org.mifos.core.database.dao.RateHistoryDao
 import org.mifos.core.database.dao.SampleDao
+import org.mifos.core.database.entity.BookkeeperEntity
+import org.mifos.core.database.entity.CoinDetailEntity
+import org.mifos.core.database.entity.CoinMarketEntity
+import org.mifos.core.database.entity.ExchangeRatesEntity
+import org.mifos.core.database.entity.RateHistoryEntity
 import org.mifos.core.database.entity.SampleEntity
 import org.mifos.core.database.utils.ChargeTypeConverters
+import org.mifos.core.database.utils.FintechTypeConverters
 
 /**
  * KSP-generated constructor bridge for [AppDatabase].
@@ -45,22 +56,30 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
  * @see org.mifos.core.database.entity.SampleEntity
  */
 @Database(
-    entities = [SampleEntity::class],
+    entities = [
+        SampleEntity::class,
+        ExchangeRatesEntity::class,
+        CoinMarketEntity::class,
+        CoinDetailEntity::class,
+        RateHistoryEntity::class,
+        BookkeeperEntity::class,
+    ],
     version = AppDatabase.VERSION,
     exportSchema = true,
 )
-@TypeConverters(ChargeTypeConverters::class)
+@TypeConverters(ChargeTypeConverters::class, FintechTypeConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
 
-    /** Data-access object for [SampleEntity] CRUD operations. */
     abstract val sampleDao: SampleDao
+    abstract val exchangeRatesDao: ExchangeRatesDao
+    abstract val coinMarketDao: CoinMarketDao
+    abstract val coinDetailDao: CoinDetailDao
+    abstract val rateHistoryDao: RateHistoryDao
+    abstract val bookkeeperDao: BookkeeperDao
 
     companion object {
-        /** Current schema version. Increment when entity definitions change. */
-        const val VERSION = 1
-
-        /** On-disk database file name used by all platforms. */
+        const val VERSION = 3
         const val DATABASE_NAME = "mifos_database.db"
     }
 }

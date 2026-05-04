@@ -127,7 +127,7 @@ fun LoadMoreFooter(
                 // (from PagingScreenStream's offline guard) categorizes as Network and
                 // shows "No internet" + cloud-off icon — instead of the generic
                 // "Failed to load more" treatment.
-                val copy = remember(loadMoreError) { loadMoreFooterCopy(loadMoreError!!) }
+                val copy = remember(loadMoreError) { loadMoreFooterCopy(loadMoreError) }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {

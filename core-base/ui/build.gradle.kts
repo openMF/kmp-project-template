@@ -38,6 +38,7 @@ kotlin {
 
         commonMain.dependencies {
             implementation(projects.coreBase.store)
+            implementation(projects.coreBase.designsystem)
             implementation(libs.cmp.network.monitor.compose)
 
             implementation(compose.ui)

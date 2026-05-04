@@ -81,7 +81,8 @@ private fun String.matchesNetworkClassName(): Boolean =
         contains("Connect", ignoreCase = true) ||
         contains("Timeout", ignoreCase = true) ||
         contains("UnknownHost", ignoreCase = true) ||
-        contains("SSLException", ignoreCase = true)
+        contains("SSLException", ignoreCase = true) ||
+        contains("Offline", ignoreCase = true)
 
 private val AUTH_HTTP_REGEX = Regex("""\b(?:HTTP\s+)?(?:401|403)\b""")
 

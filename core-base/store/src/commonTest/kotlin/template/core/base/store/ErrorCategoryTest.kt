@@ -93,4 +93,16 @@ class ErrorCategoryTest {
         val err = RuntimeException("HTTP 500")
         assertEquals(categorize(err), categorize(err))
     }
+
+    @Test
+    fun categorize_offlineException_returnsNetwork() {
+        // Contract that PagingScreenStream's offline guard relies on: throwing
+        // an OfflineException must route the UI through the no-network treatment.
+        // Class name contains "Offline" → matchesNetworkClassName() heuristic catches it.
+        assertEquals(
+            ErrorCategory.Network,
+            categorize(OfflineException()),
+            "OfflineException must categorize as Network so framework UI shows the offline treatment.",
+        )
+    }
 }

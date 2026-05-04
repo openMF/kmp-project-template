@@ -18,6 +18,7 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.common)
             implementation(projects.core.domain)
 
             implementation(compose.ui)

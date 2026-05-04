@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.core.common.formatGrouped
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,9 +104,9 @@ fun EmiCalculatorScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text("Results", style = MaterialTheme.typography.titleMedium)
-                        Text("Monthly EMI: ${"%,.2f".format(result.emi)}")
-                        Text("Total Payment: ${"%,.2f".format(result.totalPayment)}")
-                        Text("Total Interest: ${"%,.2f".format(result.totalInterest)}")
+                        Text("Monthly EMI: ${result.emi.formatGrouped(2)}")
+                        Text("Total Payment: ${result.totalPayment.formatGrouped(2)}")
+                        Text("Total Interest: ${result.totalInterest.formatGrouped(2)}")
                     }
                 }
             }

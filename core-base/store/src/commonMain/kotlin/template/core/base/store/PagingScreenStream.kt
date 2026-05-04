@@ -10,12 +10,14 @@
 package template.core.base.store
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.mobilenativefoundation.store.store5.Store
@@ -51,6 +53,7 @@ class PagingScreenStream<T : Any> internal constructor(
     private val isInitialLoading: MutableStateFlow<Boolean>,
     private val error: MutableStateFlow<Throwable?>,
     private val currentPage: MutableStateFlow<Int>,
+    private val networkMonitor: NetworkMonitor,
 ) {
     /** Load the next page. No-op if already loading or no more pages. Cache-first. */
     fun loadNextPage() {
@@ -60,8 +63,8 @@ class PagingScreenStream<T : Any> internal constructor(
             error.value = null
             val nextPage = currentPage.value + 1
             val pageKey = PageKey(page = nextPage, pageSize = pageSize, query = query)
-            // refresh=false (cache-first): if this page was loaded recently, return the
-            // cached copy instantly. Pull-to-refresh uses the dedicated refresh() path.
+            // refresh=false (cache-first): if this page is in SoT, return it instantly.
+            // Pull-to-refresh uses the dedicated refresh() path.
             when (val result = store.loadPage(pageKey, refresh = false)) {
                 is StorePageResult.Success -> {
                     items.update { it + result.items }
@@ -69,7 +72,11 @@ class PagingScreenStream<T : Any> internal constructor(
                     hasMoreMutable.value = result.nextKey != null
                 }
                 is StorePageResult.Error -> {
-                    error.value = result.error
+                    // Re-type as OfflineException when offline so categorize() routes
+                    // through Network category and LoadMoreFooter shows the no-network
+                    // treatment instantly — instead of "Failed to load more" after the
+                    // fetcher's executeWithRetry burns ~3s on a hopeless retry.
+                    error.value = retypeIfOffline(result.error)
                 }
             }
             isLoadingMoreMutable.value = false
@@ -99,11 +106,26 @@ class PagingScreenStream<T : Any> internal constructor(
                     hasMoreMutable.value = result.nextKey != null
                 }
                 is StorePageResult.Error -> {
-                    error.value = result.error
+                    // Same offline-retype as loadNextPage — fixes the warm-reopen bug
+                    // where the user navigates back to a paged screen after disabling
+                    // internet and sees "failed to fetch" briefly while the fetcher
+                    // burns retry budget. With this, DecisionEngine sees a Network-
+                    // class error and renders NoNetwork immediately.
+                    error.value = retypeIfOffline(result.error)
                 }
             }
             isInitialLoading.value = false
         }
+    }
+
+    /**
+     * If the device is offline, replace [original] with an [OfflineException] so the
+     * UI stack routes the error through the no-network treatment. If we're online,
+     * the original error is preserved untouched (caller still sees the real cause).
+     */
+    private suspend fun retypeIfOffline(original: Throwable): Throwable {
+        val online = networkMonitor.networkStatus.first() is NetworkStatus.Available
+        return if (online) original else OfflineException()
     }
 }
 
@@ -171,5 +193,6 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         isInitialLoading = isInitialLoading,
         error = error,
         currentPage = currentPage,
+        networkMonitor = networkMonitor,
     ).also { it.loadInitialPage() }
 }

@@ -2412,6 +2412,7 @@
 |    |    |    +--- org.jetbrains.androidx.core:core-bundle:1.0.1 (*)
 |    |    |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.1 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0 (*)
+|    |    |    +--- project :core:common (*)
 |    |    |    +--- project :core:domain
 |    |    |    |    +--- project :core:data (*)
 |    |    |    |    +--- project :core:model (*)
@@ -2454,6 +2455,7 @@
 |    |    |    +--- org.jetbrains.androidx.core:core-bundle:1.0.1 (*)
 |    |    |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.1 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0 (*)
+|    |    |    +--- project :core:common (*)
 |    |    |    +--- project :core:domain (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.10.3 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)

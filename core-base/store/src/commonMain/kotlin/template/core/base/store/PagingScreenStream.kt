@@ -53,7 +53,7 @@ class PagingScreenStream<T : Any> internal constructor(
     private val error: MutableStateFlow<Throwable?>,
     private val currentPage: MutableStateFlow<Int>,
 ) {
-    /** Load the next page. No-op if already loading or no more pages. */
+    /** Load the next page. No-op if already loading or no more pages. Cache-first. */
     fun loadNextPage() {
         if (isLoadingMoreMutable.value || !hasMoreMutable.value) return
         scope.launch {
@@ -61,7 +61,9 @@ class PagingScreenStream<T : Any> internal constructor(
             error.value = null
             val nextPage = currentPage.value + 1
             val pageKey = PageKey(page = nextPage, pageSize = pageSize, query = query)
-            when (val result = store.loadPage(pageKey)) {
+            // refresh=false (cache-first): if this page was loaded recently, return the
+            // cached copy instantly. Pull-to-refresh uses the dedicated refresh() path.
+            when (val result = store.loadPage(pageKey, refresh = false)) {
                 is StorePageResult.Success -> {
                     items.update { it + result.items }
                     currentPage.value = nextPage
@@ -75,7 +77,7 @@ class PagingScreenStream<T : Any> internal constructor(
         }
     }
 
-    /** Refresh from page 0, clearing all loaded pages. */
+    /** Refresh from page 0, clearing all loaded pages. Forces network for the first page. */
     fun refresh() {
         scope.launch {
             currentPage.value = 0
@@ -83,16 +85,16 @@ class PagingScreenStream<T : Any> internal constructor(
             hasMoreMutable.value = true
             error.value = null
             isInitialLoading.value = true
-            loadInitialPage()
+            loadInitialPage(refresh = true)
         }
     }
 
     fun retry() = refresh()
 
-    internal fun loadInitialPage() {
+    internal fun loadInitialPage(refresh: Boolean = false) {
         scope.launch {
             val pageKey = PageKey.first(pageSize = pageSize, query = query)
-            when (val result = store.loadPage(pageKey)) {
+            when (val result = store.loadPage(pageKey, refresh = refresh)) {
                 is StorePageResult.Success -> {
                     items.value = result.items
                     hasMoreMutable.value = result.nextKey != null

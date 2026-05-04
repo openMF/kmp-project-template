@@ -71,12 +71,17 @@ data class PageKey(
  * only returns from the lambda, it does not cancel the flow.
  *
  * @param key The page key to load.
+ * @param refresh When true, always hit the network even if the page is cached
+ *   (use for pull-to-refresh). When false (default), serve from cache if available
+ *   and only hit the network for uncached pages — the right behavior for
+ *   infinite-scroll load-more.
  * @return Success with items and pagination keys, or Error.
  */
 suspend fun <Value : Any> Store<PageKey, List<Value>>.loadPage(
     key: PageKey,
+    refresh: Boolean = false,
 ): StorePageResult<Value> {
-    val response = stream(StoreReadRequest.cached(key, refresh = true))
+    val response = stream(StoreReadRequest.cached(key, refresh = refresh))
         .filterNot {
             it is StoreReadResponse.Loading ||
                 it is StoreReadResponse.NoNewData ||

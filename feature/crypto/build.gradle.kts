@@ -19,6 +19,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.domain)
+            // KptScaffold + rememberKptPullToRefreshState bridge live in core/ui
+            implementation(projects.core.ui)
 
             implementation(compose.ui)
             implementation(compose.material3)

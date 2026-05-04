@@ -30,6 +30,9 @@ kotlin {
             implementation(projects.core.designsystem)
             implementation(projects.core.model)
             implementation(projects.core.common)
+            // For rememberKptPullToRefreshState(pagingStream) bridge — observes
+            // ScreenState freshness + calls pagingStream.refresh() on pull.
+            implementation(projects.coreBase.store)
             implementation(libs.jb.composeViewmodel)
             implementation(libs.jb.lifecycleViewmodel)
             implementation(libs.jb.lifecycleViewmodelSavedState)

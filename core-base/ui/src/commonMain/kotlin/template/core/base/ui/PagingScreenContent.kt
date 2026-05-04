@@ -14,8 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -103,14 +101,12 @@ fun <T : Any> PagingScreenContent(
  * @param loadingMessage Footer message during page load.
  * @param endMessage Footer message when all pages loaded.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T : Any> PagingScreenContent(
     pagingStream: PagingScreenStream<T>,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     showFreshnessIndicator: Boolean = true,
-    enablePullToRefresh: Boolean = true,
     listState: LazyListState = rememberLazyListState(),
     loadMoreThreshold: Int = 5,
     loadingMessage: String = "Loading more...",
@@ -138,75 +134,34 @@ fun <T : Any> PagingScreenContent(
         if (shouldLoadMore) pagingStream.loadNextPage()
     }
 
-    // Pull-to-refresh shows a spinner whenever the data is UPDATING (fresh fetch
-    // in flight after pull, or refresh-on-reconnect). Wraps the entire body so
-    // pull works in any state — Empty / Error / NoNetwork screens can also be
-    // re-fetched by pulling.
-    val isRefreshing = (state as? ScreenState.Content<*>)?.freshness == DataFreshness.UPDATING
-
-    val body: @Composable () -> Unit = {
-        ScreenContent(
-            state = state,
-            onRetry = onRetry,
+    // Pull-to-refresh is owned by the project's KptScaffold via KptPullToRefreshState
+    // (see core/ui/.../KptPullToRefreshState.kt: rememberKptPullToRefreshState(pagingStream)).
+    // PagingScreenContent intentionally does NOT wrap its own PullToRefreshBox — that
+    // would conflict with KptScaffold's gesture and indicator.
+    ScreenContent(
+        state = state,
+        onRetry = onRetry,
+        modifier = modifier,
+        showFreshnessIndicator = showFreshnessIndicator,
+        loading = loading,
+        empty = empty,
+        noNetwork = noNetwork,
+        error = error,
+    ) { items, _ ->
+        LazyColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize(),
-            showFreshnessIndicator = showFreshnessIndicator,
-            loading = loading,
-            empty = empty,
-            noNetwork = noNetwork,
-            error = error,
-        ) { items, _ ->
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                lazyContent(items)
-                item {
-                    LoadMoreFooter(
-                        isLoadingMore = isLoadingMore,
-                        hasMore = hasMore,
-                        loadMoreError = loadMoreError,
-                        onRetry = pagingStream::loadNextPage,
-                        loadingMessage = loadingMessage,
-                        endMessage = endMessage,
-                    )
-                }
-            }
-        }
-    }
-
-    if (enablePullToRefresh) {
-        PullToRefreshBox(
-            isRefreshing = isRefreshing,
-            onRefresh = pagingStream::refresh,
-            modifier = modifier,
-        ) { body() }
-    } else {
-        // No pull wrapper — apply caller's modifier directly to the body via ScreenContent.
-        ScreenContent(
-            state = state,
-            onRetry = onRetry,
-            modifier = modifier,
-            showFreshnessIndicator = showFreshnessIndicator,
-            loading = loading,
-            empty = empty,
-            noNetwork = noNetwork,
-            error = error,
-        ) { items, _ ->
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                lazyContent(items)
-                item {
-                    LoadMoreFooter(
-                        isLoadingMore = isLoadingMore,
-                        hasMore = hasMore,
-                        loadMoreError = loadMoreError,
-                        onRetry = pagingStream::loadNextPage,
-                        loadingMessage = loadingMessage,
-                        endMessage = endMessage,
-                    )
-                }
+        ) {
+            lazyContent(items)
+            item {
+                LoadMoreFooter(
+                    isLoadingMore = isLoadingMore,
+                    hasMore = hasMore,
+                    loadMoreError = loadMoreError,
+                    onRetry = pagingStream::loadNextPage,
+                    loadingMessage = loadingMessage,
+                    endMessage = endMessage,
+                )
             }
         }
     }

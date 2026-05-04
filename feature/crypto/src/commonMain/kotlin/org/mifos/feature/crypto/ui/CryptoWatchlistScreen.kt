@@ -17,25 +17,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.model.fintech.CoinMarket
+import org.mifos.core.ui.scaffold.KptScaffold
+import org.mifos.core.ui.scaffold.rememberKptPullToRefreshState
 import template.core.base.ui.PagingScreenContent
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CryptoWatchlistScreen(
     onCoinClick: (String) -> Unit,
@@ -43,29 +37,23 @@ fun CryptoWatchlistScreen(
     modifier: Modifier = Modifier,
     viewModel: CryptoWatchlistViewModel = koinViewModel(),
 ) {
-    Scaffold(
+    // KptScaffold owns pull-to-refresh (Material 3 pullToRefresh + Indicator at the top).
+    // The bridge wires KptPullToRefreshState to viewModel.pagingStream so:
+    //   - isRefreshing tracks ScreenState.Content.freshness == UPDATING
+    //   - onRefresh invokes pagingStream.refresh() (clears error, refetches page 0 from network)
+    KptScaffold(
+        showNavigationIcon = true,
+        onNavigationIconClick = onBackClick,
+        title = "Crypto Watchlist",
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = { Text("Crypto Watchlist") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-            )
-        },
-    ) { padding ->
-        // PagingScreenContent owns the LazyColumn, listState, load-more trigger,
-        // and LoadMoreFooter (loading / error+retry / end-of-list). The screen just
-        // declares per-item content. Offline-first decisions live in core-base/store
-        // (DecisionEngine) — this screen has zero state-handling code.
+        pullToRefreshState = rememberKptPullToRefreshState(viewModel.pagingStream),
+    ) {
+        // PagingScreenContent owns LazyColumn, load-more trigger, LoadMoreFooter.
+        // It does NOT wrap a PullToRefreshBox — KptScaffold handles the gesture.
         PagingScreenContent(
             pagingStream = viewModel.pagingStream,
             onRetry = viewModel::onRetry,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize(),
         ) { coins ->
             items(coins) { coin ->
                 CoinItem(coin = coin, onClick = { onCoinClick(coin.id) })

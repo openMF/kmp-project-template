@@ -89,6 +89,12 @@ fun <T> ScreenContent(
         contentKey = { it.transitionKey() },
         label = "ScreenContent",
         modifier = modifier,
+        // Default is TopStart — placing slot content at top-left when it doesn't
+        // fill the AnimatedContent box. Default*Content composables already use
+        // fillMaxSize + Arrangement.Center, but during fade transitions or with
+        // certain parent constraints they could collapse. Explicit Center here
+        // makes empty / error / no-network states predictably centered.
+        contentAlignment = Alignment.Center,
     ) { current ->
         when (current) {
             is ScreenState.Loading -> loading()
@@ -96,7 +102,10 @@ fun <T> ScreenContent(
             is ScreenState.NoNetwork -> noNetwork(current.isCaptivePortal)
             is ScreenState.Error -> error(current.error)
             is ScreenState.Content -> {
-                Column {
+                // fillMaxSize so Content (freshness indicator + caller's content)
+                // gets the full available height — otherwise this Column wraps and
+                // a LazyColumn inside content may not get its requested fill.
+                Column(modifier = Modifier.fillMaxSize()) {
                     if (showFreshnessIndicator) {
                         DataFreshnessIndicator(
                             freshness = current.freshness,

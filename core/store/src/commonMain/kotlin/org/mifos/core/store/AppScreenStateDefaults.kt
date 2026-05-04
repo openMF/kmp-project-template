@@ -18,23 +18,15 @@ import template.core.base.ui.ScreenStateLoading
 import template.core.base.ui.ScreenStateNoNetwork
 
 /**
+ * !! THIS IS THE FORK CUSTOMIZATION POINT !!
+ *
+ * Edit this file to brand your app's empty / error / no-network / loading visuals.
+ * Do NOT edit `core-base/store` or `core-base/ui` — they're framework-shared.
+ *
  * App-wide [ScreenStateDefaults] for `template.core.base.ui.ScreenContent` and
- * `template.core.base.ui.PagingScreenContent`.
- *
- * Wire this once at the app's theme root:
- *
- * ```kotlin
- * @Composable
- * fun MifosApp(content: @Composable () -> Unit) {
- *     MifosTheme {
- *         CompositionLocalProvider(
- *             LocalScreenStateDefaults provides appScreenStateDefaults(),
- *         ) {
- *             content()
- *         }
- *     }
- * }
- * ```
+ * `template.core.base.ui.PagingScreenContent`. Already wired into [MifosTheme] —
+ * every screen wrapped by `MifosTheme` automatically picks up these defaults via
+ * `LocalScreenStateDefaults`. No per-screen wiring required.
  *
  * Forks customize by replacing visuals with branded Lottie animations
  * (`ScreenStateVisual.Lottie(spec = DefaultLottieAnimations.empty)` once the bundled

@@ -15,10 +15,13 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import org.mifos.core.store.appScreenStateDefaults
 import template.core.base.designsystem.KptMaterialTheme
 import template.core.base.designsystem.theme.KptThemeProviderImpl
 import template.core.base.designsystem.toKptColorScheme
 import template.core.base.designsystem.toKptTypography
+import template.core.base.ui.LocalScreenStateDefaults
 
 val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -128,10 +131,20 @@ fun MifosTheme(
         typography = mifosTypography,
     )
 
-    KptMaterialTheme(
-        theme = themeProvider,
-        content = content,
-    )
+    val screenStateDefaults = appScreenStateDefaults()
+
+    KptMaterialTheme(theme = themeProvider) {
+        // Wire LocalScreenStateDefaults app-wide so every ScreenContent /
+        // PagingScreenContent automatically picks up the fork's branded empty /
+        // error / no-network / loading visuals without per-screen wiring.
+        // Customize visuals in core/store/AppScreenStateDefaults.kt — that's
+        // the single fork seam.
+        CompositionLocalProvider(
+            LocalScreenStateDefaults provides screenStateDefaults,
+        ) {
+            content()
+        }
+    }
 }
 
 @Composable

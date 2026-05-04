@@ -30,6 +30,9 @@ kotlin {
         }
         commonMain.dependencies {
             api(projects.coreBase.designsystem)
+            // Theme wires LocalScreenStateDefaults from core/store so every screen
+            // wrapped by MifosTheme picks up the app's branded ScreenState defaults.
+            implementation(projects.core.store)
 
             implementation(compose.ui)
             implementation(compose.uiUtil)

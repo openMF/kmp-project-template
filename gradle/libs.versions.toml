@@ -93,6 +93,7 @@ kermit = "2.0.8"
 fileKit = "0.12.0"
 uiBackhandler = "1.10.3"
 wire = "5.4.0"
+compottie = "2.0.0-rc04"
 
 # Jetbrains CMP
 windowsSizeClass = "0.5.0"
@@ -290,6 +291,14 @@ coil-kt = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
 coil-kt-compose = { group = "io.coil-kt.coil3", name = "coil-compose-core", version.ref = "coil" }
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
 coil-svg = { group = "io.coil-kt.coil3", name = "coil-svg", version.ref = "coil" }
+
+# Compottie — Lottie renderer for Compose Multiplatform (alexzhirkevich/compottie).
+# Used by core-base/ui:ScreenStateVisual.Lottie. Optional sub-modules (dot-lottie, network)
+# can be added later if .lottie/zip support or URL loading is needed.
+compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
+compottie-resources = { module = "io.github.alexzhirkevich:compottie-resources", version.ref = "compottie" }
+compottie-dot-lottie = { module = "io.github.alexzhirkevich:compottie-dot-lottie", version.ref = "compottie" }
+compottie-network = { module = "io.github.alexzhirkevich:compottie-network", version.ref = "compottie" }
 
 compose-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
 squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okioVersion" }

@@ -19,6 +19,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import io.github.alexzhirkevich.compottie.Compottie
+import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import template.core.base.store.ErrorCategory
 import template.core.base.store.categorize
 
@@ -132,9 +134,7 @@ sealed interface ScreenStateLoading {
 
 /**
  * Visual element for empty/error/no-network states. Sealed: extend by adding a new variant
- * here (or in an optional sibling module) and a branch in [ScreenStateVisualRenderer].
- *
- * Lottie support is added in Phase 3 (Compottie integration).
+ * here and a branch in [ScreenStateVisualRenderer].
  */
 sealed interface ScreenStateVisual {
     /** Material icon or any [ImageVector]. */
@@ -145,6 +145,21 @@ sealed interface ScreenStateVisual {
      * can be created with `painterResource(...)` inside a Composable scope.
      */
     data class PainterRef(val painter: @Composable () -> Painter) : ScreenStateVisual
+
+    /**
+     * Lottie animation rendered via Compottie. The [spec] lambda is a `suspend` loader
+     * (matches `rememberLottieComposition`'s signature) so it can read assets from
+     * `composeResources` via `Res.readBytes(...)` or fetch from any other suspend source.
+     *
+     * @property spec Suspend factory for the [LottieCompositionSpec] (composeResources, JSON, etc.).
+     * @property iterations Loop count; defaults to [Compottie.IterateForever].
+     * @property speed Playback speed multiplier; 1f is real-time.
+     */
+    data class Lottie(
+        val spec: suspend () -> LottieCompositionSpec,
+        val iterations: Int = Compottie.IterateForever,
+        val speed: Float = 1f,
+    ) : ScreenStateVisual
 
     /** Fully custom Composable — escape hatch for anything else. */
     data class Custom(val content: @Composable () -> Unit) : ScreenStateVisual

@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -38,6 +39,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import io.github.alexzhirkevich.compottie.rememberLottieComposition
+import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import template.core.base.designsystem.component.KptShimmerLoadingBox
 import template.core.base.designsystem.theme.KptTheme
 import template.core.base.store.DataFreshness
@@ -312,6 +315,19 @@ internal fun ScreenStateVisualRenderer(
             contentDescription = null,
             modifier = modifier,
         )
+        is ScreenStateVisual.Lottie -> {
+            val composition by rememberLottieComposition { visual.spec() }
+            val painter = rememberLottiePainter(
+                composition = composition,
+                iterations = visual.iterations,
+                speed = visual.speed,
+            )
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = modifier,
+            )
+        }
         is ScreenStateVisual.Custom -> visual.content()
     }
 }

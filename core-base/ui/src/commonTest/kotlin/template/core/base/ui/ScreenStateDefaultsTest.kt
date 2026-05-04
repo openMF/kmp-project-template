@@ -184,4 +184,43 @@ class ScreenStateDefaultsTest {
         val titled = defaultCfg.copy(title = "Couldn't load")
         assertEquals("Couldn't load", titled.title)
     }
+
+    // ── Default messageFor routes through categorize() (Phase 2.6) ────────
+
+    @Test
+    fun defaultMessageFor_networkError_returnsNetworkCopy() {
+        val err = RuntimeException("connection failed", IOExceptionLike("Connect timed out"))
+        assertEquals(
+            "Can't reach the server. Check your connection.",
+            ScreenStateError().messageFor(err),
+        )
+    }
+
+    @Test
+    fun defaultMessageFor_authError_returnsAuthCopy() {
+        val err = RuntimeException("HTTP 401: Unauthorized")
+        assertEquals(
+            "Your session expired. Please sign in again.",
+            ScreenStateError().messageFor(err),
+        )
+    }
+
+    @Test
+    fun defaultMessageFor_serverError_returnsServerCopy() {
+        val err = RuntimeException("HTTP 503: Service Unavailable")
+        assertEquals(
+            "Our servers are having a moment. Try again in a bit.",
+            ScreenStateError().messageFor(err),
+        )
+    }
+
+    @Test
+    fun defaultMessageFor_genericError_fallsBackToThrowableMessage() {
+        // Same as the original contract: nothing matches → return the throwable's message.
+        assertEquals("boom", ScreenStateError().messageFor(IllegalStateException("boom")))
+        assertEquals("Something went wrong", ScreenStateError().messageFor(IllegalStateException()))
+    }
+
+    /** Throwable whose simpleName matches the network heuristic ("IOException"). */
+    private class IOExceptionLike(message: String) : RuntimeException(message)
 }

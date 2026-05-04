@@ -14,7 +14,11 @@ libProps.stringPropertyNames()
         val path     = libProps["$lib.path"]     as? String ?: return@forEach
         val module   = libProps["$lib.module"]   as? String ?: return@forEach
         val artifact = libProps["$lib.artifact"] as? String ?: return@forEach
-        if (!file(path).exists()) {
+        // Normalize ".." segments before existence check -- Java's File.exists()
+        // doesn't collapse ".." past filesystem root on Windows, so the bare
+        // file() check can spuriously pass on CI runners.
+        val resolved = settingsDir.toPath().resolve(path).normalize().toFile()
+        if (!resolved.isDirectory) {
             println("\uD83D\uDCE6 [lib-integrate] $lib \u2192 Maven Central (source not found at $path)")
             return@forEach
         }

@@ -112,16 +112,25 @@ class ScreenStateDefaultsTest {
             ScreenStateDefaults().error.visual,
             ScreenStateDefaults().noNetwork.visual,
             ScreenStateDefaults().noNetwork.captivePortalVisual,
+            ScreenStateVisual.Lottie(spec = { error("not invoked in this test") }),
             ScreenStateVisual.Custom { /* no-op */ },
         )
         for (v in visuals) {
             val tag: String = when (v) {
                 is ScreenStateVisual.Vector -> "vector"
                 is ScreenStateVisual.PainterRef -> "painter"
+                is ScreenStateVisual.Lottie -> "lottie"
                 is ScreenStateVisual.Custom -> "custom"
             }
             assertNotNull(tag)
         }
+    }
+
+    @Test
+    fun screenStateVisual_lottie_defaultsAreSensible() {
+        val lottie = ScreenStateVisual.Lottie(spec = { error("not invoked in this test") })
+        assertEquals(io.github.alexzhirkevich.compottie.Compottie.IterateForever, lottie.iterations)
+        assertEquals(1f, lottie.speed)
     }
 
     @Test

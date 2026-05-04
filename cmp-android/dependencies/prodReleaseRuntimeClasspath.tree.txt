@@ -1856,6 +1856,7 @@
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
 |    |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
+|    |    +--- project :core-base:designsystem (*)
 |    |    +--- io.github.mobilebytelabs:cmp-network-monitor-compose:3.2.1 -> project :kmp-toolkit:cmp-network-monitor-compose
 |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 -> 2.3.20 (*)
 |    |    |    +--- project :kmp-toolkit:cmp-network-monitor (*)

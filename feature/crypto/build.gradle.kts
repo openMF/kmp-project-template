@@ -18,6 +18,7 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.common)
             implementation(projects.core.domain)
             // KptScaffold + rememberKptPullToRefreshState bridge live in core/ui
             implementation(projects.core.ui)

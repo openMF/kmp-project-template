@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.core.common.formatDecimal
 import template.core.base.ui.ScreenContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,7 +107,7 @@ private fun RateItem(code: String, rate: Double) {
             modifier = Modifier.weight(1f),
         )
         Text(
-            text = "%.4f".format(rate),
+            text = rate.formatDecimal(4),
             style = MaterialTheme.typography.bodyMedium,
         )
     }

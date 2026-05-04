@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.mifos.core.common.formatDecimal
+import org.mifos.core.common.formatGrouped
 import template.core.base.ui.ScreenContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,14 +79,14 @@ fun CoinDetailScreen(
                     style = MaterialTheme.typography.headlineMedium,
                 )
 
-                StatRow("Price", "$${"%,.2f".format(coin.currentPrice)}")
-                StatRow("24h Change", "${"%.2f".format(coin.priceChangePercent24h)}%")
-                StatRow("Market Cap", "$${"%,d".format(coin.marketCap)}")
+                StatRow("Price", "$${coin.currentPrice.formatGrouped(2)}")
+                StatRow("24h Change", "${coin.priceChangePercent24h.formatDecimal(2)}%")
+                StatRow("Market Cap", "$${coin.marketCap.formatGrouped()}")
                 StatRow("Rank", "#${coin.marketCapRank}")
-                StatRow("24h High", "$${"%,.2f".format(coin.high24h)}")
-                StatRow("24h Low", "$${"%,.2f".format(coin.low24h)}")
-                StatRow("Circulating", "%,.0f".format(coin.circulatingSupply))
-                coin.maxSupply?.let { StatRow("Max Supply", "%,.0f".format(it)) }
+                StatRow("24h High", "$${coin.high24h.formatGrouped(2)}")
+                StatRow("24h Low", "$${coin.low24h.formatGrouped(2)}")
+                StatRow("Circulating", coin.circulatingSupply.formatGrouped(0))
+                coin.maxSupply?.let { StatRow("Max Supply", it.formatGrouped(0)) }
 
                 if (coin.description.isNotBlank()) {
                     Text(

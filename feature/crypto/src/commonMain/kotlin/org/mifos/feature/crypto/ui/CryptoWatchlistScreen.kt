@@ -25,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.core.common.formatDecimal
+import org.mifos.core.common.formatGrouped
 import org.mifos.core.model.fintech.CoinMarket
 import org.mifos.core.ui.scaffold.KptScaffold
 import org.mifos.core.ui.scaffold.rememberKptPullToRefreshState
@@ -83,11 +85,11 @@ private fun CoinItem(coin: CoinMarket, onClick: () -> Unit) {
         }
         Column(horizontalAlignment = Alignment.End) {
             Text(
-                text = "$${"%,.2f".format(coin.currentPrice)}",
+                text = "$${coin.currentPrice.formatGrouped(2)}",
                 style = MaterialTheme.typography.bodyMedium,
             )
             Text(
-                text = "${"%.2f".format(coin.priceChangePercent24h)}%",
+                text = "${coin.priceChangePercent24h.formatDecimal(2)}%",
                 style = MaterialTheme.typography.bodySmall,
                 color = if (coin.priceChangePercent24h >= 0) {
                     MaterialTheme.colorScheme.primary

@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.core.common.formatDecimal
 import template.core.base.ui.ScreenContent
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -108,7 +109,7 @@ fun RateHistoryScreen(
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(history.rates) { point ->
                         Text(
-                            text = "${point.date}  \u2192  ${"%.4f".format(point.value)}",
+                            text = "${point.date}  \u2192  ${point.value.formatDecimal(4)}",
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(vertical = 6.dp),
                         )

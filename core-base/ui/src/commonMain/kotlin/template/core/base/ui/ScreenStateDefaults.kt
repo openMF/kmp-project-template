@@ -19,6 +19,8 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import template.core.base.store.ErrorCategory
+import template.core.base.store.categorize
 
 /**
  * App-level defaults for [ScreenContent] and [PagingScreenContent] slots.
@@ -75,11 +77,29 @@ data class ScreenStateEmpty(
 data class ScreenStateError(
     val visual: ScreenStateVisual = ScreenStateVisual.Vector(Icons.Default.Error),
     val title: String? = null,
-    val messageFor: (Throwable) -> String = { it.message ?: "Something went wrong" },
+    /**
+     * Translates a [Throwable] into a user-facing message. The default routes through
+     * [categorize] to provide category-aware copy (network / auth / server / generic).
+     * Override per app via `ScreenStateError(messageFor = ::myMapper)`.
+     */
+    val messageFor: (Throwable) -> String = ::defaultErrorMessage,
     val retryText: String = "Try again",
     /** Optional analytics callback fired exactly once per distinct error rendered. */
     val onShown: ((Throwable) -> Unit)? = null,
 )
+
+/**
+ * Library default for [ScreenStateError.messageFor]. Routes through [categorize] so apps
+ * that don't supply a custom mapper still get sensible category-specific copy out of the
+ * box. Apps that need branded messages should pass their own lambda — typically wired
+ * once at the theme level via `LocalScreenStateDefaults`.
+ */
+fun defaultErrorMessage(error: Throwable): String = when (categorize(error)) {
+    ErrorCategory.Network -> "Can't reach the server. Check your connection."
+    ErrorCategory.Auth -> "Your session expired. Please sign in again."
+    ErrorCategory.Server -> "Our servers are having a moment. Try again in a bit."
+    ErrorCategory.Generic -> error.message ?: "Something went wrong"
+}
 
 /** Configuration for the no-network state, including captive-portal variant. */
 @Immutable

@@ -10,7 +10,6 @@
 package template.core.base.store
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -131,20 +130,30 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         isInitialLoading,
         error,
     ) { itemList, status, loading, err ->
-        val isOnline = status is NetworkStatus.Available
-        val isCaptive = status is NetworkStatus.CaptivePortal
-        when {
-            loading && itemList.isEmpty() && (!isOnline || isCaptive) ->
-                ScreenState.NoNetwork(isCaptivePortal = isCaptive)
-            loading && itemList.isEmpty() -> ScreenState.Loading
-            err != null && itemList.isEmpty() && !isOnline ->
-                ScreenState.NoNetwork()
-            err != null && itemList.isEmpty() -> ScreenState.Error(err)
-            itemList.isEmpty() && !loading -> ScreenState.Empty
-            !isOnline || isCaptive -> ScreenState.Content(itemList, DataFreshness.STALE)
-            loading -> ScreenState.Content(itemList, DataFreshness.UPDATING)
-            else -> ScreenState.Content(itemList, DataFreshness.FRESH)
+        // Definitive Empty: paging knows the difference between "load hasn't started"
+        // (isInitialLoading=true) and "load completed with zero items" (isInitialLoading=false,
+        // err=null). DecisionEngine treats these the same (Loading), so we special-case
+        // the post-load empty here before delegating.
+        if (itemList.isEmpty() && !loading && err == null) {
+            return@combine ScreenState.Empty
         }
+        // Wrap paging state into a StoreData<List<Value>> and let DecisionEngine handle
+        // every other transition (Loading / NoNetwork / CaptivePortal / Error /
+        // Content+freshness). Single state machine for both single-key (asScreenStream)
+        // and paged (this) flows — eliminates drift between two separate `when` blocks.
+        // Note: DecisionEngine never reads .data when isEmpty=true, so emptyList() is a
+        // safe sentinel here (avoids the EMPTY_SENTINEL `as List` cast which fails at
+        // runtime — outer collection type isn't erased).
+        val storeData = StoreData(
+            data = itemList,
+            origin = DataOrigin.NETWORK,
+            isRefreshing = loading,
+            fetchedAt = null,
+            fetchedAtInstant = null,
+            error = err,
+            isEmpty = itemList.isEmpty(),
+        )
+        DecisionEngine.decide(storeData, status)
     }
 
     return PagingScreenStream(

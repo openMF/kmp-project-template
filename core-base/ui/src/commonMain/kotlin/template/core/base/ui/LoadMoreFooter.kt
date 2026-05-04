@@ -34,11 +34,12 @@ import androidx.compose.ui.unit.dp
 import template.core.base.store.PagingScreenStream
 
 /**
- * Footer for paginated lists. Shows loading indicator, error with retry, or end-of-list.
- * Place as the last item in a LazyColumn.
+ * Footer for paginated lists driven by a [PagingScreenStream]. Place as the last
+ * item in a LazyColumn. Shows loading indicator, error with retry, or end-of-list.
  *
  * @param pagingStream The paging stream to observe.
- * @param onLoadMore Called when reaching the footer (trigger next page load).
+ * @param onLoadMore Optional auto-trigger called during composition when the footer
+ *   becomes visible AND more pages are available AND no load is in flight.
  * @param loadingMessage Custom message during page load.
  * @param endMessage Custom message when all pages loaded.
  */
@@ -59,6 +60,38 @@ fun <T : Any> LoadMoreFooter(
         onLoadMore?.invoke()
     }
 
+    LoadMoreFooter(
+        isLoadingMore = isLoadingMore,
+        hasMore = hasMore,
+        loadMoreError = loadMoreError,
+        onRetry = pagingStream::loadNextPage,
+        modifier = modifier,
+        loadingMessage = loadingMessage,
+        endMessage = endMessage,
+    )
+}
+
+/**
+ * Footer overload taking raw state values. Lets screens that drive paging without
+ * exposing [PagingScreenStream] directly still use the canonical footer rendering.
+ *
+ * @param isLoadingMore Whether a page load is currently in flight.
+ * @param hasMore Whether more pages are available.
+ * @param loadMoreError The most recent load-more error, or null.
+ * @param onRetry Called when the user taps "Tap to retry".
+ * @param loadingMessage Custom message during page load.
+ * @param endMessage Custom message when all pages loaded.
+ */
+@Composable
+fun LoadMoreFooter(
+    isLoadingMore: Boolean,
+    hasMore: Boolean,
+    loadMoreError: Throwable?,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+    loadingMessage: String = "Loading more...",
+    endMessage: String = "You're all caught up",
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -104,7 +137,7 @@ fun <T : Any> LoadMoreFooter(
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
-                    TextButton(onClick = { pagingStream.loadNextPage() }) {
+                    TextButton(onClick = onRetry) {
                         Text("Tap to retry")
                     }
                 }

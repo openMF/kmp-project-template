@@ -174,6 +174,27 @@ bundle exec fastlane ios release
 
 ---
 
+## Customization Points (for consumer apps)
+
+When forking this template, your app's customization belongs in **`core/store`** —
+the single discoverable seam for app-specific:
+
+- **`AppStoreRegistry`** — your named Store qualifiers
+- **`AppScreenStateDefaults`** — brand visuals, copy, Lottie animations, telemetry hooks
+- **`AppErrorMapper`** — domain-error → user-message mapping (extends framework `categorize()`)
+- **`appStoreModule`** — Koin DI module for Store factories
+
+See `core/store/README.md` for the full integration pattern.
+
+**Do NOT modify `core-base/store` or `core-base/ui`** — they're framework-shared and
+upgrade cleanly across template versions. Push fork pressure to `core/store` instead.
+
+The framework default `ScreenContent`/`PagingScreenContent` rendering is themed via
+`CompositionLocalProvider(LocalScreenStateDefaults provides appScreenStateDefaults())`
+at the app's theme root.
+
+---
+
 ## Key Constraints
 
 ### Version Handling

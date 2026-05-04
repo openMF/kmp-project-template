@@ -1803,6 +1803,18 @@
 |    |    +--- androidx.metrics:metrics-performance:1.0.0 (*)
 |    |    +--- androidx.browser:browser:1.9.0 (*)
 |    |    +--- androidx.compose.runtime:runtime -> 1.10.5 (*)
+|    |    +--- io.github.alexzhirkevich:compottie:2.0.0-rc04
+|    |    |    \--- io.github.alexzhirkevich:compottie-android:2.0.0-rc04
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.3.20 (*)
+|    |    |         +--- org.jetbrains.compose.foundation:foundation:1.7.0 -> 1.10.3 (*)
+|    |    |         \--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3 -> 1.9.0 (*)
+|    |    +--- io.github.alexzhirkevich:compottie-resources:2.0.0-rc04
+|    |    |    \--- io.github.alexzhirkevich:compottie-resources-android:2.0.0-rc04
+|    |    |         +--- io.github.alexzhirkevich:compottie:2.0.0-rc04 (*)
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.21 -> 2.3.20 (*)
+|    |    |         +--- org.jetbrains.compose.ui:ui:1.7.0 -> 1.10.3 (*)
+|    |    |         +--- org.jetbrains.compose.components:components-resources:1.7.0 -> 1.10.3 (*)
+|    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0 -> 1.10.2 (*)
 |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 (*)
 |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    +--- io.insert-koin:koin-core:4.1.1 (*)

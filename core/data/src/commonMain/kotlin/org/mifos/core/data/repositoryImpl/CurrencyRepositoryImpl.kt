@@ -17,6 +17,7 @@ import org.mifos.core.model.fintech.ExchangeRates
 import org.mifos.core.model.fintech.RateHistory
 import org.mifos.core.model.fintech.RateHistoryKey
 import org.mobilenativefoundation.store.store5.Store
+import template.core.base.store.FetchedAtRepository
 import template.core.base.store.ScreenDataStream
 import template.core.base.store.asScreenStream
 
@@ -24,6 +25,7 @@ class CurrencyRepositoryImpl(
     private val exchangeRatesStore: Store<String, ExchangeRates>,
     private val rateHistoryStore: Store<RateHistoryKey, RateHistory>,
     private val networkMonitor: NetworkMonitor,
+    private val fetchedAtRepository: FetchedAtRepository,
 ) : CurrencyRepository {
 
     override fun exchangeRatesStream(
@@ -32,6 +34,8 @@ class CurrencyRepositoryImpl(
     ): ScreenDataStream<ExchangeRates> = exchangeRatesStore.asScreenStream(
         key = baseCurrency,
         networkMonitor = networkMonitor,
+        fetchedAtRepository = fetchedAtRepository,
+        cacheKey = "currency:exchangeRates:$baseCurrency",
         scope = scope,
     )
 
@@ -41,6 +45,8 @@ class CurrencyRepositoryImpl(
     ): ScreenDataStream<RateHistory> = rateHistoryStore.asScreenStream(
         keyFlow = keyFlow,
         networkMonitor = networkMonitor,
+        fetchedAtRepository = fetchedAtRepository,
+        cacheKeyFor = { key -> "currency:rateHistory:${key.from}-${key.to}-${key.days}d" },
         scope = scope,
     )
 }

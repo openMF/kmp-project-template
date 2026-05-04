@@ -15,6 +15,7 @@ import org.mifos.core.data.repository.CryptoRepository
 import org.mifos.core.model.fintech.CoinDetail
 import org.mifos.core.model.fintech.CoinMarket
 import org.mobilenativefoundation.store.store5.Store
+import template.core.base.store.FetchedAtRepository
 import template.core.base.store.PageKey
 import template.core.base.store.PagingScreenStream
 import template.core.base.store.ScreenDataStream
@@ -25,6 +26,7 @@ class CryptoRepositoryImpl(
     private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
     private val coinDetailStore: Store<String, CoinDetail>,
     private val networkMonitor: NetworkMonitor,
+    private val fetchedAtRepository: FetchedAtRepository,
 ) : CryptoRepository {
 
     override fun coinMarketsStream(
@@ -32,6 +34,8 @@ class CryptoRepositoryImpl(
         pageSize: Int,
     ): PagingScreenStream<CoinMarket> = coinMarketsStore.asPagingScreenStream(
         networkMonitor = networkMonitor,
+        fetchedAtRepository = fetchedAtRepository,
+        cacheKey = "crypto:coinMarkets",
         scope = scope,
         pageSize = pageSize,
     )
@@ -42,6 +46,8 @@ class CryptoRepositoryImpl(
     ): ScreenDataStream<CoinDetail> = coinDetailStore.asScreenStream(
         key = coinId,
         networkMonitor = networkMonitor,
+        fetchedAtRepository = fetchedAtRepository,
+        cacheKey = "crypto:coinDetail:$coinId",
         scope = scope,
     )
 }

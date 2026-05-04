@@ -1913,6 +1913,7 @@
 |    |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    +--- project :core:common (*)
+|    |    +--- project :core-base:store (*)
 |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.6 (*)
 |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.9.6 (*)
 |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate:2.9.6 (*)

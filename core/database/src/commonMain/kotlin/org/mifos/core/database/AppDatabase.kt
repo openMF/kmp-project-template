@@ -9,6 +9,7 @@
  */
 package org.mifos.core.database
 
+import androidx.room3.AutoMigration
 import androidx.room3.ConstructedBy
 import androidx.room3.Database
 import androidx.room3.RoomDatabase
@@ -18,12 +19,14 @@ import org.mifos.core.database.dao.BookkeeperDao
 import org.mifos.core.database.dao.CoinDetailDao
 import org.mifos.core.database.dao.CoinMarketDao
 import org.mifos.core.database.dao.ExchangeRatesDao
+import org.mifos.core.database.dao.FetchedAtDao
 import org.mifos.core.database.dao.RateHistoryDao
 import org.mifos.core.database.dao.SampleDao
 import org.mifos.core.database.entity.BookkeeperEntity
 import org.mifos.core.database.entity.CoinDetailEntity
 import org.mifos.core.database.entity.CoinMarketEntity
 import org.mifos.core.database.entity.ExchangeRatesEntity
+import org.mifos.core.database.entity.FetchedAtEntity
 import org.mifos.core.database.entity.RateHistoryEntity
 import org.mifos.core.database.entity.SampleEntity
 import org.mifos.core.database.utils.ChargeTypeConverters
@@ -63,9 +66,16 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
         CoinDetailEntity::class,
         RateHistoryEntity::class,
         BookkeeperEntity::class,
+        FetchedAtEntity::class,
     ],
     version = AppDatabase.VERSION,
     exportSchema = true,
+    autoMigrations = [
+        // v3 → v4: adds the framework-owned `framework_fetched_at` table that backs
+        // the FetchedAtRepository (durable lastFetchedAt timestamps for the
+        // staleness banner). Adding a new table is a safe Room auto-migration.
+        AutoMigration(from = 3, to = 4),
+    ],
 )
 @TypeConverters(ChargeTypeConverters::class, FintechTypeConverters::class)
 @ConstructedBy(AppDatabaseConstructor::class)
@@ -77,9 +87,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val coinDetailDao: CoinDetailDao
     abstract val rateHistoryDao: RateHistoryDao
     abstract val bookkeeperDao: BookkeeperDao
+    abstract val fetchedAtDao: FetchedAtDao
 
     companion object {
-        const val VERSION = 3
+        const val VERSION = 4
         const val DATABASE_NAME = "mifos_database.db"
     }
 }

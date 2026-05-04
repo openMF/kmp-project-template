@@ -53,6 +53,8 @@ class PagingScreenStreamOfflineTest {
             .build()
         val stream = failingStore.asPagingScreenStream(
             networkMonitor = networkMonitor,
+            fetchedAtRepository = FakeFetchedAtRepository(),
+            cacheKey = "test:offline-fail",
             scope = backgroundScope,
             pageSize = 5,
         )
@@ -80,6 +82,8 @@ class PagingScreenStreamOfflineTest {
             .build()
         val stream = failingStore.asPagingScreenStream(
             networkMonitor = networkMonitor,
+            fetchedAtRepository = FakeFetchedAtRepository(),
+            cacheKey = "test:offline-fail",
             scope = backgroundScope,
             pageSize = 5,
         )
@@ -107,6 +111,8 @@ class PagingScreenStreamOfflineTest {
             .build()
         val stream = store.asPagingScreenStream(
             networkMonitor = networkMonitor,
+            fetchedAtRepository = FakeFetchedAtRepository(),
+            cacheKey = "test:happy-path",
             scope = backgroundScope,
             pageSize = 3,
         )
@@ -135,6 +141,8 @@ class PagingScreenStreamOfflineTest {
             .build()
         val stream = store.asPagingScreenStream(
             networkMonitor = networkMonitor,
+            fetchedAtRepository = FakeFetchedAtRepository(),
+            cacheKey = "test:happy-path",
             scope = backgroundScope,
             pageSize = 3,
         )
@@ -170,6 +178,8 @@ class PagingScreenStreamOfflineTest {
             .build()
         val stream = store.asPagingScreenStream(
             networkMonitor = networkMonitor,
+            fetchedAtRepository = FakeFetchedAtRepository(),
+            cacheKey = "test:happy-path",
             scope = backgroundScope,
             pageSize = 3,
         )

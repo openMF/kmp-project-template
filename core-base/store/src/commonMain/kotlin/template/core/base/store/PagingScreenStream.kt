@@ -60,6 +60,8 @@ class PagingScreenStream<T : Any> internal constructor(
     /** Wall-clock instant of last successful page load. Drives DataFreshnessIndicator timestamp. */
     private val lastFetchedAt: MutableStateFlow<Instant?>,
     private val networkMonitor: NetworkMonitor,
+    private val cacheKey: String,
+    private val fetchedAtRepository: FetchedAtRepository,
 ) {
     /** Load the next page. No-op if already loading or no more pages. Cache-first. */
     fun loadNextPage() {
@@ -79,7 +81,11 @@ class PagingScreenStream<T : Any> internal constructor(
                     // Only update on actual network success — cache hits keep the previous
                     // timestamp so DataFreshnessIndicator shows the real age of the data,
                     // not the moment we re-read from SoT.
-                    if (result.fromNetwork) lastFetchedAt.value = Clock.System.now()
+                    if (result.fromNetwork) {
+                        val now = Clock.System.now()
+                        lastFetchedAt.value = now
+                        fetchedAtRepository.write(cacheKey, now)
+                    }
                 }
                 is StorePageResult.Error -> {
                     // Re-type as OfflineException when offline so categorize() routes
@@ -135,7 +141,11 @@ class PagingScreenStream<T : Any> internal constructor(
                     items.value = result.items
                     hasMoreMutable.value = result.nextKey != null
                     // Network-only fetchedAt update — see loadNextPage for rationale.
-                    if (result.fromNetwork) lastFetchedAt.value = Clock.System.now()
+                    if (result.fromNetwork) {
+                        val now = Clock.System.now()
+                        lastFetchedAt.value = now
+                        fetchedAtRepository.write(cacheKey, now)
+                    }
                 }
                 is StorePageResult.Error -> {
                     // Same offline-retype as loadNextPage — fixes the warm-reopen bug
@@ -165,10 +175,19 @@ class PagingScreenStream<T : Any> internal constructor(
 
 /**
  * Creates a [PagingScreenStream] with network-fused state via cmp-network-monitor.
+ *
+ * @param fetchedAtRepository Persists last-network-fetch timestamps so the staleness
+ *   banner shows real "Updated 5m ago" across ViewModel destruction and (with a
+ *   Room-backed impl) app restart. Required — there is no default. Production apps
+ *   wire `RoomFetchedAtRepository` (`core/data`); tests use `FakeFetchedAtRepository`.
+ * @param cacheKey Identifies this Store in the [fetchedAtRepository]. Convention:
+ *   `"<feature>:<storeName>"` (e.g. `"crypto:coinMarkets"`).
  */
 @Suppress("CyclomaticComplexMethod")
 fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     networkMonitor: NetworkMonitor,
+    fetchedAtRepository: FetchedAtRepository,
+    cacheKey: String,
     scope: CoroutineScope,
     pageSize: Int = PageKey.DEFAULT_PAGE_SIZE,
     query: String? = null,
@@ -180,6 +199,10 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     val error = MutableStateFlow<Throwable?>(null)
     val currentPage = MutableStateFlow(0)
     val lastFetchedAt = MutableStateFlow<Instant?>(null)
+    // Seed lastFetchedAt from persistence so warm-reopen (new ViewModel for the
+    // same Store) shows the real age of cached data. Launches in scope so the
+    // I/O doesn't block stream construction; UI shows null timestamp briefly.
+    scope.launch { lastFetchedAt.value = fetchedAtRepository.read(cacheKey) }
 
     val screenState: Flow<ScreenState<List<Value>>> = combine(
         items,
@@ -233,5 +256,7 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         currentPage = currentPage,
         lastFetchedAt = lastFetchedAt,
         networkMonitor = networkMonitor,
+        cacheKey = cacheKey,
+        fetchedAtRepository = fetchedAtRepository,
     ).also { it.loadInitialPage() }
 }

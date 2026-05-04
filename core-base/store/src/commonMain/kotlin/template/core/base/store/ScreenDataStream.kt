@@ -86,10 +86,12 @@ class ScreenDataStream<T> internal constructor(
  * @param isEmpty Optional predicate for "no data has arrived yet from Store".
  *   NOT for "empty list" detection — use [emptyIfContent] for that.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, kotlin.time.ExperimentalTime::class)
 fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     key: Key,
     networkMonitor: NetworkMonitor,
+    fetchedAtRepository: FetchedAtRepository,
+    cacheKey: String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
 ): ScreenDataStream<Output> {
@@ -104,6 +106,11 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             .collect { refreshTrigger.tryEmit(Unit) }
     }
 
+    // Seed persisted timestamp so warm-reopen shows real "Updated 5m ago".
+    // Held in a holder so the map step below can read the latest value.
+    var persistedFetchedAt: kotlin.time.Instant? = null
+    scope.launch { persistedFetchedAt = fetchedAtRepository.read(cacheKey) }
+
     // Track last known content to preserve during refresh
     var lastContent: StoreData<Output>? = null
 
@@ -113,14 +120,27 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             streamDataNoFallback(key = key, isEmpty = isEmpty)
         }
         .map { storeData ->
-            if (!storeData.isEmpty) {
-                lastContent = storeData
-                storeData
-            } else if (storeData.isEmpty && lastContent != null && storeData.error == null) {
+            // Persistence: when Store5 hands us NETWORK-origin data with a fresh
+            // timestamp, write it through. When we get CACHE/empty with null
+            // timestamp, fall back to the persisted value so the staleness banner
+            // can show the real age across ViewModel destruction.
+            val enriched = when {
+                storeData.origin == DataOrigin.NETWORK && storeData.fetchedAtInstant != null -> {
+                    fetchedAtRepository.write(cacheKey, storeData.fetchedAtInstant)
+                    storeData
+                }
+                storeData.fetchedAtInstant == null && persistedFetchedAt != null ->
+                    storeData.copy(fetchedAtInstant = persistedFetchedAt)
+                else -> storeData
+            }
+            if (!enriched.isEmpty) {
+                lastContent = enriched
+                enriched
+            } else if (enriched.isEmpty && lastContent != null && enriched.error == null) {
                 // Refresh in progress — preserve last content with UPDATING
                 lastContent!!.copy(isRefreshing = true)
             } else {
-                storeData
+                enriched
             }
         }
 
@@ -141,11 +161,17 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
 /**
  * Overload accepting a Flow<Key> for dynamic keys (e.g., selected client from DataStore).
  * Re-streams from Store when key changes. Resets lastContent on key change.
+ *
+ * @param cacheKeyFor Computes the persistence key for each Key emission. Lets the
+ *   `framework_fetched_at` table store one timestamp per key — e.g. one per
+ *   selected client — instead of overwriting on every key change.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, kotlin.time.ExperimentalTime::class)
 fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     keyFlow: Flow<Key>,
     networkMonitor: NetworkMonitor,
+    fetchedAtRepository: FetchedAtRepository,
+    cacheKeyFor: (Key) -> String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
 ): ScreenDataStream<Output> {
@@ -160,6 +186,8 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     }
 
     var lastContent: StoreData<Output>? = null
+    var currentCacheKey: String? = null
+    var persistedFetchedAt: kotlin.time.Instant? = null
 
     val storeFlow: Flow<StoreData<Output>> = combine(
         keyFlow,
@@ -167,16 +195,29 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     ) { key, _ -> key }
         .flatMapLatest { key ->
             lastContent = null // Reset on key change
+            currentCacheKey = cacheKeyFor(key)
+            // Re-seed persistedFetchedAt for the new key.
+            persistedFetchedAt = fetchedAtRepository.read(currentCacheKey!!)
             streamDataNoFallback(key = key, isEmpty = isEmpty)
         }
         .map { storeData ->
-            if (!storeData.isEmpty) {
-                lastContent = storeData
-                storeData
-            } else if (storeData.isEmpty && lastContent != null && storeData.error == null) {
+            val key = currentCacheKey ?: return@map storeData
+            val enriched = when {
+                storeData.origin == DataOrigin.NETWORK && storeData.fetchedAtInstant != null -> {
+                    fetchedAtRepository.write(key, storeData.fetchedAtInstant)
+                    storeData
+                }
+                storeData.fetchedAtInstant == null && persistedFetchedAt != null ->
+                    storeData.copy(fetchedAtInstant = persistedFetchedAt)
+                else -> storeData
+            }
+            if (!enriched.isEmpty) {
+                lastContent = enriched
+                enriched
+            } else if (enriched.isEmpty && lastContent != null && enriched.error == null) {
                 lastContent!!.copy(isRefreshing = true)
             } else {
-                storeData
+                enriched
             }
         }
 

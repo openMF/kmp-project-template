@@ -22,6 +22,7 @@ import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.data.repository.UserLogoutManager
 import org.mifos.core.data.repositoryImpl.CryptoRepositoryImpl
 import org.mifos.core.data.repositoryImpl.CurrencyRepositoryImpl
+import org.mifos.core.data.repositoryImpl.RoomFetchedAtRepository
 import org.mifos.core.data.repositoryImpl.StoreCacheManagerImpl
 import org.mifos.core.data.repositoryImpl.UserDataRepositoryImpl
 import org.mifos.core.data.repositoryImpl.UserLogoutManagerImpl
@@ -29,16 +30,22 @@ import org.mifos.core.data.store.provideCoinDetailStore
 import org.mifos.core.data.store.provideCoinMarketsStore
 import org.mifos.core.data.store.provideExchangeRatesStore
 import org.mifos.core.data.store.provideRateHistoryStore
+import org.mifos.core.database.AppDatabase
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.network.di.NetworkModule
 import template.core.base.common.di.CommonModule
+import template.core.base.store.FetchedAtRepository
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
 
     single<NetworkMonitor> { NetworkMonitorProvider.install() }
     singleOf(::UserDataRepositoryImpl) bind UserDataRepository::class
+
+    // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
+    // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
+    single<FetchedAtRepository> { RoomFetchedAtRepository(get<AppDatabase>().fetchedAtDao) }
 
     // Store cache manager — clears all caches on logout
     single<StoreCacheManager> {
@@ -65,6 +72,7 @@ val DataModule = module {
             exchangeRatesStore = get(ApplicationStoreRegistry.ExchangeRates),
             rateHistoryStore = get(ApplicationStoreRegistry.RateHistory),
             networkMonitor = get(),
+            fetchedAtRepository = get(),
         )
     }
     single<CryptoRepository> {
@@ -72,6 +80,7 @@ val DataModule = module {
             coinMarketsStore = get(ApplicationStoreRegistry.CoinMarkets),
             coinDetailStore = get(ApplicationStoreRegistry.CoinDetail),
             networkMonitor = get(),
+            fetchedAtRepository = get(),
         )
     }
 }

@@ -117,6 +117,47 @@ class PagingScreenStreamOfflineTest {
     }
 
     @Test
+    fun pullToRefresh_offline_failsFastWithoutHittingFetcher() = runTest {
+        // Regression for the "infinite spinner" bug: refresh() forces refresh=true
+        // → fresh(key) → fetcher path → executeWithRetry may block waiting for
+        // reconnect. The offline pre-check in loadInitialPage must short-circuit
+        // BEFORE calling store.loadPage, setting OfflineException so the UI can
+        // render the no-network treatment and the spinner can hide.
+        val networkMonitor = FakeNetworkMonitor(NetworkStatus.Unavailable)
+        var fetcherCalls = 0
+        val store = StoreBuilder
+            .from<PageKey, List<String>>(
+                fetcher = Fetcher.of { _ ->
+                    fetcherCalls++
+                    throw RuntimeException("network down")
+                },
+            )
+            .build()
+        val stream = store.asPagingScreenStream(
+            networkMonitor = networkMonitor,
+            scope = backgroundScope,
+            pageSize = 3,
+        )
+        // Wait for the initial loadInitialPage(refresh=false) to settle so we don't
+        // race with refresh()'s state mutations. (Initial load DID hit the fetcher
+        // because cached(refresh=false) falls through when SoT is empty.)
+        stream.loadMoreError.firstNonNullValue()
+        val initialFetcherCalls = fetcherCalls
+
+        stream.refresh()
+        val err = stream.loadMoreError.firstNonNullValue()
+        assertIs<OfflineException>(
+            err,
+            "refresh() while offline must produce OfflineException via the pre-check.",
+        )
+        assertEquals(
+            initialFetcherCalls,
+            fetcherCalls,
+            "Pre-check must short-circuit refresh() before invoking the fetcher (no new calls).",
+        )
+    }
+
+    @Test
     fun loadInitialPage_success_propagatesFetchedAtToScreenState() = runTest {
         // Verifies the fetchedAt tracking added in §4: a successful page load records
         // a wall-clock instant that flows through into ScreenState.Content.fetchedAt

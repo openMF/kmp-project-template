@@ -119,6 +119,16 @@ class PagingScreenStream<T : Any> internal constructor(
 
     internal fun loadInitialPage(refresh: Boolean = false) {
         scope.launch {
+            // Offline pre-check for refresh=true (forced network): if we're offline,
+            // don't even call store.loadPage — `fresh(key)` would dispatch to the
+            // fetcher whose `executeWithRetry` may block indefinitely waiting for
+            // reconnect. Fail fast with OfflineException so DecisionEngine renders
+            // the no-network treatment and the pull-to-refresh spinner can hide.
+            if (refresh && !isOnlineNow()) {
+                error.value = OfflineException()
+                isInitialLoading.value = false
+                return@launch
+            }
             val pageKey = PageKey.first(pageSize = pageSize, query = query)
             when (val result = store.loadPage(pageKey, refresh = refresh)) {
                 is StorePageResult.Success -> {
@@ -145,10 +155,12 @@ class PagingScreenStream<T : Any> internal constructor(
      * UI stack routes the error through the no-network treatment. If we're online,
      * the original error is preserved untouched (caller still sees the real cause).
      */
-    private suspend fun retypeIfOffline(original: Throwable): Throwable {
-        val online = networkMonitor.networkStatus.first() is NetworkStatus.Available
-        return if (online) original else OfflineException()
-    }
+    private suspend fun retypeIfOffline(original: Throwable): Throwable =
+        if (isOnlineNow()) original else OfflineException()
+
+    /** Sample current network state synchronously from the StateFlow. */
+    private suspend fun isOnlineNow(): Boolean =
+        networkMonitor.networkStatus.first() is NetworkStatus.Available
 }
 
 /**

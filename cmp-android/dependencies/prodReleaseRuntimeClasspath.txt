@@ -1,6 +1,4 @@
 :cmp-navigation
-:cmp-network-monitor
-:cmp-network-monitor-compose
 :cmp-shared
 :core-base:analytics
 :core-base:common

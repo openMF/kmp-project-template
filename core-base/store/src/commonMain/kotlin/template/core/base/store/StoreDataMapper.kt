@@ -182,8 +182,8 @@ internal fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToStoreDataNoFall
             is StoreReadResponse.Loading,
             -> {
                 refreshing = true
-                // If we have previous data, emit as refreshing
-                lastData?.let { data ->
+                val data = lastData
+                if (data != null) {
                     emit(
                         StoreData(
                             data = data,
@@ -192,6 +192,23 @@ internal fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToStoreDataNoFall
                             fetchedAt = lastFetchMark,
                             fetchedAtInstant = lastFetchInstant,
                             isEmpty = false,
+                        ),
+                    )
+                } else {
+                    // DecisionEngine starvation fix: emit explicit "no data, refreshing"
+                    // so combine() in asScreenStream can run DecisionEngine on
+                    // networkStatus immediately, instead of waiting for Ktor to
+                    // time out (~30s) and surface an Error event. Without this
+                    // emission, combine() starves until the first Data/Error.
+                    @Suppress("UNCHECKED_CAST")
+                    emit(
+                        StoreData(
+                            data = EMPTY_SENTINEL as Output,
+                            origin = DataOrigin.NETWORK,
+                            isRefreshing = true,
+                            fetchedAt = null,
+                            fetchedAtInstant = null,
+                            isEmpty = true,
                         ),
                     )
                 }

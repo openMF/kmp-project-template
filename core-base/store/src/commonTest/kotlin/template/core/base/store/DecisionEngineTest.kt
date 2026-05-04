@@ -44,6 +44,25 @@ class DecisionEngineTest {
     }
 
     @Test
+    fun `starvation-fix integration - empty sentinel while refreshing + Unavailable = NoNetwork`() {
+        // Integration contract for the StoreDataMapper starvation fix:
+        // mapToStoreDataNoFallback now emits StoreData(EMPTY_SENTINEL, isEmpty=true,
+        // isRefreshing=true) on Initial/Loading-without-cache. DecisionEngine must route
+        // this to NoNetwork when offline, preventing the "spinner stuck ~30s waiting for
+        // HTTP timeout" UX bug on cold-start offline launches (Coin Detail offline).
+        val starvationFixEmission = StoreData(
+            data = "<empty>",
+            origin = DataOrigin.NETWORK,
+            isEmpty = true,
+            isRefreshing = true, // The new flag combination this test guards.
+            error = null,
+        )
+        val result = DecisionEngine.decide(starvationFixEmission, unavailable)
+        assertIs<ScreenState.NoNetwork>(result)
+        assertEquals(false, result.isCaptivePortal)
+    }
+
+    @Test
     fun `no data + CaptivePortal + no error = NoNetwork(captive=true)`() {
         val result = DecisionEngine.decide(emptyStoreData(), captivePortal)
         assertIs<ScreenState.NoNetwork>(result)

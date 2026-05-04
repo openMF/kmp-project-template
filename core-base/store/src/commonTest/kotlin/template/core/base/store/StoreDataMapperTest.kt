@@ -318,6 +318,12 @@ class StoreDataMapperNoFallbackTest {
             nullData,
             StoreReadResponse.Data("fetched", StoreReadResponseOrigin.Fetcher()),
         ).mapToStoreDataNoFallback().test {
+            // First: Loading with no cache → empty-sentinel placeholder so DecisionEngine
+            // can act on networkStatus immediately (starvation fix).
+            val loading = awaitItem()
+            assertTrue(loading.isEmpty)
+            assertTrue(loading.isRefreshing)
+            // Then: actual data (null SOT data was skipped)
             val item = awaitItem()
             assertEquals("fetched", item.data)
             assertEquals(DataOrigin.NETWORK, item.origin)
@@ -335,10 +341,35 @@ class StoreDataMapperNoFallbackTest {
                 StoreReadResponseOrigin.Fetcher(),
             ),
         ).mapToStoreDataNoFallback<String>().test {
+            // First: Loading-without-cache empty sentinel (starvation fix).
+            val loading = awaitItem()
+            assertTrue(loading.isEmpty)
+            assertTrue(loading.isRefreshing)
+            assertNull(loading.error)
+            // Then: error
             val item = awaitItem()
             assertTrue(item.isEmpty)
+            assertFalse(item.isRefreshing)
             assertNotNull(item.error)
             assertEquals("network", item.error?.message)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun loadingWithoutCache_emitsEmptySentinelImmediately() = runTest {
+        // Starvation-fix contract: Loading with no prior data must produce a StoreData
+        // emission (isEmpty=true, isRefreshing=true) so combine() in asScreenStream
+        // can run DecisionEngine on networkStatus immediately. Without this, the
+        // downstream UI is stuck on its initial Loading until Ktor times out (~30s).
+        flowOf(
+            StoreReadResponse.Loading(StoreReadResponseOrigin.Fetcher()),
+        ).mapToStoreDataNoFallback<String>().test {
+            val item = awaitItem()
+            assertTrue(item.isEmpty, "Loading-without-cache must emit isEmpty=true sentinel")
+            assertTrue(item.isRefreshing, "Loading-without-cache must mark isRefreshing=true")
+            assertNull(item.error)
+            assertNull(item.fetchedAtInstant)
             awaitComplete()
         }
     }

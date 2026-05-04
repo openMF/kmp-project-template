@@ -21,6 +21,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.mobilenativefoundation.store.store5.Store
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Paginated variant of [ScreenDataStream].
@@ -37,6 +40,7 @@ import org.mobilenativefoundation.store.store5.Store
  * fun loadMore() = pagingStream.loadNextPage()
  * ```
  */
+@OptIn(ExperimentalTime::class)
 class PagingScreenStream<T : Any> internal constructor(
     val state: Flow<ScreenState<List<T>>>,
     val hasMore: StateFlow<Boolean>,
@@ -53,6 +57,8 @@ class PagingScreenStream<T : Any> internal constructor(
     private val isInitialLoading: MutableStateFlow<Boolean>,
     private val error: MutableStateFlow<Throwable?>,
     private val currentPage: MutableStateFlow<Int>,
+    /** Wall-clock instant of last successful page load. Drives DataFreshnessIndicator timestamp. */
+    private val lastFetchedAt: MutableStateFlow<Instant?>,
     private val networkMonitor: NetworkMonitor,
 ) {
     /** Load the next page. No-op if already loading or no more pages. Cache-first. */
@@ -70,6 +76,7 @@ class PagingScreenStream<T : Any> internal constructor(
                     items.update { it + result.items }
                     currentPage.value = nextPage
                     hasMoreMutable.value = result.nextKey != null
+                    lastFetchedAt.value = Clock.System.now()
                 }
                 is StorePageResult.Error -> {
                     // Re-type as OfflineException when offline so categorize() routes
@@ -104,6 +111,7 @@ class PagingScreenStream<T : Any> internal constructor(
                 is StorePageResult.Success -> {
                     items.value = result.items
                     hasMoreMutable.value = result.nextKey != null
+                    lastFetchedAt.value = Clock.System.now()
                 }
                 is StorePageResult.Error -> {
                     // Same offline-retype as loadNextPage — fixes the warm-reopen bug
@@ -145,13 +153,15 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     val isInitialLoading = MutableStateFlow(true)
     val error = MutableStateFlow<Throwable?>(null)
     val currentPage = MutableStateFlow(0)
+    val lastFetchedAt = MutableStateFlow<Instant?>(null)
 
     val screenState: Flow<ScreenState<List<Value>>> = combine(
         items,
         networkMonitor.networkStatus,
         isInitialLoading,
         error,
-    ) { itemList, status, loading, err ->
+        lastFetchedAt,
+    ) { itemList, status, loading, err, fetchedAt ->
         // Definitive Empty: paging knows the difference between "load hasn't started"
         // (isInitialLoading=true) and "load completed with zero items" (isInitialLoading=false,
         // err=null). DecisionEngine treats these the same (Loading), so we special-case
@@ -166,12 +176,14 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         // Note: DecisionEngine never reads .data when isEmpty=true, so emptyList() is a
         // safe sentinel here (avoids the EMPTY_SENTINEL `as List` cast which fails at
         // runtime — outer collection type isn't erased).
+        // fetchedAtInstant flows through to DataFreshnessIndicator so paged screens
+        // show "Updated Xs ago" timestamps just like single-key screens do.
         val storeData = StoreData(
             data = itemList,
             origin = DataOrigin.NETWORK,
             isRefreshing = loading,
             fetchedAt = null,
-            fetchedAtInstant = null,
+            fetchedAtInstant = fetchedAt,
             error = err,
             isEmpty = itemList.isEmpty(),
         )
@@ -193,6 +205,7 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         isInitialLoading = isInitialLoading,
         error = error,
         currentPage = currentPage,
+        lastFetchedAt = lastFetchedAt,
         networkMonitor = networkMonitor,
     ).also { it.loadInitialPage() }
 }

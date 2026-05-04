@@ -27,6 +27,7 @@ import org.mobilenativefoundation.store.store5.StoreBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -113,6 +114,30 @@ class PagingScreenStreamOfflineTest {
         // We can sample the loadMoreError to know the load attempt finished — null means success.
         val errorAfterInit = stream.loadMoreError.first()
         assertNull(errorAfterInit, "Online happy path must produce no error.")
+    }
+
+    @Test
+    fun loadInitialPage_success_propagatesFetchedAtToScreenState() = runTest {
+        // Verifies the fetchedAt tracking added in §4: a successful page load records
+        // a wall-clock instant that flows through into ScreenState.Content.fetchedAt
+        // so DataFreshnessIndicator can render "Updated Xs ago".
+        val networkMonitor = FakeNetworkMonitor(NetworkStatus.Available(onlineInfo))
+        val store = StoreBuilder
+            .from<PageKey, List<String>>(
+                fetcher = Fetcher.of { key -> List(key.pageSize) { "i$it" } },
+            )
+            .build()
+        val stream = store.asPagingScreenStream(
+            networkMonitor = networkMonitor,
+            scope = backgroundScope,
+            pageSize = 3,
+        )
+        // Wait for state to become Content (first emission after initial load completes).
+        val contentState = stream.state.first { it is ScreenState.Content<*> } as ScreenState.Content<List<String>>
+        assertNotNull(
+            contentState.fetchedAt,
+            "Successful page load must set fetchedAt so DataFreshnessIndicator shows the timestamp.",
+        )
     }
 }
 

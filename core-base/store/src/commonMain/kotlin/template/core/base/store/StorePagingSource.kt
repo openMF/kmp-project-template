@@ -96,6 +96,7 @@ suspend fun <Value : Any> Store<PageKey, List<Value>>.loadPage(
                 items = items,
                 prevKey = if (key.page > 0) key.page - 1 else null,
                 nextKey = if (items.size >= key.pageSize) key.page + 1 else null,
+                fromNetwork = response.origin.toDataOrigin() == DataOrigin.NETWORK,
             )
         }
 
@@ -117,10 +118,18 @@ suspend fun <Value : Any> Store<PageKey, List<Value>>.loadPage(
  * ```
  */
 sealed class StorePageResult<out T> {
+    /**
+     * @param fromNetwork true when this page came from the network fetcher; false when
+     *   it was served from memory cache or SoT (Room). Used by [PagingScreenStream]
+     *   to update its `lastFetchedAt` timestamp only on real network successes —
+     *   otherwise the freshness banner would say "Updated just now" every time
+     *   you re-open a screen that simply re-reads from cache.
+     */
     data class Success<T>(
         val items: List<T>,
         val prevKey: Int?,
         val nextKey: Int?,
+        val fromNetwork: Boolean = false,
     ) : StorePageResult<T>()
 
     data class Error(val error: Throwable) : StorePageResult<Nothing>()

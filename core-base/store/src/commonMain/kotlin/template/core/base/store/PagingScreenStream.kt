@@ -76,7 +76,10 @@ class PagingScreenStream<T : Any> internal constructor(
                     items.update { it + result.items }
                     currentPage.value = nextPage
                     hasMoreMutable.value = result.nextKey != null
-                    lastFetchedAt.value = Clock.System.now()
+                    // Only update on actual network success — cache hits keep the previous
+                    // timestamp so DataFreshnessIndicator shows the real age of the data,
+                    // not the moment we re-read from SoT.
+                    if (result.fromNetwork) lastFetchedAt.value = Clock.System.now()
                 }
                 is StorePageResult.Error -> {
                     // Re-type as OfflineException when offline so categorize() routes
@@ -90,11 +93,21 @@ class PagingScreenStream<T : Any> internal constructor(
         }
     }
 
-    /** Refresh from page 0, clearing all loaded pages. Forces network for the first page. */
+    /**
+     * Refresh from page 0. Forces network for the first page.
+     *
+     * Keeps existing items in place during the fetch so the UI shows
+     * `Content(UPDATING)` (data + refreshing) instead of bouncing through
+     * `Loading` (data-less). This keeps the pull-to-refresh spinner visible
+     * for the full duration of the fetch and prevents content flicker.
+     * Items are replaced with the new page-0 data when the fetch completes.
+     */
     fun refresh() {
         scope.launch {
             currentPage.value = 0
-            items.value = emptyList()
+            // Don't clear items — preserves the visible list during refresh so
+            // DecisionEngine emits Content(UPDATING) and the pull-to-refresh
+            // spinner stays on screen until the fetch completes.
             hasMoreMutable.value = true
             error.value = null
             isInitialLoading.value = true
@@ -111,7 +124,8 @@ class PagingScreenStream<T : Any> internal constructor(
                 is StorePageResult.Success -> {
                     items.value = result.items
                     hasMoreMutable.value = result.nextKey != null
-                    lastFetchedAt.value = Clock.System.now()
+                    // Network-only fetchedAt update — see loadNextPage for rationale.
+                    if (result.fromNetwork) lastFetchedAt.value = Clock.System.now()
                 }
                 is StorePageResult.Error -> {
                     // Same offline-retype as loadNextPage — fixes the warm-reopen bug

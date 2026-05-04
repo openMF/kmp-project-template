@@ -32,10 +32,11 @@ non-paginated lists, forms, and dashboards each have their own canonical pattern
 | Screen type | Framework API | Notes |
 |---|---|---|
 | **Detail (1 entity)** | `ScreenContent(state) { item -> ... }` | Single-key flow via `asScreenStream(key)`. CoinDetail uses this. |
-| **Detail (dynamic key)** | `ScreenContent(state) { item -> ... }` | Same UI; ViewModel uses `asScreenStream(keyFlow, ...)` overload. Re-streams when key changes. |
-| **Paginated list (infinite scroll)** | `PagingScreenContent { items(coins) { ... } }` | Auto LazyColumn + LoadMoreFooter + load-more trigger. CryptoWatchlist uses this. |
+| **Detail (1 entity) + pull-to-refresh** | `RefreshableScreenContent(state, onRefresh) { item -> ... }` | Same as above wrapped in M3 `PullToRefreshBox`. Pull spinner appears while `state.freshness == UPDATING`. |
+| **Detail (dynamic key)** | `ScreenContent(state) { item -> ... }` | ViewModel uses `asScreenStream(keyFlow, ...)` overload. Re-streams when key changes. |
+| **Paginated list (infinite scroll)** | `PagingScreenContent { items(coins) { ... } }` | Auto LazyColumn + LoadMoreFooter + load-more trigger + **pull-to-refresh on by default** (`enablePullToRefresh = true`). CryptoWatchlist uses this. |
 | **Paginated list (custom layout)** | `PagingScreenContent(...) { items, _ -> /* your LazyColumn */ }` | Slot-only overload — you own the LazyColumn (sticky headers, sectioned lists, etc.). |
-| **Non-paginated list** | `ScreenContent(state) { list -> LazyColumn { items(list) { ... } } }` | `asScreenStream` returning `List<T>`. No load-more wiring. |
+| **Non-paginated list** | `ScreenContent(state) { list -> LazyColumn { items(list) { ... } } }` | `asScreenStream` returning `List<T>`. No load-more wiring. Wrap in `RefreshableScreenContent` for pull-to-refresh. |
 | **Form / pure UI (no remote data)** | none — regular Compose | No state stream needed. |
 | **Multi-source combined** | Manual `combine(s1.state, s2.state) { ... }` in ViewModel → expose `Flow<ScreenState<X>>` to screen | A `combineScreenStreams` framework helper is on the roadmap. Today: do it in the ViewModel. |
 | **Dashboard with several independent panels** | One `ScreenContent` per panel, each with its own `asScreenStream` | Each panel owns its loading/empty/error UX independently. |

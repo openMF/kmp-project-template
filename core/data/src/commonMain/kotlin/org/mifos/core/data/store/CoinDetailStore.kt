@@ -34,7 +34,7 @@ fun provideCoinDetailStore(
     return StoreFactory.createStore(
         fetcher = Fetcher.of { coinId: String ->
             networkMonitor.executeWithRetry(
-                RetryPolicy { maxAttempts = 2 },
+                RetryPolicy { maxAttempts = 1 },
             ) {
                 api.getCoinDetail(coinId).toDomain()
             }

@@ -42,7 +42,7 @@ fun provideRateHistoryStore(
             val today = Clock.System.todayIn(TimeZone.UTC)
             val start = today.minus(key.days, DateTimeUnit.DAY)
             networkMonitor.executeWithRetry(
-                RetryPolicy { maxAttempts = 3 },
+                RetryPolicy { maxAttempts = 1 },
             ) {
                 api.getHistoricalRates(
                     from = key.from,

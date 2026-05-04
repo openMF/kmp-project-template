@@ -34,7 +34,7 @@ fun provideExchangeRatesStore(
     return StoreFactory.createStore(
         fetcher = Fetcher.of { baseCurrency: String ->
             networkMonitor.executeWithRetry(
-                RetryPolicy { maxAttempts = 3 },
+                RetryPolicy { maxAttempts = 1 },
             ) {
                 api.getLatestRates(from = baseCurrency).toDomain()
             }

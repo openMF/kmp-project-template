@@ -35,7 +35,10 @@ fun provideCoinMarketsStore(
     return StoreFactory.createStore(
         fetcher = Fetcher.of { key: PageKey ->
             networkMonitor.executeWithRetry(
-                RetryPolicy { maxAttempts = 2 },
+                // Retry policy: 1 attempt per fetch. HTTP 401 is handled transparently
+                // by the Ktor Auth interceptor (refresh-and-retry once). All other
+                // failures propagate immediately to PagingScreenStream → DecisionEngine.
+                RetryPolicy { maxAttempts = 1 },
             ) {
                 api.getMarkets(page = key.page + 1, perPage = key.pageSize)
                     .map { it.toDomain() }

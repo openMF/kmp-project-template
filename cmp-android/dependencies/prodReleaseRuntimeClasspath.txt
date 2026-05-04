@@ -21,6 +21,7 @@
 :core:domain
 :core:model
 :core:network
+:core:store
 :core:ui
 :feature:crypto
 :feature:currency-rates

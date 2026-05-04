@@ -10,30 +10,24 @@
 package org.mifos.feature.crypto.ui
 
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import org.mifos.core.data.repository.CryptoRepository
 import org.mifos.core.model.fintech.CoinMarket
 import template.core.base.store.PagingScreenStream
-import template.core.base.store.ScreenState
 import template.core.base.ui.BaseViewModel
 
 class CryptoWatchlistViewModel(
     cryptoRepository: CryptoRepository,
 ) : BaseViewModel<Unit, CryptoEvent, CryptoAction>(Unit) {
 
-    private val pagingStream: PagingScreenStream<CoinMarket> = cryptoRepository.coinMarketsStream(
+    /**
+     * Exposed for [template.core.base.ui.PagingScreenContent] which observes the stream
+     * directly (state, hasMore, isLoadingMore, loadMoreError) and drives load-more.
+     */
+    val pagingStream: PagingScreenStream<CoinMarket> = cryptoRepository.coinMarketsStream(
         scope = viewModelScope,
         pageSize = 20,
     )
 
-    val screenState: StateFlow<ScreenState<List<CoinMarket>>> = pagingStream.state
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
-    val hasMore: StateFlow<Boolean> = pagingStream.hasMore
-    val isLoadingMore: StateFlow<Boolean> = pagingStream.isLoadingMore
-
-    fun onLoadMore() = pagingStream.loadNextPage()
     fun onRetry() = pagingStream.retry()
     fun onRefresh() = pagingStream.refresh()
 

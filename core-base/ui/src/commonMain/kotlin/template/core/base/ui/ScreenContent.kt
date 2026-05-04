@@ -38,6 +38,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
@@ -211,6 +212,7 @@ fun DefaultEmptyContent(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(spacing.xs))
         }
@@ -218,6 +220,7 @@ fun DefaultEmptyContent(
             text = config.message,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
         config.cta?.let { cta ->
             Spacer(Modifier.height(spacing.lg))
@@ -255,6 +258,7 @@ fun DefaultNoNetworkContent(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(spacing.lg))
         Button(onClick = onRetry) {
@@ -290,6 +294,7 @@ fun DefaultErrorContent(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center,
             )
             Spacer(Modifier.height(spacing.xs))
         }
@@ -297,6 +302,7 @@ fun DefaultErrorContent(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(spacing.lg))
         Button(onClick = onRetry) {

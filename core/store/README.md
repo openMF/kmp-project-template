@@ -4,6 +4,34 @@ This module is the **single discoverable customization point** for consumer apps
 `kmp-project-template`. It scaffolds the per-app integration layer for the framework's
 `core-base/store` (state model) and `core-base/ui` (ScreenState rendering).
 
+## What you get for free (no per-screen code)
+
+By calling `ScreenContent(state, onRetry) { data -> ... }` (or `PagingScreenContent`),
+your screen automatically gets:
+
+- ✅ Loading → Content / NoNetwork / Error / Empty transitions, animated (M3 fade)
+- ✅ Captive-portal detection (hotel WiFi)
+- ✅ Auto-refresh when network reconnects (debounced 300ms)
+- ✅ `lastContent` preservation during refresh (no flicker)
+- ✅ Pagination with cache-first reads + load-more trigger + footer + retry
+- ✅ Branded visuals from `appScreenStateDefaults()` (empty / error / no-network)
+- ✅ Skeleton loading (when `ScreenStateLoading.Skeleton` is the default)
+- ✅ A11y semantics (TalkBack/VoiceOver state announcements + liveRegion)
+- ✅ Default `messageFor` routes through `categorize()` (network / auth / server / generic)
+
+You write **zero state-handling code**. Screens cannot break offline-first by misuse —
+the decision logic lives in `core-base/store`'s `DecisionEngine`, used by every flow
+(both single-key `asScreenStream` and paged `asPagingScreenStream`).
+
+## What you customize here
+
+- `AppScreenStateDefaults.kt` — brand visuals, copy, Lottie animations, telemetry
+  callbacks (`onShown`). Already wired into `MifosTheme` via
+  `LocalScreenStateDefaults` — every screen picks up your changes app-wide.
+- `AppErrorMapper.kt` — domain error → user message (extends framework `categorize()`).
+- `AppStoreRegistry.kt` — your named Store qualifiers.
+- `di/StoreModule.kt` — Koin module for Store factories.
+
 ## What lives here
 
 | File | Purpose | Forks customize by |

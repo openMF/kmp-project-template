@@ -176,22 +176,31 @@ bundle exec fastlane ios release
 
 ## Customization Points (for consumer apps)
 
-When forking this template, your app's customization belongs in **`core/store`** —
-the single discoverable seam for app-specific:
+When forking this template, your app is **offline-first by default** — `core-base/store`
+decides every state transition (loading / no-network / captive-portal / empty / error /
+content + freshness) so screens never have to. Your fork's only job is to brand the
+visuals via `core/store/AppScreenStateDefaults.kt`.
 
-- **`AppStoreRegistry`** — your named Store qualifiers
+`MifosTheme` already wires `LocalScreenStateDefaults provides appScreenStateDefaults()`,
+so every screen wrapped by the theme picks up your branded defaults — zero per-screen
+wiring.
+
+Customize in **`core/store`** (the single discoverable seam):
+
 - **`AppScreenStateDefaults`** — brand visuals, copy, Lottie animations, telemetry hooks
-- **`AppErrorMapper`** — domain-error → user-message mapping (extends framework `categorize()`)
+- **`AppErrorMapper`** — domain-error → user-message mapping (extends `categorize()`)
+- **`AppStoreRegistry`** — your named Store qualifiers
 - **`appStoreModule`** — Koin DI module for Store factories
 
-See `core/store/README.md` for the full integration pattern.
+See `core/store/README.md` for the "what you get for free" list and full integration
+pattern.
 
 **Do NOT modify `core-base/store` or `core-base/ui`** — they're framework-shared and
 upgrade cleanly across template versions. Push fork pressure to `core/store` instead.
 
-The framework default `ScreenContent`/`PagingScreenContent` rendering is themed via
-`CompositionLocalProvider(LocalScreenStateDefaults provides appScreenStateDefaults())`
-at the app's theme root.
+For paginated screens, use `PagingScreenContent { items(coins) { ... } }` —
+core-base/ui owns the LazyColumn, load-more trigger, and footer wiring (loading /
+error+retry / end-of-list). You declare only per-item content.
 
 ---
 

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -28,10 +29,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import template.core.base.store.ErrorCategory
 import template.core.base.store.PagingScreenStream
+import template.core.base.store.categorize
 
 /**
  * Footer for paginated lists driven by a [PagingScreenStream]. Place as the last
@@ -118,27 +123,30 @@ fun LoadMoreFooter(
             }
 
             loadMoreError != null -> {
+                // Category-aware copy: typed errors get typed UI. An OfflineException
+                // (from PagingScreenStream's offline guard) categorizes as Network and
+                // shows "No internet" + cloud-off icon — instead of the generic
+                // "Failed to load more" treatment.
+                val copy = remember(loadMoreError) { loadMoreFooterCopy(loadMoreError!!) }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            imageVector = Icons.Default.Warning,
+                            imageVector = copy.icon,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.error,
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Failed to load more",
+                            text = copy.label,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
                     TextButton(onClick = onRetry) {
-                        Text("Tap to retry")
+                        Text(copy.retryText)
                     }
                 }
             }
@@ -153,3 +161,34 @@ fun LoadMoreFooter(
         }
     }
 }
+
+/** Footer copy + icon selected by error category. Pure function — directly testable. */
+internal data class LoadMoreFooterCopy(
+    val label: String,
+    val retryText: String,
+    val icon: ImageVector,
+)
+
+internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
+    when (categorize(error)) {
+        ErrorCategory.Network -> LoadMoreFooterCopy(
+            label = "No internet",
+            retryText = "Tap to retry",
+            icon = Icons.Default.CloudOff,
+        )
+        ErrorCategory.Auth -> LoadMoreFooterCopy(
+            label = "Session expired",
+            retryText = "Sign in again",
+            icon = Icons.Default.Warning,
+        )
+        ErrorCategory.Server -> LoadMoreFooterCopy(
+            label = "Server unavailable",
+            retryText = "Tap to retry",
+            icon = Icons.Default.Warning,
+        )
+        ErrorCategory.Generic -> LoadMoreFooterCopy(
+            label = "Failed to load more",
+            retryText = "Tap to retry",
+            icon = Icons.Default.Warning,
+        )
+    }

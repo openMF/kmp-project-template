@@ -202,6 +202,11 @@ For paginated screens, use `PagingScreenContent { items(coins) { ... } }` —
 core-base/ui owns the LazyColumn, load-more trigger, and footer wiring (loading /
 error+retry / end-of-list). You declare only per-item content.
 
+For detail pages, non-paginated lists, multi-source dashboards, and other patterns,
+see the **screen-type taxonomy table** in `core/store/README.md` — it maps every
+common screen type to the right framework API. (`PagingScreenContent` is for
+infinite-scroll paginated lists only; detail pages use `ScreenContent`.)
+
 ---
 
 ## Key Constraints

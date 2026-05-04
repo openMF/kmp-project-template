@@ -23,6 +23,27 @@ You write **zero state-handling code**. Screens cannot break offline-first by mi
 the decision logic lives in `core-base/store`'s `DecisionEngine`, used by every flow
 (both single-key `asScreenStream` and paged `asPagingScreenStream`).
 
+## Which framework API for which screen type?
+
+`PagingScreenContent` is **not** a generic "all UI" wrapper — it's specifically for
+infinite-scroll paginated lists driven by `asPagingScreenStream`. Detail pages,
+non-paginated lists, forms, and dashboards each have their own canonical pattern:
+
+| Screen type | Framework API | Notes |
+|---|---|---|
+| **Detail (1 entity)** | `ScreenContent(state) { item -> ... }` | Single-key flow via `asScreenStream(key)`. CoinDetail uses this. |
+| **Detail (dynamic key)** | `ScreenContent(state) { item -> ... }` | Same UI; ViewModel uses `asScreenStream(keyFlow, ...)` overload. Re-streams when key changes. |
+| **Paginated list (infinite scroll)** | `PagingScreenContent { items(coins) { ... } }` | Auto LazyColumn + LoadMoreFooter + load-more trigger. CryptoWatchlist uses this. |
+| **Paginated list (custom layout)** | `PagingScreenContent(...) { items, _ -> /* your LazyColumn */ }` | Slot-only overload — you own the LazyColumn (sticky headers, sectioned lists, etc.). |
+| **Non-paginated list** | `ScreenContent(state) { list -> LazyColumn { items(list) { ... } } }` | `asScreenStream` returning `List<T>`. No load-more wiring. |
+| **Form / pure UI (no remote data)** | none — regular Compose | No state stream needed. |
+| **Multi-source combined** | Manual `combine(s1.state, s2.state) { ... }` in ViewModel → expose `Flow<ScreenState<X>>` to screen | A `combineScreenStreams` framework helper is on the roadmap. Today: do it in the ViewModel. |
+| **Dashboard with several independent panels** | One `ScreenContent` per panel, each with its own `asScreenStream` | Each panel owns its loading/empty/error UX independently. |
+
+All variants share the same offline-first guarantees from `core-base/store`'s
+`DecisionEngine`. Branded visuals come from `appScreenStateDefaults()` in this module
+and apply to every screen automatically (wired into `MifosTheme`).
+
 ## What you customize here
 
 - `AppScreenStateDefaults.kt` — brand visuals, copy, Lottie animations, telemetry

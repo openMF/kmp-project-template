@@ -144,14 +144,14 @@ private fun UpdatingBanner(
 }
 
 @OptIn(ExperimentalTime::class)
-private fun buildStaleText(fetchedAt: Instant?): String {
-    if (fetchedAt == null) return "Offline \u2014 showing cached data"
+internal fun buildStaleText(fetchedAt: Instant?): String {
+    if (fetchedAt == null) return "Offline"
     val age = kotlin.time.Clock.System.now() - fetchedAt
     return "Offline \u00b7 Updated ${formatDurationAgo(age)}"
 }
 
 @OptIn(ExperimentalTime::class)
-private fun buildUpdatingText(fetchedAt: Instant?): String {
+internal fun buildUpdatingText(fetchedAt: Instant?): String {
     if (fetchedAt == null) return "Refreshing\u2026"
     val age = kotlin.time.Clock.System.now() - fetchedAt
     return "Refreshing \u00b7 Last updated ${formatDurationAgo(age)}"

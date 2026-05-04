@@ -81,7 +81,20 @@ suspend fun <Value : Any> Store<PageKey, List<Value>>.loadPage(
     key: PageKey,
     refresh: Boolean = false,
 ): StorePageResult<Value> {
-    val response = stream(StoreReadRequest.cached(key, refresh = refresh))
+    // refresh=true (pull-to-refresh, explicit retry): use fresh(key) so we WAIT for
+    // the fetcher to return. cached(refresh=true) would emit the SoT value FIRST,
+    // .first() would short-circuit there, and the network call would never be observed —
+    // which would (a) make pull-to-refresh hide instantly, and (b) prevent
+    // lastFetchedAt from ever updating.
+    //
+    // refresh=false (cache-first load-more / initial page): cached(refresh=false) serves
+    // SoT instantly when available; falls through to the fetcher only when SoT is empty.
+    val request = if (refresh) {
+        StoreReadRequest.fresh(key)
+    } else {
+        StoreReadRequest.cached(key, refresh = false)
+    }
+    val response = stream(request)
         .filterNot {
             it is StoreReadResponse.Loading ||
                 it is StoreReadResponse.NoNewData ||

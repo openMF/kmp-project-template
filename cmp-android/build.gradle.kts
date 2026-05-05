@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.roborazzi)
     alias(libs.plugins.aboutLibraries)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.android.application)
 }
 
 val packageNameSpace: String = libs.versions.androidPackageNamespace.get()
@@ -132,6 +133,7 @@ dependencies {
     implementation(libs.filekit.compose)
     implementation(libs.filekit.dialog.compose)
     implementation(libs.filekit.coil)
+    "baselineProfile"(project(":baselineprofile"))
 
     runtimeOnly(libs.androidx.compose.runtime)
     debugImplementation(libs.androidx.compose.ui.tooling)

@@ -24,6 +24,7 @@ actual val platformModule: Module = module {
             .createDatabase<AppDatabase>(
                 databaseName = AppDatabase.DATABASE_NAME,
             )
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .setQueryCoroutineContext(Dispatchers.Default)
             .build()
     }

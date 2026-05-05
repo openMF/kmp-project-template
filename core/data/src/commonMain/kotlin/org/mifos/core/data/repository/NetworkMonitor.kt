@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Mifos Initiative
+ * Copyright 2025 Mifos Initiative
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,11 +9,8 @@
  */
 package org.mifos.core.data.repository
 
-import kotlinx.coroutines.flow.Flow
-
 /**
- * Utility for reporting app connectivity status
+ * Backward-compatible typealias — existing consumers keep their import.
+ * Delegates to cmp-network-monitor's full-featured NetworkMonitor interface.
  */
-interface NetworkMonitor {
-    val isOnline: Flow<Boolean>
-}
+typealias NetworkMonitor = io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor

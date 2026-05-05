@@ -1,0 +1,22 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package org.mifos.core.database.entity
+
+import androidx.room3.Entity
+import androidx.room3.PrimaryKey
+
+@Entity(tableName = "exchange_rates")
+data class ExchangeRatesEntity(
+    @PrimaryKey
+    val baseCurrency: String,
+    val date: String,
+    val ratesJson: String,
+    val fetchedAt: Long,
+)

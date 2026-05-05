@@ -25,6 +25,7 @@ actual val platformModule: Module = module {
             .createDatabase<AppDatabase>(
                 databaseName = AppDatabase.DATABASE_NAME,
             )
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .fallbackToDestructiveMigrationOnDowngrade(false)
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.Default)

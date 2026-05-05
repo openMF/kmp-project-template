@@ -78,6 +78,13 @@ abstract class BaseViewModel<S, E, A>(
     protected abstract fun handleAction(action: A): Unit
 
     /**
+     * Updates the current state using the given [transform] function.
+     */
+    protected fun updateState(transform: S.() -> S) {
+        mutableStateFlow.value = mutableStateFlow.value.transform()
+    }
+
+    /**
      * Convenience method for sending an action to the [actionChannel].
      */
     fun trySendAction(action: A) {

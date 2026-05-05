@@ -71,12 +71,30 @@ data class PageKey(
  * only returns from the lambda, it does not cancel the flow.
  *
  * @param key The page key to load.
+ * @param refresh When true, always hit the network even if the page is cached
+ *   (use for pull-to-refresh). When false (default), serve from cache if available
+ *   and only hit the network for uncached pages — the right behavior for
+ *   infinite-scroll load-more.
  * @return Success with items and pagination keys, or Error.
  */
 suspend fun <Value : Any> Store<PageKey, List<Value>>.loadPage(
     key: PageKey,
+    refresh: Boolean = false,
 ): StorePageResult<Value> {
-    val response = stream(StoreReadRequest.cached(key, refresh = true))
+    // refresh=true (pull-to-refresh, explicit retry): use fresh(key) so we WAIT for
+    // the fetcher to return. cached(refresh=true) would emit the SoT value FIRST,
+    // .first() would short-circuit there, and the network call would never be observed —
+    // which would (a) make pull-to-refresh hide instantly, and (b) prevent
+    // lastFetchedAt from ever updating.
+    //
+    // refresh=false (cache-first load-more / initial page): cached(refresh=false) serves
+    // SoT instantly when available; falls through to the fetcher only when SoT is empty.
+    val request = if (refresh) {
+        StoreReadRequest.fresh(key)
+    } else {
+        StoreReadRequest.cached(key, refresh = false)
+    }
+    val response = stream(request)
         .filterNot {
             it is StoreReadResponse.Loading ||
                 it is StoreReadResponse.NoNewData ||
@@ -91,6 +109,7 @@ suspend fun <Value : Any> Store<PageKey, List<Value>>.loadPage(
                 items = items,
                 prevKey = if (key.page > 0) key.page - 1 else null,
                 nextKey = if (items.size >= key.pageSize) key.page + 1 else null,
+                fromNetwork = response.origin.toDataOrigin() == DataOrigin.NETWORK,
             )
         }
 
@@ -112,10 +131,18 @@ suspend fun <Value : Any> Store<PageKey, List<Value>>.loadPage(
  * ```
  */
 sealed class StorePageResult<out T> {
+    /**
+     * @param fromNetwork true when this page came from the network fetcher; false when
+     *   it was served from memory cache or SoT (Room). Used by [PagingScreenStream]
+     *   to update its `lastFetchedAt` timestamp only on real network successes —
+     *   otherwise the freshness banner would say "Updated just now" every time
+     *   you re-open a screen that simply re-reads from cache.
+     */
     data class Success<T>(
         val items: List<T>,
         val prevKey: Int?,
         val nextKey: Int?,
+        val fromNetwork: Boolean = false,
     ) : StorePageResult<T>()
 
     data class Error(val error: Throwable) : StorePageResult<Nothing>()

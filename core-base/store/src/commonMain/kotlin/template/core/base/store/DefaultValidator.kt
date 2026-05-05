@@ -38,7 +38,9 @@ class DefaultValidator<Output : Any>(
     }
 
     override suspend fun isValid(item: Output): Boolean {
-        val mark = lastFetchMark ?: return false
+        // Before first fetch, trust cached data (avoids Store5 invalidation NPE).
+        // TTL starts after the first successful network write calls markFresh().
+        val mark = lastFetchMark ?: return true
         return mark.elapsedNow() < ttl
     }
 

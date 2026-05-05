@@ -10,7 +10,10 @@
 package template.core.base.store
 
 import template.core.base.common.DataState
+import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.time.TimeSource
 
 /**
@@ -28,14 +31,19 @@ import kotlin.time.TimeSource
  * @param origin Where this data emission came from.
  * @param isRefreshing True when a network fetch is in progress (cached data is being shown).
  * @param fetchedAt Monotonic time mark of the last successful network fetch, or null if never fetched.
+ * @param fetchedAtInstant Wall-clock instant of the last successful network fetch, for UI display
+ *   (e.g., "Last updated: 5 min ago"). Unlike [fetchedAt], this survives across sessions when
+ *   persisted, and can be compared to [Clock.System.now] for human-readable timestamps.
  * @param error Non-null if the most recent refresh attempt failed. Data may still be valid (stale).
  * @param isEmpty True if the data represents an empty result (e.g., empty list, null-equivalent).
  */
+@OptIn(ExperimentalTime::class)
 data class StoreData<out T>(
     val data: T,
     val origin: DataOrigin,
     val isRefreshing: Boolean = false,
     val fetchedAt: TimeSource.Monotonic.ValueTimeMark? = null,
+    val fetchedAtInstant: Instant? = null,
     val error: Throwable? = null,
     val isEmpty: Boolean = false,
 ) {
@@ -44,6 +52,10 @@ data class StoreData<out T>(
 
     /** Duration since last successful network fetch, or null if never fetched. */
     val staleDuration: Duration? get() = fetchedAt?.elapsedNow()
+
+    /** Wall-clock duration since last fetch, for UI display. Uses [fetchedAtInstant] when available. */
+    val wallClockAge: Duration?
+        get() = fetchedAtInstant?.let { Clock.System.now() - it }
 
     /** True if this emission has data and no error. */
     val isSuccess: Boolean get() = error == null && !isEmpty

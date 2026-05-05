@@ -9,15 +9,7 @@
  */
 package org.mifos.feature.home.di
 
-import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import org.mifos.feature.home.service.StorageService
-import org.mifos.feature.home.service.StorageServiceImpl
-import org.mifos.feature.home.task.EditTaskViewModel
-import org.mifos.feature.home.tasks.TasksViewModel
 
 val HomeModule = module {
-    single<StorageService> { StorageServiceImpl() }
-    viewModelOf(::TasksViewModel)
-    viewModelOf(::EditTaskViewModel)
 }

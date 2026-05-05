@@ -24,6 +24,11 @@ import org.mifos.core.database.AppDatabase
 val DatabaseModule = module {
     includes(platformModule)
     single { get<AppDatabase>().sampleDao }
+    single { get<AppDatabase>().exchangeRatesDao }
+    single { get<AppDatabase>().coinMarketDao }
+    single { get<AppDatabase>().coinDetailDao }
+    single { get<AppDatabase>().rateHistoryDao }
+    single { get<AppDatabase>().bookkeeperDao }
 }
 
 /**

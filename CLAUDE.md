@@ -174,6 +174,41 @@ bundle exec fastlane ios release
 
 ---
 
+## Customization Points (for consumer apps)
+
+When forking this template, your app is **offline-first by default** — `core-base/store`
+decides every state transition (loading / no-network / captive-portal / empty / error /
+content + freshness) so screens never have to. Your fork's only job is to brand the
+visuals via `core/store/AppScreenStateDefaults.kt`.
+
+`MifosTheme` already wires `LocalScreenStateDefaults provides appScreenStateDefaults()`,
+so every screen wrapped by the theme picks up your branded defaults — zero per-screen
+wiring.
+
+Customize in **`core/store`** (the single discoverable seam):
+
+- **`AppScreenStateDefaults`** — brand visuals, copy, Lottie animations, telemetry hooks
+- **`AppErrorMapper`** — domain-error → user-message mapping (extends `categorize()`)
+- **`AppStoreRegistry`** — your named Store qualifiers
+- **`appStoreModule`** — Koin DI module for Store factories
+
+See `core/store/README.md` for the "what you get for free" list and full integration
+pattern.
+
+**Do NOT modify `core-base/store` or `core-base/ui`** — they're framework-shared and
+upgrade cleanly across template versions. Push fork pressure to `core/store` instead.
+
+For paginated screens, use `PagingScreenContent { items(coins) { ... } }` —
+core-base/ui owns the LazyColumn, load-more trigger, and footer wiring (loading /
+error+retry / end-of-list). You declare only per-item content.
+
+For detail pages, non-paginated lists, multi-source dashboards, and other patterns,
+see the **screen-type taxonomy table** in `core/store/README.md` — it maps every
+common screen type to the right framework API. (`PagingScreenContent` is for
+infinite-scroll paginated lists only; detail pages use `ScreenContent`.)
+
+---
+
 ## Key Constraints
 
 ### Version Handling

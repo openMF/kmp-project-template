@@ -9,7 +9,6 @@
  */
 plugins {
     alias(libs.plugins.cmp.feature.convention)
-    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -19,25 +18,10 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.coreBase.platform)
-
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)
-            implementation(compose.components.resources)
             implementation(compose.materialIconsExtended)
-            implementation(compose.components.uiToolingPreview)
-
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlinx.serialization.json)
-
-            implementation(libs.calf.permissions)
         }
-    }
-}
-
-compose {
-    resources {
-        packageOfResClass = "org.mifos.feature.home.generated.resources"
     }
 }

@@ -25,6 +25,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.core.common)
+            implementation(projects.core.database)
             implementation(projects.core.datastore)
             implementation(projects.core.model)
             implementation(projects.core.network)
@@ -32,23 +33,17 @@ kotlin {
 
             implementation(projects.coreBase.common)
             implementation(projects.coreBase.network)
+            api(projects.coreBase.store)
 
             implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.connectivity.core)
+            implementation(libs.kotlinx.datetime)
+            api(libs.cmp.network.monitor)
         }
 
         androidMain.dependencies {
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.tracing.ktx)
             implementation(libs.koin.android)
-        }
-
-        mobileMain.dependencies {
-            implementation(libs.connectivity.device)
-        }
-
-        jvmJsCommonMain.dependencies {
-            implementation(libs.connectivity.http)
         }
     }
 }

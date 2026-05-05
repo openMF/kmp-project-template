@@ -47,8 +47,10 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun databaseVersionIsOne() {
-        assertEquals(1, AppDatabase.VERSION)
+    fun databaseVersionIsCurrent() {
+        // Bumped to 4 in v3→v4 auto-migration that adds framework_fetched_at table.
+        // Update this when bumping AppDatabase.VERSION.
+        assertEquals(4, AppDatabase.VERSION)
     }
 
     @Test

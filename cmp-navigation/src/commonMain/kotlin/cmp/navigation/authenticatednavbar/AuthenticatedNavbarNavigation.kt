@@ -26,10 +26,18 @@ internal fun NavController.navigateToAuthenticatedNavBar(navOptions: NavOptions?
 
 internal fun NavGraphBuilder.authenticatedNavbarGraph(
     navigateToSettingsScreen: () -> Unit,
+    navigateToRates: () -> Unit,
+    navigateToHistory: () -> Unit,
+    navigateToCrypto: () -> Unit,
+    navigateToEmi: () -> Unit,
 ) {
     composableWithStayTransitions<AuthenticatedNavbarRoute> {
         AuthenticatedNavbarNavigationScreen(
             navigateToSettingsScreen = navigateToSettingsScreen,
+            navigateToRates = navigateToRates,
+            navigateToHistory = navigateToHistory,
+            navigateToCrypto = navigateToCrypto,
+            navigateToEmi = navigateToEmi,
         )
     }
 }

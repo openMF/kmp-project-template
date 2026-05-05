@@ -104,8 +104,8 @@ vendor/
 *.bak
 .claude
 
-# Room schema exports — auto-generated, rebuild from source
-**/schemas/
+# Room schemas are committed — required at build time for @AutoMigration
+# (KSP needs the previous version's schema JSON to generate migration code).
 
 # Security — NEVER commit encryption keys or secure storage
 *.key

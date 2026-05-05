@@ -37,6 +37,10 @@ kotlin {
         }
 
         commonMain.dependencies {
+            implementation(projects.coreBase.store)
+            implementation(projects.coreBase.designsystem)
+            implementation(libs.cmp.network.monitor.compose)
+
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)
@@ -44,6 +48,12 @@ kotlin {
             implementation(compose.components.resources)
             implementation(compose.materialIconsExtended)
             implementation(compose.components.uiToolingPreview)
+
+            // Compottie — first-class Lottie support for ScreenStateVisual.Lottie.
+            // `api` so apps that pass ScreenStateVisual.Lottie(spec = { ... }) can build
+            // a LottieCompositionSpec without re-declaring the dep.
+            api(libs.compottie)
+            api(libs.compottie.resources)
 
             implementation(libs.jb.composeViewmodel)
             implementation(libs.jb.lifecycle.compose)

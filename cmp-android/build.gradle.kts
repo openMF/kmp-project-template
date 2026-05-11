@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.roborazzi)
     alias(libs.plugins.aboutLibraries)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.dokka)
 }
 
 val packageNameSpace: String = libs.versions.androidPackageNamespace.get()
@@ -159,4 +160,8 @@ baselineProfile {
 
     // Make use of Dex Layout Optimizations via Startup Profiles
     dexLayoutOptimization = true
+}
+
+dokka {
+   moduleName.set("cmp-android")
 }

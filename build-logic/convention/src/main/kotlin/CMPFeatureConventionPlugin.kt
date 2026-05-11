@@ -24,6 +24,7 @@ class CMPFeatureConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.compose")
                 apply("org.convention.detekt.plugin")
                 apply("org.convention.spotless.plugin")
+                apply("org.convention.dokka.plugin")
             }
 
             dependencies {

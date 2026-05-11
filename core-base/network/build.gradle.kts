@@ -9,6 +9,7 @@
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    alias(libs.plugins.dokka)
 }
 
 android {
@@ -49,4 +50,8 @@ kotlin {
             api(libs.ktor.client.js)
         }
     }
+}
+
+dokka {
+    moduleName.set("core-base-network")
 }

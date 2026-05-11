@@ -9,6 +9,7 @@
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    alias(libs.plugins.dokka)
 }
 
 android {
@@ -38,4 +39,8 @@ kotlin {
             api(libs.androidx.sqlite.web)
         }
     }
+}
+
+dokka {
+    moduleName.set("core-base-database")
 }

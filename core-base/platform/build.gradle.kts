@@ -22,6 +22,7 @@ plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.dokka)
 }
 
 android {
@@ -57,4 +58,8 @@ kotlin {
             implementation(libs.app.update)
         }
     }
+}
+
+dokka {
+    moduleName.set("core-base-platform")
 }

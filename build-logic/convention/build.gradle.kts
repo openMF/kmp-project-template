@@ -28,6 +28,7 @@ dependencies {
     compileOnly(libs.detekt.gradlePlugin)
     compileOnly(libs.ktlint.gradlePlugin)
     compileOnly(libs.spotless.gradle)
+    compileOnly(libs.dokka.gradlePlugin)
     implementation(libs.truth)
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
@@ -125,5 +126,11 @@ gradlePlugin {
             description = "Configures Room for the project"
         }
 
+        // Dokka for documentation
+        register("dokkaConvention") {
+            id = "org.convention.dokka.plugin"
+            implementationClass = "DokkaConventionPlugin"
+            description = "Configures Dokka for the project"
+        }
     }
 }

@@ -7,8 +7,10 @@ import org.gradle.api.artifacts.VersionCatalog
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
+import org.jetbrains.dokka.gradle.DokkaExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinHierarchyBuilder
+import org.jetbrains.dokka.gradle.DokkaTask
 
 /**
  * Get the `libs` version catalog.
@@ -35,5 +37,13 @@ inline fun Project.detektGradle(crossinline configure: DetektExtension.() -> Uni
  */
 inline fun Project.spotlessGradle(crossinline configure: SpotlessExtension.() -> Unit) =
     extensions.configure<SpotlessExtension> {
+        configure()
+    }
+
+/**
+ * Configures the `dokka` plugin with the [configure] lambda for all DokkaTasks.
+ */
+inline fun Project.dokkaGradle(crossinline configure: DokkaExtension.() -> Unit) =
+    extensions.configure<DokkaExtension> {
         configure()
     }

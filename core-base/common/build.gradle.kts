@@ -9,6 +9,7 @@
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    alias(libs.plugins.dokka)
 }
 
 android {
@@ -43,4 +44,8 @@ kotlin {
             api(libs.jb.kotlin.dom)
         }
     }
+}
+
+dokka {
+    moduleName.set("core-base-common")
 }

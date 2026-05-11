@@ -39,6 +39,7 @@ pathToEntries.forEach { (path, entries) ->
 pluginManagement {
     includeBuild("build-logic")
     repositories {
+        mavenLocal()
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -54,6 +55,7 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode = RepositoriesMode.PREFER_PROJECT
     repositories {
+        mavenLocal()
         google {
             content {
                 includeGroupByRegex("com\\.android.*")

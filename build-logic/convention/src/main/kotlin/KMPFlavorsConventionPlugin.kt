@@ -24,6 +24,7 @@ import com.android.build.api.dsl.CommonExtension
 import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import com.mobilebytelabs.kmpflavors.KmpFlavorPlugin
 import org.convention.configureFlavors
+import org.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -38,12 +39,12 @@ import org.gradle.kotlin.dsl.configure
  *
  * ## AGP-side registration
  *
- * `kmp-product-flavors v1.1.2`'s [bridgeAgpProductFlavors] runs in afterEvaluate
- * which is too late for AGP to register `productFlavors` as variants. We
- * therefore disable the bridge and instead register the AGP flavors synchronously
- * via [configureFlavors] inside a `pluginManager.withPlugin("com.android.application"
- * | "com.android.library")` callback — this runs at AGP plugin application time,
- * before AGP variant resolution. The plugin still handles FlavorConfig codegen +
+ * We register the AGP flavors synchronously via [configureFlavors] inside a
+ * `pluginManager.withPlugin("com.android.application" | "com.android.library")`
+ * callback — this runs at AGP plugin application time, before AGP variant
+ * resolution. The plugin's own bridge (`bridgeAgpProductFlavors` / `bridgeAgpBuildTypes`,
+ * default `true` in v1.1.5+) is idempotent: it detects the already-registered
+ * flavors and no-ops silently. The plugin still handles BuildKonfig codegen +
  * source-set wiring for KMP-side.
  *
  * Consumer apps extend this contract by creating
@@ -57,17 +58,14 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
             pluginManager.apply(KmpFlavorPlugin::class.java)
 
             // 2. Configure the KMP-side flavor contract.
+            //    buildConfigPackage comes from gradle/libs.versions.toml ([versions].appPackage)
+            //    so forks change the brand by editing ONE line. buildConfigClassName uses
+            //    the plugin default ("BuildKonfig"). bridgeAgp* defaults are safe (idempotent
+            //    in v1.1.5+) — no need to touch them.
             extensions.configure<KmpFlavorExtension> {
-                buildConfigPackage.set("org.openmf.kmptemplate")
-                buildConfigClassName.set("FlavorConfig")
+                buildConfigPackage.set(libs.findVersion("appPackage").get().requiredVersion)
                 enableBuildTypes.set(true)
 
-                // The plugin's AGP bridge has a timing issue in v1.1.2 — it runs
-                // in afterEvaluate (too late for AGP variant resolution). We
-                // register AGP productFlavors synchronously below; keep these
-                // bridge flags FALSE to avoid a duplicate-flavor collision.
-                bridgeAgpProductFlavors.set(false)
-                bridgeAgpBuildTypes.set(false)
 
                 flavorDimensions {
                     register("contentType") { priority.set(0) }

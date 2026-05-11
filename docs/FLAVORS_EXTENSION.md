@@ -18,18 +18,67 @@
 
 **Variant matrix:** `demoDebug, demoStaging, demoRelease, prodDebug, prodStaging, prodRelease` (6 variants).
 
-The generated `FlavorConfig.kt` exposes:
+The generated `BuildKonfig.kt` (default class name in plugin v1.1.5+; previously `FlavorConfig.kt`) exposes:
 
 - `VARIANT_NAME`, `BUILD_TYPE`
 - `IS_DEMO`, `IS_PROD`, `IS_DEBUG`, `IS_STAGING`, `IS_RELEASE`
 - `BASE_URL`, `DEMO_USERNAME`, `DEMO_PASSWORD`, `IS_DEMO_BUILD`
 - `ENABLE_LOGGING`, `SHOW_DEBUG_OVERLAY`, `LOG_TAG`
 
+> **Branding**: `buildConfigPackage` is read from `gradle/libs.versions.toml` `[versions].appPackage`. Forks change the brand by editing **one line** in `libs.versions.toml` — no build-logic edits.
+
+## Upgrading to plugin v1.1.5
+
+v1.1.5 is a zero-config release. If you previously had any of these in your KMPFlavorsConventionPlugin, **delete them**:
+
+```kotlin
+generateBuildConfig.set(false)          // removed — plugin now auto-detects multi-module case
+                                        // and only the first claimant generates BuildKonfig
+createIntermediateSourceSets.set(false) // removed — Kotlin 2.1+ hierarchy template owns
+                                        // webMain/nativeMain wiring; plugin no longer
+                                        // injects redundant dependsOn edges
+bridgeAgpProductFlavors.set(false)      // removed — bridge is idempotent: if AGP flavors
+bridgeAgpBuildTypes.set(false)          //   are already registered (e.g. via your own
+                                        //   configureFlavors() in a withPlugin hook),
+                                        //   the bridge silently no-ops
+buildConfigClassName.set("FlavorConfig") // removed — default is now "BuildKonfig"
+```
+
+Also delete this from `gradle.properties` if you added it:
+
+```properties
+kotlin.suppressGradlePluginWarnings=UnusedSourceSetsWarning  # removed — plugin now creates
+                                                              # per-flavor source sets
+                                                              # lazily, so no warnings
+```
+
+After cleanup, your convention plugin should look like:
+
+```kotlin
+extensions.configure<KmpFlavorExtension> {
+    buildConfigPackage.set(libs.findVersion("appPackage").get().requiredVersion)
+    enableBuildTypes.set(true)
+    flavorDimensions { ... }
+    flavors { ... }
+    buildTypes { ... }
+}
+```
+
+### What the plugin now does automatically (v1.1.5+)
+
+| Concern | v1.1.4 and earlier | v1.1.5+ |
+|---|---|---|
+| Multi-module `BuildKonfig` codegen | Every module generated → DEX duplicate error | First subproject to apply claims codegen; rest silently skip |
+| Web intermediate wiring | Redundant `webMain.dependsOn(commonMain)` warnings | Owned by Kotlin 2.1+ hierarchy template; plugin only registers src dirs |
+| Per-flavor source sets (`commonProd`, `iosDemoTest`, …) | Created eagerly → "Unused Kotlin Source Sets" warnings | Lazy: created only for active flavor OR when devs add files under `src/<name>/kotlin/` |
+| AGP product-flavor registration | Bridge clashed with manual `configureFlavors()` | Bridge is idempotent — detects existing flavors and no-ops silently |
+
+
 ## How to add your own flavors
 
 Create one file in your consumer-app repo:
 
-```
+```text
 build-logic/convention/src/main/kotlin/local/LocalFlavors.kt
 ```
 
@@ -153,7 +202,7 @@ The matrix expansion happens **after** your apply runs — so adding a new dimen
 
 When the plugin runs and finds your file:
 
-```
+```text
 [KMPFlavors] Applied local.LocalFlavors extensions
 [KMP Flavors] Configuring N flavors across M dimensions
 [KMP Flavors] Active variant: demoBankADebug
@@ -161,7 +210,7 @@ When the plugin runs and finds your file:
 
 When you don't have a local file:
 
-```
+```text
 [KMPFlavors] No local.LocalFlavors override — using base demo/prod only.
 ```
 

@@ -1,6 +1,4 @@
 :cmp-navigation
-:cmp-network-monitor
-:cmp-network-monitor-compose
 :cmp-shared
 :core-base:analytics
 :core-base:common
@@ -302,6 +300,10 @@ io.github.alexzhirkevich:compottie-android:2.0.0-rc04
 io.github.alexzhirkevich:compottie-resources-android:2.0.0-rc04
 io.github.alexzhirkevich:compottie-resources:2.0.0-rc04
 io.github.alexzhirkevich:compottie:2.0.0-rc04
+io.github.mobilebytelabs:cmp-network-monitor-android:3.2.3
+io.github.mobilebytelabs:cmp-network-monitor-compose-android:3.2.3
+io.github.mobilebytelabs:cmp-network-monitor-compose:3.2.3
+io.github.mobilebytelabs:cmp-network-monitor:3.2.3
 io.github.vinceglb:filekit-coil-android:0.12.0
 io.github.vinceglb:filekit-coil:0.12.0
 io.github.vinceglb:filekit-core-android:0.12.0

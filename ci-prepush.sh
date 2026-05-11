@@ -26,10 +26,20 @@ run_gradle_task() {
 tasks=(
     "check -p build-logic"
     "spotlessApply --no-configuration-cache"
-    "dependencyGuardBaseline"
+    # dependencyGuard (NOT dependencyGuardBaseline). Baseline regen is destructive —
+    # it rewrites the committed file with whatever resolution your machine sees, which
+    # silently masks CI drift (e.g. composite-include of kmp-toolkit on dev machines vs.
+    # Maven Central on CI). The committed baseline must reflect the CI-view (Maven
+    # Central). To intentionally refresh after a deliberate dependency bump, run
+    # `./gradlew dependencyGuardBaseline` manually after flipping
+    # lib-integrate.properties `.local=true` -> `.local=false`, then restore.
+    "dependencyGuard"
     "detekt"
     ":cmp-android:build"
-    ":cmp-android:updateProdReleaseBadging"
+    # Read-only check (no project-dir write -> Gradle 9 implicit-dependency safe).
+    # Refresh the golden manually with `./gradlew :cmp-android:updateProdReleaseBadging`
+    # when manifest/permission/locale changes are intentional, then commit.
+    ":cmp-android:checkProdReleaseBadging"
 )
 
 for task in "${tasks[@]}"; do

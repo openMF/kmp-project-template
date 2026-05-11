@@ -1664,10 +1664,9 @@
 |    |    |    |    |    |                   +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.3.20 (*)
 |    |    |    |    |    |                   \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1 -> 1.10.2 (*)
 |    |    |    |    |    +--- org.mobilenativefoundation.store:cache5:5.1.0-alpha08 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.2.3
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-network-monitor-android:3.2.3
-|    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 -> 2.3.20 (*)
-|    |    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.2.3 -> project :kmp-toolkit:cmp-network-monitor
+|    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 -> 2.3.20 (*)
+|    |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-core:4.1.1 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
@@ -1710,15 +1709,14 @@
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0 (*)
 |    |    |    |    |    +--- project :core-base:store (*)
 |    |    |    |    |    +--- project :core-base:designsystem (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor-compose:3.2.3
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-network-monitor-compose-android:3.2.3
-|    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 -> 2.3.20 (*)
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-network-monitor:3.2.3 (*)
-|    |    |    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.10.3 (*)
-|    |    |    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
-|    |    |    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
-|    |    |    |    |    |         +--- org.jetbrains.compose.animation:animation:1.10.3 (*)
-|    |    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor-compose:3.2.3 -> project :kmp-toolkit:cmp-network-monitor-compose
+|    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 -> 2.3.20 (*)
+|    |    |    |    |    |    +--- project :kmp-toolkit:cmp-network-monitor (*)
+|    |    |    |    |    |    +--- org.jetbrains.compose.runtime:runtime:1.10.3 (*)
+|    |    |    |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
+|    |    |    |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
+|    |    |    |    |    |    +--- org.jetbrains.compose.animation:animation:1.10.3 (*)
+|    |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
 |    |    |    |    |    +--- org.jetbrains.compose.ui:ui:1.10.3 (*)
 |    |    |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
@@ -1938,7 +1936,7 @@
 |    |    |    \--- androidx.tracing:tracing:1.3.0 (c)
 |    |    +--- io.insert-koin:koin-android:4.1.1 (*)
 |    |    +--- project :core-base:store (*)
-|    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.2.3 (*)
+|    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.2.3 -> project :kmp-toolkit:cmp-network-monitor (*)
 |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 (*)
 |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    +--- io.insert-koin:koin-core:4.1.1 (*)

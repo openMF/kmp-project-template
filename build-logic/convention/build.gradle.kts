@@ -32,7 +32,7 @@ dependencies {
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
-    compileOnly(libs.kmp.product.flavors.plugin)
+    implementation(libs.kmp.product.flavors.plugin)
 }
 
 tasks {
@@ -60,11 +60,6 @@ gradlePlugin {
         register("androidApplication") {
             id = "org.convention.android.application"
             implementationClass = "AndroidApplicationConventionPlugin"
-        }
-
-        register("androidFlavors") {
-            id = "org.convention.android.application.flavors"
-            implementationClass = "AndroidApplicationFlavorsConventionPlugin"
         }
 
         register("kmpFlavors") {

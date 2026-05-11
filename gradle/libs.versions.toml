@@ -371,7 +371,6 @@ kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = 
 
 android-application-convention = { id = "org.convention.android.application", version = "unspecified" }
 android-application-compose-convention = { id = "org.convention.android.application.compose", version = "unspecified" }
-android-application-flavors-convention = { id = "org.convention.android.application.flavors", version = "unspecified" }
 
 # KMP & CMP Plugins
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

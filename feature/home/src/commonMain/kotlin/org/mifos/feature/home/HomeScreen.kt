@@ -23,7 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -91,7 +91,7 @@ internal fun HomeScreen(
             FeatureCard(
                 title = "Crypto Watchlist",
                 subtitle = "PagingScreenStream + infinite scroll",
-                icon = Icons.Default.ShowChart,
+                icon = Icons.AutoMirrored.Default.ShowChart,
                 onClick = onNavigateToCrypto,
             )
             FeatureCard(

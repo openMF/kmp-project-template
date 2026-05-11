@@ -138,7 +138,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                 enriched
             } else if (enriched.isEmpty && lastContent != null && enriched.error == null) {
                 // Refresh in progress — preserve last content with UPDATING
-                lastContent!!.copy(isRefreshing = true)
+                lastContent.copy(isRefreshing = true)
             } else {
                 enriched
             }
@@ -197,7 +197,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             lastContent = null // Reset on key change
             currentCacheKey = cacheKeyFor(key)
             // Re-seed persistedFetchedAt for the new key.
-            persistedFetchedAt = fetchedAtRepository.read(currentCacheKey!!)
+            persistedFetchedAt = fetchedAtRepository.read(currentCacheKey)
             streamDataNoFallback(key = key, isEmpty = isEmpty)
         }
         .map { storeData ->

@@ -1,4 +1,6 @@
 [versions]
+kmpProductFlavors = "1.1.5"
+appPackage = "org.openmf.kmptemplate"
 # Android
 androidDesugarJdkLibs = "2.1.5"
 androidGradlePlugin = "8.12.3"
@@ -123,6 +125,7 @@ sqliteBundled = "2.6.2"
 sqliteWeb = "2.6.2"
 
 [libraries]
+kmp-product-flavors-plugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 android-tools-common = { group = "com.android.tools", name = "common", version.ref = "androidTools" }
@@ -358,6 +361,8 @@ androidx-compose-ui-test = [
 ]
 
 [plugins]
+kmp-product-flavors = { id = "io.github.mobilebytelabs.kmp-product-flavors", version.ref = "kmpProductFlavors" }
+kmp-flavors-convention = { id = "org.convention.kmp.flavors", version = "unspecified" }
 # Android & Kotlin Plugins
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
@@ -367,7 +372,6 @@ kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = 
 
 android-application-convention = { id = "org.convention.android.application", version = "unspecified" }
 android-application-compose-convention = { id = "org.convention.android.application.compose", version = "unspecified" }
-android-application-flavors-convention = { id = "org.convention.android.application.flavors", version = "unspecified" }
 
 # KMP & CMP Plugins
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

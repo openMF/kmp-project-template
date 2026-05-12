@@ -15,6 +15,12 @@ buildscript {
         classpath(libs.google.oss.licenses.plugin) {
             exclude(group = "com.google.protobuf")
         }
+        // Pin R8 to a version that understands Kotlin 2.3 metadata. The R8 bundled
+        // with AGP 8.12.3 reads up to Kotlin metadata 2.1 only, so every release-mode
+        // build with Kotlin 2.3.20 emits "R8: An error occurred when parsing kotlin
+        // metadata" warnings for almost every class. Override it with R8 9.1.x stable.
+        // Compatibility matrix: https://developer.android.com/studio/build/kotlin-d8-r8-versions
+        classpath("com.android.tools:r8:9.1.31")
     }
 }
 

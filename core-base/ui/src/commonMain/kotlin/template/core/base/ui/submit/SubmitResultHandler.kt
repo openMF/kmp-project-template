@@ -7,12 +7,12 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package template.core.base.ui
+package template.core.base.ui.submit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import template.core.base.store.ErrorCategory
-import template.core.base.store.SubmitState
+import template.core.base.store.error.ErrorCategory
+import template.core.base.store.submit.SubmitState
 
 /**
  * Side-effect composable that fires callbacks when [state] reaches a terminal state.

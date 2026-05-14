@@ -7,10 +7,11 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package template.core.base.store
+package template.core.base.store.submit
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import template.core.base.store.error.categorize
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

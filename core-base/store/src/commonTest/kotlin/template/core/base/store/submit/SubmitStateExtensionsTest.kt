@@ -7,13 +7,14 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package template.core.base.store
+package template.core.base.store.submit
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import template.core.base.store.error.ErrorCategory
 
 class SubmitStateExtensionsTest {
 

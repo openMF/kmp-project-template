@@ -7,7 +7,7 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package template.core.base.ui
+package template.core.base.ui.submit
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import template.core.base.store.SubmitState
+import template.core.base.store.submit.SubmitState
 
 /**
  * Semi-transparent scrim + centered [CircularProgressIndicator] shown while a submission is

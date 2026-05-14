@@ -7,7 +7,7 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package template.core.base.store
+package template.core.base.store.submit
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -18,6 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import template.core.base.store.error.ErrorCategory
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SubmitHandlerTest {
@@ -44,7 +45,8 @@ class SubmitHandlerTest {
 
     @Test
     fun `submit transitions to Failed with categorized error on exception`() = runTest {
-        val networkError = RuntimeException("IOException: connect timed out")
+        class IOException(message: String) : RuntimeException(message)
+        val networkError = IOException("connect timed out")
         val handler = submitHandler<Unit>()
 
         handler.submit { throw networkError }
@@ -176,7 +178,7 @@ class SubmitHandlerTest {
         testScheduler.advanceUntilIdle()
 
         // reset() forces Idle — not Failed
-        assertNotEquals(SubmitState.Idle, SubmitState.Submitting)
+        assertNotEquals<SubmitState<*>>(SubmitState.Idle, SubmitState.Submitting)
         assertEquals(SubmitState.Idle, handler.state.value)
         assertTrue(!reachedFailed)
     }
@@ -185,8 +187,9 @@ class SubmitHandlerTest {
 
     @Test
     fun `network IOException is categorised as Network`() = runTest {
+        class IOException(message: String) : RuntimeException(message)
         val handler = submitHandler<Unit>()
-        handler.submit { throw RuntimeException("IOException: failed to connect") }
+        handler.submit { throw IOException("failed to connect") }
         testScheduler.advanceUntilIdle()
 
         val state = assertIs<SubmitState.Failed>(handler.state.value)
@@ -216,5 +219,5 @@ class SubmitHandlerTest {
     // ─── Helper ──────────────────────────────────────────────────────────────
 
     private fun <R> TestScope.submitHandler(): SubmitHandler<R> =
-        SubmitHandler(backgroundScope)
+        SubmitHandler(this)
 }

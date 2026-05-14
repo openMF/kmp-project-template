@@ -102,6 +102,7 @@ fun <T> ScreenContent(
             is ScreenState.Empty -> empty()
             is ScreenState.NoNetwork -> noNetwork(current.isCaptivePortal)
             is ScreenState.Error -> error(current.error)
+            is ScreenState.Unauthenticated -> error(IllegalStateException("Unauthenticated"))
             is ScreenState.Content -> {
                 // fillMaxSize so Content (freshness indicator + caller's content)
                 // gets the full available height — otherwise this Column wraps and
@@ -129,6 +130,7 @@ private fun ScreenState<*>.transitionKey(): String = when (this) {
     is ScreenState.Empty -> "empty"
     is ScreenState.NoNetwork -> if (isCaptivePortal) "no_network_captive" else "no_network"
     is ScreenState.Error -> "error"
+    is ScreenState.Unauthenticated -> "unauthenticated"
     is ScreenState.Content -> "content"
 }
 

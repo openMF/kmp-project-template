@@ -36,7 +36,7 @@ sealed interface ScreenState<out T> {
      * Authentication required — HTTP 401/403 or equivalent token expiry.
      * Screens should redirect the user to the login flow.
      */
-    data object Unauthenticated : ScreenState<Nothing>()
+    data object Unauthenticated : ScreenState<Nothing>
 
     /** Error occurred with no usable cached data. */
     data class Error(

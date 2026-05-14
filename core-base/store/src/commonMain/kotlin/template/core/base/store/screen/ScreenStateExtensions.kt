@@ -31,6 +31,7 @@ fun <T, R> Flow<ScreenState<T>>.mapContent(
         is ScreenState.Empty -> ScreenState.Empty
         is ScreenState.NoNetwork -> state
         is ScreenState.Error -> state
+        is ScreenState.Unauthenticated -> state
     }
 }
 
@@ -51,6 +52,7 @@ fun <T, S, R> Flow<ScreenState<T>>.combineContent(
         is ScreenState.Empty -> ScreenState.Empty
         is ScreenState.NoNetwork -> state
         is ScreenState.Error -> state
+        is ScreenState.Unauthenticated -> state
     }
 }
 

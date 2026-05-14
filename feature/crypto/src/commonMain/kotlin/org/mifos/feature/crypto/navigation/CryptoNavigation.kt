@@ -17,7 +17,7 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import org.mifos.feature.crypto.ui.CoinDetailScreen
 import org.mifos.feature.crypto.ui.CryptoWatchlistScreen
-import template.core.base.ui.composableWithPushTransitions
+import template.core.base.ui.nav.composableWithPushTransitions
 
 @Serializable
 data object CryptoGraphRoute

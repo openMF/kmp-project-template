@@ -21,7 +21,7 @@ import template.core.base.designsystem.KptMaterialTheme
 import template.core.base.designsystem.theme.KptThemeProviderImpl
 import template.core.base.designsystem.toKptColorScheme
 import template.core.base.designsystem.toKptTypography
-import template.core.base.ui.LocalScreenStateDefaults
+import template.core.base.ui.screen.LocalScreenStateDefaults
 
 val lightScheme = lightColorScheme(
     primary = primaryLight,

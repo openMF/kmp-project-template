@@ -16,7 +16,7 @@ import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
 import org.mifos.feature.currencyrates.ui.CurrencyRatesScreen
 import org.mifos.feature.currencyrates.ui.RateHistoryScreen
-import template.core.base.ui.composableWithPushTransitions
+import template.core.base.ui.nav.composableWithPushTransitions
 
 @Serializable
 data object CurrencyRatesGraphRoute

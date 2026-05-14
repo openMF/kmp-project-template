@@ -19,7 +19,7 @@ import org.mifos.core.model.fintech.RateHistory
 import org.mifos.core.model.fintech.RateHistoryKey
 import org.mobilenativefoundation.store.core5.ExperimentalStoreApi
 import org.mobilenativefoundation.store.store5.Store
-import template.core.base.store.PageKey
+import template.core.base.store.paging.PageKey
 
 @OptIn(ExperimentalStoreApi::class)
 class StoreCacheManagerImpl(

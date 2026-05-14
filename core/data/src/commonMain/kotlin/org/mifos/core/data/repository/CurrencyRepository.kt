@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import org.mifos.core.model.fintech.ExchangeRates
 import org.mifos.core.model.fintech.RateHistory
 import org.mifos.core.model.fintech.RateHistoryKey
-import template.core.base.store.ScreenDataStream
+import template.core.base.store.screen.ScreenDataStream
 
 interface CurrencyRepository {
     fun exchangeRatesStream(

@@ -16,7 +16,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
 import org.mifos.feature.emicalculator.ui.EmiCalculatorScreen
-import template.core.base.ui.composableWithPushTransitions
+import template.core.base.ui.nav.composableWithPushTransitions
 
 @Serializable
 data object EmiCalculatorRoute

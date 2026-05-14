@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import org.mifos.core.data.repository.CryptoRepository
 import org.mifos.core.model.fintech.CoinDetail
-import template.core.base.store.ScreenState
-import template.core.base.ui.BaseViewModel
+import template.core.base.store.screen.ScreenState
+import template.core.base.ui.viewmodel.BaseViewModel
 
 class CoinDetailViewModel(
     cryptoRepository: CryptoRepository,

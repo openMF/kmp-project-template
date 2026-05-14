@@ -13,7 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
-import template.core.base.ui.composableWithPushTransitions
+import template.core.base.ui.nav.composableWithPushTransitions
 
 @Serializable
 data object SettingsRoute

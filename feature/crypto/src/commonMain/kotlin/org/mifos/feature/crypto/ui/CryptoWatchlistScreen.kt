@@ -30,7 +30,7 @@ import org.mifos.core.common.formatGrouped
 import org.mifos.core.model.fintech.CoinMarket
 import org.mifos.core.ui.scaffold.KptScaffold
 import org.mifos.core.ui.scaffold.rememberKptPullToRefreshState
-import template.core.base.ui.PagingScreenContent
+import template.core.base.ui.paging.PagingScreenContent
 
 @Composable
 fun CryptoWatchlistScreen(

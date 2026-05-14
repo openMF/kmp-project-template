@@ -9,7 +9,7 @@
  */
 package org.mifos.core.store
 
-import template.core.base.store.StoreRegistry
+import template.core.base.store.infra.StoreRegistry
 
 /**
  * Application-level [StoreRegistry] — the single named-qualifier registry for every

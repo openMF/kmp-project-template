@@ -17,9 +17,9 @@ import org.mifos.core.model.fintech.ExchangeRates
 import org.mifos.core.model.fintech.RateHistory
 import org.mifos.core.model.fintech.RateHistoryKey
 import org.mobilenativefoundation.store.store5.Store
-import template.core.base.store.FetchedAtRepository
-import template.core.base.store.ScreenDataStream
-import template.core.base.store.asScreenStream
+import template.core.base.store.infra.FetchedAtRepository
+import template.core.base.store.screen.ScreenDataStream
+import template.core.base.store.screen.asScreenStream
 
 class CurrencyRepositoryImpl(
     private val exchangeRatesStore: Store<String, ExchangeRates>,

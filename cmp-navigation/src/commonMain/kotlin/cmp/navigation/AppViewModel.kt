@@ -22,7 +22,7 @@ import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.model.DarkThemeConfig
 import org.mifos.core.model.LanguageConfig
 import template.core.base.platform.garbage.GarbageCollectionManager
-import template.core.base.ui.BaseViewModel
+import template.core.base.ui.viewmodel.BaseViewModel
 
 class AppViewModel(
     private val settingsRepository: UserDataRepository,

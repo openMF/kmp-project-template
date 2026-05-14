@@ -47,8 +47,8 @@ import org.mifos.feature.home.navigateToHome
 import org.mifos.feature.profile.navigateToProfile
 import org.mifos.feature.profile.profileDestination
 import template.core.base.analytics.rememberAnalyticsHelper
-import template.core.base.ui.EventsEffect
-import template.core.base.ui.RootTransitionProviders
+import template.core.base.ui.effects.EventsEffect
+import template.core.base.ui.util.RootTransitionProviders
 
 @Composable
 internal fun AuthenticatedNavbarNavigationScreen(

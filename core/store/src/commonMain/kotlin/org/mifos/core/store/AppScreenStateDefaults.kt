@@ -11,11 +11,11 @@ package org.mifos.core.store
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import template.core.base.ui.ScreenStateDefaults
-import template.core.base.ui.ScreenStateEmpty
-import template.core.base.ui.ScreenStateError
-import template.core.base.ui.ScreenStateLoading
-import template.core.base.ui.ScreenStateNoNetwork
+import template.core.base.ui.screen.ScreenStateDefaults
+import template.core.base.ui.screen.ScreenStateEmpty
+import template.core.base.ui.screen.ScreenStateError
+import template.core.base.ui.screen.ScreenStateLoading
+import template.core.base.ui.screen.ScreenStateNoNetwork
 
 /**
  * !! THIS IS THE FORK CUSTOMIZATION POINT !!

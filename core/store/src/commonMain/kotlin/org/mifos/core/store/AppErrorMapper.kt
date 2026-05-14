@@ -9,8 +9,8 @@
  */
 package org.mifos.core.store
 
-import template.core.base.store.ErrorCategory
-import template.core.base.store.categorize
+import template.core.base.store.error.ErrorCategory
+import template.core.base.store.error.categorize
 
 /**
  * Application-level error → user-facing message mapper.

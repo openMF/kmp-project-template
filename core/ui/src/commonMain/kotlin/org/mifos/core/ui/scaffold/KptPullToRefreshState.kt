@@ -13,10 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import template.core.base.store.DataFreshness
-import template.core.base.store.PagingScreenStream
-import template.core.base.store.ScreenDataStream
-import template.core.base.store.ScreenState
+import template.core.base.store.paging.PagingScreenStream
+import template.core.base.store.screen.DataFreshness
+import template.core.base.store.screen.ScreenDataStream
+import template.core.base.store.screen.ScreenState
 
 /**
  * Data class representing the pull-to-refresh state and behavior.

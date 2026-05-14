@@ -35,7 +35,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.common.formatGrouped
-import template.core.base.ui.ScreenContent
+import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.mifos.core.data.repository.NetworkMonitor
 import org.mifos.core.model.UserData
-import template.core.base.ui.BaseViewModel
+import template.core.base.ui.viewmodel.BaseViewModel
 
 internal class AuthenticatedNavbarNavigationViewModel(
     networkMonitor: NetworkMonitor,

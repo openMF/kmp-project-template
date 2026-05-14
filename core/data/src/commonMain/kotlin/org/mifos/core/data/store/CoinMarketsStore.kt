@@ -22,9 +22,9 @@ import org.mifos.core.network.fintech.CoinGeckoApi
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
-import template.core.base.store.DefaultValidator
-import template.core.base.store.PageKey
-import template.core.base.store.StoreFactory
+import template.core.base.store.infra.DefaultValidator
+import template.core.base.store.infra.StoreFactory
+import template.core.base.store.paging.PageKey
 
 fun provideCoinMarketsStore(
     api: CoinGeckoApi,

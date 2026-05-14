@@ -35,7 +35,7 @@ import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.network.di.NetworkModule
 import template.core.base.common.di.CommonModule
-import template.core.base.store.FetchedAtRepository
+import template.core.base.store.infra.FetchedAtRepository
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)

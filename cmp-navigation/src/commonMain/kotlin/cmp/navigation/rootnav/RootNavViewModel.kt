@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import org.mifos.core.data.repository.UserDataRepository
 import org.mifos.core.model.AuthState
 import org.mifos.core.model.UserData
-import template.core.base.ui.BaseViewModel
+import template.core.base.ui.viewmodel.BaseViewModel
 
 class RootNavViewModel(
     userDataRepository: UserDataRepository,

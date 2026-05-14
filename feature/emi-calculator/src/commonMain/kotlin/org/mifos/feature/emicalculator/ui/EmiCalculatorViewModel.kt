@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.mifos.core.domain.usecase.calculateEmi
 import org.mifos.core.model.fintech.EmiResult
-import template.core.base.ui.BaseViewModel
+import template.core.base.ui.viewmodel.BaseViewModel
 
 class EmiCalculatorViewModel : BaseViewModel<EmiState, Nothing, EmiAction>(EmiState()) {
 

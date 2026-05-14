@@ -15,12 +15,12 @@ import org.mifos.core.data.repository.CryptoRepository
 import org.mifos.core.model.fintech.CoinDetail
 import org.mifos.core.model.fintech.CoinMarket
 import org.mobilenativefoundation.store.store5.Store
-import template.core.base.store.FetchedAtRepository
-import template.core.base.store.PageKey
-import template.core.base.store.PagingScreenStream
-import template.core.base.store.ScreenDataStream
-import template.core.base.store.asPagingScreenStream
-import template.core.base.store.asScreenStream
+import template.core.base.store.infra.FetchedAtRepository
+import template.core.base.store.paging.PageKey
+import template.core.base.store.paging.PagingScreenStream
+import template.core.base.store.paging.asPagingScreenStream
+import template.core.base.store.screen.ScreenDataStream
+import template.core.base.store.screen.asScreenStream
 
 class CryptoRepositoryImpl(
     private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,

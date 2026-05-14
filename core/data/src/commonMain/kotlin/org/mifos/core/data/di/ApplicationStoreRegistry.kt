@@ -9,7 +9,7 @@
  */
 package org.mifos.core.data.di
 
-import template.core.base.store.StoreRegistry
+import template.core.base.store.infra.StoreRegistry
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 

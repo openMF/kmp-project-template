@@ -14,7 +14,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
-import template.core.base.ui.composableWithStayTransitions
+import template.core.base.ui.nav.composableWithStayTransitions
 
 @Serializable
 data object HomeDestination

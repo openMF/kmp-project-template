@@ -30,7 +30,7 @@ import template.core.base.analytics.AnalyticsHelper
 import template.core.base.analytics.lifecycleTracker
 import template.core.base.platform.update.AppUpdateManager
 import template.core.base.platform.update.AppUpdateManagerImpl
-import template.core.base.ui.ShareUtils
+import template.core.base.ui.util.ShareUtils
 import java.util.Locale
 
 /**

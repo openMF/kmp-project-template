@@ -431,7 +431,6 @@ core-base/store/
 │   │   ├── StoreFactory.kt           # Store/MutableStore creation
 │   │   ├── StoreResponseMapper.kt    # mapToResult/mapToData
 │   │   ├── DefaultValidator.kt       # TTL-based cache validation
-│   │   ├── InMemoryBookkeeper.kt     # Offline sync tracking
 │   │   ├── ErrorCategory.kt          # Network/Auth/Server/Generic classification
 │   │   └── di/
 │   │       └── StoreModule.kt        # Koin module

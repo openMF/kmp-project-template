@@ -61,10 +61,12 @@ class OfflineSubmitSyncer<P, R>(
     private suspend fun retryAll() {
         val pending = outbox.getAllPending()
         for (entry in pending) {
+            outbox.markRetrying(entry.id)
             try {
                 submitBlock(entry.payload)
                 outbox.markSubmitted(entry.id)
             } catch (e: CancellationException) {
+                outbox.markFailed(entry.id, "cancelled")
                 throw e
             } catch (e: Exception) {
                 outbox.markFailed(entry.id, e.message)

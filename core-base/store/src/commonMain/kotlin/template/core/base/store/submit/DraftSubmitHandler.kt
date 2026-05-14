@@ -90,7 +90,13 @@ class DraftSubmitHandler<P, R>(
     /**
      * Return to [SubmitState.Idle] without clearing the outbox draft.
      *
-     * The draft remains PENDING so [DraftResumeStream] can surface it on the next visit.
+     * **Cancellation behaviour:** if cancelled while [SubmitState.Submitting] and the network
+     * call has not yet failed, no draft is saved — the `catch` block is only reached on an
+     * exception, not on coroutine cancellation. If a draft was previously saved from an earlier
+     * failure, it remains PENDING in the outbox unchanged.
+     *
+     * This is a UI-only reset: the [SubmitOutbox] is not touched. The draft stays PENDING so
+     * [DraftResumeState] can surface it on the next screen visit.
      */
     fun reset() {
         activeJob?.cancel()

@@ -40,6 +40,9 @@ interface DraftDao {
     @Query("SELECT * FROM framework_submit_drafts WHERE status = 'PENDING'")
     suspend fun getAllPending(): List<DraftEntity>
 
+    @Query("UPDATE framework_submit_drafts SET status = 'RETRYING', updatedAtMs = :nowMs WHERE id = :id")
+    suspend fun markRetrying(id: Long, nowMs: Long)
+
     @Query("UPDATE framework_submit_drafts SET status = 'SUBMITTED', updatedAtMs = :nowMs WHERE id = :id")
     suspend fun markSubmitted(id: Long, nowMs: Long)
 
@@ -48,6 +51,9 @@ interface DraftDao {
             "updatedAtMs = :nowMs, errorMessage = :error WHERE id = :id",
     )
     suspend fun markFailed(id: Long, nowMs: Long, error: String?)
+
+    @Query("UPDATE framework_submit_drafts SET payloadJson = :payloadJson, updatedAtMs = :nowMs WHERE id = :id")
+    suspend fun updatePayload(id: Long, payloadJson: String, nowMs: Long)
 
     @Query("DELETE FROM framework_submit_drafts WHERE formKey = :formKey")
     suspend fun deleteByFormKey(formKey: String)

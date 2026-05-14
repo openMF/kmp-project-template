@@ -49,6 +49,12 @@ enum class FetchPolicy {
      * Use for explicitly offline screens or when the calling code knows connectivity is
      * unavailable and wants to avoid error flicker. If the cache is empty the stream emits
      * [ScreenState.Empty].
+     *
+     * **DataFreshnessIndicator behaviour:** the staleness banner will still show the
+     * `lastFetchedAt` timestamp from cache — even if it is very old — because no background
+     * refresh is triggered to update it. The staleness threshold is applied as normal; if the
+     * cached data is older than the TTL, the stale banner renders. To suppress the banner on
+     * explicitly offline screens, pass `showFreshnessIndicator = false` to [ScreenContent].
      */
     CACHE_ONLY,
 }

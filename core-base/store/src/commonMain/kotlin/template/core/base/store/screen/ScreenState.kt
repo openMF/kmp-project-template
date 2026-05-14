@@ -32,6 +32,12 @@ sealed interface ScreenState<out T> {
         val isCaptivePortal: Boolean = false,
     ) : ScreenState<Nothing>
 
+    /**
+     * Authentication required — HTTP 401/403 or equivalent token expiry.
+     * Screens should redirect the user to the login flow.
+     */
+    data object Unauthenticated : ScreenState<Nothing>()
+
     /** Error occurred with no usable cached data. */
     data class Error(
         val error: Throwable,

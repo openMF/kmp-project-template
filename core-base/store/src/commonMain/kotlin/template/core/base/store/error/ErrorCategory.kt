@@ -26,6 +26,9 @@ enum class ErrorCategory {
     /** HTTP 401/403 or auth-equivalent. Suggest session refresh / login UX. */
     Auth,
 
+    /** HTTP 429 — server is rate-limiting this client. Suggest backing off and retrying. */
+    RateLimit,
+
     /** HTTP 5xx or upstream service error. Suggest retry-with-backoff + status UX. */
     Server,
 
@@ -40,6 +43,7 @@ enum class ErrorCategory {
  * Matching rules (first match wins):
  * - Network: class or cause name contains `IOException`, `Connect`, `Timeout`, `UnknownHost`
  * - Auth: message matches HTTP 401 / 403 patterns, or contains `Unauthorized` / `Forbidden`
+ * - RateLimit: message matches HTTP 429 or contains `Too Many Requests` / `Rate Limit`
  * - Server: message matches HTTP 5xx pattern (500–599)
  * - Generic: fallback
  *
@@ -53,6 +57,7 @@ fun categorize(error: Throwable): ErrorCategory {
         .firstNotNullOfOrNull { msg ->
             when {
                 msg.matchesAuthPattern() -> ErrorCategory.Auth
+                msg.matchesRateLimitPattern() -> ErrorCategory.RateLimit
                 msg.matchesServerPattern() -> ErrorCategory.Server
                 else -> null
             }
@@ -90,6 +95,14 @@ private fun String.matchesAuthPattern(): Boolean =
     AUTH_HTTP_REGEX.containsMatchIn(this) ||
         contains("Unauthorized", ignoreCase = true) ||
         contains("Forbidden", ignoreCase = true)
+
+private val RATE_LIMIT_HTTP_REGEX = Regex("""\\b(?:HTTP\\s+)?429\\b""")
+
+private fun String.matchesRateLimitPattern(): Boolean =
+    RATE_LIMIT_HTTP_REGEX.containsMatchIn(this) ||
+        contains("Too Many Requests", ignoreCase = true) ||
+        contains("Rate Limit", ignoreCase = true) ||
+        contains("RateLimit", ignoreCase = true)
 
 private val SERVER_HTTP_REGEX = Regex("""\b(?:HTTP\s+)?5\d{2}\b""")
 

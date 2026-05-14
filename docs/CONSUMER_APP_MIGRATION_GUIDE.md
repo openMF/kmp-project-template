@@ -746,7 +746,7 @@ val mutableStore = StoreFactory.createMutableStore(
     updater = Updater.by(
         post = { key, item -> api.updateItem(key, item) },
     ),
-    bookkeeper = InMemoryBookkeeper(),
+    bookkeeper = RoomBookkeeper(get<AppDatabase>().bookkeeperDao, keySerializer = { it.toString() }),
 )
 ```
 

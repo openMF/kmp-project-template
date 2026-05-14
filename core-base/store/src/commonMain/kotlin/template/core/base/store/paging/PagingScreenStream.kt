@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.mobilenativefoundation.store.store5.Store
 import template.core.base.store.error.OfflineException
+import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.infra.DecisionEngine
 import template.core.base.store.infra.FetchedAtRepository
 import template.core.base.store.screen.DataOrigin
@@ -68,6 +69,7 @@ class PagingScreenStream<T : Any> internal constructor(
     private val networkMonitor: NetworkMonitor,
     private val cacheKey: String,
     private val fetchedAtRepository: FetchedAtRepository,
+    private val fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
 ) {
     /** Load the next page. No-op if already loading or no more pages. Cache-first. */
     fun loadNextPage() {
@@ -131,18 +133,33 @@ class PagingScreenStream<T : Any> internal constructor(
 
     internal fun loadInitialPage(refresh: Boolean = false) {
         scope.launch {
-            // Offline pre-check for refresh=true (forced network): if we're offline,
+            // CACHE_ONLY: read from local SoT only — never hit the network.
+            if (fetchPolicy == FetchPolicy.CACHE_ONLY) {
+                val pageKey = PageKey.first(pageSize = pageSize, query = query)
+                when (val result = store.loadPage(pageKey, refresh = false)) {
+                    is StorePageResult.Success -> {
+                        items.value = result.items
+                        hasMoreMutable.value = result.nextKey != null
+                    }
+                    is StorePageResult.Error -> error.value = result.error
+                }
+                isInitialLoading.value = false
+                return@launch
+            }
+            // NETWORK_ONLY: always force a fresh fetch — skip cache.
+            val forceRefresh = refresh || fetchPolicy == FetchPolicy.NETWORK_ONLY
+            // Offline pre-check for forced-network: if we're offline,
             // don't even call store.loadPage — `fresh(key)` would dispatch to the
             // fetcher whose `executeWithRetry` may block indefinitely waiting for
             // reconnect. Fail fast with OfflineException so DecisionEngine renders
             // the no-network treatment and the pull-to-refresh spinner can hide.
-            if (refresh && !isOnlineNow()) {
+            if (forceRefresh && !isOnlineNow()) {
                 error.value = OfflineException()
                 isInitialLoading.value = false
                 return@launch
             }
             val pageKey = PageKey.first(pageSize = pageSize, query = query)
-            when (val result = store.loadPage(pageKey, refresh = refresh)) {
+            when (val result = store.loadPage(pageKey, refresh = forceRefresh)) {
                 is StorePageResult.Success -> {
                     items.value = result.items
                     hasMoreMutable.value = result.nextKey != null
@@ -197,6 +214,7 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     scope: CoroutineScope,
     pageSize: Int = PageKey.DEFAULT_PAGE_SIZE,
     query: String? = null,
+    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
 ): PagingScreenStream<Value> {
     val items = MutableStateFlow<List<Value>>(emptyList())
     val hasMore = MutableStateFlow(true)
@@ -264,5 +282,6 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         networkMonitor = networkMonitor,
         cacheKey = cacheKey,
         fetchedAtRepository = fetchedAtRepository,
+        fetchPolicy = fetchPolicy,
     ).also { it.loadInitialPage() }
 }

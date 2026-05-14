@@ -27,10 +27,10 @@ interface SubmitOutbox<P> {
     /**
      * Save [payload] as a PENDING draft under [formKey].
      *
-     * If a PENDING draft already exists for [formKey], callers should delete it first via
-     * [deleteByFormKey] to avoid accumulating stale rows for the same form.
+     * If a PENDING draft already exists for [formKey], this method updates it in-place and
+     * returns its existing id (idempotent upsert — no duplicate rows).
      *
-     * @return The surrogate id of the inserted row, useful for subsequent status updates.
+     * @return The surrogate id of the upserted row, useful for subsequent status updates.
      */
     suspend fun save(formKey: String, payload: P): Long
 
@@ -40,8 +40,11 @@ interface SubmitOutbox<P> {
     /** Hot flow that emits the current PENDING entry whenever it changes. */
     fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?>
 
-    /** All entries currently in PENDING status — used by [OfflineSubmitSyncer]. */
+    /** All entries currently in PENDING status (excludes RETRYING) — used by [OfflineSubmitSyncer]. */
     suspend fun getAllPending(): List<SubmitOutboxEntry<P>>
+
+    /** Claim this entry for retry — transitions PENDING → RETRYING; prevents concurrent UI double-submit. */
+    suspend fun markRetrying(id: Long)
 
     /** Transition the entry identified by [id] to SUBMITTED. */
     suspend fun markSubmitted(id: Long)
@@ -81,6 +84,9 @@ data class SubmitOutboxEntry<out P>(
 enum class SubmitOutboxStatus {
     /** Saved locally, not yet sent to the server. */
     PENDING,
+
+    /** Claimed by [OfflineSubmitSyncer] — in-flight retry; prevents concurrent UI double-submit. */
+    RETRYING,
 
     /** Successfully delivered to the server. Rows in this state may be pruned. */
     SUBMITTED,

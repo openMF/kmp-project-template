@@ -10,6 +10,8 @@
 package template.core.base.store.infra
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
+import template.core.base.store.error.ErrorCategory
+import template.core.base.store.error.categorize
 import template.core.base.store.screen.DataFreshness
 import template.core.base.store.screen.ScreenState
 import template.core.base.store.screen.StoreData
@@ -19,6 +21,7 @@ import template.core.base.store.screen.StoreData
  * No side effects, no coroutines — exhaustively unit testable.
  *
  * Uses full [NetworkStatus] (not just Boolean) to detect captive portals.
+ * Error classification delegates to [categorize] — single source of truth.
  */
 object DecisionEngine {
 
@@ -36,8 +39,13 @@ object DecisionEngine {
             return when {
                 isCaptivePortal -> ScreenState.NoNetwork(isCaptivePortal = true)
                 !isOnline -> ScreenState.NoNetwork()
-                error != null && error.isNetworkError() -> ScreenState.NoNetwork()
-                error != null -> ScreenState.Error(error, isNetworkError = false)
+                error != null -> when (categorize(error)) {
+                    ErrorCategory.Network -> ScreenState.NoNetwork()
+                    ErrorCategory.Auth -> ScreenState.Unauthenticated
+                    ErrorCategory.RateLimit,
+                    ErrorCategory.Server,
+                    ErrorCategory.Generic -> ScreenState.Error(error, isNetworkError = false)
+                }
                 else -> ScreenState.Loading
             }
         }
@@ -50,16 +58,5 @@ object DecisionEngine {
             error != null -> ScreenState.Content(storeData.data, DataFreshness.STALE, fetchedAt)
             else -> ScreenState.Content(storeData.data, DataFreshness.FRESH, fetchedAt)
         }
-    }
-
-    private fun Throwable.isNetworkError(): Boolean {
-        val name = this::class.simpleName.orEmpty()
-        val causeName = cause?.let { it::class.simpleName.orEmpty() }.orEmpty()
-        return name.contains("IOException") ||
-            causeName.contains("IOException") ||
-            name.contains("Connect") ||
-            name.contains("Timeout") ||
-            causeName.contains("Connect") ||
-            causeName.contains("Timeout")
     }
 }

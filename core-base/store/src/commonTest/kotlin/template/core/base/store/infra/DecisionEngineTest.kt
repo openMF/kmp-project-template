@@ -148,25 +148,54 @@ class DecisionEngineTest {
         assertEquals(DataFreshness.UPDATING, result.freshness)
     }
 
-    // === isNetworkError detection ===
+    // === error categorization (delegates to categorize()) ===
 
     @Test
-    fun `isNetworkError - IOException direct`() {
+    fun `network error - IOException direct = NoNetwork`() {
         val data = emptyStoreData(error = FakeIOException("connection reset"))
         val result = DecisionEngine.decide(data, available)
         assertIs<ScreenState.NoNetwork>(result)
     }
 
     @Test
-    fun `isNetworkError - IOException as cause`() {
+    fun `network error - IOException as cause = NoNetwork`() {
         val data = emptyStoreData(error = RuntimeException("wrapped", FakeIOException("cause")))
         val result = DecisionEngine.decide(data, available)
         assertIs<ScreenState.NoNetwork>(result)
     }
 
     @Test
-    fun `isNetworkError - other exception = Error`() {
+    fun `generic error - non-network exception = Error`() {
         val data = emptyStoreData(error = IllegalArgumentException("bad input"))
+        val result = DecisionEngine.decide(data, available)
+        assertIs<ScreenState.Error>(result)
+    }
+
+
+    @Test
+    fun `auth error - 401 message = Unauthenticated`() {
+        val data = emptyStoreData(error = RuntimeException("HTTP 401 Unauthorized"))
+        val result = DecisionEngine.decide(data, available)
+        assertIs<ScreenState.Unauthenticated>(result)
+    }
+
+    @Test
+    fun `auth error - 403 message = Unauthenticated`() {
+        val data = emptyStoreData(error = RuntimeException("HTTP 403 Forbidden"))
+        val result = DecisionEngine.decide(data, available)
+        assertIs<ScreenState.Unauthenticated>(result)
+    }
+
+    @Test
+    fun `rate limit error - 429 message = Error`() {
+        val data = emptyStoreData(error = RuntimeException("HTTP 429 Too Many Requests"))
+        val result = DecisionEngine.decide(data, available)
+        assertIs<ScreenState.Error>(result)
+    }
+
+    @Test
+    fun `server error - 500 message = Error`() {
+        val data = emptyStoreData(error = RuntimeException("HTTP 500 Internal Server Error"))
         val result = DecisionEngine.decide(data, available)
         assertIs<ScreenState.Error>(result)
     }

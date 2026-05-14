@@ -45,6 +45,11 @@ class RoomSubmitOutbox<P>(
 
     override suspend fun save(formKey: String, payload: P): Long {
         val nowMs = currentTimeMillis()
+        val existing = dao.getPendingByFormKey(formKey)
+        if (existing != null) {
+            dao.updatePayload(existing.id, json.encodeToString(serializer, payload), nowMs)
+            return existing.id
+        }
         val entity = DraftEntity(
             formKey = formKey,
             payloadJson = json.encodeToString(serializer, payload),
@@ -63,6 +68,9 @@ class RoomSubmitOutbox<P>(
 
     override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> =
         dao.getAllPending().mapNotNull { it.toEntry() }
+
+    override suspend fun markRetrying(id: Long) =
+        dao.markRetrying(id, currentTimeMillis())
 
     override suspend fun markSubmitted(id: Long) =
         dao.markSubmitted(id, currentTimeMillis())

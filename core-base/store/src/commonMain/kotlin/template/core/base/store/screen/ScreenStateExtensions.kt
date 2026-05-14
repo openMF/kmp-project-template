@@ -12,6 +12,8 @@ package template.core.base.store.screen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import template.core.base.store.submit.SubmitHandler
+import template.core.base.store.submit.SubmitState
 
 /**
  * Transforms only [ScreenState.Content] data, passing through all other states unchanged.
@@ -85,3 +87,27 @@ fun <T> Flow<ScreenState<T>>.mapError(
         else -> state
     }
 }
+
+/**
+ * Execute [block] only when [screenState] has loaded content, passing its data.
+ * No-op when state is Loading / Error / NoNetwork / Empty — safe to call at any time.
+ * Guards against premature submits before data arrives on edit screens.
+ */
+fun <T, R> SubmitHandler<R>.submitWhenContent(
+    screenState: ScreenState<T>,
+    block: suspend (data: T) -> R,
+) {
+    val data = screenState.dataOrNull ?: return
+    submit { block(data) }
+}
+
+/**
+ * True when the screen has content AND no submission is in-flight.
+ *
+ * Use to enable a submit button without collecting two flows separately:
+ * ```kotlin
+ * Button(enabled = screenState.canInteract(submitState)) { … }
+ * ```
+ */
+fun <T, R> ScreenState<T>.canInteract(submitState: SubmitState<R>): Boolean =
+    hasContent && submitState !is SubmitState.Submitting

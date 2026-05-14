@@ -413,18 +413,32 @@ core-base/store/
 ├── build.gradle.kts
 ├── src/
 │   ├── commonMain/kotlin/template/core/base/store/
-│   │   ├── StoreFactory.kt            # Store/MutableStore creation (existing)
-│   │   ├── StoreResponseMapper.kt     # mapToResult/mapToData (existing)
-│   │   ├── DefaultValidator.kt        # TTL-based cache validation (existing)
-│   │   ├── InMemoryBookkeeper.kt      # Offline sync tracking (existing)
+│   │   ├── — READ PATH ——————————————————————————————
+│   │   ├── ScreenState.kt            # Loading/Content/Empty/NoNetwork/Error
+│   │   ├── ScreenDataStream.kt       # Single-item stream (Store.asScreenStream)
+│   │   ├── ScreenStateExtensions.kt  # mapContent, combineContent, emptyIfContent
+│   │   ├── PagingScreenStream.kt     # Paginated stream (Store.asPagingScreenStream)
 │   │   ├── StoreData.kt              # StoreData<T> + DataOrigin + toDataState()
 │   │   ├── StoreDataMapper.kt        # mapToStoreData + mapToStoreDataWithErrors
 │   │   ├── StoreDataExtensions.kt    # streamData, freshData, localData, map
 │   │   ├── StorePagingSource.kt      # PageKey + loadPage + StorePageResult
+│   │   ├── DecisionEngine.kt         # StoreData + NetworkStatus → ScreenState
+│   │   ├── — WRITE PATH —————————————————————————————
+│   │   ├── SubmitState.kt            # Idle/Submitting/Submitted<R>/Failed
+│   │   ├── SubmitHandler.kt          # One-shot executor (submitHandler() factory)
+│   │   ├── SubmitStateExtensions.kt  # isSubmitting, resultOrNull, errorOrNull, …
+│   │   ├── — INFRASTRUCTURE ————————————————————————
+│   │   ├── StoreFactory.kt           # Store/MutableStore creation
+│   │   ├── StoreResponseMapper.kt    # mapToResult/mapToData
+│   │   ├── DefaultValidator.kt       # TTL-based cache validation
+│   │   ├── InMemoryBookkeeper.kt     # Offline sync tracking
+│   │   ├── ErrorCategory.kt          # Network/Auth/Server/Generic classification
 │   │   └── di/
-│   │       └── StoreModule.kt         # Koin module (existing)
+│   │       └── StoreModule.kt        # Koin module
 │   └── commonTest/kotlin/template/core/base/store/
-│       └── StoreDataMapperTest.kt     # 20+ test cases
+│       ├── StoreDataMapperTest.kt        # 20+ read-path tests
+│       ├── SubmitHandlerTest.kt          # 12 write-path tests (T1–T12)
+│       └── SubmitStateExtensionsTest.kt  # exhaustive property tests
 ```
 
 ---
@@ -446,6 +460,69 @@ core-base/store/
 | Paginated list | N+C | PagingData via domain use case | Lazy list + page loading |
 
 ---
+
+
+---
+
+## Form / Submit
+
+### State machine
+
+```
+Idle  ──submit()──▶  Submitting  ──success──▶  Submitted<R>
+                                 ──failure──▶  Failed(error, category)
+Submitted / Failed  ──reset()──▶  Idle
+Failed              ──retry()──▶  Submitting
+```
+
+### UX Scenario Matrix
+
+| Scenario | SubmitState | UI |
+|----------|-------------|-----|
+| Form idle | `Idle` | Button enabled |
+| User taps Submit | `Submitting` | Button disabled + scrim overlay |
+| API succeeds | `Submitted(result)` | Navigate / toast |
+| API fails (network) | `Failed(Network)` | No-network bottom sheet |
+| API fails (auth) | `Failed(Auth)` | Navigate to login |
+| API fails (server) | `Failed(Server)` | Error dialog + retry button |
+| User taps Retry | `Submitting` again | Overlay reappears |
+| User dismisses | `Idle` (via reset) | Dialog hidden |
+
+### ViewModel
+
+```kotlin
+private val submit = viewModelScope.submitHandler<ClientId>()
+val submitState    = submit.state
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SubmitState.Idle)
+
+fun onSave(form: ClientForm) = submit.submit { repository.createClient(form) }
+fun onRetry()               = submit.retry()
+fun onDismiss()             = submit.reset()
+```
+
+### Screen
+
+```kotlin
+Box(Modifier.fillMaxSize()) {
+    FormContent(
+        enabled = !submitState.isSubmitting,
+        onSubmit = { viewModel.onSave(it) },
+    )
+    SubmitProgressOverlay(state = submitState)  // core-base/ui
+    SubmitResultHandler(                         // core-base/ui
+        state = submitState,
+        onSubmitted = { clientId -> onNavigateToDetail(clientId) },
+        onFailed = { error, category ->
+            viewModel.onDismiss()
+            when (category) {
+                ErrorCategory.Network -> showNoNetworkSheet()
+                ErrorCategory.Auth    -> onNavigateToLogin()
+                else                  -> showErrorDialog(error.message)
+            }
+        },
+    )
+}
+```
 
 ## Store 5 API Notes
 

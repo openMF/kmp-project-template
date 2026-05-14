@@ -572,3 +572,161 @@ kotlin {
 ```
 
 Consumer apps that need paging add `androidx.paging` to their own `libs.versions.toml` — it is NOT a dependency of `core-base/store`.
+
+---
+
+## FetchPolicy
+
+`FetchPolicy` controls whether a screen stream reads from cache, hits the network, or both.
+Pass it to `asScreenStream`, `asLoadOnceStream`, or `PagingScreenStream` to override the default.
+
+```kotlin
+enum class FetchPolicy {
+    CACHE_THEN_NETWORK,  // default — show cache instantly, refresh in background
+    NETWORK_ONLY,        // skip cache, always fetch fresh (e.g. payment confirmation)
+    CACHE_ONLY,          // never hit network (offline view, pre-fetched data)
+}
+```
+
+**Choosing a policy:**
+
+| Scenario | Policy |
+|---|---|
+| Normal screen — fast load + background refresh | `CACHE_THEN_NETWORK` (default) |
+| Stale data is harmful (payment status, balance) | `NETWORK_ONLY` |
+| Explicit offline screen or no network available | `CACHE_ONLY` |
+
+**Usage:**
+
+```kotlin
+// Always-fresh payment confirmation screen
+val stream = store.asScreenStream(
+    key = paymentId,
+    networkMonitor = networkMonitor,
+    fetchedAtRepository = fetchedAtRepository,
+    cacheKey = "payment:$paymentId",
+    scope = viewModelScope,
+    fetchPolicy = FetchPolicy.NETWORK_ONLY,
+)
+
+// Offline-capable cached list
+val stream = store.asScreenStream(
+    key = "clients",
+    networkMonitor = networkMonitor,
+    fetchedAtRepository = fetchedAtRepository,
+    cacheKey = "clients",
+    scope = viewModelScope,
+    fetchPolicy = FetchPolicy.CACHE_ONLY,
+)
+```
+
+---
+
+## Offline Submit Outbox
+
+The write-side complement to offline-first reads. When a form submission fails due to a
+network error, the payload is saved locally so the user can resume later.
+
+### Architecture
+
+```
+ViewModel
+  └─ DraftSubmitHandler<P, R>
+       ├─ on network error → SubmitOutbox.save(formKey, payload)
+       ├─ on retry success → SubmitOutbox.markSubmitted(id)
+       └─ on retry failure → SubmitOutbox.markFailed(id, error)
+
+SubmitOutbox (interface, core-base/store)
+  └─ RoomSubmitOutbox<P> (impl, core/data)
+       └─ DraftDao → AppDatabase.framework_submit_drafts
+
+DraftResumeStream
+  └─ observePending(formKey) → Flow<DraftResumeState<P>>
+       ├─ DraftResumeState.None        — form starts fresh
+       └─ DraftResumeState.HasDraft<P> — show "Resume?" banner
+
+OfflineSubmitSyncer
+  └─ watches isOnlineFlow → retries all PENDING entries on reconnect
+```
+
+### DraftSubmitHandler — out-of-box drop-in
+
+`DraftSubmitHandler` wraps `SubmitHandler` and auto-saves on network failure.
+Use it exactly like `SubmitHandler` — the draft logic is invisible to the caller.
+
+```kotlin
+// ViewModel
+private val draftHandler = viewModelScope.draftSubmitHandler<LoanPayload, LoanId>(
+    outbox  = get(), // injected RoomSubmitOutbox<LoanPayload>
+    formKey = "loan_application",
+)
+val submitState = draftHandler.state
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SubmitState.Idle)
+
+fun onSubmit(payload: LoanPayload) = draftHandler.submit(payload) { repo.submitLoan(it) }
+fun onRetry()                      = draftHandler.retry()
+fun onDismiss()                    = draftHandler.reset()
+```
+
+### DraftResumeStream — resume banner
+
+```kotlin
+// ViewModel — expose resume state to the screen
+val draftState: StateFlow<DraftResumeState<LoanPayload>> =
+    outbox.resumeStateFor("loan_application")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DraftResumeState.None)
+
+// Screen
+when (val draft = uiState.draftState) {
+    is DraftResumeState.HasDraft -> ResumeBanner(
+        message = "You have an unsaved submission from ${draft.entry.createdAtMs.toRelativeTime()}",
+        onResume = { viewModel.onResumeDraft(draft.entry.payload) },
+        onDiscard = { viewModel.onDiscardDraft() },
+    )
+    DraftResumeState.None -> { /* form starts fresh */ }
+}
+```
+
+### OfflineSubmitSyncer — reconnect retry
+
+Wire once in a long-lived scope (e.g. `AppViewModel`) to retry PENDING drafts automatically:
+
+```kotlin
+val syncer = viewModelScope.offlineSubmitSyncer(
+    outbox       = loanOutbox,
+    isOnlineFlow = networkMonitor.isOnline,
+    submitBlock  = { payload -> loanRepository.submitLoan(payload) },
+)
+syncer.start()
+```
+
+### DI wiring (Koin)
+
+```kotlin
+// In your feature's DI module
+single<SubmitOutbox<LoanPayload>> {
+    RoomSubmitOutbox(
+        dao        = get<AppDatabase>().draftDao,
+        serializer = LoanPayload.serializer(),
+    )
+}
+```
+
+`AppDatabase.draftDao` is bound automatically by `DataModule` (`core/data/di/RepositoryModule.kt`).
+`StoreCacheManager.clearAll()` calls `draftDao.deleteAll()` on logout — preventing user A's
+drafts from surfacing on user B's session.
+
+### Database migration
+
+`AppDatabase` bumped to **VERSION 5** with `AutoMigration(from = 4, to = 5)`.
+The migration adds the `framework_submit_drafts` table automatically — no manual SQL needed.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | `INTEGER PK AUTOINCREMENT` | Surrogate key |
+| `formKey` | `TEXT` | Consumer form identifier |
+| `payloadJson` | `TEXT` | Serialized form payload |
+| `status` | `TEXT` | `PENDING` / `SUBMITTED` / `FAILED` |
+| `createdAtMs` | `INTEGER` | Epoch millis, creation time |
+| `updatedAtMs` | `INTEGER` | Epoch millis, last status change |
+| `errorMessage` | `TEXT?` | Last failure reason (nullable) |

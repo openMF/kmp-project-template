@@ -127,3 +127,23 @@ fun <Key : Any, Output : Any> Store<Key, Output>.skipMemoryData(
     return stream(StoreReadRequest.skipMemory(key, refresh))
         .mapToStoreDataNoFallback(isEmpty)
 }
+
+/**
+ * Internal helper — selects the correct Store5 request based on [FetchPolicy].
+ *
+ * Used by [asScreenStream], [asLoadOnceStream], and [PagingScreenStream] so policy
+ * logic lives in one place rather than being duplicated across all three callers.
+ */
+internal fun <Key : Any, Output : Any> Store<Key, Output>.streamDataForPolicy(
+    key: Key,
+    policy: FetchPolicy,
+    isEmpty: (Output) -> Boolean = { false },
+): Flow<StoreData<Output>> = when (policy) {
+    FetchPolicy.CACHE_THEN_NETWORK -> streamDataNoFallback(key, isEmpty = isEmpty)
+    FetchPolicy.NETWORK_ONLY ->
+        stream(StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true))
+            .mapToStoreDataNoFallback(isEmpty)
+    FetchPolicy.CACHE_ONLY ->
+        stream(StoreReadRequest.localOnly(key))
+            .mapToStoreDataNoFallback(isEmpty)
+}

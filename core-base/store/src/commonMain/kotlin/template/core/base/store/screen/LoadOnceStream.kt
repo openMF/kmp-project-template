@@ -47,6 +47,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asLoadOnceStream(
     cacheKey: String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
+    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
 ): ScreenDataStream<Output> {
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -57,7 +58,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asLoadOnceStream(
             val persistedFetchedAt = fetchedAtRepository.read(cacheKey)
 
             combine(
-                streamDataNoFallback(key = key, isEmpty = isEmpty),
+                streamDataForPolicy(key = key, policy = fetchPolicy, isEmpty = isEmpty),
                 networkMonitor.networkStatus,
             ) { storeData, networkStatus ->
                 val enriched = if (

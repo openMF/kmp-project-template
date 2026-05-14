@@ -96,16 +96,20 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     cacheKey: String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
+    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
 ): ScreenDataStream<Output> {
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     // Auto-refresh when network reconnects (debounced to avoid WiFi↔Cell flicker)
-    scope.launch {
-        networkMonitor.isOnlineDebounced(300L)
-            .distinctUntilChanged()
-            .filter { it }
-            .drop(1) // Skip initial emission (don't double-load on start)
-            .collect { refreshTrigger.tryEmit(Unit) }
+    // Skipped for CACHE_ONLY — no network requests are ever made.
+    if (fetchPolicy != FetchPolicy.CACHE_ONLY) {
+        scope.launch {
+            networkMonitor.isOnlineDebounced(300L)
+                .distinctUntilChanged()
+                .filter { it }
+                .drop(1) // Skip initial emission (don't double-load on start)
+                .collect { refreshTrigger.tryEmit(Unit) }
+        }
     }
 
     // Seed persisted timestamp so warm-reopen shows real "Updated 5m ago".
@@ -119,7 +123,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     val storeFlow: Flow<StoreData<Output>> = refreshTrigger
         .onStart { emit(Unit) } // Initial load on subscription
         .flatMapLatest {
-            streamDataNoFallback(key = key, isEmpty = isEmpty)
+            streamDataForPolicy(key = key, policy = fetchPolicy, isEmpty = isEmpty)
         }
         .map { storeData ->
             // Persistence: when Store5 hands us NETWORK-origin data with a fresh
@@ -176,15 +180,18 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     cacheKeyFor: (Key) -> String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
+    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
 ): ScreenDataStream<Output> {
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    scope.launch {
-        networkMonitor.isOnlineDebounced(300L)
-            .distinctUntilChanged()
-            .filter { it }
-            .drop(1)
-            .collect { refreshTrigger.tryEmit(Unit) }
+    if (fetchPolicy != FetchPolicy.CACHE_ONLY) {
+        scope.launch {
+            networkMonitor.isOnlineDebounced(300L)
+                .distinctUntilChanged()
+                .filter { it }
+                .drop(1)
+                .collect { refreshTrigger.tryEmit(Unit) }
+        }
     }
 
     var lastContent: StoreData<Output>? = null
@@ -200,7 +207,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             currentCacheKey = cacheKeyFor(key)
             // Re-seed persistedFetchedAt for the new key.
             persistedFetchedAt = fetchedAtRepository.read(currentCacheKey)
-            streamDataNoFallback(key = key, isEmpty = isEmpty)
+            streamDataForPolicy(key = key, policy = fetchPolicy, isEmpty = isEmpty)
         }
         .map { storeData ->
             val key = currentCacheKey ?: return@map storeData

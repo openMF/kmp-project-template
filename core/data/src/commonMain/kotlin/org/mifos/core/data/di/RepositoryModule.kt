@@ -47,6 +47,9 @@ val DataModule = module {
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
     single<FetchedAtRepository> { RoomFetchedAtRepository(get<AppDatabase>().fetchedAtDao) }
 
+    // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
+    single { get<AppDatabase>().draftDao }
+
     // Store cache manager — clears all caches on logout
     single<StoreCacheManager> {
         StoreCacheManagerImpl(
@@ -55,6 +58,7 @@ val DataModule = module {
             coinMarketsStore = get(ApplicationStoreRegistry.CoinMarkets),
             coinDetailStore = get(ApplicationStoreRegistry.CoinDetail),
             bookkeeperDao = get(),
+            draftDao = get(),
         )
     }
 

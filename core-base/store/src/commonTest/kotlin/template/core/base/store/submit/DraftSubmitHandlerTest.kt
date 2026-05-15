@@ -150,7 +150,8 @@ class DraftSubmitHandlerTest {
         testScheduler.advanceUntilIdle()
 
         handler.retry()
-        // override block to succeed this time
+        testScheduler.advanceUntilIdle()
+
         handler.submit("payload") { "ok" }
         testScheduler.advanceUntilIdle()
 

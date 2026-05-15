@@ -186,6 +186,11 @@ internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
             retryText = "Tap to retry",
             icon = Icons.Default.Warning,
         )
+        ErrorCategory.RateLimit -> LoadMoreFooterCopy(
+            label = "Too many requests",
+            retryText = "Tap to retry",
+            icon = Icons.Default.Warning,
+        )
         ErrorCategory.Generic -> LoadMoreFooterCopy(
             label = "Failed to load more",
             retryText = "Tap to retry",

@@ -11,6 +11,7 @@ package template.core.base.store.submit
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -49,13 +50,11 @@ class OfflineSubmitSyncer<P, R>(
      * Individual entry failures are logged to the outbox as FAILED; they do not abort the
      * batch — remaining entries continue to be retried.
      */
-    fun start() {
-        scope.launch {
+    fun start(): Job = scope.launch {
             isOnlineFlow
                 .distinctUntilChanged()
                 .filter { isOnline -> isOnline }
                 .collect { retryAll() }
-        }
     }
 
     private suspend fun retryAll() {

@@ -11,6 +11,7 @@ package template.core.base.store.submit
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -24,7 +25,7 @@ class OfflineSubmitSyncerTest {
     // ─── T1: comes online → retries all PENDING ───────────────────────────────
 
     @Test
-    fun `coming online retries all PENDING entries`() = runTest {
+    fun `coming online retries all PENDING entries`() = runTest(UnconfinedTestDispatcher()) {
         val outbox = FakeSubmitOutbox<String>()
         outbox.save(formKey, "payload1")
         outbox.save("form2", "payload2")
@@ -32,7 +33,7 @@ class OfflineSubmitSyncerTest {
         val isOnline = MutableStateFlow(false)
         var submitCount = 0
 
-        val syncer = offlineSubmitSyncer<String, Unit>(
+        val syncer = backgroundScope.offlineSubmitSyncer<String, Unit>(
             outbox = outbox,
             isOnlineFlow = isOnline,
             submitBlock = { submitCount++ },
@@ -40,7 +41,6 @@ class OfflineSubmitSyncerTest {
         syncer.start()
 
         isOnline.value = true
-        testScheduler.advanceUntilIdle()
 
         assertEquals(2, submitCount)
         assertTrue(outbox.getAllPending().isEmpty(), "All entries should be SUBMITTED after sync")
@@ -49,24 +49,22 @@ class OfflineSubmitSyncerTest {
     // ─── T2: edge-triggered — no duplicate retries ───────────────────────────
 
     @Test
-    fun `emitting true twice only retries once per batch`() = runTest {
+    fun `emitting true twice only retries once per batch`() = runTest(UnconfinedTestDispatcher()) {
         val outbox = FakeSubmitOutbox<String>()
         outbox.save(formKey, "payload")
 
         val isOnline = MutableStateFlow(true)
         var submitCount = 0
 
-        val syncer = offlineSubmitSyncer<String, Unit>(
+        val syncer = backgroundScope.offlineSubmitSyncer<String, Unit>(
             outbox = outbox,
             isOnlineFlow = isOnline,
             submitBlock = { submitCount++ },
         )
         syncer.start()
-        testScheduler.advanceUntilIdle()
 
         // Emitting true again with no state change must not re-trigger (distinctUntilChanged)
         isOnline.value = true
-        testScheduler.advanceUntilIdle()
 
         assertEquals(1, submitCount, "distinctUntilChanged must prevent duplicate retry batch")
     }
@@ -74,19 +72,18 @@ class OfflineSubmitSyncerTest {
     // ─── T3: retry success → entry marked SUBMITTED ───────────────────────────
 
     @Test
-    fun `successful retry marks entry as SUBMITTED`() = runTest {
+    fun `successful retry marks entry as SUBMITTED`() = runTest(UnconfinedTestDispatcher()) {
         val outbox = FakeSubmitOutbox<String>()
         outbox.save(formKey, "payload")
 
         val isOnline = MutableStateFlow(false)
-        val syncer = offlineSubmitSyncer<String, Unit>(
+        val syncer = backgroundScope.offlineSubmitSyncer<String, Unit>(
             outbox = outbox,
             isOnlineFlow = isOnline,
             submitBlock = { /* success */ },
         )
         syncer.start()
         isOnline.value = true
-        testScheduler.advanceUntilIdle()
 
         val entry = outbox.entries.first()
         assertEquals(SubmitOutboxStatus.SUBMITTED, entry.status)
@@ -95,13 +92,14 @@ class OfflineSubmitSyncerTest {
     // ─── T4: individual failure → FAILED, others continue ────────────────────
 
     @Test
-    fun `one failing entry is marked FAILED and does not abort remaining entries`() = runTest {
+    fun `one failing entry is marked FAILED and does not abort remaining entries`() =
+        runTest(UnconfinedTestDispatcher()) {
         val outbox = FakeSubmitOutbox<String>()
         outbox.save("fail_form", "bad_payload")
         outbox.save("ok_form", "good_payload")
 
         val isOnline = MutableStateFlow(false)
-        val syncer = offlineSubmitSyncer<String, Unit>(
+        val syncer = backgroundScope.offlineSubmitSyncer<String, Unit>(
             outbox = outbox,
             isOnlineFlow = isOnline,
             submitBlock = { payload ->
@@ -110,7 +108,6 @@ class OfflineSubmitSyncerTest {
         )
         syncer.start()
         isOnline.value = true
-        testScheduler.advanceUntilIdle()
 
         val entries = outbox.entries
         val failEntry = entries.first { it.formKey == "fail_form" }
@@ -122,21 +119,20 @@ class OfflineSubmitSyncerTest {
     // ─── T5: RETRYING entry is excluded from getAllPending → not double-synced ─
 
     @Test
-    fun `entries already in RETRYING status are not picked up by syncer`() = runTest {
+    fun `entries already in RETRYING status are not picked up by syncer`() = runTest(UnconfinedTestDispatcher()) {
         val outbox = FakeSubmitOutbox<String>()
         val id = outbox.save(formKey, "payload")
         outbox.markRetrying(id)  // simulate UI already claiming this entry
 
         val isOnline = MutableStateFlow(false)
         var submitCount = 0
-        val syncer = offlineSubmitSyncer<String, Unit>(
+        val syncer = backgroundScope.offlineSubmitSyncer<String, Unit>(
             outbox = outbox,
             isOnlineFlow = isOnline,
             submitBlock = { submitCount++ },
         )
         syncer.start()
         isOnline.value = true
-        testScheduler.advanceUntilIdle()
 
         assertEquals(0, submitCount, "RETRYING entries must be skipped by syncer")
     }

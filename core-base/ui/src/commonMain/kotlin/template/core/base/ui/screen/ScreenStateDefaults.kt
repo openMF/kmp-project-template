@@ -107,6 +107,7 @@ fun defaultErrorMessage(error: Throwable): String = when (categorize(error)) {
     ErrorCategory.Network -> "Can't reach the server. Check your connection."
     ErrorCategory.Auth -> "Your session expired. Please sign in again."
     ErrorCategory.Server -> "Our servers are having a moment. Try again in a bit."
+    ErrorCategory.RateLimit -> "Too many requests. Please wait and try again."
     ErrorCategory.Generic -> error.message ?: "Something went wrong"
 }
 

@@ -77,7 +77,7 @@ abstract class BaseMutationViewModel<T, R> : ViewModel() {
     protected abstract suspend fun performSubmit(payload: T): R
 
     /** Trigger a form submission. No-op if already [SubmitState.Submitting]. */
-    fun onSubmit(payload: T) = submitHandler.submit(payload) { performSubmit(it) }
+    fun onSubmit(payload: T) = submitHandler.submit { performSubmit(payload) }
 
     /** Retry the last failed submission. */
     fun onRetry() = submitHandler.retry()

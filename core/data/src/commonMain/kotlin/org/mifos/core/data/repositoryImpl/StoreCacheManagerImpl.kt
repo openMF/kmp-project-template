@@ -13,33 +13,38 @@ import co.touchlab.kermit.Logger
 import org.mifos.core.data.repository.StoreCacheManager
 import org.mifos.core.database.dao.BookkeeperDao
 import org.mifos.core.database.dao.DraftDao
-import org.mifos.core.model.fintech.CoinDetail
-import org.mifos.core.model.fintech.CoinMarket
-import org.mifos.core.model.fintech.ExchangeRates
-import org.mifos.core.model.fintech.RateHistory
-import org.mifos.core.model.fintech.RateHistoryKey
 import org.mobilenativefoundation.store.core5.ExperimentalStoreApi
 import org.mobilenativefoundation.store.store5.Store
-import template.core.base.store.paging.PageKey
 
+/**
+ * Registration-based cache manager. Feature DI modules call [register] for each Store that
+ * should be cleared on logout; foundation infrastructure stays free of feature knowledge.
+ *
+ * Usage in a feature's DI module:
+ * ```kotlin
+ * (get<StoreCacheManager>() as StoreCacheManagerImpl)
+ *     .register(get(ApplicationStoreRegistry.YourStore))
+ * ```
+ */
 @OptIn(ExperimentalStoreApi::class)
 class StoreCacheManagerImpl(
-    private val exchangeRatesStore: Store<String, ExchangeRates>,
-    private val rateHistoryStore: Store<RateHistoryKey, RateHistory>,
-    private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    private val coinDetailStore: Store<String, CoinDetail>,
     private val bookkeeperDao: BookkeeperDao,
     private val draftDao: DraftDao,
 ) : StoreCacheManager {
 
+    private val registeredStores = mutableSetOf<Store<Any, Any>>()
+
+    /** Register a store to be cleared on logout. Call from your feature's DI module. */
+    @Suppress("UNCHECKED_CAST")
+    fun register(store: Store<*, *>) {
+        registeredStores += store as Store<Any, Any>
+    }
+
     override suspend fun clearAll() {
-        Logger.d { "StoreCacheManager: clearing all store caches" }
+        Logger.d { "StoreCacheManager: clearing ${registeredStores.size} registered stores" }
 
         // Store.clear() clears both in-memory cache AND SourceOfTruth (deleteAll)
-        exchangeRatesStore.clear()
-        rateHistoryStore.clear()
-        coinMarketsStore.clear()
-        coinDetailStore.clear()
+        registeredStores.forEach { it.clear() }
 
         // Clear bookkeeper sync-failure records
         bookkeeperDao.deleteAll()

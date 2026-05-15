@@ -21,6 +21,7 @@ import template.core.base.store.fixtures.FakeNetworkMonitor
 import template.core.base.store.infra.FakeFetchedAtRepository
 import kotlin.test.Test
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 /**
  * End-to-end integration tests for [asScreenStream].
@@ -55,9 +56,10 @@ class ScreenDataStreamIntegrationTest {
             val content = if (first is ScreenState.Content) first else awaitItem()
             assertIs<ScreenState.Content<String>>(content)
             val freshness = content.freshness
-            assert(freshness == DataFreshness.FRESH || freshness == DataFreshness.UPDATING) {
-                "Expected FRESH or UPDATING for an in-memory store with a live network, got $freshness"
-            }
+            assertTrue(
+                freshness == DataFreshness.FRESH || freshness == DataFreshness.UPDATING,
+                "Expected FRESH or UPDATING for an in-memory store with a live network, got $freshness",
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -121,9 +123,10 @@ class ScreenDataStreamIntegrationTest {
             var state: ScreenState<String> = awaitItem()
             while (state is ScreenState.Loading) { state = awaitItem() }
             // CACHE_ONLY must not trigger new network fetches
-            assert(fetchCallCount == callsAfterPrime) {
-                "CACHE_ONLY must not call the fetcher; fetchCallCount=$fetchCallCount"
-            }
+            assertTrue(
+                fetchCallCount == callsAfterPrime,
+                "CACHE_ONLY must not call the fetcher; fetchCallCount=$fetchCallCount",
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -158,14 +161,16 @@ class ScreenDataStreamIntegrationTest {
             // After reconnect + debounce window, a refresh is triggered
             // Drain until we get Content or timeout
             var found = false
-            repeat(5) {
-                val next = awaitItem()
-                if (next is ScreenState.Content) {
-                    found = true
-                    return@repeat
+            run drainLoop@{
+                repeat(5) {
+                    val next = awaitItem()
+                    if (next is ScreenState.Content) {
+                        found = true
+                        return@drainLoop
+                    }
                 }
             }
-            assert(found) { "Expected Content after reconnect, but state never reached Content" }
+            assertTrue(found, "Expected Content after reconnect, but state never reached Content")
             cancelAndIgnoreRemainingEvents()
         }
     }

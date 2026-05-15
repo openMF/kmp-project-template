@@ -87,6 +87,7 @@ enum class DataOrigin {
  * - [error] != null -> [DataState.Error] (with optional stale data)
  * - data present, no error -> [DataState.Success]
  */
+@Suppress("DEPRECATION")
 fun <T> StoreData<T>.toDataState(): DataState<T> {
     return when {
         isEmpty && error == null -> DataState.Loading

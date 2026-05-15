@@ -12,8 +12,10 @@ package template.core.base.store.screen
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import template.core.base.store.submit.SubmitHandler
 import template.core.base.store.submit.SubmitState
 
@@ -117,6 +119,35 @@ fun <T, R> ScreenState<T>.canInteract(submitState: SubmitState<R>): Boolean =
     hasContent && submitState !is SubmitState.Submitting
 
 /**
+ * Wraps any value in a [ScreenState.Content] with [DataFreshness.FRESH].
+ * Use for utility or settings screens that hold local state and don't use Store5.
+ *
+ * Example:
+ * ```kotlin
+ * val screenState = stateFlow
+ *     .map { it.asLocalScreenState() }
+ *     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
+ * ```
+ */
+fun <T> T.asLocalScreenState(): ScreenState<T> =
+    ScreenState.Content(this, DataFreshness.FRESH)
+
+/**
+ * Turns any [Flow]<T> into a [Flow]<[ScreenState]<T>> for use with [ScreenContent].
+ *
+ * - Emits [ScreenState.Loading] before the first value
+ * - Maps each value to [ScreenState.Content] with [DataFreshness.FRESH]
+ * - Catches exceptions → [ScreenState.Error]
+ *
+ * Use on settings, calculator, or other screens that have no network source.
+ * For network-backed screens use `Store.asScreenStream` instead.
+ */
+fun <T> Flow<T>.asLocalScreenStream(): Flow<ScreenState<T>> =
+    map { it.asLocalScreenState() }
+        .onStart { emit(ScreenState.Loading) }
+        .catch { emit(ScreenState.Error(it)) }
+
+/**
  * Combines two independent [ScreenState] flows into one, merging their [ScreenState.Content]
  * data via [transform] when both sources have loaded.
  *
@@ -136,43 +167,124 @@ fun <T, R> ScreenState<T>.canInteract(submitState: SubmitState<R>): Boolean =
  *     DashboardUiState(account = account, transactions = transactions)
  * }
  * ```
+ *
+ * For 3, 4, or 5 sources use the corresponding typed overloads.
  */
 @OptIn(ExperimentalTime::class)
 fun <A, B, R> combineScreenStates(
     a: Flow<ScreenState<A>>,
     b: Flow<ScreenState<B>>,
     transform: (A, B) -> R,
-): Flow<ScreenState<R>> = combine(a, b) { stateA, stateB ->
-    when {
-        stateA is ScreenState.NoNetwork || stateB is ScreenState.NoNetwork ->
-            ScreenState.NoNetwork()
-        stateA is ScreenState.Loading || stateB is ScreenState.Loading ->
-            ScreenState.Loading
-        stateA is ScreenState.Unauthenticated || stateB is ScreenState.Unauthenticated ->
-            ScreenState.Unauthenticated
-        stateA is ScreenState.Error -> stateA
-        stateB is ScreenState.Error -> stateB
-        stateA is ScreenState.Empty || stateB is ScreenState.Empty ->
-            ScreenState.Empty
-        stateA is ScreenState.Content && stateB is ScreenState.Content ->
-            ScreenState.Content(
-                data = transform(stateA.data, stateB.data),
-                freshness = combineFreshness(stateA.freshness, stateB.freshness),
-                fetchedAt = minFetchedAt(stateA.fetchedAt, stateB.fetchedAt),
-            )
-        else -> ScreenState.Loading
+): Flow<ScreenState<R>> = combine(a, b) { sa, sb ->
+    @Suppress("UNCHECKED_CAST")
+    resolveScreenStates(listOf(sa, sb)) {
+        transform(
+            (sa as ScreenState.Content<A>).data,
+            (sb as ScreenState.Content<B>).data,
+        )
     }
 }
 
+/**
+ * Combines three independent [ScreenState] flows. See [combineScreenStates] for priority rules.
+ */
 @OptIn(ExperimentalTime::class)
-private fun combineFreshness(a: DataFreshness, b: DataFreshness): DataFreshness = when {
-    a == DataFreshness.STALE || b == DataFreshness.STALE -> DataFreshness.STALE
-    a == DataFreshness.UPDATING || b == DataFreshness.UPDATING -> DataFreshness.UPDATING
-    else -> DataFreshness.FRESH
+fun <A, B, C, R> combineScreenStates(
+    a: Flow<ScreenState<A>>,
+    b: Flow<ScreenState<B>>,
+    c: Flow<ScreenState<C>>,
+    transform: (A, B, C) -> R,
+): Flow<ScreenState<R>> = combine(a, b, c) { sa, sb, sc ->
+    @Suppress("UNCHECKED_CAST")
+    resolveScreenStates(listOf(sa, sb, sc)) {
+        transform(
+            (sa as ScreenState.Content<A>).data,
+            (sb as ScreenState.Content<B>).data,
+            (sc as ScreenState.Content<C>).data,
+        )
+    }
 }
 
+/**
+ * Combines four independent [ScreenState] flows. See [combineScreenStates] for priority rules.
+ */
 @OptIn(ExperimentalTime::class)
-private fun minFetchedAt(a: Instant?, b: Instant?): Instant? = when {
-    a == null || b == null -> null
-    else -> if (a < b) a else b
+fun <A, B, C, D, R> combineScreenStates(
+    a: Flow<ScreenState<A>>,
+    b: Flow<ScreenState<B>>,
+    c: Flow<ScreenState<C>>,
+    d: Flow<ScreenState<D>>,
+    transform: (A, B, C, D) -> R,
+): Flow<ScreenState<R>> = combine(a, b, c, d) { sa, sb, sc, sd ->
+    @Suppress("UNCHECKED_CAST")
+    resolveScreenStates(listOf(sa, sb, sc, sd)) {
+        transform(
+            (sa as ScreenState.Content<A>).data,
+            (sb as ScreenState.Content<B>).data,
+            (sc as ScreenState.Content<C>).data,
+            (sd as ScreenState.Content<D>).data,
+        )
+    }
+}
+
+/**
+ * Combines five independent [ScreenState] flows. See [combineScreenStates] for priority rules.
+ */
+@OptIn(ExperimentalTime::class)
+fun <A, B, C, D, E, R> combineScreenStates(
+    a: Flow<ScreenState<A>>,
+    b: Flow<ScreenState<B>>,
+    c: Flow<ScreenState<C>>,
+    d: Flow<ScreenState<D>>,
+    e: Flow<ScreenState<E>>,
+    transform: (A, B, C, D, E) -> R,
+): Flow<ScreenState<R>> = combine(a, b, c, d, e) { sa, sb, sc, sd, se ->
+    @Suppress("UNCHECKED_CAST")
+    resolveScreenStates(listOf(sa, sb, sc, sd, se)) {
+        transform(
+            (sa as ScreenState.Content<A>).data,
+            (sb as ScreenState.Content<B>).data,
+            (sc as ScreenState.Content<C>).data,
+            (sd as ScreenState.Content<D>).data,
+            (se as ScreenState.Content<E>).data,
+        )
+    }
+}
+
+/**
+ * Resolves N [ScreenState]s to a single result, applying the standard priority rule.
+ *
+ * Priority: NoNetwork > Loading > Unauthenticated > Error > Empty > Content
+ * Freshness: worst across all Content sources (STALE > UPDATING > FRESH).
+ * fetchedAt: null if any Content source has null fetchedAt; otherwise the minimum (oldest).
+ */
+@OptIn(ExperimentalTime::class)
+private fun <R> resolveScreenStates(
+    states: List<ScreenState<*>>,
+    buildResult: () -> R,
+): ScreenState<R> {
+    val contents = states.filterIsInstance<ScreenState.Content<*>>()
+    val worstFreshness = contents.fold(DataFreshness.FRESH) { acc, c ->
+        when {
+            acc == DataFreshness.STALE || c.freshness == DataFreshness.STALE -> DataFreshness.STALE
+            acc == DataFreshness.UPDATING || c.freshness == DataFreshness.UPDATING -> DataFreshness.UPDATING
+            else -> DataFreshness.FRESH
+        }
+    }
+    val combinedFetchedAt: Instant? = if (contents.any { it.fetchedAt == null }) null
+        else contents.mapNotNull { it.fetchedAt }.minOrNull()
+
+    return when {
+        states.any { it is ScreenState.NoNetwork } -> ScreenState.NoNetwork()
+        states.any { it is ScreenState.Loading } -> ScreenState.Loading
+        states.any { it is ScreenState.Unauthenticated } -> ScreenState.Unauthenticated
+        states.any { it is ScreenState.Error } -> {
+            val err = states.first { it is ScreenState.Error } as ScreenState.Error
+            ScreenState.Error(err.error, err.isNetworkError)
+        }
+        states.any { it is ScreenState.Empty } -> ScreenState.Empty
+        states.size == contents.size ->
+            ScreenState.Content(buildResult(), worstFreshness, combinedFetchedAt)
+        else -> ScreenState.Loading
+    }
 }

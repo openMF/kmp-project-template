@@ -34,6 +34,23 @@ object StoreFactory {
      * Creates a read-only [Store] where the fetcher output type matches
      * the source of truth input type (no conversion needed).
      *
+     * **[DefaultValidator] wiring note:** If you pass a [DefaultValidator] as [validator],
+     * you **must** call [DefaultValidator.markFresh] inside the [fetcher] block after a
+     * successful network response. Without this call the TTL never starts and cached data
+     * is treated as always valid regardless of age:
+     * ```kotlin
+     * val validator = DefaultValidator.withTtl<MyData>()
+     * createStore(
+     *     fetcher = Fetcher.of { key ->
+     *         val data = api.fetch(key)
+     *         validator.markFresh()   // ← required
+     *         data
+     *     },
+     *     sourceOfTruth = mySourceOfTruth,
+     *     validator = validator,
+     * )
+     * ```
+     *
      * @param Key The type used to identify data (e.g., a user ID or query params).
      * @param Input The type produced by the fetcher and consumed by the source of truth.
      * @param Output The domain type exposed to consumers.

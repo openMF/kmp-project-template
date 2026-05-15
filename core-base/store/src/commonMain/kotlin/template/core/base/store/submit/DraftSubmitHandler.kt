@@ -20,36 +20,58 @@ import template.core.base.store.error.ErrorCategory
 import template.core.base.store.error.categorize
 
 /**
- * Out-of-box form submission handler that automatically persists the payload as a
- * PENDING draft when the network request fails.
+ * Out-of-box form submission handler with user-prompted draft save and restore/discard support.
  *
- * Drop-in replacement for [SubmitHandler] on screens where the user should be able
- * to resume an interrupted submission later (e.g. after connectivity is restored).
+ * **Two save modes — controlled by [autoSaveDraft]:**
  *
- * **ViewModel usage:**
+ * `autoSaveDraft = false` (default) — **user-prompted save:**
+ * 1. Network failure → state = Failed(Network, draftSaved=false)
+ * 2. [DraftSavePrompt] appears OOB: "No connection. Save as draft?"
+ * 3a. User taps Save Draft → ViewModel calls [saveDraft] → outbox.save, draftSaved=true
+ * 3b. User taps Dismiss → nothing saved, state stays Failed
+ *
+ * `autoSaveDraft = true` — **silent auto-save:**
+ * 1. Network failure → outbox.save immediately → state = Failed(Network, draftSaved=true)
+ * 2. No prompt shown; [DraftResumeBanner] surfaces the draft on next form open
+ *
+ * **Form open lifecycle (both modes):**
+ * 1. Form opens → ViewModel observes `outbox.resumeStateFor(formKey)` (a [DraftResumeState] flow)
+ * 2. HasDraft → wire [DraftResumeBanner] to show OOB with Restore / Discard
+ * 3a. Restore → pre-populate form fields with draft payload
+ * 3b. Discard → `outbox.deleteByFormKey(formKey)`
+ *
+ * **ViewModel wiring (complete example):**
  * ```kotlin
- * private val draftHandler = viewModelScope.draftSubmitHandler(
- *     outbox     = roomSubmitOutbox,
- *     formKey    = "loan_application",
+ * // User-prompted (default):
+ * private val draftHandler = viewModelScope.draftSubmitHandler<LoanPayload, Unit>(
+ *     outbox  = roomSubmitOutbox,
+ *     formKey = "loan_application",
+ * )
+ * // Auto-save:
+ * private val draftHandler = viewModelScope.draftSubmitHandler<LoanPayload, Unit>(
+ *     outbox         = roomSubmitOutbox,
+ *     formKey        = "loan_application",
+ *     autoSaveDraft  = true,
  * )
  * val submitState = draftHandler.state
  *     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SubmitState.Idle)
  *
- * fun onSubmit(payload: LoanPayload) = draftHandler.submit(payload) { repository.submit(it) }
- * fun onRetry()                      = draftHandler.retry()
- * fun onDismiss()                    = draftHandler.reset()
+ * fun onSubmit(payload: LoanPayload) = draftHandler.submit(payload) { repository.submitLoan(it) }
+ * fun onRetry()              = draftHandler.retry()
+ * fun onSaveDraft()          = draftHandler.saveDraft()          // user-prompted mode only
+ * fun onDismissDraftPrompt() = draftHandler.discardDraft()       // user-prompted mode only
  * ```
  *
- * On network failure the payload is saved via [SubmitOutbox.save]. On any subsequent
- * [submit] or [retry] call the outbox row transitions to SUBMITTED or FAILED accordingly.
- *
- * @param P Serializable payload type (the data collected by the form).
- * @param R Result type returned by the server on success.
+ * @param P             Serializable payload type (the data collected by the form).
+ * @param R             Result type returned by the server on success.
+ * @param autoSaveDraft When true, saves to outbox silently on network failure.
+ *   When false (default), the UI must show [DraftSavePrompt] and call [saveDraft].
  */
 class DraftSubmitHandler<P, R>(
     private val scope: CoroutineScope,
     private val outbox: SubmitOutbox<P>,
     private val formKey: String,
+    private val autoSaveDraft: Boolean = false,
 ) {
     private val _state = MutableStateFlow<SubmitState<R>>(SubmitState.Idle)
 
@@ -65,7 +87,8 @@ class DraftSubmitHandler<P, R>(
      * Execute [block] with [payload] as a one-shot submission.
      *
      * - No-op if already [SubmitState.Submitting].
-     * - On failure: saves [payload] to [SubmitOutbox] and transitions to [SubmitState.Failed].
+     * - On network failure: transitions to [SubmitState.Failed] with `category=Network`.
+     *   Does **not** auto-save — the UI shows [DraftSavePrompt] and the user calls [saveDraft].
      * - On success: marks the draft SUBMITTED (if one exists) and transitions to [SubmitState.Submitted].
      */
     fun submit(payload: P, block: suspend (P) -> R) {
@@ -88,15 +111,42 @@ class DraftSubmitHandler<P, R>(
     }
 
     /**
+     * Explicitly saves the last payload as a PENDING draft in the outbox.
+     *
+     * Call this from the ViewModel after the user confirms "Save Draft" on [DraftSavePrompt].
+     * Updates state to [SubmitState.Failed] with `draftSaved=true` so the prompt hides itself.
+     * No-op if there is no pending payload (i.e. no prior network failure this session).
+     */
+    fun saveDraft() {
+        val payload = lastPayload ?: return
+        scope.launch {
+            val draftId = outbox.save(formKey, payload)
+            lastDraftId = draftId
+            val current = _state.value
+            if (current is SubmitState.Failed) {
+                _state.value = current.copy(draftSaved = true)
+            }
+        }
+    }
+
+    /**
+     * Discards the in-memory payload and returns to [SubmitState.Idle] without saving to outbox.
+     *
+     * Call this from the ViewModel after the user taps "Dismiss" on [DraftSavePrompt].
+     */
+    fun discardDraft() {
+        lastPayload = null
+        lastBlock = null
+        lastDraftId = null
+        _state.value = SubmitState.Idle
+    }
+
+    /**
      * Return to [SubmitState.Idle] without clearing the outbox draft.
      *
      * **Cancellation behaviour:** if cancelled while [SubmitState.Submitting] and the network
-     * call has not yet failed, no draft is saved — the `catch` block is only reached on an
-     * exception, not on coroutine cancellation. If a draft was previously saved from an earlier
-     * failure, it remains PENDING in the outbox unchanged.
-     *
-     * This is a UI-only reset: the [SubmitOutbox] is not touched. The draft stays PENDING so
-     * [DraftResumeState] can surface it on the next screen visit.
+     * call has not yet failed, no draft is saved. If a draft was previously saved it remains
+     * PENDING in the outbox so [DraftResumeState] surfaces it on the next screen visit.
      */
     fun reset() {
         activeJob?.cancel()
@@ -116,13 +166,15 @@ class DraftSubmitHandler<P, R>(
                 throw e
             } catch (e: Exception) {
                 val category = categorize(e)
-                if (category == ErrorCategory.Network) {
+                if (autoSaveDraft && category == ErrorCategory.Network) {
                     val draftId = outbox.save(formKey, payload)
                     lastDraftId = draftId
+                    SubmitState.Failed(error = e, category = category, draftSaved = true)
                 } else {
+                    // User-prompted mode: UI shows DraftSavePrompt; user calls saveDraft() to confirm.
                     lastDraftId?.let { outbox.markFailed(it, e.message) }
+                    SubmitState.Failed(error = e, category = category)
                 }
-                SubmitState.Failed(error = e, category = category)
             }
         }
     }
@@ -132,13 +184,21 @@ class DraftSubmitHandler<P, R>(
  * Creates a [DraftSubmitHandler] bound to this [CoroutineScope] (typically `viewModelScope`).
  *
  * ```kotlin
- * private val draftHandler = viewModelScope.draftSubmitHandler(
+ * // User-prompted save (default):
+ * private val draftHandler = viewModelScope.draftSubmitHandler<LoanPayload, Unit>(
  *     outbox  = roomSubmitOutbox,
  *     formKey = "client_registration",
+ * )
+ * // Silent auto-save on network failure:
+ * private val draftHandler = viewModelScope.draftSubmitHandler<LoanPayload, Unit>(
+ *     outbox        = roomSubmitOutbox,
+ *     formKey       = "client_registration",
+ *     autoSaveDraft = true,
  * )
  * ```
  */
 fun <P, R> CoroutineScope.draftSubmitHandler(
     outbox: SubmitOutbox<P>,
     formKey: String,
-): DraftSubmitHandler<P, R> = DraftSubmitHandler(this, outbox, formKey)
+    autoSaveDraft: Boolean = false,
+): DraftSubmitHandler<P, R> = DraftSubmitHandler(this, outbox, formKey, autoSaveDraft)

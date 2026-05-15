@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import template.core.base.store.error.ErrorCategory
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -37,10 +38,10 @@ class DraftSubmitHandlerTest {
         assertTrue(outbox.entries.isEmpty(), "No draft should be saved on success")
     }
 
-    // ─── T2: network failure saves draft ─────────────────────────────────────
+    // ─── T2: network failure does NOT auto-save (user must call saveDraft) ───
 
     @Test
-    fun `submit network failure saves draft to outbox`() = runTest {
+    fun `submit network failure does not auto-save draft`() = runTest {
         val outbox = FakeSubmitOutbox<String>()
         val handler = draftSubmitHandler<String, String>(outbox, formKey)
 
@@ -50,8 +51,8 @@ class DraftSubmitHandlerTest {
 
         val state = assertIs<SubmitState.Failed>(handler.state.value)
         assertEquals(ErrorCategory.Network, state.category)
-        val draft = outbox.getPending(formKey)
-        assertEquals("payload", draft?.payload)
+        assertFalse(state.draftSaved, "draftSaved must be false until user confirms")
+        assertNull(outbox.getPending(formKey), "Network failure must not auto-save a draft")
     }
 
     // ─── T3: non-network failure does NOT save draft ──────────────────────────
@@ -102,10 +103,10 @@ class DraftSubmitHandlerTest {
         assertEquals(1, callCount, "Second submit while in-flight must be no-op")
     }
 
-    // ─── T6: reset returns to Idle, draft preserved ──────────────────────────
+    // ─── T6: reset returns to Idle ───────────────────────────────────────────
 
     @Test
-    fun `reset returns to Idle without removing outbox draft`() = runTest {
+    fun `reset returns to Idle`() = runTest {
         val outbox = FakeSubmitOutbox<String>()
         val handler = draftSubmitHandler<String, String>(outbox, formKey)
 
@@ -116,21 +117,24 @@ class DraftSubmitHandlerTest {
         handler.reset()
 
         assertEquals(SubmitState.Idle, handler.state.value)
-        assertEquals("payload", outbox.getPending(formKey)?.payload, "Draft must remain after reset")
     }
 
-    // ─── T7: second submit idempotent — updates existing draft ───────────────
+    // ─── T7: second network failure — no duplicate outbox rows ───────────────
 
     @Test
-    fun `second network failure updates existing draft instead of inserting new row`() = runTest {
+    fun `second network failure after saveDraft does not insert duplicate row`() = runTest {
         val outbox = FakeSubmitOutbox<String>()
         val handler = draftSubmitHandler<String, String>(outbox, formKey)
 
         class IOException(msg: String) : RuntimeException(msg)
         handler.submit("payload_v1") { throw IOException("offline") }
         testScheduler.advanceUntilIdle()
+        handler.saveDraft()
+        testScheduler.advanceUntilIdle()
 
         handler.submit("payload_v2") { throw IOException("still offline") }
+        testScheduler.advanceUntilIdle()
+        handler.saveDraft()
         testScheduler.advanceUntilIdle()
 
         val pending = outbox.getAllPending()
@@ -148,8 +152,7 @@ class DraftSubmitHandlerTest {
         class IOException(msg: String) : RuntimeException(msg)
         handler.submit("payload") { throw IOException("offline") }
         testScheduler.advanceUntilIdle()
-
-        handler.retry()
+        handler.saveDraft()
         testScheduler.advanceUntilIdle()
 
         handler.submit("payload") { "ok" }
@@ -158,5 +161,95 @@ class DraftSubmitHandlerTest {
         assertIs<SubmitState.Submitted<String>>(handler.state.value)
         val entry = outbox.entries.firstOrNull { it.formKey == formKey }
         assertEquals(SubmitOutboxStatus.SUBMITTED, entry?.status)
+    }
+
+    // ─── T9: saveDraft persists payload and sets draftSaved=true ─────────────
+
+    @Test
+    fun `saveDraft saves payload to outbox and sets draftSaved true`() = runTest {
+        val outbox = FakeSubmitOutbox<String>()
+        val handler = draftSubmitHandler<String, String>(outbox, formKey)
+
+        class IOException(msg: String) : RuntimeException(msg)
+        handler.submit("my_payload") { throw IOException("no network") }
+        testScheduler.advanceUntilIdle()
+
+        handler.saveDraft()
+        testScheduler.advanceUntilIdle()
+
+        val state = assertIs<SubmitState.Failed>(handler.state.value)
+        assertTrue(state.draftSaved, "State must reflect draftSaved=true after saveDraft()")
+        assertEquals("my_payload", outbox.getPending(formKey)?.payload)
+    }
+
+    // ─── T10: discardDraft resets to Idle without touching outbox ────────────
+
+    @Test
+    fun `discardDraft resets to Idle without saving to outbox`() = runTest {
+        val outbox = FakeSubmitOutbox<String>()
+        val handler = draftSubmitHandler<String, String>(outbox, formKey)
+
+        class IOException(msg: String) : RuntimeException(msg)
+        handler.submit("payload") { throw IOException("no network") }
+        testScheduler.advanceUntilIdle()
+
+        handler.discardDraft()
+
+        assertEquals(SubmitState.Idle, handler.state.value)
+        assertNull(outbox.getPending(formKey), "discardDraft must not save anything to outbox")
+    }
+
+    // ─── T11: saveDraft no-op when no prior network failure ──────────────────
+
+    @Test
+    fun `saveDraft is no-op when called without prior submit`() = runTest {
+        val outbox = FakeSubmitOutbox<String>()
+        val handler = draftSubmitHandler<String, String>(outbox, formKey)
+
+        handler.saveDraft()
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(SubmitState.Idle, handler.state.value)
+        assertTrue(outbox.entries.isEmpty(), "saveDraft with no payload must be a no-op")
+    }
+
+    // ─── T12: autoSaveDraft=true — network failure auto-saves immediately ────
+
+    @Test
+    fun `autoSaveDraft=true saves draft silently and sets draftSaved=true`() = runTest {
+        val outbox = FakeSubmitOutbox<String>()
+        val handler = draftSubmitHandler<String, String>(
+            outbox = outbox,
+            formKey = formKey,
+            autoSaveDraft = true,
+        )
+
+        class IOException(msg: String) : RuntimeException(msg)
+        handler.submit("auto_payload") { throw IOException("no network") }
+        testScheduler.advanceUntilIdle()
+
+        val state = assertIs<SubmitState.Failed>(handler.state.value)
+        assertEquals(ErrorCategory.Network, state.category)
+        assertTrue(state.draftSaved, "autoSaveDraft=true must set draftSaved=true immediately")
+        assertEquals("auto_payload", outbox.getPending(formKey)?.payload)
+    }
+
+    // ─── T13: autoSaveDraft=true — non-network failure still does NOT auto-save
+
+    @Test
+    fun `autoSaveDraft=true does not save on non-network failure`() = runTest {
+        val outbox = FakeSubmitOutbox<String>()
+        val handler = draftSubmitHandler<String, String>(
+            outbox = outbox,
+            formKey = formKey,
+            autoSaveDraft = true,
+        )
+
+        handler.submit("payload") { throw RuntimeException("HTTP 500") }
+        testScheduler.advanceUntilIdle()
+
+        val state = assertIs<SubmitState.Failed>(handler.state.value)
+        assertEquals(ErrorCategory.Server, state.category)
+        assertNull(outbox.getPending(formKey), "Non-network failure must never auto-save")
     }
 }

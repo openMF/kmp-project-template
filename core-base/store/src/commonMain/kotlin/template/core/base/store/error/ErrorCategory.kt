@@ -96,7 +96,7 @@ private fun String.matchesAuthPattern(): Boolean =
         contains("Unauthorized", ignoreCase = true) ||
         contains("Forbidden", ignoreCase = true)
 
-private val RATE_LIMIT_HTTP_REGEX = Regex("""\\b(?:HTTP\\s+)?429\\b""")
+private val RATE_LIMIT_HTTP_REGEX = Regex("""\b(?:HTTP\s+)?429\b""")
 
 private fun String.matchesRateLimitPattern(): Boolean =
     RATE_LIMIT_HTTP_REGEX.containsMatchIn(this) ||

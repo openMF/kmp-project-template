@@ -9,20 +9,14 @@
  */
 package template.core.base.store.paging
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
 import template.core.base.store.error.OfflineException
+import template.core.base.store.fixtures.FakeNetworkMonitor
 import template.core.base.store.infra.FakeFetchedAtRepository
 import template.core.base.store.screen.ScreenState
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.mobilenativefoundation.store.store5.Fetcher
@@ -201,13 +195,3 @@ class PagingScreenStreamOfflineTest {
  */
 private suspend fun <T : Any> StateFlow<T?>.firstNonNullValue(): T = first { it != null }!!
 
-/** Fake NetworkMonitor exposing a single static [NetworkStatus] for deterministic tests. */
-private class FakeNetworkMonitor(status: NetworkStatus) : NetworkMonitor {
-    private val state = MutableStateFlow(status)
-    override val networkStatus: StateFlow<NetworkStatus> = state.asStateFlow()
-    override val isOnline: StateFlow<Boolean> =
-        MutableStateFlow(status is NetworkStatus.Available).asStateFlow()
-    override val networkChanges: SharedFlow<NetworkChangeEvent> =
-        MutableSharedFlow<NetworkChangeEvent>().asSharedFlow()
-    override fun close() = Unit
-}

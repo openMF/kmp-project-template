@@ -105,4 +105,22 @@ class ErrorCategoryTest {
             "OfflineException must categorize as Network so framework UI shows the offline treatment.",
         )
     }
+
+    @Test
+    fun categorize_http429InMessage_returnsRateLimit() {
+        // Regression guard for the double-escape bug: RATE_LIMIT_HTTP_REGEX must match
+        // "HTTP 429" as a word boundary, not as the literal string "\\b...429\\b".
+        assertEquals(
+            ErrorCategory.RateLimit,
+            categorize(RuntimeException("HTTP 429 Too Many Requests")),
+        )
+    }
+
+    @Test
+    fun categorize_429Alone_returnsRateLimit() {
+        assertEquals(
+            ErrorCategory.RateLimit,
+            categorize(RuntimeException("Status: 429")),
+        )
+    }
 }

@@ -9,6 +9,8 @@
  */
 package template.core.base.store.screen
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -113,3 +115,64 @@ fun <T, R> SubmitHandler<R>.submitWhenContent(
  */
 fun <T, R> ScreenState<T>.canInteract(submitState: SubmitState<R>): Boolean =
     hasContent && submitState !is SubmitState.Submitting
+
+/**
+ * Combines two independent [ScreenState] flows into one, merging their [ScreenState.Content]
+ * data via [transform] when both sources have loaded.
+ *
+ * **Priority** (first match wins on each emission):
+ * `NoNetwork > Loading > Unauthenticated > Error > Empty > Content`
+ *
+ * Both sources must reach [ScreenState.Content] before [transform] is called.
+ * The resulting [DataFreshness] is the "worst" of the two:
+ * STALE if either is STALE; UPDATING if either is UPDATING; FRESH only when both are FRESH.
+ *
+ * Typical use — dashboard screen combining two independent data sources:
+ * ```kotlin
+ * val screenState: Flow<ScreenState<DashboardUiState>> = combineScreenStates(
+ *     a = accountStore.asScreenStream(Unit),
+ *     b = transactionStore.asScreenStream(Unit),
+ * ) { account, transactions ->
+ *     DashboardUiState(account = account, transactions = transactions)
+ * }
+ * ```
+ */
+@OptIn(ExperimentalTime::class)
+fun <A, B, R> combineScreenStates(
+    a: Flow<ScreenState<A>>,
+    b: Flow<ScreenState<B>>,
+    transform: (A, B) -> R,
+): Flow<ScreenState<R>> = combine(a, b) { stateA, stateB ->
+    when {
+        stateA is ScreenState.NoNetwork || stateB is ScreenState.NoNetwork ->
+            ScreenState.NoNetwork()
+        stateA is ScreenState.Loading || stateB is ScreenState.Loading ->
+            ScreenState.Loading
+        stateA is ScreenState.Unauthenticated || stateB is ScreenState.Unauthenticated ->
+            ScreenState.Unauthenticated
+        stateA is ScreenState.Error -> stateA
+        stateB is ScreenState.Error -> stateB
+        stateA is ScreenState.Empty || stateB is ScreenState.Empty ->
+            ScreenState.Empty
+        stateA is ScreenState.Content && stateB is ScreenState.Content ->
+            ScreenState.Content(
+                data = transform(stateA.data, stateB.data),
+                freshness = combineFreshness(stateA.freshness, stateB.freshness),
+                fetchedAt = minFetchedAt(stateA.fetchedAt, stateB.fetchedAt),
+            )
+        else -> ScreenState.Loading
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+private fun combineFreshness(a: DataFreshness, b: DataFreshness): DataFreshness = when {
+    a == DataFreshness.STALE || b == DataFreshness.STALE -> DataFreshness.STALE
+    a == DataFreshness.UPDATING || b == DataFreshness.UPDATING -> DataFreshness.UPDATING
+    else -> DataFreshness.FRESH
+}
+
+@OptIn(ExperimentalTime::class)
+private fun minFetchedAt(a: Instant?, b: Instant?): Instant? = when {
+    a == null || b == null -> null
+    else -> if (a < b) a else b
+}

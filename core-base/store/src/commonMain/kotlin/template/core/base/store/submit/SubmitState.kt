@@ -45,12 +45,16 @@ sealed interface SubmitState<out R> {
     /**
      * API call failed. [SubmitHandler.retry] is available to re-run the last block.
      *
-     * @param error    The original throwable from the suspend block.
-     * @param category High-level classification for UI routing (Network/Auth/Server/Generic).
+     * @param error      The original throwable from the suspend block.
+     * @param category   High-level classification for UI routing (Network/Auth/Server/Generic).
      *   Pre-classified so the UI doesn't need to call [categorize] itself.
+     * @param draftSaved True after the user explicitly confirmed saving the draft via
+     *   [DraftSubmitHandler.saveDraft]. Used by [DraftSavePrompt] to hide itself once the
+     *   user has already acted — prevents the prompt from re-appearing on recomposition.
      */
     data class Failed(
         val error: Throwable,
         val category: ErrorCategory,
+        val draftSaved: Boolean = false,
     ) : SubmitState<Nothing>
 }

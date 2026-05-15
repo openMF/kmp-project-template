@@ -30,8 +30,23 @@ class DefaultValidator<Output : Any>(
     private var lastFetchMark: TimeSource.Monotonic.ValueTimeMark? = null
 
     /**
-     * Marks the current moment as the last fetch time.
-     * Call this after successfully fetching fresh data.
+     * Marks the current moment as the last fetch time. **Must be called from inside the
+     * Fetcher block** after a successful network response, or the TTL timer never starts
+     * and cached data is treated as always valid regardless of age.
+     *
+     * Typical Fetcher wiring:
+     * ```kotlin
+     * val validator = DefaultValidator.withTtl<MyData>(ttl = 15.minutes)
+     * val store = StoreFactory.createStore(
+     *     fetcher = Fetcher.of { key ->
+     *         val data = api.fetch(key)
+     *         validator.markFresh()   // ← required here, after successful network call
+     *         data
+     *     },
+     *     sourceOfTruth = mySourceOfTruth,
+     *     validator = validator,
+     * )
+     * ```
      */
     fun markFresh() {
         lastFetchMark = TimeSource.Monotonic.markNow()

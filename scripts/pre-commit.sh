@@ -34,23 +34,27 @@ run_spotless_checks() {
     fi
 }
 
-# Function to run ktlint checks
+# Run dependencyGuard (check only — NOT dependencyGuardBaseline).
+# Baseline regen rewrites committed files with local project-substitution paths,
+# which then mismatch on CI where Maven Central artifacts are resolved instead.
+# To intentionally refresh baselines after a dependency bump: set lib-integrate
+# .local=false, run ./gradlew dependencyGuardBaseline manually, then restore.
 run_dependency_guard() {
-    printf "\n🚀 Brace yourself! We're about to generate dependency guard baseline!"
-    ./gradlew dependencyGuardBaseline > /tmp/dependency-result
+    printf "\n🚀 Brace yourself! We're about to check dependency guard baseline!"
+    ./gradlew dependencyGuard > /tmp/dependency-result
     KT_EXIT_CODE=$?
 
     if [ ${KT_EXIT_CODE} -ne 0 ]; then
         cat /tmp/dependency-result
         rm /tmp/dependency-result
         printf "\n*********************************************************************************"
-        echo "     💥 Oh no! Something went wrong! 💥"
-        echo "     💡 Unable to generate dependency baseline. 🛠️"
+        echo "     💥 Oh no! Dependency guard check failed! 💥"
+        echo "     💡 If intentional, run: ./gradlew dependencyGuardBaseline (with .local=false) 🛠️"
         printf "*********************************************************************************\n"
         exit ${KT_EXIT_CODE}
     else
         rm /tmp/dependency-result
-        echo "🎉 Bravo! Dependency baseline has been generated successfully! Keep rocking that clean code! 🚀💫"
+        echo "🎉 Bravo! Dependency baseline has been checked successfully! Keep rocking that clean code! 🚀💫"
     fi
 }
 
@@ -85,10 +89,13 @@ print_success_message() {
 }
 
 # Main script execution
+# Note: dependencyGuard is intentionally omitted here. With lib-integrate .local=true,
+# project substitution makes the local dependency tree differ from the committed
+# Maven-format baselines, so the check always fails for developers using local sources.
+# Dependency guard runs on CI and in ci-prepush.sh (with .local=false).
 check_current_branch
 run_spotless_checks
 run_detekt_checks
-run_dependency_guard
 print_success_message
 
 exit 0

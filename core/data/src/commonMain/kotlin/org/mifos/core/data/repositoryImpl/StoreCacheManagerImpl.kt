@@ -12,6 +12,7 @@ package org.mifos.core.data.repositoryImpl
 import co.touchlab.kermit.Logger
 import org.mifos.core.data.repository.StoreCacheManager
 import org.mifos.core.database.dao.BookkeeperDao
+import org.mifos.core.database.dao.DraftDao
 import org.mifos.core.model.fintech.CoinDetail
 import org.mifos.core.model.fintech.CoinMarket
 import org.mifos.core.model.fintech.ExchangeRates
@@ -19,7 +20,7 @@ import org.mifos.core.model.fintech.RateHistory
 import org.mifos.core.model.fintech.RateHistoryKey
 import org.mobilenativefoundation.store.core5.ExperimentalStoreApi
 import org.mobilenativefoundation.store.store5.Store
-import template.core.base.store.PageKey
+import template.core.base.store.paging.PageKey
 
 @OptIn(ExperimentalStoreApi::class)
 class StoreCacheManagerImpl(
@@ -28,6 +29,7 @@ class StoreCacheManagerImpl(
     private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
     private val coinDetailStore: Store<String, CoinDetail>,
     private val bookkeeperDao: BookkeeperDao,
+    private val draftDao: DraftDao,
 ) : StoreCacheManager {
 
     override suspend fun clearAll() {
@@ -41,5 +43,8 @@ class StoreCacheManagerImpl(
 
         // Clear bookkeeper sync-failure records
         bookkeeperDao.deleteAll()
+
+        // Clear pending form drafts — prevents user A's drafts surfacing on user B's session
+        draftDao.deleteAll()
     }
 }

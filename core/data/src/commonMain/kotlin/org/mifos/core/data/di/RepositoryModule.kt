@@ -35,7 +35,7 @@ import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.network.di.NetworkModule
 import template.core.base.common.di.CommonModule
-import template.core.base.store.FetchedAtRepository
+import template.core.base.store.infra.FetchedAtRepository
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
@@ -47,6 +47,9 @@ val DataModule = module {
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
     single<FetchedAtRepository> { RoomFetchedAtRepository(get<AppDatabase>().fetchedAtDao) }
 
+    // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
+    single { get<AppDatabase>().draftDao }
+
     // Store cache manager — clears all caches on logout
     single<StoreCacheManager> {
         StoreCacheManagerImpl(
@@ -55,6 +58,7 @@ val DataModule = module {
             coinMarketsStore = get(ApplicationStoreRegistry.CoinMarkets),
             coinDetailStore = get(ApplicationStoreRegistry.CoinDetail),
             bookkeeperDao = get(),
+            draftDao = get(),
         )
     }
 

@@ -12,8 +12,8 @@ package org.mifos.core.data.repository
 import kotlinx.coroutines.CoroutineScope
 import org.mifos.core.model.fintech.CoinDetail
 import org.mifos.core.model.fintech.CoinMarket
-import template.core.base.store.PagingScreenStream
-import template.core.base.store.ScreenDataStream
+import template.core.base.store.paging.PagingScreenStream
+import template.core.base.store.screen.ScreenDataStream
 
 interface CryptoRepository {
     fun coinMarketsStream(

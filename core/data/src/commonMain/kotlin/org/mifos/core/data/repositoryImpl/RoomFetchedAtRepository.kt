@@ -11,7 +11,7 @@ package org.mifos.core.data.repositoryImpl
 
 import org.mifos.core.database.dao.FetchedAtDao
 import org.mifos.core.database.entity.FetchedAtEntity
-import template.core.base.store.FetchedAtRepository
+import template.core.base.store.infra.FetchedAtRepository
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 

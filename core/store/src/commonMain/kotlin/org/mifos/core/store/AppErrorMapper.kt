@@ -9,8 +9,8 @@
  */
 package org.mifos.core.store
 
-import template.core.base.store.ErrorCategory
-import template.core.base.store.categorize
+import template.core.base.store.error.ErrorCategory
+import template.core.base.store.error.categorize
 
 /**
  * Application-level error → user-facing message mapper.
@@ -28,6 +28,7 @@ import template.core.base.store.categorize
 fun mapErrorToUserMessage(error: Throwable): String = when (categorize(error)) {
     ErrorCategory.Network -> "Can't reach the server. Check your connection and try again."
     ErrorCategory.Auth -> "Your session expired. Please sign in again."
+    ErrorCategory.RateLimit -> "Too many requests. Please wait a moment and try again."
     ErrorCategory.Server -> "Our servers are having a moment. Please try again shortly."
     ErrorCategory.Generic -> error.message ?: "Something went wrong."
     // TODO(fork): add branches above for app-specific exception types — e.g.

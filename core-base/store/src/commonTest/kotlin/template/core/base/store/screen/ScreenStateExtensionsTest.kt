@@ -11,6 +11,7 @@ package template.core.base.store.screen
 
 import app.cash.turbine.test
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -123,6 +124,38 @@ class ScreenStateExtensionsTest {
             assertIs<ScreenState.Error>(item)
             assertEquals("mapped: raw", item.error.message)
             assertTrue(item.isNetworkError)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `asLocalScreenState wraps value in Content with FRESH`() {
+        val state = "hello".asLocalScreenState()
+        assertIs<ScreenState.Content<String>>(state)
+        assertEquals("hello", state.data)
+        assertEquals(DataFreshness.FRESH, state.freshness)
+    }
+
+    @Test
+    fun `asLocalScreenStream emits Loading then Content`() = runTest {
+        flowOf("result").asLocalScreenStream().test {
+            assertIs<ScreenState.Loading>(awaitItem())
+            val content = awaitItem()
+            assertIs<ScreenState.Content<String>>(content)
+            assertEquals("result", content.data)
+            assertEquals(DataFreshness.FRESH, content.freshness)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `asLocalScreenStream catches upstream errors as Error state`() = runTest {
+        val err = RuntimeException("upstream failure")
+        flow<String> { throw err }.asLocalScreenStream().test {
+            assertIs<ScreenState.Loading>(awaitItem())
+            val errorState = awaitItem()
+            assertIs<ScreenState.Error>(errorState)
+            assertEquals("upstream failure", errorState.error.message)
             awaitComplete()
         }
     }

@@ -50,13 +50,9 @@ val DataModule = module {
     // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
     single { get<AppDatabase>().draftDao }
 
-    // Store cache manager — clears all caches on logout
+    // Store cache manager — clears all registered caches on logout (registration-based)
     single<StoreCacheManager> {
         StoreCacheManagerImpl(
-            exchangeRatesStore = get(ApplicationStoreRegistry.ExchangeRates),
-            rateHistoryStore = get(ApplicationStoreRegistry.RateHistory),
-            coinMarketsStore = get(ApplicationStoreRegistry.CoinMarkets),
-            coinDetailStore = get(ApplicationStoreRegistry.CoinDetail),
             bookkeeperDao = get(),
             draftDao = get(),
         )
@@ -69,6 +65,15 @@ val DataModule = module {
     single(ApplicationStoreRegistry.RateHistory) { provideRateHistoryStore(get(), get(), get()) }
     single(ApplicationStoreRegistry.CoinMarkets) { provideCoinMarketsStore(get(), get(), get()) }
     single(ApplicationStoreRegistry.CoinDetail) { provideCoinDetailStore(get(), get(), get()) }
+
+    // Register fintech feature stores for logout cache clearing
+    single(createdAtStart = true) {
+        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
+        mgr.register(get(ApplicationStoreRegistry.ExchangeRates))
+        mgr.register(get(ApplicationStoreRegistry.RateHistory))
+        mgr.register(get(ApplicationStoreRegistry.CoinMarkets))
+        mgr.register(get(ApplicationStoreRegistry.CoinDetail))
+    }
 
     // Fintech Repositories
     single<CurrencyRepository> {

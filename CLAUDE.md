@@ -208,10 +208,17 @@ see the **screen-type taxonomy table** in `core/store/README.md` — it maps eve
 common screen type to the right framework API. (`PagingScreenContent` is for
 infinite-scroll paginated lists only; detail pages use `ScreenContent`.)
 
-For **form submission and mutations**, use `SubmitHandler` (simple) or `DraftSubmitHandler`
+For **input screens** (form, wizard, quick-action, confirm, gesture — anything where
+the user submits a mutation), use `SubmitHandler` (simple) or `DraftSubmitHandler`
 (offline-resilient, persists payload across restarts). Wire the screen with
 `MutationScreenContent`. Control network vs. cache strategy per-request via `FetchPolicy`
 (`CACHE_ONLY` / `NETWORK_ONLY` / `CACHE_THEN_NETWORK`).
+
+> Screen-archetype vocabulary (used by `/kmp-feature` codegen via `ui.yaml.screens[].type`):
+> `screen-content` (→ `ScreenContent`), `paging-list` (→ `PagingScreenContent`),
+> `input` (→ `MutationScreenContent` + `SubmitHandler`/`DraftSubmitHandler`),
+> `custom` (bring-your-own), `pure-ui` (no Store). Names align 1:1 with the Compose
+> composable that wraps the screen body — see `core/store/README.md` taxonomy table.
 
 On **logout**, call `storeCacheManager.clearAll()` to wipe all Store caches and draft rows.
 On **app start**, call `storeCacheManager.pruneExpiredDrafts()` to remove SUBMITTED/FAILED

@@ -25,21 +25,31 @@ the decision logic lives in `core-base/store`'s `DecisionEngine`, used by every 
 
 ## Which framework API for which screen type?
 
+Screen-archetype names align **1:1 with the Compose composable** that wraps the screen
+body — there is no translation between the authored intent in `ui.yaml` and the emitted
+code. Pick `screen-content` and `/kmp-feature` codegen emits `ScreenContent { … }`;
+pick `paging-list` and it emits `PagingScreenContent { items(…) }`; pick `input` and it
+emits `MutationScreenContent` + `SubmitHandler` (or `DraftSubmitHandler` when
+`offline_resilient: true`).
+
 `PagingScreenContent` is **not** a generic "all UI" wrapper — it's specifically for
 infinite-scroll paginated lists driven by `asPagingScreenStream`. Detail pages,
-non-paginated lists, forms, and dashboards each have their own canonical pattern:
+non-paginated lists, inputs, and dashboards each have their own canonical pattern:
 
-| Screen type | Framework API | Notes |
-|---|---|---|
-| **Detail (1 entity)** | `ScreenContent(state) { item -> ... }` | Single-key flow via `asScreenStream(key)`. CoinDetail uses this. |
-| **Detail (1 entity) + pull-to-refresh** | `RefreshableScreenContent(state, onRefresh) { item -> ... }` | Same as above wrapped in M3 `PullToRefreshBox`. Pull spinner appears while `state.freshness == UPDATING`. |
-| **Detail (dynamic key)** | `ScreenContent(state) { item -> ... }` | ViewModel uses `asScreenStream(keyFlow, ...)` overload. Re-streams when key changes. |
-| **Paginated list (infinite scroll)** | `PagingScreenContent { items(coins) { ... } }` | Auto LazyColumn + LoadMoreFooter + load-more trigger + **pull-to-refresh on by default** (`enablePullToRefresh = true`). CryptoWatchlist uses this. |
-| **Paginated list (custom layout)** | `PagingScreenContent(...) { items, _ -> /* your LazyColumn */ }` | Slot-only overload — you own the LazyColumn (sticky headers, sectioned lists, etc.). |
-| **Non-paginated list** | `ScreenContent(state) { list -> LazyColumn { items(list) { ... } } }` | `asScreenStream` returning `List<T>`. No load-more wiring. Wrap in `RefreshableScreenContent` for pull-to-refresh. |
-| **Form / pure UI (no remote data)** | none — regular Compose | No state stream needed. |
-| **Multi-source combined** | Manual `combine(s1.state, s2.state) { ... }` in ViewModel → expose `Flow<ScreenState<X>>` to screen | A `combineScreenStreams` framework helper is on the roadmap. Today: do it in the ViewModel. |
-| **Dashboard with several independent panels** | One `ScreenContent` per panel, each with its own `asScreenStream` | Each panel owns its loading/empty/error UX independently. |
+| Type (`ui.yaml`) | Sub-kind | Framework API | Notes |
+|---|---|---|---|
+| **`screen-content`** | `content_kind: detail` | `ScreenContent(state) { item -> ... }` | Single-key flow via `asScreenStream(key)`. CoinDetail uses this. |
+| **`screen-content`** | `content_kind: detail` + pull-to-refresh | `RefreshableScreenContent(state, onRefresh) { item -> ... }` | Same as above wrapped in M3 `PullToRefreshBox`. Pull spinner appears while `state.freshness == UPDATING`. |
+| **`screen-content`** | `content_kind: dynamic-key` | `ScreenContent(state) { item -> ... }` | ViewModel uses `asScreenStream(keyFlow, ...)` overload. Re-streams when key changes. |
+| **`paging-list`** | `list_kind: cursor` | `PagingScreenContent { items(coins) { ... } }` | Auto LazyColumn + LoadMoreFooter + load-more trigger + **pull-to-refresh on by default** (`enablePullToRefresh = true`). CryptoWatchlist uses this. |
+| **`paging-list`** | custom layout | `PagingScreenContent(...) { items, _ -> /* your LazyColumn */ }` | Slot-only overload — you own the LazyColumn (sticky headers, sectioned lists, etc.). |
+| **`screen-content`** | `content_kind: list` (non-paginated) | `ScreenContent(state) { list -> LazyColumn { items(list) { ... } } }` | `asScreenStream` returning `List<T>`. No load-more wiring. Wrap in `RefreshableScreenContent` for pull-to-refresh. |
+| **`input`** | `input_kind: form` | `MutationScreenContent(state, ...) { ... }` + `SubmitHandler` | User-write screen — form, wizard, quick-action, confirm, gesture. See "Mutation / Input Submission" section in `docs/claude/store-implementation.md`. |
+| **`input`** | `input_kind: form`, `offline_resilient: true` | `MutationScreenContent(...)` + `DraftSubmitHandler` | Draft-resilient submission — persists payload across app restarts via `SubmitOutbox`. CreateLoan example uses this. |
+| **`screen-content`** | `content_kind: dashboard` (multi-source combined) | Manual `combine(s1.state, s2.state) { ... }` in ViewModel → expose `Flow<ScreenState<X>>` to screen | A `combineScreenStreams` framework helper is on the roadmap. Today: do it in the ViewModel. |
+| **`screen-content`** | `content_kind: dashboard` (independent panels) | One `ScreenContent` per panel, each with its own `asScreenStream` | Each panel owns its loading/empty/error UX independently. |
+| **`pure-ui`** | — | none — regular Compose | No state stream needed. For static screens with no remote data. |
+| **`custom`** | — | bring-your-own composable + manual Store wiring | Escape hatch for atypical layouts. Use sparingly. |
 
 All variants share the same offline-first guarantees from `core-base/store`'s
 `DecisionEngine`. Branded visuals come from `appScreenStateDefaults()` in this module

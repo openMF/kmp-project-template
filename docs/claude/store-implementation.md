@@ -96,7 +96,13 @@ store.asScreenStream(StoreRequest.cached(key, refresh = policy == CACHE_THEN_NET
 
 ---
 
-## Mutation / Form Submission
+## Mutation / Input Submission
+
+> Screen-archetype name in `ui.yaml` (when used with `/kmp-feature` codegen): `type: input`.
+> The "form" terminology here refers to the *API parameter names* (e.g. `formKey`,
+> `observePendingByFormKey`) and shape of user input — the screen archetype itself is
+> called `input` (covers form / wizard / quick-action / confirm / gesture).
+
 
 ### Basic mutation (no draft persistence)
 ```kotlin

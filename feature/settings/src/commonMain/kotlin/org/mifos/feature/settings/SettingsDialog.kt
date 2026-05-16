@@ -37,8 +37,8 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.core.model.DarkThemeConfig
-import org.mifos.core.model.ThemeBrand
+import org.mifos.core.model.user.DarkThemeConfig
+import org.mifos.core.model.user.ThemeBrand
 import org.mifos.feature.settings.generated.resources.Res
 import org.mifos.feature.settings.generated.resources.feature_settings_brand_android
 import org.mifos.feature.settings.generated.resources.feature_settings_brand_default

@@ -12,7 +12,7 @@ package org.mifos.core.data.di
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.TimeZone
-import org.mifos.core.data.repository.TimeZoneMonitor
+import org.mifos.core.data.infra.TimeZoneMonitor
 
 class TimeZoneMonitorImpl : TimeZoneMonitor {
     override val currentTimeZone: Flow<TimeZone>

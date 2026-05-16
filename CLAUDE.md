@@ -18,6 +18,7 @@
 - [Onboarding Guide](docs/claude/onboarding.md)
 - [Deployment Playbook](docs/claude/deployment-playbook.md)
 - [Patterns & Best Practices](docs/claude/patterns.md)
+- [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)
 - [Secrets Management](docs/claude/secrets-management.md)
 - [Version Handling](docs/claude/version-handling.md)
@@ -206,6 +207,17 @@ For detail pages, non-paginated lists, multi-source dashboards, and other patter
 see the **screen-type taxonomy table** in `core/store/README.md` — it maps every
 common screen type to the right framework API. (`PagingScreenContent` is for
 infinite-scroll paginated lists only; detail pages use `ScreenContent`.)
+
+For **form submission and mutations**, use `SubmitHandler` (simple) or `DraftSubmitHandler`
+(offline-resilient, persists payload across restarts). Wire the screen with
+`MutationScreenContent`. Control network vs. cache strategy per-request via `FetchPolicy`
+(`CACHE_ONLY` / `NETWORK_ONLY` / `CACHE_THEN_NETWORK`).
+
+On **logout**, call `storeCacheManager.clearAll()` to wipe all Store caches and draft rows.
+On **app start**, call `storeCacheManager.pruneExpiredDrafts()` to remove SUBMITTED/FAILED
+drafts older than 30 days (PENDING drafts are never pruned).
+
+See [Store Implementation Guide](docs/claude/store-implementation.md) for full examples.
 
 ---
 

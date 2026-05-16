@@ -35,7 +35,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.core.model.LanguageConfig
+import org.mifos.core.model.user.LanguageConfig
 import org.mifos.feature.settings.generated.resources.Res
 import org.mifos.feature.settings.generated.resources.feature_settings_dismiss_dialog_button_text
 import org.mifos.feature.settings.generated.resources.feature_settings_language_preference

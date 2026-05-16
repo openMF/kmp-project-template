@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import org.mifos.core.model.DarkThemeConfig
+import org.mifos.core.model.user.DarkThemeConfig
 
 @ColorInt
 private val SCRIM_COLOR: Int = Color.TRANSPARENT

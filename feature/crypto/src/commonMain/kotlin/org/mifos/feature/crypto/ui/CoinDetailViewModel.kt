@@ -13,8 +13,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import org.mifos.core.data.repository.CryptoRepository
-import org.mifos.core.model.fintech.CoinDetail
+import org.mifos.core.data.crypto.CryptoRepository
+import org.mifos.core.model.crypto.CoinDetail
 import template.core.base.store.screen.ScreenState
 import template.core.base.ui.viewmodel.BaseViewModel
 

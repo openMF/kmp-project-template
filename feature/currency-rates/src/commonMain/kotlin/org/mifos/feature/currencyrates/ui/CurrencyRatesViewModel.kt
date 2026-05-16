@@ -13,7 +13,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import org.mifos.core.data.repository.CurrencyRepository
+import org.mifos.core.data.currency.CurrencyRepository
 import template.core.base.store.screen.ScreenState
 import template.core.base.store.screen.combineContent
 import template.core.base.store.screen.emptyIfContent

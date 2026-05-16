@@ -15,9 +15,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.mifos.core.data.repository.CurrencyRepository
-import org.mifos.core.model.fintech.RateHistory
-import org.mifos.core.model.fintech.RateHistoryKey
+import org.mifos.core.data.currency.CurrencyRepository
+import org.mifos.core.model.currency.RateHistory
+import org.mifos.core.model.currency.RateHistoryKey
 import template.core.base.store.screen.ScreenState
 import template.core.base.ui.viewmodel.BaseViewModel
 

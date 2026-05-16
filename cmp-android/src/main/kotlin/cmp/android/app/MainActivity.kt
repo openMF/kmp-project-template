@@ -24,8 +24,8 @@ import cmp.shared.SharedApp
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
 import org.koin.android.ext.android.inject
-import org.mifos.core.data.repository.NetworkMonitor
-import org.mifos.core.data.repository.UserDataRepository
+import org.mifos.core.data.infra.NetworkMonitor
+import org.mifos.core.data.user.UserDataRepository
 import template.core.base.analytics.AnalyticsHelper
 import template.core.base.analytics.lifecycleTracker
 import template.core.base.platform.update.AppUpdateManager

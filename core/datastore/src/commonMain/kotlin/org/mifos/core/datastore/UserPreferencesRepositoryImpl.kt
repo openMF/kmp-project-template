@@ -22,10 +22,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
-import org.mifos.core.model.DarkThemeConfig
-import org.mifos.core.model.LanguageConfig
-import org.mifos.core.model.ThemeBrand
-import org.mifos.core.model.UserData
+import org.mifos.core.model.user.DarkThemeConfig
+import org.mifos.core.model.user.LanguageConfig
+import org.mifos.core.model.user.ThemeBrand
+import org.mifos.core.model.user.UserData
 import template.core.base.common.manager.DispatcherManager
 
 private const val USER_DATA_KEY = "user_data_key"

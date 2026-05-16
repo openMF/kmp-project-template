@@ -25,6 +25,14 @@ import template.core.base.store.screen.StoreData
  */
 object DecisionEngine {
 
+    /**
+     * Maps [storeData] + [networkStatus] to the correct [ScreenState].
+     *
+     * @param storeData snapshot from the Store pipeline (data, error, freshness flags)
+     * @param networkStatus current connectivity; [NetworkStatus.CaptivePortal] is treated
+     *   as offline for content decisions but surfaces a distinct UI flag
+     * @return the [ScreenState] variant the screen should render
+     */
     fun <T> decide(
         storeData: StoreData<T>,
         networkStatus: NetworkStatus,

@@ -13,8 +13,8 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.mifos.core.data.repository.TimeZoneMonitor
-import org.mifos.core.data.repository.TimeZoneMonitorImpl
+import org.mifos.core.data.infra.TimeZoneMonitor
+import org.mifos.core.data.infra.TimeZoneMonitorImpl
 import template.core.base.common.di.CommonModule
 
 actual val platformModule: Module = module {

@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import org.mifos.core.domain.usecase.calculateEmi
-import org.mifos.core.model.fintech.EmiResult
+import org.mifos.core.domain.emi.calculateEmi
+import org.mifos.core.model.emi.EmiResult
 import template.core.base.ui.viewmodel.BaseViewModel
 
 class EmiCalculatorViewModel : BaseViewModel<EmiState, Nothing, EmiAction>(EmiState()) {

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.common.formatGrouped
-import org.mifos.core.model.fintech.CoinMarket
+import org.mifos.core.model.crypto.CoinMarket
 import org.mifos.core.ui.scaffold.KptScaffold
 import org.mifos.core.ui.scaffold.rememberKptPullToRefreshState
 import template.core.base.ui.paging.PagingScreenContent

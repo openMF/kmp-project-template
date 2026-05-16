@@ -10,8 +10,8 @@
 package org.mifos.feature.crypto.ui
 
 import androidx.lifecycle.viewModelScope
-import org.mifos.core.data.repository.CryptoRepository
-import org.mifos.core.model.fintech.CoinMarket
+import org.mifos.core.data.crypto.CryptoRepository
+import org.mifos.core.model.crypto.CoinMarket
 import template.core.base.store.paging.PagingScreenStream
 import template.core.base.ui.viewmodel.BaseViewModel
 

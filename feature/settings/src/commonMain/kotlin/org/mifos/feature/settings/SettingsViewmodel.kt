@@ -16,10 +16,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.mifos.core.data.repository.UserDataRepository
-import org.mifos.core.model.DarkThemeConfig
-import org.mifos.core.model.LanguageConfig
-import org.mifos.core.model.ThemeBrand
+import org.mifos.core.data.user.UserDataRepository
+import org.mifos.core.model.user.DarkThemeConfig
+import org.mifos.core.model.user.LanguageConfig
+import org.mifos.core.model.user.ThemeBrand
 import template.core.base.analytics.AnalyticsHelper
 
 class SettingsViewmodel(

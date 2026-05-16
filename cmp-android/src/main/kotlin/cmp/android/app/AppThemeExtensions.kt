@@ -9,7 +9,7 @@
  */
 package cmp.android.app
 
-import org.mifos.core.model.DarkThemeConfig
+import org.mifos.core.model.user.DarkThemeConfig
 
 fun DarkThemeConfig.isDarkMode(
     isSystemDarkMode: Boolean,

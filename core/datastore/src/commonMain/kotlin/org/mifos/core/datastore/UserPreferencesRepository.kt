@@ -11,10 +11,10 @@ package org.mifos.core.datastore
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import org.mifos.core.model.DarkThemeConfig
-import org.mifos.core.model.LanguageConfig
-import org.mifos.core.model.ThemeBrand
-import org.mifos.core.model.UserData
+import org.mifos.core.model.user.DarkThemeConfig
+import org.mifos.core.model.user.LanguageConfig
+import org.mifos.core.model.user.ThemeBrand
+import org.mifos.core.model.user.UserData
 
 /**
  * Repository interface for managing user preferences with reactive

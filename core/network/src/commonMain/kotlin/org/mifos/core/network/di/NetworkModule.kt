@@ -11,9 +11,9 @@ package org.mifos.core.network.di
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import org.koin.dsl.module
-import org.mifos.core.network.fintech.CoinGeckoApi
-import org.mifos.core.network.fintech.FintechApiClient
-import org.mifos.core.network.fintech.FrankfurterApi
+import org.mifos.core.network.client.FintechApiClient
+import org.mifos.core.network.crypto.api.CoinGeckoApi
+import org.mifos.core.network.currency.api.FrankfurterApi
 import template.core.base.network.httpClient
 import template.core.base.network.setupDefaultHttpClient
 
@@ -25,8 +25,8 @@ val NetworkModule = module {
                 .httpClient(
                     client = httpClient(
                         setupDefaultHttpClient(
-                            baseUrl = "https://api.frankfurter.dev/",
-                            loggableHosts = listOf("api.frankfurter.dev"),
+                            baseUrl = FrankfurterApi.BASE_URL,
+                            loggableHosts = listOf("api.frankfurter.app"),
                         ),
                     ),
                 )
@@ -35,7 +35,7 @@ val NetworkModule = module {
                 .httpClient(
                     client = httpClient(
                         setupDefaultHttpClient(
-                            baseUrl = "https://api.coingecko.com/",
+                            baseUrl = CoinGeckoApi.BASE_URL,
                             loggableHosts = listOf("api.coingecko.com"),
                         ),
                     ),

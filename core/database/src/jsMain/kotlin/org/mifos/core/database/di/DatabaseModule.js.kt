@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.database.AppDatabase
-import org.mifos.core.database.utils.ChargeTypeConverters
+import org.mifos.core.database.currency.converter.ChargeTypeConverters
 import template.core.base.database.AppDatabaseFactory
 import template.core.base.security.FieldEncryptor
 

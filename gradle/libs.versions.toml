@@ -1,5 +1,5 @@
 [versions]
-kmpProductFlavors = "1.1.5"
+kmpProductFlavors = "2.4.0-alpha.0"
 appPackage = "org.openmf.kmptemplate"
 # Android
 androidDesugarJdkLibs = "2.1.5"

@@ -11,7 +11,9 @@ package org.mifos.core.network.client
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import org.mifos.core.network.crypto.api.CoinGeckoApi
+import org.mifos.core.network.crypto.api.createCoinGeckoApi
 import org.mifos.core.network.currency.api.FrankfurterApi
+import org.mifos.core.network.currency.api.createFrankfurterApi
 
 /** Multi-domain API aggregator. Consumer apps replace this with their own client. */
 class FintechApiClient(

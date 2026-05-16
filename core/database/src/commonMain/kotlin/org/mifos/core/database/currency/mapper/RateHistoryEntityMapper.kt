@@ -10,7 +10,7 @@
 package org.mifos.core.database.currency.mapper
 
 import kotlinx.serialization.json.Json
-import org.mifos.core.database.currency.RatePointPair
+import org.mifos.core.database.crypto.converter.RatePointPair
 import org.mifos.core.database.currency.entity.RateHistoryEntity
 import org.mifos.core.model.currency.RateHistory
 import org.mifos.core.model.currency.RatePoint

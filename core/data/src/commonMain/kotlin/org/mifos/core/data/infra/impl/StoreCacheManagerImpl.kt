@@ -10,7 +10,7 @@
 package org.mifos.core.data.infra.impl
 
 import co.touchlab.kermit.Logger
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.mifos.core.data.infra.StoreCacheManager
 import org.mifos.core.database.infra.dao.BookkeeperDao
 import org.mifos.core.database.infra.dao.DraftDao

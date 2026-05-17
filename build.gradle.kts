@@ -69,54 +69,8 @@ plugins {
     // reason: https://kotlin.github.io/kotlinx-kover/gradle-plugin/#multi-module-kotlin-multiplatform-project
     //
     // Tasks: ./gradlew koverHtmlReport | koverXmlReport | koverVerify
-    alias(libs.plugins.kover) apply true
-}
-
-// ============================================================================
-// Kover root aggregation — dynamic subproject discovery (no hardcoded list)
-// ============================================================================
-
-dependencies {
-    subprojects
-        .filter { sub ->
-            val p = sub.path
-            p.startsWith(":feature:") ||
-                p.startsWith(":core:") ||
-                p.startsWith(":core-base:")
-        }
-        .forEach { sub -> kover(sub) }
-}
-
-kover {
-    reports {
-        filters {
-            excludes {
-                classes(
-                    "*.di.*",                       // Koin / kotlin-inject DI modules
-                    "*.BuildConfig",
-                    "*ComposableSingletons*",       // Compose generated lambda holders
-                    "*_*Factory*",                  // Generated factories
-                    "*\$ComposableLambda\$*",
-                    "*Preview*",                    // @Preview functions
-                    "*Test*",                       // test helpers themselves
-                )
-                packages(
-                    "*.generated.*",
-                    "*.ksp.*",
-                )
-                annotatedBy(
-                    // @Composable funcs are better tested via screenshot/UI tests,
-                    // not Kover line coverage.
-                    "androidx.compose.runtime.Composable",
-                )
-            }
-        }
-        verify {
-            // Phase 1 floor — single global threshold while coverage grows.
-            // Per-module thresholds added as test-coverage PRs raise individual modules.
-            rule { minBound(40) }
-        }
-    }
+    alias(libs.plugins.kover) apply false
+    alias(libs.plugins.kover.convention)
 }
 
 object DynamicVersion {

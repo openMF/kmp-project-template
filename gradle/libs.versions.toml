@@ -364,7 +364,7 @@ androidx-compose-ui-test = [
 
 [plugins]
 kmp-product-flavors = { id = "io.github.mobilebytelabs.kmp-product-flavors", version.ref = "kmpProductFlavors" }
-kmp-flavors-convention = { id = "org.convention.kmp.flavors", version = "unspecified" }
+kmp-flavors-convention = { id = "org.convention.kmp.flavors" }
 # Android & Kotlin Plugins
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
@@ -372,8 +372,8 @@ android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 
-android-application-convention = { id = "org.convention.android.application", version = "unspecified" }
-android-application-compose-convention = { id = "org.convention.android.application.compose", version = "unspecified" }
+android-application-convention = { id = "org.convention.android.application" }
+android-application-compose-convention = { id = "org.convention.android.application.compose" }
 
 # KMP & CMP Plugins
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -383,7 +383,7 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
-kover-convention = { id = "org.convention.kover.plugin", version = "unspecified" }
+kover-convention = { id = "org.convention.kover.plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 ktrofit = { id = "de.jensklingenberg.ktorfit", version.ref = "ktorfit" }
 wire = { id = "com.squareup.wire", version.ref = "wire" }
@@ -394,20 +394,20 @@ roborazzi = { id = "io.github.takahirom.roborazzi", version.ref = "roborazzi" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxMacroBenchmark" }
 aboutLibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
 
-cmp-feature-convention = { id = "org.convention.cmp.feature", version = "unspecified" }
-kmp-koin-convention = { id = "org.convention.kmp.koin", version = "unspecified" }
-kmp-library-convention = { id = "org.convention.kmp.library", version = "unspecified" }
-kmp-core-base-library-convention = { id = "org.convention.kmp.core.base.library", version = "unspecified" }
+cmp-feature-convention = { id = "org.convention.cmp.feature" }
+kmp-koin-convention = { id = "org.convention.kmp.koin" }
+kmp-library-convention = { id = "org.convention.kmp.library" }
+kmp-core-base-library-convention = { id = "org.convention.kmp.core.base.library" }
 
 android-application-firebase = { id = "org.convention.android.application.firebase" }
 android-lint = { id = "org.convention.android.application.lint" }
 
 # Utility Plugins
-detekt-convention = { id = "org.convention.detekt.plugin", version = "unspecified" }
-git-hooks-convention = { id = "org.convention.git.hooks", version = "unspecified" }
-ktlint-convention = { id = "org.convention.ktlint.plugin", version = "unspecified" }
-spotless-convention = { id = "org.convention.spotless.plugin", version = "unspecified" }
-keystore-management = { id = "org.convention.keystore.management", version = "unspecified" }
+detekt-convention = { id = "org.convention.detekt.plugin" }
+git-hooks-convention = { id = "org.convention.git.hooks" }
+ktlint-convention = { id = "org.convention.ktlint.plugin" }
+spotless-convention = { id = "org.convention.spotless.plugin" }
+keystore-management = { id = "org.convention.keystore.management" }
 
 dependencyGuard = { id = "com.dropbox.dependency-guard", version.ref = "dependencyGuard" }
 moduleGraph = { id = "com.jraska.module.graph.assertion", version.ref = "moduleGraph" }
@@ -417,4 +417,4 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 
 #Room 3 Plugin
 room = { id = "androidx.room3", version.ref = "room" }
-mifos-kmp-room = { id = "mifos.kmp.room", version = "unspecified" }
+mifos-kmp-room = { id = "mifos.kmp.room" }

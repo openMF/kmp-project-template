@@ -32,6 +32,7 @@ dependencies {
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
+    compileOnly(libs.kover.gradlePlugin)
     implementation(libs.kmp.product.flavors.plugin)
 }
 

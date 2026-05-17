@@ -14,6 +14,10 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlin.serialization)
+    // Kover applied explicitly (cmp-desktop doesn't use a base convention plugin
+    // that would chain it — unlike feature/*, core/*, cmp-shared, cmp-navigation,
+    // cmp-android which get kover via Android/KMP/CMP convention plugins).
+    alias(libs.plugins.kover.convention)
 }
 
 kotlin {

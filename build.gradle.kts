@@ -50,6 +50,90 @@ plugins {
     alias(libs.plugins.ktrofit) apply false
 
     alias(libs.plugins.room) apply false
+
+    // Kover — root-level aggregation. Per-module kover application happens via
+    // `org.convention.kover.plugin` chained from base convention plugins
+    // (AndroidApplication / KMPLibrary / KMPCoreBaseLibrary). cmp-desktop applies
+    // it directly. Aggregation + filter/verify config lives inline below this
+    // plugins{} block because Gradle classpath isolation prevents extracting the
+    // root-aggregator config to a helper (kover needs typed DSL at root, which
+    // requires kover-gradle-plugin runtime classpath in build-logic, which causes
+    // transitive AGP conflicts — proven by trial).
+    // Tasks: ./gradlew koverHtmlReport | koverXmlReport | koverVerify
+    alias(libs.plugins.kover) apply true
+}
+
+// ============================================================================
+// Kover root aggregation
+// ============================================================================
+
+dependencies {
+    listOf(
+        // feature/* modules
+        ":feature:crypto",
+        ":feature:currency-rates",
+        ":feature:emi-calculator",
+        ":feature:home",
+        ":feature:profile",
+        ":feature:settings",
+        // core/* modules
+        ":core:analytics",
+        ":core:common",
+        ":core:data",
+        ":core:database",
+        ":core:datastore",
+        ":core:designsystem",
+        ":core:domain",
+        ":core:model",
+        ":core:network",
+        ":core:store",
+        ":core:ui",
+        // core-base/* modules (framework-pure)
+        ":core-base:analytics",
+        ":core-base:common",
+        ":core-base:database",
+        ":core-base:datastore",
+        ":core-base:designsystem",
+        ":core-base:network",
+        ":core-base:platform",
+        ":core-base:security",
+        ":core-base:store",
+        ":core-base:ui",
+    ).forEach { path ->
+        kover(project(path))
+    }
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                classes(
+                    "*.di.*",                       // Koin / kotlin-inject DI modules
+                    "*.BuildConfig",
+                    "*ComposableSingletons*",       // Compose generated lambda holders
+                    "*_*Factory*",                  // Generated factories
+                    "*\$ComposableLambda\$*",
+                    "*Preview*",                    // @Preview functions
+                    "*Test*",                       // test helpers themselves
+                )
+                packages(
+                    "*.generated.*",
+                    "*.ksp.*",
+                )
+                annotatedBy(
+                    // @Composable funcs are better tested via screenshot/UI tests,
+                    // not Kover line coverage.
+                    "androidx.compose.runtime.Composable",
+                )
+            }
+        }
+        verify {
+            // Phase 1 floor — single global threshold while coverage grows.
+            // Per-module thresholds added as test-coverage PRs raise individual modules.
+            rule { minBound(40) }
+        }
+    }
 }
 
 object DynamicVersion {

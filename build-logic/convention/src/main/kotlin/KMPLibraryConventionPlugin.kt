@@ -21,6 +21,7 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
                 apply("org.convention.kmp.koin")
                 apply("org.convention.detekt.plugin")
                 apply("org.convention.spotless.plugin")
+                apply("org.convention.kover.plugin")
                 apply("org.jetbrains.kotlin.plugin.serialization")
                 apply("org.jetbrains.kotlin.plugin.parcelize")
             }

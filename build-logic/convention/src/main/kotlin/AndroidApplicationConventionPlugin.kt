@@ -22,6 +22,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("com.dropbox.dependency-guard")
                 apply("org.convention.detekt.plugin")
                 apply("org.convention.spotless.plugin")
+                apply("org.convention.kover.plugin")
                 apply("org.convention.git.hooks")
                 apply("org.convention.android.application.lint")
                 apply("org.convention.android.application.firebase")

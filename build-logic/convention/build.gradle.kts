@@ -113,6 +113,11 @@ gradlePlugin {
             implementationClass = "KtlintConventionPlugin"
             description = "Configures kotlinter for the project"
         }
+        register("kover") {
+            id = "org.convention.kover.plugin"
+            implementationClass = "KoverConventionPlugin"
+            description = "Applies the kover code-coverage plugin to a module. Chained from base convention plugins (Android/KMP/CMP)."
+        }
         register("gitHooks") {
             id = "org.convention.git.hooks"
             implementationClass = "GitHooksConventionPlugin"

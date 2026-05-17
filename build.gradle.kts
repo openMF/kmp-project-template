@@ -51,57 +51,40 @@ plugins {
 
     alias(libs.plugins.room) apply false
 
-    // Kover — root-level aggregation. Per-module kover application happens via
-    // `org.convention.kover.plugin` chained from base convention plugins
-    // (AndroidApplication / KMPLibrary / KMPCoreBaseLibrary). cmp-desktop applies
-    // it directly. Aggregation + filter/verify config lives inline below this
-    // plugins{} block because Gradle classpath isolation prevents extracting the
-    // root-aggregator config to a helper (kover needs typed DSL at root, which
-    // requires kover-gradle-plugin runtime classpath in build-logic, which causes
-    // transitive AGP conflicts — proven by trial).
+    // Kover — root-level aggregation.
+    //
+    // Per-module kover application happens via `org.convention.kover.plugin`
+    // chained from base convention plugins (AndroidApplication / KMPLibrary /
+    // KMPCoreBaseLibrary). cmp-desktop applies it directly.
+    //
+    // Aggregation list (below) is auto-discovered from `subprojects` — any new
+    // module under :feature:*, :core:*, or :core-base:* is picked up with zero
+    // manual maintenance.
+    //
+    // Filter/verify config (further below) stays inline at root because moving
+    // it into a build-logic convention plugin would require kover-gradle-plugin
+    // on build-logic's runtime classpath, which transitively conflicts with
+    // AGP's kotlin-gradle-plugin (kover issue #135, confirmed by trial). Kover's
+    // own multi-module KMP guide recommends root-level config for the same
+    // reason: https://kotlin.github.io/kotlinx-kover/gradle-plugin/#multi-module-kotlin-multiplatform-project
+    //
     // Tasks: ./gradlew koverHtmlReport | koverXmlReport | koverVerify
     alias(libs.plugins.kover) apply true
 }
 
 // ============================================================================
-// Kover root aggregation
+// Kover root aggregation — dynamic subproject discovery (no hardcoded list)
 // ============================================================================
 
 dependencies {
-    listOf(
-        // feature/* modules
-        ":feature:crypto",
-        ":feature:currency-rates",
-        ":feature:emi-calculator",
-        ":feature:home",
-        ":feature:profile",
-        ":feature:settings",
-        // core/* modules
-        ":core:analytics",
-        ":core:common",
-        ":core:data",
-        ":core:database",
-        ":core:datastore",
-        ":core:designsystem",
-        ":core:domain",
-        ":core:model",
-        ":core:network",
-        ":core:store",
-        ":core:ui",
-        // core-base/* modules (framework-pure)
-        ":core-base:analytics",
-        ":core-base:common",
-        ":core-base:database",
-        ":core-base:datastore",
-        ":core-base:designsystem",
-        ":core-base:network",
-        ":core-base:platform",
-        ":core-base:security",
-        ":core-base:store",
-        ":core-base:ui",
-    ).forEach { path ->
-        kover(project(path))
-    }
+    subprojects
+        .filter { sub ->
+            val p = sub.path
+            p.startsWith(":feature:") ||
+                p.startsWith(":core:") ||
+                p.startsWith(":core-base:")
+        }
+        .forEach { sub -> kover(sub) }
 }
 
 kover {

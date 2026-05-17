@@ -8,6 +8,8 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+
 plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.cmp.feature.convention)
@@ -23,7 +25,9 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-            optimized = true
+            // KGP rejects debuggable=true + optimized=true on the same binary
+            // (kotlin:kgp:misconfiguration:incompatible-binary-configuration).
+            optimized = buildType == NativeBuildType.RELEASE
         }
     }
 

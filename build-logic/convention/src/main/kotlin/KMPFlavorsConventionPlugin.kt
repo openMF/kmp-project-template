@@ -63,6 +63,13 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
             //    the plugin default ("BuildKonfig"). bridgeAgp* defaults are safe (idempotent
             //    in v1.1.5+) — no need to touch them.
             extensions.configure<KmpFlavorExtension> {
+                // v2.2+ — preserve v1.x active-variant-only semantics. The template''s
+                // AppVariant.kt reads BuildKonfig from commonMain; v2.2+ auto-enabling
+                // matrix mode (Phase 0A) moves BuildKonfig into per-flavor source sets,
+                // which commonMain can''t see. Explicit opt-out keeps the v1.x codegen
+                // + demonstrates the documented kmpFlavors.autoEnable.set(false) opt-out
+                // migration path described in CHANGELOG [2.2.0] + MATRIX_MODE.md.
+                autoEnable.set(false)
                 buildConfigPackage.set(libs.findVersion("appPackage").get().requiredVersion)
                 enableBuildTypes.set(true)
 

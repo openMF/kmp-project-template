@@ -63,12 +63,23 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
             //    the plugin default ("BuildKonfig"). bridgeAgp* defaults are safe (idempotent
             //    in v1.1.5+) — no need to touch them.
             extensions.configure<KmpFlavorExtension> {
-                // v2.2+ — preserve v1.x active-variant-only semantics. The template''s
-                // AppVariant.kt reads BuildKonfig from commonMain; v2.2+ auto-enabling
-                // matrix mode (Phase 0A) moves BuildKonfig into per-flavor source sets,
-                // which commonMain can''t see. Explicit opt-out keeps the v1.x codegen
-                // + demonstrates the documented kmpFlavors.autoEnable.set(false) opt-out
-                // migration path described in CHANGELOG [2.2.0] + MATRIX_MODE.md.
+                // v2.4-rc.0 adoption: active-variant-only path preserved.
+                //
+                // Matrix mode (autoEnable=true → buildMatrix auto-flips on with our
+                // 2 flavors × 3 buildTypes × 6 targets shape) is **not** enabled
+                // here because the project's Compose Multiplatform Resources
+                // generator emits `expect` declarations in `commonMain` that have
+                // no matching `actual` once matrix-mode moves variant-scoped code
+                // into per-flavor source sets. This is a documented CMP × kmp-
+                // product-flavors limitation — see kmp-product-flavors `docs/
+                // REFERENCE.md` "Compatibility windows" + `MIGRATION_v1_to_v2.md`
+                // "Common pitfalls" → "Unresolved reference 'BuildKonfig' in
+                // commonMain".
+                //
+                // Once a workaround lands (e.g. CMP exposing a per-flavor resource
+                // generator hook, or kmp-product-flavors auto-skipping CMP-
+                // generated commonMain expect declarations), this opt-out can drop
+                // and matrix mode lights up automatically.
                 autoEnable.set(false)
                 buildConfigPackage.set(libs.findVersion("appPackage").get().requiredVersion)
                 enableBuildTypes.set(true)

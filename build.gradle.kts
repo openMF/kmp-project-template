@@ -110,6 +110,16 @@ subprojects {
             }
         }
     }
+
+    // Gradle 9+ defaults Test.failOnNoDiscoveredTests to true. AGP unit-test
+    // tasks (testDemoDebugUnitTest, testProdReleaseUnitTest, etc.) then fail
+    // on KMP `androidUnitTest` source sets that contain expect/actual TEST
+    // HELPERS but no @Test classes — those test classes legitimately live in
+    // `commonTest` or `desktopTest`. Disabling per-task unblocks the kover
+    // coverage gate without weakening real-test signal.
+    tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+        failOnNoDiscoveredTests = false
+    }
 }
 
 // Configuration for CMP module dependency graph

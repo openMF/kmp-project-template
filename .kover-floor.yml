@@ -1,0 +1,53 @@
+# Per-module line-coverage floor.
+#
+# Read by `.github/workflows/test-coverage.yml`. CI fails the PR if any module
+# falls below its floor. Floors only ratchet UPWARD — never lower an entry
+# without an explicit justification in the PR description.
+#
+# Initial values reflect the 2026-05-19 baseline audit
+# (docs/reports/source-coverage-260519.md): mostly 0% (regression-only
+# protection while Phase 9 PRs raise coverage), with `core-base/store` pinned
+# at its existing high mark.
+#
+# Format: <gradle-path>: <minimum-line-percentage>
+# A path not present here is exempt from the gate.
+# Phase 9 target: 95% for all feature/* and core/* modules; 100% aspirational.
+
+floors:
+  # feature/* — currently zero tests; ratchet up as Phase 9 T32-T36 land
+  ":feature:crypto": 0
+  ":feature:currency-rates": 0
+  ":feature:emi-calculator": 0
+  ":feature:home": 0
+  ":feature:profile": 0
+  ":feature:settings": 0
+
+  # core/* — currently zero or near-zero tests
+  ":core:analytics": 0
+  ":core:common": 0
+  ":core:data": 0
+  ":core:database": 0
+  ":core:datastore": 0
+  ":core:designsystem": 0
+  ":core:domain": 0
+  ":core:model": 0
+  ":core:network": 0
+  ":core:store": 0
+  ":core:ui": 0
+
+  # core-base/* — framework-shared layer; store is the gold standard
+  ":core-base:analytics": 0
+  ":core-base:common": 0
+  ":core-base:database": 0
+  ":core-base:datastore": 0
+  ":core-base:designsystem": 0
+  ":core-base:network": 0
+  ":core-base:platform": 0
+  ":core-base:security": 0
+  # core-base:store empirically has ~90% line coverage (outcome of
+  # PRs #145 / #147 / #148), but its report.xml is not currently produced
+  # because koverXmlReport halts on the core/database desktop compile break
+  # (Gap #1 in docs/reports/source-coverage-260519.md). Pinned to 0 in this
+  # initial baseline; bump back to 90 in the Gap #1 fix PR.
+  ":core-base:store": 0
+  ":core-base:ui": 0

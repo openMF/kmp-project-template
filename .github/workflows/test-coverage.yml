@@ -1,25 +1,23 @@
-# Test-coverage floor gate.
+# Per-module Kover coverage floor gate.
 #
-# Runs `./gradlew koverXmlReport` on every PR that touches feature/*,
-# core/*, core-base/* sources or the floor file itself, then enforces
-# per-module line-coverage floors via .kover-floor.yml.
+# Delegates to the reusable workflow at
+#   https://github.com/MobileByteLabs/mifos-x-actionhub-kover-coverage
 #
-# Floors only ratchet UPWARD over time as Phase 9 (PLAN-implement-universal)
-# raises coverage on canonical-template modules. Lowering a floor requires an
-# explicit justification in the PR description.
+# Module discovery is fully dynamic — whatever applies the Kover plugin (via
+# KoverConventionPlugin) shows up in the report set automatically. Adding a
+# new `:feature:*` / `:core:*` / `:core-base:*` module needs zero changes here.
+#
+# Per-module overrides live in `.kover-floor.yml` at repo root.
 
 name: Test Coverage Floor
 
 on:
   pull_request:
     paths:
-      - 'feature/**'
-      - 'core/**'
-      - 'core-base/**'
+      - '**/*.kt'
+      - '**/*.kts'
       - '.kover-floor.yml'
-      - 'scripts/check-coverage-floor.py'
-      - 'build-logic/convention/src/main/kotlin/KoverConventionPlugin.kt'
-      - 'build-logic/convention/src/main/kotlin/org/convention/Kover.kt'
+      - 'build-logic/**'
       - '.github/workflows/test-coverage.yml'
   push:
     branches:
@@ -32,40 +30,6 @@ concurrency:
 
 jobs:
   coverage:
-    name: Enforce per-module coverage floor
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/dev' && github.ref != 'refs/heads/master' }}
-
-      - name: Run kover aggregated XML report
-        # `--continue` lets us harvest partial coverage even when a downstream
-        # module's compile is broken; the floor-checker treats missing reports
-        # as failures, so any silent-skip is still caught.
-        run: ./gradlew koverXmlReport --continue --stacktrace
-        continue-on-error: true
-
-      - name: Check per-module floor
-        run: python3 scripts/check-coverage-floor.py
-
-      - name: Upload aggregated HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: kover-html-report
-          path: build/reports/kover/html/
-          if-no-files-found: ignore
-          retention-days: 14
+    uses: MobileByteLabs/mifos-x-actionhub-kover-coverage/.github/workflows/coverage.yml@v1
+    with:
+      default-floor: 0

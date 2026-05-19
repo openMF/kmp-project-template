@@ -20,6 +20,7 @@ class KMPCoreBaseLibraryConventionPlugin: Plugin<Project> {
                 apply("org.convention.kmp.flavors")
                 apply("org.convention.kmp.koin")
                 apply("org.convention.detekt.plugin")
+                apply("org.convention.kover.plugin")
                 apply("org.jetbrains.kotlin.plugin.serialization")
                 apply("org.jetbrains.kotlin.plugin.parcelize")
             }

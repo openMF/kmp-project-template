@@ -32,6 +32,7 @@ dependencies {
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)
+    compileOnly(libs.kover.gradlePlugin)
     implementation(libs.kmp.product.flavors.plugin)
 }
 
@@ -112,6 +113,11 @@ gradlePlugin {
             id = "org.convention.ktlint.plugin"
             implementationClass = "KtlintConventionPlugin"
             description = "Configures kotlinter for the project"
+        }
+        register("kover") {
+            id = "org.convention.kover.plugin"
+            implementationClass = "KoverConventionPlugin"
+            description = "Applies the kover code-coverage plugin to a module. Chained from base convention plugins (Android/KMP/CMP)."
         }
         register("gitHooks") {
             id = "org.convention.git.hooks"

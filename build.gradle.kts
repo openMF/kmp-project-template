@@ -50,6 +50,27 @@ plugins {
     alias(libs.plugins.ktrofit) apply false
 
     alias(libs.plugins.room) apply false
+
+    // Kover — root-level aggregation.
+    //
+    // Per-module kover application happens via `org.convention.kover.plugin`
+    // chained from base convention plugins (AndroidApplication / KMPLibrary /
+    // KMPCoreBaseLibrary). cmp-desktop applies it directly.
+    //
+    // Aggregation list (below) is auto-discovered from `subprojects` — any new
+    // module under :feature:*, :core:*, or :core-base:* is picked up with zero
+    // manual maintenance.
+    //
+    // Filter/verify config (further below) stays inline at root because moving
+    // it into a build-logic convention plugin would require kover-gradle-plugin
+    // on build-logic's runtime classpath, which transitively conflicts with
+    // AGP's kotlin-gradle-plugin (kover issue #135, confirmed by trial). Kover's
+    // own multi-module KMP guide recommends root-level config for the same
+    // reason: https://kotlin.github.io/kotlinx-kover/gradle-plugin/#multi-module-kotlin-multiplatform-project
+    //
+    // Tasks: ./gradlew koverHtmlReport | koverXmlReport | koverVerify
+    alias(libs.plugins.kover) apply false
+    alias(libs.plugins.kover.convention)
 }
 
 object DynamicVersion {

@@ -9,7 +9,8 @@
  */
 package org.mifos.core.database.currency
 
-import org.mifos.core.database.infra.entity.SampleEntity
+import org.mifos.core.database.currency.converter.ChargeTypeConverters
+import org.mifos.core.database.sample.entity.SampleEntity
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

@@ -14,7 +14,7 @@ import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.mifos.core.database.AppDatabase
-import org.mifos.core.database.infra.dao.SampleDao
+import org.mifos.core.database.sample.dao.SampleDao
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

@@ -23,7 +23,9 @@ LOG_FILE="sync-$(date +%d%m%Y-%H%M%S).log"
 
 # Directories and files to sync
 SYNC_DIRS=(
+    "cmp-android"
     "cmp-desktop"
+    "cmp-ios"
     "cmp-web"
     "cmp-shared"
     "core-base"
@@ -48,6 +50,11 @@ SYNC_FILES=(
 # type can be 'dir' or 'file'
 # Use "root" key for files in the root directory
 declare -A EXCLUSIONS=(
+    # Android — consumer-branded resources (drawables, strings, mipmaps), Firebase config,
+    # launcher icon, and the dependency-guard baseline directory are preserved across syncs.
+    ["cmp-android"]="src/main/res:dir dependencies:dir src/main/ic_launcher-playstore.png:file google-services.json:file"
+    # iOS — consumer-branded asset catalog (app icon, color palette) preserved across syncs.
+    ["cmp-ios"]="iosApp/Assets.xcassets:dir"
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
     ["cmp-desktop"]="icons:dir build.gradle.kts:file"
     ["fastlane-config"]="project_config.rb:file extract_config.rb:file"

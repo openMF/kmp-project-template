@@ -59,7 +59,9 @@ jobs:
 
           # Declare directories and files to sync
           DIRS=(
+            "cmp-android"
             "cmp-desktop"
+            "cmp-ios"
             "cmp-web"
             "cmp-shared"
             "core-base"
@@ -80,11 +82,15 @@ jobs:
           )
 
           # Define exclusions
+          # Consumer-branded assets and project-specific configs are preserved across syncs.
           declare -A EXCLUSIONS=(
+            ["cmp-android"]="src/main/res dependencies src/main/ic_launcher-playstore.png google-services.json"
+            ["cmp-ios"]="iosApp/Assets.xcassets"
             ["cmp-web"]="src/jsMain/resources src/wasmJsMain/resources"
             ["cmp-desktop"]="icons build.gradle.kts"
             ["fastlane-config"]="project_config.rb extract_config.rb"
             [".github"]="workflows/sync-dirs.yaml"
+            ["build-logic"]="convention/src/main/kotlin/local"
             ["root"]="secrets.env"
           )
 
@@ -272,16 +278,18 @@ jobs:
             Changes included in this sync:
 
             **Directories:**
+            - cmp-android (excluding src/main/res, dependencies, src/main/ic_launcher-playstore.png, google-services.json)
             - cmp-desktop (excluding icons, build.gradle.kts)
+            - cmp-ios (excluding iosApp/Assets.xcassets)
             - cmp-web (excluding src/jsMain/resources, src/wasmJsMain/resources)
             - cmp-shared
             - core-base
-            - build-logic
+            - build-logic (excluding convention/src/main/kotlin/local — consumer flavor extension point)
             - fastlane
             - fastlane-config (excluding project_config.rb, extract_config.rb)
             - scripts
             - config
-            - .github (excluding workflows/sync-dirs.yaml)
+            - .github (excluding workflows/sync-dirs.yaml — self-overwrite guard)
             - .run
 
             **Files:**

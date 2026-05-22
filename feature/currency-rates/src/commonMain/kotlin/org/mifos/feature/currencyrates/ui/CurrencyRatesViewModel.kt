@@ -21,7 +21,7 @@ import template.core.base.ui.viewmodel.BaseViewModel
 
 class CurrencyRatesViewModel(
     currencyRepository: CurrencyRepository,
-) : BaseViewModel<RatesLocalState, RatesEvent, RatesAction>(RatesLocalState()) {
+) : BaseViewModel<RatesLocalState, Nothing, RatesAction>(RatesLocalState()) {
 
     private val stream = currencyRepository.exchangeRatesStream(
         baseCurrency = "USD",
@@ -41,17 +41,26 @@ class CurrencyRatesViewModel(
         .emptyIfContent { it.rates.isEmpty() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
 
-    fun onRetry() = stream.retry()
-    fun onRefresh() = stream.refresh()
+    fun onRetry() {
+        trySendAction(RatesAction.Retry)
+    }
+
+    fun onRefresh() {
+        trySendAction(RatesAction.Refresh)
+    }
 
     override fun handleAction(action: RatesAction) = when (action) {
         is RatesAction.Search -> updateState { copy(searchQuery = action.query) }
+        RatesAction.Retry -> stream.retry()
+        RatesAction.Refresh -> stream.refresh()
     }
 }
 
 data class RatesLocalState(val searchQuery: String = "")
 data class RatesDisplay(val base: String, val date: String, val rates: Map<String, Double>)
-sealed class RatesAction {
-    data class Search(val query: String) : RatesAction()
+
+sealed interface RatesAction {
+    data class Search(val query: String) : RatesAction
+    data object Retry : RatesAction
+    data object Refresh : RatesAction
 }
-sealed class RatesEvent

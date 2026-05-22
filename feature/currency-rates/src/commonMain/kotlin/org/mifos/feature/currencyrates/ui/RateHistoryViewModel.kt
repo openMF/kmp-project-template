@@ -23,7 +23,7 @@ import template.core.base.ui.viewmodel.BaseViewModel
 
 class RateHistoryViewModel(
     currencyRepository: CurrencyRepository,
-) : BaseViewModel<HistoryLocalState, HistoryEvent, HistoryAction>(HistoryLocalState()) {
+) : BaseViewModel<HistoryLocalState, Nothing, HistoryAction>(HistoryLocalState()) {
 
     private val keyFlow = stateFlow.map { local ->
         RateHistoryKey(from = "USD", to = local.targetCurrency, days = local.periodDays)
@@ -37,17 +37,21 @@ class RateHistoryViewModel(
     val screenState: StateFlow<ScreenState<RateHistory>> = stream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
 
-    fun onRetry() = stream.retry()
+    fun onRetry() {
+        trySendAction(HistoryAction.Retry)
+    }
 
     override fun handleAction(action: HistoryAction) = when (action) {
         is HistoryAction.SelectCurrency -> updateState { copy(targetCurrency = action.code) }
         is HistoryAction.SelectPeriod -> updateState { copy(periodDays = action.days) }
+        HistoryAction.Retry -> stream.retry()
     }
 }
 
 data class HistoryLocalState(val targetCurrency: String = "INR", val periodDays: Int = 30)
-sealed class HistoryAction {
-    data class SelectCurrency(val code: String) : HistoryAction()
-    data class SelectPeriod(val days: Int) : HistoryAction()
+
+sealed interface HistoryAction {
+    data class SelectCurrency(val code: String) : HistoryAction
+    data class SelectPeriod(val days: Int) : HistoryAction
+    data object Retry : HistoryAction
 }
-sealed class HistoryEvent

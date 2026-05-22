@@ -15,13 +15,10 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.database.AppDatabase
-import org.mifos.core.database.currency.converter.ChargeTypeConverters
 import template.core.base.database.AppDatabaseFactory
-import template.core.base.security.FieldEncryptor
 
 actual val platformModule: Module = module {
     single {
-        ChargeTypeConverters.install(get<FieldEncryptor>())
         AppDatabaseFactory(androidApplication())
             .createDatabase<AppDatabase>(
                 databaseName = AppDatabase.DATABASE_NAME,

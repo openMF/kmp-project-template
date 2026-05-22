@@ -33,7 +33,9 @@ kotlin {
 
             implementation(projects.coreBase.common)
             implementation(projects.coreBase.network)
-            api(projects.coreBase.store)
+            // core/store re-exports core-base/store via `api`, so consumers of core/data
+            // transitively see both `AppStoreRegistry` and `template.core.base.store.*`.
+            api(projects.core.store)
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)

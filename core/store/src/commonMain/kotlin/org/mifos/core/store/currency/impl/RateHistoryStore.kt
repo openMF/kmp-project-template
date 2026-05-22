@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.data.currency.impl
+package org.mifos.core.store.currency.impl
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.RetryPolicy
@@ -17,13 +17,13 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.todayIn
-import org.mifos.core.data.di.ApplicationStoreRegistry
 import org.mifos.core.database.currency.dao.RateHistoryDao
 import org.mifos.core.database.currency.mapper.toDomain
 import org.mifos.core.database.currency.mapper.toEntity
 import org.mifos.core.model.currency.RateHistory
 import org.mifos.core.model.currency.RateHistoryKey
 import org.mifos.core.network.currency.api.FrankfurterApi
+import org.mifos.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
@@ -36,7 +36,7 @@ fun provideRateHistoryStore(
     networkMonitor: NetworkMonitor,
     dao: RateHistoryDao,
 ): Store<RateHistoryKey, RateHistory> {
-    val validator = DefaultValidator.withTtl<RateHistory>(ApplicationStoreRegistry.Ttl.RATE_HISTORY)
+    val validator = DefaultValidator.withTtl<RateHistory>(AppStoreRegistry.Ttl.RATE_HISTORY)
     return StoreFactory.createStore(
         fetcher = Fetcher.of { key: RateHistoryKey ->
             val today = Clock.System.todayIn(TimeZone.UTC)

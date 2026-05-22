@@ -7,18 +7,18 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.data.currency.impl
+package org.mifos.core.store.currency.impl
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.RetryPolicy
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.executeWithRetry
 import kotlinx.coroutines.flow.map
-import org.mifos.core.data.di.ApplicationStoreRegistry
 import org.mifos.core.database.currency.dao.ExchangeRatesDao
 import org.mifos.core.database.currency.mapper.toDomain
 import org.mifos.core.database.currency.mapper.toEntity
 import org.mifos.core.model.currency.ExchangeRates
 import org.mifos.core.network.currency.api.FrankfurterApi
+import org.mifos.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
@@ -30,7 +30,7 @@ fun provideExchangeRatesStore(
     networkMonitor: NetworkMonitor,
     dao: ExchangeRatesDao,
 ): Store<String, ExchangeRates> {
-    val validator = DefaultValidator.withTtl<ExchangeRates>(ApplicationStoreRegistry.Ttl.EXCHANGE_RATES)
+    val validator = DefaultValidator.withTtl<ExchangeRates>(AppStoreRegistry.Ttl.EXCHANGE_RATES)
     return StoreFactory.createStore(
         fetcher = Fetcher.of { baseCurrency: String ->
             networkMonitor.executeWithRetry(

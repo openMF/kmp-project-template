@@ -16,16 +16,10 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.mifos.core.data.crypto.CryptoRepository
 import org.mifos.core.data.crypto.impl.CryptoRepositoryImpl
-import org.mifos.core.data.crypto.impl.provideCoinDetailStore
-import org.mifos.core.data.crypto.impl.provideCoinMarketsStore
 import org.mifos.core.data.currency.CurrencyRepository
 import org.mifos.core.data.currency.impl.CurrencyRepositoryImpl
-import org.mifos.core.data.currency.impl.provideExchangeRatesStore
-import org.mifos.core.data.currency.impl.provideRateHistoryStore
 import org.mifos.core.data.infra.NetworkMonitor
-import org.mifos.core.data.infra.StoreCacheManager
 import org.mifos.core.data.infra.impl.RoomFetchedAtRepository
-import org.mifos.core.data.infra.impl.StoreCacheManagerImpl
 import org.mifos.core.data.user.UserDataRepository
 import org.mifos.core.data.user.UserLogoutManager
 import org.mifos.core.data.user.impl.UserDataRepositoryImpl
@@ -34,6 +28,7 @@ import org.mifos.core.database.AppDatabase
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.network.di.NetworkModule
+import org.mifos.core.store.AppStoreRegistry
 import template.core.base.common.di.CommonModule
 import template.core.base.store.infra.FetchedAtRepository
 
@@ -50,44 +45,22 @@ val DataModule = module {
     // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
     single { get<AppDatabase>().draftDao }
 
-    // Store cache manager — clears all registered caches on logout (registration-based)
-    single<StoreCacheManager> {
-        StoreCacheManagerImpl(
-            bookkeeperDao = get(),
-            draftDao = get(),
-        )
-    }
-
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 
-    // Fintech Stores (internal — exposed only through repositories)
-    single(ApplicationStoreRegistry.ExchangeRates) { provideExchangeRatesStore(get(), get(), get()) }
-    single(ApplicationStoreRegistry.RateHistory) { provideRateHistoryStore(get(), get(), get()) }
-    single(ApplicationStoreRegistry.CoinMarkets) { provideCoinMarketsStore(get(), get(), get()) }
-    single(ApplicationStoreRegistry.CoinDetail) { provideCoinDetailStore(get(), get(), get()) }
-
-    // Register fintech feature stores for logout cache clearing
-    single(createdAtStart = true) {
-        val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
-        mgr.register(get(ApplicationStoreRegistry.ExchangeRates))
-        mgr.register(get(ApplicationStoreRegistry.RateHistory))
-        mgr.register(get(ApplicationStoreRegistry.CoinMarkets))
-        mgr.register(get(ApplicationStoreRegistry.CoinDetail))
-    }
-
-    // Fintech Repositories
+    // Fintech Repositories — Store bindings (StoreCacheManager + the 4 stores) live in
+    // core/store's appStoreModule; we just resolve them by qualifier here.
     single<CurrencyRepository> {
         CurrencyRepositoryImpl(
-            exchangeRatesStore = get(ApplicationStoreRegistry.ExchangeRates),
-            rateHistoryStore = get(ApplicationStoreRegistry.RateHistory),
+            exchangeRatesStore = get(AppStoreRegistry.ExchangeRates),
+            rateHistoryStore = get(AppStoreRegistry.RateHistory),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
     }
     single<CryptoRepository> {
         CryptoRepositoryImpl(
-            coinMarketsStore = get(ApplicationStoreRegistry.CoinMarkets),
-            coinDetailStore = get(ApplicationStoreRegistry.CoinDetail),
+            coinMarketsStore = get(AppStoreRegistry.CoinMarkets),
+            coinDetailStore = get(AppStoreRegistry.CoinDetail),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

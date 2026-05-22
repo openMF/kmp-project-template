@@ -10,21 +10,29 @@
 package org.mifos.core.store
 
 import template.core.base.store.infra.StoreRegistry
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Application-level [StoreRegistry] — the single named-qualifier registry for every
  * `org.mobilenativefoundation.store.store5.Store` the app exposes.
  *
- * Forks of `kmp-project-template` should add their domain stores here as `val`s, e.g.:
+ * The 4 demo stores ([ExchangeRates], [RateHistory], [CoinMarkets], [CoinDetail]) live
+ * here as the canonical example shape for forks. Add your own next to them, e.g.:
  *
  * ```kotlin
  * object AppStoreRegistry : StoreRegistry() {
- *     val UserProfile = store("userProfile")
+ *     // Demo stores (kept as forkable examples)
+ *     val ExchangeRates = store("exchangeRates")
+ *     // …
+ *
+ *     // Your app's stores
+ *     val UserProfile  = store("userProfile")
  *     val Transactions = store("transactions")
  * }
  * ```
  *
- * Then reference the qualifier from Koin DI:
+ * Then reference the qualifier from Koin DI in [appStoreModule]:
  *
  * ```kotlin
  * single<Store<UserId, UserProfile>>(qualifier = AppStoreRegistry.UserProfile) { ... }
@@ -34,5 +42,16 @@ import template.core.base.store.infra.StoreRegistry
  * qualifier-name collisions across feature modules.
  */
 object AppStoreRegistry : StoreRegistry() {
-    // TODO(fork): add app-specific stores here as `val Foo = store("foo")`.
+    val ExchangeRates = store("exchangeRates")
+    val RateHistory = store("rateHistory")
+    val CoinMarkets = store("coinMarkets")
+    val CoinDetail = store("coinDetail")
+
+    /** TTL durations — financial data has different freshness requirements. */
+    object Ttl {
+        val EXCHANGE_RATES = 5.minutes
+        val RATE_HISTORY = 1.hours
+        val COIN_MARKETS = 2.minutes
+        val COIN_DETAIL = 5.minutes
+    }
 }

@@ -15,12 +15,12 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import org.mifos.core.data.infra.StoreCacheManager
 import org.mifos.core.data.user.LogoutEvent
 import org.mifos.core.data.user.LogoutReason
 import org.mifos.core.data.user.UserLogoutManager
 import org.mifos.core.data.util.bufferedMutableSharedFlow
 import org.mifos.core.datastore.UserPreferencesRepository
+import org.mifos.core.store.infra.StoreCacheManager
 import template.core.base.common.manager.DispatcherManager
 
 class UserLogoutManagerImpl(

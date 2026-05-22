@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.data.infra
+package org.mifos.core.store.infra
 
 /**
  * Manages Store cache lifecycle.

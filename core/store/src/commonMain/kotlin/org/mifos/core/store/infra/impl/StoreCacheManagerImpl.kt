@@ -7,12 +7,12 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.data.infra.impl
+package org.mifos.core.store.infra.impl
 
 import co.touchlab.kermit.Logger
-import org.mifos.core.data.infra.StoreCacheManager
 import org.mifos.core.database.infra.dao.BookkeeperDao
 import org.mifos.core.database.infra.dao.DraftDao
+import org.mifos.core.store.infra.StoreCacheManager
 import org.mobilenativefoundation.store.core5.ExperimentalStoreApi
 import org.mobilenativefoundation.store.store5.Store
 import kotlin.time.Clock
@@ -24,7 +24,7 @@ import kotlin.time.Clock
  * Usage in a feature's DI module:
  * ```kotlin
  * (get<StoreCacheManager>() as StoreCacheManagerImpl)
- *     .register(get(ApplicationStoreRegistry.YourStore))
+ *     .register(get(AppStoreRegistry.YourStore))
  * ```
  */
 @OptIn(ExperimentalStoreApi::class)

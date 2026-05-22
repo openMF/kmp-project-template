@@ -39,11 +39,11 @@ import org.mifos.core.database.sample.entity.SampleEntity
  *
  * Room 3 requires an `expect object` annotated via [@ConstructedBy][ConstructedBy] so that
  * the KSP compiler plugin can generate a platform-specific `actual object` containing the
- * `AppDatabase_Impl` instantiation logic. The `@Suppress` is needed because the `actual`
- * is generated code, not hand-written.
+ * `AppDatabase_Impl` instantiation logic.
  */
-@Suppress("NO_ACTUAL_FOR_EXPECT")
-expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
+expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
+    override fun initialize(): AppDatabase
+}
 
 /**
  * Root Room 3 database for the application.

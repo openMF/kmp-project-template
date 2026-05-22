@@ -33,7 +33,7 @@ kotlin {
 
             implementation(projects.coreBase.common)
             implementation(projects.coreBase.network)
-            api(projects.coreBase.store)
+            api(projects.core.store)
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)

@@ -24,7 +24,7 @@ import template.core.base.security.FieldEncryptor
  * encryptor cannot be passed in by constructor — it's injected post-construction through
  * the [ChargeTypeConverters.install] static method.
  */
-internal object ChargeTypeConvertersInstalled
+private object ChargeTypeConvertersInstalled
 
 /**
  * Koin module that provides the [AppDatabase] instance and all DAO singletons.

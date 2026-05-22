@@ -12,6 +12,19 @@ package org.mifos.core.database.di
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.database.AppDatabase
+import org.mifos.core.database.currency.converter.ChargeTypeConverters
+import template.core.base.security.FieldEncryptor
+
+/**
+ * Marker singleton — its instantiation has the side effect of wiring [FieldEncryptor]
+ * into [ChargeTypeConverters] before any database access. Bound with `createdAtStart = true`
+ * so the install runs eagerly at Koin start, ahead of the first [AppDatabase] resolution.
+ *
+ * Room 3 KMP instantiates `@TypeConverters` classes via no-arg constructor, so the
+ * encryptor cannot be passed in by constructor — it's injected post-construction through
+ * the [ChargeTypeConverters.install] static method.
+ */
+internal object ChargeTypeConvertersInstalled
 
 /**
  * Koin module that provides the [AppDatabase] instance and all DAO singletons.
@@ -23,6 +36,10 @@ import org.mifos.core.database.AppDatabase
  */
 val DatabaseModule = module {
     includes(platformModule)
+    single(createdAtStart = true) {
+        ChargeTypeConverters.install(get<FieldEncryptor>())
+        ChargeTypeConvertersInstalled
+    }
     single { get<AppDatabase>().sampleDao }
     single { get<AppDatabase>().exchangeRatesDao }
     single { get<AppDatabase>().coinMarketDao }

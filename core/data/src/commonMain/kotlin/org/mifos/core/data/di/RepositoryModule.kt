@@ -24,6 +24,8 @@ import org.mifos.core.data.user.UserDataRepository
 import org.mifos.core.data.user.UserLogoutManager
 import org.mifos.core.data.user.impl.UserDataRepositoryImpl
 import org.mifos.core.data.user.impl.UserLogoutManagerImpl
+import org.mifos.core.data.watchlist.WatchlistRepository
+import org.mifos.core.data.watchlist.impl.WatchlistRepositoryImpl
 import org.mifos.core.database.AppDatabase
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
@@ -44,6 +46,10 @@ val DataModule = module {
 
     // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
     single { get<AppDatabase>().draftDao }
+
+    // Personal watchlist — local-only persistence for the SubmitHandler showcase.
+    single { get<AppDatabase>().watchlistDao }
+    single<WatchlistRepository> { WatchlistRepositoryImpl(get()) }
 
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 

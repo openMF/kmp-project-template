@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Mifos Initiative
+ * Copyright 2026 Mifos Initiative
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.feature.crypto"
+    namespace = "org.mifos.feature.watchlist"
 }
 
 kotlin {
@@ -20,10 +20,8 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.common)
             implementation(projects.core.domain)
-            // KptScaffold + rememberKptPullToRefreshState bridge live in core/ui
             implementation(projects.core.ui)
-            // CoinDetailScreen embeds AddToWatchlistButton from feature/watchlist
-            implementation(projects.feature.watchlist)
+            implementation(projects.core.data)
 
             implementation(compose.ui)
             implementation(compose.material3)

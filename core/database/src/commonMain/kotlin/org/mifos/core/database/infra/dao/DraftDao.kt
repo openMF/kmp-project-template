@@ -64,7 +64,7 @@ interface DraftDao {
     /**
      * Deletes SUBMITTED and FAILED rows older than [thresholdMs] (epoch millis).
      * PENDING drafts are never pruned here — the user may still want to resume them.
-     * Call on app start via [org.mifos.core.data.infra.StoreCacheManager.pruneExpiredDrafts].
+     * Call on app start via [org.mifos.core.store.infra.StoreCacheManager.pruneExpiredDrafts].
      */
     @Query(
         "DELETE FROM framework_submit_drafts " +

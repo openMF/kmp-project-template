@@ -17,6 +17,7 @@ import org.koin.dsl.module
 import org.mifos.core.data.di.DataModule
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
+import org.mifos.core.store.di.appStoreModule
 import org.mifos.feature.crypto.di.CryptoModule
 import org.mifos.feature.currencyrates.di.CurrencyRatesModule
 import org.mifos.feature.emicalculator.di.EmiCalculatorModule
@@ -29,7 +30,7 @@ import template.core.base.security.di.SecurityModule
 
 object KoinModules {
     private val dataModule = module {
-        includes(DataModule)
+        includes(DataModule, appStoreModule)
     }
 
     private val dispatcherModule = module {

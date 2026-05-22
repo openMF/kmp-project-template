@@ -7,18 +7,18 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.data.crypto.impl
+package org.mifos.core.store.crypto.impl
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.RetryPolicy
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.executeWithRetry
 import kotlinx.coroutines.flow.map
-import org.mifos.core.data.di.ApplicationStoreRegistry
 import org.mifos.core.database.crypto.dao.CoinDetailDao
 import org.mifos.core.database.crypto.mapper.toDomain
 import org.mifos.core.database.crypto.mapper.toEntity
 import org.mifos.core.model.crypto.CoinDetail
 import org.mifos.core.network.crypto.api.CoinGeckoApi
+import org.mifos.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
@@ -30,7 +30,7 @@ fun provideCoinDetailStore(
     networkMonitor: NetworkMonitor,
     dao: CoinDetailDao,
 ): Store<String, CoinDetail> {
-    val validator = DefaultValidator.withTtl<CoinDetail>(ApplicationStoreRegistry.Ttl.COIN_DETAIL)
+    val validator = DefaultValidator.withTtl<CoinDetail>(AppStoreRegistry.Ttl.COIN_DETAIL)
     return StoreFactory.createStore(
         fetcher = Fetcher.of { coinId: String ->
             networkMonitor.executeWithRetry(

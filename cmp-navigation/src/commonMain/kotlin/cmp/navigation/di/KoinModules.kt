@@ -23,6 +23,7 @@ import org.mifos.feature.currencyrates.di.CurrencyRatesModule
 import org.mifos.feature.emicalculator.di.EmiCalculatorModule
 import org.mifos.feature.home.di.HomeModule
 import org.mifos.feature.settings.SettingsModule
+import org.mifos.feature.watchlist.di.WatchlistModule
 import template.core.base.analytics.di.analyticsModule
 import template.core.base.common.di.CommonModule
 import template.core.base.platform.di.platformModule
@@ -52,6 +53,7 @@ object KoinModules {
             EmiCalculatorModule,
             HomeModule,
             SettingsModule,
+            WatchlistModule,
         )
     }
 

@@ -33,6 +33,8 @@ import org.mifos.core.database.infra.entity.DraftEntity
 import org.mifos.core.database.infra.entity.FetchedAtEntity
 import org.mifos.core.database.sample.dao.SampleDao
 import org.mifos.core.database.sample.entity.SampleEntity
+import org.mifos.core.database.watchlist.dao.WatchlistDao
+import org.mifos.core.database.watchlist.entity.WatchlistEntity
 
 /**
  * KSP-generated constructor bridge for [AppDatabase].
@@ -70,6 +72,7 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         BookkeeperEntity::class,
         FetchedAtEntity::class,
         DraftEntity::class,
+        WatchlistEntity::class,
     ],
     version = AppDatabase.VERSION,
     exportSchema = true,
@@ -78,6 +81,8 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         AutoMigration(from = 3, to = 4),
         // v4 → v5: adds `framework_submit_drafts` for offline-first form submission outbox.
         AutoMigration(from = 4, to = 5),
+        // v5 → v6: adds `personal_watchlist` for the user's private watchlist.
+        AutoMigration(from = 5, to = 6),
     ],
 )
 @TypeConverters(ChargeTypeConverters::class, FintechTypeConverters::class)
@@ -92,9 +97,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val bookkeeperDao: BookkeeperDao
     abstract val fetchedAtDao: FetchedAtDao
     abstract val draftDao: DraftDao
+    abstract val watchlistDao: WatchlistDao
 
     companion object {
-        const val VERSION = 5
+        const val VERSION = 6
         const val DATABASE_NAME = "mifos_database.db"
     }
 }

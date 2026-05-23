@@ -10,16 +10,22 @@
 package org.mifos.core.data.di
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitorProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.mifos.core.data.alerts.AlertsRepository
+import org.mifos.core.data.alerts.impl.AlertsRepositoryImpl
 import org.mifos.core.data.crypto.CryptoRepository
 import org.mifos.core.data.crypto.impl.CryptoRepositoryImpl
 import org.mifos.core.data.currency.CurrencyRepository
 import org.mifos.core.data.currency.impl.CurrencyRepositoryImpl
 import org.mifos.core.data.infra.NetworkMonitor
 import org.mifos.core.data.infra.impl.RoomFetchedAtRepository
+import org.mifos.core.data.infra.impl.RoomSubmitOutbox
 import org.mifos.core.data.user.UserDataRepository
 import org.mifos.core.data.user.UserLogoutManager
 import org.mifos.core.data.user.impl.UserDataRepositoryImpl
@@ -27,10 +33,15 @@ import org.mifos.core.data.user.impl.UserLogoutManagerImpl
 import org.mifos.core.database.AppDatabase
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
+import org.mifos.core.model.alerts.PriceAlert
+import org.mifos.core.network.alerts.api.AlertsApi
+import org.mifos.core.network.alerts.api.FakeAlertsApi
 import org.mifos.core.network.di.NetworkModule
 import org.mifos.core.store.AppStoreRegistry
 import template.core.base.common.di.CommonModule
 import template.core.base.store.infra.FetchedAtRepository
+import template.core.base.store.submit.OfflineSubmitSyncer
+import template.core.base.store.submit.SubmitOutbox
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
@@ -63,6 +74,32 @@ val DataModule = module {
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
+    }
+
+    // Price alerts — fake-API-backed, with DraftSubmitHandler offline-resilience showcase.
+    // Real forks substitute FakeAlertsApi with a Ktorfit-backed AlertsApi client.
+    single<AlertsApi> { FakeAlertsApi() }
+    single<AlertsRepository> { AlertsRepositoryImpl(api = get()) }
+
+    // Outbox for PriceAlert payloads — RoomSubmitOutbox writes to framework_submit_drafts.
+    single<SubmitOutbox<PriceAlert>> {
+        RoomSubmitOutbox(dao = get(), serializer = PriceAlert.serializer())
+    }
+
+    // App-scoped CoroutineScope for cross-VM long-running coroutines (e.g., OfflineSubmitSyncer).
+    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+
+    // Eager singleton — starts watching network online events at Koin start; retries
+    // any pending alerts when connectivity returns.
+    single(createdAtStart = true) {
+        val syncer = OfflineSubmitSyncer<PriceAlert, PriceAlert>(
+            scope = get(),
+            outbox = get(),
+            isOnlineFlow = get<NetworkMonitor>().isOnline,
+            submitBlock = { payload -> get<AlertsApi>().create(payload) },
+        )
+        syncer.start()
+        syncer
     }
 }
 

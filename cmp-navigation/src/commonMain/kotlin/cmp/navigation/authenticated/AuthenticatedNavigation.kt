@@ -18,6 +18,7 @@ import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
+import org.mifos.feature.alerts.navigation.alertsGraph
 import org.mifos.feature.crypto.navigation.cryptoGraph
 import org.mifos.feature.crypto.navigation.navigateToCrypto
 import org.mifos.feature.currencyrates.navigation.currencyRatesGraph
@@ -62,5 +63,8 @@ internal fun NavGraphBuilder.authenticatedGraph(
         cryptoGraph(navController)
         currencyRatesGraph(navController)
         emiCalculatorDestination(onBackClick = navController::popBackStack)
+
+        // Price alerts (DraftSubmitHandler showcase — offline-resilient form submit)
+        alertsGraph(navController)
     }
 }

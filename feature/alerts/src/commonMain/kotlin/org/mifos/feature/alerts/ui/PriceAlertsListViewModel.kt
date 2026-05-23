@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.feature.alerts.ui
 
@@ -33,8 +33,11 @@ class PriceAlertsListViewModel(
 
     val screenState: StateFlow<ScreenState<List<PriceAlert>>> = repository.alertsStream()
         .map { alerts ->
-            if (alerts.isEmpty()) ScreenState.Empty
-            else ScreenState.Content(data = alerts, freshness = DataFreshness.FRESH)
+            if (alerts.isEmpty()) {
+                ScreenState.Empty
+            } else {
+                ScreenState.Content(data = alerts, freshness = DataFreshness.FRESH)
+            }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 

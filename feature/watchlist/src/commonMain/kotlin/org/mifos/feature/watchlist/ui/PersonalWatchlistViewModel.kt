@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.feature.watchlist.ui
 
@@ -33,8 +33,11 @@ class PersonalWatchlistViewModel(
 
     val screenState: StateFlow<ScreenState<List<WatchlistItem>>> = repository.watchlist()
         .map { items ->
-            if (items.isEmpty()) ScreenState.Empty
-            else ScreenState.Content(data = items, freshness = DataFreshness.FRESH)
+            if (items.isEmpty()) {
+                ScreenState.Empty
+            } else {
+                ScreenState.Content(data = items, freshness = DataFreshness.FRESH)
+            }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.mifos.feature.alerts.ui
 
@@ -17,14 +17,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlin.random.Random
-import kotlin.time.Clock
 import org.mifos.core.data.alerts.AlertsRepository
 import org.mifos.core.model.alerts.AlertDirection
 import org.mifos.core.model.alerts.PriceAlert
 import template.core.base.store.submit.SubmitOutbox
 import template.core.base.store.submit.SubmitState
 import template.core.base.store.submit.draftSubmitHandler
+import kotlin.random.Random
+import kotlin.time.Clock
 
 /**
  * **Canonical `DraftSubmitHandler` showcase.**

@@ -11,6 +11,7 @@ package org.mifos.feature.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Calculate
@@ -34,10 +37,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.core.common.formatDecimal
+import org.mifos.core.common.formatGrouped
+import org.mifos.feature.home.ui.HomeAction
+import org.mifos.feature.home.ui.HomeViewModel
+import template.core.base.store.screen.ScreenState
+import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +59,10 @@ internal fun HomeScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToCrypto: () -> Unit,
     onNavigateToEmi: () -> Unit,
+    viewModel: HomeViewModel = koinViewModel(),
 ) {
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,15 +82,32 @@ internal fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(
-                text = "ScreenDataStream Showcase",
-                style = MaterialTheme.typography.headlineSmall,
+            // Live widgets — combine showcase. Each card observes a slice of
+            // HomeUiState and renders its own per-card ScreenState transitions.
+            TopMoversCard(
+                state = state.topMovers,
+                onRetry = { viewModel.trySendAction(HomeAction.RetryTopMovers) },
+                onSeeAll = onNavigateToCrypto,
             )
-            Spacer(Modifier.height(8.dp))
 
+            ExchangeRateCard(
+                state = state.exchangeRate,
+                onRetry = { viewModel.trySendAction(HomeAction.RetryExchangeRate) },
+                onSeeAll = onNavigateToRates,
+            )
+
+            // Navigation cards — preserved from the original menu so existing
+            // features stay discoverable. Sub-plans 03/04 will add Watchlist
+            // and Alerts cards to the widget section above when their data is on dev.
+            Text(
+                text = "Quick access",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 8.dp),
+            )
             FeatureCard(
                 title = "Currency Rates",
                 subtitle = "Store + Search filter + emptyIfContent",
@@ -100,6 +132,127 @@ internal fun HomeScreen(
                 icon = Icons.Default.Calculate,
                 onClick = onNavigateToEmi,
             )
+
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun TopMoversCard(
+    state: ScreenState<List<*>>,
+    onRetry: () -> Unit,
+    onSeeAll: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Top Movers", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = "See all",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable(onClick = onSeeAll),
+                )
+            }
+            Box(modifier = Modifier.fillMaxWidth().height(120.dp)) {
+                ScreenContent(
+                    state = state,
+                    onRetry = onRetry,
+                    modifier = Modifier.fillMaxSize(),
+                ) { items, _ ->
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        items.take(5).forEach { rawItem ->
+                            val coin = rawItem as? org.mifos.core.model.crypto.CoinMarket
+                                ?: return@forEach
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    text = "${coin.symbol.uppercase()}  ${coin.name}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                val pct = coin.priceChangePercent24h.formatDecimal(2)
+                                Text(
+                                    text = "$pct%",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if (coin.priceChangePercent24h >= 0) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.error
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExchangeRateCard(
+    state: ScreenState<org.mifos.core.model.currency.ExchangeRates>,
+    onRetry: () -> Unit,
+    onSeeAll: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "USD Exchange",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = "See all",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable(onClick = onSeeAll),
+                )
+            }
+            Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
+                ScreenContent(
+                    state = state,
+                    onRetry = onRetry,
+                    modifier = Modifier.fillMaxSize(),
+                ) { rates, _ ->
+                    val keyRates = listOf("EUR", "GBP", "INR")
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        keyRates.forEach { code ->
+                            val value = rates.rates[code] ?: return@forEach
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    text = "USD → $code",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                Text(
+                                    text = value.formatGrouped(4),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

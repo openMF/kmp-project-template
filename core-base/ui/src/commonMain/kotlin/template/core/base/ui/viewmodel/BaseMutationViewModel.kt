@@ -9,105 +9,27 @@
  */
 package template.core.base.ui.viewmodel
 
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import template.core.base.store.screen.ScreenState
-import template.core.base.store.submit.MutationUiState
-import template.core.base.store.submit.SubmitState
-import template.core.base.store.submit.submitHandler
-
 /**
- * Base class for edit-screen ViewModels that combine a read stream with a form submit.
+ * Deprecated alias for [BaseSubmitMutationViewModel].
  *
- * Extends [BaseViewModel] with the MutationUiState/MutationAction shape baked in — submit
- * lifecycle is driven through the inherited MVI action channel, so concurrent
- * [MutationAction.Submit] / [MutationAction.Retry] / [MutationAction.Dismiss] are serialized.
+ * Renamed for clarity when [BaseDraftMutationViewModel] was introduced as its offline-resilient
+ * sibling — both extend the same MVI base, but each wraps a different submit handler:
  *
- * The combined screen + submit state is exposed via the inherited [stateFlow]; the legacy
- * [uiState] property is preserved as a get-only alias for backward compatibility.
+ * | Class | Wraps | When to use |
+ * |---|---|---|
+ * | [BaseSubmitMutationViewModel] | `SubmitHandler<R>` | Fire-and-forget submit. No outbox. |
+ * | [BaseDraftMutationViewModel]  | `DraftSubmitHandler<P, R>` | Offline-resilient. Persists drafts; auto-retries. |
  *
- * Subclasses override [performSubmit] to provide the actual network/repository call and
- * populate [mutableScreenState] when the read-side data resolves.
- *
- * Usage:
- * ```kotlin
- * class EditClientViewModel(
- *     private val repo: ClientRepository,
- *     private val clientId: String,
- * ) : BaseMutationViewModel<ClientDetail, Unit>() {
- *
- *     init {
- *         viewModelScope.launch {
- *             mutableScreenState.value = try {
- *                 ScreenState.Content(repo.getClient(clientId), DataFreshness.FRESH)
- *             } catch (e: Exception) {
- *                 ScreenState.Error(e)
- *             }
- *         }
- *     }
- *
- *     override suspend fun performSubmit(payload: ClientDetail): Unit =
- *         repo.updateClient(clientId, payload)
- * }
- *
- * // From the screen:
- * viewModel.trySendAction(MutationAction.Submit(updatedClient))
- * // — or the convenience shorthand —
- * viewModel.onSubmit(updatedClient)
- * ```
- *
- * @param T Domain type loaded for display.
- * @param R Result type returned by the server on a successful submit.
+ * Existing call sites keep working — [typealias][typealias] is a fully transparent rename.
+ * Update at your own pace; CI does not break.
  */
-abstract class BaseMutationViewModel<T, R> :
-    BaseViewModel<MutationUiState<T, R>, Nothing, MutationAction<T>>(MutationUiState()) {
-
-    private val submitHandler = viewModelScope.submitHandler<R>()
-
-    protected val mutableScreenState: MutableStateFlow<ScreenState<T>> =
-        MutableStateFlow(ScreenState.Loading)
-
-    /**
-     * Backward-compat alias for the inherited [stateFlow]. Existing callers using
-     * `viewModel.uiState` keep working with no change.
-     */
-    val uiState: StateFlow<MutationUiState<T, R>> get() = stateFlow
-
-    init {
-        combine(mutableScreenState, submitHandler.state) { screen, submit ->
-            MutationUiState(screen = screen, submit = submit)
-        }.onEach { combined ->
-            updateState { combined }
-        }.launchIn(viewModelScope)
-    }
-
-    /** Override to provide the network/repository call. Called with the current form payload. */
-    protected abstract suspend fun performSubmit(payload: T): R
-
-    override fun handleAction(action: MutationAction<T>) {
-        when (action) {
-            is MutationAction.Submit -> submitHandler.submit { performSubmit(action.payload) }
-            MutationAction.Retry -> submitHandler.retry()
-            MutationAction.Dismiss -> submitHandler.reset()
-        }
-    }
-
-    /** Trigger a form submission. No-op if already [SubmitState.Submitting]. */
-    fun onSubmit(payload: T) {
-        trySendAction(MutationAction.Submit(payload))
-    }
-
-    /** Retry the last failed submission. */
-    fun onRetry() {
-        trySendAction(MutationAction.Retry)
-    }
-
-    /** Dismiss the result overlay and return to [SubmitState.Idle]. */
-    fun onDismissResult() {
-        trySendAction(MutationAction.Dismiss)
-    }
-}
+@Deprecated(
+    message = "Renamed to BaseSubmitMutationViewModel for clarity. " +
+        "Use BaseDraftMutationViewModel for offline-resilient submits.",
+    replaceWith = ReplaceWith(
+        "BaseSubmitMutationViewModel<T, R>",
+        "template.core.base.ui.viewmodel.BaseSubmitMutationViewModel",
+    ),
+    level = DeprecationLevel.WARNING,
+)
+typealias BaseMutationViewModel<T, R> = BaseSubmitMutationViewModel<T, R>

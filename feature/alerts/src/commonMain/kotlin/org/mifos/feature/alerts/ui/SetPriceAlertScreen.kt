@@ -48,7 +48,8 @@ fun SetPriceAlertScreen(
     viewModel: SetPriceAlertViewModel = koinViewModel(),
 ) {
     val form by viewModel.formState.collectAsStateWithLifecycle()
-    val submit by viewModel.submitState.collectAsStateWithLifecycle()
+    val ui by viewModel.uiState.collectAsStateWithLifecycle()
+    val submit = ui.submit
 
     Scaffold(
         modifier = modifier,

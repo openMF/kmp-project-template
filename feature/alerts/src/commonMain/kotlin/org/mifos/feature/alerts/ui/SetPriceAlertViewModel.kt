@@ -9,67 +9,51 @@
  */
 package org.mifos.feature.alerts.ui
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.mifos.core.data.alerts.AlertsRepository
 import org.mifos.core.model.alerts.AlertDirection
 import org.mifos.core.model.alerts.PriceAlert
 import template.core.base.store.submit.SubmitOutbox
 import template.core.base.store.submit.SubmitState
-import template.core.base.store.submit.draftSubmitHandler
+import template.core.base.ui.viewmodel.BaseDraftMutationViewModel
 import kotlin.random.Random
 import kotlin.time.Clock
 
 /**
- * **Canonical `DraftSubmitHandler` showcase.**
+ * **Canonical `BaseDraftMutationViewModel` showcase.**
  *
- * This ViewModel demonstrates the framework's offline-resilient form submission
- * pattern: when the user taps Save while online, the alert is sent via
- * [AlertsRepository.submitAlert] immediately. When offline, the payload persists
- * in the framework outbox (`framework_submit_drafts` table, formKey =
- * `"price_alert"`); the `OfflineSubmitSyncer` (wired in `DataModule`) retries
- * it automatically on the next online transition.
+ * Demonstrates the framework's offline-resilient form submission via the unified mutation base
+ * (introduced by `p1-framework-prerequisites/02-base-mutation-vm-param`). When the user taps
+ * Save while online the alert is sent via [AlertsRepository.submitAlert]; when offline the
+ * payload persists in `framework_submit_drafts` (`formKey = "price_alert"`) and the
+ * `OfflineSubmitSyncer` retries it on the next online transition.
  *
- * The ViewModel does NOT extend `BaseMutationViewModel` — instead it uses
- * `draftSubmitHandler` directly because the canonical Mutation base supports
- * `SubmitHandler` (one-shot fire-and-forget), not `DraftSubmitHandler`
- * (persistent outbox). A future framework refactor could unify both, but
- * right now this is the cleaner shape.
+ * Form state (`coinId`, `direction`, `targetValue`, `enabled`) lives in [formState] — pre-submit
+ * ephemeral local state, NOT a derived `ScreenState<T>` from a stream. The screen edits via
+ * `onCoinIdChange` etc. and triggers the snapshot-and-submit via [onSubmit].
  *
- * Form state lives in [formState] (mutable while typing). On Save, the form
- * is snapshotted into a [PriceAlert] payload and submitted via
- * [draftHandler.submit]; [submitState] exposes the Idle/Submitting/Submitted/Failed
- * lifecycle for the screen to render feedback overlays.
+ * Submit lifecycle (Idle / Submitting / Submitted / Failed) is exposed via the inherited
+ * [uiState] (a [template.core.base.store.submit.MutationUiState] whose `.submit` field
+ * carries the [SubmitState]).
  *
- * @param autoSaveDraft When `true`, network failures silently persist the
- *   payload to the outbox (no user prompt). The plan's recommended default for
- *   showcase clarity — fork apps may flip to `false` for explicit user consent.
+ * **Single-pending mode**: `uniqueKey` is `null` (default) — one PENDING draft per `formKey`.
+ * If we ever ship per-coin price alerts where N drafts can coexist offline, switch to
+ * passing `uniqueKey = coinId` per ViewModel instance.
  */
 class SetPriceAlertViewModel(
     private val repository: AlertsRepository,
-    private val outbox: SubmitOutbox<PriceAlert>,
-) : ViewModel() {
+    outbox: SubmitOutbox<PriceAlert>,
+) : BaseDraftMutationViewModel<PriceAlert, PriceAlert>(
+    outbox = outbox,
+    formKey = "price_alert",
+    autoSaveDraft = true,
+) {
 
     private val _formState = MutableStateFlow(PriceAlertFormState())
     val formState: StateFlow<PriceAlertFormState> = _formState.asStateFlow()
-
-    private val draftHandler = viewModelScope.draftSubmitHandler<PriceAlert, PriceAlert>(
-        outbox = outbox,
-        formKey = "price_alert",
-        autoSaveDraft = true,
-    )
-
-    val submitState: StateFlow<SubmitState<PriceAlert>> = draftHandler.state.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = SubmitState.Idle,
-    )
 
     fun onCoinIdChange(value: String) {
         _formState.update { it.copy(coinId = value) }
@@ -87,7 +71,10 @@ class SetPriceAlertViewModel(
         _formState.update { it.copy(enabled = enabled) }
     }
 
-    /** Validate, snapshot to a [PriceAlert] payload, and submit through the draft handler. */
+    /**
+     * Validate, snapshot to a [PriceAlert] payload, then delegate to the base's
+     * `onSubmit(payload)`. Overload (parameter-less) — does NOT override `super.onSubmit(payload)`.
+     */
     fun onSubmit() {
         val form = _formState.value
         if (form.coinId.isBlank() || form.targetValue <= 0.0) return
@@ -99,17 +86,18 @@ class SetPriceAlertViewModel(
             enabled = form.enabled,
             createdAtMs = Clock.System.now().toEpochMilliseconds(),
         )
-        draftHandler.submit(payload) { repository.submitAlert(it) }
+        super.onSubmit(payload)
     }
 
-    fun onRetry() {
-        draftHandler.retry()
-    }
-
-    fun onDismissResult() {
-        draftHandler.reset()
+    /** Reset both submit state (super) and form fields (VM-local). */
+    override fun onDismissResult() {
+        super.onDismissResult()
         _formState.value = PriceAlertFormState()
     }
+
+    /** Repository implementation called by the inherited draft handler. */
+    override suspend fun performSubmit(payload: PriceAlert): PriceAlert =
+        repository.submitAlert(payload)
 
     private fun randomId(): String {
         // Compact client-side ID; replace with UUID4 once kotlinx.uuid or okio.UUID is wired.

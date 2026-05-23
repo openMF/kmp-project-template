@@ -28,8 +28,7 @@ class RoomBookkeeper<Key : Any>(
     private val keySerializer: (Key) -> String,
 ) : Bookkeeper<Key> {
 
-    override suspend fun getLastFailedSync(key: Key): Long? =
-        dao.getLastFailedSync(keySerializer(key))
+    override suspend fun getLastFailedSync(key: Key): Long? = dao.getLastFailedSync(keySerializer(key))
 
     override suspend fun setLastFailedSync(key: Key, timestamp: Long): Boolean {
         dao.upsert(BookkeeperEntity(key = keySerializer(key), lastFailedSync = timestamp))

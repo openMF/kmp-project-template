@@ -48,10 +48,7 @@ fun TrackMifosScreen(
 }
 
 /** Track client-related button clicks */
-fun Modifier.trackClientAction(
-    action: String,
-    clientId: String? = null,
-): Modifier = this.then(
+fun Modifier.trackClientAction(action: String, clientId: String? = null): Modifier = this.then(
     Modifier.trackMifosAction(
         "client_action",
         mapOf(
@@ -62,26 +59,20 @@ fun Modifier.trackClientAction(
 )
 
 /** Track loan-related button clicks */
-fun Modifier.trackLoanAction(
-    action: String,
-    loanId: String? = null,
-    loanProductId: String? = null,
-): Modifier = this.then(
-    Modifier.trackMifosAction(
-        "loan_action",
-        mapOf(
-            "action" to action,
-            *loanId?.let { arrayOf(MifosParamKeys.LOAN_ID to it) } ?: emptyArray(),
-            *loanProductId?.let { arrayOf(MifosParamKeys.LOAN_PRODUCT_ID to it) } ?: emptyArray(),
+fun Modifier.trackLoanAction(action: String, loanId: String? = null, loanProductId: String? = null): Modifier =
+    this.then(
+        Modifier.trackMifosAction(
+            "loan_action",
+            mapOf(
+                "action" to action,
+                *loanId?.let { arrayOf(MifosParamKeys.LOAN_ID to it) } ?: emptyArray(),
+                *loanProductId?.let { arrayOf(MifosParamKeys.LOAN_PRODUCT_ID to it) } ?: emptyArray(),
+            ),
         ),
-    ),
-)
+    )
 
 /** Track savings-related button clicks */
-fun Modifier.trackSavingsAction(
-    action: String,
-    accountId: String? = null,
-): Modifier = this.then(
+fun Modifier.trackSavingsAction(action: String, accountId: String? = null): Modifier = this.then(
     Modifier.trackMifosAction(
         "savings_action",
         mapOf(
@@ -93,21 +84,14 @@ fun Modifier.trackSavingsAction(
 
 /** Generic Mifos action tracker */
 @Suppress("UnusedParameter")
-private fun Modifier.trackMifosAction(
-    eventType: String,
-    params: Map<String, String>,
-): Modifier = this.clickable {
+private fun Modifier.trackMifosAction(eventType: String, params: Map<String, String>): Modifier = this.clickable {
     // Note: In a real implementation, you'd need to access the analytics helper here
     // This is a simplified version for demonstration
 }
 
 /** Track form field interactions in Mifos forms */
 @Composable
-fun TrackMifosFormField(
-    fieldName: String,
-    formName: String,
-    fieldType: String = "text",
-) {
+fun TrackMifosFormField(fieldName: String, formName: String, fieldType: String = "text") {
     val analytics = rememberAnalyticsHelper()
 
     LaunchedEffect(fieldName, formName) {
@@ -122,12 +106,7 @@ fun TrackMifosFormField(
 
 /** Track Mifos business flow completion */
 @Composable
-fun TrackMifosFlowCompletion(
-    flowName: String,
-    step: String,
-    totalSteps: Int,
-    entityId: String? = null,
-) {
+fun TrackMifosFlowCompletion(flowName: String, step: String, totalSteps: Int, entityId: String? = null) {
     val analytics = rememberAnalyticsHelper()
 
     LaunchedEffect(step) {

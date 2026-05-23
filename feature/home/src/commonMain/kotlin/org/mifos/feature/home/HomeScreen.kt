@@ -139,11 +139,7 @@ internal fun HomeScreen(
 }
 
 @Composable
-private fun TopMoversCard(
-    state: ScreenState<List<*>>,
-    onRetry: () -> Unit,
-    onSeeAll: () -> Unit,
-) {
+private fun TopMoversCard(state: ScreenState<List<*>>, onRetry: () -> Unit, onSeeAll: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -258,12 +254,7 @@ private fun ExchangeRateCard(
 }
 
 @Composable
-private fun FeatureCard(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-) {
+private fun FeatureCard(title: String, subtitle: String, icon: ImageVector, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

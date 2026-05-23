@@ -42,10 +42,7 @@ import org.mifos.feature.settings.generated.resources.feature_settings_language_
 import org.mifos.feature.settings.generated.resources.feature_settings_loading
 
 @Composable
-fun LanguageDialog(
-    onDismiss: () -> Unit,
-    viewModel: SettingsViewmodel = koinViewModel(),
-) {
+fun LanguageDialog(onDismiss: () -> Unit, viewModel: SettingsViewmodel = koinViewModel()) {
     val settingsUiState by viewModel.settingsUiState.collectAsStateWithLifecycle()
     LanguageDialog(
         onDismiss = onDismiss,
@@ -106,10 +103,7 @@ fun LanguageDialog(
 }
 
 @Composable
-private fun LanguagePanel(
-    currentLanguage: LanguageConfig,
-    onChangeLanguage: (language: LanguageConfig) -> Unit,
-) {
+private fun LanguagePanel(currentLanguage: LanguageConfig, onChangeLanguage: (language: LanguageConfig) -> Unit) {
     Column(Modifier.selectableGroup()) {
         LanguageConfig.entries.forEach { language ->
             LanguageChooserRow(
@@ -122,12 +116,7 @@ private fun LanguagePanel(
 }
 
 @Composable
-fun LanguageChooserRow(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun LanguageChooserRow(text: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()

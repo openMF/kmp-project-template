@@ -129,11 +129,9 @@ class UserPreferencesRepositoryImpl(
         }
     }
 
-    override suspend fun setLanguage(language: LanguageConfig) =
-        updatePreference { it.copy(appLanguage = language) }
+    override suspend fun setLanguage(language: LanguageConfig) = updatePreference { it.copy(appLanguage = language) }
 
-    override suspend fun setThemeBrand(themeBrand: ThemeBrand) =
-        updatePreference { it.copy(themeBrand = themeBrand) }
+    override suspend fun setThemeBrand(themeBrand: ThemeBrand) = updatePreference { it.copy(themeBrand = themeBrand) }
 
     override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) =
         updatePreference { it.copy(darkThemeConfig = darkThemeConfig) }
@@ -144,8 +142,7 @@ class UserPreferencesRepositoryImpl(
     override suspend fun setIsAuthenticated(isAuthenticated: Boolean) =
         updatePreference { it.copy(isAuthenticated = isAuthenticated) }
 
-    override suspend fun setIsUnlocked(isUnlocked: Boolean) =
-        updatePreference { it.copy(isUnlocked = isUnlocked) }
+    override suspend fun setIsUnlocked(isUnlocked: Boolean) = updatePreference { it.copy(isUnlocked = isUnlocked) }
 
     override suspend fun setIsPasscodeEnabled(isPasscodeEnabled: Boolean) =
         updatePreference { it.copy(isPasscodeEnabled = isPasscodeEnabled) }
@@ -159,8 +156,7 @@ class UserPreferencesRepositoryImpl(
     override suspend fun setFirstTimeState(firstTimeState: Boolean) =
         updatePreference { it.copy(firstTimeUser = firstTimeState) }
 
-    override suspend fun setPasscode(passcode: String) =
-        updatePreference { it.copy(passcode = passcode) }
+    override suspend fun setPasscode(passcode: String) = updatePreference { it.copy(passcode = passcode) }
 
     override suspend fun setScreenCapturePreference(isScreenCaptureEnabled: Boolean) =
         updatePreference { it.copy(enableScreenCapture = isScreenCaptureEnabled) }

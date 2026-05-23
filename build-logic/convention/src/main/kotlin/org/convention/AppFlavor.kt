@@ -13,22 +13,28 @@ import com.android.build.api.dsl.ApplicationProductFlavor
 import com.android.build.api.dsl.CommonExtension
 
 /**
- * AGP-side flavor registration helper shared by every Android-bearing module
- * (com.android.application + com.android.library).
+ * AGP-side flavor registration helper for modules that do NOT apply
+ * `kotlin("multiplatform")` — specifically `cmp-android`.
  *
- * `kmp-product-flavors v1.1.2`'s `bridgeAgpProductFlavors` runs in afterEvaluate
- * which is too late for AGP variant resolution. We register flavors here
- * synchronously inside KMPFlavorsConventionPlugin's pluginManager.withPlugin
- * callback — same lifecycle moment as a hand-written `android { productFlavors {} }`
- * block.
+ * `KmpFlavorPlugin` requires `KotlinMultiplatformExtension` to be present.
+ * When it is not (pure `com.android.application` modules), the plugin returns
+ * early and its built-in `bridgeAgpProductFlavors` never runs. This helper is
+ * called synchronously from [KMPFlavorsConventionPlugin] via
+ * `pluginManager.withPlugin("com.android.application")` so AGP receives the
+ * flavor registration before variant resolution.
  *
- * Both [ApplicationExtension] and [com.android.build.api.dsl.LibraryExtension]
- * extend [CommonExtension] and expose a writable productFlavors container.
+ * For KMP library modules (which DO have `kotlin("multiplatform")`) the plugin's
+ * own bridge via `androidComponents.finalizeDsl` handles everything — this
+ * helper is skipped for those modules via the `findByType(CommonExtension)` null
+ * guard in [KMPFlavorsConventionPlugin].
+ *
+ * This file is intentionally kept minimal — it mirrors only the dimensions and
+ * flavors declared in [KMPFlavorsConventionPlugin]'s `kmpFlavors { }` block.
+ * Keep both in sync when adding new flavors.
  */
+
 @Suppress("EnumEntryName")
-enum class FlavorDimension {
-    contentType,
-}
+enum class FlavorDimension { contentType }
 
 @Suppress("EnumEntryName")
 enum class AppFlavor(val dimension: FlavorDimension, val applicationIdSuffix: String? = null) {
@@ -37,12 +43,8 @@ enum class AppFlavor(val dimension: FlavorDimension, val applicationIdSuffix: St
 }
 
 /**
- * Configure base `demo`/`prod` AGP product flavors on a [CommonExtension]
- * (works for both `com.android.application` and `com.android.library`).
- *
- * Idempotent — `productFlavors.create()` would error on duplicate, but in
- * practice this helper is invoked once per module through
- * `KMPFlavorsConventionPlugin`.
+ * Registers base `demo`/`prod` AGP product flavors on [commonExtension].
+ * Idempotent — skips any flavor or dimension already present.
  */
 fun configureFlavors(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     commonExtension.apply {

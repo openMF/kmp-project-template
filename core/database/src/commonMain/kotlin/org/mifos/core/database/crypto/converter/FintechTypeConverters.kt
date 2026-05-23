@@ -15,20 +15,16 @@ import kotlinx.serialization.json.Json
 class FintechTypeConverters {
 
     @TypeConverter
-    fun mapToString(map: Map<String, Double>): String =
-        Json.encodeToString(map)
+    fun mapToString(map: Map<String, Double>): String = Json.encodeToString(map)
 
     @TypeConverter
-    fun stringToMap(json: String): Map<String, Double> =
-        Json.decodeFromString(json)
+    fun stringToMap(json: String): Map<String, Double> = Json.decodeFromString(json)
 
     @TypeConverter
-    fun ratePointsToString(list: List<RatePointPair>): String =
-        Json.encodeToString(list)
+    fun ratePointsToString(list: List<RatePointPair>): String = Json.encodeToString(list)
 
     @TypeConverter
-    fun stringToRatePoints(json: String): List<RatePointPair> =
-        Json.decodeFromString(json)
+    fun stringToRatePoints(json: String): List<RatePointPair> = Json.decodeFromString(json)
 }
 
 @kotlinx.serialization.Serializable

@@ -244,7 +244,11 @@ fun RevealSwipe(
                             }
                         },
                         // no indication if just closing
-                        indication = if (state.anchoredDraggableState.targetValue != RevealValue.Default) null else LocalIndication.current,
+                        indication = if (state.anchoredDraggableState.targetValue != RevealValue.Default) {
+                            null
+                        } else {
+                            LocalIndication.current
+                        },
                         interactionSource = remember { MutableInteractionSource() },
                     )
                 }

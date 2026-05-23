@@ -37,11 +37,10 @@ private class NonLetterColorVisualTransformation(
     private val specialCharacterColor: Color,
 ) : VisualTransformation {
 
-    override fun filter(text: AnnotatedString): TransformedText =
-        TransformedText(
-            buildTransformedAnnotatedString(text.toString()),
-            OffsetMapping.Identity,
-        )
+    override fun filter(text: AnnotatedString): TransformedText = TransformedText(
+        buildTransformedAnnotatedString(text.toString()),
+        OffsetMapping.Identity,
+    )
 
     private fun buildTransformedAnnotatedString(text: String): AnnotatedString {
         val builder = AnnotatedString.Builder()

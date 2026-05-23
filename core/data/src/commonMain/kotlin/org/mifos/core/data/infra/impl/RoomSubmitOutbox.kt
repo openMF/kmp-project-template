@@ -66,23 +66,17 @@ class RoomSubmitOutbox<P>(
     override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> =
         dao.observePendingByFormKey(formKey).map { it?.toEntry() }
 
-    override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> =
-        dao.getAllPending().mapNotNull { it.toEntry() }
+    override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> = dao.getAllPending().mapNotNull { it.toEntry() }
 
-    override suspend fun markRetrying(id: Long) =
-        dao.markRetrying(id, currentTimeMillis())
+    override suspend fun markRetrying(id: Long) = dao.markRetrying(id, currentTimeMillis())
 
-    override suspend fun markSubmitted(id: Long) =
-        dao.markSubmitted(id, currentTimeMillis())
+    override suspend fun markSubmitted(id: Long) = dao.markSubmitted(id, currentTimeMillis())
 
-    override suspend fun markFailed(id: Long, error: String?) =
-        dao.markFailed(id, currentTimeMillis(), error)
+    override suspend fun markFailed(id: Long, error: String?) = dao.markFailed(id, currentTimeMillis(), error)
 
-    override suspend fun deleteByFormKey(formKey: String) =
-        dao.deleteByFormKey(formKey)
+    override suspend fun deleteByFormKey(formKey: String) = dao.deleteByFormKey(formKey)
 
-    override suspend fun deleteAll() =
-        dao.deleteAll()
+    override suspend fun deleteAll() = dao.deleteAll()
 
     private fun DraftEntity.toEntry(): SubmitOutboxEntry<P>? = runCatching {
         SubmitOutboxEntry(

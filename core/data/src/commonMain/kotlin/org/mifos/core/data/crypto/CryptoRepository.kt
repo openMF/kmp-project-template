@@ -16,13 +16,7 @@ import template.core.base.store.paging.PagingScreenStream
 import template.core.base.store.screen.ScreenDataStream
 
 interface CryptoRepository {
-    fun coinMarketsStream(
-        scope: CoroutineScope,
-        pageSize: Int = 20,
-    ): PagingScreenStream<CoinMarket>
+    fun coinMarketsStream(scope: CoroutineScope, pageSize: Int = 20): PagingScreenStream<CoinMarket>
 
-    fun coinDetailStream(
-        coinId: String,
-        scope: CoroutineScope,
-    ): ScreenDataStream<CoinDetail>
+    fun coinDetailStream(coinId: String, scope: CoroutineScope): ScreenDataStream<CoinDetail>
 }

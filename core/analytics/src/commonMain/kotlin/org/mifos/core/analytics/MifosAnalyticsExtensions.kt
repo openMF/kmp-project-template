@@ -32,11 +32,7 @@ fun AnalyticsHelper.trackClientCreationFlow(step: String, success: Boolean = tru
 /**
  * Extension for tracking loan application flow
  */
-fun AnalyticsHelper.trackLoanApplicationFlow(
-    step: String,
-    loanProductId: String? = null,
-    success: Boolean = true,
-) {
+fun AnalyticsHelper.trackLoanApplicationFlow(step: String, loanProductId: String? = null, success: Boolean = true) {
     val params = mutableMapOf(
         "step" to step,
         ParamKeys.SUCCESS to success.toString(),
@@ -118,11 +114,7 @@ fun AnalyticsHelper.trackDataSync(
 /**
  * Extension for tracking user preferences changes
  */
-fun AnalyticsHelper.trackPreferenceChange(
-    preferenceName: String,
-    oldValue: String?,
-    newValue: String,
-) {
+fun AnalyticsHelper.trackPreferenceChange(preferenceName: String, oldValue: String?, newValue: String) {
     val params = mutableMapOf(
         "preference_name" to preferenceName,
         "new_value" to newValue,
@@ -255,10 +247,7 @@ fun AnalyticsHelper.mifosTracker(): MifosAnalyticsTracker = MifosAnalyticsTracke
 /**
  * Extension for tracking custom business events specific to microfinance
  */
-fun AnalyticsHelper.trackMicrofinanceEvent(
-    eventName: String,
-    businessParams: Map<String, String>,
-) {
+fun AnalyticsHelper.trackMicrofinanceEvent(eventName: String, businessParams: Map<String, String>) {
     logEvent(
         "microfinance_event",
         mapOf("event_name" to eventName) + businessParams,

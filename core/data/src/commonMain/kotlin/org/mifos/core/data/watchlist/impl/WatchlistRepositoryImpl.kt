@@ -21,10 +21,9 @@ internal class WatchlistRepositoryImpl(
     private val dao: WatchlistDao,
 ) : WatchlistRepository {
 
-    override fun watchlist(): Flow<List<WatchlistItem>> =
-        dao.observeAll().map { rows ->
-            rows.map { WatchlistItem(coinId = it.coinId, addedAtMs = it.addedAtMs) }
-        }
+    override fun watchlist(): Flow<List<WatchlistItem>> = dao.observeAll().map { rows ->
+        rows.map { WatchlistItem(coinId = it.coinId, addedAtMs = it.addedAtMs) }
+    }
 
     override fun contains(coinId: String): Flow<Boolean> = dao.observeContains(coinId)
 

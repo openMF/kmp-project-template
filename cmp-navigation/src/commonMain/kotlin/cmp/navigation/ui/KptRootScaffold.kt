@@ -156,10 +156,7 @@ fun KptRootScaffold(
 }
 
 @Composable
-private fun ScaffoldBottomAppBar(
-    navigationData: ScaffoldNavigationData,
-    modifier: Modifier = Modifier,
-) {
+private fun ScaffoldBottomAppBar(navigationData: ScaffoldNavigationData, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxWidth()) {
         KptBottomBar(
             navigationItems = navigationData.navigationItems,
@@ -173,10 +170,7 @@ private fun ScaffoldBottomAppBar(
 }
 
 @Composable
-private fun ScaffoldNavigationRail(
-    navigationData: ScaffoldNavigationData,
-    modifier: Modifier = Modifier,
-) {
+private fun ScaffoldNavigationRail(navigationData: ScaffoldNavigationData, modifier: Modifier = Modifier) {
     // We set the z-index to 1f in order to make sure the content transitions
     // animate in under the navigation rail.
     Box(

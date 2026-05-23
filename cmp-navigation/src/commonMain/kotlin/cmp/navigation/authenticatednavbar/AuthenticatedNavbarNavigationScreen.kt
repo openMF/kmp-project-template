@@ -206,8 +206,7 @@ private fun NavController.navigateToTabOrRoot(
     }
 }
 
-private fun NavBackStackEntry?.isCurrentRoute(route: String): Boolean =
-    this
-        ?.destination
-        ?.hierarchy
-        ?.any { it.route == route } == true
+private fun NavBackStackEntry?.isCurrentRoute(route: String): Boolean = this
+    ?.destination
+    ?.hierarchy
+    ?.any { it.route == route } == true

@@ -21,11 +21,7 @@ import kotlin.math.pow
  * @param tenureMonths Number of months
  * @return [EmiResult] with monthly EMI, total payment, and total interest
  */
-fun calculateEmi(
-    principal: Double,
-    annualRatePercent: Double,
-    tenureMonths: Int,
-): EmiResult {
+fun calculateEmi(principal: Double, annualRatePercent: Double, tenureMonths: Int): EmiResult {
     val monthlyRate = annualRatePercent / 12.0 / 100.0
     val n = tenureMonths.toDouble()
     val emi = if (monthlyRate == 0.0) {

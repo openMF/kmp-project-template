@@ -27,9 +27,7 @@ internal fun ProfileScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-internal fun ProfileScreenContent(
-    modifier: Modifier = Modifier,
-) {
+internal fun ProfileScreenContent(modifier: Modifier = Modifier) {
     KptScaffold(modifier = modifier) {
         Column(
             modifier = Modifier

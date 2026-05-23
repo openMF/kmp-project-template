@@ -29,25 +29,21 @@ class CryptoRepositoryImpl(
     private val fetchedAtRepository: FetchedAtRepository,
 ) : CryptoRepository {
 
-    override fun coinMarketsStream(
-        scope: CoroutineScope,
-        pageSize: Int,
-    ): PagingScreenStream<CoinMarket> = coinMarketsStore.asPagingScreenStream(
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
-        cacheKey = "crypto:coinMarkets",
-        scope = scope,
-        pageSize = pageSize,
-    )
+    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
+        coinMarketsStore.asPagingScreenStream(
+            networkMonitor = networkMonitor,
+            fetchedAtRepository = fetchedAtRepository,
+            cacheKey = "crypto:coinMarkets",
+            scope = scope,
+            pageSize = pageSize,
+        )
 
-    override fun coinDetailStream(
-        coinId: String,
-        scope: CoroutineScope,
-    ): ScreenDataStream<CoinDetail> = coinDetailStore.asScreenStream(
-        key = coinId,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
-        cacheKey = "crypto:coinDetail:$coinId",
-        scope = scope,
-    )
+    override fun coinDetailStream(coinId: String, scope: CoroutineScope): ScreenDataStream<CoinDetail> =
+        coinDetailStore.asScreenStream(
+            key = coinId,
+            networkMonitor = networkMonitor,
+            fetchedAtRepository = fetchedAtRepository,
+            cacheKey = "crypto:coinDetail:$coinId",
+            scope = scope,
+        )
 }

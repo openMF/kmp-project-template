@@ -18,6 +18,8 @@ import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
+import org.mifos.feature.alerts.navigation.alertsGraph
+import org.mifos.feature.crypto.navigation.CoinDetailRoute
 import org.mifos.feature.crypto.navigation.cryptoGraph
 import org.mifos.feature.crypto.navigation.navigateToCrypto
 import org.mifos.feature.currencyrates.navigation.currencyRatesGraph
@@ -28,6 +30,7 @@ import org.mifos.feature.emicalculator.navigation.navigateToEmiCalculator
 import org.mifos.feature.settings.navigateToSettings
 import org.mifos.feature.settings.notificationDestination
 import org.mifos.feature.settings.settingsDestination
+import org.mifos.feature.watchlist.navigation.personalWatchlistDestination
 
 @Serializable
 internal data object AuthenticatedGraphRoute
@@ -62,5 +65,14 @@ internal fun NavGraphBuilder.authenticatedGraph(
         cryptoGraph(navController)
         currencyRatesGraph(navController)
         emiCalculatorDestination(onBackClick = navController::popBackStack)
+
+        // Personal watchlist (local-only — SubmitHandler showcase target)
+        personalWatchlistDestination(
+            onBackClick = navController::popBackStack,
+            onCoinClick = { coinId -> navController.navigate(CoinDetailRoute(coinId)) },
+        )
+
+        // Price alerts (DraftSubmitHandler showcase — offline-resilient form submit)
+        alertsGraph(navController)
     }
 }

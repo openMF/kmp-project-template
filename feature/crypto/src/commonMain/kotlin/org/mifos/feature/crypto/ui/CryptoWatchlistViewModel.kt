@@ -17,22 +17,34 @@ import template.core.base.ui.viewmodel.BaseViewModel
 
 class CryptoWatchlistViewModel(
     cryptoRepository: CryptoRepository,
-) : BaseViewModel<Unit, CryptoEvent, CryptoAction>(Unit) {
+) : BaseViewModel<Unit, Nothing, CryptoWatchlistAction>(Unit) {
 
     /**
      * Exposed for [template.core.base.ui.PagingScreenContent] which observes the stream
      * directly (state, hasMore, isLoadingMore, loadMoreError) and drives load-more.
+     * Paging state inherently spans multiple flows, so it stays as a field rather than
+     * being folded into the inherited [stateFlow].
      */
     val pagingStream: PagingScreenStream<CoinMarket> = cryptoRepository.coinMarketsStream(
         scope = viewModelScope,
         pageSize = 20,
     )
 
-    fun onRetry() = pagingStream.retry()
-    fun onRefresh() = pagingStream.refresh()
+    fun onRetry() {
+        trySendAction(CryptoWatchlistAction.Retry)
+    }
 
-    override fun handleAction(action: CryptoAction) {}
+    fun onRefresh() {
+        trySendAction(CryptoWatchlistAction.Refresh)
+    }
+
+    override fun handleAction(action: CryptoWatchlistAction) = when (action) {
+        CryptoWatchlistAction.Retry -> pagingStream.retry()
+        CryptoWatchlistAction.Refresh -> pagingStream.refresh()
+    }
 }
 
-sealed class CryptoAction
-sealed class CryptoEvent
+sealed interface CryptoWatchlistAction {
+    data object Retry : CryptoWatchlistAction
+    data object Refresh : CryptoWatchlistAction
+}

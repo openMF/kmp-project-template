@@ -35,6 +35,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.common.formatGrouped
+import org.mifos.feature.watchlist.ui.AddToWatchlistButton
 import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,6 +57,9 @@ fun CoinDetailScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
+                },
+                actions = {
+                    AddToWatchlistButton(coinId = coinId)
                 },
             )
         },

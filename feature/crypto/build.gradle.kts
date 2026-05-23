@@ -22,6 +22,8 @@ kotlin {
             implementation(projects.core.domain)
             // KptScaffold + rememberKptPullToRefreshState bridge live in core/ui
             implementation(projects.core.ui)
+            // CoinDetailScreen embeds AddToWatchlistButton from feature/watchlist
+            implementation(projects.feature.watchlist)
 
             implementation(compose.ui)
             implementation(compose.material3)

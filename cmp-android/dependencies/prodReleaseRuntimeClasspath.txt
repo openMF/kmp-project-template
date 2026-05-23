@@ -21,12 +21,14 @@
 :core:network
 :core:store
 :core:ui
+:feature:alerts
 :feature:crypto
 :feature:currency-rates
 :feature:emi-calculator
 :feature:home
 :feature:profile
 :feature:settings
+:feature:watchlist
 androidx.activity:activity-compose:1.12.2
 androidx.activity:activity-ktx:1.12.2
 androidx.activity:activity:1.12.2

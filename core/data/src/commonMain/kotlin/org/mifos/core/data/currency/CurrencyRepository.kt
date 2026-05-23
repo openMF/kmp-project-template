@@ -17,13 +17,7 @@ import org.mifos.core.model.currency.RateHistoryKey
 import template.core.base.store.screen.ScreenDataStream
 
 interface CurrencyRepository {
-    fun exchangeRatesStream(
-        baseCurrency: String,
-        scope: CoroutineScope,
-    ): ScreenDataStream<ExchangeRates>
+    fun exchangeRatesStream(baseCurrency: String, scope: CoroutineScope): ScreenDataStream<ExchangeRates>
 
-    fun rateHistoryStream(
-        keyFlow: Flow<RateHistoryKey>,
-        scope: CoroutineScope,
-    ): ScreenDataStream<RateHistory>
+    fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>
 }

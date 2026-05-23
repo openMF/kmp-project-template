@@ -20,10 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import org.mifos.core.ui.scaffold.KptScaffold
 
 @Composable
-internal fun NotificationScreen(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
-) {
+internal fun NotificationScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
     NotificationScreenContent(
         modifier = modifier,
         onBackClick = onBackClick,
@@ -31,10 +28,7 @@ internal fun NotificationScreen(
 }
 
 @Composable
-internal fun NotificationScreenContent(
-    modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
-) {
+internal fun NotificationScreenContent(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
     KptScaffold(
         onNavigationIconClick = onBackClick,
         title = "Notification",

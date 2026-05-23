@@ -23,10 +23,7 @@ fun NavController.navigateToPersonalWatchlist(navOptions: NavOptions? = null) {
     navigate(route = PersonalWatchlistRoute, navOptions = navOptions)
 }
 
-fun NavGraphBuilder.personalWatchlistDestination(
-    onBackClick: () -> Unit,
-    onCoinClick: (String) -> Unit,
-) {
+fun NavGraphBuilder.personalWatchlistDestination(onBackClick: () -> Unit, onCoinClick: (String) -> Unit) {
     composableWithPushTransitions<PersonalWatchlistRoute> {
         PersonalWatchlistScreen(
             onBackClick = onBackClick,

@@ -39,9 +39,7 @@ internal fun NavController.navigateToAuthenticatedGraph(navOptions: NavOptions? 
     navigate(route = AuthenticatedGraphRoute, navOptions = navOptions)
 }
 
-internal fun NavGraphBuilder.authenticatedGraph(
-    navController: NavController,
-) {
+internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
     navigation<AuthenticatedGraphRoute>(
         startDestination = AuthenticatedNavbarRoute,
     ) {

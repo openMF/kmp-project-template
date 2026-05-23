@@ -55,10 +55,7 @@ import org.mifos.feature.settings.generated.resources.feature_settings_theme
 import org.mifos.feature.settings.generated.resources.feature_settings_title
 
 @Composable
-fun SettingsDialog(
-    onDismiss: () -> Unit,
-    viewModel: SettingsViewmodel = koinViewModel(),
-) {
+fun SettingsDialog(onDismiss: () -> Unit, viewModel: SettingsViewmodel = koinViewModel()) {
     val settingsUiState by viewModel.settingsUiState.collectAsStateWithLifecycle()
     SettingsDialog(
         onDismiss = onDismiss,
@@ -193,10 +190,7 @@ private fun ColumnScope.SettingsPanel(
 }
 
 @Composable
-private fun SettingsDialogSectionTitle(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
+private fun SettingsDialogSectionTitle(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,

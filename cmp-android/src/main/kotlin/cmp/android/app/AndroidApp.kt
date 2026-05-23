@@ -80,15 +80,14 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
         }
     }
 
-    override fun newImageLoader(context: PlatformContext): ImageLoader =
-        getDefaultImageLoader(context)
-            .newBuilder()
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .diskCache {
-                DiskCache.Builder()
-                    .directory(context.cacheDir.resolve("image_cache"))
-                    .maxSizePercent(0.25)
-                    .build()
-            }
-            .build()
+    override fun newImageLoader(context: PlatformContext): ImageLoader = getDefaultImageLoader(context)
+        .newBuilder()
+        .diskCachePolicy(CachePolicy.ENABLED)
+        .diskCache {
+            DiskCache.Builder()
+                .directory(context.cacheDir.resolve("image_cache"))
+                .maxSizePercent(0.25)
+                .build()
+        }
+        .build()
 }

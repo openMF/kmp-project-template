@@ -28,16 +28,14 @@ class CurrencyRepositoryImpl(
     private val fetchedAtRepository: FetchedAtRepository,
 ) : CurrencyRepository {
 
-    override fun exchangeRatesStream(
-        baseCurrency: String,
-        scope: CoroutineScope,
-    ): ScreenDataStream<ExchangeRates> = exchangeRatesStore.asScreenStream(
-        key = baseCurrency,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
-        cacheKey = "currency:exchangeRates:$baseCurrency",
-        scope = scope,
-    )
+    override fun exchangeRatesStream(baseCurrency: String, scope: CoroutineScope): ScreenDataStream<ExchangeRates> =
+        exchangeRatesStore.asScreenStream(
+            key = baseCurrency,
+            networkMonitor = networkMonitor,
+            fetchedAtRepository = fetchedAtRepository,
+            cacheKey = "currency:exchangeRates:$baseCurrency",
+            scope = scope,
+        )
 
     override fun rateHistoryStream(
         keyFlow: Flow<RateHistoryKey>,

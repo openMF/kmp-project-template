@@ -42,9 +42,7 @@ class RootNavViewModel(
         }
     }
 
-    private fun handleUserStateUpdateReceive(
-        action: UserStateUpdateReceive,
-    ) {
+    private fun handleUserStateUpdateReceive(action: UserStateUpdateReceive) {
         val userData = action.userData
 
         // TODO:: Configure this based on the user state

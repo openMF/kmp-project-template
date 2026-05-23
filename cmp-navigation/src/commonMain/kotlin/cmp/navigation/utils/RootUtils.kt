@@ -23,5 +23,4 @@ fun <T : Any> T.toObjectNavigationRoute(): String = this::class.toObjectKClassNa
  * Gets the route string for a [KClass] of an object.
  */
 @OptIn(InternalSerializationApi::class)
-fun <T : Any> KClass<T>.toObjectKClassNavigationRoute(): String =
-    this.serializer().descriptor.serialName
+fun <T : Any> KClass<T>.toObjectKClassNavigationRoute(): String = this.serializer().descriptor.serialName

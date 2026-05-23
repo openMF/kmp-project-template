@@ -19,9 +19,7 @@ data object RootNavNavigation
 /**
  * Add the root navigation screen to the nav graph.
  */
-fun NavGraphBuilder.rootNavDestination(
-    onSplashScreenRemoved: () -> Unit,
-) {
+fun NavGraphBuilder.rootNavDestination(onSplashScreenRemoved: () -> Unit) {
     composable<RootNavNavigation> {
         RootNavScreen(onSplashScreenRemoved = onSplashScreenRemoved)
     }

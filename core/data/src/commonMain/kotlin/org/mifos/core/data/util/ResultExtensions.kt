@@ -81,43 +81,39 @@ fun <D> NetworkResult<D, *>.toDataState(): DataState<D> = when (this) {
  * existing data preserved in error state. Useful when you want to keep
  * showing previous data even when an error occurs.
  */
-fun <D> NetworkResult<D, *>.toDataState(existingData: D?): DataState<D> =
-    when (this) {
-        is NetworkResult.Success -> DataState.Success(data)
-        is NetworkResult.Error -> DataState.Error(error.toThrowable(), existingData)
-    }
+fun <D> NetworkResult<D, *>.toDataState(existingData: D?): DataState<D> = when (this) {
+    is NetworkResult.Success -> DataState.Success(data)
+    is NetworkResult.Error -> DataState.Error(error.toThrowable(), existingData)
+}
 
 /**
  * Smart conversion from org.mifos.corebase.network.NetworkResult to
  * DataState that maps certain RemoteErrors to more specific DataState
  * types.
  */
-fun <D> NetworkResult<D, *>.toDataStateWithMapping(): DataState<D> =
-    when (this) {
-        is NetworkResult.Success -> DataState.Success(data)
-        is NetworkResult.Error -> when (error) {
-            NetworkError.REQUEST_TIMEOUT -> DataState.NoNetwork(null)
-            else -> DataState.Error(error.toThrowable(), null)
-        }
+fun <D> NetworkResult<D, *>.toDataStateWithMapping(): DataState<D> = when (this) {
+    is NetworkResult.Success -> DataState.Success(data)
+    is NetworkResult.Error -> when (error) {
+        NetworkError.REQUEST_TIMEOUT -> DataState.NoNetwork(null)
+        else -> DataState.Error(error.toThrowable(), null)
     }
+}
 
 /** Smart conversion with existing data preserved. */
-fun <D> NetworkResult<D, *>.toDataStateWithMapping(existingData: D?): DataState<D> =
-    when (this) {
-        is NetworkResult.Success -> DataState.Success(data)
-        is NetworkResult.Error -> when (error) {
-            NetworkError.REQUEST_TIMEOUT -> DataState.NoNetwork(existingData)
-            else -> DataState.Error(error.toThrowable(), existingData)
-        }
+fun <D> NetworkResult<D, *>.toDataStateWithMapping(existingData: D?): DataState<D> = when (this) {
+    is NetworkResult.Success -> DataState.Success(data)
+    is NetworkResult.Error -> when (error) {
+        NetworkError.REQUEST_TIMEOUT -> DataState.NoNetwork(existingData)
+        else -> DataState.Error(error.toThrowable(), existingData)
     }
+}
 
 /**
  * Extension for Flow<org.mifos.corebase.network.NetworkResult> to convert
  * to Flow<DataState>
  */
-fun <D> Flow<NetworkResult<D, *>>.asDataStateFlow(): Flow<DataState<D>> =
-    map { it.toDataState() }
-        .onStart { emit(DataState.Loading) }
+fun <D> Flow<NetworkResult<D, *>>.asDataStateFlow(): Flow<DataState<D>> = map { it.toDataState() }
+    .onStart { emit(DataState.Loading) }
 
 /**
  * Extension for Flow<org.mifos.corebase.network.NetworkResult> with

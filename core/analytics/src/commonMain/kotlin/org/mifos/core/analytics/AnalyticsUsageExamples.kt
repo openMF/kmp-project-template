@@ -128,10 +128,7 @@ class MifosAnalyticsExample(private val analytics: AnalyticsHelper) {
 
 /** Example: Compose integration */
 @Composable
-fun ClientDetailsScreen(
-    clientId: String,
-    onNavigateBack: () -> Unit,
-) {
+fun ClientDetailsScreen(clientId: String, onNavigateBack: () -> Unit) {
     // Automatic screen tracking with business context
     TrackMifosScreen(
         screenName = "ClientDetails",

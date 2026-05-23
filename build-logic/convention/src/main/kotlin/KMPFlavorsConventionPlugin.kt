@@ -20,8 +20,10 @@
  *  See docs/FLAVORS_EXTENSION.md.
  * ================================================================================= */
 
+import com.android.build.api.dsl.CommonExtension
 import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import com.mobilebytelabs.kmpflavors.KmpFlavorPlugin
+import org.convention.configureFlavors
 import org.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -112,6 +114,26 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                 // Consumer extension hook — must be the LAST statement so the
                 // local file sees the fully-populated extension.
                 LocalFlavorsLoader.applyIfPresent(this, target)
+            }
+
+            // AGP-side registration for pure Android modules (e.g. cmp-android).
+            //
+            // KmpFlavorPlugin requires KotlinMultiplatformExtension. When that is not
+            // present (com.android.application modules without kotlin("multiplatform")),
+            // the plugin returns early and its built-in bridgeAgpProductFlavors never
+            // fires. We register the same demo/prod dimensions + flavors synchronously
+            // here via pluginManager.withPlugin so AGP receives them before variant
+            // resolution.
+            //
+            // For KMP library modules the plugin's own androidComponents.finalizeDsl
+            // bridge handles registration — configureFlavors() is idempotent and skips
+            // any flavor already present, so calling it here is safe for those modules
+            // too.
+            listOf("com.android.application", "com.android.library").forEach { agpId ->
+                pluginManager.withPlugin(agpId) {
+                    extensions.findByType(CommonExtension::class.java)
+                        ?.let { configureFlavors(it) }
+                }
             }
         }
     }

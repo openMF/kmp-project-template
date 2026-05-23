@@ -23,9 +23,7 @@ interface FrankfurterApi {
     }
 
     @GET("v1/latest")
-    suspend fun getLatestRates(
-        @Query("from") from: String,
-    ): ExchangeRatesDto
+    suspend fun getLatestRates(@Query("from") from: String): ExchangeRatesDto
 
     @GET("v1/{startDate}..{endDate}")
     suspend fun getHistoricalRates(

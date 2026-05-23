@@ -43,10 +43,7 @@ import template.core.base.analytics.TrackScreenView
 import template.core.base.analytics.rememberAnalyticsHelper
 
 @Composable
-internal fun SettingsScreen(
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun SettingsScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
     val analyticsHelper = rememberAnalyticsHelper()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
@@ -112,10 +109,7 @@ internal fun SettingsScreenContent(
 }
 
 @Composable
-internal fun ThemeCard(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun ThemeCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
     OutlinedCard(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(
@@ -149,10 +143,7 @@ internal fun ThemeCard(
 }
 
 @Composable
-internal fun LanguageCard(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun LanguageCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
     OutlinedCard(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(

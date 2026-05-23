@@ -149,11 +149,7 @@ fun SetPriceAlertScreen(
 }
 
 @Composable
-private fun SubmitStatusLine(
-    submit: SubmitState<*>,
-    onRetry: () -> Unit,
-    onDismiss: () -> Unit,
-) {
+private fun SubmitStatusLine(submit: SubmitState<*>, onRetry: () -> Unit, onDismiss: () -> Unit) {
     when (submit) {
         is SubmitState.Idle -> Unit
         is SubmitState.Submitting -> Text(

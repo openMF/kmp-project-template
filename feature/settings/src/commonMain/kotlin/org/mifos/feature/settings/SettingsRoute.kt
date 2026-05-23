@@ -21,15 +21,11 @@ data object SettingsRoute
 @Serializable
 data object NotificationRoute
 
-fun NavController.navigateToSettings(navOptions: NavOptions? = null) =
-    navigate(SettingsRoute, navOptions)
+fun NavController.navigateToSettings(navOptions: NavOptions? = null) = navigate(SettingsRoute, navOptions)
 
-fun NavController.navigateToNotification(navOptions: NavOptions? = null) =
-    navigate(NotificationRoute, navOptions)
+fun NavController.navigateToNotification(navOptions: NavOptions? = null) = navigate(NotificationRoute, navOptions)
 
-fun NavGraphBuilder.settingsDestination(
-    onBackClick: () -> Unit,
-) {
+fun NavGraphBuilder.settingsDestination(onBackClick: () -> Unit) {
     composableWithPushTransitions<SettingsRoute> {
         SettingsScreen(
             onBackClick = onBackClick,
@@ -37,9 +33,7 @@ fun NavGraphBuilder.settingsDestination(
     }
 }
 
-fun NavGraphBuilder.notificationDestination(
-    onBackClick: () -> Unit,
-) {
+fun NavGraphBuilder.notificationDestination(onBackClick: () -> Unit) {
     composableWithPushTransitions<NotificationRoute> {
         NotificationScreen(
             onBackClick = onBackClick,

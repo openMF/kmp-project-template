@@ -19,6 +19,7 @@ import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
 import org.mifos.feature.alerts.navigation.alertsGraph
+import org.mifos.feature.alerts.navigation.navigateToAlerts
 import org.mifos.feature.crypto.navigation.CoinDetailRoute
 import org.mifos.feature.crypto.navigation.cryptoGraph
 import org.mifos.feature.crypto.navigation.navigateToCrypto
@@ -30,6 +31,7 @@ import org.mifos.feature.emicalculator.navigation.navigateToEmiCalculator
 import org.mifos.feature.settings.navigateToSettings
 import org.mifos.feature.settings.notificationDestination
 import org.mifos.feature.settings.settingsDestination
+import org.mifos.feature.watchlist.navigation.navigateToPersonalWatchlist
 import org.mifos.feature.watchlist.navigation.personalWatchlistDestination
 
 @Serializable
@@ -49,6 +51,8 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             navigateToHistory = { navController.navigateToRateHistory() },
             navigateToCrypto = { navController.navigateToCrypto() },
             navigateToEmi = { navController.navigateToEmiCalculator() },
+            navigateToWatchlist = { navController.navigateToPersonalWatchlist() },
+            navigateToAlerts = { navController.navigateToAlerts() },
         )
 
         notificationDestination(

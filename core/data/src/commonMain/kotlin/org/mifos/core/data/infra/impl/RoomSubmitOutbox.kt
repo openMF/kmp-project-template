@@ -52,6 +52,25 @@ class RoomSubmitOutbox<P>(
         }
         val entity = DraftEntity(
             formKey = formKey,
+            uniqueKey = null,
+            payloadJson = json.encodeToString(serializer, payload),
+            status = SubmitOutboxStatus.PENDING.name,
+            createdAtMs = nowMs,
+            updatedAtMs = nowMs,
+        )
+        return dao.insert(entity)
+    }
+
+    override suspend fun saveByUniqueKey(formKey: String, uniqueKey: String, payload: P): Long {
+        val nowMs = currentTimeMillis()
+        val existing = dao.getPendingByUniqueKey(formKey, uniqueKey)
+        if (existing != null) {
+            dao.updatePayload(existing.id, json.encodeToString(serializer, payload), nowMs)
+            return existing.id
+        }
+        val entity = DraftEntity(
+            formKey = formKey,
+            uniqueKey = uniqueKey,
             payloadJson = json.encodeToString(serializer, payload),
             status = SubmitOutboxStatus.PENDING.name,
             createdAtMs = nowMs,
@@ -63,8 +82,17 @@ class RoomSubmitOutbox<P>(
     override suspend fun getPending(formKey: String): SubmitOutboxEntry<P>? =
         dao.getPendingByFormKey(formKey)?.toEntry()
 
+    override suspend fun getPendingByUniqueKey(formKey: String, uniqueKey: String): SubmitOutboxEntry<P>? =
+        dao.getPendingByUniqueKey(formKey, uniqueKey)?.toEntry()
+
     override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> =
         dao.observePendingByFormKey(formKey).map { it?.toEntry() }
+
+    override fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<SubmitOutboxEntry<P>?> =
+        dao.observePendingByUniqueKey(formKey, uniqueKey).map { it?.toEntry() }
+
+    override fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>> =
+        dao.observeAllByFormKey(formKey).map { rows -> rows.mapNotNull { it.toEntry() } }
 
     override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> = dao.getAllPending().mapNotNull { it.toEntry() }
 
@@ -76,6 +104,9 @@ class RoomSubmitOutbox<P>(
 
     override suspend fun deleteByFormKey(formKey: String) = dao.deleteByFormKey(formKey)
 
+    override suspend fun deleteByUniqueKey(formKey: String, uniqueKey: String) =
+        dao.deleteByUniqueKey(formKey, uniqueKey)
+
     override suspend fun deleteAll() = dao.deleteAll()
 
     private fun DraftEntity.toEntry(): SubmitOutboxEntry<P>? = runCatching {
@@ -85,6 +116,7 @@ class RoomSubmitOutbox<P>(
             payload = json.decodeFromString(serializer, payloadJson),
             status = SubmitOutboxStatus.valueOf(status),
             createdAtMs = createdAtMs,
+            uniqueKey = uniqueKey,
             errorMessage = errorMessage,
         )
     }.getOrNull()

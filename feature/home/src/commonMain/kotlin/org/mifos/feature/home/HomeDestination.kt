@@ -32,6 +32,8 @@ fun NavGraphBuilder.homeGraph(
     onNavigateToHistory: () -> Unit,
     onNavigateToCrypto: () -> Unit,
     onNavigateToEmi: () -> Unit,
+    onNavigateToWatchlist: () -> Unit,
+    onNavigateToAlerts: () -> Unit,
 ) {
     navigation<HomeDestination>(
         startDestination = HomeRoute,
@@ -43,6 +45,8 @@ fun NavGraphBuilder.homeGraph(
                 onNavigateToHistory = onNavigateToHistory,
                 onNavigateToCrypto = onNavigateToCrypto,
                 onNavigateToEmi = onNavigateToEmi,
+                onNavigateToWatchlist = onNavigateToWatchlist,
+                onNavigateToAlerts = onNavigateToAlerts,
             )
         }
     }

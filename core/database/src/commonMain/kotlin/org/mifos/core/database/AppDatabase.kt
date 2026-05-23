@@ -83,6 +83,9 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         AutoMigration(from = 4, to = 5),
         // v5 → v6: adds `personal_watchlist` for the user's private watchlist.
         AutoMigration(from = 5, to = 6),
+        // v6 → v7: adds nullable `uniqueKey` column to `framework_submit_drafts` for
+        // multi-pending drafts under one formKey (Portfolio Tracker, Bill Reminders, wizard steps).
+        AutoMigration(from = 6, to = 7),
     ],
 )
 @TypeConverters(ChargeTypeConverters::class, FintechTypeConverters::class)
@@ -100,7 +103,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val watchlistDao: WatchlistDao
 
     companion object {
-        const val VERSION = 6
+        const val VERSION = 7
         const val DATABASE_NAME = "mifos_database.db"
     }
 }

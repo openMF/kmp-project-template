@@ -21,8 +21,14 @@ import androidx.room3.PrimaryKey
  * @param id          Auto-generated surrogate key.
  * @param formKey     Consumer-defined identifier that groups drafts by screen/form type
  *                    (e.g. `"loan_application"`, `"client_registration"`). One pending draft
- *                    per formKey is the intended invariant — consumers are responsible for
- *                    enforcing uniqueness via [DraftDao.deleteByFormKey] before inserting.
+ *                    per (formKey, uniqueKey) pair is the intended invariant — consumers are
+ *                    responsible for enforcing uniqueness via [DraftDao.deleteByFormKey] or
+ *                    [DraftDao.deleteByUniqueKey] before inserting.
+ * @param uniqueKey   Optional sub-identifier within a form type. `null` means
+ *                    "the canonical/singleton draft for this form" (e.g. settings save,
+ *                    Personal Alert form). Non-null distinguishes one of many drafts under
+ *                    the same form type (e.g. Portfolio holding row, alert-per-coin) —
+ *                    enables N concurrent independent drafts under one `formKey`.
  * @param payloadJson Serialized form payload (JSON). The concrete type is opaque to the
  *                    framework; consumers encode/decode via kotlinx.serialization.
  * @param status      Lifecycle state — see [DraftStatus].
@@ -34,6 +40,7 @@ import androidx.room3.PrimaryKey
 data class DraftEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val formKey: String,
+    val uniqueKey: String? = null,
     val payloadJson: String,
     val status: String,
     val createdAtMs: Long,

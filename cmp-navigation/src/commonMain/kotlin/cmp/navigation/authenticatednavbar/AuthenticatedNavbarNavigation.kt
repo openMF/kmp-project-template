@@ -30,6 +30,8 @@ internal fun NavGraphBuilder.authenticatedNavbarGraph(
     navigateToHistory: () -> Unit,
     navigateToCrypto: () -> Unit,
     navigateToEmi: () -> Unit,
+    navigateToWatchlist: () -> Unit,
+    navigateToAlerts: () -> Unit,
 ) {
     composableWithStayTransitions<AuthenticatedNavbarRoute> {
         AuthenticatedNavbarNavigationScreen(
@@ -38,6 +40,8 @@ internal fun NavGraphBuilder.authenticatedNavbarGraph(
             navigateToHistory = navigateToHistory,
             navigateToCrypto = navigateToCrypto,
             navigateToEmi = navigateToEmi,
+            navigateToWatchlist = navigateToWatchlist,
+            navigateToAlerts = navigateToAlerts,
         )
     }
 }

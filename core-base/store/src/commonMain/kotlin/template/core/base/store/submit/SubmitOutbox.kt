@@ -25,20 +25,46 @@ import kotlinx.coroutines.flow.Flow
 interface SubmitOutbox<P> {
 
     /**
-     * Save [payload] as a PENDING draft under [formKey].
+     * Save [payload] as the singleton PENDING draft under [formKey].
      *
-     * If a PENDING draft already exists for [formKey], this method updates it in-place and
-     * returns its existing id (idempotent upsert — no duplicate rows).
+     * If a PENDING draft already exists for [formKey] with `uniqueKey IS NULL`, this method
+     * updates it in-place and returns its existing id (idempotent upsert — no duplicate rows).
+     *
+     * Use [saveByUniqueKey] when a screen needs N concurrent independent drafts under one
+     * `formKey` (e.g. Portfolio Tracker per-holding, Bill Reminders per-bill).
      *
      * @return The surrogate id of the upserted row, useful for subsequent status updates.
      */
     suspend fun save(formKey: String, payload: P): Long
 
-    /** Retrieve the current PENDING entry for [formKey], or `null` if none. */
+    /**
+     * Multi-pending companion to [save]. Saves [payload] as a PENDING draft scoped on
+     * `(formKey, uniqueKey)`. N concurrent drafts can coexist under one [formKey] as long as
+     * each carries a distinct [uniqueKey] (e.g. `loan_id`, `bill_id`, wizard `"step_N"`).
+     *
+     * If a PENDING draft already exists for the exact `(formKey, uniqueKey)` pair, this method
+     * updates it in-place — preserves single-pending-per-(formKey, uniqueKey) semantics.
+     */
+    suspend fun saveByUniqueKey(formKey: String, uniqueKey: String, payload: P): Long
+
+    /** Retrieve the current singleton PENDING entry for [formKey], or `null` if none. */
     suspend fun getPending(formKey: String): SubmitOutboxEntry<P>?
 
-    /** Hot flow that emits the current PENDING entry whenever it changes. */
+    /** Retrieve the PENDING entry for a specific `(formKey, uniqueKey)` pair, or `null` if none. */
+    suspend fun getPendingByUniqueKey(formKey: String, uniqueKey: String): SubmitOutboxEntry<P>?
+
+    /** Hot flow that emits the current singleton PENDING entry whenever it changes. */
     fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?>
+
+    /** Streaming variant of [getPendingByUniqueKey]. */
+    fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<SubmitOutboxEntry<P>?>
+
+    /**
+     * Observes ALL non-terminal drafts (PENDING / RETRYING / FAILED) for [formKey], ordered
+     * newest-first. Used by feature UIs that need to display "N drafts pending sync" across
+     * multiple uniqueKeys (e.g. Portfolio: "3 holdings pending").
+     */
+    fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>>
 
     /** All entries currently in PENDING status (excludes RETRYING) — used by [OfflineSubmitSyncer]. */
     suspend fun getAllPending(): List<SubmitOutboxEntry<P>>
@@ -55,6 +81,12 @@ interface SubmitOutbox<P> {
     /** Delete all drafts for [formKey] (e.g. on screen close or after successful submit). */
     suspend fun deleteByFormKey(formKey: String)
 
+    /**
+     * Delete a single `(formKey, uniqueKey)` row. Use after a multi-pending draft successfully
+     * submits. Does NOT affect the singleton draft (uniqueKey IS NULL) under the same [formKey].
+     */
+    suspend fun deleteByUniqueKey(formKey: String, uniqueKey: String)
+
     /** Delete every draft — called from [StoreCacheManager.clearAll] on logout. */
     suspend fun deleteAll()
 }
@@ -64,6 +96,10 @@ interface SubmitOutbox<P> {
  *
  * @param id        Surrogate row id from the database.
  * @param formKey   Consumer-defined screen/form identifier.
+ * @param uniqueKey Sub-identifier within [formKey]. `null` = singleton draft (legacy [save]);
+ *                  non-null = one of N concurrent drafts under one form type (via
+ *                  [SubmitOutbox.saveByUniqueKey]). Surfaced here so [SubmitOutbox.getAllPending]
+ *                  consumers (notably [OfflineSubmitSyncer]) can re-route the retry per uniqueKey.
  * @param payload   Decoded payload (already deserialized by the concrete [SubmitOutbox]).
  * @param status    Current lifecycle state.
  * @param createdAtMs Epoch millis when the draft was first saved.
@@ -75,6 +111,7 @@ data class SubmitOutboxEntry<out P>(
     val payload: P,
     val status: SubmitOutboxStatus,
     val createdAtMs: Long,
+    val uniqueKey: String? = null,
     val errorMessage: String? = null,
 )
 

@@ -31,11 +31,47 @@ interface DraftDao {
     @Query("SELECT * FROM framework_submit_drafts WHERE id = :id")
     suspend fun getById(id: Long): DraftEntity?
 
-    @Query("SELECT * FROM framework_submit_drafts WHERE formKey = :formKey AND status = 'PENDING' LIMIT 1")
+    @Query(
+        "SELECT * FROM framework_submit_drafts " +
+            "WHERE formKey = :formKey AND uniqueKey IS NULL AND status = 'PENDING' LIMIT 1",
+    )
     suspend fun getPendingByFormKey(formKey: String): DraftEntity?
 
-    @Query("SELECT * FROM framework_submit_drafts WHERE formKey = :formKey AND status = 'PENDING' LIMIT 1")
+    @Query(
+        "SELECT * FROM framework_submit_drafts " +
+            "WHERE formKey = :formKey AND uniqueKey IS NULL AND status = 'PENDING' LIMIT 1",
+    )
     fun observePendingByFormKey(formKey: String): Flow<DraftEntity?>
+
+    /**
+     * Multi-pending companion to [getPendingByFormKey]. Reads the PENDING draft for a specific
+     * `(formKey, uniqueKey)` pair — N concurrent independent drafts can coexist under one
+     * `formKey` when each carries a distinct `uniqueKey` (e.g. `loan_id`, `bill_id`, wizard step).
+     */
+    @Query(
+        "SELECT * FROM framework_submit_drafts " +
+            "WHERE formKey = :formKey AND uniqueKey = :uniqueKey AND status = 'PENDING' LIMIT 1",
+    )
+    suspend fun getPendingByUniqueKey(formKey: String, uniqueKey: String): DraftEntity?
+
+    /** Streaming variant of [getPendingByUniqueKey]. */
+    @Query(
+        "SELECT * FROM framework_submit_drafts " +
+            "WHERE formKey = :formKey AND uniqueKey = :uniqueKey AND status = 'PENDING' LIMIT 1",
+    )
+    fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<DraftEntity?>
+
+    /**
+     * Observes ALL non-terminal drafts (PENDING / RETRYING / FAILED) for a `formKey`, ordered
+     * newest-first by `createdAtMs`. Includes singleton drafts (uniqueKey IS NULL) and all
+     * multi-pending rows. Used by feature UIs that need to display "N drafts pending sync".
+     */
+    @Query(
+        "SELECT * FROM framework_submit_drafts " +
+            "WHERE formKey = :formKey AND status IN ('PENDING','RETRYING','FAILED') " +
+            "ORDER BY createdAtMs DESC",
+    )
+    fun observeAllByFormKey(formKey: String): Flow<List<DraftEntity>>
 
     @Query("SELECT * FROM framework_submit_drafts WHERE status = 'PENDING'")
     suspend fun getAllPending(): List<DraftEntity>
@@ -57,6 +93,14 @@ interface DraftDao {
 
     @Query("DELETE FROM framework_submit_drafts WHERE formKey = :formKey")
     suspend fun deleteByFormKey(formKey: String)
+
+    /**
+     * Deletes a single `(formKey, uniqueKey)` row. Use after a multi-pending draft
+     * successfully submits (paired with [getPendingByUniqueKey]). Does NOT affect the
+     * singleton draft (uniqueKey IS NULL) under the same `formKey`.
+     */
+    @Query("DELETE FROM framework_submit_drafts WHERE formKey = :formKey AND uniqueKey = :uniqueKey")
+    suspend fun deleteByUniqueKey(formKey: String, uniqueKey: String)
 
     @Query("DELETE FROM framework_submit_drafts")
     suspend fun deleteAll()

@@ -62,16 +62,27 @@ import template.core.base.store.error.categorize
  * fun onDismissDraftPrompt() = draftHandler.discardDraft()       // user-prompted mode only
  * ```
  *
+ * **Multi-pending drafts (optional [uniqueKey]):**
+ * When N concurrent independent drafts must coexist under one [formKey] (e.g. Portfolio
+ * Tracker per-holding, Bill Reminders per-bill, wizard per-step), pass a distinct
+ * [uniqueKey] per handler instance. The handler then routes through
+ * [SubmitOutbox.saveByUniqueKey] / [SubmitOutbox.deleteByUniqueKey] so drafts don't
+ * overwrite each other. `uniqueKey = null` (default) preserves the legacy singleton
+ * semantics — one PENDING draft per [formKey].
+ *
  * @param P             Serializable payload type (the data collected by the form).
  * @param R             Result type returned by the server on success.
  * @param autoSaveDraft When true, saves to outbox silently on network failure.
  *   When false (default), the UI must show [DraftSavePrompt] and call [saveDraft].
+ * @param uniqueKey     Optional sub-identifier within [formKey]. `null` = singleton mode
+ *   (existing behavior). Non-null = multi-pending mode — one draft per `(formKey, uniqueKey)`.
  */
 class DraftSubmitHandler<P, R>(
     private val scope: CoroutineScope,
     private val outbox: SubmitOutbox<P>,
     private val formKey: String,
     private val autoSaveDraft: Boolean = false,
+    private val uniqueKey: String? = null,
 ) {
     private val _state = MutableStateFlow<SubmitState<R>>(SubmitState.Idle)
 
@@ -120,7 +131,7 @@ class DraftSubmitHandler<P, R>(
     fun saveDraft() {
         val payload = lastPayload ?: return
         scope.launch {
-            val draftId = outbox.save(formKey, payload)
+            val draftId = persistDraft(payload)
             lastDraftId = draftId
             val current = _state.value
             if (current is SubmitState.Failed) {
@@ -128,6 +139,18 @@ class DraftSubmitHandler<P, R>(
             }
         }
     }
+
+    /**
+     * Routes the upsert through the right outbox API: [SubmitOutbox.saveByUniqueKey] in
+     * multi-pending mode, [SubmitOutbox.save] in singleton mode. Defined once so the two
+     * call sites (user-prompted [saveDraft] + silent auto-save inside [execute]) stay aligned.
+     */
+    private suspend fun persistDraft(payload: P): Long =
+        if (uniqueKey != null) {
+            outbox.saveByUniqueKey(formKey, uniqueKey, payload)
+        } else {
+            outbox.save(formKey, payload)
+        }
 
     /**
      * Discards the in-memory payload and returns to [SubmitState.Idle] without saving to outbox.
@@ -167,7 +190,7 @@ class DraftSubmitHandler<P, R>(
             } catch (e: Exception) {
                 val category = categorize(e)
                 if (autoSaveDraft && category == ErrorCategory.Network) {
-                    val draftId = outbox.save(formKey, payload)
+                    val draftId = persistDraft(payload)
                     lastDraftId = draftId
                     SubmitState.Failed(error = e, category = category, draftSaved = true)
                 } else {
@@ -201,4 +224,5 @@ fun <P, R> CoroutineScope.draftSubmitHandler(
     outbox: SubmitOutbox<P>,
     formKey: String,
     autoSaveDraft: Boolean = false,
-): DraftSubmitHandler<P, R> = DraftSubmitHandler(this, outbox, formKey, autoSaveDraft)
+    uniqueKey: String? = null,
+): DraftSubmitHandler<P, R> = DraftSubmitHandler(this, outbox, formKey, autoSaveDraft, uniqueKey)

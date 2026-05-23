@@ -18,6 +18,12 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.common)
+            implementation(projects.core.data)
+            implementation(projects.core.model)
+            implementation(projects.core.ui)
+            implementation(projects.coreBase.store)
+
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)

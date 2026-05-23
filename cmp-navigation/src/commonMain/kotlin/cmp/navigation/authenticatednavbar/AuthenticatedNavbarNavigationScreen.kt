@@ -57,6 +57,8 @@ internal fun AuthenticatedNavbarNavigationScreen(
     navigateToHistory: () -> Unit,
     navigateToCrypto: () -> Unit,
     navigateToEmi: () -> Unit,
+    navigateToWatchlist: () -> Unit,
+    navigateToAlerts: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberKptNavController(
         name = "AuthenticatedNavbarScreen",
@@ -109,6 +111,8 @@ internal fun AuthenticatedNavbarNavigationScreen(
         navigateToHistory = navigateToHistory,
         navigateToCrypto = navigateToCrypto,
         navigateToEmi = navigateToEmi,
+        navigateToWatchlist = navigateToWatchlist,
+        navigateToAlerts = navigateToAlerts,
         onAction = remember(viewModel) {
             { viewModel.trySendAction(it) }
         },
@@ -123,6 +127,8 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
     navigateToHistory: () -> Unit,
     navigateToCrypto: () -> Unit,
     navigateToEmi: () -> Unit,
+    navigateToWatchlist: () -> Unit,
+    navigateToAlerts: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
@@ -178,6 +184,8 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                 onNavigateToHistory = navigateToHistory,
                 onNavigateToCrypto = navigateToCrypto,
                 onNavigateToEmi = navigateToEmi,
+                onNavigateToWatchlist = navigateToWatchlist,
+                onNavigateToAlerts = navigateToAlerts,
             )
 
             profileDestination()

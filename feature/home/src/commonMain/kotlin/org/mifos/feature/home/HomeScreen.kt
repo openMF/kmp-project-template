@@ -26,7 +26,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CurrencyExchange
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,6 +48,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.common.formatGrouped
+import org.mifos.core.data.watchlist.WatchlistItem
+import org.mifos.core.model.alerts.AlertDirection
+import org.mifos.core.model.alerts.PriceAlert
 import org.mifos.feature.home.ui.HomeAction
 import org.mifos.feature.home.ui.HomeViewModel
 import template.core.base.store.screen.ScreenState
@@ -59,6 +64,8 @@ internal fun HomeScreen(
     onNavigateToHistory: () -> Unit,
     onNavigateToCrypto: () -> Unit,
     onNavigateToEmi: () -> Unit,
+    onNavigateToWatchlist: () -> Unit,
+    onNavigateToAlerts: () -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -100,9 +107,18 @@ internal fun HomeScreen(
                 onSeeAll = onNavigateToRates,
             )
 
+            WatchlistPreviewCard(
+                state = state.watchlistPreview,
+                onSeeAll = onNavigateToWatchlist,
+            )
+
+            ActiveAlertsCard(
+                state = state.activeAlerts,
+                onSeeAll = onNavigateToAlerts,
+            )
+
             // Navigation cards — preserved from the original menu so existing
-            // features stay discoverable. Sub-plans 03/04 will add Watchlist
-            // and Alerts cards to the widget section above when their data is on dev.
+            // features stay discoverable alongside the 4 live widgets above.
             Text(
                 text = "Quick access",
                 style = MaterialTheme.typography.titleMedium,
@@ -254,7 +270,165 @@ private fun ExchangeRateCard(
 }
 
 @Composable
-private fun FeatureCard(title: String, subtitle: String, icon: ImageVector, onClick: () -> Unit) {
+private fun WatchlistPreviewCard(
+    state: ScreenState<List<WatchlistItem>>,
+    onSeeAll: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = "My Watchlist",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+                Text(
+                    text = "See all",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable(onClick = onSeeAll),
+                )
+            }
+            Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
+                // Local-only stream — no error path; onRetry is a no-op.
+                ScreenContent(
+                    state = state,
+                    onRetry = {},
+                    modifier = Modifier.fillMaxSize(),
+                    empty = { WidgetEmpty("Tap the star on any coin to add it.") },
+                ) { items, _ ->
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        items.take(3).forEach { item ->
+                            Text(
+                                text = item.coinId,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActiveAlertsCard(
+    state: ScreenState<List<PriceAlert>>,
+    onSeeAll: () -> Unit,
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.NotificationsActive,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = "Active Alerts",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+                Text(
+                    text = "See all",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable(onClick = onSeeAll),
+                )
+            }
+            Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
+                // Local committed-alerts stream — no error path; onRetry is a no-op.
+                ScreenContent(
+                    state = state,
+                    onRetry = {},
+                    modifier = Modifier.fillMaxSize(),
+                    empty = { WidgetEmpty("No alerts yet. Open Alerts to create one.") },
+                ) { alerts, _ ->
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        alerts.take(3).forEach { alert ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    text = alert.coinId,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                Text(
+                                    text = formatAlertSummary(alert),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WidgetEmpty(message: String) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+private fun formatAlertSummary(alert: PriceAlert): String {
+    val arrow = when (alert.direction) {
+        AlertDirection.ABOVE -> "↑"
+        AlertDirection.BELOW -> "↓"
+        AlertDirection.PCT_CHANGE -> "Δ"
+    }
+    val value = when (alert.direction) {
+        AlertDirection.PCT_CHANGE -> "${alert.targetValue.formatDecimal(2)}%"
+        else -> "$${alert.targetValue.formatGrouped(2)}"
+    }
+    return "$arrow $value"
+}
+
+@Composable
+private fun FeatureCard(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

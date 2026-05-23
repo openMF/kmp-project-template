@@ -30,6 +30,7 @@ import org.mifos.core.common.formatGrouped
 import org.mifos.core.model.crypto.CoinMarket
 import org.mifos.core.ui.scaffold.KptScaffold
 import org.mifos.core.ui.scaffold.rememberKptPullToRefreshState
+import org.mifos.feature.watchlist.ui.AddToWatchlistButton
 import template.core.base.ui.paging.PagingScreenContent
 
 @Composable
@@ -71,7 +72,7 @@ private fun CoinItem(coin: CoinMarket, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(start = 16.dp, end = 4.dp, top = 4.dp, bottom = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -98,5 +99,6 @@ private fun CoinItem(coin: CoinMarket, onClick: () -> Unit) {
                 },
             )
         }
+        AddToWatchlistButton(coinId = coin.id)
     }
 }

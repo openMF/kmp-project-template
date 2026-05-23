@@ -18,6 +18,7 @@ import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
+import org.mifos.feature.alerts.navigation.alertsGraph
 import org.mifos.feature.crypto.navigation.CoinDetailRoute
 import org.mifos.feature.crypto.navigation.cryptoGraph
 import org.mifos.feature.crypto.navigation.navigateToCrypto
@@ -70,5 +71,8 @@ internal fun NavGraphBuilder.authenticatedGraph(
             onBackClick = navController::popBackStack,
             onCoinClick = { coinId -> navController.navigate(CoinDetailRoute(coinId)) },
         )
+
+        // Price alerts (DraftSubmitHandler showcase — offline-resilient form submit)
+        alertsGraph(navController)
     }
 }

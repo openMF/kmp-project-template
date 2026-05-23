@@ -18,6 +18,7 @@ import org.mifos.core.data.di.DataModule
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.store.di.appStoreModule
+import org.mifos.feature.alerts.di.AlertsModule
 import org.mifos.feature.crypto.di.CryptoModule
 import org.mifos.feature.currencyrates.di.CurrencyRatesModule
 import org.mifos.feature.emicalculator.di.EmiCalculatorModule
@@ -54,6 +55,7 @@ object KoinModules {
             HomeModule,
             SettingsModule,
             WatchlistModule,
+            AlertsModule,
         )
     }
 

@@ -21,13 +21,24 @@ kotlin {
             implementation(projects.core.common)
             implementation(projects.core.data)
             implementation(projects.core.model)
+            implementation(projects.core.store)
             implementation(projects.core.ui)
             implementation(projects.coreBase.store)
+            implementation(projects.coreBase.ui)
 
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)
             implementation(compose.materialIconsExtended)
+
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
         }
     }
 }

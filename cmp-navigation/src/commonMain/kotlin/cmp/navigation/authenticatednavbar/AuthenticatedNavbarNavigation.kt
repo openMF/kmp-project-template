@@ -26,22 +26,32 @@ internal fun NavController.navigateToAuthenticatedNavBar(navOptions: NavOptions?
 
 internal fun NavGraphBuilder.authenticatedNavbarGraph(
     navigateToSettingsScreen: () -> Unit,
+    navigateToLoans: () -> Unit,
+    navigateToBills: () -> Unit,
     navigateToRates: () -> Unit,
-    navigateToHistory: () -> Unit,
-    navigateToCrypto: () -> Unit,
+    navigateToExchangeRates: () -> Unit,
+    navigateToRateHistory: () -> Unit,
+    navigateToMacro: () -> Unit,
     navigateToEmi: () -> Unit,
-    navigateToWatchlist: () -> Unit,
-    navigateToAlerts: () -> Unit,
+    navigateToAffordability: () -> Unit,
+    navigateToAmortization: () -> Unit,
+    navigateToLoanComparison: () -> Unit,
+    navigateToLoanCalcWizard: () -> Unit,
 ) {
     composableWithStayTransitions<AuthenticatedNavbarRoute> {
         AuthenticatedNavbarNavigationScreen(
             navigateToSettingsScreen = navigateToSettingsScreen,
+            navigateToLoans = navigateToLoans,
+            navigateToBills = navigateToBills,
             navigateToRates = navigateToRates,
-            navigateToHistory = navigateToHistory,
-            navigateToCrypto = navigateToCrypto,
+            navigateToExchangeRates = navigateToExchangeRates,
+            navigateToRateHistory = navigateToRateHistory,
+            navigateToMacro = navigateToMacro,
             navigateToEmi = navigateToEmi,
-            navigateToWatchlist = navigateToWatchlist,
-            navigateToAlerts = navigateToAlerts,
+            navigateToAffordability = navigateToAffordability,
+            navigateToAmortization = navigateToAmortization,
+            navigateToLoanComparison = navigateToLoanComparison,
+            navigateToLoanCalcWizard = navigateToLoanCalcWizard,
         )
     }
 }

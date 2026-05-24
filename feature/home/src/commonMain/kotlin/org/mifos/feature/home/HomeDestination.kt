@@ -28,12 +28,17 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.homeGraph(
     onSettingsClick: () -> Unit,
+    onNavigateToLoans: () -> Unit,
+    onNavigateToBills: () -> Unit,
     onNavigateToRates: () -> Unit,
-    onNavigateToHistory: () -> Unit,
-    onNavigateToCrypto: () -> Unit,
+    onNavigateToExchangeRates: () -> Unit,
+    onNavigateToRateHistory: () -> Unit,
+    onNavigateToMacro: () -> Unit,
     onNavigateToEmi: () -> Unit,
-    onNavigateToWatchlist: () -> Unit,
-    onNavigateToAlerts: () -> Unit,
+    onNavigateToAffordability: () -> Unit,
+    onNavigateToAmortization: () -> Unit,
+    onNavigateToLoanComparison: () -> Unit,
+    onNavigateToLoanCalcWizard: () -> Unit,
 ) {
     navigation<HomeDestination>(
         startDestination = HomeRoute,
@@ -41,12 +46,17 @@ fun NavGraphBuilder.homeGraph(
         composableWithStayTransitions<HomeRoute> {
             HomeScreen(
                 onSettingsClick = onSettingsClick,
+                onNavigateToLoans = onNavigateToLoans,
+                onNavigateToBills = onNavigateToBills,
                 onNavigateToRates = onNavigateToRates,
-                onNavigateToHistory = onNavigateToHistory,
-                onNavigateToCrypto = onNavigateToCrypto,
+                onNavigateToExchangeRates = onNavigateToExchangeRates,
+                onNavigateToRateHistory = onNavigateToRateHistory,
+                onNavigateToMacro = onNavigateToMacro,
                 onNavigateToEmi = onNavigateToEmi,
-                onNavigateToWatchlist = onNavigateToWatchlist,
-                onNavigateToAlerts = onNavigateToAlerts,
+                onNavigateToAffordability = onNavigateToAffordability,
+                onNavigateToAmortization = onNavigateToAmortization,
+                onNavigateToLoanComparison = onNavigateToLoanComparison,
+                onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
             )
         }
     }

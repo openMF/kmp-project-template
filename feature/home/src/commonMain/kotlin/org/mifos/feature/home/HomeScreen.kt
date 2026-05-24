@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Mifos Initiative
+ * Copyright 2026 Mifos Initiative
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,13 +23,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ShowChart
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Compare
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -48,11 +52,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.common.formatGrouped
-import org.mifos.core.data.watchlist.WatchlistItem
-import org.mifos.core.model.alerts.AlertDirection
-import org.mifos.core.model.alerts.PriceAlert
+import org.mifos.core.model.banking.BillReminder
 import org.mifos.feature.home.ui.HomeAction
 import org.mifos.feature.home.ui.HomeViewModel
+import org.mifos.feature.home.ui.LoansSummary
+import org.mifos.feature.home.ui.RatesQuickView
 import template.core.base.store.screen.ScreenState
 import template.core.base.ui.screen.ScreenContent
 
@@ -60,12 +64,17 @@ import template.core.base.ui.screen.ScreenContent
 @Composable
 internal fun HomeScreen(
     onSettingsClick: () -> Unit,
+    onNavigateToLoans: () -> Unit,
+    onNavigateToBills: () -> Unit,
     onNavigateToRates: () -> Unit,
-    onNavigateToHistory: () -> Unit,
-    onNavigateToCrypto: () -> Unit,
+    onNavigateToExchangeRates: () -> Unit,
+    onNavigateToRateHistory: () -> Unit,
+    onNavigateToMacro: () -> Unit,
     onNavigateToEmi: () -> Unit,
-    onNavigateToWatchlist: () -> Unit,
-    onNavigateToAlerts: () -> Unit,
+    onNavigateToAffordability: () -> Unit,
+    onNavigateToAmortization: () -> Unit,
+    onNavigateToLoanComparison: () -> Unit,
+    onNavigateToLoanCalcWizard: () -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -73,7 +82,7 @@ internal fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Fintech Demo") },
+                title = { Text("Money Toolkit") },
                 actions = {
                     IconButton(onClick = onSettingsClick) {
                         Icon(
@@ -95,58 +104,81 @@ internal fun HomeScreen(
         ) {
             // Live widgets — combine showcase. Each card observes a slice of
             // HomeUiState and renders its own per-card ScreenState transitions.
-            TopMoversCard(
-                state = state.topMovers,
-                onRetry = { viewModel.trySendAction(HomeAction.RetryTopMovers) },
-                onSeeAll = onNavigateToCrypto,
+            LoansSummaryCard(
+                state = state.loans,
+                onSeeAll = onNavigateToLoans,
+            )
+
+            UpcomingBillsCard(
+                state = state.bills,
+                onSeeAll = onNavigateToBills,
+            )
+
+            RatesQuickCard(
+                state = state.rates,
+                onRetry = { viewModel.trySendAction(HomeAction.RetryRates) },
+                onSeeAll = onNavigateToRates,
             )
 
             ExchangeRateCard(
                 state = state.exchangeRate,
                 onRetry = { viewModel.trySendAction(HomeAction.RetryExchangeRate) },
-                onSeeAll = onNavigateToRates,
+                onSeeAll = onNavigateToExchangeRates,
             )
 
-            WatchlistPreviewCard(
-                state = state.watchlistPreview,
-                onSeeAll = onNavigateToWatchlist,
-            )
-
-            ActiveAlertsCard(
-                state = state.activeAlerts,
-                onSeeAll = onNavigateToAlerts,
-            )
-
-            // Navigation cards — preserved from the original menu so existing
-            // features stay discoverable alongside the 4 live widgets above.
+            // Quick access — the rest of the toolkit at one tap.
             Text(
                 text = "Quick access",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(top = 8.dp),
             )
             FeatureCard(
+                title = "EMI Calculator",
+                subtitle = "Compute monthly EMI for any loan",
+                icon = Icons.Default.Calculate,
+                onClick = onNavigateToEmi,
+            )
+            FeatureCard(
+                title = "Affordability",
+                subtitle = "How much loan can I afford?",
+                icon = Icons.Default.Savings,
+                onClick = onNavigateToAffordability,
+            )
+            FeatureCard(
+                title = "Amortization",
+                subtitle = "Full payment schedule per loan",
+                icon = Icons.AutoMirrored.Default.TrendingUp,
+                onClick = onNavigateToAmortization,
+            )
+            FeatureCard(
+                title = "Compare Loans",
+                subtitle = "Side-by-side total cost analysis",
+                icon = Icons.Default.Compare,
+                onClick = onNavigateToLoanComparison,
+            )
+            FeatureCard(
+                title = "Loan Wizard",
+                subtitle = "Step-by-step affordability planner",
+                icon = Icons.Default.Tune,
+                onClick = onNavigateToLoanCalcWizard,
+            )
+            FeatureCard(
                 title = "Currency Rates",
-                subtitle = "Store + Search filter + emptyIfContent",
+                subtitle = "Live exchange rates by base currency",
                 icon = Icons.Default.CurrencyExchange,
-                onClick = onNavigateToRates,
+                onClick = onNavigateToExchangeRates,
             )
             FeatureCard(
                 title = "Rate History",
-                subtitle = "Dynamic key flow + auto-refresh",
-                icon = Icons.Default.Timeline,
-                onClick = onNavigateToHistory,
+                subtitle = "Historical FX charts",
+                icon = Icons.AutoMirrored.Default.ReceiptLong,
+                onClick = onNavigateToRateHistory,
             )
             FeatureCard(
-                title = "Crypto Watchlist",
-                subtitle = "PagingScreenStream + infinite scroll",
-                icon = Icons.AutoMirrored.Default.ShowChart,
-                onClick = onNavigateToCrypto,
-            )
-            FeatureCard(
-                title = "EMI Calculator",
-                subtitle = "Pure local state (no Store)",
-                icon = Icons.Default.Calculate,
-                onClick = onNavigateToEmi,
+                title = "Country Macro",
+                subtitle = "GDP, CPI, unemployment by country",
+                icon = Icons.Default.Public,
+                onClick = onNavigateToMacro,
             )
 
             Spacer(Modifier.height(16.dp))
@@ -155,56 +187,112 @@ internal fun HomeScreen(
 }
 
 @Composable
-private fun TopMoversCard(state: ScreenState<List<*>>, onRetry: () -> Unit, onSeeAll: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Top Movers", style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = "See all",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable(onClick = onSeeAll),
-                )
+private fun LoansSummaryCard(
+    state: ScreenState<LoansSummary>,
+    onSeeAll: () -> Unit,
+) {
+    WidgetCard(
+        title = "My Loans",
+        icon = Icons.Default.AccountBalance,
+        onSeeAll = onSeeAll,
+    ) {
+        Box(modifier = Modifier.fillMaxWidth().height(96.dp)) {
+            ScreenContent(
+                state = state,
+                onRetry = {},
+                modifier = Modifier.fillMaxSize(),
+                empty = { WidgetEmpty("Track your first loan — tap See all.") },
+            ) { summary, _ ->
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SummaryRow(
+                        label = "Monthly EMI",
+                        value = "$${summary.totalMonthlyEmi.formatGrouped(2)}",
+                    )
+                    SummaryRow(
+                        label = "Outstanding",
+                        value = "$${summary.totalOutstanding.formatGrouped(2)}",
+                    )
+                    SummaryRow(
+                        label = "Active loans",
+                        value = summary.count.toString(),
+                    )
+                }
             }
-            Box(modifier = Modifier.fillMaxWidth().height(120.dp)) {
-                ScreenContent(
-                    state = state,
-                    onRetry = onRetry,
-                    modifier = Modifier.fillMaxSize(),
-                ) { items, _ ->
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        items.take(5).forEach { rawItem ->
-                            val coin = rawItem as? org.mifos.core.model.crypto.CoinMarket
-                                ?: return@forEach
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Text(
-                                    text = "${coin.symbol.uppercase()}  ${coin.name}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                                val pct = coin.priceChangePercent24h.formatDecimal(2)
-                                Text(
-                                    text = "$pct%",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = if (coin.priceChangePercent24h >= 0) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.error
-                                    },
-                                )
-                            }
+        }
+    }
+}
+
+@Composable
+private fun UpcomingBillsCard(
+    state: ScreenState<List<BillReminder>>,
+    onSeeAll: () -> Unit,
+) {
+    WidgetCard(
+        title = "Upcoming Bills",
+        icon = Icons.Default.NotificationsActive,
+        onSeeAll = onSeeAll,
+    ) {
+        Box(modifier = Modifier.fillMaxWidth().height(120.dp)) {
+            ScreenContent(
+                state = state,
+                onRetry = {},
+                modifier = Modifier.fillMaxSize(),
+                empty = { WidgetEmpty("No bills due in the next 7 days.") },
+            ) { bills, _ ->
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    val total = bills.sumOf { it.amount }
+                    SummaryRow(
+                        label = "Total due (next 7d)",
+                        value = "$${total.formatGrouped(2)}",
+                    )
+                    bills.take(BILLS_PREVIEW_LIMIT).forEach { bill ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = bill.name,
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Text(
+                                text = "Day ${bill.dueDay}  ·  $${bill.amount.formatGrouped(2)}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RatesQuickCard(
+    state: ScreenState<RatesQuickView>,
+    onRetry: () -> Unit,
+    onSeeAll: () -> Unit,
+) {
+    WidgetCard(
+        title = "Today's Rates",
+        icon = Icons.AutoMirrored.Default.TrendingUp,
+        onSeeAll = onSeeAll,
+    ) {
+        Box(modifier = Modifier.fillMaxWidth().height(96.dp)) {
+            ScreenContent(
+                state = state,
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxSize(),
+            ) { rates, _ ->
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    SummaryRow(
+                        label = "Federal Funds",
+                        value = "${rates.fedFundsPercent.formatDecimal(2)}%",
+                    )
+                    SummaryRow(
+                        label = "30Y Mortgage",
+                        value = "${rates.mortgage30YPercent.formatDecimal(2)}%",
+                    )
                 }
             }
         }
@@ -217,51 +305,25 @@ private fun ExchangeRateCard(
     onRetry: () -> Unit,
     onSeeAll: () -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "USD Exchange",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = "See all",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable(onClick = onSeeAll),
-                )
-            }
-            Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
-                ScreenContent(
-                    state = state,
-                    onRetry = onRetry,
-                    modifier = Modifier.fillMaxSize(),
-                ) { rates, _ ->
-                    val keyRates = listOf("EUR", "GBP", "INR")
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        keyRates.forEach { code ->
-                            val value = rates.rates[code] ?: return@forEach
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Text(
-                                    text = "USD → $code",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                                Text(
-                                    text = value.formatGrouped(4),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                            }
-                        }
+    WidgetCard(
+        title = "USD Exchange",
+        icon = Icons.Default.CurrencyExchange,
+        onSeeAll = onSeeAll,
+    ) {
+        Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
+            ScreenContent(
+                state = state,
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxSize(),
+            ) { rates, _ ->
+                val keyRates = listOf("EUR", "GBP", "INR")
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    keyRates.forEach { code ->
+                        val value = rates.rates[code] ?: return@forEach
+                        SummaryRow(
+                            label = "USD → $code",
+                            value = value.formatGrouped(4),
+                        )
                     }
                 }
             }
@@ -270,9 +332,11 @@ private fun ExchangeRateCard(
 }
 
 @Composable
-private fun WatchlistPreviewCard(
-    state: ScreenState<List<WatchlistItem>>,
+private fun WidgetCard(
+    title: String,
+    icon: ImageVector,
     onSeeAll: () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -289,12 +353,12 @@ private fun WatchlistPreviewCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Star,
+                        imageVector = icon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                     )
                     Text(
-                        text = "My Watchlist",
+                        text = title,
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }
@@ -305,93 +369,19 @@ private fun WatchlistPreviewCard(
                     modifier = Modifier.clickable(onClick = onSeeAll),
                 )
             }
-            Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
-                // Local-only stream — no error path; onRetry is a no-op.
-                ScreenContent(
-                    state = state,
-                    onRetry = {},
-                    modifier = Modifier.fillMaxSize(),
-                    empty = { WidgetEmpty("Tap the star on any coin to add it.") },
-                ) { items, _ ->
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        items.take(3).forEach { item ->
-                            Text(
-                                text = item.coinId,
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        }
-                    }
-                }
-            }
+            content()
         }
     }
 }
 
 @Composable
-private fun ActiveAlertsCard(
-    state: ScreenState<List<PriceAlert>>,
-    onSeeAll: () -> Unit,
-) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.NotificationsActive,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                    Text(
-                        text = "Active Alerts",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                }
-                Text(
-                    text = "See all",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.clickable(onClick = onSeeAll),
-                )
-            }
-            Box(modifier = Modifier.fillMaxWidth().height(100.dp)) {
-                // Local committed-alerts stream — no error path; onRetry is a no-op.
-                ScreenContent(
-                    state = state,
-                    onRetry = {},
-                    modifier = Modifier.fillMaxSize(),
-                    empty = { WidgetEmpty("No alerts yet. Open Alerts to create one.") },
-                ) { alerts, _ ->
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        alerts.take(3).forEach { alert ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Text(
-                                    text = alert.coinId,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                                Text(
-                                    text = formatAlertSummary(alert),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
+private fun SummaryRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Text(text = value, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
@@ -407,19 +397,6 @@ private fun WidgetEmpty(message: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-}
-
-private fun formatAlertSummary(alert: PriceAlert): String {
-    val arrow = when (alert.direction) {
-        AlertDirection.ABOVE -> "↑"
-        AlertDirection.BELOW -> "↓"
-        AlertDirection.PCT_CHANGE -> "Δ"
-    }
-    val value = when (alert.direction) {
-        AlertDirection.PCT_CHANGE -> "${alert.targetValue.formatDecimal(2)}%"
-        else -> "$${alert.targetValue.formatGrouped(2)}"
-    }
-    return "$arrow $value"
 }
 
 @Composable
@@ -456,3 +433,5 @@ private fun FeatureCard(
         }
     }
 }
+
+private const val BILLS_PREVIEW_LIMIT = 3

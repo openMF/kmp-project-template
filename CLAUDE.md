@@ -103,6 +103,34 @@ kmp-project-template/
 
 ---
 
+## First-time Fork Setup
+
+After cloning, before running the toolkit's economic-data screens (B7 Interest
+Rate Tracker, B8 Country Macro Snapshot), copy `.env.local.example` to
+`.env.local` and fill in fork-specific values:
+
+```bash
+cp .env.local.example .env.local
+# Edit .env.local — add your FRED API key
+```
+
+**FRED (Federal Reserve Economic Data)** — free developer key required:
+
+1. Sign up: https://fred.stlouisfed.org/docs/api/api_key.html (30 seconds)
+2. Paste the key into `.env.local` as `FRED_API_KEY=...`
+3. Wire it into Koin in your fork's app module:
+   ```kotlin
+   single { FredApiConfig(apiKey = System.getenv("FRED_API_KEY")) }
+   ```
+   (Or load via BuildKonfig / Gradle property — whichever your fork prefers.)
+
+Leave the key blank and the FRED-backed screens render an explicit "FRED key
+not configured" empty state rather than crashing.
+
+**World Bank Open Data** — no setup. Fully open API.
+
+---
+
 ## Development Workflow
 
 ### 1. Initial Setup

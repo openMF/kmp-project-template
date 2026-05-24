@@ -14,10 +14,17 @@ import org.koin.dsl.module
 import org.mifos.core.network.client.FintechApiClient
 import org.mifos.core.network.crypto.api.CoinGeckoApi
 import org.mifos.core.network.currency.api.FrankfurterApi
+import org.mifos.core.network.economic.api.FredApi
+import org.mifos.core.network.economic.api.WorldBankApi
+import org.mifos.core.network.economic.config.FredApiConfig
 import template.core.base.network.httpClient
 import template.core.base.network.setupDefaultHttpClient
 
 val NetworkModule = module {
+
+    // Default FRED config — not configured. Forks override this single() in
+    // their own DI module to thread in the actual key (BuildKonfig / env / etc.).
+    single<FredApiConfig> { FredApiConfig.Unconfigured }
 
     single {
         FintechApiClient(
@@ -41,9 +48,31 @@ val NetworkModule = module {
                     ),
                 )
                 .build(),
+            fredKtorfit = Ktorfit.Builder()
+                .httpClient(
+                    client = httpClient(
+                        setupDefaultHttpClient(
+                            baseUrl = FredApi.BASE_URL,
+                            loggableHosts = listOf("api.stlouisfed.org"),
+                        ),
+                    ),
+                )
+                .build(),
+            worldBankKtorfit = Ktorfit.Builder()
+                .httpClient(
+                    client = httpClient(
+                        setupDefaultHttpClient(
+                            baseUrl = WorldBankApi.BASE_URL,
+                            loggableHosts = listOf("api.worldbank.org"),
+                        ),
+                    ),
+                )
+                .build(),
         )
     }
 
     single<FrankfurterApi> { get<FintechApiClient>().frankfurterApi }
     single<CoinGeckoApi> { get<FintechApiClient>().coinGeckoApi }
+    single<FredApi> { get<FintechApiClient>().fredApi }
+    single<WorldBankApi> { get<FintechApiClient>().worldBankApi }
 }

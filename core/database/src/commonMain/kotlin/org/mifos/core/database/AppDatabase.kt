@@ -15,6 +15,11 @@ import androidx.room3.Database
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
 import androidx.room3.TypeConverters
+import org.mifos.core.database.banking.converter.BankingTypeConverters
+import org.mifos.core.database.banking.dao.BillReminderDao
+import org.mifos.core.database.banking.dao.LoanDao
+import org.mifos.core.database.banking.entity.BillReminderEntity
+import org.mifos.core.database.banking.entity.LoanEntity
 import org.mifos.core.database.crypto.converter.FintechTypeConverters
 import org.mifos.core.database.crypto.dao.CoinDetailDao
 import org.mifos.core.database.crypto.dao.CoinMarketDao
@@ -73,6 +78,8 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         FetchedAtEntity::class,
         DraftEntity::class,
         WatchlistEntity::class,
+        LoanEntity::class,
+        BillReminderEntity::class,
     ],
     version = AppDatabase.VERSION,
     exportSchema = true,
@@ -86,9 +93,18 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         // v6 → v7: adds nullable `uniqueKey` column to `framework_submit_drafts` for
         // multi-pending drafts under one formKey (Portfolio Tracker, Bill Reminders, wizard steps).
         AutoMigration(from = 6, to = 7),
+        // v7 → v8: purely additive — creates `banking_loans` and `banking_bill_reminders`
+        // for the local-only Loan Tracker (B1) and Bill Reminders (B4) features.
+        // No existing schema modifications, so Room's auto-migration trivially generates
+        // `CREATE TABLE IF NOT EXISTS …` statements; existing rows are untouched.
+        AutoMigration(from = 7, to = 8),
     ],
 )
-@TypeConverters(ChargeTypeConverters::class, FintechTypeConverters::class)
+@TypeConverters(
+    ChargeTypeConverters::class,
+    FintechTypeConverters::class,
+    BankingTypeConverters::class,
+)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -101,9 +117,11 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val fetchedAtDao: FetchedAtDao
     abstract val draftDao: DraftDao
     abstract val watchlistDao: WatchlistDao
+    abstract val loanDao: LoanDao
+    abstract val billReminderDao: BillReminderDao
 
     companion object {
-        const val VERSION = 7
+        const val VERSION = 8
         const val DATABASE_NAME = "mifos_database.db"
     }
 }

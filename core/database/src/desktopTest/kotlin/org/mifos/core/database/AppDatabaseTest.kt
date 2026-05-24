@@ -48,9 +48,11 @@ class AppDatabaseTest {
 
     @Test
     fun databaseVersionIsCurrent() {
-        // Bumped to 5 in the v4→v5 schema migration. Update this constant when
-        // bumping AppDatabase.VERSION so this guardrail stays meaningful.
-        assertEquals(5, AppDatabase.VERSION)
+        // Bumped to 8 in the v7→v8 migration that added the banking domain
+        // tables (`banking_loans`, `banking_bill_reminders`). Update this
+        // constant when bumping AppDatabase.VERSION so the guardrail stays
+        // meaningful.
+        assertEquals(8, AppDatabase.VERSION)
     }
 
     @Test

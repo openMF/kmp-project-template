@@ -16,6 +16,8 @@ import org.mifos.core.store.crypto.impl.provideCoinDetailStore
 import org.mifos.core.store.crypto.impl.provideCoinMarketsStore
 import org.mifos.core.store.currency.impl.provideExchangeRatesStore
 import org.mifos.core.store.currency.impl.provideRateHistoryStore
+import org.mifos.core.store.economic.impl.provideInterestRateSeriesStore
+import org.mifos.core.store.economic.impl.provideMacroIndicatorStore
 import org.mifos.core.store.infra.StoreCacheManager
 import org.mifos.core.store.infra.impl.StoreCacheManagerImpl
 
@@ -48,6 +50,14 @@ val appStoreModule: Module = module {
     single(AppStoreRegistry.CoinMarkets) { provideCoinMarketsStore(get(), get(), get()) }
     single(AppStoreRegistry.CoinDetail) { provideCoinDetailStore(get(), get(), get()) }
 
+    // Economic Stores (Banking Utility Toolkit — FRED + World Bank)
+    single(AppStoreRegistry.InterestRateSeries) {
+        provideInterestRateSeriesStore(get(), get(), get())
+    }
+    single(AppStoreRegistry.MacroIndicator) {
+        provideMacroIndicatorStore(get(), get())
+    }
+
     // Register fintech feature stores for logout cache clearing
     single(createdAtStart = true) {
         val mgr = get<StoreCacheManager>() as StoreCacheManagerImpl
@@ -55,5 +65,7 @@ val appStoreModule: Module = module {
         mgr.register(get(AppStoreRegistry.RateHistory))
         mgr.register(get(AppStoreRegistry.CoinMarkets))
         mgr.register(get(AppStoreRegistry.CoinDetail))
+        mgr.register(get(AppStoreRegistry.InterestRateSeries))
+        mgr.register(get(AppStoreRegistry.MacroIndicator))
     }
 }

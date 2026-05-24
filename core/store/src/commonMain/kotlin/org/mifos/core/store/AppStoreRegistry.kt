@@ -10,6 +10,7 @@
 package org.mifos.core.store
 
 import template.core.base.store.infra.StoreRegistry
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
@@ -47,11 +48,22 @@ object AppStoreRegistry : StoreRegistry() {
     val CoinMarkets = store("coinMarkets")
     val CoinDetail = store("coinDetail")
 
+    // Banking Utility Toolkit — economic data
+    val InterestRateSeries = store("interestRateSeries")
+    val MacroIndicator = store("macroIndicator")
+
     /** TTL durations — financial data has different freshness requirements. */
     object Ttl {
         val EXCHANGE_RATES = 5.minutes
         val RATE_HISTORY = 1.hours
         val COIN_MARKETS = 2.minutes
         val COIN_DETAIL = 5.minutes
+
+        // Banking Utility Toolkit
+        /** FRED publishes daily; 24h freshness window matches their cadence. */
+        val INTEREST_RATE_SERIES = 24.hours
+
+        /** World Bank publishes annually; 7 days is conservatively fresh. */
+        val MACRO_INDICATOR = 7.days
     }
 }

@@ -14,12 +14,20 @@ import org.mifos.core.network.crypto.api.CoinGeckoApi
 import org.mifos.core.network.crypto.api.createCoinGeckoApi
 import org.mifos.core.network.currency.api.FrankfurterApi
 import org.mifos.core.network.currency.api.createFrankfurterApi
+import org.mifos.core.network.economic.api.FredApi
+import org.mifos.core.network.economic.api.WorldBankApi
+import org.mifos.core.network.economic.api.createFredApi
+import org.mifos.core.network.economic.api.createWorldBankApi
 
 /** Multi-domain API aggregator. Consumer apps replace this with their own client. */
 class FintechApiClient(
     frankfurterKtorfit: Ktorfit,
     coinGeckoKtorfit: Ktorfit,
+    fredKtorfit: Ktorfit,
+    worldBankKtorfit: Ktorfit,
 ) {
     val frankfurterApi: FrankfurterApi by lazy { frankfurterKtorfit.createFrankfurterApi() }
     val coinGeckoApi: CoinGeckoApi by lazy { coinGeckoKtorfit.createCoinGeckoApi() }
+    val fredApi: FredApi by lazy { fredKtorfit.createFredApi() }
+    val worldBankApi: WorldBankApi by lazy { worldBankKtorfit.createWorldBankApi() }
 }

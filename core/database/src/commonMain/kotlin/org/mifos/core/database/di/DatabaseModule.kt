@@ -46,6 +46,8 @@ val DatabaseModule = module {
     single { get<AppDatabase>().coinDetailDao }
     single { get<AppDatabase>().rateHistoryDao }
     single { get<AppDatabase>().bookkeeperDao }
+    single { get<AppDatabase>().loanDao }
+    single { get<AppDatabase>().billReminderDao }
 }
 
 /**

@@ -73,6 +73,41 @@ class ScreenDataStream<T> internal constructor(
 }
 
 /**
+ * Test-only constructor for [ScreenDataStream]. Lets feature-module unit tests
+ * stitch a [state] flow + an externally-observable [refreshTrigger] into a real
+ * [ScreenDataStream] instance, without granting feature modules access to the
+ * primary [internal] constructor.
+ *
+ * The framework's own tests use [FakeScreenDataStream] (a higher-level fake);
+ * cross-module consumers should reach for this when they need bespoke routing
+ * (per-key fakes, multi-stream dashboards) that doesn't fit the FakeScreenDataStream
+ * single-buffer shape. Returned instance is fully usable production-side — there
+ * is no internal "test mode" flag.
+ *
+ * Marked `ExperimentalScreenDataStreamTestingApi` so feature modules opt-in
+ * explicitly, signalling test-only intent in the call site.
+ */
+@RequiresOptIn(
+    level = RequiresOptIn.Level.WARNING,
+    message = "This API is for unit tests of ScreenDataStream consumers only. " +
+        "Do not call from production code.",
+)
+@Retention(AnnotationRetention.BINARY)
+annotation class ExperimentalScreenDataStreamTestingApi
+
+/**
+ * Construct a [ScreenDataStream] from an arbitrary [state] flow and a caller-owned
+ * [refreshTrigger]. The trigger is what [ScreenDataStream.refresh] / .retry() will
+ * emit to — tests can subscribe to it to assert refresh dispatch behavior without
+ * touching the framework's internals.
+ */
+@ExperimentalScreenDataStreamTestingApi
+fun <T> screenDataStreamForTesting(
+    state: Flow<ScreenState<T>>,
+    refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
+): ScreenDataStream<T> = ScreenDataStream(state = state, refreshTrigger = refreshTrigger)
+
+/**
  * Creates a [ScreenDataStream] from this Store, fusing network state via cmp-network-monitor.
  *
  * Features:

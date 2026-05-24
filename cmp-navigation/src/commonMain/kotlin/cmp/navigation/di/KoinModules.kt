@@ -19,10 +19,15 @@ import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.store.di.appStoreModule
 import org.mifos.feature.alerts.di.AlertsModule
+import org.mifos.feature.bills.di.BillsModule
+import org.mifos.feature.calculators.di.CalculatorsModule
 import org.mifos.feature.crypto.di.CryptoModule
 import org.mifos.feature.currencyrates.di.CurrencyRatesModule
 import org.mifos.feature.emicalculator.di.EmiCalculatorModule
 import org.mifos.feature.home.di.HomeModule
+import org.mifos.feature.loans.di.LoansModule
+import org.mifos.feature.macro.di.MacroModule
+import org.mifos.feature.rates.di.RatesModule
 import org.mifos.feature.settings.SettingsModule
 import org.mifos.feature.watchlist.di.WatchlistModule
 import template.core.base.analytics.di.analyticsModule
@@ -56,6 +61,11 @@ object KoinModules {
             SettingsModule,
             WatchlistModule,
             AlertsModule,
+            BillsModule,
+            LoansModule,
+            RatesModule,
+            CalculatorsModule,
+            MacroModule,
         )
     }
 

@@ -20,6 +20,8 @@ import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
 import org.mifos.feature.alerts.navigation.alertsGraph
 import org.mifos.feature.alerts.navigation.navigateToAlerts
+import org.mifos.feature.bills.navigation.billsGraph
+import org.mifos.feature.calculators.navigation.calculatorsGraph
 import org.mifos.feature.crypto.navigation.CoinDetailRoute
 import org.mifos.feature.crypto.navigation.cryptoGraph
 import org.mifos.feature.crypto.navigation.navigateToCrypto
@@ -28,6 +30,9 @@ import org.mifos.feature.currencyrates.navigation.navigateToCurrencyRates
 import org.mifos.feature.currencyrates.navigation.navigateToRateHistory
 import org.mifos.feature.emicalculator.navigation.emiCalculatorDestination
 import org.mifos.feature.emicalculator.navigation.navigateToEmiCalculator
+import org.mifos.feature.loans.navigation.loansGraph
+import org.mifos.feature.macro.navigation.macroGraph
+import org.mifos.feature.rates.navigation.ratesGraph
 import org.mifos.feature.settings.navigateToSettings
 import org.mifos.feature.settings.notificationDestination
 import org.mifos.feature.settings.settingsDestination
@@ -76,5 +81,12 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
 
         // Price alerts (DraftSubmitHandler showcase — offline-resilient form submit)
         alertsGraph(navController)
+
+        // Banking utility toolkit — local-only personal tools
+        loansGraph(navController) // B1 — multi-formKey draft showcase
+        billsGraph(navController) // B4 — multi-formKey + platform notification scheduler
+        calculatorsGraph(navController) // B2/B3/B5/B6 — affordability + amortization + comparison + wizard
+        ratesGraph(navController) // B7 — CACHE_THEN_NETWORK rate tracker
+        macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
     }
 }

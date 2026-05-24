@@ -1963,6 +1963,7 @@
 |    |    |    |    |    |    +--- io.insert-koin:koin-annotations:2.1.0 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0 (*)
 |    |    |    |    |    |    +--- project :core:common (*)
+|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
 |    |    |    |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    |    |    |    +--- project :core-base:security
 |    |    |    |    |    |    +--- androidx.security:security-crypto:1.1.0-alpha06

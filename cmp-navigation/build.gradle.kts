@@ -37,6 +37,11 @@ kotlin {
             implementation(projects.feature.settings)
             implementation(projects.feature.watchlist)
             implementation(projects.feature.alerts)
+            implementation(projects.feature.bills)
+            implementation(projects.feature.loans)
+            implementation(projects.feature.rates)
+            implementation(projects.feature.calculators)
+            implementation(projects.feature.macro)
 
             //put your multiplatform dependencies here
             implementation(compose.material3)

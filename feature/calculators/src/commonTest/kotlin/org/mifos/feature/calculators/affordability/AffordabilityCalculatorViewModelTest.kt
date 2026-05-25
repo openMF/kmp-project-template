@@ -9,7 +9,6 @@
  */
 package org.mifos.feature.calculators.affordability
 
-import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

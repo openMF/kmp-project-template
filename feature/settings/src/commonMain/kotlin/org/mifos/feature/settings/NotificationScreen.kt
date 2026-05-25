@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.ui.scaffold.KptScaffold
 
@@ -56,7 +55,7 @@ internal fun NotificationScreenContent(modifier: Modifier = Modifier, onBackClic
                     verticalArrangement = Arrangement.spacedBy(sp.sm),
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Notifications,
+                        imageVector = AppIcons.OutlinedNotifications,
                         contentDescription = null,
                         modifier = Modifier.padding(sp.sm),
                     )

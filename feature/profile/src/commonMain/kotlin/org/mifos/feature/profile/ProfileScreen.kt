@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.ui.scaffold.KptScaffold
 
@@ -53,7 +52,7 @@ internal fun ProfileScreenContent(modifier: Modifier = Modifier) {
                     verticalArrangement = Arrangement.spacedBy(sp.sm),
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.AccountCircle,
+                        imageVector = AppIcons.AccountCircle,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                     )

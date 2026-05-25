@@ -55,6 +55,10 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
         }
+
+        commonTest.dependencies {
+            implementation(libs.kotlinx.serialization.core)
+        }
     }
 }
 

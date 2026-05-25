@@ -126,4 +126,3 @@ internal fun LoanRowCard(
         }
     }
 }
-

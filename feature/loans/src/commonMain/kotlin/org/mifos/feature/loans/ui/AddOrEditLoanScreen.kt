@@ -25,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -50,6 +49,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.mifos.core.designsystem.component.AmountDisplay
+import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.model.banking.LoanKind
 import template.core.base.store.submit.SubmitState
 
@@ -291,29 +292,17 @@ private fun DateField(
 
 @Composable
 private fun ComputedPreviewCard(monthlyEmi: Double, totalInterest: Double) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Text(text = "Computed preview", style = MaterialTheme.typography.titleSmall)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text("Monthly EMI", style = MaterialTheme.typography.bodyMedium)
-                Text(formatMoney(monthlyEmi), style = MaterialTheme.typography.bodyMedium)
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text("Total interest", style = MaterialTheme.typography.bodyMedium)
-                Text(formatMoney(totalInterest), style = MaterialTheme.typography.bodyMedium)
-            }
-        }
+    HeroCard {
+        AmountDisplay(
+            amountText = formatMoney(monthlyEmi),
+            label = "Monthly EMI",
+            supporting = {
+                Text(
+                    text = "Total interest: ${formatMoney(totalInterest)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+        )
     }
 }
 

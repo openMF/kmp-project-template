@@ -11,7 +11,6 @@ package org.mifos.feature.bills.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -245,18 +244,7 @@ private fun shortDueLabel(diff: Int): String = when {
     diff == 1 -> "Tomorrow"
     diff in 2..30 -> "Due in ${diff}d"
     diff < 0 -> "Overdue"
-    else -> "Day ${diff}"
-}
-
-private fun dueRelativeLabel(dueDay: Int, todayDay: Int): String {
-    val diff = dueDay - todayDay
-    return when {
-        diff == 0 -> "Due today"
-        diff == 1 -> "Due tomorrow"
-        diff in 2..30 -> "Due in $diff days"
-        diff < 0 -> "Overdue (day $dueDay)"
-        else -> "Day $dueDay"
-    }
+    else -> "Day $diff"
 }
 
 private fun formatCurrency(value: Double): String {

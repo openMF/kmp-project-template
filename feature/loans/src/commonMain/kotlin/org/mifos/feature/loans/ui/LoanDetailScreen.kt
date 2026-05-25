@@ -22,10 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,10 +40,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.mifos.core.designsystem.component.AmountDisplay
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.component.StatusChip
+import org.mifos.core.designsystem.component.StatusChipIntent
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.Loan
 import template.core.base.ui.screen.ScreenContent
 
@@ -118,44 +120,61 @@ private fun LoanDetailContent(
     onAmortizationClick: () -> Unit,
     onDeleteClick: () -> Unit,
 ) {
+    val sp = MaterialTheme.spacing
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(sp.lg),
+        verticalArrangement = Arrangement.spacedBy(sp.md),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(sp.md),
+        ) {
             Text(
                 text = loan.name,
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.weight(1f),
             )
-            AssistChip(
-                onClick = {},
-                label = { Text(loanKindLabel(loan.kind)) },
-                colors = AssistChipDefaults.assistChipColors(),
+            StatusChip(
+                text = loanKindLabel(loan.kind),
+                intent = StatusChipIntent.Info,
             )
         }
 
-        Card(modifier = Modifier.fillMaxWidth()) {
+        HeroCard {
+            AmountDisplay(
+                amountText = formatMoney(loan.principalRemaining),
+                label = "Principal remaining",
+                supporting = {
+                    Text(
+                        text = "${loan.monthsRemaining} months remaining",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                },
+            )
+        }
+
+        AppCard {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                    .padding(sp.md),
+                verticalArrangement = Arrangement.spacedBy(sp.md),
             ) {
-                MetricRow(label = "Principal remaining", value = formatMoney(loan.principalRemaining))
                 MetricRow(label = "Original principal", value = formatMoney(loan.principal))
                 MetricRow(label = "Monthly payment (EMI)", value = formatMoney(loan.monthlyPayment))
+                MetricRow(label = "Total paid to date", value = formatMoney(loan.totalPaid))
                 MetricRow(label = "Annual rate", value = "${loan.annualRatePercent}%")
                 MetricRow(label = "Next due date", value = loan.nextDueDate.toString())
                 MetricRow(label = "Tenure", value = "${loan.tenureMonths} months")
-                MetricRow(label = "Months remaining", value = "${loan.monthsRemaining}")
-                MetricRow(label = "Total paid to date", value = formatMoney(loan.totalPaid))
+
+                Spacer(modifier = Modifier.height(sp.xs))
 
                 val progress = tenureProgress(loan)
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(sp.xs)) {
                     Text(
                         text = "Tenure progress",
                         style = MaterialTheme.typography.bodyMedium,
@@ -175,22 +194,19 @@ private fun LoanDetailContent(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(sp.sm),
         ) {
             Button(onClick = onEditClick, modifier = Modifier.weight(1f)) {
                 Text("Edit")
             }
             OutlinedButton(onClick = onAmortizationClick, modifier = Modifier.weight(1f)) {
-                // TODO(banking-utility-toolkit-06): wire to Amortization Schedule screen once
-                //  sub-plan 06 ships. This button stays present as a UX affordance even
-                //  before the destination exists.
                 Text("Schedule")
             }
             OutlinedButton(onClick = onDeleteClick, modifier = Modifier.weight(1f)) {
                 Text("Delete")
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(sp.sm))
     }
 }
 

@@ -33,9 +33,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.theme.finance
 
-/** Direction of a rate / price / metric change relative to the prior period. */
-enum class RateDirection { Up, Down, Flat }
-
 /**
  * Compact rate-change indicator — directional icon + percentage / delta text, both colored
  * from [MaterialTheme.finance] (rateUp / rateDown / rateFlat). Renders inside a tinted

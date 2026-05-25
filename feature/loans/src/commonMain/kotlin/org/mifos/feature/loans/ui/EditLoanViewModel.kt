@@ -165,9 +165,7 @@ class EditLoanViewModel(
 
     /** Local commit. With the syncer wired, this also runs during offline-draft replay. */
     override suspend fun performSubmit(payload: Loan): Loan {
-        println("DBG_SaveLoan VM.performSubmit START | id=${payload.id} name=${payload.name} principal=${payload.principal}")
         repository.upsert(payload)
-        println("DBG_SaveLoan VM.performSubmit DONE | id=${payload.id}")
         return payload
     }
 

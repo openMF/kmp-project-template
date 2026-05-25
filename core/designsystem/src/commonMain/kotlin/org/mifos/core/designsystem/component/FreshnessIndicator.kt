@@ -33,9 +33,6 @@ import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.theme.finance
 import org.mifos.core.designsystem.theme.motion
 
-/** Data-recency state from Store5 / cache layer. */
-enum class FreshnessState { Fresh, Stale, Updating, Offline }
-
 /**
  * Tiny dot + label showing how fresh the displayed data is. Useful inline below
  * dashboard amounts or next to list headers so users understand whether they're

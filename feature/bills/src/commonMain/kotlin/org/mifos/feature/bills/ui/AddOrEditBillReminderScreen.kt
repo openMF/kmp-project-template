@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.BillCategory
 import org.mifos.core.model.banking.Recurrence
 import template.core.base.store.submit.SubmitState
@@ -84,6 +86,8 @@ fun AddOrEditBillReminderScreen(
             )
         },
     ) { padding ->
+        val sp = MaterialTheme.spacing
+        val isSubmitting = submit is SubmitState.Submitting
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -91,102 +95,36 @@ fun AddOrEditBillReminderScreen(
                 .verticalScroll(rememberScrollState())
                 .imePadding()
                 .navigationBarsPadding()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(sp.lg),
+            verticalArrangement = Arrangement.spacedBy(sp.md),
         ) {
-            OutlinedTextField(
-                value = form.name,
-                onValueChange = viewModel::onNameChange,
-                label = { Text("Name (e.g. Electricity)") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = submit !is SubmitState.Submitting,
+            BasicInfoSection(
+                form = form,
+                isSubmitting = isSubmitting,
+                onNameChange = viewModel::onNameChange,
+                onAmountChange = viewModel::onAmountChange,
+                onDueDayChange = viewModel::onDueDayChange,
             )
 
-            OutlinedTextField(
-                value = if (form.amount == 0.0) "" else form.amount.toString(),
-                onValueChange = { value -> viewModel.onAmountChange(value.toDoubleOrNull() ?: 0.0) },
-                label = { Text("Amount") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = submit !is SubmitState.Submitting,
+            RecurrenceSection(
+                selected = form.recurrence,
+                isSubmitting = isSubmitting,
+                onChange = viewModel::onRecurrenceChange,
             )
 
-            OutlinedTextField(
-                value = form.dueDay.toString(),
-                onValueChange = { value -> viewModel.onDueDayChange(value.toIntOrNull() ?: 1) },
-                label = { Text("Due day of month (1-31)") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = submit !is SubmitState.Submitting,
+            CategorySection(
+                selected = form.category,
+                isSubmitting = isSubmitting,
+                onChange = viewModel::onCategoryChange,
             )
 
-            Text("Recurrence", style = MaterialTheme.typography.titleSmall)
-            Recurrence.entries.forEach { rec ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = form.recurrence == rec,
-                            onClick = { viewModel.onRecurrenceChange(rec) },
-                            enabled = submit !is SubmitState.Submitting,
-                        )
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    RadioButton(
-                        selected = form.recurrence == rec,
-                        onClick = null,
-                        enabled = submit !is SubmitState.Submitting,
-                    )
-                    Text(text = recurrenceLabel(rec), modifier = Modifier.padding(start = 8.dp))
-                }
-            }
-
-            Text("Category", style = MaterialTheme.typography.titleSmall)
-            androidx.compose.foundation.layout.FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                BillCategory.entries.forEach { cat ->
-                    FilterChip(
-                        selected = form.category == cat,
-                        onClick = { viewModel.onCategoryChange(cat) },
-                        label = {
-                            Text(
-                                cat.name.lowercase().replaceFirstChar { it.uppercase() },
-                                maxLines = 1,
-                            )
-                        },
-                        enabled = submit !is SubmitState.Submitting,
-                    )
-                }
-            }
-
-            OutlinedTextField(
-                value = form.reminderDaysBefore.toString(),
-                onValueChange = { value ->
-                    viewModel.onReminderDaysBeforeChange(value.toIntOrNull() ?: 1)
-                },
-                label = { Text("Remind days before") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = submit !is SubmitState.Submitting,
+            ReminderSettingsSection(
+                reminderDaysBefore = form.reminderDaysBefore,
+                enabled = form.enabled,
+                isSubmitting = isSubmitting,
+                onReminderDaysBeforeChange = viewModel::onReminderDaysBeforeChange,
+                onEnabledChange = viewModel::onEnabledChange,
             )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text("Enabled", style = MaterialTheme.typography.bodyLarge)
-                Switch(
-                    checked = form.enabled,
-                    onCheckedChange = viewModel::onEnabledChange,
-                    enabled = submit !is SubmitState.Submitting,
-                )
-            }
 
             Button(
                 onClick = viewModel::onSubmit,
@@ -253,6 +191,168 @@ private fun SubmitStatusLine(
                     Button(onClick = onRetry) { Text("Retry") }
                     Button(onClick = onDismiss) { Text("Dismiss") }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BasicInfoSection(
+    form: BillReminderFormState,
+    isSubmitting: Boolean,
+    onNameChange: (String) -> Unit,
+    onAmountChange: (Double) -> Unit,
+    onDueDayChange: (Int) -> Unit,
+) {
+    val sp = MaterialTheme.spacing
+    AppCard {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(sp.md),
+            verticalArrangement = Arrangement.spacedBy(sp.md),
+        ) {
+            OutlinedTextField(
+                value = form.name,
+                onValueChange = onNameChange,
+                label = { Text("Name (e.g. Electricity)") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isSubmitting,
+            )
+            OutlinedTextField(
+                value = if (form.amount == 0.0) "" else form.amount.toString(),
+                onValueChange = { value -> onAmountChange(value.toDoubleOrNull() ?: 0.0) },
+                label = { Text("Amount") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isSubmitting,
+            )
+            OutlinedTextField(
+                value = form.dueDay.toString(),
+                onValueChange = { value -> onDueDayChange(value.toIntOrNull() ?: 1) },
+                label = { Text("Due day of month (1-31)") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isSubmitting,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RecurrenceSection(
+    selected: Recurrence,
+    isSubmitting: Boolean,
+    onChange: (Recurrence) -> Unit,
+) {
+    val sp = MaterialTheme.spacing
+    AppCard {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(sp.md),
+            verticalArrangement = Arrangement.spacedBy(sp.sm),
+        ) {
+            Text("Recurrence", style = MaterialTheme.typography.titleSmall)
+            Recurrence.entries.forEach { rec ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = selected == rec,
+                            onClick = { onChange(rec) },
+                            enabled = !isSubmitting,
+                        )
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    RadioButton(
+                        selected = selected == rec,
+                        onClick = null,
+                        enabled = !isSubmitting,
+                    )
+                    Text(text = recurrenceLabel(rec), modifier = Modifier.padding(start = 8.dp))
+                }
+            }
+        }
+    }
+}
+
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun CategorySection(
+    selected: BillCategory,
+    isSubmitting: Boolean,
+    onChange: (BillCategory) -> Unit,
+) {
+    val sp = MaterialTheme.spacing
+    AppCard {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(sp.md),
+            verticalArrangement = Arrangement.spacedBy(sp.sm),
+        ) {
+            Text("Category", style = MaterialTheme.typography.titleSmall)
+            androidx.compose.foundation.layout.FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(sp.sm),
+                verticalArrangement = Arrangement.spacedBy(sp.sm),
+            ) {
+                BillCategory.entries.forEach { cat ->
+                    FilterChip(
+                        selected = selected == cat,
+                        onClick = { onChange(cat) },
+                        label = {
+                            Text(
+                                cat.name.lowercase().replaceFirstChar { it.uppercase() },
+                                maxLines = 1,
+                            )
+                        },
+                        enabled = !isSubmitting,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReminderSettingsSection(
+    reminderDaysBefore: Int,
+    enabled: Boolean,
+    isSubmitting: Boolean,
+    onReminderDaysBeforeChange: (Int) -> Unit,
+    onEnabledChange: (Boolean) -> Unit,
+) {
+    val sp = MaterialTheme.spacing
+    AppCard {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(sp.md),
+            verticalArrangement = Arrangement.spacedBy(sp.md),
+        ) {
+            OutlinedTextField(
+                value = reminderDaysBefore.toString(),
+                onValueChange = { value -> onReminderDaysBeforeChange(value.toIntOrNull() ?: 1) },
+                label = { Text("Remind days before") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isSubmitting,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Enabled", style = MaterialTheme.typography.bodyLarge)
+                Switch(
+                    checked = enabled,
+                    onCheckedChange = onEnabledChange,
+                    enabled = !isSubmitting,
+                )
             }
         }
     }

@@ -20,22 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import org.mifos.core.designsystem.theme.finance
 
 /**
- * Money tone — how a monetary amount should be colored regardless of the raw value's sign.
- *
- * Most call sites should use [MoneyTone.AutoFromSign] and pass the raw `amount` parameter;
- * the component picks moneyPositive / moneyNegative / moneyNeutral from
- * [MaterialTheme.finance] based on the sign.
- *
- * Use [MoneyTone.Positive] / [MoneyTone.Negative] / [MoneyTone.Neutral] to force a specific
- * tone (e.g. payment confirmation always green even though the user "paid" / amount is
- * conceptually negative).
- *
- * Use [MoneyTone.Inherit] when you want the surrounding `LocalContentColor` (e.g. inside a
- * gradient hero where black text would clash).
- */
-enum class MoneyTone { AutoFromSign, Positive, Negative, Neutral, Inherit }
-
-/**
  * Currency text that picks its color from [MaterialTheme.finance] based on the amount's
  * sign (or a forced [MoneyTone]). Use everywhere a monetary value is rendered so the app
  * has a single visual grammar for money.

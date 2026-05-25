@@ -22,9 +22,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.theme.finance
 
-/** Due-date urgency tier — informs the color of a leading dot on a list row. */
-enum class Urgency { Overdue, Today, Upcoming, Distant }
-
 /**
  * Solid colored dot used as the leading accent on a list row (bill reminder, loan due,
  * task). Pairs cheaply with any list-item layout to encode urgency at a glance without

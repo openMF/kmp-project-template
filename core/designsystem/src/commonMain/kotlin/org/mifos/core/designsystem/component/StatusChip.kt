@@ -25,23 +25,6 @@ import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.theme.finance
 
 /**
- * Semantic intent of a [StatusChip]. Maps to a (container, content) color pair derived
- * from [MaterialTheme.colorScheme] or [MaterialTheme.finance].
- */
-enum class StatusChipIntent {
-    /** Positive / paid / completed. Emerald. */
-    Success,
-    /** Warning / due-soon / partial. Amber. */
-    Warning,
-    /** Overdue / failed / urgent. Rose. */
-    Danger,
-    /** Informational / upcoming / scheduled. Indigo container. */
-    Info,
-    /** Neutral / archived / inactive. */
-    Neutral,
-}
-
-/**
  * Compact colored pill used to convey state at a glance — bill status, loan stage, rate
  * direction, sync state. Stays one line; no icons (use [UrgencyDot] when you want a leading
  * accent).

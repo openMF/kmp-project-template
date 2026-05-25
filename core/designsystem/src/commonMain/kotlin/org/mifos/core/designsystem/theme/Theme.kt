@@ -132,14 +132,24 @@ fun MifosTheme(
     )
 
     val screenStateDefaults = appScreenStateDefaults()
+    val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
 
     KptMaterialTheme(theme = themeProvider) {
-        // Wire LocalScreenStateDefaults app-wide so every ScreenContent /
+        // Provide the design-system token CompositionLocals app-wide so every widget
+        // built on `core/designsystem/component/`, `chart/`, and `motion/` resolves
+        // semantic finance colors, motion specs, spacing scale, and elevation tiers
+        // without per-call wiring. Forks override any subset via
+        // `CompositionLocalProvider(LocalFinanceColors provides ...)` etc.
+        //
+        // Also wires LocalScreenStateDefaults so every ScreenContent /
         // PagingScreenContent automatically picks up the fork's branded empty /
-        // error / no-network / loading visuals without per-screen wiring.
-        // Customize visuals in core/store/AppScreenStateDefaults.kt — that's
-        // the single fork seam.
+        // error / no-network / loading visuals. Customize in
+        // core/store/AppScreenStateDefaults.kt — that's the single fork seam.
         CompositionLocalProvider(
+            LocalFinanceColors provides financeColors,
+            LocalMotion provides Motion(),
+            LocalSpacing provides Spacing(),
+            LocalElevation provides Elevation(),
             LocalScreenStateDefaults provides screenStateDefaults,
         ) {
             content()

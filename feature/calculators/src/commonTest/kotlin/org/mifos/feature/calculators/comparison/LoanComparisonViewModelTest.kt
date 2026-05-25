@@ -9,13 +9,33 @@
  */
 package org.mifos.feature.calculators.comparison
 
-import app.cash.turbine.test
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class LoanComparisonViewModelTest {
+
+    private val dispatcher = StandardTestDispatcher()
+
+    @BeforeTest
+    fun setUp() {
+        Dispatchers.setMain(dispatcher)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     @Test
     fun defaultStateHasThreeStaggeredScenarios() = runTest {
@@ -29,9 +49,9 @@ class LoanComparisonViewModelTest {
         val vm = LoanComparisonViewModel()
         val replacement = LoanScenario(principal = 1.0, ratePercent = 1.0, tenureMonths = 1)
         vm.trySendAction(LoanComparisonAction.UpdateScenario(index = 1, scenario = replacement))
+        dispatcher.scheduler.advanceUntilIdle()
         val updated = vm.stateFlow.value.scenarios
         assertEquals(replacement, updated[1])
-        // Other indices unchanged.
         assertTrue(updated[0] != replacement)
         assertTrue(updated[2] != replacement)
     }
@@ -39,7 +59,6 @@ class LoanComparisonViewModelTest {
     @Test
     fun analysisIdentifiesCheapestByTotalPayable() = runTest {
         val vm = LoanComparisonViewModel()
-        // Scenario 0: lowest rate, shortest tenure → should be cheapest by total payable.
         vm.trySendAction(
             LoanComparisonAction.UpdateScenario(
                 0,
@@ -58,11 +77,11 @@ class LoanComparisonViewModelTest {
                 LoanScenario(principal = 100_000.0, ratePercent = 12.0, tenureMonths = 240),
             ),
         )
+        dispatcher.scheduler.advanceUntilIdle()
 
-        vm.analysis.test {
-            val latest = expectMostRecentItem()
-            assertEquals(0, latest.cheapestIndex)
-            cancelAndIgnoreRemainingEvents()
-        }
+        // Wait until the analysis re-computes for the latest scenarios + identifies
+        // scenario 0 as cheapest (lowest rate × shortest tenure).
+        val latest = vm.analysis.first { it.cheapestIndex == 0 && it.results.size == 3 }
+        assertEquals(0, latest.cheapestIndex)
     }
 }

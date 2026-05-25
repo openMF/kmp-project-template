@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -39,6 +38,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatGrouped
+import org.mifos.core.designsystem.component.AmountDisplay
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.domain.calc.AmortizationRow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,54 +72,69 @@ fun AmortizationScreen(
             )
         },
     ) { padding ->
+        val sp = MaterialTheme.spacing
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = sp.lg),
+            verticalArrangement = Arrangement.spacedBy(sp.md),
         ) {
-            OutlinedTextField(
-                value = state.principal.toLong().toString(),
-                onValueChange = {
-                    it.toDoubleOrNull()
-                        ?.let { v -> viewModel.trySendAction(AmortizationAction.UpdatePrincipal(v)) }
-                },
-                label = { Text("Principal") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-            )
-            OutlinedTextField(
-                value = state.ratePercent.toString(),
-                onValueChange = {
-                    it.toDoubleOrNull()
-                        ?.let { v -> viewModel.trySendAction(AmortizationAction.UpdateRate(v)) }
-                },
-                label = { Text("Annual Rate (%)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth(),
-            )
-            OutlinedTextField(
-                value = state.tenureMonths.toString(),
-                onValueChange = {
-                    it.toIntOrNull()
-                        ?.let { v -> viewModel.trySendAction(AmortizationAction.UpdateTenure(v)) }
-                },
-                label = { Text("Tenure (months)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Card(modifier = Modifier.fillMaxWidth()) {
+            AppCard {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(sp.md),
+                    verticalArrangement = Arrangement.spacedBy(sp.md),
                 ) {
-                    Text("Summary", style = MaterialTheme.typography.titleSmall)
-                    Text("Monthly EMI: ${summary.emi.formatGrouped(2)}")
-                    Text("Total Interest: ${summary.totalInterest.formatGrouped(2)}")
-                    Text("Total Payable: ${summary.totalPayment.formatGrouped(2)}")
+                    OutlinedTextField(
+                        value = state.principal.toLong().toString(),
+                        onValueChange = {
+                            it.toDoubleOrNull()?.let { v ->
+                                viewModel.trySendAction(AmortizationAction.UpdatePrincipal(v))
+                            }
+                        },
+                        label = { Text("Principal") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    OutlinedTextField(
+                        value = state.ratePercent.toString(),
+                        onValueChange = {
+                            it.toDoubleOrNull()?.let { v ->
+                                viewModel.trySendAction(AmortizationAction.UpdateRate(v))
+                            }
+                        },
+                        label = { Text("Annual Rate (%)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    OutlinedTextField(
+                        value = state.tenureMonths.toString(),
+                        onValueChange = {
+                            it.toIntOrNull()?.let { v ->
+                                viewModel.trySendAction(AmortizationAction.UpdateTenure(v))
+                            }
+                        },
+                        label = { Text("Tenure (months)") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
+            }
+
+            HeroCard {
+                AmountDisplay(
+                    amountText = summary.emi.formatGrouped(2),
+                    label = "Monthly EMI",
+                    supporting = {
+                        Text(
+                            text = "Interest ${summary.totalInterest.formatGrouped(2)} · " +
+                                "Total ${summary.totalPayment.formatGrouped(2)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    },
+                )
             }
 
             AmortizationHeader()

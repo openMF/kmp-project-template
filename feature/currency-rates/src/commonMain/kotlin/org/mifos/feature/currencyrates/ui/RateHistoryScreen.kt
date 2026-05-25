@@ -31,10 +31,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.theme.spacing
 import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -70,48 +71,56 @@ fun RateHistoryScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) { history, _ ->
+            val sp = MaterialTheme.spacing
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = sp.lg),
+                verticalArrangement = Arrangement.spacedBy(sp.sm),
             ) {
-                Text("Currency", style = MaterialTheme.typography.labelMedium)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    currencies.forEach { code ->
-                        FilterChip(
-                            selected = localState.targetCurrency == code,
-                            onClick = { viewModel.trySendAction(HistoryAction.SelectCurrency(code)) },
-                            label = { Text(code) },
-                        )
-                    }
-                }
-
-                Text(
-                    "Period",
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    periods.forEach { days ->
-                        FilterChip(
-                            selected = localState.periodDays == days,
-                            onClick = { viewModel.trySendAction(HistoryAction.SelectPeriod(days)) },
-                            label = { Text("${days}d") },
-                        )
+                AppCard(modifier = Modifier.padding(top = sp.sm)) {
+                    Column(
+                        modifier = Modifier.padding(sp.md),
+                        verticalArrangement = Arrangement.spacedBy(sp.sm),
+                    ) {
+                        Text("Currency", style = MaterialTheme.typography.labelMedium)
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
+                            currencies.forEach { code ->
+                                FilterChip(
+                                    selected = localState.targetCurrency == code,
+                                    onClick = {
+                                        viewModel.trySendAction(HistoryAction.SelectCurrency(code))
+                                    },
+                                    label = { Text(code) },
+                                )
+                            }
+                        }
+                        Text("Period", style = MaterialTheme.typography.labelMedium)
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
+                            periods.forEach { days ->
+                                FilterChip(
+                                    selected = localState.periodDays == days,
+                                    onClick = {
+                                        viewModel.trySendAction(HistoryAction.SelectPeriod(days))
+                                    },
+                                    label = { Text("${days}d") },
+                                )
+                            }
+                        }
                     }
                 }
 
                 Text(
                     text = "USD \u2192 ${history.to} (${history.startDate} to ${history.endDate})",
                     style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(history.rates) { point ->
                         Text(
                             text = "${point.date}  \u2192  ${point.value.formatDecimal(4)}",
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(vertical = 6.dp),
+                            modifier = Modifier.padding(vertical = sp.sm),
                         )
                         HorizontalDivider()
                     }

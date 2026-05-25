@@ -12,11 +12,19 @@ package org.mifos.feature.settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.ui.scaffold.KptScaffold
 
 @Composable
@@ -29,6 +37,7 @@ internal fun NotificationScreen(modifier: Modifier = Modifier, onBackClick: () -
 
 @Composable
 internal fun NotificationScreenContent(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
+    val sp = MaterialTheme.spacing
     KptScaffold(
         onNavigationIconClick = onBackClick,
         title = "Notification",
@@ -36,12 +45,34 @@ internal fun NotificationScreenContent(modifier: Modifier = Modifier, onBackClic
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(sp.lg),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            // NotificationScreenContent
-            Text(text = "Notification Screen", fontWeight = FontWeight.SemiBold)
+            HeroCard {
+                Column(
+                    modifier = Modifier.padding(sp.md),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(sp.sm),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Notifications,
+                        contentDescription = null,
+                        modifier = Modifier.padding(sp.sm),
+                    )
+                    Text(
+                        text = "No notifications yet",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        text = "You'll see bill reminders and rate alerts here.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
     }
 }

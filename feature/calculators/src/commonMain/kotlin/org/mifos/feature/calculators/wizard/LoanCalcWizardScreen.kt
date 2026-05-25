@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,6 +41,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatGrouped
+import org.mifos.core.designsystem.component.AmountDisplay
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.LoanCalcScenario
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -170,19 +173,48 @@ private fun StepRate(form: LoanCalcScenario, viewModel: LoanCalcWizardViewModel)
 
 @Composable
 private fun StepReview(form: LoanCalcScenario, preview: org.mifos.core.model.emi.EmiResult) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text("Review", style = MaterialTheme.typography.titleMedium)
-            Text("Principal: ${form.principal.formatGrouped(2)}")
-            Text("Tenure: ${form.tenureMonths} months")
-            Text("Rate: ${form.ratePercent}%")
-            Text("Monthly EMI: ${preview.emi.formatGrouped(2)}")
-            Text("Total Interest: ${preview.totalInterest.formatGrouped(2)}")
-            Text("Total Payable: ${preview.totalPayment.formatGrouped(2)}")
+    val sp = MaterialTheme.spacing
+    Column(verticalArrangement = Arrangement.spacedBy(sp.md)) {
+        HeroCard {
+            AmountDisplay(
+                amountText = preview.emi.formatGrouped(2),
+                label = "Monthly EMI",
+                supporting = {
+                    Text(
+                        text = "Total payable: ${preview.totalPayment.formatGrouped(2)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                },
+            )
         }
+        AppCard {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(sp.md),
+                verticalArrangement = Arrangement.spacedBy(sp.sm),
+            ) {
+                ReviewMetricRow(label = "Principal", value = form.principal.formatGrouped(2))
+                ReviewMetricRow(label = "Tenure", value = "${form.tenureMonths} months")
+                ReviewMetricRow(label = "Rate", value = "${form.ratePercent}%")
+                ReviewMetricRow(label = "Total interest", value = preview.totalInterest.formatGrouped(2))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewMetricRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(text = value, style = MaterialTheme.typography.bodyMedium)
     }
 }
 

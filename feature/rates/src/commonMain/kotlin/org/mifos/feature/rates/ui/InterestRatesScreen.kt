@@ -25,11 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.TrendingDown
-import androidx.compose.material.icons.automirrored.filled.TrendingFlat
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,10 +37,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.RateBadge
+import org.mifos.core.designsystem.component.RateDirection
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.InterestRateSeries
 import org.mifos.feature.rates.chart.Sparkline
 import template.core.base.store.screen.ScreenState
@@ -94,13 +94,14 @@ internal fun InterestRatesScreen(
             )
         },
     ) { padding ->
+        val sp = MaterialTheme.spacing
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(sp.lg)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(sp.md),
         ) {
             RateRowCard(
                 state = state.fedFunds,
@@ -122,7 +123,7 @@ internal fun InterestRatesScreen(
                 onRetry = { viewModel.trySendAction(RatesAction.RetryTreasury10Y) },
                 onSeriesClick = onSeriesClick,
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(sp.md))
         }
     }
 }
@@ -133,8 +134,9 @@ private fun RateRowCard(
     onRetry: () -> Unit,
     onSeriesClick: (seriesId: String) -> Unit,
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Box(modifier = Modifier.fillMaxWidth().height(140.dp).padding(16.dp)) {
+    val sp = MaterialTheme.spacing
+    AppCard {
+        Box(modifier = Modifier.fillMaxWidth().height(140.dp).padding(sp.md)) {
             ScreenContent(
                 state = state,
                 onRetry = onRetry,
@@ -154,6 +156,7 @@ private fun RateRowContent(
     series: InterestRateSeries,
     onClick: () -> Unit,
 ) {
+    val sp = MaterialTheme.spacing
     val delta = computeOneDayDelta(series)
     Row(
         modifier = Modifier
@@ -161,53 +164,40 @@ private fun RateRowContent(
             .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Left: name + current + delta.
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(sp.xs),
         ) {
             Text(
                 text = series.name,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(sp.sm),
+            ) {
                 Text(
                     text = "${series.current.formatDecimal(2)}${series.unit}",
                     style = MaterialTheme.typography.headlineSmall,
                 )
-                Spacer(Modifier.width(12.dp))
-                DeltaBadge(delta = delta, unit = series.unit)
+                delta?.let {
+                    val direction = when {
+                        it > 0 -> RateDirection.Up
+                        it < 0 -> RateDirection.Down
+                        else -> RateDirection.Flat
+                    }
+                    val sign = if (it >= 0) "+" else ""
+                    RateBadge(
+                        delta = "$sign${it.formatDecimal(2)}${series.unit}",
+                        direction = direction,
+                    )
+                }
             }
         }
 
-        // Right: sparkline.
         Sparkline(
             values = series.observations.map { it.value },
             modifier = Modifier.weight(1f).fillMaxSize(),
-        )
-    }
-}
-
-@Composable
-private fun DeltaBadge(delta: Double?, unit: String) {
-    if (delta == null) return
-    val (icon, tint) = when {
-        delta > 0 -> Icons.AutoMirrored.Default.TrendingUp to MaterialTheme.colorScheme.primary
-        delta < 0 -> Icons.AutoMirrored.Default.TrendingDown to MaterialTheme.colorScheme.error
-        else -> Icons.AutoMirrored.Default.TrendingFlat to MaterialTheme.colorScheme.onSurfaceVariant
-    }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = tint,
-            modifier = Modifier.size(18.dp),
-        )
-        Spacer(Modifier.width(4.dp))
-        Text(
-            text = "${if (delta >= 0) "+" else ""}${delta.formatDecimal(2)}$unit",
-            style = MaterialTheme.typography.labelMedium,
-            color = tint,
         )
     }
 }

@@ -35,6 +35,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatDecimal
+import org.mifos.core.designsystem.component.AmountDisplay
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.IndicatorKind
 import org.mifos.feature.macro.ui.components.Sparkline
 import org.mifos.feature.macro.ui.components.displayName
@@ -85,27 +89,35 @@ fun MacroIndicatorDetailScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) { indicator, _ ->
-            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                Text(
-                    text = indicator.headlineValue(),
-                    style = MaterialTheme.typography.displaySmall,
-                )
-                Text(
-                    text = "Source: ${indicator.source}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 12.dp),
-                )
-                Sparkline(
-                    values = indicator.observations.map { it.value },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp),
-                )
+            val sp = MaterialTheme.spacing
+            Column(
+                modifier = Modifier.fillMaxSize().padding(sp.lg),
+                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(sp.md),
+            ) {
+                HeroCard {
+                    AmountDisplay(
+                        amountText = indicator.headlineValue(),
+                        label = indicatorKind.displayName(),
+                        supporting = {
+                            Text(
+                                text = "Source: ${indicator.source}",
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        },
+                    )
+                }
+                AppCard {
+                    Sparkline(
+                        values = indicator.observations.map { it.value },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp)
+                            .padding(sp.md),
+                    )
+                }
                 Text(
                     text = "Year-by-year",
                     style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
                 )
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(
@@ -115,12 +127,12 @@ fun MacroIndicatorDetailScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = sp.sm),
                         ) {
                             Text(
                                 text = obs.year.toString(),
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(end = 16.dp),
+                                modifier = Modifier.padding(end = sp.md),
                             )
                             Text(
                                 text = obs.value?.formatDecimal(2) ?: "—",

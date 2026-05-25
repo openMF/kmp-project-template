@@ -9,6 +9,7 @@
  */
 package org.mifos.feature.currencyrates.ui
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,10 +32,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.theme.spacing
 import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,21 +70,30 @@ fun CurrencyRatesScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) { data, _ ->
+            val sp = MaterialTheme.spacing
             Column(modifier = Modifier.fillMaxSize()) {
-                OutlinedTextField(
-                    value = localState.searchQuery,
-                    onValueChange = { viewModel.trySendAction(RatesAction.Search(it)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    placeholder = { Text("Search currency...") },
-                    singleLine = true,
-                )
-                Text(
-                    text = "Base: ${data.base} \u2022 ${data.date}",
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                )
+                Column(
+                    modifier = Modifier.padding(horizontal = sp.lg, vertical = sp.sm),
+                    verticalArrangement = Arrangement.spacedBy(sp.xs),
+                ) {
+                    AppCard {
+                        OutlinedTextField(
+                            value = localState.searchQuery,
+                            onValueChange = { viewModel.trySendAction(RatesAction.Search(it)) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(sp.sm),
+                            placeholder = { Text("Search currency...") },
+                            singleLine = true,
+                        )
+                    }
+                    Text(
+                        text = "Base: ${data.base} \u2022 ${data.date}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = sp.xs),
+                    )
+                }
                 LazyColumn(modifier = Modifier.weight(1f)) {
                     items(data.rates.entries.toList()) { (code, rate) ->
                         RateItem(code = code, rate = rate)
@@ -95,15 +107,16 @@ fun CurrencyRatesScreen(
 
 @Composable
 private fun RateItem(code: String, rate: Double) {
+    val sp = MaterialTheme.spacing
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = sp.lg, vertical = sp.md),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = code,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.weight(1f),
         )
         Text(

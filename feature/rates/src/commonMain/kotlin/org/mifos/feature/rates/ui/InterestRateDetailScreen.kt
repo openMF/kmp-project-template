@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -39,6 +38,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatDecimal
+import org.mifos.core.designsystem.component.AmountDisplay
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.InterestRateSeries
 import org.mifos.feature.rates.chart.AreaChart
 import template.core.base.ui.screen.ScreenContent
@@ -91,13 +94,25 @@ internal fun InterestRateDetailScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) { series, _ ->
+            val sp = MaterialTheme.spacing
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                    .padding(horizontal = sp.lg),
+                verticalArrangement = Arrangement.spacedBy(sp.md),
             ) {
-                CurrentValueHeader(series)
+                HeroCard {
+                    AmountDisplay(
+                        amountText = "${series.current.formatDecimal(2)}${series.unit}",
+                        label = "Current",
+                        supporting = {
+                            Text(
+                                text = "Source: ${series.source}",
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        },
+                    )
+                }
                 ChartCard(series)
                 Text(
                     text = "Observations",
@@ -108,7 +123,7 @@ internal fun InterestRateDetailScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = sp.sm),
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Text(
@@ -129,29 +144,10 @@ internal fun InterestRateDetailScreen(
 }
 
 @Composable
-private fun CurrentValueHeader(series: InterestRateSeries) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(
-            text = "Current",
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Text(
-            text = "${series.current.formatDecimal(2)}${series.unit}",
-            style = MaterialTheme.typography.headlineLarge,
-        )
-        Text(
-            text = "Source: ${series.source}",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
-
-@Composable
 private fun ChartCard(series: InterestRateSeries) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Box(modifier = Modifier.fillMaxWidth().height(220.dp).padding(12.dp)) {
+    val sp = MaterialTheme.spacing
+    AppCard {
+        Box(modifier = Modifier.fillMaxWidth().height(220.dp).padding(sp.sm)) {
             AreaChart(
                 values = series.observations.map { it.value },
                 modifier = Modifier.fillMaxSize(),

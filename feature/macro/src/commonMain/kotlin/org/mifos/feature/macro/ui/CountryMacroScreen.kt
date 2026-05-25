@@ -17,8 +17,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,11 +29,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.data.economic.SupportedCountries
+import org.mifos.core.designsystem.component.StatusChip
+import org.mifos.core.designsystem.component.StatusChipIntent
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.IndicatorKind
 import org.mifos.feature.macro.ui.components.IndicatorCard
 import template.core.base.store.screen.DataFreshness
@@ -63,22 +65,12 @@ fun CountryMacroScreen(
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
     val country = SupportedCountries.findByCode(uiState.countryCode)
 
+    val sp = MaterialTheme.spacing
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = {
-                    Column {
-                        Text("Country Macro")
-                        if (uiState.overallFreshness == DataFreshness.STALE) {
-                            Text(
-                                text = "STALE — showing cached data",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        }
-                    }
-                },
+                title = { Text("Country Macro") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -88,14 +80,12 @@ fun CountryMacroScreen(
                     }
                 },
                 actions = {
-                    AssistChip(
-                        onClick = onPickCountry,
-                        label = {
-                            Text(
-                                text = "${country?.flagEmoji.orEmpty()} ${country?.name ?: uiState.countryCode}",
-                            )
-                        },
-                        colors = AssistChipDefaults.assistChipColors(),
+                    StatusChip(
+                        text = "${country?.flagEmoji.orEmpty()} ${country?.name ?: uiState.countryCode}",
+                        intent = StatusChipIntent.Info,
+                        modifier = Modifier
+                            .padding(end = sp.sm)
+                            .clickable(onClick = onPickCountry),
                     )
                     IconButton(onClick = { viewModel.trySendAction(MacroAction.RefreshAll) }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Refresh all")
@@ -108,9 +98,17 @@ fun CountryMacroScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(vertical = 8.dp)
+                .padding(vertical = sp.sm)
                 .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(sp.sm),
         ) {
+            if (uiState.overallFreshness == DataFreshness.STALE) {
+                StatusChip(
+                    text = "STALE — showing cached data",
+                    intent = StatusChipIntent.Warning,
+                    modifier = Modifier.padding(horizontal = sp.lg),
+                )
+            }
             IndicatorCard(
                 indicatorKind = IndicatorKind.GDP,
                 state = uiState.gdp,

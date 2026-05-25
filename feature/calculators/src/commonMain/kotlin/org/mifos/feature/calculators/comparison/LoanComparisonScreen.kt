@@ -14,14 +14,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,12 +32,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatGrouped
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.StatusChip
+import org.mifos.core.designsystem.component.StatusChipIntent
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.emi.EmiResult
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,18 +68,20 @@ fun LoanComparisonScreen(
             )
         },
     ) { padding ->
+        val sp = MaterialTheme.spacing
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .verticalScroll(rememberScrollState())
+                .imePadding()
+                .navigationBarsPadding()
+                .padding(sp.lg),
+            verticalArrangement = Arrangement.spacedBy(sp.md),
         ) {
-            // Side-by-side editable input columns.
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(sp.sm),
             ) {
                 state.scenarios.forEachIndexed { idx, scenario ->
                     ScenarioInputColumn(
@@ -90,11 +97,14 @@ fun LoanComparisonScreen(
                 }
             }
 
-            Text("Side-by-side analysis", style = MaterialTheme.typography.titleMedium)
+            Text(
+                "Side-by-side analysis",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(sp.sm),
             ) {
                 analysis.results.forEachIndexed { idx, result ->
                     ScenarioResultCard(
@@ -116,41 +126,46 @@ private fun ScenarioInputColumn(
     onChange: (LoanScenario) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(
-            "Scenario ${index + 1}",
-            style = MaterialTheme.typography.titleSmall,
-        )
-        OutlinedTextField(
-            value = scenario.principal.toLong().toString(),
-            onValueChange = {
-                it.toDoubleOrNull()?.let { v -> onChange(scenario.copy(principal = v)) }
-            },
-            label = { Text("Principal") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        OutlinedTextField(
-            value = scenario.ratePercent.toString(),
-            onValueChange = {
-                it.toDoubleOrNull()?.let { v -> onChange(scenario.copy(ratePercent = v)) }
-            },
-            label = { Text("Rate (%)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            modifier = Modifier.fillMaxWidth(),
-        )
-        OutlinedTextField(
-            value = scenario.tenureMonths.toString(),
-            onValueChange = {
-                it.toIntOrNull()?.let { v -> onChange(scenario.copy(tenureMonths = v)) }
-            },
-            label = { Text("Months") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth(),
-        )
+    val sp = MaterialTheme.spacing
+    AppCard(modifier = modifier) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(sp.sm),
+            verticalArrangement = Arrangement.spacedBy(sp.sm),
+        ) {
+            Text(
+                "Scenario ${index + 1}",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            )
+            OutlinedTextField(
+                value = scenario.principal.toLong().toString(),
+                onValueChange = {
+                    it.toDoubleOrNull()?.let { v -> onChange(scenario.copy(principal = v)) }
+                },
+                label = { Text("Principal") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                value = scenario.ratePercent.toString(),
+                onValueChange = {
+                    it.toDoubleOrNull()?.let { v -> onChange(scenario.copy(ratePercent = v)) }
+                },
+                label = { Text("Rate (%)") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
+                value = scenario.tenureMonths.toString(),
+                onValueChange = {
+                    it.toIntOrNull()?.let { v -> onChange(scenario.copy(tenureMonths = v)) }
+                },
+                label = { Text("Months") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -161,27 +176,49 @@ private fun ScenarioResultCard(
     isCheapest: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier,
-        colors = if (isCheapest) {
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            )
-        } else {
-            CardDefaults.cardColors()
-        },
-    ) {
+    val sp = MaterialTheme.spacing
+    AppCard(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(sp.sm),
+            verticalArrangement = Arrangement.spacedBy(sp.xs),
         ) {
-            Text(
-                title + if (isCheapest) " · best" else "",
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Text("EMI ${result.emi.formatGrouped(2)}")
-            Text("Interest ${result.totalInterest.formatGrouped(2)}")
-            Text("Total ${result.totalPayment.formatGrouped(2)}")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(sp.xs),
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier.weight(1f),
+                )
+                if (isCheapest) {
+                    StatusChip(text = "Best", intent = StatusChipIntent.Success)
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text("EMI", style = MaterialTheme.typography.bodySmall)
+                Text(result.emi.formatGrouped(2), style = MaterialTheme.typography.bodySmall)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text("Interest", style = MaterialTheme.typography.bodySmall)
+                Text(result.totalInterest.formatGrouped(2), style = MaterialTheme.typography.bodySmall)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text("Total", style = MaterialTheme.typography.bodySmall)
+                Text(result.totalPayment.formatGrouped(2), style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import kotlinx.datetime.LocalDate
 import org.mifos.core.data.banking.LoanRepository
 import org.mifos.core.domain.calc.computeEmi
 import org.mifos.core.model.banking.Loan
+import org.mifos.core.model.banking.LoanCalcScenario
 import org.mifos.core.model.banking.LoanKind
 import org.mifos.core.model.emi.EmiResult
 import template.core.base.store.submit.SubmitOutbox
@@ -175,8 +176,12 @@ class LoanCalcWizardViewModel(
         super.onSubmit(snapshot)
     }
 
-    /** Validation for the final wizard step — all inputs must be populated and positive. */
-    private fun LoanCalcScenario.isReadyForSubmit(): Boolean =
+    /**
+     * Validation for the final wizard step — exposed `internal` so the screen can disable the
+     * "Save as Loan" button visually (rather than silently no-op on tap, which leaves the user
+     * unable to tell why nothing happened). Computed from the current [formState] snapshot.
+     */
+    internal fun LoanCalcScenario.isReadyForSubmit(): Boolean =
         principal > 0.0 &&
             ratePercent >= 0.0 &&
             tenureMonths > 0 &&
@@ -210,6 +215,14 @@ class LoanCalcWizardViewModel(
             updatedAtMs = nowMs,
         )
         repository.upsert(loan)
+        // Clear the draft so the NEXT wizard entry doesn't rehydrate the saved-and-done
+        // snapshot (with currentStep=5 + a now-blank-feeling name field) — that was the
+        // "Save as Loan does nothing" reproduction: a stale PENDING draft pinned the form
+        // to step 5 with a cleared name, so the validator-gated Save button stayed disabled.
+        outboxHandle.deleteByUniqueKey(FORM_KEY, uniqueKey)
+        // Reset the form to a fresh scenario so the screen reflects a "saved → restart" state
+        // rather than continuing to render the prior wizard's review fields.
+        _formState.value = LoanCalcScenario(scenarioId = randomScenarioId())
         return loan
     }
 

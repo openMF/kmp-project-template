@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -65,7 +67,14 @@ fun AddOrEditLoanScreen(
     onBackClick: () -> Unit,
     onSaved: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: EditLoanViewModel = koinViewModel(key = loanId ?: EditLoanViewModel.NEW_LOAN_KEY) {
+    // Key behaviour:
+    //   • Edit (loanId non-null): stable key per loan id → VM survives configuration changes.
+    //   • Add  (loanId null):     pass null so Koin uses the per-NavBackStackEntry key,
+    //                              giving each "+ New loan" tap a fresh VM. Without this,
+    //                              the previous Add VM is reused with state stuck in
+    //                              SubmitState.Submitted and the form pre-filled with the
+    //                              prior loan's data — so the next Save looks like a no-op.
+    viewModel: EditLoanViewModel = koinViewModel(key = loanId) {
         parametersOf(loanId)
     },
 ) {
@@ -97,6 +106,8 @@ fun AddOrEditLoanScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
+                .imePadding()
+                .navigationBarsPadding()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {

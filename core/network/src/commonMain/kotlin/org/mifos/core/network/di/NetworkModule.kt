@@ -33,7 +33,7 @@ val NetworkModule = module {
                     client = httpClient(
                         setupDefaultHttpClient(
                             baseUrl = FrankfurterApi.BASE_URL,
-                            loggableHosts = listOf("api.frankfurter.app"),
+                            loggableHosts = listOf("api.frankfurter.dev"),
                         ),
                     ),
                 )

@@ -11,6 +11,7 @@ package org.mifos.feature.loans.di
 
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import org.mifos.core.data.di.OutboxQualifiers
 import org.mifos.feature.loans.ui.EditLoanViewModel
 import org.mifos.feature.loans.ui.LoanDetailViewModel
 import org.mifos.feature.loans.ui.PersonalLoansListViewModel
@@ -30,7 +31,7 @@ val LoansModule = module {
     viewModel { params ->
         EditLoanViewModel(
             repository = get(),
-            outbox = get(),
+            outbox = get(qualifier = OutboxQualifiers.Loan),
             loanId = params.getOrNull(),
         )
     }

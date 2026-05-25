@@ -12,6 +12,7 @@ package org.mifos.feature.bills.di
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.mifos.core.data.di.OutboxQualifiers
 import org.mifos.feature.bills.notification.BillNotificationGateway
 import org.mifos.feature.bills.notification.BillNotificationGatewayImpl
 import org.mifos.feature.bills.ui.BillRemindersListViewModel
@@ -37,7 +38,7 @@ val BillsModule = module {
             repository = get(),
             scheduler = get(),
             billId = billId,
-            outbox = get(),
+            outbox = get(qualifier = OutboxQualifiers.BillReminder),
         )
     } bind EditBillReminderViewModel::class
 }

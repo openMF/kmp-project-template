@@ -14,8 +14,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -54,7 +58,7 @@ import template.core.base.store.submit.SubmitState
  * submit button shows Saving / Saved / Failed-with-retry, and the Save button + every
  * input are disabled while a submit is in flight.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun AddOrEditBillReminderScreen(
     onBackClick: () -> Unit,
@@ -84,6 +88,9 @@ fun AddOrEditBillReminderScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .imePadding()
+                .navigationBarsPadding()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
@@ -137,15 +144,21 @@ fun AddOrEditBillReminderScreen(
             }
 
             Text("Category", style = MaterialTheme.typography.titleSmall)
-            Row(
+            androidx.compose.foundation.layout.FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 BillCategory.entries.forEach { cat ->
                     FilterChip(
                         selected = form.category == cat,
                         onClick = { viewModel.onCategoryChange(cat) },
-                        label = { Text(cat.name.lowercase().replaceFirstChar { it.uppercase() }) },
+                        label = {
+                            Text(
+                                cat.name.lowercase().replaceFirstChar { it.uppercase() },
+                                maxLines = 1,
+                            )
+                        },
                         enabled = submit !is SubmitState.Submitting,
                     )
                 }

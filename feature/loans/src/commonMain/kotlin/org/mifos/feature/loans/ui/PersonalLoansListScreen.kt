@@ -12,6 +12,7 @@ package org.mifos.feature.loans.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,9 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,15 +31,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
+import org.mifos.core.designsystem.component.AmountDisplay
+import org.mifos.core.designsystem.component.HeroCard
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.Loan
 import template.core.base.ui.screen.ScreenContent
 
@@ -55,23 +60,39 @@ fun PersonalLoansListScreen(
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     var pendingDelete by remember { mutableStateOf<Loan?>(null) }
 
+    val sp = MaterialTheme.spacing
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Personal Loans") },
+                title = {
+                    Text(
+                        "Personal Loans",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddLoanClick) {
-                Icon(Icons.Filled.Add, contentDescription = "Add loan")
-            }
+            ExtendedFloatingActionButton(
+                onClick = onAddLoanClick,
+                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                text = { Text("New loan") },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+            )
         },
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         ScreenContent(
             state = screenState,
@@ -83,12 +104,12 @@ fun PersonalLoansListScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                contentPadding = PaddingValues(vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                    .padding(horizontal = sp.lg),
+                contentPadding = PaddingValues(top = sp.sm, bottom = sp.xxl),
+                verticalArrangement = Arrangement.spacedBy(sp.md),
             ) {
                 item(key = "summary") {
-                    SummaryCard(ui)
+                    SummaryHero(ui)
                 }
                 items(items = ui.loans, key = { it.id }) { loan ->
                     LoanRowCard(
@@ -120,31 +141,35 @@ fun PersonalLoansListScreen(
 }
 
 @Composable
-private fun SummaryCard(ui: LoansListUiState) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(
-                text = "Portfolio Summary",
-                style = MaterialTheme.typography.titleMedium,
+private fun SummaryHero(ui: LoansListUiState) {
+    HeroCard {
+        Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)) {
+            AmountDisplay(
+                amountText = formatMoney(ui.totalPrincipalRemaining),
+                label = "Total outstanding",
+                supporting = {
+                    Text(
+                        text = "${ui.loans.size} active loan${if (ui.loans.size == 1) "" else "s"}",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                },
             )
-            Text(
-                text = "Loans: ${ui.loans.size}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = "Total monthly EMI: ${formatMoney(ui.totalMonthlyEmi)}",
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Text(
-                text = "Total outstanding: ${formatMoney(ui.totalPrincipalRemaining)}",
-                style = MaterialTheme.typography.bodyLarge,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                Column {
+                    Text(
+                        text = "Monthly EMI",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                    Text(
+                        text = formatMoney(ui.totalMonthlyEmi),
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+                    )
+                }
+            }
         }
     }
 }

@@ -110,10 +110,10 @@ fun lightFinanceColors(): FinanceColors = FinanceColors(
     freshnessStale = Color(0xFF9AA0A6),
     freshnessUpdating = Color(0xFFF9AB00),
     freshnessOffline = Color(0xFF5F6368),
-    urgencyOverdue = Color(0xFFB3261E),
-    urgencyToday = Color(0xFFE65100),
-    urgencyUpcoming = Color(0xFFF9AB00),
-    urgencyDistant = Color(0xFF5F6368),
+    urgencyOverdue = Color(0xFFF87171),
+    urgencyToday = Color(0xFFFB923C),
+    urgencyUpcoming = Color(0xFFFBBF24),
+    urgencyDistant = Color(0xFF94A3B8),
 )
 
 /**
@@ -139,10 +139,10 @@ fun darkFinanceColors(): FinanceColors = FinanceColors(
     freshnessStale = Color(0xFF80868B),
     freshnessUpdating = Color(0xFFFDD663),
     freshnessOffline = Color(0xFF80868B),
-    urgencyOverdue = Color(0xFFFFB4AB),
-    urgencyToday = Color(0xFFFFB871),
-    urgencyUpcoming = Color(0xFFFDD663),
-    urgencyDistant = Color(0xFF80868B),
+    urgencyOverdue = Color(0xFFFDBA74),
+    urgencyToday = Color(0xFFFBBF24),
+    urgencyUpcoming = Color(0xFFFDE68A),
+    urgencyDistant = Color(0xFF94A3B8),
 )
 
 /**

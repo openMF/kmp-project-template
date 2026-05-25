@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.feature.calculators.wizard
+package org.mifos.core.model.banking
 
 import kotlinx.serialization.Serializable
 
@@ -18,6 +18,10 @@ import kotlinx.serialization.Serializable
  *
  * The wizard advances Amount → Tenure → Rate → Review → Save. [currentStep]
  * is the 1-based step the user was on when the snapshot was taken.
+ *
+ * Lives in `core/model/banking/` (not `feature/calculators/`) so the outbox
+ * binding in `core/data/.../RepositoryModule.kt` can reference it without
+ * pulling a layer-violating feature → core dep.
  *
  * @property scenarioId Stable identifier for this in-progress wizard run. New
  *   wizards generate a UUID-ish id; resumed wizards re-use the prior id.

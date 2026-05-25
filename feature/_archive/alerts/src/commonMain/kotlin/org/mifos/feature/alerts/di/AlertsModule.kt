@@ -11,10 +11,16 @@ package org.mifos.feature.alerts.di
 
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import org.mifos.core.data.di.OutboxQualifiers
 import org.mifos.feature.alerts.ui.PriceAlertsListViewModel
 import org.mifos.feature.alerts.ui.SetPriceAlertViewModel
 
 val AlertsModule = module {
     viewModel { PriceAlertsListViewModel(get()) }
-    viewModel { SetPriceAlertViewModel(repository = get(), outbox = get()) }
+    viewModel {
+        SetPriceAlertViewModel(
+            repository = get(),
+            outbox = get(qualifier = OutboxQualifiers.PriceAlert),
+        )
+    }
 }

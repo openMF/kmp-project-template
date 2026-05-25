@@ -13,17 +13,23 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.MoneyText
+import org.mifos.core.designsystem.component.StatusChip
+import org.mifos.core.designsystem.component.StatusChipIntent
+import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.Loan
 
 /**
@@ -39,49 +45,85 @@ internal fun LoanRowCard(
     onLongPress: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .combinedClickable(onClick = onClick, onLongClick = onLongPress),
+    val sp = MaterialTheme.spacing
+    val progress = if (loan.principal > 0) {
+        (1.0 - (loan.principalRemaining / loan.principal)).toFloat().coerceIn(0f, 1f)
+    } else {
+        0f
+    }
+
+    AppCard(
+        modifier = modifier.combinedClickable(onClick = onClick, onLongClick = onLongPress),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+            Text(
+                text = loan.name,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.weight(1f),
+            )
+            StatusChip(text = loanKindLabel(loan.kind), intent = StatusChipIntent.Info)
+        }
+        Spacer(Modifier.size(sp.sm))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column {
                 Text(
-                    text = loan.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "Remaining",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                AssistChip(
-                    onClick = onClick,
-                    label = { Text(loanKindLabel(loan.kind)) },
-                    colors = AssistChipDefaults.assistChipColors(),
+                MoneyText(
+                    text = formatMoney(loan.principalRemaining),
+                    tone = org.mifos.core.designsystem.component.MoneyTone.Negative,
+                    style = MaterialTheme.typography.titleLarge,
                 )
             }
-            Text(
-                text = "Remaining: ${formatMoney(loan.principalRemaining)} / ${formatMoney(loan.principal)}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
+            Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "EMI: ${formatMoney(loan.monthlyPayment)}",
-                    style = MaterialTheme.typography.bodySmall,
+                    text = "Monthly EMI",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = "Next: ${loan.nextDueDate}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = formatMoney(loan.monthlyPayment),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 )
             }
         }
+
+        Spacer(Modifier.size(sp.md))
+        LinearProgressIndicator(
+            progress = { progress },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp),
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        )
+        Spacer(Modifier.size(sp.xs))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = "${(progress * 100).toInt()}% paid",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = "Next: ${loan.nextDueDate}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
+

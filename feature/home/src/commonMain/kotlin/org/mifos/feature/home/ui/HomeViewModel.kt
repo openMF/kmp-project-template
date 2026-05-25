@@ -100,6 +100,7 @@ class HomeViewModel(
                         count = loans.size,
                         totalMonthlyEmi = loans.sumOf { it.monthlyPayment },
                         totalOutstanding = loans.sumOf { it.principalRemaining },
+                        loans = loans,
                     )
                     ScreenState.Content(data = summary, freshness = DataFreshness.FRESH)
                 }
@@ -183,6 +184,12 @@ data class LoansSummary(
     val count: Int,
     val totalMonthlyEmi: Double,
     val totalOutstanding: Double,
+    /**
+     * The actual loans, sorted soonest-due first. The home dashboard hero renders these as a
+     * horizontally-scrollable carousel below the totals so users can flip through every loan
+     * without leaving the dashboard.
+     */
+    val loans: List<org.mifos.core.model.banking.Loan> = emptyList(),
 )
 
 /**

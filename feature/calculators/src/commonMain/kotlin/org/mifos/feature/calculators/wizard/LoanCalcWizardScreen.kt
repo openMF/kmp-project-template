@@ -42,6 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatGrouped
+import org.mifos.core.model.banking.LoanCalcScenario
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,6 +114,10 @@ fun LoanCalcWizardScreen(
 
             WizardButtons(
                 currentStep = form.currentStep,
+                canSave = form.name.isNotBlank() &&
+                    form.principal > 0.0 &&
+                    form.ratePercent >= 0.0 &&
+                    form.tenureMonths > 0,
                 onBack = viewModel::goBack,
                 onNext = viewModel::goNext,
                 onComplete = viewModel::completeAndSave,
@@ -192,6 +197,16 @@ private fun StepNameAndSave(form: LoanCalcScenario, viewModel: LoanCalcWizardVie
             value = form.name,
             onValueChange = viewModel::onUpdateName,
             label = { Text("Scenario Name") },
+            singleLine = true,
+            isError = form.name.isBlank(),
+            supportingText = {
+                if (form.name.isBlank()) {
+                    Text(
+                        "Required — type a name to enable Save.",
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -200,6 +215,7 @@ private fun StepNameAndSave(form: LoanCalcScenario, viewModel: LoanCalcWizardVie
 @Composable
 private fun WizardButtons(
     currentStep: Int,
+    canSave: Boolean,
     onBack: () -> Unit,
     onNext: () -> Unit,
     onComplete: () -> Unit,
@@ -212,7 +228,9 @@ private fun WizardButtons(
         if (currentStep < LoanCalcWizardViewModel.LAST_STEP) {
             Button(onClick = onNext) { Text("Next") }
         } else {
-            Button(onClick = onComplete) { Text("Save as Loan") }
+            // Disable when validation fails so the user can see WHY the tap doesn't fire,
+            // instead of completeAndSave() silently early-returning.
+            Button(onClick = onComplete, enabled = canSave) { Text("Save as Loan") }
         }
     }
 }

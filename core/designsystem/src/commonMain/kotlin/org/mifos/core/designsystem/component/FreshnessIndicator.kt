@@ -9,12 +9,6 @@
  */
 package org.mifos.core.designsystem.component
 
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -23,15 +17,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.theme.finance
-import org.mifos.core.designsystem.theme.motion
+import template.core.base.ui.motion.mifosRefreshingPulse
 
 /**
  * Tiny dot + label showing how fresh the displayed data is. Useful inline below
@@ -64,28 +56,12 @@ fun FreshnessIndicator(
 
 @Composable
 private fun FreshnessDot(color: Color, pulsing: Boolean) {
-    val pulseAlpha = if (pulsing) {
-        val transition = rememberInfiniteTransition(label = "freshnessPulse")
-        val durationMs = MaterialTheme.motion.refreshingPulseDurationMs
-        val a by transition.animateFloat(
-            initialValue = 0.35f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMs, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
-            label = "freshnessPulseAlpha",
-        )
-        a
-    } else {
-        1f
-    }
     androidx.compose.foundation.layout.Box(
         modifier = Modifier
             .size(8.dp)
             .clip(CircleShape)
-            .alpha(pulseAlpha)
-            .background(color),
+            .background(color)
+            .mifosRefreshingPulse(active = pulsing),
     )
 }
 

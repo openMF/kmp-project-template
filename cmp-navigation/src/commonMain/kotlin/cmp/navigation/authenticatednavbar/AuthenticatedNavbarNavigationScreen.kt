@@ -10,6 +10,7 @@
 package cmp.navigation.authenticatednavbar
 
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration.Indefinite
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -47,6 +48,7 @@ import org.mifos.feature.home.navigateToHome
 import org.mifos.feature.profile.navigateToProfile
 import org.mifos.feature.profile.profileDestination
 import template.core.base.analytics.rememberAnalyticsHelper
+import template.core.base.designsystem.theme.motion
 import template.core.base.ui.effects.EventsEffect
 import template.core.base.ui.util.RootTransitionProviders
 
@@ -184,13 +186,17 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
         // Because this Scaffold has a bottom navigation bar, the NavHost will:
         // - consume the vertical navigation bar insets.
         // - consume the IME insets.
+        // Snapshot motion tokens once so the non-Composable enterTransition lambdas capture
+        // theme-resolved values rather than the hardcoded fallbacks.
+        val motion = MaterialTheme.motion
         NavHost(
             navController = navController,
             startDestination = HomeDestination,
-            enterTransition = RootTransitionProviders.Enter.fadeIn,
-            exitTransition = RootTransitionProviders.Exit.fadeOut,
-            popEnterTransition = RootTransitionProviders.Enter.fadeIn,
-            popExitTransition = RootTransitionProviders.Exit.fadeOut,
+            // Sibling navigation (bottom-nav tab switch) uses M3 fade-through pattern.
+            enterTransition = RootTransitionProviders.Mifos.Enter.fadeThrough(motion),
+            exitTransition = RootTransitionProviders.Mifos.Exit.fadeThrough(motion),
+            popEnterTransition = RootTransitionProviders.Mifos.Enter.fadeThrough(motion),
+            popExitTransition = RootTransitionProviders.Mifos.Exit.fadeThrough(motion),
         ) {
             // TOP LEVEL DESTINATIONS
             homeGraph(

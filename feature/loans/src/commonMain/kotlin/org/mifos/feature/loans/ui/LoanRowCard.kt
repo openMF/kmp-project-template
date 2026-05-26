@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.component.AppCard
@@ -31,6 +32,7 @@ import org.mifos.core.designsystem.component.StatusChip
 import org.mifos.core.designsystem.component.StatusChipIntent
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.Loan
+import org.mifos.core.model.banking.LoanKind
 
 /**
  * Tappable row representing a single [Loan] in the list screen.
@@ -54,6 +56,7 @@ internal fun LoanRowCard(
 
     AppCard(
         modifier = modifier.combinedClickable(onClick = onClick, onLongClick = onLongPress),
+        accentColor = loanKindAccent(loan.kind),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -125,4 +128,19 @@ internal fun LoanRowCard(
             )
         }
     }
+}
+
+/**
+ * Loan-kind → accent stripe colour. Mirrored in the Home carousel
+ * (see `feature/home/HomeScreen.kt#loanKindAccent`) so the visual vocabulary
+ * stays consistent across the dashboard and the full loans list.
+ */
+@Composable
+private fun loanKindAccent(kind: LoanKind): Color? = when (kind) {
+    LoanKind.MORTGAGE -> MaterialTheme.colorScheme.secondary
+    LoanKind.BUSINESS -> MaterialTheme.colorScheme.secondary
+    LoanKind.AUTO -> MaterialTheme.colorScheme.tertiary
+    LoanKind.STUDENT -> MaterialTheme.colorScheme.tertiary
+    LoanKind.PERSONAL -> MaterialTheme.colorScheme.primary
+    LoanKind.OTHER -> null
 }

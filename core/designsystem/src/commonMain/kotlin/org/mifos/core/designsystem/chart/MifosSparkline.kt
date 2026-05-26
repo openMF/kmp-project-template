@@ -7,17 +7,17 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.feature.rates.chart
+package org.mifos.core.designsystem.chart
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 
 /**
  * Minimal Canvas-based sparkline — a one-pass connected polyline whose y-axis is
@@ -26,22 +26,22 @@ import androidx.compose.ui.unit.dp
  * Drawn purely with [Canvas] + [Path.lineTo]; the geometry computation lives in
  * [SparklineGeometry] for unit-testability.
  *
- * Per plan Phase 1: the toolkit chose **option B — custom Canvas** to avoid taking
- * on a third-party chart library while still showing a 365-day rate trend at row-
- * card scale. Visual density and visual quality decisions can be revisited later
- * by swapping in a richer primitive (e.g. Vico) without touching call sites.
+ * Caps practical input at ~365 points (1 year daily) — caller decimates larger
+ * series before passing in. Renders identically on Android / iOS / Desktop / Web.
  *
  * @param values Ordered time series (oldest → newest). Empty list renders nothing.
  * @param modifier Layout modifier — caller supplies `Modifier.size(...)` or `.fillMaxWidth().height(...)`.
- * @param color Stroke color. Defaults to the primary brand color.
- * @param strokeWidth Stroke thickness.
+ * @param color Stroke color. Defaults to `colorScheme.primary`; caller can pass `MaterialTheme.finance.rateUp` etc.
+ * @param strokeWidth Stroke thickness; defaults to `ChartTokens.defaultStrokeWidth`.
+ * @param markerAtEnd If true, draws a filled circle at the final point to emphasize "current" value.
  */
 @Composable
-fun Sparkline(
+fun MifosSparkline(
     values: List<Double>,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary,
-    strokeWidth: Dp = 1.5.dp,
+    strokeWidth: Dp = ChartTokens.defaultStrokeWidth,
+    markerAtEnd: Boolean = false,
 ) {
     Canvas(modifier = modifier) {
         if (values.isEmpty()) return@Canvas
@@ -62,5 +62,14 @@ fun Sparkline(
             color = color,
             style = Stroke(width = strokeWidth.toPx()),
         )
+
+        if (markerAtEnd) {
+            val (lastX, lastY) = points.last()
+            drawCircle(
+                color = color,
+                radius = strokeWidth.toPx() * 1.75f,
+                center = Offset(lastX, lastY),
+            )
+        }
     }
 }

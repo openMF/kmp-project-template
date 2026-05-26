@@ -27,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.icon.AppIcons
@@ -113,6 +114,7 @@ internal fun ThemeCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
         icon = AppIcons.Sun,
         title = stringResource(Res.string.feature_settings_change_theme_text),
         contentDescription = stringResource(Res.string.feature_settings_change_theme_placeholder_text),
+        accentColor = MaterialTheme.colorScheme.tertiary,
         onClick = onClick,
         modifier = modifier,
     )
@@ -124,6 +126,7 @@ internal fun LanguageCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
         icon = AppIcons.Language,
         title = stringResource(Res.string.feature_settings_change_language_text),
         contentDescription = stringResource(Res.string.feature_settings_change_language_placeholder_text),
+        accentColor = MaterialTheme.colorScheme.primary,
         onClick = onClick,
         modifier = modifier,
     )
@@ -134,11 +137,16 @@ private fun SettingsRowCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     contentDescription: String,
+    accentColor: androidx.compose.ui.graphics.Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
-    AppCard(modifier = modifier.fillMaxWidth().clickable(onClick = onClick)) {
+    AppCard(
+        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
+        accentColor = accentColor,
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -146,7 +154,7 @@ private fun SettingsRowCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(sp.md),
         ) {
-            Icon(imageVector = icon, contentDescription = null)
+            Icon(imageVector = icon, contentDescription = null, tint = accentColor)
             Text(text = title, modifier = Modifier.weight(1f))
             IconButton(onClick = onClick) {
                 Icon(imageVector = AppIcons.ArrowRight, contentDescription = contentDescription)

@@ -10,6 +10,7 @@
 package org.mifos.feature.calculators.comparison
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,15 +37,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatGrouped
+import org.mifos.core.designsystem.component.AmountDisplay
 import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.component.StatusChip
 import org.mifos.core.designsystem.component.StatusChipIntent
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.emi.EmiResult
 
+/**
+ * Compare Loans — full-width vertical-stack redesign.
+ *
+ * Original (broken) layout was 3 side-by-side columns squeezed into a phone width: input
+ * fields wrapped letter-by-letter, the "Best" badge collapsed the entire scenario card,
+ * and the results table became unreadable. New layout:
+ *
+ *  1. HeroCard summary at top — cheapest EMI as the headline, with delta over the most
+ *     expensive scenario so users immediately see the value of comparing.
+ *  2. Each scenario gets its own full-width card with: header (Scenario N + Best badge) +
+ *     inputs in a single row (3 short fields fit cleanly at full width) + result row at
+ *     the bottom (EMI / Interest / Total).
+ *
+ * Tested at 360dp phone width — no truncation, no wrap-by-character.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoanComparisonScreen(
@@ -59,7 +78,14 @@ fun LoanComparisonScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Compare Loans") },
+                title = {
+                    Text(
+                        "Compare Loans",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -79,65 +105,90 @@ fun LoanComparisonScreen(
                 .padding(sp.lg),
             verticalArrangement = Arrangement.spacedBy(sp.md),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(sp.sm),
-            ) {
-                state.scenarios.forEachIndexed { idx, scenario ->
-                    ScenarioInputColumn(
-                        index = idx,
-                        scenario = scenario,
-                        onChange = { updated ->
-                            viewModel.trySendAction(
-                                LoanComparisonAction.UpdateScenario(idx, updated),
-                            )
-                        },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
+            ComparisonHero(analysis = analysis)
 
-            Text(
-                "Side-by-side analysis",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(sp.sm),
-            ) {
-                analysis.results.forEachIndexed { idx, result ->
-                    ScenarioResultCard(
-                        title = "Scenario ${idx + 1}",
-                        result = result,
-                        isCheapest = idx == analysis.cheapestIndex,
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+            state.scenarios.forEachIndexed { idx, scenario ->
+                val result = analysis.results.getOrNull(idx)
+                ScenarioCard(
+                    index = idx,
+                    scenario = scenario,
+                    result = result,
+                    isCheapest = idx == analysis.cheapestIndex && analysis.results.size > 1,
+                    onChange = { updated ->
+                        viewModel.trySendAction(
+                            LoanComparisonAction.UpdateScenario(idx, updated),
+                        )
+                    },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ScenarioInputColumn(
+private fun ComparisonHero(analysis: LoanComparisonAnalysis) {
+    val sp = MaterialTheme.spacing
+    val cheapest = analysis.results.getOrNull(analysis.cheapestIndex)
+    val mostExpensive = analysis.results.maxByOrNull { it.totalPayment }
+    val savings = if (cheapest != null && mostExpensive != null) {
+        mostExpensive.totalPayment - cheapest.totalPayment
+    } else {
+        0.0
+    }
+    HeroCard {
+        AmountDisplay(
+            amountText = cheapest?.emi?.formatGrouped(2)?.let { "$it/mo" } ?: "—",
+            label = "Best EMI · Scenario ${analysis.cheapestIndex + 1}",
+            supporting = {
+                Column(verticalArrangement = Arrangement.spacedBy(sp.xs)) {
+                    if (savings > 0) {
+                        Text(
+                            text = "Saves ${savings.formatGrouped(2)} total vs. costliest",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                    Text(
+                        text = "Edit any scenario below to see the comparison update live.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun ScenarioCard(
     index: Int,
     scenario: LoanScenario,
+    result: EmiResult?,
+    isCheapest: Boolean,
     onChange: (LoanScenario) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val sp = MaterialTheme.spacing
-    AppCard(modifier = modifier) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(sp.sm),
-            verticalArrangement = Arrangement.spacedBy(sp.sm),
-        ) {
-            Text(
-                "Scenario ${index + 1}",
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-            )
+    AppCard(
+        accentColor = if (isCheapest) MaterialTheme.colorScheme.secondary else null,
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(sp.md)) {
+            // Header row — scenario label + Best badge.
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(sp.sm),
+            ) {
+                Text(
+                    text = "Scenario ${index + 1}",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    modifier = Modifier.weight(1f),
+                )
+                if (isCheapest) {
+                    StatusChip(text = "Best", intent = StatusChipIntent.Success)
+                }
+            }
+
+            // Inputs — full width each. Fits cleanly on every phone.
             OutlinedTextField(
                 value = scenario.principal.toLong().toString(),
                 onValueChange = {
@@ -145,80 +196,91 @@ private fun ScenarioInputColumn(
                 },
                 label = { Text("Principal") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
-            OutlinedTextField(
-                value = scenario.ratePercent.toString(),
-                onValueChange = {
-                    it.toDoubleOrNull()?.let { v -> onChange(scenario.copy(ratePercent = v)) }
-                },
-                label = { Text("Rate (%)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+
+            // Rate + Months side-by-side — both short numerics, fit comfortably.
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-            )
-            OutlinedTextField(
-                value = scenario.tenureMonths.toString(),
-                onValueChange = {
-                    it.toIntOrNull()?.let { v -> onChange(scenario.copy(tenureMonths = v)) }
-                },
-                label = { Text("Months") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-            )
+                horizontalArrangement = Arrangement.spacedBy(sp.sm),
+            ) {
+                OutlinedTextField(
+                    value = scenario.ratePercent.toString(),
+                    onValueChange = {
+                        it.toDoubleOrNull()?.let { v ->
+                            onChange(scenario.copy(ratePercent = v))
+                        }
+                    },
+                    label = { Text("Rate (%)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                )
+                OutlinedTextField(
+                    value = scenario.tenureMonths.toString(),
+                    onValueChange = {
+                        it.toIntOrNull()?.let { v -> onChange(scenario.copy(tenureMonths = v)) }
+                    },
+                    label = { Text("Tenure (months)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+
+            // Result strip — EMI / Interest / Total at a glance.
+            if (result != null) {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    ResultStrip(result = result, highlight = isCheapest)
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun ScenarioResultCard(
-    title: String,
-    result: EmiResult,
-    isCheapest: Boolean,
-    modifier: Modifier = Modifier,
-) {
+private fun ResultStrip(result: EmiResult, highlight: Boolean) {
     val sp = MaterialTheme.spacing
-    AppCard(modifier = modifier) {
-        Column(
+    val container = if (highlight) {
+        MaterialTheme.colorScheme.secondaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceContainerHighest
+    }
+    val onContainer = if (highlight) {
+        MaterialTheme.colorScheme.onSecondaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+    androidx.compose.material3.Surface(
+        color = container,
+        contentColor = onContainer,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(sp.sm),
-            verticalArrangement = Arrangement.spacedBy(sp.xs),
+                .padding(horizontal = sp.md, vertical = sp.sm),
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(sp.xs),
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-                    modifier = Modifier.weight(1f),
-                )
-                if (isCheapest) {
-                    StatusChip(text = "Best", intent = StatusChipIntent.Success)
-                }
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text("EMI", style = MaterialTheme.typography.bodySmall)
-                Text(result.emi.formatGrouped(2), style = MaterialTheme.typography.bodySmall)
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text("Interest", style = MaterialTheme.typography.bodySmall)
-                Text(result.totalInterest.formatGrouped(2), style = MaterialTheme.typography.bodySmall)
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text("Total", style = MaterialTheme.typography.bodySmall)
-                Text(result.totalPayment.formatGrouped(2), style = MaterialTheme.typography.bodySmall)
-            }
+            ResultCell(label = "EMI", value = result.emi.formatGrouped(2))
+            ResultCell(label = "Interest", value = result.totalInterest.formatGrouped(2))
+            ResultCell(label = "Total", value = result.totalPayment.formatGrouped(2))
         }
+    }
+}
+
+@Composable
+private fun ResultCell(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.Start) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+        )
     }
 }

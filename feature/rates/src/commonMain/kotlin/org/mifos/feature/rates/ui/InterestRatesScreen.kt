@@ -41,12 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
+import org.mifos.core.designsystem.chart.MifosSparkline
 import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.component.RateBadge
 import org.mifos.core.designsystem.component.RateDirection
+import org.mifos.core.designsystem.theme.finance
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.InterestRateSeries
-import org.mifos.feature.rates.chart.Sparkline
 import template.core.base.store.screen.ScreenState
 import template.core.base.ui.screen.ScreenContent
 
@@ -135,7 +136,19 @@ private fun RateRowCard(
     onSeriesClick: (seriesId: String) -> Unit,
 ) {
     val sp = MaterialTheme.spacing
-    AppCard {
+    val f = MaterialTheme.finance
+    // Direction-driven accent stripe: up = rateUp tone, down = rateDown tone, flat = none.
+    // Only available once we have Content — Loading/Error rows render unstriped.
+    val accent: androidx.compose.ui.graphics.Color? = if (state is ScreenState.Content) {
+        when {
+            computeOneDayDelta(state.data).let { it != null && it > 0 } -> f.rateUp
+            computeOneDayDelta(state.data).let { it != null && it < 0 } -> f.rateDown
+            else -> null
+        }
+    } else {
+        null
+    }
+    AppCard(accentColor = accent) {
         Box(modifier = Modifier.fillMaxWidth().height(140.dp).padding(sp.md)) {
             ScreenContent(
                 state = state,
@@ -195,7 +208,7 @@ private fun RateRowContent(
             }
         }
 
-        Sparkline(
+        MifosSparkline(
             values = series.observations.map { it.value },
             modifier = Modifier.weight(1f).fillMaxSize(),
         )

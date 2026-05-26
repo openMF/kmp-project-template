@@ -333,18 +333,13 @@ private fun LoanCarouselTile(
     } else {
         0f
     }
-    androidx.compose.material3.ElevatedCard(
-        onClick = onClick,
-        modifier = Modifier.width(220.dp),
-        colors = androidx.compose.material3.CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        ),
+    AppCard(
+        modifier = Modifier
+            .width(220.dp)
+            .clickable(onClick = onClick),
+        accentColor = loanKindAccent(loan.kind),
     ) {
-        Column(
-            modifier = Modifier
-                .padding(sp.md),
-            verticalArrangement = Arrangement.spacedBy(sp.xs),
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(sp.xs)) {
             Text(
                 text = loan.name,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
@@ -377,6 +372,23 @@ private fun LoanCarouselTile(
             )
         }
     }
+}
+
+/**
+ * Maps each [org.mifos.core.model.banking.LoanKind] to a distinct accent stripe colour so
+ * users can scan a list of loans and identify mortgage vs. auto vs. personal vs. business
+ * vs. student at a glance — same vocabulary as [PersonalLoansListScreen]'s LoanRowCard.
+ */
+@Composable
+private fun loanKindAccent(
+    kind: org.mifos.core.model.banking.LoanKind,
+): androidx.compose.ui.graphics.Color? = when (kind) {
+    org.mifos.core.model.banking.LoanKind.MORTGAGE -> MaterialTheme.colorScheme.secondary
+    org.mifos.core.model.banking.LoanKind.BUSINESS -> MaterialTheme.colorScheme.secondary
+    org.mifos.core.model.banking.LoanKind.AUTO -> MaterialTheme.colorScheme.tertiary
+    org.mifos.core.model.banking.LoanKind.STUDENT -> MaterialTheme.colorScheme.tertiary
+    org.mifos.core.model.banking.LoanKind.PERSONAL -> MaterialTheme.colorScheme.primary
+    org.mifos.core.model.banking.LoanKind.OTHER -> null
 }
 
 @Composable

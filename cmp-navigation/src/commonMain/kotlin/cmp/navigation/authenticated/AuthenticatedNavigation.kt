@@ -76,13 +76,9 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             navigateToLoanCalcWizard = { navController.navigateToLoanCalcWizard() },
         )
 
-        notificationDestination(
-            onBackClick = navController::popBackStack,
-        )
+        notificationDestination(onBackClick = navController::popBackStack)
 
-        settingsDestination(
-            onBackClick = navController::popBackStack,
-        )
+        settingsDestination(onBackClick = navController::popBackStack)
 
         // Money Toolkit feature graphs — generic personal-finance utilities.
         currencyRatesGraph(navController)

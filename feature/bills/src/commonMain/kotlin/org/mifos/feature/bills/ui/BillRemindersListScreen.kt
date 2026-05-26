@@ -53,6 +53,7 @@ import org.mifos.core.designsystem.component.StatusChip
 import org.mifos.core.designsystem.component.StatusChipIntent
 import org.mifos.core.designsystem.component.Urgency
 import org.mifos.core.designsystem.component.UrgencyDot
+import org.mifos.core.designsystem.theme.finance
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.BillReminder
 import template.core.base.ui.screen.ScreenContent
@@ -177,7 +178,17 @@ private fun BillReminderRow(
         diff <= 7 -> StatusChipIntent.Info
         else -> StatusChipIntent.Neutral
     }
-    AppCard(modifier = Modifier.clickable(onClick = onClick)) {
+    val f = MaterialTheme.finance
+    val accent = when {
+        diff < 0 -> f.urgencyOverdue
+        diff <= 1 -> f.urgencyToday
+        diff <= 7 -> f.urgencyUpcoming
+        else -> null
+    }
+    AppCard(
+        modifier = Modifier.clickable(onClick = onClick),
+        accentColor = accent,
+    ) {
         // Row 1 — leading dot + bill name + amount on the right
         Row(
             modifier = Modifier.fillMaxWidth(),

@@ -1,0 +1,74 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package template.core.base.ui.motion
+
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
+
+/**
+ * `NavGraphBuilder.composable<T>(...)` wrapper that pre-wires Mifos's shared-axis
+ * transitions for **forward/back navigation** in a single stack.
+ *
+ * Reads `MaterialTheme.motion` at graph-build time (`@Composable` extension) so the
+ * pre-resolved transitions honor the active theme tokens.
+ *
+ * Usage:
+ * ```
+ * fun NavGraphBuilder.loansGraph(nav: NavController) {
+ *     sharedAxisComposable<LoanListRoute> { LoanListScreen(...) }
+ *     sharedAxisComposable<LoanDetailRoute> { LoanDetailScreen(...) }
+ * }
+ * ```
+ *
+ * For broader-stroke adoption, the legacy `composableWithPushTransitions<T>()` in
+ * `template.core.base.ui.nav.NavGraphBuilderExtensions.kt` is also theme-aware now —
+ * either helper works.
+ */
+@Composable
+inline fun <reified T : Any> NavGraphBuilder.sharedAxisComposable(
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+) {
+    // Snapshot @Composable-resolved transitions at graph-build time so the non-Composable
+    // enterTransition lambdas can capture them as plain data.
+    val enterFwd = MifosSharedAxis.enterForward()
+    val exitFwd = MifosSharedAxis.exitForward()
+    val enterBack = MifosSharedAxis.enterBack()
+    val exitBack = MifosSharedAxis.exitBack()
+    composable<T>(
+        enterTransition = { enterFwd },
+        exitTransition = { exitFwd },
+        popEnterTransition = { enterBack },
+        popExitTransition = { exitBack },
+        content = content,
+    )
+}
+
+/**
+ * `NavGraphBuilder.composable<T>(...)` wrapper for **sibling navigation** —
+ * bottom-nav tabs, paged sub-sections. Outgoing fades to nothing before
+ * incoming fades in (per [MifosFadeThrough]).
+ */
+@Composable
+inline fun <reified T : Any> NavGraphBuilder.fadeThroughComposable(
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+) {
+    val enter = MifosFadeThrough.enter()
+    val exit = MifosFadeThrough.exit()
+    composable<T>(
+        enterTransition = { enter },
+        exitTransition = { exit },
+        popEnterTransition = { enter },
+        popExitTransition = { exit },
+        content = content,
+    )
+}

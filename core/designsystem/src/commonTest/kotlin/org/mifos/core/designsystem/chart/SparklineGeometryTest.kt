@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.feature.rates.chart
+package org.mifos.core.designsystem.chart
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -31,8 +31,7 @@ class SparklineGeometryTest {
 
     @Test
     fun singleValueRendersAsHorizontalMidpoint() {
-        // Plan risk: "jittery on small screens with sparse data" — a 1-point series
-        // must NOT divide-by-zero on range.
+        // A 1-point series must NOT divide-by-zero on range.
         val pts = SparklineGeometry.normalize(values = listOf(2.5), width = 100f, height = 40f)
         assertEquals(1, pts.size)
         assertEquals(0f, pts[0].first)
@@ -43,7 +42,6 @@ class SparklineGeometryTest {
     @Test
     fun flatSeriesRendersAsHorizontalMidline() {
         // All-equal values would otherwise yield NaN from (v - min) / (max - min).
-        // Risk-mitigation per plan.
         val pts = SparklineGeometry.normalize(
             values = listOf(5.0, 5.0, 5.0, 5.0),
             width = 90f,

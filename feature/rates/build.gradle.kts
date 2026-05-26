@@ -20,6 +20,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.common)
             implementation(projects.core.data)
+            implementation(projects.core.designsystem)
             implementation(projects.core.model)
             implementation(projects.core.store)
             implementation(projects.coreBase.store)

@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.designsystem.theme
+package template.core.base.designsystem.theme
 
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
@@ -25,9 +25,13 @@ import androidx.compose.ui.unit.dp
  * Values align with Material 3 motion guidance
  * (https://m3.material.io/styles/motion/easing-and-duration). All durations in milliseconds.
  *
- * Access from any Composable via [MaterialTheme.motion]. Sub-plan 05 builds shared-axis nav
- * transitions, fade-through, list-item-enter, and refreshing-pulse on top of these tokens —
- * changing a single value here propagates everywhere.
+ * Access from any Composable via [MaterialTheme.motion]. Framework transition factories under
+ * `template.core.base.ui.motion` (`MifosSharedAxis`, `MifosFadeThrough`, etc.) and the
+ * `RootTransitionProviders.Mifos` / `TransitionProviders.Mifos` provider namespaces consume
+ * these values — changing a single token here propagates app-wide.
+ *
+ * Lives in `core-base/designsystem` so framework-shared transition code can read it without
+ * depending on `core/designsystem` (forbidden dependency direction).
  */
 @Immutable
 data class Motion(
@@ -70,20 +74,11 @@ data class Motion(
     // ── Pattern parameters ───────────────────────────────────────────────────
     /** Slide distance for shared-axis-X transitions. */
     val sharedAxisSlideDistance: Dp = 30.dp,
-    /**
-     * Duration of one full breath of the "refreshing now" pulse.
-     * Consumed by sub-plan 05's `Modifier.mifosRefreshingPulse`.
-     */
+    /** Duration of one full breath of the "refreshing now" pulse (consumed by `Modifier.mifosRefreshingPulse`). */
     val refreshingPulseDurationMs: Int = 1200,
-    /**
-     * Stagger delay per item when `LazyColumn` items use sub-plan 05's
-     * `Modifier.mifosListItemEnter`.
-     */
+    /** Stagger delay per item when `LazyColumn` items use `Modifier.mifosListItemEnter`. */
     val listItemEnterStaggerMs: Int = 30,
-    /**
-     * Cap on list-item stagger — items past this index snap into place.
-     * Avoids delay-stacking on long lists.
-     */
+    /** Cap on list-item stagger — items past this index snap into place. */
     val listItemEnterMaxAnimated: Int = 20,
 )
 
@@ -93,4 +88,27 @@ val LocalMotion = staticCompositionLocalOf { Motion() }
 val MaterialTheme.motion: Motion
     @Composable
     @ReadOnlyComposable
-    get() = LocalMotion.current
+    get() = LocalMotion.current.also { MotionSnapshot.current = it }
+
+/**
+ * Last-read snapshot of the active [Motion]. Updated as a side effect whenever any
+ * `@Composable` site reads [MaterialTheme.motion]. Used by non-`@Composable` code
+ * paths — chiefly the `composableWith*Transitions` helpers in `core-base/ui` — that
+ * need motion tokens from outside a Composable scope (`NavGraphBuilder` lambdas are
+ * non-`@Composable`).
+ *
+ * **Reactivity caveat**: the snapshot updates **on `@Composable` read**. If a fork
+ * swaps the Motion provider mid-app, non-`@Composable` consumers won't observe the
+ * change until at least one `@Composable` site reads `MaterialTheme.motion` again.
+ * In practice every screen using motion-aware widgets (FreshnessIndicator, charts,
+ * list-item-enter modifier, etc.) triggers a read on composition, so transitions on
+ * subsequent pushes get the updated value.
+ *
+ * **Initial value**: defaults to `Motion()` — same as `LocalMotion`'s default — so
+ * the very first transition is well-defined even before any `@Composable` read.
+ */
+object MotionSnapshot {
+    @kotlin.concurrent.Volatile
+    var current: Motion = Motion()
+        internal set
+}

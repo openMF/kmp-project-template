@@ -7,10 +7,10 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.feature.rates.chart
+package org.mifos.core.designsystem.chart
 
 /**
- * Pure-function path geometry for the [Sparkline] and [AreaChart] composables.
+ * Pure-function path geometry for [MifosSparkline] and [MifosAreaChart].
  *
  * Extracted from the `Canvas { drawPath() }` block so the math is unit-testable
  * without a Compose test rule. The composable consumes the returned `(x, y)` pairs
@@ -21,9 +21,9 @@ package org.mifos.feature.rates.chart
  * and the series minimum maps to `y = height` (bottom). That matches what a
  * human reads as "line going up = value going up".
  *
- * **Degenerate-input contracts** (per plan risk mitigation):
+ * **Degenerate-input contracts**:
  *  - Empty list → empty result.
- *  - Single value → centered horizontally at `x = 0` and vertically at `height / 2`.
+ *  - Single value → `x = 0`, `y = height / 2`.
  *  - All-equal values (zero range) → all y's at the canvas midline. No division by zero.
  */
 internal object SparklineGeometry {
@@ -48,7 +48,6 @@ internal object SparklineGeometry {
                         height / 2f
                     } else {
                         val normalized = ((value - min) / range).toFloat()
-                        // Flip Y: max → 0 (top), min → height (bottom).
                         height - normalized * height
                     }
                     x to y

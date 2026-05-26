@@ -19,6 +19,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import org.mifos.core.store.appScreenStateDefaults
 import template.core.base.designsystem.KptMaterialTheme
 import template.core.base.designsystem.theme.KptThemeProviderImpl
+import template.core.base.designsystem.theme.LocalMotion
+import template.core.base.designsystem.theme.Motion
 import template.core.base.designsystem.toKptColorScheme
 import template.core.base.designsystem.toKptTypography
 import template.core.base.ui.screen.LocalScreenStateDefaults

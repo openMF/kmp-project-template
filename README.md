@@ -2,9 +2,12 @@
 
 <img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="Project Logo" width="150" style="margin-right: 20px;" />
 
-<h1>KMP Multi-Module Project Generator</h1>
+<h1>Money Toolkit — KMP Financial Utility Template</h1>
 
-<p>🚀 The Ultimate Kotlin Multiplatform Project Generator with Production-Ready Setup</p>
+<p>An open-source financial utility template for Kotlin Multiplatform. No login.
+No backend. Ships working personal-finance tools you can use out-of-the-box:
+loan tracking, bill reminders, interest-rate watching, financial calculators,
+country-level macro indicators. Fork to brand and extend.</p>
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-7f52ff?style=flat-square&logo=kotlin&logoColor=white)
 ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin%20Multiplatform-4c8d3f?style=flat-square&logo=kotlin&logoColor=white)
@@ -31,6 +34,21 @@
 > For full customization, please use the `full-customizable` branch instead.
 
 ## 🌟 Key Features
+
+### Shipped financial utilities (the toolkit)
+
+- **B1 Loan Tracker** — track personal loans, principal remaining, EMI, due dates
+- **B2 EMI Calculator** — compute monthly installments for any loan
+- **B3 Affordability** — "how much loan can I afford?" planner
+- **B4 Bill Reminders** — recurring bills + in-app notification scheduler
+- **B5 Amortization** — full payment schedule per loan
+- **B6 Loan Comparison** — side-by-side total-cost analysis wizard
+- **B7 Interest Rates** — FRED-backed Fed Funds / Prime / Mortgage / Treasury series
+- **B8 Country Macro** — GDP / CPI / unemployment by country (World Bank)
+- **Currency Rates** — live FX rates + historical FX charts
+- **Home dashboard** — loans summary + upcoming bills + rates + USD exchange
+
+### Template infrastructure
 
 - **Cross-Platform Support**: Android, iOS, Desktop, and Web applications from a single codebase
 - **Multi-Module Architecture**: Clean, organized, and scalable project structure

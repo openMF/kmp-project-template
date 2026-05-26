@@ -80,6 +80,8 @@ secrets.env
 secrets/
 !secrets/.gitkeep
 !secrets/*.template
+.env.local
+!.env.local.example
 PROJECT_SETUP_INFO.txt
 
 # iOS Secrets - NEVER COMMIT THESE!

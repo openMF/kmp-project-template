@@ -10,6 +10,7 @@
 package cmp.navigation.authenticatednavbar
 
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration.Indefinite
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -47,18 +48,24 @@ import org.mifos.feature.home.navigateToHome
 import org.mifos.feature.profile.navigateToProfile
 import org.mifos.feature.profile.profileDestination
 import template.core.base.analytics.rememberAnalyticsHelper
+import template.core.base.designsystem.theme.motion
 import template.core.base.ui.effects.EventsEffect
 import template.core.base.ui.util.RootTransitionProviders
 
 @Composable
 internal fun AuthenticatedNavbarNavigationScreen(
     navigateToSettingsScreen: () -> Unit,
+    navigateToLoans: () -> Unit,
+    navigateToBills: () -> Unit,
     navigateToRates: () -> Unit,
-    navigateToHistory: () -> Unit,
-    navigateToCrypto: () -> Unit,
+    navigateToExchangeRates: () -> Unit,
+    navigateToRateHistory: () -> Unit,
+    navigateToMacro: () -> Unit,
     navigateToEmi: () -> Unit,
-    navigateToWatchlist: () -> Unit,
-    navigateToAlerts: () -> Unit,
+    navigateToAffordability: () -> Unit,
+    navigateToAmortization: () -> Unit,
+    navigateToLoanComparison: () -> Unit,
+    navigateToLoanCalcWizard: () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberKptNavController(
         name = "AuthenticatedNavbarScreen",
@@ -107,12 +114,17 @@ internal fun AuthenticatedNavbarNavigationScreen(
         snackbarHostState = snackbarHostState,
         modifier = modifier,
         navigateToSettingsScreen = navigateToSettingsScreen,
+        navigateToLoans = navigateToLoans,
+        navigateToBills = navigateToBills,
         navigateToRates = navigateToRates,
-        navigateToHistory = navigateToHistory,
-        navigateToCrypto = navigateToCrypto,
+        navigateToExchangeRates = navigateToExchangeRates,
+        navigateToRateHistory = navigateToRateHistory,
+        navigateToMacro = navigateToMacro,
         navigateToEmi = navigateToEmi,
-        navigateToWatchlist = navigateToWatchlist,
-        navigateToAlerts = navigateToAlerts,
+        navigateToAffordability = navigateToAffordability,
+        navigateToAmortization = navigateToAmortization,
+        navigateToLoanComparison = navigateToLoanComparison,
+        navigateToLoanCalcWizard = navigateToLoanCalcWizard,
         onAction = remember(viewModel) {
             { viewModel.trySendAction(it) }
         },
@@ -123,12 +135,17 @@ internal fun AuthenticatedNavbarNavigationScreen(
 internal fun AuthenticatedNavbarNavigationScreenContent(
     navController: NavHostController,
     navigateToSettingsScreen: () -> Unit,
+    navigateToLoans: () -> Unit,
+    navigateToBills: () -> Unit,
     navigateToRates: () -> Unit,
-    navigateToHistory: () -> Unit,
-    navigateToCrypto: () -> Unit,
+    navigateToExchangeRates: () -> Unit,
+    navigateToRateHistory: () -> Unit,
+    navigateToMacro: () -> Unit,
     navigateToEmi: () -> Unit,
-    navigateToWatchlist: () -> Unit,
-    navigateToAlerts: () -> Unit,
+    navigateToAffordability: () -> Unit,
+    navigateToAmortization: () -> Unit,
+    navigateToLoanComparison: () -> Unit,
+    navigateToLoanCalcWizard: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
@@ -169,23 +186,32 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
         // Because this Scaffold has a bottom navigation bar, the NavHost will:
         // - consume the vertical navigation bar insets.
         // - consume the IME insets.
+        // Snapshot motion tokens once so the non-Composable enterTransition lambdas capture
+        // theme-resolved values rather than the hardcoded fallbacks.
+        val motion = MaterialTheme.motion
         NavHost(
             navController = navController,
             startDestination = HomeDestination,
-            enterTransition = RootTransitionProviders.Enter.fadeIn,
-            exitTransition = RootTransitionProviders.Exit.fadeOut,
-            popEnterTransition = RootTransitionProviders.Enter.fadeIn,
-            popExitTransition = RootTransitionProviders.Exit.fadeOut,
+            // Sibling navigation (bottom-nav tab switch) uses M3 fade-through pattern.
+            enterTransition = RootTransitionProviders.Mifos.Enter.fadeThrough(motion),
+            exitTransition = RootTransitionProviders.Mifos.Exit.fadeThrough(motion),
+            popEnterTransition = RootTransitionProviders.Mifos.Enter.fadeThrough(motion),
+            popExitTransition = RootTransitionProviders.Mifos.Exit.fadeThrough(motion),
         ) {
             // TOP LEVEL DESTINATIONS
             homeGraph(
                 onSettingsClick = navigateToSettingsScreen,
+                onNavigateToLoans = navigateToLoans,
+                onNavigateToBills = navigateToBills,
                 onNavigateToRates = navigateToRates,
-                onNavigateToHistory = navigateToHistory,
-                onNavigateToCrypto = navigateToCrypto,
+                onNavigateToExchangeRates = navigateToExchangeRates,
+                onNavigateToRateHistory = navigateToRateHistory,
+                onNavigateToMacro = navigateToMacro,
                 onNavigateToEmi = navigateToEmi,
-                onNavigateToWatchlist = navigateToWatchlist,
-                onNavigateToAlerts = navigateToAlerts,
+                onNavigateToAffordability = navigateToAffordability,
+                onNavigateToAmortization = navigateToAmortization,
+                onNavigateToLoanComparison = navigateToLoanComparison,
+                onNavigateToLoanCalcWizard = navigateToLoanCalcWizard,
             )
 
             profileDestination()

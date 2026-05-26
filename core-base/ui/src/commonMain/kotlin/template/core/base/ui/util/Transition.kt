@@ -19,6 +19,9 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.NavBackStackEntry
 import kotlin.jvm.JvmSuppressWildcards
+import template.core.base.designsystem.theme.Motion
+import template.core.base.ui.motion.MifosFadeThrough
+import template.core.base.ui.motion.MifosSharedAxis
 
 /**
  * Function type for providing nullable enter transitions in navigation.
@@ -224,7 +227,100 @@ object TransitionProviders {
                 .takeIf { isSameGraphNavigation }
         }
     }
+
+    /**
+     * Mifos-branded transition vocabulary aligned with the M3 motion spec
+     * (https://m3.material.io/styles/motion/transitions/transition-patterns). These are
+     * **semantic aliases** of the existing [Enter] / [Exit] providers — same animation specs,
+     * but named after the motion pattern they implement rather than the direction of travel.
+     *
+     *  - [sharedAxisForward] — pushing a new screen onto the stack.
+     *  - [sharedAxisBack] — popping back to the previous screen.
+     *  - [fadeThrough] — sibling navigation (bottom-nav tab switch, paged sub-section switch).
+     *
+     * Like the parent providers, these return `null` for cross-graph navigation so the outer
+     * navigator's transition can take over (see [isSameGraphNavigation]).
+     *
+     * **Theme-token injection (follow-up):** these still capture hardcoded durations from
+     * [DEFAULT_FADE_TRANSITION_TIME_MS] / [DEFAULT_PUSH_TRANSITION_TIME_MS]. Wiring
+     * `MaterialTheme.motion` through them requires moving the `Motion` data class from
+     * `core/designsystem/theme/Motion.kt` down to `core-base/designsystem` (today blocked by
+     * dependency direction) and lifting the providers from `val` to `fun(motion: Motion)`.
+     */
+    object Mifos {
+        object Enter {
+            /** Hardcoded aliases — kept for callers that don't have a `Motion` in scope. */
+            val sharedAxisForward: EnterTransitionProvider = TransitionProviders.Enter.pushLeft
+            val sharedAxisBack: EnterTransitionProvider = TransitionProviders.Enter.pushRight
+            val fadeThrough: EnterTransitionProvider = TransitionProviders.Enter.fadeIn
+            val slideUp: EnterTransitionProvider = TransitionProviders.Enter.slideUp
+            val stay: EnterTransitionProvider = TransitionProviders.Enter.stay
+
+            /**
+             * Theme-aware variants. Consume tokens from [Motion]. Caller resolves
+             * `MaterialTheme.motion` at a `@Composable` site and passes it in — the
+             * returned provider snapshots the values and is safe to pass into the
+             * non-`@Composable` `enterTransition = ...` lambda.
+             */
+            fun sharedAxisForward(motion: Motion): EnterTransitionProvider = {
+                MifosSharedAxis.enterForward(motion).takeIf { isSameGraphNavigation }
+            }
+            fun sharedAxisBack(motion: Motion): EnterTransitionProvider = {
+                MifosSharedAxis.enterBack(motion).takeIf { isSameGraphNavigation }
+            }
+            fun fadeThrough(motion: Motion): EnterTransitionProvider = {
+                MifosFadeThrough.enter(motion).takeIf { isSameGraphNavigation }
+            }
+            fun slideUp(motion: Motion): EnterTransitionProvider = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+                ).takeIf { isSameGraphNavigation }
+            }
+            // "stay" holds 0.99 alpha so Compose doesn't optimize it away — duration must
+            // match the longest concurrent transition so the held side doesn't blink in/out
+            // while the other side animates.
+            fun stay(motion: Motion): EnterTransitionProvider = {
+                fadeIn(
+                    animationSpec = tween(motion.durationLong1),
+                    initialAlpha = 1f,
+                ).takeIf { isSameGraphNavigation }
+            }
+        }
+
+        object Exit {
+            val sharedAxisForward: ExitTransitionProvider = TransitionProviders.Exit.pushLeft
+            val sharedAxisBack: ExitTransitionProvider = TransitionProviders.Exit.pushRight
+            val fadeThrough: ExitTransitionProvider = TransitionProviders.Exit.fadeOut
+            val slideDown: ExitTransitionProvider = TransitionProviders.Exit.slideDown
+            val stay: ExitTransitionProvider = TransitionProviders.Exit.stay
+
+            fun sharedAxisForward(motion: Motion): ExitTransitionProvider = {
+                MifosSharedAxis.exitForward(motion).takeIf { isSameGraphNavigation }
+            }
+            fun sharedAxisBack(motion: Motion): ExitTransitionProvider = {
+                MifosSharedAxis.exitBack(motion).takeIf { isSameGraphNavigation }
+            }
+            fun fadeThrough(motion: Motion): ExitTransitionProvider = {
+                MifosFadeThrough.exit(motion).takeIf { isSameGraphNavigation }
+            }
+            fun slideDown(motion: Motion): ExitTransitionProvider = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+                ).takeIf { isSameGraphNavigation }
+            }
+            fun stay(motion: Motion): ExitTransitionProvider = {
+                fadeOut(
+                    animationSpec = tween(motion.durationLong1),
+                    targetAlpha = 0.99f,
+                ).takeIf { isSameGraphNavigation }
+            }
+        }
+    }
 }
+
+
 
 /**
  * Contains standard "transition providers" that may be used to specify the [EnterTransition] and
@@ -389,6 +485,91 @@ object RootTransitionProviders {
                 animationSpec = tween(DEFAULT_STAY_TRANSITION_TIME_MS),
                 targetAlpha = 0.99f,
             )
+        }
+    }
+
+    /**
+     * Mifos-branded transition vocabulary for **root [NavHost]** wiring (non-null providers).
+     *
+     * Companion to [TransitionProviders.Mifos] — same motion patterns, but always non-null since
+     * the root [NavHost] requires every transition slot filled.
+     *
+     *  - [sharedAxisForward] — pushing a new screen onto the stack.
+     *  - [sharedAxisBack] — popping back.
+     *  - [fadeThrough] — sibling navigation (used by `cmp-navigation/authenticatednavbar` for
+     *    bottom-nav tab switches).
+     *  - [none] — instant, no animation (splash → first authenticated screen handoff).
+     *  - [stay] — no-op holding the screen visible while the other side transitions.
+     *
+     * See [TransitionProviders.Mifos] for the wider rationale + the theme-token follow-up note.
+     */
+    object Mifos {
+        object Enter {
+            /** Hardcoded aliases — kept for callers that don't have a `Motion` in scope. */
+            val sharedAxisForward: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.pushLeft
+            val sharedAxisBack: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.pushRight
+            val fadeThrough: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.fadeIn
+            val slideUp: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.slideUp
+            val none: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.none
+            val stay: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.stay
+
+            /**
+             * Theme-aware variants. Caller resolves `MaterialTheme.motion` at a
+             * `@Composable` site and passes it; the returned provider snapshots the
+             * values. Use these whenever theme tokens should drive the transition.
+             */
+            fun sharedAxisForward(motion: Motion): NonNullEnterTransitionProvider = {
+                MifosSharedAxis.enterForward(motion)
+            }
+            fun sharedAxisBack(motion: Motion): NonNullEnterTransitionProvider = {
+                MifosSharedAxis.enterBack(motion)
+            }
+            fun fadeThrough(motion: Motion): NonNullEnterTransitionProvider = {
+                MifosFadeThrough.enter(motion)
+            }
+            fun slideUp(motion: Motion): NonNullEnterTransitionProvider = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+                )
+            }
+            fun stay(motion: Motion): NonNullEnterTransitionProvider = {
+                fadeIn(
+                    animationSpec = tween(motion.durationLong1),
+                    initialAlpha = 1f,
+                )
+            }
+        }
+
+        object Exit {
+            val sharedAxisForward: NonNullExitTransitionProvider = RootTransitionProviders.Exit.pushLeft
+            val sharedAxisBack: NonNullExitTransitionProvider = RootTransitionProviders.Exit.pushRight
+            val fadeThrough: NonNullExitTransitionProvider = RootTransitionProviders.Exit.fadeOut
+            val slideDown: NonNullExitTransitionProvider = RootTransitionProviders.Exit.slideDown
+            val none: NonNullExitTransitionProvider = RootTransitionProviders.Exit.none
+            val stay: NonNullExitTransitionProvider = RootTransitionProviders.Exit.stay
+
+            fun sharedAxisForward(motion: Motion): NonNullExitTransitionProvider = {
+                MifosSharedAxis.exitForward(motion)
+            }
+            fun sharedAxisBack(motion: Motion): NonNullExitTransitionProvider = {
+                MifosSharedAxis.exitBack(motion)
+            }
+            fun fadeThrough(motion: Motion): NonNullExitTransitionProvider = {
+                MifosFadeThrough.exit(motion)
+            }
+            fun slideDown(motion: Motion): NonNullExitTransitionProvider = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+                )
+            }
+            fun stay(motion: Motion): NonNullExitTransitionProvider = {
+                fadeOut(
+                    animationSpec = tween(motion.durationLong1),
+                    targetAlpha = 0.99f,
+                )
+            }
         }
     }
 }

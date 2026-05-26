@@ -12,20 +12,20 @@ package org.mifos.feature.home.ui
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import org.mifos.core.data.alerts.AlertsRepository
-import org.mifos.core.data.crypto.CryptoRepository
+import org.mifos.core.data.banking.BillReminderRepository
+import org.mifos.core.data.banking.LoanRepository
 import org.mifos.core.data.currency.CurrencyRepository
-import org.mifos.core.data.watchlist.WatchlistItem
-import org.mifos.core.data.watchlist.WatchlistRepository
-import org.mifos.core.model.alerts.PriceAlert
-import org.mifos.core.model.crypto.CoinMarket
+import org.mifos.core.data.economic.EconomicRatesRepository
+import org.mifos.core.model.banking.BillReminder
 import org.mifos.core.model.currency.ExchangeRates
+import org.mifos.core.store.economic.impl.InterestRateSeriesKey
 import template.core.base.store.screen.DataFreshness
 import template.core.base.store.screen.ScreenState
+import template.core.base.store.screen.combineScreenStates
 import template.core.base.ui.viewmodel.BaseViewModel
 
 /**
- * **Canonical multi-source combine showcase.**
+ * **Money Toolkit home dashboard ViewModel.**
  *
  * Composes four independent reactive sources into a single UI state with
  * per-widget loading/empty/error/content slots. Each widget's state evolves
@@ -33,40 +33,38 @@ import template.core.base.ui.viewmodel.BaseViewModel
  * to-refresh fans out to the network-backed streams concurrently.
  *
  * Sources split by character:
- *  - [pagingStream] and [exchangeRateStream] are network-backed `ScreenDataStream`s
- *    with their own Loading/Error/Content + freshness state.
- *  - [WatchlistRepository.watchlist] and [AlertsRepository.alertsStream] are
- *    purely local reactive `Flow`s — mapped here into `ScreenState.Empty` /
- *    `ScreenState.Content(freshness = FRESH)` (same projection used by
- *    `PersonalWatchlistViewModel`).
+ *  - [exchangeRateStream] and the two FRED rate streams ([fedFundsStream],
+ *    [mortgageStream]) are network-backed `ScreenDataStream`s with their own
+ *    Loading/Error/Content + freshness state. The rate streams feed a single
+ *    [RatesQuickView] slot via [combine].
+ *  - [LoanRepository.observeAll] and [BillReminderRepository.observeUpcoming]
+ *    are purely local reactive `Flow`s — mapped here into `ScreenState.Empty` /
+ *    `ScreenState.Content(freshness = FRESH)` (same projection used elsewhere
+ *    in the toolkit for local-only sources).
  */
 class HomeViewModel(
-    private val cryptoRepository: CryptoRepository,
+    private val loanRepository: LoanRepository,
+    private val billReminderRepository: BillReminderRepository,
+    private val economicRatesRepository: EconomicRatesRepository,
     private val currencyRepository: CurrencyRepository,
-    watchlistRepository: WatchlistRepository,
-    alertsRepository: AlertsRepository,
 ) : BaseViewModel<HomeUiState, Nothing, HomeAction>(HomeUiState()) {
-
-    // Take the first page of coin markets; we'll show the top 5 in the widget.
-    private val pagingStream = cryptoRepository.coinMarketsStream(
-        scope = viewModelScope,
-        pageSize = 5,
-    )
 
     private val exchangeRateStream = currencyRepository.exchangeRatesStream(
         baseCurrency = "USD",
         scope = viewModelScope,
     )
 
-    init {
-        // Top Movers widget: project the paging stream's state into a flat
-        // ScreenState<List<CoinMarket>>, truncated to the first 5.
-        pagingStream.state
-            .onEach { state ->
-                updateState { copy(topMovers = state) }
-            }
-            .launchIn(viewModelScope)
+    private val fedFundsStream = economicRatesRepository.interestRateSeriesStream(
+        key = FedFundsKey,
+        scope = viewModelScope,
+    )
 
+    private val mortgageStream = economicRatesRepository.interestRateSeriesStream(
+        key = Mortgage30YKey,
+        scope = viewModelScope,
+    )
+
+    init {
         // Exchange Rate widget: direct ScreenState<ExchangeRates>.
         exchangeRateStream.state
             .onEach { state ->
@@ -74,65 +72,144 @@ class HomeViewModel(
             }
             .launchIn(viewModelScope)
 
-        // Watchlist preview: pure-local Flow → ScreenState. No retry surface
+        // Rates quick view: zip Fed Funds + 30Y Mortgage into a single widget
+        // state via `combineScreenStates` — the framework helper applies the
+        // canonical priority: NoNetwork > Loading > Unauthenticated > Error >
+        // Empty > Content. The resulting Content's freshness is the worst of
+        // the two source freshnesses.
+        combineScreenStates(
+            a = fedFundsStream.state,
+            b = mortgageStream.state,
+        ) { fed, mortgage ->
+            RatesQuickView(
+                fedFundsPercent = fed.current,
+                mortgage30YPercent = mortgage.current,
+            )
+        }
+            .onEach { state -> updateState { copy(rates = state) } }
+            .launchIn(viewModelScope)
+
+        // Loans summary widget: pure-local Flow → ScreenState. No retry surface
         // (Room is the only source), so just Empty / Content.
-        watchlistRepository.watchlist()
-            .onEach { items ->
-                val next = if (items.isEmpty()) {
+        loanRepository.observeAll()
+            .onEach { loans ->
+                val next = if (loans.isEmpty()) {
                     ScreenState.Empty
                 } else {
-                    ScreenState.Content(data = items, freshness = DataFreshness.FRESH)
+                    val summary = LoansSummary(
+                        count = loans.size,
+                        totalMonthlyEmi = loans.sumOf { it.monthlyPayment },
+                        totalOutstanding = loans.sumOf { it.principalRemaining },
+                        loans = loans,
+                    )
+                    ScreenState.Content(data = summary, freshness = DataFreshness.FRESH)
                 }
-                updateState { copy(watchlistPreview = next) }
+                updateState { copy(loans = next) }
             }
             .launchIn(viewModelScope)
 
-        // Active alerts: same pure-local projection. The committed-alerts stream
-        // is the canonical "what the user has set up" view; pending drafts are
-        // surfaced at the form-handler level (see AlertsRepository docstring).
-        alertsRepository.alertsStream()
-            .onEach { alerts ->
-                val next = if (alerts.isEmpty()) {
+        // Upcoming bills (next 7 days) — same pure-local projection.
+        billReminderRepository.observeUpcoming(maxDays = UPCOMING_BILLS_WINDOW_DAYS)
+            .onEach { bills ->
+                val next = if (bills.isEmpty()) {
                     ScreenState.Empty
                 } else {
-                    ScreenState.Content(data = alerts, freshness = DataFreshness.FRESH)
+                    ScreenState.Content(data = bills, freshness = DataFreshness.FRESH)
                 }
-                updateState { copy(activeAlerts = next) }
+                updateState { copy(bills = next) }
             }
             .launchIn(viewModelScope)
     }
 
     override fun handleAction(action: HomeAction) = when (action) {
         HomeAction.RefreshAll -> {
-            pagingStream.refresh()
             exchangeRateStream.refresh()
-            // Watchlist + Alerts are local reactive Flows — nothing to refresh.
+            fedFundsStream.refresh()
+            mortgageStream.refresh()
+            // Loans + Bills are local reactive Flows — nothing to refresh.
         }
-        HomeAction.RetryTopMovers -> pagingStream.retry()
         HomeAction.RetryExchangeRate -> exchangeRateStream.retry()
+        HomeAction.RetryRates -> {
+            fedFundsStream.retry()
+            mortgageStream.retry()
+        }
+    }
+
+    companion object {
+        /** Lookahead window for the "Upcoming Bills" widget. */
+        const val UPCOMING_BILLS_WINDOW_DAYS: Int = 7
+
+        /** Effective Federal Funds Rate — the overnight bank-to-bank lending rate. */
+        val FedFundsKey: InterestRateSeriesKey = InterestRateSeriesKey(
+            seriesId = "DFF",
+            name = "Federal Funds Rate",
+            unit = "%",
+            days = 30,
+        )
+
+        /** 30-Year Fixed Mortgage Average — Freddie Mac weekly survey. */
+        val Mortgage30YKey: InterestRateSeriesKey = InterestRateSeriesKey(
+            seriesId = "MORTGAGE30US",
+            name = "30-Year Mortgage",
+            unit = "%",
+            days = 30,
+        )
     }
 }
 
 /**
- * Aggregate state for the home dashboard.
+ * Aggregate state for the Money Toolkit home dashboard.
  *
  * Each slot is an independent [ScreenState] so the screen can render per-card
  * Loading / Empty / Error / Content states.
  */
 data class HomeUiState(
-    val topMovers: ScreenState<List<CoinMarket>> = ScreenState.Loading,
+    val loans: ScreenState<LoansSummary> = ScreenState.Loading,
+    val bills: ScreenState<List<BillReminder>> = ScreenState.Loading,
+    val rates: ScreenState<RatesQuickView> = ScreenState.Loading,
     val exchangeRate: ScreenState<ExchangeRates> = ScreenState.Loading,
-    val watchlistPreview: ScreenState<List<WatchlistItem>> = ScreenState.Loading,
-    val activeAlerts: ScreenState<List<PriceAlert>> = ScreenState.Loading,
+)
+
+/**
+ * Compact projection of the user's loan portfolio for the home dashboard.
+ *
+ * Only the dashboard's summary surface needs these aggregates; the full list
+ * lives on the Loans screen.
+ *
+ * @property count Number of tracked loans.
+ * @property totalMonthlyEmi Sum of every loan's monthly EMI.
+ * @property totalOutstanding Sum of every loan's remaining principal.
+ */
+data class LoansSummary(
+    val count: Int,
+    val totalMonthlyEmi: Double,
+    val totalOutstanding: Double,
+    /**
+     * The actual loans, sorted soonest-due first. The home dashboard hero renders these as a
+     * horizontally-scrollable carousel below the totals so users can flip through every loan
+     * without leaving the dashboard.
+     */
+    val loans: List<org.mifos.core.model.banking.Loan> = emptyList(),
+)
+
+/**
+ * Compact projection of the two headline rate series for the home dashboard.
+ *
+ * @property fedFundsPercent Latest Effective Federal Funds Rate, in percent.
+ * @property mortgage30YPercent Latest 30-Year Fixed Mortgage Average, in percent.
+ */
+data class RatesQuickView(
+    val fedFundsPercent: Double,
+    val mortgage30YPercent: Double,
 )
 
 sealed interface HomeAction {
     /** Pull-to-refresh — fans out to every network-backed stream. */
     data object RefreshAll : HomeAction
 
-    /** Retry just the Top Movers widget (after an error). */
-    data object RetryTopMovers : HomeAction
-
     /** Retry just the Exchange Rate widget (after an error). */
     data object RetryExchangeRate : HomeAction
+
+    /** Retry the Rates Quick widget (refreshes both FRED-backed streams). */
+    data object RetryRates : HomeAction
 }

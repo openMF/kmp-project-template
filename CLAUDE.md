@@ -1,7 +1,7 @@
-# Claude Code - KMP Project Template
+# Claude Code - Money Toolkit (KMP)
 
-**Last Updated:** 2026-02-13
-**Project Type:** Kotlin Multiplatform (KMP)
+**Last Updated:** 2026-05-24
+**Project Type:** Kotlin Multiplatform (KMP) — generic financial utility toolkit
 **Platforms:** Android | iOS | macOS | Desktop (Windows/macOS/Linux) | Web
 
 ---
@@ -30,7 +30,19 @@
 
 ## Project Overview
 
-This is a **Kotlin Multiplatform (KMP) mobile/desktop/web application** with comprehensive CI/CD infrastructure spanning **5 platforms** and **9 deployment targets**.
+This is the **Money Toolkit** — a generic, open-source financial utility template
+built on Kotlin Multiplatform. It ships working personal-finance tools out of
+the box (loan tracking, bill reminders, interest-rate watching, calculators,
+country-level macro indicators) wired through the same offline-first store
+contract every framework feature uses. No login. No backend. Fork to brand and
+extend.
+
+The project doubles as a **reference implementation** for every architectural
+pattern in `core-base/store` and `core-base/ui` — each shipped feature is the
+canonical showcase for one or more framework archetypes (see "Toolkit feature
+showcase" below).
+
+CI/CD infrastructure spans **5 platforms** and **9 deployment targets**.
 
 ### Architecture
 
@@ -48,6 +60,35 @@ kmp-project-template/
 ├── .github/workflows/   # GitHub Actions CI/CD
 └── scripts/             # Bash automation scripts
 ```
+
+### Toolkit feature showcase
+
+Every shipped feature exists for two reasons: it's a working tool, AND it's the
+canonical demo of one or more framework patterns. Forks can keep the lot, swap
+the per-feature branding, or selectively remove features they don't need.
+
+| Feature                   | What it does                                              | Pattern showcased                                          |
+|---------------------------|-----------------------------------------------------------|------------------------------------------------------------|
+| **B1 Loan Tracker**       | Personal loans — track principal, EMI, due dates locally  | `PagingScreenStream` list + `SubmitHandler` edit form      |
+| **B2 EMI Calculator**     | Compute monthly EMI for any loan                          | Pure local state (no Store)                                |
+| **B3 Affordability**      | "How much loan can I afford?" calculator                  | Pure local state + derived multi-input math                |
+| **B4 Bill Reminders**     | Recurring bills + in-app notification scheduler           | `DraftSubmitHandler` (offline-resilient form)              |
+| **B5 Amortization**       | Full payment schedule for any loan                        | Read-side projection of `LoanRepository`                   |
+| **B6 Loan Comparison**    | Side-by-side total-cost comparison wizard                 | Multi-step wizard state machine                            |
+| **B7 Interest Rates**     | FRED-backed federal funds / mortgage / treasury series    | `CACHE_THEN_NETWORK` `ScreenDataStream` + 4-stream combine |
+| **B8 Country Macro**      | GDP / CPI / unemployment from World Bank                  | Multi-source combine + country picker                      |
+| **Home dashboard**        | Loans summary + upcoming bills + rates + USD exchange     | `combineScreenStates` 4-way fan-in                         |
+| **Currency Rates**        | Live FX rates by base currency                            | `Store` + search filter + emptyIfContent                   |
+| **Rate History**          | Historical FX charts                                      | Dynamic-key flow + auto-refresh                            |
+
+> **Note on archived modules.** Earlier crypto-themed showcase features
+> (`feature/crypto`, `feature/watchlist`, `feature/alerts`) demonstrated the same
+> three framework patterns (PagingScreenStream, SubmitHandler, DraftSubmitHandler)
+> in a coins/price-alerts domain. They moved to `feature/_archive/` on
+> 2026-05-24 as part of the Money Toolkit pivot. The canonical showcase is now
+> in the banking domain (`feature/loans`, `feature/bills`). The archived modules
+> remain in-tree until **2026-08-23** — see each `feature/_archive/{module}/README.md`
+> for re-enable instructions.
 
 ### Tech Stack
 
@@ -100,6 +141,34 @@ kmp-project-template/
 
 ### Web
 - **GitHub Pages** (continuous deployment)
+
+---
+
+## First-time Fork Setup
+
+After cloning, before running the toolkit's economic-data screens (B7 Interest
+Rate Tracker, B8 Country Macro Snapshot), copy `.env.local.example` to
+`.env.local` and fill in fork-specific values:
+
+```bash
+cp .env.local.example .env.local
+# Edit .env.local — add your FRED API key
+```
+
+**FRED (Federal Reserve Economic Data)** — free developer key required:
+
+1. Sign up: https://fred.stlouisfed.org/docs/api/api_key.html (30 seconds)
+2. Paste the key into `.env.local` as `FRED_API_KEY=...`
+3. Wire it into Koin in your fork's app module:
+   ```kotlin
+   single { FredApiConfig(apiKey = System.getenv("FRED_API_KEY")) }
+   ```
+   (Or load via BuildKonfig / Gradle property — whichever your fork prefers.)
+
+Leave the key blank and the FRED-backed screens render an explicit "FRED key
+not configured" empty state rather than crashing.
+
+**World Bank Open Data** — no setup. Fully open API.
 
 ---
 
@@ -195,6 +264,24 @@ Customize in **`core/store`** (the single discoverable seam):
 
 See `core/store/README.md` for the "what you get for free" list and full integration
 pattern.
+
+### User-facing surfaces (extend these in your fork)
+
+The Money Toolkit ships two domain surfaces forks typically brand or extend:
+
+- **Banking domain** (`core/model/banking/`, `core/data/banking/`,
+  `core/database/banking/`) — `Loan` + `BillReminder` entities, repositories,
+  Room DAOs. Add fields, new categories, or related entities (savings goals,
+  budgets) here. The `feature/loans` and `feature/bills` UIs read straight from
+  the repository contracts — extend the model + DAO and the UI follows.
+- **Economic API integration** (`core/network/economic/`, `core/data/economic/`,
+  `core/store/economic/`) — FRED + World Bank API clients, Store5-backed
+  caches, repository surfaces. Add new FRED series by extending
+  `feature/rates/.../RateSeriesCatalog.kt` (no client changes needed); add new
+  World Bank indicators by extending `core/model/economic/MacroIndicator.kt`
+  and the `MacroIndicatorsRepository` query set.
+
+Both surfaces follow the same offline-first contract — see `core/store/README.md`.
 
 **Do NOT modify `core-base/store` or `core-base/ui`** — they're framework-shared and
 upgrade cleanly across template versions. Push fork pressure to `core/store` instead.

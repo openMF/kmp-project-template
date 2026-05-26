@@ -281,6 +281,7 @@ ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.r
 ktor-client-js = { group = "io.ktor", name = "ktor-client-js", version.ref = "ktorVersion" }
 ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version.ref = "ktorVersion" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktorVersion" }
+ktor-client-mock = { group = "io.ktor", name = "ktor-client-mock", version.ref = "ktorVersion" }
 ktor-client-serialization = { group = "io.ktor", name = "ktor-client-serialization", version.ref = "ktorVersion" }
 ktor-client-websockets = { group = "io.ktor", name = "ktor-client-websockets", version.ref = "ktorVersion" }
 ktor-client-winhttp = { group = "io.ktor", name = "ktor-client-winhttp", version.ref = "ktorVersion" }

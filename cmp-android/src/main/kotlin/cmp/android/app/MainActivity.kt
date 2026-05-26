@@ -130,7 +130,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateScreenCapture(isScreenCaptureAllowed: Boolean) {
-        if (isScreenCaptureAllowed) {
+        // Debug builds always allow screen capture so QA / device-test tooling (adb
+        // screencap, screen recordings, Android Studio Profiler captures) work without
+        // toggling the user-facing "Allow screen capture" preference. Release builds
+        // honor the user preference — FLAG_SECURE is on by default for production
+        // because this is a fintech app (loan balances, EMI amounts, account names).
+        val allow = isScreenCaptureAllowed || BuildConfig.DEBUG
+        if (allow) {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
         } else {
             window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)

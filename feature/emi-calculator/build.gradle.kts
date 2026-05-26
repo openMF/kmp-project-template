@@ -26,5 +26,9 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.materialIconsExtended)
         }
+
+        commonTest.dependencies {
+            implementation(libs.turbine)
+        }
     }
 }

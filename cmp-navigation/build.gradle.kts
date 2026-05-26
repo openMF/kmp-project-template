@@ -30,13 +30,20 @@ kotlin {
             implementation(projects.coreBase.security)
 
             implementation(projects.feature.home)
-            implementation(projects.feature.crypto)
             implementation(projects.feature.currencyRates)
             implementation(projects.feature.emiCalculator)
             implementation(projects.feature.profile)
             implementation(projects.feature.settings)
-            implementation(projects.feature.watchlist)
-            implementation(projects.feature.alerts)
+            implementation(projects.feature.bills)
+            implementation(projects.feature.loans)
+            implementation(projects.feature.rates)
+            implementation(projects.feature.calculators)
+            implementation(projects.feature.macro)
+            // Archived 2026-05-24 (Money Toolkit pivot) — restore by uncommenting + re-wiring per
+            // feature/_archive/{module}/README.md:
+            //   implementation(projects.feature.archive.crypto)
+            //   implementation(projects.feature.archive.watchlist)
+            //   implementation(projects.feature.archive.alerts)
 
             //put your multiplatform dependencies here
             implementation(compose.material3)
@@ -47,6 +54,10 @@ kotlin {
             implementation(libs.window.size)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlinx.serialization.core)
         }
     }
 }

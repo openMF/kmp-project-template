@@ -19,10 +19,18 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.mifos.core.data.alerts.AlertsRepository
 import org.mifos.core.data.alerts.impl.AlertsRepositoryImpl
+import org.mifos.core.data.banking.BillReminderRepository
+import org.mifos.core.data.banking.LoanRepository
+import org.mifos.core.data.banking.impl.BillReminderRepositoryImpl
+import org.mifos.core.data.banking.impl.LoanRepositoryImpl
 import org.mifos.core.data.crypto.CryptoRepository
 import org.mifos.core.data.crypto.impl.CryptoRepositoryImpl
 import org.mifos.core.data.currency.CurrencyRepository
 import org.mifos.core.data.currency.impl.CurrencyRepositoryImpl
+import org.mifos.core.data.economic.EconomicRatesRepository
+import org.mifos.core.data.economic.MacroIndicatorsRepository
+import org.mifos.core.data.economic.impl.EconomicRatesRepositoryImpl
+import org.mifos.core.data.economic.impl.MacroIndicatorsRepositoryImpl
 import org.mifos.core.data.infra.NetworkMonitor
 import org.mifos.core.data.infra.impl.RoomFetchedAtRepository
 import org.mifos.core.data.infra.impl.RoomSubmitOutbox
@@ -36,6 +44,9 @@ import org.mifos.core.database.AppDatabase
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.model.alerts.PriceAlert
+import org.mifos.core.model.banking.BillReminder
+import org.mifos.core.model.banking.Loan
+import org.mifos.core.model.banking.LoanCalcScenario
 import org.mifos.core.network.alerts.api.AlertsApi
 import org.mifos.core.network.alerts.api.FakeAlertsApi
 import org.mifos.core.network.di.NetworkModule
@@ -62,6 +73,67 @@ val DataModule = module {
     single { get<AppDatabase>().watchlistDao }
     single<WatchlistRepository> { WatchlistRepositoryImpl(get()) }
 
+    // Banking domain — purely local Loan + Bill Reminder persistence.
+    // No remote sync; the DraftSubmitHandler outboxes below give the UX
+    // polish (saving badge, retry on failure) for a local commit "submit".
+    single { get<AppDatabase>().loanDao }
+    single { get<AppDatabase>().billReminderDao }
+    single<LoanRepository> { LoanRepositoryImpl(get()) }
+    single<BillReminderRepository> { BillReminderRepositoryImpl(get()) }
+
+    // Outboxes — each form payload type gets its own RoomSubmitOutbox so
+    // formKey collisions across features are impossible. The "submit" target
+    // for both is the local repository's `upsert`, simulating remote sync.
+    // All four SubmitOutbox bindings MUST declare their qualifier — Koin matches
+    // single<> definitions by raw type (SubmitOutbox::class), not full KType, so
+    // multiple SubmitOutbox<*> bindings collide and the last one wins regardless of
+    // the generic parameter. See `OutboxQualifiers` KDoc for full background.
+    single<SubmitOutbox<Loan>>(qualifier = OutboxQualifiers.Loan) {
+        RoomSubmitOutbox(dao = get(), serializer = Loan.serializer())
+    }
+    single<SubmitOutbox<BillReminder>>(qualifier = OutboxQualifiers.BillReminder) {
+        RoomSubmitOutbox(dao = get(), serializer = BillReminder.serializer())
+    }
+    single<SubmitOutbox<LoanCalcScenario>>(qualifier = OutboxQualifiers.LoanCalcScenario) {
+        RoomSubmitOutbox(dao = get(), serializer = LoanCalcScenario.serializer())
+    }
+
+    // OfflineSubmitSyncer eagerly retries pending drafts when connectivity
+    // returns. For purely-local features (no real network), the submitBlock
+    // commits to the repository directly — `isOnlineFlow` is still required
+    // by the syncer contract.
+    //
+    // We register each syncer behind a unique marker singleton so Koin's
+    // type resolution doesn't collide with other `OfflineSubmitSyncer<*, *>`
+    // bindings (PriceAlert below uses the same pattern by virtue of being
+    // declared as the bare `OfflineSubmitSyncer` type — see note there).
+    single<LoanSubmitSyncer>(createdAtStart = true) {
+        LoanSubmitSyncer(
+            syncer = OfflineSubmitSyncer<Loan, Loan>(
+                scope = get(),
+                outbox = get(qualifier = OutboxQualifiers.Loan),
+                isOnlineFlow = get<NetworkMonitor>().isOnline,
+                submitBlock = { payload ->
+                    get<LoanRepository>().upsert(payload)
+                    payload
+                },
+            ).also { it.start() },
+        )
+    }
+    single<BillReminderSubmitSyncer>(createdAtStart = true) {
+        BillReminderSubmitSyncer(
+            syncer = OfflineSubmitSyncer<BillReminder, BillReminder>(
+                scope = get(),
+                outbox = get(qualifier = OutboxQualifiers.BillReminder),
+                isOnlineFlow = get<NetworkMonitor>().isOnline,
+                submitBlock = { payload ->
+                    get<BillReminderRepository>().upsert(payload)
+                    payload
+                },
+            ).also { it.start() },
+        )
+    }
+
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 
     // Fintech Repositories
@@ -82,13 +154,29 @@ val DataModule = module {
         )
     }
 
+    // Economic Repositories (Banking Utility Toolkit — FRED + World Bank)
+    single<EconomicRatesRepository> {
+        EconomicRatesRepositoryImpl(
+            interestRateSeriesStore = get(AppStoreRegistry.InterestRateSeries),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+    single<MacroIndicatorsRepository> {
+        MacroIndicatorsRepositoryImpl(
+            macroIndicatorStore = get(AppStoreRegistry.MacroIndicator),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
     // Price alerts — fake-API-backed, with DraftSubmitHandler offline-resilience showcase.
     // Real forks substitute FakeAlertsApi with a Ktorfit-backed AlertsApi client.
     single<AlertsApi> { FakeAlertsApi() }
     single<AlertsRepository> { AlertsRepositoryImpl(api = get()) }
 
     // Outbox for PriceAlert payloads — RoomSubmitOutbox writes to framework_submit_drafts.
-    single<SubmitOutbox<PriceAlert>> {
+    single<SubmitOutbox<PriceAlert>>(qualifier = OutboxQualifiers.PriceAlert) {
         RoomSubmitOutbox(dao = get(), serializer = PriceAlert.serializer())
     }
 
@@ -100,7 +188,7 @@ val DataModule = module {
     single(createdAtStart = true) {
         val syncer = OfflineSubmitSyncer<PriceAlert, PriceAlert>(
             scope = get(),
-            outbox = get(),
+            outbox = get(qualifier = OutboxQualifiers.PriceAlert),
             isOnlineFlow = get<NetworkMonitor>().isOnline,
             submitBlock = { payload -> get<AlertsApi>().create(payload) },
         )
@@ -110,3 +198,19 @@ val DataModule = module {
 }
 
 expect val platformModule: Module
+
+/**
+ * Marker singleton wrapping the Loan offline submit syncer.
+ *
+ * Exists so Koin can resolve the binding by a unique type — bare
+ * `OfflineSubmitSyncer<*, *>` would erase to the same runtime [kotlin.reflect.KClass]
+ * across every payload type and collide with the PriceAlert syncer.
+ */
+internal class LoanSubmitSyncer internal constructor(
+    @Suppress("unused") val syncer: OfflineSubmitSyncer<Loan, Loan>,
+)
+
+/** Marker singleton wrapping the BillReminder offline submit syncer. */
+internal class BillReminderSubmitSyncer internal constructor(
+    @Suppress("unused") val syncer: OfflineSubmitSyncer<BillReminder, BillReminder>,
+)

@@ -32,7 +32,7 @@ import template.core.base.designsystem.theme.motion
  * Sequence: exit fades to 0 over `durationShort4`, then enter fades to 1
  * over `durationMedium2` after a `durationShort4` delay.
  */
-object MifosFadeThrough {
+object KptFadeThrough {
 
     @Composable
     fun enter(): EnterTransition = enter(MaterialTheme.motion)

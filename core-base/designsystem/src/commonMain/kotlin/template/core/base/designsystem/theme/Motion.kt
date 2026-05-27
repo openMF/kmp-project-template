@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
  * (https://m3.material.io/styles/motion/easing-and-duration). All durations in milliseconds.
  *
  * Access from any Composable via [MaterialTheme.motion]. Framework transition factories under
- * `template.core.base.ui.motion` (`KptSharedAxis`, `MifosFadeThrough`, etc.) and the
+ * `template.core.base.ui.motion` (`KptSharedAxis`, `KptFadeThrough`, etc.) and the
  * `RootTransitionProviders.Mifos` / `TransitionProviders.Mifos` provider namespaces consume
  * these values — changing a single token here propagates app-wide.
  *

@@ -56,14 +56,14 @@ inline fun <reified T : Any> NavGraphBuilder.sharedAxisComposable(
 /**
  * `NavGraphBuilder.composable<T>(...)` wrapper for **sibling navigation** —
  * bottom-nav tabs, paged sub-sections. Outgoing fades to nothing before
- * incoming fades in (per [MifosFadeThrough]).
+ * incoming fades in (per [KptFadeThrough]).
  */
 @Composable
 inline fun <reified T : Any> NavGraphBuilder.fadeThroughComposable(
     noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
-    val enter = MifosFadeThrough.enter()
-    val exit = MifosFadeThrough.exit()
+    val enter = KptFadeThrough.enter()
+    val exit = KptFadeThrough.exit()
     composable<T>(
         enterTransition = { enter },
         exitTransition = { exit },

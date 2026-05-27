@@ -20,7 +20,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.NavBackStackEntry
 import kotlin.jvm.JvmSuppressWildcards
 import template.core.base.designsystem.theme.Motion
-import template.core.base.ui.motion.MifosFadeThrough
+import template.core.base.ui.motion.KptFadeThrough
 import template.core.base.ui.motion.KptSharedAxis
 
 /**
@@ -269,7 +269,7 @@ object TransitionProviders {
                 KptSharedAxis.enterBack(motion).takeIf { isSameGraphNavigation }
             }
             fun fadeThrough(motion: Motion): EnterTransitionProvider = {
-                MifosFadeThrough.enter(motion).takeIf { isSameGraphNavigation }
+                KptFadeThrough.enter(motion).takeIf { isSameGraphNavigation }
             }
             fun slideUp(motion: Motion): EnterTransitionProvider = {
                 slideIntoContainer(
@@ -302,7 +302,7 @@ object TransitionProviders {
                 KptSharedAxis.exitBack(motion).takeIf { isSameGraphNavigation }
             }
             fun fadeThrough(motion: Motion): ExitTransitionProvider = {
-                MifosFadeThrough.exit(motion).takeIf { isSameGraphNavigation }
+                KptFadeThrough.exit(motion).takeIf { isSameGraphNavigation }
             }
             fun slideDown(motion: Motion): ExitTransitionProvider = {
                 slideOutOfContainer(
@@ -525,7 +525,7 @@ object RootTransitionProviders {
                 KptSharedAxis.enterBack(motion)
             }
             fun fadeThrough(motion: Motion): NonNullEnterTransitionProvider = {
-                MifosFadeThrough.enter(motion)
+                KptFadeThrough.enter(motion)
             }
             fun slideUp(motion: Motion): NonNullEnterTransitionProvider = {
                 slideIntoContainer(
@@ -556,7 +556,7 @@ object RootTransitionProviders {
                 KptSharedAxis.exitBack(motion)
             }
             fun fadeThrough(motion: Motion): NonNullExitTransitionProvider = {
-                MifosFadeThrough.exit(motion)
+                KptFadeThrough.exit(motion)
             }
             fun slideDown(motion: Motion): NonNullExitTransitionProvider = {
                 slideOutOfContainer(

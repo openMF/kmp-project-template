@@ -74,7 +74,7 @@ data class Motion(
     // ── Pattern parameters ───────────────────────────────────────────────────
     /** Slide distance for shared-axis-X transitions. */
     val sharedAxisSlideDistance: Dp = 30.dp,
-    /** Duration of one full breath of the "refreshing now" pulse (consumed by `Modifier.mifosRefreshingPulse`). */
+    /** Duration of one full breath of the "refreshing now" pulse (consumed by `Modifier.kptRefreshingPulse`). */
     val refreshingPulseDurationMs: Int = 1200,
     /** Stagger delay per item when `LazyColumn` items use `Modifier.kptListItemEnter`. */
     val listItemEnterStaggerMs: Int = 30,

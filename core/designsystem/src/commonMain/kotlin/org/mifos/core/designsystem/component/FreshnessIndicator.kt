@@ -23,7 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.theme.finance
-import template.core.base.ui.motion.mifosRefreshingPulse
+import template.core.base.ui.motion.kptRefreshingPulse
 
 /**
  * Tiny dot + label showing how fresh the displayed data is. Useful inline below
@@ -61,7 +61,7 @@ private fun FreshnessDot(color: Color, pulsing: Boolean) {
             .size(8.dp)
             .clip(CircleShape)
             .background(color)
-            .mifosRefreshingPulse(active = pulsing),
+            .kptRefreshingPulse(active = pulsing),
     )
 }
 

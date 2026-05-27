@@ -37,9 +37,9 @@ import template.core.base.designsystem.theme.motion
  * Duration comes from `MaterialTheme.motion.refreshingPulseDurationMs` —
  * change once, every pulse in the app shifts.
  */
-fun Modifier.mifosRefreshingPulse(active: Boolean): Modifier = composed {
+fun Modifier.kptRefreshingPulse(active: Boolean): Modifier = composed {
     val motion = MaterialTheme.motion
-    val transition = rememberInfiniteTransition(label = "mifosRefreshingPulse")
+    val transition = rememberInfiniteTransition(label = "kptRefreshingPulse")
     val scale by transition.animateFloat(
         initialValue = 1.0f,
         targetValue = if (active) 1.12f else 1.0f,
@@ -47,7 +47,7 @@ fun Modifier.mifosRefreshingPulse(active: Boolean): Modifier = composed {
             animation = tween(motion.refreshingPulseDurationMs, easing = motion.easingStandard),
             repeatMode = RepeatMode.Reverse,
         ),
-        label = "mifosRefreshingPulseScale",
+        label = "kptRefreshingPulseScale",
     )
     val alpha by transition.animateFloat(
         initialValue = 1.0f,
@@ -56,7 +56,7 @@ fun Modifier.mifosRefreshingPulse(active: Boolean): Modifier = composed {
             animation = tween(motion.refreshingPulseDurationMs, easing = motion.easingStandard),
             repeatMode = RepeatMode.Reverse,
         ),
-        label = "mifosRefreshingPulseAlpha",
+        label = "kptRefreshingPulseAlpha",
     )
 
     this.graphicsLayer {

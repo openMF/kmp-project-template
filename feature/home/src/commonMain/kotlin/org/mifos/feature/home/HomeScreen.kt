@@ -60,7 +60,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.common.formatGrouped
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.component.FreshnessIndicator
 import org.mifos.core.designsystem.component.FreshnessState
 import org.mifos.core.designsystem.component.MoneyText
@@ -76,6 +75,7 @@ import org.mifos.feature.home.ui.HomeAction
 import org.mifos.feature.home.ui.HomeViewModel
 import org.mifos.feature.home.ui.LoansSummary
 import org.mifos.feature.home.ui.RatesQuickView
+import template.core.base.designsystem.component.AppCard
 import template.core.base.store.screen.ScreenState
 import template.core.base.ui.screen.ScreenContent
 

@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.designsystem.component
+package template.core.base.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.mifos.core.designsystem.theme.spacing
+import template.core.base.designsystem.theme.KptTheme
 
 /**
  * Material 3 elevated card for grouping related content (loan rows, form sections,
@@ -55,7 +55,7 @@ import org.mifos.core.designsystem.theme.spacing
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(MaterialTheme.spacing.lg),
+    contentPadding: PaddingValues = PaddingValues(KptTheme.spacing.md),
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
     accentColor: Color? = null,
     cornerRadius: Dp = 20.dp,

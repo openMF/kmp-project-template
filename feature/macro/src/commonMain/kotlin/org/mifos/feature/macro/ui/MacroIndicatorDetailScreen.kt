@@ -36,13 +36,13 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.IndicatorKind
 import org.mifos.feature.macro.ui.components.Sparkline
 import org.mifos.feature.macro.ui.components.displayName
 import org.mifos.feature.macro.ui.components.headlineValue
+import template.core.base.designsystem.component.AppCard
 import template.core.base.ui.screen.ScreenContent
 
 /**

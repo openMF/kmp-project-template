@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
-import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.ui.scaffold.KptScaffold
@@ -41,6 +40,7 @@ import org.mifos.feature.settings.generated.resources.feature_settings_change_th
 import template.core.base.analytics.AnalyticsHelper
 import template.core.base.analytics.TrackScreenView
 import template.core.base.analytics.rememberAnalyticsHelper
+import template.core.base.designsystem.component.AppCard
 
 @Composable
 internal fun SettingsScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {

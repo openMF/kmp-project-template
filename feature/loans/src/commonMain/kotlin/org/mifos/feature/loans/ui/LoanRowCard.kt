@@ -26,13 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.component.MoneyText
 import org.mifos.core.designsystem.component.StatusChip
 import org.mifos.core.designsystem.component.StatusChipIntent
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.Loan
 import org.mifos.core.model.banking.LoanKind
+import template.core.base.designsystem.component.AppCard
 
 /**
  * Tappable row representing a single [Loan] in the list screen.

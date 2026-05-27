@@ -45,7 +45,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.component.MoneyText
 import org.mifos.core.designsystem.component.MoneyTone
@@ -56,6 +55,7 @@ import org.mifos.core.designsystem.component.UrgencyDot
 import org.mifos.core.designsystem.theme.finance
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.BillReminder
+import template.core.base.designsystem.component.AppCard
 import template.core.base.ui.screen.ScreenContent
 import kotlin.time.Clock
 

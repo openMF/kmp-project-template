@@ -147,7 +147,7 @@ fun ClientDetailsScreen(clientId: String, onNavigateBack: () -> Unit) {
     // Remember analytics helper
     val analytics = rememberAnalyticsHelper()
     val documentTracker = rememberMifosDocumentTracker()
-    val mifosAnalytics = rememberMifosAnalyticsTracker()
+    val mifosAnalytics = rememberKptAnalyticsTracker()
 
     Column(
         modifier = Modifier
@@ -201,7 +201,7 @@ fun ClientDetailsScreen(clientId: String, onNavigateBack: () -> Unit) {
 /** Example: Survey tracking */
 @Composable
 fun SurveyScreen(surveyId: String) {
-    val analytics = rememberMifosAnalyticsTracker()
+    val analytics = rememberKptAnalyticsTracker()
     var currentQuestion by remember { mutableStateOf(1) }
     val totalQuestions = 5
 
@@ -381,7 +381,7 @@ object AnalyticsDIExample {
         }
 
         // Mifos tracker
-        single<MifosAnalyticsTracker> { MifosAnalyticsTracker(get()) }
+        single<KptAnalyticsTracker> { KptAnalyticsTracker(get()) }
 
         // Performance tracker
         single<PerformanceTracker> { get<AnalyticsHelper>().performanceTracker() }

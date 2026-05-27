@@ -242,7 +242,7 @@ fun AnalyticsHelper.trackBackupRestore(
 /**
  * Convenience function to create Mifos analytics tracker
  */
-fun AnalyticsHelper.mifosTracker(): MifosAnalyticsTracker = MifosAnalyticsTracker(this)
+fun AnalyticsHelper.mifosTracker(): KptAnalyticsTracker = KptAnalyticsTracker(this)
 
 /**
  * Extension for tracking custom business events specific to microfinance

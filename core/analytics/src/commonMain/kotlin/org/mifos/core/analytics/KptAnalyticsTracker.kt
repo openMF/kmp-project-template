@@ -22,7 +22,7 @@ import template.core.base.analytics.rememberAnalyticsHelper
  * Project-specific analytics tracker that provides domain-specific
  * tracking methods for the Mifos application.
  */
-class MifosAnalyticsTracker(
+class KptAnalyticsTracker(
     private val analyticsHelper: AnalyticsHelper,
 ) {
 
@@ -233,7 +233,7 @@ class MifosAnalyticsTracker(
 }
 
 @Composable
-fun rememberMifosAnalyticsTracker(): MifosAnalyticsTracker {
+fun rememberKptAnalyticsTracker(): KptAnalyticsTracker {
     val analyticsHelper = rememberAnalyticsHelper()
-    return remember(analyticsHelper) { MifosAnalyticsTracker(analyticsHelper) }
+    return remember(analyticsHelper) { KptAnalyticsTracker(analyticsHelper) }
 }

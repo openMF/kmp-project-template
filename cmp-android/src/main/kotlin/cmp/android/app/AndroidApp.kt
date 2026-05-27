@@ -26,6 +26,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.mifos.core.data.user.UserDataRepository
+import template.core.base.ui.captiveportal.installCaptivePortalLauncher
 import template.core.base.ui.util.getDefaultImageLoader
 
 /**
@@ -46,6 +47,11 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
             androidContext(this@AndroidApp)
             androidLogger()
         }
+
+        // Wire the captive-portal launcher with an application context so that
+        // ScreenStateNoNetwork's captive-portal CTA can route through
+        // template.core.base.ui.captiveportal.openCaptivePortalSignIn().
+        installCaptivePortalLauncher(this)
 
         // Restore the user's saved language preference to AppCompatDelegate.
         // This ensures the app always launches with the user's chosen language,

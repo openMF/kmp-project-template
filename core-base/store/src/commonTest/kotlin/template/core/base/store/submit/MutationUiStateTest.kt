@@ -43,7 +43,7 @@ class MutationUiStateTest {
     fun canInteract_contentAndSubmitting_returnsFalse() {
         val state = MutationUiState(
             screen = ScreenState.Content("data", DataFreshness.FRESH),
-            submit = SubmitState.Submitting,
+            submit = SubmitState.Submitting(),
         )
         assertFalse(state.canInteract)
     }
@@ -66,7 +66,7 @@ class MutationUiStateTest {
 
     @Test
     fun isSubmitting_submitting_returnsTrue() {
-        val state = MutationUiState<String, Unit>(submit = SubmitState.Submitting)
+        val state = MutationUiState<String, Unit>(submit = SubmitState.Submitting())
         assertTrue(state.isSubmitting)
     }
 

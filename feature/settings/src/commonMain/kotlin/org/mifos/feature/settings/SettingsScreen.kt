@@ -51,10 +51,12 @@ internal fun SettingsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     onTransitionGalleryClick: (() -> Unit)? = null,
+    onStateGalleryClick: (() -> Unit)? = null,
 ) {
     val analyticsHelper = rememberAnalyticsHelper()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
+    var showDevMenu by rememberSaveable { mutableStateOf(false) }
 
     if (showSettingsDialog) {
         SettingsDialog(
@@ -74,6 +76,22 @@ internal fun SettingsScreen(
         )
     }
 
+    if (showDevMenu) {
+        DevMenuDialog(
+            onTransitionGalleryClick = onTransitionGalleryClick,
+            onStateGalleryClick = onStateGalleryClick,
+            onDismiss = { showDevMenu = false },
+        )
+    }
+
+    // Footer long-press surfaces the dev menu when either gallery is available.
+    val hasDevEntries = onTransitionGalleryClick != null || onStateGalleryClick != null
+    val onFooterLongClick: (() -> Unit)? = if (hasDevEntries) {
+        { showDevMenu = true }
+    } else {
+        null
+    }
+
     SettingsScreenContent(
         modifier = modifier.fillMaxSize(),
         onBackClick = onBackClick,
@@ -85,7 +103,7 @@ internal fun SettingsScreen(
             analyticsHelper.logLanguageDialogVisible(true)
             showLanguageDialog = true
         },
-        onTransitionGalleryClick = onTransitionGalleryClick,
+        onFooterLongClick = onFooterLongClick,
     )
 
     TrackScreenView(screenName = "SettingsScreen")
@@ -97,7 +115,7 @@ internal fun SettingsScreenContent(
     onThemeCardClick: () -> Unit,
     onLanguageCardClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onTransitionGalleryClick: (() -> Unit)? = null,
+    onFooterLongClick: (() -> Unit)? = null,
 ) {
     val sp = MaterialTheme.spacing
     KptScaffold(
@@ -115,18 +133,62 @@ internal fun SettingsScreenContent(
             ThemeCard(onClick = onThemeCardClick)
             LanguageCard(onClick = onLanguageCardClick)
             Spacer(modifier = Modifier.fillMaxWidth().padding(sp.sm))
-            VersionLabel(onLongClick = onTransitionGalleryClick)
+            VersionLabel(onLongClick = onFooterLongClick)
         }
     }
 }
 
 /**
- * Static version footer label. In debug builds, long-pressing opens the Transition
- * Gallery (dev menu). In release builds the long-press handler is wired to `null`
- * by the navigation graph builder, so the label behaves as a plain text footer.
+ * Dev-menu dialog surfaced by long-pressing the [VersionLabel] footer. Lists every
+ * available debug-only gallery (Transition Gallery, State Gallery, …). Each entry is
+ * shown only when its callback is non-null — release-build wiring nulls them all out and
+ * the dialog is never reachable.
+ */
+@Composable
+private fun DevMenuDialog(
+    onTransitionGalleryClick: (() -> Unit)?,
+    onStateGalleryClick: (() -> Unit)?,
+    onDismiss: () -> Unit,
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Dev tools") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
+                if (onTransitionGalleryClick != null) {
+                    androidx.compose.material3.TextButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            onDismiss()
+                            onTransitionGalleryClick()
+                        },
+                    ) { Text("Transition Gallery") }
+                }
+                if (onStateGalleryClick != null) {
+                    androidx.compose.material3.TextButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            onDismiss()
+                            onStateGalleryClick()
+                        },
+                    ) { Text("State Gallery") }
+                }
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onDismiss) { Text("Close") }
+        },
+    )
+}
+
+/**
+ * Static version footer label. In debug builds, long-pressing opens the Dev tools menu
+ * (Transition Gallery, State Gallery, etc.). In release builds the long-press handler is
+ * wired to `null` by the navigation graph builder, so the label behaves as a plain text
+ * footer.
  *
- * Wire point: [cmp.navigation.authenticated.authenticatedGraph] passes a non-null
- * `onTransitionGalleryClick` only when `!isReleaseBuild()`.
+ * Wire point: [cmp.navigation.authenticated.authenticatedGraph] passes non-null
+ * gallery click handlers only when `!isReleaseBuild()`.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

@@ -18,9 +18,15 @@ android {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            // State-gallery deps (Phase 02): need core/store for the ScreenState model
+            // (the convention plugin auto-includes core:ui, core-base:ui, core:designsystem,
+            // core-base:designsystem; it does NOT include core:store).
+            implementation(projects.core.store)
+
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)
+            implementation(compose.materialIconsExtended)
         }
     }
 }

@@ -62,6 +62,13 @@ class SubmitHandler<R> internal constructor(
     private var activeJob: Job? = null
 
     /**
+     * Per-mutation copy attached to the most recent [submit] / [retry] cycle. Carried into
+     * the [SubmitState] transitions so consumers can surface action-specific messages.
+     * Reset to null when [reset] is called.
+     */
+    private var currentMessages: SubmitMessages? = null
+
+    /**
      * Execute [block] as a one-shot submission.
      *
      * - No-op if already [SubmitState.Submitting] (idempotent — safe on rapid button taps).
@@ -73,6 +80,24 @@ class SubmitHandler<R> internal constructor(
     fun submit(block: suspend () -> R) {
         if (_state.value is SubmitState.Submitting) return
         lastBlock = block
+        currentMessages = null
+        execute(block)
+    }
+
+    /**
+     * Execute [block] as a one-shot submission with per-mutation copy overrides.
+     *
+     * Same transitions as the no-args [submit] overload, but the supplied [messages] are
+     * carried into each subsequent [SubmitState] transition. Each field of [messages] is
+     * optional — `null` falls back to the theme-level default copy in the renderer.
+     *
+     * @param messages Per-mutation copy. Pass `null` for theme defaults.
+     * @param block    Suspend lambda performing the actual API call. Should throw on failure.
+     */
+    fun submit(messages: SubmitMessages?, block: suspend () -> R) {
+        if (_state.value is SubmitState.Submitting) return
+        lastBlock = block
+        currentMessages = messages
         execute(block)
     }
 
@@ -95,21 +120,24 @@ class SubmitHandler<R> internal constructor(
      */
     fun reset() {
         activeJob?.cancel()
+        currentMessages = null
         _state.value = SubmitState.Idle
     }
 
     private fun execute(block: suspend () -> R) {
         activeJob?.cancel()
-        _state.value = SubmitState.Submitting
+        val msgs = currentMessages
+        _state.value = SubmitState.Submitting(message = msgs?.submitting)
         activeJob = scope.launch {
             _state.value = try {
-                SubmitState.Submitted(block())
+                SubmitState.Submitted(block(), message = msgs?.submitted)
             } catch (e: CancellationException) {
                 throw e // never swallow scope cancellation as a failure
             } catch (e: Exception) {
                 SubmitState.Failed(
                     error = e,
                     category = categorize(e),
+                    message = msgs?.failed,
                 )
             }
         }

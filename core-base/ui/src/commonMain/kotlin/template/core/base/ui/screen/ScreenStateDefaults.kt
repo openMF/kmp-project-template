@@ -111,13 +111,28 @@ fun defaultErrorMessage(error: Throwable): String = when (categorize(error)) {
     ErrorCategory.Generic -> error.message ?: "Something went wrong"
 }
 
-/** Configuration for the no-network state, including captive-portal variant. */
+/**
+ * Configuration for the no-network state, including captive-portal variant.
+ *
+ * When [captivePortalAction] is non-null AND the rendered state is `isCaptivePortal == true`,
+ * the [DefaultNoNetworkContent] renderer surfaces a primary CTA button labelled
+ * [captivePortalActionText] that invokes the lambda — typically wired by apps to the
+ * platform-native captive-portal sign-in flow via
+ * `template.core.base.ui.captiveportal.openCaptivePortalSignIn()`.
+ */
 @Immutable
 data class ScreenStateNoNetwork(
     val visual: ScreenStateVisual = ScreenStateVisual.Vector(Icons.Default.WifiOff),
     val captivePortalVisual: ScreenStateVisual = ScreenStateVisual.Vector(Icons.Default.CloudOff),
     val message: String = "You're offline",
     val captivePortalMessage: String = "Sign in to your WiFi network",
+    val captivePortalActionText: String = "Open sign-in page",
+    /**
+     * Optional platform-native captive-portal launcher. Surfaced as a primary button in
+     * [DefaultNoNetworkContent] when `isCaptivePortal` is true. Apps typically wire this to
+     * `template.core.base.ui.captiveportal.openCaptivePortalSignIn()`.
+     */
+    val captivePortalAction: (() -> Unit)? = null,
     val retryText: String = "Try again",
 )
 

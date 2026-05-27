@@ -32,15 +32,25 @@ sealed interface SubmitState<out R> {
     /** No submission in flight. Initial state; also restored by [SubmitHandler.reset]. */
     data object Idle : SubmitState<Nothing>
 
-    /** API call is executing. Disable the submit button and show a progress overlay. */
-    data object Submitting : SubmitState<Nothing>
+    /**
+     * API call is executing. Disable the submit button and show a progress overlay.
+     *
+     * @param message Optional per-mutation copy supplied via
+     *   [SubmitHandler.submit] / [SubmitMessages.submitting]. When non-null, UI surfaces
+     *   (e.g. `SubmitProgressOverlay`) prefer this over the theme-level default copy.
+     */
+    data class Submitting(val message: String? = null) : SubmitState<Nothing>
 
     /**
      * API call completed successfully.
      *
-     * @param result The value returned by the suspend block passed to [SubmitHandler.submit].
+     * @param result  The value returned by the suspend block passed to [SubmitHandler.submit].
+     * @param message Optional per-mutation success copy from [SubmitMessages.submitted].
      */
-    data class Submitted<out R>(val result: R) : SubmitState<R>
+    data class Submitted<out R>(
+        val result: R,
+        val message: String? = null,
+    ) : SubmitState<R>
 
     /**
      * API call failed. [SubmitHandler.retry] is available to re-run the last block.
@@ -51,10 +61,12 @@ sealed interface SubmitState<out R> {
      * @param draftSaved True after the user explicitly confirmed saving the draft via
      *   [DraftSubmitHandler.saveDraft]. Used by [DraftSavePrompt] to hide itself once the
      *   user has already acted — prevents the prompt from re-appearing on recomposition.
+     * @param message    Optional per-mutation failure copy from [SubmitMessages.failed].
      */
     data class Failed(
         val error: Throwable,
         val category: ErrorCategory,
         val draftSaved: Boolean = false,
+        val message: String? = null,
     ) : SubmitState<Nothing>
 }

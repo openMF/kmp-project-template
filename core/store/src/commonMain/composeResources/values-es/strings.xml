@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    Copyright 2024 Mifos Initiative
+    Copyright 2026 Mifos Initiative
 
     This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
     If a copy of the MPL was not distributed with this file,
@@ -9,13 +9,6 @@
     See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->
 <resources>
-    <string name="app_name">KPT Design</string>
-    <string name="home">Inicio</string>
-    <string name="profile">Perfil</string>
-    <string name="settings">Configuración</string>
-    <string name="not_connected">⚠️ No estás conectado a Internet</string>
-
-    <!-- ===== Screen-state default copy ===== -->
     <string name="screenstate_empty_title">Aún no hay nada aquí</string>
     <string name="screenstate_empty_message">Cuando tengas datos, aparecerán aquí.</string>
     <string name="screenstate_error_title">Algo salió mal</string>

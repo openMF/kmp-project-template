@@ -39,6 +39,8 @@ import org.mifos.feature.rates.navigation.ratesGraph
 import org.mifos.feature.settings.navigateToSettings
 import org.mifos.feature.settings.notificationDestination
 import org.mifos.feature.settings.settingsDestination
+import org.mifos.feature.showcase.stategallery.StateGalleryRoute
+import org.mifos.feature.showcase.stategallery.stateGalleryGraph
 import org.mifos.feature.showcase.transitions.TransitionGalleryRoute
 import org.mifos.feature.showcase.transitions.transitionGalleryGraph
 import template.core.base.security.isReleaseBuild
@@ -81,17 +83,23 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
 
         notificationDestination(onBackClick = navController::popBackStack)
 
-        // Dev-only entry point to the transition gallery (only wired in non-release builds).
-        // Released builds receive null → SettingsScreen hides the dev row entirely.
-        // See feature/showcase for the gallery destination.
+        // Dev-only entry points to the showcase galleries (only wired in non-release builds).
+        // Released builds receive null → SettingsScreen hides the dev menu entirely.
+        // See feature/showcase for the gallery destinations.
         val onTransitionGalleryClick: (() -> Unit)? = if (!isReleaseBuild()) {
             { navController.navigate(TransitionGalleryRoute) }
+        } else {
+            null
+        }
+        val onStateGalleryClick: (() -> Unit)? = if (!isReleaseBuild()) {
+            { navController.navigate(StateGalleryRoute) }
         } else {
             null
         }
         settingsDestination(
             onBackClick = navController::popBackStack,
             onTransitionGalleryClick = onTransitionGalleryClick,
+            onStateGalleryClick = onStateGalleryClick,
         )
 
         // Money Toolkit feature graphs — generic personal-finance utilities.
@@ -107,5 +115,8 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
 
         // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).
         transitionGalleryGraph(navController)
+
+        // Dev-only state gallery (Phase 02 Task 17 — ScreenState variants + component-scale primitives).
+        stateGalleryGraph(navController)
     }
 }

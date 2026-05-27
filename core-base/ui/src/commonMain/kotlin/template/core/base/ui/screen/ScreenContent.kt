@@ -243,6 +243,7 @@ fun DefaultNoNetworkContent(
     val spacing = KptTheme.spacing
     val visual = if (isCaptivePortal) config.captivePortalVisual else config.visual
     val message = if (isCaptivePortal) config.captivePortalMessage else config.message
+    val captivePortalAction = config.captivePortalAction
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -263,8 +264,20 @@ fun DefaultNoNetworkContent(
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(spacing.lg))
-        Button(onClick = onRetry) {
-            Text(config.retryText)
+        if (isCaptivePortal && captivePortalAction != null) {
+            // Primary: open platform-native captive-portal sign-in.
+            Button(onClick = captivePortalAction) {
+                Text(config.captivePortalActionText)
+            }
+            Spacer(Modifier.height(spacing.sm))
+            // Secondary: retry, in case the user already signed in via system UI.
+            OutlinedButton(onClick = onRetry) {
+                Text(config.retryText)
+            }
+        } else {
+            Button(onClick = onRetry) {
+                Text(config.retryText)
+            }
         }
     }
 }

@@ -178,7 +178,7 @@ class DraftSubmitHandler<P, R>(
 
     private fun execute(payload: P, block: suspend (P) -> R) {
         activeJob?.cancel()
-        _state.value = SubmitState.Submitting
+        _state.value = SubmitState.Submitting()
         activeJob = scope.launch {
             _state.value = try {
                 val result = block(payload)

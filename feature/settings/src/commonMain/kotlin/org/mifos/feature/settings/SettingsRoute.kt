@@ -28,11 +28,13 @@ fun NavController.navigateToNotification(navOptions: NavOptions? = null) = navig
 fun NavGraphBuilder.settingsDestination(
     onBackClick: () -> Unit,
     onTransitionGalleryClick: (() -> Unit)? = null,
+    onStateGalleryClick: (() -> Unit)? = null,
 ) {
     composableWithPushTransitions<SettingsRoute> {
         SettingsScreen(
             onBackClick = onBackClick,
             onTransitionGalleryClick = onTransitionGalleryClick,
+            onStateGalleryClick = onStateGalleryClick,
         )
     }
 }

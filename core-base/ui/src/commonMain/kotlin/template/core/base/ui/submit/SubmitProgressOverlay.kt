@@ -15,16 +15,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import template.core.base.designsystem.component.progress.KptProgress
+import template.core.base.designsystem.component.progress.ProgressSize
 import template.core.base.store.submit.SubmitState
 
 /**
- * Semi-transparent scrim + centered [CircularProgressIndicator] shown while a submission is
- * in-flight. Render above form content inside a [Box].
+ * Semi-transparent scrim + centered [KptProgress] circular spinner shown while a submission
+ * is in-flight. Render above form content inside a [Box].
  *
  * Accepts either a raw [Boolean] (`submitState.isSubmitting`) or the full [SubmitState]
  * via the [SubmitState] overload below.
@@ -57,7 +58,7 @@ fun SubmitProgressOverlay(
                 .background(scrimColor),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator()
+            KptProgress(variant = KptProgress.Circular(size = ProgressSize.Lg))
         }
     }
 }

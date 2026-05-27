@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.mifos.core.designsystem.theme.finance
+import org.mifos.core.designsystem.component.freshness.resolveFreshnessColor
 import template.core.base.ui.motion.kptRefreshingPulse
 
 /**
@@ -63,15 +63,4 @@ private fun FreshnessDot(color: Color, pulsing: Boolean) {
             .background(color)
             .kptRefreshingPulse(active = pulsing),
     )
-}
-
-@Composable
-private fun resolveFreshnessColor(state: FreshnessState): Color {
-    val f = MaterialTheme.finance
-    return when (state) {
-        FreshnessState.Fresh -> f.freshnessFresh
-        FreshnessState.Stale -> f.freshnessStale
-        FreshnessState.Updating -> f.freshnessUpdating
-        FreshnessState.Offline -> f.freshnessOffline
-    }
 }

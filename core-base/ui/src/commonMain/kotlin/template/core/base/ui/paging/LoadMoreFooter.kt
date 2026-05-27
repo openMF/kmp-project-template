@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import template.core.base.designsystem.component.progress.KptProgress
+import template.core.base.designsystem.component.progress.ProgressSize
 import template.core.base.store.error.ErrorCategory
 import template.core.base.store.paging.PagingScreenStream
 import template.core.base.store.error.categorize
@@ -109,10 +110,7 @@ fun LoadMoreFooter(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                    )
+                    KptProgress(variant = KptProgress.Circular(size = ProgressSize.Sm))
                     Spacer(Modifier.width(12.dp))
                     Text(
                         text = loadingMessage,

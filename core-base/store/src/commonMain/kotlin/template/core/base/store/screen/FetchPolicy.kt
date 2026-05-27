@@ -16,13 +16,18 @@ package template.core.base.store.screen
  * [PagingScreenStream] to override the default cache-then-network behaviour.
  *
  * **Choosing a policy:**
- * | Scenario | Policy |
- * |---|---|
- * | Normal screen — show cached data immediately, refresh in background | [CACHE_THEN_NETWORK] (default) |
- * | Always-fresh data required (e.g. payment confirmation) | [NETWORK_ONLY] |
- * | Offline-only view or explicit "load from cache" | [CACHE_ONLY] |
+ * | Scenario                                                                    | Policy                          |
+ * |-----------------------------------------------------------------------------|---------------------------------|
+ * | Normal screen — show cached data immediately, refresh in background         | [CACHE_THEN_NETWORK] (default)  |
+ * | Online-first — try network, gracefully fall back to cache when network fails | [NETWORK_THEN_CACHE_FALLBACK]   |
+ * | Always-fresh data required (e.g. payment confirmation)                      | [NETWORK_ONLY]                  |
+ * | Offline-only view or explicit "load from cache"                             | [CACHE_ONLY]                    |
+ *
+ * Modelled as a sealed interface so the vocabulary is open to additional variants
+ * without breaking the source-compatible `FetchPolicy.CACHE_THEN_NETWORK`-style
+ * access pattern.
  */
-enum class FetchPolicy {
+sealed interface FetchPolicy {
 
     /**
      * Emit cached data immediately (if present), then trigger a background network fetch
@@ -32,7 +37,25 @@ enum class FetchPolicy {
      * while the data is silently refreshed in the background. The staleness banner from
      * [DataFreshnessIndicator] is shown when the data is older than the configured TTL.
      */
-    CACHE_THEN_NETWORK,
+    data object CACHE_THEN_NETWORK : FetchPolicy
+
+    /**
+     * Try the network first; if it fails, fall back to the local source of truth.
+     *
+     * Use for screens that prefer fresh data but should remain functional offline —
+     * e.g. an account summary that wants the latest balance but is fine with the
+     * last-cached value during a network outage. Unlike [NETWORK_ONLY], failure
+     * does NOT emit [ScreenState.NoNetwork]; instead, Store5 serves the
+     * SourceOfTruth value and downstream [DecisionEngine] decides freshness
+     * (typically `STALE` while offline).
+     *
+     * Internally maps to `StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true)`
+     * — the same request shape as [NETWORK_ONLY]. The semantic difference is one of
+     * intent: [NETWORK_THEN_CACHE_FALLBACK] documents that cache-fallback is the
+     * expected happy path during transient network failure, whereas [NETWORK_ONLY]
+     * is reserved for screens where stale data would be actively misleading.
+     */
+    data object NETWORK_THEN_CACHE_FALLBACK : FetchPolicy
 
     /**
      * Skip the local cache entirely and always fetch from the network.
@@ -41,7 +64,7 @@ enum class FetchPolicy {
      * balance after a transaction). If the network fails the stream emits
      * [ScreenState.NoNetwork] or [ScreenState.Error] instead of showing stale data.
      */
-    NETWORK_ONLY,
+    data object NETWORK_ONLY : FetchPolicy
 
     /**
      * Read only from the local cache; never perform a network request.
@@ -56,5 +79,5 @@ enum class FetchPolicy {
      * cached data is older than the TTL, the stale banner renders. To suppress the banner on
      * explicitly offline screens, pass `showFreshnessIndicator = false` to [ScreenContent].
      */
-    CACHE_ONLY,
+    data object CACHE_ONLY : FetchPolicy
 }

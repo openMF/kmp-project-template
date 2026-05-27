@@ -140,6 +140,13 @@ internal fun <Key : Any, Output : Any> Store<Key, Output>.streamDataForPolicy(
     isEmpty: (Output) -> Boolean = { false },
 ): Flow<StoreData<Output>> = when (policy) {
     FetchPolicy.CACHE_THEN_NETWORK -> streamDataNoFallback(key, isEmpty = isEmpty)
+    FetchPolicy.NETWORK_THEN_CACHE_FALLBACK ->
+        // Online-first: try network, fall back to SourceOfTruth on failure. Store5's
+        // fresh(fallBackToSourceOfTruth = true) already implements this semantic
+        // (identical wire-level request to NETWORK_ONLY); the distinction is
+        // documentary — see FetchPolicy.NETWORK_THEN_CACHE_FALLBACK KDoc.
+        stream(StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true))
+            .mapToStoreDataNoFallback(isEmpty)
     FetchPolicy.NETWORK_ONLY ->
         stream(StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true))
             .mapToStoreDataNoFallback(isEmpty)

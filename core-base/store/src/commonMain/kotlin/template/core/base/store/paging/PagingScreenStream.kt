@@ -146,8 +146,16 @@ class PagingScreenStream<T : Any> internal constructor(
                 isInitialLoading.value = false
                 return@launch
             }
-            // NETWORK_ONLY: always force a fresh fetch — skip cache.
-            val forceRefresh = refresh || fetchPolicy == FetchPolicy.NETWORK_ONLY
+            // Online-first policies always force a fresh fetch:
+            //   - NETWORK_ONLY: stale data would be misleading; skip cache.
+            //   - NETWORK_THEN_CACHE_FALLBACK: prefer fresh, fall back to SoT on failure.
+            // Store5's fresh(fallBackToSourceOfTruth = true) honours both intents at the
+            // single-key layer (see streamDataForPolicy); for paging, the same forceRefresh
+            // signal is the closest analogue — failure to fetch still surfaces existing
+            // items from `items` MutableStateFlow if the previous page load primed them.
+            val forceRefresh = refresh ||
+                fetchPolicy == FetchPolicy.NETWORK_ONLY ||
+                fetchPolicy == FetchPolicy.NETWORK_THEN_CACHE_FALLBACK
             // Offline pre-check for forced-network: if we're offline,
             // don't even call store.loadPage — `fresh(key)` would dispatch to the
             // fetcher whose `executeWithRetry` may block indefinitely waiting for

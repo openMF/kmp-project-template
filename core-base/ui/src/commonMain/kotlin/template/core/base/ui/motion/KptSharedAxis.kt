@@ -81,8 +81,8 @@ object KptSharedAxis {
     fun exitBack(motion: Motion): ExitTransition {
         val slide = motion.sharedAxisSlideDistance
         return slideOutHorizontally(
-            animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+            animationSpec = tween(SharedAxisSpec.exitBackSlideMs(motion), easing = motion.easingEmphasized),
             targetOffsetX = { fullWidth -> (slide.value.toInt().coerceAtMost(fullWidth)) },
-        ) + fadeOut(animationSpec = tween(motion.durationShort4, easing = motion.easingStandard))
+        ) + fadeOut(animationSpec = tween(SharedAxisSpec.exitBackFadeMs(motion), easing = motion.easingStandard))
     }
 }

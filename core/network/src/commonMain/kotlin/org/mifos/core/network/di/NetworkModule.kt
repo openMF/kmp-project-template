@@ -11,7 +11,6 @@ package org.mifos.core.network.di
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import org.koin.dsl.module
-import org.mifos.core.network.client.FintechApiClient
 import org.mifos.core.network.crypto.api.CoinGeckoApi
 import org.mifos.core.network.currency.api.FrankfurterApi
 import org.mifos.core.network.currency.config.FrankfurterApiConfig
@@ -19,6 +18,7 @@ import org.mifos.core.network.economic.api.FredApi
 import org.mifos.core.network.economic.api.WorldBankApi
 import org.mifos.core.network.economic.config.FredApiConfig
 import org.mifos.core.network.economic.config.WorldBankApiConfig
+import org.mifos.core.network.infra.FintechApiClient
 import template.core.base.network.httpClient
 import template.core.base.network.setupDefaultHttpClient
 

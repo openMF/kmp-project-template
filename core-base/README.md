@@ -128,3 +128,42 @@ MUST use `Kpt*` exclusively.
 If you see a `Mifos*` reference in fork code, run the IDE's "Replace with
 Kpt-equivalent" intention or `git grep "Mifos<symbol>"` and migrate by hand —
 the typealiases map 1:1.
+
+---
+
+## Day-1 fork checklist
+
+The minimum five steps to turn a fresh clone of this template into a branded,
+running app. For the long-form walkthrough see
+[`templates/FORK_QUICKSTART.md`](../templates/FORK_QUICKSTART.md).
+
+1. **Rebrand identifiers** — edit the five `APP_*` keys in `gradle.properties`
+   (`APP_ID_BASE`, `APP_NAME`, `APP_VERSION_BASE`, `APP_BUNDLE_DISPLAY_NAME`,
+   `APP_BRAND_PREFIX`). See the **Fork branding** section of the root
+   `CLAUDE.md` (Phase 10) for the consumer-file rename surface.
+
+2. **Override the 4 customization-point Koin bindings** in your fork's app
+   module (each ships a working stub today — swap the binding, no callers
+   change):
+   - `AuthProvider` — `NoOpAuthProvider` → your auth impl (Firebase Auth,
+     OAuth, biometric, etc.).
+   - `CrashReporter` — `ConsoleCrashReporter` → Firebase Crashlytics, Sentry,
+     Bugsnag, or similar.
+   - `AnalyticsHelper` — `NoOpAnalyticsHelper` → `FirebaseAnalyticsHelper`,
+     Amplitude, Mixpanel, etc.
+   - **Network config bindings** — `FredApiConfig`, `FrankfurterApiConfig`,
+     `WorldBankApiConfig`: override the `baseUrl` (and `apiKey` for FRED) for
+     your backend / proxy.
+
+3. **Generate Android keystores** — `./keystore-manager.sh generate` creates
+   the ORIGINAL + UPLOAD keystores under `keystores/` (gitignored).
+
+4. **Populate `.env.local`** — `cp .env.local.example .env.local` and add
+   `FRED_API_KEY=...` (free key from https://fred.stlouisfed.org/docs/api/api_key.html).
+
+5. **Smoke-test** — `./gradlew :cmp-android:installDemoDebug` should install
+   the demo build on a connected device / emulator.
+
+That's the floor. Everything else (icons, splash, push, deep links, store
+listings) layers on top — see the [Fork Quickstart](../templates/FORK_QUICKSTART.md)
+for the expanded walkthrough.

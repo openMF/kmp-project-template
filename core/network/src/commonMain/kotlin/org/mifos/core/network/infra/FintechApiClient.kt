@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.network.client
+package org.mifos.core.network.infra
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import org.mifos.core.network.crypto.api.CoinGeckoApi

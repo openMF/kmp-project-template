@@ -66,7 +66,7 @@ class DraftSubmitHandlerTest {
         testScheduler.advanceUntilIdle()
 
         val state = assertIs<SubmitState.Failed>(handler.state.value)
-        assertEquals(ErrorCategory.Server, state.category)
+        assertEquals(ErrorCategory.Server(httpCode = 500), state.category)
         assertNull(outbox.getPending(formKey), "Server errors must not create a draft")
     }
 
@@ -249,7 +249,7 @@ class DraftSubmitHandlerTest {
         testScheduler.advanceUntilIdle()
 
         val state = assertIs<SubmitState.Failed>(handler.state.value)
-        assertEquals(ErrorCategory.Server, state.category)
+        assertEquals(ErrorCategory.Server(httpCode = 500), state.category)
         assertNull(outbox.getPending(formKey), "Non-network failure must never auto-save")
     }
 }

@@ -213,7 +213,7 @@ class SubmitHandlerTest {
         testScheduler.advanceUntilIdle()
 
         val state = assertIs<SubmitState.Failed>(handler.state.value)
-        assertEquals(ErrorCategory.Server, state.category)
+        assertEquals(ErrorCategory.Server(httpCode = 500), state.category)
     }
 
     // ─── Helper ──────────────────────────────────────────────────────────────

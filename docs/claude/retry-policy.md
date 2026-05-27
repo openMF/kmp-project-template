@@ -72,3 +72,57 @@ When the migration lands, this document will be revised to point at the
 follow-up PLAN reference and the migration's commit hash. Until then, the
 `@Suppress("unused")` annotation on `OfflineSubmitSyncer.retryPolicy` is the
 breadcrumb signalling the deferred wire-in.
+
+---
+
+## Phase 06 follow-up: idempotency keys (Room v10→v11)
+
+**Status:** Partial — `IdempotencyKey.generate()` ships + `BatchSubmitHandler`
+threads the key through `submitBlock`; durable persistence to
+`framework_submit_drafts` deferred.
+
+### What ships today (Phase 06)
+
+- **`template.core.base.store.submit.IdempotencyKey`** — `object` with a single
+  `generate(): String` returning a Kotlin `Uuid.random().toString()`. KMP-safe
+  (currently `@OptIn(ExperimentalUuidApi::class)`).
+- **`BatchSubmitHandler.submitBatch(idempotencyKey: String = IdempotencyKey.generate(), ...)`**
+  — the handler threads the key into the per-payload `submitBlock(index, payload, key)`
+  signature so callers can attach it to an `Idempotency-Key` header (or equivalent).
+- **`SubmitOutboxEntry.idempotencyKey: String? = null`** — new optional field on the
+  common-main data class. **Default null. Currently not persisted** by any Room-
+  backed `SubmitOutbox` — every `RoomSubmitOutbox.toEntity()` ignores the field
+  and reconstructs entries with `idempotencyKey = null` on read.
+
+### What's deferred (Room v10→v11)
+
+To make the field durable across process restarts we need a Room migration that:
+
+1. **Adds an `idempotency_key TEXT` column** to `framework_submit_drafts` with
+   `DEFAULT NULL`.
+2. **Mirrors the same shape** on any fork-side outbox tables.
+3. **Backfills `idempotency_key = NULL`** for existing rows — pre-existing drafts
+   never had a key and shouldn't suddenly be deduplicated server-side.
+4. **Plumbs read/write through every concrete `SubmitOutbox` impl** — the
+   `save` / `saveByUniqueKey` overloads gain an optional `idempotencyKey` parameter
+   (defaulting to `null` for backwards-compat), and `getPending` / `observePending`
+   surface the persisted value.
+
+### Why deferred
+
+Identical reasoning to Phase 05's retry-policy deferral: the migration touches
+every downstream module that builds a `SubmitOutbox` (currently 2 production
+features + 1 archived feature group), and Phase 06's scope was the in-memory
+API surface (PushStoreAdapter / N-way combine / BatchSubmitHandler /
+IdempotencyKey). Shipping the API now lets forks adopt the generate-and-thread
+contract today; the persistence wire-in is a separate, additive PR with no API
+break.
+
+### Behaviour today
+
+- **In-batch retries within the same process**: `BatchSubmitHandler` reuses
+  the same key for every payload in the batch, so server-side dedup works for
+  intra-batch retries already.
+- **Cross-process retries via the outbox**: do **not** dedupe. After the
+  v10→v11 migration lands, `OfflineSubmitSyncer.retryAll()` will read the
+  persisted key off each `SubmitOutboxEntry` and attach it to the retry call.

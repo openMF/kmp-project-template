@@ -35,11 +35,15 @@ import template.core.base.store.error.categorize
  * matching `categoryCopyFor` in [rememberAppErrorMessageFor]) with their own domain-error
  * branches before falling back to [categorize].
  */
-fun mapErrorToUserMessage(error: Throwable): String = when (categorize(error)) {
+fun mapErrorToUserMessage(error: Throwable): String = when (val cat = categorize(error)) {
     ErrorCategory.Network -> "Can't reach the server. Check your connection and try again."
+    ErrorCategory.Timeout.Connect -> "Connection timed out. Check your connection and try again."
+    ErrorCategory.Timeout.Read -> "Server took too long to respond. Please try again shortly."
     ErrorCategory.Auth -> "Your session expired. Please sign in again."
     ErrorCategory.RateLimit -> "Too many requests. Please wait a moment and try again."
-    ErrorCategory.Server -> "Our servers are having a moment. Please try again shortly."
+    ErrorCategory.QuotaExceeded -> "You've reached your quota. Upgrade or wait to continue."
+    is ErrorCategory.Server -> "Our servers are having a moment. Please try again shortly."
+    is ErrorCategory.ClientError -> error.message ?: "Request failed (${cat.httpCode})."
     ErrorCategory.Generic -> error.message ?: "Something went wrong."
     // TODO(fork): add branches above for app-specific exception types — e.g.
     //   error is InsufficientFundsException -> "Not enough balance for this transfer."
@@ -63,10 +67,14 @@ fun rememberAppErrorMessageFor(): (Throwable) -> String {
     return remember(networkCopy, authCopy, rateLimitCopy, serverCopy, genericCopy) {
         { error: Throwable ->
             when (categorize(error)) {
-                ErrorCategory.Network -> networkCopy
+                ErrorCategory.Network,
+                ErrorCategory.Timeout.Connect,
+                ErrorCategory.Timeout.Read,
+                -> networkCopy
                 ErrorCategory.Auth -> authCopy
-                ErrorCategory.RateLimit -> rateLimitCopy
-                ErrorCategory.Server -> serverCopy
+                ErrorCategory.RateLimit, ErrorCategory.QuotaExceeded -> rateLimitCopy
+                is ErrorCategory.Server -> serverCopy
+                is ErrorCategory.ClientError -> error.message ?: genericCopy
                 ErrorCategory.Generic -> error.message ?: genericCopy
             }
         }

@@ -56,11 +56,15 @@ object DecisionEngine {
                 isCaptivePortal -> ScreenState.NoNetwork(isCaptivePortal = true)
                 !isOnline -> ScreenState.NoNetwork()
                 error != null -> when (categorize(error)) {
-                    ErrorCategory.Network -> ScreenState.NoNetwork()
+                    ErrorCategory.Network, ErrorCategory.Timeout.Connect, ErrorCategory.Timeout.Read ->
+                        ScreenState.NoNetwork()
                     ErrorCategory.Auth -> ScreenState.Unauthenticated
                     ErrorCategory.RateLimit,
-                    ErrorCategory.Server,
-                    ErrorCategory.Generic -> ScreenState.Error(error, isNetworkError = false)
+                    ErrorCategory.QuotaExceeded,
+                    ErrorCategory.Generic,
+                    is ErrorCategory.Server,
+                    is ErrorCategory.ClientError,
+                    -> ScreenState.Error(error, isNetworkError = false)
                 }
                 else -> ScreenState.Loading
             }

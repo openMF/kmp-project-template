@@ -103,11 +103,15 @@ val DefaultErrorMessageFor: (Throwable) -> String = ::defaultErrorMessage
  * box. Apps that need branded messages should pass their own lambda — typically wired
  * once at the theme level via `LocalScreenStateDefaults`.
  */
-fun defaultErrorMessage(error: Throwable): String = when (categorize(error)) {
+fun defaultErrorMessage(error: Throwable): String = when (val cat = categorize(error)) {
     ErrorCategory.Network -> "Can't reach the server. Check your connection."
+    ErrorCategory.Timeout.Connect -> "Connection timed out. Check your connection and try again."
+    ErrorCategory.Timeout.Read -> "Server took too long to respond. Try again in a bit."
     ErrorCategory.Auth -> "Your session expired. Please sign in again."
-    ErrorCategory.Server -> "Our servers are having a moment. Try again in a bit."
+    is ErrorCategory.Server -> "Our servers are having a moment. Try again in a bit."
     ErrorCategory.RateLimit -> "Too many requests. Please wait and try again."
+    ErrorCategory.QuotaExceeded -> "You've reached your quota. Upgrade or wait to continue."
+    is ErrorCategory.ClientError -> error.message ?: "Request failed (${cat.httpCode})."
     ErrorCategory.Generic -> error.message ?: "Something went wrong"
 }
 

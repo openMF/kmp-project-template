@@ -122,8 +122,8 @@ class SubmitStateExtensionsTest {
     fun `Failed with Server category exposed correctly`() {
         val state: SubmitState<Unit> = SubmitState.Failed(
             error = RuntimeException("500"),
-            category = ErrorCategory.Server,
+            category = ErrorCategory.Server(httpCode = 500),
         )
-        assertEquals(ErrorCategory.Server, state.categoryOrNull)
+        assertEquals(ErrorCategory.Server(httpCode = 500), state.categoryOrNull)
     }
 }

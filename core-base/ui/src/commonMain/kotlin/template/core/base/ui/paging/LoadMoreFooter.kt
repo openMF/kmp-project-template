@@ -169,7 +169,10 @@ internal data class LoadMoreFooterCopy(
 
 internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
     when (categorize(error)) {
-        ErrorCategory.Network -> LoadMoreFooterCopy(
+        ErrorCategory.Network,
+        ErrorCategory.Timeout.Connect,
+        ErrorCategory.Timeout.Read,
+        -> LoadMoreFooterCopy(
             label = "No internet",
             retryText = "Tap to retry",
             icon = Icons.Default.CloudOff,
@@ -179,7 +182,7 @@ internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
             retryText = "Sign in again",
             icon = Icons.Default.Warning,
         )
-        ErrorCategory.Server -> LoadMoreFooterCopy(
+        is ErrorCategory.Server -> LoadMoreFooterCopy(
             label = "Server unavailable",
             retryText = "Tap to retry",
             icon = Icons.Default.Warning,
@@ -189,7 +192,14 @@ internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
             retryText = "Tap to retry",
             icon = Icons.Default.Warning,
         )
-        ErrorCategory.Generic -> LoadMoreFooterCopy(
+        ErrorCategory.QuotaExceeded -> LoadMoreFooterCopy(
+            label = "Quota exceeded",
+            retryText = "Tap to retry",
+            icon = Icons.Default.Warning,
+        )
+        is ErrorCategory.ClientError,
+        ErrorCategory.Generic,
+        -> LoadMoreFooterCopy(
             label = "Failed to load more",
             retryText = "Tap to retry",
             icon = Icons.Default.Warning,

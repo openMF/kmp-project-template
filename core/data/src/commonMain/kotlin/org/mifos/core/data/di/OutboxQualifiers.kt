@@ -34,6 +34,14 @@ import org.koin.core.qualifier.named
  *
  * Add a new payload type? Add a new constant here, register its `single<>` with the
  * qualifier, and have the consuming feature module fetch with the same qualifier.
+ *
+ * **Verification.** Every entry in this object MUST have a matching `single<SubmitOutbox<T>>`
+ * binding under the same qualifier in [DataModule] (in `RepositoryModule.kt`). The contract
+ * is enforced statically by `RepositoryModuleVerifyTest` (in
+ * `core/data/src/commonTest/.../di/RepositoryModuleVerifyTest.kt`) — adding a new constant
+ * here without the matching `single<>` registration (or vice versa) fails the build at
+ * `:core:data:desktopTest`, catching the regression class long before the
+ * `ClassCastException-at-first-save` shows up at runtime.
  */
 object OutboxQualifiers {
     /** `SubmitOutbox<org.mifos.core.model.banking.Loan>`. */

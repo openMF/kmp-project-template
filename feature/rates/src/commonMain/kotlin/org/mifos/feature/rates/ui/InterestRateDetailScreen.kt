@@ -40,10 +40,10 @@ import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.designsystem.chart.MifosAreaChart
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.InterestRateSeries
 import template.core.base.designsystem.component.AppCard
+import template.core.base.designsystem.component.HeroCard
 import template.core.base.ui.screen.ScreenContent
 
 /**

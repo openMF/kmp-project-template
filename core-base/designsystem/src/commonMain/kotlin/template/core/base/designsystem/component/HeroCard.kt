@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.designsystem.component
+package template.core.base.designsystem.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -25,8 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.mifos.core.designsystem.theme.elevation
-import org.mifos.core.designsystem.theme.spacing
+import template.core.base.designsystem.theme.KptTheme
 
 /**
  * Hero card — the dashboard's first impression. Renders a vertical gradient from
@@ -40,7 +39,8 @@ import org.mifos.core.designsystem.theme.spacing
 @Composable
 fun HeroCard(
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(MaterialTheme.spacing.xl),
+    // KptTheme.spacing.lg == 24.dp — value-equivalent to the legacy MaterialTheme.spacing.xl (24dp).
+    contentPadding: PaddingValues = PaddingValues(KptTheme.spacing.lg),
     gradientStart: Color = MaterialTheme.colorScheme.primary,
     gradientEnd: Color = MaterialTheme.colorScheme.primaryContainer,
     content: @Composable () -> Unit,
@@ -49,7 +49,8 @@ fun HeroCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = MaterialTheme.elevation.medium,
+            // KptTheme.elevation.level2 == 3.dp — value-equivalent to the legacy MaterialTheme.elevation.medium (3dp).
+            defaultElevation = KptTheme.elevation.level2,
         ),
     ) {
         Column(

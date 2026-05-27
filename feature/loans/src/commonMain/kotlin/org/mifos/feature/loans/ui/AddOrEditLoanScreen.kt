@@ -50,8 +50,8 @@ import kotlinx.datetime.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.model.banking.LoanKind
+import template.core.base.designsystem.component.HeroCard
 import template.core.base.store.submit.SubmitState
 
 /**

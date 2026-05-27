@@ -227,7 +227,7 @@ internal fun HomeScreen(
  */
 @Composable
 private fun HeroSnapshot(state: ScreenState<LoansSummary>) {
-    org.mifos.core.designsystem.component.HeroCard {
+    template.core.base.designsystem.component.HeroCard {
         ScreenContent(
             state = state,
             onRetry = {},

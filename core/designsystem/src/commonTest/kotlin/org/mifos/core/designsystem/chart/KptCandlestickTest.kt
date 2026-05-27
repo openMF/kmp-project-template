@@ -15,10 +15,10 @@ import kotlin.test.assertTrue
 
 /**
  * Tests for [Candle.isUp] direction classification — drives the up/down color
- * pick inside [MifosCandlestick]. Pure-Kotlin; no Canvas / Compose test rule
+ * pick inside [KptCandlestick]. Pure-Kotlin; no Canvas / Compose test rule
  * needed.
  */
-class MifosCandlestickTest {
+class KptCandlestickTest {
 
     @Test
     fun closeAboveOpenIsUp() {

@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.Dp
  * @param markerAtEnd If true, draws a filled circle at the final point to emphasize "current" value.
  */
 @Composable
-fun MifosSparkline(
+fun KptSparkline(
     values: List<Double>,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary,

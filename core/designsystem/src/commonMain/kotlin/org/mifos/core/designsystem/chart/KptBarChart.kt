@@ -37,7 +37,7 @@ import org.mifos.core.designsystem.theme.spacing
 import template.core.base.designsystem.theme.motion
 
 /**
- * One bar of [MifosBarChart]. [value] is unitless — the chart normalizes each
+ * One bar of [KptBarChart]. [value] is unitless — the chart normalizes each
  * bar to a fraction of the running max.
  */
 data class BarDatum(
@@ -62,7 +62,7 @@ data class BarDatum(
  * @param animationSpec How the max-value normalization animates on data change.
  */
 @Composable
-fun MifosBarChart(
+fun KptBarChart(
     data: List<BarDatum>,
     modifier: Modifier = Modifier,
     showLabels: Boolean = true,
@@ -74,7 +74,7 @@ fun MifosBarChart(
     val animatedFraction by animateFloatAsState(
         targetValue = if (data.isEmpty()) 0f else 1f,
         animationSpec = animationSpec,
-        label = "mifosBarFraction",
+        label = "kptBarFraction",
     )
     val labelStyle = ChartTokens.axisLabelStyle()
     val sp = MaterialTheme.spacing

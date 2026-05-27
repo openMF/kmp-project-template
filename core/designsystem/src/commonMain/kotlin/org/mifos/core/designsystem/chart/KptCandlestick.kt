@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import org.mifos.core.designsystem.theme.finance
 
 /**
- * One open-high-low-close bar for [MifosCandlestick]. All values are in the
+ * One open-high-low-close bar for [KptCandlestick]. All values are in the
  * same unit (price, rate, etc.) and rendered against a shared y-axis covering
  * the series' min/max.
  */
@@ -55,7 +55,7 @@ data class Candle(
  * @param wickWidth Stroke width for the high-low wick line.
  */
 @Composable
-fun MifosCandlestick(
+fun KptCandlestick(
     candles: List<Candle>,
     modifier: Modifier = Modifier,
     upColor: Color = MaterialTheme.finance.moneyPositive,

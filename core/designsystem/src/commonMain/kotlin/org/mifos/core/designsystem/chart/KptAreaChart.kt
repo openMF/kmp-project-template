@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Filled area chart for the detail-screen Hero. Same geometry contract as
- * [MifosSparkline] but adds a gradient fill under the line via
+ * [KptSparkline] but adds a gradient fill under the line via
  * [ChartTokens.areaFillBrush].
  *
  * Reuses [SparklineGeometry] so degenerate-input handling (empty / single /
@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
  * @param strokeWidth Stroke thickness for the line.
  */
 @Composable
-fun MifosAreaChart(
+fun KptAreaChart(
     values: List<Double>,
     modifier: Modifier = Modifier,
     lineColor: Color = MaterialTheme.colorScheme.primary,

@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import template.core.base.designsystem.theme.motion
 
 /**
- * One slice of [MifosDonutChart]. [value] is unitless — the chart normalizes
+ * One slice of [KptDonutChart]. [value] is unitless — the chart normalizes
  * each slice to a fraction of the sum.
  */
 data class DonutSlice(
@@ -55,7 +55,7 @@ data class DonutSlice(
  * @param animationSpec How the donut animates when [slices] changes (default: motion.durationMedium2 tween).
  */
 @Composable
-fun MifosDonutChart(
+fun KptDonutChart(
     slices: List<DonutSlice>,
     modifier: Modifier = Modifier,
     strokeWidth: Dp = 24.dp,
@@ -69,7 +69,7 @@ fun MifosDonutChart(
     val animatedFraction by animateFloatAsState(
         targetValue = if (sweeps.any { it > 0f }) 1f else 0f,
         animationSpec = animationSpec,
-        label = "mifosDonutFraction",
+        label = "kptDonutFraction",
     )
 
     Box(modifier = modifier, contentAlignment = Alignment.Center) {

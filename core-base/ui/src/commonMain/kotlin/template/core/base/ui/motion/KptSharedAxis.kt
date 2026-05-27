@@ -57,9 +57,9 @@ object KptSharedAxis {
     fun exitForward(motion: Motion): ExitTransition {
         val slide = motion.sharedAxisSlideDistance
         return slideOutHorizontally(
-            animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+            animationSpec = tween(SharedAxisSpec.exitForwardSlideMs(motion), easing = motion.easingEmphasized),
             targetOffsetX = { fullWidth -> -(slide.value.toInt().coerceAtMost(fullWidth)) },
-        ) + fadeOut(animationSpec = tween(motion.durationShort4, easing = motion.easingStandard))
+        ) + fadeOut(animationSpec = tween(SharedAxisSpec.exitForwardFadeMs(motion), easing = motion.easingStandard))
     }
 
     /** Back/pop — new screen slides in from the left, mirroring [enterForward]. */

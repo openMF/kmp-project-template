@@ -16,7 +16,7 @@ import kotlin.test.assertTrue
 
 /**
  * Pure-function tests for [ListItemEnterMath]. The Composable
- * `Modifier.mifosListItemEnter` consumes these helpers — these tests guard
+ * `Modifier.kptListItemEnter` consumes these helpers — these tests guard
  * the stagger / cap / snap-past-N contract.
  */
 class ListItemEnterMathTest {

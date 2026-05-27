@@ -40,7 +40,7 @@ import template.core.base.designsystem.theme.motion
  *     itemsIndexed(loans) { index, loan ->
  *         LoanRowCard(
  *             loan,
- *             modifier = Modifier.mifosListItemEnter(index),
+ *             modifier = Modifier.kptListItemEnter(index),
  *         )
  *     }
  * }
@@ -50,7 +50,7 @@ import template.core.base.designsystem.theme.motion
  * @param totalAnimated Maximum number of items that animate; defaults to
  *                      `MaterialTheme.motion.listItemEnterMaxAnimated`.
  */
-fun Modifier.mifosListItemEnter(
+fun Modifier.kptListItemEnter(
     index: Int,
     totalAnimated: Int? = null,
 ): Modifier = composed {
@@ -70,12 +70,12 @@ fun Modifier.mifosListItemEnter(
     val animatedAlpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(motion.durationMedium2, easing = motion.easingStandard),
-        label = "mifosListItemEnterAlpha",
+        label = "kptListItemEnterAlpha",
     )
     val translateY by animateDpAsState(
         targetValue = if (visible) 0.dp else 16.dp,
         animationSpec = tween(motion.durationMedium2, easing = motion.easingDecelerated),
-        label = "mifosListItemEnterTranslate",
+        label = "kptListItemEnterTranslate",
     )
 
     this

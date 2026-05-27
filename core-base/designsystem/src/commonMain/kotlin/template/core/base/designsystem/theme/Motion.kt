@@ -76,7 +76,7 @@ data class Motion(
     val sharedAxisSlideDistance: Dp = 30.dp,
     /** Duration of one full breath of the "refreshing now" pulse (consumed by `Modifier.mifosRefreshingPulse`). */
     val refreshingPulseDurationMs: Int = 1200,
-    /** Stagger delay per item when `LazyColumn` items use `Modifier.mifosListItemEnter`. */
+    /** Stagger delay per item when `LazyColumn` items use `Modifier.kptListItemEnter`. */
     val listItemEnterStaggerMs: Int = 30,
     /** Cap on list-item stagger — items past this index snap into place. */
     val listItemEnterMaxAnimated: Int = 20,

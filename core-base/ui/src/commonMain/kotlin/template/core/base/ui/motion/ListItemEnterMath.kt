@@ -10,7 +10,7 @@
 package template.core.base.ui.motion
 
 /**
- * Pure-function math behind [Modifier.mifosListItemEnter]. Extracted so the
+ * Pure-function math behind [Modifier.kptListItemEnter]. Extracted so the
  * stagger/cap rules can be unit-tested without a Compose UI test rule.
  *
  * **Contracts**:

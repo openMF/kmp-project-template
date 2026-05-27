@@ -80,4 +80,39 @@ sealed interface FetchPolicy {
      * explicitly offline screens, pass `showFreshnessIndicator = false` to [ScreenContent].
      */
     data object CACHE_ONLY : FetchPolicy
+
+    /**
+     * Cache-then-network on the read side, plus a periodic background refresh.
+     *
+     * Use for ambient surfaces that should silently re-fetch on a cadence — live FX
+     * rates, market tickers, dashboard tiles. The read semantic is identical to
+     * [CACHE_THEN_NETWORK] (cached value emitted immediately, network refresh
+     * layered in); the periodic refresh is fired by [ScreenDataStream] internally
+     * via the same refresh-trigger pipeline as the reconnect refresh and the
+     * user-tap refresh — so it goes through the user-tap debounce window, the
+     * staleness banner, and the lastContent preservation logic for free.
+     *
+     * **Tuning notes:**
+     * - [intervalMillis] must be positive. Values shorter than ~5s on mobile
+     *   risk battery drain; values shorter than the
+     *   [DEFAULT_USER_REFRESH_DEBOUNCE_MS] (1s) will be coalesced by the
+     *   user-tap debounce anyway.
+     * - [foregroundOnly] is wired as a flag today but the foreground-aware
+     *   gating is deferred to a follow-up phase (needs `LocalAppForegroundFlow`
+     *   threading through core-base/ui). The ticker fires unconditionally for
+     *   now; the flag is parsed and held so callers can declare intent without
+     *   waiting for the runtime gate.
+     *
+     * @property intervalMillis Refresh cadence in milliseconds. Must be `> 0`.
+     * @property foregroundOnly If true (default), refresh only when the app is
+     *   in the foreground. Currently informational — see "Tuning notes".
+     */
+    data class PERIODIC(
+        val intervalMillis: Long,
+        val foregroundOnly: Boolean = true,
+    ) : FetchPolicy {
+        init {
+            require(intervalMillis > 0L) { "intervalMillis must be positive (got $intervalMillis)" }
+        }
+    }
 }

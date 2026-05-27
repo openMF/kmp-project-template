@@ -153,4 +153,8 @@ internal fun <Key : Any, Output : Any> Store<Key, Output>.streamDataForPolicy(
     FetchPolicy.CACHE_ONLY ->
         stream(StoreReadRequest.localOnly(key))
             .mapToStoreDataNoFallback(isEmpty)
+    // PERIODIC's read semantic is cache-then-network — the periodic refresh
+    // is layered on top by ScreenDataStream via a ticker that fires through
+    // the same refresh-trigger pipeline as the reconnect/user-tap refresh.
+    is FetchPolicy.PERIODIC -> streamDataNoFallback(key, isEmpty = isEmpty)
 }

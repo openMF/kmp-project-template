@@ -17,15 +17,19 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -76,12 +80,13 @@ fun <T> ScreenContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     showFreshnessIndicator: Boolean = true,
+    onDismiss: (() -> Unit)? = null,
     loading: @Composable () -> Unit = { DefaultLoadingContent() },
     empty: @Composable () -> Unit = { DefaultEmptyContent() },
     noNetwork: @Composable (isCaptivePortal: Boolean) -> Unit = { captive ->
-        DefaultNoNetworkContent(onRetry, isCaptivePortal = captive)
+        DefaultNoNetworkContent(onRetry, isCaptivePortal = captive, onDismiss = onDismiss)
     },
-    error: @Composable (Throwable) -> Unit = { DefaultErrorContent(it, onRetry) },
+    error: @Composable (Throwable) -> Unit = { DefaultErrorContent(it, onRetry, onDismiss = onDismiss) },
     content: @Composable (data: T, freshness: DataFreshness) -> Unit,
 ) {
     AnimatedContent(
@@ -238,6 +243,7 @@ fun DefaultNoNetworkContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     isCaptivePortal: Boolean = false,
+    onDismiss: (() -> Unit)? = null,
     config: ScreenStateNoNetwork = LocalScreenStateDefaults.current.noNetwork,
 ) {
     val spacing = KptTheme.spacing
@@ -271,13 +277,9 @@ fun DefaultNoNetworkContent(
             }
             Spacer(Modifier.height(spacing.sm))
             // Secondary: retry, in case the user already signed in via system UI.
-            OutlinedButton(onClick = onRetry) {
-                Text(config.retryText)
-            }
+            ActionRow(onRetry = onRetry, retryText = config.retryText, onDismiss = onDismiss, retryAsOutlined = true)
         } else {
-            Button(onClick = onRetry) {
-                Text(config.retryText)
-            }
+            ActionRow(onRetry = onRetry, retryText = config.retryText, onDismiss = onDismiss)
         }
     }
 }
@@ -287,6 +289,7 @@ fun DefaultErrorContent(
     error: Throwable,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    onDismiss: (() -> Unit)? = null,
     config: ScreenStateError = LocalScreenStateDefaults.current.error,
 ) {
     LaunchedEffect(error) { config.onShown?.invoke(error) }
@@ -320,8 +323,39 @@ fun DefaultErrorContent(
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(spacing.lg))
-        Button(onClick = onRetry) {
-            Text(config.retryText)
+        ActionRow(onRetry = onRetry, retryText = config.retryText, onDismiss = onDismiss)
+    }
+}
+
+/**
+ * Internal helper rendering a retry button alongside an optional dismiss (X) icon.
+ * Used by [DefaultErrorContent] and [DefaultNoNetworkContent] when consumed inside
+ * a multi-card dashboard via [template.core.base.ui.dashboard.IndependentCardLayout],
+ * where users can opt to dismiss a single failed card rather than retry.
+ */
+@Composable
+private fun ActionRow(
+    onRetry: () -> Unit,
+    retryText: String,
+    onDismiss: (() -> Unit)?,
+    retryAsOutlined: Boolean = false,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(KptTheme.spacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (retryAsOutlined) {
+            OutlinedButton(onClick = onRetry) { Text(retryText) }
+        } else {
+            Button(onClick = onRetry) { Text(retryText) }
+        }
+        if (onDismiss != null) {
+            IconButton(onClick = onDismiss) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Dismiss",
+                )
+            }
         }
     }
 }

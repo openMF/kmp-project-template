@@ -57,6 +57,17 @@ class OfflineSubmitSyncer<P, R>(
     private val submitBlock: suspend (P) -> R,
     private val retryOnStatus: RetryOnNetworkStatus = RetryOnNetworkStatus.OnlineOnly,
     private val crashReporter: CrashReporter? = null,
+    /**
+     * Per-attempt retry-backoff policy. **Held but not yet applied** — the per-entry
+     * `attemptCount` and `nextRetryAt` columns required to schedule backoff between
+     * the connectivity-triggered retry cycles are pending a Room schema migration
+     * (see `docs/claude/retry-policy.md` for the deferred work). Until then,
+     * `retryAll()` continues to fire every PENDING entry once per reconnect with
+     * no inter-entry delay — same behavior as before this parameter existed.
+     * Defaults to [RetryPolicy] defaults (3 attempts, 1s/2s/4s backoff, ±25% jitter).
+     */
+    @Suppress("unused")
+    private val retryPolicy: RetryPolicy = RetryPolicy(),
 ) {
 
     /**
@@ -117,6 +128,7 @@ fun <P, R> CoroutineScope.offlineSubmitSyncer(
     submitBlock: suspend (P) -> R,
     retryOnStatus: RetryOnNetworkStatus = RetryOnNetworkStatus.OnlineOnly,
     crashReporter: CrashReporter? = null,
+    retryPolicy: RetryPolicy = RetryPolicy(),
 ): OfflineSubmitSyncer<P, R> = OfflineSubmitSyncer(
     scope = this,
     outbox = outbox,
@@ -124,6 +136,7 @@ fun <P, R> CoroutineScope.offlineSubmitSyncer(
     submitBlock = submitBlock,
     retryOnStatus = retryOnStatus,
     crashReporter = crashReporter,
+    retryPolicy = retryPolicy,
 )
 
 /**

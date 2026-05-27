@@ -13,6 +13,7 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.isOnlineDebounced
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.mobilenativefoundation.store.store5.Store
 import template.core.base.store.infra.DecisionEngine
@@ -217,6 +219,20 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         }
     }
 
+    // Periodic background refresh — FetchPolicy.PERIODIC only.
+    // The ticker fires through the same refreshTrigger as user-tap / reconnect refresh,
+    // so lastContent preservation + debounce + freshness banner all work uniformly.
+    // foregroundOnly: parsed but currently informational; the foreground gate is
+    // a follow-up phase (needs LocalAppForegroundFlow threading through core-base/ui).
+    if (fetchPolicy is FetchPolicy.PERIODIC) {
+        scope.launch {
+            while (isActive) {
+                delay(fetchPolicy.intervalMillis)
+                refreshTrigger.tryEmit(Unit)
+            }
+        }
+    }
+
     // Seed persisted timestamp so warm-reopen shows real "Updated 5m ago".
     // Held in a holder so the map step below can read the latest value.
     var persistedFetchedAt: kotlin.time.Instant? = null
@@ -279,6 +295,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
  *   selected client — instead of overwriting on every key change.
  */
 @OptIn(ExperimentalCoroutinesApi::class, kotlin.time.ExperimentalTime::class)
+@Suppress("CyclomaticComplexMethod", "LongParameterList")
 fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     keyFlow: Flow<Key>,
     networkMonitor: NetworkMonitor,
@@ -299,6 +316,16 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                 .filter { it }
                 .drop(1)
                 .collect { refreshTrigger.tryEmit(Unit) }
+        }
+    }
+
+    // Periodic background refresh — see single-key overload for rationale.
+    if (fetchPolicy is FetchPolicy.PERIODIC) {
+        scope.launch {
+            while (isActive) {
+                delay(fetchPolicy.intervalMillis)
+                refreshTrigger.tryEmit(Unit)
+            }
         }
     }
 

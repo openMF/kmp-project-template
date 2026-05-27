@@ -21,6 +21,7 @@
 - [Onboarding Guide](docs/claude/onboarding.md)
 - [Deployment Playbook](docs/claude/deployment-playbook.md)
 - [Patterns & Best Practices](docs/claude/patterns.md)
+- [Independent Cards Pattern](docs/claude/PATTERN-independent-cards.md) - Multi-card dashboards where each card has its own ScreenState (loading / error / empty / content) — `IndependentCardLayout` + `DashboardProgressBar` + `aggregateDashboardProgress`
 - [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
 - [Motion + Transitions](core-base/ui/MOTION.md) - Symmetric durations, M3 patterns, debug Transition Gallery
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)

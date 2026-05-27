@@ -122,6 +122,14 @@ object StoreFactory {
      * @param updater Writes data back to the server (e.g., POST/PUT API call).
      * @param bookkeeper Tracks unsynced local changes for retry on reconnection.
      * @param validator Optional cache validity check.
+     * @param conflictStrategy Optional reconciliation policy for server/client divergence.
+     *   **Currently informational — Store5's [Updater] does not automatically consume a
+     *   `ConflictStrategy<O>`.** Forks should apply conflict resolution inside their own
+     *   `Updater` block by calling `conflictStrategy.resolve(server, client)` and writing
+     *   back the resolved value. The parameter is exposed here so the strategy choice is
+     *   visible at Store-construction time (discovery + audit), and so a future
+     *   wiring-in-place upgrade is non-breaking — forks already declaring the parameter
+     *   pick up auto-wiring without an API change. Defaults to `null` (no policy declared).
      * @return A configured [MutableStore] ready for reads and writes.
      */
     @OptIn(ExperimentalStoreApi::class)
@@ -132,6 +140,8 @@ object StoreFactory {
         updater: Updater<Key, Output, *>,
         bookkeeper: Bookkeeper<Key>,
         validator: Validator<Output>? = null,
+        @Suppress("UNUSED_PARAMETER")
+        conflictStrategy: ConflictStrategy<Output>? = null,
     ): MutableStore<Key, Output> {
         var builder = StoreBuilder.from(
             fetcher = fetcher,

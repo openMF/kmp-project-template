@@ -115,6 +115,7 @@ include(":core:ui")
 include(":feature:home")
 include(":feature:profile")
 include(":feature:settings")
+include(":feature:showcase")
 // include(":feature:_archive:crypto")    // archived 2026-05-24 — see feature/_archive/crypto/README.md
 include(":feature:currency-rates")
 include(":feature:emi-calculator")

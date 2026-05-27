@@ -9,10 +9,13 @@
  */
 package org.mifos.feature.settings
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.mifos.core.designsystem.icon.AppIcons
@@ -43,7 +47,11 @@ import template.core.base.analytics.rememberAnalyticsHelper
 import template.core.base.designsystem.component.AppCard
 
 @Composable
-internal fun SettingsScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun SettingsScreen(
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    onTransitionGalleryClick: (() -> Unit)? = null,
+) {
     val analyticsHelper = rememberAnalyticsHelper()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
@@ -77,6 +85,7 @@ internal fun SettingsScreen(onBackClick: () -> Unit, modifier: Modifier = Modifi
             analyticsHelper.logLanguageDialogVisible(true)
             showLanguageDialog = true
         },
+        onTransitionGalleryClick = onTransitionGalleryClick,
     )
 
     TrackScreenView(screenName = "SettingsScreen")
@@ -88,6 +97,7 @@ internal fun SettingsScreenContent(
     onThemeCardClick: () -> Unit,
     onLanguageCardClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onTransitionGalleryClick: (() -> Unit)? = null,
 ) {
     val sp = MaterialTheme.spacing
     KptScaffold(
@@ -104,8 +114,47 @@ internal fun SettingsScreenContent(
         ) {
             ThemeCard(onClick = onThemeCardClick)
             LanguageCard(onClick = onLanguageCardClick)
+            Spacer(modifier = Modifier.fillMaxWidth().padding(sp.sm))
+            VersionLabel(onLongClick = onTransitionGalleryClick)
         }
     }
+}
+
+/**
+ * Static version footer label. In debug builds, long-pressing opens the Transition
+ * Gallery (dev menu). In release builds the long-press handler is wired to `null`
+ * by the navigation graph builder, so the label behaves as a plain text footer.
+ *
+ * Wire point: [cmp.navigation.authenticated.authenticatedGraph] passes a non-null
+ * `onTransitionGalleryClick` only when `!isReleaseBuild()`.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun VersionLabel(
+    onLongClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    // TODO: Replace literal with BuildKonfig-emitted version string once the
+    // BuildKonfig plugin is wired into the consumer module (see core/network
+    // FredApiConfig.kt for the threading pattern). For now we render a static
+    // app-name footer — the long-press hook still works.
+    val rowModifier = if (onLongClick != null) {
+        modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = { /* no-op short-tap */ },
+                onLongClick = onLongClick,
+            )
+    } else {
+        modifier.fillMaxWidth()
+    }
+    Text(
+        text = "Money Toolkit",
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        modifier = rowModifier,
+    )
 }
 
 @Composable

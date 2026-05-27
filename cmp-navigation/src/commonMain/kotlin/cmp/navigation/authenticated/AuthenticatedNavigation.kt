@@ -39,6 +39,9 @@ import org.mifos.feature.rates.navigation.ratesGraph
 import org.mifos.feature.settings.navigateToSettings
 import org.mifos.feature.settings.notificationDestination
 import org.mifos.feature.settings.settingsDestination
+import org.mifos.feature.showcase.transitions.TransitionGalleryRoute
+import org.mifos.feature.showcase.transitions.transitionGalleryGraph
+import template.core.base.security.isReleaseBuild
 
 // Archived 2026-05-24 (Money Toolkit pivot) — restore by re-importing + re-wiring graphs per
 // feature/_archive/{module}/README.md:
@@ -78,7 +81,18 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
 
         notificationDestination(onBackClick = navController::popBackStack)
 
-        settingsDestination(onBackClick = navController::popBackStack)
+        // Dev-only entry point to the transition gallery (only wired in non-release builds).
+        // Released builds receive null → SettingsScreen hides the dev row entirely.
+        // See feature/showcase for the gallery destination.
+        val onTransitionGalleryClick: (() -> Unit)? = if (!isReleaseBuild()) {
+            { navController.navigate(TransitionGalleryRoute) }
+        } else {
+            null
+        }
+        settingsDestination(
+            onBackClick = navController::popBackStack,
+            onTransitionGalleryClick = onTransitionGalleryClick,
+        )
 
         // Money Toolkit feature graphs — generic personal-finance utilities.
         currencyRatesGraph(navController)
@@ -90,5 +104,8 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         calculatorsGraph(navController) // B2/B3/B5/B6 — affordability + amortization + comparison + wizard
         ratesGraph(navController) // B7 — CACHE_THEN_NETWORK rate tracker
         macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
+
+        // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).
+        transitionGalleryGraph(navController)
     }
 }

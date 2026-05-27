@@ -19,6 +19,7 @@
 - [Deployment Playbook](docs/claude/deployment-playbook.md)
 - [Patterns & Best Practices](docs/claude/patterns.md)
 - [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
+- [Motion + Transitions](core-base/ui/MOTION.md) - Symmetric durations, M3 patterns, debug Transition Gallery
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)
 - [Secrets Management](docs/claude/secrets-management.md)
 - [Version Handling](docs/claude/version-handling.md)

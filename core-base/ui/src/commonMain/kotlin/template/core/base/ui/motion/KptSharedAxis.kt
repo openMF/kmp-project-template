@@ -36,7 +36,7 @@ import template.core.base.designsystem.theme.motion
  * easingStandard, sharedAxisSlideDistance}` — change those once and every shared-axis
  * surface in the app shifts.
  */
-object MifosSharedAxis {
+object KptSharedAxis {
 
     /** Forward push — new screen slides in from the right, old screen slides out left. */
     @Composable

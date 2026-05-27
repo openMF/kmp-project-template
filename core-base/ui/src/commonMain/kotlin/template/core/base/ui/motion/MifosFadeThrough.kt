@@ -25,7 +25,7 @@ import template.core.base.designsystem.theme.motion
  * surface fades to nothing before the incoming surface fades in, so there's
  * no overlap of two competing UIs.
  *
- * Two API surfaces (same as [MifosSharedAxis]): `@Composable` no-arg variants for
+ * Two API surfaces (same as [KptSharedAxis]): `@Composable` no-arg variants for
  * `@Composable` scopes, and `fun(motion: Motion)` variants for non-Composable lambdas
  * (provider definitions).
  *

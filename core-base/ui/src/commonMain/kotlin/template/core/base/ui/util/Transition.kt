@@ -21,7 +21,7 @@ import androidx.navigation.NavBackStackEntry
 import kotlin.jvm.JvmSuppressWildcards
 import template.core.base.designsystem.theme.Motion
 import template.core.base.ui.motion.MifosFadeThrough
-import template.core.base.ui.motion.MifosSharedAxis
+import template.core.base.ui.motion.KptSharedAxis
 
 /**
  * Function type for providing nullable enter transitions in navigation.
@@ -263,10 +263,10 @@ object TransitionProviders {
              * non-`@Composable` `enterTransition = ...` lambda.
              */
             fun sharedAxisForward(motion: Motion): EnterTransitionProvider = {
-                MifosSharedAxis.enterForward(motion).takeIf { isSameGraphNavigation }
+                KptSharedAxis.enterForward(motion).takeIf { isSameGraphNavigation }
             }
             fun sharedAxisBack(motion: Motion): EnterTransitionProvider = {
-                MifosSharedAxis.enterBack(motion).takeIf { isSameGraphNavigation }
+                KptSharedAxis.enterBack(motion).takeIf { isSameGraphNavigation }
             }
             fun fadeThrough(motion: Motion): EnterTransitionProvider = {
                 MifosFadeThrough.enter(motion).takeIf { isSameGraphNavigation }
@@ -296,10 +296,10 @@ object TransitionProviders {
             val stay: ExitTransitionProvider = TransitionProviders.Exit.stay
 
             fun sharedAxisForward(motion: Motion): ExitTransitionProvider = {
-                MifosSharedAxis.exitForward(motion).takeIf { isSameGraphNavigation }
+                KptSharedAxis.exitForward(motion).takeIf { isSameGraphNavigation }
             }
             fun sharedAxisBack(motion: Motion): ExitTransitionProvider = {
-                MifosSharedAxis.exitBack(motion).takeIf { isSameGraphNavigation }
+                KptSharedAxis.exitBack(motion).takeIf { isSameGraphNavigation }
             }
             fun fadeThrough(motion: Motion): ExitTransitionProvider = {
                 MifosFadeThrough.exit(motion).takeIf { isSameGraphNavigation }
@@ -519,10 +519,10 @@ object RootTransitionProviders {
              * values. Use these whenever theme tokens should drive the transition.
              */
             fun sharedAxisForward(motion: Motion): NonNullEnterTransitionProvider = {
-                MifosSharedAxis.enterForward(motion)
+                KptSharedAxis.enterForward(motion)
             }
             fun sharedAxisBack(motion: Motion): NonNullEnterTransitionProvider = {
-                MifosSharedAxis.enterBack(motion)
+                KptSharedAxis.enterBack(motion)
             }
             fun fadeThrough(motion: Motion): NonNullEnterTransitionProvider = {
                 MifosFadeThrough.enter(motion)
@@ -550,10 +550,10 @@ object RootTransitionProviders {
             val stay: NonNullExitTransitionProvider = RootTransitionProviders.Exit.stay
 
             fun sharedAxisForward(motion: Motion): NonNullExitTransitionProvider = {
-                MifosSharedAxis.exitForward(motion)
+                KptSharedAxis.exitForward(motion)
             }
             fun sharedAxisBack(motion: Motion): NonNullExitTransitionProvider = {
-                MifosSharedAxis.exitBack(motion)
+                KptSharedAxis.exitBack(motion)
             }
             fun fadeThrough(motion: Motion): NonNullExitTransitionProvider = {
                 MifosFadeThrough.exit(motion)

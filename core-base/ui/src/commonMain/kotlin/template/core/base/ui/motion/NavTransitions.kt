@@ -40,10 +40,10 @@ inline fun <reified T : Any> NavGraphBuilder.sharedAxisComposable(
 ) {
     // Snapshot @Composable-resolved transitions at graph-build time so the non-Composable
     // enterTransition lambdas can capture them as plain data.
-    val enterFwd = MifosSharedAxis.enterForward()
-    val exitFwd = MifosSharedAxis.exitForward()
-    val enterBack = MifosSharedAxis.enterBack()
-    val exitBack = MifosSharedAxis.exitBack()
+    val enterFwd = KptSharedAxis.enterForward()
+    val exitFwd = KptSharedAxis.exitForward()
+    val enterBack = KptSharedAxis.enterBack()
+    val exitBack = KptSharedAxis.exitBack()
     composable<T>(
         enterTransition = { enterFwd },
         exitTransition = { exitFwd },

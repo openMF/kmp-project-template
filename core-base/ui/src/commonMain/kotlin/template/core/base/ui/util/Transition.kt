@@ -229,7 +229,7 @@ object TransitionProviders {
     }
 
     /**
-     * Mifos-branded transition vocabulary aligned with the M3 motion spec
+     * Kpt transition vocabulary aligned with the M3 motion spec
      * (https://m3.material.io/styles/motion/transitions/transition-patterns). These are
      * **semantic aliases** of the existing [Enter] / [Exit] providers — same animation specs,
      * but named after the motion pattern they implement rather than the direction of travel.
@@ -247,7 +247,7 @@ object TransitionProviders {
      * `core/designsystem/theme/Motion.kt` down to `core-base/designsystem` (today blocked by
      * dependency direction) and lifting the providers from `val` to `fun(motion: Motion)`.
      */
-    object Mifos {
+    object Kpt {
         object Enter {
             /** Hardcoded aliases — kept for callers that don't have a `Motion` in scope. */
             val sharedAxisForward: EnterTransitionProvider = TransitionProviders.Enter.pushLeft
@@ -318,6 +318,17 @@ object TransitionProviders {
             }
         }
     }
+
+    /**
+     * Deprecated alias for [TransitionProviders.Kpt]. Renamed as part of the Money Toolkit pivot
+     * (`Mifos` → `Kpt`, "Kotlin Project Template"). Will be removed in the next release.
+     */
+    @Deprecated(
+        "Renamed to TransitionProviders.Kpt",
+        ReplaceWith("TransitionProviders.Kpt"),
+        level = DeprecationLevel.WARNING,
+    )
+    val Mifos = Kpt
 }
 
 
@@ -489,9 +500,9 @@ object RootTransitionProviders {
     }
 
     /**
-     * Mifos-branded transition vocabulary for **root [NavHost]** wiring (non-null providers).
+     * Kpt transition vocabulary for **root [NavHost]** wiring (non-null providers).
      *
-     * Companion to [TransitionProviders.Mifos] — same motion patterns, but always non-null since
+     * Companion to [TransitionProviders.Kpt] — same motion patterns, but always non-null since
      * the root [NavHost] requires every transition slot filled.
      *
      *  - [sharedAxisForward] — pushing a new screen onto the stack.
@@ -501,9 +512,9 @@ object RootTransitionProviders {
      *  - [none] — instant, no animation (splash → first authenticated screen handoff).
      *  - [stay] — no-op holding the screen visible while the other side transitions.
      *
-     * See [TransitionProviders.Mifos] for the wider rationale + the theme-token follow-up note.
+     * See [TransitionProviders.Kpt] for the wider rationale + the theme-token follow-up note.
      */
-    object Mifos {
+    object Kpt {
         object Enter {
             /** Hardcoded aliases — kept for callers that don't have a `Motion` in scope. */
             val sharedAxisForward: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.pushLeft
@@ -572,4 +583,15 @@ object RootTransitionProviders {
             }
         }
     }
+
+    /**
+     * Deprecated alias for [RootTransitionProviders.Kpt]. Renamed as part of the Money Toolkit
+     * pivot (`Mifos` → `Kpt`, "Kotlin Project Template"). Will be removed in the next release.
+     */
+    @Deprecated(
+        "Renamed to RootTransitionProviders.Kpt",
+        ReplaceWith("RootTransitionProviders.Kpt"),
+        level = DeprecationLevel.WARNING,
+    )
+    val Mifos = Kpt
 }

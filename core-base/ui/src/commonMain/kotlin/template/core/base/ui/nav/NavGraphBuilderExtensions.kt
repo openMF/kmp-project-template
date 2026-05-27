@@ -49,10 +49,10 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithSlideTransitions(
     this.composable<T>(
         typeMap = typeMap,
         deepLinks = deepLinks,
-        enterTransition = TransitionProviders.Mifos.Enter.slideUp(motion),
-        exitTransition = TransitionProviders.Mifos.Exit.stay(motion),
-        popEnterTransition = TransitionProviders.Mifos.Enter.stay(motion),
-        popExitTransition = TransitionProviders.Mifos.Exit.slideDown(motion),
+        enterTransition = TransitionProviders.Kpt.Enter.slideUp(motion),
+        exitTransition = TransitionProviders.Kpt.Exit.stay(motion),
+        popEnterTransition = TransitionProviders.Kpt.Enter.stay(motion),
+        popExitTransition = TransitionProviders.Kpt.Exit.slideDown(motion),
         sizeTransform = null,
         content = content,
     )
@@ -83,10 +83,10 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithStayTransitions(
     this.composable<T>(
         typeMap = typeMap,
         deepLinks = deepLinks,
-        enterTransition = TransitionProviders.Mifos.Enter.stay(motion),
-        exitTransition = TransitionProviders.Mifos.Exit.stay(motion),
-        popEnterTransition = TransitionProviders.Mifos.Enter.stay(motion),
-        popExitTransition = TransitionProviders.Mifos.Exit.stay(motion),
+        enterTransition = TransitionProviders.Kpt.Enter.stay(motion),
+        exitTransition = TransitionProviders.Kpt.Exit.stay(motion),
+        popEnterTransition = TransitionProviders.Kpt.Enter.stay(motion),
+        popExitTransition = TransitionProviders.Kpt.Exit.stay(motion),
         sizeTransform = null,
         content = content,
     )
@@ -121,10 +121,10 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithPushTransitions(
     this.composable<T>(
         typeMap = typeMap,
         deepLinks = deepLinks,
-        enterTransition = TransitionProviders.Mifos.Enter.sharedAxisForward(motion),
+        enterTransition = TransitionProviders.Kpt.Enter.sharedAxisForward(motion),
         exitTransition = TransitionProviders.Exit.stay,
         popEnterTransition = TransitionProviders.Enter.stay,
-        popExitTransition = TransitionProviders.Mifos.Exit.sharedAxisBack(motion),
+        popExitTransition = TransitionProviders.Kpt.Exit.sharedAxisBack(motion),
         sizeTransform = null,
         content = content,
     )
@@ -152,8 +152,8 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithRootPushTransitions(
         typeMap = typeMap,
         deepLinks = deepLinks,
         enterTransition = TransitionProviders.Enter.stay,
-        exitTransition = TransitionProviders.Mifos.Exit.sharedAxisForward(motion),
-        popEnterTransition = TransitionProviders.Mifos.Enter.sharedAxisBack(motion),
+        exitTransition = TransitionProviders.Kpt.Exit.sharedAxisForward(motion),
+        popEnterTransition = TransitionProviders.Kpt.Enter.sharedAxisBack(motion),
         popExitTransition = TransitionProviders.Exit.fadeOut,
         sizeTransform = null,
         content = content,

@@ -193,10 +193,10 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
             navController = navController,
             startDestination = HomeDestination,
             // Sibling navigation (bottom-nav tab switch) uses M3 fade-through pattern.
-            enterTransition = RootTransitionProviders.Mifos.Enter.fadeThrough(motion),
-            exitTransition = RootTransitionProviders.Mifos.Exit.fadeThrough(motion),
-            popEnterTransition = RootTransitionProviders.Mifos.Enter.fadeThrough(motion),
-            popExitTransition = RootTransitionProviders.Mifos.Exit.fadeThrough(motion),
+            enterTransition = RootTransitionProviders.Kpt.Enter.fadeThrough(motion),
+            exitTransition = RootTransitionProviders.Kpt.Exit.fadeThrough(motion),
+            popEnterTransition = RootTransitionProviders.Kpt.Enter.fadeThrough(motion),
+            popExitTransition = RootTransitionProviders.Kpt.Exit.fadeThrough(motion),
         ) {
             // TOP LEVEL DESTINATIONS
             homeGraph(

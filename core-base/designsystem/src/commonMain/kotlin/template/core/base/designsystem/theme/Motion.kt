@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
  *
  * Access from any Composable via [MaterialTheme.motion]. Framework transition factories under
  * `template.core.base.ui.motion` (`KptSharedAxis`, `KptFadeThrough`, etc.) and the
- * `RootTransitionProviders.Mifos` / `TransitionProviders.Mifos` provider namespaces consume
+ * `RootTransitionProviders.Kpt` / `TransitionProviders.Kpt` provider namespaces consume
  * these values — changing a single token here propagates app-wide.
  *
  * Lives in `core-base/designsystem` so framework-shared transition code can read it without

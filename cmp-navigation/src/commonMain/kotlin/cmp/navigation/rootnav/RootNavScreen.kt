@@ -59,10 +59,10 @@ fun RootNavScreen(
     // theme-resolved providers. Splash → main handoff suppresses motion; other transitions
     // use the M3 fade-through pattern, both honoring MaterialTheme.motion.
     val motion = MaterialTheme.motion
-    val fadeThroughEnter = RootTransitionProviders.Mifos.Enter.fadeThrough(motion)
-    val fadeThroughExit = RootTransitionProviders.Mifos.Exit.fadeThrough(motion)
-    val noEnter = RootTransitionProviders.Mifos.Enter.none
-    val noExit = RootTransitionProviders.Mifos.Exit.none
+    val fadeThroughEnter = RootTransitionProviders.Kpt.Enter.fadeThrough(motion)
+    val fadeThroughExit = RootTransitionProviders.Kpt.Exit.fadeThrough(motion)
+    val noEnter = RootTransitionProviders.Kpt.Enter.none
+    val noExit = RootTransitionProviders.Kpt.Exit.none
 
     NavHost(
         navController = navController,

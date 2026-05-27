@@ -13,6 +13,7 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.mifos.core.data.di.OutboxQualifiers
+import org.mifos.core.platform.notification.bill.di.notificationModule
 import org.mifos.feature.bills.notification.BillNotificationGateway
 import org.mifos.feature.bills.notification.BillNotificationGatewayImpl
 import org.mifos.feature.bills.ui.BillRemindersListViewModel
@@ -23,13 +24,17 @@ import org.mifos.feature.bills.ui.EditBillReminderViewModel
  *
  * Bindings:
  *  - `BillNotificationGateway` — feature-local seam over the platform scheduler. Resolves
- *    the platform `BillReminderScheduler` from `template.core.base.platform.di.notificationModule`
- *    (included by the shared `platformModule`).
+ *    the platform `BillReminderScheduler` from
+ *    `org.mifos.core.platform.notification.bill.di.notificationModule` (pulled in here via
+ *    `includes()` rather than the shared `platformModule`, since bill-reminder wiring is
+ *    banking-domain-specific and now lives in `core/platform`).
  *  - List ViewModel — parameter-less.
  *  - Edit ViewModel — takes the nullable `billId` via Koin's `parameters` channel so
  *    navigation passes the route argument straight through.
  */
 val BillsModule = module {
+    includes(notificationModule)
+
     single<BillNotificationGateway> { BillNotificationGatewayImpl(get()) }
 
     viewModel { BillRemindersListViewModel(repository = get(), scheduler = get()) }

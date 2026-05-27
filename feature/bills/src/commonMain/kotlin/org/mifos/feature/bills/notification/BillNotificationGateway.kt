@@ -9,8 +9,8 @@
  */
 package org.mifos.feature.bills.notification
 
-import template.core.base.platform.notification.BillReminderSchedule
-import template.core.base.platform.notification.BillReminderScheduler
+import org.mifos.core.platform.notification.bill.BillReminderSchedule
+import org.mifos.core.platform.notification.bill.BillReminderScheduler
 
 /**
  * Feature-local boundary over [BillReminderScheduler].

@@ -9,8 +9,8 @@
  */
 package org.mifos.feature.bills.testing
 
+import org.mifos.core.platform.notification.bill.BillReminderSchedule
 import org.mifos.feature.bills.notification.BillNotificationGateway
-import template.core.base.platform.notification.BillReminderSchedule
 
 /**
  * Recording fake [BillNotificationGateway] for ViewModel unit tests.

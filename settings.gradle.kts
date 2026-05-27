@@ -108,6 +108,7 @@ include(":core:designsystem")
 include(":core:domain")
 include(":core:model")
 include(":core:network")
+include(":core:platform")
 include(":core:store")
 include(":core:ui")
 

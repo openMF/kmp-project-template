@@ -7,10 +7,10 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.designsystem.chart
+package template.core.base.designsystem.chart
 
 /**
- * Pure-function path geometry for [MifosSparkline] and [MifosAreaChart].
+ * Pure-function path geometry for sparkline / area chart composables.
  *
  * Extracted from the `Canvas { drawPath() }` block so the math is unit-testable
  * without a Compose test rule. The composable consumes the returned `(x, y)` pairs
@@ -26,7 +26,7 @@ package org.mifos.core.designsystem.chart
  *  - Single value → `x = 0`, `y = height / 2`.
  *  - All-equal values (zero range) → all y's at the canvas midline. No division by zero.
  */
-internal object SparklineGeometry {
+object SparklineGeometry {
 
     /**
      * Normalize [values] to canvas coordinates fitting `[0, width] × [0, height]`.

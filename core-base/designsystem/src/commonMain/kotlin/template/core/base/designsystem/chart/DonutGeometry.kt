@@ -7,18 +7,18 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.designsystem.chart
+package template.core.base.designsystem.chart
 
 /**
- * Pure-function math for [MifosDonutChart]. Extracted from the Composable so
- * sweep-angle correctness can be tested without a Compose test rule.
+ * Pure-function math for donut chart composables. Extracted from the Composable
+ * so sweep-angle correctness can be tested without a Compose test rule.
  *
  * **Degenerate-input contracts**:
  *  - Empty list → empty result.
  *  - All-zero or negative total → every sweep is `0f` (no division by zero).
  *  - Otherwise sweeps sum to exactly `360f` for finite positive inputs.
  */
-internal object DonutGeometry {
+object DonutGeometry {
 
     /**
      * Per-slice sweep angle in degrees, in the same order as [values].

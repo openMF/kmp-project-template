@@ -7,10 +7,10 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package org.mifos.core.designsystem.chart
+package template.core.base.designsystem.chart
 
 /**
- * Pure-function math for [MifosBarChart]. Normalizes each bar to a fraction
+ * Pure-function math for bar chart composables. Normalizes each bar to a fraction
  * in `[0f, 1f]` against the series' max.
  *
  * **Degenerate-input contracts**:
@@ -18,7 +18,7 @@ package org.mifos.core.designsystem.chart
  *  - All-zero or negative max → every fraction is `0f` (no division by zero).
  *  - Negative values clamp to `0f` (bars can't grow downward).
  */
-internal object BarGeometry {
+object BarGeometry {
 
     /**
      * Per-bar height as a fraction `[0, 1]` of the canvas height.

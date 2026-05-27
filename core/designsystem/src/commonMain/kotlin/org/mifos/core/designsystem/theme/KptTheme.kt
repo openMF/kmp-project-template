@@ -102,19 +102,18 @@ val darkScheme = darkColorScheme(
 )
 
 /**
- * The main theme composable for the Mifos application.
+ * The main theme composable for the application.
  *
  * This composable uses KptMaterialTheme under the hood to provide seamless integration
  * between KptTheme design tokens and Material3 theming system.
  *
  * @param darkTheme Whether to use dark theme. Defaults to system preference.
- * @param useDynamicColor Whether to use dynamic color (Android 12+). Defaults to false.
  * @param androidTheme Whether to use Android-specific theming. Defaults to false.
  * @param useDynamicColor Whether dynamic theming should be displayed. Defaults to false.
  * @param content The composable content that will have access to both KptTheme and MaterialTheme.
  */
 @Composable
-fun MifosTheme(
+fun KptTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     androidTheme: Boolean = false,
     useDynamicColor: Boolean = false,

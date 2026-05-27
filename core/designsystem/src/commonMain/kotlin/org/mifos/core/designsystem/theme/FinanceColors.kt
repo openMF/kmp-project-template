@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
  * **Fork override pattern** — to brand the toolkit without forking widgets:
  * ```
  * CompositionLocalProvider(LocalFinanceColors provides myForkFinanceColors()) {
- *     MifosTheme { App() }
+ *     KptTheme { App() }
  * }
  * ```
  *
@@ -146,12 +146,12 @@ fun darkFinanceColors(): FinanceColors = FinanceColors(
 )
 
 /**
- * CompositionLocal for the active [FinanceColors]. Provided by [MifosTheme].
+ * CompositionLocal for the active [FinanceColors]. Provided by [KptTheme].
  *
  * Direct access discouraged — use [MaterialTheme.finance] extension instead.
  */
 val LocalFinanceColors = staticCompositionLocalOf<FinanceColors> {
-    error("FinanceColors not provided — wrap content in MifosTheme")
+    error("FinanceColors not provided — wrap content in KptTheme")
 }
 
 /** Resolve the active [FinanceColors] from composition. */

@@ -24,8 +24,8 @@ import template.core.base.ui.screen.ScreenStateNoNetwork
  * Do NOT edit `core-base/store` or `core-base/ui` — they're framework-shared.
  *
  * App-wide [ScreenStateDefaults] for `template.core.base.ui.ScreenContent` and
- * `template.core.base.ui.PagingScreenContent`. Already wired into [MifosTheme] —
- * every screen wrapped by `MifosTheme` automatically picks up these defaults via
+ * `template.core.base.ui.PagingScreenContent`. Already wired into [KptTheme] —
+ * every screen wrapped by `KptTheme` automatically picks up these defaults via
  * `LocalScreenStateDefaults`. No per-screen wiring required.
  *
  * Forks customize by replacing visuals with branded Lottie animations

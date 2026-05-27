@@ -1,5 +1,72 @@
 # :core:analytics module
 
+## Fork-customisation seam (start here)
+
+The toolkit ships **without analytics** — every event call becomes a no-op via
+`coreAnalyticsModule` (the `AnalyticsHelper` is bound to `NoOpAnalyticsHelper`).
+The fork-customisation seam is a single Koin binding. To wire real analytics,
+override the binding in your app module:
+
+### 1. No-op (toolkit default — privacy-respecting open-source build)
+
+```kotlin
+import org.mifos.core.analytics.di.coreAnalyticsModule
+
+startKoin {
+    modules(coreAnalyticsModule, /* ... */)  // NoOpAnalyticsHelper installed
+}
+```
+
+### 2. Console stub (development — print events to logcat / stdout)
+
+```kotlin
+val devAnalyticsModule = module {
+    single<AnalyticsHelper> { StubAnalyticsHelper() }
+}
+startKoin { modules(devAnalyticsModule, /* ... */) }
+```
+
+### 3. Firebase Analytics (skip `coreAnalyticsModule`, use framework actuals)
+
+```kotlin
+import template.core.base.analytics.di.analyticsModule
+startKoin {
+    modules(analyticsModule, /* ... */)  // FirebaseAnalyticsHelper via expect/actual
+}
+```
+
+Requires `google-services.json` (Android) / `GoogleService-Info.plist` (iOS).
+
+### 4. Mixpanel / Amplitude / Segment (custom provider)
+
+```kotlin
+class MixpanelAnalyticsHelper(token: String) : AnalyticsHelper {
+    private val mixpanel = MixpanelAPI.getInstance(applicationContext, token)
+    override fun logEvent(event: AnalyticsEvent) {
+        mixpanel.track(event.type, JSONObject(event.params.associate { it.key to it.value }))
+    }
+    override fun setUserId(userId: String) = mixpanel.identify(userId)
+    override fun setUserProperty(name: String, value: String) = mixpanel.people.set(name, value)
+}
+
+val mixpanelModule = module {
+    single<AnalyticsHelper> { MixpanelAnalyticsHelper(BuildConfig.MIXPANEL_TOKEN) }
+}
+startKoin { modules(mixpanelModule, /* ... */) }  // Overrides coreAnalyticsModule
+```
+
+Koin's last-binding-wins resolution means later modules override earlier
+bindings — your fork never edits framework files.
+
+### Related seams
+
+- **CrashReporter** (`core-base:observability.observabilityModule`) — separate
+  seam for non-fatal errors + caught exceptions. Don't conflate with analytics.
+- **AuthProvider** (`core:auth.authModule`) — sign-in / session state. Default
+  is `NoOpAuthProvider` (toolkit ships without a login wall).
+
+---
+
 ## Overview
 
 This module provides Project-specific analytics tracking functionality built on top of the base

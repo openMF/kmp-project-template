@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import template.core.base.observability.CrashReporter
+import template.core.base.observability.CrashSeverity
 
 /**
  * Retries all PENDING outbox entries whenever the device regains connectivity.
@@ -41,6 +43,12 @@ import kotlinx.coroutines.launch
  *
  * @param P Serializable payload type that the outbox holds.
  * @param R Result type returned by the server on success (ignored — fire-and-forget).
+ *
+ * **Optional crash reporter:** Pass a [CrashReporter] (typically Koin-injected) and the syncer
+ * will record retry failures as non-fatal exceptions — useful in production where a single
+ * persistent retry failure can indicate a server-side regression. When null (the default),
+ * failures are silently logged to the outbox only. The optional shape preserves backwards
+ * compatibility — existing call-sites that don't pass a reporter remain unchanged.
  */
 class OfflineSubmitSyncer<P, R>(
     private val scope: CoroutineScope,
@@ -48,6 +56,7 @@ class OfflineSubmitSyncer<P, R>(
     private val networkStatusFlow: Flow<NetworkStatus>,
     private val submitBlock: suspend (P) -> R,
     private val retryOnStatus: RetryOnNetworkStatus = RetryOnNetworkStatus.OnlineOnly,
+    private val crashReporter: CrashReporter? = null,
 ) {
 
     /**
@@ -78,6 +87,13 @@ class OfflineSubmitSyncer<P, R>(
                 throw e
             } catch (e: Exception) {
                 outbox.markFailed(entry.id, e.message)
+                // Surface retry-failure to the fork's crash-reporter (if wired) so production
+                // installs can spot recurring failures without polling the outbox table.
+                crashReporter?.recordException(
+                    throwable = e,
+                    message = "OfflineSubmitSyncer.retryAll: entry=${entry.id} " +
+                        "failed during connectivity-triggered retry",
+                )
             }
         }
     }
@@ -100,10 +116,20 @@ fun <P, R> CoroutineScope.offlineSubmitSyncer(
     networkStatusFlow: Flow<NetworkStatus>,
     submitBlock: suspend (P) -> R,
     retryOnStatus: RetryOnNetworkStatus = RetryOnNetworkStatus.OnlineOnly,
+    crashReporter: CrashReporter? = null,
 ): OfflineSubmitSyncer<P, R> = OfflineSubmitSyncer(
     scope = this,
     outbox = outbox,
     networkStatusFlow = networkStatusFlow,
     submitBlock = submitBlock,
     retryOnStatus = retryOnStatus,
+    crashReporter = crashReporter,
 )
+
+/**
+ * Re-exported for callers that want to set retry-classification severity in their own code.
+ * Currently informational only — [OfflineSubmitSyncer] records exceptions at the default
+ * severity (no [CrashSeverity] argument needed). Re-exposing the type avoids forcing every
+ * call-site to depend on `core-base:observability` directly.
+ */
+typealias OfflineSubmitSyncerCrashSeverity = CrashSeverity

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Mifos Initiative
+ * Copyright 2026 Mifos Initiative
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,25 +12,19 @@ plugins {
 }
 
 android {
-    namespace = "template.core.base.store"
+    namespace = "template.core.base.observability"
 }
 
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            api(libs.store5)
-            api(libs.store5.cache)
-            api(libs.cmp.network.monitor)
-            api(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
-            implementation(project(":core-base:common"))
-            implementation(project(":core-base:observability"))
+            api(libs.koin.core)
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
-            implementation(libs.turbine)
         }
     }
 }

@@ -360,14 +360,16 @@ object RootTransitionProviders {
          * Slides the new screen in from the left of the screen.
          */
         val pushLeft: NonNullEnterTransitionProvider = {
-            val totalTransitionDurationMs = DEFAULT_PUSH_TRANSITION_TIME_MS
             slideInHorizontally(
-                animationSpec = tween(durationMillis = totalTransitionDurationMs),
+                animationSpec = tween(
+                    durationMillis = TransitionPushSpec.enterSlideDurationMs(),
+                    delayMillis = TransitionPushSpec.enterSlideDelayMs(),
+                ),
                 initialOffsetX = { fullWidth -> fullWidth / 2 },
             ) + fadeIn(
                 animationSpec = tween(
-                    durationMillis = totalTransitionDurationMs / 2,
-                    delayMillis = totalTransitionDurationMs / 2,
+                    durationMillis = TransitionPushSpec.enterFadeDurationMs(),
+                    delayMillis = TransitionPushSpec.enterFadeDelayMs(),
                 ),
             )
         }
@@ -376,14 +378,16 @@ object RootTransitionProviders {
          * Slides the new screen in from the right of the screen.
          */
         val pushRight: NonNullEnterTransitionProvider = {
-            val totalTransitionDurationMs = DEFAULT_PUSH_TRANSITION_TIME_MS
             slideInHorizontally(
-                animationSpec = tween(durationMillis = totalTransitionDurationMs),
+                animationSpec = tween(
+                    durationMillis = TransitionPushSpec.enterSlideDurationMs(),
+                    delayMillis = TransitionPushSpec.enterSlideDelayMs(),
+                ),
                 initialOffsetX = { fullWidth -> -fullWidth / 2 },
             ) + fadeIn(
                 animationSpec = tween(
-                    durationMillis = totalTransitionDurationMs / 2,
-                    delayMillis = totalTransitionDurationMs / 2,
+                    durationMillis = TransitionPushSpec.enterFadeDurationMs(),
+                    delayMillis = TransitionPushSpec.enterFadeDelayMs(),
                 ),
             )
         }

@@ -6,6 +6,7 @@
 :core-base:datastore
 :core-base:designsystem
 :core-base:network
+:core-base:observability
 :core-base:platform
 :core-base:security
 :core-base:store

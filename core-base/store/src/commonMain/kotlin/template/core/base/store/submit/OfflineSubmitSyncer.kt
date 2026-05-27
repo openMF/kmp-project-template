@@ -9,12 +9,14 @@
  */
 package template.core.base.store.submit
 
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
@@ -25,12 +27,17 @@ import kotlinx.coroutines.launch
  *
  * ```kotlin
  * val syncer = coroutineScope.offlineSubmitSyncer(
- *     outbox          = roomSubmitOutbox,
- *     isOnlineFlow    = networkMonitor.isOnline,
- *     submitBlock     = { payload -> repository.submitLoanApplication(payload) },
+ *     outbox             = roomSubmitOutbox,
+ *     networkStatusFlow  = networkMonitor.networkStatus,
+ *     submitBlock        = { payload -> repository.submitLoanApplication(payload) },
+ *     retryOnStatus      = RetryOnNetworkStatus.OnlineOnly,   // default
  * )
  * syncer.start()
  * ```
+ *
+ * Pass `retryOnStatus = RetryOnNetworkStatus.OnlineOrCaptivePortal` for apps whose API is
+ * reachable behind a captive portal (e.g. corporate WiFi after sign-in) — retries will
+ * resume immediately after portal auth instead of waiting for the portal to clear.
  *
  * @param P Serializable payload type that the outbox holds.
  * @param R Result type returned by the server on success (ignored — fire-and-forget).
@@ -38,23 +45,25 @@ import kotlinx.coroutines.launch
 class OfflineSubmitSyncer<P, R>(
     private val scope: CoroutineScope,
     private val outbox: SubmitOutbox<P>,
-    private val isOnlineFlow: Flow<Boolean>,
+    private val networkStatusFlow: Flow<NetworkStatus>,
     private val submitBlock: suspend (P) -> R,
+    private val retryOnStatus: RetryOnNetworkStatus = RetryOnNetworkStatus.OnlineOnly,
 ) {
 
     /**
-     * Begin watching [isOnlineFlow]. On each `true` emission (edge-triggered — only fires
-     * when transitioning from offline to online), fetch all PENDING entries and retry each
-     * one sequentially.
+     * Begin watching [networkStatusFlow]. The status is mapped through [retryOnStatus] to
+     * a `Boolean` "should retry now?" signal, then edge-triggered so retries fire only when
+     * transitioning into a retry-eligible state.
      *
      * Individual entry failures are logged to the outbox as FAILED; they do not abort the
      * batch — remaining entries continue to be retried.
      */
     fun start(): Job = scope.launch {
-            isOnlineFlow
-                .distinctUntilChanged()
-                .filter { isOnline -> isOnline }
-                .collect { retryAll() }
+        networkStatusFlow
+            .map { status -> retryOnStatus.shouldRetry(status) }
+            .distinctUntilChanged()
+            .filter { shouldRetry -> shouldRetry }
+            .collect { retryAll() }
     }
 
     private suspend fun retryAll() {
@@ -79,15 +88,22 @@ class OfflineSubmitSyncer<P, R>(
  *
  * ```kotlin
  * val syncer = viewModelScope.offlineSubmitSyncer(
- *     outbox       = roomSubmitOutbox,
- *     isOnlineFlow = networkMonitor.isOnline,
- *     submitBlock  = { payload -> api.submit(payload) },
+ *     outbox             = roomSubmitOutbox,
+ *     networkStatusFlow  = networkMonitor.networkStatus,
+ *     submitBlock        = { payload -> api.submit(payload) },
  * )
  * syncer.start()
  * ```
  */
 fun <P, R> CoroutineScope.offlineSubmitSyncer(
     outbox: SubmitOutbox<P>,
-    isOnlineFlow: Flow<Boolean>,
+    networkStatusFlow: Flow<NetworkStatus>,
     submitBlock: suspend (P) -> R,
-): OfflineSubmitSyncer<P, R> = OfflineSubmitSyncer(this, outbox, isOnlineFlow, submitBlock)
+    retryOnStatus: RetryOnNetworkStatus = RetryOnNetworkStatus.OnlineOnly,
+): OfflineSubmitSyncer<P, R> = OfflineSubmitSyncer(
+    scope = this,
+    outbox = outbox,
+    networkStatusFlow = networkStatusFlow,
+    submitBlock = submitBlock,
+    retryOnStatus = retryOnStatus,
+)

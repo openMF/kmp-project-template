@@ -24,6 +24,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation(libs.cmp.network.monitor)
         }
     }
 }

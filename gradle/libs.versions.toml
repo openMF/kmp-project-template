@@ -81,7 +81,7 @@ koinAnnotationsVersion = "2.1.0"
 
 
 # KMP Toolkit Libraries
-kmptoolkit = "3.2.3"
+kmptoolkit = "3.3.1"
 
 # CMP Libraries
 compose-plugin = "1.10.3"

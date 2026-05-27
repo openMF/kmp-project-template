@@ -19,6 +19,7 @@
 :core:domain
 :core:model
 :core:network
+:core:platform
 :core:store
 :core:ui
 :feature:bills

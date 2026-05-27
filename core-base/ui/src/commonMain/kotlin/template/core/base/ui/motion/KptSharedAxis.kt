@@ -45,9 +45,9 @@ object KptSharedAxis {
     fun enterForward(motion: Motion): EnterTransition {
         val slide = motion.sharedAxisSlideDistance
         return slideInHorizontally(
-            animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+            animationSpec = tween(SharedAxisSpec.enterForwardSlideMs(motion), easing = motion.easingEmphasized),
             initialOffsetX = { fullWidth -> (slide.value.toInt()).coerceAtMost(fullWidth) },
-        ) + fadeIn(animationSpec = tween(motion.durationLong1, easing = motion.easingStandard))
+        ) + fadeIn(animationSpec = tween(SharedAxisSpec.enterForwardFadeMs(motion), easing = motion.easingStandard))
     }
 
     /** Forward push — companion exit (the popped/replaced screen). */
@@ -69,9 +69,9 @@ object KptSharedAxis {
     fun enterBack(motion: Motion): EnterTransition {
         val slide = motion.sharedAxisSlideDistance
         return slideInHorizontally(
-            animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+            animationSpec = tween(SharedAxisSpec.enterBackSlideMs(motion), easing = motion.easingEmphasized),
             initialOffsetX = { fullWidth -> -(slide.value.toInt().coerceAtMost(fullWidth)) },
-        ) + fadeIn(animationSpec = tween(motion.durationLong1, easing = motion.easingStandard))
+        ) + fadeIn(animationSpec = tween(SharedAxisSpec.enterBackFadeMs(motion), easing = motion.easingStandard))
     }
 
     /** Back/pop — companion exit (the screen being popped). */

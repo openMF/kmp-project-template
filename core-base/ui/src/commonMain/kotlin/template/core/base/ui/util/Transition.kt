@@ -453,21 +453,17 @@ object RootTransitionProviders {
         /**
          * Slides the current screen out to the right of the screen.
          */
-        @Suppress("MagicNumber")
         val pushRight: NonNullExitTransitionProvider = {
-            val totalTransitionDurationMs = DEFAULT_PUSH_TRANSITION_TIME_MS
-            val delayMs = totalTransitionDurationMs / 7
-            val slideWithoutDelayMs = totalTransitionDurationMs - delayMs
             slideOutHorizontally(
                 animationSpec = tween(
-                    durationMillis = slideWithoutDelayMs,
-                    delayMillis = delayMs,
+                    durationMillis = TransitionPushSpec.exitSlideDurationMs(),
+                    delayMillis = TransitionPushSpec.exitSlideDelayMs(),
                 ),
                 targetOffsetX = { fullWidth -> fullWidth / 2 },
             ) + fadeOut(
                 animationSpec = tween(
-                    durationMillis = totalTransitionDurationMs / 2,
-                    delayMillis = delayMs,
+                    durationMillis = TransitionPushSpec.exitFadeDurationMs(),
+                    delayMillis = TransitionPushSpec.exitFadeDelayMs(),
                 ),
             )
         }

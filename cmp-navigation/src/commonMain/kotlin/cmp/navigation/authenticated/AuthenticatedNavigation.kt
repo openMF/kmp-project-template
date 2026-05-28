@@ -12,6 +12,7 @@
 package cmp.navigation.authenticated
 
 import androidx.navigation.NavController
+import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -81,7 +82,7 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             navigateToLoanCalcWizard = { navController.navigateToLoanCalcWizard() },
         )
 
-        notificationDestination(onBackClick = navController::popBackStack)
+        notificationDestination(onBackClick = { navController.popBackStackSafely() })
 
         // Dev-only entry points to the showcase galleries (only wired in non-release builds).
         // Released builds receive null → SettingsScreen hides the dev menu entirely.
@@ -97,14 +98,14 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             null
         }
         settingsDestination(
-            onBackClick = navController::popBackStack,
+            onBackClick = { navController.popBackStackSafely() },
             onTransitionGalleryClick = onTransitionGalleryClick,
             onStateGalleryClick = onStateGalleryClick,
         )
 
         // Money Toolkit feature graphs — generic personal-finance utilities.
         currencyRatesGraph(navController)
-        emiCalculatorDestination(onBackClick = navController::popBackStack)
+        emiCalculatorDestination(onBackClick = { navController.popBackStackSafely() })
 
         // Banking utility toolkit — local-only personal tools.
         loansGraph(navController) // B1 — multi-formKey draft showcase

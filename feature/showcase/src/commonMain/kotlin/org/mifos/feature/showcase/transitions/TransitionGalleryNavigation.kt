@@ -18,11 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 data object TransitionGalleryRoute
@@ -31,19 +31,19 @@ data object TransitionGalleryRoute
 data class TransitionDemoRoute(val variantName: String)
 
 fun NavGraphBuilder.transitionGalleryGraph(navController: NavController) {
-    composable<TransitionGalleryRoute> {
+    composableWithPushTransitions<TransitionGalleryRoute> {
         TransitionGalleryScreen(
             onNavigateToDemo = { variant ->
                 navController.navigate(TransitionDemoRoute(variant.name))
             },
-            onBackClick = { navController.popBackStack() },
+            onBackClick = { navController.popBackStackSafely() },
         )
     }
 
     composableWithPushTransitions<TransitionDemoRoute> { backStackEntry ->
         val variantName = backStackEntry.toRoute<TransitionDemoRoute>().variantName
         val variant = TransitionVariant.valueOf(variantName)
-        TransitionDemoScreen(variant = variant, onAutoPop = { navController.popBackStack() })
+        TransitionDemoScreen(variant = variant, onAutoPop = { navController.popBackStackSafely() })
     }
 }
 

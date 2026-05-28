@@ -9,24 +9,42 @@
  */
 package template.core.base.ui.captiveportal
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import com.mobilebytelabs.kmptoolkit.intentlauncher.ExperimentalIntentLauncherApi
+import com.mobilebytelabs.kmptoolkit.intentlauncher.IntentResult
+import com.mobilebytelabs.kmptoolkit.intentlauncher.rememberIntentLauncher
+import kotlinx.coroutines.launch
+
 /**
- * Opens the platform-native captive-portal sign-in flow when the user is on
- * a WiFi network requiring sign-in (e.g. hotel WiFi, coffee shop).
+ * Returns a stable `() -> Unit` lambda that opens the platform-native captive-portal
+ * sign-in flow using [cmp-intent-launcher](https://github.com/MobileByteLabs/KmpToolkit).
  *
  * Per-platform behaviour:
- *  - **Android** — opens `Settings.ACTION_WIFI_SETTINGS`. Requires a one-time call to
- *    [installCaptivePortalLauncher] from the `Application.onCreate()` so the launcher
- *    holds an application Context.
- *  - **iOS** — opens the URL scheme `prefs:root=WIFI` (or `App-Prefs:root=WIFI`). Apps
- *    must declare `prefs` in `LSApplicationQueriesSchemes` in `Info.plist` for this
- *    to succeed; otherwise the call returns `false`.
- *  - **Desktop** — opens the system browser to `http://captive.apple.com/`, a known
- *    captive-portal probe URL that most enterprise/hotel WiFi networks will rewrite
- *    to their sign-in page.
- *  - **JS / WasmJs** — opens `http://captive.apple.com/` in a new browser tab.
+ *  - **Android** — fires `android.settings.WIFI_SETTINGS` via `ActivityResultContracts`;
+ *    no application-context wiring required (the Compose activity owns the launcher).
+ *  - **iOS** — defers to `onUnsupported`; URL-scheme support (`prefs:root=WIFI`) is
+ *    planned for a future KmpToolkit release.
+ *  - **Desktop / Web** — defers to `onUnsupported`; captive portals rarely apply to
+ *    these platforms in practice.
  *
- * @return `true` if the platform dispatched the launch; `false` if it could not (e.g. the
- *   Android launcher was never installed, iOS lacks the URL scheme allowlist, or the
- *   desktop has no browser).
+ * The returned lambda is safe to call from any button `onClick` — it dispatches the
+ * intent on the calling coroutine scope and is automatically stable across recompositions.
  */
-expect fun openCaptivePortalSignIn(): Boolean
+@OptIn(ExperimentalIntentLauncherApi::class)
+@Composable
+fun rememberOpenCaptivePortalSignIn(): () -> Unit {
+    val launcher = rememberIntentLauncher()
+    val scope = rememberCoroutineScope()
+    return remember(launcher, scope) {
+        {
+            scope.launch {
+                launcher.launch {
+                    action("android.settings.WIFI_SETTINGS")
+                    onUnsupported { IntentResult.Ok(null) }
+                }
+            }
+        }
+    }
+}

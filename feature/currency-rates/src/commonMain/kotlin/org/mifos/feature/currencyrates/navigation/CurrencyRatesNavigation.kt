@@ -10,6 +10,7 @@
 package org.mifos.feature.currencyrates.navigation
 
 import androidx.navigation.NavController
+import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -34,11 +35,11 @@ fun NavController.navigateToCurrencyRates(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.currencyRatesGraph(navController: NavController) {
     navigation<CurrencyRatesGraphRoute>(startDestination = CurrencyRatesRoute) {
         composableWithPushTransitions<CurrencyRatesRoute> {
-            CurrencyRatesScreen(onBackClick = navController::popBackStack)
+            CurrencyRatesScreen(onBackClick = { navController.popBackStackSafely() })
         }
 
         composableWithPushTransitions<RateHistoryRoute> {
-            RateHistoryScreen(onBackClick = navController::popBackStack)
+            RateHistoryScreen(onBackClick = { navController.popBackStackSafely() })
         }
     }
 }

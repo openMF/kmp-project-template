@@ -12,6 +12,7 @@
 package org.mifos.feature.calculators.navigation
 
 import androidx.navigation.NavController
+import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -66,22 +67,22 @@ fun NavGraphBuilder.calculatorsGraph(navController: NavController) {
         startDestination = AffordabilityCalculatorRoute,
     ) {
         composableWithPushTransitions<AffordabilityCalculatorRoute> {
-            AffordabilityCalculatorScreen(onBackClick = navController::popBackStack)
+            AffordabilityCalculatorScreen(onBackClick = { navController.popBackStackSafely() })
         }
         composableWithPushTransitions<AmortizationRoute> { entry ->
             val route = entry.toRoute<AmortizationRoute>()
             AmortizationScreen(
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
                 loanId = route.loanId,
             )
         }
         composableWithPushTransitions<LoanComparisonRoute> {
-            LoanComparisonScreen(onBackClick = navController::popBackStack)
+            LoanComparisonScreen(onBackClick = { navController.popBackStackSafely() })
         }
         composableWithPushTransitions<LoanCalcWizardRoute> { entry ->
             val route = entry.toRoute<LoanCalcWizardRoute>()
             LoanCalcWizardScreen(
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
                 scenarioId = route.scenarioId,
             )
         }

@@ -10,6 +10,7 @@
 package org.mifos.feature.rates.navigation
 
 import androidx.navigation.NavController
+import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -52,7 +53,7 @@ fun NavGraphBuilder.ratesGraph(navController: NavController) {
     navigation<RatesGraphRoute>(startDestination = RatesListRoute) {
         composableWithPushTransitions<RatesListRoute> {
             InterestRatesScreen(
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
                 onSeriesClick = { seriesId ->
                     navController.navigateToRateDetail(seriesId = seriesId)
                 },
@@ -62,7 +63,7 @@ fun NavGraphBuilder.ratesGraph(navController: NavController) {
             val route = backStackEntry.toRoute<RateDetailRoute>()
             InterestRateDetailScreen(
                 seriesId = route.seriesId,
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
             )
         }
     }

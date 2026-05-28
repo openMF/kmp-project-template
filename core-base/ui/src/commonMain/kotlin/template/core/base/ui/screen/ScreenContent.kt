@@ -50,6 +50,7 @@ import template.core.base.designsystem.component.KptShimmerLoadingBox
 import template.core.base.designsystem.theme.KptTheme
 import template.core.base.store.screen.DataFreshness
 import template.core.base.store.screen.ScreenState
+import template.core.base.ui.captiveportal.rememberOpenCaptivePortalSignIn
 
 /** Default size of the visual icon/illustration in the empty/error/no-network states. */
 private val DefaultVisualSize = 64.dp
@@ -249,7 +250,9 @@ fun DefaultNoNetworkContent(
     val spacing = KptTheme.spacing
     val visual = if (isCaptivePortal) config.captivePortalVisual else config.visual
     val message = if (isCaptivePortal) config.captivePortalMessage else config.message
+    // Prefer an explicitly configured action; fall back to the library-provided launcher.
     val captivePortalAction = config.captivePortalAction
+        ?: rememberOpenCaptivePortalSignIn()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -270,7 +273,7 @@ fun DefaultNoNetworkContent(
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(spacing.lg))
-        if (isCaptivePortal && captivePortalAction != null) {
+        if (isCaptivePortal) {
             // Primary: open platform-native captive-portal sign-in.
             Button(onClick = captivePortalAction) {
                 Text(config.captivePortalActionText)

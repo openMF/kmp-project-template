@@ -118,11 +118,11 @@ fun defaultErrorMessage(error: Throwable): String = when (val cat = categorize(e
 /**
  * Configuration for the no-network state, including captive-portal variant.
  *
- * When [captivePortalAction] is non-null AND the rendered state is `isCaptivePortal == true`,
- * the [DefaultNoNetworkContent] renderer surfaces a primary CTA button labelled
- * [captivePortalActionText] that invokes the lambda — typically wired by apps to the
- * platform-native captive-portal sign-in flow via
- * `template.core.base.ui.captiveportal.openCaptivePortalSignIn()`.
+ * When the rendered state is `isCaptivePortal == true`, [DefaultNoNetworkContent] surfaces
+ * a primary CTA button labelled [captivePortalActionText]. If [captivePortalAction] is `null`
+ * (the default), [DefaultNoNetworkContent] automatically wires the button to
+ * `rememberOpenCaptivePortalSignIn()` (backed by cmp-intent-launcher). Provide a non-null
+ * [captivePortalAction] only to override the default behaviour for this screen.
  */
 @Immutable
 data class ScreenStateNoNetwork(
@@ -132,9 +132,8 @@ data class ScreenStateNoNetwork(
     val captivePortalMessage: String = "Sign in to your WiFi network",
     val captivePortalActionText: String = "Open sign-in page",
     /**
-     * Optional platform-native captive-portal launcher. Surfaced as a primary button in
-     * [DefaultNoNetworkContent] when `isCaptivePortal` is true. Apps typically wire this to
-     * `template.core.base.ui.captiveportal.openCaptivePortalSignIn()`.
+     * Optional override for the captive-portal CTA. When `null` (the default),
+     * [DefaultNoNetworkContent] provides the action via `rememberOpenCaptivePortalSignIn()`.
      */
     val captivePortalAction: (() -> Unit)? = null,
     val retryText: String = "Try again",

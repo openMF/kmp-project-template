@@ -40,7 +40,11 @@ object KptFadeThrough {
     fun enter(motion: Motion): EnterTransition = fadeIn(
         animationSpec = tween(
             durationMillis = motion.durationMedium2,
-            delayMillis = motion.durationShort4,
+            // No delay: old screen fades out while new screen fades in simultaneously
+            // (crossfade). The previous sequential-fade (delay = durationShort4) created
+            // a ~200ms window where both screens were at alpha≈0, showing the background
+            // as a dark blink on every screen-open.
+            delayMillis = 0,
             easing = motion.easingStandard,
         ),
     )

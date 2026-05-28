@@ -21,7 +21,6 @@ import org.mifos.core.store.generated.resources.screenstate_error_retry
 import org.mifos.core.store.generated.resources.screenstate_error_title
 import org.mifos.core.store.generated.resources.screenstate_nonet_message
 import org.mifos.core.store.generated.resources.screenstate_nonet_retry
-import template.core.base.ui.captiveportal.openCaptivePortalSignIn
 import template.core.base.ui.screen.DefaultLottieAnimations
 import template.core.base.ui.screen.ScreenStateDefaults
 import template.core.base.ui.screen.ScreenStateEmpty
@@ -47,8 +46,8 @@ import template.core.base.ui.screen.ScreenStateVisual
  *    `no_network.json`) into the empty/error/no-network visuals
  *  - routes the error-message mapping through [rememberAppErrorMessageFor] so error copy
  *    is also localized (per-category via [template.core.base.store.error.categorize])
- *  - wires `captivePortalAction` to the platform-native captive-portal sign-in launcher
- *    ([openCaptivePortalSignIn]), so the NoNetwork CTA opens the user's WiFi settings
+ *  - wires no explicit `captivePortalAction`; [DefaultNoNetworkContent] supplies the
+ *    default via [rememberOpenCaptivePortalSignIn] (backed by cmp-intent-launcher)
  *
  * Forks customize by overriding any of these calls — swap the Lottie spec to a branded
  * .json, set [ScreenStateError.onShown] to a telemetry hook, or wrap the result via
@@ -98,7 +97,6 @@ fun appScreenStateDefaults(): ScreenStateDefaults {
                 message = nonetMessage,
                 captivePortalMessage = captiveMessage,
                 captivePortalActionText = captiveAction,
-                captivePortalAction = { openCaptivePortalSignIn() },
                 retryText = nonetRetry,
             ),
         )

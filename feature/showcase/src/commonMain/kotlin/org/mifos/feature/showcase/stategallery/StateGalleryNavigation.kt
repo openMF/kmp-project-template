@@ -13,16 +13,17 @@ package org.mifos.feature.showcase.stategallery
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
+import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 data object StateGalleryRoute
 
 fun NavGraphBuilder.stateGalleryGraph(navController: NavController) {
-    composable<StateGalleryRoute> {
+    composableWithPushTransitions<StateGalleryRoute> {
         StateGalleryScreen(
-            onBackClick = { navController.popBackStack() },
+            onBackClick = { navController.popBackStackSafely() },
         )
     }
 }

@@ -10,7 +10,6 @@
 package org.mifos.feature.rates.navigation
 
 import androidx.navigation.NavController
-import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -19,6 +18,7 @@ import kotlinx.serialization.Serializable
 import org.mifos.feature.rates.ui.InterestRateDetailScreen
 import org.mifos.feature.rates.ui.InterestRatesScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 /** Parent graph route for the B7 Interest Rate Tracker. */
 @Serializable

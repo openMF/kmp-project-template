@@ -12,7 +12,6 @@
 package org.mifos.feature.calculators.navigation
 
 import androidx.navigation.NavController
-import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -23,6 +22,7 @@ import org.mifos.feature.calculators.amortization.AmortizationScreen
 import org.mifos.feature.calculators.comparison.LoanComparisonScreen
 import org.mifos.feature.calculators.wizard.LoanCalcWizardScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 data object CalculatorsGraphRoute

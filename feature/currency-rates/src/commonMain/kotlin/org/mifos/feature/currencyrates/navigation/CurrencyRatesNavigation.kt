@@ -10,7 +10,6 @@
 package org.mifos.feature.currencyrates.navigation
 
 import androidx.navigation.NavController
-import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -18,6 +17,7 @@ import kotlinx.serialization.Serializable
 import org.mifos.feature.currencyrates.ui.CurrencyRatesScreen
 import org.mifos.feature.currencyrates.ui.RateHistoryScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 data object CurrencyRatesGraphRoute

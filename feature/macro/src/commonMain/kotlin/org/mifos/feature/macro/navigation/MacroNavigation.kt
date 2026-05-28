@@ -10,7 +10,6 @@
 package org.mifos.feature.macro.navigation
 
 import androidx.navigation.NavController
-import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -21,6 +20,7 @@ import org.mifos.feature.macro.ui.CountryMacroScreen
 import org.mifos.feature.macro.ui.CountryPickerScreen
 import org.mifos.feature.macro.ui.MacroIndicatorDetailScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 /** Root of the country-macro nav graph. */
 @Serializable

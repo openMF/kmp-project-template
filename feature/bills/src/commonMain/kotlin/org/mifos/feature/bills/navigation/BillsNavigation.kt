@@ -12,7 +12,6 @@
 package org.mifos.feature.bills.navigation
 
 import androidx.navigation.NavController
-import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -21,6 +20,7 @@ import kotlinx.serialization.Serializable
 import org.mifos.feature.bills.ui.AddOrEditBillReminderScreen
 import org.mifos.feature.bills.ui.BillRemindersListScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 /** Route for the entire Bill Reminders graph — entry for [NavController.navigateToBills]. */
 @Serializable

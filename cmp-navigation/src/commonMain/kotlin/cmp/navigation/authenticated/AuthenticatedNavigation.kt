@@ -12,7 +12,6 @@
 package cmp.navigation.authenticated
 
 import androidx.navigation.NavController
-import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -45,6 +44,7 @@ import org.mifos.feature.showcase.stategallery.stateGalleryGraph
 import org.mifos.feature.showcase.transitions.TransitionGalleryRoute
 import org.mifos.feature.showcase.transitions.transitionGalleryGraph
 import template.core.base.security.isReleaseBuild
+import template.core.base.ui.nav.popBackStackSafely
 
 // Archived 2026-05-24 (Money Toolkit pivot) — restore by re-importing + re-wiring graphs per
 // feature/_archive/{module}/README.md:

@@ -12,7 +12,6 @@
 package org.mifos.feature.loans.navigation
 
 import androidx.navigation.NavController
-import template.core.base.ui.nav.popBackStackSafely
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
@@ -22,6 +21,7 @@ import org.mifos.feature.loans.ui.AddOrEditLoanScreen
 import org.mifos.feature.loans.ui.LoanDetailScreen
 import org.mifos.feature.loans.ui.PersonalLoansListScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 data object LoansGraphRoute

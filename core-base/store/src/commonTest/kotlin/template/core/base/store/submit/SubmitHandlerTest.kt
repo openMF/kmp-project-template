@@ -32,7 +32,7 @@ class SubmitHandlerTest {
         assertEquals(SubmitState.Idle, handler.state.value)
 
         handler.submit { "ok" }
-        assertEquals(SubmitState.Submitting, handler.state.value)
+        assertIs<SubmitState.Submitting>(handler.state.value)
 
         testScheduler.advanceUntilIdle()
 
@@ -153,7 +153,7 @@ class SubmitHandlerTest {
             kotlinx.coroutines.delay(10_000)
             blockCompleted = true
         }
-        assertEquals(SubmitState.Submitting, handler.state.value)
+        assertIs<SubmitState.Submitting>(handler.state.value)
 
         handler.reset()
         testScheduler.advanceUntilIdle()
@@ -172,13 +172,13 @@ class SubmitHandlerTest {
         // We verify by observing that state never becomes Failed when the scope is cancelled.
         // The cancel happens via reset() which cancels activeJob.
         handler.submit { kotlinx.coroutines.delay(10_000) }
-        assertEquals(SubmitState.Submitting, handler.state.value)
+        assertIs<SubmitState.Submitting>(handler.state.value)
 
         handler.reset() // cancels the job
         testScheduler.advanceUntilIdle()
 
         // reset() forces Idle — not Failed
-        assertNotEquals<SubmitState<*>>(SubmitState.Idle, SubmitState.Submitting)
+        assertNotEquals<SubmitState<*>>(SubmitState.Idle, SubmitState.Submitting())
         assertEquals(SubmitState.Idle, handler.state.value)
         assertTrue(!reachedFailed)
     }
@@ -213,7 +213,7 @@ class SubmitHandlerTest {
         testScheduler.advanceUntilIdle()
 
         val state = assertIs<SubmitState.Failed>(handler.state.value)
-        assertEquals(ErrorCategory.Server, state.category)
+        assertEquals(ErrorCategory.Server(httpCode = 500), state.category)
     }
 
     // ─── Helper ──────────────────────────────────────────────────────────────

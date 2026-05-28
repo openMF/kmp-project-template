@@ -19,7 +19,7 @@ import template.core.base.store.error.ErrorCategory
 class SubmitStateExtensionsTest {
 
     private val idle: SubmitState<String>       = SubmitState.Idle
-    private val submitting: SubmitState<String> = SubmitState.Submitting
+    private val submitting: SubmitState<String> = SubmitState.Submitting()
     private val submitted: SubmitState<String>  = SubmitState.Submitted("result")
     private val failed: SubmitState<String>     = SubmitState.Failed(
         error = RuntimeException("oops"),
@@ -122,8 +122,8 @@ class SubmitStateExtensionsTest {
     fun `Failed with Server category exposed correctly`() {
         val state: SubmitState<Unit> = SubmitState.Failed(
             error = RuntimeException("500"),
-            category = ErrorCategory.Server,
+            category = ErrorCategory.Server(httpCode = 500),
         )
-        assertEquals(ErrorCategory.Server, state.categoryOrNull)
+        assertEquals(ErrorCategory.Server(httpCode = 500), state.categoryOrNull)
     }
 }

@@ -36,6 +36,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import template.core.base.designsystem.theme.KptTheme
 
+/**
+ * Animated shimmer placeholder box.
+ *
+ * **Future migration:** new call sites should prefer
+ * `KptProgress(KptProgress.Shimmer(...))` from
+ * [template.core.base.designsystem.component.progress] — the unified progress family.
+ * `KptShimmerLoadingBox` itself stays in place because it is the primitive that the
+ * `KptProgress.Shimmer` / `KptProgress.Skeleton` variants delegate to. No deprecation —
+ * existing callers continue to compile and behave identically.
+ */
 @Composable
 fun KptShimmerLoadingBox(
     modifier: Modifier = Modifier,

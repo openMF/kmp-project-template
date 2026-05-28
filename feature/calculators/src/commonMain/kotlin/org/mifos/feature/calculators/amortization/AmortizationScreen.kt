@@ -39,10 +39,10 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatGrouped
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.AppCard
-import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.domain.calc.AmortizationRow
+import template.core.base.designsystem.component.AppCard
+import template.core.base.designsystem.component.HeroCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

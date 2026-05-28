@@ -11,6 +11,8 @@ package template.core.base.store.error
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class ErrorCategoryTest {
 
@@ -66,15 +68,28 @@ class ErrorCategoryTest {
     }
 
     @Test
-    fun categorize_serverError_returnsServer() {
+    fun categorize_serverError_returnsServerWithHttpCode() {
+        // Phase 07: Server is now a data class carrying the exact 5xx code.
         assertEquals(
-            ErrorCategory.Server,
+            ErrorCategory.Server(httpCode = 500),
             categorize(RuntimeException("HTTP 500 Internal Server Error")),
         )
         assertEquals(
-            ErrorCategory.Server,
+            ErrorCategory.Server(httpCode = 503),
             categorize(RuntimeException("503 Service Unavailable")),
         )
+    }
+
+    @Test
+    fun categorize_5xx_carriesExactCode() {
+        // Spot check that 502/505 etc. each propagate their exact code.
+        val cat502 = categorize(RuntimeException("HTTP 502 Bad Gateway"))
+        val server502 = assertIs<ErrorCategory.Server>(cat502)
+        assertEquals(502, server502.httpCode)
+
+        val cat505 = categorize(RuntimeException("505 HTTP Version Not Supported"))
+        val server505 = assertIs<ErrorCategory.Server>(cat505)
+        assertEquals(505, server505.httpCode)
     }
 
     @Test
@@ -122,5 +137,91 @@ class ErrorCategoryTest {
             ErrorCategory.RateLimit,
             categorize(RuntimeException("Status: 429")),
         )
+    }
+
+    // ─── Phase 07: new sealed-interface variants ─────────────────────────────
+
+    @Test
+    fun categorize_http402_returnsQuotaExceeded() {
+        // 402 Payment Required → billing/quota CTA, never retry.
+        assertEquals(
+            ErrorCategory.QuotaExceeded,
+            categorize(RuntimeException("HTTP 402 Payment Required")),
+        )
+    }
+
+    @Test
+    fun categorize_http507_returnsQuotaExceeded() {
+        // 507 Insufficient Storage — server-side quota, treat as billing.
+        assertEquals(
+            ErrorCategory.QuotaExceeded,
+            categorize(RuntimeException("HTTP 507 Insufficient Storage")),
+        )
+    }
+
+    @Test
+    fun categorize_http408_returnsTimeoutConnect() {
+        // 408 Request Timeout — never reached the server's body parser.
+        assertEquals(
+            ErrorCategory.Timeout.Connect,
+            categorize(RuntimeException("HTTP 408 Request Timeout")),
+        )
+    }
+
+    @Test
+    fun categorize_http504_returnsTimeoutRead() {
+        // 504 Gateway Timeout — upstream didn't respond in time.
+        assertEquals(
+            ErrorCategory.Timeout.Read,
+            categorize(RuntimeException("HTTP 504 Gateway Timeout")),
+        )
+    }
+
+    @Test
+    fun categorize_http400_returnsClientErrorWithCode() {
+        val cat = categorize(RuntimeException("HTTP 400 Bad Request"))
+        val client = assertIs<ErrorCategory.ClientError>(cat)
+        assertEquals(400, client.httpCode)
+    }
+
+    @Test
+    fun categorize_http404_returnsClientErrorWithCode() {
+        val cat = categorize(RuntimeException("HTTP 404 Not Found"))
+        val client = assertIs<ErrorCategory.ClientError>(cat)
+        assertEquals(404, client.httpCode)
+    }
+
+    @Test
+    fun categorize_http422_returnsClientErrorWithCode() {
+        // Validation errors — UI should surface the body, not "session expired".
+        val cat = categorize(RuntimeException("HTTP 422 Unprocessable Entity"))
+        val client = assertIs<ErrorCategory.ClientError>(cat)
+        assertEquals(422, client.httpCode)
+    }
+
+    @Test
+    fun categorize_http401_takesPrecedenceOverClientError() {
+        // 401 must still be Auth, not the generic ClientError bucket.
+        assertEquals(
+            ErrorCategory.Auth,
+            categorize(RuntimeException("HTTP 401")),
+        )
+    }
+
+    @Test
+    fun categorize_http429_takesPrecedenceOverClientError() {
+        // 429 must still be RateLimit, not ClientError.
+        assertEquals(
+            ErrorCategory.RateLimit,
+            categorize(RuntimeException("HTTP 429")),
+        )
+    }
+
+    @Test
+    fun categorize_server500_carriesCode() {
+        val cat = categorize(RuntimeException("HTTP 500"))
+        val server = assertIs<ErrorCategory.Server>(cat)
+        assertNotNull(server.httpCode)
+        assertEquals(500, server.httpCode)
     }
 }

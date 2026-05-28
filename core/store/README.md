@@ -47,7 +47,7 @@ non-paginated lists, inputs, and dashboards each have their own canonical patter
 | **`input`** | `input_kind: form` | `MutationScreenContent(state, ...) { ... }` + `SubmitHandler` | User-write screen — form, wizard, quick-action, confirm, gesture. See "Mutation / Input Submission" section in `docs/claude/store-implementation.md`. |
 | **`input`** | `input_kind: form`, `offline_resilient: true` | `MutationScreenContent(...)` + `DraftSubmitHandler` | Draft-resilient submission — persists payload across app restarts via `SubmitOutbox`. CreateLoan example uses this. |
 | **`screen-content`** | `content_kind: dashboard` (multi-source combined) | Manual `combine(s1.state, s2.state) { ... }` in ViewModel → expose `Flow<ScreenState<X>>` to screen | A `combineScreenStreams` framework helper is on the roadmap. Today: do it in the ViewModel. |
-| **`screen-content`** | `content_kind: dashboard` (independent panels) | One `ScreenContent` per panel, each with its own `asScreenStream` | Each panel owns its loading/empty/error UX independently. |
+| **`screen-content`** | `content_kind: dashboard` (independent cards) | `IndependentCardLayout(states, onRetry) { i, data, freshness -> ... }` + `DashboardProgressBar(progress)` | Each card owns its loading/empty/error UX independently. One slow card doesn't block fast ones; one failed fetch doesn't blank the whole dashboard. See [PATTERN-independent-cards.md](../../docs/claude/PATTERN-independent-cards.md) for the full recipe (ViewModel + Screen + refresh semantics + paged-mix). |
 | **`pure-ui`** | — | none — regular Compose | No state stream needed. For static screens with no remote data. |
 | **`custom`** | — | bring-your-own composable + manual Store wiring | Escape hatch for atypical layouts. Use sparingly. |
 

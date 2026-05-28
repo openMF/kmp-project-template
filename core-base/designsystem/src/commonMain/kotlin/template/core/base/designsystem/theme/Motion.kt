@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
  * (https://m3.material.io/styles/motion/easing-and-duration). All durations in milliseconds.
  *
  * Access from any Composable via [MaterialTheme.motion]. Framework transition factories under
- * `template.core.base.ui.motion` (`MifosSharedAxis`, `MifosFadeThrough`, etc.) and the
- * `RootTransitionProviders.Mifos` / `TransitionProviders.Mifos` provider namespaces consume
+ * `template.core.base.ui.motion` (`KptSharedAxis`, `KptFadeThrough`, etc.) and the
+ * `RootTransitionProviders.Kpt` / `TransitionProviders.Kpt` provider namespaces consume
  * these values — changing a single token here propagates app-wide.
  *
  * Lives in `core-base/designsystem` so framework-shared transition code can read it without
@@ -74,9 +74,9 @@ data class Motion(
     // ── Pattern parameters ───────────────────────────────────────────────────
     /** Slide distance for shared-axis-X transitions. */
     val sharedAxisSlideDistance: Dp = 30.dp,
-    /** Duration of one full breath of the "refreshing now" pulse (consumed by `Modifier.mifosRefreshingPulse`). */
+    /** Duration of one full breath of the "refreshing now" pulse (consumed by `Modifier.kptRefreshingPulse`). */
     val refreshingPulseDurationMs: Int = 1200,
-    /** Stagger delay per item when `LazyColumn` items use `Modifier.mifosListItemEnter`. */
+    /** Stagger delay per item when `LazyColumn` items use `Modifier.kptListItemEnter`. */
     val listItemEnterStaggerMs: Int = 30,
     /** Cap on list-item stagger — items past this index snap into place. */
     val listItemEnterMaxAnimated: Int = 20,

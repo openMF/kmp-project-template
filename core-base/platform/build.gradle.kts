@@ -55,16 +55,6 @@ kotlin {
 
             implementation(libs.app.update.ktx)
             implementation(libs.app.update)
-
-            // Bill-reminder notification scheduling (Phase 1 — Sub-Plan 05).
-            // WorkManager + NotificationCompat power the Android actual of
-            // template.core.base.platform.notification.BillReminderScheduler.
-            implementation(libs.androidx.work.ktx)
-            implementation(libs.androidx.core.ktx)
-
-            // koin-android exposes androidContext() for Koin scope wiring in
-            // NotificationModule.android.kt.
-            implementation(libs.koin.android)
         }
     }
 }

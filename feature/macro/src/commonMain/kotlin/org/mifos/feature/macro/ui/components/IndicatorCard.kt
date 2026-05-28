@@ -25,9 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.model.economic.IndicatorKind
 import org.mifos.core.model.economic.MacroIndicator
+import template.core.base.designsystem.component.AppCard
 import template.core.base.store.screen.ScreenState
 
 /**

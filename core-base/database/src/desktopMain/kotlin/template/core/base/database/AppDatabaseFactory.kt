@@ -17,11 +17,23 @@ import java.io.File
  * Desktop (JVM) factory for creating Room 3 database instances.
  *
  * Resolves the database path to the OS-appropriate application data directory:
- * - **Windows**: `%APPDATA%/MifosDatabase/`
- * - **macOS**: `~/Library/Application Support/MifosDatabase/`
- * - **Linux**: `~/.local/share/MifosDatabase/`
+ * - **Windows**: `%APPDATA%/{databaseDirName}/`
+ * - **macOS**: `~/Library/Application Support/{databaseDirName}/`
+ * - **Linux**: `~/.local/share/{databaseDirName}/`
+ *
+ * The default [databaseDirName] is `"KptDatabase"` (template-neutral). Forks
+ * should override this with their own brand identifier (e.g. `"MifosDatabase"`,
+ * `"<YourApp>Database"`) when constructing this factory in their Koin module
+ * — using a fork-specific directory keeps each consumer's data isolated and
+ * prevents collisions when multiple template-derived apps are installed side
+ * by side.
+ *
+ * @param databaseDirName Parent directory name under the OS app-data root.
+ *   Defaults to `"KptDatabase"`. Forks supply their own identifier.
  */
-class AppDatabaseFactory {
+class AppDatabaseFactory(
+    @PublishedApi internal val databaseDirName: String = DEFAULT_DATABASE_DIR_NAME,
+) {
 
     /**
      * Creates a [RoomDatabase.Builder] for the given database type.
@@ -53,10 +65,15 @@ class AppDatabaseFactory {
         val os = System.getProperty("os.name").lowercase()
         val userHome = System.getProperty("user.home")
         val appDataDir = when {
-            os.contains("win") -> File(System.getenv("APPDATA"), "MifosDatabase")
-            os.contains("mac") -> File(userHome, "Library/Application Support/MifosDatabase")
-            else -> File(userHome, ".local/share/MifosDatabase")
+            os.contains("win") -> File(System.getenv("APPDATA"), databaseDirName)
+            os.contains("mac") -> File(userHome, "Library/Application Support/$databaseDirName")
+            else -> File(userHome, ".local/share/$databaseDirName")
         }
         return File(appDataDir, databaseName)
+    }
+
+    companion object {
+        /** Template-neutral default; forks override via constructor. */
+        const val DEFAULT_DATABASE_DIR_NAME: String = "KptDatabase"
     }
 }

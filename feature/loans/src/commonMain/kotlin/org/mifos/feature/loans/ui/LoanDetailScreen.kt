@@ -44,12 +44,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.AppCard
-import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.component.StatusChip
 import org.mifos.core.designsystem.component.StatusChipIntent
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.Loan
+import template.core.base.designsystem.component.AppCard
+import template.core.base.designsystem.component.HeroCard
 import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalMaterial3Api::class)

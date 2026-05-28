@@ -194,7 +194,7 @@ fun rememberMifosReportTracker(): ReportTracker {
 }
 
 class ReportTracker(private val analytics: AnalyticsHelper) {
-    val analyticsTracker = MifosAnalyticsTracker(analytics)
+    val analyticsTracker = KptAnalyticsTracker(analytics)
     fun trackGeneration(
         reportName: String,
         filters: Map<String, String> = emptyMap(),

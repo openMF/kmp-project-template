@@ -104,6 +104,12 @@ interface SubmitOutbox<P> {
  * @param status    Current lifecycle state.
  * @param createdAtMs Epoch millis when the draft was first saved.
  * @param errorMessage Last failure reason, if any.
+ * @param idempotencyKey Optional client-generated UUID for server-side de-duplication of
+ *                  retries (see [template.core.base.store.submit.IdempotencyKey]).
+ *                  **Phase 06 caveat:** the field is currently in-memory only — the Room
+ *                  schema migration to v11 that persists this column is deferred. The
+ *                  field is honoured by [BatchSubmitHandler] but ignored by every Room-
+ *                  backed [SubmitOutbox] for now.
  */
 data class SubmitOutboxEntry<out P>(
     val id: Long,
@@ -113,6 +119,7 @@ data class SubmitOutboxEntry<out P>(
     val createdAtMs: Long,
     val uniqueKey: String? = null,
     val errorMessage: String? = null,
+    val idempotencyKey: String? = null,
 )
 
 /**

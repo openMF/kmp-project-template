@@ -6,6 +6,7 @@
 :core-base:datastore
 :core-base:designsystem
 :core-base:network
+:core-base:observability
 :core-base:platform
 :core-base:security
 :core-base:store
@@ -19,6 +20,7 @@
 :core:domain
 :core:model
 :core:network
+:core:platform
 :core:store
 :core:ui
 :feature:bills
@@ -31,6 +33,7 @@
 :feature:profile
 :feature:rates
 :feature:settings
+:feature:showcase
 androidx.activity:activity-compose:1.12.2
 androidx.activity:activity-ktx:1.12.2
 androidx.activity:activity:1.12.2
@@ -311,10 +314,12 @@ io.github.alexzhirkevich:compottie-android:2.0.0-rc04
 io.github.alexzhirkevich:compottie-resources-android:2.0.0-rc04
 io.github.alexzhirkevich:compottie-resources:2.0.0-rc04
 io.github.alexzhirkevich:compottie:2.0.0-rc04
-io.github.mobilebytelabs:cmp-network-monitor-android:3.2.3
-io.github.mobilebytelabs:cmp-network-monitor-compose-android:3.2.3
-io.github.mobilebytelabs:cmp-network-monitor-compose:3.2.3
-io.github.mobilebytelabs:cmp-network-monitor:3.2.3
+io.github.mobilebytelabs:cmp-intent-launcher-android:3.3.1
+io.github.mobilebytelabs:cmp-intent-launcher:3.3.1
+io.github.mobilebytelabs:cmp-network-monitor-android:3.3.1
+io.github.mobilebytelabs:cmp-network-monitor-compose-android:3.3.1
+io.github.mobilebytelabs:cmp-network-monitor-compose:3.3.1
+io.github.mobilebytelabs:cmp-network-monitor:3.3.1
 io.github.vinceglb:filekit-coil-android:0.12.0
 io.github.vinceglb:filekit-coil:0.12.0
 io.github.vinceglb:filekit-core-android:0.12.0

@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.dp
 @Preview(name = "Finance palette — light", showBackground = true, widthDp = 360)
 @Composable
 private fun FinancePalettePreviewLight() {
-    MifosTheme(darkTheme = false) {
+    KptTheme(darkTheme = false) {
         Surface { FinancePaletteSwatches() }
     }
 }
@@ -42,7 +42,7 @@ private fun FinancePalettePreviewLight() {
 @Preview(name = "Finance palette — dark", showBackground = true, widthDp = 360, backgroundColor = 0xFF13131B)
 @Composable
 private fun FinancePalettePreviewDark() {
-    MifosTheme(darkTheme = true) {
+    KptTheme(darkTheme = true) {
         Surface { FinancePaletteSwatches() }
     }
 }
@@ -50,7 +50,7 @@ private fun FinancePalettePreviewDark() {
 @Preview(name = "Spacing scale", showBackground = true, widthDp = 360)
 @Composable
 private fun SpacingScalePreview() {
-    MifosTheme(darkTheme = false) {
+    KptTheme(darkTheme = false) {
         Surface { SpacingSwatches() }
     }
 }
@@ -58,7 +58,7 @@ private fun SpacingScalePreview() {
 @Preview(name = "Elevation tiers", showBackground = true, widthDp = 360)
 @Composable
 private fun ElevationTiersPreview() {
-    MifosTheme(darkTheme = false) {
+    KptTheme(darkTheme = false) {
         Surface { ElevationSwatches() }
     }
 }

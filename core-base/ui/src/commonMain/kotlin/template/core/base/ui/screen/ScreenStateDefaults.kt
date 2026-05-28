@@ -103,21 +103,39 @@ val DefaultErrorMessageFor: (Throwable) -> String = ::defaultErrorMessage
  * box. Apps that need branded messages should pass their own lambda — typically wired
  * once at the theme level via `LocalScreenStateDefaults`.
  */
-fun defaultErrorMessage(error: Throwable): String = when (categorize(error)) {
+fun defaultErrorMessage(error: Throwable): String = when (val cat = categorize(error)) {
     ErrorCategory.Network -> "Can't reach the server. Check your connection."
+    ErrorCategory.Timeout.Connect -> "Connection timed out. Check your connection and try again."
+    ErrorCategory.Timeout.Read -> "Server took too long to respond. Try again in a bit."
     ErrorCategory.Auth -> "Your session expired. Please sign in again."
-    ErrorCategory.Server -> "Our servers are having a moment. Try again in a bit."
+    is ErrorCategory.Server -> "Our servers are having a moment. Try again in a bit."
     ErrorCategory.RateLimit -> "Too many requests. Please wait and try again."
+    ErrorCategory.QuotaExceeded -> "You've reached your quota. Upgrade or wait to continue."
+    is ErrorCategory.ClientError -> error.message ?: "Request failed (${cat.httpCode})."
     ErrorCategory.Generic -> error.message ?: "Something went wrong"
 }
 
-/** Configuration for the no-network state, including captive-portal variant. */
+/**
+ * Configuration for the no-network state, including captive-portal variant.
+ *
+ * When the rendered state is `isCaptivePortal == true`, [DefaultNoNetworkContent] surfaces
+ * a primary CTA button labelled [captivePortalActionText]. If [captivePortalAction] is `null`
+ * (the default), [DefaultNoNetworkContent] automatically wires the button to
+ * `rememberOpenCaptivePortalSignIn()` (backed by cmp-intent-launcher). Provide a non-null
+ * [captivePortalAction] only to override the default behaviour for this screen.
+ */
 @Immutable
 data class ScreenStateNoNetwork(
     val visual: ScreenStateVisual = ScreenStateVisual.Vector(Icons.Default.WifiOff),
     val captivePortalVisual: ScreenStateVisual = ScreenStateVisual.Vector(Icons.Default.CloudOff),
     val message: String = "You're offline",
     val captivePortalMessage: String = "Sign in to your WiFi network",
+    val captivePortalActionText: String = "Open sign-in page",
+    /**
+     * Optional override for the captive-portal CTA. When `null` (the default),
+     * [DefaultNoNetworkContent] provides the action via `rememberOpenCaptivePortalSignIn()`.
+     */
+    val captivePortalAction: (() -> Unit)? = null,
     val retryText: String = "Try again",
 )
 

@@ -32,7 +32,6 @@ kotlin {
     sourceSets {
         androidMain.dependencies {
             api(libs.androidx.metrics)
-            implementation(libs.androidx.browser)
             implementation(libs.androidx.compose.runtime)
         }
 
@@ -40,6 +39,7 @@ kotlin {
             implementation(projects.coreBase.store)
             implementation(projects.coreBase.designsystem)
             implementation(libs.cmp.network.monitor.compose)
+            implementation(libs.cmp.intent.launcher)
 
             implementation(compose.ui)
             implementation(compose.material3)

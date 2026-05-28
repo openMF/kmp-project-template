@@ -13,6 +13,7 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import template.core.base.store.error.ErrorCategory
 import template.core.base.store.error.categorize
 import template.core.base.store.screen.DataFreshness
+import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.screen.ScreenState
 import template.core.base.store.screen.StoreData
 
@@ -31,11 +32,18 @@ object DecisionEngine {
      * @param storeData snapshot from the Store pipeline (data, error, freshness flags)
      * @param networkStatus current connectivity; [NetworkStatus.CaptivePortal] is treated
      *   as offline for content decisions but surfaces a distinct UI flag
+     * @param fetchPolicy informational only — surfaced so callers can pass-through the
+     *   policy that drove the upstream Store5 request shape for telemetry / debug logging.
+     *   The case mapping below is **purely** a function of `(storeData, networkStatus)`;
+     *   policy-specific behaviour materialises at the stream layer
+     *   (see `streamDataForPolicy` in `StoreDataExtensions.kt`), not inside this decider.
      * @return the [ScreenState] variant the screen should render
      */
     fun <T> decide(
         storeData: StoreData<T>,
         networkStatus: NetworkStatus,
+        @Suppress("UNUSED_PARAMETER")
+        fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
     ): ScreenState<T> {
         val noData = storeData.isEmpty
         val error = storeData.error
@@ -48,11 +56,15 @@ object DecisionEngine {
                 isCaptivePortal -> ScreenState.NoNetwork(isCaptivePortal = true)
                 !isOnline -> ScreenState.NoNetwork()
                 error != null -> when (categorize(error)) {
-                    ErrorCategory.Network -> ScreenState.NoNetwork()
+                    ErrorCategory.Network, ErrorCategory.Timeout.Connect, ErrorCategory.Timeout.Read ->
+                        ScreenState.NoNetwork()
                     ErrorCategory.Auth -> ScreenState.Unauthenticated
                     ErrorCategory.RateLimit,
-                    ErrorCategory.Server,
-                    ErrorCategory.Generic -> ScreenState.Error(error, isNetworkError = false)
+                    ErrorCategory.QuotaExceeded,
+                    ErrorCategory.Generic,
+                    is ErrorCategory.Server,
+                    is ErrorCategory.ClientError,
+                    -> ScreenState.Error(error, isNetworkError = false)
                 }
                 else -> ScreenState.Loading
             }

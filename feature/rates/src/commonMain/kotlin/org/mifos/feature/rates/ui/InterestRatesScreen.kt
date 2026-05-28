@@ -41,13 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
-import org.mifos.core.designsystem.chart.MifosSparkline
-import org.mifos.core.designsystem.component.AppCard
+import org.mifos.core.designsystem.chart.KptSparkline
 import org.mifos.core.designsystem.component.RateBadge
 import org.mifos.core.designsystem.component.RateDirection
 import org.mifos.core.designsystem.theme.finance
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.InterestRateSeries
+import template.core.base.designsystem.component.AppCard
 import template.core.base.store.screen.ScreenState
 import template.core.base.ui.screen.ScreenContent
 
@@ -208,7 +208,7 @@ private fun RateRowContent(
             }
         }
 
-        MifosSparkline(
+        KptSparkline(
             values = series.observations.map { it.value },
             modifier = Modifier.weight(1f).fillMaxSize(),
         )

@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import template.core.base.designsystem.component.progress.KptProgress
+import template.core.base.designsystem.component.progress.ProgressSize
 import template.core.base.store.error.ErrorCategory
 import template.core.base.store.paging.PagingScreenStream
 import template.core.base.store.error.categorize
@@ -109,10 +110,7 @@ fun LoadMoreFooter(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,
                 ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                    )
+                    KptProgress(variant = KptProgress.Circular(size = ProgressSize.Sm))
                     Spacer(Modifier.width(12.dp))
                     Text(
                         text = loadingMessage,
@@ -171,7 +169,10 @@ internal data class LoadMoreFooterCopy(
 
 internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
     when (categorize(error)) {
-        ErrorCategory.Network -> LoadMoreFooterCopy(
+        ErrorCategory.Network,
+        ErrorCategory.Timeout.Connect,
+        ErrorCategory.Timeout.Read,
+        -> LoadMoreFooterCopy(
             label = "No internet",
             retryText = "Tap to retry",
             icon = Icons.Default.CloudOff,
@@ -181,7 +182,7 @@ internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
             retryText = "Sign in again",
             icon = Icons.Default.Warning,
         )
-        ErrorCategory.Server -> LoadMoreFooterCopy(
+        is ErrorCategory.Server -> LoadMoreFooterCopy(
             label = "Server unavailable",
             retryText = "Tap to retry",
             icon = Icons.Default.Warning,
@@ -191,7 +192,14 @@ internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
             retryText = "Tap to retry",
             icon = Icons.Default.Warning,
         )
-        ErrorCategory.Generic -> LoadMoreFooterCopy(
+        ErrorCategory.QuotaExceeded -> LoadMoreFooterCopy(
+            label = "Quota exceeded",
+            retryText = "Tap to retry",
+            icon = Icons.Default.Warning,
+        )
+        is ErrorCategory.ClientError,
+        ErrorCategory.Generic,
+        -> LoadMoreFooterCopy(
             label = "Failed to load more",
             retryText = "Tap to retry",
             icon = Icons.Default.Warning,

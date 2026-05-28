@@ -20,10 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.ui.scaffold.KptScaffold
+import template.core.base.designsystem.component.HeroCard
 
 @Composable
 internal fun NotificationScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {

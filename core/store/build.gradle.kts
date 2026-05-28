@@ -29,6 +29,8 @@ kotlin {
 
             // Compose runtime — needed for the @Composable appScreenStateDefaults() factory.
             implementation(compose.runtime)
+            // compose-resources — for stringResource()-based ScreenState copy (i18n).
+            implementation(compose.components.resources)
 
             implementation(projects.core.database)
             implementation(projects.core.model)
@@ -39,4 +41,10 @@ kotlin {
             implementation(libs.kermit.logging)
         }
     }
+}
+
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+    packageOfResClass = "org.mifos.core.store.generated.resources"
 }

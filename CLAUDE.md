@@ -8,6 +8,9 @@
 
 ## Quick Links
 
+🚀 **New fork? Start here:**
+- [Fork Quickstart](templates/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
+
 📖 **Domain-Specific Guides:**
 - [GitHub Actions & CI/CD](.github/CLAUDE.md) - Workflows, custom actions, secrets
 - [Fastlane Deployment](fastlane/CLAUDE.md) - iOS & Android deployment lanes
@@ -18,7 +21,9 @@
 - [Onboarding Guide](docs/claude/onboarding.md)
 - [Deployment Playbook](docs/claude/deployment-playbook.md)
 - [Patterns & Best Practices](docs/claude/patterns.md)
+- [Independent Cards Pattern](docs/claude/PATTERN-independent-cards.md) - Multi-card dashboards where each card has its own ScreenState (loading / error / empty / content) — `IndependentCardLayout` + `DashboardProgressBar` + `aggregateDashboardProgress`
 - [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
+- [Motion + Transitions](core-base/ui/MOTION.md) - Symmetric durations, M3 patterns, debug Transition Gallery
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)
 - [Secrets Management](docs/claude/secrets-management.md)
 - [Version Handling](docs/claude/version-handling.md)
@@ -312,6 +317,40 @@ On **app start**, call `storeCacheManager.pruneExpiredDrafts()` to remove SUBMIT
 drafts older than 30 days (PENDING drafts are never pruned).
 
 See [Store Implementation Guide](docs/claude/store-implementation.md) for full examples.
+
+---
+
+## Fork branding
+
+The toolkit centralises every brand-touching string into **five properties** in
+`gradle.properties`. Today they're reference values (consumers still have the
+strings hardcoded across `cmp-android/build.gradle.kts`, `cmp-ios/`,
+`cmp-desktop/build.gradle.kts`, `cmp-web/build.gradle.kts`, `Info.plist`,
+`AndroidManifest.xml`, etc.). The intent: a future one-shot rename script reads
+these five properties + does substitutions across the consumer build files in a
+single pass.
+
+| Property                   | Default value    | Consumer (planned)                                                  |
+| -------------------------- | ---------------- | ------------------------------------------------------------------- |
+| `APP_ID_BASE`              | `cmp.android.app`| Android `applicationId`; iOS bundle ID base                         |
+| `APP_NAME`                 | `Money Toolkit`  | App display name (Android `app_name`, iOS `CFBundleDisplayName`)    |
+| `APP_VERSION_BASE`         | `1.0.0`          | Base for Gradle-generated `YYYY.M.D-{prerelease}.{n}+{sha}` versions|
+| `APP_BUNDLE_DISPLAY_NAME`  | `Money Toolkit`  | iOS Springboard label; macOS `CFBundleName`                         |
+| `APP_BRAND_PREFIX`         | `Kpt`            | Kotlin-namespace prefix (e.g. `KptTheme`, `KptProgress`)            |
+
+**Today**: forks edit these properties **and** every consumer file by hand.
+**Roadmap**: a `scripts/fork-rename.sh` (TBD) will accept new values and write
+them through to every consumer file in one pass — eliminating the rename-drift
+class of fork failure. The properties exist today so:
+
+1. Forks can grep `APP_NAME` / `APP_ID_BASE` and confirm the rename surface.
+2. The rename-script PR has a stable target — no schema renegotiation.
+3. Consumer build files can incrementally migrate to reading these properties
+   via `project.findProperty("APP_NAME") as? String ?: "Money Toolkit"` patterns
+   without breaking forks mid-flight.
+
+See `gradle.properties` for the current values; see Phase 10 of the
+core-base-store-coverage epic for the seam rationale.
 
 ---
 

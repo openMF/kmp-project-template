@@ -21,9 +21,9 @@ import org.mifos.core.data.banking.BillReminderRepository
 import org.mifos.core.model.banking.BillCategory
 import org.mifos.core.model.banking.BillReminder
 import org.mifos.core.model.banking.Recurrence
+import org.mifos.core.platform.notification.bill.BillReminderSchedule
 import org.mifos.feature.bills.domain.BillReminderRecurrence
 import org.mifos.feature.bills.notification.BillNotificationGateway
-import template.core.base.platform.notification.BillReminderSchedule
 import template.core.base.store.submit.SubmitOutbox
 import template.core.base.ui.viewmodel.BaseDraftMutationViewModel
 import kotlin.random.Random

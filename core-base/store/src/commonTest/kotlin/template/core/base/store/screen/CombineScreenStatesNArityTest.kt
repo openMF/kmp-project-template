@@ -297,6 +297,120 @@ class CombineScreenStatesNArityTest {
         }
     }
 
+    // ─── N-arity vararg ──────────────────────────────────────────────────────
+
+    @Test
+    fun `vararg 6-source all Content FRESH produces Content with ordered list`() = runTest {
+        combineScreenStates(
+            content(1, DataFreshness.FRESH),
+            content(2, DataFreshness.FRESH),
+            content(3, DataFreshness.FRESH),
+            content(4, DataFreshness.FRESH),
+            content(5, DataFreshness.FRESH),
+            content(6, DataFreshness.FRESH),
+        ).test {
+            val item = awaitItem()
+            assertIs<ScreenState.Content<List<Any?>>>(item)
+            assertEquals(listOf(1, 2, 3, 4, 5, 6), item.data)
+            assertEquals(DataFreshness.FRESH, item.freshness)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `vararg 6-source any STALE produces Content STALE`() = runTest {
+        combineScreenStates(
+            content(1, DataFreshness.FRESH),
+            content(2, DataFreshness.FRESH),
+            content(3, DataFreshness.FRESH),
+            content(4, DataFreshness.STALE),
+            content(5, DataFreshness.FRESH),
+            content(6, DataFreshness.FRESH),
+        ).test {
+            val item = awaitItem()
+            assertIs<ScreenState.Content<List<Any?>>>(item)
+            assertEquals(DataFreshness.STALE, item.freshness)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `vararg 6-source any NoNetwork produces NoNetwork`() = runTest {
+        combineScreenStates(
+            content(1),
+            content(2),
+            content(3),
+            noNetwork<Int>(),
+            content(5),
+            content(6),
+        ).test {
+            assertIs<ScreenState.NoNetwork>(awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `vararg 10-source all Content FRESH produces 10-element list`() = runTest {
+        combineScreenStates(
+            content(1, DataFreshness.FRESH),
+            content(2, DataFreshness.FRESH),
+            content(3, DataFreshness.FRESH),
+            content(4, DataFreshness.FRESH),
+            content(5, DataFreshness.FRESH),
+            content(6, DataFreshness.FRESH),
+            content(7, DataFreshness.FRESH),
+            content(8, DataFreshness.FRESH),
+            content(9, DataFreshness.FRESH),
+            content(10, DataFreshness.FRESH),
+        ).test {
+            val item = awaitItem()
+            assertIs<ScreenState.Content<List<Any?>>>(item)
+            assertEquals(10, item.data.size)
+            assertEquals((1..10).toList(), item.data)
+            awaitComplete()
+        }
+    }
+
+    // ─── N-arity list ────────────────────────────────────────────────────────
+
+    @Test
+    fun `list overload empty input emits Content with empty list`() = runTest {
+        combineScreenStates(emptyList()).test {
+            val item = awaitItem()
+            assertIs<ScreenState.Content<List<Any?>>>(item)
+            assertEquals(emptyList<Any?>(), item.data)
+            assertEquals(DataFreshness.FRESH, item.freshness)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `list overload single source matches Content`() = runTest {
+        combineScreenStates(listOf(content("alpha"))).test {
+            val item = awaitItem()
+            assertIs<ScreenState.Content<List<Any?>>>(item)
+            assertEquals(listOf<Any?>("alpha"), item.data)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `list overload aggregates 4 sources with UPDATING worst-case`() = runTest {
+        val flows: List<kotlinx.coroutines.flow.Flow<ScreenState<*>>> = listOf(
+            content(1, DataFreshness.FRESH),
+            content(2, DataFreshness.UPDATING),
+            content(3, DataFreshness.FRESH),
+            content(4, DataFreshness.FRESH),
+        )
+        combineScreenStates(flows).test {
+            val item = awaitItem()
+            assertIs<ScreenState.Content<List<Any?>>>(item)
+            assertEquals(listOf<Any?>(1, 2, 3, 4), item.data)
+            assertEquals(DataFreshness.UPDATING, item.freshness)
+            awaitComplete()
+        }
+    }
+
     // ─── helpers ─────────────────────────────────────────────────────────────
 
     private fun <T> content(value: T, freshness: DataFreshness = DataFreshness.FRESH) =

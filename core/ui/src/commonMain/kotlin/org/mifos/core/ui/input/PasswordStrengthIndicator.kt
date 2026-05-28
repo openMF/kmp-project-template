@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.mifos.core.designsystem.icon.AppIcons
-import org.mifos.core.designsystem.theme.MifosTheme
+import org.mifos.core.designsystem.theme.KptTheme
 
 @Suppress("LongMethod", "CyclomaticComplexMethod", "MagicNumber")
 @Composable
@@ -182,7 +182,7 @@ private val weakColor = Color(0xFF8B6609)
 @Preview
 @Composable
 private fun PasswordStrengthIndicatorPreview_minCharMet() {
-    MifosTheme {
+    KptTheme {
         PasswordStrengthIndicator(
             state = PasswordStrengthState.WEAK_3,
             currentCharacterCount = 12,
@@ -194,7 +194,7 @@ private fun PasswordStrengthIndicatorPreview_minCharMet() {
 @Preview
 @Composable
 private fun PasswordStrengthIndicatorPreview_minCharNotMet() {
-    MifosTheme {
+    KptTheme {
         PasswordStrengthIndicator(
             state = PasswordStrengthState.WEAK_3,
             currentCharacterCount = 11,
@@ -206,7 +206,7 @@ private fun PasswordStrengthIndicatorPreview_minCharNotMet() {
 @Preview
 @Composable
 private fun PasswordStrengthIndicatorPreview_noMinChar() {
-    MifosTheme {
+    KptTheme {
         PasswordStrengthIndicator(
             state = PasswordStrengthState.WEAK_3,
             currentCharacterCount = 12,

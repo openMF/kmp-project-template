@@ -81,7 +81,7 @@ koinAnnotationsVersion = "2.1.0"
 
 
 # KMP Toolkit Libraries
-kmptoolkit = "3.2.3"
+kmptoolkit = "3.3.1"
 
 # CMP Libraries
 compose-plugin = "1.10.3"
@@ -333,6 +333,7 @@ ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.r
 window-size = { group = "dev.chrisbanes.material3", name = "material3-window-size-class-multiplatform", version.ref = "windowsSizeClass" }
 
 
+cmp-intent-launcher = { module = "io.github.mobilebytelabs:cmp-intent-launcher", version.ref = "kmptoolkit" }
 cmp-network-monitor = { module = "io.github.mobilebytelabs:cmp-network-monitor", version.ref = "kmptoolkit" }
 cmp-network-monitor-compose = { module = "io.github.mobilebytelabs:cmp-network-monitor-compose", version.ref = "kmptoolkit" }
 

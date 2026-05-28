@@ -33,7 +33,7 @@ import kotlin.time.Clock
  *    [TimeZone].
  *
  * Tests pin both behaviours; the schedule produced here flows into
- * [template.core.base.platform.notification.BillReminderScheduler.schedule].
+ * [org.mifos.core.platform.notification.bill.BillReminderScheduler.schedule].
  */
 internal object BillReminderRecurrence {
 

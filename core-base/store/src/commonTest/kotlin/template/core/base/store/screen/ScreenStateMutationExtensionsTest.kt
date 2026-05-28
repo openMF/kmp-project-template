@@ -35,7 +35,7 @@ class ScreenStateMutationExtensionsTest {
     fun canInteract_contentAndSubmitting_returnsFalse() {
         assertFalse(
             ScreenState.Content("data", DataFreshness.FRESH)
-                .canInteract(SubmitState.Submitting),
+                .canInteract(SubmitState.Submitting()),
         )
     }
 
@@ -43,7 +43,7 @@ class ScreenStateMutationExtensionsTest {
     fun canInteract_contentAndFailed_returnsTrue() {
         assertFalse(
             ScreenState.Content("data", DataFreshness.FRESH)
-                .canInteract(SubmitState.Submitting),
+                .canInteract(SubmitState.Submitting()),
         )
     }
 
@@ -103,7 +103,7 @@ class ScreenStateMutationExtensionsTest {
     fun submitWhenContent_alreadySubmitting_noOp() = runTest {
         val handler = submitHandler<String>()
         handler.submit { kotlinx.coroutines.delay(10_000); "first" }
-        assertEquals(SubmitState.Submitting, handler.state.value)
+        assertIs<SubmitState.Submitting>(handler.state.value)
 
         var secondCalled = false
         handler.submitWhenContent(

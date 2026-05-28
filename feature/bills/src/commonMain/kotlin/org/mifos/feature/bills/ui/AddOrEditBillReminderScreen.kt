@@ -43,10 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.banking.BillCategory
 import org.mifos.core.model.banking.Recurrence
+import template.core.base.designsystem.component.AppCard
 import template.core.base.store.submit.SubmitState
 
 /**

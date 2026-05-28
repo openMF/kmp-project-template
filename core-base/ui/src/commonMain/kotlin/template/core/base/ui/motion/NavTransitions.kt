@@ -40,10 +40,10 @@ inline fun <reified T : Any> NavGraphBuilder.sharedAxisComposable(
 ) {
     // Snapshot @Composable-resolved transitions at graph-build time so the non-Composable
     // enterTransition lambdas can capture them as plain data.
-    val enterFwd = MifosSharedAxis.enterForward()
-    val exitFwd = MifosSharedAxis.exitForward()
-    val enterBack = MifosSharedAxis.enterBack()
-    val exitBack = MifosSharedAxis.exitBack()
+    val enterFwd = KptSharedAxis.enterForward()
+    val exitFwd = KptSharedAxis.exitForward()
+    val enterBack = KptSharedAxis.enterBack()
+    val exitBack = KptSharedAxis.exitBack()
     composable<T>(
         enterTransition = { enterFwd },
         exitTransition = { exitFwd },
@@ -56,14 +56,14 @@ inline fun <reified T : Any> NavGraphBuilder.sharedAxisComposable(
 /**
  * `NavGraphBuilder.composable<T>(...)` wrapper for **sibling navigation** —
  * bottom-nav tabs, paged sub-sections. Outgoing fades to nothing before
- * incoming fades in (per [MifosFadeThrough]).
+ * incoming fades in (per [KptFadeThrough]).
  */
 @Composable
 inline fun <reified T : Any> NavGraphBuilder.fadeThroughComposable(
     noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
-    val enter = MifosFadeThrough.enter()
-    val exit = MifosFadeThrough.exit()
+    val enter = KptFadeThrough.enter()
+    val exit = KptFadeThrough.exit()
     composable<T>(
         enterTransition = { enter },
         exitTransition = { exit },

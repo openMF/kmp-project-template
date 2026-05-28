@@ -20,6 +20,7 @@ import org.mifos.feature.macro.ui.CountryMacroScreen
 import org.mifos.feature.macro.ui.CountryPickerScreen
 import org.mifos.feature.macro.ui.MacroIndicatorDetailScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 /** Root of the country-macro nav graph. */
 @Serializable
@@ -66,7 +67,7 @@ fun NavGraphBuilder.macroGraph(navController: NavController) {
             val route = entry.toRoute<CountryMacroRoute>()
             CountryMacroScreen(
                 countryCode = route.countryCode,
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
                 onPickCountry = { navController.navigate(CountryPickerRoute) },
                 onOpenIndicator = { kind ->
                     navController.navigate(
@@ -81,7 +82,7 @@ fun NavGraphBuilder.macroGraph(navController: NavController) {
 
         composableWithPushTransitions<CountryPickerRoute> {
             CountryPickerScreen(
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
                 onCountryPicked = { code ->
                     // Replace the dashboard's countryCode so the ViewModel
                     // hosting the new country is created cleanly. The picker
@@ -98,7 +99,7 @@ fun NavGraphBuilder.macroGraph(navController: NavController) {
             MacroIndicatorDetailScreen(
                 countryCode = route.countryCode,
                 indicatorKind = IndicatorKind.valueOf(route.indicatorKindName),
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
             )
         }
     }

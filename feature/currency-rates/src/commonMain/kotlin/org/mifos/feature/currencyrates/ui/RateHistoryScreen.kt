@@ -34,8 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
-import org.mifos.core.designsystem.component.AppCard
 import org.mifos.core.designsystem.theme.spacing
+import template.core.base.designsystem.component.AppCard
 import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)

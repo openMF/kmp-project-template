@@ -21,6 +21,7 @@ import org.mifos.feature.loans.ui.AddOrEditLoanScreen
 import org.mifos.feature.loans.ui.LoanDetailScreen
 import org.mifos.feature.loans.ui.PersonalLoansListScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 data object LoansGraphRoute
@@ -42,7 +43,7 @@ fun NavGraphBuilder.loansGraph(navController: NavController) {
     navigation<LoansGraphRoute>(startDestination = PersonalLoansListRoute) {
         composableWithPushTransitions<PersonalLoansListRoute> {
             PersonalLoansListScreen(
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
                 onAddLoanClick = { navController.navigate(AddOrEditLoanRoute()) },
                 onLoanClick = { loanId -> navController.navigate(LoanDetailRoute(loanId)) },
             )
@@ -51,7 +52,7 @@ fun NavGraphBuilder.loansGraph(navController: NavController) {
             val route = entry.toRoute<LoanDetailRoute>()
             LoanDetailScreen(
                 loanId = route.loanId,
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
                 onEditClick = { loanId ->
                     navController.navigate(AddOrEditLoanRoute(loanId = loanId))
                 },
@@ -64,8 +65,8 @@ fun NavGraphBuilder.loansGraph(navController: NavController) {
             val route = entry.toRoute<AddOrEditLoanRoute>()
             AddOrEditLoanScreen(
                 loanId = route.loanId,
-                onBackClick = navController::popBackStack,
-                onSaved = { navController.popBackStack() },
+                onBackClick = { navController.popBackStackSafely() },
+                onSaved = { navController.popBackStackSafely() },
             )
         }
     }

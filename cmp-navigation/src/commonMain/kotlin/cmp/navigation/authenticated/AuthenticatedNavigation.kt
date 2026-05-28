@@ -39,6 +39,12 @@ import org.mifos.feature.rates.navigation.ratesGraph
 import org.mifos.feature.settings.navigateToSettings
 import org.mifos.feature.settings.notificationDestination
 import org.mifos.feature.settings.settingsDestination
+import org.mifos.feature.showcase.stategallery.StateGalleryRoute
+import org.mifos.feature.showcase.stategallery.stateGalleryGraph
+import org.mifos.feature.showcase.transitions.TransitionGalleryRoute
+import org.mifos.feature.showcase.transitions.transitionGalleryGraph
+import template.core.base.security.isReleaseBuild
+import template.core.base.ui.nav.popBackStackSafely
 
 // Archived 2026-05-24 (Money Toolkit pivot) — restore by re-importing + re-wiring graphs per
 // feature/_archive/{module}/README.md:
@@ -76,13 +82,30 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             navigateToLoanCalcWizard = { navController.navigateToLoanCalcWizard() },
         )
 
-        notificationDestination(onBackClick = navController::popBackStack)
+        notificationDestination(onBackClick = { navController.popBackStackSafely() })
 
-        settingsDestination(onBackClick = navController::popBackStack)
+        // Dev-only entry points to the showcase galleries (only wired in non-release builds).
+        // Released builds receive null → SettingsScreen hides the dev menu entirely.
+        // See feature/showcase for the gallery destinations.
+        val onTransitionGalleryClick: (() -> Unit)? = if (!isReleaseBuild()) {
+            { navController.navigate(TransitionGalleryRoute) }
+        } else {
+            null
+        }
+        val onStateGalleryClick: (() -> Unit)? = if (!isReleaseBuild()) {
+            { navController.navigate(StateGalleryRoute) }
+        } else {
+            null
+        }
+        settingsDestination(
+            onBackClick = { navController.popBackStackSafely() },
+            onTransitionGalleryClick = onTransitionGalleryClick,
+            onStateGalleryClick = onStateGalleryClick,
+        )
 
         // Money Toolkit feature graphs — generic personal-finance utilities.
         currencyRatesGraph(navController)
-        emiCalculatorDestination(onBackClick = navController::popBackStack)
+        emiCalculatorDestination(onBackClick = { navController.popBackStackSafely() })
 
         // Banking utility toolkit — local-only personal tools.
         loansGraph(navController) // B1 — multi-formKey draft showcase
@@ -90,5 +113,11 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         calculatorsGraph(navController) // B2/B3/B5/B6 — affordability + amortization + comparison + wizard
         ratesGraph(navController) // B7 — CACHE_THEN_NETWORK rate tracker
         macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
+
+        // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).
+        transitionGalleryGraph(navController)
+
+        // Dev-only state gallery (Phase 02 Task 17 — ScreenState variants + component-scale primitives).
+        stateGalleryGraph(navController)
     }
 }

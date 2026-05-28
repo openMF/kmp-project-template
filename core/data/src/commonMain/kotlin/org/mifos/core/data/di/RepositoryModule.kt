@@ -100,8 +100,8 @@ val DataModule = module {
 
     // OfflineSubmitSyncer eagerly retries pending drafts when connectivity
     // returns. For purely-local features (no real network), the submitBlock
-    // commits to the repository directly — `isOnlineFlow` is still required
-    // by the syncer contract.
+    // commits to the repository directly — `networkStatusFlow` is still
+    // required by the syncer contract.
     //
     // We register each syncer behind a unique marker singleton so Koin's
     // type resolution doesn't collide with other `OfflineSubmitSyncer<*, *>`
@@ -112,7 +112,7 @@ val DataModule = module {
             syncer = OfflineSubmitSyncer<Loan, Loan>(
                 scope = get(),
                 outbox = get(qualifier = OutboxQualifiers.Loan),
-                isOnlineFlow = get<NetworkMonitor>().isOnline,
+                networkStatusFlow = get<NetworkMonitor>().networkStatus,
                 submitBlock = { payload ->
                     get<LoanRepository>().upsert(payload)
                     payload
@@ -125,7 +125,7 @@ val DataModule = module {
             syncer = OfflineSubmitSyncer<BillReminder, BillReminder>(
                 scope = get(),
                 outbox = get(qualifier = OutboxQualifiers.BillReminder),
-                isOnlineFlow = get<NetworkMonitor>().isOnline,
+                networkStatusFlow = get<NetworkMonitor>().networkStatus,
                 submitBlock = { payload ->
                     get<BillReminderRepository>().upsert(payload)
                     payload
@@ -189,7 +189,7 @@ val DataModule = module {
         val syncer = OfflineSubmitSyncer<PriceAlert, PriceAlert>(
             scope = get(),
             outbox = get(qualifier = OutboxQualifiers.PriceAlert),
-            isOnlineFlow = get<NetworkMonitor>().isOnline,
+            networkStatusFlow = get<NetworkMonitor>().networkStatus,
             submitBlock = { payload -> get<AlertsApi>().create(payload) },
         )
         syncer.start()

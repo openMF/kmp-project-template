@@ -20,8 +20,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.navigation.NavBackStackEntry
 import kotlin.jvm.JvmSuppressWildcards
 import template.core.base.designsystem.theme.Motion
-import template.core.base.ui.motion.MifosFadeThrough
-import template.core.base.ui.motion.MifosSharedAxis
+import template.core.base.ui.motion.KptFadeThrough
+import template.core.base.ui.motion.KptSharedAxis
 
 /**
  * Function type for providing nullable enter transitions in navigation.
@@ -229,7 +229,7 @@ object TransitionProviders {
     }
 
     /**
-     * Mifos-branded transition vocabulary aligned with the M3 motion spec
+     * Kpt transition vocabulary aligned with the M3 motion spec
      * (https://m3.material.io/styles/motion/transitions/transition-patterns). These are
      * **semantic aliases** of the existing [Enter] / [Exit] providers — same animation specs,
      * but named after the motion pattern they implement rather than the direction of travel.
@@ -247,7 +247,7 @@ object TransitionProviders {
      * `core/designsystem/theme/Motion.kt` down to `core-base/designsystem` (today blocked by
      * dependency direction) and lifting the providers from `val` to `fun(motion: Motion)`.
      */
-    object Mifos {
+    object Kpt {
         object Enter {
             /** Hardcoded aliases — kept for callers that don't have a `Motion` in scope. */
             val sharedAxisForward: EnterTransitionProvider = TransitionProviders.Enter.pushLeft
@@ -263,13 +263,13 @@ object TransitionProviders {
              * non-`@Composable` `enterTransition = ...` lambda.
              */
             fun sharedAxisForward(motion: Motion): EnterTransitionProvider = {
-                MifosSharedAxis.enterForward(motion).takeIf { isSameGraphNavigation }
+                KptSharedAxis.enterForward(motion).takeIf { isSameGraphNavigation }
             }
             fun sharedAxisBack(motion: Motion): EnterTransitionProvider = {
-                MifosSharedAxis.enterBack(motion).takeIf { isSameGraphNavigation }
+                KptSharedAxis.enterBack(motion).takeIf { isSameGraphNavigation }
             }
             fun fadeThrough(motion: Motion): EnterTransitionProvider = {
-                MifosFadeThrough.enter(motion).takeIf { isSameGraphNavigation }
+                KptFadeThrough.enter(motion).takeIf { isSameGraphNavigation }
             }
             fun slideUp(motion: Motion): EnterTransitionProvider = {
                 slideIntoContainer(
@@ -296,13 +296,13 @@ object TransitionProviders {
             val stay: ExitTransitionProvider = TransitionProviders.Exit.stay
 
             fun sharedAxisForward(motion: Motion): ExitTransitionProvider = {
-                MifosSharedAxis.exitForward(motion).takeIf { isSameGraphNavigation }
+                KptSharedAxis.exitForward(motion).takeIf { isSameGraphNavigation }
             }
             fun sharedAxisBack(motion: Motion): ExitTransitionProvider = {
-                MifosSharedAxis.exitBack(motion).takeIf { isSameGraphNavigation }
+                KptSharedAxis.exitBack(motion).takeIf { isSameGraphNavigation }
             }
             fun fadeThrough(motion: Motion): ExitTransitionProvider = {
-                MifosFadeThrough.exit(motion).takeIf { isSameGraphNavigation }
+                KptFadeThrough.exit(motion).takeIf { isSameGraphNavigation }
             }
             fun slideDown(motion: Motion): ExitTransitionProvider = {
                 slideOutOfContainer(
@@ -318,6 +318,17 @@ object TransitionProviders {
             }
         }
     }
+
+    /**
+     * Deprecated alias for [TransitionProviders.Kpt]. Renamed as part of the Money Toolkit pivot
+     * (`Mifos` → `Kpt`, "Kotlin Project Template"). Will be removed in the next release.
+     */
+    @Deprecated(
+        "Renamed to TransitionProviders.Kpt",
+        ReplaceWith("TransitionProviders.Kpt"),
+        level = DeprecationLevel.WARNING,
+    )
+    val Mifos = Kpt
 }
 
 
@@ -349,14 +360,16 @@ object RootTransitionProviders {
          * Slides the new screen in from the left of the screen.
          */
         val pushLeft: NonNullEnterTransitionProvider = {
-            val totalTransitionDurationMs = DEFAULT_PUSH_TRANSITION_TIME_MS
             slideInHorizontally(
-                animationSpec = tween(durationMillis = totalTransitionDurationMs),
+                animationSpec = tween(
+                    durationMillis = TransitionPushSpec.enterSlideDurationMs(),
+                    delayMillis = TransitionPushSpec.enterSlideDelayMs(),
+                ),
                 initialOffsetX = { fullWidth -> fullWidth / 2 },
             ) + fadeIn(
                 animationSpec = tween(
-                    durationMillis = totalTransitionDurationMs / 2,
-                    delayMillis = totalTransitionDurationMs / 2,
+                    durationMillis = TransitionPushSpec.enterFadeDurationMs(),
+                    delayMillis = TransitionPushSpec.enterFadeDelayMs(),
                 ),
             )
         }
@@ -365,14 +378,16 @@ object RootTransitionProviders {
          * Slides the new screen in from the right of the screen.
          */
         val pushRight: NonNullEnterTransitionProvider = {
-            val totalTransitionDurationMs = DEFAULT_PUSH_TRANSITION_TIME_MS
             slideInHorizontally(
-                animationSpec = tween(durationMillis = totalTransitionDurationMs),
+                animationSpec = tween(
+                    durationMillis = TransitionPushSpec.enterSlideDurationMs(),
+                    delayMillis = TransitionPushSpec.enterSlideDelayMs(),
+                ),
                 initialOffsetX = { fullWidth -> -fullWidth / 2 },
             ) + fadeIn(
                 animationSpec = tween(
-                    durationMillis = totalTransitionDurationMs / 2,
-                    delayMillis = totalTransitionDurationMs / 2,
+                    durationMillis = TransitionPushSpec.enterFadeDurationMs(),
+                    delayMillis = TransitionPushSpec.enterFadeDelayMs(),
                 ),
             )
         }
@@ -424,21 +439,17 @@ object RootTransitionProviders {
         /**
          * Slides the current screen out to the left of the screen.
          */
-        @Suppress("MagicNumber")
         val pushLeft: NonNullExitTransitionProvider = {
-            val totalTransitionDurationMs = DEFAULT_PUSH_TRANSITION_TIME_MS
-            val delayMs = totalTransitionDurationMs / 7
-            val slideWithoutDelayMs = totalTransitionDurationMs - delayMs
             slideOutHorizontally(
                 animationSpec = tween(
-                    durationMillis = slideWithoutDelayMs,
-                    delayMillis = delayMs,
+                    durationMillis = TransitionPushSpec.exitSlideDurationMs(),
+                    delayMillis = TransitionPushSpec.exitSlideDelayMs(),
                 ),
                 targetOffsetX = { fullWidth -> -fullWidth / 2 },
             ) + fadeOut(
                 animationSpec = tween(
-                    durationMillis = totalTransitionDurationMs / 2,
-                    delayMillis = delayMs,
+                    durationMillis = TransitionPushSpec.exitFadeDurationMs(),
+                    delayMillis = TransitionPushSpec.exitFadeDelayMs(),
                 ),
             )
         }
@@ -446,21 +457,17 @@ object RootTransitionProviders {
         /**
          * Slides the current screen out to the right of the screen.
          */
-        @Suppress("MagicNumber")
         val pushRight: NonNullExitTransitionProvider = {
-            val totalTransitionDurationMs = DEFAULT_PUSH_TRANSITION_TIME_MS
-            val delayMs = totalTransitionDurationMs / 7
-            val slideWithoutDelayMs = totalTransitionDurationMs - delayMs
             slideOutHorizontally(
                 animationSpec = tween(
-                    durationMillis = slideWithoutDelayMs,
-                    delayMillis = delayMs,
+                    durationMillis = TransitionPushSpec.exitSlideDurationMs(),
+                    delayMillis = TransitionPushSpec.exitSlideDelayMs(),
                 ),
                 targetOffsetX = { fullWidth -> fullWidth / 2 },
             ) + fadeOut(
                 animationSpec = tween(
-                    durationMillis = totalTransitionDurationMs / 2,
-                    delayMillis = delayMs,
+                    durationMillis = TransitionPushSpec.exitFadeDurationMs(),
+                    delayMillis = TransitionPushSpec.exitFadeDelayMs(),
                 ),
             )
         }
@@ -489,9 +496,9 @@ object RootTransitionProviders {
     }
 
     /**
-     * Mifos-branded transition vocabulary for **root [NavHost]** wiring (non-null providers).
+     * Kpt transition vocabulary for **root [NavHost]** wiring (non-null providers).
      *
-     * Companion to [TransitionProviders.Mifos] — same motion patterns, but always non-null since
+     * Companion to [TransitionProviders.Kpt] — same motion patterns, but always non-null since
      * the root [NavHost] requires every transition slot filled.
      *
      *  - [sharedAxisForward] — pushing a new screen onto the stack.
@@ -501,9 +508,9 @@ object RootTransitionProviders {
      *  - [none] — instant, no animation (splash → first authenticated screen handoff).
      *  - [stay] — no-op holding the screen visible while the other side transitions.
      *
-     * See [TransitionProviders.Mifos] for the wider rationale + the theme-token follow-up note.
+     * See [TransitionProviders.Kpt] for the wider rationale + the theme-token follow-up note.
      */
-    object Mifos {
+    object Kpt {
         object Enter {
             /** Hardcoded aliases — kept for callers that don't have a `Motion` in scope. */
             val sharedAxisForward: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.pushLeft
@@ -519,13 +526,13 @@ object RootTransitionProviders {
              * values. Use these whenever theme tokens should drive the transition.
              */
             fun sharedAxisForward(motion: Motion): NonNullEnterTransitionProvider = {
-                MifosSharedAxis.enterForward(motion)
+                KptSharedAxis.enterForward(motion)
             }
             fun sharedAxisBack(motion: Motion): NonNullEnterTransitionProvider = {
-                MifosSharedAxis.enterBack(motion)
+                KptSharedAxis.enterBack(motion)
             }
             fun fadeThrough(motion: Motion): NonNullEnterTransitionProvider = {
-                MifosFadeThrough.enter(motion)
+                KptFadeThrough.enter(motion)
             }
             fun slideUp(motion: Motion): NonNullEnterTransitionProvider = {
                 slideIntoContainer(
@@ -550,13 +557,13 @@ object RootTransitionProviders {
             val stay: NonNullExitTransitionProvider = RootTransitionProviders.Exit.stay
 
             fun sharedAxisForward(motion: Motion): NonNullExitTransitionProvider = {
-                MifosSharedAxis.exitForward(motion)
+                KptSharedAxis.exitForward(motion)
             }
             fun sharedAxisBack(motion: Motion): NonNullExitTransitionProvider = {
-                MifosSharedAxis.exitBack(motion)
+                KptSharedAxis.exitBack(motion)
             }
             fun fadeThrough(motion: Motion): NonNullExitTransitionProvider = {
-                MifosFadeThrough.exit(motion)
+                KptFadeThrough.exit(motion)
             }
             fun slideDown(motion: Motion): NonNullExitTransitionProvider = {
                 slideOutOfContainer(
@@ -572,4 +579,15 @@ object RootTransitionProviders {
             }
         }
     }
+
+    /**
+     * Deprecated alias for [RootTransitionProviders.Kpt]. Renamed as part of the Money Toolkit
+     * pivot (`Mifos` → `Kpt`, "Kotlin Project Template"). Will be removed in the next release.
+     */
+    @Deprecated(
+        "Renamed to RootTransitionProviders.Kpt",
+        ReplaceWith("RootTransitionProviders.Kpt"),
+        level = DeprecationLevel.WARNING,
+    )
+    val Mifos = Kpt
 }

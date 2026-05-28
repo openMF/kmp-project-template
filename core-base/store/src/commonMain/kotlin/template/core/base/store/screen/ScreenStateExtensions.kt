@@ -14,6 +14,7 @@ import kotlin.time.Instant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import template.core.base.store.submit.SubmitHandler
@@ -248,6 +249,52 @@ fun <A, B, C, D, E, R> combineScreenStates(
             (sd as ScreenState.Content<D>).data,
             (se as ScreenState.Content<E>).data,
         )
+    }
+}
+
+/**
+ * Combines N independent [ScreenState] flows (vararg form). The resulting [ScreenState.Content]
+ * holds a `List<Any?>` of the per-source `Content.data` values in input order.
+ *
+ * Priority rules + freshness aggregation are identical to the typed 2-5 arity overloads.
+ *
+ * Use this when the source count is large enough (or dynamic) to make a typed overload
+ * impractical. Most dashboards stay below 5 sources and should prefer the typed overloads
+ * for better compile-time safety on the transform lambda.
+ *
+ * ```kotlin
+ * val combined: Flow<ScreenState<List<Any?>>> = combineScreenStates(
+ *     accountStream, transactionStream, ratesStream, billsStream, loansStream, alertsStream,
+ * )
+ * ```
+ */
+@OptIn(ExperimentalTime::class)
+fun combineScreenStates(
+    vararg flows: Flow<ScreenState<*>>,
+): Flow<ScreenState<List<Any?>>> = combineScreenStates(flows.toList())
+
+/**
+ * Combines N independent [ScreenState] flows (list form). Mirror of the vararg overload —
+ * convenient when callers already have a `List<Flow<ScreenState<*>>>` (e.g. a dynamic
+ * collection built per-screen).
+ *
+ * An empty input list emits a single `ScreenState.Content(emptyList(), DataFreshness.FRESH)`
+ * — a degenerate but well-defined result that lets `combineScreenStates(emptyList())` plug
+ * into existing pipelines without special-casing.
+ */
+@OptIn(ExperimentalTime::class)
+fun combineScreenStates(
+    flows: List<Flow<ScreenState<*>>>,
+): Flow<ScreenState<List<Any?>>> {
+    if (flows.isEmpty()) {
+        return flowOf(ScreenState.Content(emptyList(), DataFreshness.FRESH))
+    }
+    return combine(flows) { statesArray ->
+        val states = statesArray.toList()
+        @Suppress("UNCHECKED_CAST")
+        resolveScreenStates(states) {
+            states.map { (it as ScreenState.Content<Any?>).data }
+        }
     }
 }
 

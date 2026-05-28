@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
 import org.mifos.feature.rates.ui.InterestRateDetailScreen
 import org.mifos.feature.rates.ui.InterestRatesScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 /** Parent graph route for the B7 Interest Rate Tracker. */
 @Serializable
@@ -52,7 +53,7 @@ fun NavGraphBuilder.ratesGraph(navController: NavController) {
     navigation<RatesGraphRoute>(startDestination = RatesListRoute) {
         composableWithPushTransitions<RatesListRoute> {
             InterestRatesScreen(
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
                 onSeriesClick = { seriesId ->
                     navController.navigateToRateDetail(seriesId = seriesId)
                 },
@@ -62,7 +63,7 @@ fun NavGraphBuilder.ratesGraph(navController: NavController) {
             val route = backStackEntry.toRoute<RateDetailRoute>()
             InterestRateDetailScreen(
                 seriesId = route.seriesId,
-                onBackClick = navController::popBackStack,
+                onBackClick = { navController.popBackStackSafely() },
             )
         }
     }

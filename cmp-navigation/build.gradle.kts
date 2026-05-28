@@ -39,6 +39,7 @@ kotlin {
             implementation(projects.feature.rates)
             implementation(projects.feature.calculators)
             implementation(projects.feature.macro)
+            implementation(projects.feature.showcase)
             // Archived 2026-05-24 (Money Toolkit pivot) — restore by uncommenting + re-wiring per
             // feature/_archive/{module}/README.md:
             //   implementation(projects.feature.archive.crypto)

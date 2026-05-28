@@ -9,6 +9,10 @@
  */
 package template.core.base.store.infra
 
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.mobilenativefoundation.store.core5.ExperimentalStoreApi
 import org.mobilenativefoundation.store.store5.MemoryPolicy
 import org.mobilenativefoundation.store.store5.Bookkeeper
@@ -20,6 +24,11 @@ import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreBuilder
 import org.mobilenativefoundation.store.store5.Updater
 import org.mobilenativefoundation.store.store5.Validator
+import template.core.base.store.combine.ScreenWithMutationStream
+import template.core.base.store.combine.internal.ScreenWithMutationStreamImpl
+import template.core.base.store.screen.FetchPolicy
+import template.core.base.store.screen.asScreenStream
+import template.core.base.store.submit.SubmitHandler
 
 /**
  * Factory for creating [Store] and [MutableStore] instances with sensible defaults.
@@ -113,6 +122,14 @@ object StoreFactory {
      * @param updater Writes data back to the server (e.g., POST/PUT API call).
      * @param bookkeeper Tracks unsynced local changes for retry on reconnection.
      * @param validator Optional cache validity check.
+     * @param conflictStrategy Optional reconciliation policy for server/client divergence.
+     *   **Currently informational — Store5's [Updater] does not automatically consume a
+     *   `ConflictStrategy<O>`.** Forks should apply conflict resolution inside their own
+     *   `Updater` block by calling `conflictStrategy.resolve(server, client)` and writing
+     *   back the resolved value. The parameter is exposed here so the strategy choice is
+     *   visible at Store-construction time (discovery + audit), and so a future
+     *   wiring-in-place upgrade is non-breaking — forks already declaring the parameter
+     *   pick up auto-wiring without an API change. Defaults to `null` (no policy declared).
      * @return A configured [MutableStore] ready for reads and writes.
      */
     @OptIn(ExperimentalStoreApi::class)
@@ -123,6 +140,8 @@ object StoreFactory {
         updater: Updater<Key, Output, *>,
         bookkeeper: Bookkeeper<Key>,
         validator: Validator<Output>? = null,
+        @Suppress("UNUSED_PARAMETER")
+        conflictStrategy: ConflictStrategy<Output>? = null,
     ): MutableStore<Key, Output> {
         var builder = StoreBuilder.from(
             fetcher = fetcher,
@@ -138,5 +157,74 @@ object StoreFactory {
                 updater = updater,
                 bookkeeper = bookkeeper,
             )
+    }
+
+    /**
+     * Creates a [ScreenWithMutationStream] — a fused read + write + sync seam for
+     * screens that both display data and submit mutations against the same domain object
+     * (edit forms, settings panels, in-place record updates).
+     *
+     * Wires the read pipeline ([Store.asScreenStream]) and the write pipeline
+     * ([SubmitHandler]) into a single hot state flow ([ScreenWithMutationStream.state])
+     * so the consuming ViewModel exposes one `StateFlow<CombinedState<R, W>>` instead
+     * of three separate flows.
+     *
+     * **Outbox / sync wiring (optional):** pass [pendingCountFlow] to surface a
+     * "X pending" badge, and [syncingFlow] to surface a "Syncing..." indicator
+     * (typically wired to `outbox.observeAllByFormKey(formKey).map { it.size }` and
+     * the offline syncer's status flow respectively). Both default to constant flows
+     * so screens that don't need the outbox indicator get a clean
+     * `outboxPending = 0, isSyncing = false`.
+     *
+     * @param Key Store key type.
+     * @param R Read-side domain payload type.
+     * @param W Write-side payload type submitted by the screen.
+     * @param store the read-side Store.
+     * @param key Store key to stream data for.
+     * @param networkMonitor cmp-network-monitor's NetworkMonitor (injected via Koin).
+     * @param fetchedAtRepository Persists last-network-fetch timestamps; required for
+     *   the read pipeline's freshness banner.
+     * @param cacheKey Identifies this Store in the [fetchedAtRepository].
+     * @param submitHandler Caller-provided write handler typed at [W]. Created via
+     *   `viewModelScope.submitHandler<W>()` at the call site.
+     * @param submitBlock The actual API call. Receives the payload [W] and returns
+     *   the saved/updated payload (typically the same value passed in) on success.
+     *   Throwing transitions [submitHandler] to `Failed`.
+     * @param scope CoroutineScope (typically `viewModelScope`).
+     * @param fetchPolicy Read-side fetch policy. Defaults to
+     *   [FetchPolicy.CACHE_THEN_NETWORK].
+     * @param pendingCountFlow Optional outbox-pending-count flow; default `flowOf(0)`.
+     * @param syncingFlow Optional background-sync indicator flow; default `flowOf(false)`.
+     */
+    fun <Key : Any, R : Any, W : Any> createScreenWithMutation(
+        store: Store<Key, R>,
+        key: Key,
+        networkMonitor: NetworkMonitor,
+        fetchedAtRepository: FetchedAtRepository,
+        cacheKey: String,
+        submitHandler: SubmitHandler<W>,
+        submitBlock: suspend (W) -> W,
+        scope: CoroutineScope,
+        fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+        pendingCountFlow: Flow<Int> = flowOf(0),
+        syncingFlow: Flow<Boolean> = flowOf(false),
+    ): ScreenWithMutationStream<R, W> {
+        val readStream = store.asScreenStream(
+            key = key,
+            networkMonitor = networkMonitor,
+            fetchedAtRepository = fetchedAtRepository,
+            cacheKey = cacheKey,
+            scope = scope,
+            fetchPolicy = fetchPolicy,
+        )
+        return ScreenWithMutationStreamImpl(
+            readStream = readStream.state,
+            submitHandler = submitHandler,
+            submitBlock = submitBlock,
+            pendingCountFlow = pendingCountFlow,
+            syncingFlow = syncingFlow,
+            scope = scope,
+            onRefresh = { readStream.refresh() },
+        )
     }
 }

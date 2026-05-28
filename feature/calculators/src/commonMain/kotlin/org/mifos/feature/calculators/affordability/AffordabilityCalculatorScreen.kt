@@ -38,9 +38,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatGrouped
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.AppCard
-import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.theme.spacing
+import template.core.base.designsystem.component.AppCard
+import template.core.base.designsystem.component.HeroCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

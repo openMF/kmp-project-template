@@ -18,7 +18,7 @@ import template.core.base.database.AppDatabaseFactory
 
 actual val platformModule: Module = module {
     single {
-        AppDatabaseFactory()
+        AppDatabaseFactory(databaseDirName = "MifosDatabase")
             .createDatabase<AppDatabase>(
                 databaseName = AppDatabase.DATABASE_NAME,
             )

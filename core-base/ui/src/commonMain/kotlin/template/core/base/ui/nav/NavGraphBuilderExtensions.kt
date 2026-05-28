@@ -20,6 +20,7 @@ import kotlin.jvm.JvmSuppressWildcards
 import kotlin.reflect.KType
 import template.core.base.designsystem.theme.Motion
 import template.core.base.designsystem.theme.MotionSnapshot
+import template.core.base.ui.util.RootTransitionProviders
 import template.core.base.ui.util.TransitionProviders
 
 /**
@@ -49,10 +50,10 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithSlideTransitions(
     this.composable<T>(
         typeMap = typeMap,
         deepLinks = deepLinks,
-        enterTransition = TransitionProviders.Mifos.Enter.slideUp(motion),
-        exitTransition = TransitionProviders.Mifos.Exit.stay(motion),
-        popEnterTransition = TransitionProviders.Mifos.Enter.stay(motion),
-        popExitTransition = TransitionProviders.Mifos.Exit.slideDown(motion),
+        enterTransition = RootTransitionProviders.Kpt.Enter.slideUp(motion),
+        exitTransition = RootTransitionProviders.Kpt.Exit.stay(motion),
+        popEnterTransition = RootTransitionProviders.Kpt.Enter.stay(motion),
+        popExitTransition = RootTransitionProviders.Kpt.Exit.slideDown(motion),
         sizeTransform = null,
         content = content,
     )
@@ -83,10 +84,14 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithStayTransitions(
     this.composable<T>(
         typeMap = typeMap,
         deepLinks = deepLinks,
-        enterTransition = TransitionProviders.Mifos.Enter.stay(motion),
-        exitTransition = TransitionProviders.Mifos.Exit.stay(motion),
-        popEnterTransition = TransitionProviders.Mifos.Enter.stay(motion),
-        popExitTransition = TransitionProviders.Mifos.Exit.stay(motion),
+        // RootTransitionProviders (non-null) so the navbar container always holds at 0.99α
+        // when a feature graph slides in over it — cross-graph isSameGraphNavigation guard
+        // in TransitionProviders.Kpt returns null here, making the outer NavHost's
+        // fade-through fire instead of stay.
+        enterTransition = RootTransitionProviders.Kpt.Enter.stay(motion),
+        exitTransition = RootTransitionProviders.Kpt.Exit.stay(motion),
+        popEnterTransition = RootTransitionProviders.Kpt.Enter.stay(motion),
+        popExitTransition = RootTransitionProviders.Kpt.Exit.stay(motion),
         sizeTransform = null,
         content = content,
     )
@@ -121,10 +126,15 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithPushTransitions(
     this.composable<T>(
         typeMap = typeMap,
         deepLinks = deepLinks,
-        enterTransition = TransitionProviders.Mifos.Enter.sharedAxisForward(motion),
-        exitTransition = TransitionProviders.Exit.stay,
-        popEnterTransition = TransitionProviders.Enter.stay,
-        popExitTransition = TransitionProviders.Mifos.Exit.sharedAxisBack(motion),
+        // All four slots use RootTransitionProviders (non-null) so push animations always
+        // apply regardless of graph depth. TransitionProviders.Kpt returns null for
+        // cross-graph navigation (isSameGraphNavigation guard), which makes the outer
+        // NavHost's fade-through default fire instead of the intended slide — producing the
+        // "blink" on any feature whose nav is wrapped in a nested navigation<XxxGraphRoute>.
+        enterTransition = RootTransitionProviders.Kpt.Enter.sharedAxisForward(motion),
+        exitTransition = RootTransitionProviders.Kpt.Exit.stay(motion),
+        popEnterTransition = RootTransitionProviders.Kpt.Enter.stay(motion),
+        popExitTransition = RootTransitionProviders.Kpt.Exit.sharedAxisBack(motion),
         sizeTransform = null,
         content = content,
     )
@@ -151,10 +161,10 @@ inline fun <reified T : Any> NavGraphBuilder.composableWithRootPushTransitions(
     this.composable<T>(
         typeMap = typeMap,
         deepLinks = deepLinks,
-        enterTransition = TransitionProviders.Enter.stay,
-        exitTransition = TransitionProviders.Mifos.Exit.sharedAxisForward(motion),
-        popEnterTransition = TransitionProviders.Mifos.Enter.sharedAxisBack(motion),
-        popExitTransition = TransitionProviders.Exit.fadeOut,
+        enterTransition = RootTransitionProviders.Kpt.Enter.stay(motion),
+        exitTransition = RootTransitionProviders.Kpt.Exit.sharedAxisForward(motion),
+        popEnterTransition = RootTransitionProviders.Kpt.Enter.sharedAxisBack(motion),
+        popExitTransition = RootTransitionProviders.Kpt.Exit.fadeThrough(motion),
         sizeTransform = null,
         content = content,
     )

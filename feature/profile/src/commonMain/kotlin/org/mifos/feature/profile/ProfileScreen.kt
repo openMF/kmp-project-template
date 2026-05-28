@@ -22,10 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.mifos.core.designsystem.component.HeroCard
 import org.mifos.core.designsystem.icon.AppIcons
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.ui.scaffold.KptScaffold
+import template.core.base.designsystem.component.HeroCard
 
 @Composable
 internal fun ProfileScreen(modifier: Modifier = Modifier) {

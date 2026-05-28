@@ -17,6 +17,7 @@ import kotlinx.serialization.Serializable
 import org.mifos.feature.currencyrates.ui.CurrencyRatesScreen
 import org.mifos.feature.currencyrates.ui.RateHistoryScreen
 import template.core.base.ui.nav.composableWithPushTransitions
+import template.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 data object CurrencyRatesGraphRoute
@@ -34,11 +35,11 @@ fun NavController.navigateToCurrencyRates(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.currencyRatesGraph(navController: NavController) {
     navigation<CurrencyRatesGraphRoute>(startDestination = CurrencyRatesRoute) {
         composableWithPushTransitions<CurrencyRatesRoute> {
-            CurrencyRatesScreen(onBackClick = navController::popBackStack)
+            CurrencyRatesScreen(onBackClick = { navController.popBackStackSafely() })
         }
 
         composableWithPushTransitions<RateHistoryRoute> {
-            RateHistoryScreen(onBackClick = navController::popBackStack)
+            RateHistoryScreen(onBackClick = { navController.popBackStackSafely() })
         }
     }
 }

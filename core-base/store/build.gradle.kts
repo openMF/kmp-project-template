@@ -24,6 +24,7 @@ kotlin {
             api(libs.koin.core)
             implementation(libs.kotlinx.coroutines.core)
             implementation(project(":core-base:common"))
+            implementation(project(":core-base:observability"))
         }
 
         commonTest.dependencies {

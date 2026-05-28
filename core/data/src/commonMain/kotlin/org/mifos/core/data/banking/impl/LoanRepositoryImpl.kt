@@ -10,42 +10,48 @@
 package org.mifos.core.data.banking.impl
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import org.mifos.core.data.banking.LoanRepository
 import org.mifos.core.database.banking.dao.LoanDao
 import org.mifos.core.database.banking.entity.LoanEntity
 import org.mifos.core.model.banking.Loan
+import org.mobilenativefoundation.store.store5.Store
+import org.mobilenativefoundation.store.store5.StoreReadRequest
+import org.mobilenativefoundation.store.store5.StoreResponse
 
 internal class LoanRepositoryImpl(
-    private val dao: LoanDao,
+    private val loansStore: Store<Unit, List<LoanEntity>>,
+    private val loanDao: LoanDao,
 ) : LoanRepository {
 
-    override fun observeAll(): Flow<List<Loan>> = dao.observeAll().map { rows ->
-        rows.map { it.toDomain() }
-    }
+    override fun observeAll(): Flow<List<Loan>> =
+        loansStore.stream(StoreReadRequest.cached(Unit, refresh = false))
+            .filterIsInstance<StoreResponse.Data<List<LoanEntity>>>()
+            .map { response -> response.value.map { it.toDomain() } }
 
     override fun observeById(id: String): Flow<Loan?> =
-        dao.observeById(id).map { it?.toDomain() }
+        loanDao.observeById(id).map { it?.toDomain() }
 
-    override suspend fun getById(id: String): Loan? = dao.getById(id)?.toDomain()
+    override suspend fun getById(id: String): Loan? = loanDao.getById(id)?.toDomain()
 
     override suspend fun upsert(loan: Loan) {
-        dao.upsert(loan.toEntity())
+        loanDao.upsert(loan.toEntity())
     }
 
     override suspend fun delete(id: String) {
-        dao.deleteById(id)
+        loanDao.deleteById(id)
     }
 
-    override fun observeTotalMonthlyEmi(): Flow<Double> = dao.observeAll().map { rows ->
+    override fun observeTotalMonthlyEmi(): Flow<Double> = loanDao.observeAll().map { rows ->
         rows.sumOf { it.monthlyPayment }
     }
 
-    override fun observeTotalPrincipalRemaining(): Flow<Double> = dao.observeAll().map { rows ->
+    override fun observeTotalPrincipalRemaining(): Flow<Double> = loanDao.observeAll().map { rows ->
         rows.sumOf { it.principalRemaining }
     }
 
-    override fun observeCount(): Flow<Int> = dao.count()
+    override fun observeCount(): Flow<Int> = loanDao.count()
 }
 
 private fun LoanEntity.toDomain(): Loan = Loan(

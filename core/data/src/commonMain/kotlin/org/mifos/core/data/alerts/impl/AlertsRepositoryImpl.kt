@@ -10,17 +10,69 @@
 package org.mifos.core.data.alerts.impl
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import org.mifos.core.data.alerts.AlertsRepository
+import org.mifos.core.database.alerts.AlertDao
+import org.mifos.core.database.alerts.AlertEntity
+import org.mifos.core.model.alerts.AlertDirection
 import org.mifos.core.model.alerts.PriceAlert
-import org.mifos.core.network.alerts.api.AlertsApi
+import org.mobilenativefoundation.store.store5.Store
+import org.mobilenativefoundation.store.store5.StoreReadRequest
+import org.mobilenativefoundation.store.store5.StoreResponse
 
 internal class AlertsRepositoryImpl(
-    private val api: AlertsApi,
+    private val alertsStore: Store<Unit, List<AlertEntity>>,
+    private val alertDao: AlertDao,
 ) : AlertsRepository {
 
-    override fun alertsStream(): Flow<List<PriceAlert>> = api.observe()
+    override fun alertsStream(): Flow<List<PriceAlert>> =
+        alertsStore.stream(StoreReadRequest.cached(Unit, refresh = false))
+            .filterIsInstance<StoreResponse.Data<List<AlertEntity>>>()
+            .map { response -> response.value.map { it.toPriceAlert() } }
 
-    override suspend fun submitAlert(alert: PriceAlert): PriceAlert = api.create(alert)
+    override suspend fun submitAlert(alert: PriceAlert): PriceAlert {
+        alertDao.upsert(alert.toAlertEntity())
+        return alert
+    }
 
-    override suspend fun deleteAlert(id: String) = api.delete(id)
+    override suspend fun deleteAlert(id: String) {
+        alertDao.deleteById(id)
+    }
 }
+
+/**
+ * Maps a persisted [AlertEntity] to the domain [PriceAlert].
+ *
+ * Field-level mapping:
+ * - [AlertEntity.symbol] → [PriceAlert.coinId] (both identify the watched instrument)
+ * - [AlertEntity.conditionAbove] → [PriceAlert.direction] (true → ABOVE, false → BELOW)
+ * - [AlertEntity.targetPrice] → [PriceAlert.targetValue]
+ * - [AlertEntity.createdAt] → [PriceAlert.createdAtMs]
+ * - [PriceAlert.enabled] defaults to `true` (AlertEntity has no enabled field)
+ */
+private fun AlertEntity.toPriceAlert(): PriceAlert = PriceAlert(
+    id = id,
+    coinId = symbol,
+    direction = if (conditionAbove) AlertDirection.ABOVE else AlertDirection.BELOW,
+    targetValue = targetPrice,
+    enabled = true,
+    createdAtMs = createdAt,
+)
+
+/**
+ * Maps a domain [PriceAlert] to a persistable [AlertEntity].
+ *
+ * Field-level mapping:
+ * - [PriceAlert.coinId] → [AlertEntity.symbol]
+ * - [PriceAlert.direction] → [AlertEntity.conditionAbove] (ABOVE → true, BELOW/PCT_CHANGE → false)
+ * - [PriceAlert.targetValue] → [AlertEntity.targetPrice]
+ * - [PriceAlert.createdAtMs] → [AlertEntity.createdAt]
+ */
+private fun PriceAlert.toAlertEntity(): AlertEntity = AlertEntity(
+    id = id,
+    symbol = coinId,
+    conditionAbove = direction == AlertDirection.ABOVE,
+    targetPrice = targetValue,
+    createdAt = createdAtMs,
+)

@@ -37,22 +37,31 @@ class AppDatabaseTest {
     }
 
     @Test
-    fun databaseExposeSampleDao() {
+    fun databaseExposeAlertDao() {
         database = Room.inMemoryDatabaseBuilder<AppDatabase>()
             .setDriver(BundledSQLiteDriver())
             .setQueryCoroutineContext(Dispatchers.IO)
             .build()
 
-        assertNotNull(database!!.sampleDao)
+        assertNotNull(database!!.alertDao)
+    }
+
+    @Test
+    fun databaseExposeInterestRateSeriesDao() {
+        database = Room.inMemoryDatabaseBuilder<AppDatabase>()
+            .setDriver(BundledSQLiteDriver())
+            .setQueryCoroutineContext(Dispatchers.IO)
+            .build()
+
+        assertNotNull(database!!.interestRateSeriesDao)
     }
 
     @Test
     fun databaseVersionIsCurrent() {
-        // Bumped to 8 in the v7→v8 migration that added the banking domain
-        // tables (`banking_loans`, `banking_bill_reminders`). Update this
-        // constant when bumping AppDatabase.VERSION so the guardrail stays
-        // meaningful.
-        assertEquals(8, AppDatabase.VERSION)
+        // Bumped to 10 in the v9→v10 migration that added `interest_rate_series`.
+        // Update this constant when bumping AppDatabase.VERSION so the guardrail
+        // stays meaningful.
+        assertEquals(10, AppDatabase.VERSION)
     }
 
     @Test

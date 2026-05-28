@@ -111,7 +111,7 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         loansGraph(navController) // B1 — multi-formKey draft showcase
         billsGraph(navController) // B4 — multi-formKey + platform notification scheduler
         calculatorsGraph(navController) // B2/B3/B5/B6 — affordability + amortization + comparison + wizard
-        ratesGraph(navController) // B7 — CACHE_THEN_NETWORK rate tracker
+        ratesGraph(navController) // B7 — NETWORK_WITH_CACHE rate tracker
         macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
 
         // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).

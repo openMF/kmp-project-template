@@ -44,7 +44,7 @@ actual fun LocalManagerProvider(
     val activity = context.activity as Activity
     CompositionLocalProvider(
         LocalAppReviewManager provides AppReviewManagerImpl(activity),
-        LocalIntentManager provides IntentManagerImpl(activity),
+        LocalIntentManager provides IntentManagerImpl(),
         LocalAppUpdateManager provides AppUpdateManagerImpl(activity),
     ) {
         content()

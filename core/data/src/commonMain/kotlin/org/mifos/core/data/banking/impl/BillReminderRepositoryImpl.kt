@@ -10,6 +10,7 @@
 package org.mifos.core.data.banking.impl
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalDate
@@ -19,6 +20,9 @@ import org.mifos.core.data.banking.BillReminderRepository
 import org.mifos.core.database.banking.dao.BillReminderDao
 import org.mifos.core.database.banking.entity.BillReminderEntity
 import org.mifos.core.model.banking.BillReminder
+import org.mobilenativefoundation.store.store5.Store
+import org.mobilenativefoundation.store.store5.StoreReadRequest
+import org.mobilenativefoundation.store.store5.StoreResponse
 import kotlin.time.Clock
 
 /**
@@ -27,43 +31,49 @@ import kotlin.time.Clock
  * The "upcoming" window math (today + N days → set of day-of-month integers)
  * runs in the repository so the DAO stays trivial and portable across SQLite
  * engines. [Clock] + [TimeZone] are injected so tests can fix "today".
+ *
+ * [observeAll] delegates to [billRemindersStore] so any write through the Store's
+ * SourceOfTruth is reflected here reactively. All other reads and all writes go
+ * directly to [billReminderDao] (filtered reads, per-id lookup, upsert, delete).
  */
 internal class BillReminderRepositoryImpl(
-    private val dao: BillReminderDao,
+    private val billRemindersStore: Store<Unit, List<BillReminderEntity>>,
+    private val billReminderDao: BillReminderDao,
     private val clock: Clock = Clock.System,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BillReminderRepository {
 
-    override fun observeAll(): Flow<List<BillReminder>> = dao.observeAll().map { rows ->
-        rows.map { it.toDomain() }
-    }
+    override fun observeAll(): Flow<List<BillReminder>> =
+        billRemindersStore.stream(StoreReadRequest.cached(Unit, refresh = false))
+            .filterIsInstance<StoreResponse.Data<List<BillReminderEntity>>>()
+            .map { response -> response.value.map { it.toDomain() } }
 
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> {
         val window = upcomingDayWindow(maxDays)
         if (window.isEmpty()) return flowOf(emptyList())
-        return dao.observeUpcoming(window).map { rows -> rows.map { it.toDomain() } }
+        return billReminderDao.observeUpcoming(window).map { rows -> rows.map { it.toDomain() } }
     }
 
     override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> {
         val window = upcomingDayWindow(maxDays)
         if (window.isEmpty()) return flowOf(0.0)
-        return dao.observeUpcoming(window).map { rows -> rows.sumOf { it.amount } }
+        return billReminderDao.observeUpcoming(window).map { rows -> rows.sumOf { it.amount } }
     }
 
     override fun observeById(id: String): Flow<BillReminder?> =
-        dao.observeById(id).map { it?.toDomain() }
+        billReminderDao.observeById(id).map { it?.toDomain() }
 
-    override suspend fun getById(id: String): BillReminder? = dao.getById(id)?.toDomain()
+    override suspend fun getById(id: String): BillReminder? = billReminderDao.getById(id)?.toDomain()
 
     override suspend fun upsert(bill: BillReminder) {
-        dao.upsert(bill.toEntity())
+        billReminderDao.upsert(bill.toEntity())
     }
 
     override suspend fun delete(id: String) {
-        dao.deleteById(id)
+        billReminderDao.deleteById(id)
     }
 
-    override fun observeCount(): Flow<Int> = dao.count()
+    override fun observeCount(): Flow<Int> = billReminderDao.count()
 
     /**
      * Returns the set of day-of-month integers covered by `[today, today + maxDays]`,

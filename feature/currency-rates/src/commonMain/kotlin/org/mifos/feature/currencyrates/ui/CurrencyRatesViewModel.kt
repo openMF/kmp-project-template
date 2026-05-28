@@ -10,17 +10,41 @@
 package org.mifos.feature.currencyrates.ui
 
 import androidx.lifecycle.viewModelScope
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.mifos.core.data.currency.CurrencyRepository
+import org.mifos.core.model.currency.ExchangeRates
+import org.mobilenativefoundation.store.store5.Store
+import template.core.base.store.infra.FetchedAtRepository
+import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.screen.ScreenState
+import template.core.base.store.screen.asScreenStream
 import template.core.base.store.screen.combineContent
 import template.core.base.store.screen.emptyIfContent
 import template.core.base.ui.viewmodel.BaseViewModel
 
+/**
+ * **Archetype showcase: CACHE_ONLY + NETWORK_ONLY**
+ *
+ * In addition to the regular exchange-rates stream (NETWORK_WITH_CACHE default),
+ * this ViewModel demonstrates policy routing based on network status:
+ * - Online  → [FetchPolicy.NETWORK_ONLY]  (always-fresh spot rate, no stale cache)
+ * - Offline → [FetchPolicy.CACHE_ONLY]    (read cached value, never call API)
+ *
+ * The [spotConversionRate] property is the canonical reference implementation for
+ * this archetype pattern. See [AppStoreRegistry.SpotRate] for the store registration.
+ */
 class CurrencyRatesViewModel(
     currencyRepository: CurrencyRepository,
+    private val networkMonitor: NetworkMonitor,
+    private val fetchedAtRepository: FetchedAtRepository,
+    private val spotRateStore: Store<String, ExchangeRates>,
 ) : BaseViewModel<RatesLocalState, Nothing, RatesAction>(RatesLocalState()) {
 
     private val stream = currencyRepository.exchangeRatesStream(
@@ -40,6 +64,39 @@ class CurrencyRatesViewModel(
         }
         .emptyIfContent { it.rates.isEmpty() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
+
+    /**
+     * **Archetype: CACHE_ONLY + NETWORK_ONLY**
+     *
+     * Spot conversion rate for the currently-selected currency pair (defaults to
+     * "USD"). Policy is chosen based on live network connectivity:
+     * - Online  → [FetchPolicy.NETWORK_ONLY]:  skip cache, always fetch fresh rate.
+     * - Offline → [FetchPolicy.CACHE_ONLY]:    read from cache, never call the API
+     *   (avoids an error-state flicker when the user is known to be offline).
+     *
+     * The stream is rebuilt via [flatMapLatest] whenever connectivity flips so the
+     * displayed rate immediately reflects the right freshness contract.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val spotConversionRate: StateFlow<ScreenState<ExchangeRates>> =
+        networkMonitor.networkStatus
+            .map { status -> status is NetworkStatus.Available }
+            .flatMapLatest { isOnline ->
+                val policy = if (isOnline) FetchPolicy.NETWORK_ONLY else FetchPolicy.CACHE_ONLY
+                spotRateStore.asScreenStream(
+                    key = "USD",
+                    networkMonitor = networkMonitor,
+                    fetchedAtRepository = fetchedAtRepository,
+                    cacheKey = "currency:spotRate:USD",
+                    scope = viewModelScope,
+                    fetchPolicy = policy,
+                ).state
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = ScreenState.Loading,
+            )
 
     fun onRetry() {
         trySendAction(RatesAction.Retry)

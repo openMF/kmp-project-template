@@ -32,12 +32,12 @@ import kotlin.test.assertTrue
  *   `FetchPolicy` is not an input there because the engine only reacts to what the Store
  *   pipeline emits. Policy selection happens one layer up in
  *   [template.core.base.store.screen.streamDataForPolicy].
- * - [ScreenDataStreamIntegrationTest] covers the default `CACHE_THEN_NETWORK` happy path
+ * - [ScreenDataStreamIntegrationTest] covers the default `NETWORK_WITH_CACHE` happy path
  *   plus a `CACHE_ONLY` smoke test (T3).
  *
  * This file covers the **gaps** that production features depend on:
  * - Stocks Tracker / Gas Tracker → `NETWORK_ONLY` (no stale prices ever)
- * - Bill Reminders fallback → `CACHE_THEN_NETWORK` offline (must serve cached without crash)
+ * - Bill Reminders fallback → `NETWORK_WITH_CACHE` offline (must serve cached without crash)
  * - Crypto Glossary → `CACHE_ONLY` empty path (graceful when never primed)
  *
  * Each test corresponds to a row of the decision table documented in
@@ -111,11 +111,11 @@ class FetchPolicyEnforcementTest {
         }
     }
 
-    // ─── CACHE_THEN_NETWORK fallback ─────────────────────────────────────────
+    // ─── NETWORK_WITH_CACHE fallback ──────────────────────────────────────────
 
     @Test
-    fun cacheThenNetwork_empty_cache_offline_emits_NoNetwork() = runTest {
-        // Negative case: CACHE_THEN_NETWORK should NOT spin forever when offline +
+    fun networkWithCache_empty_cache_offline_emits_NoNetwork() = runTest {
+        // Negative case: NETWORK_WITH_CACHE should NOT spin forever when offline +
         // empty cache. DecisionEngine should route to NoNetwork promptly.
         val store = StoreBuilder
             .from<String, String>(
@@ -126,12 +126,12 @@ class FetchPolicyEnforcementTest {
             .build()
 
         val stream = store.asScreenStream(
-            key = "ctn-empty-offline",
+            key = "nwc-empty-offline",
             networkMonitor = FakeNetworkMonitor(offline),
             fetchedAtRepository = FakeFetchedAtRepository(),
-            cacheKey = "test:ctn-empty-offline",
+            cacheKey = "test:nwc-empty-offline",
             scope = backgroundScope,
-            fetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+            fetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
         )
 
         stream.state.test {
@@ -143,7 +143,7 @@ class FetchPolicyEnforcementTest {
     }
 
     @Test
-    fun cacheThenNetwork_cached_offline_emits_Content_STALE() = runTest {
+    fun networkWithCache_cached_offline_emits_Content_STALE() = runTest {
         // After priming the cache, going offline should still show content with STALE
         // freshness — the user sees their last-known data with a clear staleness banner.
         var fetchCount = 0
@@ -157,19 +157,19 @@ class FetchPolicyEnforcementTest {
             .build()
 
         // Prime the in-memory cache while online.
-        store.streamData("ctn-cached-offline").test {
+        store.streamData("nwc-cached-offline").test {
             awaitItem()
             cancelAndIgnoreRemainingEvents()
         }
 
         // Switch to offline and read via asScreenStream.
         val stream = store.asScreenStream(
-            key = "ctn-cached-offline",
+            key = "nwc-cached-offline",
             networkMonitor = FakeNetworkMonitor(offline),
             fetchedAtRepository = FakeFetchedAtRepository(),
-            cacheKey = "test:ctn-cached-offline",
+            cacheKey = "test:nwc-cached-offline",
             scope = backgroundScope,
-            fetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+            fetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
         )
 
         stream.state.test {
@@ -182,7 +182,7 @@ class FetchPolicyEnforcementTest {
             val acceptable = state is ScreenState.Content<String> || state is ScreenState.NoNetwork
             assertTrue(
                 acceptable,
-                "CACHE_THEN_NETWORK offline+cached must emit Content or NoNetwork; got $state",
+                "NETWORK_WITH_CACHE offline+cached must emit Content or NoNetwork; got $state",
             )
             if (state is ScreenState.Content<*>) {
                 assertTrue(

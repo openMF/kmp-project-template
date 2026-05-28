@@ -38,7 +38,7 @@ Default 300ms reconnect debounce works for most apps. Override per stream via
 ```kotlin
 store.asScreenStream(
     key = "rates",
-    fetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+    fetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
     reconnectDebounceMs = 1_000L,     // long window for slow networks
     userRefreshDebounceMs = 500L,     // tighter user-tap window
     scope = viewModelScope,

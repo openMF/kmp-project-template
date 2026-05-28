@@ -10,72 +10,70 @@
 package template.core.base.platform.intent
 
 import androidx.compose.ui.graphics.ImageBitmap
+import com.mobilebytelabs.kmptoolkit.intentlauncher.ExperimentalIntentLauncherApi
+import com.mobilebytelabs.kmptoolkit.intentlauncher.IntentResult
 import template.core.base.platform.model.MimeType
 
 /**
- * Manages platform-specific intent operations and content sharing functionality.
- * This interface abstracts platform differences for various system interactions
- * such as launching activities, sharing content, and handling system intents.
+ * Platform-neutral surface for share + system-intent operations.
+ *
+ * Backed by KmpToolkit's `cmp-share` (share sheets) + `cmp-intent-launcher` (system
+ * intents) so the implementation lives entirely in `commonMain` — Android no longer
+ * needs its own actual. Targets: Android, JVM Desktop, iOS, JS, wasmJs (every
+ * Compose-MP target the template declares).
+ *
+ * **Methods are suspend**: share sheets + settings deep-links are inherently async on
+ * iOS / JS / wasmJs; the suspend signature avoids fire-and-forget hacks at consumer
+ * call sites. Wrap calls in `LaunchedEffect` or `rememberCoroutineScope().launch { }`.
+ *
+ * **Migration from the prior interface**:
+ * | Prior method | Replacement |
+ * |---|---|
+ * | `fun startActivity(intent: Any)` | Removed. Use cmp-intent-launcher's `IntentLauncher` directly. |
+ * | `fun createDocumentIntent(fileName): Any` | Removed. Use `IntentLauncher` with `PickDocument` contract. |
+ * | `fun startApplicationDetailsSettingsActivity()` | [`openAppSettings`] (suspend, returns `IntentResult`). |
  */
+@OptIn(ExperimentalIntentLauncherApi::class)
 interface IntentManager {
     /**
-     * Starts a platform-specific activity with the provided intent.
-     *
-     * @param intent The platform-specific intent object to be processed
+     * Opens the given URI in the platform's default handler (browser, mailto:, deep
+     * link, etc.). Implemented via cmp-share's URL share sheet — on Android this routes
+     * through `ACTION_SEND` so the user picks the handler; on iOS / desktop it presents
+     * the system share sheet.
      */
-    fun startActivity(intent: Any)
+    suspend fun launchUri(uri: String)
 
-    /**
-     * Opens the specified URI in an appropriate application.
-     * Typically used for opening websites, deep links, or specific application URIs.
-     *
-     * @param uri The URI string to be opened
-     */
-    fun launchUri(uri: String)
+    /** Shares plain text via the platform share sheet. */
+    suspend fun shareText(text: String)
 
-    /**
-     * Shares text content with other applications via the platform's share mechanism.
-     *
-     * @param text The text content to be shared
-     */
-    fun shareText(text: String)
+    /** Shares a file URI with the given MIME type. */
+    suspend fun shareFile(fileUri: String, mimeType: MimeType)
 
-    /**
-     * Shares a file with other applications.
-     *
-     * @param fileUri The URI string pointing to the file to be shared
-     * @param mimeType The MIME type of the file to help receiving applications handle it properly
-     */
-    fun shareFile(fileUri: String, mimeType: MimeType)
+    /** Shares a file URI with the given MIME type and accompanying text. */
+    suspend fun shareFile(fileUri: String, mimeType: MimeType, extraText: String)
 
-    /**
-     * Shares a file with other applications, including additional text content.
-     *
-     * @param fileUri The URI string pointing to the file to be shared
-     * @param mimeType The MIME type of the file to help receiving applications handle it properly
-     * @param extraText Additional text to include with the shared file
-     */
-    fun shareFile(fileUri: String, mimeType: MimeType, extraText: String)
-
-    /**
-     * Shares an image with other applications.
-     *
-     * @param title The title to use when sharing the image
-     * @param image The ImageBitmap to be shared
-     */
+    /** Shares an in-memory image. PNG-encoded via Skia on non-Android targets. */
     suspend fun shareImage(title: String, image: ImageBitmap)
 
     /**
-     * Creates a platform-specific intent for document creation.
-     *
-     * @param fileName The suggested name for the document to be created
-     * @return A platform-specific intent object for document creation
+     * Opens the host application's settings page. Behaviour per-platform documented in
+     * [com.mobilebytelabs.kmptoolkit.intentlauncher.SystemIntents.openAppSettings].
+     * Returns `IntentResult.Failed(UnsupportedPlatform)` on JS / wasmJs / tvOS / watchOS.
      */
-    fun createDocumentIntent(fileName: String): Any
+    suspend fun openAppSettings(): IntentResult
 
     /**
-     * Opens the application details settings screen for the current application.
-     * Typically used to direct users to app permissions, notifications, or other system settings.
+     * Presents an OS save dialog and returns the chosen destination URI in
+     * `IntentResult.Ok(IntentData(uri = ...))`. Per-platform behaviour documented in
+     * [com.mobilebytelabs.kmptoolkit.intentlauncher.SystemIntents.createDocument]
+     * (Android proxy Activity → SAF, iOS `UIDocumentPickerViewController` export mode,
+     * JVM `JFileChooser`, JS / wasmJs `showSaveFilePicker`).
+     *
+     * Returns `Cancelled` when the user dismisses, `Failed(UnsupportedPlatform)` on
+     * platforms without a save-dialog surface (tvOS, watchOS, mingw).
+     *
+     * @param fileName suggested filename pre-filled in the picker
+     * @param mimeType MIME used to filter / suggest extension (defaults to "&#42;/&#42;")
      */
-    fun startApplicationDetailsSettingsActivity()
+    suspend fun createDocument(fileName: String, mimeType: String = "*/*"): IntentResult
 }

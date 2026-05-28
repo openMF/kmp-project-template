@@ -11,10 +11,18 @@ package org.mifos.feature.currencyrates.di
 
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import org.mifos.core.store.AppStoreRegistry
 import org.mifos.feature.currencyrates.ui.CurrencyRatesViewModel
 import org.mifos.feature.currencyrates.ui.RateHistoryViewModel
 
 val CurrencyRatesModule = module {
-    viewModel { CurrencyRatesViewModel(get()) }
+    viewModel {
+        CurrencyRatesViewModel(
+            currencyRepository = get(),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+            spotRateStore = get(qualifier = AppStoreRegistry.SpotRate),
+        )
+    }
     viewModel { RateHistoryViewModel(get()) }
 }

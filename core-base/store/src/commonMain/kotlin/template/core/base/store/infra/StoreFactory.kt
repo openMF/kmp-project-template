@@ -106,6 +106,24 @@ object StoreFactory {
     }
 
     /**
+     * Creates a read-only [Store] backed only by a [SourceOfTruth] (no network fetcher).
+     *
+     * Suitable for purely offline/local-only data flows where there is no remote data
+     * source — Room DAO flows, file-backed stores, or in-process caches that are
+     * populated through a separate write path (e.g., [createMutableStore]).
+     *
+     * @param Key The type used to identify data (e.g., a primary key or query params).
+     * @param Output The domain type exposed to consumers.
+     * @param sourceOfTruth Local persistence layer whose reader emits cached data.
+     * @return A configured [Store] that streams exclusively from local storage.
+     */
+    fun <Key : Any, Output : Any> createOfflineStore(
+        sourceOfTruth: SourceOfTruth<Key, Output>,
+    ): Store<Key, Output> = StoreBuilder
+        .from(sourceOfTruth = sourceOfTruth)
+        .build()
+
+    /**
      * Creates a [MutableStore] that supports reads, writes, and offline sync.
      *
      * Uses a [Converter] to transform between network, local, and output types.
@@ -192,7 +210,7 @@ object StoreFactory {
      *   Throwing transitions [submitHandler] to `Failed`.
      * @param scope CoroutineScope (typically `viewModelScope`).
      * @param fetchPolicy Read-side fetch policy. Defaults to
-     *   [FetchPolicy.CACHE_THEN_NETWORK].
+     *   [FetchPolicy.NETWORK_WITH_CACHE].
      * @param pendingCountFlow Optional outbox-pending-count flow; default `flowOf(0)`.
      * @param syncingFlow Optional background-sync indicator flow; default `flowOf(false)`.
      */
@@ -205,7 +223,7 @@ object StoreFactory {
         submitHandler: SubmitHandler<W>,
         submitBlock: suspend (W) -> W,
         scope: CoroutineScope,
-        fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+        fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
         pendingCountFlow: Flow<Int> = flowOf(0),
         syncingFlow: Flow<Boolean> = flowOf(false),
     ): ScreenWithMutationStream<R, W> {

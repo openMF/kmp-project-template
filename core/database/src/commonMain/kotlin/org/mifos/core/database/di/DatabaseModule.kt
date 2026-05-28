@@ -40,7 +40,6 @@ val DatabaseModule = module {
         ChargeTypeConverters.install(get<FieldEncryptor>())
         ChargeTypeConvertersInstalled
     }
-    single { get<AppDatabase>().sampleDao }
     single { get<AppDatabase>().exchangeRatesDao }
     single { get<AppDatabase>().coinMarketDao }
     single { get<AppDatabase>().coinDetailDao }
@@ -48,6 +47,8 @@ val DatabaseModule = module {
     single { get<AppDatabase>().bookkeeperDao }
     single { get<AppDatabase>().loanDao }
     single { get<AppDatabase>().billReminderDao }
+    single { get<AppDatabase>().alertDao }
+    single { get<AppDatabase>().interestRateSeriesDao }
 }
 
 /**

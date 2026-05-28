@@ -27,13 +27,8 @@ import kotlin.test.assertNotNull
 class FetchPolicyTest {
 
     @Test
-    fun cacheThenNetwork_exists() {
-        assertNotNull(FetchPolicy.CACHE_THEN_NETWORK)
-    }
-
-    @Test
-    fun networkThenCacheFallback_exists() {
-        assertNotNull(FetchPolicy.NETWORK_THEN_CACHE_FALLBACK)
+    fun networkWithCache_exists() {
+        assertNotNull(FetchPolicy.NETWORK_WITH_CACHE)
     }
 
     @Test
@@ -44,5 +39,10 @@ class FetchPolicyTest {
     @Test
     fun cacheOnly_exists() {
         assertNotNull(FetchPolicy.CACHE_ONLY)
+    }
+
+    @Test
+    fun periodic_exists() {
+        assertNotNull(FetchPolicy.PERIODIC(intervalMillis = 5_000L))
     }
 }

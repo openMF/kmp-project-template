@@ -48,9 +48,17 @@ object AppStoreRegistry : StoreRegistry() {
     val CoinMarkets = store("coinMarkets")
     val CoinDetail = store("coinDetail")
 
-    // Banking Utility Toolkit — economic data
+    // Banking Utility Toolkit — offline-local stores (OFFLINE_LOCAL_ONLY archetype)
+    val Alerts = store("alerts")
+    val Loans = store("loans")
+    val BillReminders = store("billReminders")
+
+    // Banking Utility Toolkit — economic data (NETWORK_WITH_CACHE archetype)
     val InterestRateSeries = store("interestRateSeries")
     val MacroIndicator = store("macroIndicator")
+
+    // Banking Utility Toolkit — spot exchange-rate lookup (NETWORK_ONLY callsite)
+    val SpotRate = store("spotRate")
 
     /** TTL durations — financial data has different freshness requirements. */
     object Ttl {

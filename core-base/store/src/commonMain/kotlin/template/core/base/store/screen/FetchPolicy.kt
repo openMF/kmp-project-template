@@ -13,18 +13,18 @@ package template.core.base.store.screen
  * Controls whether a screen stream reads from cache, hits the network, or both.
  *
  * Pass to [ScreenDataStream.asScreenStream], [LoadOnceStream.asLoadOnceStream], or
- * [PagingScreenStream] to override the default cache-then-network behaviour.
+ * [PagingScreenStream] to override the default network-with-cache behaviour.
  *
  * **Choosing a policy:**
- * | Scenario                                                                    | Policy                          |
- * |-----------------------------------------------------------------------------|---------------------------------|
- * | Normal screen — show cached data immediately, refresh in background         | [CACHE_THEN_NETWORK] (default)  |
- * | Online-first — try network, gracefully fall back to cache when network fails | [NETWORK_THEN_CACHE_FALLBACK]   |
- * | Always-fresh data required (e.g. payment confirmation)                      | [NETWORK_ONLY]                  |
- * | Offline-only view or explicit "load from cache"                             | [CACHE_ONLY]                    |
+ * | Scenario                                                                    | Policy                         |
+ * |-----------------------------------------------------------------------------|--------------------------------|
+ * | Normal screen — show cached data immediately, refresh in background         | [NETWORK_WITH_CACHE] (default) |
+ * | Always-fresh data required (e.g. payment confirmation)                      | [NETWORK_ONLY]                 |
+ * | Offline-only view or explicit "load from cache"                             | [CACHE_ONLY]                   |
+ * | Ambient surface that silently re-fetches on a cadence (FX rates, tickers)  | [PERIODIC]                     |
  *
  * Modelled as a sealed interface so the vocabulary is open to additional variants
- * without breaking the source-compatible `FetchPolicy.CACHE_THEN_NETWORK`-style
+ * without breaking the source-compatible `FetchPolicy.NETWORK_WITH_CACHE`-style
  * access pattern.
  */
 sealed interface FetchPolicy {
@@ -37,25 +37,7 @@ sealed interface FetchPolicy {
      * while the data is silently refreshed in the background. The staleness banner from
      * [DataFreshnessIndicator] is shown when the data is older than the configured TTL.
      */
-    data object CACHE_THEN_NETWORK : FetchPolicy
-
-    /**
-     * Try the network first; if it fails, fall back to the local source of truth.
-     *
-     * Use for screens that prefer fresh data but should remain functional offline —
-     * e.g. an account summary that wants the latest balance but is fine with the
-     * last-cached value during a network outage. Unlike [NETWORK_ONLY], failure
-     * does NOT emit [ScreenState.NoNetwork]; instead, Store5 serves the
-     * SourceOfTruth value and downstream [DecisionEngine] decides freshness
-     * (typically `STALE` while offline).
-     *
-     * Internally maps to `StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true)`
-     * — the same request shape as [NETWORK_ONLY]. The semantic difference is one of
-     * intent: [NETWORK_THEN_CACHE_FALLBACK] documents that cache-fallback is the
-     * expected happy path during transient network failure, whereas [NETWORK_ONLY]
-     * is reserved for screens where stale data would be actively misleading.
-     */
-    data object NETWORK_THEN_CACHE_FALLBACK : FetchPolicy
+    data object NETWORK_WITH_CACHE : FetchPolicy
 
     /**
      * Skip the local cache entirely and always fetch from the network.
@@ -82,11 +64,11 @@ sealed interface FetchPolicy {
     data object CACHE_ONLY : FetchPolicy
 
     /**
-     * Cache-then-network on the read side, plus a periodic background refresh.
+     * Network-with-cache on the read side, plus a periodic background refresh.
      *
      * Use for ambient surfaces that should silently re-fetch on a cadence — live FX
      * rates, market tickers, dashboard tiles. The read semantic is identical to
-     * [CACHE_THEN_NETWORK] (cached value emitted immediately, network refresh
+     * [NETWORK_WITH_CACHE] (cached value emitted immediately, network refresh
      * layered in); the periodic refresh is fired by [ScreenDataStream] internally
      * via the same refresh-trigger pipeline as the reconnect refresh and the
      * user-tap refresh — so it goes through the user-tap debounce window, the

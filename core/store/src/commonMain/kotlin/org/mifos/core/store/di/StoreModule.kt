@@ -12,12 +12,16 @@ package org.mifos.core.store.di
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.mifos.core.store.AppStoreRegistry
+import org.mifos.core.store.alerts.impl.provideAlertsStore
+import org.mifos.core.store.banking.impl.provideBillRemindersStore
+import org.mifos.core.store.banking.impl.provideLoansStore
 import org.mifos.core.store.crypto.impl.provideCoinDetailStore
 import org.mifos.core.store.crypto.impl.provideCoinMarketsStore
 import org.mifos.core.store.currency.impl.provideExchangeRatesStore
 import org.mifos.core.store.currency.impl.provideRateHistoryStore
 import org.mifos.core.store.economic.impl.provideInterestRateSeriesStore
 import org.mifos.core.store.economic.impl.provideMacroIndicatorStore
+import org.mifos.core.store.exchange.impl.provideSpotRateLookupStore
 import org.mifos.core.store.infra.StoreCacheManager
 import org.mifos.core.store.infra.impl.StoreCacheManagerImpl
 
@@ -52,10 +56,27 @@ val appStoreModule: Module = module {
 
     // Economic Stores (Banking Utility Toolkit — FRED + World Bank)
     single(AppStoreRegistry.InterestRateSeries) {
-        provideInterestRateSeriesStore(get(), get(), get())
+        // Updated: now persists to InterestRateSeriesDao (NETWORK_WITH_CACHE archetype).
+        provideInterestRateSeriesStore(get(), get(), get(), get())
     }
     single(AppStoreRegistry.MacroIndicator) {
         provideMacroIndicatorStore(get(), get())
+    }
+
+    // Banking Utility Toolkit — offline-local stores (OFFLINE_LOCAL_ONLY archetype)
+    single(AppStoreRegistry.Alerts) {
+        provideAlertsStore(dao = get())
+    }
+    single(AppStoreRegistry.Loans) {
+        provideLoansStore(dao = get())
+    }
+    single(AppStoreRegistry.BillReminders) {
+        provideBillRemindersStore(dao = get())
+    }
+
+    // Banking Utility Toolkit — spot exchange-rate lookup (NETWORK_ONLY callsite archetype)
+    single(AppStoreRegistry.SpotRate) {
+        provideSpotRateLookupStore(api = get(), networkMonitor = get(), dao = get())
     }
 
     // Register fintech feature stores for logout cache clearing
@@ -67,5 +88,9 @@ val appStoreModule: Module = module {
         mgr.register(get(AppStoreRegistry.CoinDetail))
         mgr.register(get(AppStoreRegistry.InterestRateSeries))
         mgr.register(get(AppStoreRegistry.MacroIndicator))
+        mgr.register(get(AppStoreRegistry.Alerts))
+        mgr.register(get(AppStoreRegistry.Loans))
+        mgr.register(get(AppStoreRegistry.BillReminders))
+        mgr.register(get(AppStoreRegistry.SpotRate))
     }
 }

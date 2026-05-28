@@ -12,7 +12,6 @@ package org.mifos.core.database.currency.converter
 import androidx.room3.TypeConverter
 import co.touchlab.kermit.Logger
 import kotlinx.serialization.json.Json
-import org.mifos.core.database.sample.entity.SampleEntity
 import template.core.base.security.FieldEncryptor
 
 private const val ENC_PREFIX = "ENC:"
@@ -78,24 +77,5 @@ class ChargeTypeConverters {
     @TypeConverter
     fun toIntList(list: ArrayList<Int?>): String {
         return encryptString(Json.encodeToString(list))
-    }
-
-    /** Serializes a [SampleEntity] to a JSON string, or `null` if the entity is `null`. */
-    @TypeConverter
-    fun fromSampleEntity(value: SampleEntity?): String? {
-        return value?.let { encryptString(Json.encodeToString(SampleEntity.serializer(), it)) }
-    }
-
-    /** Deserializes a JSON string to a [SampleEntity], or `null` if the string is `null`. */
-    @TypeConverter
-    fun toSampleEntity(value: String?): SampleEntity? {
-        return value?.let {
-            try {
-                Json.decodeFromString(SampleEntity.serializer(), decryptString(it))
-            } catch (e: Exception) {
-                Logger.d("ChargeTypeConverters") { "Failed to decode SampleEntity: ${e.message}" }
-                null
-            }
-        }
     }
 }

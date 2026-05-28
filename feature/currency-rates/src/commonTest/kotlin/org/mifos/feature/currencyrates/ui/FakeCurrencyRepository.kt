@@ -20,6 +20,7 @@ import org.mifos.core.model.currency.ExchangeRates
 import org.mifos.core.model.currency.RateHistory
 import org.mifos.core.model.currency.RateHistoryKey
 import template.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
+import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.screen.ScreenDataStream
 import template.core.base.store.screen.ScreenState
 import template.core.base.store.screen.screenDataStreamForTesting
@@ -52,6 +53,7 @@ internal class FakeCurrencyRepository : CurrencyRepository {
     override fun exchangeRatesStream(
         baseCurrency: String,
         scope: CoroutineScope,
+        fetchPolicy: FetchPolicy,
     ): ScreenDataStream<ExchangeRates> {
         lastExchangeRatesBase = baseCurrency
         return screenDataStreamForTesting(

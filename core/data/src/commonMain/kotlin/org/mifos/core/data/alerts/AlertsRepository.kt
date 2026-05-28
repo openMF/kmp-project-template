@@ -15,7 +15,7 @@ import org.mifos.core.model.alerts.PriceAlert
 /**
  * Repository for the Price Alerts feature.
  *
- * Read side: observable list of committed alerts (from [AlertsApi.observe]).
+ * Read side: observable list of committed alerts (from the Store-backed [AlertsRepository.alertsStream]).
  * Pending drafts (in the framework outbox) are tracked at the form-handler
  * level via `DraftSubmitHandler` — the `framework_submit_drafts` row for
  * formKey `"price_alert"` indicates an in-flight or failed submission, surfaced

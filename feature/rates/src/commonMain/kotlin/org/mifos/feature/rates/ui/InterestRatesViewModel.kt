@@ -18,7 +18,7 @@ import template.core.base.store.screen.ScreenState
 import template.core.base.ui.viewmodel.BaseViewModel
 
 /**
- * **B7 Interest Rate Tracker** — canonical `CACHE_THEN_NETWORK` + DataFreshness
+ * **B7 Interest Rate Tracker** — canonical `NETWORK_WITH_CACHE` + DataFreshness
  * showcase.
  *
  * Composes four independent FRED-backed reactive streams into a single dashboard

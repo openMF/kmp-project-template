@@ -87,12 +87,31 @@ val uiState = loadOnceStream(
 |---|---|
 | `CACHE_ONLY` | Never fetch; emit stale data or `NoNetwork` |
 | `NETWORK_ONLY` | Always fetch; ignore cache |
-| `CACHE_THEN_NETWORK` | Emit cached immediately, then refresh (default) |
+| `NETWORK_WITH_CACHE` | Emit cached immediately, then refresh (default) |
 
 Pass via `StoreRequest`:
 ```kotlin
-store.asScreenStream(StoreRequest.cached(key, refresh = policy == CACHE_THEN_NETWORK))
+store.asScreenStream(StoreRequest.cached(key, refresh = policy == NETWORK_WITH_CACHE))
 ```
+
+### NETWORK_WITH_CACHE
+
+Use `FetchPolicy.NETWORK_WITH_CACHE` for any domain with a Room SourceOfTruth + Fetcher.
+Internal routing (from `StoreDataExtensions.kt`):
+- Fresh cache (within TTL, `validator.isValid == true`) → emit cache immediately + background refresh
+- Stale or empty cache → try network first; on failure fall back to cache
+
+### createOfflineStore — OFFLINE_LOCAL_ONLY
+
+`StoreFactory.createOfflineStore(sourceOfTruth)` wraps `StoreBuilder.from(sourceOfTruth)` with no Fetcher.
+Use when the app is the single source of truth (alerts, loans, bill reminders).
+
+### SpotRateLookupStore — NETWORK_ONLY + Room write side-effect
+
+`createStore(fetcher=frankfurterApi, sourceOfTruth=exchangeRatesDao)` with `FetchPolicy.NETWORK_ONLY`
+at the stream callsite. Read path always skips cache (always-fresh). Write path persists to Room
+as a side-effect — so `NETWORK_WITH_CACHE` consumers (currency list) pick up the fresh rate
+without their own network call.
 
 ---
 

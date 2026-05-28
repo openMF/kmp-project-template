@@ -20,6 +20,7 @@ import org.mifos.core.model.banking.BillReminder
 import org.mifos.core.model.currency.ExchangeRates
 import org.mifos.core.store.economic.impl.InterestRateSeriesKey
 import template.core.base.store.screen.DataFreshness
+import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.screen.ScreenState
 import template.core.base.store.screen.combineScreenStates
 import template.core.base.ui.viewmodel.BaseViewModel
@@ -49,9 +50,19 @@ class HomeViewModel(
     private val currencyRepository: CurrencyRepository,
 ) : BaseViewModel<HomeUiState, Nothing, HomeAction>(HomeUiState()) {
 
+    /**
+     * **Archetype showcase: PERIODIC(300_000L)**
+     *
+     * The home dashboard exchange-rate tile is an ambient surface — the user expects
+     * it to stay fresh without manually pulling to refresh. By passing
+     * [FetchPolicy.PERIODIC] with a 5-minute cadence the framework's [ScreenDataStream]
+     * fires a background refresh every 5 minutes automatically, through the same
+     * debounce + lastContent preservation pipeline as a user-tap refresh.
+     */
     private val exchangeRateStream = currencyRepository.exchangeRatesStream(
         baseCurrency = "USD",
         scope = viewModelScope,
+        fetchPolicy = FetchPolicy.PERIODIC(intervalMillis = EXCHANGE_RATE_REFRESH_INTERVAL_MS),
     )
 
     private val fedFundsStream = economicRatesRepository.interestRateSeriesStream(
@@ -138,6 +149,16 @@ class HomeViewModel(
     companion object {
         /** Lookahead window for the "Upcoming Bills" widget. */
         const val UPCOMING_BILLS_WINDOW_DAYS: Int = 7
+
+        /**
+         * **Archetype: PERIODIC** — background refresh cadence for the exchange-rate tile.
+         *
+         * 5 minutes (300 000 ms). FX rates are volatile; refreshing every 5 minutes keeps
+         * the dashboard tile reasonably fresh without hammering the Frankfurter API. The
+         * ticker fires through [ScreenDataStream]'s internal refresh pipeline so last-known
+         * content is preserved across intervals and no Loading flicker occurs.
+         */
+        const val EXCHANGE_RATE_REFRESH_INTERVAL_MS: Long = 300_000L
 
         /** Effective Federal Funds Rate — the overnight bank-to-bank lending rate. */
         val FedFundsKey: InterestRateSeriesKey = InterestRateSeriesKey(

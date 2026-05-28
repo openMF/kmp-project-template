@@ -11,11 +11,9 @@ package org.mifos.core.database.di
 
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import org.mifos.core.database.AppDatabase
 
 val TestDatabaseModule = module {
     includes(testPlatformModule)
-    single { get<AppDatabase>().sampleDao }
 }
 
 expect val testPlatformModule: Module

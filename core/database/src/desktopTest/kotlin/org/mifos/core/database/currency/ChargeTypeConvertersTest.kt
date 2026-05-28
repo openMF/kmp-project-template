@@ -10,10 +10,8 @@
 package org.mifos.core.database.currency
 
 import org.mifos.core.database.currency.converter.ChargeTypeConverters
-import org.mifos.core.database.sample.entity.SampleEntity
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 class ChargeTypeConvertersTest {
 
@@ -40,28 +38,6 @@ class ChargeTypeConvertersTest {
         val original = arrayListOf<Int?>(null, null, null)
         val json = converters.toIntList(original)
         val restored = converters.fromIntList(json)
-        assertEquals(original, restored)
-    }
-
-    @Test
-    fun sampleEntityRoundTripPreservesData() {
-        val original = SampleEntity(id = 42, name = "Test Entity")
-        val json = converters.fromSampleEntity(original)
-        val restored = converters.toSampleEntity(json)
-        assertEquals(original, restored)
-    }
-
-    @Test
-    fun sampleEntityNullInputReturnsNull() {
-        assertNull(converters.fromSampleEntity(null))
-        assertNull(converters.toSampleEntity(null))
-    }
-
-    @Test
-    fun sampleEntityDefaultValuesRoundTrips() {
-        val original = SampleEntity()
-        val json = converters.fromSampleEntity(original)
-        val restored = converters.toSampleEntity(json)
         assertEquals(original, restored)
     }
 }

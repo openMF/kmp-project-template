@@ -47,7 +47,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asLoadOnceStream(
     cacheKey: String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
-    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+    fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
 ): ScreenDataStream<Output> {
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 

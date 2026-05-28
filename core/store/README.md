@@ -23,6 +23,19 @@ You write **zero state-handling code**. Screens cannot break offline-first by mi
 the decision logic lives in `core-base/store`'s `DecisionEngine`, used by every flow
 (both single-key `asScreenStream` and paged `asPagingScreenStream`).
 
+## Store Archetype Decision Matrix
+
+| Archetype | Factory | FetchPolicy | Live Example | When to use |
+|---|---|---|---|---|
+| OFFLINE_LOCAL_ONLY | `createOfflineStore(dao)` | — | `AlertsStore`, `LoansStore`, `BillRemindersStore` | App is source of truth; no network sync needed |
+| NETWORK_WITH_CACHE | `createStore(fetcher, dao)` | `NETWORK_WITH_CACHE` | `ExchangeRatesStore`, `InterestRateSeriesStore` | Network-backed + offline fallback; most common |
+| NETWORK_ONLY | `createStore(fetcher, dao)` | `NETWORK_ONLY` | `SpotRateLookupStore` | Always-fresh read; stale data actively wrong |
+| CACHE_ONLY | `createStore(fetcher, dao)` | `CACHE_ONLY` | `CurrencyConverterViewModel` offline mode | Read without network (offline/airplane mode) |
+| PERIODIC | `createStore(fetcher, dao)` | `PERIODIC(ms)` | `HomeDashboardViewModel` exchange tile | Auto-refresh on cadence without user trigger |
+| MEMORY_ONLY | `createMemoryStore(fetcher)` | any | `MacroIndicatorStore` | Cheap-to-re-fetch public data; no Room needed |
+| LOAD_ONCE | `createStore(fetcher, dao)` | — (via `asLoadOnceStream`) | `LoanDetailViewModel` | Load once; no background refresh; detail screens |
+| MUTABLE | `createMutableStore(fetcher, dao, updater)` | — (via `SubmitHandler`) | `DraftSubmitHandler` (bills/reminders) | Reads + writes + offline sync |
+
 ## Which framework API for which screen type?
 
 Screen-archetype names align **1:1 with the Compose composable** that wraps the screen

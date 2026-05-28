@@ -200,7 +200,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     cacheKey: String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
-    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+    fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
     reconnectDebounceMs: Long = DEFAULT_RECONNECT_DEBOUNCE_MS,
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
 ): ScreenDataStream<Output> {
@@ -303,7 +303,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     cacheKeyFor: (Key) -> String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
-    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+    fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
     reconnectDebounceMs: Long = DEFAULT_RECONNECT_DEBOUNCE_MS,
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
 ): ScreenDataStream<Output> {

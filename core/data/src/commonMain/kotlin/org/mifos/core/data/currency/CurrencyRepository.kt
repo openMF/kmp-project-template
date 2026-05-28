@@ -14,10 +14,23 @@ import kotlinx.coroutines.flow.Flow
 import org.mifos.core.model.currency.ExchangeRates
 import org.mifos.core.model.currency.RateHistory
 import org.mifos.core.model.currency.RateHistoryKey
+import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.screen.ScreenDataStream
 
 interface CurrencyRepository {
-    fun exchangeRatesStream(baseCurrency: String, scope: CoroutineScope): ScreenDataStream<ExchangeRates>
+    /**
+     * Stream of exchange rates for [baseCurrency].
+     *
+     * @param fetchPolicy Controls network vs. cache strategy. Defaults to
+     *   [FetchPolicy.NETWORK_WITH_CACHE] (cached data shown immediately, refreshed
+     *   in background). Pass [FetchPolicy.PERIODIC] for ambient surfaces like the
+     *   home dashboard tile that should auto-refresh on a cadence.
+     */
+    fun exchangeRatesStream(
+        baseCurrency: String,
+        scope: CoroutineScope,
+        fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
+    ): ScreenDataStream<ExchangeRates>
 
     fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>
 }

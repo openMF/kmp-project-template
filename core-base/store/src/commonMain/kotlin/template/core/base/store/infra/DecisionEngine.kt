@@ -43,7 +43,7 @@ object DecisionEngine {
         storeData: StoreData<T>,
         networkStatus: NetworkStatus,
         @Suppress("UNUSED_PARAMETER")
-        fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+        fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
     ): ScreenState<T> {
         val noData = storeData.isEmpty
         val error = storeData.error

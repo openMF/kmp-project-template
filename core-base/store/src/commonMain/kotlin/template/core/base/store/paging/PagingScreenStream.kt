@@ -69,7 +69,7 @@ class PagingScreenStream<T : Any> internal constructor(
     private val networkMonitor: NetworkMonitor,
     private val cacheKey: String,
     private val fetchedAtRepository: FetchedAtRepository,
-    private val fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+    private val fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
 ) {
     /** Load the next page. No-op if already loading or no more pages. Cache-first. */
     fun loadNextPage() {
@@ -148,14 +148,12 @@ class PagingScreenStream<T : Any> internal constructor(
             }
             // Online-first policies always force a fresh fetch:
             //   - NETWORK_ONLY: stale data would be misleading; skip cache.
-            //   - NETWORK_THEN_CACHE_FALLBACK: prefer fresh, fall back to SoT on failure.
-            // Store5's fresh(fallBackToSourceOfTruth = true) honours both intents at the
+            // Store5's fresh(fallBackToSourceOfTruth = true) honours this intent at the
             // single-key layer (see streamDataForPolicy); for paging, the same forceRefresh
             // signal is the closest analogue — failure to fetch still surfaces existing
             // items from `items` MutableStateFlow if the previous page load primed them.
             val forceRefresh = refresh ||
-                fetchPolicy == FetchPolicy.NETWORK_ONLY ||
-                fetchPolicy == FetchPolicy.NETWORK_THEN_CACHE_FALLBACK
+                fetchPolicy == FetchPolicy.NETWORK_ONLY
             // Offline pre-check for forced-network: if we're offline,
             // don't even call store.loadPage — `fresh(key)` would dispatch to the
             // fetcher whose `executeWithRetry` may block indefinitely waiting for
@@ -222,7 +220,7 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     scope: CoroutineScope,
     pageSize: Int = PageKey.DEFAULT_PAGE_SIZE,
     query: String? = null,
-    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_THEN_NETWORK,
+    fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
 ): PagingScreenStream<Value> {
     val items = MutableStateFlow<List<Value>>(emptyList())
     val hasMore = MutableStateFlow(true)

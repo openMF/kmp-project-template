@@ -40,6 +40,7 @@ import org.mifos.core.model.economic.RateObservation
 import org.mifos.core.store.economic.impl.InterestRateSeriesKey
 import template.core.base.store.screen.DataFreshness
 import template.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
+import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.screen.ScreenDataStream
 import template.core.base.store.screen.ScreenState
 import template.core.base.store.screen.screenDataStreamForTesting
@@ -249,6 +250,35 @@ class HomeViewModelTest {
         assertEquals(1, currency.refreshCount)
     }
 
+    // region Archetype: PERIODIC(300_000L)
+
+    /**
+     * **Archetype showcase: PERIODIC(300_000L)**
+     *
+     * The home dashboard exchange-rate tile must be opened with [FetchPolicy.PERIODIC]
+     * at the 5-minute cadence so the tile auto-refreshes in the background without the
+     * user triggering a pull-to-refresh.
+     */
+    @Test
+    fun exchangeRateTileUsesPeriodicFetchPolicyWith5MinuteInterval() = runTest {
+        val currency = FakeCurrencyRepository()
+        buildViewModel(currency = currency)
+        dispatcher.scheduler.advanceUntilIdle()
+
+        val policy = currency.lastFetchPolicy
+        assertTrue(
+            policy is FetchPolicy.PERIODIC,
+            "Exchange-rate tile must use FetchPolicy.PERIODIC — found: $policy",
+        )
+        assertEquals(
+            HomeViewModel.EXCHANGE_RATE_REFRESH_INTERVAL_MS,
+            (policy as FetchPolicy.PERIODIC).intervalMillis,
+            "Periodic interval must be exactly 300 000 ms (5 minutes).",
+        )
+    }
+
+    // endregion
+
     @Test
     fun ratesQuickKeysRequestThirtyDayWindowForCompactCards() {
         // Home dashboard widgets only need the latest value, so the keys ask for
@@ -437,10 +467,19 @@ private class FakeCurrencyRepository : CurrencyRepository {
     var refreshCount: Int = 0
         private set
 
+    /**
+     * Records the [fetchPolicy] the Home VM supplied on the last call so tests
+     * can assert that PERIODIC was chosen for the exchange-rate tile.
+     */
+    var lastFetchPolicy: FetchPolicy? = null
+        private set
+
     override fun exchangeRatesStream(
         baseCurrency: String,
         scope: CoroutineScope,
+        fetchPolicy: FetchPolicy,
     ): ScreenDataStream<ExchangeRates> {
+        lastFetchPolicy = fetchPolicy
         val trigger = MutableSharedFlow<Unit>(extraBufferCapacity = 64)
         trigger.onEach { refreshCount += 1 }.launchIn(scope)
         return screenDataStreamForTesting(state = source, refreshTrigger = trigger)

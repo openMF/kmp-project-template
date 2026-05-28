@@ -47,8 +47,6 @@ import org.mifos.core.model.alerts.PriceAlert
 import org.mifos.core.model.banking.BillReminder
 import org.mifos.core.model.banking.Loan
 import org.mifos.core.model.banking.LoanCalcScenario
-import org.mifos.core.network.alerts.api.AlertsApi
-import org.mifos.core.network.alerts.api.FakeAlertsApi
 import org.mifos.core.network.di.NetworkModule
 import org.mifos.core.store.AppStoreRegistry
 import template.core.base.common.di.CommonModule
@@ -78,8 +76,18 @@ val DataModule = module {
     // polish (saving badge, retry on failure) for a local commit "submit".
     single { get<AppDatabase>().loanDao }
     single { get<AppDatabase>().billReminderDao }
-    single<LoanRepository> { LoanRepositoryImpl(get()) }
-    single<BillReminderRepository> { BillReminderRepositoryImpl(get()) }
+    single<LoanRepository> {
+        LoanRepositoryImpl(
+            loansStore = get(AppStoreRegistry.Loans),
+            loanDao = get(),
+        )
+    }
+    single<BillReminderRepository> {
+        BillReminderRepositoryImpl(
+            billRemindersStore = get(AppStoreRegistry.BillReminders),
+            billReminderDao = get(),
+        )
+    }
 
     // Outboxes — each form payload type gets its own RoomSubmitOutbox so
     // formKey collisions across features are impossible. The "submit" target
@@ -170,10 +178,15 @@ val DataModule = module {
         )
     }
 
-    // Price alerts — fake-API-backed, with DraftSubmitHandler offline-resilience showcase.
-    // Real forks substitute FakeAlertsApi with a Ktorfit-backed AlertsApi client.
-    single<AlertsApi> { FakeAlertsApi() }
-    single<AlertsRepository> { AlertsRepositoryImpl(api = get()) }
+    // Price alerts — Store-backed (OFFLINE_LOCAL_ONLY archetype).
+    // AlertsStore is the source of truth; AlertDao is the write target.
+    single { get<AppDatabase>().alertDao }
+    single<AlertsRepository> {
+        AlertsRepositoryImpl(
+            alertsStore = get(AppStoreRegistry.Alerts),
+            alertDao = get(),
+        )
+    }
 
     // Outbox for PriceAlert payloads — RoomSubmitOutbox writes to framework_submit_drafts.
     single<SubmitOutbox<PriceAlert>>(qualifier = OutboxQualifiers.PriceAlert) {
@@ -184,13 +197,14 @@ val DataModule = module {
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
 
     // Eager singleton — starts watching network online events at Koin start; retries
-    // any pending alerts when connectivity returns.
+    // any pending alerts when connectivity returns. For the local-only alerts feature,
+    // the submit block commits directly to the repository (simulating offline resilience).
     single(createdAtStart = true) {
         val syncer = OfflineSubmitSyncer<PriceAlert, PriceAlert>(
             scope = get(),
             outbox = get(qualifier = OutboxQualifiers.PriceAlert),
             networkStatusFlow = get<NetworkMonitor>().networkStatus,
-            submitBlock = { payload -> get<AlertsApi>().create(payload) },
+            submitBlock = { payload -> get<AlertsRepository>().submitAlert(payload) },
         )
         syncer.start()
         syncer

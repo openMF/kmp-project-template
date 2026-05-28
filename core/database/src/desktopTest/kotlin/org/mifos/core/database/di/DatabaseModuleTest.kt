@@ -14,7 +14,6 @@ import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.get
 import org.mifos.core.database.AppDatabase
-import org.mifos.core.database.sample.dao.SampleDao
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -41,16 +40,14 @@ class DatabaseModuleTest : KoinTest {
     }
 
     @Test
-    fun databaseModuleProvidesSampleDao() {
-        val dao: SampleDao = get()
-        assertNotNull(dao)
+    fun databaseModuleProvidesAlertDao() {
+        val database: AppDatabase = get()
+        assertNotNull(database.alertDao)
     }
 
     @Test
-    fun sampleDaoComesFromDatabase() {
+    fun alertDaoComesFromDatabase() {
         val database: AppDatabase = get()
-        val dao: SampleDao = get()
-        assertNotNull(database.sampleDao)
-        assertNotNull(dao)
+        assertNotNull(database.alertDao)
     }
 }

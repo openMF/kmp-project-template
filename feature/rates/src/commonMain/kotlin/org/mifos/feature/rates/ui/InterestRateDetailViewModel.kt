@@ -21,7 +21,7 @@ import template.core.base.ui.viewmodel.BaseViewModel
 
 /**
  * ViewModel for the per-series detail screen. Streams the full 365-day window
- * for [seriesId] through the same CACHE_THEN_NETWORK Store5 path used by the
+ * for [seriesId] through the same NETWORK_WITH_CACHE Store5 path used by the
  * list screen.
  *
  * @param seriesId FRED series identifier — must match a [RateSeriesCatalog] entry.

@@ -46,16 +46,6 @@ import org.mifos.feature.showcase.transitions.transitionGalleryGraph
 import template.core.base.security.isReleaseBuild
 import template.core.base.ui.nav.popBackStackSafely
 
-// Archived 2026-05-24 (Money Toolkit pivot) — restore by re-importing + re-wiring graphs per
-// feature/_archive/{module}/README.md:
-//   import org.mifos.feature.alerts.navigation.alertsGraph
-//   import org.mifos.feature.alerts.navigation.navigateToAlerts
-//   import org.mifos.feature.crypto.navigation.CoinDetailRoute
-//   import org.mifos.feature.crypto.navigation.cryptoGraph
-//   import org.mifos.feature.crypto.navigation.navigateToCrypto
-//   import org.mifos.feature.watchlist.navigation.navigateToPersonalWatchlist
-//   import org.mifos.feature.watchlist.navigation.personalWatchlistDestination
-
 @Serializable
 internal data object AuthenticatedGraphRoute
 

@@ -23,6 +23,7 @@ import org.mifos.feature.calculators.di.CalculatorsModule
 import org.mifos.feature.currencyrates.di.CurrencyRatesModule
 import org.mifos.feature.emicalculator.di.EmiCalculatorModule
 import org.mifos.feature.home.di.HomeModule
+import org.mifos.feature.amortization.di.AmortizationModule
 import org.mifos.feature.loans.di.LoansModule
 import org.mifos.feature.macro.di.MacroModule
 import org.mifos.feature.rates.di.RatesModule
@@ -31,12 +32,6 @@ import template.core.base.analytics.di.analyticsModule
 import template.core.base.common.di.CommonModule
 import template.core.base.platform.di.platformModule
 import template.core.base.security.di.SecurityModule
-
-// Archived 2026-05-24 (Money Toolkit pivot) — restore by re-importing + re-including in
-// `featureModule` per feature/_archive/{module}/README.md:
-//   import org.mifos.feature.alerts.di.AlertsModule
-//   import org.mifos.feature.crypto.di.CryptoModule
-//   import org.mifos.feature.watchlist.di.WatchlistModule
 
 object KoinModules {
     private val dataModule = module {
@@ -63,6 +58,7 @@ object KoinModules {
             SettingsModule,
             BillsModule,
             LoansModule,
+            AmortizationModule,
             RatesModule,
             CalculatorsModule,
             MacroModule,

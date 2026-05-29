@@ -117,13 +117,11 @@ include(":feature:home")
 include(":feature:profile")
 include(":feature:settings")
 include(":feature:showcase")
-// include(":feature:_archive:crypto")    // archived 2026-05-24 — see feature/_archive/crypto/README.md
 include(":feature:currency-rates")
 include(":feature:emi-calculator")
-// include(":feature:_archive:watchlist") // archived 2026-05-24 — see feature/_archive/watchlist/README.md
-// include(":feature:_archive:alerts")    // archived 2026-05-24 — see feature/_archive/alerts/README.md
 include(":feature:bills")
 include(":feature:loans")
+include(":feature:amortization")
 include(":feature:rates")
 include(":feature:calculators")
 include(":feature:macro")

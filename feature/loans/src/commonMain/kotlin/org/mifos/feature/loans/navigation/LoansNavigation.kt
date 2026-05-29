@@ -17,6 +17,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import org.mifos.feature.amortization.navigation.AmortizationScheduleRoute
+import org.mifos.feature.amortization.navigation.amortizationScheduleDestination
 import org.mifos.feature.loans.ui.AddOrEditLoanScreen
 import org.mifos.feature.loans.ui.LoanDetailScreen
 import org.mifos.feature.loans.ui.PersonalLoansListScreen
@@ -56,8 +58,8 @@ fun NavGraphBuilder.loansGraph(navController: NavController) {
                 onEditClick = { loanId ->
                     navController.navigate(AddOrEditLoanRoute(loanId = loanId))
                 },
-                onAmortizationClick = {
-                    // TODO(banking-utility-toolkit-06): wire to amortization schedule route.
+                onAmortizationClick = { loanId ->
+                    navController.navigate(AmortizationScheduleRoute(loanId))
                 },
             )
         }
@@ -69,5 +71,6 @@ fun NavGraphBuilder.loansGraph(navController: NavController) {
                 onSaved = { navController.popBackStackSafely() },
             )
         }
+        amortizationScheduleDestination(navController)
     }
 }

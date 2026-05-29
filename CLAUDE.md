@@ -85,21 +85,13 @@ the per-feature branding, or selectively remove features they don't need.
 | **Home dashboard**        | Loans summary + upcoming bills + rates + USD exchange     | `combineScreenStates` 4-way fan-in                         |
 | **Currency Rates**        | Live FX rates by base currency                            | `Store` + search filter + emptyIfContent                   |
 | **Rate History**          | Historical FX charts                                      | Dynamic-key flow + auto-refresh                            |
-
-> **Note on archived modules.** Earlier crypto-themed showcase features
-> (`feature/crypto`, `feature/watchlist`, `feature/alerts`) demonstrated the same
-> three framework patterns (PagingScreenStream, SubmitHandler, DraftSubmitHandler)
-> in a coins/price-alerts domain. They moved to `feature/_archive/` on
-> 2026-05-24 as part of the Money Toolkit pivot. The canonical showcase is now
-> in the banking domain (`feature/loans`, `feature/bills`). The archived modules
-> remain in-tree until **2026-08-23** — see each `feature/_archive/{module}/README.md`
-> for re-enable instructions.
+| **Amortization Schedule** | Month-by-month payment breakdown for any loan             | OFFLINE_LOCAL_ONLY projection via `ScreenDataStream`       |
 
 ## Store Archetype Showcases (kmp-project-template)
 
 | Archetype | Store | ViewModel/Feature | Test |
 |---|---|---|---|
-| OFFLINE_LOCAL_ONLY | `AlertsStore`, `LoansStore`, `BillRemindersStore` | — | `AlertsStoreTest`, `LoansStoreTest` |
+| OFFLINE_LOCAL_ONLY | `AlertsStore`, `LoansStore`, `BillRemindersStore` | `AmortizationScheduleViewModel` | `AlertsStoreTest`, `LoansStoreTest`, `AmortizationScheduleViewModelTest` |
 | NETWORK_WITH_CACHE | `ExchangeRatesStore`, `InterestRateSeriesStore` | `ExchangeRatesViewModel` | `EconomicMemoryOnlyTest` |
 | NETWORK_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (online) | `SpotRateLookupStoreTest` |
 | CACHE_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (offline) | `CurrencyConverterViewModelTest` |

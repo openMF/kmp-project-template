@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.feature.loans"
+    namespace = "org.mifos.feature.amortization"
 }
 
 kotlin {
@@ -24,7 +24,6 @@ kotlin {
             implementation(projects.core.data)
             implementation(projects.core.model)
             implementation(projects.coreBase.store)
-            implementation(projects.feature.amortization)
 
             implementation(compose.ui)
             implementation(compose.material3)
@@ -35,7 +34,6 @@ kotlin {
         }
 
         commonTest.dependencies {
-            // kotlin.test + kotlinx.coroutines.test come from the convention plugin.
             implementation(libs.turbine)
         }
     }

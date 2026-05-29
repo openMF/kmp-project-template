@@ -18,7 +18,7 @@ import org.mifos.core.database.banking.entity.LoanEntity
 import org.mifos.core.model.banking.Loan
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
-import org.mobilenativefoundation.store.store5.StoreResponse
+import org.mobilenativefoundation.store.store5.StoreReadResponse
 
 internal class LoanRepositoryImpl(
     private val loansStore: Store<Unit, List<LoanEntity>>,
@@ -27,7 +27,7 @@ internal class LoanRepositoryImpl(
 
     override fun observeAll(): Flow<List<Loan>> =
         loansStore.stream(StoreReadRequest.cached(Unit, refresh = false))
-            .filterIsInstance<StoreResponse.Data<List<LoanEntity>>>()
+            .filterIsInstance<StoreReadResponse.Data<List<LoanEntity>>>()
             .map { response -> response.value.map { it.toDomain() } }
 
     override fun observeById(id: String): Flow<Loan?> =

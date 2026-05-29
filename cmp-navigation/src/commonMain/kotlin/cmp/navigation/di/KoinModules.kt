@@ -18,12 +18,12 @@ import org.mifos.core.data.di.DataModule
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.store.di.appStoreModule
+import org.mifos.feature.amortization.di.AmortizationModule
 import org.mifos.feature.bills.di.BillsModule
 import org.mifos.feature.calculators.di.CalculatorsModule
 import org.mifos.feature.currencyrates.di.CurrencyRatesModule
 import org.mifos.feature.emicalculator.di.EmiCalculatorModule
 import org.mifos.feature.home.di.HomeModule
-import org.mifos.feature.amortization.di.AmortizationModule
 import org.mifos.feature.loans.di.LoansModule
 import org.mifos.feature.macro.di.MacroModule
 import org.mifos.feature.rates.di.RatesModule

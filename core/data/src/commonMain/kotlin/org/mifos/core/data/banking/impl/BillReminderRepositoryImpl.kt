@@ -22,7 +22,7 @@ import org.mifos.core.database.banking.entity.BillReminderEntity
 import org.mifos.core.model.banking.BillReminder
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
-import org.mobilenativefoundation.store.store5.StoreResponse
+import org.mobilenativefoundation.store.store5.StoreReadResponse
 import kotlin.time.Clock
 
 /**
@@ -45,7 +45,7 @@ internal class BillReminderRepositoryImpl(
 
     override fun observeAll(): Flow<List<BillReminder>> =
         billRemindersStore.stream(StoreReadRequest.cached(Unit, refresh = false))
-            .filterIsInstance<StoreResponse.Data<List<BillReminderEntity>>>()
+            .filterIsInstance<StoreReadResponse.Data<List<BillReminderEntity>>>()
             .map { response -> response.value.map { it.toDomain() } }
 
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> {

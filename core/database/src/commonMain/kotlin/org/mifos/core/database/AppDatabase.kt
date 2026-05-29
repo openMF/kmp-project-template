@@ -76,8 +76,7 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
  * | v5 → v6 | adds `personal_watchlist` |
  * | v6 → v7 | adds `uniqueKey` column to drafts |
  * | v7 → v8 | adds `banking_loans` + `banking_bill_reminders` |
- * | v8 → v9 | adds `alerts`; drops `samples` ([MigrationSpec8to9]) |
- * | v9 → v10 | adds `interest_rate_series` |
+ * | v8 → v10 | adds `alerts` + `interest_rate_series`; drops `samples` ([MigrationSpec8to10]) |
  */
 @Database(
     entities = [
@@ -111,12 +110,12 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         // No existing schema modifications, so Room's auto-migration trivially generates
         // `CREATE TABLE IF NOT EXISTS …` statements; existing rows are untouched.
         AutoMigration(from = 7, to = 8),
-        // v8 → v9: adds `alerts` table; drops `samples` table (SampleEntity retired).
-        // Room auto-migration requires an explicit @DeleteTable spec to DROP a table.
-        AutoMigration(from = 8, to = 9, spec = AppDatabase.MigrationSpec8to9::class),
-        // v9 → v10: purely additive — creates `interest_rate_series` for the B7
-        // Interest Rate Tracker offline cache.
-        AutoMigration(from = 9, to = 10),
+        // v8 → v10: adds `alerts` + `interest_rate_series` tables; drops `samples` table.
+        // v9 was never shipped — both v8→9 and v9→10 were introduced in the same unreleased
+        // commit, so they are collapsed here into a single 8→10 hop. Room auto-migration
+        // generates CREATE TABLE for the two new tables; the explicit @DeleteTable spec
+        // handles the DROP of `samples`.
+        AutoMigration(from = 8, to = 10, spec = AppDatabase.MigrationSpec8to10::class),
     ],
 )
 @TypeConverters(
@@ -141,14 +140,14 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val interestRateSeriesDao: InterestRateSeriesDao
 
     /**
-     * Auto-migration spec for v8 → v9.
+     * Auto-migration spec for v8 → v10 (collapsed from the never-shipped v8→9 + v9→10 path).
      *
      * Instructs Room to DROP the `samples` table that was present in v1–v8 and is no
-     * longer part of the schema. Adding [AlertEntity] (`alerts` table) is fully
-     * auto-handled by Room; only the DROP requires an explicit declaration.
+     * longer part of the schema. Adding [AlertEntity] and [InterestRateSeriesEntity] tables
+     * is fully auto-handled by Room; only the DROP requires an explicit declaration.
      */
     @DeleteTable(tableName = "samples")
-    class MigrationSpec8to9 : AutoMigrationSpec
+    class MigrationSpec8to10 : AutoMigrationSpec
 
     companion object {
         const val VERSION = 10

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -199,7 +200,7 @@ private fun SummaryLine(
 }
 
 @Composable
-private fun HeaderCell(
+private fun RowScope.HeaderCell(
     text: String,
     weight: Float,
     modifier: Modifier = Modifier,
@@ -217,7 +218,7 @@ private fun HeaderCell(
 }
 
 @Composable
-private fun DataCell(
+private fun RowScope.DataCell(
     text: String,
     weight: Float,
     modifier: Modifier = Modifier,

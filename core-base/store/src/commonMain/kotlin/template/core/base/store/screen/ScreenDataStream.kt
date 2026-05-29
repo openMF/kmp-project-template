@@ -10,6 +10,7 @@
 package template.core.base.store.screen
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.isOnlineDebounced
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -271,12 +272,21 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             }
         }
 
-    // Combine with FULL NetworkStatus (not just Boolean) for captive portal detection
+    // Combine with FULL NetworkStatus (not just Boolean) for captive portal detection.
+    // .onStart {} immediately emits NoNetwork when offline so that newly-created ViewModels
+    // (e.g., detail pages navigated to while offline) show NoNetwork instead of Loading.
+    // Without this, combine() cannot fire until storeFlow emits its first value (Store5
+    // round-trip), leaving the stateIn initialValue = Loading visible for a brief flash.
     val screenStateFlow: Flow<ScreenState<Output>> = combine(
         storeFlow,
         networkMonitor.networkStatus,
     ) { storeData, status ->
         DecisionEngine.decide(storeData, status)
+    }.onStart {
+        val current = networkMonitor.networkStatus.value
+        if (current !is NetworkStatus.Available) {
+            emit(ScreenState.NoNetwork(isCaptivePortal = current is NetworkStatus.CaptivePortal))
+        }
     }
 
     return ScreenDataStream(
@@ -370,6 +380,11 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         networkMonitor.networkStatus,
     ) { storeData, status ->
         DecisionEngine.decide(storeData, status)
+    }.onStart {
+        val current = networkMonitor.networkStatus.value
+        if (current !is NetworkStatus.Available) {
+            emit(ScreenState.NoNetwork(isCaptivePortal = current is NetworkStatus.CaptivePortal))
+        }
     }
 
     return ScreenDataStream(

@@ -12,6 +12,7 @@ package template.core.base.store.infra
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import org.mobilenativefoundation.store.core5.ExperimentalStoreApi
 import org.mobilenativefoundation.store.store5.MemoryPolicy
@@ -118,9 +119,12 @@ object StoreFactory {
      * @return A configured [Store] that streams exclusively from local storage.
      */
     fun <Key : Any, Output : Any> createOfflineStore(
-        sourceOfTruth: SourceOfTruth<Key, Output>,
+        sourceOfTruth: SourceOfTruth<Key, Output, Output>,
     ): Store<Key, Output> = StoreBuilder
-        .from(sourceOfTruth = sourceOfTruth)
+        .from(
+            fetcher = Fetcher.ofFlow<Key, Output> { _ -> emptyFlow() },
+            sourceOfTruth = sourceOfTruth,
+        )
         .build()
 
     /**

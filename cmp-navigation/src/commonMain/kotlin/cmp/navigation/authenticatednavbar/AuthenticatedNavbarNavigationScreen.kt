@@ -11,17 +11,13 @@ package cmp.navigation.authenticatednavbar
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration.Indefinite
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -31,15 +27,11 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
-import cmp.navigation.generated.resources.Res
-import cmp.navigation.generated.resources.not_connected
 import cmp.navigation.ui.KptRootScaffold
 import cmp.navigation.ui.ScaffoldNavigationData
 import cmp.navigation.ui.logDestinationChanged
 import cmp.navigation.ui.rememberKptNavController
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.ui.NavigationItem
 import org.mifos.feature.home.HomeDestination
@@ -49,6 +41,7 @@ import org.mifos.feature.profile.navigateToProfile
 import org.mifos.feature.profile.profileDestination
 import template.core.base.analytics.rememberAnalyticsHelper
 import template.core.base.designsystem.theme.motion
+import template.core.base.ui.KptConnectivityBanner
 import template.core.base.ui.effects.EventsEffect
 import template.core.base.ui.util.RootTransitionProviders
 
@@ -73,9 +66,6 @@ internal fun AuthenticatedNavbarNavigationScreen(
     viewModel: AuthenticatedNavbarNavigationViewModel = koinViewModel(),
 ) {
     val analyticsHelper = rememberAnalyticsHelper()
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val isOffline by viewModel.isOffline.collectAsStateWithLifecycle()
 
     EventsEffect(eventFlow = viewModel.eventFlow) { event ->
         navController.apply {
@@ -97,21 +87,8 @@ internal fun AuthenticatedNavbarNavigationScreen(
         }
     }
 
-    val message = stringResource(Res.string.not_connected)
-    LaunchedEffect(isOffline) {
-        if (isOffline) {
-            scope.launch {
-                snackbarHostState.showSnackbar(
-                    message = message,
-                    duration = Indefinite,
-                )
-            }
-        }
-    }
-
     AuthenticatedNavbarNavigationScreenContent(
         navController = navController,
-        snackbarHostState = snackbarHostState,
         modifier = modifier,
         navigateToSettingsScreen = navigateToSettingsScreen,
         navigateToLoans = navigateToLoans,
@@ -131,6 +108,14 @@ internal fun AuthenticatedNavbarNavigationScreen(
     )
 }
 
+/**
+ * Root authenticated scaffold.
+ *
+ * @param showConnectivityBanner When true (default), a `ConnectivityBanner` from
+ *   `cmp-network-monitor-compose` is shown at the top whenever the device is offline.
+ *   Pass `false` to suppress it — e.g. for apps without `INTERNET` permission or forks
+ *   that handle connectivity status via a different UI surface.
+ */
 @Composable
 internal fun AuthenticatedNavbarNavigationScreenContent(
     navController: NavHostController,
@@ -146,6 +131,7 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
     navigateToAmortization: () -> Unit,
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
+    showConnectivityBanner: Boolean = true,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
@@ -178,6 +164,12 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                 navBackStackEntry.isCurrentRoute(route = it.startDestinationRoute)
             },
         ),
+        utilityBar = {
+            // ConnectivityBanner observes NetworkMonitor directly — no ViewModel state needed.
+            // Slides in from top when offline, out when online.
+            // debounceMs = 300 suppresses WiFi↔Cell handoff flicker.
+            KptConnectivityBanner(showBanner = showConnectivityBanner)
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },

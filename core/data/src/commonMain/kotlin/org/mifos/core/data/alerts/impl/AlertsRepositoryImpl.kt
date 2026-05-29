@@ -19,7 +19,7 @@ import org.mifos.core.model.alerts.AlertDirection
 import org.mifos.core.model.alerts.PriceAlert
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
-import org.mobilenativefoundation.store.store5.StoreResponse
+import org.mobilenativefoundation.store.store5.StoreReadResponse
 
 internal class AlertsRepositoryImpl(
     private val alertsStore: Store<Unit, List<AlertEntity>>,
@@ -28,7 +28,7 @@ internal class AlertsRepositoryImpl(
 
     override fun alertsStream(): Flow<List<PriceAlert>> =
         alertsStore.stream(StoreReadRequest.cached(Unit, refresh = false))
-            .filterIsInstance<StoreResponse.Data<List<AlertEntity>>>()
+            .filterIsInstance<StoreReadResponse.Data<List<AlertEntity>>>()
             .map { response -> response.value.map { it.toPriceAlert() } }
 
     override suspend fun submitAlert(alert: PriceAlert): PriceAlert {

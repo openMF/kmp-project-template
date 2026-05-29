@@ -45,6 +45,8 @@ class AmortizationScheduleViewModel(
     private val loanId: String,
 ) : BaseViewModel<Unit, Nothing, Nothing>(Unit) {
 
+    override fun handleAction(action: Nothing): Unit = Unit
+
     val screenState: StateFlow<ScreenState<List<AmortizationRow>>> =
         repository.observeById(loanId)
             .map { loan ->

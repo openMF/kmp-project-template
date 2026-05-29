@@ -93,7 +93,6 @@ fun appScreenStateDefaults(): ScreenStateDefaults {
                 //   onShown = { error -> AppTelemetry.recordError("screen_state_error", error) },
             ),
             noNetwork = ScreenStateNoNetwork(
-                visual = ScreenStateVisual.Lottie(spec = DefaultLottieAnimations.noNetwork),
                 message = nonetMessage,
                 captivePortalMessage = captiveMessage,
                 captivePortalActionText = captiveAction,

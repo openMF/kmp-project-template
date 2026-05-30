@@ -131,8 +131,8 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
     navigateToAmortization: () -> Unit,
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
-    showConnectivityBanner: Boolean = true,
     modifier: Modifier = Modifier,
+    showConnectivityBanner: Boolean = true,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
 ) {

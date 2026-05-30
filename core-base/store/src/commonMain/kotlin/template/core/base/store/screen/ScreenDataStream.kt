@@ -193,6 +193,7 @@ fun <T> screenDataStreamForTesting(
  *   requests; pass `0L` to disable. Defaults to 1s. Protects against pull-to-refresh
  *   spam.
  */
+@Suppress("CyclomaticComplexMethod")
 @OptIn(ExperimentalCoroutinesApi::class, kotlin.time.ExperimentalTime::class)
 fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     key: Key,

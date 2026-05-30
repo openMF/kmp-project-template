@@ -182,8 +182,8 @@ private fun ScheduleTotalRow(
 private fun SummaryLine(
     label: String,
     value: String,
-    valueColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
     modifier: Modifier = Modifier,
+    valueColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),

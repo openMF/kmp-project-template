@@ -18,6 +18,7 @@ import org.mifos.core.data.di.DataModule
 import org.mifos.core.database.di.DatabaseModule
 import org.mifos.core.datastore.di.DatastoreModule
 import org.mifos.core.store.di.appStoreModule
+import org.mifos.sync.di.SyncModule
 import org.mifos.feature.bills.di.BillsModule
 import org.mifos.feature.calculators.di.CalculatorsModule
 import org.mifos.feature.currencyrates.di.CurrencyRatesModule
@@ -69,6 +70,8 @@ object KoinModules {
         )
     }
 
+    private val syncModule = SyncModule
+
     val allModules = listOf(
         SecurityModule,
         dataModule,
@@ -78,5 +81,6 @@ object KoinModules {
         DatastoreModule,
         featureModule,
         AppModule,
+        syncModule,
     )
 }

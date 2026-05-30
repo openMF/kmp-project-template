@@ -34,6 +34,10 @@ dependencies {
     compileOnly(libs.firebase.performance.gradlePlugin)
     compileOnly(libs.kover.gradlePlugin)
     implementation(libs.kmp.product.flavors.plugin)
+    // worker-kmp integration — see docs/getting-started/convention-plugin.md
+    // Rationale: pluginManager.apply resolves META-INF descriptor at RUNTIME;
+    // compileOnly keeps the descriptor off the runtime classpath → plugin-not-found.
+    implementation(libs.worker.app.plugin)
 }
 
 tasks {
@@ -130,6 +134,14 @@ gradlePlugin {
             id = "mifos.kmp.room"
             implementationClass = "KMPRoomConventionPlugin"
             description = "Configures Room for the project"
+        }
+
+        // worker-kmp integration plugin — wires worker-app + worker-compose-all + koin-compose + ExperimentalWorkerApi opt-in
+        register("workerCompose") {
+            id                  = "org.convention.worker.compose"
+            implementationClass = "WorkerComposeConventionPlugin"
+            description         = "Wires worker-kmp's worker-app plugin + worker-compose-all + " +
+                "koin-compose + ExperimentalWorkerApi opt-in into any CMP module that schedules work."
         }
 
     }

@@ -13,6 +13,8 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import cmp.shared.utils.initKoin
+import org.mifos.sync.Sync
+import org.mifos.sync.WorkScheduler
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -46,6 +48,10 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
             androidContext(this@AndroidApp)
             androidLogger()
         }
+
+        // NEW — start a background sync at app launch via the injected scheduler.
+        val scheduler: WorkScheduler = get()
+        Sync.initialize(scheduler)
 
         // Restore the user's saved language preference to AppCompatDelegate.
         // This ensures the app always launches with the user's chosen language,

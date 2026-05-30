@@ -11,12 +11,13 @@ package org.mifos.core.data.currency
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import org.mifos.core.data.infra.Syncable
 import org.mifos.core.model.currency.ExchangeRates
 import org.mifos.core.model.currency.RateHistory
 import org.mifos.core.model.currency.RateHistoryKey
 import template.core.base.store.screen.ScreenDataStream
 
-interface CurrencyRepository {
+interface CurrencyRepository : Syncable {
     fun exchangeRatesStream(baseCurrency: String, scope: CoroutineScope): ScreenDataStream<ExchangeRates>
 
     fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>

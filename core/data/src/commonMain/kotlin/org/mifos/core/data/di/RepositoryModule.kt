@@ -137,12 +137,13 @@ val DataModule = module {
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 
     // Fintech Repositories
-    single<CurrencyRepository> {
-        CurrencyRepositoryImpl(
-            exchangeRatesStore = get(AppStoreRegistry.ExchangeRates),
-            rateHistoryStore = get(AppStoreRegistry.RateHistory),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
+    // D20 — Phase 3 canonical Syncable adopters.
+    // D5/D8 amended 2026-05-30: bind by natural interface ONLY (no Syncable qualifier binding).
+    // Phase 4's DataSyncWorker constructor-injects both via Koin.
+    single<org.mifos.core.data.currency.CurrencyRepository> {
+        org.mifos.core.data.currency.impl.OfflineFirstCurrencyRepository(
+            frankfurterApi = get(),
+            currencyStore = get(),
         )
     }
     single<CryptoRepository> {
@@ -162,11 +163,10 @@ val DataModule = module {
             fetchedAtRepository = get(),
         )
     }
-    single<MacroIndicatorsRepository> {
-        MacroIndicatorsRepositoryImpl(
-            macroIndicatorStore = get(AppStoreRegistry.MacroIndicator),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
+    single<org.mifos.core.data.economic.MacroIndicatorsRepository> {
+        org.mifos.core.data.economic.impl.OfflineFirstMacroIndicatorsRepository(
+            worldBankApi = get(),
+            macroStore = get(),
         )
     }
 

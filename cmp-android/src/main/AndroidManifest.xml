@@ -16,6 +16,7 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <!--
     Firebase automatically adds the AD_ID permission, even though we don't use it. If you use this

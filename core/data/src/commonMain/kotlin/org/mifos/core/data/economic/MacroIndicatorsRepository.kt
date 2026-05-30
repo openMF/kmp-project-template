@@ -11,6 +11,7 @@ package org.mifos.core.data.economic
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import org.mifos.core.data.infra.Syncable
 import org.mifos.core.model.economic.MacroIndicator
 import org.mifos.core.store.economic.impl.MacroIndicatorKey
 import template.core.base.store.screen.ScreenDataStream
@@ -22,7 +23,7 @@ import template.core.base.store.screen.ScreenDataStream
  * [ScreenDataStream] that emits loading/empty/error/content transitions
  * automatically (per the toolkit's offline-first store contract).
  */
-interface MacroIndicatorsRepository {
+interface MacroIndicatorsRepository : Syncable {
 
     /**
      * Stream observations for a single static (country, indicator) pair.

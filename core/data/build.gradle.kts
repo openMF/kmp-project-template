@@ -37,6 +37,8 @@ kotlin {
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.worker.compose.all)
             api(libs.cmp.network.monitor)
         }
 

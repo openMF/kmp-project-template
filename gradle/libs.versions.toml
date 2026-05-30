@@ -125,6 +125,9 @@ room = "3.0.0-alpha05"
 sqliteBundled = "2.6.2"
 sqliteWeb = "2.6.2"
 
+
+# worker-kmp
+worker-version = "3.0.2"
 [libraries]
 kmp-product-flavors-plugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -364,6 +367,10 @@ androidx-compose-ui-test = [
     "androidx-compose-ui-test-manifest"
 ]
 
+
+# worker-kmp integration libraries
+worker-compose-all = { module = "io.github.mobilebytelabs:worker-compose-all", version.ref = "worker-version" }
+worker-app-plugin = { module = "io.github.mobilebytelabs:worker-app-plugin", version.ref = "worker-version" }
 [plugins]
 kmp-product-flavors = { id = "io.github.mobilebytelabs.kmp-product-flavors", version.ref = "kmpProductFlavors" }
 kmp-flavors-convention = { id = "org.convention.kmp.flavors" }
@@ -420,3 +427,6 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 #Room 3 Plugin
 room = { id = "androidx.room3", version.ref = "room" }
 mifos-kmp-room = { id = "mifos.kmp.room" }
+
+# worker-kmp Gradle plugin (registered for build-logic/convention)
+worker-app = { id = "io.github.mobilebytelabs.worker-app", version.ref = "worker-version" }

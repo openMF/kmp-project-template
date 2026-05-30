@@ -41,7 +41,6 @@ import org.mifos.feature.profile.navigateToProfile
 import org.mifos.feature.profile.profileDestination
 import template.core.base.analytics.rememberAnalyticsHelper
 import template.core.base.designsystem.theme.motion
-import template.core.base.ui.KptConnectivityBanner
 import template.core.base.ui.effects.EventsEffect
 import template.core.base.ui.util.RootTransitionProviders
 
@@ -108,14 +107,6 @@ internal fun AuthenticatedNavbarNavigationScreen(
     )
 }
 
-/**
- * Root authenticated scaffold.
- *
- * @param showConnectivityBanner When true (default), a `ConnectivityBanner` from
- *   `cmp-network-monitor-compose` is shown at the top whenever the device is offline.
- *   Pass `false` to suppress it — e.g. for apps without `INTERNET` permission or forks
- *   that handle connectivity status via a different UI surface.
- */
 @Composable
 internal fun AuthenticatedNavbarNavigationScreenContent(
     navController: NavHostController,
@@ -132,7 +123,6 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
     modifier: Modifier = Modifier,
-    showConnectivityBanner: Boolean = true,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
 ) {
@@ -164,12 +154,6 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                 navBackStackEntry.isCurrentRoute(route = it.startDestinationRoute)
             },
         ),
-        utilityBar = {
-            // ConnectivityBanner observes NetworkMonitor directly — no ViewModel state needed.
-            // Slides in from top when offline, out when online.
-            // debounceMs = 300 suppresses WiFi↔Cell handoff flicker.
-            KptConnectivityBanner(showBanner = showConnectivityBanner)
-        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },

@@ -1366,8 +1366,8 @@
 |    |    |    |    |         |    \--- co.touchlab:kermit-core-android:2.0.8
 |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.2.0 -> 2.3.20 (*)
 |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.2.0 -> 2.3.20 (*)
-|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1
-|    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.7.1
+|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0
+|    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.8.0
 |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.3.20 (*)
 |    |    |    |    +--- dev.gitlive:firebase-crashlytics:2.4.0
 |    |    |    |    |    \--- dev.gitlive:firebase-crashlytics-android:2.4.0
@@ -1454,7 +1454,9 @@
 |    |    |    |    +--- org.jetbrains.compose.ui:ui-util:1.9.1 -> 1.10.3 (*)
 |    |    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib -> 2.3.20 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.10.3 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.4.0 FAILED
+|    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.4.0 -> project :kmp-toolkit:cmp-network-monitor
+|    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.10 -> 2.3.20 (*)
+|    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    +--- project :core:designsystem
 |    |    |    +--- project :core-base:designsystem
@@ -1665,7 +1667,7 @@
 |    |    |    |    |    |                   +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.3.20 (*)
 |    |    |    |    |    |                   \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1 -> 1.10.2 (*)
 |    |    |    |    |    +--- org.mobilenativefoundation.store:cache5:5.1.0-alpha08 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.4.0 FAILED
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.4.0 -> project :kmp-toolkit:cmp-network-monitor (*)
 |    |    |    |    |    +--- io.insert-koin:koin-core:4.1.1 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
@@ -1677,7 +1679,7 @@
 |    |    |    |    |    |    +--- co.touchlab:kermit:2.0.8 (*)
 |    |    |    |    |    |    +--- com.squareup.okio:okio:3.16.4 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 (*)
-|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-core:4.1.1 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-annotations:2.1.0 (*)
@@ -1715,8 +1717,21 @@
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0 (*)
 |    |    |    |    |    +--- project :core-base:store (*)
 |    |    |    |    |    +--- project :core-base:designsystem (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor-compose:3.4.0 FAILED
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.4.0 FAILED
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor-compose:3.4.0 -> project :kmp-toolkit:cmp-network-monitor-compose
+|    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.10 -> 2.3.20 (*)
+|    |    |    |    |    |    +--- project :kmp-toolkit:cmp-network-monitor (*)
+|    |    |    |    |    |    +--- org.jetbrains.compose.runtime:runtime:1.10.3 (*)
+|    |    |    |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
+|    |    |    |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
+|    |    |    |    |    |    +--- org.jetbrains.compose.animation:animation:1.10.3 (*)
+|    |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.4.0
+|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-intent-launcher-android:3.4.0
+|    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.10 -> 2.3.20 (*)
+|    |    |    |    |    |         +--- androidx.core:core-ktx:1.13.1 -> 1.17.0 (*)
+|    |    |    |    |    |         +--- androidx.activity:activity:1.10.1 -> 1.12.2 (*)
+|    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 (*)
+|    |    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
 |    |    |    |    |    +--- org.jetbrains.compose.ui:ui:1.10.3 (*)
 |    |    |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
@@ -1889,7 +1904,7 @@
 |    |    |    |    |    +--- io.insert-koin:koin-android:4.1.1 (*)
 |    |    |    |    |    +--- project :core:common
 |    |    |    |    |    |    +--- co.touchlab:kermit:2.0.8 (*)
-|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-core:4.1.1 (*)
@@ -1962,7 +1977,7 @@
 |    |    |    |    |    |    +--- io.insert-koin:koin-annotations:2.1.0 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0 (*)
 |    |    |    |    |    |    +--- project :core:common (*)
-|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    |    |    |    +--- project :core-base:security
 |    |    |    |    |    |    +--- androidx.security:security-crypto:1.1.0-alpha06
@@ -2204,9 +2219,9 @@
 |    |    |    |    |    +--- de.jensklingenberg.ktorfit:ktorfit-lib:2.7.3 (*)
 |    |    |    |    |    +--- com.squareup.okio:okio:3.16.4 (*)
 |    |    |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
-|    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.4.0 FAILED
+|    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.4.0 -> project :kmp-toolkit:cmp-network-monitor (*)
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
-|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    +--- co.touchlab:kermit:2.0.8 (*)
 |    |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.10.3 (*)
@@ -2244,7 +2259,7 @@
 |    |    |    \--- androidx.tracing:tracing:1.3.0 (c)
 |    |    +--- io.insert-koin:koin-android:4.1.1 (*)
 |    |    +--- project :core:store (*)
-|    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.4.0 FAILED
+|    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.4.0 -> project :kmp-toolkit:cmp-network-monitor (*)
 |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 (*)
 |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    +--- io.insert-koin:koin-core:4.1.1 (*)
@@ -2259,7 +2274,7 @@
 |    |    +--- project :core-base:common (*)
 |    |    +--- project :core-base:network (*)
 |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
-|    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    +--- project :core:analytics (*)
 |    +--- io.insert-koin:koin-compose:4.1.1 (*)
@@ -2358,8 +2373,13 @@
 |    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.8.0 -> 1.10.3 (*)
 |    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.8.0 -> 1.10.3 (*)
 |    |    |    |         \--- org.jetbrains.compose.material:material:1.8.0 -> 1.10.3 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-share:3.4.0 FAILED
-|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.4.0 FAILED
+|    |    |    +--- io.github.mobilebytelabs:cmp-share:3.4.0
+|    |    |    |    \--- io.github.mobilebytelabs:cmp-share-android:3.4.0
+|    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.10 -> 2.3.20 (*)
+|    |    |    |         +--- androidx.core:core-ktx:1.13.1 -> 1.17.0 (*)
+|    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 (*)
+|    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
+|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.4.0 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    +--- project :core-base:security (*)
@@ -2399,7 +2419,7 @@
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
-|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    +--- project :feature:currency-rates
 |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
@@ -2631,7 +2651,7 @@
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
-|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    +--- project :feature:loans
 |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
@@ -2664,12 +2684,50 @@
 |    |    |    +--- project :core:domain (*)
 |    |    |    +--- project :core:model (*)
 |    |    |    +--- project :core-base:store (*)
+|    |    |    +--- project :feature:amortization
+|    |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
+|    |    |    |    +--- io.insert-koin:koin-android:4.1.1 (*)
+|    |    |    |    +--- io.insert-koin:koin-androidx-compose:4.1.1 (*)
+|    |    |    |    +--- io.insert-koin:koin-androidx-navigation:4.1.1 (*)
+|    |    |    |    +--- io.insert-koin:koin-core-viewmodel:4.1.1 (*)
+|    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 (*)
+|    |    |    |    +--- io.insert-koin:koin-core:4.1.1 (*)
+|    |    |    |    +--- io.insert-koin:koin-annotations:2.1.0 (*)
+|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0 (*)
+|    |    |    |    +--- project :core:ui (*)
+|    |    |    |    +--- project :core-base:ui (*)
+|    |    |    |    +--- project :core:designsystem (*)
+|    |    |    |    +--- project :core-base:designsystem (*)
+|    |    |    |    +--- project :core:data (*)
+|    |    |    |    +--- project :core:analytics (*)
+|    |    |    |    +--- io.insert-koin:koin-compose:4.1.1 (*)
+|    |    |    |    +--- io.insert-koin:koin-compose-viewmodel:4.1.1 (*)
+|    |    |    |    +--- org.jetbrains.compose.runtime:runtime:1.10.3 (*)
+|    |    |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.6 (*)
+|    |    |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.9.6 (*)
+|    |    |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.6 (*)
+|    |    |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate:2.9.6 (*)
+|    |    |    |    +--- org.jetbrains.androidx.savedstate:savedstate:1.4.0 -> 1.3.6 (*)
+|    |    |    |    +--- org.jetbrains.androidx.core:core-bundle:1.0.1 (*)
+|    |    |    |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.1 (*)
+|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0 (*)
+|    |    |    |    +--- project :core:common (*)
+|    |    |    |    +--- project :core:domain (*)
+|    |    |    |    +--- project :core:model (*)
+|    |    |    |    +--- project :core-base:store (*)
+|    |    |    |    +--- org.jetbrains.compose.ui:ui:1.10.3 (*)
+|    |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
+|    |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
+|    |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
+|    |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.10.3 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
-|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
+|    |    +--- project :feature:amortization (*)
 |    |    +--- project :feature:rates
 |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
 |    |    |    +--- io.insert-koin:koin-android:4.1.1 (*)
@@ -2706,7 +2764,7 @@
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 (*)
-|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 (*)
+|    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    +--- project :feature:calculators
 |    |    |    +--- io.insert-koin:koin-bom:4.1.1 (*)
@@ -2814,6 +2872,7 @@
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    |    \--- org.jetbrains.kotlin:kotlin-parcelize-runtime:2.3.20 (*)
 |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
+|    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    +--- org.jetbrains.compose.foundation:foundation:1.10.3 (*)
 |    |    +--- org.jetbrains.compose.ui:ui:1.10.3 (*)
 |    |    +--- org.jetbrains.compose.components:components-ui-tooling-preview:1.10.3 (*)

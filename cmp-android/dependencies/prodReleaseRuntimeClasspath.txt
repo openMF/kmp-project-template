@@ -1,4 +1,6 @@
 :cmp-navigation
+:cmp-network-monitor
+:cmp-network-monitor-compose
 :cmp-shared
 :core-base:analytics
 :core-base:common
@@ -23,6 +25,7 @@
 :core:platform
 :core:store
 :core:ui
+:feature:amortization
 :feature:bills
 :feature:calculators
 :feature:currency-rates
@@ -314,6 +317,10 @@ io.github.alexzhirkevich:compottie-android:2.0.0-rc04
 io.github.alexzhirkevich:compottie-resources-android:2.0.0-rc04
 io.github.alexzhirkevich:compottie-resources:2.0.0-rc04
 io.github.alexzhirkevich:compottie:2.0.0-rc04
+io.github.mobilebytelabs:cmp-intent-launcher-android:3.4.0
+io.github.mobilebytelabs:cmp-intent-launcher:3.4.0
+io.github.mobilebytelabs:cmp-share-android:3.4.0
+io.github.mobilebytelabs:cmp-share:3.4.0
 io.github.vinceglb:filekit-coil-android:0.12.0
 io.github.vinceglb:filekit-coil:0.12.0
 io.github.vinceglb:filekit-core-android:0.12.0
@@ -435,8 +442,8 @@ org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.10.2
 org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2
 org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2
 org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.2
-org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.7.1
-org.jetbrains.kotlinx:kotlinx-datetime:0.7.1
+org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.8.0
+org.jetbrains.kotlinx:kotlinx-datetime:0.8.0
 org.jetbrains.kotlinx:kotlinx-io-bytestring-jvm:0.8.2
 org.jetbrains.kotlinx:kotlinx-io-bytestring:0.8.2
 org.jetbrains.kotlinx:kotlinx-io-core-jvm:0.8.2

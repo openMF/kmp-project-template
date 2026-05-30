@@ -10,6 +10,14 @@
 package cmp.navigation.rootnav
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +40,7 @@ import cmp.navigation.ui.rememberKptNavController
 import cmp.navigation.utils.toObjectNavigationRoute
 import org.koin.compose.viewmodel.koinViewModel
 import template.core.base.designsystem.theme.motion
+import template.core.base.ui.KptConnectivityBanner
 import template.core.base.ui.util.NonNullEnterTransitionProvider
 import template.core.base.ui.util.NonNullExitTransitionProvider
 import template.core.base.ui.util.RootTransitionProviders
@@ -64,20 +73,35 @@ fun RootNavScreen(
     val noEnter = RootTransitionProviders.Kpt.Enter.none
     val noExit = RootTransitionProviders.Kpt.Exit.none
 
-    NavHost(
-        navController = navController,
-        startDestination = SplashRoute,
-        modifier = modifier,
-        enterTransition = { pickEnter(fadeThroughEnter, noEnter)(this) },
-        exitTransition = { pickExit(fadeThroughExit, noExit)(this) },
-        popEnterTransition = { pickEnter(fadeThroughEnter, noEnter)(this) },
-        popExitTransition = { pickExit(fadeThroughExit, noExit)(this) },
-    ) {
-        splashDestination()
-//        onboardingDestination()
-//        authNavGraph(navController)
-        authenticatedGraph(navController)
-//        userUnlockDestination()
+    // Column layout: connectivity stripe always sits above the NavHost.
+    // The stripe's outer Box unconditionally claims statusBarsPadding() space so the
+    // NavHost below it never sees the status-bar inset — inner TopAppBars start flush
+    // against the stripe without double-padding. This covers ALL authenticated routes
+    // (including Settings, Loans, etc.) without per-screen wiring.
+    Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        KptConnectivityBanner()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .consumeWindowInsets(WindowInsets.statusBars),
+        ) {
+            NavHost(
+                navController = navController,
+                startDestination = SplashRoute,
+                modifier = Modifier.fillMaxSize(),
+                enterTransition = { pickEnter(fadeThroughEnter, noEnter)(this) },
+                exitTransition = { pickExit(fadeThroughExit, noExit)(this) },
+                popEnterTransition = { pickEnter(fadeThroughEnter, noEnter)(this) },
+                popExitTransition = { pickExit(fadeThroughExit, noExit)(this) },
+            ) {
+                splashDestination()
+//            onboardingDestination()
+//            authNavGraph(navController)
+                authenticatedGraph(navController)
+//            userUnlockDestination()
+            }
+        }
     }
 
     val targetRoute = when (state) {

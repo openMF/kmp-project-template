@@ -44,7 +44,7 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.compose.rememberNetwor
 fun KptConnectivityBanner(
     modifier: Modifier = Modifier,
     showBanner: Boolean = true,
-    debounceMs: Long = 300L,
+    debounceMs: Long = 0L,
     message: String = "No internet connection",
     icon: ImageVector? = null,
     monitor: NetworkMonitor = rememberNetworkMonitor(),

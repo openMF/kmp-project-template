@@ -11,7 +11,6 @@ package template.core.base.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.compose.ConnectivityBanner
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.compose.rememberNetworkMonitor
@@ -26,16 +25,11 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.compose.rememberNetwor
  *
  * Placed via [KptRootScaffold]'s `utilityBar` slot at the authenticated root.
  * Slides in from the top when the device goes offline; slides out when back online.
- * The [debounceMs] default (300 ms) suppresses WiFi↔Cell handoff flicker.
  *
  * @param showBanner Set to `false` to suppress the banner entirely — e.g. for apps
  *   without `INTERNET` permission or forks that surface connectivity via a different UI.
  * @param debounceMs Debounce applied to the underlying online/offline state transition.
- *   Defaults to 300 ms to avoid flash on WiFi↔Cell handoff.
  * @param message Text shown in the banner when offline.
- * @param icon Optional leading icon displayed before the message.
- * @param trailingContent Optional composable slot after the message — e.g. a "Retry"
- *   [TextButton] or a [CircularProgressIndicator].
  * @param monitor The [NetworkMonitor] to observe. Defaults to the process-global singleton.
  *   Override in tests by passing a fake that lets you toggle online/offline state.
  * @param modifier Modifier forwarded to [ConnectivityBanner].
@@ -46,17 +40,13 @@ fun KptConnectivityBanner(
     showBanner: Boolean = true,
     debounceMs: Long = 0L,
     message: String = "No internet connection",
-    icon: ImageVector? = null,
     monitor: NetworkMonitor = rememberNetworkMonitor(),
-    trailingContent: (@Composable () -> Unit)? = null,
 ) {
     if (showBanner) {
         ConnectivityBanner(
             modifier = modifier,
             debounceMs = debounceMs,
             message = message,
-            icon = icon,
-            trailingContent = trailingContent,
             monitor = monitor,
         )
     }

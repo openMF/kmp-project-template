@@ -61,8 +61,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.common.formatGrouped
 import org.mifos.core.designsystem.component.AmountDisplay
-import org.mifos.core.designsystem.component.FreshnessIndicator
-import org.mifos.core.designsystem.component.FreshnessState
 import org.mifos.core.designsystem.component.MoneyText
 import org.mifos.core.designsystem.component.MoneyTone
 import org.mifos.core.designsystem.component.RateBadge
@@ -77,7 +75,9 @@ import org.mifos.feature.home.ui.HomeViewModel
 import org.mifos.feature.home.ui.LoansSummary
 import org.mifos.feature.home.ui.RatesQuickView
 import template.core.base.designsystem.component.AppCard
+import template.core.base.store.freshness.FreshnessSignal
 import template.core.base.store.screen.ScreenState
+import template.core.base.ui.freshness.FreshnessIndicator
 import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,6 +98,8 @@ internal fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val exchangeFreshness by viewModel.exchangeFreshness.collectAsStateWithLifecycle()
+    val ratesFreshness by viewModel.ratesFreshness.collectAsStateWithLifecycle()
     val sp = MaterialTheme.spacing
 
     Scaffold(
@@ -154,12 +156,14 @@ internal fun HomeScreen(
 
             RatesQuickCard(
                 state = state.rates,
+                freshness = ratesFreshness,
                 onRetry = { viewModel.trySendAction(HomeAction.RetryRates) },
                 onSeeAll = onNavigateToRates,
             )
 
             ExchangeRateCard(
                 state = state.exchangeRate,
+                freshness = exchangeFreshness,
                 onRetry = { viewModel.trySendAction(HomeAction.RetryExchangeRate) },
                 onSeeAll = onNavigateToExchangeRates,
             )
@@ -459,6 +463,7 @@ private fun BillsQuickCard(
 @Composable
 private fun RatesQuickCard(
     state: ScreenState<RatesQuickView>,
+    freshness: FreshnessSignal,
     onRetry: () -> Unit,
     onSeeAll: () -> Unit,
 ) {
@@ -466,6 +471,12 @@ private fun RatesQuickCard(
         title = "Today's Rates",
         icon = Icons.AutoMirrored.Default.TrendingUp,
         onSeeAll = onSeeAll,
+        trailing = {
+            FreshnessIndicator(
+                signal = freshness,
+                onRefresh = onRetry,
+            )
+        },
     ) {
         ScreenContent(
             state = state,
@@ -485,7 +496,6 @@ private fun RatesQuickCard(
                     direction = RateDirection.Up,
                     delta = "+0.05",
                 )
-                FreshnessIndicator(state = FreshnessState.Fresh, label = "Live · FRED")
             }
         }
     }
@@ -494,6 +504,7 @@ private fun RatesQuickCard(
 @Composable
 private fun ExchangeRateCard(
     state: ScreenState<org.mifos.core.model.currency.ExchangeRates>,
+    freshness: FreshnessSignal,
     onRetry: () -> Unit,
     onSeeAll: () -> Unit,
 ) {
@@ -501,6 +512,12 @@ private fun ExchangeRateCard(
         title = "USD Exchange",
         icon = Icons.Default.CurrencyExchange,
         onSeeAll = onSeeAll,
+        trailing = {
+            FreshnessIndicator(
+                signal = freshness,
+                onRefresh = onRetry,
+            )
+        },
     ) {
         ScreenContent(
             state = state,
@@ -539,6 +556,7 @@ private fun SectionCard(
     title: String,
     icon: ImageVector,
     onSeeAll: () -> Unit,
+    trailing: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     AppCard {
@@ -569,6 +587,7 @@ private fun SectionCard(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 )
+                trailing?.invoke()
             }
             Text(
                 text = "See all",

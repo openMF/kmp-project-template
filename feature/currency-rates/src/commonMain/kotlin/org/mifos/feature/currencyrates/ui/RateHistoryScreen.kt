@@ -36,6 +36,10 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
 import org.mifos.core.designsystem.theme.spacing
 import template.core.base.designsystem.component.AppCard
+import template.core.base.store.freshness.FreshnessBand
+import template.core.base.store.screen.ScreenState
+import template.core.base.ui.freshness.FreshnessIndicator
+import template.core.base.ui.freshness.RefreshStateChip
 import template.core.base.ui.screen.ScreenContent
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -47,6 +51,7 @@ fun RateHistoryScreen(
 ) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val localState by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val freshness by viewModel.freshness.collectAsStateWithLifecycle()
 
     val currencies = listOf("INR", "EUR", "GBP", "JPY", "AUD")
     val periods = listOf(7, 14, 30, 90)
@@ -55,7 +60,17 @@ fun RateHistoryScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Rate History") },
+                title = {
+                    androidx.compose.foundation.layout.Row(
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    ) {
+                        Text("Rate History")
+                        FreshnessIndicator(
+                            signal = freshness,
+                            onRefresh = viewModel::onRetry,
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -64,68 +79,83 @@ fun RateHistoryScreen(
             )
         },
     ) { padding ->
-        ScreenContent(
-            state = screenState,
-            onRetry = viewModel::onRetry,
+        // Inline carry-forward chip: when an input-store key-change fetch fails but
+        // previous data is preserved (Phase 2 T7 fix), surface a non-destructive
+        // explanation instead of letting the user wonder why old data still shows.
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-        ) { history, _ ->
-            val sp = MaterialTheme.spacing
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = sp.lg),
-                verticalArrangement = Arrangement.spacedBy(sp.sm),
-            ) {
-                AppCard(modifier = Modifier.padding(top = sp.sm)) {
-                    Column(
-                        modifier = Modifier.padding(sp.md),
-                        verticalArrangement = Arrangement.spacedBy(sp.sm),
-                    ) {
-                        Text("Currency", style = MaterialTheme.typography.labelMedium)
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
-                            currencies.forEach { code ->
-                                FilterChip(
-                                    selected = localState.targetCurrency == code,
-                                    onClick = {
-                                        viewModel.trySendAction(HistoryAction.SelectCurrency(code))
-                                    },
-                                    label = { Text(code) },
-                                )
-                            }
-                        }
-                        Text("Period", style = MaterialTheme.typography.labelMedium)
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
-                            periods.forEach { days ->
-                                FilterChip(
-                                    selected = localState.periodDays == days,
-                                    onClick = {
-                                        viewModel.trySendAction(HistoryAction.SelectPeriod(days))
-                                    },
-                                    label = { Text("${days}d") },
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Text(
-                    text = "USD \u2192 ${history.to} (${history.startDate} to ${history.endDate})",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+        ) {
+            if (screenState is ScreenState.Content && freshness.band == FreshnessBand.VeryStale) {
+                RefreshStateChip(
+                    signal = freshness,
+                    onRetry = viewModel::onRetry,
+                    modifier = Modifier
+                        .padding(horizontal = MaterialTheme.spacing.lg, vertical = MaterialTheme.spacing.xs),
                 )
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    items(history.rates) { point ->
-                        Text(
-                            text = "${point.date}  \u2192  ${point.value.formatDecimal(4)}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(vertical = sp.sm),
-                        )
-                        HorizontalDivider()
+            }
+            ScreenContent(
+                state = screenState,
+                onRetry = viewModel::onRetry,
+                modifier = Modifier.fillMaxSize(),
+            ) { history, _ ->
+                val sp = MaterialTheme.spacing
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = sp.lg),
+                    verticalArrangement = Arrangement.spacedBy(sp.sm),
+                ) {
+                    AppCard(modifier = Modifier.padding(top = sp.sm)) {
+                        Column(
+                            modifier = Modifier.padding(sp.md),
+                            verticalArrangement = Arrangement.spacedBy(sp.sm),
+                        ) {
+                            Text("Currency", style = MaterialTheme.typography.labelMedium)
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
+                                currencies.forEach { code ->
+                                    FilterChip(
+                                        selected = localState.targetCurrency == code,
+                                        onClick = {
+                                            viewModel.trySendAction(HistoryAction.SelectCurrency(code))
+                                        },
+                                        label = { Text(code) },
+                                    )
+                                }
+                            }
+                            Text("Period", style = MaterialTheme.typography.labelMedium)
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
+                                periods.forEach { days ->
+                                    FilterChip(
+                                        selected = localState.periodDays == days,
+                                        onClick = {
+                                            viewModel.trySendAction(HistoryAction.SelectPeriod(days))
+                                        },
+                                        label = { Text("${days}d") },
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = "USD \u2192 ${history.to} (${history.startDate} to ${history.endDate})",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    LazyColumn(modifier = Modifier.weight(1f)) {
+                        items(history.rates) { point ->
+                            Text(
+                                text = "${point.date}  \u2192  ${point.value.formatDecimal(4)}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(vertical = sp.sm),
+                            )
+                            HorizontalDivider()
+                        }
                     }
                 }
-            }
-        }
+            } // \u2190 close ScreenContent { history, _ -> ... }
+        } // \u2190 close outer Column wrapper
     }
 }

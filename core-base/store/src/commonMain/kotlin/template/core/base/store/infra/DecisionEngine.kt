@@ -10,8 +10,13 @@
 package template.core.base.store.infra
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 import template.core.base.store.error.ErrorCategory
 import template.core.base.store.error.categorize
+import template.core.base.store.freshness.FreshnessBands
+import template.core.base.store.freshness.FreshnessSignal
 import template.core.base.store.screen.DataFreshness
 import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.screen.ScreenState
@@ -78,5 +83,43 @@ object DecisionEngine {
             error != null -> ScreenState.Content(storeData.data, DataFreshness.STALE, fetchedAt)
             else -> ScreenState.Content(storeData.data, DataFreshness.FRESH, fetchedAt)
         }
+    }
+
+    /**
+     * Pure sibling function: maps [storeData] + [ttl] to a [FreshnessSignal].
+     *
+     * Decoupled from [decide]; runs in parallel and outputs the per-card freshness
+     * signal consumed by `FreshnessIndicator`. `networkStatus` is accepted for
+     * API symmetry with [decide] but **deliberately ignored** — freshness is purely
+     * time-relative + last-error-aware. Network connectivity is rendered separately
+     * by `ConnectivityBanner`.
+     *
+     * @param storeData snapshot from the Store pipeline (uses `fetchedAtInstant` + `error`)
+     * @param networkStatus accepted for API symmetry; NOT read
+     * @param ttl per-store TTL bound (from `AppStoreRegistry.Ttl`); above this age the
+     *   band degrades from Fresh → Stale → VeryStale
+     */
+    @OptIn(ExperimentalTime::class)
+    fun <T> decideFreshness(
+        storeData: StoreData<T>,
+        @Suppress("UNUSED_PARAMETER")
+        networkStatus: NetworkStatus,
+        ttl: Duration,
+    ): FreshnessSignal {
+        val now = Clock.System.now()
+        val lastSyncedAt = storeData.fetchedAtInstant
+        val lastError = storeData.error
+        val band = FreshnessBands.bandFor(
+            now = now,
+            lastSyncedAt = lastSyncedAt,
+            ttl = ttl,
+            lastError = lastError,
+        )
+        return FreshnessSignal(
+            lastSyncedAt = lastSyncedAt,
+            ttl = ttl,
+            lastError = lastError,
+            band = band,
+        )
     }
 }

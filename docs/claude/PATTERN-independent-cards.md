@@ -112,10 +112,13 @@ you have ≥ 5 cards.
   `CACHE_ONLY` will re-emit instantly (they never hit the network); cards
   backed by `NETWORK_WITH_CACHE` or `NETWORK_ONLY` will fan out parallel
   network calls.
-- **Stale-while-revalidate:** each card's `DataFreshness.UPDATING` indicator
-  shows mid-refresh; the card never blanks back to `Loading` once it has
-  cached content (handled by `ScreenDataStream`'s state-machine — no extra
-  wiring needed at the screen level).
+- **Stale-while-revalidate:** each card exposes a `FreshnessIndicator(signal, onRefresh)`
+  driven by `ScreenDataStream.freshness` — a pure time-based staleness signal
+  (`FreshnessBand.Initial / Fresh / Stale / VeryStale`) decoupled from
+  `NetworkMonitor`. Network connectivity is rendered separately by the global
+  `ConnectivityBanner`. The card never blanks back to `Loading` once it has cached
+  content (handled by `ScreenDataStream`'s state-machine — no extra wiring needed
+  at the screen level).
 
 ---
 

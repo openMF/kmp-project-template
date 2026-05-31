@@ -10,6 +10,7 @@
 package template.core.base.store.infra
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
+import template.core.base.store.freshness.FreshnessBand
 import template.core.base.store.screen.DataFreshness
 import template.core.base.store.screen.ScreenState
 import template.core.base.store.screen.DataOrigin
@@ -20,7 +21,11 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.ExperimentalTime
 
 class DecisionEngineTest {
 
@@ -200,6 +205,65 @@ class DecisionEngineTest {
         assertIs<ScreenState.Error>(result)
     }
 
+    // === decideFreshness() sibling — pure time-based staleness ===
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `decideFreshness - has data + online + fresh = Fresh band`() {
+        val now = Clock.System.now()
+        val data = dataStoreData("cached", fetchedAtInstant = now - 2.minutes)
+        val signal = DecisionEngine.decideFreshness(data, available, ttl = 5.minutes)
+        assertEquals(FreshnessBand.Fresh, signal.band)
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `decideFreshness - has data + age between ttl and 3xttl = Stale band`() {
+        val now = Clock.System.now()
+        val data = dataStoreData("cached", fetchedAtInstant = now - 8.minutes)
+        val signal = DecisionEngine.decideFreshness(data, available, ttl = 5.minutes)
+        assertEquals(FreshnessBand.Stale, signal.band)
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `decideFreshness - has data + offline + fresh = Fresh band (network ignored)`() {
+        // freshness is pure time + error; network connectivity is NEVER read.
+        val now = Clock.System.now()
+        val data = dataStoreData("cached", fetchedAtInstant = now - 2.minutes)
+        val signal = DecisionEngine.decideFreshness(data, unavailable, ttl = 5.minutes)
+        assertEquals(FreshnessBand.Fresh, signal.band)
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `decideFreshness - has data + last error = VeryStale band with lastError preserved`() {
+        val now = Clock.System.now()
+        val err = RuntimeException("HTTP 503")
+        val data = dataStoreData("cached", fetchedAtInstant = now - 1.minutes, error = err)
+        val signal = DecisionEngine.decideFreshness(data, available, ttl = 5.minutes)
+        assertEquals(FreshnessBand.VeryStale, signal.band)
+        assertNotNull(signal.lastError)
+        assertEquals(err, signal.lastError)
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `decideFreshness - no data + no error = Initial band`() {
+        val data = emptyStoreData()
+        val signal = DecisionEngine.decideFreshness(data, available, ttl = 5.minutes)
+        assertEquals(FreshnessBand.Initial, signal.band)
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test
+    fun `decideFreshness - has data + age over 3xttl = VeryStale band`() {
+        val now = Clock.System.now()
+        val data = dataStoreData("cached", fetchedAtInstant = now - 20.minutes)
+        val signal = DecisionEngine.decideFreshness(data, available, ttl = 5.minutes)
+        assertEquals(FreshnessBand.VeryStale, signal.band)
+    }
+
     // === Helpers ===
 
     private fun emptyStoreData(error: Throwable? = null): StoreData<String> = StoreData(
@@ -209,16 +273,19 @@ class DecisionEngineTest {
         error = error,
     )
 
+    @OptIn(ExperimentalTime::class)
     private fun dataStoreData(
         value: String,
         isRefreshing: Boolean = false,
         error: Throwable? = null,
+        fetchedAtInstant: kotlin.time.Instant? = null,
     ): StoreData<String> = StoreData(
         data = value,
         origin = DataOrigin.CACHE,
         isEmpty = false,
         isRefreshing = isRefreshing,
         error = error,
+        fetchedAtInstant = fetchedAtInstant,
     )
 }
 

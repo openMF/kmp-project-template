@@ -10,8 +10,12 @@
 package org.mifos.feature.home.ui
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import org.mifos.core.data.banking.BillReminderRepository
 import org.mifos.core.data.banking.LoanRepository
 import org.mifos.core.data.currency.CurrencyRepository
@@ -19,6 +23,8 @@ import org.mifos.core.data.economic.EconomicRatesRepository
 import org.mifos.core.model.banking.BillReminder
 import org.mifos.core.model.currency.ExchangeRates
 import org.mifos.core.store.economic.impl.InterestRateSeriesKey
+import template.core.base.store.freshness.FreshnessBand
+import template.core.base.store.freshness.FreshnessSignal
 import template.core.base.store.screen.DataFreshness
 import template.core.base.store.screen.FetchPolicy
 import template.core.base.store.screen.ScreenState
@@ -73,6 +79,34 @@ class HomeViewModel(
     private val mortgageStream = economicRatesRepository.interestRateSeriesStream(
         key = Mortgage30YKey,
         scope = viewModelScope,
+    )
+
+    /**
+     * Per-card freshness for the Exchange Rate widget — drives the [FreshnessIndicator]
+     * info icon next to the card title. Pure time-based staleness; network connectivity
+     * is rendered separately by the global `ConnectivityBanner`.
+     */
+    val exchangeFreshness: StateFlow<FreshnessSignal> = exchangeRateStream.freshness
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = STATE_TIMEOUT_MS),
+            initialValue = FreshnessSignal.initial(),
+        )
+
+    /**
+     * Per-card freshness for the Rates Quick widget — combines the worse of the two
+     * underlying FRED series (Fed Funds + 30Y Mortgage) so the indicator surfaces the
+     * weakest signal across the two streams.
+     */
+    val ratesFreshness: StateFlow<FreshnessSignal> = combine(
+        fedFundsStream.freshness,
+        mortgageStream.freshness,
+    ) { fed, mortgage ->
+        if (mortgage.band.severity() > fed.band.severity()) mortgage else fed
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(stopTimeoutMillis = STATE_TIMEOUT_MS),
+        initialValue = FreshnessSignal.initial(),
     )
 
     init {
@@ -146,7 +180,22 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Returns a "worse-of-two" ordering on [FreshnessBand] — used by the rates-quick
+     * combiner to surface the weaker of two source signals. Order: Initial < Fresh <
+     * Stale < VeryStale (higher = worse).
+     */
+    private fun FreshnessBand.severity(): Int = when (this) {
+        FreshnessBand.Initial -> 0
+        FreshnessBand.Fresh -> 1
+        FreshnessBand.Stale -> 2
+        FreshnessBand.VeryStale -> 3
+    }
+
     companion object {
+        /** WhileSubscribed timeout for the per-card freshness StateFlows. */
+        private const val STATE_TIMEOUT_MS: Long = 5_000L
+
         /** Lookahead window for the "Upcoming Bills" widget. */
         const val UPCOMING_BILLS_WINDOW_DAYS: Int = 7
 

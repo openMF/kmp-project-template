@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.stateIn
 import org.mifos.core.data.currency.CurrencyRepository
 import org.mifos.core.model.currency.RateHistory
 import org.mifos.core.model.currency.RateHistoryKey
+import template.core.base.store.freshness.FreshnessSignal
 import template.core.base.store.screen.ScreenState
 import template.core.base.ui.viewmodel.BaseViewModel
 
@@ -36,6 +37,17 @@ class RateHistoryViewModel(
 
     val screenState: StateFlow<ScreenState<RateHistory>> = stream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
+
+    /**
+     * Per-card freshness signal. Input-type store: when the user changes period/currency
+     * and the new key's fetch fails, the previous selection's data is preserved as a
+     * stale fallback (via [ScreenDataStream.flatMapLatest] carry-forward) — the
+     * freshness Flow surfaces a `VeryStale` band + categorised `lastError`, letting the
+     * UI render an inline `RefreshStateChip` ("No network · Showing previous data ↺")
+     * instead of a full-screen `NoNetwork`.
+     */
+    val freshness: StateFlow<FreshnessSignal> = stream.freshness
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FreshnessSignal.initial())
 
     fun onRetry() {
         trySendAction(HistoryAction.Retry)

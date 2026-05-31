@@ -10,6 +10,7 @@
 package org.mifos.core.store
 
 import template.core.base.store.infra.StoreRegistry
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -74,4 +75,23 @@ object AppStoreRegistry : StoreRegistry() {
         /** World Bank publishes annually; 7 days is conservatively fresh. */
         val MACRO_INDICATOR = 7.days
     }
+
+    /**
+     * Runtime lookup of per-store TTL by qualifier name — paired with the compile-time
+     * [Ttl] object so `ScreenDataStream` / `asScreenStream` can resolve a store's TTL
+     * dynamically when the key/qualifier is only known at runtime (e.g. multi-store
+     * registries, store-by-name fan-outs).
+     *
+     * Keys correspond to the qualifier name passed into [store] (e.g. `"exchangeRates"`).
+     * Stores not listed here have no registered TTL — callers should pass a sensible
+     * default to `asScreenStream(ttl = ...)`.
+     */
+    val ttlByName: Map<String, Duration> = mapOf(
+        "exchangeRates" to Ttl.EXCHANGE_RATES,
+        "rateHistory" to Ttl.RATE_HISTORY,
+        "coinMarkets" to Ttl.COIN_MARKETS,
+        "coinDetail" to Ttl.COIN_DETAIL,
+        "interestRateSeries" to Ttl.INTEREST_RATE_SERIES,
+        "macroIndicator" to Ttl.MACRO_INDICATOR,
+    )
 }

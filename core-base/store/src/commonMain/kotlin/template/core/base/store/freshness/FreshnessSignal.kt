@@ -1,0 +1,52 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package template.core.base.store.freshness
+
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+
+/**
+ * Pure-staleness signal carried by [template.core.base.store.screen.ScreenDataStream.freshness]
+ * alongside `state`. Decouples cache age from network connectivity.
+ *
+ * UI maps `band` to a per-card freshness indicator (icon + tooltip); the surrounding
+ * `lastSyncedAt` / `ttl` / `lastError` fields are exposed so tooltips can humanize the
+ * age and categorize the error message.
+ *
+ * Construction is normally indirect via [template.core.base.store.infra.DecisionEngine.decideFreshness]
+ * or the sibling Flow on `ScreenDataStream`. Tests + initial StateFlow values use [initial].
+ */
+@OptIn(ExperimentalTime::class)
+data class FreshnessSignal(
+    val lastSyncedAt: Instant?,
+    val ttl: Duration,
+    val lastError: Throwable?,
+    val band: FreshnessBand,
+) {
+    companion object {
+        /**
+         * Convenience factory for the "never synced, no error" initial state.
+         * Used as the initial value for `StateFlow<FreshnessSignal>` in ViewModels and
+         * as the default in `ScreenState.Content.freshnessSignal`.
+         *
+         * The `ttl` argument has no effect on the resulting band (which is always
+         * [FreshnessBand.Initial]); it defaults to 24 hours so the resulting signal
+         * is a safe fallback if a consumer later reads it without a real TTL bound.
+         */
+        fun initial(ttl: Duration = 24.hours): FreshnessSignal = FreshnessSignal(
+            lastSyncedAt = null,
+            ttl = ttl,
+            lastError = null,
+            band = FreshnessBand.Initial,
+        )
+    }
+}

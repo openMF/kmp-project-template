@@ -12,6 +12,8 @@ package template.core.base.store.screen
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.isOnlineDebounced
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -27,6 +30,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.mobilenativefoundation.store.store5.Store
+import template.core.base.store.freshness.FreshnessSignal
 import template.core.base.store.infra.DecisionEngine
 import template.core.base.store.infra.FetchedAtRepository
 
@@ -86,6 +90,19 @@ class ScreenDataStream<T> internal constructor(
      * when consumer applies mapContent/combineContent before stateIn.
      */
     val state: Flow<ScreenState<T>>,
+    /**
+     * Cold sibling Flow of pure-staleness [FreshnessSignal]s — derived from the same
+     * underlying [StoreData] snapshot as [state] but decoupled from `NetworkStatus`.
+     *
+     * ViewModels typically convert this to `StateFlow<FreshnessSignal>` via
+     * `.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FreshnessSignal.initial())`
+     * and pass it into `FreshnessIndicator(signal, onRefresh)` next to the card title.
+     *
+     * Defaults to an empty Flow for back-compat with test-only constructors that don't
+     * supply a freshness stream; production code paths through `asScreenStream` always
+     * supply a non-empty Flow.
+     */
+    val freshness: Flow<FreshnessSignal> = emptyFlow(),
     private val refreshTrigger: MutableSharedFlow<Unit>,
     private val userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
     private val timeSource: kotlin.time.TimeSource = kotlin.time.TimeSource.Monotonic,
@@ -154,8 +171,10 @@ fun <T> screenDataStreamForTesting(
     refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
     userRefreshDebounceMs: Long = 0L, // tests don't want debounce by default
     timeSource: kotlin.time.TimeSource = kotlin.time.TimeSource.Monotonic,
+    freshness: Flow<FreshnessSignal> = emptyFlow(),
 ): ScreenDataStream<T> = ScreenDataStream(
     state = state,
+    freshness = freshness,
     refreshTrigger = refreshTrigger,
     userRefreshDebounceMs = userRefreshDebounceMs,
     timeSource = timeSource,
@@ -193,7 +212,7 @@ fun <T> screenDataStreamForTesting(
  *   requests; pass `0L` to disable. Defaults to 1s. Protects against pull-to-refresh
  *   spam.
  */
-@Suppress("CyclomaticComplexMethod")
+@Suppress("CyclomaticComplexMethod", "LongParameterList")
 @OptIn(ExperimentalCoroutinesApi::class, kotlin.time.ExperimentalTime::class)
 fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     key: Key,
@@ -205,6 +224,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
     reconnectDebounceMs: Long = DEFAULT_RECONNECT_DEBOUNCE_MS,
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
+    ttl: Duration = 24.hours,
 ): ScreenDataStream<Output> {
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -290,8 +310,18 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         }
     }
 
+    // Sibling Flow of pure-staleness signals — derived from the same storeFlow snapshot
+    // but decoupled from NetworkStatus. networkStatus is passed for API symmetry only.
+    val freshnessFlow: Flow<FreshnessSignal> = combine(
+        storeFlow,
+        networkMonitor.networkStatus,
+    ) { storeData, status ->
+        DecisionEngine.decideFreshness(storeData = storeData, networkStatus = status, ttl = ttl)
+    }.distinctUntilChanged()
+
     return ScreenDataStream(
         state = screenStateFlow,
+        freshness = freshnessFlow,
         refreshTrigger = refreshTrigger,
         userRefreshDebounceMs = userRefreshDebounceMs,
     )
@@ -317,6 +347,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
     reconnectDebounceMs: Long = DEFAULT_RECONNECT_DEBOUNCE_MS,
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
+    ttl: Duration = 24.hours,
 ): ScreenDataStream<Output> {
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -349,7 +380,13 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         refreshTrigger.onStart { emit(Unit) },
     ) { key, _ -> key }
         .flatMapLatest { key ->
-            lastContent = null // Reset on key change
+            // NOTE: do NOT null `lastContent` on key change — carry previous content forward
+            // as a stale fallback so input-type stores (Rate History period/currency picker)
+            // keep showing data while the new key's fetch is in-flight or fails. The
+            // sibling `freshness` Flow surfaces a VeryStale band with `lastError` populated
+            // when carry-forward is active, letting UI render an inline `RefreshStateChip`
+            // ("No network · Showing previous data ↺") rather than a full-screen NoNetwork.
+            // `lastContent` is updated to the new key's data once a successful fetch arrives.
             currentCacheKey = cacheKeyFor(key)
             // Re-seed persistedFetchedAt for the new key.
             persistedFetchedAt = fetchedAtRepository.read(currentCacheKey)
@@ -366,11 +403,18 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                     storeData.copy(fetchedAtInstant = persistedFetchedAt)
                 else -> storeData
             }
+            val carry = lastContent
             if (!enriched.isEmpty) {
                 lastContent = enriched
                 enriched
-            } else if (enriched.isEmpty && lastContent != null && enriched.error == null) {
-                lastContent!!.copy(isRefreshing = true)
+            } else if (carry != null && enriched.error == null) {
+                // Empty mid-refresh — preserve last content with isRefreshing=true.
+                carry.copy(isRefreshing = true)
+            } else if (carry != null && enriched.error != null) {
+                // Empty + error mid-key-change — preserve last content, attach error so
+                // DecisionEngine routes to Content (has data + error → STALE) instead of
+                // NoNetwork, and the sibling freshness Flow emits VeryStale + lastError.
+                carry.copy(isRefreshing = false, error = enriched.error)
             } else {
                 enriched
             }
@@ -388,8 +432,17 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         }
     }
 
+    // Sibling Flow of pure-staleness signals — see single-key overload for rationale.
+    val freshnessFlow: Flow<FreshnessSignal> = combine(
+        storeFlow,
+        networkMonitor.networkStatus,
+    ) { storeData, status ->
+        DecisionEngine.decideFreshness(storeData = storeData, networkStatus = status, ttl = ttl)
+    }.distinctUntilChanged()
+
     return ScreenDataStream(
         state = screenStateFlow,
+        freshness = freshnessFlow,
         refreshTrigger = refreshTrigger,
         userRefreshDebounceMs = userRefreshDebounceMs,
     )

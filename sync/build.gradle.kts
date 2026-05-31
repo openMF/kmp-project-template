@@ -15,7 +15,7 @@ kotlin {
         // worker-compose-all and koin-compose come from the convention plugin
     }
     sourceSets.androidMain.dependencies {
-        implementation(libs.androidx.core.ktx)  // NotificationManagerCompat
+        implementation(libs.androidx.core.ktx) // NotificationManagerCompat
     }
     sourceSets.commonTest.dependencies {
         implementation(libs.kotlin.test)

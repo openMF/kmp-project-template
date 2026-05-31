@@ -11,7 +11,7 @@ package org.mifos.core.data.economic
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import org.mifos.core.data.infra.Syncable
+import io.github.mobilebytelabs.worker.scheduler.sync.Syncable
 import org.mifos.core.model.economic.MacroIndicator
 import org.mifos.core.store.economic.impl.MacroIndicatorKey
 import template.core.base.store.screen.ScreenDataStream

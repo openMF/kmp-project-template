@@ -74,7 +74,10 @@ plugins {
 }
 
 object DynamicVersion {
-    fun setDynamicVersion(file: File, version: String) {
+    fun setDynamicVersion(
+        file: File,
+        version: String,
+    ) {
         val cleanedVersion = version.split('+')[0]
         file.writeText(cleanedVersion)
     }
@@ -131,4 +134,3 @@ moduleGraphAssert {
     configurations += setOf("nativeMainImplementation", "nativeMainApi")
     configurations += setOf("wasmJsMainImplementation", "wasmJsMainApi")
 }
-

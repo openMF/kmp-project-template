@@ -46,7 +46,7 @@ kotlin {
             //   implementation(projects.feature.archive.watchlist)
             //   implementation(projects.feature.archive.alerts)
 
-            //put your multiplatform dependencies here
+            // put your multiplatform dependencies here
             implementation(compose.material3)
             implementation(compose.foundation)
             implementation(compose.ui)

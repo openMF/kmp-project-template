@@ -66,7 +66,7 @@ project-specific values.
 fastlane android assembleDebugApks
 
 # Build release APK
-fastlane android assembleReleaseApks 
+fastlane android assembleReleaseApks
 # Optional params: store_file, store_password, key_alias, key_password
 
 # Deploy to Firebase App Distribution

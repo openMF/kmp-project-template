@@ -4,8 +4,8 @@ import io.github.mobilebytelabs.worker.WorkData
 import io.github.mobilebytelabs.worker.workDataOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import org.mifos.core.data.infra.Synchronizer
-import org.mifos.core.data.infra.snapshotSync
+import io.github.mobilebytelabs.worker.scheduler.sync.Synchronizer
+import io.github.mobilebytelabs.worker.scheduler.sync.snapshotSync
 import org.mifos.core.data.economic.MacroIndicatorsRepository
 import org.mifos.core.data.economic.SupportedCountries
 import org.mifos.core.model.economic.Country

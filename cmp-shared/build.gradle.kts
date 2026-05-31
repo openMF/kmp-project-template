@@ -19,7 +19,7 @@ plugins {
 kotlin {
     listOf(
         iosArm64(),
-        iosSimulatorArm64()
+        iosSimulatorArm64(),
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
@@ -51,7 +51,11 @@ kotlin {
     cocoapods {
         summary = "KMP Shared Module"
         homepage = "https://github.com/openMF/kmp-project-template"
-        version = project.version.toString().substringBefore("-").substringBefore("+")
+        version =
+            project.version
+                .toString()
+                .substringBefore("-")
+                .substringBefore("+")
         ios.deploymentTarget = "16.0"
         podfile = project.file("../cmp-ios/Podfile")
 

@@ -1,12 +1,15 @@
-// File: samples/kmp-project-template/sync/src/commonMain/kotlin/org/mifos/sync/NotificationWorker.kt
 package org.mifos.sync
 
 import io.github.mobilebytelabs.worker.CoroutineWorker
-import io.github.mobilebytelabs.worker.ForegroundInfo
 import io.github.mobilebytelabs.worker.WorkResult
 import io.github.mobilebytelabs.worker.WorkerContext
 
-/** Reads NotificationContent from inputData and delegates to expect/actual renderNotification. */
+/**
+ * Sample-side worker: reads NotificationContent from inputData and delegates to the
+ * expect/actual `renderNotification`. Scheduled via raw
+ * `workManager.enqueue(oneTimeWorkRequest<NotificationWorker> { setInputData(...); setInitialDelay(...) })`
+ * — see [org.mifos.feature.loans.LoanReminderUseCase] for the canonical use pattern.
+ */
 class NotificationWorker(ctx: WorkerContext) : CoroutineWorker(ctx) {
 
     override suspend fun doWork(): WorkResult {
@@ -18,16 +21,7 @@ class NotificationWorker(ctx: WorkerContext) : CoroutineWorker(ctx) {
             renderNotification(content)
             WorkResult.success()
         } catch (t: Throwable) {
-            WorkResult.failure(t.message)
+            WorkResult.failure(t.message ?: t::class.simpleName ?: "render failed")
         }
-    }
-
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        val title = inputData.getString("title").orEmpty()
-        return ForegroundInfo(
-            notificationId = FOREGROUND_NOTIFICATION_ID_NOTIFICATION,
-            title = title,
-            body = "Preparing notification…",
-        )
     }
 }

@@ -18,7 +18,7 @@ android {
 }
 
 kotlin {
-    sourceSets{
+    sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.compose.ui.tooling)
         }

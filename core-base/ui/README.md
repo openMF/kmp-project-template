@@ -688,7 +688,7 @@ Beyond basic image transitions, shared elements can be used for:
    ) {
        // Card content
    }
-   
+
    // In detail screen:
    Surface(
        modifier = Modifier
@@ -712,7 +712,7 @@ Beyond basic image transitions, shared elements can be used for:
            state = rememberSharedContentState(key = "title-${item.id}")
        )
    )
-   
+
    // In detail screen:
    Text(
        text = item.title,

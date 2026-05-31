@@ -1,18 +1,19 @@
-// File: samples/kmp-project-template/sync/src/commonMain/kotlin/org/mifos/sync/di/SyncModule.kt
 package org.mifos.sync.di
 
+import io.github.mobilebytelabs.worker.registry.WorkerRegistry
+import io.github.mobilebytelabs.worker.scheduler.DefaultWorkScheduler
+import io.github.mobilebytelabs.worker.scheduler.WorkScheduler
+import io.github.mobilebytelabs.worker.scheduler.sync.SyncManager
+import io.github.mobilebytelabs.worker.scheduler.sync.SyncStatePersister
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import org.mifos.core.data.util.SyncManager
-import org.mifos.core.datastore.SyncStatePersister
 import org.mifos.sync.DataSyncWorker
-import org.mifos.sync.DefaultWorkScheduler
 import org.mifos.sync.NotificationWorker
-import org.mifos.sync.WorkScheduler
-import io.github.mobilebytelabs.worker.registry.WorkerRegistry
 
 val SyncModule: Module = module {
-    single { SyncStatePersister(dataStore = get()) }
+    // Library's in-memory MutableStateFlow-backed persister. Swap for a DataStore-
+    // backed impl by binding your own SyncStatePersister subclass to this qualifier.
+    single { SyncStatePersister() }
     single<WorkScheduler> { DefaultWorkScheduler(workManager = get(), persister = get()) }
     single<SyncManager> { provideSyncManager(workManager = get()) }
 }

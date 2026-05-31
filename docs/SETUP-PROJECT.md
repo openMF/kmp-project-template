@@ -113,7 +113,7 @@ The following tools must be installed and accessible in your system PATH:
    ```bash
    # macOS
    brew install gh
-   
+
    # Linux
    # See: https://cli.github.com/manual/installation
    ```
@@ -222,7 +222,7 @@ You can choose to:
 Respond to each prompt with the information you prepared:
 
 ```
-Enter Android package name [e.g., com.example.myapp]: 
+Enter Android package name [e.g., com.example.myapp]:
 ```
 
 **Validation features:**

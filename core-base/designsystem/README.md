@@ -129,7 +129,7 @@ kptTheme {
 ```kotlin
 // Predefined spacing scale
 KptTheme.spacing.xs    // 4.dp
-KptTheme.spacing.sm    // 8.dp  
+KptTheme.spacing.sm    // 8.dp
 KptTheme.spacing.md    // 16.dp
 KptTheme.spacing.lg    // 24.dp
 KptTheme.spacing.xl    // 32.dp

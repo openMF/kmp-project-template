@@ -2,8 +2,8 @@ package org.mifos.core.data.currency
 
 import io.github.mobilebytelabs.worker.workDataOf
 import kotlinx.coroutines.test.runTest
-import org.mifos.core.data.infra.ChangeListVersions
-import org.mifos.core.data.infra.Synchronizer
+import io.github.mobilebytelabs.worker.scheduler.sync.ChangeListVersions
+import io.github.mobilebytelabs.worker.scheduler.sync.Synchronizer
 import org.mifos.core.data.currency.impl.CurrencyStoreWriteSurface
 import org.mifos.core.data.currency.impl.OfflineFirstCurrencyRepository
 import org.mifos.core.model.currency.ExchangeRates

@@ -13,8 +13,9 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import cmp.shared.utils.initKoin
-import org.mifos.sync.Sync
-import org.mifos.sync.WorkScheduler
+import io.github.mobilebytelabs.worker.scheduler.Sync
+import io.github.mobilebytelabs.worker.scheduler.WorkScheduler
+import org.mifos.sync.DataSyncWorker
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
@@ -50,8 +51,10 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
         }
 
         // NEW — start a background sync at app launch via the injected scheduler.
+        // Typed reified API (v3.1.1): library reads DataSyncWorker::class.simpleName
+        // and threads it to WorkManager → matches the WorkerRegistry binding in SyncModule.
         val scheduler: WorkScheduler = get()
-        Sync.initialize(scheduler)
+        Sync.initialize<DataSyncWorker>(scheduler)
 
         // Restore the user's saved language preference to AppCompatDelegate.
         // This ensures the app always launches with the user's chosen language,

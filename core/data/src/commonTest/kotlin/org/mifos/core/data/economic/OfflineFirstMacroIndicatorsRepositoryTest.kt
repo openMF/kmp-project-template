@@ -2,8 +2,8 @@ package org.mifos.core.data.economic
 
 import io.github.mobilebytelabs.worker.workDataOf
 import kotlinx.coroutines.test.runTest
-import org.mifos.core.data.infra.ChangeListVersions
-import org.mifos.core.data.infra.Synchronizer
+import io.github.mobilebytelabs.worker.scheduler.sync.ChangeListVersions
+import io.github.mobilebytelabs.worker.scheduler.sync.Synchronizer
 import org.mifos.core.data.economic.impl.MacroStoreWriteSurface
 import org.mifos.core.data.economic.impl.OfflineFirstMacroIndicatorsRepository
 import org.mifos.core.model.economic.Country

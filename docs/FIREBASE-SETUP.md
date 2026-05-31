@@ -299,7 +299,7 @@ import json
 with open('cmp-android/google-services.json', 'r') as f:
     data = json.load(f)
     clients = data.get('client', [])
-    
+
     print(f"Total configured variants: {len(clients)}")
     print("\nConfigured packages:")
     for client in clients:

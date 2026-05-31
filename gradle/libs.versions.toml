@@ -127,7 +127,7 @@ sqliteWeb = "2.6.2"
 
 
 # worker-kmp
-worker-version = "3.0.2"
+worker-version = "3.1.1-alpha01"
 [libraries]
 kmp-product-flavors-plugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -361,16 +361,16 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
 
+# worker-kmp integration libraries
+worker-compose-all = { module = "io.github.mobilebytelabs:worker-compose-all", version.ref = "worker-version" }
+worker-app-plugin = { module = "io.github.mobilebytelabs:worker-app-plugin", version.ref = "worker-version" }
+
 [bundles]
 androidx-compose-ui-test = [
     "androidx-compose-ui-test",
     "androidx-compose-ui-test-manifest"
 ]
 
-
-# worker-kmp integration libraries
-worker-compose-all = { module = "io.github.mobilebytelabs:worker-compose-all", version.ref = "worker-version" }
-worker-app-plugin = { module = "io.github.mobilebytelabs:worker-app-plugin", version.ref = "worker-version" }
 [plugins]
 kmp-product-flavors = { id = "io.github.mobilebytelabs.kmp-product-flavors", version.ref = "kmpProductFlavors" }
 kmp-flavors-convention = { id = "org.convention.kmp.flavors" }
@@ -430,3 +430,6 @@ mifos-kmp-room = { id = "mifos.kmp.room" }
 
 # worker-kmp Gradle plugin (registered for build-logic/convention)
 worker-app = { id = "io.github.mobilebytelabs.worker-app", version.ref = "worker-version" }
+# Local convention plugin (build-logic/convention) — wires worker-app + worker-compose-all
+# + koin-compose + ExperimentalWorkerApi opt-in into any CMP module that schedules work.
+worker-compose-convention = { id = "org.convention.worker.compose" }

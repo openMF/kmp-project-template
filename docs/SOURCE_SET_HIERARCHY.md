@@ -253,7 +253,7 @@ Here's an example of how code sharing works with this hierarchy:
    expect class PlatformInfo {
        fun getPlatformName(): String
    }
-   
+
    class DataRepository(private val platformInfo: PlatformInfo) {
        fun getWelcomeMessage(): String {
            return "Hello from ${platformInfo.getPlatformName()}"

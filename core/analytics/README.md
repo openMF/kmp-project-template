@@ -130,7 +130,7 @@ val tracker = analyticsHelper.mifosTracker()
 // Track client operations
 tracker.trackClientOperation("create", clientId = "12345", success = true)
 
-// Track loan operations  
+// Track loan operations
 tracker.trackLoanOperation("apply", loanType = "personal", amount = "5000")
 
 // Track savings operations

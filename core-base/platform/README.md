@@ -43,7 +43,7 @@ commonMain
 ├── Interfaces (expect)
 ├── Models
 └── Utilities
-    
+
 androidMain
 ├── Concrete implementations
 └── Android-specific utilities
@@ -623,7 +623,7 @@ fun testMyScreen() {
            // Android implementation
        }
    }
-   
+
    // Other platforms
    class MyNewManagerImpl : MyNewManager {
        override fun doSomething() {

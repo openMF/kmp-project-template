@@ -300,7 +300,7 @@ class MyRepository(private val encryptor: FieldEncryptor) {
     fun storeSecret(value: String): String {
         return "ENC:" + encryptor.encrypt(value)
     }
-    
+
     fun readSecret(stored: String): String {
         if (!stored.startsWith("ENC:")) return stored  // Legacy unencrypted
         return encryptor.decrypt(stored.removePrefix("ENC:"))

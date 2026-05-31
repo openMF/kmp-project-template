@@ -227,7 +227,7 @@ project/
 │   └── upload.keystore        # Release/production keystore
 ├── fastlane-config/           # Fastlane configuration directory
 │   └── android_config.rb      # Fastlane configuration for Android
-└── cmp-android/              
+└── cmp-android/
     └── build.gradle.kts       # Gradle build file with signing config
 ```
 
@@ -262,25 +262,25 @@ keytool -list -v -keystore keystores/original.keystore -storepass your_password
 
 ## FAQ
 
-**Q: What's the difference between ORIGINAL and UPLOAD keystores?**  
+**Q: What's the difference between ORIGINAL and UPLOAD keystores?**
 A: ORIGINAL (debug) keystores are for development/testing, while UPLOAD (release) keystores are for
 production builds that get published to the Play Store.
 
-**Q: Will my certificate information be uploaded to GitHub?**  
+**Q: Will my certificate information be uploaded to GitHub?**
 A: No. Certificate information (COMPANY_NAME, DEPARTMENT, etc.) is excluded from GitHub secrets by
 default.
 
-**Q: How do I change the keystore passwords?**  
+**Q: How do I change the keystore passwords?**
 A: Edit the values in `secrets.env` and run `./keystore-manager.sh generate` with the OVERWRITE
 option set to true.
 
-**Q: Can I use this script in CI/CD pipelines?**  
+**Q: Can I use this script in CI/CD pipelines?**
 A: Yes, the script is designed to work in both interactive and automated environments. For CI/CD,
 you would typically use the `add` command to upload secrets.
 
-**Q: How are my keystore files secured?**  
+**Q: How are my keystore files secured?**
 A: Keystore files are stored in the `keystores` directory and never directly uploaded to GitHub.
 Only base64-encoded versions are added as GitHub secrets.
 
-**Q: Do I need to manually update Gradle and fastlane configurations?**  
+**Q: Do I need to manually update Gradle and fastlane configurations?**
 A: No, the script automatically updates both configurations when you run the `generate` command.

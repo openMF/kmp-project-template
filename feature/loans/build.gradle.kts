@@ -24,6 +24,8 @@ kotlin {
             implementation(projects.core.data)
             implementation(projects.core.model)
             implementation(projects.coreBase.store)
+            // LoanReminderUseCase imports org.mifos.sync.{DataSyncWorker,NotificationWorker,NotificationContent}
+            implementation(projects.sync)
 
             implementation(compose.ui)
             implementation(compose.material3)

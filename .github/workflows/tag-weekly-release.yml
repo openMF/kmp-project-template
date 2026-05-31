@@ -107,9 +107,8 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'multi-platform-build-and-publish.yml',
-              ref: 'dev', 
+              ref: 'dev',
               inputs: {
                 "release_type": "beta",
               },
             })
-

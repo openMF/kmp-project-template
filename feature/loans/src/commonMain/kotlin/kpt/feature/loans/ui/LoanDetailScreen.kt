@@ -41,16 +41,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
+import kpt.core.base.designsystem.component.AppCard
+import kpt.core.base.designsystem.component.HeroCard
+import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.Loan
-import kpt.core.base.designsystem.component.AppCard
-import kpt.core.base.designsystem.component.HeroCard
-import kpt.core.base.ui.screen.ScreenContent
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

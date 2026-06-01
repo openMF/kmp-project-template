@@ -13,13 +13,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.economic.MacroIndicatorsRepository
 import kpt.core.model.economic.IndicatorKind
 import kpt.core.model.economic.MacroIndicator
 import kpt.core.store.economic.impl.MacroIndicatorKey
-import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.ui.viewmodel.BaseViewModel
 
 /**
  * Deep-dive ViewModel for a single (country, indicator) tuple.

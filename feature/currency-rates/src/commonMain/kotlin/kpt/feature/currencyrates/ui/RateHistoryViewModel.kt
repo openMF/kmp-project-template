@@ -15,12 +15,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kpt.core.data.currency.CurrencyRepository
-import kpt.core.model.currency.RateHistory
-import kpt.core.model.currency.RateHistoryKey
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.data.currency.CurrencyRepository
+import kpt.core.model.currency.RateHistory
+import kpt.core.model.currency.RateHistoryKey
 
 class RateHistoryViewModel(
     currencyRepository: CurrencyRepository,

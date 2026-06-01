@@ -25,10 +25,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kpt.core.model.economic.IndicatorKind
-import kpt.core.model.economic.MacroIndicator
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.model.economic.IndicatorKind
+import kpt.core.model.economic.MacroIndicator
 
 /**
  * A single indicator's at-a-glance card on the country-macro dashboard.

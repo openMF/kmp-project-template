@@ -17,13 +17,13 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.composableWithPushTransitions
+import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.amortization.navigation.AmortizationScheduleRoute
 import kpt.feature.amortization.navigation.amortizationScheduleDestination
 import kpt.feature.loans.ui.AddOrEditLoanScreen
 import kpt.feature.loans.ui.LoanDetailScreen
 import kpt.feature.loans.ui.PersonalLoansListScreen
-import kpt.core.base.ui.nav.composableWithPushTransitions
-import kpt.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 data object LoansGraphRoute

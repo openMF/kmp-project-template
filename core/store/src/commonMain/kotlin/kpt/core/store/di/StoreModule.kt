@@ -9,8 +9,6 @@
  */
 package kpt.core.store.di
 
-import org.koin.core.module.Module
-import org.koin.dsl.module
 import kpt.core.store.AppStoreRegistry
 import kpt.core.store.alerts.impl.provideAlertsStore
 import kpt.core.store.banking.impl.provideBillRemindersStore
@@ -24,6 +22,8 @@ import kpt.core.store.economic.impl.provideMacroIndicatorStore
 import kpt.core.store.exchange.impl.provideSpotRateLookupStore
 import kpt.core.store.infra.StoreCacheManager
 import kpt.core.store.infra.impl.StoreCacheManagerImpl
+import org.koin.core.module.Module
+import org.koin.dsl.module
 
 /**
  * Koin module for app-level Store wiring.

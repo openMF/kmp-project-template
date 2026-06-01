@@ -11,10 +11,10 @@ package kpt.feature.rates.ui
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.data.economic.EconomicRatesRepository
 import kpt.core.model.economic.InterestRateSeries
 import kpt.core.store.economic.impl.InterestRateSeriesKey
-import kpt.core.base.store.screen.ScreenState
 
 /**
  * Per-series stream + refresh seam used by [InterestRatesViewModel].

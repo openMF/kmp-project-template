@@ -17,6 +17,8 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.todayIn
+import kpt.core.base.store.infra.DefaultValidator
+import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.currency.dao.RateHistoryDao
 import kpt.core.database.currency.mapper.toDomain
 import kpt.core.database.currency.mapper.toEntity
@@ -27,8 +29,6 @@ import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
-import kpt.core.base.store.infra.DefaultValidator
-import kpt.core.base.store.infra.StoreFactory
 import kotlin.time.Clock
 
 fun provideRateHistoryStore(

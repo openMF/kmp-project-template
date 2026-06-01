@@ -12,7 +12,6 @@ package kpt.core.designsystem.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import org.jetbrains.compose.resources.Font
 import kpt.core.designsystem.generated.resources.Res
 import kpt.core.designsystem.generated.resources.outfit_black
 import kpt.core.designsystem.generated.resources.outfit_bold
@@ -23,6 +22,7 @@ import kpt.core.designsystem.generated.resources.outfit_medium
 import kpt.core.designsystem.generated.resources.outfit_regular
 import kpt.core.designsystem.generated.resources.outfit_semi_bold
 import kpt.core.designsystem.generated.resources.outfit_thin
+import org.jetbrains.compose.resources.Font
 
 val fontFamily: FontFamily
     @Composable get() = FontFamily(

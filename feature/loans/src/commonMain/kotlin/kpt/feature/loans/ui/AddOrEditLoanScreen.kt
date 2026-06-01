@@ -47,12 +47,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.LocalDate
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
-import kpt.core.designsystem.component.AmountDisplay
-import kpt.core.model.banking.LoanKind
 import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.base.store.submit.SubmitState
+import kpt.core.designsystem.component.AmountDisplay
+import kpt.core.model.banking.LoanKind
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Combined add/edit screen.

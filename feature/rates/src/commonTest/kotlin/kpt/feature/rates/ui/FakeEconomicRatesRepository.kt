@@ -13,13 +13,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kpt.core.data.economic.EconomicRatesRepository
-import kpt.core.model.economic.InterestRateSeries
-import kpt.core.store.economic.impl.InterestRateSeriesKey
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
+import kpt.core.data.economic.EconomicRatesRepository
+import kpt.core.model.economic.InterestRateSeries
+import kpt.core.store.economic.impl.InterestRateSeriesKey
 
 /**
  * Test double for [EconomicRatesRepository] that drives [InterestRateDetailViewModel]

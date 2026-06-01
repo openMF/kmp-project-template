@@ -9,10 +9,10 @@
  */
 package kpt.feature.rates.di
 
-import org.koin.core.module.dsl.viewModel
-import org.koin.dsl.module
 import kpt.feature.rates.ui.InterestRateDetailViewModel
 import kpt.feature.rates.ui.InterestRatesViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 
 /**
  * Koin module for the B7 Interest Rate Tracker.

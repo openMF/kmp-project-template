@@ -15,10 +15,10 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import kpt.feature.rates.ui.InterestRateDetailScreen
-import kpt.feature.rates.ui.InterestRatesScreen
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.rates.ui.InterestRateDetailScreen
+import kpt.feature.rates.ui.InterestRatesScreen
 
 /** Parent graph route for the B7 Interest Rate Tracker. */
 @Serializable

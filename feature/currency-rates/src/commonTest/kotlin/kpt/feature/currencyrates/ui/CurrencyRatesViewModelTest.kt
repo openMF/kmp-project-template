@@ -28,13 +28,13 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kpt.core.base.store.infra.FetchedAtRepository
+import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.currency.ExchangeRates
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreBuilder
-import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.screen.DataFreshness
-import kpt.core.base.store.screen.ScreenState
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

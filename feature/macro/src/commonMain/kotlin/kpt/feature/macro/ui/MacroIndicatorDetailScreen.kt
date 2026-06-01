@@ -37,8 +37,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
+import kpt.core.base.designsystem.component.AppCard
+import kpt.core.base.designsystem.component.HeroCard
+import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
 import kpt.core.common.formatTimeAgo
 import kpt.core.designsystem.component.AmountDisplay
@@ -47,11 +50,8 @@ import kpt.core.model.economic.IndicatorKind
 import kpt.feature.macro.ui.components.Sparkline
 import kpt.feature.macro.ui.components.displayName
 import kpt.feature.macro.ui.components.headlineValue
-import kpt.core.base.designsystem.component.AppCard
-import kpt.core.base.designsystem.component.HeroCard
-import kpt.core.base.store.screen.DataFreshness
-import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.ui.screen.ScreenContent
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 

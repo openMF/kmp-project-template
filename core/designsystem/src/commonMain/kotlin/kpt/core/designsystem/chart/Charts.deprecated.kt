@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kpt.core.designsystem.theme.finance
 import kpt.core.base.designsystem.theme.motion
+import kpt.core.designsystem.theme.finance
 
 /**
  * Back-compat shims — chart composables were renamed from `Mifos*` → `Kpt*`

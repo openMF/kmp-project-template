@@ -16,7 +16,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import kpt.core.store.appScreenStateDefaults
 import kpt.core.base.designsystem.KptMaterialTheme
 import kpt.core.base.designsystem.theme.KptThemeProviderImpl
 import kpt.core.base.designsystem.theme.LocalMotion
@@ -24,6 +23,7 @@ import kpt.core.base.designsystem.theme.Motion
 import kpt.core.base.designsystem.toKptColorScheme
 import kpt.core.base.designsystem.toKptTypography
 import kpt.core.base.ui.screen.LocalScreenStateDefaults
+import kpt.core.store.appScreenStateDefaults
 
 val lightScheme = lightColorScheme(
     primary = primaryLight,

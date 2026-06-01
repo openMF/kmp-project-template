@@ -16,11 +16,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kpt.core.base.analytics.AnalyticsHelper
 import kpt.core.data.user.UserDataRepository
 import kpt.core.model.user.DarkThemeConfig
 import kpt.core.model.user.LanguageConfig
 import kpt.core.model.user.ThemeBrand
-import kpt.core.base.analytics.AnalyticsHelper
 
 class SettingsViewmodel(
     private val settingsRepository: UserDataRepository,

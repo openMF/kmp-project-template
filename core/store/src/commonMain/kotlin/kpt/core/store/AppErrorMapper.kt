@@ -11,15 +11,15 @@ package kpt.core.store
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import org.jetbrains.compose.resources.stringResource
+import kpt.core.base.store.error.ErrorCategory
+import kpt.core.base.store.error.categorize
 import kpt.core.store.generated.resources.Res
 import kpt.core.store.generated.resources.error_category_auth
 import kpt.core.store.generated.resources.error_category_generic
 import kpt.core.store.generated.resources.error_category_network
 import kpt.core.store.generated.resources.error_category_ratelimit
 import kpt.core.store.generated.resources.error_category_server
-import kpt.core.base.store.error.ErrorCategory
-import kpt.core.base.store.error.categorize
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Application-level error → user-facing message mapper.

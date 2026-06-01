@@ -26,13 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.component.MoneyText
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.Loan
 import kpt.core.model.banking.LoanKind
-import kpt.core.base.designsystem.component.AppCard
 
 /**
  * Tappable row representing a single [Loan] in the list screen.

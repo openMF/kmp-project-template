@@ -35,8 +35,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.core.model.user.DarkThemeConfig
 import kpt.core.model.user.ThemeBrand
 import kpt.feature.settings.generated.resources.Res
@@ -53,6 +51,8 @@ import kpt.feature.settings.generated.resources.feature_settings_dynamic_color_y
 import kpt.feature.settings.generated.resources.feature_settings_loading
 import kpt.feature.settings.generated.resources.feature_settings_theme
 import kpt.feature.settings.generated.resources.feature_settings_title
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SettingsDialog(onDismiss: () -> Unit, viewModel: SettingsViewmodel = koinViewModel()) {

@@ -15,15 +15,15 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kpt.core.data.currency.CurrencyRepository
-import kpt.core.model.currency.ExchangeRates
-import kpt.core.model.currency.RateHistory
-import kpt.core.model.currency.RateHistoryKey
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
+import kpt.core.data.currency.CurrencyRepository
+import kpt.core.model.currency.ExchangeRates
+import kpt.core.model.currency.RateHistory
+import kpt.core.model.currency.RateHistoryKey
 
 /**
  * Test double for [CurrencyRepository] that exposes the underlying mutable state

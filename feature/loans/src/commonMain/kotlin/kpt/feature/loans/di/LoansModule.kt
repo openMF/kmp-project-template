@@ -9,12 +9,12 @@
  */
 package kpt.feature.loans.di
 
-import org.koin.core.module.dsl.viewModel
-import org.koin.dsl.module
 import kpt.core.data.di.OutboxQualifiers
 import kpt.feature.loans.ui.EditLoanViewModel
 import kpt.feature.loans.ui.LoanDetailViewModel
 import kpt.feature.loans.ui.PersonalLoansListViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 
 /**
  * Koin module for the personal-loans feature.

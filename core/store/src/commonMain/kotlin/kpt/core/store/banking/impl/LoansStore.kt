@@ -9,11 +9,11 @@
  */
 package kpt.core.store.banking.impl
 
+import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.banking.dao.LoanDao
 import kpt.core.database.banking.entity.LoanEntity
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
-import kpt.core.base.store.infra.StoreFactory
 
 /**
  * Build an offline-only [Store] for tracked personal loans.

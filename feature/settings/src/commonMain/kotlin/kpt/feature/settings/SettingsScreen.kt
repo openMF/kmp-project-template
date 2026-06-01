@@ -32,7 +32,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
+import kpt.core.base.analytics.AnalyticsHelper
+import kpt.core.base.analytics.TrackScreenView
+import kpt.core.base.analytics.rememberAnalyticsHelper
+import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
@@ -41,10 +44,7 @@ import kpt.feature.settings.generated.resources.feature_settings_change_language
 import kpt.feature.settings.generated.resources.feature_settings_change_language_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_text
-import kpt.core.base.analytics.AnalyticsHelper
-import kpt.core.base.analytics.TrackScreenView
-import kpt.core.base.analytics.rememberAnalyticsHelper
-import kpt.core.base.designsystem.component.AppCard
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun SettingsScreen(

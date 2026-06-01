@@ -18,6 +18,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.todayIn
+import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.economic.InterestRateSeriesDao
 import kpt.core.database.economic.InterestRateSeriesEntity
 import kpt.core.model.economic.InterestRateSeries
@@ -27,7 +28,6 @@ import kpt.core.network.economic.config.FredApiConfig
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
-import kpt.core.base.store.infra.StoreFactory
 import kotlin.time.Clock
 
 /**

@@ -18,9 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kpt.core.data.currency.CurrencyRepository
-import kpt.core.model.currency.ExchangeRates
-import org.mobilenativefoundation.store.store5.Store
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
@@ -28,6 +25,9 @@ import kpt.core.base.store.screen.asScreenStream
 import kpt.core.base.store.screen.combineContent
 import kpt.core.base.store.screen.emptyIfContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.data.currency.CurrencyRepository
+import kpt.core.model.currency.ExchangeRates
+import org.mobilenativefoundation.store.store5.Store
 
 /**
  * **Archetype showcase: CACHE_ONLY + NETWORK_ONLY**

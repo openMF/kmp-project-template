@@ -9,9 +9,9 @@
  */
 package kpt.feature.home.di
 
+import kpt.feature.home.ui.HomeViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.home.ui.HomeViewModel
 
 val HomeModule = module {
     viewModelOf(::HomeViewModel)

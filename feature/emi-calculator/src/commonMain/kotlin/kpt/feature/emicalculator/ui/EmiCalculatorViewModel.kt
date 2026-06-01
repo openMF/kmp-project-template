@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.domain.emi.calculateEmi
 import kpt.core.model.emi.EmiResult
-import kpt.core.base.ui.viewmodel.BaseViewModel
 
 class EmiCalculatorViewModel : BaseViewModel<EmiState, Nothing, EmiAction>(EmiState()) {
 

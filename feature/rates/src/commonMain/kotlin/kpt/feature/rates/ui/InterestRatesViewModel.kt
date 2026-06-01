@@ -12,10 +12,10 @@ package kpt.feature.rates.ui
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kpt.core.data.economic.EconomicRatesRepository
-import kpt.core.model.economic.InterestRateSeries
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.data.economic.EconomicRatesRepository
+import kpt.core.model.economic.InterestRateSeries
 
 /**
  * **B7 Interest Rate Tracker** — canonical `NETWORK_WITH_CACHE` + DataFreshness

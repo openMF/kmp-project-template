@@ -34,8 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
 import kpt.core.model.economic.Country
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Country picker — search + flag-emoji list. Selecting a row reports the

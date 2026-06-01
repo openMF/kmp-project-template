@@ -9,12 +9,12 @@
  */
 package kpt.feature.macro.di
 
-import org.koin.core.module.dsl.viewModel
-import org.koin.dsl.module
 import kpt.core.model.economic.IndicatorKind
 import kpt.feature.macro.ui.CountryMacroViewModel
 import kpt.feature.macro.ui.CountryPickerViewModel
 import kpt.feature.macro.ui.MacroIndicatorDetailViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 
 /**
  * Koin module for the Country Macro Snapshot feature.

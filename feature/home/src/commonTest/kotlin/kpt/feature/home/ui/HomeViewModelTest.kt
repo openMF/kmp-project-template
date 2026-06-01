@@ -23,6 +23,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
+import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
+import kpt.core.base.store.screen.FetchPolicy
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.screenDataStreamForTesting
 import kpt.core.data.banking.BillReminderRepository
 import kpt.core.data.banking.LoanRepository
 import kpt.core.data.currency.CurrencyRepository
@@ -38,12 +44,6 @@ import kpt.core.model.currency.RateHistoryKey
 import kpt.core.model.economic.InterestRateSeries
 import kpt.core.model.economic.RateObservation
 import kpt.core.store.economic.impl.InterestRateSeriesKey
-import kpt.core.base.store.screen.DataFreshness
-import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
-import kpt.core.base.store.screen.FetchPolicy
-import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.store.screen.screenDataStreamForTesting
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

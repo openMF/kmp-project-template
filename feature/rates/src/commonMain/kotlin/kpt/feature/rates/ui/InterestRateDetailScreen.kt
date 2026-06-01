@@ -35,16 +35,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
+import kpt.core.base.designsystem.component.AppCard
+import kpt.core.base.designsystem.component.HeroCard
+import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
 import kpt.core.designsystem.chart.KptAreaChart
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.economic.InterestRateSeries
-import kpt.core.base.designsystem.component.AppCard
-import kpt.core.base.designsystem.component.HeroCard
-import kpt.core.base.ui.screen.ScreenContent
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * **B7 Interest Rate Tracker** — per-series detail.

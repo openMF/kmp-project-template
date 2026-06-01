@@ -33,8 +33,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kpt.core.designsystem.theme.spacing
 import kpt.core.base.designsystem.theme.motion
+import kpt.core.designsystem.theme.spacing
 
 /**
  * One bar of [KptBarChart]. [value] is unitless — the chart normalizes each

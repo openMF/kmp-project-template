@@ -9,9 +9,9 @@
  */
 package kpt.feature.emicalculator.di
 
+import kpt.feature.emicalculator.ui.EmiCalculatorViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kpt.feature.emicalculator.ui.EmiCalculatorViewModel
 
 val EmiCalculatorModule = module {
     viewModelOf(::EmiCalculatorViewModel)

@@ -16,13 +16,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kpt.core.data.banking.BillReminderRepository
-import kpt.core.data.banking.LoanRepository
-import kpt.core.data.currency.CurrencyRepository
-import kpt.core.data.economic.EconomicRatesRepository
-import kpt.core.model.banking.BillReminder
-import kpt.core.model.currency.ExchangeRates
-import kpt.core.store.economic.impl.InterestRateSeriesKey
 import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.DataFreshness
@@ -30,6 +23,13 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.combineScreenStates
 import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.data.banking.BillReminderRepository
+import kpt.core.data.banking.LoanRepository
+import kpt.core.data.currency.CurrencyRepository
+import kpt.core.data.economic.EconomicRatesRepository
+import kpt.core.model.banking.BillReminder
+import kpt.core.model.currency.ExchangeRates
+import kpt.core.store.economic.impl.InterestRateSeriesKey
 
 /**
  * **Money Toolkit home dashboard ViewModel.**

@@ -15,9 +15,9 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kpt.core.model.banking.Loan
 import kpt.core.base.store.submit.SubmitOutboxStatus
 import kpt.core.base.store.submit.SubmitState
+import kpt.core.model.banking.Loan
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

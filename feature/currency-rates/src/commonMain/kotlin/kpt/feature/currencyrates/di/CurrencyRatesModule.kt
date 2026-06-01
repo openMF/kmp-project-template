@@ -9,11 +9,11 @@
  */
 package kpt.feature.currencyrates.di
 
-import org.koin.core.module.dsl.viewModel
-import org.koin.dsl.module
 import kpt.core.store.AppStoreRegistry
 import kpt.feature.currencyrates.ui.CurrencyRatesViewModel
 import kpt.feature.currencyrates.ui.RateHistoryViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 
 val CurrencyRatesModule = module {
     viewModel {

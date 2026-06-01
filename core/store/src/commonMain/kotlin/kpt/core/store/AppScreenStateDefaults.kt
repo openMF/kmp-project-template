@@ -11,7 +11,13 @@ package kpt.core.store
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import org.jetbrains.compose.resources.stringResource
+import kpt.core.base.ui.screen.DefaultLottieAnimations
+import kpt.core.base.ui.screen.ScreenStateDefaults
+import kpt.core.base.ui.screen.ScreenStateEmpty
+import kpt.core.base.ui.screen.ScreenStateError
+import kpt.core.base.ui.screen.ScreenStateLoading
+import kpt.core.base.ui.screen.ScreenStateNoNetwork
+import kpt.core.base.ui.screen.ScreenStateVisual
 import kpt.core.store.generated.resources.Res
 import kpt.core.store.generated.resources.screenstate_captive_action
 import kpt.core.store.generated.resources.screenstate_captive_message
@@ -21,13 +27,7 @@ import kpt.core.store.generated.resources.screenstate_error_retry
 import kpt.core.store.generated.resources.screenstate_error_title
 import kpt.core.store.generated.resources.screenstate_nonet_message
 import kpt.core.store.generated.resources.screenstate_nonet_retry
-import kpt.core.base.ui.screen.DefaultLottieAnimations
-import kpt.core.base.ui.screen.ScreenStateDefaults
-import kpt.core.base.ui.screen.ScreenStateEmpty
-import kpt.core.base.ui.screen.ScreenStateError
-import kpt.core.base.ui.screen.ScreenStateLoading
-import kpt.core.base.ui.screen.ScreenStateNoNetwork
-import kpt.core.base.ui.screen.ScreenStateVisual
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * !! THIS IS THE FORK CUSTOMIZATION POINT !!

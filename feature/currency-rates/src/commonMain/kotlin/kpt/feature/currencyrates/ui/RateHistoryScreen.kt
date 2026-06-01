@@ -39,15 +39,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
-import kpt.core.common.formatDecimal
-import kpt.core.common.formatTimeAgo
-import kpt.core.designsystem.theme.spacing
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
+import kpt.core.common.formatDecimal
+import kpt.core.common.formatTimeAgo
+import kpt.core.designsystem.theme.spacing
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 

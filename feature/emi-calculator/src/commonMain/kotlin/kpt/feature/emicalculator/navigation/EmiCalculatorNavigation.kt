@@ -15,8 +15,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
-import kpt.feature.emicalculator.ui.EmiCalculatorScreen
 import kpt.core.base.ui.nav.composableWithPushTransitions
+import kpt.feature.emicalculator.ui.EmiCalculatorScreen
 
 @Serializable
 data object EmiCalculatorRoute

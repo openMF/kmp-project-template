@@ -76,10 +76,14 @@ object DecisionEngine {
         }
 
         // === Has data branch ===
+        // Offline/captive-portal is checked BEFORE isRefreshing so that a background
+        // refresh timer (e.g. FetchPolicy.PERIODIC) firing while the device is offline
+        // never promotes DataFreshness to UPDATING — it stays STALE. This also prevents
+        // DataFreshnessIndicator from treating an offline key-change as a "reconnect" event.
         val fetchedAt = storeData.fetchedAtInstant
         return when {
-            storeData.isRefreshing -> ScreenState.Content(storeData.data, DataFreshness.UPDATING, fetchedAt)
             !isOnline || isCaptivePortal -> ScreenState.Content(storeData.data, DataFreshness.STALE, fetchedAt)
+            storeData.isRefreshing -> ScreenState.Content(storeData.data, DataFreshness.UPDATING, fetchedAt)
             error != null -> ScreenState.Content(storeData.data, DataFreshness.STALE, fetchedAt)
             else -> ScreenState.Content(storeData.data, DataFreshness.FRESH, fetchedAt)
         }

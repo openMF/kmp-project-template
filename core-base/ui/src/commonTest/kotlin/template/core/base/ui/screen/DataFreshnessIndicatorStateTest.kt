@@ -14,57 +14,34 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Locks the [deriveDisplayState] contract — the pure mapping from
- * (DataFreshness × showReconnected) to [DisplayState] used by
- * [DataFreshnessIndicator].
+ * Locks the [deriveDisplayState] contract — the pure mapping from [DataFreshness]
+ * to [DisplayState] used by [DataFreshnessIndicator].
  *
- * Compose-runtime behavior (LaunchedEffect timing of the just-reconnected
- * banner, AnimatedVisibility transitions) is verified manually on device —
- * Compose UI test infra is not yet wired into core-base/ui's commonTest.
+ * [DisplayState.Stale] and [DisplayState.Reconnected] were removed in the
+ * staleness-ui-consumer-ownership refactor. Stale/offline UI is now owned by
+ * feature screens via the `content { data, freshness -> }` lambda; this indicator
+ * is UPDATING-only.
+ *
+ * Null [ScreenContent] `refreshingIndicator` slot suppression is verified by
+ * inspection: the guard `if (freshness == UPDATING) refreshingIndicator?.invoke()`
+ * is a no-op when the slot is null. Full Compose UI tests require compose.uiTest
+ * wired into commonTest — tracked separately.
  */
 class DataFreshnessIndicatorStateTest {
 
-    // ── showReconnected = false: pure freshness mapping ───────────────────
-
     @Test
-    fun freshFalseReconnectedIsHidden() {
-        assertEquals(DisplayState.Hidden, deriveDisplayState(DataFreshness.FRESH, showReconnected = false))
+    fun freshIsHidden() {
+        assertEquals(DisplayState.Hidden, deriveDisplayState(DataFreshness.FRESH))
     }
 
     @Test
-    fun staleFalseReconnectedIsStale() {
-        assertEquals(DisplayState.Stale, deriveDisplayState(DataFreshness.STALE, showReconnected = false))
+    fun staleIsHidden() {
+        // Stale/offline UI is owned by feature screens — core-base shows nothing.
+        assertEquals(DisplayState.Hidden, deriveDisplayState(DataFreshness.STALE))
     }
 
     @Test
-    fun updatingFalseReconnectedIsUpdating() {
-        assertEquals(DisplayState.Updating, deriveDisplayState(DataFreshness.UPDATING, showReconnected = false))
-    }
-
-    // ── showReconnected = true: wins over freshness ───────────────────────
-
-    @Test
-    fun freshTrueReconnectedIsReconnected() {
-        assertEquals(DisplayState.Reconnected, deriveDisplayState(DataFreshness.FRESH, showReconnected = true))
-    }
-
-    @Test
-    fun staleTrueReconnectedIsReconnected() {
-        // Edge case: shouldn't happen via the state machine (we only set
-        // showReconnected after STALE → non-STALE), but the helper must be
-        // correct in isolation.
-        assertEquals(DisplayState.Reconnected, deriveDisplayState(DataFreshness.STALE, showReconnected = true))
-    }
-
-    @Test
-    fun updatingTrueReconnectedIsReconnected() {
-        assertEquals(DisplayState.Reconnected, deriveDisplayState(DataFreshness.UPDATING, showReconnected = true))
-    }
-
-    // ── Reconnected text ──────────────────────────────────────────────────
-
-    @Test
-    fun reconnectedTextIsStandardCopy() {
-        assertEquals("Connected · Refreshing data", RECONNECTED_TEXT)
+    fun updatingIsUpdating() {
+        assertEquals(DisplayState.Updating, deriveDisplayState(DataFreshness.UPDATING))
     }
 }

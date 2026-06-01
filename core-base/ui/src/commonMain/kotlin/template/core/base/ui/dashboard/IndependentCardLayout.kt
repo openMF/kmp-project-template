@@ -53,6 +53,7 @@ fun <T> IndependentCardLayout(
     states: List<ScreenState<T>>,
     onRetry: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    refreshingIndicator: (@Composable () -> Unit)? = null,
     onDismiss: ((Int) -> Unit)? = null,
     content: @Composable (index: Int, data: T, freshness: DataFreshness) -> Unit,
 ) {
@@ -65,6 +66,7 @@ fun <T> IndependentCardLayout(
             ScreenContent(
                 state = state,
                 onRetry = { onRetry(index) },
+                refreshingIndicator = refreshingIndicator,
                 onDismiss = onDismiss?.let { dismiss -> { dismiss(index) } },
             ) { data, freshness ->
                 content(index, data, freshness)

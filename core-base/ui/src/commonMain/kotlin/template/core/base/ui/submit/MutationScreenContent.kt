@@ -47,6 +47,7 @@ fun <T, R> MutationScreenContent(
     onRetry: () -> Unit,
     onSubmitted: (result: R) -> Unit,
     modifier: Modifier = Modifier,
+    refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: template.core.base.store.error.ErrorCategory) -> Unit)? = null,
     content: @Composable (data: T, freshness: DataFreshness) -> Unit,
 ) {
@@ -60,6 +61,7 @@ fun <T, R> MutationScreenContent(
             state = screenState,
             onRetry = onRetry,
             modifier = Modifier.fillMaxSize(),
+            refreshingIndicator = refreshingIndicator,
             content = content,
         )
         SubmitProgressOverlay(state = submitState)
@@ -86,6 +88,7 @@ fun <T, R> MutationScreenContent(
     onRetry: () -> Unit,
     onSubmitted: (result: R) -> Unit,
     modifier: Modifier = Modifier,
+    refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: template.core.base.store.error.ErrorCategory) -> Unit)? = null,
     content: @Composable (data: T, freshness: DataFreshness) -> Unit,
 ) {
@@ -95,6 +98,7 @@ fun <T, R> MutationScreenContent(
         onRetry = onRetry,
         onSubmitted = onSubmitted,
         modifier = modifier,
+        refreshingIndicator = refreshingIndicator,
         onFailed = onFailed,
         content = content,
     )
@@ -131,6 +135,7 @@ fun <T, R> MutationScreenContent(
     onResumeClick: () -> Unit,
     onDiscardClick: () -> Unit,
     modifier: Modifier = Modifier,
+    refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: template.core.base.store.error.ErrorCategory) -> Unit)? = null,
     content: @Composable (data: T, freshness: DataFreshness) -> Unit,
 ) {
@@ -150,6 +155,7 @@ fun <T, R> MutationScreenContent(
                 state = screenState,
                 onRetry = onRetry,
                 modifier = Modifier.fillMaxSize(),
+                refreshingIndicator = refreshingIndicator,
                 content = content,
             )
             SubmitProgressOverlay(state = submitState)
@@ -170,6 +176,7 @@ fun <T, R> MutationScreenContent(
     onResumeClick: () -> Unit,
     onDiscardClick: () -> Unit,
     modifier: Modifier = Modifier,
+    refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: template.core.base.store.error.ErrorCategory) -> Unit)? = null,
     content: @Composable (data: T, freshness: DataFreshness) -> Unit,
 ) {
@@ -182,6 +189,7 @@ fun <T, R> MutationScreenContent(
         onResumeClick = onResumeClick,
         onDiscardClick = onDiscardClick,
         modifier = modifier,
+        refreshingIndicator = refreshingIndicator,
         onFailed = onFailed,
         content = content,
     )

@@ -11,7 +11,7 @@ package template.core.base.store.screen
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.isOnlineDebounced
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.networkStatusDebouncedState
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -226,17 +227,29 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
     ttl: Duration = 24.hours,
 ): ScreenDataStream<Output> {
+    // Single debounced NetworkStatus StateFlow shared by reconnect trigger, screen state,
+    // and freshness combine. When reconnectDebounceMs > 0, transient WiFi↔Cell handoffs
+    // (< 300ms Unavailable) are suppressed — no NoNetwork flash during handoff.
+    // When 0, raw networkStatus is used directly (caller opted out of debounce).
+    val networkStatusFlow: StateFlow<NetworkStatus> = if (reconnectDebounceMs > 0L) {
+        networkMonitor.networkStatusDebouncedState(scope, reconnectDebounceMs)
+    } else {
+        networkMonitor.networkStatus
+    }
+
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    // Auto-refresh when network reconnects (debounced to avoid WiFi↔Cell flicker)
+    // Auto-refresh when network reconnects. Uses the same debounced status flow so a brief
+    // handoff that doesn't reach Unavailable→Available never triggers a spurious fetch.
     // Skipped for CACHE_ONLY — no network requests are ever made.
     // Skipped when reconnectDebounceMs <= 0 — consumer opted out of auto-refresh.
     if (fetchPolicy != FetchPolicy.CACHE_ONLY && reconnectDebounceMs > 0L) {
         scope.launch {
-            networkMonitor.isOnlineDebounced(reconnectDebounceMs)
+            networkStatusFlow
+                .map { it is NetworkStatus.Available }
                 .distinctUntilChanged()
                 .filter { it }
-                .drop(1) // Skip initial emission (don't double-load on start)
+                .drop(1) // Skip initial seed — don't double-load on start
                 .collect { refreshTrigger.tryEmit(Unit) }
         }
     }
@@ -286,35 +299,40 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                 lastContent = enriched
                 enriched
             } else if (enriched.isEmpty && lastContent != null && enriched.error == null) {
-                // Refresh in progress — preserve last content with UPDATING
-                lastContent.copy(isRefreshing = true)
+                // Refresh in progress — preserve last content with isRefreshing=true.
+                lastContent!!.copy(isRefreshing = true)
+            } else if (enriched.isEmpty && lastContent != null && enriched.error != null) {
+                // Empty + error — preserve last content, attach error so
+                // DecisionEngine routes to Content (has data + error → STALE) instead of
+                // NoNetwork, and the sibling freshness Flow emits VeryStale + lastError.
+                lastContent!!.copy(isRefreshing = false, error = enriched.error)
             } else {
                 enriched
             }
         }
 
-    // Combine with FULL NetworkStatus (not just Boolean) for captive portal detection.
+    // Combine with FULL debounced NetworkStatus for captive portal detection.
     // .onStart {} immediately emits NoNetwork when offline so that newly-created ViewModels
     // (e.g., detail pages navigated to while offline) show NoNetwork instead of Loading.
     // Without this, combine() cannot fire until storeFlow emits its first value (Store5
     // round-trip), leaving the stateIn initialValue = Loading visible for a brief flash.
     val screenStateFlow: Flow<ScreenState<Output>> = combine(
         storeFlow,
-        networkMonitor.networkStatus,
+        networkStatusFlow,
     ) { storeData, status ->
         DecisionEngine.decide(storeData, status)
     }.onStart {
-        val current = networkMonitor.networkStatus.value
+        val current = networkStatusFlow.value
         if (current !is NetworkStatus.Available) {
             emit(ScreenState.NoNetwork(isCaptivePortal = current is NetworkStatus.CaptivePortal))
         }
     }
 
     // Sibling Flow of pure-staleness signals — derived from the same storeFlow snapshot
-    // but decoupled from NetworkStatus. networkStatus is passed for API symmetry only.
+    // but decoupled from NetworkStatus. Uses the same debounced flow for consistency.
     val freshnessFlow: Flow<FreshnessSignal> = combine(
         storeFlow,
-        networkMonitor.networkStatus,
+        networkStatusFlow,
     ) { storeData, status ->
         DecisionEngine.decideFreshness(storeData = storeData, networkStatus = status, ttl = ttl)
     }.distinctUntilChanged()
@@ -349,11 +367,18 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
     ttl: Duration = 24.hours,
 ): ScreenDataStream<Output> {
+    val networkStatusFlow: StateFlow<NetworkStatus> = if (reconnectDebounceMs > 0L) {
+        networkMonitor.networkStatusDebouncedState(scope, reconnectDebounceMs)
+    } else {
+        networkMonitor.networkStatus
+    }
+
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     if (fetchPolicy != FetchPolicy.CACHE_ONLY && reconnectDebounceMs > 0L) {
         scope.launch {
-            networkMonitor.isOnlineDebounced(reconnectDebounceMs)
+            networkStatusFlow
+                .map { it is NetworkStatus.Available }
                 .distinctUntilChanged()
                 .filter { it }
                 .drop(1)
@@ -422,11 +447,11 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
 
     val screenStateFlow: Flow<ScreenState<Output>> = combine(
         storeFlow,
-        networkMonitor.networkStatus,
+        networkStatusFlow,
     ) { storeData, status ->
         DecisionEngine.decide(storeData, status)
     }.onStart {
-        val current = networkMonitor.networkStatus.value
+        val current = networkStatusFlow.value
         if (current !is NetworkStatus.Available) {
             emit(ScreenState.NoNetwork(isCaptivePortal = current is NetworkStatus.CaptivePortal))
         }
@@ -435,7 +460,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     // Sibling Flow of pure-staleness signals — see single-key overload for rationale.
     val freshnessFlow: Flow<FreshnessSignal> = combine(
         storeFlow,
-        networkMonitor.networkStatus,
+        networkStatusFlow,
     ) { storeData, status ->
         DecisionEngine.decideFreshness(storeData = storeData, networkStatus = status, ttl = ttl)
     }.distinctUntilChanged()

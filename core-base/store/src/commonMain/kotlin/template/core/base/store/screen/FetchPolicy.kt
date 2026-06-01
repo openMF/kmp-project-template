@@ -55,11 +55,10 @@ sealed interface FetchPolicy {
      * unavailable and wants to avoid error flicker. If the cache is empty the stream emits
      * [ScreenState.Empty].
      *
-     * **DataFreshnessIndicator behaviour:** the staleness banner will still show the
-     * `lastFetchedAt` timestamp from cache — even if it is very old — because no background
-     * refresh is triggered to update it. The staleness threshold is applied as normal; if the
-     * cached data is older than the TTL, the stale banner renders. To suppress the banner on
-     * explicitly offline screens, pass `showFreshnessIndicator = false` to [ScreenContent].
+     * **DataFreshness behaviour:** the stream emits [template.core.base.store.screen.DataFreshness.STALE]
+     * when the cached data is older than the TTL. [DataFreshness.UPDATING] is never emitted
+     * in CACHE_ONLY mode, so no refreshing banner shows. Feature screens handle stale presentation
+     * inside their `content { data, freshness -> }` lambda by checking `freshness == DataFreshness.STALE`.
      */
     data object CACHE_ONLY : FetchPolicy
 

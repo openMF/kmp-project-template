@@ -1,4 +1,5 @@
 [versions]
+buildkonfig = "0.15.2"
 kmpProductFlavors = "2.4.2"
 appPackage = "org.openmf.kmptemplate"
 # Android
@@ -81,7 +82,7 @@ koinAnnotationsVersion = "2.1.0"
 
 
 # KMP Toolkit Libraries
-kmptoolkit = "3.4.3"
+kmptoolkit = "3.4.4"
 
 # CMP Libraries
 compose-plugin = "1.10.3"
@@ -366,6 +367,7 @@ androidx-compose-ui-test = [
 ]
 
 [plugins]
+buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
 kmp-product-flavors = { id = "io.github.mobilebytelabs.kmp-product-flavors", version.ref = "kmpProductFlavors" }
 kmp-flavors-convention = { id = "org.convention.kmp.flavors" }
 # Android & Kotlin Plugins

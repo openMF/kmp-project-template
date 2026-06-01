@@ -11,6 +11,7 @@ package org.mifos.core.network.di
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import org.koin.dsl.module
+import org.mifos.core.network.BuildKonfig
 import org.mifos.core.network.crypto.api.CoinGeckoApi
 import org.mifos.core.network.currency.api.FrankfurterApi
 import org.mifos.core.network.currency.config.FrankfurterApiConfig
@@ -33,9 +34,9 @@ import template.core.base.network.setupDefaultHttpClient
 // provides the same fork-customisation surface without the buildscript complexity.
 val NetworkModule = module {
 
-    // Default FRED config — not configured. Forks override this single() in
-    // their own DI module to thread in the actual key (BuildKonfig / env / etc.).
-    single<FredApiConfig> { FredApiConfig.Unconfigured }
+    single<FredApiConfig> {
+        FredApiConfig(apiKey = BuildKonfig.FRED_API_KEY.takeIf { it.isNotBlank() })
+    }
     single<FrankfurterApiConfig> { FrankfurterApiConfig.Default }
     single<WorldBankApiConfig> { WorldBankApiConfig.Default }
 

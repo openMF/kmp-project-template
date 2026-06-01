@@ -9,16 +9,20 @@
  */
 package org.mifos.feature.macro.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -29,12 +33,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.mifos.core.common.formatDecimal
+import org.mifos.core.common.formatTimeAgo
 import org.mifos.core.designsystem.component.AmountDisplay
 import org.mifos.core.designsystem.theme.spacing
 import org.mifos.core.model.economic.IndicatorKind
@@ -43,7 +49,11 @@ import org.mifos.feature.macro.ui.components.displayName
 import org.mifos.feature.macro.ui.components.headlineValue
 import template.core.base.designsystem.component.AppCard
 import template.core.base.designsystem.component.HeroCard
+import template.core.base.store.screen.DataFreshness
+import template.core.base.store.screen.ScreenState
 import template.core.base.ui.screen.ScreenContent
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Full-history view for a single (country, indicator) pair.
@@ -88,7 +98,17 @@ fun MacroIndicatorDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-        ) { indicator, _ ->
+        ) { indicator, freshness ->
+            if (freshness == DataFreshness.STALE) {
+                val fetchedAt = (screenState as? ScreenState.Content)?.fetchedAt
+                OfflineDataBanner(
+                    fetchedAt = fetchedAt,
+                    modifier = Modifier.padding(
+                        horizontal = MaterialTheme.spacing.lg,
+                        vertical = MaterialTheme.spacing.xs,
+                    ),
+                )
+            }
             val sp = MaterialTheme.spacing
             Column(
                 modifier = Modifier.fillMaxSize().padding(sp.lg),
@@ -144,5 +164,36 @@ fun MacroIndicatorDetailScreen(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+@Composable
+private fun OfflineDataBanner(
+    fetchedAt: Instant?,
+    modifier: Modifier = Modifier,
+) {
+    val label = formatTimeAgo(fetchedAt)
+        ?.let { "No network · Updated $it" }
+        ?: "No network · Cached data"
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.errorContainer)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Default.CloudOff,
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onErrorContainer,
+        )
     }
 }

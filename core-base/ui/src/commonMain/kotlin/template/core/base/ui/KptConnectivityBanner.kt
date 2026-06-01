@@ -42,7 +42,8 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.compose.rememberNetwor
 fun KptConnectivityBanner(
     modifier: Modifier = Modifier,
     showBanner: Boolean = true,
-    debounceMs: Long = 0L,
+    // 300ms mirrors NetworkMonitorContract.DEFAULT_DEBOUNCE_MS — suppresses WiFi↔Cell handoff flicker
+    debounceMs: Long = 300L,
     message: String = "No internet connection",
     icon: ImageVector? = null,
     monitor: NetworkMonitor = rememberNetworkMonitor(),

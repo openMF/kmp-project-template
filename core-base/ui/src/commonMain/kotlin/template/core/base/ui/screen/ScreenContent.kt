@@ -57,8 +57,9 @@ private val DefaultVisualSize = 64.dp
 
 /**
  * Generic composable that renders any [ScreenState] with sensible defaults.
- * Integrates [DataFreshnessIndicator] for STALE/UPDATING state and animates between states
- * with a fade transition.
+ * Animates between states with a fade transition. When content is [DataFreshness.UPDATING],
+ * invokes the [refreshingIndicator] slot above the content area. Pass `null` to suppress
+ * the in-flight progress banner entirely.
  *
  * Override precedence (highest first): per-call slot lambdas → [LocalScreenStateDefaults] →
  * library defaults. Pass slot lambdas to override at this call site, or wrap a subtree in
@@ -80,7 +81,7 @@ fun <T> ScreenContent(
     state: ScreenState<T>,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
-    showFreshnessIndicator: Boolean = true,
+    refreshingIndicator: (@Composable () -> Unit)? = { DefaultRefreshingBanner() },
     onDismiss: (() -> Unit)? = null,
     loading: @Composable () -> Unit = { DefaultLoadingContent() },
     empty: @Composable () -> Unit = { DefaultEmptyContent() },
@@ -114,11 +115,8 @@ fun <T> ScreenContent(
                 // gets the full available height — otherwise this Column wraps and
                 // a LazyColumn inside content may not get its requested fill.
                 Column(modifier = Modifier.fillMaxSize()) {
-                    if (showFreshnessIndicator) {
-                        DataFreshnessIndicator(
-                            freshness = current.freshness,
-                            fetchedAt = current.fetchedAt,
-                        )
+                    if (current.freshness == DataFreshness.UPDATING) {
+                        refreshingIndicator?.invoke()
                     }
                     content(current.data, current.freshness)
                 }

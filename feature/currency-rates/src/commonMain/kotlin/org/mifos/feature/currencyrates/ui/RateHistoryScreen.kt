@@ -9,16 +9,21 @@
  */
 package org.mifos.feature.currencyrates.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
@@ -30,17 +35,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.mifos.core.common.formatDecimal
+import org.mifos.core.common.formatTimeAgo
 import org.mifos.core.designsystem.theme.spacing
 import template.core.base.designsystem.component.AppCard
-import template.core.base.store.freshness.FreshnessBand
+import template.core.base.store.screen.DataFreshness
 import template.core.base.store.screen.ScreenState
 import template.core.base.ui.freshness.FreshnessIndicator
-import template.core.base.ui.freshness.RefreshStateChip
 import template.core.base.ui.screen.ScreenContent
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -79,27 +88,26 @@ fun RateHistoryScreen(
             )
         },
     ) { padding ->
-        // Inline carry-forward chip: when an input-store key-change fetch fails but
-        // previous data is preserved (Phase 2 T7 fix), surface a non-destructive
-        // explanation instead of letting the user wonder why old data still shows.
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            if (screenState is ScreenState.Content && freshness.band == FreshnessBand.VeryStale) {
-                RefreshStateChip(
-                    signal = freshness,
-                    onRetry = viewModel::onRetry,
-                    modifier = Modifier
-                        .padding(horizontal = MaterialTheme.spacing.lg, vertical = MaterialTheme.spacing.xs),
-                )
-            }
             ScreenContent(
                 state = screenState,
                 onRetry = viewModel::onRetry,
                 modifier = Modifier.fillMaxSize(),
-            ) { history, _ ->
+            ) { history, freshness ->
+                if (freshness == DataFreshness.STALE) {
+                    val fetchedAt = (screenState as? ScreenState.Content)?.fetchedAt
+                    OfflineDataBanner(
+                        fetchedAt = fetchedAt,
+                        modifier = Modifier.padding(
+                            horizontal = MaterialTheme.spacing.lg,
+                            vertical = MaterialTheme.spacing.xs,
+                        ),
+                    )
+                }
                 val sp = MaterialTheme.spacing
                 Column(
                     modifier = Modifier
@@ -155,7 +163,38 @@ fun RateHistoryScreen(
                         }
                     }
                 }
-            } // \u2190 close ScreenContent { history, _ -> ... }
+            } // \u2190 close ScreenContent { history, freshness -> ... }
         } // \u2190 close outer Column wrapper
+    }
+}
+
+@OptIn(ExperimentalTime::class)
+@Composable
+private fun OfflineDataBanner(
+    fetchedAt: Instant?,
+    modifier: Modifier = Modifier,
+) {
+    val label = formatTimeAgo(fetchedAt)
+        ?.let { "No network \u00b7 Updated $it" }
+        ?: "No network \u00b7 Cached data"
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.errorContainer)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Default.CloudOff,
+            contentDescription = null,
+            modifier = Modifier.size(14.dp),
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onErrorContainer,
+        )
     }
 }

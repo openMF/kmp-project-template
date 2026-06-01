@@ -41,5 +41,5 @@ kotlin {
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "template.core.base.designsystem.generated.resources"
+    packageOfResClass = "kpt.core.base.designsystem.generated.resources"
 }

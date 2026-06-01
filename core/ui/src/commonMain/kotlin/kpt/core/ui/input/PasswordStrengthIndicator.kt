@@ -37,7 +37,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.KptTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 
 @Suppress("LongMethod", "CyclomaticComplexMethod", "MagicNumber")
 @Composable

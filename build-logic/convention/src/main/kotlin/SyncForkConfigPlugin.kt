@@ -7,6 +7,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.register
+import org.gradle.work.DisableCachingByDefault
 
 /**
  * Registers the `syncForkConfig` task on whichever project applies this plugin.
@@ -44,6 +45,7 @@ class SyncForkConfigPlugin : Plugin<Project> {
     }
 }
 
+@DisableCachingByDefault(because = "Writes to local.properties which is gitignored and machine-specific")
 abstract class SyncForkConfigTask : DefaultTask() {
 
     @get:Input abstract val appId:          Property<String>

@@ -216,11 +216,12 @@ class AppLifecycleTracker(private val analytics: AnalyticsHelper) {
     fun markAppBackground() {
         backgroundTime = currentTime
         val foregroundTime = lastForegroundTime
+        val bgTime = backgroundTime
 
         analytics.logEvent(
             Types.APP_BACKGROUND,
-            if (foregroundTime != null) {
-                mapOf("foreground_duration_ms" to (backgroundTime!! - foregroundTime).toString())
+            if (foregroundTime != null && bgTime != null) {
+                mapOf("foreground_duration_ms" to (bgTime - foregroundTime).toString())
             } else {
                 emptyMap()
             },

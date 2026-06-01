@@ -125,7 +125,7 @@ private fun SparklineCanvas(
         // Tail dot so single-segment series have a visible terminator.
         val lastIdx = values.indexOfLast { it != null }
         if (lastIdx >= 0) {
-            val raw = values[lastIdx]!!
+            val raw = values[lastIdx] ?: return@Canvas
             val x = lastIdx * stepX
             val normalized = ((raw - minValue) / spread).toFloat()
             val y = heightPx - (normalized * heightPx)

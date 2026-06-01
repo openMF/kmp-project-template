@@ -27,7 +27,7 @@
         tools:node="remove" />
 
     <application
-        android:name=".AndroidApp"
+        android:name="cmp.android.app.AndroidApp"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -38,7 +38,7 @@
         android:localeConfig="@xml/locale_config">
 
         <activity
-            android:name=".MainActivity"
+            android:name="cmp.android.app.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.AppSplash"
             android:windowSoftInputMode="adjustPan|adjustResize">

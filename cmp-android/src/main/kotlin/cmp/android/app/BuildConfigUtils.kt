@@ -10,6 +10,7 @@
 package cmp.android.app
 
 import android.os.Build
+import org.mifos.kmp.template.BuildConfig
 
 /**
  * A boolean property that indicates whether the current build is a dev build.

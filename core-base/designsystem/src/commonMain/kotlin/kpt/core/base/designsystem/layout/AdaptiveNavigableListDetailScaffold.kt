@@ -257,7 +257,7 @@ private fun <T : PaneScaffoldItem<*>> ListContent(
     ) {
         itemsIndexed(
             items = items,
-            key = { _, item -> item.id!! },
+            key = { _, item -> item.id },
         ) { index, item ->
 
             val interactionModifier = when (selectionState) {
@@ -348,6 +348,6 @@ sealed interface SelectionVisibilityState {
     ) : SelectionVisibilityState
 }
 
-interface PaneScaffoldItem<T> {
+interface PaneScaffoldItem<T : Any> {
     val id: T
 }

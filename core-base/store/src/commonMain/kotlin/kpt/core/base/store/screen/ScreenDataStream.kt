@@ -295,17 +295,18 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                     storeData.copy(fetchedAtInstant = persistedFetchedAt)
                 else -> storeData
             }
+            val cached = lastContent
             if (!enriched.isEmpty) {
                 lastContent = enriched
                 enriched
-            } else if (enriched.isEmpty && lastContent != null && enriched.error == null) {
+            } else if (enriched.isEmpty && cached != null && enriched.error == null) {
                 // Refresh in progress — preserve last content with isRefreshing=true.
-                lastContent!!.copy(isRefreshing = true)
-            } else if (enriched.isEmpty && lastContent != null && enriched.error != null) {
+                cached.copy(isRefreshing = true)
+            } else if (enriched.isEmpty && cached != null && enriched.error != null) {
                 // Empty + error — preserve last content, attach error so
                 // DecisionEngine routes to Content (has data + error → STALE) instead of
                 // NoNetwork, and the sibling freshness Flow emits VeryStale + lastError.
-                lastContent!!.copy(isRefreshing = false, error = enriched.error)
+                cached.copy(isRefreshing = false, error = enriched.error)
             } else {
                 enriched
             }

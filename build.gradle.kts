@@ -71,6 +71,7 @@ plugins {
     // Tasks: ./gradlew koverHtmlReport | koverXmlReport | koverVerify
     alias(libs.plugins.kover) apply false
     alias(libs.plugins.kover.convention)
+    id("org.convention.fork.sync-config")
 }
 
 object DynamicVersion {

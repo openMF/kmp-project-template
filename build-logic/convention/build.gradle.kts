@@ -132,5 +132,11 @@ gradlePlugin {
             description = "Configures Room for the project"
         }
 
+        // Fork identity sync
+        register("forkSyncConfig") {
+            id = "org.convention.fork.sync-config"
+            implementationClass = "SyncForkConfigPlugin"
+            description = "Registers syncForkConfig task — syncs libs.versions.toml identity to iOS xcconfig, local.properties, gradle.properties"
+        }
     }
 }

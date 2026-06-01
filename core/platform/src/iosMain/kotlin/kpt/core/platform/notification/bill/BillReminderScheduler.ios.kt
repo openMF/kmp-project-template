@@ -10,6 +10,7 @@
 package kpt.core.platform.notification.bill
 
 import kotlinx.cinterop.ExperimentalForeignApi
+import kpt.core.base.platform.notification.NotificationScheduler
 import platform.Foundation.NSDate
 import platform.Foundation.dateWithTimeIntervalSinceNow
 import platform.Foundation.timeIntervalSince1970
@@ -20,7 +21,6 @@ import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNUserNotificationCenter
-import kpt.core.base.platform.notification.NotificationScheduler
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

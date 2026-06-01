@@ -23,14 +23,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.shared.SharedApp
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
-import org.koin.android.ext.android.inject
-import kpt.core.data.infra.NetworkMonitor
-import kpt.core.data.user.UserDataRepository
 import kpt.core.base.analytics.AnalyticsHelper
 import kpt.core.base.analytics.lifecycleTracker
 import kpt.core.base.platform.update.AppUpdateManager
 import kpt.core.base.platform.update.AppUpdateManagerImpl
 import kpt.core.base.ui.util.ShareUtils
+import kpt.core.data.infra.NetworkMonitor
+import kpt.core.data.user.UserDataRepository
+import org.koin.android.ext.android.inject
 import java.util.Locale
 
 /**

@@ -9,10 +9,10 @@
  */
 package kpt.core.platform.notification.bill.di
 
+import kpt.core.platform.notification.bill.BillReminderScheduler
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import kpt.core.platform.notification.bill.BillReminderScheduler
 
 /**
  * Android wiring — the scheduler needs `applicationContext` so [BillReminderScheduler]

@@ -39,15 +39,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
+import kpt.core.base.designsystem.component.AppCard
+import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.emi.EmiResult
-import kpt.core.base.designsystem.component.AppCard
-import kpt.core.base.designsystem.component.HeroCard
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Compare Loans — full-width vertical-stack redesign.

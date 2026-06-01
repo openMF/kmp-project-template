@@ -10,13 +10,13 @@
 package kpt.core.datastore.di
 
 import com.russhwolf.settings.Settings
+import kpt.core.base.common.di.CommonModule
+import kpt.core.base.datastore.di.DatastoreBaseModule
+import kpt.core.datastore.UserPreferencesRepository
+import kpt.core.datastore.UserPreferencesRepositoryImpl
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import kpt.core.datastore.UserPreferencesRepository
-import kpt.core.datastore.UserPreferencesRepositoryImpl
-import kpt.core.base.common.di.CommonModule
-import kpt.core.base.datastore.di.DatastoreBaseModule
 
 val DatastoreModule = module {
     includes(CommonModule, DatastoreBaseModule)

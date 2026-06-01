@@ -9,9 +9,9 @@
  */
 package kpt.feature.amortization.di
 
+import kpt.feature.amortization.ui.AmortizationScheduleViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
-import kpt.feature.amortization.ui.AmortizationScheduleViewModel
 
 /**
  * Koin module for the amortization-schedule feature.

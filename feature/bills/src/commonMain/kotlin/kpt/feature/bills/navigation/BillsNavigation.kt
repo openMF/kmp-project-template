@@ -17,10 +17,10 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import kpt.feature.bills.ui.AddOrEditBillReminderScreen
-import kpt.feature.bills.ui.BillRemindersListScreen
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.bills.ui.AddOrEditBillReminderScreen
+import kpt.feature.bills.ui.BillRemindersListScreen
 
 /** Route for the entire Bill Reminders graph — entry for [NavController.navigateToBills]. */
 @Serializable

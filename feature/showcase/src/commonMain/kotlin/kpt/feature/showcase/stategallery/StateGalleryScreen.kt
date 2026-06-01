@@ -26,6 +26,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.ui.screen.DefaultErrorContent
+import kpt.core.base.ui.screen.DefaultNoNetworkContent
+import kpt.core.base.ui.screen.LocalScreenStateDefaults
 import kpt.core.designsystem.component.state.CardLoadingSkeleton
 import kpt.core.designsystem.component.state.CardStateBox
 import kpt.core.designsystem.component.state.ErrorChip
@@ -33,11 +38,6 @@ import kpt.core.designsystem.component.state.InlineErrorPill
 import kpt.core.designsystem.component.state.RowLoadingShimmer
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
-import kpt.core.base.store.screen.DataFreshness
-import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.ui.screen.DefaultErrorContent
-import kpt.core.base.ui.screen.DefaultNoNetworkContent
-import kpt.core.base.ui.screen.LocalScreenStateDefaults
 
 /**
  * Dev-only screen exhibiting every [ScreenState] variant and each of the 5 component-scale

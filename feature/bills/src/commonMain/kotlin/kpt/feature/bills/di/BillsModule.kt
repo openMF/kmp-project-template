@@ -9,15 +9,15 @@
  */
 package kpt.feature.bills.di
 
-import org.koin.core.module.dsl.viewModel
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import kpt.core.data.di.OutboxQualifiers
 import kpt.core.platform.notification.bill.di.notificationModule
 import kpt.feature.bills.notification.BillNotificationGateway
 import kpt.feature.bills.notification.BillNotificationGatewayImpl
 import kpt.feature.bills.ui.BillRemindersListViewModel
 import kpt.feature.bills.ui.EditBillReminderViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.bind
+import org.koin.dsl.module
 
 /**
  * Koin module for the Bill Reminders feature.

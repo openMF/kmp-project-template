@@ -11,8 +11,8 @@
 
 package kpt.core.data.di
 
-import org.koin.core.qualifier.Qualifier
 import kpt.core.base.store.submit.SubmitOutbox
+import org.koin.core.qualifier.Qualifier
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue

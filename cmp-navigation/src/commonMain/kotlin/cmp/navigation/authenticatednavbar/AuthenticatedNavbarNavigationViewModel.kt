@@ -9,8 +9,8 @@
  */
 package cmp.navigation.authenticatednavbar
 
-import kpt.core.model.user.UserData
 import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.model.user.UserData
 
 internal class AuthenticatedNavbarNavigationViewModel :
     BaseViewModel<Unit, AuthenticatedNavBarEvent, AuthenticatedNavBarAction>(

@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.domain.calc.computeEmi
 import kpt.core.model.emi.EmiResult
-import kpt.core.base.ui.viewmodel.BaseViewModel
 
 /**
  * VM for B6 Loan Comparison.

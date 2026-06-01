@@ -15,10 +15,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kpt.core.base.store.screen.ScreenState
 import kpt.feature.bills.testing.FakeBillReminderRepository
 import kpt.feature.bills.testing.FakeBillReminderScheduler
 import kpt.feature.bills.testing.bill
-import kpt.core.base.store.screen.ScreenState
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

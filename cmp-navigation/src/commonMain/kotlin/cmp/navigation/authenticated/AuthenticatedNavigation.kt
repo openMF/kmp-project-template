@@ -18,6 +18,8 @@ import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
+import kpt.core.base.security.isReleaseBuild
+import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.bills.navigation.billsGraph
 import kpt.feature.bills.navigation.navigateToBills
 import kpt.feature.calculators.navigation.calculatorsGraph
@@ -43,8 +45,6 @@ import kpt.feature.showcase.stategallery.StateGalleryRoute
 import kpt.feature.showcase.stategallery.stateGalleryGraph
 import kpt.feature.showcase.transitions.TransitionGalleryRoute
 import kpt.feature.showcase.transitions.transitionGalleryGraph
-import kpt.core.base.security.isReleaseBuild
-import kpt.core.base.ui.nav.popBackStackSafely
 
 @Serializable
 internal data object AuthenticatedGraphRoute

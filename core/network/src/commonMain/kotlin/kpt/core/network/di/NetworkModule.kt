@@ -10,7 +10,8 @@
 package kpt.core.network.di
 
 import de.jensklingenberg.ktorfit.Ktorfit
-import org.koin.dsl.module
+import kpt.core.base.network.httpClient
+import kpt.core.base.network.setupDefaultHttpClient
 import kpt.core.network.BuildKonfig
 import kpt.core.network.crypto.api.CoinGeckoApi
 import kpt.core.network.currency.api.FrankfurterApi
@@ -20,8 +21,7 @@ import kpt.core.network.economic.api.WorldBankApi
 import kpt.core.network.economic.config.FredApiConfig
 import kpt.core.network.economic.config.WorldBankApiConfig
 import kpt.core.network.infra.FintechApiClient
-import kpt.core.base.network.httpClient
-import kpt.core.base.network.setupDefaultHttpClient
+import org.koin.dsl.module
 
 // NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
 // FrankfurterApiConfig, WorldBankApiConfig), each carrying a `baseUrl: String` field that

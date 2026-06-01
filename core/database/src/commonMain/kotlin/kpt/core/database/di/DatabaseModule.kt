@@ -9,11 +9,11 @@
  */
 package kpt.core.database.di
 
-import org.koin.core.module.Module
-import org.koin.dsl.module
+import kpt.core.base.security.FieldEncryptor
 import kpt.core.database.AppDatabase
 import kpt.core.database.currency.converter.ChargeTypeConverters
-import kpt.core.base.security.FieldEncryptor
+import org.koin.core.module.Module
+import org.koin.dsl.module
 
 /**
  * Marker singleton — its instantiation has the side effect of wiring [FieldEncryptor]

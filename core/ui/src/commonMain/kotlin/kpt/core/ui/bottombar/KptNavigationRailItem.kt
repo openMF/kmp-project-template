@@ -22,9 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import kpt.core.base.designsystem.theme.KptTheme
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-import kpt.core.base.designsystem.theme.KptTheme
 
 @Composable
 fun ColumnScope.KptNavigationRailItem(

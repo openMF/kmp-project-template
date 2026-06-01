@@ -11,9 +11,9 @@ package kpt.core.data.economic
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.model.economic.MacroIndicator
 import kpt.core.store.economic.impl.MacroIndicatorKey
-import kpt.core.base.store.screen.ScreenDataStream
 
 /**
  * Repository surface for World Bank macro-indicator series.

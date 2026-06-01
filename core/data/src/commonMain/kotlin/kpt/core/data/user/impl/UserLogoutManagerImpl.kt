@@ -15,13 +15,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kpt.core.base.common.manager.DispatcherManager
 import kpt.core.data.user.LogoutEvent
 import kpt.core.data.user.LogoutReason
 import kpt.core.data.user.UserLogoutManager
 import kpt.core.data.util.bufferedMutableSharedFlow
 import kpt.core.datastore.UserPreferencesRepository
 import kpt.core.store.infra.StoreCacheManager
-import kpt.core.base.common.manager.DispatcherManager
 
 class UserLogoutManagerImpl(
     private val repository: UserPreferencesRepository,

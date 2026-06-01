@@ -9,9 +9,9 @@
  */
 package kpt.core.data.di
 
+import kpt.core.data.infra.TimeZoneMonitor
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import kpt.core.data.infra.TimeZoneMonitor
 
 actual val platformModule: Module
     get() = module {

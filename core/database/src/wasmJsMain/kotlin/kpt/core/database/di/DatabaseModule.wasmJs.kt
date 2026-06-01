@@ -10,10 +10,10 @@
 package kpt.core.database.di
 
 import kotlinx.coroutines.Dispatchers
+import kpt.core.base.database.AppDatabaseFactory
+import kpt.core.database.AppDatabase
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import kpt.core.database.AppDatabase
-import kpt.core.base.database.AppDatabaseFactory
 
 actual val platformModule: Module = module {
     single {

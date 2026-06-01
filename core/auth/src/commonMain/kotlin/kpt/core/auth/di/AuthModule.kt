@@ -9,11 +9,11 @@
  */
 package kpt.core.auth.di
 
+import kpt.core.auth.AuthProvider
+import kpt.core.auth.NoOpAuthProvider
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import kpt.core.auth.AuthProvider
-import kpt.core.auth.NoOpAuthProvider
 
 /**
  * Koin module exposing the default [AuthProvider] binding (no-op).

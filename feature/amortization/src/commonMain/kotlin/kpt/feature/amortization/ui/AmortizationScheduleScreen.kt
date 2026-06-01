@@ -38,10 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.ui.screen.ScreenContent
+import kpt.core.model.banking.AmortizationRow
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import kpt.core.model.banking.AmortizationRow
-import kpt.core.base.ui.screen.ScreenContent
 import kotlin.math.roundToLong
 
 @OptIn(ExperimentalMaterial3Api::class)

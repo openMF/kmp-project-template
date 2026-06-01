@@ -22,11 +22,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
+import kpt.core.base.common.manager.DispatcherManager
 import kpt.core.model.user.DarkThemeConfig
 import kpt.core.model.user.LanguageConfig
 import kpt.core.model.user.ThemeBrand
 import kpt.core.model.user.UserData
-import kpt.core.base.common.manager.DispatcherManager
 
 private const val USER_DATA_KEY = "user_data_key"
 private const val SECURE_DATA_KEY = "secure_data_key"

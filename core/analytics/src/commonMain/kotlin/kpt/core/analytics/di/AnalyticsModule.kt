@@ -9,11 +9,11 @@
  */
 package kpt.core.analytics.di
 
+import kpt.core.base.analytics.AnalyticsHelper
+import kpt.core.base.analytics.NoOpAnalyticsHelper
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import kpt.core.base.analytics.AnalyticsHelper
-import kpt.core.base.analytics.NoOpAnalyticsHelper
 
 /**
  * Project-scoped Koin module exposing the **default** [AnalyticsHelper] binding for the toolkit.

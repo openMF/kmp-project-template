@@ -32,17 +32,17 @@ import cmp.navigation.ui.ScaffoldNavigationData
 import cmp.navigation.ui.logDestinationChanged
 import cmp.navigation.ui.rememberKptNavController
 import kotlinx.collections.immutable.persistentListOf
-import org.koin.compose.viewmodel.koinViewModel
+import kpt.core.base.analytics.rememberAnalyticsHelper
+import kpt.core.base.designsystem.theme.motion
+import kpt.core.base.ui.effects.EventsEffect
+import kpt.core.base.ui.util.RootTransitionProviders
 import kpt.core.ui.NavigationItem
 import kpt.feature.home.HomeDestination
 import kpt.feature.home.homeGraph
 import kpt.feature.home.navigateToHome
 import kpt.feature.profile.navigateToProfile
 import kpt.feature.profile.profileDestination
-import kpt.core.base.analytics.rememberAnalyticsHelper
-import kpt.core.base.designsystem.theme.motion
-import kpt.core.base.ui.effects.EventsEffect
-import kpt.core.base.ui.util.RootTransitionProviders
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 internal fun AuthenticatedNavbarNavigationScreen(

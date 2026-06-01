@@ -9,9 +9,9 @@
  */
 package kpt.core.data.infra.impl
 
+import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.database.infra.dao.FetchedAtDao
 import kpt.core.database.infra.entity.FetchedAtEntity
-import kpt.core.base.store.infra.FetchedAtRepository
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 

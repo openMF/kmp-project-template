@@ -15,9 +15,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import kpt.feature.amortization.ui.AmortizationScheduleScreen
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.amortization.ui.AmortizationScheduleScreen
 
 @Serializable
 data class AmortizationScheduleRoute(val loanId: String)

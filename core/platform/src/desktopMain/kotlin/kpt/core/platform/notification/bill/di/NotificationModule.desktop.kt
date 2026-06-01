@@ -9,9 +9,9 @@
  */
 package kpt.core.platform.notification.bill.di
 
+import kpt.core.platform.notification.bill.BillReminderScheduler
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import kpt.core.platform.notification.bill.BillReminderScheduler
 
 /** Desktop wiring — stub scheduler, no platform deps. */
 actual val notificationModule: Module = module {

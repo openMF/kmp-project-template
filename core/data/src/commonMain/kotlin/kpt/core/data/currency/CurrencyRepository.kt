@@ -11,11 +11,11 @@ package kpt.core.data.currency
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kpt.core.base.store.screen.FetchPolicy
+import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.model.currency.ExchangeRates
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RateHistoryKey
-import kpt.core.base.store.screen.FetchPolicy
-import kpt.core.base.store.screen.ScreenDataStream
 
 interface CurrencyRepository {
     /**

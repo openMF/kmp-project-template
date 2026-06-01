@@ -41,13 +41,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
+import kpt.core.base.designsystem.component.AppCard
+import kpt.core.base.store.submit.SubmitState
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.BillCategory
 import kpt.core.model.banking.Recurrence
-import kpt.core.base.designsystem.component.AppCard
-import kpt.core.base.store.submit.SubmitState
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /**
  * Add-or-edit screen for a single bill reminder.

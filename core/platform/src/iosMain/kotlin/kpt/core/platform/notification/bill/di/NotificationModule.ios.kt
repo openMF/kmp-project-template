@@ -9,9 +9,9 @@
  */
 package kpt.core.platform.notification.bill.di
 
+import kpt.core.platform.notification.bill.BillReminderScheduler
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import kpt.core.platform.notification.bill.BillReminderScheduler
 
 /** iOS wiring — the scheduler talks to `UNUserNotificationCenter.currentNotificationCenter()`. */
 actual val notificationModule: Module = module {

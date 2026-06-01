@@ -22,10 +22,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
-import kpt.core.base.designsystem.component.HeroCard
 
 @Composable
 internal fun ProfileScreen(modifier: Modifier = Modifier) {

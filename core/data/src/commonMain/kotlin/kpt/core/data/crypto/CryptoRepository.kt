@@ -10,10 +10,10 @@
 package kpt.core.data.crypto
 
 import kotlinx.coroutines.CoroutineScope
-import kpt.core.model.crypto.CoinDetail
-import kpt.core.model.crypto.CoinMarket
 import kpt.core.base.store.paging.PagingScreenStream
 import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.model.crypto.CoinDetail
+import kpt.core.model.crypto.CoinMarket
 
 interface CryptoRepository {
     fun coinMarketsStream(scope: CoroutineScope, pageSize: Int = 20): PagingScreenStream<CoinMarket>

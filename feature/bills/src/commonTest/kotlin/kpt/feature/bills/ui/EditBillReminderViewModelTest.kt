@@ -16,6 +16,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kpt.core.base.store.submit.SubmitOutboxStatus
+import kpt.core.base.store.submit.SubmitState
 import kpt.core.data.banking.BillReminderRepository
 import kpt.core.model.banking.BillCategory
 import kpt.core.model.banking.BillReminder
@@ -23,8 +25,6 @@ import kpt.core.model.banking.Recurrence
 import kpt.feature.bills.testing.FakeBillReminderRepository
 import kpt.feature.bills.testing.FakeBillReminderScheduler
 import kpt.feature.bills.testing.InMemorySubmitOutbox
-import kpt.core.base.store.submit.SubmitOutboxStatus
-import kpt.core.base.store.submit.SubmitState
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

@@ -12,9 +12,9 @@ package kpt.core.database.di
 import androidx.room3.Room
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import kotlinx.coroutines.Dispatchers
+import kpt.core.database.AppDatabase
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import kpt.core.database.AppDatabase
 
 actual val testPlatformModule: Module = module {
     factory<AppDatabase> {

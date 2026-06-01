@@ -13,10 +13,10 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitorProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import org.koin.core.module.Module
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
+import kpt.core.base.common.di.CommonModule
+import kpt.core.base.store.infra.FetchedAtRepository
+import kpt.core.base.store.submit.OfflineSubmitSyncer
+import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.data.alerts.AlertsRepository
 import kpt.core.data.alerts.impl.AlertsRepositoryImpl
 import kpt.core.data.banking.BillReminderRepository
@@ -49,10 +49,10 @@ import kpt.core.model.banking.Loan
 import kpt.core.model.banking.LoanCalcScenario
 import kpt.core.network.di.NetworkModule
 import kpt.core.store.AppStoreRegistry
-import kpt.core.base.common.di.CommonModule
-import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.submit.OfflineSubmitSyncer
-import kpt.core.base.store.submit.SubmitOutbox
+import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
+import org.koin.dsl.module
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)

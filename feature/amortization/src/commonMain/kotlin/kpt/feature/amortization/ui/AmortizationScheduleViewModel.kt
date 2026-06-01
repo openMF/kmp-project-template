@@ -14,12 +14,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kpt.core.data.banking.LoanRepository
-import kpt.core.model.banking.AmortizationRow
-import kpt.core.model.banking.Loan
 import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.data.banking.LoanRepository
+import kpt.core.model.banking.AmortizationRow
+import kpt.core.model.banking.Loan
 
 /**
  * ViewModel for [AmortizationScheduleScreen].

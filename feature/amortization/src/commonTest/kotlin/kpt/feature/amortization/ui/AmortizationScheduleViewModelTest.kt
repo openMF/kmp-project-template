@@ -12,9 +12,9 @@ package kpt.feature.amortization.ui
 import app.cash.turbine.test
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.banking.Loan
 import kpt.core.model.banking.LoanKind
-import kpt.core.base.store.screen.ScreenState
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

@@ -9,14 +9,14 @@
  */
 package kpt.feature.calculators.di
 
-import org.koin.core.module.dsl.viewModel
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.module
 import kpt.core.data.di.OutboxQualifiers
 import kpt.feature.calculators.affordability.AffordabilityCalculatorViewModel
 import kpt.feature.calculators.amortization.AmortizationViewModel
 import kpt.feature.calculators.comparison.LoanComparisonViewModel
 import kpt.feature.calculators.wizard.LoanCalcWizardViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.module
 
 /**
  * DI module for the four calculator ViewModels.

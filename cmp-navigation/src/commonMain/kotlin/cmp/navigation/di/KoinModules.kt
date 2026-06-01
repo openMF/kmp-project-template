@@ -12,8 +12,10 @@ package cmp.navigation.di
 import cmp.navigation.AppViewModel
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarNavigationViewModel
 import cmp.navigation.rootnav.RootNavViewModel
-import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.module
+import kpt.core.base.analytics.di.analyticsModule
+import kpt.core.base.common.di.CommonModule
+import kpt.core.base.platform.di.platformModule
+import kpt.core.base.security.di.SecurityModule
 import kpt.core.data.di.DataModule
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
@@ -28,10 +30,8 @@ import kpt.feature.loans.di.LoansModule
 import kpt.feature.macro.di.MacroModule
 import kpt.feature.rates.di.RatesModule
 import kpt.feature.settings.SettingsModule
-import kpt.core.base.analytics.di.analyticsModule
-import kpt.core.base.common.di.CommonModule
-import kpt.core.base.platform.di.platformModule
-import kpt.core.base.security.di.SecurityModule
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.module
 
 object KoinModules {
     private val dataModule = module {

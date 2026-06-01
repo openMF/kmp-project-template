@@ -20,13 +20,16 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-val packageNameSpace: String = libs.versions.androidPackageNamespace.get()
+val appId: String = libs.versions.appId.get()
+val appDisplayName: String = libs.versions.appDisplayName.get()
 
 android {
-    namespace = "cmp.android.app"
+    namespace = appId
 
     defaultConfig {
-        applicationId = packageNameSpace
+        applicationId = appId
+        // app_name is injected from libs.versions.toml — no hardcoded strings.xml entry needed
+        resValue("string", "app_name", appDisplayName)
         versionName = System.getenv("VERSION") ?: project.dynamicVersion
         versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
         vectorDrawables.useSupportLibrary = true
@@ -63,6 +66,7 @@ android {
     buildFeatures {
         dataBinding = true
         buildConfig = true
+        resValues = true
     }
 
     packaging {

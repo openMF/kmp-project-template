@@ -17,7 +17,6 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    namespace = "org.mifos.core.designsystem"
 }
 
 kotlin {

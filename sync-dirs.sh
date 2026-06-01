@@ -54,7 +54,7 @@ declare -A EXCLUSIONS=(
     # launcher icon, and the dependency-guard baseline directory are preserved across syncs.
     ["cmp-android"]="src/main/res:dir dependencies:dir src/main/ic_launcher-playstore.png:file google-services.json:file"
     # iOS — consumer-branded asset catalog (app icon, color palette) preserved across syncs.
-    ["cmp-ios"]="iosApp/Assets.xcassets:dir"
+    ["cmp-ios"]="iosApp/Assets.xcassets:dir Configuration/Config.xcconfig:file"
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
     ["cmp-desktop"]="icons:dir build.gradle.kts:file"
     ["fastlane-config"]="project_config.rb:file extract_config.rb:file"

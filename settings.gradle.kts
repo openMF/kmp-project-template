@@ -89,7 +89,9 @@ extensions.configure<org.ajoberstar.reckon.gradle.ReckonExtension> {
     setTagWriter { it.toString() }
 }
 
-rootProject.name = "kmp-project-template"
+// Project name is driven by fork.project.name in gradle.properties (written by syncForkConfig).
+// Fallback keeps the template name so a clean checkout builds without running syncForkConfig first.
+rootProject.name = providers.gradleProperty("fork.project.name").getOrElse("kmp-project-template")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 

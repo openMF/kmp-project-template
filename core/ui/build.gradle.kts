@@ -13,10 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.core.ui"
-}
-
 kotlin {
     sourceSets {
         androidMain.dependencies {

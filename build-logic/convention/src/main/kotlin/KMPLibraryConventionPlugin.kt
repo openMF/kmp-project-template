@@ -2,6 +2,7 @@
 import com.android.build.gradle.LibraryExtension
 import org.convention.configureKotlinAndroid
 import org.convention.configureKotlinMultiplatform
+import org.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -27,10 +28,7 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
 
             configureKotlinMultiplatform()
 
-            val catalog = extensions
-                .getByType(org.gradle.api.artifacts.VersionCatalogsExtension::class.java)
-                .named("libs")
-            val baseNamespace = catalog.findVersion("baseNamespace").get().requiredVersion
+            val baseNamespace = libs.findVersion("baseNamespace").get().requiredVersion
 
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
@@ -38,7 +36,7 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
                 // namespace is derived from baseNamespace (libs.versions.toml) + module path,
                 // so all modules stay in sync when a fork changes baseNamespace.
                 // e.g. baseNamespace="org.mifos", path=":feature:loans" → "org.mifos.feature.loans"
-                namespace = baseNamespace + path.replace(":", ".").lowercase()
+                namespace = baseNamespace + path.replace(":", ".").replace("-", "_").lowercase()
                 // The resource prefix is derived from the module name,
                 // so resources inside ":core:module1" must be prefixed with "core_module1_"
                 resourcePrefix = path
@@ -49,9 +47,9 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
             }
 
             dependencies {
-                add("commonMainImplementation", catalog.findLibrary("kotlinx.serialization.json").get())
-                add("commonTestImplementation", catalog.findLibrary("kotlin.test").get())
-                add("commonTestImplementation", catalog.findLibrary("kotlinx.coroutines.test").get())
+                add("commonMainImplementation", libs.findLibrary("kotlinx.serialization.json").get())
+                add("commonTestImplementation", libs.findLibrary("kotlin.test").get())
+                add("commonTestImplementation", libs.findLibrary("kotlinx.coroutines.test").get())
             }
         }
     }

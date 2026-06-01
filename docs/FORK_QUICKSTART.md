@@ -1,0 +1,285 @@
+# Fork Quickstart — Day-1 Customization Checklist
+
+This is the long-form walkthrough for turning a fresh clone of
+`kmp-project-template` into a branded, running app. The condensed five-step
+version lives in [`core-base/README.md`](../core-base/README.md#day-1-fork-checklist) —
+this file expands each step with rationale, gotchas, and pointers into the rest
+of the codebase.
+
+> **Estimated time:** 5 minutes for steps 1–2 (one command does it), plus
+> whatever your auth / analytics / crash-reporter integrations take.
+
+---
+
+## Step 1 — Set fork identity (one command)
+
+All fork identity lives in **six lines** at the top of `gradle/libs.versions.toml`.
+You never touch Android source files, iOS source files, Fastlane config, or
+`settings.gradle.kts` — a single Gradle task bridges the catalog to every
+platform automatically.
+
+### Option A — One-shot via `customizer.sh` (recommended)
+
+```bash
+bash customizer.sh com.myapp.example MyAwesomeApp "My Awesome App" ABCDE12345
+#                  <package_id>       <project_name> [display_name]  [ios_team_id]
+```
+
+That's it. The script:
+1. Rewrites the 5 identity lines in `gradle/libs.versions.toml`
+2. Runs `./gradlew syncForkConfig` to propagate changes to all platform config files
+
+### Option B — Edit `libs.versions.toml` directly
+
+Open `gradle/libs.versions.toml` and change only the six lines in the fork
+identity block (near the top of the `[versions]` section):
+
+```toml
+# ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──
+appId            = "com.myapp.example"   # Android applicationId + iOS bundle ID
+appDisplayName   = "My Awesome App"      # Android app_name, iOS CFBundleDisplayName
+baseNamespace    = "com.myapp"           # prefix for all module R-class namespaces
+desktopAppName   = "MyAwesomeAppDesktop" # JVM package name, dock name
+projectName      = "my-awesome-app"      # rootProject.name, Fastlane PROJECT_NAME
+iosTeamId        = "ABCDE12345"          # Apple Developer Team ID
+```
+
+Then propagate to all platform config files:
+
+```bash
+./gradlew syncForkConfig
+```
+
+### What `syncForkConfig` writes
+
+| File | What changes |
+|------|-------------|
+| `cmp-ios/Configuration/Config.xcconfig` | `APP_BUNDLE_ID`, `APP_NAME`, `TEAM_ID` |
+| `local.properties` | `fork.app.id`, `fork.app.display.name`, `fork.project.name` |
+| `gradle.properties` | `fork.project.name` (→ `rootProject.name`) |
+
+`Config.xcconfig` is committed to your repo and excluded from upstream
+`sync-dirs` syncs so your identity survives template updates.
+
+### How identity flows to each platform
+
+| Platform | Identity source |
+|---------|----------------|
+| Android `applicationId` | `appId` via `cmp-android/build.gradle.kts` |
+| Android `app_name` | `appDisplayName` via `resValue` in `build.gradle.kts` |
+| All 38 library module namespaces | `baseNamespace` + module path (derived by convention plugin) |
+| iOS bundle ID | `Config.xcconfig` → `APP_BUNDLE_ID` → `project.pbxproj` |
+| iOS display name | `Config.xcconfig` → `APP_NAME` → Info.plist `CFBundleDisplayName` |
+| iOS team | `Config.xcconfig` → `TEAM_ID` → Xcode signing settings |
+| Desktop app name / package | `desktopAppName` via `cmp-desktop/build.gradle.kts` |
+| Fastlane `package_name` / `app_identifier` | `local.properties` → `fastlane-config/project_config.rb` |
+| Gradle project name | `gradle.properties` → `settings.gradle.kts` |
+
+**Kotlin source files never change.** `package org.mifos.*` in `.kt` files is
+the framework's internal code organization — it is completely separate from
+the Android `applicationId` / iOS bundle ID the stores use to identify your
+app. You do not rename source packages.
+
+### Updating identity later
+
+```bash
+# Edit libs.versions.toml, then:
+./gradlew syncForkConfig
+```
+
+Or re-run `customizer.sh` with the new values.
+
+## Step 2 — Override the 4 customization-point Koin bindings
+
+The template ships working stubs for every fork-customizable dependency so the
+demo build runs out of the box. Each binding lives behind a stable interface;
+your fork swaps the implementation in its app Koin module and no callers
+change.
+
+### 2a. `AuthProvider`
+
+- **Default:** `NoOpAuthProvider` (returns "not authenticated" forever — the
+  demo app has no login).
+- **Swap for:** Firebase Auth, OAuth, biometric-only, your own SSO.
+- **Where:** consumer Koin module (typically `cmp-shared/`'s DI). Bind your
+  impl as `single<AuthProvider> { ... }`.
+
+### 2b. `CrashReporter`
+
+- **Default:** `ConsoleCrashReporter` (prints to logcat / stderr).
+- **Swap for:** `FirebaseCrashlyticsCrashReporter`, Sentry, Bugsnag.
+- **Where:** consumer Koin module. Bind as `single<CrashReporter> { ... }`.
+  The interface lives in `core-base/observability/`.
+
+### 2c. `AnalyticsHelper`
+
+- **Default:** `NoOpAnalyticsHelper` (drops events).
+- **Swap for:** `FirebaseAnalyticsHelper` (already shipped — opt-in by
+  changing the Koin binding), Amplitude, Mixpanel, PostHog.
+- **Where:** consumer Koin module. The higher-level `KptAnalyticsTracker`
+  (in `core/analytics/`) consumes whichever `AnalyticsHelper` you bind — no
+  call-site changes.
+
+### 2d. Network config bindings
+
+- **`FredApiConfig`** — the FRED API key for B7 Interest Rates. Swap
+  `apiKey` for your own key (free signup at
+  https://fred.stlouisfed.org/docs/api/api_key.html) and optionally swap
+  `baseUrl` to point at a proxy.
+- **`FrankfurterApiConfig`** — the Frankfurter exchange-rates base URL.
+  Override `baseUrl` to point at a self-hosted Frankfurter or your own FX
+  service.
+- **`WorldBankApiConfig`** — the World Bank Open Data base URL. No auth
+  required; override `baseUrl` only if proxying.
+
+All three configs are plain data classes — bind one of each in your fork's
+Koin module with the values you want.
+
+## Step 3 — Generate Android keystores
+
+```bash
+./keystore-manager.sh generate
+```
+
+Creates `keystores/release_keystore.keystore` (and the UPLOAD variant for Play
+Console). The `keystores/` directory is `.gitignore`'d — values never reach
+the public history. Use `./keystore-manager.sh encode-secrets` later to push
+encoded keystores into GitHub Actions secrets for CI builds.
+
+iOS keystore equivalents (Fastlane Match, `.p8` keys) — see
+`scripts/setup_ios_complete.sh` and the [Secrets Management Guide](claude/secrets-management.md).
+
+## Step 4 — Populate `.env.local`
+
+```bash
+cp .env.local.example .env.local
+```
+
+Edit `.env.local` and add at minimum:
+
+```
+FRED_API_KEY=<your-key-here>
+```
+
+Leave the key blank and the B7 Interest Rates screen renders an explicit
+"FRED key not configured" empty state rather than crashing.
+
+If your fork uses additional third-party APIs, add their keys to `.env.local`
+alongside `FRED_API_KEY` and wire them through Koin (or BuildKonfig) the same
+way `FredApiConfig` does.
+
+## Step 5 — Smoke-test the demo build
+
+```bash
+./gradlew :cmp-android:installDemoDebug
+```
+
+Should install the demo Android variant on a connected device or emulator
+and launch successfully. If the install fails:
+
+1. Check Android Studio's `Build` panel — most failures are missing keystores
+   (re-run Step 3) or stale Gradle caches (`./gradlew clean`).
+2. Confirm `FRED_API_KEY` is set if the B7 screen is your smoke-test surface.
+3. See [Troubleshooting Guide](claude/troubleshooting.md) for the
+   common failure modes.
+
+---
+
+## Beyond Day 1
+
+Once Steps 1–5 are done you have a renamed, signed, running demo build. The
+following customizations are typically Day-2+ work — pick what your fork
+needs:
+
+- **Icons + splash** — `cmp-android/src/main/res/mipmap-*/` and
+  `cmp-ios/iosApp/Assets.xcassets/AppIcon.appiconset/`.
+- **Push notifications** — wire FCM (Android) and APNs (iOS); register a
+  notification handler in the consumer Koin module.
+- **Deep links** — declare intent filters / universal-link entitlements in
+  `AndroidManifest.xml` and `Info.plist`.
+- **Store listings** — Play Console + App Store Connect metadata, screenshots,
+  release notes.
+- **Replace shipped features** — every Money Toolkit feature is a working
+  showcase of one framework pattern; remove what you don't want from
+  `feature/` and `settings.gradle.kts`. See the
+  [toolkit feature showcase table](../CLAUDE.md#toolkit-feature-showcase) for
+  which pattern each feature demonstrates.
+- **Brand visuals (Store-driven states)** — extend `AppScreenStateDefaults`
+  in `core/store/` to swap loading / error / empty visuals across every
+  screen at once. See [`core/store/README.md`](../core/store/README.md).
+- **Domain model** — extend `core/model/banking/` (loans, bills) and
+  `core/data/banking/` with your own entities; `feature/loans` + `feature/bills`
+  read straight from the repository contracts.
+
+---
+
+## Pointers
+
+- **`CLAUDE.md` (root)** — the central hub. Read this first if you're new.
+- **`core-base/README.md`** — framework-shared layer overview; the `Kpt*`
+  symbol catalogue.
+- **`core/store/README.md`** — Store contract + screen-archetype taxonomy.
+- **`docs/claude/onboarding.md`** — full onboarding walkthrough.
+- **`docs/claude/deployment-playbook.md`** — pushing builds to Firebase,
+  TestFlight, Play Store, App Store.
+
+---
+
+## G10 — Migrating an existing fork to the identity-block system
+
+If your fork was created from the template **before** the `libs.versions.toml`
+identity block was introduced, follow these steps once to adopt the new system.
+
+### What changed
+
+| Before (legacy) | After (identity block) |
+|----------------|----------------------|
+| Identity split across `gradle.properties`, `cmp-android/build.gradle.kts`, `cmp-ios/Configuration/Config.xcconfig`, `local.properties`, `settings.gradle.kts` | All identity in 6 lines of `gradle/libs.versions.toml` |
+| `Config.xcconfig` used `BUNDLE_ID` / `APP_NAME` keys (no `TEAM_ID`) | `Config.xcconfig` uses `APP_BUNDLE_ID` / `APP_NAME` / `TEAM_ID` |
+| Module `build.gradle.kts` files each declared an explicit `namespace` | `namespace` derived by convention plugin from `baseNamespace` + module path |
+| `customizer.sh` renamed Kotlin source packages | `customizer.sh` only edits `libs.versions.toml` + calls `syncForkConfig` |
+
+### Migration steps
+
+1. **Pull the updated template** (via sync-dirs PR or manual merge of
+   `build-logic/`, `cmp-android/build.gradle.kts`, `cmp-desktop/build.gradle.kts`,
+   root `build.gradle.kts`, `settings.gradle.kts`, `customizer.sh`).
+
+2. **Add the identity block to your `gradle/libs.versions.toml`** — insert
+   these six lines near the top of the `[versions]` section, replacing your
+   fork's current values:
+
+   ```toml
+   appId            = "com.myapp.example"
+   appDisplayName   = "My Awesome App"
+   baseNamespace    = "com.myapp"
+   desktopAppName   = "MyAwesomeAppDesktop"
+   projectName      = "my-awesome-app"
+   iosTeamId        = "ABCDE12345"
+   ```
+
+3. **Remove old identity properties from `gradle.properties`** — delete
+   `APP_ID_BASE`, `APP_NAME`, `APP_BUNDLE_DISPLAY_NAME`, `APP_BRAND_PREFIX`,
+   `APP_VERSION_BASE` if they exist. (Version config lives elsewhere.)
+
+4. **Run `./gradlew syncForkConfig`** — regenerates `Config.xcconfig`,
+   `local.properties`, and `gradle.properties` from the catalog.
+
+5. **Verify `cmp-ios/Configuration/Config.xcconfig`** — it should now contain
+   `APP_BUNDLE_ID`, `APP_NAME`, and `TEAM_ID` with your fork's values.
+   In Xcode, confirm the bundle ID resolves correctly
+   (`$(APP_BUNDLE_ID)` in Build Settings → Product Bundle Identifier).
+
+6. **Remove explicit `namespace` from library module `build.gradle.kts` files**
+   — if your fork has `namespace = "com.myapp.feature.loans"` etc. in each
+   module, remove them. The convention plugin in the updated `build-logic`
+   derives every namespace from `baseNamespace + module path`. Run
+   `./gradlew :cmp-android:assembleDebug` to confirm no namespace conflicts.
+
+7. **Commit** — the only files that should now carry your fork's package
+   identity are `gradle/libs.versions.toml`, `cmp-ios/Configuration/Config.xcconfig`,
+   `local.properties`, and `gradle.properties`.
+
+After migration, your fork will receive all future `build-logic/` and
+`cmp-*/build.gradle.kts` improvements via `sync-dirs` without overwriting
+your package identity.

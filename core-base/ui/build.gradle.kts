@@ -24,10 +24,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "template.core.base.ui"
-}
-
 kotlin {
     sourceSets {
         androidMain.dependencies {

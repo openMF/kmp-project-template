@@ -25,7 +25,6 @@ plugins {
 }
 
 android {
-    namespace = "template.core.base.platform"
 
     buildFeatures {
         buildConfig = true

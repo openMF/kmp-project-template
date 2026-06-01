@@ -56,10 +56,10 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
             pluginManager.apply(KmpFlavorPlugin::class.java)
 
             // 2. Configure the KMP-side flavor contract.
-            //    buildConfigPackage comes from gradle/libs.versions.toml ([versions].appPackage)
+            //    buildConfigPackage comes from gradle/libs.versions.toml ([versions].appId)
             //    so forks change the brand by editing ONE line.
             extensions.configure<KmpFlavorExtension> {
-                buildConfigPackage.set(libs.findVersion("appPackage").get().requiredVersion)
+                buildConfigPackage.set(libs.findVersion("appId").get().requiredVersion)
                 enableBuildTypes.set(true)
 
                 flavorDimensions {

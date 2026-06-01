@@ -14,7 +14,6 @@ plugins {
 }
 
 android {
-    namespace = "template.core.base.security"
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }

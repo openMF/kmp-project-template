@@ -27,9 +27,12 @@ class KMPCoreBaseLibraryConventionPlugin: Plugin<Project> {
 
             configureKotlinMultiplatform()
 
+            val baseNamespace = libs.findVersion("baseNamespace").get().requiredVersion
+
             extensions.configure<LibraryExtension> {
                 configureKotlinAndroid(this)
                 defaultConfig.targetSdk = 36
+                namespace = baseNamespace + path.replace(":", ".").replace("-", "_").lowercase()
                 // The resource prefix is derived from the module name,
                 // so resources inside ":core:module1" must be prefixed with "core_module1_"
                 resourcePrefix = path

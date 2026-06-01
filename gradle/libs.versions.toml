@@ -1,7 +1,16 @@
 [versions]
 buildkonfig = "0.15.2"
 kmpProductFlavors = "2.4.2"
-appPackage = "org.openmf.kmptemplate"
+
+# ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──────────────────
+appId            = "org.mifos.kmp.template"   # Android applicationId + iOS bundle ID
+appDisplayName   = "Money Toolkit"             # Android app_name, iOS CFBundleDisplayName
+baseNamespace    = "org.mifos"                 # prefix for all module R-class namespaces
+desktopAppName   = "MoneyToolkitDesktop"       # JVM package name, dock name
+projectName      = "kmp-project-template"      # rootProject.name, Fastlane PROJECT_NAME
+iosTeamId        = "L432S2FZP5"               # Apple Developer Team ID
+# ─────────────────────────────────────────────────────────────────────────────────────────────────
+
 # Android
 androidDesugarJdkLibs = "2.1.5"
 androidGradlePlugin = "8.12.3"
@@ -111,12 +120,7 @@ gitLive = "2.4.0"
 aboutLibraries = "13.2.1"
 
 # Desktop Version
-desktopPackageName = "DesktopApp"
-desktopPackageNamespace = "cmp.desktop.app"
 desktopPackageVersion = "1.0.0"
-
-# Android Version
-androidPackageNamespace = "cmp.android.app"
 
 # Store 5
 store = "5.1.0-alpha08"

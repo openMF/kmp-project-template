@@ -12,7 +12,6 @@ plugins {
 }
 
 android {
-    namespace = "org.mifos.core.data"
     testOptions {
         unitTests {
             isIncludeAndroidResources = true

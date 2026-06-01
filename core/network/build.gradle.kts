@@ -34,7 +34,6 @@ buildkonfig {
 }
 
 android {
-    namespace = "org.mifos.core.network"
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }

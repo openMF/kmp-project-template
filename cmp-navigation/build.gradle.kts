@@ -60,10 +60,6 @@ kotlin {
     }
 }
 
-android {
-    namespace = "cmp.navigation"
-}
-
 compose.resources {
     publicResClass = true
     generateResClass = always

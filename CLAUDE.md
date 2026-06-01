@@ -9,7 +9,7 @@
 ## Quick Links
 
 🚀 **New fork? Start here:**
-- [Fork Quickstart](templates/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
+- [Fork Quickstart](docs/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
 
 📖 **Domain-Specific Guides:**
 - [GitHub Actions & CI/CD](.github/CLAUDE.md) - Workflows, custom actions, secrets

@@ -135,7 +135,7 @@ the typealiases map 1:1.
 
 The minimum five steps to turn a fresh clone of this template into a branded,
 running app. For the long-form walkthrough see
-[`templates/FORK_QUICKSTART.md`](../templates/FORK_QUICKSTART.md).
+[`templates/FORK_QUICKSTART.md`](../docs/FORK_QUICKSTART.md).
 
 1. **Rebrand identifiers** — edit the five `APP_*` keys in `gradle.properties`
    (`APP_ID_BASE`, `APP_NAME`, `APP_VERSION_BASE`, `APP_BUNDLE_DISPLAY_NAME`,
@@ -165,5 +165,5 @@ running app. For the long-form walkthrough see
    the demo build on a connected device / emulator.
 
 That's the floor. Everything else (icons, splash, push, deep links, store
-listings) layers on top — see the [Fork Quickstart](../templates/FORK_QUICKSTART.md)
+listings) layers on top — see the [Fork Quickstart](../docs/FORK_QUICKSTART.md)
 for the expanded walkthrough.

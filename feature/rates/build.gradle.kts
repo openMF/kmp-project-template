@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.cmp.feature.convention)
 }
 
-android {
-    namespace = "org.mifos.feature.rates"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

@@ -14,10 +14,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.core.store"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

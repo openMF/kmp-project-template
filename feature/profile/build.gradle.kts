@@ -12,10 +12,6 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-android {
-    namespace = "org.mifos.feature.profile"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

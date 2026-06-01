@@ -9,8 +9,8 @@
  */
 package cmp.navigation.authenticatednavbar
 
-import org.mifos.core.model.user.UserData
-import template.core.base.ui.viewmodel.BaseViewModel
+import kpt.core.model.user.UserData
+import kpt.core.base.ui.viewmodel.BaseViewModel
 
 internal class AuthenticatedNavbarNavigationViewModel :
     BaseViewModel<Unit, AuthenticatedNavBarEvent, AuthenticatedNavBarAction>(

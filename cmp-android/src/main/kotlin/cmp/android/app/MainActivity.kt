@@ -24,13 +24,13 @@ import cmp.shared.SharedApp
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
 import org.koin.android.ext.android.inject
-import org.mifos.core.data.infra.NetworkMonitor
-import org.mifos.core.data.user.UserDataRepository
-import template.core.base.analytics.AnalyticsHelper
-import template.core.base.analytics.lifecycleTracker
-import template.core.base.platform.update.AppUpdateManager
-import template.core.base.platform.update.AppUpdateManagerImpl
-import template.core.base.ui.util.ShareUtils
+import kpt.core.data.infra.NetworkMonitor
+import kpt.core.data.user.UserDataRepository
+import kpt.core.base.analytics.AnalyticsHelper
+import kpt.core.base.analytics.lifecycleTracker
+import kpt.core.base.platform.update.AppUpdateManager
+import kpt.core.base.platform.update.AppUpdateManagerImpl
+import kpt.core.base.ui.util.ShareUtils
 import java.util.Locale
 
 /**

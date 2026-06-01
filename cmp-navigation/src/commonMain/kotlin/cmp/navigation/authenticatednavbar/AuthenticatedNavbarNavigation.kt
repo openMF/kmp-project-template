@@ -15,7 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
-import template.core.base.ui.nav.composableWithStayTransitions
+import kpt.core.base.ui.nav.composableWithStayTransitions
 
 @Serializable
 data object AuthenticatedNavbarRoute

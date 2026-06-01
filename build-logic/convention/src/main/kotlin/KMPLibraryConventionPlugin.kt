@@ -35,7 +35,7 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
                 defaultConfig.targetSdk = 36
                 // namespace is derived from baseNamespace (libs.versions.toml) + module path,
                 // so all modules stay in sync when a fork changes baseNamespace.
-                // e.g. baseNamespace="org.mifos", path=":feature:loans" → "org.mifos.feature.loans"
+                // e.g. baseNamespace="org.mifos", path=":feature:loans" → "kpt.feature.loans"
                 namespace = baseNamespace + path.replace(":", ".").replace("-", "_").lowercase()
                 // The resource prefix is derived from the module name,
                 // so resources inside ":core:module1" must be prefixed with "core_module1_"

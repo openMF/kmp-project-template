@@ -14,24 +14,24 @@ import cmp.navigation.authenticatednavbar.AuthenticatedNavbarNavigationViewModel
 import cmp.navigation.rootnav.RootNavViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import org.mifos.core.data.di.DataModule
-import org.mifos.core.database.di.DatabaseModule
-import org.mifos.core.datastore.di.DatastoreModule
-import org.mifos.core.store.di.appStoreModule
-import org.mifos.feature.amortization.di.AmortizationModule
-import org.mifos.feature.bills.di.BillsModule
-import org.mifos.feature.calculators.di.CalculatorsModule
-import org.mifos.feature.currencyrates.di.CurrencyRatesModule
-import org.mifos.feature.emicalculator.di.EmiCalculatorModule
-import org.mifos.feature.home.di.HomeModule
-import org.mifos.feature.loans.di.LoansModule
-import org.mifos.feature.macro.di.MacroModule
-import org.mifos.feature.rates.di.RatesModule
-import org.mifos.feature.settings.SettingsModule
-import template.core.base.analytics.di.analyticsModule
-import template.core.base.common.di.CommonModule
-import template.core.base.platform.di.platformModule
-import template.core.base.security.di.SecurityModule
+import kpt.core.data.di.DataModule
+import kpt.core.database.di.DatabaseModule
+import kpt.core.datastore.di.DatastoreModule
+import kpt.core.store.di.appStoreModule
+import kpt.feature.amortization.di.AmortizationModule
+import kpt.feature.bills.di.BillsModule
+import kpt.feature.calculators.di.CalculatorsModule
+import kpt.feature.currencyrates.di.CurrencyRatesModule
+import kpt.feature.emicalculator.di.EmiCalculatorModule
+import kpt.feature.home.di.HomeModule
+import kpt.feature.loans.di.LoansModule
+import kpt.feature.macro.di.MacroModule
+import kpt.feature.rates.di.RatesModule
+import kpt.feature.settings.SettingsModule
+import kpt.core.base.analytics.di.analyticsModule
+import kpt.core.base.common.di.CommonModule
+import kpt.core.base.platform.di.platformModule
+import kpt.core.base.security.di.SecurityModule
 
 object KoinModules {
     private val dataModule = module {

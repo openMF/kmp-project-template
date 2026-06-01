@@ -75,7 +75,7 @@ Then propagate to all platform config files:
 | Fastlane `package_name` / `app_identifier` | `local.properties` → `fastlane-config/project_config.rb` |
 | Gradle project name | `gradle.properties` → `settings.gradle.kts` |
 
-**Kotlin source files never change.** `package org.mifos.*` in `.kt` files is
+**Kotlin source files never change.** `package kpt.*` in `.kt` files is
 the framework's internal code organization — it is completely separate from
 the Android `applicationId` / iOS bundle ID the stores use to identify your
 app. You do not rename source packages.

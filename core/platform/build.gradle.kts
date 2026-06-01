@@ -24,7 +24,7 @@ kotlin {
 
         androidMain.dependencies {
             // Bill-reminder notification scheduling — WorkManager + NotificationCompat power
-            // the Android actual of org.mifos.core.platform.notification.bill.BillReminderScheduler.
+            // the Android actual of kpt.core.platform.notification.bill.BillReminderScheduler.
             implementation(libs.androidx.work.ktx)
             implementation(libs.androidx.core.ktx)
 

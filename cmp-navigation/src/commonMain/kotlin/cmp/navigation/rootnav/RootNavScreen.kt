@@ -39,11 +39,11 @@ import cmp.navigation.splash.splashDestination
 import cmp.navigation.ui.rememberKptNavController
 import cmp.navigation.utils.toObjectNavigationRoute
 import org.koin.compose.viewmodel.koinViewModel
-import template.core.base.designsystem.theme.motion
-import template.core.base.ui.KptConnectivityBanner
-import template.core.base.ui.util.NonNullEnterTransitionProvider
-import template.core.base.ui.util.NonNullExitTransitionProvider
-import template.core.base.ui.util.RootTransitionProviders
+import kpt.core.base.designsystem.theme.motion
+import kpt.core.base.ui.KptConnectivityBanner
+import kpt.core.base.ui.util.NonNullEnterTransitionProvider
+import kpt.core.base.ui.util.NonNullExitTransitionProvider
+import kpt.core.base.ui.util.RootTransitionProviders
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 

@@ -27,6 +27,6 @@ kotlin {
 
 compose {
     resources {
-        packageOfResClass = "org.mifos.feature.profile.generated.resources"
+        packageOfResClass = "kpt.feature.profile.generated.resources"
     }
 }

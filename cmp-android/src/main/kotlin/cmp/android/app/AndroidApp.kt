@@ -25,8 +25,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.mifos.core.data.user.UserDataRepository
-import template.core.base.ui.util.getDefaultImageLoader
+import kpt.core.data.user.UserDataRepository
+import kpt.core.base.ui.util.getDefaultImageLoader
 
 /**
  * Android application class.

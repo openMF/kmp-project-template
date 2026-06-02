@@ -6,7 +6,7 @@ kmpProductFlavors = "2.4.2"
 appId            = "org.mifos.kmp.template"   # Android applicationId + iOS bundle ID
 appDisplayName   = "Money Toolkit"             # Android app_name, iOS CFBundleDisplayName
 baseNamespace    = "kpt"                       # prefix for all module R-class namespaces
-desktopAppName   = "MoneyToolkitDesktop"       # JVM package name, dock name
+desktopAppName   = "Money Toolkit"             # JVM package name, dock name
 projectName      = "kmp-project-template"      # rootProject.name, Fastlane PROJECT_NAME
 iosTeamId        = "L432S2FZP5"               # Apple Developer Team ID
 # ─────────────────────────────────────────────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@
  * See https://github.com/openMF/mobile-wallet/blob/master/LICENSE.md
  */
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -23,7 +24,7 @@ plugins {
 kotlin {
     jvm()
 
-    jvmToolchain(17)
+    jvmToolchain(libs.versions.jvmToolchain.get().toInt())
 
     sourceSets {
         jvmMain.dependencies {
@@ -46,6 +47,12 @@ val appVersion: String = libs.versions.desktopPackageVersion.get()
 compose.desktop {
     application {
         mainClass = "MainKt"
+        // Use the same JDK that compiled cmp-shared (toolchain version 21).
+        // The plugin defaults to the Gradle daemon's java.home (JDK 17 on this machine),
+        // which can't load Java 21 bytecode from cmp-shared at runtime.
+        javaHome = javaToolchains.launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(libs.versions.jvmToolchain.get().toInt()))
+        }.get().metadata.installationPath.asFile.absolutePath
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
             packageName = appName
@@ -88,3 +95,4 @@ compose.desktop {
         }
     }
 }
+

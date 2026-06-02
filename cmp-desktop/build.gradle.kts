@@ -53,6 +53,7 @@ compose.desktop {
         javaHome = javaToolchains.launcherFor {
             languageVersion.set(JavaLanguageVersion.of(libs.versions.jvmToolchain.get().toInt()))
         }.get().metadata.installationPath.asFile.absolutePath
+        jvmArgs("-Dapp.name=$appName")
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
             packageName = appName

@@ -26,7 +26,7 @@ class KMPRoomConventionPlugin : Plugin<Project> {
             }
 
             dependencies {
-                "implementation"(libs.findLibrary("androidx.room.runtime").get())
+                "commonMainImplementation"(libs.findLibrary("androidx.room.runtime").get())
 
                 listOf(
                     "kspAndroid",

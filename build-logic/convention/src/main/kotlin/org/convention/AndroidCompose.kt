@@ -12,36 +12,26 @@ import org.jetbrains.kotlin.compose.compiler.gradle.ComposeCompilerGradlePluginE
  * Configure Compose-specific options
  */
 internal fun Project.configureAndroidCompose(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
-    commonExtension.apply {
-        buildFeatures {
-            compose = true
-        }
+    commonExtension.buildFeatures.compose = true
 
-        dependencies {
-            val bom = libs.findLibrary("androidx-compose-bom").get()
-            add("implementation", platform(bom))
-            add("androidTestImplementation", platform(bom))
+    dependencies {
+        val bom = libs.findLibrary("androidx-compose-bom").get()
+        add("implementation", platform(bom))
+        add("androidTestImplementation", platform(bom))
 
-            add("implementation", libs.findLibrary("androidx-compose-ui-tooling-preview").get())
-            add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
-        }
-
-        testOptions {
-            unitTests {
-                // For Robolectric
-                isIncludeAndroidResources = true
-
-                isReturnDefaultValues = true
-
-                all {
-                    it.systemProperties["robolectric.pixelCopyRenderMode"] = "hardware"
-                }
-            }
-        }
-        
+        add("implementation", libs.findLibrary("androidx-compose-ui-tooling-preview").get())
+        add("debugImplementation", libs.findLibrary("androidx-compose-ui-tooling").get())
     }
+
+    commonExtension.testOptions.unitTests {
+        // For Robolectric
+        isIncludeAndroidResources = true
+        isReturnDefaultValues = true
+        all { it.systemProperties["robolectric.pixelCopyRenderMode"] = "hardware" }
+    }
+
 
     extensions.configure<ComposeCompilerGradlePluginExtension> {
         fun Provider<String>.onlyIfTrue() = flatMap { provider { it.takeIf(String::toBoolean) } }

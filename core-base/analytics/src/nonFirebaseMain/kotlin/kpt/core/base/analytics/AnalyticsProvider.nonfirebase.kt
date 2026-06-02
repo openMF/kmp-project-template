@@ -7,12 +7,6 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.base.analytics.di
+package kpt.core.base.analytics
 
-import kpt.core.base.analytics.AnalyticsHelper
-import kpt.core.base.analytics.provideAnalyticsHelper
-import org.koin.dsl.module
-
-val analyticsModule = module {
-    single<AnalyticsHelper> { provideAnalyticsHelper() }
-}
+actual fun provideAnalyticsHelper(): AnalyticsHelper = NoOpAnalyticsHelper()

@@ -16,7 +16,7 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.ktx.isImmediateUpdateAllowed
-import kpt.core.base.platform.BuildConfig
+import android.content.pm.ApplicationInfo
 
 /**
  * Android-specific implementation of the AppUpdateManager interface that integrates
@@ -69,7 +69,8 @@ class AppUpdateManagerImpl(
      * development process with update prompts.
      */
     override fun checkForAppUpdate() {
-        if (!BuildConfig.DEBUG) {
+        val isDebug = (activity.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (!isDebug) {
             manager
                 .appUpdateInfo
                 .addOnSuccessListener { info ->

@@ -13,11 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-}
 
 kotlin {
     sourceSets {

@@ -1,14 +1,14 @@
-
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.gradle.BaseExtension
 import org.convention.configureBadgingTasks
 import org.convention.configureGradleManagedDevices
 import org.convention.configureKotlinAndroid
+import org.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
+
 
 /**
  * Plugin that applies the Android application plugin and configures it.
@@ -18,7 +18,6 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
-                apply("org.jetbrains.kotlin.android")
                 apply("com.dropbox.dependency-guard")
                 apply("org.convention.detekt.plugin")
                 apply("org.convention.spotless.plugin")
@@ -34,7 +33,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
-                defaultConfig.targetSdk = 36
+                defaultConfig.targetSdk = libs.findVersion("targetSdk").get().requiredVersion.toInt()
                 @Suppress("UnstableApiUsage")
                 testOptions.animationsDisabled = true
                 configureGradleManagedDevices(this)
@@ -44,14 +43,8 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             // application variant. These compare APK manifest output (aapt2 dump badging)
             // against a committed golden — catches accidental manifest/permission/locale
             // drift in PRs.
-            //
-            // Requires both the legacy BaseExtension (for sdkDirectory/buildToolsVersion)
-            // and the variant API extension. The variant API extension is registered by
-            // com.android.application at apply time, so we read it after the AGP plugin
-            // has been applied above.
-            val baseExt = extensions.getByType<BaseExtension>()
             val componentsExt = extensions.getByType<ApplicationAndroidComponentsExtension>()
-            configureBadgingTasks(baseExt, componentsExt)
+            configureBadgingTasks(componentsExt)
         }
     }
 }

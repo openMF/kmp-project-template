@@ -16,22 +16,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
  * Configure base Kotlin with Android options
  */
 internal fun Project.configureKotlinAndroid(
-    commonExtension: CommonExtension<*, *, *, *, *, *>,
+    commonExtension: CommonExtension,
 ) {
+    val compileSdkVersion = libs.findVersion("compileSdk").get().requiredVersion.toInt()
+    val minSdkVersion = libs.findVersion("minSdk").get().requiredVersion.toInt()
+    val javaVer = JavaVersion.toVersion(libs.findVersion("javaVersion").get().requiredVersion)
+
     commonExtension.apply {
-        compileSdk = 36
-
-        defaultConfig {
-            minSdk = 26
-        }
-
-        compileOptions {
-            // Up to Java 11 APIs are available through desugaring
-            // https://developer.android.com/studio/write/java11-minimal-support-table
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
-            isCoreLibraryDesugaringEnabled = true
-        }
+        compileSdk = compileSdkVersion
+        defaultConfig.minSdk = minSdkVersion
+        compileOptions.sourceCompatibility = javaVer
+        compileOptions.targetCompatibility = javaVer
+        compileOptions.isCoreLibraryDesugaringEnabled = true
     }
 
     configureKotlin()
@@ -45,11 +41,10 @@ internal fun Project.configureKotlinAndroid(
  * Configure base Kotlin options for JVM (non-Android)
  */
 internal fun Project.configureKotlinJvm() {
+    val javaVer = JavaVersion.toVersion(libs.findVersion("javaVersion").get().requiredVersion)
     extensions.configure<JavaPluginExtension> {
-        // Up to Java 11 APIs are available through desugaring
-        // https://developer.android.com/studio/write/java11-minimal-support-table
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = javaVer
+        targetCompatibility = javaVer
     }
 
     configureKotlin()
@@ -59,11 +54,13 @@ internal fun Project.configureKotlinJvm() {
  * Configure base Kotlin options
  */
 private fun Project.configureKotlin() {
+    val jvmTargetVersion = JvmTarget.fromTarget(
+        libs.findVersion("javaVersion").get().requiredVersion
+    )
     // Use withType to workaround https://youtrack.jetbrains.com/issue/KT-55947
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
-            // Set JVM target to 17
-            jvmTarget = JvmTarget.JVM_17
+            jvmTarget = jvmTargetVersion
             // Treat all Kotlin warnings as errors (disabled by default)
             // Override by setting warningsAsErrors=true in your ~/.gradle/gradle.properties
             val warningsAsErrors: String? by project

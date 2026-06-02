@@ -33,12 +33,9 @@ buildkonfig {
     }
 }
 
-android {
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    testOptions {
-        unitTests {
+androidComponents {
+    finalizeDsl { ext ->
+        ext.withHostTest {
             isReturnDefaultValues = true
             isIncludeAndroidResources = true
         }

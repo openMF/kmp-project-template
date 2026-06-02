@@ -2,8 +2,6 @@ package org.convention
 
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import com.android.build.gradle.BaseExtension
-import com.android.SdkConstants
 import com.google.common.truth.Truth.assertWithMessage
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -23,7 +21,6 @@ import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.process.ExecOperations
-import java.io.File
 import java.util.Locale
 import javax.inject.Inject
 
@@ -99,7 +96,6 @@ abstract class CheckBadgingTask : DefaultTask() {
 }
 
 fun Project.configureBadgingTasks(
-    baseExtension: BaseExtension,
     componentsExtension: ApplicationAndroidComponentsExtension,
 ) {
     // Registers a callback to be called, when a new variant is configured
@@ -117,12 +113,7 @@ fun Project.configureBadgingTasks(
                     variant.artifacts.get(SingleArtifact.APK_FROM_BUNDLE),
                 )
                 aapt2Executable.set(
-                    File(
-                        baseExtension.sdkDirectory,
-                        "${SdkConstants.FD_BUILD_TOOLS}/" +
-                                "${baseExtension.buildToolsVersion}/" +
-                                SdkConstants.FN_AAPT2,
-                    ),
+                    componentsExtension.sdkComponents.aapt2.flatMap { it.executable },
                 )
 
                 badging.set(

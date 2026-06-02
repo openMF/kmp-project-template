@@ -12,7 +12,7 @@ package kpt.core.base.platform.review
 import android.app.Activity
 import android.util.Log
 import com.google.android.play.core.review.ReviewManagerFactory
-import kpt.core.base.platform.BuildConfig
+import android.content.pm.ApplicationInfo
 
 /**
  * Default implementation of the AppReviewManager interface for Android platforms.
@@ -56,7 +56,8 @@ class AppReviewManagerImpl(
             }
         }
 
-        if (BuildConfig.DEBUG) {
+        val isDebug = (activity.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        if (isDebug) {
             Log.d("ReviewManager", "Prompting for review")
         }
     }

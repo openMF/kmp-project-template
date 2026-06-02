@@ -120,7 +120,7 @@ jbCoreBundle = "1.0.1"
 jbSavedState = "1.4.0"
 material3adaptive = "1.2.0"
 gitLive = "2.4.0"
-aboutLibraries = "13.2.1"
+aboutLibraries = "14.2.1"
 
 # Desktop Version
 desktopPackageVersion = "1.0.0"

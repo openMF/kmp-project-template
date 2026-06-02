@@ -36,18 +36,15 @@ kotlin {
             implementation(projects.feature.settings)
             implementation(projects.feature.bills)
             implementation(projects.feature.loans)
+            implementation(projects.feature.amortization)
             implementation(projects.feature.rates)
             implementation(projects.feature.calculators)
             implementation(projects.feature.macro)
             implementation(projects.feature.showcase)
-            // Archived 2026-05-24 (Money Toolkit pivot) — restore by uncommenting + re-wiring per
-            // feature/_archive/{module}/README.md:
-            //   implementation(projects.feature.archive.crypto)
-            //   implementation(projects.feature.archive.watchlist)
-            //   implementation(projects.feature.archive.alerts)
 
             //put your multiplatform dependencies here
             implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
             implementation(compose.foundation)
             implementation(compose.ui)
             implementation(compose.components.uiToolingPreview)
@@ -61,10 +58,6 @@ kotlin {
             implementation(libs.kotlinx.serialization.core)
         }
     }
-}
-
-android {
-    namespace = "cmp.navigation"
 }
 
 compose.resources {

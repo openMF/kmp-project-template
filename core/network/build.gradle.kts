@@ -7,15 +7,33 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.ktrofit)
+    alias(libs.plugins.buildkonfig)
     id("kotlinx-serialization")
     id("com.google.devtools.ksp")
 }
 
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
+}
+
+buildkonfig {
+    packageName = "kpt.core.network"
+    defaultConfigs {
+        buildConfigField(
+            STRING, "FRED_API_KEY",
+            System.getenv("FRED_API_KEY") ?: localProps.getProperty("FRED_API_KEY", ""),
+        )
+    }
+}
+
 android {
-    namespace = "org.mifos.core.network"
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }

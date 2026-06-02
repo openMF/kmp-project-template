@@ -12,10 +12,6 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
 }
 
-android {
-    namespace = "org.mifos.feature.profile"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -31,6 +27,6 @@ kotlin {
 
 compose {
     resources {
-        packageOfResClass = "org.mifos.feature.profile.generated.resources"
+        packageOfResClass = "kpt.feature.profile.generated.resources"
     }
 }

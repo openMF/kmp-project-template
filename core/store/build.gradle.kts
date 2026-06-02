@@ -14,10 +14,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.core.store"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -46,5 +42,5 @@ kotlin {
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "org.mifos.core.store.generated.resources"
+    packageOfResClass = "kpt.core.store.generated.resources"
 }

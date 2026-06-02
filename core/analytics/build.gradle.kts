@@ -13,10 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.core.analytics"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

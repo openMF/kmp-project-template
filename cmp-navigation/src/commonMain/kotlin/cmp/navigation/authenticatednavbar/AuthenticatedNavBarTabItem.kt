@@ -14,12 +14,12 @@ import cmp.navigation.generated.resources.Res
 import cmp.navigation.generated.resources.home
 import cmp.navigation.generated.resources.profile
 import cmp.navigation.utils.toObjectNavigationRoute
+import kpt.core.designsystem.icon.AppIcons
+import kpt.core.ui.NavigationItem
+import kpt.feature.home.HomeDestination
+import kpt.feature.home.HomeRoute
+import kpt.feature.profile.ProfileRoute
 import org.jetbrains.compose.resources.StringResource
-import org.mifos.core.designsystem.icon.AppIcons
-import org.mifos.core.ui.NavigationItem
-import org.mifos.feature.home.HomeDestination
-import org.mifos.feature.home.HomeRoute
-import org.mifos.feature.profile.ProfileRoute
 
 sealed class AuthenticatedNavBarTabItem : NavigationItem {
 

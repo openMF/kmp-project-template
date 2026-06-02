@@ -6,12 +6,12 @@ import org.gradle.kotlin.dsl.dependencies
 /**
  * Plugin that applies the CMP feature plugin and configures it.
  * This plugin applies the following plugins:
- * - org.mifos.kmp.library - Kotlin Multiplatform Library
- * - org.mifos.kmp.koin - Koin for Kotlin Multiplatform
+ * - kpt.kmp.library - Kotlin Multiplatform Library
+ * - kpt.kmp.koin - Koin for Kotlin Multiplatform
  * - org.jetbrains.kotlin.plugin.compose - Kotlin Compose
  * - org.jetbrains.compose - Compose Multiplatform
- * - org.mifos.detekt.plugin - Detekt Plugin
- * - org.mifos.spotless.plugin - Spotless Plugin
+ * - kpt.detekt.plugin - Detekt Plugin
+ * - kpt.spotless.plugin - Spotless Plugin
  *
  */
 class CMPFeatureConventionPlugin : Plugin<Project> {

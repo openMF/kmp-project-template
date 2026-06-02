@@ -13,10 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "template.core.base.analytics"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

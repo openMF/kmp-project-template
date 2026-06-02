@@ -9,14 +9,14 @@
  */
 @file:Suppress("InvalidPackageDeclaration")
 
-package template.core.base.analytics.di
+package kpt.core.base.analytics.di
 
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import template.core.base.analytics.AnalyticsHelper
-import template.core.base.analytics.StubAnalyticsHelper
+import kpt.core.base.analytics.AnalyticsHelper
+import kpt.core.base.analytics.StubAnalyticsHelper
 
 actual val analyticsModule: Module
     get() = module {

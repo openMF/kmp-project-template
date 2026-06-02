@@ -1,24 +1,62 @@
 # ==============================================================================
-# Project Configuration - Update these values when setting up a new project
+# Project Configuration — driven by libs.versions.toml (single source of truth)
 # ==============================================================================
-# This is the SINGLE SOURCE OF TRUTH for all project-specific configurations.
-# Update these values once, and they will be applied across all fastlane lanes.
+# Fork identity is read directly from gradle/libs.versions.toml so this file
+# works on CI without any extra setup step (no syncForkConfig required).
+# To change fork identity: edit libs.versions.toml only.
 # ==============================================================================
 
 module FastlaneConfig
   module ProjectConfig
+
+    # ── Fork identity from gradle/libs.versions.toml ────────────────────────────
+    # Reads the 6 identity keys directly — no TOML gem required (plain regex).
+    # Falls back to local.properties (written by syncForkConfig) when toml is absent.
+    def self.load_fork_identity
+      toml_path  = File.expand_path("../../gradle/libs.versions.toml", __FILE__)
+      props_path = File.expand_path("../../local.properties", __FILE__)
+
+      if File.exist?(toml_path)
+        text = File.read(toml_path)
+        extract = ->(key) {
+          m = text.match(/^\s*#{Regexp.escape(key)}\s*=\s*"([^"]+)"/)
+          m ? m[1] : nil
+        }
+        {
+          "appId"          => extract.call("appId"),
+          "appDisplayName" => extract.call("appDisplayName"),
+          "projectName"    => extract.call("projectName"),
+        }
+      elsif File.exist?(props_path)
+        props = {}
+        File.readlines(props_path).each do |line|
+          next if line.strip.start_with?("#") || !line.include?("=")
+          k, v = line.strip.split("=", 2)
+          props[k.strip] = v&.strip
+        end
+        {
+          "appId"          => props["fork.app.id"],
+          "appDisplayName" => props["fork.app.display.name"],
+          "projectName"    => props["fork.project.name"],
+        }
+      else
+        {}
+      end
+    end
+    FORK = load_fork_identity
+
     # ============================================================================
     # Core Project Information
     # ============================================================================
-    PROJECT_NAME = "kmp-project-template"
+    PROJECT_NAME      = FORK["projectName"] || "kmp-project-template"
     ORGANIZATION_NAME = "Mifos Initiative"
 
     # ============================================================================
     # Android Configuration
     # ============================================================================
     ANDROID = {
-      # Package name for Android app
-      package_name: "cmp.android.app",
+      # Package name driven by appId in libs.versions.toml
+      package_name: FORK["appId"] || "org.mifos.kmp.template",
 
       # Play Store credentials file path
       play_store_json_key: "secrets/playStorePublishServiceCredentialsFile.json",
@@ -50,8 +88,8 @@ module FastlaneConfig
     # iOS Configuration - App Specific (Change for each app)
     # ============================================================================
     IOS = {
-      # Bundle identifier (CHANGE THIS FOR EACH APP)
-      app_identifier: "org.mifos.kmp.template",
+      # Bundle identifier driven by appId in libs.versions.toml
+      app_identifier: FORK["appId"] || "org.mifos.kmp.template",
 
       # Firebase App Distribution (CHANGE THIS FOR EACH APP)
       firebase: {

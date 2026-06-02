@@ -18,43 +18,33 @@ import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
-import org.mifos.feature.bills.navigation.billsGraph
-import org.mifos.feature.bills.navigation.navigateToBills
-import org.mifos.feature.calculators.navigation.calculatorsGraph
-import org.mifos.feature.calculators.navigation.navigateToAffordability
-import org.mifos.feature.calculators.navigation.navigateToAmortization
-import org.mifos.feature.calculators.navigation.navigateToLoanCalcWizard
-import org.mifos.feature.calculators.navigation.navigateToLoanComparison
-import org.mifos.feature.currencyrates.navigation.currencyRatesGraph
-import org.mifos.feature.currencyrates.navigation.navigateToCurrencyRates
-import org.mifos.feature.currencyrates.navigation.navigateToRateHistory
-import org.mifos.feature.emicalculator.navigation.emiCalculatorDestination
-import org.mifos.feature.emicalculator.navigation.navigateToEmiCalculator
-import org.mifos.feature.loans.navigation.loansGraph
-import org.mifos.feature.loans.navigation.navigateToLoans
-import org.mifos.feature.macro.navigation.macroGraph
-import org.mifos.feature.macro.navigation.navigateToMacroGraph
-import org.mifos.feature.rates.navigation.navigateToRates
-import org.mifos.feature.rates.navigation.ratesGraph
-import org.mifos.feature.settings.navigateToSettings
-import org.mifos.feature.settings.notificationDestination
-import org.mifos.feature.settings.settingsDestination
-import org.mifos.feature.showcase.stategallery.StateGalleryRoute
-import org.mifos.feature.showcase.stategallery.stateGalleryGraph
-import org.mifos.feature.showcase.transitions.TransitionGalleryRoute
-import org.mifos.feature.showcase.transitions.transitionGalleryGraph
-import template.core.base.security.isReleaseBuild
-import template.core.base.ui.nav.popBackStackSafely
-
-// Archived 2026-05-24 (Money Toolkit pivot) — restore by re-importing + re-wiring graphs per
-// feature/_archive/{module}/README.md:
-//   import org.mifos.feature.alerts.navigation.alertsGraph
-//   import org.mifos.feature.alerts.navigation.navigateToAlerts
-//   import org.mifos.feature.crypto.navigation.CoinDetailRoute
-//   import org.mifos.feature.crypto.navigation.cryptoGraph
-//   import org.mifos.feature.crypto.navigation.navigateToCrypto
-//   import org.mifos.feature.watchlist.navigation.navigateToPersonalWatchlist
-//   import org.mifos.feature.watchlist.navigation.personalWatchlistDestination
+import kpt.core.base.security.isReleaseBuild
+import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.bills.navigation.billsGraph
+import kpt.feature.bills.navigation.navigateToBills
+import kpt.feature.calculators.navigation.calculatorsGraph
+import kpt.feature.calculators.navigation.navigateToAffordability
+import kpt.feature.calculators.navigation.navigateToAmortization
+import kpt.feature.calculators.navigation.navigateToLoanCalcWizard
+import kpt.feature.calculators.navigation.navigateToLoanComparison
+import kpt.feature.currencyrates.navigation.currencyRatesGraph
+import kpt.feature.currencyrates.navigation.navigateToCurrencyRates
+import kpt.feature.currencyrates.navigation.navigateToRateHistory
+import kpt.feature.emicalculator.navigation.emiCalculatorDestination
+import kpt.feature.emicalculator.navigation.navigateToEmiCalculator
+import kpt.feature.loans.navigation.loansGraph
+import kpt.feature.loans.navigation.navigateToLoans
+import kpt.feature.macro.navigation.macroGraph
+import kpt.feature.macro.navigation.navigateToMacroGraph
+import kpt.feature.rates.navigation.navigateToRates
+import kpt.feature.rates.navigation.ratesGraph
+import kpt.feature.settings.navigateToSettings
+import kpt.feature.settings.notificationDestination
+import kpt.feature.settings.settingsDestination
+import kpt.feature.showcase.stategallery.StateGalleryRoute
+import kpt.feature.showcase.stategallery.stateGalleryGraph
+import kpt.feature.showcase.transitions.TransitionGalleryRoute
+import kpt.feature.showcase.transitions.transitionGalleryGraph
 
 @Serializable
 internal data object AuthenticatedGraphRoute
@@ -111,7 +101,7 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         loansGraph(navController) // B1 — multi-formKey draft showcase
         billsGraph(navController) // B4 — multi-formKey + platform notification scheduler
         calculatorsGraph(navController) // B2/B3/B5/B6 — affordability + amortization + comparison + wizard
-        ratesGraph(navController) // B7 — CACHE_THEN_NETWORK rate tracker
+        ratesGraph(navController) // B7 — NETWORK_WITH_CACHE rate tracker
         macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
 
         // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).

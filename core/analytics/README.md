@@ -10,7 +10,7 @@ override the binding in your app module:
 ### 1. No-op (toolkit default — privacy-respecting open-source build)
 
 ```kotlin
-import org.mifos.core.analytics.di.coreAnalyticsModule
+import kpt.core.analytics.di.coreAnalyticsModule
 
 startKoin {
     modules(coreAnalyticsModule, /* ... */)  // NoOpAnalyticsHelper installed

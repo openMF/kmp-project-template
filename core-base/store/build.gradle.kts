@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
 }
 
-android {
-    namespace = "template.core.base.store"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

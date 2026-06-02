@@ -13,10 +13,6 @@ plugins {
     id("kotlinx-serialization")
 }
 
-android {
-    namespace = "org.mifos.core.model"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

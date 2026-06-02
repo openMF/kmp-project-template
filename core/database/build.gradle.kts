@@ -14,10 +14,6 @@ plugins {
     alias(libs.plugins.mifos.kmp.room)
 }
 
-android {
-    namespace = "org.mifos.core.database"
-}
-
 kotlin {
     sourceSets {
         androidMain.dependencies {

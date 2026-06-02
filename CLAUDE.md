@@ -9,7 +9,7 @@
 ## Quick Links
 
 🚀 **New fork? Start here:**
-- [Fork Quickstart](templates/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
+- [Fork Quickstart](docs/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
 
 📖 **Domain-Specific Guides:**
 - [GitHub Actions & CI/CD](.github/CLAUDE.md) - Workflows, custom actions, secrets
@@ -80,20 +80,25 @@ the per-feature branding, or selectively remove features they don't need.
 | **B4 Bill Reminders**     | Recurring bills + in-app notification scheduler           | `DraftSubmitHandler` (offline-resilient form)              |
 | **B5 Amortization**       | Full payment schedule for any loan                        | Read-side projection of `LoanRepository`                   |
 | **B6 Loan Comparison**    | Side-by-side total-cost comparison wizard                 | Multi-step wizard state machine                            |
-| **B7 Interest Rates**     | FRED-backed federal funds / mortgage / treasury series    | `CACHE_THEN_NETWORK` `ScreenDataStream` + 4-stream combine |
+| **B7 Interest Rates**     | FRED-backed federal funds / mortgage / treasury series    | `NETWORK_WITH_CACHE` `ScreenDataStream` + 4-stream combine |
 | **B8 Country Macro**      | GDP / CPI / unemployment from World Bank                  | Multi-source combine + country picker                      |
 | **Home dashboard**        | Loans summary + upcoming bills + rates + USD exchange     | `combineScreenStates` 4-way fan-in                         |
 | **Currency Rates**        | Live FX rates by base currency                            | `Store` + search filter + emptyIfContent                   |
 | **Rate History**          | Historical FX charts                                      | Dynamic-key flow + auto-refresh                            |
+| **Amortization Schedule** | Month-by-month payment breakdown for any loan             | OFFLINE_LOCAL_ONLY projection via `ScreenDataStream`       |
 
-> **Note on archived modules.** Earlier crypto-themed showcase features
-> (`feature/crypto`, `feature/watchlist`, `feature/alerts`) demonstrated the same
-> three framework patterns (PagingScreenStream, SubmitHandler, DraftSubmitHandler)
-> in a coins/price-alerts domain. They moved to `feature/_archive/` on
-> 2026-05-24 as part of the Money Toolkit pivot. The canonical showcase is now
-> in the banking domain (`feature/loans`, `feature/bills`). The archived modules
-> remain in-tree until **2026-08-23** — see each `feature/_archive/{module}/README.md`
-> for re-enable instructions.
+## Store Archetype Showcases (kmp-project-template)
+
+| Archetype | Store | ViewModel/Feature | Test |
+|---|---|---|---|
+| OFFLINE_LOCAL_ONLY | `AlertsStore`, `LoansStore`, `BillRemindersStore` | `AmortizationScheduleViewModel` | `AlertsStoreTest`, `LoansStoreTest`, `AmortizationScheduleViewModelTest` |
+| NETWORK_WITH_CACHE | `ExchangeRatesStore`, `InterestRateSeriesStore` | `ExchangeRatesViewModel` | `EconomicMemoryOnlyTest` |
+| NETWORK_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (online) | `SpotRateLookupStoreTest` |
+| CACHE_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (offline) | `CurrencyConverterViewModelTest` |
+| PERIODIC | `ExchangeRatesStore` | `HomeDashboardViewModel` tile | `HomeDashboardViewModelTest` |
+| MEMORY_ONLY | `MacroIndicatorStore` | `MacroIndicatorsViewModel` | `EconomicMemoryOnlyTest` |
+| LOAD_ONCE | `LoansStore` | `LoanDetailViewModel` | `LoanDetailViewModelTest` |
+| MUTABLE | (DraftSubmitHandler) | `BillReminderCreateViewModel` | (existing) |
 
 ### Tech Stack
 
@@ -304,7 +309,7 @@ For **input screens** (form, wizard, quick-action, confirm, gesture — anything
 the user submits a mutation), use `SubmitHandler` (simple) or `DraftSubmitHandler`
 (offline-resilient, persists payload across restarts). Wire the screen with
 `MutationScreenContent`. Control network vs. cache strategy per-request via `FetchPolicy`
-(`CACHE_ONLY` / `NETWORK_ONLY` / `CACHE_THEN_NETWORK`).
+(`CACHE_ONLY` / `NETWORK_ONLY` / `NETWORK_WITH_CACHE`).
 
 > Screen-archetype vocabulary (used by `/kmp-feature` codegen via `ui.yaml.screens[].type`):
 > `screen-content` (→ `ScreenContent`), `paging-list` (→ `PagingScreenContent`),

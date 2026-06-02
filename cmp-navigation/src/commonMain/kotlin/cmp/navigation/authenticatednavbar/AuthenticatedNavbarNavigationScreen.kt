@@ -11,17 +11,13 @@ package cmp.navigation.authenticatednavbar
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration.Indefinite
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -31,26 +27,22 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
-import cmp.navigation.generated.resources.Res
-import cmp.navigation.generated.resources.not_connected
 import cmp.navigation.ui.KptRootScaffold
 import cmp.navigation.ui.ScaffoldNavigationData
 import cmp.navigation.ui.logDestinationChanged
 import cmp.navigation.ui.rememberKptNavController
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.stringResource
+import kpt.core.base.analytics.rememberAnalyticsHelper
+import kpt.core.base.designsystem.theme.motion
+import kpt.core.base.ui.effects.EventsEffect
+import kpt.core.base.ui.util.RootTransitionProviders
+import kpt.core.ui.NavigationItem
+import kpt.feature.home.HomeDestination
+import kpt.feature.home.homeGraph
+import kpt.feature.home.navigateToHome
+import kpt.feature.profile.navigateToProfile
+import kpt.feature.profile.profileDestination
 import org.koin.compose.viewmodel.koinViewModel
-import org.mifos.core.ui.NavigationItem
-import org.mifos.feature.home.HomeDestination
-import org.mifos.feature.home.homeGraph
-import org.mifos.feature.home.navigateToHome
-import org.mifos.feature.profile.navigateToProfile
-import org.mifos.feature.profile.profileDestination
-import template.core.base.analytics.rememberAnalyticsHelper
-import template.core.base.designsystem.theme.motion
-import template.core.base.ui.effects.EventsEffect
-import template.core.base.ui.util.RootTransitionProviders
 
 @Composable
 internal fun AuthenticatedNavbarNavigationScreen(
@@ -73,9 +65,6 @@ internal fun AuthenticatedNavbarNavigationScreen(
     viewModel: AuthenticatedNavbarNavigationViewModel = koinViewModel(),
 ) {
     val analyticsHelper = rememberAnalyticsHelper()
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val isOffline by viewModel.isOffline.collectAsStateWithLifecycle()
 
     EventsEffect(eventFlow = viewModel.eventFlow) { event ->
         navController.apply {
@@ -97,21 +86,8 @@ internal fun AuthenticatedNavbarNavigationScreen(
         }
     }
 
-    val message = stringResource(Res.string.not_connected)
-    LaunchedEffect(isOffline) {
-        if (isOffline) {
-            scope.launch {
-                snackbarHostState.showSnackbar(
-                    message = message,
-                    duration = Indefinite,
-                )
-            }
-        }
-    }
-
     AuthenticatedNavbarNavigationScreenContent(
         navController = navController,
-        snackbarHostState = snackbarHostState,
         modifier = modifier,
         navigateToSettingsScreen = navigateToSettingsScreen,
         navigateToLoans = navigateToLoans,

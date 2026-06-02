@@ -581,7 +581,7 @@ Pass it to `asScreenStream`, `asLoadOnceStream`, or `PagingScreenStream` to over
 
 ```kotlin
 enum class FetchPolicy {
-    CACHE_THEN_NETWORK,  // default — show cache instantly, refresh in background
+    NETWORK_WITH_CACHE,  // default — show cache instantly, refresh in background
     NETWORK_ONLY,        // skip cache, always fetch fresh (e.g. payment confirmation)
     CACHE_ONLY,          // never hit network (offline view, pre-fetched data)
 }
@@ -591,7 +591,7 @@ enum class FetchPolicy {
 
 | Scenario | Policy |
 |---|---|
-| Normal screen — fast load + background refresh | `CACHE_THEN_NETWORK` (default) |
+| Normal screen — fast load + background refresh | `NETWORK_WITH_CACHE` (default) |
 | Stale data is harmful (payment status, balance) | `NETWORK_ONLY` |
 | Explicit offline screen or no network available | `CACHE_ONLY` |
 

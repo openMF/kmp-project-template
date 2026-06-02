@@ -85,7 +85,7 @@ jobs:
           # Consumer-branded assets and project-specific configs are preserved across syncs.
           declare -A EXCLUSIONS=(
             ["cmp-android"]="src/main/res dependencies src/main/ic_launcher-playstore.png google-services.json"
-            ["cmp-ios"]="iosApp/Assets.xcassets"
+            ["cmp-ios"]="iosApp/Assets.xcassets Configuration/Config.xcconfig"
             ["cmp-web"]="src/jsMain/resources src/wasmJsMain/resources"
             ["cmp-desktop"]="icons build.gradle.kts"
             ["fastlane-config"]="project_config.rb extract_config.rb"
@@ -401,7 +401,7 @@ jobs:
             **Directories:**
             - cmp-android (excluding src/main/res, dependencies, src/main/ic_launcher-playstore.png, google-services.json)
             - cmp-desktop (excluding icons, build.gradle.kts)
-            - cmp-ios (excluding iosApp/Assets.xcassets)
+            - cmp-ios (excluding iosApp/Assets.xcassets, Configuration/Config.xcconfig)
             - cmp-web (excluding src/jsMain/resources, src/wasmJsMain/resources)
             - cmp-shared
             - core-base

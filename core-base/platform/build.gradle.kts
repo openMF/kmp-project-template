@@ -25,8 +25,6 @@ plugins {
 }
 
 android {
-    namespace = "template.core.base.platform"
-
     buildFeatures {
         buildConfig = true
     }
@@ -38,6 +36,15 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.runtime)
             implementation(libs.calf.permissions)
+
+            // KmpToolkit IPC modules — power the cross-platform IntentManager impl
+            // in nonAndroidMain (Android keeps its native ACTION_SEND/ACTION_VIEW path).
+            implementation(libs.cmp.share)
+            implementation(libs.cmp.intent.launcher)
+
+            // Explicit (rather than transitive via compose.runtime) — nonAndroidMain
+            // IntentManagerImpl owns its own CoroutineScope for fire-and-forget dispatch.
+            implementation(libs.kotlinx.coroutines.core)
         }
 
         androidMain.dependencies {

@@ -89,7 +89,9 @@ extensions.configure<org.ajoberstar.reckon.gradle.ReckonExtension> {
     setTagWriter { it.toString() }
 }
 
-rootProject.name = "kmp-project-template"
+// Project name is driven by fork.project.name in gradle.properties (written by syncForkConfig).
+// Fallback keeps the template name so a clean checkout builds without running syncForkConfig first.
+rootProject.name = providers.gradleProperty("fork.project.name").getOrElse("kmp-project-template")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -117,13 +119,11 @@ include(":feature:home")
 include(":feature:profile")
 include(":feature:settings")
 include(":feature:showcase")
-// include(":feature:_archive:crypto")    // archived 2026-05-24 — see feature/_archive/crypto/README.md
 include(":feature:currency-rates")
 include(":feature:emi-calculator")
-// include(":feature:_archive:watchlist") // archived 2026-05-24 — see feature/_archive/watchlist/README.md
-// include(":feature:_archive:alerts")    // archived 2026-05-24 — see feature/_archive/alerts/README.md
 include(":feature:bills")
 include(":feature:loans")
+include(":feature:amortization")
 include(":feature:rates")
 include(":feature:calculators")
 include(":feature:macro")

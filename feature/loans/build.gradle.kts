@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.cmp.feature.convention)
 }
 
-android {
-    namespace = "org.mifos.feature.loans"
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {
@@ -24,6 +20,7 @@ kotlin {
             implementation(projects.core.data)
             implementation(projects.core.model)
             implementation(projects.coreBase.store)
+            implementation(projects.feature.amortization)
 
             implementation(compose.ui)
             implementation(compose.material3)

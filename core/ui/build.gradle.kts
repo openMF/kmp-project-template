@@ -13,10 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "org.mifos.core.ui"
-}
-
 kotlin {
     sourceSets {
         androidMain.dependencies {
@@ -57,5 +53,5 @@ dependencies {
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "org.mifos.core.ui.generated.resources"
+    packageOfResClass = "kpt.core.ui.generated.resources"
 }

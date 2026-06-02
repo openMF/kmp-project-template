@@ -13,10 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cmp.navigation.ComposeApp
 import coil3.compose.LocalPlatformContext
-import template.core.base.platform.LocalManagerProvider
-import template.core.base.platform.context.LocalContext
-import template.core.base.ui.util.LocalImageLoaderProvider
-import template.core.base.ui.util.getDefaultImageLoader
+import kpt.core.base.platform.LocalManagerProvider
+import kpt.core.base.platform.context.LocalContext
+import kpt.core.base.ui.util.LocalImageLoaderProvider
+import kpt.core.base.ui.util.getDefaultImageLoader
 
 @Composable
 fun SharedApp(

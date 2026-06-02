@@ -62,10 +62,6 @@ kotlin {
     }
 }
 
-android {
-    namespace = "cmp.shared"
-}
-
 compose.resources {
     publicResClass = true
     generateResClass = always

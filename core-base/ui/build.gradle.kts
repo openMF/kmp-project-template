@@ -24,10 +24,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    namespace = "template.core.base.ui"
-}
-
 kotlin {
     sourceSets {
         androidMain.dependencies {
@@ -88,5 +84,5 @@ kotlin {
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "template.core.base.ui.generated.resources"
+    packageOfResClass = "kpt.core.base.ui.generated.resources"
 }

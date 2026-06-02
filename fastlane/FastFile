@@ -448,7 +448,7 @@ platform :ios do
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
       # Generate dummy framework so pod install can resolve the local podspec
-      gradle(task: ":cmp-shared:generateDummyFramework", project_dir: "..")
+      gradle(task: ":cmp-shared:generateDummyFramework")
 
       # Install CocoaPods dependencies
       cocoapods(
@@ -470,7 +470,7 @@ platform :ios do
   lane :build_signed_ios do |options|
       options = sanitize_options(options)
       # Generate dummy framework so pod install can resolve the local podspec
-      gradle(task: ":cmp-shared:generateDummyFramework", project_dir: "..")
+      gradle(task: ":cmp-shared:generateDummyFramework")
       # Install CocoaPods dependencies
       cocoapods(
           podfile: "cmp-ios/Podfile",
@@ -553,7 +553,7 @@ platform :ios do
       testflight_config = FastlaneConfig::IosConfig::TESTFLIGHT_CONFIG
 
       # Generate dummy framework so pod install can resolve the local podspec
-      gradle(task: ":cmp-shared:generateDummyFramework", project_dir: "..")
+      gradle(task: ":cmp-shared:generateDummyFramework")
 
       # Install CocoaPods dependencies
       cocoapods(
@@ -682,7 +682,7 @@ platform :ios do
      appstore_config = FastlaneConfig::IosConfig::APPSTORE_CONFIG
 
       # Generate dummy framework so pod install can resolve the local podspec
-      gradle(task: ":cmp-shared:generateDummyFramework", project_dir: "..")
+      gradle(task: ":cmp-shared:generateDummyFramework")
 
       # Install CocoaPods dependencies
       cocoapods(

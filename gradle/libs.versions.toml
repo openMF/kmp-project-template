@@ -14,9 +14,9 @@ iosTeamId        = "L432S2FZP5"               # Apple Developer Team ID
 androidDesugarJdkLibs = "2.1.5"
 androidGradlePlugin = "9.2.1"
 androidTools = "32.2.0"
-compileSdk = "36"
+compileSdk = "37"
 minSdk = "26"
-targetSdk = "36"
+targetSdk = "37"
 javaVersion = "17"
 jvmToolchain = "21"
 

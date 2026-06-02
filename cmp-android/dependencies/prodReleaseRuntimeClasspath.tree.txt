@@ -1436,35 +1436,26 @@
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0
 |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.8.0
 |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.3.21 (*)
-|    |    |    |    +--- dev.gitlive:firebase-analytics:2.4.0
-|    |    |    |    |    \--- dev.gitlive:firebase-analytics-android:2.4.0
-|    |    |    |    |         +--- com.google.firebase:firebase-analytics -> 23.2.0 (*)
-|    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2 -> 1.11.0 (*)
-|    |    |    |    |         +--- com.google.firebase:firebase-bom:33.15.0 -> 34.14.0 (*)
-|    |    |    |    |         +--- dev.gitlive:firebase-app:2.4.0
-|    |    |    |    |         |    \--- dev.gitlive:firebase-app-android:2.4.0
-|    |    |    |    |         |         +--- com.google.firebase:firebase-common -> 22.0.1 (*)
-|    |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2 -> 1.11.0 (*)
-|    |    |    |    |         |         +--- com.google.firebase:firebase-bom:33.15.0 -> 34.14.0 (*)
-|    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.3.21 (*)
-|    |    |    |    |         |         +--- dev.gitlive:firebase-common:2.4.0
-|    |    |    |    |         |         |    \--- dev.gitlive:firebase-common-android:2.4.0
-|    |    |    |    |         |         |         +--- com.google.firebase:firebase-common -> 22.0.1 (*)
-|    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2 -> 1.11.0 (*)
-|    |    |    |    |         |         |         +--- com.google.firebase:firebase-bom:33.15.0 -> 34.14.0 (*)
-|    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0 -> 1.11.0 (*)
-|    |    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.3.21 (*)
-|    |    |    |    |         |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
-|    |    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
-|    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.3.21 (*)
-|    |    |    |    |         +--- dev.gitlive:firebase-common:2.4.0 (*)
-|    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
-|    |    |    |    \--- dev.gitlive:firebase-crashlytics:2.4.0
-|    |    |    |         \--- dev.gitlive:firebase-crashlytics-android:2.4.0
-|    |    |    |              +--- com.google.firebase:firebase-crashlytics -> 20.0.6 (*)
+|    |    |    |    \--- dev.gitlive:firebase-analytics:2.4.0
+|    |    |    |         \--- dev.gitlive:firebase-analytics-android:2.4.0
+|    |    |    |              +--- com.google.firebase:firebase-analytics -> 23.2.0 (*)
 |    |    |    |              +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2 -> 1.11.0 (*)
 |    |    |    |              +--- com.google.firebase:firebase-bom:33.15.0 -> 34.14.0 (*)
-|    |    |    |              +--- dev.gitlive:firebase-app:2.4.0 (*)
+|    |    |    |              +--- dev.gitlive:firebase-app:2.4.0
+|    |    |    |              |    \--- dev.gitlive:firebase-app-android:2.4.0
+|    |    |    |              |         +--- com.google.firebase:firebase-common -> 22.0.1 (*)
+|    |    |    |              |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2 -> 1.11.0 (*)
+|    |    |    |              |         +--- com.google.firebase:firebase-bom:33.15.0 -> 34.14.0 (*)
+|    |    |    |              |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.3.21 (*)
+|    |    |    |              |         +--- dev.gitlive:firebase-common:2.4.0
+|    |    |    |              |         |    \--- dev.gitlive:firebase-common-android:2.4.0
+|    |    |    |              |         |         +--- com.google.firebase:firebase-common -> 22.0.1 (*)
+|    |    |    |              |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2 -> 1.11.0 (*)
+|    |    |    |              |         |         +--- com.google.firebase:firebase-bom:33.15.0 -> 34.14.0 (*)
+|    |    |    |              |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0 -> 1.11.0 (*)
+|    |    |    |              |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.3.21 (*)
+|    |    |    |              |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
+|    |    |    |              |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
 |    |    |    |              +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.3.21 (*)
 |    |    |    |              +--- dev.gitlive:firebase-common:2.4.0 (*)
 |    |    |    |              \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
@@ -1521,7 +1512,15 @@
 |    |    |              |    \--- io.github.mobilebytelabs:cmp-observe-android:3.4.4
 |    |    |              |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.10 -> 2.3.21 (*)
 |    |    |              |         +--- com.google.firebase:firebase-bom:33.7.0 -> 34.14.0 (*)
-|    |    |              |         +--- dev.gitlive:firebase-crashlytics:2.4.0 (*)
+|    |    |              |         +--- dev.gitlive:firebase-crashlytics:2.4.0
+|    |    |              |         |    \--- dev.gitlive:firebase-crashlytics-android:2.4.0
+|    |    |              |         |         +--- com.google.firebase:firebase-crashlytics -> 20.0.6 (*)
+|    |    |              |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2 -> 1.11.0 (*)
+|    |    |              |         |         +--- com.google.firebase:firebase-bom:33.15.0 -> 34.14.0 (*)
+|    |    |              |         |         +--- dev.gitlive:firebase-app:2.4.0 (*)
+|    |    |              |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.3.21 (*)
+|    |    |              |         |         +--- dev.gitlive:firebase-common:2.4.0 (*)
+|    |    |              |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
 |    |    |              |         +--- dev.gitlive:firebase-analytics:2.4.0 (*)
 |    |    |              |         \--- dev.gitlive:firebase-perf:2.4.0
 |    |    |              |              \--- dev.gitlive:firebase-perf-android:2.4.0

@@ -9,6 +9,7 @@ plugins {
 
 kotlin {
     js(IR) {
+        useEsModules()
         outputModuleName = "cmp-web"
         browser {
             commonWebpackConfig {
@@ -20,6 +21,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
+        useEsModules()
         outputModuleName = "cmp-wasm"
         browser {
             commonWebpackConfig {

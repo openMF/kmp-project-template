@@ -17,16 +17,31 @@ import org.w3c.dom.Worker
 /**
  * JS (Kotlin/JS) factory for creating Room 3 database instances.
  *
+ * Workers are bundled locally via webpack (no CDN dependency) using the
+ * `sqlite-wasm-worker` npm package declared in core-base/database/build.gradle.kts.
+ * webpack resolves `new URL("sqlite-wasm-worker/worker.js", import.meta.url)` at
+ * build time and emits the worker + its WASM dependency as a separate bundle.
+ *
  * [createDatabase] auto-detects the runtime environment:
- *  - crossOriginIsolated = true  (localhost with COOP/COEP headers) →
- *    WebWorkerSQLiteDriver backed by a dedicated SQLite web worker.
- *    The worker uses OPFS for persistent storage when available.
- *  - crossOriginIsolated = false (GitHub Pages or any host without the headers) →
+ *  - crossOriginIsolated = true  (COOP/COEP headers — localhost dev) →
+ *    WebWorkerSQLiteDriver + OPFS-backed persistent storage.
+ *  - crossOriginIsolated = false (GitHub Pages / no headers) →
  *    Room.inMemoryDatabaseBuilder — data lives only for the current page session.
  */
 @PublishedApi
 internal fun isCrossOriginIsolated(): Boolean =
     js("self.crossOriginIsolated === true").unsafeCast<Boolean>()
+
+private fun createSQLiteWasmWorker(): Worker =
+    Worker(js("""new URL("sqlite-wasm-worker/worker.js", import.meta.url)"""))
+
+/**
+ * Alternative driver backed by sql.js (in-memory only, broader browser compatibility).
+ * Switch by calling `createSqlJsWorker()` in `createDatabase` / `createInMemoryDatabase`.
+ */
+@Suppress("unused")
+private fun createSqlJsWorker(): Worker =
+    Worker(js("""new URL("sql-js-worker/worker.js", import.meta.url)"""))
 
 class AppDatabaseFactory {
 
@@ -35,13 +50,12 @@ class AppDatabaseFactory {
     ): RoomDatabase.Builder<T> {
         return if (isCrossOriginIsolated()) {
             Room.databaseBuilder<T>(name = databaseName)
-                .setDriver(WebWorkerSQLiteDriver(Worker("sqlite-web-worker.js")))
+                .setDriver(WebWorkerSQLiteDriver(createSQLiteWasmWorker()))
         } else {
             Room.inMemoryDatabaseBuilder<T>()
         }
     }
 
-    inline fun <reified T : RoomDatabase> createInMemoryDatabase(): RoomDatabase.Builder<T> {
-        return Room.inMemoryDatabaseBuilder<T>()
-    }
+    inline fun <reified T : RoomDatabase> createInMemoryDatabase(): RoomDatabase.Builder<T> =
+        Room.inMemoryDatabaseBuilder<T>()
 }

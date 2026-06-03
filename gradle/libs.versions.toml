@@ -1,6 +1,6 @@
 [versions]
 buildkonfig = "0.21.2"
-kmpProductFlavors = "2.4.2"
+kmpProductFlavors = "2.7.0"
 
 # ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──────────────────
 appId            = "org.mifos.kmp.template"   # Android applicationId + iOS bundle ID

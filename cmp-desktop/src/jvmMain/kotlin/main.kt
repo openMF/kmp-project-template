@@ -35,6 +35,9 @@ import java.util.Locale
  * @see SharedApp
  */
 fun main() {
+    val appName = System.getProperty("app.name", "Money Toolkit")
+    // Must be set before AWT initialises — controls the macOS menu-bar process name.
+    System.setProperty("apple.awt.application.name", appName)
     application {
         // Initializes the Koin dependency injection framework.
         initKoin()
@@ -49,7 +52,7 @@ fun main() {
         Window(
             onCloseRequest = ::exitApplication,
             state = windowState,
-            title = "DesktopApp",
+            title = appName,
         ) {
             // Use key() to force complete recomposition when locale changes
             key(localeVersion) {

@@ -1,59 +1,63 @@
 [versions]
-buildkonfig = "0.15.2"
+buildkonfig = "0.21.2"
 kmpProductFlavors = "2.4.2"
 
 # ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──────────────────
 appId            = "org.mifos.kmp.template"   # Android applicationId + iOS bundle ID
 appDisplayName   = "Money Toolkit"             # Android app_name, iOS CFBundleDisplayName
 baseNamespace    = "kpt"                       # prefix for all module R-class namespaces
-desktopAppName   = "MoneyToolkitDesktop"       # JVM package name, dock name
+desktopAppName   = "Money Toolkit"             # JVM package name, dock name
 projectName      = "kmp-project-template"      # rootProject.name, Fastlane PROJECT_NAME
 iosTeamId        = "L432S2FZP5"               # Apple Developer Team ID
 # ─────────────────────────────────────────────────────────────────────────────────────────────────
-
 # Android
 androidDesugarJdkLibs = "2.1.5"
-androidGradlePlugin = "8.12.3"
-androidTools = "31.12.3"
+androidGradlePlugin = "9.2.1"
+androidTools = "32.2.0"
+compileSdk = "37"
+minSdk = "26"
+targetSdk = "37"
+javaVersion = "17"
+jvmToolchain = "21"
 
-commonsCodec = "1.20.0"
-firebaseBom = "34.7.0"
-firebaseCrashlyticsPlugin = "3.0.6"
+commonsCodec = "1.22.0"
+firebaseBom = "34.14.0"
+firebaseCrashlyticsPlugin = "3.0.7"
 firebasePerfPlugin = "2.0.2"
-androidxMacroBenchmark = "1.4.1"
+androidxMacroBenchmark = "1.5.0-alpha06"
 githubApi = "1.329"
 gmsPlugin = "4.4.4"
 
 # AndroidX Dependencies
 androidx-test-ext-junit = "1.3.0"
-androidxActivity = "1.12.2"
+androidxActivity = "1.13.0"
 androidxBrowser = "1.9.0"
-androidxComposeBom = "2025.12.01"
+androidxComposeBom = "2026.05.01"
 androidxComposeCompiler = "1.5.15"
-androidxComposeRuntimeTracing = "1.10.0"
+androidxComposeRuntimeTracing = "1.11.0"
 androidxCoreSplashscreen = "1.2.0"
-androidxWork = "2.11.0"
+androidxWork = "2.11.2"
 androidxMetrics = "1.0.0"
 androidxProfileinstaller = "1.4.1"
 androidxTracing = "1.3.0"
 appcompatVersion = "1.7.1"
-calfPermissions = "0.8.0"
-coreKtxVersion = "1.17.0"
+calfPermissions = "0.11.0"
+coreKtxVersion = "1.18.0"
 
 jacksonCore = "2.19.2"
 junitJupiterApi = "5.13.4"
 junitPlatformLauncherVersion = "1.13.4"
 okhttp = "5.3.2"
-robolectric = "4.16"
-roborazzi = "1.52.0"
+robolectric = "4.16.1"
+roborazzi = "1.63.0"
 
 # Testing Dependencies
 junitVersion = "4.13.2"
 truth = "1.4.5"
 
 # Security Dependencies
-androidxSecurityCrypto = "1.1.0-alpha06"
-bouncycastle = "1.78.1"
+androidxSecurityCrypto = "1.1.0"
+bouncycastle = "1.84"
 
 # Utility Dependencies
 dependencyGuard = "0.5.0"
@@ -66,58 +70,58 @@ integrity = "1.6.0"
 # Static Analysis & Code Formatting
 ktlint = "12.1.1"
 detekt = "1.23.8"
-spotlessVersion = "7.0.2"
+spotlessVersion = "8.6.0"
 turbine = "1.2.1"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
 
 # Kotlin KMP Dependencies
-kotlin = "2.3.20"
-kover = "0.9.1"
-kotlinInject = "0.7.2"
-kotlinxCoroutines = "1.10.2"
+kotlin = "2.3.21"
+kover = "0.9.8"
+kotlinInject = "0.9.0"
+kotlinxBrowser = "0.5.0"
+kotlinxCoroutines = "1.11.0"
 kotlinxDatetime = "0.8.0"
 kotlinxImmutable = "0.4.0"
 kotlinxSerializationJson = "1.9.0"
-ksp = "2.3.6"
+ksp = "2.3.9"
 
 # Ktor & Ktorfit
-ktorVersion = "3.3.3"
+ktorVersion = "3.5.0"
 ktorfit = "2.7.3"
 
 # Koin CMP Dependencies
-koin = "4.1.1"
-koinAnnotationsVersion = "2.1.0"
+koin = "4.2.1"
+koinAnnotationsVersion = "2.3.1"
 
 
 # KMP Toolkit Libraries
 kmptoolkit = "3.4.4"
 
 # CMP Libraries
-compose-plugin = "1.10.3"
-coil = "3.3.0"
+compose-plugin = "1.11.0"
+coil = "3.4.0"
 backHandlerVersion = "2.5.0"
-constraintLayout = "0.6.0"
+constraintLayout = "0.6.1"
 multiplatformSettings = "1.3.0"
-mokoPermission = "0.19.1"
+mokoPermission = "0.20.1"
 qroseVersion = "1.0.1"
-okioVersion = "3.16.4"
+okioVersion = "3.17.0"
 kermit = "2.0.8"
-fileKit = "0.12.0"
-uiBackhandler = "1.10.3"
-wire = "5.4.0"
-compottie = "2.0.0-rc04"
+fileKit = "0.14.0"
+uiBackhandler = "1.11.0"
+wire = "6.2.0"
+compottie = "2.1.0"
 
 # Jetbrains CMP
-windowsSizeClass = "0.5.0"
-composeJB = "1.10.3"
+composeJB = "1.11.0"
 composeLifecycle = "2.9.6"
-composeNavigation = "2.9.1"
+composeNavigation = "2.9.2"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.4.0"
-material3adaptive = "1.1.2"
+material3adaptive = "1.2.0"
 gitLive = "2.4.0"
-aboutLibraries = "13.2.1"
+aboutLibraries = "14.2.1"
 
 # Desktop Version
 desktopPackageVersion = "1.0.0"
@@ -128,7 +132,7 @@ store = "5.1.0-alpha08"
 #Room 3
 room = "3.0.0-alpha05"
 sqliteBundled = "2.6.2"
-sqliteWeb = "2.6.2"
+sqliteWeb = "2.7.0-alpha05"
 
 [libraries]
 kmp-product-flavors-plugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
@@ -264,6 +268,7 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", v
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
 
+kotlinx-browser = { group = "org.jetbrains.kotlinx", name = "kotlinx-browser", version.ref = "kotlinxBrowser" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxImmutable" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
@@ -335,7 +340,6 @@ moko-permission = { group = "dev.icerock.moko", name = "permissions", version.re
 moko-permission-compose = { group = "dev.icerock.moko", name = "permissions-compose", version.ref = "mokoPermission" }
 
 ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
-window-size = { group = "dev.chrisbanes.material3", name = "material3-window-size-class-multiplatform", version.ref = "windowsSizeClass" }
 
 
 cmp-intent-launcher = { module = "io.github.mobilebytelabs:cmp-intent-launcher", version.ref = "kmptoolkit" }

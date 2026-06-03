@@ -19,6 +19,11 @@ actual fun httpClient(config: HttpClientConfig<*>.() -> Unit) = HttpClient(OkHtt
     config(this)
 }
 
+internal actual fun HttpClientConfig<*>.installProxyPlugin(
+    proxiedHosts: List<String>,
+    corsProxyBaseUrl: String,
+) = Unit
+
 /**
  * Creates an OkHttp-based [HttpClient] with TLS certificate pinning applied.
  */

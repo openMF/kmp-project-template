@@ -8,25 +8,30 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 /**
  * Configure the Kotlin Multiplatform plugin with the default hierarchy template and additional targets.
- * This includes JVM, Android, iOS, JS and WASM targets.
+ * This includes JVM, iOS, JS and WASM targets.
+ *
+ * NOTE: androidTarget() is intentionally absent. com.android.kotlin.multiplatform.library (AGP 9+)
+ * registers the Android target automatically via its withPlugin("kotlin.multiplatform") callback.
+ * Calling androidTarget() here would create a duplicate 'android' target conflict.
+ *
  * @see KotlinMultiplatformExtension
  * @see configure
  */
 @OptIn(ExperimentalWasmDsl::class, ExperimentalKotlinGradlePluginApi::class)
 internal fun Project.configureKotlinMultiplatform() {
+    val jvmToolchainVersion = libs.findVersion("jvmToolchain").get().requiredVersion.toInt()
+
     extensions.configure<KotlinMultiplatformExtension> {
         applyProjectHierarchyTemplate()
 
         // Gradle JVM toolchain — selects the JDK used to compile + run tests.
-        // Bumped to 21 in Phase 12 because cmp-network-monitor v3.3.1+ emits
-        // Java 21 bytecode (class file version 65) which a Java 17 JVM can't load.
-        // Source/target compatibility stays at Java 17 (see KotlinAndroid.kt) so
-        // emitted bytecode remains 17-compatible for downstream consumers; only
-        // the BUILD JVM is bumped.
-        jvmToolchain(21)
+        // Source/target compatibility stays at javaVersion (KotlinAndroid.kt) so
+        // emitted bytecode remains compatible for downstream consumers; only the
+        // BUILD JVM is set here.
+        jvmToolchain(jvmToolchainVersion)
+
 
         jvm("desktop")
-        androidTarget()
         iosSimulatorArm64()
         iosArm64()
         js(IR) {

@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import kpt.core.base.database.invalidation.daoFlow
+import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.data.banking.BillReminderRepository
 import kpt.core.database.banking.dao.BillReminderDao
 import kpt.core.database.banking.entity.BillReminderEntity
@@ -35,6 +37,15 @@ import kotlin.time.Clock
  * [observeAll] delegates to [billRemindersStore] so any write through the Store's
  * SourceOfTruth is reflected here reactively. All other reads and all writes go
  * directly to [billReminderDao] (filtered reads, per-id lookup, upsert, delete).
+ *
+ * Writes are wrapped with [notifyingWrite] and direct-DAO `Flow` reads are wrapped with
+ * [daoFlow] so the wasmJs target's long-lived collectors (e.g. the Home dashboard's
+ * "Upcoming Bills" tile) re-emit after writes even when Room 3 alpha05's async
+ * InvalidationTracker fails to fan out. On Android/Desktop/iOS the wraps are a
+ * microsecond-cost no-op alongside Room's native invalidation.
+ *
+ * See `core-base/database/.../invalidation/README.md` for the rationale, integration
+ * recipe, and removal plan.
  */
 internal class BillReminderRepositoryImpl(
     private val billRemindersStore: Store<Unit, List<BillReminderEntity>>,
@@ -51,29 +62,35 @@ internal class BillReminderRepositoryImpl(
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> {
         val window = upcomingDayWindow(maxDays)
         if (window.isEmpty()) return flowOf(emptyList())
-        return billReminderDao.observeUpcoming(window).map { rows -> rows.map { it.toDomain() } }
+        return daoFlow(BILL_REMINDERS_TABLE) { billReminderDao.observeUpcoming(window) }
+            .map { rows -> rows.map { it.toDomain() } }
     }
 
     override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> {
         val window = upcomingDayWindow(maxDays)
         if (window.isEmpty()) return flowOf(0.0)
-        return billReminderDao.observeUpcoming(window).map { rows -> rows.sumOf { it.amount } }
+        return daoFlow(BILL_REMINDERS_TABLE) { billReminderDao.observeUpcoming(window) }
+            .map { rows -> rows.sumOf { it.amount } }
     }
 
     override fun observeById(id: String): Flow<BillReminder?> =
-        billReminderDao.observeById(id).map { it?.toDomain() }
+        daoFlow(BILL_REMINDERS_TABLE) { billReminderDao.observeById(id) }.map { it?.toDomain() }
 
     override suspend fun getById(id: String): BillReminder? = billReminderDao.getById(id)?.toDomain()
 
     override suspend fun upsert(bill: BillReminder) {
-        billReminderDao.upsert(bill.toEntity())
+        notifyingWrite(BILL_REMINDERS_TABLE) {
+            billReminderDao.upsert(bill.toEntity())
+        }
     }
 
     override suspend fun delete(id: String) {
-        billReminderDao.deleteById(id)
+        notifyingWrite(BILL_REMINDERS_TABLE) {
+            billReminderDao.deleteById(id)
+        }
     }
 
-    override fun observeCount(): Flow<Int> = billReminderDao.count()
+    override fun observeCount(): Flow<Int> = daoFlow(BILL_REMINDERS_TABLE) { billReminderDao.count() }
 
     /**
      * Returns the set of day-of-month integers covered by `[today, today + maxDays]`,
@@ -94,6 +111,11 @@ internal class BillReminderRepositoryImpl(
                 date = date.nextDay()
             }
         }
+    }
+
+    private companion object {
+        /** Room `@Entity(tableName = …)` for [BillReminderEntity]. */
+        const val BILL_REMINDERS_TABLE = "banking_bill_reminders"
     }
 }
 

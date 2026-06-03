@@ -11,9 +11,9 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-android {
-    testOptions {
-        unitTests {
+androidComponents {
+    finalizeDsl { ext ->
+        ext.withHostTest {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
         }

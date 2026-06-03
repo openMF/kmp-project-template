@@ -18,10 +18,7 @@ import org.koin.dsl.module
 actual val platformModule: Module = module {
     single {
         AppDatabaseFactory()
-            .createDatabase<AppDatabase>(
-                databaseName = AppDatabase.DATABASE_NAME,
-            )
-            .fallbackToDestructiveMigration(dropAllTables = true)
+            .createDatabase<AppDatabase>(databaseName = "app_database")
             .setQueryCoroutineContext(Dispatchers.Default)
             .build()
     }

@@ -95,6 +95,8 @@ android {
 }
 
 dependencies {
+    implementation(platform(libs.firebase.bom))
+
     implementation(projects.cmpShared)
     implementation(projects.core.ui)
     implementation(projects.coreBase.platform)

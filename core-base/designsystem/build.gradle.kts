@@ -32,7 +32,6 @@ kotlin {
             api(libs.jetbrains.compose.material3.adaptive.navigation)
 
             implementation(libs.jb.lifecycleViewmodel)
-            implementation(libs.window.size)
             implementation(libs.ui.backhandler)
         }
     }

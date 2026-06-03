@@ -7,14 +7,31 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
 }
 
 kotlin {
+    js {
+        useEsModules()
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        useEsModules()
+    }
+
     sourceSets {
         commonMain.dependencies {
             api(libs.androidx.room.runtime)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
         }
 
         desktopMain.dependencies {
@@ -29,9 +46,14 @@ kotlin {
 
         jsMain.dependencies {
             api(libs.androidx.sqlite.web)
+            implementation(npm("sqlite-wasm-worker", layout.projectDirectory.dir("sqlite-wasm-worker").asFile))
+            implementation(npm("sql-js-worker", layout.projectDirectory.dir("sql-js-worker").asFile))
         }
         wasmJsMain.dependencies {
             api(libs.androidx.sqlite.web)
+            api(libs.kotlinx.browser)
+            implementation(npm("sqlite-wasm-worker", layout.projectDirectory.dir("sqlite-wasm-worker").asFile))
+            implementation(npm("sql-js-worker", layout.projectDirectory.dir("sql-js-worker").asFile))
         }
     }
 }

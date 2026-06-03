@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -147,18 +148,54 @@ fun RateHistoryScreen(
                         }
                     }
 
-                    Text(
-                        text = "USD \u2192 ${history.to} (${history.startDate} to ${history.endDate})",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    // Header \u2014 "USD \u2192 $to ($startDate to $endDate)" rendered with a
+                    // Material Icon for the arrow. Outfit (the project's bundled font)
+                    // does not include U+2192; Compose Icon is a vector path that
+                    // renders correctly on every platform including wasmJs.
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(sp.xs),
+                    ) {
+                        Text(
+                            text = "USD",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(12.dp),
+                        )
+                        Text(
+                            text = "${history.to} (${history.startDate} to ${history.endDate})",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                     LazyColumn(modifier = Modifier.weight(1f)) {
                         items(history.rates) { point ->
-                            Text(
-                                text = "${point.date}  \u2192  ${point.value.formatDecimal(4)}",
-                                style = MaterialTheme.typography.bodyMedium,
+                            // Per-row "$date \u2192 $value" \u2014 same Material Icon arrow.
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(sp.sm),
                                 modifier = Modifier.padding(vertical = sp.sm),
-                            )
+                            ) {
+                                Text(
+                                    text = point.date.toString(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(14.dp),
+                                )
+                                Text(
+                                    text = point.value.formatDecimal(4),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            }
                             HorizontalDivider()
                         }
                     }

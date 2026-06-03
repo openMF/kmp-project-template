@@ -5,10 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.analytics.di
 
-import org.koin.core.module.Module
+import kpt.core.base.analytics.AnalyticsHelper
+import kpt.core.base.analytics.provideAnalyticsHelper
+import org.koin.dsl.module
 
-expect val analyticsModule: Module
+val analyticsModule = module {
+    single<AnalyticsHelper> { provideAnalyticsHelper() }
+}

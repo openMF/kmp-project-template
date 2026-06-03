@@ -11,27 +11,47 @@ package kpt.core.base.database
 
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
+import androidx.sqlite.driver.web.WebWorkerSQLiteDriver
+import org.w3c.dom.Worker
 
 /**
- * WasmJS (Kotlin/Wasm) factory for creating Room 3 database instances.
+ * WasmJs factory for creating Room 3 database instances.
  *
- * Uses the browser's Origin Private File System (OPFS) for persistence via the
- * `sqlite-web` driver. The [databaseName] is used as the OPFS file name.
+ * Workers are bundled locally via webpack (no CDN dependency) using the
+ * `sqlite-wasm-worker` npm package declared in core-base/database/build.gradle.kts.
+ * webpack resolves `new URL("sqlite-wasm-worker/worker.js", import.meta.url)` at
+ * build time and emits the worker + its WASM dependency as a separate bundle.
+ *
+ * The worker handles OPFS persistent storage when crossOriginIsolated=true
+ * (localhost with COOP/COEP headers) and falls back to in-memory when OPFS is
+ * unavailable (e.g. GitHub Pages without the required response headers).
  */
+@PublishedApi
+@OptIn(ExperimentalWasmJsInterop::class)
+internal fun createSQLiteWasmWorker(): Worker =
+    js("""new Worker(new URL("sqlite-wasm-worker/worker.js", import.meta.url))""")
+
+/**
+ * Alternative driver backed by sql.js (in-memory only, broader browser compatibility).
+ * Switch by calling `createSqlJsWorker()` in `createDatabase` / `createInMemoryDatabase`.
+ */
+@PublishedApi
+@OptIn(ExperimentalWasmJsInterop::class)
+@Suppress("unused")
+internal fun createSqlJsWorker(): Worker =
+    js("""new Worker(new URL("sql-js-worker/worker.js", import.meta.url))""")
+
 class AppDatabaseFactory {
 
-    /**
-     * Creates a [RoomDatabase.Builder] for the given database type.
-     *
-     * @param T The concrete [RoomDatabase] subclass.
-     * @param databaseName OPFS file name for the database.
-     * @return A pre-configured builder.
-     */
     inline fun <reified T : RoomDatabase> createDatabase(
         databaseName: String,
     ): RoomDatabase.Builder<T> {
-        return Room.databaseBuilder<T>(
-            name = databaseName,
-        )
+        return Room.databaseBuilder<T>(name = databaseName)
+            .setDriver(WebWorkerSQLiteDriver(createSQLiteWasmWorker()))
+    }
+
+    inline fun <reified T : RoomDatabase> createInMemoryDatabase(): RoomDatabase.Builder<T> {
+        return Room.inMemoryDatabaseBuilder<T>()
+            .setDriver(WebWorkerSQLiteDriver(createSQLiteWasmWorker()))
     }
 }

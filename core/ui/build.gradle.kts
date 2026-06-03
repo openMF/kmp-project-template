@@ -19,6 +19,7 @@ kotlin {
             api(libs.androidx.metrics)
             implementation(libs.androidx.browser)
             implementation(libs.androidx.compose.runtime)
+            implementation(compose.uiTooling)
         }
 
         commonMain.dependencies {
@@ -45,9 +46,6 @@ kotlin {
             implementation(libs.bundles.androidx.compose.ui.test)
         }
     }
-}
-dependencies {
-    debugImplementation(compose.uiTooling)
 }
 
 compose.resources {

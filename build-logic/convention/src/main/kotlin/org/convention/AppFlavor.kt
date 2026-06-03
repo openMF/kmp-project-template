@@ -11,6 +11,7 @@ package org.convention
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.ApplicationProductFlavor
 import com.android.build.api.dsl.CommonExtension
+import org.gradle.kotlin.dsl.invoke
 
 /**
  * AGP-side flavor registration helper for modules that do NOT apply
@@ -46,10 +47,10 @@ enum class AppFlavor(val dimension: FlavorDimension, val applicationIdSuffix: St
  * Registers base `demo`/`prod` AGP product flavors on [commonExtension].
  * Idempotent — skips any flavor or dimension already present.
  */
-fun configureFlavors(commonExtension: CommonExtension<*, *, *, *, *, *>) {
+fun configureFlavors(commonExtension: CommonExtension) {
     commonExtension.apply {
         if (FlavorDimension.contentType.name !in flavorDimensions) {
-            flavorDimensions += FlavorDimension.contentType.name
+            (flavorDimensions as MutableList<String>).add(FlavorDimension.contentType.name)
         }
         productFlavors {
             AppFlavor.values().forEach { flv ->

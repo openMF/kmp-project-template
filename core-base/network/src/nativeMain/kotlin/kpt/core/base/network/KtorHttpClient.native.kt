@@ -16,3 +16,8 @@ import io.ktor.client.engine.darwin.Darwin
 actual fun httpClient(config: HttpClientConfig<*>.() -> Unit) = HttpClient(Darwin) {
     config(this)
 }
+
+internal actual fun HttpClientConfig<*>.installProxyPlugin(
+    proxiedHosts: List<String>,
+    corsProxyBaseUrl: String,
+) = Unit

@@ -36,6 +36,18 @@ import co.touchlab.kermit.Logger.Companion as KermitLogger
 expect fun httpClient(config: HttpClientConfig<*>.() -> Unit): HttpClient
 
 /**
+ * Platform hook: installs a CORS proxy plugin on web targets; no-op on native/Android/Desktop.
+ *
+ * Called automatically by [setupDefaultHttpClient] when [proxiedHosts] is non-empty.
+ * On web, requests to any host in [proxiedHosts] are transparently rewritten through
+ * [corsProxyBaseUrl] (format: "https://proxy-host/path?" — original URL is appended as-is).
+ */
+internal expect fun HttpClientConfig<*>.installProxyPlugin(
+    proxiedHosts: List<String>,
+    corsProxyBaseUrl: String,
+)
+
+/**
  * Provides a default [HttpClientConfig] setup for use with a Ktor-based HTTP client.
  *
  * This function simplifies client configuration by handling common concerns such as:
@@ -67,6 +79,13 @@ expect fun httpClient(config: HttpClientConfig<*>.() -> Unit): HttpClient
  * @param bearerRefreshProvider Optional refresh logic for Bearer tokens (only used if Bearer auth is configured).
  * @param certificatePinConfig TLS certificate pin configuration. Pins are applied by platform
  *   engines that support it (OkHttp on Android/Desktop). Other platforms ignore this parameter.
+ * @param proxiedHosts Hostnames whose requests should be transparently routed through
+ *   [corsProxyBaseUrl] on browser targets (web only). Ignored on Android/Desktop/iOS.
+ *   Example: `listOf("api.stlouisfed.org")` routes FRED API calls via the CORS proxy.
+ * @param corsProxyBaseUrl Base URL of the CORS proxy. Must accept the target URL appended raw
+ *   after `?` — corsproxy.io format: `https://proxy/?<original-url>`. corsproxy.io is the
+ *   default (free, sets CORS headers on all responses). Replace with a self-hosted proxy in
+ *   production.
  *
  * @return A configuration lambda to be passed into the Ktor [HttpClient].
  */
@@ -93,6 +112,8 @@ fun setupDefaultHttpClient(
     bearerTokensProvider: (() -> BearerTokens)? = null,
     bearerRefreshProvider: (() -> BearerTokens)? = null,
     certificatePinConfig: CertificatePinConfig = CertificatePinConfig.default(),
+    proxiedHosts: List<String> = emptyList(),
+    corsProxyBaseUrl: String = "https://corsproxy.io",
 ): HttpClientConfig<*>.() -> Unit = {
     val refreshMutex = Mutex()
 
@@ -177,4 +198,6 @@ fun setupDefaultHttpClient(
     install(ContentNegotiation) {
         json(jsonConfig)
     }
+
+    installProxyPlugin(proxiedHosts, corsProxyBaseUrl)
 }

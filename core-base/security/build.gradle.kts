@@ -13,12 +13,6 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

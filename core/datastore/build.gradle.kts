@@ -11,12 +11,9 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-android {
-    defaultConfig {
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    testOptions {
-        unitTests {
+androidComponents {
+    finalizeDsl { ext ->
+        ext.withHostTest {
             isReturnDefaultValues = true
         }
     }

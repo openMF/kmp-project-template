@@ -23,6 +23,7 @@
 - [Patterns & Best Practices](docs/claude/patterns.md)
 - [Independent Cards Pattern](docs/claude/PATTERN-independent-cards.md) - Multi-card dashboards where each card has its own ScreenState (loading / error / empty / content) — `IndependentCardLayout` + `DashboardProgressBar` + `aggregateDashboardProgress`
 - [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
+- [Room Invalidation Bridge](core-base/database/src/commonMain/kotlin/kpt/core/base/database/invalidation/README.md) - `RoomChangeBus` + `daoFlow{}` + `notifyingWrite{}` — absorbs Room 3 alpha05's wasmJs async-fan-out gap so DAO Flow consumers re-emit after writes; no-op on Android/Desktop/iOS
 - [Motion + Transitions](core-base/ui/MOTION.md) - Symmetric durations, M3 patterns, debug Transition Gallery
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)
 - [Secrets Management](docs/claude/secrets-management.md)
@@ -356,6 +357,26 @@ class of fork failure. The properties exist today so:
 
 See `gradle.properties` for the current values; see Phase 10 of the
 core-base-store-coverage epic for the seam rationale.
+
+### Fork app icons
+
+App icons follow the same source-of-truth → `syncForkConfig` propagation pattern
+as the text fields above, just for binary files:
+
+- **Drop fork-specific icons** into `branding/icons/` (one file per platform —
+  see `branding/icons/README.md` for the exact name → destination mapping).
+- **Run** `./gradlew syncForkConfig`. The task copies whichever files are
+  present into the canonical platform locations
+  (`cmp-ios/iosApp/Assets.xcassets/AppIcon.appiconset/AppIcon.png`,
+  `cmp-web/src/{js,wasmJs}Main/resources/favicon.ico`,
+  `cmp-desktop/icons/ic_launcher.{icns,ico,png}`).
+- **Missing source = no-op.** An empty `branding/icons/` keeps the template
+  defaults — every drop is opt-in.
+- **Android adaptive icons** require Android Studio's Image Asset Studio (one
+  time per fork, commit the result). Alternatively drop a pre-built res tree
+  into `branding/icons/android/` to have `syncForkConfig` copy it across.
+
+Implementation: `build-logic/convention/src/main/kotlin/SyncForkConfigPlugin.kt`.
 
 ---
 

@@ -68,6 +68,7 @@ val NetworkModule = module {
                         setupDefaultHttpClient(
                             baseUrl = get<FredApiConfig>().baseUrl,
                             loggableHosts = listOf("api.stlouisfed.org"),
+                            proxiedHosts = listOf("api.stlouisfed.org"),
                         ),
                     ),
                 )

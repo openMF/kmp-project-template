@@ -1,3 +1,4 @@
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
@@ -65,3 +66,13 @@ compose.resources {
     publicResClass = true
     generateResClass = always
 }
+
+val appDisplayName = libs.versions.appDisplayName.get()
+
+tasks.matching { it.name == "jsProcessResources" || it.name == "wasmJsProcessResources" }
+    .configureEach {
+        (this as Copy).filter(
+            mapOf("tokens" to mapOf("APP_DISPLAY_NAME" to appDisplayName)),
+            ReplaceTokens::class.java,
+        )
+    }

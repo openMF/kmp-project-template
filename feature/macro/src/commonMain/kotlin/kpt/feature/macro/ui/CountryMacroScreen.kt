@@ -80,8 +80,13 @@ fun CountryMacroScreen(
                     }
                 },
                 actions = {
+                    // Country chip — drops the flag emoji prefix because regional-
+                    // indicator code points (U+1F1E6..U+1F1FF) are not in the
+                    // project's Outfit font and render as tofu on wasmJs. The
+                    // chip's affordance (clickable, accent-tinted) already signals
+                    // "tap to change country"; the country name alone is sufficient.
                     StatusChip(
-                        text = "${country?.flagEmoji.orEmpty()} ${country?.name ?: uiState.countryCode}",
+                        text = country?.name ?: uiState.countryCode,
                         intent = StatusChipIntent.Info,
                         modifier = Modifier
                             .padding(end = sp.sm)

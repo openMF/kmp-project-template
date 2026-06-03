@@ -23,6 +23,7 @@
 - [Patterns & Best Practices](docs/claude/patterns.md)
 - [Independent Cards Pattern](docs/claude/PATTERN-independent-cards.md) - Multi-card dashboards where each card has its own ScreenState (loading / error / empty / content) — `IndependentCardLayout` + `DashboardProgressBar` + `aggregateDashboardProgress`
 - [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
+- [Room Invalidation Bridge](core-base/database/src/commonMain/kotlin/kpt/core/base/database/invalidation/README.md) - `RoomChangeBus` + `daoFlow{}` + `notifyingWrite{}` — absorbs Room 3 alpha05's wasmJs async-fan-out gap so DAO Flow consumers re-emit after writes; no-op on Android/Desktop/iOS
 - [Motion + Transitions](core-base/ui/MOTION.md) - Symmetric durations, M3 patterns, debug Transition Gallery
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)
 - [Secrets Management](docs/claude/secrets-management.md)

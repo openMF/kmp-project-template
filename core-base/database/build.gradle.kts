@@ -28,6 +28,12 @@ kotlin {
             api(libs.androidx.room.runtime)
         }
 
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+        }
+
         desktopMain.dependencies {
             api(libs.androidx.sqlite.bundled)
         }

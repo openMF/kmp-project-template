@@ -9,6 +9,7 @@
  */
 package kpt.core.store.banking.impl
 
+import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.banking.dao.BillReminderDao
 import kpt.core.database.banking.entity.BillReminderEntity
@@ -25,12 +26,17 @@ import org.mobilenativefoundation.store.store5.Store
  *
  * Key: [Unit] — returns all reminders. Filtered reads (e.g., upcoming within N days)
  * are handled in the repository via [BillReminderDao.observeUpcoming].
+ *
+ * The DAO reader is wrapped with [daoFlow] so wasmJs collectors re-emit after writes
+ * even when Room 3 alpha05's async InvalidationTracker fails to fan out (see
+ * `core-base/database/.../invalidation/README.md`). On Android/Desktop/iOS the wrap
+ * is a microsecond no-op alongside Room's native invalidation.
  */
 fun provideBillRemindersStore(
     dao: BillReminderDao,
 ): Store<Unit, List<BillReminderEntity>> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
-        reader = { _: Unit -> dao.observeAll() },
+        reader = { _: Unit -> daoFlow(BILL_REMINDERS_TABLE) { dao.observeAll() } },
         writer = { _: Unit, reminders: List<BillReminderEntity> ->
             reminders.forEach { dao.upsert(it) }
         },
@@ -38,3 +44,6 @@ fun provideBillRemindersStore(
         deleteAll = { dao.deleteAll() },
     ),
 )
+
+/** Room `@Entity(tableName = …)` for [BillReminderEntity]. Shared with the repository's writes. */
+private const val BILL_REMINDERS_TABLE = "banking_bill_reminders"

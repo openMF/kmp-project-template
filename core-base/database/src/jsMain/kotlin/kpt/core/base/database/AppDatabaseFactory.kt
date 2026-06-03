@@ -32,15 +32,22 @@ import org.w3c.dom.Worker
 internal fun isCrossOriginIsolated(): Boolean =
     js("self.crossOriginIsolated === true").unsafeCast<Boolean>()
 
-private fun createSQLiteWasmWorker(): Worker =
+// @PublishedApi internal — referenced by the public `inline fun createDatabase`
+// below. Kotlin's JS compiler rejects public inline functions that touch
+// `private` symbols (`Public-API inline function cannot access non-public-API
+// function`), so the helper has to be at least internal + @PublishedApi. Same
+// pattern as `isCrossOriginIsolated` above and as the wasmJs sibling factory.
+@PublishedApi
+internal fun createSQLiteWasmWorker(): Worker =
     Worker(js("""new URL("sqlite-wasm-worker/worker.js", import.meta.url)"""))
 
 /**
  * Alternative driver backed by sql.js (in-memory only, broader browser compatibility).
  * Switch by calling `createSqlJsWorker()` in `createDatabase` / `createInMemoryDatabase`.
  */
+@PublishedApi
 @Suppress("unused")
-private fun createSqlJsWorker(): Worker =
+internal fun createSqlJsWorker(): Worker =
     Worker(js("""new URL("sql-js-worker/worker.js", import.meta.url)"""))
 
 class AppDatabaseFactory {

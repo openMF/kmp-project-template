@@ -11,19 +11,34 @@ package kpt.core.base.database
 
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
+import androidx.sqlite.driver.web.WebWorkerSQLiteDriver
+import org.w3c.dom.Worker
 
 /**
  * JS (Kotlin/JS) factory for creating Room 3 database instances.
  *
- * On the browser platform Room requires an explicit SQLite driver via [setDriver].
- * Use [createInMemoryDatabase] for in-browser use (data is not persisted across reloads).
+ * [createDatabase] auto-detects the runtime environment:
+ *  - crossOriginIsolated = true  (localhost with COOP/COEP headers) →
+ *    WebWorkerSQLiteDriver backed by a dedicated SQLite web worker.
+ *    The worker uses OPFS for persistent storage when available.
+ *  - crossOriginIsolated = false (GitHub Pages or any host without the headers) →
+ *    Room.inMemoryDatabaseBuilder — data lives only for the current page session.
  */
+@PublishedApi
+internal fun isCrossOriginIsolated(): Boolean =
+    js("self.crossOriginIsolated === true").unsafeCast<Boolean>()
+
 class AppDatabaseFactory {
 
     inline fun <reified T : RoomDatabase> createDatabase(
         databaseName: String,
     ): RoomDatabase.Builder<T> {
-        return Room.databaseBuilder<T>(name = databaseName)
+        return if (isCrossOriginIsolated()) {
+            Room.databaseBuilder<T>(name = databaseName)
+                .setDriver(WebWorkerSQLiteDriver(Worker("sqlite-web-worker.js")))
+        } else {
+            Room.inMemoryDatabaseBuilder<T>()
+        }
     }
 
     inline fun <reified T : RoomDatabase> createInMemoryDatabase(): RoomDatabase.Builder<T> {

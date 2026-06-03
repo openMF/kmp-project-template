@@ -32,6 +32,7 @@ kotlin {
         }
         wasmJsMain.dependencies {
             api(libs.androidx.sqlite.web)
+            api(libs.kotlinx.browser)
         }
     }
 }

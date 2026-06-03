@@ -11,12 +11,16 @@ package kpt.core.base.database
 
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
+import androidx.sqlite.driver.web.WebWorkerSQLiteDriver
+import org.w3c.dom.Worker
 
 /**
- * WasmJS (Kotlin/Wasm) factory for creating Room 3 database instances.
+ * WasmJs factory for creating Room 3 database instances.
  *
- * On the browser platform Room requires an explicit SQLite driver via [setDriver].
- * Use [createInMemoryDatabase] for in-browser use (data is not persisted across reloads).
+ * Room 3 for wasmJs requires an explicit SQLiteDriver — there is no built-in default.
+ * WebWorkerSQLiteDriver is used for all cases; the worker itself handles OPFS persistent
+ * storage when crossOriginIsolated=true (localhost with COOP/COEP headers) and falls
+ * back to in-memory SQLite when OPFS is not available (e.g. GitHub Pages).
  */
 class AppDatabaseFactory {
 
@@ -24,9 +28,11 @@ class AppDatabaseFactory {
         databaseName: String,
     ): RoomDatabase.Builder<T> {
         return Room.databaseBuilder<T>(name = databaseName)
+            .setDriver(WebWorkerSQLiteDriver(Worker("sqlite-web-worker.js")))
     }
 
     inline fun <reified T : RoomDatabase> createInMemoryDatabase(): RoomDatabase.Builder<T> {
         return Room.inMemoryDatabaseBuilder<T>()
+            .setDriver(WebWorkerSQLiteDriver(Worker("sqlite-web-worker.js")))
     }
 }

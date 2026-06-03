@@ -46,13 +46,15 @@ private val WebApiProxyPlugin = createClientPlugin("WebApiProxy", ::WebApiProxyC
                 protocol = proxyMeta.protocol
                 host = proxyMeta.host
                 port = proxyMeta.port
-                // Embed the complete target URL in encodedPath as "/?{targetUrl}".
-                // encodedPathSegments are used as-is (no re-encoding), and clearing
-                // parameters ensures Ktor appends no extra "?key=" to the URL.
+                // Embed the complete target URL in encodedPathSegments as ["", "?{targetUrl}"]
+                // which Ktor joins to "/?$originalUrl" (empty first segment → leading /).
+                // Ktor 3.x removed the `encodedPath` String setter; the segments list is the
+                // public API. Segments are used as-is (no re-encoding); clearing parameters
+                // ensures Ktor appends no extra "?key=" to the URL.
                 // Result: https://corsproxy.io/?https://api.target.com/path?param=value
-                encodedPath = "/?$originalUrl"
                 parameters.clear()
                 encodedParameters.clear()
+                encodedPathSegments = listOf("", "?$originalUrl")
             }
         }
     }

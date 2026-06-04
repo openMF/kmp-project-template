@@ -142,7 +142,11 @@ module FastlaneConfig
         match_type: "adhoc",
         match_git_url: ENV['MATCH_GIT_URL'] || "git@github.com:openMF/ios-provisioning-profile.git",
         match_git_branch: ENV['MATCH_GIT_BRANCH'] || "master",
-        match_git_private_key: ENV['MATCH_SSH_KEY_PATH'] || "./secrets/match_ci_key",
+        # AC7 FIX: canonical name MATCH_GIT_PRIVATE_KEY (matches Fastlane match's
+        # git_private_key option). Previously read from MATCH_SSH_KEY_PATH;
+        # adjacent tooling (keystore-manager.sh, .github/CLAUDE.md) also unified
+        # on this name. Legacy names purged for clarity.
+        match_git_private_key: ENV['MATCH_GIT_PRIVATE_KEY'] || "./secrets/match_ci_key",
         # Provisioning profile names are generated based on app_identifier
         provisioning_profiles: {
           adhoc: "match AdHoc #{IOS[:app_identifier]}",

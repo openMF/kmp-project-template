@@ -7,6 +7,13 @@ require File.join(project_dir, 'fastlane-config', 'project_config')
 json_key_file(FastlaneConfig::ProjectConfig::ANDROID[:play_store_json_key])
 package_name(FastlaneConfig::ProjectConfig.android_package_name)
 
-# iOS configuration  
-apple_id(FastlaneConfig::ProjectConfig::IOS[:app_identifier])
+# iOS configuration
+# AC6 FIX: apple_id was set to IOS[:app_identifier] which is the BUNDLE ID
+# ("org.mifos.kmp.template"), not an Apple ID login. Fastlane attempts to
+# authenticate against App Store Connect using this value as the username,
+# which always fails. The bundle identifier is declared via app_identifier()
+# (correctly populated below). Apple ID login should come from FASTLANE_APPLE_ID
+# env var or the match keychain — not from the Appfile.
+app_identifier(FastlaneConfig::ProjectConfig::IOS[:app_identifier])
+# apple_id(ENV["FASTLANE_APPLE_ID"]) # optional — set FASTLANE_APPLE_ID to a maintainer email
 team_id(FastlaneConfig::ProjectConfig::IOS[:team_id])

@@ -13,9 +13,27 @@ end
 
 default_platform(:android)
 
+# AC22 FIX: single source of truth for the release-keystore file path.
+# Reads secrets-manifest.yaml#needs[].materialize.at for the alias
+# `kmp_template_release_keystore`. Previously the filename
+# "release_keystore.keystore" was hardcoded in multiple Fastfile sites
+# (and would drift from the manifest entry).
+def keystore_path_from_manifest
+  manifest_path = File.expand_path("../secrets-manifest.yaml", __dir__)
+  UI.user_error!("secrets-manifest.yaml not found at #{manifest_path}") unless File.exist?(manifest_path)
+  require 'yaml'
+  manifest = YAML.load_file(manifest_path)
+  need = (manifest['needs'] || []).find { |n| n['alias'] == 'kmp_template_release_keystore' }
+  UI.user_error!("alias kmp_template_release_keystore missing from secrets-manifest.yaml") unless need
+  at = need.dig('materialize', 'at')
+  UI.user_error!("materialize.at missing for kmp_template_release_keystore") unless at
+  File.expand_path("../#{at}", __dir__)
+end
+
 platform :android do
   desc "Assemble debug APKs."
   lane :assembleDebugApks do |options|
+    options = sanitize_options(options)
     gradle(
       tasks: ["assembleDebug"],
     )
@@ -23,6 +41,7 @@ platform :android do
 
   desc "Assemble Release APK"
   lane :assembleReleaseApks do |options|
+    options = sanitize_options(options)
     signing_config = FastlaneConfig.get_android_signing_config(options)
 
     # Generate version
@@ -35,22 +54,47 @@ platform :android do
     )
   end
 
-  desc "Bundle Release APK"
+  desc "Bundle Release App Bundle (.aab)"
   lane :bundleReleaseApks do |options|
+    options = sanitize_options(options)
     signing_config = FastlaneConfig.get_android_signing_config(options)
 
     # Generate version
     generateVersion = generateVersion()
 
+    # AC5 FIX: bundle (produces .aab) — was "assemble" which produced .apk.
+    # The lane name + downstream Play Store upload contract require .aab.
+    # Downstream gradle invocation becomes equivalent to `task: "bundle"`,
+    # producing cmp-android/build/outputs/bundle/<flavor>Release/*.aab.
     buildAndSignApp(
-      taskName: "assemble",
+      taskName: "bundle",
       buildType: "Release",
       **signing_config
     )
   end
 
+  # AC15 DECISION (locked 2026-06-04): KEEP SEPARATE.
+  #
+  # Rationale for NOT consolidating deployReleaseApkOnFirebase + deployDemoApkOnFirebase:
+  #   - The two lanes target different Firebase appIds (prod vs demo). Collapsing
+  #     would force every caller to pass `flavor: :prod | :demo` correctly; a typo
+  #     would silently distribute the wrong build to the wrong tester group.
+  #   - Tester groups differ per flavor — resolving them inside one lane needs
+  #     branching anyway.
+  #   - The 4 actionhub custom actions and the framework's /release dispatcher
+  #     reference the two lane names verbatim. Collapsing breaks the public lane
+  #     contract (D8) — actionhub would need a coordinated re-release.
+  #   - The duplication is ~30 lines per lane — minor and stable. Tier-3
+  #     (sub-plan 06 `06-deployment-scaffold`) will move both into
+  #     deployment/android/<target>/lane.rb where each file naturally narrows
+  #     to its own appId, eliminating the duplication as a side effect.
+  #
+  # ALTERNATIVE (rejected): a single `deployFlavorOnFirebase` private lane —
+  # adds indirection that Tier-3 immediately removes. Skipped to avoid
+  # double-refactoring.
   desc "Publish Release Artifacts to Firebase App Distribution"
   lane :deployReleaseApkOnFirebase do |options|
+    options = sanitize_options(options)
     signing_config = FastlaneConfig.get_android_signing_config(options)
     firebase_config = FastlaneConfig.get_firebase_config(:android, :prod)
     build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
@@ -75,13 +119,15 @@ platform :android do
       android_artifact_type: "APK",
       android_artifact_path: build_paths[:prod_apk_path],
       service_credentials_file: firebase_config[:serviceCredsFile],
-      groups: firebase_config[:groups],
+      # AC8 FIX: honour the workflow input; fall back to firebase config default.
+      groups: options[:tester_groups] || firebase_config[:groups],
       release_notes: releaseNotes
     )
   end
 
   desc "Publish Demo Artifacts to Firebase App Distribution"
   lane :deployDemoApkOnFirebase do |options|
+    options = sanitize_options(options)
     signing_config = FastlaneConfig.get_android_signing_config(options)
     firebase_config = FastlaneConfig.get_firebase_config(:android, :demo)
     build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
@@ -106,13 +152,15 @@ platform :android do
       android_artifact_type: "APK",
       android_artifact_path: build_paths[:demo_apk_path],
       service_credentials_file: firebase_config[:serviceCredsFile],
-      groups: firebase_config[:groups],
+      # AC8 FIX: honour the workflow input; fall back to firebase config default.
+      groups: options[:tester_groups] || firebase_config[:groups],
       release_notes: releaseNotes
     )
   end
 
   desc "Deploy internal tracks to Google Play"
   lane :deployInternal do |options|
+    options = sanitize_options(options)
     signing_config = FastlaneConfig.get_android_signing_config(options)
     build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
 
@@ -171,14 +219,25 @@ platform :android do
     # Get the project root directory
     project_dir = File.expand_path('..', Dir.pwd)
 
-    # Construct the absolute path to the keystore
-    keystore_path = File.join(project_dir, 'keystores', options[:storeFile])
+    # AC22 FIX: keystore path resolution — prefer the manifest-derived path
+    # (single source of truth via keystore_path_from_manifest), fall back to the
+    # legacy storeFile-in-keystores-dir convention for callers that still pass
+    # storeFile explicitly.
+    keystore_path = if options[:storeFile] && !options[:storeFile].to_s.empty?
+                      File.join(project_dir, 'keystores', options[:storeFile])
+                    else
+                      keystore_path_from_manifest
+                    end
 
     # Check if keystore exists
+    # AC11 FIX: use UI.user_error! instead of bare `exit 1` so the failure flows
+    # through Fastlane's structured error channel (stack frame, :on_error block,
+    # clean CI logs) instead of a process-level exit.
     unless File.exist?(keystore_path)
-      UI.error "Keystore file not found at: #{keystore_path}"
-      UI.error "Please ensure the keystore file exists at the correct location"
-      exit 1  # Exit with error code 1
+      UI.user_error!(
+        "Keystore file not found at: #{keystore_path.inspect}. " \
+        "Run `/secrets pull` (vault-managed) or set storeFile / KEYSTORE_PATH before invoking this lane."
+      )
     end
 
     gradle(
@@ -196,6 +255,7 @@ platform :android do
 
   desc "Generate Version for different platforms"
   lane :generateVersion do |options|
+    options = sanitize_options(options)
     platform = (options[:platform] || 'git').downcase
 
     # Generate version file for all platforms
@@ -241,87 +301,18 @@ platform :android do
 
   desc "Generate release notes"
   lane :generateReleaseNote do |options|
+    options = sanitize_options(options)
     releaseNotes = changelog_from_git_commits(
       commits_count: 1,
     )
     releaseNotes
   end
 
-  desc "Generate full release notes from specified tag or latest release tag"
-  lane :generateFullReleaseNote do |options|
-    def get_latest_tag
-      latest = `git describe --tags --abbrev=0`.strip
-      return latest unless latest.empty?
-
-      latest = `git tag --sort=-creatordate`.split("\n").first
-      return latest unless latest.nil? || latest.empty?
-
-      nil
-    end
-
-    from_tag = options[:fromTag] || get_latest_tag
-    UI.message "Using tag: #{from_tag || 'No tags found. Getting all commits...'}"
-
-    commits = if from_tag && !from_tag.empty?
-      `git log #{from_tag}..HEAD --pretty=format:"%B"`.split("\n")
-    else
-      `git log --pretty=format:"%B"`.split("\n")
-    end
-
-    categories = process_commits(commits)
-    format_release_notes(categories)
-  end
-
-  private_lane :process_commits do |commits|
-    notes = {
-      "breaking" => [], "feat" => [], "fix" => [],
-      "perf" => [], "refactor" => [], "style" => [],
-      "docs" => [], "test" => [], "build" => [],
-      "ci" => [], "chore" => [], "other" => []
-    }
-
-    commits.each do |commit|
-      next if commit.empty? || commit.start_with?("Co-authored-by:", "Merge")
-
-      if commit.include?("BREAKING CHANGE:") || commit.include?("!")
-        notes["breaking"] << commit.sub(/^[^:]+:\s*/, "")
-      elsif commit =~ /^(feat|fix|perf|refactor|style|docs|test|build|ci|chore)(\(.+?\))?:/
-        notes[$1] << commit.sub(/^[^:]+:\s*/, "")
-      else
-        notes["other"] << commit
-      end
-    end
-    notes
-  end
-
-  private_lane :format_release_notes do |categories|
-    sections = {
-      "breaking" => "💥 Breaking Changes",
-      "feat" => "🚀 New Features",
-      "fix" => "🐛 Bug Fixes",
-      "perf" => "⚡ Performance Improvements",
-      "refactor" => "♻️ Refactoring",
-      "style" => "💅 Style Changes",
-      "docs" => "📚 Documentation",
-      "test" => "🧪 Tests",
-      "build" => "📦 Build System",
-      "ci" => "👷 CI Changes",
-      "chore" => "🔧 Maintenance",
-      "other" => "📝 Other Changes"
-    }
-
-    notes = ["# Release Notes", "\nRelease date: #{Time.now.strftime('%d-%m-%Y')}"]
-
-    sections.each do |type, title|
-      next if categories[type].empty?
-      notes << "\n## #{title}"
-      categories[type].each { |commit| notes << "\n- #{commit}" }
-    end
-
-    UI.message "Generated Release Notes:"
-    UI.message notes.join("\n")
-    notes.join("\n")
-  end
+  # AC12 FIX: the full-release-note lane was removed (orphan — never called
+  # from any deploy lane). It interpolated user-supplied options into a shell
+  # command without Shellwords.escape, presenting a shell-injection surface.
+  # The remaining `generateReleaseNote` lane covers the production path.
+  # Associated commit-classification helpers removed alongside.
 
 end
 
@@ -439,22 +430,53 @@ platform :ios do
       end
   end
 
+  # AC13 FIX: extract iOS preamble (the gradle dummy-framework + cocoapods
+  # install block) previously inlined verbatim in build_ios, build_signed_ios,
+  # beta, and release. Single source of truth — every iOS build/upload lane
+  # opens with `with_ios_preamble(options)`.
+  private_lane :with_ios_preamble do |options|
+    options = sanitize_options(options)
+    # Generate dummy framework so pod install can resolve the local podspec
+    gradle(task: ":cmp-shared:generateDummyFramework")
+    # Install CocoaPods dependencies
+    cocoapods(
+        podfile: "cmp-ios/Podfile",
+        try_repo_update_on_error: true
+    )
+  end
+
+  # AC14 FIX: extract the version-comparison + auto-bump logic byte-identical
+  # in `beta` and `release`. Returns the resolved version string that the
+  # caller should pass to increment_version_number().
+  private_lane :bump_versions_for_appstore do |options|
+    options = sanitize_options(options)
+    version        = options[:version]
+    latest_version = options[:latest_version]
+    return version if latest_version.nil? || latest_version.to_s.empty?
+    begin
+      if Gem::Version.new(version) <= Gem::Version.new(latest_version)
+        parts = latest_version.split('.')
+        parts[-1] = (parts[-1].to_i + 1).to_s
+        bumped = parts.join('.')
+        UI.important("⚠️ Gradle version #{version} <= TestFlight #{latest_version}, bumping to #{bumped}")
+        return bumped
+      end
+    rescue ArgumentError => e
+      UI.error("Version comparison failed: #{e.message}, using gradle version #{version}")
+    end
+    version
+  end
+
   ###################
   # Main Public lanes
   ###################
 
   desc "Build Ios application"
   lane :build_ios do |options|
+      options = sanitize_options(options)
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
-      # Generate dummy framework so pod install can resolve the local podspec
-      gradle(task: ":cmp-shared:generateDummyFramework")
-
-      # Install CocoaPods dependencies
-      cocoapods(
-          podfile: "cmp-ios/Podfile",
-          try_repo_update_on_error: true
-      )
+      with_ios_preamble(options)
 
       build_ios_app(
           scheme: ios_config[:scheme],
@@ -469,13 +491,7 @@ platform :ios do
   desc "Build Signed Ios application"
   lane :build_signed_ios do |options|
       options = sanitize_options(options)
-      # Generate dummy framework so pod install can resolve the local podspec
-      gradle(task: ":cmp-shared:generateDummyFramework")
-      # Install CocoaPods dependencies
-      cocoapods(
-          podfile: "cmp-ios/Podfile",
-          try_repo_update_on_error: true
-      )
+      with_ios_preamble(options)
 
       setup_ci_if_needed
       load_api_key(options)
@@ -485,6 +501,7 @@ platform :ios do
 
   desc "Increment build number from latest Firebase release and set version number"
   lane :increment_version do |options|
+    options = sanitize_options(options)
     firebase_config = FastlaneConfig.get_firebase_config(:ios)
     ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
 
@@ -552,14 +569,7 @@ platform :ios do
       ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
       testflight_config = FastlaneConfig::IosConfig::TESTFLIGHT_CONFIG
 
-      # Generate dummy framework so pod install can resolve the local podspec
-      gradle(task: ":cmp-shared:generateDummyFramework")
-
-      # Install CocoaPods dependencies
-      cocoapods(
-          podfile: "cmp-ios/Podfile",
-          try_repo_update_on_error: true
-      )
+      with_ios_preamble(options)
 
       setup_ci_if_needed
       load_api_key(options)
@@ -578,22 +588,11 @@ platform :ios do
       )
       latest_version = Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
 
-      # Determine final version: must be higher than latest TestFlight version
-      version = options[:version_number] || gradle_version
-      if latest_version && !latest_version.to_s.empty?
-        begin
-          if Gem::Version.new(version) <= Gem::Version.new(latest_version)
-            # Bump: increment patch of latest TestFlight version
-            parts = latest_version.split('.')
-            parts[-1] = (parts[-1].to_i + 1).to_s
-            bumped = parts.join('.')
-            UI.important("⚠️ Gradle version #{version} <= TestFlight #{latest_version}, bumping to #{bumped}")
-            version = bumped
-          end
-        rescue ArgumentError => e
-          UI.error("Version comparison failed: #{e.message}, using gradle version #{version}")
-        end
-      end
+      # Determine final version via shared helper (AC14).
+      version = bump_versions_for_appstore(
+        version:        options[:version_number] || gradle_version,
+        latest_version: latest_version
+      )
       UI.important("📱 Final App Store version: #{version}")
 
       # Set version in Xcode project
@@ -681,14 +680,7 @@ platform :ios do
      ios_config = FastlaneConfig::IosConfig::BUILD_CONFIG
      appstore_config = FastlaneConfig::IosConfig::APPSTORE_CONFIG
 
-      # Generate dummy framework so pod install can resolve the local podspec
-      gradle(task: ":cmp-shared:generateDummyFramework")
-
-      # Install CocoaPods dependencies
-      cocoapods(
-          podfile: "cmp-ios/Podfile",
-          try_repo_update_on_error: true
-      )
+      with_ios_preamble(options)
 
       setup_ci_if_needed
       load_api_key(options)
@@ -707,21 +699,11 @@ platform :ios do
       )
       latest_version = Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
 
-      # Determine final version: must be higher than latest TestFlight version
-      version = options[:version_number] || gradle_version
-      if latest_version && !latest_version.to_s.empty?
-        begin
-          if Gem::Version.new(version) <= Gem::Version.new(latest_version)
-            parts = latest_version.split('.')
-            parts[-1] = (parts[-1].to_i + 1).to_s
-            bumped = parts.join('.')
-            UI.important("⚠️ Gradle version #{version} <= TestFlight #{latest_version}, bumping to #{bumped}")
-            version = bumped
-          end
-        rescue ArgumentError => e
-          UI.error("Version comparison failed: #{e.message}, using gradle version #{version}")
-        end
-      end
+      # Determine final version via shared helper (AC14).
+      version = bump_versions_for_appstore(
+        version:        options[:version_number] || gradle_version,
+        latest_version: latest_version
+      )
       UI.important("📱 Final App Store version: #{version}")
 
       # Set version in Xcode project
@@ -736,22 +718,33 @@ platform :ios do
         build_number: latest_build_number + 1
       )
 
-      # Update Info.plist with required privacy strings
-      update_plist(
-        plist_path: ios_config[:plist_path],
-        block: proc do |plist|
-          plist['NSContactsUsageDescription'] = 'This app does not access your contacts. This message is required for compliance only.'
-          plist['NSLocationWhenInUseUsageDescription'] = 'This app does not access your location. This message is required for compliance only.'
-          plist['NSBluetoothAlwaysUsageDescription'] = 'This app does not use Bluetooth. This message is required for compliance only.'
-        end
-      )
+      # AC10 FIX: wrap Info.plist mutation in backup-then-restore so the
+      # working tree stays clean after the lane (build/upload happens
+      # against the mutated plist, restore happens in `ensure` even on
+      # failure). Post-condition: `git status -- {plist_path}` shows no changes.
+      plist_path = ios_config[:plist_path]
+      plist_backup_path = "#{plist_path}.bak"
 
-      # Build signed IPA
-      build_ios_project(
-        options.merge(
-            provisioning_profile_name: ios_config[:provisioning_profile_appstore]
+      # 1. Backup the pristine plist (skip if backup already present from a prior failed run)
+      FileUtils.cp(plist_path, plist_backup_path) unless File.exist?(plist_backup_path)
+
+      begin
+        # 2. Mutate Info.plist with required privacy strings
+        update_plist(
+          plist_path: plist_path,
+          block: proc do |plist|
+            plist['NSContactsUsageDescription'] = 'This app does not access your contacts. This message is required for compliance only.'
+            plist['NSLocationWhenInUseUsageDescription'] = 'This app does not access your location. This message is required for compliance only.'
+            plist['NSBluetoothAlwaysUsageDescription'] = 'This app does not use Bluetooth. This message is required for compliance only.'
+          end
         )
-      )
+
+        # 3. Build signed IPA (consumes the mutated plist)
+        build_ios_project(
+          options.merge(
+              provisioning_profile_name: ios_config[:provisioning_profile_appstore]
+          )
+        )
 
       # Generate release notes from git commits
       releaseNotes = generateReleaseNote()
@@ -823,5 +816,15 @@ platform :ios do
 
       UI.success("✅ Successfully deployed to App Store!")
       UI.success("📝 Release Notes: #{releaseNotes}")
+      ensure
+        # 5. AC10 FIX: ALWAYS restore the pristine plist — even on build/upload failure.
+        if defined?(plist_backup_path) && plist_backup_path && File.exist?(plist_backup_path)
+          FileUtils.mv(plist_backup_path, plist_path)
+        end
+      end
   end
 end
+
+# SP-08 LIFT (2026-06-04): the interim `platform :mac do` block that lived here
+# has been moved to deployment/desktop/mac-app-store/lane.rb. The deployment/
+# Fastfile imports it via the per-target lane.rb chain. Do not re-add it here.

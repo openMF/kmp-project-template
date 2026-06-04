@@ -1,0 +1,58 @@
+# deployment/desktop/dmg-notarized/workflow-snippet.yml
+name: desktop-dmg-notarized-deploy
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        type: string
+        required: true
+      confirm:
+        description: "Type CONFIRM"
+        required: true
+        type: string
+
+jobs:
+  build:
+    if: ${{ inputs.confirm == 'CONFIRM' }}
+    runs-on: macos-14
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+
+      - name: Materialize secrets (vault-mode)
+        if: ${{ secrets.SOPS_AGE_KEY != '' }}
+        env:
+          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+        run: bash deployment/_shared/scripts/secrets-pull.sh --required-for macos-signing
+
+      - name: Materialize secrets (manual-mode)
+        if: ${{ secrets.SOPS_AGE_KEY == '' }}
+        run: |
+          mkdir -p secrets
+          echo "${{ secrets.DEVELOPER_ID_CERT_B64 }}" | base64 -d > secrets/developer_id.p12
+          echo "${{ secrets.APPSTORE_AUTH_KEY_B64 }}" | base64 -d > secrets/AuthKey.p8
+
+      - name: Import Developer ID cert into keychain
+        env:
+          DEVELOPER_ID_CERT_PASSWORD: ${{ secrets.DEVELOPER_ID_CERT_PASSWORD }}
+        run: |
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import secrets/developer_id.p12 -P "$DEVELOPER_ID_CERT_PASSWORD" -A
+          security set-key-partition-list -S apple-tool:,apple: -k "" build.keychain
+
+      - name: Build + sign + notarize + upload
+        env:
+          TAG:                ${{ inputs.tag }}
+          GH_TOKEN:           ${{ secrets.GITHUB_TOKEN }}
+          DEVELOPER_ID_NAME:  ${{ secrets.DEVELOPER_ID_NAME }}
+          ASC_API_KEY_PATH:   secrets/AuthKey.p8
+          ASC_KEY_ID:         ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID:      ${{ secrets.ASC_ISSUER_ID }}
+        run: bash deployment/desktop/dmg-notarized/script.sh

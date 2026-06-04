@@ -1,0 +1,8 @@
+{
+  "_comment": "StoreBroker submission config — Partner Center API. appId resolves from env at submit time.",
+  "appId": "${ENV:MS_APP_ID}",
+  "flightId": null,
+  "packagePath": "cmp-desktop/build/compose/binaries/main-release/msix/mifos.msix",
+  "targetPublishMode": "Manual",
+  "visibility": "Public"
+}

@@ -1,3 +1,4 @@
+# CLAUDE-PLACEHOLDER — do not commit this to secrets/
 -----BEGIN OPENSSH PRIVATE KEY-----
 REPLACE_THIS_WITH_YOUR_ACTUAL_SSH_PRIVATE_KEY_FOR_MATCH_REPOSITORY
 Generate with: ssh-keygen -t ed25519 -C "fastlane-match" -f secrets/match_ci_key -N ""

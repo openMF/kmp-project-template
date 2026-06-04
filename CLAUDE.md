@@ -157,26 +157,38 @@ the per-feature branding, or selectively remove features they don't need.
 
 ## First-time Fork Setup
 
-After cloning, before running the toolkit's economic-data screens (B7 Interest
-Rate Tracker, B8 Country Macro Snapshot), copy `.env.local.example` to
-`.env.local` and fill in fork-specific values:
+> **Canonical guide:** [`deployment/BOOTSTRAP.md`](deployment/BOOTSTRAP.md) — Path A
+> (manual mode, OSS forks) and Path B (vault mode, framework maintainers) with a
+> decision matrix at the top. Start there for the full step-by-step.
 
-```bash
-cp .env.local.example .env.local
-# Edit .env.local — add your FRED API key
-```
+The `template_version: "2.6.0"` epic (fastlane-modernization) replaced the
+legacy `.env.local.example` pattern with a structured secrets pipeline. Pick
+the path that matches your team:
 
-**FRED (Federal Reserve Economic Data)** — free developer key required:
+- **Path A — OSS fork (manual mode):** copy the schema from `secrets_demo/`
+  into `secrets/` and fill in real values; CI consumes them via the per-target
+  `deployment/<platform>/<target>/workflow-snippet.yml` manual flavor.
+- **Path B — Vault mode (maintainers):** run `/secrets pull` from a
+  framework-bound session; secrets materialize to canonical filesystem
+  locations from the SOPS+age vault.
+
+**FRED (Federal Reserve Economic Data)** — free developer key required for the
+B7 Interest Rate Tracker + B8 Country Macro Snapshot screens:
 
 1. Sign up: https://fred.stlouisfed.org/docs/api/api_key.html (30 seconds)
-2. Paste the key into `.env.local` as `FRED_API_KEY=...`
+2. Provide the key one of two ways:
+   - **Path A:** copy `secrets/shared_keys.env.template` to
+     `secrets/shared_keys.env` (gitignored) and set `FRED_API_KEY=...`.
+   - **Path B:** run `/secrets request mifos_x_fred_api_key` from a
+     project-bound session; the framework opens a vault PR proposing the
+     new alias row. After it merges, `/secrets pull` materializes it.
 3. Wire it into Koin in your fork's app module:
    ```kotlin
    single { FredApiConfig(apiKey = System.getenv("FRED_API_KEY")) }
    ```
    (Or load via BuildKonfig / Gradle property — whichever your fork prefers.)
 
-Leave the key blank and the FRED-backed screens render an explicit "FRED key
+Leave the key unset and the FRED-backed screens render an explicit "FRED key
 not configured" empty state rather than crashing.
 
 **World Bank Open Data** — no setup. Fully open API.

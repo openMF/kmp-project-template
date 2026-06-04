@@ -1,3 +1,4 @@
+# CLAUDE-PLACEHOLDER — do not commit this to secrets/
 -----BEGIN PRIVATE KEY-----
 REPLACE_THIS_WITH_YOUR_ACTUAL_APP_STORE_CONNECT_API_KEY_P8_FILE_CONTENT
 Download from: https://appstoreconnect.apple.com → Users and Access → Keys

@@ -149,24 +149,45 @@ encoded keystores into GitHub Actions secrets for CI builds.
 iOS keystore equivalents (Fastlane Match, `.p8` keys) — see
 `scripts/setup_ios_complete.sh` and the [Secrets Management Guide](claude/secrets-management.md).
 
-## Step 4 — Populate `.env.local`
+## Step 4 — Populate secrets
+
+> The legacy `.env.local.example` pattern was removed at `template_version:
+> "2.6.0"` (fastlane-modernization epic). See
+> [`deployment/BOOTSTRAP.md`](../deployment/BOOTSTRAP.md) for the full Path A
+> (manual) vs Path B (vault) walkthrough — this section is the short version.
+
+### Path A (OSS fork — manual mode, default)
 
 ```bash
-cp .env.local.example .env.local
+# 1. Copy the schema mirror into the real secrets/ tree
+cp -n secrets_demo/shared_keys.env.template secrets/shared_keys.env
+
+# 2. Edit secrets/shared_keys.env and add at minimum:
+#    FRED_API_KEY=<your-key-here>
 ```
 
-Edit `.env.local` and add at minimum:
+`secrets/` is gitignored; `secrets_demo/` is committed and carries
+placeholder files with magic markers (`# CLAUDE-PLACEHOLDER` for text,
+`CLAUDE-PLHLD-v1\0` for binary) so it's unambiguous which tree is safe to
+commit.
 
-```
-FRED_API_KEY=<your-key-here>
+### Path B (vault mode — framework maintainers)
+
+```bash
+/secrets request mifos_x_fred_api_key   # opens vault PR for the new alias
+# (admin merges the PR)
+/secrets pull                            # materializes to local.properties
 ```
 
-Leave the key blank and the B7 Interest Rates screen renders an explicit
+Leave the key unset and the B7 Interest Rates screen renders an explicit
 "FRED key not configured" empty state rather than crashing.
 
-If your fork uses additional third-party APIs, add their keys to `.env.local`
-alongside `FRED_API_KEY` and wire them through Koin (or BuildKonfig) the same
-way `FredApiConfig` does.
+If your fork uses additional third-party APIs, add them via the same path:
+- **Path A:** append `KEY=value` lines to `secrets/shared_keys.env`.
+- **Path B:** run `/secrets request <alias>` to open a vault PR.
+
+In both cases, wire the value through Koin (or BuildKonfig) the same way
+`FredApiConfig` does.
 
 ## Step 5 — Smoke-test the demo build
 

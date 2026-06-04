@@ -3,36 +3,10 @@
 #
 # Contract (RULE-DEPLOYMENT-MANIFEST-001): this file contains ONLY Fastlane
 # `import` directives. NO lane definitions, NO helpers, NO platform blocks.
-# Per-target lane bodies live at deployment/<platform>/<target>/lane.rb and
-# are populated by sub-plans 07 (Android), 08 (iOS+macOS), 09 (desktop), 10 (web).
+# Per-target lane bodies live at deployment/<platform>/<target>/lane.rb.
 #
-# DUPLICATE-LANE NOTE (SP-07/08/09/10 → SP-14):
-#   Until SP-14 prunes the migrated lane bodies from ../fastlane/Fastfile, both
-#   the legacy file AND the per-target lane.rb files define the same lane
-#   symbols (deployReleaseApkOnFirebase, deployDemoApkOnFirebase, deployInternal,
-#   promoteToBeta, promote_to_production, deploy_on_firebase, beta, release,
-#   plus the lifted :mac block). To avoid Fastlane's duplicate-lane parse
-#   error during the migration window, this file imports ONLY the legacy tree
-#   today; the per-target imports below are intentionally COMMENTED OUT and
-#   will be uncommented + the legacy Fastfile pruned in a single atomic step
-#   when SP-14 lands. Until then, `bundle exec fastlane <lane>` continues to
-#   resolve lanes from the legacy tree — preserving back-compat exactly per
-#   the SP-06 contract.
-#
-# SP-11 NOTE (release-dispatcher integration — 2026-06-04):
-#   The /release {platform} {target} dispatcher (layers/release/commands/release.md
-#   "Deployment-tree Dispatch" section) now invokes lanes via
-#   `bundle exec fastlane --fastlane-dir deployment <platform> <lane_name>`,
-#   making THIS file the canonical entry point. During the SP-11..SP-14 window
-#   the per-target imports below remain COMMENTED to avoid duplicate-lane parse
-#   errors against the legacy `../fastlane/Fastfile`. The dispatcher's
-#   --dry-run default means SP-11 itself does not trigger live lane invocations.
-#   SP-14 will atomically: (a) delete ../fastlane/Fastfile lane bodies,
-#   (b) uncomment the per-target imports below, (c) remove this paragraph.
+# Entry point: bundle exec fastlane --fastlane-dir deployment <platform> <lane>
 # ═════════════════════════════════════════════════════════════════════════════
 
-# ── Back-compat bridge to legacy fastlane/ tree (REMOVED in SP-14) ──────────
-import "../fastlane/Fastfile"
-
-# ── Per-target lane.rb imports — UNCOMMENT IN SP-14 (after legacy prune) ────
-# Dir["./*/**/lane.rb"].each { |f| import f }
+# ── Per-target lane imports ───────────────────────────────────────────────────
+Dir["./*/**/lane.rb"].each { |f| import f }

@@ -72,7 +72,7 @@ Then propagate to all platform config files:
 | iOS display name | `Config.xcconfig` → `APP_NAME` → Info.plist `CFBundleDisplayName` |
 | iOS team | `Config.xcconfig` → `TEAM_ID` → Xcode signing settings |
 | Desktop app name / package | `desktopAppName` via `cmp-desktop/build.gradle.kts` |
-| Fastlane `package_name` / `app_identifier` | `local.properties` → `fastlane-config/project_config.rb` |
+| Fastlane `package_name` / `app_identifier` | `local.properties` → `deployment/<platform>/<target>/lane.rb` AppFile configs |
 | Gradle project name | `gradle.properties` → `settings.gradle.kts` |
 
 **Kotlin source files never change.** `package kpt.*` in `.kt` files is

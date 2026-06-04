@@ -13,7 +13,7 @@
 
 📖 **Domain-Specific Guides:**
 - [GitHub Actions & CI/CD](.github/CLAUDE.md) - Workflows, custom actions, secrets
-- [Fastlane Deployment](fastlane/CLAUDE.md) - iOS & Android deployment lanes
+- [Fastlane Deployment](deployment/BOOTSTRAP.md) - Deployment architecture, secrets bootstrap, all 18 targets
 - [Bash Scripts](scripts/CLAUDE.md) - Setup, deployment, and verification scripts
 
 📚 **Deep-Dive Documentation:**
@@ -48,7 +48,7 @@ pattern in `core-base/store` and `core-base/ui` — each shipped feature is the
 canonical showcase for one or more framework archetypes (see "Toolkit feature
 showcase" below).
 
-CI/CD infrastructure spans **5 platforms** and **9 deployment targets**.
+CI/CD infrastructure spans **5 platforms** and **18 deployment targets** (see `deployment/DEPLOYMENT_MANIFEST.yaml`).
 
 ### Architecture
 
@@ -62,7 +62,7 @@ kmp-project-template/
 ├── core/                # Core modules (data, domain, network, etc.)
 ├── core-base/           # Base platform implementations
 ├── feature/             # Feature modules
-├── fastlane/            # Deployment automation (iOS & Android)
+├── deployment/          # Deployment automation — 18 targets across 5 platforms
 ├── .github/workflows/   # GitHub Actions CI/CD
 └── scripts/             # Bash automation scripts
 ```
@@ -121,7 +121,7 @@ the per-feature branding, or selectively remove features they don't need.
 **CI/CD:**
 - GitHub Actions with **reusable workflows** (`openMF/mifos-x-actionhub@v1.0.8`)
 - **13 custom actions** (4 Android, 4 iOS, 2 macOS, 1 Desktop, 1 Web, 1 Static Analysis)
-- **Fastlane** (12 lanes: 7 Android + 5 iOS)
+- **Fastlane** (8 lanes across 8 deployment targets in `deployment/<platform>/<target>/lane.rb`)
 - **17 bash scripts** for setup, deployment, and verification
 
 **Code Quality:**
@@ -246,16 +246,16 @@ git commit -m "feat(android): add new feature"
 2. Trigger `multi-platform-build-and-publish` workflow
 3. Select deployment targets via workflow inputs
 
-**Via Fastlane (Local/Manual):**
+**Via Fastlane (Local/Manual — from repo root):**
 ```bash
 # Android
-bundle exec fastlane android deployReleaseApkOnFirebase
-bundle exec fastlane android deployInternal
+bundle exec fastlane --fastlane-dir deployment android deployReleaseApkOnFirebase
+bundle exec fastlane --fastlane-dir deployment android deployInternal
 
 # iOS
-bundle exec fastlane ios deploy_on_firebase
-bundle exec fastlane ios beta
-bundle exec fastlane ios release
+bundle exec fastlane --fastlane-dir deployment ios deploy_on_firebase
+bundle exec fastlane --fastlane-dir deployment ios beta
+bundle exec fastlane --fastlane-dir deployment ios release
 ```
 
 **Via Bash Scripts (iOS only):**

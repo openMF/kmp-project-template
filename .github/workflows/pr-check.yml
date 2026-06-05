@@ -82,7 +82,7 @@ permissions:
 jobs:
   pr_checks:
     name: PR Checks
-    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check.yaml@v1.0.14
+    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check.yaml@v1.0.16
     with:
       android_package_name: 'cmp-android' # <-- Change Your Android Package Name
       desktop_package_name: 'cmp-desktop' # <-- Change Your Desktop Package Name
@@ -91,3 +91,10 @@ jobs:
       build_ios: true # <-- Change to 'false' if you don't want to build iOS
       use_cocoapods: true
       shared_module: ':cmp-shared'
+      # Auto-detected: CI_RUNNER repo variable is set to 'self-hosted' when a local
+      # runner is registered (via gha-runner-setup.sh), cleared on remove.
+      # On GitHub CI (openMF upstream): CI_RUNNER unset → GitHub-hosted runners.
+      # On your fork with runner registered: CI_RUNNER=self-hosted → your Mac.
+      runner: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+      runner_macos: ${{ vars.CI_RUNNER || 'macos-latest' }}
+      runner_desktop_matrix: ${{ vars.CI_RUNNER == 'self-hosted' && '["self-hosted"]' || '["ubuntu-latest","macos-latest","windows-latest"]' }}

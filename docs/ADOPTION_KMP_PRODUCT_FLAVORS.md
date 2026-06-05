@@ -13,7 +13,7 @@
 
 ## How this template's adoption pattern works
 
-The plugin is consumed via the **convention-plugin pattern** (Pattern 3b per the library's [adoption guide](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#3-choose-your-adoption-pattern)). Three files do the work:
+The plugin is consumed via the **convention-plugin pattern** (Pattern 3b per the library's [adoption guide](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)). Three files do the work:
 
 | File | Role |
 |---|---|
@@ -29,11 +29,53 @@ Three downstream support files:
 | [`build-logic/convention/src/main/kotlin/LocalFlavorsLoader.kt`](../build-logic/convention/src/main/kotlin/LocalFlavorsLoader.kt) | Reflective hook letting downstream forks add flavors via a `build-logic/convention/src/main/kotlin/local/LocalFlavors.kt` file that `sync-dirs.sh` excludes from sync. |
 | [`build-logic/convention/src/main/kotlin/local/.gitkeep`](../build-logic/convention/src/main/kotlin/local/) | Placeholder for the local override directory — fork apps drop their `LocalFlavors.kt` here. |
 
-For the abstract verify gates that this concrete adoption realizes, see the library's [`consumer.md`](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md). Each section of this doc references the corresponding library section number.
+For the abstract verify gates that this concrete adoption realizes, see the library's [`consumer.md`](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md). Each section of this doc references the corresponding library section number.
 
 ---
 
-## v2.7.0 (current) — adopted 2026-06-02
+## v2.8.1 (current) — adopted 2026-06-05
+
+### Bump from v2.7.0 → v2.8.1
+
+This template's `gradle/libs.versions.toml` previously pinned `kmpProductFlavors = "2.7.0"` (a no-DSL-change bump from v2.4.2 per the section below). v2.8.1 is the v2.8 minor stable, shipping per-flavor `signingConfigs {}` DSL + per-flavor `versionCode`/`versionName` + V50/V51 validator codes. **Zero DSL changes required** — the existing 2-flavor (demo/prod) + 3-buildType (debug/staging/release) shape does not declare signing configs (consumer-domain concern; bridged via existing fastlane lanes + GitHub Actions secrets, see `fastlane/CLAUDE.md`).
+
+### Files changed (this version)
+
+```diff
+- gradle/libs.versions.toml#[versions].kmpProductFlavors = "2.7.0"
++ gradle/libs.versions.toml#[versions].kmpProductFlavors = "2.8.1"
+```
+
+That's the only line change for this version. No source diff in `KMPFlavorsConventionPlugin.kt`, `AppFlavor.kt`, or `LocalFlavorsLoader.kt`.
+
+### Why the bump is safe
+
+Per the library's [v2.8 CHANGELOG](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/CHANGELOG.md):
+
+- **Version floor unchanged** — AGP 8.2+ / Gradle 8.0+ / KGP 2.0.21+ / JDK 17+ / CMP 1.7.0+. Same as v2.4 → v2.5 → v2.6 → v2.7 → v2.8.
+- **All v2.7 DSL surfaces preserved byte-identically** — every block this template uses (`kmpFlavors {}`, `flavorDimensions {}`, `flavors {}`, `buildTypes {}`, `buildConfigField`, `buildConfigPackage`) unchanged.
+- **New v2.8 surfaces are opt-in** — `signingConfigs {}` + per-flavor `versionCode`/`versionName` are additive; not declaring them is a valid no-op.
+- **Plugin built-against bumped** to AGP 9.2.1 + Kotlin 2.3.21 (matches this template's own toolchain).
+
+### Verify gates (delta vs v2.7.0)
+
+Section §1 (Plugin pinned) command output changes only in the version string:
+```bash
+grep -E 'kmpProductFlavors\s*=' gradle/libs.versions.toml
+# Expected: kmpProductFlavors = "2.8.1"
+```
+
+All other §2-§14 verify gates pass byte-identically to v2.7.0 since the adoption surface is unchanged.
+
+### Assembly evidence
+
+Verified via `./gradlew :cmp-android:assembleDemoDebug` against v2.8.1 — exits 0; generated `BuildKonfig.IS_DEMO_BUILD`, `BuildKonfig.BASE_URL`, `BuildKonfig.DEMO_USERNAME`, `BuildKonfig.DEMO_PASSWORD` consumed by `core/network/` as before.
+
+> **Note on local resolution**: v2.8.1 requires `mavenLocal()` first in `pluginManagement.repositories` until the release propagates to Maven Central (already pre-wired in this template's `settings.gradle.kts`). No changes needed to `settings.gradle.kts`.
+
+---
+
+## v2.7.0 — adopted 2026-06-02
 
 ### Bump from v2.4.2 → v2.7.0
 
@@ -50,7 +92,7 @@ That's the only line change for this version. No source diff in `KMPFlavorsConve
 
 ### Why the bump is safe
 
-Per the library's [`MIGRATION_v2.6_TO_v2.7.md`](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/MIGRATION_v2.6_TO_v2.7.md) (opens with "You do not need to migrate."):
+Per the library's [`MIGRATION_v2.6_TO_v2.7.md`](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/CHANGELOG.md) (opens with "You do not need to migrate."):
 
 - **Version floor unchanged** — Gradle 8.0+ / KGP 2.0.21+ / AGP 8.2+ / JDK 17+ / CMP 1.7.0+. Same as v2.4 → v2.5 → v2.6 → v2.7.
 - **All DSL surfaces preserved** — `kmpFlavors {}`, `dimensions {}`, `flavorDimensions {}`, `flavors {}`, `buildTypes {}`, `variantFilter {}`, `promote()`, `spm {}`, `featureFlags {}`, `di {}`, `analytics {}`, `buildKonfig {}` all unchanged.
@@ -61,7 +103,7 @@ Per the library's [`MIGRATION_v2.6_TO_v2.7.md`](https://github.com/MobileByteLab
 
 For each library section, this template's verify shows the actual command + actual output expected from THIS codebase.
 
-#### [§1 — Plugin pinned](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#1-plugin-pinned-to-v270-via-libsversionstoml)
+#### [§1 — Plugin pinned](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 ```bash
 grep -E 'kmpProductFlavors\s*=' gradle/libs.versions.toml
@@ -74,7 +116,7 @@ grep -E 'kmp-product-flavors-plugin\s*=\s*\{\s*group\s*=' gradle/libs.versions.t
 # Expected: kmp-product-flavors-plugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
 ```
 
-#### [§2 — Toolchain compatibility](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#2-toolchain-compatibility)
+#### [§2 — Toolchain compatibility](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 This template's `gradle/libs.versions.toml` pins:
 - `agp` to a value ≥ 8.2 — currently the AGP-9-compatible head per [v2.7 Phase 02 samples-audit](https://github.com/MobileByteLabs/kmp-product-flavors/pull/115)
@@ -88,7 +130,7 @@ grep -E '^(kotlin|agp)\s*=' gradle/libs.versions.toml
 # Expected: kotlin and agp present
 ```
 
-#### [§3 — Adoption pattern: convention-plugin (3b)](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#3-choose-your-adoption-pattern)
+#### [§3 — Adoption pattern: convention-plugin (3b)](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 This template uses **pattern 3b (convention plugin)**. Verify:
 
@@ -96,7 +138,7 @@ This template uses **pattern 3b (convention plugin)**. Verify:
 ls -d build-logic/convention/ && echo "✓ convention-plugin pattern (3b)"
 ```
 
-#### [§4b — Plugin applied + configured via convention plugin](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#4b-plugin-applied--configured-via-convention-plugin-recommended-3b)
+#### [§4b — Plugin applied + configured via convention plugin](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 ```bash
 # Convention plugin registration
@@ -118,7 +160,7 @@ grep -rln 'apply\("org\.convention\.kmp\.flavors"\)' \
   build-logic/convention/src/main/kotlin/ | head -5
 ```
 
-#### [§5 — Flavors + dimensions](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#5-flavors--dimensions-registered-any-v25-style)
+#### [§5 — Flavors + dimensions](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 This template uses the **flat DSL** style (v2.4+):
 
@@ -142,7 +184,7 @@ Variant matrix: **6 variants** = 2 flavors × 3 buildTypes = `demoDebug, demoSta
 # Expected: table listing 6 variants with "← ACTIVE" next to demoDebug
 ```
 
-#### [§6 — buildConfigPackage from single source of truth](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#6-buildconfigpackage--set-ideally-from-a-single-source-of-truth)
+#### [§6 — buildConfigPackage from single source of truth](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 This template stores the brand identifier ONCE in `gradle/libs.versions.toml#[versions].appId`:
 
@@ -167,7 +209,7 @@ grep -E 'libs\.findVersion\("appId"\)' \
   build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt
 ```
 
-#### [§7 — Default variant resolves](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#7-default-variant-resolves)
+#### [§7 — Default variant resolves](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 ```bash
 ./gradlew :cmp-navigation:listActiveVariant --no-daemon --no-configuration-cache 2>&1 | grep -E 'Active|All'
@@ -176,7 +218,7 @@ grep -E 'libs\.findVersion\("appId"\)' \
 #   All    : demoDebug, demoStaging, demoRelease, prodDebug, prodStaging, prodRelease
 ```
 
-#### [§8 — BuildKonfig codegen output + claim mechanism](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#8-buildkonfigkt-codegen-produces-output-at-the-expected-path)
+#### [§8 — BuildKonfig codegen output + claim mechanism](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 The codegen host in this template is **`cmp-navigation`** (deterministic winner across local + CI). Other modules log `skipping FlavorConfig codegen — already generated by :cmp-navigation`.
 
@@ -191,7 +233,7 @@ test -f cmp-navigation/build/generated/kmpFlavors/commonMain/kotlin/org/mifos/km
 
 This path is what the upstream library's [`.github/workflows/pr-check.yml`](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/.github/workflows/pr-check.yml) validates on every PR.
 
-#### [§9 — Validator codes V01-V30 pass](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#9-validator-codes-v01v30-pass)
+#### [§9 — Validator codes V01-V30 pass](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 ```bash
 ./gradlew :cmp-navigation:validateFlavors --no-daemon --no-configuration-cache 2>&1 | \
@@ -201,7 +243,7 @@ This path is what the upstream library's [`.github/workflows/pr-check.yml`](http
 
 WARNINGs are advisory and expected on this template (e.g. KMPF-V05 on Apple Silicon + iosX64).
 
-#### [§10 — AGP-only modules: configureFlavors(CommonExtension) helper](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#10-agp-only-modules-configureflavorscommonextension-helper)
+#### [§10 — AGP-only modules: configureFlavors(CommonExtension) helper](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 This template has the `cmp-android` module which applies `com.android.application` without `kotlin("multiplatform")`. The KMP plugin returns early there; the AGP-side flavor registration uses the helper at [`org/convention/AppFlavor.kt`](../build-logic/convention/src/main/kotlin/org/convention/AppFlavor.kt).
 
@@ -215,7 +257,7 @@ grep -E 'withPlugin\("com\.android\.(application|library)"\)' \
 # Expected: both greps return at least one match
 ```
 
-#### [§11 — Downstream extension hook: LocalFlavorsLoader](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#11-downstream-extension-hook-localflavorsloader-pattern-optional)
+#### [§11 — Downstream extension hook: LocalFlavorsLoader](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 This template IS the template. Downstream forks (`mifos-mobile`, `mifos-pay`, `mifos-x-field-officer-app`, …) sync `build-logic/convention/` from here via `sync-dirs.sh` and add their fork-specific flavors via `local/LocalFlavors.kt`.
 
@@ -232,7 +274,7 @@ ls -d build-logic/convention/src/main/kotlin/local/ && echo "✓ local override 
 
 For details on the fork extension pattern, see [`FLAVORS_EXTENSION.md`](FLAVORS_EXTENSION.md).
 
-#### [§12 — AGP 9.x compatibility (conditional)](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#12-agp-9x-compatibility-conditional--only-if-youre-on-agp-9)
+#### [§12 — AGP 9.x compatibility (conditional)](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 If this template is currently on AGP 9.x (check `gradle/libs.versions.toml#[versions].agp`), no consumer-side changes were needed because this template never used:
 
@@ -241,9 +283,9 @@ If this template is currently on AGP 9.x (check `gradle/libs.versions.toml#[vers
 - `com.android.library + kotlin("multiplatform")` co-application → uses `com.android.kotlin.multiplatform.library` already
 - `dependencyGuard` without `afterEvaluate` → already wrapped where applicable
 
-See the library's [`AGP_9_MIGRATION_NOTES.md`](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/AGP_9_MIGRATION_NOTES.md) for the full cookbook.
+See the library's [`AGP_9_MIGRATION_NOTES.md`](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/AGP_SUPPORT.md) for the full cookbook.
 
-#### [§13 — End-to-end smoke test](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#13-end-to-end-smoke-test)
+#### [§13 — End-to-end smoke test](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 ```bash
 ./gradlew :cmp-navigation:validateFlavors :cmp-navigation:listFlavors \
@@ -252,7 +294,7 @@ See the library's [`AGP_9_MIGRATION_NOTES.md`](https://github.com/MobileByteLabs
 # Expected: BUILD SUCCESSFUL + Validation passed + 6 variants listed + BuildKonfig.kt generated
 ```
 
-#### [§14 — Reference implementation](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/docs/adoption/v2.7/consumer.md#14-reference-implementation-sampleskmp-project-template)
+#### [§14 — Reference implementation](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
 This template IS the reference implementation that the library's consumer.md §14 cites. The library's CI workflow `pr-check.yml` validates against this template's adoption on every PR to the library.
 

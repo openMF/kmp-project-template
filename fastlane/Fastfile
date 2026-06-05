@@ -1,0 +1,22 @@
+# fastlane/Fastfile — CI-only lanes consumed by mifos-x-actionhub actions.
+#
+# The mifos-x-actionhub-build-ios-app action runs `bundle exec fastlane ios build_ios`
+# from the repo root and expects fastlane/ to exist here.
+# Deployment lanes (firebase / testflight / appstore) live in deployment/ and are
+# invoked via `bundle exec fastlane --fastlane-dir deployment <platform> <lane>`.
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build unsigned debug iOS app for PR checks (no signing, no archive)"
+  lane :build_ios do
+    build_ios_app(
+      scheme:            "iosApp",
+      workspace:         "cmp-ios/iosApp.xcworkspace",
+      output_name:       "iosApp.ipa",
+      output_directory:  "cmp-ios/build",
+      skip_codesigning:  true,
+      skip_archive:      true
+    )
+  end
+end

@@ -1,0 +1,5 @@
+# CLAUDE-PLACEHOLDER — do not commit this to secrets/
+# Replace with your Firebase Android (demo flavor) App ID.
+# Find it in: Firebase Console → Project Settings → General → Your apps
+# Format: 1:123456789012:android:def456abc123
+PLACEHOLDER_FIREBASE_ANDROID_DEMO_APP_ID

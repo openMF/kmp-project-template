@@ -8,5 +8,11 @@
 # Entry point: bundle exec fastlane --fastlane-dir deployment <platform> <lane>
 # ═════════════════════════════════════════════════════════════════════════════
 
+# ── Shared config: FastlaneConfig module + global helpers ────────────────────
+# Must be imported FIRST so FastlaneConfig constants and helper methods
+# (sanitize_options, generateReleaseNote, buildAndSignApp, …) are in scope
+# before any lane.rb is imported.
+import "_shared/config.rb"
+
 # ── Per-target lane imports ───────────────────────────────────────────────────
 Dir["./*/**/lane.rb"].each { |f| import f }

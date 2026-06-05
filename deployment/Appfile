@@ -1,29 +1,15 @@
-# ═════════════════════════════════════════════════════════════════════════════
-# deployment/Appfile — bridge to legacy fastlane-config/project_config.rb
+# deployment/Appfile
 #
-# Fastlane does not support `import_from_git` for Appfiles, so this file
-# replicates the legacy ../fastlane/AppFile contents verbatim. Once sub-plan
-# 14 removes the legacy fastlane/ tree, this becomes the canonical Appfile;
-# until then both files are kept in sync (RULE-DEPLOYMENT-MANIFEST-001 DM8
-# detects drift between them at validator-time).
+# Identity values read from FastlaneConfig, which parses gradle/libs.versions.toml.
+# config.rb is imported by Fastfile before this file is evaluated.
 #
-# Source of truth: deployment/_shared/project_config.rb (moved from
-# fastlane-config/project_config.rb in sub-plan 14).
-# ═════════════════════════════════════════════════════════════════════════════
+# Entry point: bundle exec fastlane --fastlane-dir deployment <platform> <lane>
 
-# Load project configuration using absolute path
-# require_relative doesn't work in AppFile due to eval context
-project_dir = File.expand_path('..', __dir__)
-require File.join(project_dir, 'fastlane-config', 'project_config')
-
-# Android configuration
+# Android
 json_key_file(FastlaneConfig::ProjectConfig::ANDROID[:play_store_json_key])
 package_name(FastlaneConfig::ProjectConfig.android_package_name)
 
-# iOS configuration
-# Apple ID login should come from FASTLANE_APPLE_ID env var or the match
-# keychain — not from this Appfile (using the bundle identifier as the
-# Apple ID always fails App Store Connect auth).
+# iOS
 app_identifier(FastlaneConfig::ProjectConfig::IOS[:app_identifier])
-# apple_id(ENV["FASTLANE_APPLE_ID"]) # optional — set FASTLANE_APPLE_ID to a maintainer email
 team_id(FastlaneConfig::ProjectConfig::IOS[:team_id])
+# apple_id is read from FASTLANE_APPLE_ID env var — do not hardcode here.

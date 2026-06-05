@@ -1,0 +1,15 @@
+# act default configuration — KMP project template
+# Picked up automatically when running `act` from this repo root.
+# Overrides can be passed on the command line; these are defaults only.
+
+# Apple Silicon compatibility
+--container-architecture linux/amd64
+
+# macOS jobs run natively on the host (Xcode + CocoaPods available on macOS dev machines)
+-P macos-latest=-self-hosted
+
+# Windows jobs run in ubuntu container (Gradle/KMP/WASM builds are platform-agnostic)
+-P windows-latest=catthehacker/ubuntu:act-latest
+
+# Standard ubuntu runner image
+-P ubuntu-latest=catthehacker/ubuntu:act-latest

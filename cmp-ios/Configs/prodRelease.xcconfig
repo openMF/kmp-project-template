@@ -1,0 +1,18 @@
+// kmp-product-flavors — flavor: prod  build-type: release
+
+KMPF_VARIANT = prodRelease
+KMPF_FLAVOR_NAME = prod
+KMPF_BUILD_TYPE_NAME = release
+KMPF_BASE_URL = https://api.openmf.org
+KMPF_BUNDLE_ID = cmp-shared.prod
+KMPF_DEMO_USERNAME =
+KMPF_DEMO_PASSWORD =
+KMPF_ENABLE_LOGGING = NO
+KMPF_IS_DEBUG = NO
+KMPF_IS_DEMO = NO
+KMPF_IS_DEMO_BUILD = NO
+KMPF_LOG_TAG = KMPTemplate
+KMPF_SHOW_DEBUG_OVERLAY = NO
+
+// Optional: uncomment after running `pod install`
+// #include? "../Pods/Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"

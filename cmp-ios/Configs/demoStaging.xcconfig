@@ -1,0 +1,18 @@
+// kmp-product-flavors — flavor: demo  build-type: staging
+
+KMPF_VARIANT = demoStaging
+KMPF_FLAVOR_NAME = demo
+KMPF_BUILD_TYPE_NAME = staging
+KMPF_BASE_URL = https://demo.openmf.org
+KMPF_BUNDLE_ID = cmp-shared.demo.staging
+KMPF_DEMO_USERNAME = demo
+KMPF_DEMO_PASSWORD = demo
+KMPF_ENABLE_LOGGING = YES
+KMPF_IS_DEBUG = NO
+KMPF_IS_DEMO = YES
+KMPF_IS_DEMO_BUILD = YES
+KMPF_LOG_TAG = KMPTemplate-STAGING
+KMPF_SHOW_DEBUG_OVERLAY = NO
+
+// Optional: uncomment after running `pod install`
+// #include? "../Pods/Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"

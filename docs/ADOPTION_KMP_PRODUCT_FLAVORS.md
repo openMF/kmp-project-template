@@ -19,13 +19,12 @@ The plugin is consumed via the **convention-plugin pattern** (Pattern 3b per the
 |---|---|
 | [`gradle/libs.versions.toml`](../gradle/libs.versions.toml) | Pins the plugin version + exposes the maven artifact (for compileOnly) and the Gradle plugin id (for direct-apply, unused here). Also defines the local convention plugin id `kmp-flavors-convention`. |
 | [`build-logic/convention/build.gradle.kts`](../build-logic/convention/build.gradle.kts) | Registers the `KMPFlavorsConventionPlugin` (id `org.convention.kmp.flavors`) and takes a `compileOnly` dep on the upstream maven artifact. |
-| [`build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt`](../build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt) | Applies `KmpFlavorPlugin` programmatically and configures the flavor matrix via `extensions.configure<KmpFlavorExtension>`. Wires the AGP-only-module helper (`configureFlavors(CommonExtension)`) and the downstream extension hook (`LocalFlavorsLoader.applyIfPresent`). |
+| [`build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt`](../build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt) | Applies `KmpFlavorPlugin` programmatically and configures the flavor matrix via `extensions.configure<KmpFlavorExtension>`. AGP-bridge is handled natively by the plugin's `AgpProductFlavorRegistrar` (wired via `pluginManager.withPlugin` in `KmpFlavorPlugin.apply()`). Wires the downstream extension hook (`LocalFlavorsLoader.applyIfPresent`). |
 
-Three downstream support files:
+Two downstream support files:
 
 | File | Role |
 |---|---|
-| [`build-logic/convention/src/main/kotlin/org/convention/AppFlavor.kt`](../build-logic/convention/src/main/kotlin/org/convention/AppFlavor.kt) | The `configureFlavors(CommonExtension)` helper used for pure Android modules (e.g. `cmp-android`) where the KMP plugin returns early. |
 | [`build-logic/convention/src/main/kotlin/LocalFlavorsLoader.kt`](../build-logic/convention/src/main/kotlin/LocalFlavorsLoader.kt) | Reflective hook letting downstream forks add flavors via a `build-logic/convention/src/main/kotlin/local/LocalFlavors.kt` file that `sync-dirs.sh` excludes from sync. |
 | [`build-logic/convention/src/main/kotlin/local/.gitkeep`](../build-logic/convention/src/main/kotlin/local/) | Placeholder for the local override directory — fork apps drop their `LocalFlavors.kt` here. |
 
@@ -69,9 +68,124 @@ All other §2-§14 verify gates pass byte-identically to v2.7.0 since the adopti
 
 ### Assembly evidence
 
-Verified via `./gradlew :cmp-android:assembleDemoDebug` against v2.8.1 — exits 0; generated `BuildKonfig.IS_DEMO_BUILD`, `BuildKonfig.BASE_URL`, `BuildKonfig.DEMO_USERNAME`, `BuildKonfig.DEMO_PASSWORD` consumed by `core/network/` as before.
+Verified via `./gradlew :cmp-android:assembleDemoDebug` and `:cmp-android:assembleProdRelease` against v2.8.1 — both exit 0; generated `BuildKonfig.IS_DEMO_BUILD`, `BuildKonfig.BASE_URL`, `BuildKonfig.DEMO_USERNAME`, `BuildKonfig.DEMO_PASSWORD` consumed by `core/network/` as before.
 
 > **Note on local resolution**: v2.8.1 requires `mavenLocal()` first in `pluginManagement.repositories` until the release propagates to Maven Central (already pre-wired in this template's `settings.gradle.kts`). No changes needed to `settings.gradle.kts`.
+
+### Template cleanup — 2026-06-05 (no plugin version bump)
+
+Source analysis of `KmpFlavorPlugin.kt` (lines 237-268) confirmed that `AgpProductFlavorRegistrar.apply()` is already called for pure-AGP modules via `pluginManager.withPlugin("com.android.application/library")` hooks — independent of the `configurePlugin()` KMP-absent early return. The convention plugin's `configureFlavors(CommonExtension)` workaround and `AppFlavor.kt` helper were therefore **redundant** and have been removed:
+
+- `build-logic/convention/src/main/kotlin/org/convention/AppFlavor.kt` — **deleted**
+- `build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt` — removed the 19-line `listOf("com.android.application", "com.android.library").forEach { configureFlavors(it) }` block and the `import com.android.build.api.dsl.CommonExtension` / `import org.convention.configureFlavors` imports
+
+The plugin version stays at `2.8.1` — this is a template-level cleanup, not a plugin change.
+
+### Pure single API: AGP manual bridge removal — 2026-06-05
+
+With `AgpProductFlavorRegistrar` confirmed as the authoritative bridge, the remaining manual AGP
+overrides in `cmp-android/build.gradle.kts` were also redundant:
+
+**Removed from `cmp-android/build.gradle.kts`:**
+
+| Removed setting | Why |
+|---|---|
+| `import org.convention.AppBuildType` | No longer referenced |
+| `debug { applicationIdSuffix = AppBuildType.DEBUG.applicationIdSuffix }` | Plugin sets `.debug` via `AgpProductFlavorRegistrar` |
+| `release { isMinifyEnabled = true }` | Plugin's `release { isMinifyEnabled.set(true) }` handles it |
+| `release { isDebuggable = false }` | Plugin's `release { isDebuggable.set(false) }` handles it |
+| `release { applicationIdSuffix = AppBuildType.RELEASE.applicationIdSuffix }` | Was `null` (no-op) |
+
+**Deleted:**
+- `build-logic/convention/src/main/kotlin/org/convention/AppBuildType.kt` — enum only used by the removed lines above
+
+**What stays (Android-app-specific, the plugin does not own these):**
+- `signingConfigs { create("release") { ... } }` — signing is an app-level concern
+- `buildTypes { staging { signingConfig, proguardFiles } }` — release-signed staging builds for distribution
+- `buildTypes { release { isShrinkResources, isJniDebuggable, signingConfig, proguardFiles } }`
+
+`kmp-product-flavors` is now the **single API** for all flavor/build-type lifecycle settings.
+Verify:
+
+```bash
+# AppBuildType.kt is gone
+test ! -f build-logic/convention/src/main/kotlin/org/convention/AppBuildType.kt && echo "✓ deleted"
+
+# No AppBuildType references remain
+grep -r "AppBuildType" . --include="*.kt" --include="*.kts" | grep -v ".gradle/caches" && echo "FAIL" || echo "✓ no refs"
+
+# buildTypes block only has Android-specific settings
+grep -A 20 "buildTypes {" cmp-android/build.gradle.kts
+```
+
+Both `:cmp-android:assembleDemoDebug` and `:cmp-android:assembleProdRelease` pass after this cleanup.
+
+### iOS Xcode wiring — 2026-06-05
+
+Wired the Xcode project for per-flavor builds so the KMP shared framework is resolved from the
+correct variant output directory (`cmp-shared/build/xcode-frameworks/<variant>/`).
+
+**Files created:**
+
+```
+cmp-ios/Configs/
+├── iOSApp.xcconfig          ← umbrella: #include "$(CONFIGURATION).xcconfig"
+├── demoDebug.xcconfig       ← KMPF_VARIANT=demoDebug + all KMPF_* vars
+├── demoStaging.xcconfig
+├── demoRelease.xcconfig
+├── prodDebug.xcconfig
+├── prodRelease.xcconfig
+└── prodStaging.xcconfig
+
+cmp-ios/iosApp.xcodeproj/xcshareddata/xcschemes/
+├── demoDebug.xcscheme
+├── demoRelease.xcscheme
+├── prodDebug.xcscheme
+└── prodRelease.xcscheme
+```
+
+**`project.pbxproj` changes:**
+
+- Added `PBXFileReference` for `iOSApp.xcconfig` (ID `CAFE001F00000000000000A1`)
+- Added `Configs` PBXGroup (ID `CAFE001F00000000000000A2`) in the root group
+- Fixed legacy `FRAMEWORK_SEARCH_PATHS` in Debug/Release target configs (was `../shared/` and
+  `../composeApp/` — corrected to `../cmp-shared/`)
+- Added 6 project-level `XCBuildConfiguration` entries (B1–B6: demoDebug … prodRelease),
+  base config → `Config.xcconfig`
+- Added 6 target-level `XCBuildConfiguration` entries (C1–C6: demoDebug … prodRelease),
+  base config → `iOSApp.xcconfig`, with:
+  `FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../cmp-shared/build/xcode-frameworks/$(KMPF_VARIANT)/$(SDK_NAME)"`
+- Both `XCConfigurationList` entries updated to include all 6 new configurations
+
+**How the xcconfig chain works:**
+
+1. Each flavor Xcode scheme selects build configuration e.g. `demoDebug`
+2. Target's `baseConfigurationReference` → `Configs/iOSApp.xcconfig`
+3. `iOSApp.xcconfig` executes `#include "$(CONFIGURATION).xcconfig"` → `Configs/demoDebug.xcconfig`
+4. `demoDebug.xcconfig` defines `KMPF_VARIANT = demoDebug` (plus all other `KMPF_*` vars)
+5. `FRAMEWORK_SEARCH_PATHS` resolves to `…/cmp-shared/build/xcode-frameworks/demoDebug/iphoneos`
+6. Xcode picks up the KMP framework built for that exact flavor variant
+
+**Verify gates:**
+
+```bash
+PBXPROJ=cmp-ios/iosApp.xcodeproj/project.pbxproj
+
+# AC-5: iOSApp.xcconfig registered in pbxproj
+grep -c "iOSApp.xcconfig" "$PBXPROJ"               # expect ≥1
+
+# AC-6: demoDebug and prodDebug configs present
+grep -cE "demoDebug|prodDebug" "$PBXPROJ"           # expect ≥2
+
+# AC-7: FRAMEWORK_SEARCH_PATHS uses multi-line format (no $(CONFIGURATION) on same grep line)
+grep -c "FRAMEWORK_SEARCH_PATHS.*\$(CONFIGURATION)" "$PBXPROJ"   # expect 0
+
+# AC-8: ≥4 shared xcschemes
+ls cmp-ios/iosApp.xcodeproj/xcshareddata/xcschemes/*.xcscheme | wc -l   # expect ≥4
+
+# KMPF_VARIANT wired in 6 target configs
+grep -c "KMPF_VARIANT" "$PBXPROJ"                  # expect 6
+```
 
 ---
 
@@ -243,18 +357,25 @@ This path is what the upstream library's [`.github/workflows/pr-check.yml`](http
 
 WARNINGs are advisory and expected on this template (e.g. KMPF-V05 on Apple Silicon + iosX64).
 
-#### [§10 — AGP-only modules: configureFlavors(CommonExtension) helper](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
+#### [§10 — AGP-only modules: native plugin bridge via AgpProductFlavorRegistrar](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
-This template has the `cmp-android` module which applies `com.android.application` without `kotlin("multiplatform")`. The KMP plugin returns early there; the AGP-side flavor registration uses the helper at [`org/convention/AppFlavor.kt`](../build-logic/convention/src/main/kotlin/org/convention/AppFlavor.kt).
+This template has the `cmp-android` module which applies `com.android.application` without `kotlin("multiplatform")`. `KmpFlavorPlugin.apply()` registers `AgpProductFlavorRegistrar` via `pluginManager.withPlugin("com.android.application/library")` hooks — these fire synchronously for modules with AGP applied, BEFORE `configurePlugin()`'s KMP-absent early return. `AgpProductFlavorRegistrar` propagates flavor dimensions + product flavors + build types to AGP via `whenObjectAdded` callbacks on the `kmpFlavors {}` extension.
+
+No manual `configureFlavors(CommonExtension)` helper or `AppFlavor.kt` is needed. Both were removed in the 2026-06-05 template cleanup (see v2.8.1 section below).
 
 ```bash
-test -f build-logic/convention/src/main/kotlin/org/convention/AppFlavor.kt
-grep -E 'fun configureFlavors\(' \
-  build-logic/convention/src/main/kotlin/org/convention/AppFlavor.kt
+# Plugin handles pure-AGP modules natively — no AppFlavor.kt needed
+test ! -f build-logic/convention/src/main/kotlin/org/convention/AppFlavor.kt
+# Expected: exit 0
 
-grep -E 'withPlugin\("com\.android\.(application|library)"\)' \
+grep -c "configureFlavors" \
   build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt
-# Expected: both greps return at least one match
+# Expected: 0
+
+# Assembly confirms AGP flavors are registered for pure com.android.application module
+./gradlew :cmp-android:assembleDemoDebug -x :cmp-android:installGitHooks \
+  --no-configuration-cache 2>&1 | tail -3
+# Expected: BUILD SUCCESSFUL
 ```
 
 #### [§11 — Downstream extension hook: LocalFlavorsLoader](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
@@ -389,7 +510,7 @@ This is why the three-tier model is asymmetric:
 | Tier | Owns | Pull rate |
 |---|---|---|
 | Library | abstract spec + migration recipes | publishes per minor release |
-| Template (this repo) | concrete record + convention plugin + AppFlavor + LocalFlavorsLoader | bumped per library release via `/lib-sync` |
+| Template (this repo) | concrete record + convention plugin + LocalFlavorsLoader | bumped per library release via `/lib-sync` |
 | Fork (mifos-mobile etc.) | `LocalFlavors.kt` only | inherits via `sync-dirs.sh` |
 
 Forks DON'T maintain an adoption doc. The template's doc IS their adoption doc — they inherit it.

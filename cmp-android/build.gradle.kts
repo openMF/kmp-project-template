@@ -8,7 +8,6 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 import com.android.build.api.instrumentation.InstrumentationScope
-import org.convention.AppBuildType
 import org.convention.dynamicVersion
 
 plugins {
@@ -48,15 +47,16 @@ android {
     }
 
     buildTypes {
-        debug {
-            applicationIdSuffix = AppBuildType.DEBUG.applicationIdSuffix
+        // debug/staging/release are registered by org.convention.kmp.flavors via
+        // KMPFlavorsConventionPlugin (isDebuggable, applicationIdSuffix, isMinifyEnabled).
+        // Only Android-app-specific settings that the plugin doesn't own live here.
+        getByName("staging") {
+            isJniDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-
         release {
-            isMinifyEnabled = true
-            applicationIdSuffix = AppBuildType.RELEASE.applicationIdSuffix
             isShrinkResources = true
-            isDebuggable = false
             isJniDebuggable = false
             signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

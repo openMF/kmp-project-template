@@ -20,10 +20,8 @@
  *  See docs/FLAVORS_EXTENSION.md.
  * ================================================================================= */
 
-import com.android.build.api.dsl.CommonExtension
 import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import com.mobilebytelabs.kmpflavors.KmpFlavorPlugin
-import org.convention.configureFlavors
 import org.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -40,9 +38,10 @@ import org.gradle.kotlin.dsl.configure
  * ## AGP bridge
  *
  * `bridgeAgpProductFlavors` and `bridgeAgpBuildTypes` default to `true` in the plugin
- * and use `androidComponents.finalizeDsl` — the correct AGP lifecycle hook (runs after
- * `kmpFlavors {}` DSL evaluation, before AGP variant resolution). No manual
- * `android { productFlavors {} }` block is needed in build-logic.
+ * and use `AgpProductFlavorRegistrar` (hooked via `pluginManager.withPlugin`) — the
+ * correct AGP lifecycle hook (fires synchronously before AGP's afterEvaluate). No manual
+ * `android { productFlavors {} }` block is needed in build-logic, including for pure
+ * `com.android.application` modules that do not apply `kotlin("multiplatform")`.
  *
  * Consumer apps extend this contract by creating
  * `build-logic/convention/src/main/kotlin/local/LocalFlavors.kt` — see
@@ -52,7 +51,7 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             // 1. Apply the upstream plugin (provides KmpFlavorExtension + codegen + source-set wiring
-            //    + AGP bridge via androidComponents.finalizeDsl).
+            //    + AGP bridge via AgpProductFlavorRegistrar.whenObjectAdded).
             pluginManager.apply(KmpFlavorPlugin::class.java)
 
             // 2. Configure the KMP-side flavor contract.
@@ -114,26 +113,6 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                 // Consumer extension hook — must be the LAST statement so the
                 // local file sees the fully-populated extension.
                 LocalFlavorsLoader.applyIfPresent(this, target)
-            }
-
-            // AGP-side registration for pure Android modules (e.g. cmp-android).
-            //
-            // KmpFlavorPlugin requires KotlinMultiplatformExtension. When that is not
-            // present (com.android.application modules without kotlin("multiplatform")),
-            // the plugin returns early and its built-in bridgeAgpProductFlavors never
-            // fires. We register the same demo/prod dimensions + flavors synchronously
-            // here via pluginManager.withPlugin so AGP receives them before variant
-            // resolution.
-            //
-            // For KMP library modules the plugin's own androidComponents.finalizeDsl
-            // bridge handles registration — configureFlavors() is idempotent and skips
-            // any flavor already present, so calling it here is safe for those modules
-            // too.
-            listOf("com.android.application", "com.android.library").forEach { agpId ->
-                pluginManager.withPlugin(agpId) {
-                    extensions.findByType(CommonExtension::class.java)
-                        ?.let { configureFlavors(it) }
-                }
             }
         }
     }

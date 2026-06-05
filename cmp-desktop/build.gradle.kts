@@ -7,8 +7,9 @@
  *
  * See https://github.com/openMF/mobile-wallet/blob/master/LICENSE.md
  */
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -19,6 +20,7 @@ plugins {
     // that would chain it — unlike feature/*, core/*, cmp-shared, cmp-navigation,
     // cmp-android which get kover via Android/KMP/CMP convention plugins).
     alias(libs.plugins.kover.convention)
+    alias(libs.plugins.kmp.flavors.convention)
 }
 
 kotlin {
@@ -44,6 +46,16 @@ val appName: String = libs.versions.desktopAppName.get()
 val packageNameSpace: String = libs.versions.appId.get()
 val appVersion: String = libs.versions.desktopPackageVersion.get()
 
+// Resolve the active flavor (Gradle property -PkmpFlavor=demo|prod; falls back to DSL default).
+val kmpFlavorExt = extensions.getByType<KmpFlavorExtension>()
+val activeFlavor: String = (findProperty("kmpFlavor") as? String)
+    ?: kmpFlavorExt.flavors.find { it.isDefault.getOrElse(false) }?.name
+    ?: "prod"
+val activeFlavorConfig = kmpFlavorExt.flavors.findByName(activeFlavor)
+
+val windowTitle = appName + (activeFlavorConfig?.desktopWindowTitleSuffix?.orNull ?: "")
+val macBundleId = packageNameSpace + (activeFlavorConfig?.applicationIdSuffix?.orNull ?: "")
+
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -53,10 +65,10 @@ compose.desktop {
         javaHome = javaToolchains.launcherFor {
             languageVersion.set(JavaLanguageVersion.of(libs.versions.jvmToolchain.get().toInt()))
         }.get().metadata.installationPath.asFile.absolutePath
-        jvmArgs("-Dapp.name=$appName")
+        jvmArgs("-Dapp.name=$windowTitle")
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
-            packageName = appName
+            packageName = windowTitle
             packageVersion = appVersion
             description = "Desktop Application"
             copyright = "© 2024 Mifos Initiative. All rights reserved."
@@ -65,8 +77,8 @@ compose.desktop {
             includeAllModules = true
 
             macOS {
-                bundleID = packageNameSpace
-                dockName = appName
+                bundleID = macBundleId
+                dockName = windowTitle
                 iconFile.set(project.file("icons/ic_launcher.icns"))
                 notarization {
                     val providers = project.providers
@@ -77,7 +89,7 @@ compose.desktop {
             }
 
             windows {
-                menuGroup = appName
+                menuGroup = windowTitle
                 shortcut = true
                 dirChooser = true
                 perUserInstall = true

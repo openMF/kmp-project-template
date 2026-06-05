@@ -26,6 +26,8 @@ import org.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 
 /**
  * Convention plugin that wires `kmp-product-flavors` with the BASE flavor contract
@@ -71,6 +73,8 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                         isDefault.set(true)
                         applicationIdSuffix.set(".demo")
                         bundleIdSuffix.set(".demo")
+                        desktopWindowTitleSuffix.set(" (Demo)")
+                        webTitleSuffix.set(" (Demo)")
                         buildConfigField("Boolean", "IS_DEMO_BUILD", "true")
                         buildConfigField("String", "BASE_URL", "\"https://demo.openmf.org\"")
                         buildConfigField("String", "DEMO_USERNAME", "\"demo\"")
@@ -113,6 +117,40 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                 // Consumer extension hook — must be the LAST statement so the
                 // local file sees the fully-populated extension.
                 LocalFlavorsLoader.applyIfPresent(this, target)
+            }
+
+            // 3. Register xcconfig generator. Reads the live DSL at execution time so
+            //    adding / renaming / removing a flavor automatically updates xcconfigs
+            //    on the next iOS build — no manual sync step required.
+            registerIosFlavorXcconfigsTask()
+        }
+    }
+
+    private fun Project.registerIosFlavorXcconfigsTask() {
+        val ext = extensions.getByType<KmpFlavorExtension>()
+
+        val generateTask = tasks.register<GenerateIosFlavorXcconfigsTask>("generateIosFlavorXcconfigs") {
+            group       = "kmp-flavors"
+            description = "Auto-generate cmp-ios/Configs/{variant}.xcconfig from kmpFlavors DSL."
+
+            // Lazy providers — Gradle reads these at execution time after DSL is fully
+            // configured (including LocalFlavors.kt additions).
+            flavorBundleSuffixes.set(provider {
+                ext.flavors.associate { f -> f.name to (f.bundleIdSuffix.orNull ?: "") }
+            })
+            buildTypeBundleSuffixes.set(provider {
+                ext.buildTypes.associate { bt -> bt.name to (bt.bundleIdSuffix.orNull ?: "") }
+            })
+            // Relative to :cmp-shared — cmp-ios is a sibling module.
+            outputDir.set(layout.projectDirectory.dir("../cmp-ios/Configs"))
+        }
+
+        // Wire to iOS framework compilation so xcconfigs are always fresh before
+        // Xcode links the KMP framework (covers both Xcode-triggered and CLI builds).
+        tasks.configureEach {
+            if (name == "embedAndSignAppleFrameworkForXcode" ||
+                (name.startsWith("link") && name.contains("Framework") && name.contains("Ios"))) {
+                dependsOn(generateTask)
             }
         }
     }

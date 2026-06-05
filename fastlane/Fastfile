@@ -10,6 +10,11 @@ default_platform(:ios)
 platform :ios do
   desc "Build unsigned debug iOS app for PR checks (no signing, no archive)"
   lane :build_ios do
+    cocoapods(
+      podfile:                  "cmp-ios/Podfile",
+      try_repo_update_on_error: true
+    )
+
     build_ios_app(
       scheme:            "iosApp",
       workspace:         "cmp-ios/iosApp.xcworkspace",

@@ -1,3 +1,4 @@
+# CLAUDE-PLACEHOLDER — do not commit this to secrets/
 ssh-ed25519 REPLACE_THIS_WITH_YOUR_ACTUAL_SSH_PUBLIC_KEY fastlane-match
 
 # This is the public key corresponding to match_ci_key

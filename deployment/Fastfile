@@ -1,0 +1,12 @@
+# ═════════════════════════════════════════════════════════════════════════════
+# deployment/Fastfile — CANONICAL IMPORT DELEGATOR
+#
+# Contract (RULE-DEPLOYMENT-MANIFEST-001): this file contains ONLY Fastlane
+# `import` directives. NO lane definitions, NO helpers, NO platform blocks.
+# Per-target lane bodies live at deployment/<platform>/<target>/lane.rb.
+#
+# Entry point: bundle exec fastlane --fastlane-dir deployment <platform> <lane>
+# ═════════════════════════════════════════════════════════════════════════════
+
+# ── Per-target lane imports ───────────────────────────────────────────────────
+Dir["./*/**/lane.rb"].each { |f| import f }

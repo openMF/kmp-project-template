@@ -1,0 +1,17 @@
+# deployment/desktop/macos-dmg-unsigned/config.yaml
+target: desktop-macos-dmg-unsigned
+platform: desktop
+os: macos
+tier: 1
+owning_capability: github-releases-publish
+output_format: dmg
+output_path: "cmp-desktop/build/compose/binaries/main-release/dmg/"
+version_format: "git"
+signing: none
+distribution_groups: ["public"]
+retention: "indefinite"
+runners:
+  local: { command: "bash deployment/desktop/macos-dmg-unsigned/script.sh" }
+  ci:    { workflow_snippet: workflow-snippet.yml }
+requires_confirm: false
+enabled_by_default: true

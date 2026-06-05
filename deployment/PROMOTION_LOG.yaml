@@ -1,0 +1,36 @@
+# ═════════════════════════════════════════════════════════════════════════════
+# PROMOTION_LOG.yaml — append-only deploy audit log (kmp-project-template)
+#
+# Authority: schema lifted from `/server promote` v1.1.
+# Schema:    core/schemas/promotion-log.schema.json (v1.1)
+# Rule:      RULE-DEPLOYMENT-MANIFEST-001 (DM6)
+#
+# CONTRACT — NEVER MUTATE existing entries. Every deploy invocation APPENDS one
+# row to `events[]`; rollbacks ALSO append a new row (no delete, no edit).
+# Validator: `core/scripts/deployment-manifest-validate.sh` Phase-3 walks the
+# log to detect retroactive edits via `event.commit_sha` ↔ git history reconcile.
+#
+# Per-entry 12-field schema (validated by promotion-log.schema.json v1.1):
+#   1.  timestamp        ISO-8601 (RFC 3339)   - exact instant of deploy
+#   2.  actor            string                - operator email | "ci-system"
+#   3.  target           kebab-case-name       - matches DEPLOYMENT_MANIFEST canonical_name
+#   4.  tier              1 | 2                - tier of the target (mirrors manifest)
+#   5.  version_from     SemVer | "none"       - prior shipped version on this target
+#   6.  version_to       SemVer                - new version after this deploy
+#   7.  commit_sha       40-hex                - HEAD commit at deploy time
+#   8.  ci_run_url       URI | "local"         - GHA run permalink, or "local"
+#   9.  manifest_sha     40-hex                - SHA of DEPLOYMENT_MANIFEST.yaml at deploy
+#  10.  secrets_sha      40-hex                - SHA of the resolved secrets-needs.yaml
+#  11.  mode             dry-run|confirm|force - deploy mode used
+#  12.  secrets_mode     vault|manual          - which provider materialized the secrets
+#  Optional:
+#       outcome          success|failure|aborted|blocked
+#       duration_ms      integer ≥ 0
+#       deploy_url       URI                   - store listing / install URL
+#       notes            string                - free-form operator note
+# ═════════════════════════════════════════════════════════════════════════════
+
+schema_version: "1.0"
+
+# Append rows to `events[]` ONLY. See contract above.
+events: []

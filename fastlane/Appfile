@@ -1,0 +1,3 @@
+# fastlane/Appfile — minimal for CI-only (PR check) lanes.
+# Deployment lanes use deployment/Appfile via --fastlane-dir deployment.
+app_identifier("org.mifos.kmp.template")

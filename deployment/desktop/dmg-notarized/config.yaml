@@ -1,0 +1,20 @@
+# deployment/desktop/dmg-notarized/config.yaml
+target: desktop-dmg-notarized
+platform: desktop
+os: macos
+tier: 2
+owning_capability: macos-signing
+output_format: dmg
+output_path: "cmp-desktop/build/compose/binaries/main-release/dmg/"
+version_format: "git"
+signing: developer-id-application
+distribution_groups: ["public"]
+retention: "indefinite"
+runners:
+  local: { command: "bash deployment/desktop/dmg-notarized/script.sh" }
+  ci:    { workflow_snippet: workflow-snippet.yml }
+requires_confirm: true
+enabled_by_default: false
+dev_fallback:
+  signing_mode: "ad-hoc"
+  rationale: "Local dev builds skip notarytool (5-15min wait) — use ad-hoc codesign for trusted-device runs."

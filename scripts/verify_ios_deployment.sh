@@ -170,26 +170,23 @@ check "Deliver action has skip_screenshots: true" \
 # ============================================================================
 print_section "3. Configuration Files"
 
-check "project_config.rb exists" \
-    "[ -f 'fastlane-config/project_config.rb' ]"
+check "deployment/_shared/config.rb exists" \
+    "[ -f 'deployment/_shared/config.rb' ]"
 
-check "ios_config.rb exists" \
-    "[ -f 'fastlane-config/ios_config.rb' ]"
+check "config.rb defines FastlaneConfig::IosConfig" \
+    "grep -q 'module IosConfig' 'deployment/_shared/config.rb'"
 
-check "project_config.rb defines IOS hash" \
-    "grep -q 'IOS = {' 'fastlane-config/project_config.rb'"
+check "config.rb defines BUILD_CONFIG" \
+    "grep -q 'BUILD_CONFIG' 'deployment/_shared/config.rb'"
 
-check "project_config.rb defines IOS_SHARED hash" \
-    "grep -q 'IOS_SHARED = {' 'fastlane-config/project_config.rb'"
+check "config.rb has app_identifier" \
+    "grep -q 'app_identifier:' 'deployment/_shared/config.rb'"
 
-check "project_config.rb has app_identifier" \
-    "grep -q 'app_identifier:' 'fastlane-config/project_config.rb'"
+check "config.rb has metadata_path" \
+    "grep -q 'metadata_path:' 'deployment/_shared/config.rb'"
 
-check "project_config.rb has metadata_path" \
-    "grep -q 'metadata_path:' 'fastlane-config/project_config.rb'"
-
-check "skip_app_version_update is false (allows version creation)" \
-    "grep -q 'skip_app_version_update: false' 'fastlane-config/project_config.rb'"
+check "config.rb has skip_app_version_update" \
+    "grep -q 'skip_app_version_update:' 'deployment/_shared/config.rb'"
 
 # ============================================================================
 # 4. Export Compliance

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Money Toolkit – Loans</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1080px; height:1920px; overflow:hidden; font-family:-apple-system,'SF Pro Display','Google Sans',Roboto,sans-serif; background:#F0F2F8; color:#0F172A; }
+  .status-bar { height:64px; background:#3730A3; display:flex; align-items:center; justify-content:space-between; padding:0 40px; color:#fff; font-size:26px; font-weight:700; }
+  .status-icons { display:flex; align-items:center; gap:14px; font-size:24px; }
+  .top-bar { background:linear-gradient(160deg,#4338CA 0%,#3730A3 100%); padding:36px 40px 44px; }
+  .top-row { display:flex; align-items:center; justify-content:space-between; }
+  .page-title { font-size:56px; font-weight:900; color:#fff; letter-spacing:-1.5px; }
+  .page-sub { font-size:28px; color:rgba(255,255,255,0.7); margin-top:6px; }
+  /* Summary strip */
+  .summary-strip { display:flex; gap:20px; margin-top:32px; }
+  .sum-chip {
+    flex:1; background:rgba(255,255,255,0.15); border-radius:24px; padding:22px 20px;
+    border:1.5px solid rgba(255,255,255,0.2); text-align:center;
+  }
+  .sum-val { font-size:48px; font-weight:900; color:#fff; letter-spacing:-1px; }
+  .sum-lbl { font-size:22px; color:rgba(255,255,255,0.65); font-weight:600; margin-top:4px; text-transform:uppercase; letter-spacing:0.5px; }
+  /* Content */
+  .content { padding:0 40px; }
+  .section-header { display:flex; align-items:center; justify-content:space-between; margin:44px 0 24px; }
+  .section-title { font-size:34px; font-weight:800; }
+  .section-link { font-size:26px; font-weight:700; color:#4338CA; }
+  /* Loan card */
+  .loan-card {
+    background:#fff; border-radius:36px; padding:40px;
+    margin-bottom:24px;
+    box-shadow:0 4px 24px rgba(67,56,202,0.08), 0 1px 4px rgba(15,23,42,0.05);
+  }
+  .loan-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px; }
+  .loan-icon-name { display:flex; align-items:center; gap:20px; }
+  .loan-icon-bg { width:80px; height:80px; border-radius:24px; background:#EEF2FF; display:flex; align-items:center; justify-content:center; font-size:38px; }
+  .loan-name { font-size:36px; font-weight:800; color:#0F172A; }
+  .loan-type { font-size:24px; color:#64748B; margin-top:4px; }
+  .loan-badge { border-radius:16px; padding:10px 20px; font-size:24px; font-weight:800; }
+  .badge-amber { background:#FEF3C7; color:#D97706; }
+  .badge-green { background:#D1FAE5; color:#059669; }
+  /* Loan stats grid */
+  .loan-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px; margin-bottom:28px; }
+  .stat { }
+  .stat-lbl { font-size:22px; color:#64748B; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+  .stat-val { font-size:38px; font-weight:900; color:#0F172A; margin-top:6px; }
+  .stat-val.primary { color:#4338CA; }
+  /* Progress */
+  .progress-track { background:#E2E8F0; border-radius:8px; height:14px; }
+  .progress-fill { border-radius:8px; height:14px; background:linear-gradient(90deg,#4338CA,#6366F1); }
+  .progress-fill.green { background:linear-gradient(90deg,#059669,#10B981); }
+  .progress-row { display:flex; justify-content:space-between; font-size:24px; color:#64748B; font-weight:600; margin-top:12px; }
+  /* FAB */
+  .fab {
+    position:absolute; bottom:180px; right:40px;
+    width:120px; height:120px; border-radius:36px;
+    background:linear-gradient(135deg,#4338CA,#6366F1);
+    display:flex; align-items:center; justify-content:center;
+    font-size:56px; color:#fff; font-weight:300;
+    box-shadow:0 8px 32px rgba(67,56,202,0.4);
+  }
+  /* Nav */
+  .nav-bar { position:absolute; bottom:0; left:0; right:0; height:156px; background:#fff; border-top:2px solid #E2E8F0; display:flex; align-items:flex-start; justify-content:space-around; padding-top:20px; }
+  .nav-item { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .nav-icon-wrap { width:100px; height:64px; border-radius:32px; display:flex; align-items:center; justify-content:center; font-size:36px; }
+  .nav-icon-wrap.active { background:#E0E7FF; }
+  .nav-label { font-size:22px; font-weight:700; color:#94A3B8; }
+  .nav-label.active { color:#4338CA; }
+</style>
+</head>
+<body>
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons"><span>▲▲▲</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+
+  <div class="top-bar">
+    <div class="top-row">
+      <div>
+        <div class="page-title">My Loans</div>
+        <div class="page-sub">Track and manage all repayments</div>
+      </div>
+      <span style="font-size:44px">⚙️</span>
+    </div>
+    <div class="summary-strip">
+      <div class="sum-chip">
+        <div class="sum-val">$12,450</div>
+        <div class="sum-lbl">Total Owed</div>
+      </div>
+      <div class="sum-chip">
+        <div class="sum-val">$656</div>
+        <div class="sum-lbl">Monthly</div>
+      </div>
+      <div class="sum-chip">
+        <div class="sum-val">3</div>
+        <div class="sum-lbl">Active</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="section-header">
+      <div class="section-title">Active Loans</div>
+      <div class="section-link">Filter ▾</div>
+    </div>
+
+    <div class="loan-card">
+      <div class="loan-header">
+        <div class="loan-icon-name">
+          <div class="loan-icon-bg">🏠</div>
+          <div>
+            <div class="loan-name">Home Renovation</div>
+            <div class="loan-type">Personal · HDFC Bank</div>
+          </div>
+        </div>
+        <div class="loan-badge badge-amber">24 mo left</div>
+      </div>
+      <div class="loan-stats">
+        <div class="stat">
+          <div class="stat-lbl">Balance</div>
+          <div class="stat-val">$8,500</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">EMI / Month</div>
+          <div class="stat-val primary">$342</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Rate</div>
+          <div class="stat-val">8.5%</div>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:40%"></div></div>
+      <div class="progress-row"><span>40% repaid</span><span>$5,100 remaining</span></div>
+    </div>
+
+    <div class="loan-card">
+      <div class="loan-header">
+        <div class="loan-icon-name">
+          <div class="loan-icon-bg">🚗</div>
+          <div>
+            <div class="loan-name">Car Loan</div>
+            <div class="loan-type">Vehicle · SBI</div>
+          </div>
+        </div>
+        <div class="loan-badge badge-amber">18 mo left</div>
+      </div>
+      <div class="loan-stats">
+        <div class="stat">
+          <div class="stat-lbl">Balance</div>
+          <div class="stat-val">$3,200</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">EMI / Month</div>
+          <div class="stat-val primary">$189</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Rate</div>
+          <div class="stat-val">7.2%</div>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:60%"></div></div>
+      <div class="progress-row"><span>60% repaid</span><span>$1,280 remaining</span></div>
+    </div>
+
+    <div class="loan-card">
+      <div class="loan-header">
+        <div class="loan-icon-name">
+          <div class="loan-icon-bg">💳</div>
+          <div>
+            <div class="loan-name">Personal Loan</div>
+            <div class="loan-type">Consumer · Kotak</div>
+          </div>
+        </div>
+        <div class="loan-badge badge-green">6 mo left</div>
+      </div>
+      <div class="loan-stats">
+        <div class="stat">
+          <div class="stat-lbl">Balance</div>
+          <div class="stat-val">$750</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">EMI / Month</div>
+          <div class="stat-val primary">$125</div>
+        </div>
+        <div class="stat">
+          <div class="stat-lbl">Rate</div>
+          <div class="stat-val">9.0%</div>
+        </div>
+      </div>
+      <div class="progress-track"><div class="progress-fill green" style="width:80%"></div></div>
+      <div class="progress-row"><span>80% repaid</span><span>$150 remaining</span></div>
+    </div>
+  </div>
+
+  <div class="fab">＋</div>
+
+  <div class="nav-bar">
+    <div class="nav-item"><div class="nav-icon-wrap"><span>🏠</span></div><div class="nav-label">Home</div></div>
+    <div class="nav-item"><div class="nav-icon-wrap active"><span>🏦</span></div><div class="nav-label active">Loans</div></div>
+    <div class="nav-item"><div class="nav-icon-wrap"><span>📋</span></div><div class="nav-label">Bills</div></div>
+    <div class="nav-item"><div class="nav-icon-wrap"><span>📈</span></div><div class="nav-label">Rates</div></div>
+    <div class="nav-item"><div class="nav-icon-wrap"><span>🔢</span></div><div class="nav-label">Tools</div></div>
+  </div>
+</body>
+</html>

@@ -42,20 +42,54 @@ def _secret(env_var, file_path = nil)
 end
 
 # ── Fork identity (single read at load time) ──────────────────────────────────
+# Uses module_function so _toml_value is callable with self=ForkIdentity
+# (plain `def` at eval-binding scope is not accessible inside module bodies).
 
 module ForkIdentity
-  APP_ID           = _toml_value("appId")          || "org.example.app"
-  APP_DISPLAY_NAME = _toml_value("appDisplayName") || "My App"
-  BASE_NAMESPACE   = _toml_value("baseNamespace")  || "app"
-  DESKTOP_APP_NAME = _toml_value("desktopAppName") || "My App"
-  PROJECT_NAME     = _toml_value("projectName")    || "kmp-project-template"
-  IOS_TEAM_ID      = _toml_value("iosTeamId")      || ""
+  module_function
+
+  def _read_toml(key)
+    toml = File.join(DEPLOYMENT_REPO_ROOT, "gradle", "libs.versions.toml")
+    File.readlines(toml).each do |line|
+      m = line.match(/^\s*#{Regexp.escape(key)}\s*=\s*"([^"]+)"/)
+      return m[1] if m
+    end
+    nil
+  rescue Errno::ENOENT
+    nil
+  end
+
+  public
+
+  APP_ID           = _read_toml("appId")          || "org.example.app"
+  APP_DISPLAY_NAME = _read_toml("appDisplayName") || "My App"
+  BASE_NAMESPACE   = _read_toml("baseNamespace")  || "app"
+  DESKTOP_APP_NAME = _read_toml("desktopAppName") || "My App"
+  PROJECT_NAME     = _read_toml("projectName")    || "kmp-project-template"
+  IOS_TEAM_ID      = _read_toml("iosTeamId")      || ""
 end
 
 # ── FastlaneConfig module ─────────────────────────────────────────────────────
 
 module FastlaneConfig
   SECRETS_DIR = "secrets".freeze
+
+  # ── Module-level helpers (module_function so callable from nested modules) ──
+  # Top-level `def _secret/_secret_file` is accessible only in FastFile's eval
+  # binding scope (i.e. inside lane bodies), NOT from nested module bodies at
+  # parse time. These module_function copies fix that gap.
+  module_function
+
+  def _secret(env_var, file_path = nil)
+    ENV[env_var] || (file_path ? _secret_file(file_path) : nil)
+  end
+
+  def _secret_file(rel_path)
+    full = File.join(DEPLOYMENT_REPO_ROOT, rel_path)
+    File.exist?(full) ? File.read(full).strip : nil
+  end
+
+  public
 
   # --------------------------------------------------------------------------
   # ProjectConfig — identity + service-account paths consumed by Appfile
@@ -83,6 +117,7 @@ module FastlaneConfig
   # --------------------------------------------------------------------------
   module IosConfig
     _s = FastlaneConfig::SECRETS_DIR
+    _c = FastlaneConfig  # alias for brevity — calls FastlaneConfig._secret(...)
 
     BUILD_CONFIG = {
       scheme:                        "iosApp",
@@ -91,15 +126,15 @@ module FastlaneConfig
       app_identifier:                ForkIdentity::APP_ID,
       team_id:                       ForkIdentity::IOS_TEAM_ID,
       # ASC API key — ENV preferred (CI); file fallback (local/vault)
-      key_id:                        _secret("APPSTORE_KEY_ID",    "#{_s}/appstore/key_id"),
-      issuer_id:                     _secret("APPSTORE_ISSUER_ID", "#{_s}/appstore/issuer_id"),
+      key_id:                        _c._secret("APPSTORE_KEY_ID",    "#{_s}/appstore/key_id"),
+      issuer_id:                     _c._secret("APPSTORE_ISSUER_ID", "#{_s}/appstore/issuer_id"),
       key_filepath:                  "#{_s}/appstore/AuthKey.p8",
       # Match certificate repository
-      match_git_url:                 _secret("MATCH_GIT_URL"),
+      match_git_url:                 _c._secret("MATCH_GIT_URL"),
       match_git_branch:              "main",
       match_type:                    "adhoc",
       match_ssh_key_path:            "#{_s}/match/match_ci_key",
-      match_password:                _secret("MATCH_PASSWORD", "#{_s}/match/.match_password"),
+      match_password:                _c._secret("MATCH_PASSWORD", "#{_s}/match/.match_password"),
       # Provisioning profiles
       provisioning_profile_adhoc:    "#{ForkIdentity::APP_ID} AdHoc",
       provisioning_profile_appstore: "#{ForkIdentity::APP_ID} AppStore",
@@ -112,18 +147,18 @@ module FastlaneConfig
 
     TESTFLIGHT_CONFIG = {
       beta_app_review_info: {
-        contact_email:         _secret("TESTFLIGHT_CONTACT_EMAIL") || "team@mifos.org",
-        contact_first_name:    _secret("TESTFLIGHT_FIRST_NAME")    || "Mifos",
-        contact_last_name:     _secret("TESTFLIGHT_LAST_NAME")     || "Team",
-        contact_phone:         _secret("TESTFLIGHT_PHONE")         || "+1234567890",
+        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || "team@mifos.org",
+        contact_first_name:    _c._secret("TESTFLIGHT_FIRST_NAME")    || "Mifos",
+        contact_last_name:     _c._secret("TESTFLIGHT_LAST_NAME")     || "Team",
+        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || "+1234567890",
         demo_account_required: false,
       }.freeze,
-      beta_app_feedback_email:           _secret("BETA_FEEDBACK_EMAIL") || "team@mifos.org",
+      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || "team@mifos.org",
       beta_app_description:              "#{ForkIdentity::APP_DISPLAY_NAME} beta build",
       demo_account_required:             false,
       distribute_external:               true,
       notify_external_testers:           true,
-      groups:                            (_secret("TESTFLIGHT_GROUPS") || "internal-testers").split(",").map(&:strip),
+      groups:                            (_c._secret("TESTFLIGHT_GROUPS") || "internal-testers").split(",").map(&:strip),
       skip_submission:                   false,
       skip_waiting_for_build_processing: true,
       submit_beta_review:                true,
@@ -146,18 +181,20 @@ module FastlaneConfig
       run_precheck_before_submit:         true,
       submission_information:             { add_id_info_uses_idfa: false }.freeze,
       app_review_information: {
-        first_name: _secret("APPSTORE_REVIEW_FIRST_NAME") || "Mifos",
-        last_name:  _secret("APPSTORE_REVIEW_LAST_NAME")  || "Team",
-        phone:      _secret("APPSTORE_REVIEW_PHONE")      || "+1234567890",
-        email:      _secret("APPSTORE_REVIEW_EMAIL")      || "review@mifos.org",
+        first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || "Mifos",
+        last_name:  _c._secret("APPSTORE_REVIEW_LAST_NAME")  || "Team",
+        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || "+1234567890",
+        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || "review@mifos.org",
       }.freeze,
     }.freeze
   end
 
   # --------------------------------------------------------------------------
-  # AndroidConfig — build artifact paths
+  # AndroidConfig — build artifact paths + Play Store metadata path
   # --------------------------------------------------------------------------
   module AndroidConfig
+    METADATA_PATH = "deployment/android/metadata".freeze
+
     BUILD_PATHS = {
       prod_apk_path: "cmp-android/build/outputs/apk/prod/release/cmp-android-prod-release.apk",
       demo_apk_path: "cmp-android/build/outputs/apk/demo/release/cmp-android-demo-release.apk",
@@ -209,9 +246,14 @@ module FastlaneConfig
       end
     end
 
+    # Read storeFile dynamically so forks can rename the keystore without
+    # touching config.rb (storeFile key in release.properties is canonical).
+    default_jks = "#{_s}/keystores/#{props.fetch("storeFile", "release.jks")}"
+
     {
       keystore_path:     options[:keystore_path]     ||
-                         "#{_s}/keystores/release.jks",
+                         ENV["KEYSTORE_PATH"]        ||
+                         default_jks,
       keystore_password: options[:keystore_password] ||
                          ENV["KEYSTORE_PASSWORD"]    ||
                          props["storePassword"]      || "",
@@ -293,13 +335,15 @@ def get_version_from_gradle(sanitize_for_appstore: false)
 end
 
 # Generate release notes from recent git merge commits.
+# Play Store enforces a 500-char cap per locale; truncate with ellipsis if needed.
 def generateReleaseNote
-  changelog_from_git_commits(
+  notes = changelog_from_git_commits(
     commits_count:          15,
     pretty:                 "- %s",
     merge_commit_filtering: "only_include_merges",
     quiet:                  true,
   )
+  notes.length <= 500 ? notes : notes[0, 497] + "..."
 rescue
   "#{ForkIdentity::APP_DISPLAY_NAME} update"
 end
@@ -346,7 +390,7 @@ end
 # Compute and export VERSION_NAME / VERSION_CODE for Android builds.
 # Must be called before buildAndSignApp so Gradle picks up the injected values.
 def generateVersion(platform: "firebase", **config)
-  sh("./gradlew versionFile 2>/dev/null || true") rescue nil
+  sh("#{DEPLOYMENT_REPO_ROOT}/gradlew versionFile 2>/dev/null || true") rescue nil
   version_name = VersionHelpers.gradle_version
   version_code = sh("git rev-list --count HEAD 2>/dev/null || echo 1").strip.to_i rescue 1
 
@@ -358,21 +402,24 @@ def generateVersion(platform: "firebase", **config)
 end
 
 # Build and sign an Android APK/AAB via Gradle with signing config injected.
+# Uses sh() + absolute gradlew path because the multi-module repo layout has
+# gradlew at root, not inside cmp-android/ — incompatible with gradle() action's
+# project_dir expectation.
 def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
   keystore = signing_config[:keystore_path] || "secrets/keystores/release.jks"
   keystore_abs = File.expand_path(File.join(DEPLOYMENT_REPO_ROOT, keystore))
+  gradlew    = File.join(DEPLOYMENT_REPO_ROOT, "gradlew")
+  full_task  = ":cmp-android:#{taskName}#{buildType}"
 
-  gradle(
-    task:        taskName.to_s,
-    build_type:  buildType,
-    project_dir: "cmp-android",
-    properties: {
-      "android.injected.signing.store.file"     => keystore_abs,
-      "android.injected.signing.store.password" => signing_config[:keystore_password] || "",
-      "android.injected.signing.key.alias"      => signing_config[:key_alias]         || "release",
-      "android.injected.signing.key.password"   => signing_config[:key_password]      || "",
-      "VERSION_NAME"                            => ENV["VERSION_NAME"] || "1.0.0",
-      "VERSION_CODE"                            => ENV["VERSION_CODE"] || "1",
-    },
+  # -p tells Gradle to use repo root as project dir, overriding whatever cwd
+  # Fastlane sets (deployment/fastlane/) when running the lane.
+  sh(
+    gradlew, "-p", DEPLOYMENT_REPO_ROOT, full_task,
+    "-Pandroid.injected.signing.store.file=#{keystore_abs}",
+    "-Pandroid.injected.signing.store.password=#{signing_config[:keystore_password] || ''}",
+    "-Pandroid.injected.signing.key.alias=#{signing_config[:key_alias] || 'release'}",
+    "-Pandroid.injected.signing.key.password=#{signing_config[:key_password] || ''}",
+    "-PVERSION_NAME=#{ENV['VERSION_NAME'] || '1.0.0'}",
+    "-PVERSION_CODE=#{ENV['VERSION_CODE'] || '1'}",
   )
 end

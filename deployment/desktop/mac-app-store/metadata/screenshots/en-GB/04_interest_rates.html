@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Money Toolkit – Interest Rates</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:390px; height:844px; overflow:hidden; font-family:'Google Sans',Roboto,sans-serif; background:#FAFAFB; color:#0F172A; }
+  .status-bar { height:28px; background:#4338CA; display:flex; align-items:center; justify-content:space-between; padding:0 16px; color:white; font-size:12px; font-weight:600; }
+  .top-bar { background:#4338CA; padding:12px 16px 16px; color:white; }
+  .top-bar h1 { font-size:22px; font-weight:700; }
+  .top-bar p { font-size:13px; opacity:0.85; margin-top:2px; }
+  /* Rate cards */
+  .rate-cards { display:flex; gap:8px; padding:12px 16px; }
+  .rate-card { flex:1; background:white; border-radius:14px; padding:12px 10px; box-shadow:0 1px 4px rgba(15,23,42,0.08); text-align:center; }
+  .rate-name { font-size:9px; color:#64748B; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:4px; }
+  .rate-val { font-size:18px; font-weight:900; color:#0F172A; }
+  .rate-change { font-size:11px; font-weight:700; margin-top:2px; }
+  .up { color:#059669; }
+  .down { color:#F87171; }
+  /* Chart */
+  .chart-section { padding:0 16px; }
+  .chart-title { font-size:13px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+  .chart-card { background:white; border-radius:16px; padding:16px; box-shadow:0 1px 4px rgba(15,23,42,0.08); }
+  .chart-legend { display:flex; gap:14px; margin-bottom:12px; }
+  .legend-item { display:flex; align-items:center; gap:5px; font-size:11px; font-weight:600; color:#475569; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; }
+  /* SVG chart */
+  svg { width:100%; height:140px; }
+  /* Time filter */
+  .time-filter { display:flex; gap:6px; margin:0 16px 12px; }
+  .time-btn { flex:1; background:white; border-radius:8px; padding:6px; text-align:center; font-size:12px; font-weight:600; color:#64748B; box-shadow:0 1px 2px rgba(15,23,42,0.06); }
+  .time-btn.active { background:#4338CA; color:white; }
+  /* Data rows */
+  .data-section { padding:0 16px; margin-top:12px; }
+  .data-row { background:white; border-radius:12px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 3px rgba(15,23,42,0.06); }
+  .data-left { display:flex; align-items:center; gap:10px; }
+  .data-dot { width:12px; height:12px; border-radius:50%; }
+  .data-name { font-size:14px; font-weight:600; }
+  .data-source { font-size:11px; color:#94A3B8; }
+  .data-rate { font-size:18px; font-weight:800; }
+  .data-trend { font-size:11px; font-weight:700; }
+  /* Nav */
+  .nav-bar { position:absolute; bottom:0; left:0; right:0; height:72px; background:white; border-top:1px solid #E2E8F0; display:flex; align-items:flex-start; justify-content:space-around; padding-top:8px; }
+  .nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .nav-icon { font-size:22px; }
+  .nav-label { font-size:10px; font-weight:600; color:#94A3B8; }
+  .nav-pill { background:#E0E7FF; border-radius:16px; padding:4px 18px; margin-bottom:2px; }
+</style>
+</head>
+<body>
+  <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="top-bar">
+    <h1>Interest Rates</h1>
+    <p>FRED Economic Data · Updated today</p>
+  </div>
+
+  <div class="rate-cards">
+    <div class="rate-card">
+      <div class="rate-name">Fed Funds</div>
+      <div class="rate-val">5.33%</div>
+      <div class="rate-change down">↓ −0.01</div>
+    </div>
+    <div class="rate-card">
+      <div class="rate-name">30Y Mortgage</div>
+      <div class="rate-val">6.85%</div>
+      <div class="rate-change down">↓ −0.12</div>
+    </div>
+    <div class="rate-card">
+      <div class="rate-name">10Y Treasury</div>
+      <div class="rate-val">4.72%</div>
+      <div class="rate-change up">↑ +0.04</div>
+    </div>
+  </div>
+
+  <div class="time-filter">
+    <div class="time-btn">1W</div>
+    <div class="time-btn active">1M</div>
+    <div class="time-btn">3M</div>
+    <div class="time-btn">1Y</div>
+    <div class="time-btn">5Y</div>
+  </div>
+
+  <div class="chart-section">
+    <div class="chart-card">
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4338CA"></div>Fed Funds</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#059669"></div>Mortgage</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#D97706"></div>Treasury</div>
+      </div>
+      <svg viewBox="0 0 358 140" preserveAspectRatio="none">
+        <!-- Grid lines -->
+        <line x1="0" y1="30" x2="358" y2="30" stroke="#F1F5F9" stroke-width="1"/>
+        <line x1="0" y1="70" x2="358" y2="70" stroke="#F1F5F9" stroke-width="1"/>
+        <line x1="0" y1="110" x2="358" y2="110" stroke="#F1F5F9" stroke-width="1"/>
+        <!-- Fed Funds line (5.33%) -->
+        <polyline points="0,95 40,93 80,90 120,88 160,85 200,86 240,88 280,87 320,86 358,87"
+          fill="none" stroke="#4338CA" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- Mortgage line (6.85%) -->
+        <polyline points="0,60 40,58 80,55 120,60 160,65 200,62 240,58 280,55 320,52 358,54"
+          fill="none" stroke="#059669" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- Treasury line (4.72%) -->
+        <polyline points="0,108 40,106 80,103 120,100 160,97 200,99 240,102 280,100 320,98 358,97"
+          fill="none" stroke="#D97706" stroke-width="2.5" stroke-linejoin="round"/>
+        <!-- Dots at end -->
+        <circle cx="358" cy="87" r="4" fill="#4338CA"/>
+        <circle cx="358" cy="54" r="4" fill="#059669"/>
+        <circle cx="358" cy="97" r="4" fill="#D97706"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="data-section">
+    <div class="data-row">
+      <div class="data-left">
+        <div class="data-dot" style="background:#4338CA"></div>
+        <div>
+          <div class="data-name">Federal Funds Rate</div>
+          <div class="data-source">FRED · DFF</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="data-rate">5.33%</div>
+        <div class="data-trend down">↓ −0.01 wk</div>
+      </div>
+    </div>
+    <div class="data-row">
+      <div class="data-left">
+        <div class="data-dot" style="background:#059669"></div>
+        <div>
+          <div class="data-name">30-Year Mortgage</div>
+          <div class="data-source">FRED · MORTGAGE30US</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="data-rate">6.85%</div>
+        <div class="data-trend down">↓ −0.12 wk</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-item"><span class="nav-icon">🏠</span><div class="nav-label">Home</div></div>
+    <div class="nav-item"><span class="nav-icon">🏦</span><div class="nav-label">Loans</div></div>
+    <div class="nav-item"><span class="nav-icon">📋</span><div class="nav-label">Bills</div></div>
+    <div class="nav-item">
+      <div class="nav-pill"><span class="nav-icon">📈</span></div>
+      <div class="nav-label" style="color:#4338CA">Rates</div>
+    </div>
+    <div class="nav-item"><span class="nav-icon">🔢</span><div class="nav-label">Tools</div></div>
+  </div>
+</body>
+</html>

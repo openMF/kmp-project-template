@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Money Toolkit – Loans</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:390px; height:844px; overflow:hidden; font-family:'Google Sans',Roboto,sans-serif; background:#FAFAFB; color:#0F172A; }
+  .status-bar { height:28px; background:#4338CA; display:flex; align-items:center; justify-content:space-between; padding:0 16px; color:white; font-size:12px; font-weight:600; }
+  .top-bar { background:#4338CA; padding:12px 16px 16px; color:white; display:flex; align-items:center; justify-content:space-between; }
+  .top-bar h1 { font-size:22px; font-weight:700; }
+  .search-bar { margin:12px 16px; background:white; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:8px; box-shadow:0 1px 4px rgba(15,23,42,0.08); }
+  .search-bar span { font-size:16px; }
+  .search-bar p { font-size:14px; color:#94A3B8; }
+  .summary-row { display:flex; gap:10px; padding:0 16px 12px; }
+  .summary-chip { flex:1; background:white; border-radius:12px; padding:10px 12px; box-shadow:0 1px 3px rgba(15,23,42,0.06); text-align:center; }
+  .summary-chip .val { font-size:18px; font-weight:800; color:#4338CA; }
+  .summary-chip .lbl { font-size:10px; color:#64748B; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
+  .loan-card { background:white; border-radius:16px; margin:0 16px 10px; padding:14px 16px; box-shadow:0 1px 4px rgba(15,23,42,0.08); }
+  .loan-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .loan-name { font-size:16px; font-weight:700; }
+  .loan-badge { background:#E0E7FF; color:#4338CA; border-radius:8px; padding:3px 8px; font-size:11px; font-weight:700; }
+  .loan-badge.green { background:#D1FAE5; color:#059669; }
+  .loan-badge.amber { background:#FEF3C7; color:#D97706; }
+  .loan-row { display:flex; justify-content:space-between; margin-bottom:6px; }
+  .loan-key { font-size:12px; color:#64748B; font-weight:500; }
+  .loan-val { font-size:13px; font-weight:700; }
+  .progress-bg { background:#E2E8F0; border-radius:4px; height:5px; margin:8px 0 4px; }
+  .progress-fill { border-radius:4px; height:5px; background:#4338CA; }
+  .progress-lbl { display:flex; justify-content:space-between; font-size:10px; color:#94A3B8; }
+  .fab { position:absolute; bottom:86px; right:20px; width:56px; height:56px; border-radius:16px; background:#4338CA; display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 4px 12px rgba(67,56,202,0.35); color:white; }
+  .nav-bar { position:absolute; bottom:0; left:0; right:0; height:72px; background:white; border-top:1px solid #E2E8F0; display:flex; align-items:flex-start; justify-content:space-around; padding-top:8px; }
+  .nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .nav-icon { font-size:22px; }
+  .nav-label { font-size:10px; font-weight:600; color:#94A3B8; }
+  .nav-pill { background:#E0E7FF; border-radius:16px; padding:4px 18px; margin-bottom:2px; }
+</style>
+</head>
+<body>
+  <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="top-bar">
+    <h1>Loans</h1>
+    <span style="font-size:22px">⚙️</span>
+  </div>
+
+  <div class="search-bar">
+    <span>🔍</span>
+    <p>Search loans…</p>
+  </div>
+
+  <div class="summary-row">
+    <div class="summary-chip">
+      <div class="val">$12,450</div>
+      <div class="lbl">Total Owed</div>
+    </div>
+    <div class="summary-chip">
+      <div class="val">$656</div>
+      <div class="lbl">Monthly EMI</div>
+    </div>
+    <div class="summary-chip">
+      <div class="val">3</div>
+      <div class="lbl">Active</div>
+    </div>
+  </div>
+
+  <div class="loan-card">
+    <div class="loan-header">
+      <div class="loan-name">🏠 Home Renovation</div>
+      <div class="loan-badge amber">24 mo left</div>
+    </div>
+    <div class="loan-row">
+      <span class="loan-key">Principal</span>
+      <span class="loan-val">$8,500</span>
+    </div>
+    <div class="loan-row">
+      <span class="loan-key">Monthly EMI</span>
+      <span class="loan-val" style="color:#4338CA">$342/mo</span>
+    </div>
+    <div class="loan-row">
+      <span class="loan-key">Interest Rate</span>
+      <span class="loan-val">8.5%</span>
+    </div>
+    <div class="progress-bg"><div class="progress-fill" style="width:40%"></div></div>
+    <div class="progress-lbl"><span>40% paid</span><span>$5,100 remaining</span></div>
+  </div>
+
+  <div class="loan-card">
+    <div class="loan-header">
+      <div class="loan-name">🚗 Car Loan</div>
+      <div class="loan-badge amber">18 mo left</div>
+    </div>
+    <div class="loan-row">
+      <span class="loan-key">Principal</span>
+      <span class="loan-val">$3,200</span>
+    </div>
+    <div class="loan-row">
+      <span class="loan-key">Monthly EMI</span>
+      <span class="loan-val" style="color:#4338CA">$189/mo</span>
+    </div>
+    <div class="loan-row">
+      <span class="loan-key">Interest Rate</span>
+      <span class="loan-val">7.2%</span>
+    </div>
+    <div class="progress-bg"><div class="progress-fill" style="width:60%"></div></div>
+    <div class="progress-lbl"><span>60% paid</span><span>$1,280 remaining</span></div>
+  </div>
+
+  <div class="loan-card">
+    <div class="loan-header">
+      <div class="loan-name">💳 Personal Loan</div>
+      <div class="loan-badge green">6 mo left</div>
+    </div>
+    <div class="loan-row">
+      <span class="loan-key">Principal</span>
+      <span class="loan-val">$750</span>
+    </div>
+    <div class="loan-row">
+      <span class="loan-key">Monthly EMI</span>
+      <span class="loan-val" style="color:#4338CA">$125/mo</span>
+    </div>
+    <div class="progress-bg"><div class="progress-fill" style="width:80%; background:#059669"></div></div>
+    <div class="progress-lbl"><span>80% paid</span><span>$150 remaining</span></div>
+  </div>
+
+  <div class="fab">＋</div>
+
+  <div class="nav-bar">
+    <div class="nav-item"><span class="nav-icon">🏠</span><div class="nav-label">Home</div></div>
+    <div class="nav-item">
+      <div class="nav-pill"><span class="nav-icon">🏦</span></div>
+      <div class="nav-label" style="color:#4338CA">Loans</div>
+    </div>
+    <div class="nav-item"><span class="nav-icon">📋</span><div class="nav-label">Bills</div></div>
+    <div class="nav-item"><span class="nav-icon">📈</span><div class="nav-label">Rates</div></div>
+    <div class="nav-item"><span class="nav-icon">🔢</span><div class="nav-label">Tools</div></div>
+  </div>
+</body>
+</html>

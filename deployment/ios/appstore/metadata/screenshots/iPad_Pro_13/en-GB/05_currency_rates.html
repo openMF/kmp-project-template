@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Money Toolkit – Currency Rates</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:390px; height:844px; overflow:hidden; font-family:'Google Sans',Roboto,sans-serif; background:#FAFAFB; color:#0F172A; }
+  .status-bar { height:28px; background:#4338CA; display:flex; align-items:center; justify-content:space-between; padding:0 16px; color:white; font-size:12px; font-weight:600; }
+  .top-bar { background:#4338CA; padding:12px 16px 16px; color:white; }
+  .top-bar h1 { font-size:22px; font-weight:700; }
+  .top-bar p { font-size:13px; opacity:0.85; margin-top:2px; }
+  /* Base selector */
+  .base-row { display:flex; align-items:center; justify-content:space-between; padding:12px 16px 8px; }
+  .base-label { font-size:12px; color:#64748B; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; }
+  .base-selector { display:flex; align-items:center; gap:8px; background:white; border-radius:10px; padding:8px 14px; box-shadow:0 1px 4px rgba(15,23,42,0.08); }
+  .base-flag { font-size:20px; }
+  .base-code { font-size:16px; font-weight:800; color:#4338CA; }
+  .base-chevron { color:#94A3B8; font-size:12px; }
+  /* Search */
+  .search-bar { margin:0 16px 12px; background:white; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:8px; box-shadow:0 1px 3px rgba(15,23,42,0.06); }
+  .search-bar span { font-size:15px; }
+  .search-bar p { font-size:14px; color:#94A3B8; }
+  /* Hero conversion card */
+  .hero-card { background:linear-gradient(135deg,#4338CA,#6366F1); border-radius:18px; margin:0 16px 14px; padding:18px; color:white; }
+  .hero-from { font-size:13px; opacity:0.8; }
+  .hero-amount { font-size:36px; font-weight:900; margin:4px 0; }
+  .hero-arrow { font-size:22px; margin:8px 0; opacity:0.7; }
+  .hero-to { font-size:13px; opacity:0.8; }
+  .hero-result { font-size:28px; font-weight:800; }
+  .hero-rate { font-size:12px; opacity:0.7; margin-top:4px; }
+  /* Rate list */
+  .rate-list { padding:0 16px; }
+  .rate-row { background:white; border-radius:12px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 3px rgba(15,23,42,0.06); }
+  .rate-left { display:flex; align-items:center; gap:10px; }
+  .flag { font-size:22px; }
+  .currency-name { font-size:14px; font-weight:700; }
+  .currency-code { font-size:12px; color:#64748B; }
+  .rate-right { text-align:right; }
+  .rate-val { font-size:17px; font-weight:800; }
+  .rate-change { font-size:11px; font-weight:700; }
+  .up { color:#059669; }
+  .down { color:#F87171; }
+  /* Nav */
+  .nav-bar { position:absolute; bottom:0; left:0; right:0; height:72px; background:white; border-top:1px solid #E2E8F0; display:flex; align-items:flex-start; justify-content:space-around; padding-top:8px; }
+  .nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .nav-icon { font-size:22px; }
+  .nav-label { font-size:10px; font-weight:600; color:#94A3B8; }
+  .nav-pill { background:#E0E7FF; border-radius:16px; padding:4px 18px; margin-bottom:2px; }
+</style>
+</head>
+<body>
+  <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="top-bar">
+    <h1>Currency Rates</h1>
+    <p>Live exchange rates · 42 currencies</p>
+  </div>
+
+  <div class="base-row">
+    <span class="base-label">Base Currency</span>
+    <div class="base-selector">
+      <span class="base-flag">🇺🇸</span>
+      <span class="base-code">USD</span>
+      <span class="base-chevron">▼</span>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <span>🔍</span>
+    <p>Search currency…</p>
+  </div>
+
+  <div class="hero-card">
+    <div class="hero-from">1 US Dollar equals</div>
+    <div class="hero-amount">$1.00</div>
+    <div class="hero-arrow">↕</div>
+    <div class="hero-to">Euro</div>
+    <div class="hero-result">€ 0.9234</div>
+    <div class="hero-rate">Rate updated 12 min ago</div>
+  </div>
+
+  <div class="rate-list">
+    <div class="rate-row">
+      <div class="rate-left">
+        <span class="flag">🇪🇺</span>
+        <div><div class="currency-name">Euro</div><div class="currency-code">EUR</div></div>
+      </div>
+      <div class="rate-right">
+        <div class="rate-val">0.9234</div>
+        <div class="rate-change up">↑ +0.0012</div>
+      </div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-left">
+        <span class="flag">🇬🇧</span>
+        <div><div class="currency-name">British Pound</div><div class="currency-code">GBP</div></div>
+      </div>
+      <div class="rate-right">
+        <div class="rate-val">0.7896</div>
+        <div class="rate-change up">↑ +0.0008</div>
+      </div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-left">
+        <span class="flag">🇯🇵</span>
+        <div><div class="currency-name">Japanese Yen</div><div class="currency-code">JPY</div></div>
+      </div>
+      <div class="rate-right">
+        <div class="rate-val">149.85</div>
+        <div class="rate-change down">↓ −0.42</div>
+      </div>
+    </div>
+    <div class="rate-row">
+      <div class="rate-left">
+        <span class="flag">🇮🇳</span>
+        <div><div class="currency-name">Indian Rupee</div><div class="currency-code">INR</div></div>
+      </div>
+      <div class="rate-right">
+        <div class="rate-val">83.42</div>
+        <div class="rate-change up">↑ +0.18</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-item"><span class="nav-icon">🏠</span><div class="nav-label">Home</div></div>
+    <div class="nav-item"><span class="nav-icon">🏦</span><div class="nav-label">Loans</div></div>
+    <div class="nav-item"><span class="nav-icon">📋</span><div class="nav-label">Bills</div></div>
+    <div class="nav-item">
+      <div class="nav-pill"><span class="nav-icon">📈</span></div>
+      <div class="nav-label" style="color:#4338CA">Rates</div>
+    </div>
+    <div class="nav-item"><span class="nav-icon">🔢</span><div class="nav-label">Tools</div></div>
+  </div>
+</body>
+</html>

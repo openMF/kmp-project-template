@@ -177,7 +177,9 @@ _sync_android() {
       esac
     done < "$props"
   fi
-  _set_from_binary "KMP_TEMPLATE_RELEASE_KEYSTORE" "$SECRETS_DIR/keystores/release.jks"
+  local jks_name
+  jks_name=$(grep '^storeFile=' "$SECRETS_DIR/keystores/release.properties" 2>/dev/null | cut -d'=' -f2-)
+  _set_from_binary "KMP_TEMPLATE_RELEASE_KEYSTORE" "$SECRETS_DIR/keystores/${jks_name:-release.jks}"
   echo ""
 }
 

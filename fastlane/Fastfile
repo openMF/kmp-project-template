@@ -2,8 +2,11 @@
 #
 # The mifos-x-actionhub-build-ios-app action runs `bundle exec fastlane ios build_ios`
 # from the repo root and expects fastlane/ to exist here.
-# Deployment lanes (firebase / testflight / appstore) live in deployment/ and are
-# invoked via `bundle exec fastlane --fastlane-dir deployment <platform> <lane>`.
+#
+# Deployment lanes live in deployment/Fastfile. Due to Fastlane's nested-import path
+# resolution limitation (fastlane/fastlane#20974), they are invoked via a dedicated
+# script: `bash scripts/sync-play-listing.sh` (Android Play Store listing sync).
+# See deployment/BOOTSTRAP.md for all available lanes and their invocation commands.
 
 default_platform(:ios)
 

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Money Toolkit – EMI Calculator</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:390px; height:844px; overflow:hidden; font-family:'Google Sans',Roboto,sans-serif; background:#FAFAFB; color:#0F172A; }
+  .status-bar { height:28px; background:#4338CA; display:flex; align-items:center; justify-content:space-between; padding:0 16px; color:white; font-size:12px; font-weight:600; }
+  .top-bar { background:#4338CA; padding:12px 16px 20px; color:white; }
+  .top-bar h1 { font-size:22px; font-weight:700; }
+  .top-bar p { font-size:13px; opacity:0.85; margin-top:2px; }
+  /* Result hero card */
+  .result-card { background:white; border-radius:20px; margin:16px 16px 12px; padding:20px; box-shadow:0 2px 12px rgba(67,56,202,0.12); border:2px solid #E0E7FF; text-align:center; }
+  .result-label { font-size:12px; color:#64748B; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+  .result-value { font-size:42px; font-weight:900; color:#4338CA; margin:6px 0; letter-spacing:-1px; }
+  .result-sub { font-size:13px; color:#64748B; }
+  /* Breakdown row */
+  .breakdown { display:flex; gap:0; margin:0 16px 14px; }
+  .breakdown-item { flex:1; background:white; padding:12px; text-align:center; box-shadow:0 1px 3px rgba(15,23,42,0.06); }
+  .breakdown-item:first-child { border-radius:12px 0 0 12px; }
+  .breakdown-item:last-child { border-radius:0 12px 12px 0; }
+  .breakdown-val { font-size:16px; font-weight:800; }
+  .breakdown-lbl { font-size:10px; color:#64748B; font-weight:600; text-transform:uppercase; margin-top:2px; }
+  /* Input fields */
+  .inputs { padding:0 16px; }
+  .field { background:white; border-radius:12px; padding:14px 16px; margin-bottom:10px; box-shadow:0 1px 3px rgba(15,23,42,0.06); }
+  .field-label { font-size:11px; color:#64748B; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:4px; }
+  .field-row { display:flex; align-items:center; justify-content:space-between; }
+  .field-value { font-size:20px; font-weight:800; color:#0F172A; }
+  .field-unit { font-size:13px; color:#94A3B8; font-weight:600; }
+  /* Slider */
+  .slider { width:100%; height:4px; background:#E0E7FF; border-radius:4px; margin-top:10px; position:relative; }
+  .slider-fill { height:4px; background:#4338CA; border-radius:4px; }
+  .slider-thumb { width:20px; height:20px; border-radius:50%; background:#4338CA; position:absolute; top:-8px; box-shadow:0 2px 6px rgba(67,56,202,0.35); }
+  /* CTA */
+  .cta { margin:14px 16px; background:#4338CA; border-radius:14px; padding:16px; text-align:center; color:white; font-size:16px; font-weight:700; }
+  /* Nav */
+  .nav-bar { position:absolute; bottom:0; left:0; right:0; height:72px; background:white; border-top:1px solid #E2E8F0; display:flex; align-items:flex-start; justify-content:space-around; padding-top:8px; }
+  .nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .nav-icon { font-size:22px; }
+  .nav-label { font-size:10px; font-weight:600; color:#94A3B8; }
+  .nav-pill { background:#E0E7FF; border-radius:16px; padding:4px 18px; margin-bottom:2px; }
+</style>
+</head>
+<body>
+  <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+  <div class="top-bar">
+    <h1>EMI Calculator</h1>
+    <p>Plan your loan repayments</p>
+  </div>
+
+  <div class="result-card">
+    <div class="result-label">Monthly EMI</div>
+    <div class="result-value">$310.73</div>
+    <div class="result-sub">for 36 months at 7.5% p.a.</div>
+  </div>
+
+  <div class="breakdown">
+    <div class="breakdown-item">
+      <div class="breakdown-val">$10,000</div>
+      <div class="breakdown-lbl">Principal</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="breakdown-val" style="color:#D97706">$1,186</div>
+      <div class="breakdown-lbl">Interest</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="breakdown-val" style="color:#4338CA">$11,186</div>
+      <div class="breakdown-lbl">Total Pay</div>
+    </div>
+  </div>
+
+  <div class="inputs">
+    <div class="field">
+      <div class="field-label">Loan Amount</div>
+      <div class="field-row">
+        <div class="field-value">$10,000</div>
+        <div class="field-unit">USD</div>
+      </div>
+      <div class="slider">
+        <div class="slider-fill" style="width:40%"></div>
+        <div class="slider-thumb" style="left:calc(40% - 10px)"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Annual Interest Rate</div>
+      <div class="field-row">
+        <div class="field-value">7.5%</div>
+        <div class="field-unit">% p.a.</div>
+      </div>
+      <div class="slider">
+        <div class="slider-fill" style="width:30%"></div>
+        <div class="slider-thumb" style="left:calc(30% - 10px)"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Loan Tenure</div>
+      <div class="field-row">
+        <div class="field-value">36</div>
+        <div class="field-unit">months</div>
+      </div>
+      <div class="slider">
+        <div class="slider-fill" style="width:50%"></div>
+        <div class="slider-thumb" style="left:calc(50% - 10px)"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta">View Full Amortization Schedule →</div>
+
+  <div class="nav-bar">
+    <div class="nav-item"><span class="nav-icon">🏠</span><div class="nav-label">Home</div></div>
+    <div class="nav-item"><span class="nav-icon">🏦</span><div class="nav-label">Loans</div></div>
+    <div class="nav-item"><span class="nav-icon">📋</span><div class="nav-label">Bills</div></div>
+    <div class="nav-item"><span class="nav-icon">📈</span><div class="nav-label">Rates</div></div>
+    <div class="nav-item">
+      <div class="nav-pill"><span class="nav-icon">🔢</span></div>
+      <div class="nav-label" style="color:#4338CA">Tools</div>
+    </div>
+  </div>
+</body>
+</html>

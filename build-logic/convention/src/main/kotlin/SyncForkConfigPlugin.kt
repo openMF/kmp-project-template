@@ -66,7 +66,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val fork = java.util.Properties()
         val forkFile = File(root, "gradle/fork.properties")
         if (forkFile.exists()) {
-            forkFile.inputStream().use(fork::load)
+            forkFile.reader(Charsets.UTF_8).use(fork::load)
         } else {
             logger.warn(
                 "syncForkConfig: gradle/fork.properties not found.\n" +
@@ -116,25 +116,38 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val cloudflareProject = get("web.cloudflare.project","CLOUDFLARE_PAGES_PROJECT_NAME")
 
         // Store — shared
-        val storeTitle        = get("store.title")
-        val storeSubtitle     = get("store.subtitle")
-        val storePromoText    = get("store.promotional.text")
-        val storeReleaseNotes = get("store.release.notes")
-        val storeCopyright    = get("store.copyright")
-        val storeReviewNotes  = get("store.review.notes")
+        val storeTitle         = get("store.title")
+        val storeSubtitle      = get("store.subtitle")
+        val storeDescription   = get("store.description")
+        val storePromoText     = get("store.promotional.text")
+        val storeReleaseNotes  = get("store.release.notes")
+        val storeCopyright     = get("store.copyright")
+        val storeReviewNotes   = get("store.review.notes")
+        val reviewDemoUser     = get("store.review.demo.user")
+        val reviewDemoPassword = get("store.review.demo.password")
+        val iosAgeRating       = get("store.ios.age.rating").ifBlank { "4+" }
 
         // Store — Android
         val androidChangelog  = get("store.android.changelog")
         val androidShortDesc  = get("store.android.short.description")
         val androidCategory   = get("store.android.category")
+        val androidVideoUrl   = get("store.android.video.url")
 
         // Store — iOS
-        val iosKeywords  = get("store.ios.keywords")
-        val iosCategory  = get("store.ios.category")
+        val iosKeywords           = get("store.ios.keywords")
+        val iosCategory           = get("store.ios.category")
+        val iosSecondaryCategory  = get("store.ios.secondary.category")
+        val iosAppleTvPrivacyUrl  = get("store.ios.apple.tv.privacy.url")
 
         // Store — macOS
-        val macosKeywords = get("store.macos.keywords")
-        val macosCategory = get("store.macos.category")
+        val macosKeywords          = get("store.macos.keywords")
+        val macosCategory          = get("store.macos.category")
+        val macosSecondaryCategory = get("store.macos.secondary.category")
+
+        // Store — Windows / Microsoft Store
+        val msAppId      = get("store.windows.ms.app.id", "MS_APP_ID")
+        val msPublishMode = get("store.windows.ms.publish.mode").ifBlank { "Manual" }
+        val msVisibility  = get("store.windows.ms.visibility").ifBlank { "Public" }
 
         // ── 3. iOS xcconfig ───────────────────────────────────────────────────
         val xcconfigFile = File(root, "cmp-ios/Configuration/Config.xcconfig")
@@ -179,6 +192,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // ── 6. Store metadata files ───────────────────────────────────────────
         var written = 0
 
+        // Write only when value is non-blank (skip optional fields that aren't set)
         fun writeIfPresent(rel: String, value: String) {
             if (value.isBlank()) return
             val f = File(root, rel)
@@ -188,9 +202,51 @@ abstract class SyncForkConfigTask : DefaultTask() {
             written++
         }
 
-        // iOS App Store
+        // Always write — clears file when value is blank (used for optional/empty fields
+        // that must exist so Fastlane / Deliver don't fall back to stale content)
+        fun writeAlways(rel: String, value: String) {
+            val f = File(root, rel)
+            if (!f.parentFile.exists()) return
+            f.writeText(value)
+            logger.lifecycle("syncForkConfig: wrote $rel")
+            written++
+        }
+
+        // Generate App Store / Mac App Store age-rating JSON from store.ios.age.rating
+        fun writeRatingConfig(rel: String) {
+            val f = File(root, rel)
+            if (!f.parentFile.exists()) return
+            f.writeText("""{
+  "v1_0": {
+    "ratings": {
+      "violenceCartoonOrFantasy": "NONE",
+      "violenceRealistic": "NONE",
+      "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+      "profanityOrCrudeHumor": "NONE",
+      "matureOrSuggestiveThemes": "NONE",
+      "horrorOrFearThemesForChildren": "NONE",
+      "medicalOrTreatmentInformation": "NONE",
+      "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+      "gamblingAndContests": "NONE",
+      "sexualContentOrNudity": "NONE",
+      "sexualContentGraphicAndNudity": "NONE"
+    },
+    "booleans": {
+      "ageRatingProcess": false,
+      "gamblingAllowed": false,
+      "unrestrictedWebAccess": false,
+      "kidsAgeBand": false
+    }
+  }
+}""")
+            logger.lifecycle("syncForkConfig: wrote $rel (age rating: $iosAgeRating)")
+            written++
+        }
+
+        // ── iOS App Store ─────────────────────────────────────────────────────
         writeIfPresent("deployment/ios/appstore/metadata/en-GB/name.txt",             storeTitle)
         writeIfPresent("deployment/ios/appstore/metadata/en-GB/subtitle.txt",         storeSubtitle)
+        writeIfPresent("deployment/ios/appstore/metadata/en-GB/description.txt",      storeDescription)
         writeIfPresent("deployment/ios/appstore/metadata/en-GB/keywords.txt",         iosKeywords)
         writeIfPresent("deployment/ios/appstore/metadata/en-GB/promotional_text.txt", storePromoText)
         writeIfPresent("deployment/ios/appstore/metadata/en-GB/release_notes.txt",    storeReleaseNotes)
@@ -199,15 +255,25 @@ abstract class SyncForkConfigTask : DefaultTask() {
         writeIfPresent("deployment/ios/appstore/metadata/en-GB/support_url.txt",      supportUrl)
         writeIfPresent("deployment/ios/appstore/metadata/copyright.txt",              storeCopyright)
         writeIfPresent("deployment/ios/appstore/metadata/primary_category.txt",       iosCategory)
+        writeAlways("deployment/ios/appstore/metadata/primary_first_sub_category.txt",  "")
+        writeAlways("deployment/ios/appstore/metadata/primary_second_sub_category.txt", "")
+        writeAlways("deployment/ios/appstore/metadata/secondary_category.txt",          iosSecondaryCategory)
+        writeAlways("deployment/ios/appstore/metadata/secondary_first_sub_category.txt",  "")
+        writeAlways("deployment/ios/appstore/metadata/secondary_second_sub_category.txt", "")
         writeIfPresent("deployment/ios/appstore/metadata/review_information/email_address.txt", orgEmail)
         writeIfPresent("deployment/ios/appstore/metadata/review_information/first_name.txt",    orgFirstName)
         writeIfPresent("deployment/ios/appstore/metadata/review_information/last_name.txt",     orgLastName)
         writeIfPresent("deployment/ios/appstore/metadata/review_information/phone_number.txt",  orgPhone)
         writeIfPresent("deployment/ios/appstore/metadata/review_information/notes.txt",         storeReviewNotes)
+        writeAlways("deployment/ios/appstore/metadata/review_information/demo_user.txt",     reviewDemoUser)
+        writeAlways("deployment/ios/appstore/metadata/review_information/demo_password.txt", reviewDemoPassword)
+        writeAlways("deployment/ios/appstore/metadata/en-GB/apple_tv_privacy_policy.txt",   iosAppleTvPrivacyUrl)
+        writeRatingConfig("deployment/ios/appstore/metadata/app_store_rating_config.json")
 
-        // macOS App Store
+        // ── macOS App Store ───────────────────────────────────────────────────
         writeIfPresent("deployment/desktop/mac-app-store/metadata/en-GB/name.txt",             storeTitle)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/en-GB/subtitle.txt",         storeSubtitle)
+        writeIfPresent("deployment/desktop/mac-app-store/metadata/en-GB/description.txt",      storeDescription)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/en-GB/keywords.txt",         macosKeywords)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/en-GB/promotional_text.txt", storePromoText)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/en-GB/release_notes.txt",    storeReleaseNotes)
@@ -216,25 +282,42 @@ abstract class SyncForkConfigTask : DefaultTask() {
         writeIfPresent("deployment/desktop/mac-app-store/metadata/en-GB/support_url.txt",      supportUrl)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/copyright.txt",              storeCopyright)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/primary_category.txt",       macosCategory)
+        writeAlways("deployment/desktop/mac-app-store/metadata/primary_first_sub_category.txt",  "")
+        writeAlways("deployment/desktop/mac-app-store/metadata/primary_second_sub_category.txt", "")
+        writeAlways("deployment/desktop/mac-app-store/metadata/secondary_category.txt",          macosSecondaryCategory)
+        writeAlways("deployment/desktop/mac-app-store/metadata/secondary_first_sub_category.txt",  "")
+        writeAlways("deployment/desktop/mac-app-store/metadata/secondary_second_sub_category.txt", "")
         writeIfPresent("deployment/desktop/mac-app-store/metadata/review_information/email_address.txt", orgEmail)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/review_information/first_name.txt",    orgFirstName)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/review_information/last_name.txt",     orgLastName)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/review_information/phone_number.txt",  orgPhone)
         writeIfPresent("deployment/desktop/mac-app-store/metadata/review_information/notes.txt",         storeReviewNotes)
+        writeAlways("deployment/desktop/mac-app-store/metadata/review_information/demo_user.txt",     reviewDemoUser)
+        writeAlways("deployment/desktop/mac-app-store/metadata/review_information/demo_password.txt", reviewDemoPassword)
+        writeRatingConfig("deployment/desktop/mac-app-store/metadata/app_store_rating_config.json")
 
-        // Android Play Store
-        writeIfPresent("deployment/android/metadata/en-US/title.txt",             storeTitle)
-        writeIfPresent("deployment/android/metadata/en-US/short_description.txt", androidShortDesc)
-        writeIfPresent("deployment/android/metadata/en-US/changelogs/default.txt",androidChangelog)
+        // ── Android Play Store ────────────────────────────────────────────────
+        writeIfPresent("deployment/android/metadata/en-US/title.txt",              storeTitle)
+        writeIfPresent("deployment/android/metadata/en-US/short_description.txt",  androidShortDesc)
+        writeIfPresent("deployment/android/metadata/en-US/full_description.txt",   storeDescription)
+        writeIfPresent("deployment/android/metadata/en-US/changelogs/default.txt", androidChangelog)
+        writeAlways("deployment/android/metadata/en-US/video.txt", androidVideoUrl)
 
-        // full_description.txt — regex-replace the GitHub/support URL only (don't overwrite long-form copy)
-        if (supportUrl.isNotBlank()) {
-            val descFile = File(root, "deployment/android/metadata/en-US/full_description.txt")
-            if (descFile.exists()) {
-                val updated = descFile.readText().replace(Regex("GitHub: .*"), "GitHub: $supportUrl")
-                descFile.writeText(updated)
-                logger.lifecycle("syncForkConfig: updated deployment/android/metadata/en-US/full_description.txt")
-            }
+        // ── Windows / Microsoft Store ─────────────────────────────────────────
+        val storeBrokerFile = File(root, "deployment/desktop/microsoft-store/StoreBroker.config.json")
+        if (storeBrokerFile.parentFile.exists()) {
+            val resolvedAppId = msAppId.ifBlank { "\${ENV:MS_APP_ID}" }
+            val msixName = if (projectName.isNotBlank()) "$projectName.msix" else "app.msix"
+            storeBrokerFile.writeText("""{
+  "_comment": "StoreBroker submission config — generated by ./gradlew syncForkConfig. Edit gradle/fork.properties to change.",
+  "appId": "$resolvedAppId",
+  "flightId": null,
+  "packagePath": "cmp-desktop/build/compose/binaries/main-release/msix/$msixName",
+  "targetPublishMode": "$msPublishMode",
+  "visibility": "$msVisibility"
+}""")
+            logger.lifecycle("syncForkConfig: wrote deployment/desktop/microsoft-store/StoreBroker.config.json")
+            written++
         }
 
         logger.lifecycle("syncForkConfig: wrote $written store metadata files")
@@ -251,9 +334,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
             if (trimmed.startsWith("#") || !trimmed.contains("=")) return@forEach
             val eq = trimmed.indexOf('=')
             val key = trimmed.substring(0, eq).trim()
-            val raw = trimmed.substring(eq + 1).trim().removePrefix("\"").removeSuffix("\"").trim()
-            // Drop inline TOML comment
-            result[key] = raw.substringBefore(" #").trim()
+            // Drop inline TOML comment first, then strip quotes
+            val raw = trimmed.substring(eq + 1).trim().substringBefore(" #").trim()
+            result[key] = raw.removePrefix("\"").removeSuffix("\"").trim()
         }
         return result
     }

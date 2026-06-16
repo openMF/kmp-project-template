@@ -274,9 +274,16 @@ module FastlaneConfig
   # --------------------------------------------------------------------------
   # get_android_signing_config — returns signing config hash for buildAndSignApp
   # --------------------------------------------------------------------------
+  # v2 Play App Signing model: read upload_keystore.properties (canonical).
+  # Falls back to legacy release.properties for forks pre-v2.
   def self.get_android_signing_config(options = {})
     _s = SECRETS_DIR
-    props_path = "#{_s}/keystores/release.properties"
+    # v2 canonical → legacy fallback chain
+    candidate_props = [
+      "#{_s}/keystores/upload_keystore.properties",
+      "#{_s}/keystores/release.properties",
+    ]
+    props_path = candidate_props.find { |p| File.exist?(File.join(DEPLOYMENT_REPO_ROOT, p)) } || candidate_props.first
     props = {}
     if File.exist?(File.join(DEPLOYMENT_REPO_ROOT, props_path))
       File.readlines(File.join(DEPLOYMENT_REPO_ROOT, props_path)).each do |line|
@@ -286,8 +293,8 @@ module FastlaneConfig
     end
 
     # Read storeFile dynamically so forks can rename the keystore without
-    # touching config.rb (storeFile key in release.properties is canonical).
-    default_jks = "#{_s}/keystores/#{props.fetch("storeFile", "release.jks")}"
+    # touching config.rb (storeFile key in *_keystore.properties is canonical).
+    default_jks = "#{_s}/keystores/#{props.fetch("storeFile", "upload_keystore.keystore")}"
 
     {
       keystore_path:     options[:keystore_path]     ||
@@ -649,7 +656,7 @@ end
 # gradlew at root, not inside cmp-android/ — incompatible with gradle() action's
 # project_dir expectation.
 def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
-  keystore = signing_config[:keystore_path] || "secrets/keystores/release.jks"
+  keystore = signing_config[:keystore_path] || "secrets/keystores/upload_keystore.keystore"
   keystore_abs = File.expand_path(File.join(DEPLOYMENT_REPO_ROOT, keystore))
   gradlew    = File.join(DEPLOYMENT_REPO_ROOT, "gradlew")
   full_task  = ":cmp-android:#{taskName}#{buildType}"

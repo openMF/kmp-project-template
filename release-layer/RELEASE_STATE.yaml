@@ -1,0 +1,21 @@
+schema_version: "1.0"
+current_version: "2026.6.1"
+tag_created: true
+release_created: true
+last_updated: "2026-06-06T18:00:00Z"
+platforms:
+  android_playstore_internal:
+    status: deployed
+    version_code: 173
+    deployed_at: "2026-06-06T17:54:20Z"
+  android_playstore_beta:
+    status: deployed
+    deployed_at: "2026-06-06T20:33:07Z"
+    note: "draft status — roll out in Play Console to make available to testers"
+  android_playstore_production:
+    status: pending
+store_listing:
+  synced: true
+  locales: ["en-US"]
+  screenshot_count: 5
+  feature_graphic: true

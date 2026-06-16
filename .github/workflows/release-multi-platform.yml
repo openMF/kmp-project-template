@@ -1,27 +1,22 @@
 # .github/workflows/release-multi-platform.yml
 #
-# Multi-platform release. Default deploys hit Stage 0 (Firebase) + Stage 1 (testers)
-# in parallel for every configured platform; promotion to beta + production is a
-# separate workflow run (re-dispatch with the desired target).
+# Thin wrapper → openMF/mifos-x-actionhub/.github/workflows/v2/release-multi-platform.yaml@v1.0.19
+# All orchestration logic — per-platform target dropdowns, auto-version_tag,
+# parallel firebase+internal / firebase+testflight fan-out, smart defaults —
+# lives in the centralized reusable workflow. This file only declares the
+# workflow_dispatch inputs the consumer exposes + maps secrets.
 #
-# Default mode (just pick "Run workflow", touch nothing else):
-#   Android  → Firebase Distribution + Play Internal     (Stage 0 + Stage 1)
-#   iOS      → Firebase Distribution + TestFlight        (Stage 0 + Stage 1)
+# Default mode (touch nothing in the Run workflow form):
+#   Android  → Firebase Distribution + Play Internal     (parallel)
+#   iOS      → Firebase Distribution + TestFlight        (parallel)
 #   macOS    → Mac TestFlight                            (Stage 1)
 #   Windows  → GH Pre-release                            (Stage 1-equivalent)
 #   Linux    → GH Pre-release                            (Stage 1-equivalent)
 #   Web      → Preview deploy                            (Stage 1)
-#   version_tag → auto-computed YYYY.M.D (today's date, with -.N suffix if collision)
+#   version_tag → auto-computed YYYY.M.D
 #
-# Promotion (re-dispatch with a higher rung):
-#   Android  internal → beta → production
-#   iOS      internal (TF) → beta (TF External) → production (App Store review)
-#   macOS    internal (Mac TF) → beta → production (Mac App Store)
-#   Desktop  prerelease → beta → stable (GH Release flag promotion)
-#   Web      preview → staging → production
-#
-# Set any platform to `skip` to exclude it from this run.
-
+# Per-platform skip: set `<platform>_target: skip`.
+# Promote via re-dispatch with a higher rung.
 name: Release · Multi-Platform
 run-name: "🚀 Release ${{ inputs.version_tag || format('auto-{0}', github.run_number) }} · Android=${{ inputs.android_target }} · iOS=${{ inputs.ios_target }}"
 
@@ -34,101 +29,60 @@ on:
         type: string
         default: ''
 
-      target_branch:
-        description: 'Source branch to release from'
-        required: false
-        type: string
-        default: 'dev'
-
       android_target:
-        description: 'Android: firebase+internal (default) | firebase | internal | beta | production | skip'
+        description: 'Android'
         required: false
         type: choice
-        options:
-          - firebase+internal
-          - firebase
-          - internal
-          - beta
-          - production
-          - skip
+        options: [firebase+internal, firebase, internal, beta, production, skip]
         default: firebase+internal
 
       ios_target:
-        description: 'iOS: firebase+testflight (default) | firebase | internal (TF) | beta (TF External) | production (App Store) | skip'
+        description: 'iOS'
         required: false
         type: choice
-        options:
-          - firebase+testflight
-          - firebase
-          - internal
-          - beta
-          - production
-          - skip
+        options: [firebase+testflight, firebase, internal, beta, production, skip]
         default: firebase+testflight
 
       mac_target:
-        description: 'macOS MAS: internal (Mac TF, default) | beta (Mac TF External) | production (Mac App Store) | skip'
+        description: 'macOS MAS'
         required: false
         type: choice
-        options:
-          - internal
-          - beta
-          - production
-          - skip
+        options: [internal, beta, production, skip]
         default: internal
 
       desktop_win_target:
-        description: 'Windows: prerelease (default) | beta | stable | skip'
+        description: 'Windows'
         required: false
         type: choice
-        options:
-          - prerelease
-          - beta
-          - stable
-          - skip
+        options: [prerelease, beta, stable, skip]
         default: prerelease
 
       desktop_win_artifact:
         description: 'Windows artifact format'
         required: false
         type: choice
-        options:
-          - windows-msi-signed
-          - windows-exe
-          - windows-microsoft-store
+        options: [windows-msi-signed, windows-exe, windows-microsoft-store]
         default: windows-msi-signed
 
       desktop_linux_target:
-        description: 'Linux DEB: prerelease (default) | beta | stable | skip'
+        description: 'Linux DEB'
         required: false
         type: choice
-        options:
-          - prerelease
-          - beta
-          - stable
-          - skip
+        options: [prerelease, beta, stable, skip]
         default: prerelease
 
       web_target:
-        description: 'Web: preview (default) | staging | production | skip'
+        description: 'Web'
         required: false
         type: choice
-        options:
-          - preview
-          - staging
-          - production
-          - skip
+        options: [preview, staging, production, skip]
         default: preview
 
       web_host:
         description: 'Web host provider'
         required: false
         type: choice
-        options:
-          - gh-pages
-          - cloudflare-pages
-          - netlify
-          - vercel
+        options: [gh-pages, cloudflare-pages, netlify, vercel]
         default: gh-pages
 
       production_rollout:
@@ -138,80 +92,25 @@ on:
         default: '0.10'
 
 jobs:
-  # ─────────────────────────────────────────────────────────────────────────────
-  # version-resolve — auto-compute YYYY.M.D (with -.N suffix on collision)
-  # ─────────────────────────────────────────────────────────────────────────────
-  version-resolve:
-    name: Resolve version
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.compute.outputs.version }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
-      - id: compute
-        run: |
-          if [[ -n "${{ inputs.version_tag }}" ]]; then
-            VERSION="${{ inputs.version_tag }}"
-            echo "🔖 Using user-provided version: $VERSION"
-          else
-            # Auto-compute: today's date, suffix -.N if tag already exists
-            DATE=$(date -u +%Y.%-m.%-d)
-            VERSION="$DATE"
-            N=0
-            while git rev-parse "refs/tags/$VERSION" >/dev/null 2>&1 \
-               || git rev-parse "refs/tags/v$VERSION" >/dev/null 2>&1; do
-              N=$((N+1))
-              VERSION="${DATE}.${N}"
-              if [[ $N -gt 50 ]]; then
-                echo "❌ Too many collisions for $DATE — bail"
-                exit 1
-              fi
-            done
-            echo "🔖 Auto-computed version: $VERSION"
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-  # ─────────────────────────────────────────────────────────────────────────────
-  # Android — firebase+internal default fires BOTH stages in parallel
-  # ─────────────────────────────────────────────────────────────────────────────
-  android-firebase:
-    name: Android · Firebase Distribution (Stage 0)
-    if: ${{ inputs.android_target == 'firebase+internal' || inputs.android_target == 'firebase' }}
-    needs: version-resolve
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-android.yaml@v1.0.18
+  release:
+    name: Release
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-multi-platform.yaml@v1.0.19
     with:
+      version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
-      version_tag:          ${{ needs.version-resolve.outputs.version }}
-      starting_rung:        firebase
-      production_rollout:   '0.0'
-    secrets:
-      google_services:          ${{ secrets.GOOGLESERVICES }}
-      firebase_creds:           ${{ secrets.FIREBASECREDS }}
-      playstore_creds:          ${{ secrets.PLAYSTORECREDS }}
-      upload_keystore:          ${{ secrets.UPLOAD_KEYSTORE_FILE }}
-      keystore_password:        ${{ secrets.UPLOAD_KEYSTORE_FILE_PASSWORD }}
-      keystore_alias:           ${{ secrets.UPLOAD_KEYSTORE_ALIAS }}
-      keystore_alias_password:  ${{ secrets.UPLOAD_KEYSTORE_ALIAS_PASSWORD }}
-
-  android-promote:
-    name: Android · Play Store (Internal / Beta / Production)
-    if: >-
-      ${{ inputs.android_target == 'firebase+internal'
-          || inputs.android_target == 'internal'
-          || inputs.android_target == 'beta'
-          || inputs.android_target == 'production' }}
-    needs: version-resolve
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-android.yaml@v1.0.18
-    with:
-      android_package_name: cmp-android
-      version_tag:          ${{ needs.version-resolve.outputs.version }}
-      # firebase+internal → internal lane (firebase fires in sibling job above)
-      # internal/beta/production → use as-is
-      starting_rung:        ${{ inputs.android_target == 'firebase+internal' && 'internal' || inputs.android_target }}
+      ios_package_name:     cmp-ios
+      mac_package_name:     cmp-desktop
+      shared_module:        cmp-shared
+      desktop_package_name: cmp-desktop
+      web_package_name:     cmp-web
+      android_target:       ${{ inputs.android_target }}
+      ios_target:           ${{ inputs.ios_target }}
+      mac_target:           ${{ inputs.mac_target }}
+      desktop_win_target:   ${{ inputs.desktop_win_target }}
+      desktop_win_artifact: ${{ inputs.desktop_win_artifact }}
+      desktop_linux_target: ${{ inputs.desktop_linux_target }}
+      web_target:           ${{ inputs.web_target }}
+      web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
     secrets:
       google_services:          ${{ secrets.GOOGLESERVICES }}
@@ -221,107 +120,8 @@ jobs:
       keystore_password:        ${{ secrets.UPLOAD_KEYSTORE_FILE_PASSWORD }}
       keystore_alias:           ${{ secrets.UPLOAD_KEYSTORE_ALIAS }}
       keystore_alias_password:  ${{ secrets.UPLOAD_KEYSTORE_ALIAS_PASSWORD }}
-
-  # ─────────────────────────────────────────────────────────────────────────────
-  # iOS — firebase+testflight default fires BOTH stages in parallel
-  # ─────────────────────────────────────────────────────────────────────────────
-  ios-firebase:
-    name: iOS · Firebase Distribution (Stage 0)
-    if: ${{ inputs.ios_target == 'firebase+testflight' || inputs.ios_target == 'firebase' }}
-    needs: version-resolve
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.18
-    with:
-      platform:      ios
-      package_name:  cmp-ios
-      shared_module: cmp-shared
-      version_tag:   ${{ needs.version-resolve.outputs.version }}
-      starting_rung: firebase
-    secrets:
-      appstore_key_id:        ${{ secrets.APPSTORE_KEY_ID }}
-      appstore_issuer_id:     ${{ secrets.APPSTORE_ISSUER_ID }}
-      appstore_auth_key:      ${{ secrets.APPSTORE_AUTH_KEY }}
-      match_password:         ${{ secrets.MATCH_PASSWORD }}
-      match_ssh_private_key:  ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
-      firebase_creds:         ${{ secrets.FIREBASECREDS }}
-
-  ios-promote:
-    name: iOS · TestFlight / Beta / App Store
-    if: >-
-      ${{ inputs.ios_target == 'firebase+testflight'
-          || inputs.ios_target == 'internal'
-          || inputs.ios_target == 'beta'
-          || inputs.ios_target == 'production' }}
-    needs: version-resolve
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.18
-    with:
-      platform:      ios
-      package_name:  cmp-ios
-      shared_module: cmp-shared
-      version_tag:   ${{ needs.version-resolve.outputs.version }}
-      starting_rung: ${{ inputs.ios_target == 'firebase+testflight' && 'internal' || inputs.ios_target }}
-    secrets:
-      appstore_key_id:        ${{ secrets.APPSTORE_KEY_ID }}
-      appstore_issuer_id:     ${{ secrets.APPSTORE_ISSUER_ID }}
-      appstore_auth_key:      ${{ secrets.APPSTORE_AUTH_KEY }}
-      match_password:         ${{ secrets.MATCH_PASSWORD }}
-      match_ssh_private_key:  ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
-      firebase_creds:         ${{ secrets.FIREBASECREDS }}
-
-  # ─────────────────────────────────────────────────────────────────────────────
-  # macOS — defaults to Mac TestFlight; promote to MAS production via re-dispatch
-  # ─────────────────────────────────────────────────────────────────────────────
-  mac:
-    name: macOS · Mac TF / Beta / MAS
-    if: ${{ inputs.mac_target != 'skip' }}
-    needs: version-resolve
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.18
-    with:
-      platform:      mac
-      package_name:  cmp-desktop
-      shared_module: cmp-shared
-      version_tag:   ${{ needs.version-resolve.outputs.version }}
-      starting_rung: ${{ inputs.mac_target }}
-    secrets:
-      appstore_key_id:        ${{ secrets.APPSTORE_KEY_ID }}
-      appstore_issuer_id:     ${{ secrets.APPSTORE_ISSUER_ID }}
-      appstore_auth_key:      ${{ secrets.APPSTORE_AUTH_KEY }}
-      match_password:         ${{ secrets.MATCH_PASSWORD }}
-      match_ssh_private_key:  ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
-
-  # ─────────────────────────────────────────────────────────────────────────────
-  # Desktop / Web — start at prerelease/preview by default, promote via re-dispatch
-  # ─────────────────────────────────────────────────────────────────────────────
-  desktop-win:
-    name: Desktop · Windows
-    if: ${{ inputs.desktop_win_target != 'skip' }}
-    needs: version-resolve
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-desktop.yaml@v1.0.18
-    with:
-      target:               ${{ inputs.desktop_win_artifact }}
-      desktop_package_name: cmp-desktop
-      github_tag:           ${{ needs.version-resolve.outputs.version }}
-      starting_rung:        ${{ inputs.desktop_win_target }}
-    secrets: inherit
-
-  desktop-linux:
-    name: Desktop · Linux
-    if: ${{ inputs.desktop_linux_target != 'skip' }}
-    needs: version-resolve
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-desktop.yaml@v1.0.18
-    with:
-      target:               linux-deb
-      desktop_package_name: cmp-desktop
-      github_tag:           ${{ needs.version-resolve.outputs.version }}
-      starting_rung:        ${{ inputs.desktop_linux_target }}
-    secrets: inherit
-
-  web:
-    name: Web · ${{ inputs.web_host }}
-    if: ${{ inputs.web_target != 'skip' }}
-    needs: version-resolve
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-web.yaml@v1.0.18
-    with:
-      host:             ${{ inputs.web_host }}
-      web_package_name: cmp-web
-      starting_rung:    ${{ inputs.web_target }}
-    secrets: inherit
+      appstore_key_id:          ${{ secrets.APPSTORE_KEY_ID }}
+      appstore_issuer_id:       ${{ secrets.APPSTORE_ISSUER_ID }}
+      appstore_auth_key:        ${{ secrets.APPSTORE_AUTH_KEY }}
+      match_password:           ${{ secrets.MATCH_PASSWORD }}
+      match_ssh_private_key:    ${{ secrets.MATCH_GIT_PRIVATE_KEY }}

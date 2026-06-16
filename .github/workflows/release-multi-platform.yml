@@ -94,7 +94,9 @@ on:
 jobs:
   release:
     name: Release
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-multi-platform.yaml@v1.0.19
+    # Bumped to v1.0.20 which adds the validate-secrets preflight job — missing
+    # secrets fail fast in 8s instead of dying deep in Fastlane after 5-10 min build.
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-multi-platform.yaml@v1.0.20
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -112,16 +114,8 @@ jobs:
       web_target:           ${{ inputs.web_target }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-    secrets:
-      google_services:          ${{ secrets.GOOGLESERVICES }}
-      firebase_creds:           ${{ secrets.FIREBASECREDS }}
-      playstore_creds:          ${{ secrets.PLAYSTORECREDS }}
-      upload_keystore:          ${{ secrets.UPLOAD_KEYSTORE_FILE }}
-      keystore_password:        ${{ secrets.UPLOAD_KEYSTORE_FILE_PASSWORD }}
-      keystore_alias:           ${{ secrets.UPLOAD_KEYSTORE_ALIAS }}
-      keystore_alias_password:  ${{ secrets.UPLOAD_KEYSTORE_ALIAS_PASSWORD }}
-      appstore_key_id:          ${{ secrets.APPSTORE_KEY_ID }}
-      appstore_issuer_id:       ${{ secrets.APPSTORE_ISSUER_ID }}
-      appstore_auth_key:        ${{ secrets.APPSTORE_AUTH_KEY }}
-      match_password:           ${{ secrets.MATCH_PASSWORD }}
-      match_ssh_private_key:    ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
+    # GHA secrets use the lowercase actionhub v2 names (google_services, upload_keystore,
+    # appstore_key_id, etc. — see openMF/mifos-x-actionhub v2/README.md). The sync script
+    # dual-writes UPPERCASE + lowercase during migration; once all consumers verify
+    # lowercase works the UPPERCASE family can be deleted via gh secret delete.
+    secrets: inherit

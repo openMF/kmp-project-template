@@ -57,6 +57,11 @@ placeholders:
   kind: text
   gha_secret: FIREBASECREDS
   magic: '"_comment": "CLAUDE-PLACEHOLDER'
+- path: firebase/google-services.json
+  secrets_peer: secrets/firebase/google-services.json
+  kind: text
+  gha_secret: GOOGLESERVICES
+  magic: '"_comment": "CLAUDE-PLACEHOLDER'
 - path: firebase/android_app_id
   secrets_peer: secrets/firebase/android_app_id
   kind: text

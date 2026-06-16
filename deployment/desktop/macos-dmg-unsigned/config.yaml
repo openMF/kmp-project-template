@@ -11,7 +11,8 @@ signing: none
 distribution_groups: ["public"]
 retention: "indefinite"
 runners:
-  local: { command: "bash deployment/desktop/macos-dmg-unsigned/script.sh" }
+  local: { command: "bundle exec fastlane mac buildMacDmg" }
   ci:    { workflow_snippet: workflow-snippet.yml }
+fastlane_lane: buildMacDmg
 requires_confirm: false
 enabled_by_default: true

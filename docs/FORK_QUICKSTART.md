@@ -141,7 +141,7 @@ Koin module with the values you want.
 ./keystore-manager.sh generate
 ```
 
-Creates `keystores/release_keystore.keystore` (and the UPLOAD variant for Play
+Creates `keystores/upload_keystore.keystore` (and the UPLOAD variant for Play
 Console). The `keystores/` directory is `.gitignore`'d — values never reach
 the public history. Use `./keystore-manager.sh encode-secrets` later to push
 encoded keystores into GitHub Actions secrets for CI builds.

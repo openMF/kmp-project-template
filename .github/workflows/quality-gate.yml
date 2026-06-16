@@ -1,0 +1,22 @@
+# .github/workflows/quality-gate.yml — v2 combined quality suite
+#
+# Coverage + Spotless + Detekt + Dependency Guard + SBOM.
+# Runs on every PR + on tag creation.
+name: Quality Gate
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  quality:
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/quality-gate.yaml@v1.0.17
+    with:
+      coverage_threshold: '0.50'   # bump as coverage grows; floor for now
+      sbom_format:        'cyclonedx-json'
+      fail_on_warnings:   false
+    secrets: inherit

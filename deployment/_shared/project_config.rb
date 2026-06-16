@@ -126,7 +126,7 @@ module FastlaneConfig
       },
       aab_path:  "cmp-android/build/outputs/bundle/prodRelease/cmp-android-prod-release.aab",
       keystore: {
-        file:         ENV["ANDROID_STORE_FILE"]    || "release_keystore.keystore",
+        file:         ENV["ANDROID_STORE_FILE"]    || "upload_keystore.keystore",
         password:     ENV["ANDROID_STORE_PASSWORD"] || "",
         key_alias:    ENV["ANDROID_KEY_ALIAS"]     || "release-key",
         key_password: ENV["ANDROID_KEY_PASSWORD"]  || "",

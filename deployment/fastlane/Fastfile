@@ -16,6 +16,20 @@
 #   running lanes. We immediately Dir.chdir to repo root so that ./gradlew,
 #   cmp-android/, secrets/, and all other relative paths work correctly.
 
+# ── OpenSSL 3.x fix: Apple's API closes TCP without TLS close_notify ─────────
+# OP_IGNORE_UNEXPECTED_EOF (128) treats server-side EOF as a clean close rather
+# than raising SSL_read: unexpected eof while reading on every metadata PATCH.
+require "openssl"
+if defined?(OpenSSL::SSL::OP_IGNORE_UNEXPECTED_EOF)
+  OpenSSL::SSL::SSLContext.class_eval do
+    alias_method :_orig_initialize, :initialize
+    def initialize(*args)
+      _orig_initialize(*args)
+      self.options |= OpenSSL::SSL::OP_IGNORE_UNEXPECTED_EOF
+    end
+  end
+end
+
 # ── cwd → repo root ──────────────────────────────────────────────────────────
 # Fastlane sets cwd to deployment/fastlane/ when evaluating this file.
 # Two levels up → repo root.

@@ -62,15 +62,39 @@ placeholders:
     gha_secret: null  # multi-key file — individual vars set via shared_keys.env parsing
     magic: "# CLAUDE-PLACEHOLDER — do not commit this to secrets/"
 
-  # ── Android / keystore ───────────────────────────────────────────────────────
+  # ── Android / keystores (v2 — Play App Signing model) ────────────────────────
+  # ORIGINAL = app signing key (Play App Signing identity, immutable)
+  - path: keystores/original.properties
+    secrets_peer: secrets/keystores/original.properties
+    kind: text
+    gha_secret: null  # parsed: ORIGINAL_KEYSTORE_FILE_PASSWORD, ORIGINAL_KEYSTORE_ALIAS, ORIGINAL_KEYSTORE_ALIAS_PASSWORD
+    magic: "# CLAUDE-PLACEHOLDER — do not commit this to secrets/"
+
+  - path: keystores/original_keystore.keystore
+    secrets_peer: secrets/keystores/original_keystore.keystore
+    kind: binary
+    gha_secret: ORIGINAL_KEYSTORE_FILE
+    magic: "CLAUDE-PLHLD-v1"
+
+  # UPLOAD = Play Console upload key (rotatable)
+  - path: keystores/upload.properties
+    secrets_peer: secrets/keystores/upload.properties
+    kind: text
+    gha_secret: null  # parsed: UPLOAD_KEYSTORE_FILE_PASSWORD, UPLOAD_KEYSTORE_ALIAS, UPLOAD_KEYSTORE_ALIAS_PASSWORD
+    magic: "# CLAUDE-PLACEHOLDER — do not commit this to secrets/"
+
+  - path: keystores/upload_keystore.keystore
+    secrets_peer: secrets/keystores/upload_keystore.keystore
+    kind: binary
+    gha_secret: UPLOAD_KEYSTORE_FILE
+    magic: "CLAUDE-PLHLD-v1"
+
+  # Legacy single-keystore mode (auto-mapped to ORIGINAL+UPLOAD by sync script)
   - path: keystores/release.properties
     secrets_peer: secrets/keystores/release.properties
     kind: text
-    gha_secret: null  # parsed: KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+    gha_secret: null  # legacy fallback — sync script maps to ORIGINAL+UPLOAD families
     magic: "# CLAUDE-PLACEHOLDER — do not commit this to secrets/"
-
-  # release.jks is generated — no secrets_demo placeholder for binary keystore
-  # Generate with: keytool -genkey -keystore secrets/keystores/release.jks ...
 
   # ── Firebase ─────────────────────────────────────────────────────────────────
   - path: firebase/service-account.json

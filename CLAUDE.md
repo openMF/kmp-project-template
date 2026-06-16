@@ -520,7 +520,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 2. **Signing parameter naming inconsistency** - Mixed snake_case/camelCase/UPPERCASE
 
 ### 🟡 Medium
-3. **Hardcoded keystore filename** - `release_keystore.keystore` in multiple places
+3. **Hardcoded keystore filename** - `upload_keystore.keystore` in multiple places
 4. **Version generation may fail silently** - `set +e` swallows errors
 5. **Production promotion has no validation** - Doesn't verify beta release exists
 

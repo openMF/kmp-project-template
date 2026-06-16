@@ -1,0 +1,173 @@
+# .github/workflows/release-multi-platform.yml
+#
+# Multi-platform release with per-platform target picker (v1-style UX over v2 ladder).
+#
+# Each platform has its OWN target dropdown. Pick `skip` to disable a platform.
+# Otherwise pick the rung you want to land at. Per-platform jobs fire independently —
+# approval gates + supersede still apply within each platform via the consolidated
+# actionhub.
+#
+# Examples:
+#   android_target=internal + ios_target=firebase + web_target=preview
+#     → Android: Play Internal; iOS: Firebase only; Web: gh-pages-preview
+#   android_target=production + ios_target=app-store + web_target=production + mac_target=skip
+#     → Full production sweep on Android + iOS + Web; macOS skipped
+#   ios_target=app-store only (everything else skip)
+#     → iOS App Store hotfix path
+name: Release · Multi-Platform
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag (e.g. v2026.06.16)'
+        required: true
+        type: string
+
+      target_branch:
+        description: 'Source branch to release from'
+        required: false
+        type: string
+        default: 'dev'
+
+      android_target:
+        description: 'Android: skip | firebase (Stage 0) | internal | beta | production'
+        required: false
+        type: choice
+        options: [skip, firebase, internal, beta, production]
+        default: skip
+
+      ios_target:
+        description: 'iOS: skip | firebase (Stage 0) | internal (TF) | beta (TF External) | production (App Store)'
+        required: false
+        type: choice
+        options: [skip, firebase, internal, beta, production]
+        default: skip
+
+      mac_target:
+        description: 'macOS MAS: skip | internal (Mac TF) | beta (Mac TF External) | production (Mac App Store)'
+        required: false
+        type: choice
+        options: [skip, internal, beta, production]
+        default: skip
+
+      desktop_win_target:
+        description: 'Windows: skip | prerelease | beta | stable (GH Release flag)'
+        required: false
+        type: choice
+        options: [skip, prerelease, beta, stable]
+        default: skip
+
+      desktop_win_artifact:
+        description: 'Windows artifact: windows-msi-signed (Azure) | windows-exe | windows-microsoft-store'
+        required: false
+        type: choice
+        options: [windows-msi-signed, windows-exe, windows-microsoft-store]
+        default: windows-msi-signed
+
+      desktop_linux_target:
+        description: 'Linux DEB: skip | prerelease | beta | stable'
+        required: false
+        type: choice
+        options: [skip, prerelease, beta, stable]
+        default: skip
+
+      web_target:
+        description: 'Web: skip | preview | staging | production'
+        required: false
+        type: choice
+        options: [skip, preview, staging, production]
+        default: skip
+
+      web_host:
+        description: 'Web host: gh-pages | cloudflare-pages | netlify | vercel'
+        required: false
+        type: choice
+        options: [gh-pages, cloudflare-pages, netlify, vercel]
+        default: gh-pages
+
+      production_rollout:
+        description: 'Android staged rollout (0.0-1.0, only used when android_target=production)'
+        required: false
+        type: string
+        default: '0.10'
+
+jobs:
+  android:
+    if: ${{ inputs.android_target != 'skip' }}
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-android.yaml@v1.0.17
+    with:
+      android_package_name: cmp-android
+      version_tag:          ${{ inputs.version_tag }}
+      starting_rung:        ${{ inputs.android_target }}
+      production_rollout:   ${{ inputs.production_rollout }}
+    secrets:
+      google_services:          ${{ secrets.GOOGLESERVICES }}
+      firebase_creds:           ${{ secrets.FIREBASECREDS }}
+      playstore_creds:          ${{ secrets.PLAYSTORECREDS }}
+      release_keystore:         ${{ secrets.ORIGINAL_KEYSTORE_FILE }}
+      keystore_password:        ${{ secrets.ORIGINAL_KEYSTORE_FILE_PASSWORD }}
+      keystore_alias:           ${{ secrets.ORIGINAL_KEYSTORE_ALIAS }}
+      keystore_alias_password:  ${{ secrets.ORIGINAL_KEYSTORE_ALIAS_PASSWORD }}
+
+  ios:
+    if: ${{ inputs.ios_target != 'skip' }}
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.17
+    with:
+      platform:      ios
+      package_name:  cmp-ios
+      shared_module: cmp-shared
+      version_tag:   ${{ inputs.version_tag }}
+      starting_rung: ${{ inputs.ios_target }}
+    secrets:
+      appstore_key_id:        ${{ secrets.APPSTORE_KEY_ID }}
+      appstore_issuer_id:     ${{ secrets.APPSTORE_ISSUER_ID }}
+      appstore_auth_key:      ${{ secrets.APPSTORE_AUTH_KEY }}
+      match_password:         ${{ secrets.MATCH_PASSWORD }}
+      match_ssh_private_key:  ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
+      firebase_creds:         ${{ secrets.FIREBASECREDS }}
+
+  mac:
+    if: ${{ inputs.mac_target != 'skip' }}
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.17
+    with:
+      platform:      mac
+      package_name:  cmp-desktop
+      shared_module: cmp-shared
+      version_tag:   ${{ inputs.version_tag }}
+      starting_rung: ${{ inputs.mac_target }}
+    secrets:
+      appstore_key_id:        ${{ secrets.APPSTORE_KEY_ID }}
+      appstore_issuer_id:     ${{ secrets.APPSTORE_ISSUER_ID }}
+      appstore_auth_key:      ${{ secrets.APPSTORE_AUTH_KEY }}
+      match_password:         ${{ secrets.MATCH_PASSWORD }}
+      match_ssh_private_key:  ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
+
+  desktop-win:
+    if: ${{ inputs.desktop_win_target != 'skip' }}
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-desktop.yaml@v1.0.17
+    with:
+      target:               ${{ inputs.desktop_win_artifact }}
+      desktop_package_name: cmp-desktop
+      github_tag:           ${{ inputs.version_tag }}
+      starting_rung:        ${{ inputs.desktop_win_target }}
+    secrets: inherit
+
+  desktop-linux:
+    if: ${{ inputs.desktop_linux_target != 'skip' }}
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-desktop.yaml@v1.0.17
+    with:
+      target:               linux-deb
+      desktop_package_name: cmp-desktop
+      github_tag:           ${{ inputs.version_tag }}
+      starting_rung:        ${{ inputs.desktop_linux_target }}
+    secrets: inherit
+
+  web:
+    if: ${{ inputs.web_target != 'skip' }}
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-web.yaml@v1.0.17
+    with:
+      host:             ${{ inputs.web_host }}
+      web_package_name: cmp-web
+      starting_rung:    ${{ inputs.web_target }}
+    secrets: inherit

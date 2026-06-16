@@ -53,15 +53,7 @@ Deploy AAB to Google Play Store internal track
 [bundle exec] fastlane android promote_to_production
 ```
 
-Promote beta track to production on Google Play
-
-### android syncListing
-
-```sh
-[bundle exec] fastlane android syncListing
-```
-
-Sync Play Store store listing — title, description, screenshots, feature graphic. No APK/AAB uploaded.
+Promote to production on Google Play (internal → production for first-time apps; beta → production otherwise)
 
 ### android upload_android_screenshots
 
@@ -87,6 +79,14 @@ Sync full Play Store listing (text + screenshots + feature graphic)
 
 Alias for upload_android_screenshots
 
+### android syncListing
+
+```sh
+[bundle exec] fastlane android syncListing
+```
+
+Sync Play Store listing (metadata + screenshots) — no build, no binary upload
+
 ----
 
 
@@ -98,7 +98,23 @@ Alias for upload_android_screenshots
 [bundle exec] fastlane mac desktop_testflight
 ```
 
-Upload macOS desktop build to TestFlight (Mac App Store track)
+Build and upload macOS desktop build to TestFlight (Mac App Store track)
+
+### mac create_mac_installer_cert
+
+```sh
+[bundle exec] fastlane mac create_mac_installer_cert
+```
+
+One-shot: create proper Mac Installer Distribution cert in Apple Developer Portal + push to Match repo.
+
+### mac promoteMacToAppStore
+
+```sh
+[bundle exec] fastlane mac promoteMacToAppStore
+```
+
+Promote an existing Mac TestFlight build to Mac App Store review — no rebuild, no re-upload.
 
 ### mac desktop_release
 
@@ -106,12 +122,49 @@ Upload macOS desktop build to TestFlight (Mac App Store track)
 [bundle exec] fastlane mac desktop_release
 ```
 
-Promote macOS desktop build to Mac App Store production
+Full Mac App Store release — build PKG from source + deliver (use promoteMacToAppStore when a TestFlight build already exists)
+
+### mac buildMacDmg
+
+```sh
+[bundle exec] fastlane mac buildMacDmg
+```
+
+Build unsigned macOS DMG and upload to GitHub Release
+
+----
+
+
+## desktop
+
+### desktop syncListing
+
+```sh
+[bundle exec] fastlane desktop syncListing
+```
+
+Sync Desktop store listings — no binary upload (GitHub Release + Mac App Store)
 
 ----
 
 
 ## iOS
+
+### ios promoteToAppStore
+
+```sh
+[bundle exec] fastlane ios promoteToAppStore
+```
+
+Promote an existing TestFlight build to App Store review — no rebuild, no re-upload. Mirrors Android's promote_to_production.
+
+### ios uploadAppStore
+
+```sh
+[bundle exec] fastlane ios uploadAppStore
+```
+
+Upload an already-built IPA to App Store (skips build; use after release build succeeded but deliver failed)
 
 ### ios release
 
@@ -121,13 +174,65 @@ Promote macOS desktop build to Mac App Store production
 
 Upload iOS application to App Store
 
+### ios renewCerts
+
+```sh
+[bundle exec] fastlane ios renewCerts
+```
+
+Renew expired iOS Distribution certificate: revoke from Apple portal + create fresh adhoc + appstore certs
+
+### ios renewAllCerts
+
+```sh
+[bundle exec] fastlane ios renewAllCerts
+```
+
+Full cross-platform cert renewal — all 4 cert types across all managed bundle IDs.
+
+Covers:
+  • appstore (iOS)                    — TestFlight + App Store (all app IDs)
+  • adhoc (iOS)                       — Firebase App Distribution (all app IDs)
+  • appstore (macOS)                  — Mac .app codesign (primary app ID)
+  • mac_installer_distribution (macOS) — Mac .pkg signing (primary app ID)
+
+Options:
+  force:true          — renew even if certs are not near expiry (default false)
+  type:TYPE           — all | appstore | adhoc | mac_installer_distribution (default all)
+
+Run locally:
+  cd deployment && bundle exec fastlane ios renewAllCerts
+  cd deployment && bundle exec fastlane ios renewAllCerts force:true
+  cd deployment && bundle exec fastlane ios renewAllCerts type:mac_installer_distribution
+
+This is the local equivalent of .github/workflows/ios-cert-renewal.yml.
+See deployment/_shared/scripts/cert-renewal.sh for a standalone bash runner
+that also works outside of this Fastlane context (e.g. from ios-provisioning-profile).
+
+
+### ios deployProdIpaOnFirebase
+
+```sh
+[bundle exec] fastlane ios deployProdIpaOnFirebase
+```
+
+Upload iOS production IPA to Firebase App Distribution
+
+### ios deployDemoIpaOnFirebase
+
+```sh
+[bundle exec] fastlane ios deployDemoIpaOnFirebase
+```
+
+Upload iOS demo IPA to Firebase App Distribution
+
 ### ios deploy_on_firebase
 
 ```sh
 [bundle exec] fastlane ios deploy_on_firebase
 ```
 
-Upload iOS application to Firebase App Distribution
+Alias for deployProdIpaOnFirebase (backward compatibility)
 
 ### ios frame_ios_screenshots
 
@@ -152,6 +257,22 @@ Upload framed iOS screenshots to App Store Connect
 ```
 
 Frame + upload iOS screenshots (generation is handled by /release)
+
+### ios syncListing
+
+```sh
+[bundle exec] fastlane ios syncListing
+```
+
+Sync App Store listing (metadata + screenshots) — no build, no binary upload, no submission
+
+### ios uploadTestFlight
+
+```sh
+[bundle exec] fastlane ios uploadTestFlight
+```
+
+Upload an already-built IPA to TestFlight (skips build; use after beta build succeeded but pilot upload failed)
 
 ### ios beta
 

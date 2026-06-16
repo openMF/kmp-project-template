@@ -48,6 +48,9 @@ apple.team.id=YOUR_TEAM_ID
 # Guide: deployment/BOOTSTRAP.md → Fastlane Match setup
 # ENV: MATCH_GIT_URL
 apple.match.git.url=git@github.com:YOUR_ORG/ios-provisioning.git
+# Branch in the Match certificate repo (default: master).
+# ENV: MATCH_GIT_BRANCH
+apple.match.git.branch=master
 
 # TestFlight external tester groups (comma-separated for multiple groups).
 # Create at: App Store Connect → TestFlight → Builds → External Groups
@@ -68,9 +71,18 @@ firebase.android.prod.app.id=1:000000000000:android:aaaaaaaaaaaaaaaa
 # ENV: FIREBASE_ANDROID_DEMO_APP_ID
 firebase.android.demo.app.id=1:000000000000:android:bbbbbbbbbbbbbbbb
 
-# iOS App ID — Firebase console → iOS app
+# iOS App ID — Firebase console → iOS app (legacy single-flavor key; prod takes precedence when set)
 # ENV: FIREBASE_IOS_APP_ID
 firebase.ios.app.id=1:000000000000:ios:cccccccccccccccc
+
+# iOS prod flavor App ID — Firebase console → iOS prod app
+# ENV: FIREBASE_IOS_PROD_APP_ID
+firebase.ios.prod.app.id=1:000000000000:ios:cccccccccccccccc
+
+# iOS demo flavor App ID — Firebase console → iOS demo app
+# Register a separate iOS app in Firebase console for the demo flavor.
+# ENV: FIREBASE_IOS_DEMO_APP_ID
+firebase.ios.demo.app.id=1:000000000000:ios:dddddddddddddddd
 
 # Firebase App Distribution tester group(s).
 # Find at: Firebase Console → App Distribution → Testers & Groups tab

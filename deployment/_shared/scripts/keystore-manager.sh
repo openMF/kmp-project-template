@@ -1548,9 +1548,12 @@ generate_keystores() {
     check_keytool
     create_keystores_dir
 
-    # Names for local keystore files (these won't be uploaded to GitHub)
-    ORIGINAL_KEYSTORE_NAME=${ORIGINAL_KEYSTORE_NAME:-"original.keystore"}
-    UPLOAD_KEYSTORE_NAME=${UPLOAD_KEYSTORE_NAME:-"upload.keystore"}
+    # Names for local keystore files (these won't be uploaded to GitHub).
+    # Aligned with v2 naming: matches Gradle's signingConfig fallback path
+    # (../keystores/upload_keystore.keystore) and materialize-android-secrets.sh
+    # output paths (keystores/{original,upload}_keystore.keystore).
+    ORIGINAL_KEYSTORE_NAME=${ORIGINAL_KEYSTORE_NAME:-"original_keystore.keystore"}
+    UPLOAD_KEYSTORE_NAME=${UPLOAD_KEYSTORE_NAME:-"upload_keystore.keystore"}
 
     # Map GitHub secret names to local keystore variables
     ORIGINAL_KEYSTORE_FILE_PASSWORD=${ORIGINAL_KEYSTORE_FILE_PASSWORD:-"Keystore_password"}

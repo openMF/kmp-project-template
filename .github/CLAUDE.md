@@ -209,7 +209,7 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 1. Installs Fastlane + plugins (`firebase_app_distribution`, `increment_build_number`)
 2. Inflates secrets to:
    - `{package_name}/google-services.json`
-   - `keystores/release_keystore.keystore`
+   - `keystores/upload_keystore.keystore`
    - `secrets/firebaseAppDistributionServiceCredentialsFile.json`
 3. Calls Fastlane lane:
    - Prod: `bundle exec fastlane android deployReleaseApkOnFirebase`
@@ -239,7 +239,7 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 **What it does:**
 1. Inflates secrets to:
    - `{package_name}/google-services.json`
-   - `keystores/release_keystore.keystore`
+   - `keystores/upload_keystore.keystore`
    - `secrets/playStorePublishServiceCredentialsFile.json`
 2. Calls Fastlane lane: `bundle exec fastlane android deployInternal`
    - Uploads AAB to internal track

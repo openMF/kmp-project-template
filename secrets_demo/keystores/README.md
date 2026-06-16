@@ -1,46 +1,76 @@
-# Android Keystores
+# Android Keystores (Play App Signing model)
 
 Used for: signing Android release APKs and AABs for Play Store and Firebase distribution.
 
-## Overview
+## Two-keystore model (recommended for new apps — v2)
 
-Android requires a keystore to sign release builds. This project uses a single
-release keystore (`release.jks`) with a `release` key alias.
+Modern Android publishing uses Google's [Play App Signing](https://developer.android.com/studio/publish/app-signing#app-signing-google-play) with **two separate keystores**:
 
-## How to generate a keystore (first time)
+| Keystore | File | Env-var family | Role |
+|---|---|---|---|
+| **ORIGINAL** | `original_keystore.keystore` | `ORIGINAL_KEYSTORE_*` | **App Signing Key** — the immutable identity Google Play uses to re-sign your AAB after upload verification. Lose this and you cannot publish updates to the same package name. |
+| **UPLOAD** | `upload_keystore.keystore` | `UPLOAD_KEYSTORE_*` | **Upload Key** — what your CI signs AABs with before uploading. Play Console verifies the upload signature, then re-signs with the ORIGINAL key. Rotatable if compromised. |
+
+> **Why two keystores?** The Upload Key can be rotated if compromised, but the App Signing Key is permanent. Separating them means a leaked CI signing key doesn't permanently lock you out of updating your app.
+
+## Single-keystore fallback (legacy, pre–Play App Signing)
+
+If you're not using Play App Signing, you only need one keystore (`release.jks`).
+The sync script auto-detects this and pushes the same keystore as both `ORIGINAL_*` and `UPLOAD_*` families so v2 CI workflows still work.
+
+## How to generate keystores (first time)
 
 ```bash
 mkdir -p secrets/keystores
 
+# ORIGINAL — app signing key (long-lived)
 keytool -genkey -v \
-  -keystore secrets/keystores/release.jks \
-  -alias release \
+  -keystore secrets/keystores/original_keystore.keystore \
+  -alias original \
   -keyalg RSA \
   -keysize 4096 \
-  -validity 10000 \
+  -validity 25000 \
+  -dname "CN=Your Name, OU=Engineering, O=Your Org, L=City, S=State, C=US"
+
+# UPLOAD — upload signing key (rotatable)
+keytool -genkey -v \
+  -keystore secrets/keystores/upload_keystore.keystore \
+  -alias upload \
+  -keyalg RSA \
+  -keysize 4096 \
+  -validity 25000 \
   -dname "CN=Your Name, OU=Engineering, O=Your Org, L=City, S=State, C=US"
 ```
 
-You'll be prompted for a keystore password and key password. Use strong,
-unique passwords (store them in a password manager).
+Or use the project's helper: `./keystore-manager.sh generate`
 
-## Create release.properties
+## Create properties files
 
 ```bash
-cat > secrets/keystores/release.properties <<'EOF'
-storeFile=release.jks
-storePassword=YOUR_STORE_PASSWORD
-keyAlias=release
-keyPassword=YOUR_KEY_PASSWORD
+cat > secrets/keystores/original.properties <<'EOF'
+storeFile=original_keystore.keystore
+storePassword=YOUR_ORIGINAL_STORE_PASSWORD
+keyAlias=original
+keyPassword=YOUR_ORIGINAL_KEY_PASSWORD
+EOF
+
+cat > secrets/keystores/upload.properties <<'EOF'
+storeFile=upload_keystore.keystore
+storePassword=YOUR_UPLOAD_STORE_PASSWORD
+keyAlias=upload
+keyPassword=YOUR_UPLOAD_KEY_PASSWORD
 EOF
 ```
 
-## Files
+## Files → GHA secret mapping
 
-| File | Content | GHA Secret |
-|------|---------|------------|
-| `secrets/keystores/release.jks` | Keystore binary | `KMP_TEMPLATE_RELEASE_KEYSTORE` |
-| `secrets/keystores/release.properties` | Password/alias | `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD` |
+| File | Content | GHA secret(s) |
+|---|---|---|
+| `secrets/keystores/original_keystore.keystore` | App signing keystore binary | `ORIGINAL_KEYSTORE_FILE` (base64) |
+| `secrets/keystores/original.properties` | App signing creds | `ORIGINAL_KEYSTORE_FILE_PASSWORD`, `ORIGINAL_KEYSTORE_ALIAS`, `ORIGINAL_KEYSTORE_ALIAS_PASSWORD` |
+| `secrets/keystores/upload_keystore.keystore` | Upload keystore binary | `UPLOAD_KEYSTORE_FILE` (base64) |
+| `secrets/keystores/upload.properties` | Upload creds | `UPLOAD_KEYSTORE_FILE_PASSWORD`, `UPLOAD_KEYSTORE_ALIAS`, `UPLOAD_KEYSTORE_ALIAS_PASSWORD` |
+| `secrets/firebase/google-services.json` | Firebase config | `GOOGLESERVICES` (base64) |
 
 ## Sync to GitHub
 
@@ -48,20 +78,20 @@ EOF
 bash scripts/sync-secrets-to-github.sh --only android
 ```
 
-## CRITICAL: Back up your keystore
+## CRITICAL: Back up your keystores
 
-⚠️ **If you lose your release keystore, you CANNOT publish updates to the Play Store.**
-The Play Store permanently associates your app with the signing key used for the
-first upload. There is no recovery path.
+⚠️ **If you lose your ORIGINAL keystore, you CANNOT publish updates to the Play Store under the same package name.** There is no recovery path.
 
-Back up in at least two places:
+Back up the ORIGINAL keystore in at least three places:
 - Password manager (1Password, Bitwarden, etc.)
-- Encrypted cloud storage
-- Another team member's secure storage
+- Encrypted cloud storage (separate from your Google account)
+- Physical backup (USB key in a safe / printed escrow)
+
+UPLOAD keystore is rotatable, so a single backup is enough.
 
 ## Notes
 
-- Keep the same keystore for the entire lifetime of your app on Play Store
-- For Play App Signing (recommended for new apps), Google holds the upload key —
-  see: https://support.google.com/googleplay/android-developer/answer/9842756
-- Debug keystores (auto-generated by Android Studio) are NOT used for release builds
+- Keep the ORIGINAL keystore for the entire lifetime of your app on Play Store.
+- UPLOAD keystore can be rotated via Play Console if compromised — see [Reset a lost or compromised upload key](https://support.google.com/googleplay/android-developer/answer/9842756).
+- Debug keystores (auto-generated by Android Studio) are NOT used for release builds.
+- For migrating from a single-keystore project: the sync script handles single-keystore mode automatically by detecting `release.properties` and pushing it as both ORIGINAL and UPLOAD families.

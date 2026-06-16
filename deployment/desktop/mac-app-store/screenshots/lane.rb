@@ -9,23 +9,18 @@
 #   upload_macos_screenshots   — upload screenshots to Mac App Store via deliver
 #   macos_screenshots          — alias for upload_macos_screenshots
 
-MAC_SCREENSHOTS_PATH = File.expand_path("../metadata/screenshots", __dir__).freeze
-MAC_METADATA_PATH    = File.expand_path("../metadata", __dir__).freeze
-MAC_PRIMARY_LOCALE   = "en-GB".freeze
-
 platform :mac do
   desc "Upload macOS screenshots to Mac App Store via deliver"
   lane :upload_macos_screenshots do |options|
     setup_ci_if_needed
 
-    cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
-
     deliver(
-      username:               ENV["FASTLANE_APPLE_ID"] || options[:apple_id_email],
-      team_id:                ENV["APPLE_TEAM_ID"],
-      metadata_path:          MAC_METADATA_PATH,
-      screenshots_path:       MAC_SCREENSHOTS_PATH,
-      primary_locale:         MAC_PRIMARY_LOCALE,
+      platform:               "osx",
+      api_key:                Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      app_identifier:         ENV["MAC_APP_IDENTIFIER"] || ENV["MAC_BUNDLE_ID"] || ForkIdentity::APP_ID,
+      metadata_path:          MAC_APP_STORE_METADATA_PATH,
+      screenshots_path:       MAC_APP_STORE_SCREENSHOTS_PATH,
+      primary_locale:         MAC_APP_STORE_PRIMARY_LOCALE,
       skip_binary_upload:     true,
       skip_metadata:          true,
       skip_screenshots:       false,

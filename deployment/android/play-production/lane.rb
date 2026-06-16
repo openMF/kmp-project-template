@@ -4,45 +4,45 @@
 # Gated by `requires_confirm: true` in config.yaml (AC34).
 
 platform :android do
-  desc "Promote beta track to production on Google Play"
+  desc "Promote to production on Google Play (internal → production for first-time apps; beta → production otherwise)"
   lane :promote_to_production do
-    upload_to_play_store(
-      track:                   "beta",
-      track_promote_to:        "production",
-      json_key:                File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json"),
-      package_name:            FastlaneConfig::ProjectConfig.android_package_name,
-      skip_upload_changelogs:  true,
-      skip_upload_metadata:    true,
-      skip_upload_images:      true,
-      skip_upload_screenshots: true,
-    )
+    json_key = File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json")
+    pkg      = FastlaneConfig::ProjectConfig.android_package_name
+
+    # For first-time apps the beta release may be in draft with no country targeting,
+    # making beta→production promotion fail with "Release in track targeting no countries".
+    # Promote from internal directly to production in that case.
+    # rollout 100% immediately — no manual intervention in Play Console required.
+    begin
+      upload_to_play_store(
+        track:                  "beta",
+        track_promote_to:       "production",
+        rollout:                "1.0",
+        json_key:               json_key,
+        package_name:           pkg,
+        skip_upload_changelogs: true,
+        skip_upload_metadata:   true,
+        skip_upload_images:     true,
+        skip_upload_screenshots: true,
+      )
+    rescue => e
+      if e.message.include?("targeting no countries") || e.message.include?("draft app")
+        UI.important("Beta track unavailable (#{e.message.split(".").first}). Promoting from internal → production.")
+        upload_to_play_store(
+          track:                  "internal",
+          track_promote_to:       "production",
+          rollout:                "1.0",
+          json_key:               json_key,
+          package_name:           pkg,
+          skip_upload_changelogs: true,
+          skip_upload_metadata:   true,
+          skip_upload_images:     true,
+          skip_upload_screenshots: true,
+        )
+      else
+        raise e
+      end
+    end
   end
 
-  desc "Sync Play Store store listing — title, description, screenshots, feature graphic. No APK/AAB uploaded."
-  lane :syncListing do |options|
-    options = sanitize_options(options)
-
-    metadata_path = FastlaneConfig::AndroidConfig::METADATA_PATH
-    json_key      = FastlaneConfig::ProjectConfig::ANDROID[:play_store_json_key]
-    pkg           = FastlaneConfig::ProjectConfig.android_package_name
-
-    UI.message("Syncing Play Store listing for #{pkg}")
-    UI.message("Metadata path: #{metadata_path}")
-    UI.message("Service account: #{json_key}")
-
-    upload_to_play_store(
-      package_name:           pkg,
-      json_key:               json_key,
-      metadata_path:          metadata_path,
-      # Metadata-only: no binary upload
-      skip_upload_apk:        true,
-      skip_upload_aab:        true,
-      # Changelogs are version-specific — uploaded alongside each release build
-      skip_upload_changelogs: true,
-      # Upload screenshots + feature graphic from metadata/images/
-      sync_image_upload:      true,
-    )
-
-    UI.success("Play Store listing updated successfully!")
-  end
 end

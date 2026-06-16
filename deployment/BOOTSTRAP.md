@@ -138,6 +138,60 @@ Required secrets (from `deployment/ios/testflight/secrets-needs.yaml`):
 - `APP_STORE_CONNECT_API_KEY_ID` (env var)
 - `APP_STORE_CONNECT_API_ISSUER_ID` (env var)
 
+### iOS Certificate Lifecycle — `renewCerts`
+
+Apple Distribution certificates expire after **1 year**. When one expires,
+every iOS deploy lane fails with `"Your certificate '…' is not valid"`. The
+`renewCerts` lane handles the full renewal cycle:
+
+1. Revoke expired (or soonest-expiring) cert from Apple portal via ASC API.
+2. Purge the old cert files from the Match git repo (`ios-provisioning-profile`).
+3. Run `match adhoc` + `match appstore` to create a fresh cert and push it.
+
+**Run it:**
+```bash
+# From repo root
+(cd deployment && bundle exec fastlane ios renewCerts)
+```
+
+**When to run:**
+- A deploy fails with `"not valid, please check end date"` → run immediately.
+- Monthly CI schedule (`.github/workflows/ios-cert-renewal.yml`) handles the
+  proactive case automatically on the 1st of every month.
+
+#### Colleague setup (one-time per machine)
+
+Everyone who needs to run `renewCerts` or any iOS lane locally needs:
+
+| What | Where | How to get it |
+|------|-------|---------------|
+| SSH private key with write access to `openMF/ios-provisioning-profile` | `secrets/match/match_ci_key` | Framework vault: `/secrets pull`; or request from team lead |
+| `MATCH_PASSWORD` | `secrets/match/.match_password` | Same vault / team lead |
+| `KEYCHAIN_PASSWORD` | `secrets/match/keychain_password` | Your macOS login keychain password |
+| `CERTIFICATES_PASSWORD` | `secrets/match/certificates_password` | Same as `MATCH_PASSWORD` in standard setups |
+| ASC API key | `secrets/appstore/AuthKey.p8` + `key_id` + `issuer_id` | Framework vault: `/secrets pull` |
+
+Once secrets are in place, clone the Match repo once so subsequent runs
+are fast (`git fetch + reset` instead of a full clone):
+
+```bash
+# From repo root — one-time setup per machine
+GIT_SSH_COMMAND="ssh -i secrets/match/match_ci_key -o StrictHostKeyChecking=no" \
+  git clone --depth 1 git@github.com:openMF/ios-provisioning-profile.git \
+  secrets/match/ios-provisioning-profile
+```
+
+> The `secrets/` directory is gitignored — the clone never enters source control.
+> The `renewCerts` lane auto-clones on first run if the directory is absent, so
+> this manual step is optional but speeds up subsequent runs.
+
+**GitHub Actions** — the `ios-cert-renewal.yml` workflow sets up all secrets
+and clones the Match repo automatically. Required repo secrets:
+`MATCH_GIT_PRIVATE_KEY`, `MATCH_PASSWORD`, `CERTIFICATES_PASSWORD`,
+`KEYCHAIN_PASSWORD`, `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`, `APPSTORE_AUTH_KEY`.
+
+---
+
 ### Path A — example: Web GitHub Pages
 
 ```bash

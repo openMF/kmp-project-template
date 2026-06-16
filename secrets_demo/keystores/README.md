@@ -47,14 +47,14 @@ Or use the project's helper: `./keystore-manager.sh generate`
 ## Create properties files
 
 ```bash
-cat > secrets/keystores/original.properties <<'EOF'
+cat > secrets/keystores/original_keystore.properties <<'EOF'
 storeFile=original_keystore.keystore
 storePassword=YOUR_ORIGINAL_STORE_PASSWORD
 keyAlias=original
 keyPassword=YOUR_ORIGINAL_KEY_PASSWORD
 EOF
 
-cat > secrets/keystores/upload.properties <<'EOF'
+cat > secrets/keystores/upload_keystore.properties <<'EOF'
 storeFile=upload_keystore.keystore
 storePassword=YOUR_UPLOAD_STORE_PASSWORD
 keyAlias=upload
@@ -67,9 +67,9 @@ EOF
 | File | Content | GHA secret(s) |
 |---|---|---|
 | `secrets/keystores/original_keystore.keystore` | App signing keystore binary | `ORIGINAL_KEYSTORE_FILE` (base64) |
-| `secrets/keystores/original.properties` | App signing creds | `ORIGINAL_KEYSTORE_FILE_PASSWORD`, `ORIGINAL_KEYSTORE_ALIAS`, `ORIGINAL_KEYSTORE_ALIAS_PASSWORD` |
+| `secrets/keystores/original_keystore.properties` | App signing creds | `ORIGINAL_KEYSTORE_FILE_PASSWORD`, `ORIGINAL_KEYSTORE_ALIAS`, `ORIGINAL_KEYSTORE_ALIAS_PASSWORD` |
 | `secrets/keystores/upload_keystore.keystore` | Upload keystore binary | `UPLOAD_KEYSTORE_FILE` (base64) |
-| `secrets/keystores/upload.properties` | Upload creds | `UPLOAD_KEYSTORE_FILE_PASSWORD`, `UPLOAD_KEYSTORE_ALIAS`, `UPLOAD_KEYSTORE_ALIAS_PASSWORD` |
+| `secrets/keystores/upload_keystore.properties` | Upload creds | `UPLOAD_KEYSTORE_FILE_PASSWORD`, `UPLOAD_KEYSTORE_ALIAS`, `UPLOAD_KEYSTORE_ALIAS_PASSWORD` |
 | `secrets/firebase/google-services.json` | Firebase config | `GOOGLESERVICES` (base64) |
 
 ## Sync to GitHub

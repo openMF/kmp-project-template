@@ -19,7 +19,7 @@
 #   UPLOAD_KEYSTORE_ALIAS_PASSWORD      Upload keystore alias password
 set -euo pipefail
 
-mkdir -p secrets keystores cmp-android/src/prod cmp-android/src/demo
+mkdir -p secrets/keystores cmp-android/src/prod cmp-android/src/demo
 
 # Google Services — required for prod + demo flavors.
 if [[ -n "${GOOGLESERVICES:-}" ]]; then
@@ -32,13 +32,15 @@ fi
 [[ -n "${FIREBASECREDS:-}"   ]] && printf '%s' "$FIREBASECREDS"   > secrets/firebaseAppDistributionServiceCredentialsFile.json
 
 # ORIGINAL keystore (app signing key — Play App Signing identity).
+# In Play App Signing mode Google holds this; only materialized if the secret is set.
 if [[ -n "${ORIGINAL_KEYSTORE_FILE:-}" ]]; then
-  echo "$ORIGINAL_KEYSTORE_FILE" | base64 -d > keystores/original_keystore.keystore
+  echo "$ORIGINAL_KEYSTORE_FILE" | base64 -d > secrets/keystores/original_keystore.keystore
 fi
 
 # UPLOAD keystore (signs the bundle that goes to Play Console — Play re-signs with the app signing key).
+# This is what Gradle's signingConfig reads from (../secrets/keystores/upload_keystore.keystore).
 if [[ -n "${UPLOAD_KEYSTORE_FILE:-}" ]]; then
-  echo "$UPLOAD_KEYSTORE_FILE" | base64 -d > keystores/upload_keystore.keystore
+  echo "$UPLOAD_KEYSTORE_FILE" | base64 -d > secrets/keystores/upload_keystore.keystore
 fi
 
 echo "✅ Android secrets materialized (manual-mode)"

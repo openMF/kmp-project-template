@@ -64,8 +64,8 @@ placeholders:
 
   # ── Android / keystores (v2 — Play App Signing model) ────────────────────────
   # ORIGINAL = app signing key (Play App Signing identity, immutable)
-  - path: keystores/original.properties
-    secrets_peer: secrets/keystores/original.properties
+  - path: keystores/original_keystore.properties
+    secrets_peer: secrets/keystores/original_keystore.properties
     kind: text
     gha_secret: null  # parsed: ORIGINAL_KEYSTORE_FILE_PASSWORD, ORIGINAL_KEYSTORE_ALIAS, ORIGINAL_KEYSTORE_ALIAS_PASSWORD
     magic: "# CLAUDE-PLACEHOLDER — do not commit this to secrets/"
@@ -77,8 +77,8 @@ placeholders:
     magic: "CLAUDE-PLHLD-v1"
 
   # UPLOAD = Play Console upload key (rotatable)
-  - path: keystores/upload.properties
-    secrets_peer: secrets/keystores/upload.properties
+  - path: keystores/upload_keystore.properties
+    secrets_peer: secrets/keystores/upload_keystore.properties
     kind: text
     gha_secret: null  # parsed: UPLOAD_KEYSTORE_FILE_PASSWORD, UPLOAD_KEYSTORE_ALIAS, UPLOAD_KEYSTORE_ALIAS_PASSWORD
     magic: "# CLAUDE-PLACEHOLDER — do not commit this to secrets/"
@@ -88,13 +88,6 @@ placeholders:
     kind: binary
     gha_secret: UPLOAD_KEYSTORE_FILE
     magic: "CLAUDE-PLHLD-v1"
-
-  # Legacy single-keystore mode (auto-mapped to ORIGINAL+UPLOAD by sync script)
-  - path: keystores/release.properties
-    secrets_peer: secrets/keystores/release.properties
-    kind: text
-    gha_secret: null  # legacy fallback — sync script maps to ORIGINAL+UPLOAD families
-    magic: "# CLAUDE-PLACEHOLDER — do not commit this to secrets/"
 
   # ── Firebase ─────────────────────────────────────────────────────────────────
   - path: firebase/service-account.json

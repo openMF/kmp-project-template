@@ -217,19 +217,19 @@ _sync_android() {
 
   # ORIGINAL keystore (app signing key — Play App Signing identity)
   _set_keystore_family "ORIGINAL" \
-    "$SECRETS_DIR/keystores/original.properties" \
+    "$SECRETS_DIR/keystores/original_keystore.properties" \
     "$SECRETS_DIR/keystores/original_keystore.keystore"
 
   # UPLOAD keystore (Play Console upload key)
   _set_keystore_family "UPLOAD" \
-    "$SECRETS_DIR/keystores/upload.properties" \
+    "$SECRETS_DIR/keystores/upload_keystore.properties" \
     "$SECRETS_DIR/keystores/upload_keystore.keystore"
 
-  # Single-keystore fallback — if neither original.properties nor upload.properties
-  # has REAL credentials (missing OR still a placeholder) but legacy release.properties
-  # does, push it as both ORIGINAL and UPLOAD families so v2 workflows still sign.
-  local _orig="$SECRETS_DIR/keystores/original.properties"
-  local _upld="$SECRETS_DIR/keystores/upload.properties"
+  # Single-keystore fallback (legacy forks pre-v2) — if neither *_keystore.properties
+  # has REAL credentials (missing OR placeholder) but legacy release.properties does,
+  # push it as both ORIGINAL and UPLOAD families so v2 workflows still sign.
+  local _orig="$SECRETS_DIR/keystores/original_keystore.properties"
+  local _upld="$SECRETS_DIR/keystores/upload_keystore.properties"
   local _rels="$SECRETS_DIR/keystores/release.properties"
   if   { [[ ! -f "$_orig" ]] || grep -q "CLAUDE-PLACEHOLDER" "$_orig"; } \
     && { [[ ! -f "$_upld" ]] || grep -q "CLAUDE-PLACEHOLDER" "$_upld"; } \

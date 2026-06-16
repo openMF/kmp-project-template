@@ -15,7 +15,7 @@ on:
 
 jobs:
   quality:
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/quality-gate.yaml@v1.0.18
+    uses: openMF/mifos-x-actionhub/.github/workflows/quality-gate-v2.yaml@v1.0.21
     with:
       coverage_threshold: '0.50'   # bump as coverage grows; floor for now
       sbom_format:        'cyclonedx-json'

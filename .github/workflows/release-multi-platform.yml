@@ -1,24 +1,35 @@
 # .github/workflows/release-multi-platform.yml
 #
-# Thin wrapper → openMF/mifos-x-actionhub/.github/workflows/v2/release-multi-platform.yaml@v1.0.19
-# All orchestration logic — per-platform target dropdowns, auto-version_tag,
-# parallel firebase+internal / firebase+testflight fan-out, smart defaults —
-# lives in the centralized reusable workflow. This file only declares the
-# workflow_dispatch inputs the consumer exposes + maps secrets.
+# Thin wrapper → openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.21
 #
-# Default mode (touch nothing in the Run workflow form):
-#   Android  → Firebase Distribution + Play Internal     (parallel)
-#   iOS      → Firebase Distribution + TestFlight        (parallel)
-#   macOS    → Mac TestFlight                            (Stage 1)
-#   Windows  → GH Pre-release                            (Stage 1-equivalent)
-#   Linux    → GH Pre-release                            (Stage 1-equivalent)
-#   Web      → Preview deploy                            (Stage 1)
+# All orchestration logic lives in the centralized reusable workflow.
+# This file just declares the dispatch inputs + passes secrets through.
+#
+# Default mode (just click "Run workflow"):
+#   Android  → ladder up to internal (firebase + internal auto-fire if envs configured)
+#   iOS      → ladder up to internal (firebase + TestFlight auto-fire)
+#   macOS    → ladder up to internal (Mac TestFlight)
+#   Windows  → prerelease (GH Pre-release)
+#   Linux    → prerelease (GH Pre-release)
+#   Web      → preview
 #   version_tag → auto-computed YYYY.M.D
 #
-# Per-platform skip: set `<platform>_target: skip`.
-# Promote via re-dispatch with a higher rung.
+# Promote with a single dispatch:
+#   Pick `<platform>_rung: production` → publish-* workflow runs ALL stages
+#   sequentially (firebase → internal → beta → production), pausing at each
+#   environment-gated stage with an in-graph "Approve and deploy" button.
+#
+# Required one-time setup in repo Settings → Environments:
+#   android-firebase, android-play-internal, android-play-beta, android-play-production
+#   ios-firebase, ios-testflight-internal, ios-testflight-external, ios-app-store
+#   mac-testflight-internal, mac-testflight-external, mac-app-store
+#   desktop-<artifact>-prerelease/beta/stable
+#   web-<host>-preview/staging/production
+#   Configure required reviewers per environment to control where promote
+#   buttons appear in the workflow graph.
+
 name: Release · Multi-Platform
-run-name: "🚀 Release ${{ inputs.version_tag || format('auto-{0}', github.run_number) }} · Android=${{ inputs.android_target }} · iOS=${{ inputs.ios_target }}"
+run-name: "🚀 Release ${{ inputs.version_tag || format('auto-{0}', github.run_number) }} · Android=${{ inputs.android_rung }} · iOS=${{ inputs.ios_rung }}"
 
 on:
   workflow_dispatch:
@@ -29,32 +40,32 @@ on:
         type: string
         default: ''
 
-      android_target:
-        description: 'Android'
+      android_rung:
+        description: 'Android — top rung to reach (lower rungs auto-fire)'
         required: false
         type: choice
-        options: [firebase+internal, firebase, internal, beta, production, skip]
-        default: firebase+internal
-
-      ios_target:
-        description: 'iOS'
-        required: false
-        type: choice
-        options: [firebase+testflight, firebase, internal, beta, production, skip]
-        default: firebase+testflight
-
-      mac_target:
-        description: 'macOS MAS'
-        required: false
-        type: choice
-        options: [internal, beta, production, skip]
+        options: [skip, firebase, internal, beta, production]
         default: internal
 
-      desktop_win_target:
-        description: 'Windows'
+      ios_rung:
+        description: 'iOS — top rung to reach'
         required: false
         type: choice
-        options: [prerelease, beta, stable, skip]
+        options: [skip, firebase, internal, beta, production]
+        default: internal
+
+      mac_rung:
+        description: 'macOS MAS — top rung to reach'
+        required: false
+        type: choice
+        options: [skip, internal, beta, production]
+        default: internal
+
+      desktop_win_rung:
+        description: 'Windows — top rung'
+        required: false
+        type: choice
+        options: [skip, prerelease, beta, stable]
         default: prerelease
 
       desktop_win_artifact:
@@ -64,18 +75,18 @@ on:
         options: [windows-msi-signed, windows-exe, windows-microsoft-store]
         default: windows-msi-signed
 
-      desktop_linux_target:
-        description: 'Linux DEB'
+      desktop_linux_rung:
+        description: 'Linux DEB — top rung'
         required: false
         type: choice
-        options: [prerelease, beta, stable, skip]
+        options: [skip, prerelease, beta, stable]
         default: prerelease
 
-      web_target:
-        description: 'Web'
+      web_rung:
+        description: 'Web — top rung'
         required: false
         type: choice
-        options: [preview, staging, production, skip]
+        options: [skip, preview, staging, production]
         default: preview
 
       web_host:
@@ -86,7 +97,7 @@ on:
         default: gh-pages
 
       production_rollout:
-        description: 'Android staged rollout (0.0-1.0, only used when android_target=production)'
+        description: 'Android staged rollout (0.0-1.0, only used when android_rung=production)'
         required: false
         type: string
         default: '0.10'
@@ -94,9 +105,7 @@ on:
 jobs:
   release:
     name: Release
-    # Bumped to v1.0.20 which adds the validate-secrets preflight job — missing
-    # secrets fail fast in 8s instead of dying deep in Fastlane after 5-10 min build.
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-multi-platform.yaml@v1.0.20
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.21
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -105,17 +114,13 @@ jobs:
       shared_module:        cmp-shared
       desktop_package_name: cmp-desktop
       web_package_name:     cmp-web
-      android_target:       ${{ inputs.android_target }}
-      ios_target:           ${{ inputs.ios_target }}
-      mac_target:           ${{ inputs.mac_target }}
-      desktop_win_target:   ${{ inputs.desktop_win_target }}
+      android_rung:         ${{ inputs.android_rung }}
+      ios_rung:             ${{ inputs.ios_rung }}
+      mac_rung:             ${{ inputs.mac_rung }}
+      desktop_win_rung:     ${{ inputs.desktop_win_rung }}
       desktop_win_artifact: ${{ inputs.desktop_win_artifact }}
-      desktop_linux_target: ${{ inputs.desktop_linux_target }}
-      web_target:           ${{ inputs.web_target }}
+      desktop_linux_rung:   ${{ inputs.desktop_linux_rung }}
+      web_rung:             ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-    # GHA secrets use the lowercase actionhub v2 names (google_services, upload_keystore,
-    # appstore_key_id, etc. — see openMF/mifos-x-actionhub v2/README.md). The sync script
-    # dual-writes UPPERCASE + lowercase during migration; once all consumers verify
-    # lowercase works the UPPERCASE family can be deleted via gh secret delete.
     secrets: inherit

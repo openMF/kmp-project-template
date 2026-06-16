@@ -13,7 +13,7 @@ on:
 
 jobs:
   scan:
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/security-scan.yaml@v1.0.18
+    uses: openMF/mifos-x-actionhub/.github/workflows/security-scan-v2.yaml@v1.0.21
     with:
       fail_on_vuln_severity: 'high'
       sbom_format:           'cyclonedx-json'

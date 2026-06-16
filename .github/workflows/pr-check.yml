@@ -12,7 +12,7 @@ on:
 
 jobs:
   validate:
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/pr-check.yaml@v1.0.18
+    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check-v2.yaml@v1.0.21
     with:
       platforms:            'android,ios,desktop,web'
       android_package_name: cmp-android

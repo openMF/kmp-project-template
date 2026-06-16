@@ -2,6 +2,7 @@
 #
 # Runs Android + iOS + Desktop + Web checks in parallel on every PR + push to main/dev.
 name: PR Check
+run-name: "🔍 PR Check · #${{ github.event.pull_request.number || github.ref_name }} · ${{ github.event.pull_request.title || github.event.head_commit.message }}"
 
 on:
   pull_request:

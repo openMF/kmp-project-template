@@ -3,6 +3,7 @@
 # Revert a release. `reason` is required (audit log).
 # Each platform job uses its own environment (rollback-{platform}) with required reviewers.
 name: Rollback
+run-name: "⏪ Rollback · ${{ inputs.version_tag || github.ref_name }}"
 
 on:
   workflow_dispatch:

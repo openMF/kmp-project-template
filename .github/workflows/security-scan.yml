@@ -2,6 +2,7 @@
 #
 # SBOM + dependency vuln scan + gitleaks. Runs on PRs + nightly cron.
 name: Security Scan
+run-name: "🔒 Security Scan · ${{ github.event.pull_request.title || github.ref_name }}"
 
 on:
   pull_request:

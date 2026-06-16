@@ -2,6 +2,7 @@
 #
 # Sunday 04:00 UTC. Default strategy: calver-week (vYYYY.W##.0). Lands at Stage 2 (Beta).
 name: Tag Weekly Release
+run-name: "🏷️ Tag Weekly · $(date +%Y-W%U)"
 
 on:
   schedule:

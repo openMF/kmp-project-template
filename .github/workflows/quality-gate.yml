@@ -3,6 +3,7 @@
 # Coverage + Spotless + Detekt + Dependency Guard + SBOM.
 # Runs on every PR + on tag creation.
 name: Quality Gate
+run-name: "✅ Quality Gate · ${{ github.event.pull_request.title || github.ref_name }}"
 
 on:
   pull_request:

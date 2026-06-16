@@ -2,6 +2,7 @@
 #
 # 1st of month 03:30 UTC. Default strategy: calver-month (vYYYY.MM.0). Lands at Stage 3 (Production).
 name: Tag Monthly Release
+run-name: "🏷️ Tag Monthly · $(date +%Y.%m)"
 
 on:
   schedule:

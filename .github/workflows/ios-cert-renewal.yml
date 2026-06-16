@@ -1,4 +1,5 @@
 name: iOS/macOS Certificate Renewal
+run-name: "ios-cert-renewal · ${{ github.ref_name }}"
 
 # CI wrapper that runs cert-renewal.sh from its CANONICAL home:
 #   github.com/openMF/ios-provisioning-profile/cert-renewal.sh

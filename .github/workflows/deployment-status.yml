@@ -3,6 +3,7 @@
 # Reads deployment/PROMOTION_LOG.yaml + emits Markdown step summary.
 # Runs hourly + on manual dispatch.
 name: Deployment Status
+run-name: "📊 Deployment Status · ${{ github.ref_name }}"
 
 on:
   schedule:

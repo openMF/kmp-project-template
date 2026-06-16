@@ -1,0 +1,19 @@
+# .github/workflows/security-scan.yml — v2 security gate
+#
+# SBOM + dependency vuln scan + gitleaks. Runs on PRs + nightly cron.
+name: Security Scan
+
+on:
+  pull_request:
+    branches: [main, dev]
+  schedule:
+    - cron: '0 2 * * *'   # nightly 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  scan:
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/security-scan.yaml@v1.0.18
+    with:
+      fail_on_vuln_severity: 'high'
+      sbom_format:           'cyclonedx-json'
+    secrets: inherit

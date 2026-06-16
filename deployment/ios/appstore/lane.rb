@@ -8,6 +8,99 @@ require_relative "../../_shared/lib/appstore_helpers"
 require_relative "../../_shared/lib/version_helpers"
 
 platform :ios do
+  desc "Promote an existing TestFlight build to App Store review — no rebuild, no re-upload. Mirrors Android's promote_to_production."
+  lane :promoteToAppStore do |options|
+    options         = sanitize_options(options)
+    ios_config      = FastlaneConfig::IosConfig::BUILD_CONFIG
+    appstore_config = FastlaneConfig::IosConfig::APPSTORE_CONFIG
+
+    load_api_key(options)
+
+    # Resolve build number: explicit option > latest TestFlight build
+    if options[:build_number]
+      build_number = options[:build_number].to_s
+      app_version  = options[:app_version] || ios_config[:primary_locale]  # caller must supply version when pinning build
+      UI.important("📦 Using provided build #{build_number}")
+    else
+      build_number = latest_testflight_build_number(
+        app_identifier: ios_config[:app_identifier],
+        api_key:        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      ).to_s
+      app_version = Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
+      UI.important("📦 Latest TestFlight build: #{build_number}  (#{app_version})")
+    end
+
+    UI.message("🚀 Submitting build #{build_number} for App Store review...")
+    UI.message("   automatic_release: #{appstore_config[:automatic_release]}  (goes live on approval — no manual step)")
+
+    deliver(
+      api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      app_identifier:                       ios_config[:app_identifier],
+      app_version:                          app_version,
+      build_number:                         build_number,
+      # No binary — use the build already on TestFlight
+      skip_binary_upload:                   true,
+      # Metadata + screenshots (keeps listing in sync)
+      metadata_path:                        ios_config[:metadata_path],
+      screenshots_path:                     ios_config[:screenshots_path],
+      overwrite_screenshots:                true,
+      ignore_language_directory_validation: true,
+      skip_app_version_update:              true,
+      # Review + release settings
+      submit_for_review:                    true,
+      automatic_release:                    appstore_config[:automatic_release],
+      phased_release:                       appstore_config[:phased_release],
+      reject_if_possible:                   appstore_config[:reject_if_possible],
+      app_review_information:               appstore_config[:app_review_information].dup,
+      submission_information:               appstore_config[:submission_information],
+      run_precheck_before_submit:           false,
+      force:                                true,
+    )
+
+    UI.success("✅ Build #{build_number} submitted for App Store review — will auto-release on approval.")
+  end
+
+  desc "Upload an already-built IPA to App Store (skips build; use after release build succeeded but deliver failed)"
+  lane :uploadAppStore do |options|
+    options         = sanitize_options(options)
+    ios_config      = FastlaneConfig::IosConfig::BUILD_CONFIG
+    appstore_config = FastlaneConfig::IosConfig::APPSTORE_CONFIG
+
+    load_api_key(options)
+
+    ipa_path = options[:ipa] || File.join(DEPLOYMENT_REPO_ROOT, "cmp-ios/build/iosApp.ipa")
+    UI.user_error!("IPA not found at #{ipa_path}") unless File.exist?(ipa_path)
+    UI.important("📦 Uploading existing IPA: #{ipa_path} (#{File.size(ipa_path) / 1_048_576} MB)")
+
+    releaseNotes = generateReleaseNote()
+    locale = ios_config[:primary_locale]
+    release_notes_path = File.join(ios_config[:metadata_path], locale, "release_notes.txt")
+    FileUtils.mkdir_p(File.dirname(release_notes_path))
+    File.write(release_notes_path, releaseNotes)
+
+    deliver(
+      api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      ipa:                                  ipa_path,
+      metadata_path:                        ios_config[:metadata_path],
+      screenshots_path:                     ios_config[:screenshots_path],
+      skip_metadata:                        options.key?(:skip_metadata) ? options[:skip_metadata] : false,
+      skip_screenshots:                     options.key?(:skip_screenshots) ? options[:skip_screenshots] : false,
+      skip_binary_upload:                   options[:skip_binary_upload] || false,
+      skip_app_version_update:              options.key?(:skip_app_version_update) ? options[:skip_app_version_update] : options[:skip_binary_upload] || false,
+      overwrite_screenshots:                true,
+      ignore_language_directory_validation: true,
+      run_precheck_before_submit:           false,
+      submit_for_review:                    options[:submit_for_review] || appstore_config[:submit_for_review],
+      automatic_release:                    options[:automatic_release] || appstore_config[:automatic_release],
+      phased_release:                       options[:phased_release] || appstore_config[:phased_release],
+      reject_if_possible:                   appstore_config[:reject_if_possible],
+      force:                                appstore_config[:force],
+      submission_information:               appstore_config[:submission_information],
+    )
+
+    UI.success("✅ Successfully uploaded to App Store!")
+  end
+
   desc "Upload iOS application to App Store"
   lane :release do |options|
     options          = sanitize_options(options)
@@ -19,17 +112,34 @@ platform :ios do
     load_api_key(options)
     fetch_certificates_with_match(options.merge(match_type: "appstore"))
 
-    gradle_version = get_version_from_gradle(sanitize_for_appstore: true)
-    latest_build_number = latest_testflight_build_number(
-      app_identifier: options[:app_identifier] || ios_config[:app_identifier],
-      api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path:                  ios_config[:project_path],
+      team_id:               ios_config[:team_id],
+      code_sign_identity:    "Apple Distribution",
+      targets:               [ios_config[:scheme]],
+      bundle_identifier:     ios_config[:app_identifier],
+      profile_name:          "match AppStore #{ios_config[:app_identifier]}",
     )
-    latest_version = Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
-    version = AppStoreHelpers.bumped_version(options[:version_number] || gradle_version, latest_version)
-    UI.important("📱 Final App Store version: #{version}")
+
+    if options[:version_number] && options[:build_number]
+      version             = options[:version_number].to_s
+      next_build_number   = options[:build_number].to_i
+      UI.important("📱 Using provided version/build: #{version} (#{next_build_number})")
+    else
+      gradle_version = get_version_from_gradle(sanitize_for_appstore: true)
+      latest_build_number = latest_testflight_build_number(
+        app_identifier: options[:app_identifier] || ios_config[:app_identifier],
+        api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      )
+      latest_version    = Actions.lane_context[SharedValues::LATEST_TESTFLIGHT_VERSION]
+      version           = AppStoreHelpers.bumped_version(options[:version_number] || gradle_version, latest_version)
+      next_build_number = latest_build_number + 1
+      UI.important("📱 Final App Store version: #{version}")
+    end
 
     increment_version_number(xcodeproj: ios_config[:project_path], version_number: version)
-    increment_build_number(xcodeproj: ios_config[:project_path], build_number: latest_build_number + 1)
+    increment_build_number(xcodeproj: ios_config[:project_path], build_number: next_build_number)
 
     plist_path = ios_config[:plist_path]
     # AC10/AC39 — write-then-restore so the working tree stays clean.
@@ -55,11 +165,13 @@ platform :ios do
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
         copyright: "#{Time.now.year} #{FastlaneConfig::ProjectConfig::ORGANIZATION_NAME}",
         metadata_path: ios_config[:metadata_path],
+        screenshots_path: ios_config[:screenshots_path],
         skip_metadata: false,
-        skip_screenshots: true,
+        skip_screenshots: options.key?(:skip_screenshots) ? options[:skip_screenshots] : false,
         skip_binary_upload: options[:skip_binary_upload] || false,
-        overwrite_screenshots: false,
-        app_review_information: appstore_config[:app_review_information],
+        overwrite_screenshots: true,
+        ignore_language_directory_validation: true,
+        app_review_information: appstore_config[:app_review_information].dup,
         submit_for_review: options[:submit_for_review] || appstore_config[:submit_for_review],
         automatic_release: options[:automatic_release] || appstore_config[:automatic_release],
         phased_release: options[:phased_release] || appstore_config[:phased_release],

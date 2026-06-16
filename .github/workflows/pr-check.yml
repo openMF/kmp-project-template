@@ -1,100 +1,22 @@
-## Overview
+# .github/workflows/pr-check.yml — v2 multi-platform PR validation
 #
-# This reusable GitHub Actions workflow provides a comprehensive Continuous Integration (CI) pipeline
-# for multi-platform mobile and desktop applications, specifically designed for projects using Gradle and Java/Kotlin.
-#
-### Key Features
-# - Automated code quality checks
-# - Dependency management and verification
-# - Cross-platform desktop application builds (Windows, Linux, MacOS)
-# - Android APK build generation
-# - Artifact generation and storage
-#
-### Workflow Jobs
-# 1. **Setup**: Prepares the build environment
-#   - Checks out repository code
-#   - Sets up Java 17
-#   - Configures Gradle
-#   - Manages dependency caching
-#
-# 2. **Code Quality Checks**:
-#   - Build logic verification
-#   - Code formatting checks (Spotless)
-#   - Static code analysis (Detekt)
-#
-# 3. **Dependency Guard**:
-#   - Verifies dependencies against baseline
-#   - Prevents unauthorized dependency changes
-#   - Supports automatic baseline updates
-#
-# 4. **Android App Build**:
-#   - Builds debug APK for demo flavor
-#   - Uploads APK artifacts
-#
-# 5. **Desktop App Build**:
-#   - Builds applications for Windows, Linux, and MacOS
-#   - Generates platform-specific executables and packages
-#
-### Prerequisites
-#   - Java 17
-#   - Gradle
-#   - Configured build scripts for:
-#       - Android module
-#       - Desktop module
-#   - Installed Gradle plugins:
-#       - Spotless
-#       - Detekt
-#       - Dependency Guard
-#
-### Configuration Parameters
-# The workflow requires two input parameters:
-#
-#   |         Parameter      |              Description           |  Type  | Required |
-#   |------------------------|------------------------------------|--------|----------|
-#   | `android_package_name` | Name of the Android project module | String |    Yes   |
-#   | `desktop_package_name` | Name of the Desktop project module | String |    Yes   |
-#
+# Runs Android + iOS + Desktop + Web checks in parallel on every PR + push to main/dev.
+name: PR Check
 
-# https://github.com/openMF/mifos-x-actionhub/blob/main/.github/workflows/pr-check.yaml
-
-# ##############################################################################
-#                 DON'T EDIT THIS FILE UNLESS NECESSARY                        #
-# ##############################################################################
-
-
-name: PR Checks
-
-# Trigger conditions for the workflow
 on:
-  push:
-    branches: [ dev ]  # Runs on pushes to dev branch
   pull_request:
-    branches: [ dev ]  # Runs on pushes to dev branch
-
-# Concurrency settings to prevent multiple simultaneous workflow runs
-concurrency:
-  group: pr-${{ github.ref }}
-  cancel-in-progress: true  # Cancels previous runs if a new one is triggered
-
-permissions:
-  contents: write
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
 
 jobs:
-  pr_checks:
-    name: PR Checks
-    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check.yaml@v1.0.16
+  validate:
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/pr-check.yaml@v1.0.18
     with:
-      android_package_name: 'cmp-android' # <-- Change Your Android Package Name
-      desktop_package_name: 'cmp-desktop' # <-- Change Your Desktop Package Name
-      web_package_name: 'cmp-web' # <-- Change Your Web Package Name
-      ios_package_name: 'cmp-ios' # <-- Change Your iOS Package Name
-      build_ios: true # <-- Change to 'false' if you don't want to build iOS
-      use_cocoapods: true
-      shared_module: ':cmp-shared'
-      # Auto-detected: CI_RUNNER repo variable is set to 'self-hosted' when a local
-      # runner is registered (via gha-runner-setup.sh), cleared on remove.
-      # On GitHub CI (openMF upstream): CI_RUNNER unset → GitHub-hosted runners.
-      # On your fork with runner registered: CI_RUNNER=self-hosted → your Mac.
-      runner: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
-      runner_macos: ${{ vars.CI_RUNNER || 'macos-latest' }}
-      runner_desktop_matrix: ${{ vars.CI_RUNNER == 'self-hosted' && '["self-hosted"]' || '["ubuntu-latest","macos-latest","windows-latest"]' }}
+      platforms:            'android,ios,desktop,web'
+      android_package_name: cmp-android
+      ios_package_name:     cmp-ios
+      shared_module:        cmp-shared
+      desktop_package_name: cmp-desktop
+      web_package_name:     cmp-web
+    secrets: inherit

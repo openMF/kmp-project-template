@@ -26,9 +26,9 @@ platform :android do
     upload_to_play_store(
       track: "internal",
       aab: build_paths[:prod_aab_path],
-      skip_upload_metadata: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true,
+      json_key: File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json"),
+      package_name: FastlaneConfig::ProjectConfig.android_package_name,
+      metadata_path: File.join(DEPLOYMENT_REPO_ROOT, "deployment/android/metadata"),
     )
   end
 end

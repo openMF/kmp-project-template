@@ -1,3 +1,6 @@
-# fastlane/Appfile — minimal for CI-only (PR check) lanes.
-# Deployment lanes use deployment/Appfile via --fastlane-dir deployment.
+# fastlane/Appfile — identity for all lanes (CI + deployment).
+# Deployment lanes are imported via `import "../deployment/Fastfile"` in Fastfile.
+# Deployment-specific Appfile (deployment/Appfile) is not used since --fastlane-dir
+# is not a valid Fastlane CLI flag; all config is loaded here instead.
 app_identifier("org.mifos.kmp.template")
+json_key_file("secrets/play/service-account.json")

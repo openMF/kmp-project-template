@@ -8,6 +8,7 @@ set -euo pipefail
 
 FLAVOR="${FLAVOR:-prod}"
 TAG="${TAG:?GitHub release tag must be set}"
+STAGE="${STAGE:-stable}"   # prerelease | beta | stable — direct-distro promotion ladder
 
 SIGNTOOL="${SIGNTOOL:?SIGNTOOL env var required (path to signtool.exe; CI exports it via azure/trusted-signing-action)}"
 AZURE_SIGNING_DLIB="${AZURE_SIGNING_DLIB:?Azure dlib path from trusted-signing-action}"
@@ -30,3 +31,6 @@ MSI_PATH="$(find cmp-desktop/build/compose/binaries/main-release/msi -name '*.ms
 
 # 3. Upload to the GH Release.
 gh release upload "$TAG" "$MSI_PATH" --clobber
+
+# 4. Apply promotion-stage flags (prerelease + latest) per the direct-distro ladder.
+bash "$(dirname "$0")/../../_shared/scripts/gh-release-stage.sh" "$TAG" "$STAGE"

@@ -1,0 +1,8 @@
+What's new in 2026.6.1:
+
+• Faster loan, bill, and rate screens — data loads more reliably on slow connections
+• Smoother first-launch experience with better offline data handling
+• More stable app — fixed edge-case crashes and improved background data refresh
+• Improved build pipeline for faster, more reliable future updates
+
+100% offline — no login, no account, no ads.

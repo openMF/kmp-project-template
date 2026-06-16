@@ -79,6 +79,19 @@ platforms:
           - android-signing
           - android-play-prod-publish
 
+      - canonical_name: android-sync-listing
+        name: android-sync-listing
+        tier: 1
+        path: "deployment/android/sync-listing/"
+        platform: android
+        enabled: true
+        requires_confirm: false
+        lane: syncListing
+        description: "Sync Play Store title/description/screenshots — no binary upload"
+        runners: { local: "darwin", ci: "ubuntu-latest" }
+        required_capabilities:
+          - android-play-prod-publish
+
   ios:
     targets:
       - canonical_name: ios-firebase
@@ -117,6 +130,19 @@ platforms:
           - ios-signing
           - ios-app-store
 
+      - canonical_name: ios-sync-listing
+        name: ios-sync-listing
+        tier: 1
+        path: "deployment/ios/sync-listing/"
+        platform: ios
+        enabled: true
+        requires_confirm: false
+        lane: syncListing
+        description: "Sync App Store name/subtitle/keywords/description/screenshots — no binary upload, no submission"
+        runners: { local: "darwin", ci: "macos-14" }
+        required_capabilities:
+          - ios-app-store-connect-api
+
   desktop:
     targets:
       # ── Tier 1 — unsigned community-friendly distributions ────────────────
@@ -150,6 +176,21 @@ platforms:
         runners: { local: "darwin", ci: "macos-14" }
         required_capabilities: []
 
+      # ── Mac TestFlight (Tier 1 — signing required but no manual confirmation) ─
+      - canonical_name: desktop-mac-testflight
+        name: desktop-mac-testflight
+        tier: 1
+        path: "deployment/desktop/mac-app-store/"
+        platform: desktop
+        enabled: true
+        requires_confirm: false
+        lane: desktop_testflight
+        description: "Build macOS PKG + upload to Mac TestFlight"
+        runners: { local: "darwin", ci: "macos-14" }
+        required_capabilities:
+          - macos-signing
+          - ios-app-store-connect-api
+
       # ── Tier 2 — signed / notarized / store-distributed ───────────────────
       - canonical_name: desktop-dmg-notarized
         name: desktop-dmg-notarized
@@ -159,8 +200,12 @@ platforms:
         enabled: false
         requires_confirm: true
         runners: { local: "darwin", ci: "macos-14" }
+        # Match-managed Developer ID cert + Fastlane notarize action — see
+        # deployment/desktop/dmg-notarized/lane.rb. ASC API is required for both
+        # Match cert issuance and notarytool submission.
         required_capabilities:
           - macos-signing
+          - ios-app-store-connect-api
 
       - canonical_name: desktop-msi-signed
         name: desktop-msi-signed
@@ -178,12 +223,13 @@ platforms:
         tier: 2
         path: "deployment/desktop/mac-app-store/"
         platform: desktop
-        enabled: false
+        enabled: true
         requires_confirm: true
+        lane: promoteMacToAppStore
+        description: "Promote existing Mac TestFlight build to Mac App Store — no rebuild"
         runners: { local: "darwin", ci: "macos-14" }
         required_capabilities:
-          - macos-signing
-          - desktop-mac-app-store
+          - ios-app-store-connect-api
 
       - canonical_name: desktop-microsoft-store
         name: desktop-microsoft-store
@@ -195,6 +241,22 @@ platforms:
         runners: { local: "windows", ci: "windows-latest" }
         required_capabilities:
           - desktop-microsoft-store
+
+      - canonical_name: desktop-sync-listing
+        name: desktop-sync-listing
+        tier: 1
+        path: "deployment/desktop/sync-listing/"
+        platform: desktop
+        enabled: true
+        requires_confirm: false
+        lane: syncListing
+        description: "Sync GitHub Release notes + Mac App Store listing — no binary upload"
+        runners: { local: "darwin", ci: "macos-14" }
+        required_capabilities: []
+        sub_targets:
+          github: { description: "Update GitHub Release notes only", requires_confirm: false }
+          mac:    { description: "Sync Mac App Store listing only (requires ASC API key)", requires_confirm: false }
+          all:    { description: "Both GitHub + Mac App Store (default)", requires_confirm: false }
 
   web:
     targets:
@@ -305,6 +367,12 @@ enabled_targets:
     tier: 1
     requires_confirm: false
     runners: { local: "darwin", ci: "macos-14" }
+  - canonical_name: desktop-mac-testflight
+    enabled: true
+    platform: desktop
+    tier: 1
+    requires_confirm: false
+    runners: { local: "darwin", ci: "macos-14" }
   - canonical_name: desktop-dmg-notarized
     enabled: false
     platform: desktop
@@ -318,7 +386,7 @@ enabled_targets:
     requires_confirm: true
     runners: { local: "windows", ci: "windows-latest" }
   - canonical_name: desktop-mac-app-store
-    enabled: false
+    enabled: true
     platform: desktop
     tier: 2
     requires_confirm: true

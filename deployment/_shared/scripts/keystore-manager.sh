@@ -55,7 +55,6 @@ EXCLUDED_GITHUB_KEYS=(
     "KEYALG"
     "KEYSIZE"
     "OVERWRITE"
-    "ORIGINAL_KEYSTORE_NAME"
     "UPLOAD_KEYSTORE_NAME"
     "CN"
     "OU"
@@ -963,11 +962,11 @@ validate_sync_result() {
         "FIREBASECREDS"
     )
 
-    # Map alternative key names used in this project
+    # Map alternative key names used in this project (Play App Signing single-keystore)
     declare -A key_aliases
-    key_aliases["KEYSTORE_PASSWORD"]="ORIGINAL_KEYSTORE_FILE_PASSWORD|UPLOAD_KEYSTORE_FILE_PASSWORD"
-    key_aliases["KEYALIAS"]="ORIGINAL_KEYSTORE_ALIAS|UPLOAD_KEYSTORE_ALIAS"
-    key_aliases["KEY_PASSWORD"]="ORIGINAL_KEYSTORE_ALIAS_PASSWORD|UPLOAD_KEYSTORE_ALIAS_PASSWORD"
+    key_aliases["KEYSTORE_PASSWORD"]="UPLOAD_KEYSTORE_FILE_PASSWORD"
+    key_aliases["KEYALIAS"]="UPLOAD_KEYSTORE_ALIAS"
+    key_aliases["KEY_PASSWORD"]="UPLOAD_KEYSTORE_ALIAS_PASSWORD"
 
     # Check Android secrets
     for secret in "${required_android[@]}"; do
@@ -1033,7 +1032,6 @@ validate_sync_result() {
         "FIREBASECREDS"
         "APPSTORE_AUTH_KEY"
         "MATCH_GIT_PRIVATE_KEY"
-        "ORIGINAL_KEYSTORE_FILE"
         "UPLOAD_KEYSTORE_FILE"
         "MAC_APP_DISTRIBUTION_CERTIFICATE_B64"
         "MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64"
@@ -1120,35 +1118,20 @@ validate_sync_result() {
 
 # Function to create/update secrets.env file
 update_secrets_env() {
-    local original_keystore=$1
-    local upload_keystore=$2
-    local original_b64=$(encode_base64 "keystores/$original_keystore")
+    # Play App Signing model — single UPLOAD keystore. Google holds the app signing key.
+    local upload_keystore=$1
     local upload_b64=$(encode_base64 "keystores/$upload_keystore")
 
-    # Check if secrets.env exists
     if [ -f "$ENV_FILE" ]; then
         echo -e "${BLUE}Updating existing $ENV_FILE${NC}"
-
-        # Create a temporary file
         local temp_file="${ENV_FILE}.tmp"
 
-        # Process the file line by line
-        local in_original_block=false
         local in_upload_block=false
-        local original_found=false
+        local in_legacy_original_block=false
         local upload_found=false
 
         while IFS= read -r line || [ -n "$line" ]; do
-            # Check if we're in the ORIGINAL_KEYSTORE_FILE block
-            if [[ "$line" == "ORIGINAL_KEYSTORE_FILE<<EOF" ]]; then
-                in_original_block=true
-                original_found=true
-                echo "$line" >> "$temp_file"
-                echo "$original_b64" >> "$temp_file"
-                continue
-            fi
-
-            # Check if we're in the UPLOAD_KEYSTORE_FILE block
+            # Replace UPLOAD_KEYSTORE_FILE block with current content
             if [[ "$line" == "UPLOAD_KEYSTORE_FILE<<EOF" ]]; then
                 in_upload_block=true
                 upload_found=true
@@ -1157,35 +1140,33 @@ update_secrets_env() {
                 continue
             fi
 
-            # Check if we're exiting a block
-            if [ "$in_original_block" = true ] && [[ "$line" == "EOF" ]]; then
-                in_original_block=false
-                echo "$line" >> "$temp_file"
+            # Drop legacy ORIGINAL_KEYSTORE_FILE block + its scalar siblings (silent purge)
+            if [[ "$line" == "ORIGINAL_KEYSTORE_FILE<<EOF" ]]; then
+                in_legacy_original_block=true
                 continue
             fi
+            if [[ "$line" == ORIGINAL_KEYSTORE_* ]]; then
+                continue   # drops ORIGINAL_KEYSTORE_FILE_PASSWORD / _ALIAS / _ALIAS_PASSWORD scalars
+            fi
 
+            # EOF marker — exit the matching block
             if [ "$in_upload_block" = true ] && [[ "$line" == "EOF" ]]; then
                 in_upload_block=false
                 echo "$line" >> "$temp_file"
                 continue
             fi
-
-            # Skip lines inside blocks as we've already written the new content
-            if [ "$in_original_block" = true ] || [ "$in_upload_block" = true ]; then
+            if [ "$in_legacy_original_block" = true ] && [[ "$line" == "EOF" ]]; then
+                in_legacy_original_block=false
                 continue
             fi
 
-            # Write all other lines as is
+            # Skip content inside blocks
+            if [ "$in_upload_block" = true ] || [ "$in_legacy_original_block" = true ]; then
+                continue
+            fi
+
             echo "$line" >> "$temp_file"
         done < "$ENV_FILE"
-
-        # Add blocks that weren't found
-        if [ "$original_found" = false ]; then
-            echo "" >> "$temp_file"
-            echo "ORIGINAL_KEYSTORE_FILE<<EOF" >> "$temp_file"
-            echo "$original_b64" >> "$temp_file"
-            echo "EOF" >> "$temp_file"
-        fi
 
         if [ "$upload_found" = false ]; then
             echo "" >> "$temp_file"
@@ -1194,27 +1175,16 @@ update_secrets_env() {
             echo "EOF" >> "$temp_file"
         fi
 
-        # Replace the original file
         mv "$temp_file" "$ENV_FILE"
     else
         echo -e "${BLUE}Creating new $ENV_FILE${NC}"
-
-        # Ensure directory exists
         mkdir -p "$(dirname "$ENV_FILE")"
 
-        # Create a new secrets.env file
         cat > "$ENV_FILE" <<EOL
-# GitHub Secrets Environment File
+# GitHub Secrets Environment File (Play App Signing single-keystore model)
 # Format: KEY=VALUE
 # Use <<EOF and EOF to denote multiline values
 # Run this command to format these secrets: dos2unix $ENV_FILE
-
-ORIGINAL_KEYSTORE_FILE_PASSWORD=${ORIGINAL_KEYSTORE_FILE_PASSWORD:-Keystore_password}
-ORIGINAL_KEYSTORE_ALIAS=${ORIGINAL_KEYSTORE_ALIAS:-Keystore_Alias}
-ORIGINAL_KEYSTORE_ALIAS_PASSWORD=${ORIGINAL_KEYSTORE_ALIAS_PASSWORD:-Alias_password}
-ORIGINAL_KEYSTORE_FILE<<EOF
-$original_b64
-EOF
 
 UPLOAD_KEYSTORE_FILE_PASSWORD=${UPLOAD_KEYSTORE_FILE_PASSWORD:-Keystore_password}
 UPLOAD_KEYSTORE_ALIAS=${UPLOAD_KEYSTORE_ALIAS:-Keystore_Alias}
@@ -1225,7 +1195,7 @@ EOF
 EOL
     fi
 
-    echo -e "${GREEN}$ENV_FILE has been updated with base64 encoded keystores${NC}"
+    echo -e "${GREEN}$ENV_FILE has been updated with base64 encoded upload keystore${NC}"
 }
 
 # Function to update fastlane-config/project_config.rb with keystore information
@@ -1543,35 +1513,24 @@ generate_keystore() {
     fi
 }
 
-# Function to generate both keystores
+# Generate the single UPLOAD keystore. Play App Signing model — Google holds the app
+# signing key in KMS, developer only holds the upload key.
+# Per https://support.google.com/googleplay/android-developer/answer/9842756
 generate_keystores() {
     check_keytool
     create_keystores_dir
 
-    # Names for local keystore files (these won't be uploaded to GitHub)
-    ORIGINAL_KEYSTORE_NAME=${ORIGINAL_KEYSTORE_NAME:-"original.keystore"}
-    UPLOAD_KEYSTORE_NAME=${UPLOAD_KEYSTORE_NAME:-"upload.keystore"}
-
-    # Map GitHub secret names to local keystore variables
-    ORIGINAL_KEYSTORE_FILE_PASSWORD=${ORIGINAL_KEYSTORE_FILE_PASSWORD:-"Keystore_password"}
-    ORIGINAL_KEYSTORE_ALIAS=${ORIGINAL_KEYSTORE_ALIAS:-"Keystore_Alias"}
-    ORIGINAL_KEYSTORE_ALIAS_PASSWORD=${ORIGINAL_KEYSTORE_ALIAS_PASSWORD:-"Alias_password"}
-
+    UPLOAD_KEYSTORE_NAME=${UPLOAD_KEYSTORE_NAME:-"upload_keystore.keystore"}
     UPLOAD_KEYSTORE_FILE_PASSWORD=${UPLOAD_KEYSTORE_FILE_PASSWORD:-"Keystore_password"}
     UPLOAD_KEYSTORE_ALIAS=${UPLOAD_KEYSTORE_ALIAS:-"Keystore_Alias"}
     UPLOAD_KEYSTORE_ALIAS_PASSWORD=${UPLOAD_KEYSTORE_ALIAS_PASSWORD:-"Alias_password"}
 
-    # Generate ORIGINAL keystore
-    generate_keystore "ORIGINAL" "$ORIGINAL_KEYSTORE_NAME" "$ORIGINAL_KEYSTORE_ALIAS" "$ORIGINAL_KEYSTORE_FILE_PASSWORD" "$ORIGINAL_KEYSTORE_ALIAS_PASSWORD"
-    ORIGINAL_RESULT=$?
-
-    # Generate UPLOAD keystore
+    echo -e "${BLUE}🔑 Play App Signing mode: generating UPLOAD keystore${NC}"
     generate_keystore "UPLOAD" "$UPLOAD_KEYSTORE_NAME" "$UPLOAD_KEYSTORE_ALIAS" "$UPLOAD_KEYSTORE_FILE_PASSWORD" "$UPLOAD_KEYSTORE_ALIAS_PASSWORD"
     UPLOAD_RESULT=$?
 
-    # Update secrets.env with base64 encoded keystores
-    if [ $ORIGINAL_RESULT -eq 0 ] && [ $UPLOAD_RESULT -eq 0 ]; then
-        update_secrets_env "$ORIGINAL_KEYSTORE_NAME" "$UPLOAD_KEYSTORE_NAME"
+    if [ $UPLOAD_RESULT -eq 0 ]; then
+        update_secrets_env "$UPLOAD_KEYSTORE_NAME"
 
         # Update fastlane-config/project_config.rb with UPLOAD keystore information
         update_fastlane_config "$UPLOAD_KEYSTORE_NAME" "$UPLOAD_KEYSTORE_FILE_PASSWORD" "$UPLOAD_KEYSTORE_ALIAS" "$UPLOAD_KEYSTORE_ALIAS_PASSWORD"
@@ -1590,12 +1549,6 @@ generate_keystores() {
     echo -e "${BLUE}                          SUMMARY                                  ${NC}"
     echo -e "${BLUE}==================================================================${NC}"
 
-    if [ $ORIGINAL_RESULT -eq 0 ]; then
-        echo -e "${GREEN}ORIGINAL keystore: SUCCESS - $(realpath "keystores/$ORIGINAL_KEYSTORE_NAME")${NC}"
-    else
-        echo -e "${RED}ORIGINAL keystore: FAILED${NC}"
-    fi
-
     if [ $UPLOAD_RESULT -eq 0 ]; then
         echo -e "${GREEN}UPLOAD keystore: SUCCESS - $(realpath "keystores/$UPLOAD_KEYSTORE_NAME")${NC}"
     else
@@ -1603,13 +1556,14 @@ generate_keystores() {
     fi
 
     echo ""
-    echo -e "${BLUE}IMPORTANT: Keep these keystore files and their passwords in a safe place.${NC}"
-    echo -e "${BLUE}If you lose them, you will not be able to update your application on the Play Store.${NC}"
+    echo -e "${BLUE}IMPORTANT: back up your UPLOAD keystore. Lose it and you must request an${NC}"
+    echo -e "${BLUE}upload key reset from Play Console (1-2 business days). Google holds the${NC}"
+    echo -e "${BLUE}app signing key in KMS — you never need a local copy.${NC}"
 
-    if [ $ORIGINAL_RESULT -eq 0 ] && [ $UPLOAD_RESULT -eq 0 ]; then
-        echo -e "${GREEN}$ENV_FILE has been updated with base64 encoded keystores${NC}"
-        echo -e "${GREEN}fastlane-config/project_config.rb has been updated with UPLOAD keystore information${NC}"
-        echo -e "${GREEN}cmp-android/build.gradle.kts has been updated with UPLOAD keystore information${NC}"
+    if [ $UPLOAD_RESULT -eq 0 ]; then
+        echo -e "${GREEN}$ENV_FILE has been updated with the upload keystore${NC}"
+        echo -e "${GREEN}fastlane-config/project_config.rb updated${NC}"
+        echo -e "${GREEN}cmp-android/build.gradle.kts updated${NC}"
         echo -e "${BLUE}Note: If you have files in secrets/ directory, they have been encoded and added to $ENV_FILE${NC}"
         return 0
     else

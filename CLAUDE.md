@@ -246,16 +246,25 @@ git commit -m "feat(android): add new feature"
 2. Trigger `multi-platform-build-and-publish` workflow
 3. Select deployment targets via workflow inputs
 
-**Via Fastlane (Local/Manual — from repo root):**
+**Via Fastlane (Local/Manual):**
 ```bash
+# Invocation: (cd deployment && bundle exec fastlane <platform> <lane>)
+# --fastlane-dir flag does NOT exist in Fastlane 2.235.0 (doc bug fixed).
+
 # Android
-bundle exec fastlane --fastlane-dir deployment android deployReleaseApkOnFirebase
-bundle exec fastlane --fastlane-dir deployment android deployInternal
+(cd deployment && bundle exec fastlane android deployReleaseApkOnFirebase)
+(cd deployment && bundle exec fastlane android deployInternal)
+(cd deployment && bundle exec fastlane android promoteToBeta)
+(cd deployment && bundle exec fastlane android promote_to_production)
 
 # iOS
-bundle exec fastlane --fastlane-dir deployment ios deploy_on_firebase
-bundle exec fastlane --fastlane-dir deployment ios beta
-bundle exec fastlane --fastlane-dir deployment ios release
+(cd deployment && bundle exec fastlane ios deploy_on_firebase)
+(cd deployment && bundle exec fastlane ios beta)
+(cd deployment && bundle exec fastlane ios release)
+
+# macOS / Desktop
+(cd deployment && bundle exec fastlane mac desktop_testflight)
+(cd deployment && bundle exec fastlane mac desktop_release)
 ```
 
 **Via Bash Scripts (iOS only):**
@@ -348,13 +357,18 @@ strings hardcoded across `cmp-android/build.gradle.kts`, `cmp-ios/`,
 these five properties + does substitutions across the consumer build files in a
 single pass.
 
-| Property                   | Default value    | Consumer (planned)                                                  |
-| -------------------------- | ---------------- | ------------------------------------------------------------------- |
-| `APP_ID_BASE`              | `cmp.android.app`| Android `applicationId`; iOS bundle ID base                         |
-| `APP_NAME`                 | `Money Toolkit`  | App display name (Android `app_name`, iOS `CFBundleDisplayName`)    |
-| `APP_VERSION_BASE`         | `1.0.0`          | Base for Gradle-generated `YYYY.M.D-{prerelease}.{n}+{sha}` versions|
-| `APP_BUNDLE_DISPLAY_NAME`  | `Money Toolkit`  | iOS Springboard label; macOS `CFBundleName`                         |
-| `APP_BRAND_PREFIX`         | `Kpt`            | Kotlin-namespace prefix (e.g. `KptTheme`, `KptProgress`)            |
+> **Source of truth: `gradle/libs.versions.toml`** — the `appId`, `appDisplayName`,
+> `baseNamespace`, `desktopAppName`, and `projectName` keys are what the build system
+> actually reads at runtime. `gradle.properties` holds fork-rename placeholders for
+> the future `scripts/fork-rename.sh` script. When in doubt, read `libs.versions.toml`.
+
+| Property | `gradle.properties` | `libs.versions.toml` (runtime SoT) | Consumer (planned) |
+| -------- | ------------------- | ----------------------------------- | ------------------ |
+| `APP_ID_BASE` | `cmp.android.app` _(placeholder)_ | `appId = "org.mifos.kmp.template"` | Android `applicationId`; iOS bundle ID |
+| `APP_NAME` | `Money Toolkit` | `appDisplayName = "Money Toolkit"` | Android `app_name`, iOS `CFBundleDisplayName` |
+| `APP_VERSION_BASE` | `1.0.0` | _(not in toml — Gradle computes `YYYY.M.D` from git)_ | Base for version string generation |
+| `APP_BUNDLE_DISPLAY_NAME` | `Money Toolkit` | `desktopAppName = "Money Toolkit"` | iOS Springboard label; macOS `CFBundleName` |
+| `APP_BRAND_PREFIX` | `Kpt` | `baseNamespace = "kpt"` | Kotlin-namespace prefix (e.g. `KptTheme`, `KptProgress`) |
 
 **Today**: forks edit these properties **and** every consumer file by hand.
 **Roadmap**: a `scripts/fork-rename.sh` (TBD) will accept new values and write
@@ -431,7 +445,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 ## Platform-Specific Notes
 
 ### Android
-- **Package:** `cmp.android.app`
+- **Package:** read from `gradle/libs.versions.toml` → `appId` key (currently `org.mifos.kmp.template`). Do NOT use `APP_ID_BASE` in `gradle.properties` — that is a fork-rename placeholder, not the runtime applicationId.
 - **Min SDK:** 24, **Target SDK:** 34
 - **Flavors:** `prod`, `demo`
 - **Build Types:** `debug`, `release`
@@ -439,7 +453,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 - **Firebase:** 2 apps registered (prod + demo), 4 variants in google-services.json
 
 ### iOS
-- **Bundle ID:** `org.mifos.kmp.template`
+- **Bundle ID:** read from `gradle/libs.versions.toml` → `appId` key (currently `org.mifos.kmp.template`). Same key as Android — both platforms share the single `appId` source of truth.
 - **Min Version:** iOS 15.0, **Target:** iOS 17.0
 - **Code Signing:** Fastlane Match (adhoc for Firebase, appstore for TestFlight/App Store)
 - **CocoaPods:** Required for iOS dependencies
@@ -506,7 +520,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 2. **Signing parameter naming inconsistency** - Mixed snake_case/camelCase/UPPERCASE
 
 ### 🟡 Medium
-3. **Hardcoded keystore filename** - `release_keystore.keystore` in multiple places
+3. **Hardcoded keystore filename** - `upload_keystore.keystore` in multiple places
 4. **Version generation may fail silently** - `set +e` swallows errors
 5. **Production promotion has no validation** - Doesn't verify beta release exists
 

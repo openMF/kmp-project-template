@@ -24,7 +24,7 @@ jobs:
         if: ${{ secrets.SOPS_AGE_KEY == '' }}
         run: |
           mkdir -p secrets keystores
-          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE_B64 }}" | base64 -d > keystores/release_keystore.keystore
+          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE_B64 }}" | base64 -d > keystores/upload_keystore.keystore
           echo '${{ secrets.PLAYSTORE_PUBLISHER_JSON }}' > secrets/playStorePublishServiceCredentialsFile.json
 
       - name: Deploy to Play internal

@@ -1,0 +1,5 @@
+# CLAUDE-PLACEHOLDER — do not commit this to secrets/
+# Replace with your Firebase Android (prod) App ID.
+# Find it in: Firebase Console → Project Settings → General → Your apps
+# Format: 1:123456789012:android:abc123def456
+PLACEHOLDER_FIREBASE_ANDROID_APP_ID

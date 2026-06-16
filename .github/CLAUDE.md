@@ -209,7 +209,7 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 1. Installs Fastlane + plugins (`firebase_app_distribution`, `increment_build_number`)
 2. Inflates secrets to:
    - `{package_name}/google-services.json`
-   - `keystores/release_keystore.keystore`
+   - `keystores/upload_keystore.keystore`
    - `secrets/firebaseAppDistributionServiceCredentialsFile.json`
 3. Calls Fastlane lane:
    - Prod: `bundle exec fastlane android deployReleaseApkOnFirebase`
@@ -239,7 +239,7 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 **What it does:**
 1. Inflates secrets to:
    - `{package_name}/google-services.json`
-   - `keystores/release_keystore.keystore`
+   - `keystores/upload_keystore.keystore`
    - `secrets/playStorePublishServiceCredentialsFile.json`
 2. Calls Fastlane lane: `bundle exec fastlane android deployInternal`
    - Uploads AAB to internal track
@@ -549,7 +549,7 @@ runs-on: ${{ matrix.os }}
 
 | Category | Count | Secrets |
 |----------|-------|---------|
-| **Android** | 8 | ORIGINAL_KEYSTORE_FILE, ORIGINAL_KEYSTORE_FILE_PASSWORD, ORIGINAL_KEYSTORE_ALIAS, ORIGINAL_KEYSTORE_ALIAS_PASSWORD, UPLOAD_KEYSTORE_FILE, UPLOAD_KEYSTORE_FILE_PASSWORD, UPLOAD_KEYSTORE_ALIAS, UPLOAD_KEYSTORE_ALIAS_PASSWORD |
+| **Android** | 4 | UPLOAD_KEYSTORE_FILE, UPLOAD_KEYSTORE_FILE_PASSWORD, UPLOAD_KEYSTORE_ALIAS, UPLOAD_KEYSTORE_ALIAS_PASSWORD |
 | **Firebase** | 3 | FIREBASECREDS, GOOGLESERVICES |
 | **Play Store** | 1 | PLAYSTORECREDS |
 | **iOS** | 5 | APPSTORE_KEY_ID, APPSTORE_ISSUER_ID, APPSTORE_AUTH_KEY, MATCH_PASSWORD, MATCH_GIT_PRIVATE_KEY |

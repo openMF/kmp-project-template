@@ -5,6 +5,52 @@ require_relative "../../_shared/lib/appstore_helpers"
 require_relative "../../_shared/lib/version_helpers"
 
 platform :ios do
+  desc "Upload an already-built IPA to TestFlight (skips build; use after beta build succeeded but pilot upload failed)"
+  lane :uploadTestFlight do |options|
+    options         = sanitize_options(options)
+    ios_config      = FastlaneConfig::IosConfig::BUILD_CONFIG
+    testflight_config = FastlaneConfig::IosConfig::TESTFLIGHT_CONFIG
+
+    load_api_key(options)
+
+    ipa_path = options[:ipa] || File.join(DEPLOYMENT_REPO_ROOT, "cmp-ios/build/iosApp.ipa")
+    UI.user_error!("IPA not found at #{ipa_path}") unless File.exist?(ipa_path)
+    UI.important("📦 Uploading existing IPA: #{ipa_path} (#{File.size(ipa_path) / 1_048_576} MB)")
+
+    releaseNotes = generateReleaseNote()
+    locale = ios_config[:primary_locale]
+    localized_build_info = {
+      "default" => { whats_new: releaseNotes },
+      locale    => { whats_new: releaseNotes },
+    }
+
+    pilot(
+      api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      apple_id:                             ios_config[:apple_id] || "6744892773",
+      ipa:                                  ipa_path,
+      beta_app_review_info:                 testflight_config[:beta_app_review_info].dup,
+      beta_app_feedback_email:              testflight_config[:beta_app_feedback_email],
+      beta_app_description:                 testflight_config[:beta_app_description],
+      demo_account_required:                testflight_config[:demo_account_required],
+      distribute_external:                  testflight_config[:distribute_external],
+      notify_external_testers:              testflight_config[:notify_external_testers],
+      groups:                               testflight_config[:groups],
+      skip_submission:                      testflight_config[:skip_submission],
+      skip_waiting_for_build_processing:    testflight_config[:skip_waiting_for_build_processing],
+      submit_beta_review:                   testflight_config[:submit_beta_review],
+      expire_previous_builds:               testflight_config[:expire_previous_builds],
+      reject_build_waiting_for_review:      testflight_config[:reject_build_waiting_for_review],
+      wait_processing_interval:             testflight_config[:wait_processing_interval],
+      wait_processing_timeout_duration:     testflight_config[:wait_processing_timeout_duration],
+      uses_non_exempt_encryption:           testflight_config[:uses_non_exempt_encryption],
+      changelog:                            releaseNotes,
+      localized_app_info:                   testflight_config[:localized_app_info],
+      localized_build_info:                 localized_build_info,
+    )
+
+    UI.success("✅ Successfully uploaded to TestFlight!")
+  end
+
   desc "Upload beta build to TestFlight"
   lane :beta do |options|
     options = sanitize_options(options)
@@ -15,6 +61,19 @@ platform :ios do
     setup_ci_if_needed
     load_api_key(options)
     fetch_certificates_with_match(options.merge(match_type: "appstore"))
+
+    # Switch project from whatever signing state the previous lane left it in
+    # (e.g. Manual+AdHoc from a Firebase deploy) to Manual+AppStore so xcodebuild
+    # archives with the AppStore profile Match just installed.
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path:                  ios_config[:project_path],
+      team_id:               ios_config[:team_id],
+      code_sign_identity:    "Apple Distribution",
+      targets:               [ios_config[:scheme]],
+      bundle_identifier:     ios_config[:app_identifier],
+      profile_name:          "match AppStore #{ios_config[:app_identifier]}",
+    )
 
     gradle_version = get_version_from_gradle(sanitize_for_appstore: true)
 
@@ -44,7 +103,6 @@ platform :ios do
 
     pilot(
       api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
-      beta_app_review_info: testflight_config[:beta_app_review_info],
       beta_app_feedback_email: testflight_config[:beta_app_feedback_email],
       beta_app_description: testflight_config[:beta_app_description],
       demo_account_required: testflight_config[:demo_account_required],
@@ -65,5 +123,45 @@ platform :ios do
     )
 
     UI.success("✅ Successfully uploaded to TestFlight!")
+  end
+
+  desc "Stage 1 → Stage 2 promotion: distribute an already-uploaded TF build to external testers (no rebuild, no re-upload). Triggers Apple's beta review (~24h)."
+  lane :promoteToExternalBeta do |options|
+    options           = sanitize_options(options)
+    ios_config        = FastlaneConfig::IosConfig::BUILD_CONFIG
+    testflight_config = FastlaneConfig::IosConfig::TESTFLIGHT_CONFIG
+
+    load_api_key(options)
+
+    # Resolve build: explicit option > latest TF build for this app.
+    build_number = options[:build_number]&.to_s || latest_testflight_build_number(
+      app_identifier: ios_config[:app_identifier],
+      api_key:        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+    ).to_s
+
+    external_groups = options[:groups] ||
+                      testflight_config[:external_groups] ||
+                      ["External Beta"]
+
+    UI.important("📦 Promoting TF build #{build_number} → external testers (#{external_groups.join(', ')})")
+
+    # pilot in distribute-only mode — Spaceship updates the build's group
+    # assignment + submits for beta review. No IPA upload.
+    pilot(
+      api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      app_identifier:                       ios_config[:app_identifier],
+      build_number:                         build_number,
+      distribute_only:                      true,
+      distribute_external:                  true,
+      notify_external_testers:              true,
+      groups:                               external_groups,
+      submit_beta_review:                   true,
+      reject_build_waiting_for_review:      true,
+      changelog:                            options[:changelog] || generateReleaseNote(),
+      beta_app_review_info:                 testflight_config[:beta_app_review_info]&.dup,
+      uses_non_exempt_encryption:           testflight_config[:uses_non_exempt_encryption],
+    )
+
+    UI.success("✅ Build #{build_number} submitted for Apple's beta review — external testers will receive it on approval (~24h).")
   end
 end

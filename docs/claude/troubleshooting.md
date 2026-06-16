@@ -897,7 +897,6 @@ bundle exec fastlane ios release
 🔴 **KNOWN BUG:** Inconsistent keystore parameter naming
 
 **Details:**
-- Scripts use: `ORIGINAL_KEYSTORE_FILE`
 - Actions use: `KEYSTORE_FILE` (without ORIGINAL prefix)
 - Both should work, but causes confusion
 
@@ -906,7 +905,7 @@ bundle exec fastlane ios release
 ```bash
 # Set both versions in GitHub secrets
 gh secret set KEYSTORE_FILE < keystores/original-release-key.jks.b64
-gh secret set ORIGINAL_KEYSTORE_FILE < keystores/original-release-key.jks.b64
+gh secret set UPLOAD_KEYSTORE_FILE < keystores/original-release-key.jks.b64
 
 # Or use keystore-manager which handles both
 ./keystore-manager.sh add
@@ -1093,7 +1092,7 @@ security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovisi
 
 #### 2. Signing Parameter Naming Inconsistency
 **Impact:** Confusion with keystore parameters
-**Workaround:** Set both `KEYSTORE_FILE` and `ORIGINAL_KEYSTORE_FILE`
+**Workaround:** Set both `KEYSTORE_FILE` and `UPLOAD_KEYSTORE_FILE`
 **See:** [BUGS_AND_ISSUES.md#2](../analysis/BUGS_AND_ISSUES.md#2-signing-parameter-naming-inconsistency-critical)
 
 ### 🟡 Medium Severity Bugs

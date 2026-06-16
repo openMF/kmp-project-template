@@ -38,7 +38,12 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "../keystores/release_keystore.keystore")
+            // v2 Play App Signing model — Gradle signs release AABs with the UPLOAD key.
+            // Single source of truth: secrets/keystores/upload_keystore.keystore
+            // - Local-dev: developer drops their real upload_keystore.keystore into secrets/keystores/
+            // - CI: materialize-android-secrets.sh decodes UPLOAD_KEYSTORE_FILE GHA secret to the same path
+            // - KEYSTORE_PATH env var overrides (advanced use)
+            storeFile = file(System.getenv("KEYSTORE_PATH") ?: "../secrets/keystores/upload_keystore.keystore")
             storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "Wizard@123"
             keyAlias = System.getenv("KEYSTORE_ALIAS") ?: "kmp-project-template"
             keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: "Wizard@123"

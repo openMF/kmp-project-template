@@ -6,6 +6,7 @@ set -euo pipefail
 
 FLAVOR="${FLAVOR:-prod}"
 TAG="${TAG:?GitHub release tag must be set (e.g. v2026.06.04)}"
+STAGE="${STAGE:-stable}"   # prerelease | beta | stable — direct-distro promotion ladder
 
 # 1. Build the EXE installer via Compose Desktop.
 ./gradlew :cmp-desktop:packageReleaseExe -PflavorDimension="$FLAVOR"
@@ -16,3 +17,6 @@ EXE_PATH="$(find cmp-desktop/build/compose/binaries/main-release/exe -name '*.ex
 
 # 3. Upload to the GH Release.
 gh release upload "$TAG" "$EXE_PATH" --clobber
+
+# 4. Apply promotion-stage flags (prerelease + latest) per the direct-distro ladder.
+bash "$(dirname "$0")/../../_shared/scripts/gh-release-stage.sh" "$TAG" "$STAGE"

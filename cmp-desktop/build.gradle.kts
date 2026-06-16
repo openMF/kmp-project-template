@@ -55,7 +55,7 @@ compose.desktop {
         }.get().metadata.installationPath.asFile.absolutePath
         jvmArgs("-Dapp.name=$appName")
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg, TargetFormat.Pkg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
             packageName = appName
             packageVersion = appVersion
             description = "Desktop Application"
@@ -67,7 +67,43 @@ compose.desktop {
             macOS {
                 bundleID = packageNameSpace
                 dockName = appName
+                appCategory = "public.app-category.finance"
                 iconFile.set(project.file("icons/ic_launcher.icns"))
+                // Mac App Store signing.
+                // MAC_SIGNING_IDENTITY: identity string passed by Fastlane lane via -P property.
+                // MAC_KEYCHAIN_PATH: explicit keychain file path from the lane's temp keychain.
+                // Identity format: "Apple Distribution: Org Name (TEAMID)"
+                // Signing is skipped when MAC_SIGNING_IDENTITY is absent/empty (e.g. local DMG).
+                val macSigningId = (project.findProperty("MAC_SIGNING_IDENTITY") as? String)
+                    ?.takeIf { it.isNotEmpty() }
+                    ?: providers.environmentVariable("MAC_SIGNING_IDENTITY").orNull
+                        ?.takeIf { it.isNotEmpty() }
+                // Explicit keychain path passed by Fastlane lane (MAC_KEYCHAIN_PATH).
+                // Bypasses the execOperations.exec() keychain-search-list issue in
+                // Gradle 9.x: security find-certificate with an explicit path works
+                // even when the search-list lookup fails from a subprocess context.
+                val macKeychainPath = (project.findProperty("MAC_KEYCHAIN_PATH") as? String)
+                    ?.takeIf { it.isNotEmpty() }
+                    ?: providers.environmentVariable("MAC_KEYCHAIN_PATH").orNull
+                        ?.takeIf { it.isNotEmpty() }
+                signing {
+                    sign.set(macSigningId != null)
+                    identity.set(macSigningId ?: "")
+                    if (macKeychainPath != null) {
+                        keychain.set(macKeychainPath)
+                    }
+                }
+                // Sandbox entitlements required for Mac App Store submission.
+                entitlementsFile.set(project.file("mac-app-store.entitlements"))
+                // Provisioning profile embeds team + distribution cert info.
+                // Set MAC_PROVISIONING_PROFILE_PATH to the .provisionprofile file path.
+                // Capture projectDirectory eagerly (config-cache serializable Directory value)
+                // so the .map{} lambda never captures an implicit Project reference.
+                val projectDirectory = layout.projectDirectory
+                provisioningProfile.set(
+                    providers.environmentVariable("MAC_PROVISIONING_PROFILE_PATH")
+                        .map { projectDirectory.file(it) }
+                )
                 notarization {
                     val providers = project.providers
                     appleID.set(providers.environmentVariable("NOTARIZATION_APPLE_ID"))
@@ -96,4 +132,6 @@ compose.desktop {
         }
     }
 }
+
+
 

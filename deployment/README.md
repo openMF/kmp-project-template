@@ -18,7 +18,7 @@ deployment/
 ├── DEPLOYMENT_MANIFEST.yaml     ← enumerates every target (schema v1.0)
 ├── PROMOTION_LOG.yaml           ← append-only deploy audit log (12-field)
 ├── Fastfile                     ← canonical import delegator (NO lanes inline)
-├── Appfile                      ← bridge to fastlane-config/project_config.rb
+├── Appfile                      ← reads identity from FastlaneConfig (config.rb)
 ├── README.md                    ← (this file)
 ├── _shared/
 │   ├── lib/                     ← Ruby helpers (populated in SP-07/08)

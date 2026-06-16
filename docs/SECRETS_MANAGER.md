@@ -139,18 +139,12 @@ The `secrets.env` file contains all the keystore and secret information. Example
 # Format: KEY=VALUE (use quotes for values with spaces)
 # Use <<EOF and EOF for multiline values
 
-# ORIGINAL Keystore credentials (Debug/Development)
-ORIGINAL_KEYSTORE_FILE_PASSWORD=original_keystore_password
-ORIGINAL_KEYSTORE_ALIAS=original_key
-ORIGINAL_KEYSTORE_ALIAS_PASSWORD=original_key_password
-
 # UPLOAD Keystore credentials (Release/Production)
 UPLOAD_KEYSTORE_FILE_PASSWORD=upload_keystore_password
 UPLOAD_KEYSTORE_ALIAS=upload_key
 UPLOAD_KEYSTORE_ALIAS_PASSWORD=upload_key_password
 
 # Local keystore generation settings (not sent to GitHub)
-ORIGINAL_KEYSTORE_NAME=original_keystore.keystore
 UPLOAD_KEYSTORE_NAME=upload_keystore.keystore
 VALIDITY=25
 KEYALG=RSA
@@ -167,9 +161,6 @@ STATE="West Bengal"
 COUNTRY=IN
 
 # Base64 encoded keystores (added by the script)
-ORIGINAL_KEYSTORE_FILE<<EOF
-MIICXAIBAAKBgQDCFENGw33yGihy92pDjZQhl0C36rPJj+...
-EOF
 
 UPLOAD_KEYSTORE_FILE<<EOF
 MIICXQIBAAKBgQDASAEDHGOPsVNlHCYi6ofmoEOdG+7xDRa...

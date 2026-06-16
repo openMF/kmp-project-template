@@ -20,14 +20,16 @@ platform :android do
 
     buildAndSignApp(taskName: "assembleProd", buildType: "Release", **signing_config)
 
-    firebase_app_distribution(
+    resolved_groups = FirebaseHelpers.resolve_groups(options, firebase_config)
+    dist_params = {
       app: firebase_config[:appId],
       android_artifact_type: "APK",
       android_artifact_path: build_paths[:prod_apk_path],
       service_credentials_file: FirebaseHelpers.service_credentials_path(firebase_config),
-      groups: FirebaseHelpers.resolve_groups(options, firebase_config),
       release_notes: releaseNotes,
-    )
+    }
+    dist_params[:groups] = resolved_groups if resolved_groups && !resolved_groups.to_s.strip.empty?
+    firebase_app_distribution(dist_params)
   end
 
   # ── flavor: :demo ─────────────────────────────────────────────────────────
@@ -44,13 +46,15 @@ platform :android do
 
     buildAndSignApp(taskName: "assembleDemo", buildType: "Release", **signing_config)
 
-    firebase_app_distribution(
+    resolved_groups = FirebaseHelpers.resolve_groups(options, firebase_config)
+    dist_params = {
       app: firebase_config[:appId],
       android_artifact_type: "APK",
       android_artifact_path: build_paths[:demo_apk_path],
       service_credentials_file: FirebaseHelpers.service_credentials_path(firebase_config),
-      groups: FirebaseHelpers.resolve_groups(options, firebase_config),
       release_notes: releaseNotes,
-    )
+    }
+    dist_params[:groups] = resolved_groups if resolved_groups && !resolved_groups.to_s.strip.empty?
+    firebase_app_distribution(dist_params)
   end
 end

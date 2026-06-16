@@ -84,10 +84,10 @@ This guide covers complete secrets management for all platforms.
 
 | Secret Name | Description | Required For |
 |------------|-------------|--------------|
-| `ORIGINAL_KEYSTORE_FILE` | Original keystore (base64) | Play Store signing |
-| `ORIGINAL_KEYSTORE_FILE_PASSWORD` | Keystore password | Play Store signing |
-| `ORIGINAL_KEYSTORE_ALIAS` | Key alias | Play Store signing |
-| `ORIGINAL_KEYSTORE_ALIAS_PASSWORD` | Key alias password | Play Store signing |
+| `UPLOAD_KEYSTORE_FILE` | Original keystore (base64) | Play Store signing |
+| `UPLOAD_KEYSTORE_FILE_PASSWORD` | Keystore password | Play Store signing |
+| `UPLOAD_KEYSTORE_ALIAS` | Key alias | Play Store signing |
+| `UPLOAD_KEYSTORE_ALIAS_PASSWORD` | Key alias password | Play Store signing |
 | `UPLOAD_KEYSTORE_FILE` | Upload keystore (base64) | Play Console upload |
 | `GOOGLESERVICES` | google-services.json (base64) | Firebase integration |
 | `FIREBASECREDS` | Firebase credentials (base64) | Firebase App Distribution |
@@ -501,7 +501,7 @@ MACOS_INSTALLER_CERTIFICATE
 
 | Local File | GitHub Secret Name | Encoding |
 |-----------|-------------------|----------|
-| `keystores/original-release-key.jks` | `ORIGINAL_KEYSTORE_FILE` or `KEYSTORE_FILE` | Base64 |
+| `keystores/original-release-key.jks` | `UPLOAD_KEYSTORE_FILE` or `KEYSTORE_FILE` | Base64 |
 | `secrets/google-services.json` | `GOOGLESERVICES` | Base64 |
 | `secrets/firebaseAppDistributionServiceCredentialsFile.json` | `FIREBASECREDS` | Base64 |
 | `secrets/playStorePublishServiceCredentialsFile.json` | `PLAYSTORECREDS` | Base64 |
@@ -515,9 +515,9 @@ MACOS_INSTALLER_CERTIFICATE
 
 | Value | GitHub Secret Name | Source |
 |-------|-------------------|--------|
-| Keystore password | `ORIGINAL_KEYSTORE_FILE_PASSWORD` | From `secrets.env` |
-| Keystore alias | `ORIGINAL_KEYSTORE_ALIAS` | From `secrets.env` |
-| Alias password | `ORIGINAL_KEYSTORE_ALIAS_PASSWORD` | From `secrets.env` |
+| Keystore password | `UPLOAD_KEYSTORE_FILE_PASSWORD` | From `secrets.env` |
+| Keystore alias | `UPLOAD_KEYSTORE_ALIAS` | From `secrets.env` |
+| Alias password | `UPLOAD_KEYSTORE_ALIAS_PASSWORD` | From `secrets.env` |
 | App Store Key ID | `APPSTORE_KEY_ID` | From App Store Connect |
 | Issuer ID | `APPSTORE_ISSUER_ID` | From App Store Connect |
 | Match password | `MATCH_PASSWORD` | From `secrets/shared_keys.env` |
@@ -543,8 +543,6 @@ MACOS_INSTALLER_CERTIFICATE
 ---
 
 ### Rotating Android Keystore
-
-**⚠️ WARNING:** Cannot rotate original keystore for published app
 
 **For new apps only:**
 

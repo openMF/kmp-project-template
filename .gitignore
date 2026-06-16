@@ -125,3 +125,6 @@ vendor/
 *.pem
 .mifos-secure/
 *.hprof
+
+# Release state lives at workspace level (workspaces/{ws}/{project}/release-layer/), not in source.
+release-layer/

@@ -95,7 +95,7 @@ on:
 jobs:
   android:
     if: ${{ inputs.android_target != 'skip' }}
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-android.yaml@v1.0.17
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-android.yaml@v1.0.18
     with:
       android_package_name: cmp-android
       version_tag:          ${{ inputs.version_tag }}
@@ -105,14 +105,15 @@ jobs:
       google_services:          ${{ secrets.GOOGLESERVICES }}
       firebase_creds:           ${{ secrets.FIREBASECREDS }}
       playstore_creds:          ${{ secrets.PLAYSTORECREDS }}
-      release_keystore:         ${{ secrets.ORIGINAL_KEYSTORE_FILE }}
-      keystore_password:        ${{ secrets.ORIGINAL_KEYSTORE_FILE_PASSWORD }}
-      keystore_alias:           ${{ secrets.ORIGINAL_KEYSTORE_ALIAS }}
-      keystore_alias_password:  ${{ secrets.ORIGINAL_KEYSTORE_ALIAS_PASSWORD }}
+      # Play App Signing model: ONE keystore (UPLOAD). Google holds the app signing key.
+      upload_keystore:          ${{ secrets.UPLOAD_KEYSTORE_FILE }}
+      keystore_password:        ${{ secrets.UPLOAD_KEYSTORE_FILE_PASSWORD }}
+      keystore_alias:           ${{ secrets.UPLOAD_KEYSTORE_ALIAS }}
+      keystore_alias_password:  ${{ secrets.UPLOAD_KEYSTORE_ALIAS_PASSWORD }}
 
   ios:
     if: ${{ inputs.ios_target != 'skip' }}
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.17
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.18
     with:
       platform:      ios
       package_name:  cmp-ios
@@ -129,7 +130,7 @@ jobs:
 
   mac:
     if: ${{ inputs.mac_target != 'skip' }}
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.17
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-apple.yaml@v1.0.18
     with:
       platform:      mac
       package_name:  cmp-desktop
@@ -145,7 +146,7 @@ jobs:
 
   desktop-win:
     if: ${{ inputs.desktop_win_target != 'skip' }}
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-desktop.yaml@v1.0.17
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-desktop.yaml@v1.0.18
     with:
       target:               ${{ inputs.desktop_win_artifact }}
       desktop_package_name: cmp-desktop
@@ -155,7 +156,7 @@ jobs:
 
   desktop-linux:
     if: ${{ inputs.desktop_linux_target != 'skip' }}
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-desktop.yaml@v1.0.17
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-desktop.yaml@v1.0.18
     with:
       target:               linux-deb
       desktop_package_name: cmp-desktop
@@ -165,7 +166,7 @@ jobs:
 
   web:
     if: ${{ inputs.web_target != 'skip' }}
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-web.yaml@v1.0.17
+    uses: openMF/mifos-x-actionhub/.github/workflows/v2/release-web.yaml@v1.0.18
     with:
       host:             ${{ inputs.web_host }}
       web_package_name: cmp-web

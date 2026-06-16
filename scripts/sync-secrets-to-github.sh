@@ -22,11 +22,11 @@
 #   bash scripts/sync-secrets-to-github.sh --only azure-signing
 #   bash scripts/sync-secrets-to-github.sh --only web
 #
-# v2 (Play App Signing model):
-#   Android requires BOTH keystore families:
-#     ORIGINAL_KEYSTORE_FILE  + _PASSWORD + _ALIAS + _ALIAS_PASSWORD  → app signing key
-#     UPLOAD_KEYSTORE_FILE    + _PASSWORD + _ALIAS + _ALIAS_PASSWORD  → Play Console upload key
-#   Single-keystore mode (no Play App Signing): point both families at the same file.
+# Play App Signing model (per https://support.google.com/googleplay/android-developer/answer/9842756):
+#   Google holds the app signing key; developer holds ONLY the upload key.
+#   Android requires ONE keystore family:
+#     UPLOAD_KEYSTORE_FILE + _PASSWORD + _ALIAS + _ALIAS_PASSWORD → Play Console upload key
+#   90%+ of new apps use this default; Google's KMS holds the app signing key.
 
 set -euo pipefail
 
@@ -210,17 +210,11 @@ _sync_ios() {
 }
 
 # ── Android secrets ───────────────────────────────────────────────────────────
-# v2 model — two keystores: ORIGINAL (app signing) + UPLOAD (Play Console).
-# In single-keystore mode, point both families at the same .jks file.
+# Play App Signing model: ONE keystore (UPLOAD). Google holds the app signing key.
 _sync_android() {
-  echo "🤖 Android / Play Store (v2 — Play App Signing model)"
+  echo "🤖 Android / Play Store (Play App Signing model — single UPLOAD keystore)"
 
-  # ORIGINAL keystore (app signing key — Play App Signing identity)
-  _set_keystore_family "ORIGINAL" \
-    "$SECRETS_DIR/keystores/original_keystore.properties" \
-    "$SECRETS_DIR/keystores/original_keystore.keystore"
-
-  # UPLOAD keystore (Play Console upload key)
+  # UPLOAD keystore (Play Console upload key) — the only keystore the developer holds
   _set_keystore_family "UPLOAD" \
     "$SECRETS_DIR/keystores/upload_keystore.properties" \
     "$SECRETS_DIR/keystores/upload_keystore.keystore"

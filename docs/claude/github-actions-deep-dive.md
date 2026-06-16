@@ -135,7 +135,6 @@ on:
       # ... more inputs
 
     secrets:
-      ORIGINAL_KEYSTORE_FILE:
         required: true
       GOOGLESERVICES:
         required: true

@@ -92,6 +92,14 @@ Sync Play Store listing (metadata + screenshots) — no build, no binary upload
 
 ## Mac
 
+### mac buildNotarizedMacDmg
+
+```sh
+[bundle exec] fastlane mac buildNotarizedMacDmg
+```
+
+Tier-2 Apple-notarized macOS DMG → GitHub Releases (Developer ID via Match + notarytool via Fastlane notarize)
+
 ### mac desktop_testflight
 
 ```sh
@@ -107,6 +115,14 @@ Build and upload macOS desktop build to TestFlight (Mac App Store track)
 ```
 
 One-shot: create proper Mac Installer Distribution cert in Apple Developer Portal + push to Match repo.
+
+### mac promoteMacToExternalBeta
+
+```sh
+[bundle exec] fastlane mac promoteMacToExternalBeta
+```
+
+Stage 1 → Stage 2 promotion: distribute an already-uploaded Mac TF build to external testers (no rebuild). Triggers Apple's beta review (~24h).
 
 ### mac promoteMacToAppStore
 
@@ -130,7 +146,7 @@ Full Mac App Store release — build PKG from source + deliver (use promoteMacTo
 [bundle exec] fastlane mac buildMacDmg
 ```
 
-Build unsigned macOS DMG and upload to GitHub Release
+Build unsigned macOS DMG and upload to GitHub Release (direct-distro Stage 1/2/3 via STAGE env)
 
 ----
 
@@ -281,6 +297,14 @@ Upload an already-built IPA to TestFlight (skips build; use after beta build suc
 ```
 
 Upload beta build to TestFlight
+
+### ios promoteToExternalBeta
+
+```sh
+[bundle exec] fastlane ios promoteToExternalBeta
+```
+
+Stage 1 → Stage 2 promotion: distribute an already-uploaded TF build to external testers (no rebuild, no re-upload). Triggers Apple's beta review (~24h).
 
 ----
 

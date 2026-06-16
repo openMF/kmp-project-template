@@ -1,97 +1,85 @@
-# Android Keystores (Play App Signing model)
+# Android Keystore (Play App Signing model)
 
-Used for: signing Android release APKs and AABs for Play Store and Firebase distribution.
+Single source of truth for Android release signing: **`upload_keystore.keystore`** (Play Console upload key) + **`upload_keystore.properties`** (credentials). One keystore — that's all you hold under Play App Signing.
 
-## Two-keystore model (recommended for new apps — v2)
+## Why only one keystore?
 
-Modern Android publishing uses Google's [Play App Signing](https://developer.android.com/studio/publish/app-signing#app-signing-google-play) with **two separate keystores**:
+Per [Google's official Play App Signing documentation](https://support.google.com/googleplay/android-developer/answer/9842756):
 
-| Keystore | File | Env-var family | Role |
-|---|---|---|---|
-| **ORIGINAL** | `original_keystore.keystore` | `ORIGINAL_KEYSTORE_*` | **App Signing Key** — the immutable identity Google Play uses to re-sign your AAB after upload verification. Lose this and you cannot publish updates to the same package name. |
-| **UPLOAD** | `upload_keystore.keystore` | `UPLOAD_KEYSTORE_*` | **Upload Key** — what your CI signs AABs with before uploading. Play Console verifies the upload signature, then re-signs with the ORIGINAL key. Rotatable if compromised. |
+> *"By default, when you upload your app bundle, Play App Signing automatically generates a cryptographically strong RSA 4096-bit key to manage and protect your app. Over 90% of new apps use this recommended default."*
 
-> **Why two keystores?** The Upload Key can be rotated if compromised, but the App Signing Key is permanent. Separating them means a leaked CI signing key doesn't permanently lock you out of updating your app.
+> *"Google manages and protects your app's signing key on the same secure infrastructure that Google uses to store its own keys. These keys are protected by Google's Key Management Service (KMS)."*
 
-## Single-keystore fallback (legacy, pre–Play App Signing)
+This means:
 
-If you're not using Play App Signing, you only need one keystore (`release.jks`).
-The sync script auto-detects this and pushes the same keystore as both `ORIGINAL_*` and `UPLOAD_*` families so v2 CI workflows still work.
+| Key type | Who holds it | What you do with it |
+|---|---|---|
+| **Upload key** | **You** — `upload_keystore.keystore` | Sign AABs before uploading to Play Console |
+| **App signing key** | **Google Play (KMS)** | You can never download it. Google uses it to re-sign APKs delivered to users. |
 
-## How to generate keystores (first time)
+The legacy two-keystore model only applies to apps published before 2021 or explicit Play App Signing opt-outs. This template assumes the modern default.
+
+## File layout
+
+```
+secrets/keystores/
+├── upload_keystore.keystore     ← the keystore binary
+├── upload_keystore.properties   ← passwords + alias
+└── README.md
+```
+
+## Generate a new upload keystore
 
 ```bash
-mkdir -p secrets/keystores
-
-# ORIGINAL — app signing key (long-lived)
-keytool -genkey -v \
-  -keystore secrets/keystores/original_keystore.keystore \
-  -alias original \
-  -keyalg RSA \
-  -keysize 4096 \
-  -validity 25000 \
-  -dname "CN=Your Name, OU=Engineering, O=Your Org, L=City, S=State, C=US"
-
-# UPLOAD — upload signing key (rotatable)
 keytool -genkey -v \
   -keystore secrets/keystores/upload_keystore.keystore \
   -alias upload \
   -keyalg RSA \
   -keysize 4096 \
   -validity 25000 \
-  -dname "CN=Your Name, OU=Engineering, O=Your Org, L=City, S=State, C=US"
+  -dname "CN=Your Org, OU=Engineering, O=Your Org, L=City, S=State, C=US"
 ```
 
-Or use the project's helper: `./keystore-manager.sh generate`
+Then write `upload_keystore.properties`:
 
-## Create properties files
-
-```bash
-cat > secrets/keystores/original_keystore.properties <<'EOF'
-storeFile=original_keystore.keystore
-storePassword=YOUR_ORIGINAL_STORE_PASSWORD
-keyAlias=original
-keyPassword=YOUR_ORIGINAL_KEY_PASSWORD
-EOF
-
-cat > secrets/keystores/upload_keystore.properties <<'EOF'
+```properties
 storeFile=upload_keystore.keystore
-storePassword=YOUR_UPLOAD_STORE_PASSWORD
+storePassword=YOUR_STORE_PASSWORD
 keyAlias=upload
-keyPassword=YOUR_UPLOAD_KEY_PASSWORD
-EOF
+keyPassword=YOUR_KEY_PASSWORD
 ```
 
-## Files → GHA secret mapping
-
-| File | Content | GHA secret(s) |
-|---|---|---|
-| `secrets/keystores/original_keystore.keystore` | App signing keystore binary | `ORIGINAL_KEYSTORE_FILE` (base64) |
-| `secrets/keystores/original_keystore.properties` | App signing creds | `ORIGINAL_KEYSTORE_FILE_PASSWORD`, `ORIGINAL_KEYSTORE_ALIAS`, `ORIGINAL_KEYSTORE_ALIAS_PASSWORD` |
-| `secrets/keystores/upload_keystore.keystore` | Upload keystore binary | `UPLOAD_KEYSTORE_FILE` (base64) |
-| `secrets/keystores/upload_keystore.properties` | Upload creds | `UPLOAD_KEYSTORE_FILE_PASSWORD`, `UPLOAD_KEYSTORE_ALIAS`, `UPLOAD_KEYSTORE_ALIAS_PASSWORD` |
-| `secrets/firebase/google-services.json` | Firebase config | `GOOGLESERVICES` (base64) |
-
-## Sync to GitHub
+## Sync to GitHub Actions
 
 ```bash
 bash scripts/sync-secrets-to-github.sh --only android
 ```
 
-## CRITICAL: Back up your keystores
+Pushes 4 secrets to the repo's GHA settings:
+- `UPLOAD_KEYSTORE_FILE` (base64-encoded keystore binary)
+- `UPLOAD_KEYSTORE_FILE_PASSWORD`
+- `UPLOAD_KEYSTORE_ALIAS`
+- `UPLOAD_KEYSTORE_ALIAS_PASSWORD`
 
-⚠️ **If you lose your ORIGINAL keystore, you CANNOT publish updates to the Play Store under the same package name.** There is no recovery path.
+Plus `GOOGLESERVICES` (Firebase config) if `secrets/firebase/google-services.json` exists.
 
-Back up the ORIGINAL keystore in at least three places:
-- Password manager (1Password, Bitwarden, etc.)
+## CRITICAL: back up your upload keystore
+
+⚠️ **The upload keystore is your identity to Play Console**. Lose it and you have to request an upload key reset (Google takes 1-2 business days to approve), which means your CI is blocked until then. Back it up to:
+
+- 1Password / Bitwarden secure note (base64-encoded)
 - Encrypted cloud storage (separate from your Google account)
-- Physical backup (USB key in a safe / printed escrow)
+- Another team member's password manager
 
-UPLOAD keystore is rotatable, so a single backup is enough.
+Google can reset the upload key if compromised — see [Request an upload key reset](https://support.google.com/googleplay/android-developer/answer/9842756).
 
-## Notes
+## Where Play Console reads from
 
-- Keep the ORIGINAL keystore for the entire lifetime of your app on Play Store.
-- UPLOAD keystore can be rotated via Play Console if compromised — see [Reset a lost or compromised upload key](https://support.google.com/googleplay/android-developer/answer/9842756).
-- Debug keystores (auto-generated by Android Studio) are NOT used for release builds.
-- For migrating from a single-keystore project: the sync script handles single-keystore mode automatically by detecting `release.properties` and pushing it as both ORIGINAL and UPLOAD families.
+`/release` → fastlane `android deployInternal` → reads `secrets/keystores/upload_keystore.keystore` per Gradle's `signingConfig` → signs AAB → uploads to Play Console → Play Console verifies signature against the registered upload key cert → re-signs with Google's app signing key → distributes.
+
+If Play Console rejects with "Upload key mismatch", the local keystore's SHA-1 doesn't match Play Console's registered upload key cert. Verify with:
+
+```bash
+keytool -list -v -keystore secrets/keystores/upload_keystore.keystore -alias <your-alias>
+# SHA-1 must match: Play Console → Setup → App integrity → "Upload key certificate"
+```

@@ -5,92 +5,27 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="00: app_store_connect_api_key" time="0.001856">
+      <testcase classname="fastlane.lanes" name="0: /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/gradlew versionFile 2&gt;/dev/null || true" time="0.867411">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="01: chmod 600 &apos;/Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/secrets/match/match_ci_key&apos;" time="0.010369">
+      <testcase classname="fastlane.lanes" name="1: git rev-list --count HEAD 2&gt;/dev/null || echo 1" time="0.022104">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="02: shell command" time="0.017516">
+      <testcase classname="fastlane.lanes" name="2: changelog_from_git_commits" time="0.015518">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="03: shell command" time="0.018168">
+      <testcase classname="fastlane.lanes" name="3: /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/gradlew -p /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template :cmp-android:bundleProdRelease -Pandroid.injected.signing.store.file\=/Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/secrets/keystores/upload_keystore.keystore -Pandroid.injected.signing.store.password\=OkOe10KTcc4EdNIeMl0psSgrNFteNjZuBmOwBSag -Pandroid.injected.signing.key.alias\=mifos-kmp-release -Pandroid.injected.signing.key.password\=OkOe10KTcc4EdNIeMl0psSgrNFteNjZuBmOwBSag -PVERSION_NAME\=1.0.0 -PVERSION_CODE\=179" time="484.778344">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="04: match" time="5.0751">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="05: shell command" time="0.018005">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="06: shell command" time="0.035195">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="07: match" time="4.381234">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="08: shell command" time="0.036648">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="09: shell command" time="0.036474">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="10: /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/gradlew -p /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template :cmp-desktop:createReleaseDistributable --no-daemon --no-configuration-cache" time="163.997953">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="11: shell command" time="0.010661">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="12: codesign --force --deep --sign E1232F09C79A44ADD8292C0FBEE4186BADD38656 --keychain /Users/therajanmaurya/Library/Keychains/login.keychain-db --entitlements /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/cmp-desktop/mac-app-store.entitlements /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/cmp-desktop/build/compose/binaries/main-release/app/Mifos\ -\ Money\ Toolkit.app" time="0.140776">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="13: shell command" time="0.047822">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="14: codesign --force --sign E1232F09C79A44ADD8292C0FBEE4186BADD38656 --keychain /Users/therajanmaurya/Library/Keychains/login.keychain-db --entitlements /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/cmp-desktop/mac-app-store.entitlements /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/cmp-desktop/build/compose/binaries/main-release/app/Mifos\ -\ Money\ Toolkit.app" time="0.138032">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="15: codesign --verify --deep --strict /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/cmp-desktop/build/compose/binaries/main-release/app/Mifos\ -\ Money\ Toolkit.app" time="0.11144">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="16: productbuild --sign 3rd\ Party\ Mac\ Developer\ Installer:\ The\ Mifos\ Initiative\ \(L432S2FZP5\) --component /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/cmp-desktop/build/compose/binaries/main-release/app/Mifos\ -\ Money\ Toolkit.app /Applications /Users/therajanmaurya/project-development/claude-product-cycle/workspaces/mifos-x/kmp-project-template/source/kmp-project-template/cmp-desktop/build/compose/binaries/main-release/pkg/Mifos\ -\ Money\ Toolkit.pkg" time="6.725886">
-        
-      </testcase>
-    
-      
-      <testcase classname="fastlane.lanes" name="17: upload_to_testflight" time="109.144189">
+      <testcase classname="fastlane.lanes" name="4: upload_to_play_store" time="145.951257">
         
       </testcase>
     

@@ -225,22 +225,6 @@ _sync_android() {
     "$SECRETS_DIR/keystores/upload_keystore.properties" \
     "$SECRETS_DIR/keystores/upload_keystore.keystore"
 
-  # Single-keystore fallback (legacy forks pre-v2) — if neither *_keystore.properties
-  # has REAL credentials (missing OR placeholder) but legacy release.properties does,
-  # push it as both ORIGINAL and UPLOAD families so v2 workflows still sign.
-  local _orig="$SECRETS_DIR/keystores/original_keystore.properties"
-  local _upld="$SECRETS_DIR/keystores/upload_keystore.properties"
-  local _rels="$SECRETS_DIR/keystores/release.properties"
-  if   { [[ ! -f "$_orig" ]] || grep -q "CLAUDE-PLACEHOLDER" "$_orig"; } \
-    && { [[ ! -f "$_upld" ]] || grep -q "CLAUDE-PLACEHOLDER" "$_upld"; } \
-    &&   [[   -f "$_rels" ]] && ! grep -q "CLAUDE-PLACEHOLDER" "$_rels"; then
-    echo "  ℹ️  legacy single-keystore mode detected (release.properties) — pushing as ORIGINAL + UPLOAD"
-    local jks_name
-    jks_name=$(grep '^storeFile=' "$_rels" 2>/dev/null | cut -d'=' -f2-)
-    _set_keystore_family "ORIGINAL" "$_rels" "$SECRETS_DIR/keystores/${jks_name:-release.jks}"
-    _set_keystore_family "UPLOAD"   "$_rels" "$SECRETS_DIR/keystores/${jks_name:-release.jks}"
-  fi
-
   # google-services.json — required by all Android builds
   _set_from_binary "GOOGLESERVICES" "$SECRETS_DIR/firebase/google-services.json"
   echo ""

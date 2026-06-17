@@ -39,13 +39,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@v3
       - uses: maxim-lobanov/setup-xcode@v1
         with: { xcode-version: '15.2' }
-      - name: Install CocoaPods
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          # bundler-cache: false — we manage cocoapods manually below, no Gemfile here.
+      - name: Install CocoaPods + pod install
         run: |
-          # macos-14 ships Ruby 3.0+ and CocoaPods preinstalled; this is a
-          # safety net for older runner images or if the preinstalled version
-          # diverges from what cmp-ios's Podfile expects.
-          which pod || sudo gem install cocoapods --no-document
-          cd cmp-ios && pod install --repo-update
+          gem install cocoapods --no-document
+          cd cmp-ios && pod install
       - name: Build iOS shared framework + xcodebuild (unsigned)
         run: |
           # The actionhub workflow calls `:cmp-shared:compileKotlin` which is

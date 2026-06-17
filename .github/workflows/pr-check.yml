@@ -54,6 +54,12 @@ jobs:
         run: cd cmp-ios && pod install
       - name: xcodebuild (unsigned, triggers syncFramework via podspec script_phase)
         run: |
+          # ARCHS=arm64 — cmp-shared only declares iosArm64() + iosSimulatorArm64()
+          # in its KMP targets. Default xcodebuild on Apple Silicon (macos-14)
+          # tries both arm64 and x86_64; the Kotlin/Native script_phase fails
+          # with 'Unknown iOS simulator arch: x86_64' for the x86_64 slice.
           xcodebuild -workspace cmp-ios/iosApp.xcworkspace \
             -scheme iosApp -configuration Debug -sdk iphonesimulator \
+            -arch arm64 \
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
             CODE_SIGNING_ALLOWED=NO build

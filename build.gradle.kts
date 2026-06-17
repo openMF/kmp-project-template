@@ -38,7 +38,6 @@ plugins {
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.spotless) apply false
     alias(libs.plugins.moduleGraph) apply true
-    alias(libs.plugins.cyclonedxBom) apply true
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.firebase.perf) apply false
     alias(libs.plugins.gms) apply false
@@ -74,6 +73,7 @@ plugins {
     alias(libs.plugins.kover.convention)
     id("org.convention.fork.sync-config")
 }
+
 
 object DynamicVersion {
     fun setDynamicVersion(file: File, version: String) {

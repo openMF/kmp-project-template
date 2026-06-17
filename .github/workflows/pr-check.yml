@@ -32,6 +32,13 @@ jobs:
   ios:
     name: PR Check · iOS
     runs-on: macos-14
+    # iOS check is non-blocking until macos-15 + Xcode 26 ship on GitHub
+    # runners. Current state: Compose Multiplatform's bundled CMPLayoutRegion
+    # references _OBJC_CLASS_$_UIViewLayoutRegion which is an iOS 26+ API.
+    # macos-14 has Xcode 16.1 (iOS 18 SDK) max — link fails with
+    # 'Undefined symbols for architecture arm64'.
+    # Re-enable as a required check once macos-15 (Xcode 26) is GA.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4

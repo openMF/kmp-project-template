@@ -44,13 +44,15 @@ jobs:
           ruby-version: '3.2'
       - name: Install CocoaPods gem
         run: gem install cocoapods --no-document
-      - name: Generate podspec
-        run: ./gradlew :cmp-shared:podspec
+      - name: Generate podspec + placeholder framework
+        # podspec has a raise-if-missing check on
+        # build/cocoapods/framework/ComposeApp.framework. generateDummyFramework
+        # produces a placeholder so `pod install` passes; xcodebuild's
+        # script_phase later swaps in the real framework via syncFramework.
+        run: ./gradlew :cmp-shared:podspec :cmp-shared:generateDummyFramework
       - name: pod install
         run: cd cmp-ios && pod install
-      - name: Compile shared iOS framework
-        run: ./gradlew :cmp-shared:compileKotlinIosSimulatorArm64
-      - name: xcodebuild (unsigned)
+      - name: xcodebuild (unsigned, triggers syncFramework via podspec script_phase)
         run: |
           xcodebuild -workspace cmp-ios/iosApp.xcworkspace \
             -scheme iosApp -configuration Debug -sdk iphonesimulator \

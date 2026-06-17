@@ -42,15 +42,25 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
-          bundler-cache: true
+      - name: Install CocoaPods gem
+        run: gem install cocoapods --no-document
       - name: Generate podspec + placeholder framework
         # podspec has a raise-if-missing check on
         # build/cocoapods/framework/ComposeApp.framework. generateDummyFramework
         # produces a placeholder so `pod install` passes; xcodebuild's
         # script_phase later swaps in the real framework via syncFramework.
         run: ./gradlew :cmp-shared:podspec :cmp-shared:generateDummyFramework
-      - name: Build iOS (unsigned) via canonical fastlane lane
-        # fastlane ios build_ios is the canonical PR-check lane. It runs
-        # cocoapods + build_ios_app(skip_codesigning: true, skip_archive: true)
-        # — the same path the actionhub action would invoke.
-        run: bundle exec fastlane ios build_ios
+      - name: pod install
+        run: cd cmp-ios && pod install
+      - name: xcodebuild iphonesimulator arm64 (unsigned)
+        # The fastlane build_ios lane gym-targets device (-destination 'generic/platform=iOS')
+        # which builds Firebase SDK pods + fails through xcbeautify with hidden
+        # errors. Direct simulator build with arm64-only matches what
+        # 'cmp-shared' KMP targets declare (iosArm64 + iosSimulatorArm64 — no
+        # iosX64), and was verified BUILD SUCCEEDED on Apple Silicon locally.
+        run: |
+          xcodebuild -workspace cmp-ios/iosApp.xcworkspace \
+            -scheme iosApp -configuration Debug -sdk iphonesimulator \
+            -arch arm64 \
+            ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
+            CODE_SIGNING_ALLOWED=NO build

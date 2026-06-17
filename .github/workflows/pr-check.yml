@@ -44,16 +44,14 @@ jobs:
           ruby-version: '3.2'
       - name: Install CocoaPods gem
         run: gem install cocoapods --no-document
-      - name: Generate podspec + pod install + xcodebuild (unsigned)
+      - name: Generate podspec
+        run: ./gradlew :cmp-shared:podspec
+      - name: pod install
+        run: cd cmp-ios && pod install
+      - name: Compile shared iOS framework
+        run: ./gradlew :cmp-shared:compileKotlinIosSimulatorArm64
+      - name: xcodebuild (unsigned)
         run: |
-          # cmp-shared uses Kotlin Cocoapods plugin (cocoapods { ... } block).
-          # :cmp-shared:podInstall generates cmp-shared.podspec from the gradle
-          # cocoapods config AND runs `pod install` against the Podfile pointed
-          # at by the cocoapods.podfile property.
-          ./gradlew :cmp-shared:podInstall
-          # Compile shared iOS sim framework explicitly (the actionhub
-          # workflow's :cmp-shared:compileKotlin task name is ambiguous in KMP).
-          ./gradlew :cmp-shared:compileKotlinIosSimulatorArm64
           xcodebuild -workspace cmp-ios/iosApp.xcworkspace \
             -scheme iosApp -configuration Debug -sdk iphonesimulator \
             CODE_SIGNING_ALLOWED=NO build

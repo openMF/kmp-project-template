@@ -30,7 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.data.economic.SupportedCountries
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
@@ -49,7 +49,7 @@ import org.koin.core.parameter.parametersOf
  * The Scaffold's TopAppBar surfaces:
  * - The current country's flag + name as an AssistChip → tap to open picker
  * - A refresh icon → triggers [MacroAction.RefreshAll]
- * - A STALE badge (when [MacroUiState.overallFreshness] is STALE) so users
+ * - A STALE badge (when [MacroUiState.overallBand] is Stale/VeryStale) so users
  *   know they're looking at cached data without per-card inspection
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,7 +107,7 @@ fun CountryMacroScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(sp.sm),
         ) {
-            if (uiState.overallFreshness == DataFreshness.STALE) {
+            if (uiState.overallBand == FreshnessBand.Stale || uiState.overallBand == FreshnessBand.VeryStale) {
                 StatusChip(
                     text = "STALE — showing cached data",
                     intent = StatusChipIntent.Warning,

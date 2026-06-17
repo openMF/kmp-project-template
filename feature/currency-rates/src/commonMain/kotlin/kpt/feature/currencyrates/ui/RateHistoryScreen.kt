@@ -41,7 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
@@ -98,8 +98,8 @@ fun RateHistoryScreen(
                 state = screenState,
                 onRetry = viewModel::onRetry,
                 modifier = Modifier.fillMaxSize(),
-            ) { history, freshness ->
-                if (freshness == DataFreshness.STALE) {
+            ) { history, freshnessSignal ->
+                if (freshnessSignal.band == FreshnessBand.Stale || freshnessSignal.band == FreshnessBand.VeryStale) {
                     val fetchedAt = (screenState as? ScreenState.Content)?.fetchedAt
                     OfflineDataBanner(
                         fetchedAt = fetchedAt,

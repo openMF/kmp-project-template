@@ -9,7 +9,7 @@
  */
 package kpt.core.base.store.submit
 
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -33,7 +33,7 @@ class MutationUiStateTest {
     @Test
     fun canInteract_contentAndIdle_returnsTrue() {
         val state = MutationUiState(
-            screen = ScreenState.Content("data", DataFreshness.FRESH),
+            screen = ScreenState.Content("data"),
             submit = SubmitState.Idle,
         )
         assertTrue(state.canInteract)
@@ -42,7 +42,7 @@ class MutationUiStateTest {
     @Test
     fun canInteract_contentAndSubmitting_returnsFalse() {
         val state = MutationUiState(
-            screen = ScreenState.Content("data", DataFreshness.FRESH),
+            screen = ScreenState.Content("data"),
             submit = SubmitState.Submitting(),
         )
         assertFalse(state.canInteract)
@@ -80,7 +80,7 @@ class MutationUiStateTest {
     @Test
     fun dataOrNull_content_returnsData() {
         val state = MutationUiState(
-            screen = ScreenState.Content("hello", DataFreshness.FRESH),
+            screen = ScreenState.Content("hello"),
             submit = SubmitState.Idle,
         )
         assertEquals("hello", state.dataOrNull)

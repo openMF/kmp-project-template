@@ -26,7 +26,7 @@ class ScreenStateMutationExtensionsTest {
     @Test
     fun canInteract_contentAndIdle_returnsTrue() {
         assertTrue(
-            ScreenState.Content("data", DataFreshness.FRESH)
+            ScreenState.Content("data")
                 .canInteract(SubmitState.Idle),
         )
     }
@@ -34,7 +34,7 @@ class ScreenStateMutationExtensionsTest {
     @Test
     fun canInteract_contentAndSubmitting_returnsFalse() {
         assertFalse(
-            ScreenState.Content("data", DataFreshness.FRESH)
+            ScreenState.Content("data")
                 .canInteract(SubmitState.Submitting()),
         )
     }
@@ -42,7 +42,7 @@ class ScreenStateMutationExtensionsTest {
     @Test
     fun canInteract_contentAndFailed_returnsTrue() {
         assertFalse(
-            ScreenState.Content("data", DataFreshness.FRESH)
+            ScreenState.Content("data")
                 .canInteract(SubmitState.Submitting()),
         )
     }
@@ -92,7 +92,7 @@ class ScreenStateMutationExtensionsTest {
     fun submitWhenContent_content_submitsWithExtractedData() = runTest {
         val handler = submitHandler<String>()
         handler.submitWhenContent(
-            ScreenState.Content("hello", DataFreshness.FRESH),
+            ScreenState.Content("hello"),
         ) { data -> data.uppercase() }
         testScheduler.advanceUntilIdle()
         val state = assertIs<SubmitState.Submitted<String>>(handler.state.value)
@@ -107,7 +107,7 @@ class ScreenStateMutationExtensionsTest {
 
         var secondCalled = false
         handler.submitWhenContent(
-            ScreenState.Content("data", DataFreshness.FRESH),
+            ScreenState.Content("data"),
         ) { secondCalled = true; "second" }
 
         assertFalse(secondCalled)

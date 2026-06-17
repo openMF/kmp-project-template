@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.combineScreenStates
@@ -147,7 +146,7 @@ class HomeViewModel(
                         totalOutstanding = loans.sumOf { it.principalRemaining },
                         loans = loans,
                     )
-                    ScreenState.Content(data = summary, freshness = DataFreshness.FRESH)
+                    ScreenState.Content(data = summary)
                 }
                 updateState { copy(loans = next) }
             }
@@ -159,7 +158,7 @@ class HomeViewModel(
                 val next = if (bills.isEmpty()) {
                     ScreenState.Empty
                 } else {
-                    ScreenState.Content(data = bills, freshness = DataFreshness.FRESH)
+                    ScreenState.Content(data = bills)
                 }
                 updateState { copy(bills = next) }
             }

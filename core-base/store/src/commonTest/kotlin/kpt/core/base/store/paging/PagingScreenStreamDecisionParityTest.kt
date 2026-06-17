@@ -12,7 +12,7 @@ package kpt.core.base.store.paging
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
 import kpt.core.base.store.infra.FakeFetchedAtRepository
 import kpt.core.base.store.infra.DecisionEngine
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.DataOrigin
 import kpt.core.base.store.screen.StoreData
 import kpt.core.base.store.screen.ScreenState
@@ -20,6 +20,7 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
@@ -139,23 +140,28 @@ class PagingScreenStreamDecisionParityTest {
         val result = decideForPaging(items, available, isInitialLoading = false)
         assertIs<ScreenState.Content<*>>(result)
         assertEquals(items, result.data)
-        assertEquals(DataFreshness.FRESH, result.freshness)
+        assertFalse(result.freshnessSignal.isRefreshing, "Expected not refreshing")
     }
 
     @Test
-    fun hasData_offline_returnsContentStale() {
+    fun hasData_offline_returnsContent() {
+        // Phase A of data-freshness-redesign (2026-06-17): paging Content path
+        // no longer encodes network state — DecisionEngine returns Content with
+        // isRefreshing=false regardless of online/offline. Network state lives in
+        // ConnectivityBanner; per-card staleness in FreshnessSignal.band.
         val items = listOf("a", "b")
         val result = decideForPaging(items, unavailable, isInitialLoading = false)
         assertIs<ScreenState.Content<*>>(result)
-        assertEquals(DataFreshness.STALE, result.freshness)
+        assertFalse(result.freshnessSignal.isRefreshing, "Content path not refreshing while offline")
     }
 
     @Test
-    fun hasData_captive_returnsContentStale() {
+    fun hasData_captive_returnsContent() {
+        // Same as offline — captive portal is a connectivity concern, not staleness.
         val items = listOf("a")
         val result = decideForPaging(items, captive, isInitialLoading = false)
         assertIs<ScreenState.Content<*>>(result)
-        assertEquals(DataFreshness.STALE, result.freshness)
+        assertFalse(result.freshnessSignal.isRefreshing, "Content path not refreshing on captive portal")
     }
 
     @Test
@@ -163,7 +169,7 @@ class PagingScreenStreamDecisionParityTest {
         val items = listOf("a")
         val result = decideForPaging(items, available, isInitialLoading = true)
         assertIs<ScreenState.Content<*>>(result)
-        assertEquals(DataFreshness.UPDATING, result.freshness)
+        assertTrue(result.freshnessSignal.isRefreshing, "Expected refreshing")
     }
 
     @Test
@@ -173,18 +179,21 @@ class PagingScreenStreamDecisionParityTest {
         val items = listOf("a")
         val result = decideForPaging(items, unavailable, isInitialLoading = true)
         assertIs<ScreenState.Content<*>>(result)
-        assertEquals(DataFreshness.UPDATING, result.freshness)
+        assertTrue(result.freshnessSignal.isRefreshing, "Expected refreshing")
     }
 
     @Test
-    fun hasData_errorAfterRefresh_returnsContentStale() {
+    fun hasData_errorAfterRefresh_returnsContent() {
+        // Phase A: error after refresh no longer maps to STALE on the Content path.
+        // The error is surfaced via FreshnessSignal.lastError for the per-card
+        // FreshnessIndicator; Content.isRefreshing reflects request lifecycle only.
         val items = listOf("a")
         val result = decideForPaging(
             items, available, isInitialLoading = false,
             error = RuntimeException("refresh failed"),
         )
         assertIs<ScreenState.Content<*>>(result)
-        assertEquals(DataFreshness.STALE, result.freshness)
+        assertFalse(result.freshnessSignal.isRefreshing, "Content path not refreshing after error")
     }
 }
 

@@ -60,9 +60,15 @@ class KMPLibraryConventionPlugin: Plugin<Project> {
 
             // KotlinMultiplatformAndroidLibraryExtension is not registered as a top-level
             // project extension when both com.android.kotlin.multiplatform.library and
-            // org.jetbrains.kotlin.multiplatform are applied together. Access it via
-            // KotlinMultiplatformAndroidComponentsExtension.finalizeDsl(), which fires after
-            // DSL evaluation and before variant creation — the correct time to set compileSdk/minSdk.
+            // org.jetbrains.kotlin.multiplatform are applied together. Inline DSL pattern
+            // `kotlin { androidLibrary { } }` also fails — verified 2026-06-17: 9 unresolved-
+            // reference compile errors (`androidLibrary`/`compileSdk`/`minSdk`/`namespace`/
+            // `enableCoreLibraryDesugaring`/`androidResources`/`resourcePrefix`/`optimization`/
+            // `consumerKeepRules`). The KotlinMultiplatformExtension simply doesn't expose
+            // androidLibrary as a DSL function when KGP is applied alongside AGP9 KMP library.
+            // Access via KotlinMultiplatformAndroidComponentsExtension.finalizeDsl(), which
+            // fires after DSL evaluation and before variant creation — the correct time to
+            // set compileSdk/minSdk.
             extensions.configure<KotlinMultiplatformAndroidComponentsExtension> {
                 finalizeDsl { androidExt ->
                     androidExt.compileSdk = compileSdkVersion

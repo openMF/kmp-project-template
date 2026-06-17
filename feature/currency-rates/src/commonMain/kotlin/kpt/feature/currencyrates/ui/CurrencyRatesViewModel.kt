@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
@@ -64,6 +65,18 @@ class CurrencyRatesViewModel(
         }
         .emptyIfContent { it.rates.isEmpty() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
+
+    /**
+     * Per-screen freshness — drives the [FreshnessIndicator] info icon in the TopAppBar.
+     * Pure time-based staleness derived from the same StoreDataStream snapshot;
+     * network connectivity is rendered separately by the global `ConnectivityBanner`.
+     */
+    val freshness: StateFlow<FreshnessSignal> = stream.freshness
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = FreshnessSignal.initial(),
+        )
 
     /**
      * **Archetype: CACHE_ONLY + NETWORK_ONLY**

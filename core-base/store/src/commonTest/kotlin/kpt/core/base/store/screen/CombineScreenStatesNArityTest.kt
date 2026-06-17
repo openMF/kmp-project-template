@@ -12,9 +12,13 @@ package kpt.core.base.store.screen
 import app.cash.turbine.test
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kpt.core.base.store.freshness.FreshnessBand
+import kpt.core.base.store.freshness.FreshnessSignal
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
 
 class CombineScreenStatesNArityTest {
 
@@ -23,14 +27,14 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `3-source all Content FRESH produces Content FRESH`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.FRESH),
-            content(3, DataFreshness.FRESH),
+            content(1),
+            content(2),
+            content(3),
         ) { a, b, c -> Triple(a, b, c) }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Triple<Int, Int, Int>>>(item)
             assertEquals(Triple(1, 2, 3), item.data)
-            assertEquals(DataFreshness.FRESH, item.freshness)
+            assertEquals(FreshnessBand.Fresh, item.freshnessSignal.band); assertFalse(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -38,13 +42,13 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `3-source any STALE produces STALE`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.STALE),
-            content(3, DataFreshness.FRESH),
+            content(1),
+            content(2, band = FreshnessBand.Stale),
+            content(3),
         ) { a, b, c -> a + b + c }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
-            assertEquals(DataFreshness.STALE, item.freshness)
+            assertEquals(FreshnessBand.Stale, item.freshnessSignal.band)
             awaitComplete()
         }
     }
@@ -52,13 +56,13 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `3-source any UPDATING (no STALE) produces UPDATING`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.UPDATING),
-            content(3, DataFreshness.FRESH),
+            content(1),
+            content(2, isRefreshing = true),
+            content(3),
         ) { a, b, c -> a + b + c }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
-            assertEquals(DataFreshness.UPDATING, item.freshness)
+            assertTrue(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -119,30 +123,33 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `4-source all Content FRESH produces Content FRESH`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.FRESH),
-            content(3, DataFreshness.FRESH),
-            content(4, DataFreshness.FRESH),
+            content(1),
+            content(2),
+            content(3),
+            content(4),
         ) { a, b, c, d -> a + b + c + d }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
             assertEquals(10, item.data)
-            assertEquals(DataFreshness.FRESH, item.freshness)
+            assertEquals(FreshnessBand.Fresh, item.freshnessSignal.band); assertFalse(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
 
     @Test
-    fun `4-source STALE beats UPDATING`() = runTest {
+    fun `4-source STALE beats refreshing`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.UPDATING),
-            content(3, DataFreshness.STALE),
-            content(4, DataFreshness.FRESH),
+            content(1),
+            content(2, isRefreshing = true),
+            content(3, band = FreshnessBand.Stale),
+            content(4),
         ) { a, b, c, d -> a + b + c + d }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
-            assertEquals(DataFreshness.STALE, item.freshness)
+            // Stale band aggregates worst-of; isRefreshing aggregates any-of.
+            // Both must be reflected on the combined signal.
+            assertEquals(FreshnessBand.Stale, item.freshnessSignal.band)
+            assertTrue(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -192,16 +199,16 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `5-source all Content FRESH produces Content FRESH`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.FRESH),
-            content(3, DataFreshness.FRESH),
-            content(4, DataFreshness.FRESH),
-            content(5, DataFreshness.FRESH),
+            content(1),
+            content(2),
+            content(3),
+            content(4),
+            content(5),
         ) { a, b, c, d, e -> a + b + c + d + e }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
             assertEquals(15, item.data)
-            assertEquals(DataFreshness.FRESH, item.freshness)
+            assertEquals(FreshnessBand.Fresh, item.freshnessSignal.band); assertFalse(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -209,15 +216,15 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `5-source any STALE produces STALE`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.FRESH),
-            content(3, DataFreshness.STALE),
-            content(4, DataFreshness.UPDATING),
-            content(5, DataFreshness.FRESH),
+            content(1),
+            content(2),
+            content(3, band = FreshnessBand.Stale),
+            content(4, isRefreshing = true),
+            content(5),
         ) { a, b, c, d, e -> a + b + c + d + e }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
-            assertEquals(DataFreshness.STALE, item.freshness)
+            assertEquals(FreshnessBand.Stale, item.freshnessSignal.band)
             awaitComplete()
         }
     }
@@ -273,26 +280,27 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `2-source refactored still produces Content FRESH when both fresh`() = runTest {
         combineScreenStates(
-            content(10, DataFreshness.FRESH),
-            content(20, DataFreshness.FRESH),
+            content(10),
+            content(20),
         ) { a, b -> a + b }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
             assertEquals(30, item.data)
-            assertEquals(DataFreshness.FRESH, item.freshness)
+            assertEquals(FreshnessBand.Fresh, item.freshnessSignal.band); assertFalse(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
 
     @Test
-    fun `2-source refactored STALE wins over UPDATING`() = runTest {
+    fun `2-source STALE wins over refreshing on band - isRefreshing also aggregated`() = runTest {
         combineScreenStates(
-            content(10, DataFreshness.STALE),
-            content(20, DataFreshness.UPDATING),
+            content(10, band = FreshnessBand.Stale),
+            content(20, isRefreshing = true),
         ) { a, b -> a + b }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
-            assertEquals(DataFreshness.STALE, item.freshness)
+            assertEquals(FreshnessBand.Stale, item.freshnessSignal.band)
+            assertTrue(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -302,17 +310,17 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `vararg 6-source all Content FRESH produces Content with ordered list`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.FRESH),
-            content(3, DataFreshness.FRESH),
-            content(4, DataFreshness.FRESH),
-            content(5, DataFreshness.FRESH),
-            content(6, DataFreshness.FRESH),
+            content(1),
+            content(2),
+            content(3),
+            content(4),
+            content(5),
+            content(6),
         ).test {
             val item = awaitItem()
             assertIs<ScreenState.Content<List<Any?>>>(item)
             assertEquals(listOf(1, 2, 3, 4, 5, 6), item.data)
-            assertEquals(DataFreshness.FRESH, item.freshness)
+            assertEquals(FreshnessBand.Fresh, item.freshnessSignal.band); assertFalse(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -320,16 +328,16 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `vararg 6-source any STALE produces Content STALE`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.FRESH),
-            content(3, DataFreshness.FRESH),
-            content(4, DataFreshness.STALE),
-            content(5, DataFreshness.FRESH),
-            content(6, DataFreshness.FRESH),
+            content(1),
+            content(2),
+            content(3, band = FreshnessBand.Stale),
+            content(4),
+            content(5),
+            content(6),
         ).test {
             val item = awaitItem()
             assertIs<ScreenState.Content<List<Any?>>>(item)
-            assertEquals(DataFreshness.STALE, item.freshness)
+            assertEquals(FreshnessBand.Stale, item.freshnessSignal.band)
             awaitComplete()
         }
     }
@@ -352,16 +360,16 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `vararg 10-source all Content FRESH produces 10-element list`() = runTest {
         combineScreenStates(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.FRESH),
-            content(3, DataFreshness.FRESH),
-            content(4, DataFreshness.FRESH),
-            content(5, DataFreshness.FRESH),
-            content(6, DataFreshness.FRESH),
-            content(7, DataFreshness.FRESH),
-            content(8, DataFreshness.FRESH),
-            content(9, DataFreshness.FRESH),
-            content(10, DataFreshness.FRESH),
+            content(1),
+            content(2),
+            content(3),
+            content(4),
+            content(5),
+            content(6),
+            content(7),
+            content(8),
+            content(9),
+            content(10),
         ).test {
             val item = awaitItem()
             assertIs<ScreenState.Content<List<Any?>>>(item)
@@ -379,7 +387,10 @@ class CombineScreenStatesNArityTest {
             val item = awaitItem()
             assertIs<ScreenState.Content<List<Any?>>>(item)
             assertEquals(emptyList<Any?>(), item.data)
-            assertEquals(DataFreshness.FRESH, item.freshness)
+            // Empty-input Content uses default FreshnessSignal.initial() — band=Initial,
+            // not Fresh. There are no source Contents to derive a band from.
+            assertEquals(FreshnessBand.Initial, item.freshnessSignal.band)
+            assertFalse(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -397,24 +408,36 @@ class CombineScreenStatesNArityTest {
     @Test
     fun `list overload aggregates 4 sources with UPDATING worst-case`() = runTest {
         val flows: List<kotlinx.coroutines.flow.Flow<ScreenState<*>>> = listOf(
-            content(1, DataFreshness.FRESH),
-            content(2, DataFreshness.UPDATING),
-            content(3, DataFreshness.FRESH),
-            content(4, DataFreshness.FRESH),
+            content(1),
+            content(2, isRefreshing = true),
+            content(3),
+            content(4),
         )
         combineScreenStates(flows).test {
             val item = awaitItem()
             assertIs<ScreenState.Content<List<Any?>>>(item)
             assertEquals(listOf<Any?>(1, 2, 3, 4), item.data)
-            assertEquals(DataFreshness.UPDATING, item.freshness)
+            assertTrue(item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
 
     // ─── helpers ─────────────────────────────────────────────────────────────
 
-    private fun <T> content(value: T, freshness: DataFreshness = DataFreshness.FRESH) =
-        flowOf(ScreenState.Content(value, freshness))
+    /**
+     * Test helper for `Flow<ScreenState.Content>`. Lets per-call tests vary the
+     * freshness band + isRefreshing flag carried on the resulting Content's signal.
+     */
+    private fun <T> content(
+        value: T,
+        band: FreshnessBand = FreshnessBand.Fresh,
+        isRefreshing: Boolean = false,
+    ) = flowOf<ScreenState<T>>(
+        ScreenState.Content(
+            data = value,
+            freshnessSignal = FreshnessSignal.initial().copy(band = band, isRefreshing = isRefreshing),
+        ),
+    )
 
     private fun <T> noNetwork() =
         flowOf<ScreenState<T>>(ScreenState.NoNetwork())

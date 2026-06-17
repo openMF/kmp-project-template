@@ -51,7 +51,7 @@ import kpt.core.base.store.submit.submitHandler
  *     init {
  *         viewModelScope.launch {
  *             mutableScreenState.value = try {
- *                 ScreenState.Content(repo.getClient(clientId), DataFreshness.FRESH)
+ *                 ScreenState.Content(repo.getClient(clientId))
  *             } catch (e: Exception) {
  *                 ScreenState.Error(e)
  *             }

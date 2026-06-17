@@ -29,7 +29,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.currency.ExchangeRates
 import org.mobilenativefoundation.store.store5.Fetcher
@@ -104,7 +103,6 @@ class CurrencyRatesViewModelTest {
                 date = "2026-05-25",
                 rates = mapOf("EUR" to 0.92, "INR" to 83.5, "GBP" to 0.79),
             ),
-            freshness = DataFreshness.FRESH,
         )
         dispatcher.scheduler.advanceUntilIdle()
 
@@ -132,7 +130,6 @@ class CurrencyRatesViewModelTest {
                 date = "2026-05-25",
                 rates = mapOf("EUR" to 0.92, "INR" to 83.5),
             ),
-            freshness = DataFreshness.FRESH,
         )
         dispatcher.scheduler.advanceUntilIdle()
 

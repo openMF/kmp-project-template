@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.DraftResumeState
 import kpt.core.base.store.submit.MutationUiState
@@ -49,7 +49,7 @@ fun <T, R> MutationScreenContent(
     modifier: Modifier = Modifier,
     refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: kpt.core.base.store.error.ErrorCategory) -> Unit)? = null,
-    content: @Composable (data: T, freshness: DataFreshness) -> Unit,
+    content: @Composable (data: T, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     SubmitResultHandler(
         state = submitState,
@@ -90,7 +90,7 @@ fun <T, R> MutationScreenContent(
     modifier: Modifier = Modifier,
     refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: kpt.core.base.store.error.ErrorCategory) -> Unit)? = null,
-    content: @Composable (data: T, freshness: DataFreshness) -> Unit,
+    content: @Composable (data: T, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     MutationScreenContent(
         screenState = state.screen,
@@ -137,7 +137,7 @@ fun <T, R> MutationScreenContent(
     modifier: Modifier = Modifier,
     refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: kpt.core.base.store.error.ErrorCategory) -> Unit)? = null,
-    content: @Composable (data: T, freshness: DataFreshness) -> Unit,
+    content: @Composable (data: T, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     SubmitResultHandler(
         state = submitState,
@@ -178,7 +178,7 @@ fun <T, R> MutationScreenContent(
     modifier: Modifier = Modifier,
     refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: kpt.core.base.store.error.ErrorCategory) -> Unit)? = null,
-    content: @Composable (data: T, freshness: DataFreshness) -> Unit,
+    content: @Composable (data: T, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     MutationScreenContent(
         screenState = state.screen,

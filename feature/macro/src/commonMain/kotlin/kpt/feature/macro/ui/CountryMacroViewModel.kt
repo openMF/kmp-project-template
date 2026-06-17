@@ -13,7 +13,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
@@ -128,26 +128,25 @@ data class MacroUiState(
     val unemployment: ScreenState<MacroIndicator> = ScreenState.Loading,
 ) {
     /**
-     * Worst-case freshness across the three indicator cells.
+     * Worst-case freshness band across the three indicator cells.
      *
-     * STALE if any Content cell is STALE; UPDATING if any is UPDATING; FRESH
-     * only when every Content cell reports FRESH. Cells that are not Content
-     * (Loading / Error / Empty / NoNetwork) do not contribute — the screen's
-     * freshness badge is only meaningful once at least one indicator has
-     * surfaced data.
+     * VeryStale > Stale > Fresh > Initial — cells not in Content (Loading / Error /
+     * Empty / NoNetwork) do not contribute. The screen's freshness badge is only
+     * meaningful once at least one indicator has surfaced data.
      */
-    val overallFreshness: DataFreshness
+    val overallBand: FreshnessBand
         get() {
-            val contents = listOfNotNull(
-                (gdp as? ScreenState.Content<*>)?.freshness,
-                (inflation as? ScreenState.Content<*>)?.freshness,
-                (unemployment as? ScreenState.Content<*>)?.freshness,
+            val bands = listOfNotNull(
+                (gdp as? ScreenState.Content<*>)?.freshnessSignal?.band,
+                (inflation as? ScreenState.Content<*>)?.freshnessSignal?.band,
+                (unemployment as? ScreenState.Content<*>)?.freshnessSignal?.band,
             )
-            if (contents.isEmpty()) return DataFreshness.FRESH
+            if (bands.isEmpty()) return FreshnessBand.Fresh
             return when {
-                contents.any { it == DataFreshness.STALE } -> DataFreshness.STALE
-                contents.any { it == DataFreshness.UPDATING } -> DataFreshness.UPDATING
-                else -> DataFreshness.FRESH
+                bands.any { it == FreshnessBand.VeryStale } -> FreshnessBand.VeryStale
+                bands.any { it == FreshnessBand.Stale } -> FreshnessBand.Stale
+                bands.any { it == FreshnessBand.Initial } -> FreshnessBand.Initial
+                else -> FreshnessBand.Fresh
             }
         }
 }

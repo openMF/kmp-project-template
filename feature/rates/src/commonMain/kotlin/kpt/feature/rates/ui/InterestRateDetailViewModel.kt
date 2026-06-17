@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.economic.EconomicRatesRepository
@@ -43,6 +44,14 @@ internal class InterestRateDetailViewModel(
 
     val screenState: StateFlow<ScreenState<InterestRateSeries>> = stream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
+
+    /**
+     * Per-screen freshness — drives the TopAppBar [FreshnessIndicator] info icon.
+     * Pure time-based staleness; network connectivity is rendered separately by
+     * the global `ConnectivityBanner`.
+     */
+    val freshness: StateFlow<FreshnessSignal> = stream.freshness
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FreshnessSignal.initial())
 
     /** Resolved key — exposed so the screen can show the human-readable series name. */
     val seriesKey: InterestRateSeriesKey get() = key

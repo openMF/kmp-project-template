@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.screen.DefaultErrorContent
 import kpt.core.base.ui.screen.DefaultNoNetworkContent
@@ -119,7 +118,6 @@ fun StateGalleryScreen(
             CardStateBox<String>(
                 state = ScreenState.Content(
                     data = "Account: \$1,234.56",
-                    freshness = DataFreshness.FRESH,
                 ),
             ) { Card { Text(it, modifier = Modifier.padding(16.dp)) } }
 

@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.asSharedFlow
  * val vm = EditClientViewModel(stream = fakeStream.asStream, ...)
  *
  * fakeStream.emit(ScreenState.Loading)
- * fakeStream.emit(ScreenState.Content(client, DataFreshness.FRESH))
+ * fakeStream.emit(ScreenState.Content(client))
  * ```
  *
  * **Combined-VM fixture pattern** for ScreenDataStream + SubmitHandler tests:

@@ -10,8 +10,14 @@
 package kpt.feature.rates.ui
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kpt.core.base.store.freshness.FreshnessBand
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.economic.EconomicRatesRepository
@@ -60,6 +66,39 @@ internal class InterestRatesViewModel(
             .launchIn(viewModelScope)
     }
 
+    /**
+     * Per-screen aggregate freshness for the TopAppBar [FreshnessIndicator] — combines
+     * the worst band across all four FRED series so the header indicator surfaces the
+     * weakest signal. Per-row freshness is exposed via [fedFundsFreshness] /
+     * [primeFreshness] / [mortgage30YFreshness] / [treasury10YFreshness] for the
+     * per-card `RateRowCard` indicators.
+     */
+    val aggregateFreshness: StateFlow<FreshnessSignal> = combine(
+        fedFundsStream.freshness,
+        primeStream.freshness,
+        mortgage30YStream.freshness,
+        treasury10YStream.freshness,
+    ) { fed, prime, mortgage, treasury ->
+        listOf<FreshnessSignal>(fed, prime, mortgage, treasury)
+            .maxByOrNull { it.band.severity() } ?: fed
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = FreshnessSignal.initial(),
+    )
+
+    val fedFundsFreshness: StateFlow<FreshnessSignal> = fedFundsStream.freshness
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FreshnessSignal.initial())
+
+    val primeFreshness: StateFlow<FreshnessSignal> = primeStream.freshness
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FreshnessSignal.initial())
+
+    val mortgage30YFreshness: StateFlow<FreshnessSignal> = mortgage30YStream.freshness
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FreshnessSignal.initial())
+
+    val treasury10YFreshness: StateFlow<FreshnessSignal> = treasury10YStream.freshness
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FreshnessSignal.initial())
+
     override fun handleAction(action: RatesAction) = when (action) {
         RatesAction.RefreshAll -> {
             fedFundsStream.refresh()
@@ -71,6 +110,19 @@ internal class InterestRatesViewModel(
         RatesAction.RetryPrime -> primeStream.refresh()
         RatesAction.RetryMortgage30Y -> mortgage30YStream.refresh()
         RatesAction.RetryTreasury10Y -> treasury10YStream.refresh()
+    }
+
+    /**
+     * Worse-of-N severity ordering on [FreshnessBand] — used by [aggregateFreshness]
+     * so the TopAppBar indicator surfaces the weakest signal across the four streams.
+     * Mirrors the same private extension in `HomeViewModel`; if a third consumer
+     * appears, lift to a shared helper in `core-base/store/freshness`.
+     */
+    private fun FreshnessBand.severity(): Int = when (this) {
+        FreshnessBand.Initial -> 0
+        FreshnessBand.Fresh -> 1
+        FreshnessBand.Stale -> 2
+        FreshnessBand.VeryStale -> 3
     }
 }
 

@@ -14,7 +14,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import kpt.core.base.store.paging.PagingScreenStream
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 
@@ -83,7 +82,7 @@ fun rememberKptPullToRefreshState(
     isEnabled: Boolean = true,
 ): KptPullToRefreshState {
     val state by pagingStream.state.collectAsState(ScreenState.Loading)
-    val isRefreshing = (state as? ScreenState.Content<*>)?.freshness == DataFreshness.UPDATING
+    val isRefreshing = (state as? ScreenState.Content<*>)?.freshnessSignal?.isRefreshing == true
     return remember(isEnabled, isRefreshing) {
         KptPullToRefreshState(
             isEnabled = isEnabled,
@@ -114,7 +113,7 @@ fun <T> rememberKptPullToRefreshState(
     currentState: ScreenState<T>,
     isEnabled: Boolean = true,
 ): KptPullToRefreshState {
-    val isRefreshing = (currentState as? ScreenState.Content<*>)?.freshness == DataFreshness.UPDATING
+    val isRefreshing = (currentState as? ScreenState.Content<*>)?.freshnessSignal?.isRefreshing == true
     return remember(isEnabled, isRefreshing) {
         KptPullToRefreshState(
             isEnabled = isEnabled,

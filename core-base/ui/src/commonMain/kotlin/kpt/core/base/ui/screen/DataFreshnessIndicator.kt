@@ -31,37 +31,38 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 /**
  * Compact updating banner shown above content when a background refresh is in flight.
  *
- * - **FRESH** → hidden (no banner)
- * - **STALE** → hidden; feature screens own stale/offline UI via the content lambda
- * - **UPDATING** → `primaryContainer` background, `Sync` icon, linear progress on top,
+ * - `signal.isRefreshing = false` → hidden (no banner)
+ * - `signal.isRefreshing = true`  → `primaryContainer` background, `Sync` icon, linear progress on top,
  *   "Refreshing · Last updated Xm ago"
  *
- * @param freshness Current data freshness state.
- * @param fetchedAt Wall-clock instant of last successful fetch for human-readable timestamp.
+ * Stale/offline UI is owned by feature screens via the per-card [FreshnessIndicator]
+ * (Material 3 `RichTooltip` info icon). Network connectivity lives in `ConnectivityBanner`.
+ *
+ * @param signal Per-card freshness signal. Only [FreshnessSignal.isRefreshing] is read here;
+ *   the band + lastSyncedAt feed the per-card `FreshnessIndicator` info icon.
  * @param updatingLabel Custom updating message. Null uses "Refreshing…" with timestamp.
  */
 @OptIn(ExperimentalTime::class)
 @Composable
 fun DataFreshnessIndicator(
-    freshness: DataFreshness,
+    signal: FreshnessSignal,
     modifier: Modifier = Modifier,
-    fetchedAt: Instant? = null,
     updatingLabel: String? = null,
 ) {
     AnimatedVisibility(
-        visible = freshness == DataFreshness.UPDATING,
+        visible = signal.isRefreshing,
         enter = expandVertically(expandFrom = Alignment.Top),
         exit = shrinkVertically(shrinkTowards = Alignment.Top),
         modifier = modifier,
     ) {
-        UpdatingBanner(fetchedAt = fetchedAt, customLabel = updatingLabel)
+        UpdatingBanner(fetchedAt = signal.lastSyncedAt, customLabel = updatingLabel)
     }
 }
 
@@ -77,7 +78,7 @@ fun DefaultRefreshingBanner(fetchedAt: Instant? = null) {
 }
 
 /**
- * Visible-state representation derived from [DataFreshness].
+ * Visible-state representation derived from [FreshnessSignal.isRefreshing].
  * Internal so [DataFreshnessIndicatorStateTest] can exercise [deriveDisplayState] directly.
  */
 internal enum class DisplayState {
@@ -86,10 +87,8 @@ internal enum class DisplayState {
 }
 
 /** Pure helper — directly testable. */
-internal fun deriveDisplayState(freshness: DataFreshness): DisplayState = when (freshness) {
-    DataFreshness.UPDATING -> DisplayState.Updating
-    else -> DisplayState.Hidden
-}
+internal fun deriveDisplayState(signal: FreshnessSignal): DisplayState =
+    if (signal.isRefreshing) DisplayState.Updating else DisplayState.Hidden
 
 @OptIn(ExperimentalTime::class)
 @Composable

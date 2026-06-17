@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.banking.BillReminderRepository
@@ -60,7 +59,6 @@ class BillRemindersListViewModel(
                     upcoming = upcoming,
                     totalUpcomingAmount = total,
                 ),
-                freshness = DataFreshness.FRESH,
             )
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_TIMEOUT_MS), ScreenState.Loading)

@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
@@ -98,8 +98,8 @@ fun MacroIndicatorDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-        ) { indicator, freshness ->
-            if (freshness == DataFreshness.STALE) {
+        ) { indicator, freshnessSignal ->
+            if (freshnessSignal.band == FreshnessBand.Stale || freshnessSignal.band == FreshnessBand.VeryStale) {
                 val fetchedAt = (screenState as? ScreenState.Content)?.fetchedAt
                 OfflineDataBanner(
                     fetchedAt = fetchedAt,

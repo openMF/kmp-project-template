@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RateHistoryKey
@@ -124,7 +123,6 @@ class RateHistoryViewModelTest {
                 endDate = "2026-05-25",
                 rates = emptyList(),
             ),
-            freshness = DataFreshness.FRESH,
         )
         dispatcher.scheduler.advanceUntilIdle()
 

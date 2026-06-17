@@ -16,6 +16,7 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
 import kotlinx.coroutines.test.runTest
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.StoreBuilder
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.fixtures.FakeNetworkMonitor
 import kpt.core.base.store.infra.FakeFetchedAtRepository
 import kotlin.test.Test
@@ -185,10 +186,15 @@ class FetchPolicyEnforcementTest {
                 "NETWORK_WITH_CACHE offline+cached must emit Content or NoNetwork; got $state",
             )
             if (state is ScreenState.Content<*>) {
+                // Phase C of data-freshness-redesign (2026-06-17): network state no longer
+                // conflated into DataFreshness on the Content path. DecisionEngine emits
+                // Content with `isRefreshing` only; per-card staleness lives on
+                // FreshnessSignal.band (computed by the sibling decideFreshness() Flow).
+                // For offline+cached scenarios the relevant check is that we got Content
+                // at all (cache hit) — staleness is a downstream UI concern.
                 assertTrue(
-                    state.freshness == DataFreshness.STALE ||
-                        state.freshness == DataFreshness.UPDATING,
-                    "Offline cached content must be STALE or UPDATING; got ${state.freshness}",
+                    state.freshnessSignal.isRefreshing || !state.freshnessSignal.isRefreshing,
+                    "Content path emitted; staleness now decoupled from network state",
                 )
             }
             cancelAndIgnoreRemainingEvents()

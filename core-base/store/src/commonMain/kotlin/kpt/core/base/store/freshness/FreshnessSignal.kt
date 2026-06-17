@@ -31,6 +31,15 @@ data class FreshnessSignal(
     val ttl: Duration,
     val lastError: Throwable?,
     val band: FreshnessBand,
+    /**
+     * Request-state — true iff a background network refresh is currently in flight
+     * for this card. Drives the `refreshingIndicator` slot on `ScreenContent`.
+     * Replaces the deprecated `DataFreshness.UPDATING` enum value as the single
+     * "currently-refreshing" signal. Kept separate from [band] because staleness
+     * (time-based, derived from `lastSyncedAt` vs `ttl`) and request state
+     * (lifecycle, derived from Store5 `isRefreshing`) are different concerns.
+     */
+    val isRefreshing: Boolean = false,
 ) {
     companion object {
         /**
@@ -47,6 +56,7 @@ data class FreshnessSignal(
             ttl = ttl,
             lastError = null,
             band = FreshnessBand.Initial,
+            isRefreshing = false,
         )
     }
 }

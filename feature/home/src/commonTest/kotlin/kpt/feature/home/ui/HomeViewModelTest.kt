@@ -23,7 +23,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
@@ -165,7 +164,7 @@ class HomeViewModelTest {
         dispatcher.scheduler.advanceUntilIdle()
 
         // Only Fed reached Content — widget still Loading because Mortgage is still Loading.
-        fed.value = ScreenState.Content(sampleSeries("DFF", current = 5.33), DataFreshness.FRESH)
+        fed.value = ScreenState.Content(sampleSeries("DFF", current = 5.33))
         dispatcher.scheduler.advanceUntilIdle()
         assertEquals(ScreenState.Loading, vm.stateFlow.first().rates)
 

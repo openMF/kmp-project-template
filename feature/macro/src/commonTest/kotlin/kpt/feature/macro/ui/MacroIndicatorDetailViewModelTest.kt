@@ -20,7 +20,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.yield
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
@@ -91,7 +90,6 @@ class MacroIndicatorDetailViewModelTest {
                     IndicatorObservation(2024, 2.0),
                 ),
             ),
-            freshness = DataFreshness.FRESH,
         )
         repo.bus.emit(content)
 

@@ -48,9 +48,9 @@ private class FakeAlertDao : AlertDao {
             .plus(alert)
     }
 
-    override suspend fun upsertAll(alerts: List<AlertEntity>) {
+    override suspend fun upsertAll(items: List<AlertEntity>) {
         val existing = alerts.value.associateBy { it.id }.toMutableMap()
-        alerts.forEach { existing[it.id] = it }
+        items.forEach { existing[it.id] = it }
         alerts.value = existing.values.toList()
     }
 

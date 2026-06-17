@@ -41,25 +41,16 @@ jobs:
         with: { xcode-version: '15.2' }
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2'
-      - name: Install CocoaPods gem
-        run: gem install cocoapods --no-document
+          ruby-version: '3.3'
+          bundler-cache: true
       - name: Generate podspec + placeholder framework
         # podspec has a raise-if-missing check on
         # build/cocoapods/framework/ComposeApp.framework. generateDummyFramework
         # produces a placeholder so `pod install` passes; xcodebuild's
         # script_phase later swaps in the real framework via syncFramework.
         run: ./gradlew :cmp-shared:podspec :cmp-shared:generateDummyFramework
-      - name: pod install
-        run: cd cmp-ios && pod install
-      - name: xcodebuild (unsigned, triggers syncFramework via podspec script_phase)
-        run: |
-          # ARCHS=arm64 — cmp-shared only declares iosArm64() + iosSimulatorArm64()
-          # in its KMP targets. Default xcodebuild on Apple Silicon (macos-14)
-          # tries both arm64 and x86_64; the Kotlin/Native script_phase fails
-          # with 'Unknown iOS simulator arch: x86_64' for the x86_64 slice.
-          xcodebuild -workspace cmp-ios/iosApp.xcworkspace \
-            -scheme iosApp -configuration Debug -sdk iphonesimulator \
-            -arch arm64 \
-            ARCHS=arm64 ONLY_ACTIVE_ARCH=YES \
-            CODE_SIGNING_ALLOWED=NO build
+      - name: Build iOS (unsigned) via canonical fastlane lane
+        # fastlane ios build_ios is the canonical PR-check lane. It runs
+        # cocoapods + build_ios_app(skip_codesigning: true, skip_archive: true)
+        # — the same path the actionhub action would invoke.
+        run: bundle exec fastlane ios build_ios

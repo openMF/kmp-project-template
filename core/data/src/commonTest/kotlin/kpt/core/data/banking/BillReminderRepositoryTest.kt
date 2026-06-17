@@ -14,10 +14,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kpt.core.data.banking.impl.BillReminderRepositoryImpl
-import kpt.core.store.banking.impl.provideBillRemindersStore
 import kpt.core.model.banking.BillCategory
 import kpt.core.model.banking.BillReminder
 import kpt.core.model.banking.Recurrence
+import kpt.core.store.banking.impl.provideBillRemindersStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

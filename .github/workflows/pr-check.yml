@@ -1,6 +1,12 @@
 # .github/workflows/pr-check.yml — v2 multi-platform PR validation
 #
 # Runs Android + iOS + Desktop + Web checks in parallel on every PR + push to main/dev.
+#
+# iOS is invoked LOCALLY (not via actionhub) because the actionhub's reusable
+# workflow calls `:cmp-shared:compileKotlin` which doesn't exist in modern KMP —
+# the task is ambiguous (resolves to compileKotlinIosArm64, compileKotlinJs, etc.).
+# We route iOS through a thin local job that calls the correct platform task.
+# Track removal of this local override at: openMF/mifos-x-actionhub PR (TBD).
 name: PR Check
 run-name: "🔍 PR Check · #${{ github.event.pull_request.number || github.ref_name }} · ${{ github.event.pull_request.title || github.event.head_commit.message }}"
 
@@ -14,10 +20,30 @@ jobs:
   validate:
     uses: openMF/mifos-x-actionhub/.github/workflows/pr-check-v2.yaml@v1.0.21
     with:
-      platforms:            'android,ios,desktop,web'
+      # iOS handled locally below (actionhub iOS step is broken on KMP).
+      platforms:            'android,desktop,web'
       android_package_name: cmp-android
       ios_package_name:     cmp-ios
       shared_module:        cmp-shared
       desktop_package_name: cmp-desktop
       web_package_name:     cmp-web
     secrets: inherit
+
+  ios:
+    name: PR Check · iOS
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: zulu, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v3
+      - uses: maxim-lobanov/setup-xcode@v1
+        with: { xcode-version: '15.2' }
+      - name: Build iOS shared framework + xcodebuild (unsigned)
+        run: |
+          # The actionhub workflow calls `:cmp-shared:compileKotlin` which is
+          # ambiguous in KMP. Use the platform-specific task instead.
+          ./gradlew ":cmp-shared:compileKotlinIosSimulatorArm64"
+          xcodebuild -workspace cmp-ios/iosApp.xcworkspace \
+            -scheme iosApp -configuration Debug -sdk iphonesimulator \
+            CODE_SIGNING_ALLOWED=NO build

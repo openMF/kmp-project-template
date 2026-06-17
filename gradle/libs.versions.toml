@@ -72,6 +72,7 @@ ktlint = "12.1.1"
 detekt = "1.23.8"
 spotlessVersion = "8.6.0"
 turbine = "1.2.1"
+cyclonedxBom = "1.10.0"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
 # AGP 9 migration (agp9-migration-build-logic epic T2/T3):
@@ -436,6 +437,7 @@ dependencyGuard = { id = "com.dropbox.dependency-guard", version.ref = "dependen
 moduleGraph = { id = "com.jraska.module.graph.assertion", version.ref = "moduleGraph" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+cyclonedxBom = { id = "org.cyclonedx.bom", version.ref = "cyclonedxBom" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 
 #Room 3 Plugin

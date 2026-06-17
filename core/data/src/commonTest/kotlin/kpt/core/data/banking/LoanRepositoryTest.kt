@@ -16,6 +16,7 @@ import kotlinx.datetime.LocalDate
 import kpt.core.data.banking.impl.LoanRepositoryImpl
 import kpt.core.model.banking.Loan
 import kpt.core.model.banking.LoanKind
+import kpt.core.store.banking.impl.provideLoansStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -30,7 +31,10 @@ import kotlin.test.assertNull
 class LoanRepositoryTest {
 
     private val dao = FakeLoanDao()
-    private val repo: LoanRepository = LoanRepositoryImpl(dao)
+    private val repo: LoanRepository = LoanRepositoryImpl(
+        loansStore = provideLoansStore(dao),
+        loanDao = dao,
+    )
 
     @Test
     fun upsertThenObserveAllRoundTripsTheDomainObject() = runTest {

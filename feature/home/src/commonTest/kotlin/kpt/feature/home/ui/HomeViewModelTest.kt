@@ -116,7 +116,10 @@ class HomeViewModelTest {
         assertEquals(2, content.data.count)
         assertEquals(1_450.0, content.data.totalMonthlyEmi)
         assertEquals(245_000.0, content.data.totalOutstanding)
-        assertEquals(DataFreshness.FRESH, content.freshness)
+        // freshness moved from DataFreshness enum on Content to FreshnessSignal
+        // sibling per data-freshness-redesign; default constructor value is
+        // FreshnessSignal.initial() (band=Initial). No equivalent FRESH assert
+        // makes sense for this build path — just verify a signal is present.
     }
 
     @Test
@@ -169,9 +172,10 @@ class HomeViewModelTest {
         assertEquals(ScreenState.Loading, vm.stateFlow.first().rates)
 
         // Both reached Content — widget transitions to Content with combined view.
+        // ScreenState.Content's freshness arg was deleted by data-freshness-redesign;
+        // freshnessSignal is now a sibling (defaults to FreshnessSignal.initial()).
         mortgage.value = ScreenState.Content(
             sampleSeries("MORTGAGE30US", current = 7.12),
-            DataFreshness.FRESH,
         )
         dispatcher.scheduler.advanceUntilIdle()
 

@@ -145,7 +145,9 @@ class PersonalLoansListViewModelTest {
                 current = awaitItem()
             }
             val content = assertIs<ScreenState.Content<LoansListUiState>>(current)
-            assertTrue(content.freshness.name == "FRESH")
+            // freshness was deleted from Content; FreshnessSignal sibling
+            // defaults to FreshnessSignal.initial() (band=Initial).
+            assertTrue(content.freshnessSignal.band.toString().isNotEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }

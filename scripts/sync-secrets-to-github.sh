@@ -153,6 +153,11 @@ _set_from_binary() {
 #   $3 = keystore file path
 # Properties keys recognized (case-sensitive):
 #   storePassword | keyAlias | keyPassword | storeFile (informational; binary path overrides)
+#
+# Dual-write transition: also pushes the actionhub v2 lowercase secret names
+# (google_services, upload_keystore, etc.) so consumers can use `secrets: inherit`
+# while their old UPPERCASE names still work. After consumers verify lowercase
+# names work, the UPPERCASE family can be deleted.
 _set_keystore_family() {
   local prefix="$1"
   local props="$2"
@@ -173,23 +178,44 @@ _set_keystore_family() {
   while IFS='=' read -r k v; do
     [[ -z "$k" || "$k" =~ ^# ]] && continue
     case "$k" in
-      storePassword) _set_secret "${prefix}_KEYSTORE_FILE_PASSWORD"  "$v" "$props" ;;
-      keyAlias)      _set_secret "${prefix}_KEYSTORE_ALIAS"          "$v" "$props" ;;
-      keyPassword)   _set_secret "${prefix}_KEYSTORE_ALIAS_PASSWORD" "$v" "$props" ;;
+      storePassword)
+        _set_secret "${prefix}_KEYSTORE_FILE_PASSWORD"  "$v" "$props"
+        # Dual-write: actionhub v2 lowercase name (consumer can use `secrets: inherit`)
+        _set_secret "keystore_password"                 "$v" "$props (v2 alias)"
+        ;;
+      keyAlias)
+        _set_secret "${prefix}_KEYSTORE_ALIAS"          "$v" "$props"
+        _set_secret "keystore_alias"                    "$v" "$props (v2 alias)"
+        ;;
+      keyPassword)
+        _set_secret "${prefix}_KEYSTORE_ALIAS_PASSWORD" "$v" "$props"
+        _set_secret "keystore_alias_password"           "$v" "$props (v2 alias)"
+        ;;
     esac
   done < "$props"
 
   _set_from_binary "${prefix}_KEYSTORE_FILE" "$jks"
+  # Dual-write: v2 lowercase keystore alias
+  if [[ -f "$jks" && $(head -c 16 "$jks") != "CLAUDE-PLHLD-v1" ]]; then
+    local b64; b64=$(base64 -i "$jks" 2>/dev/null || base64 "$jks")
+    _set_secret "upload_keystore" "$b64" "$jks (base64, v2 alias)"
+  fi
 }
 
 # ── iOS secrets ───────────────────────────────────────────────────────────────
 _sync_ios() {
   echo "📱 iOS / App Store"
-  _set_from_file    "APPSTORE_KEY_ID"    "$SECRETS_DIR/appstore/key_id"
-  _set_from_file    "APPSTORE_ISSUER_ID" "$SECRETS_DIR/appstore/issuer_id"
-  _set_from_binary  "APPSTORE_AUTH_KEY"  "$SECRETS_DIR/appstore/AuthKey.p8"
-  _set_from_binary  "MATCH_GIT_PRIVATE_KEY" "$SECRETS_DIR/match/match_ci_key"
-  _set_from_file    "MATCH_PASSWORD"     "$SECRETS_DIR/match/.match_password"
+  # Dual-write each secret: legacy UPPERCASE + v2 lowercase
+  _set_from_file    "APPSTORE_KEY_ID"        "$SECRETS_DIR/appstore/key_id"
+  _set_from_file    "appstore_key_id"        "$SECRETS_DIR/appstore/key_id"
+  _set_from_file    "APPSTORE_ISSUER_ID"     "$SECRETS_DIR/appstore/issuer_id"
+  _set_from_file    "appstore_issuer_id"     "$SECRETS_DIR/appstore/issuer_id"
+  _set_from_binary  "APPSTORE_AUTH_KEY"      "$SECRETS_DIR/appstore/AuthKey.p8"
+  _set_from_binary  "appstore_auth_key"      "$SECRETS_DIR/appstore/AuthKey.p8"
+  _set_from_binary  "MATCH_GIT_PRIVATE_KEY"  "$SECRETS_DIR/match/match_ci_key"
+  _set_from_binary  "match_ssh_private_key"  "$SECRETS_DIR/match/match_ci_key"
+  _set_from_file    "MATCH_PASSWORD"         "$SECRETS_DIR/match/.match_password"
+  _set_from_file    "match_password"         "$SECRETS_DIR/match/.match_password"
 
   # shared_keys.env — parse and set individual vars (FRED_API_KEY etc.)
   local env_file="$SECRETS_DIR/shared_keys.env"
@@ -220,7 +246,14 @@ _sync_android() {
     "$SECRETS_DIR/keystores/upload_keystore.keystore"
 
   # google-services.json — required by all Android builds
-  _set_from_binary "GOOGLESERVICES" "$SECRETS_DIR/firebase/google-services.json"
+  _set_from_binary "GOOGLESERVICES"   "$SECRETS_DIR/firebase/google-services.json"
+  _set_from_binary "google_services"  "$SECRETS_DIR/firebase/google-services.json"
+
+  # Firebase / Play Store service account JSON (dual-write)
+  _set_from_binary "FIREBASECREDS"  "$SECRETS_DIR/firebase/service-account.json"
+  _set_from_binary "firebase_creds" "$SECRETS_DIR/firebase/service-account.json"
+  _set_from_binary "PLAYSTORECREDS"  "$SECRETS_DIR/play/service-account.json"
+  _set_from_binary "playstore_creds" "$SECRETS_DIR/play/service-account.json"
   echo ""
 }
 

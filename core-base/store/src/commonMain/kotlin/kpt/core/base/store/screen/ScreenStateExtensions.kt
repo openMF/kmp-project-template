@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kpt.core.base.store.freshness.FreshnessBand
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.submit.SubmitHandler
 import kpt.core.base.store.submit.SubmitState
 
@@ -24,13 +26,13 @@ import kpt.core.base.store.submit.SubmitState
  * Transforms only [ScreenState.Content] data, passing through all other states unchanged.
  */
 fun <T, R> Flow<ScreenState<T>>.mapContent(
-    transform: (data: T, freshness: DataFreshness) -> R,
+    transform: (data: T, freshnessSignal: FreshnessSignal) -> R,
 ): Flow<ScreenState<R>> = map { state ->
     when (state) {
         is ScreenState.Content -> ScreenState.Content(
-            data = transform(state.data, state.freshness),
-            freshness = state.freshness,
+            data = transform(state.data, state.freshnessSignal),
             fetchedAt = state.fetchedAt,
+            freshnessSignal = state.freshnessSignal,
         )
         is ScreenState.Loading -> ScreenState.Loading
         is ScreenState.Empty -> ScreenState.Empty
@@ -45,13 +47,13 @@ fun <T, R> Flow<ScreenState<T>>.mapContent(
  */
 fun <T, S, R> Flow<ScreenState<T>>.combineContent(
     other: Flow<S>,
-    transform: (data: T, extra: S, freshness: DataFreshness) -> R,
+    transform: (data: T, extra: S, freshnessSignal: FreshnessSignal) -> R,
 ): Flow<ScreenState<R>> = combine(this, other) { state, extra ->
     when (state) {
         is ScreenState.Content -> ScreenState.Content(
-            data = transform(state.data, extra, state.freshness),
-            freshness = state.freshness,
+            data = transform(state.data, extra, state.freshnessSignal),
             fetchedAt = state.fetchedAt,
+            freshnessSignal = state.freshnessSignal,
         )
         is ScreenState.Loading -> ScreenState.Loading
         is ScreenState.Empty -> ScreenState.Empty
@@ -131,7 +133,7 @@ fun <T, R> ScreenState<T>.canInteract(submitState: SubmitState<R>): Boolean =
  * ```
  */
 fun <T> T.asLocalScreenState(): ScreenState<T> =
-    ScreenState.Content(this, DataFreshness.FRESH)
+    ScreenState.Content(this)
 
 /**
  * Turns any [Flow]<T> into a [Flow]<[ScreenState]<T>> for use with [ScreenContent].
@@ -278,7 +280,7 @@ fun combineScreenStates(
  * convenient when callers already have a `List<Flow<ScreenState<*>>>` (e.g. a dynamic
  * collection built per-screen).
  *
- * An empty input list emits a single `ScreenState.Content(emptyList(), DataFreshness.FRESH)`
+ * An empty input list emits a single `ScreenState.Content(emptyList())`
  * — a degenerate but well-defined result that lets `combineScreenStates(emptyList())` plug
  * into existing pipelines without special-casing.
  */
@@ -287,7 +289,7 @@ fun combineScreenStates(
     flows: List<Flow<ScreenState<*>>>,
 ): Flow<ScreenState<List<Any?>>> {
     if (flows.isEmpty()) {
-        return flowOf(ScreenState.Content(emptyList(), DataFreshness.FRESH))
+        return flowOf(ScreenState.Content(emptyList()))
     }
     return combine(flows) { statesArray ->
         val states = statesArray.toList()
@@ -311,15 +313,18 @@ private fun <R> resolveScreenStates(
     buildResult: () -> R,
 ): ScreenState<R> {
     val contents = states.filterIsInstance<ScreenState.Content<*>>()
-    val worstFreshness = contents.fold(DataFreshness.FRESH) { acc, c ->
-        when {
-            acc == DataFreshness.STALE || c.freshness == DataFreshness.STALE -> DataFreshness.STALE
-            acc == DataFreshness.UPDATING || c.freshness == DataFreshness.UPDATING -> DataFreshness.UPDATING
-            else -> DataFreshness.FRESH
-        }
-    }
+    // Worst-of band aggregation across all Content sources. Any source still refreshing
+    // surfaces isRefreshing = true on the combined signal so the refreshing banner shows.
+    val combinedIsRefreshing = contents.any { it.freshnessSignal.isRefreshing }
+    val worstBand = contents.maxOfOrNull { it.freshnessSignal.band.severityOrdinal() } ?: 0
     val combinedFetchedAt: Instant? = if (contents.any { it.fetchedAt == null }) null
         else contents.mapNotNull { it.fetchedAt }.minOrNull()
+    val combinedSignal = if (contents.isEmpty()) FreshnessSignal.initial() else {
+        contents.first().freshnessSignal.copy(
+            band = bandFromOrdinal(worstBand),
+            isRefreshing = combinedIsRefreshing,
+        )
+    }
 
     return when {
         states.any { it is ScreenState.NoNetwork } -> ScreenState.NoNetwork()
@@ -331,7 +336,21 @@ private fun <R> resolveScreenStates(
         }
         states.any { it is ScreenState.Empty } -> ScreenState.Empty
         states.size == contents.size ->
-            ScreenState.Content(buildResult(), worstFreshness, combinedFetchedAt)
+            ScreenState.Content(buildResult(), combinedFetchedAt, combinedSignal)
         else -> ScreenState.Loading
     }
+}
+
+private fun FreshnessBand.severityOrdinal(): Int = when (this) {
+    FreshnessBand.Initial -> 0
+    FreshnessBand.Fresh -> 1
+    FreshnessBand.Stale -> 2
+    FreshnessBand.VeryStale -> 3
+}
+
+private fun bandFromOrdinal(ord: Int): FreshnessBand = when (ord) {
+    0 -> FreshnessBand.Initial
+    1 -> FreshnessBand.Fresh
+    2 -> FreshnessBand.Stale
+    else -> FreshnessBand.VeryStale
 }

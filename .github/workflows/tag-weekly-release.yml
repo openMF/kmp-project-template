@@ -2,6 +2,7 @@
 #
 # Sunday 04:00 UTC. Default strategy: calver-week (vYYYY.W##.0). Lands at Stage 2 (Beta).
 name: Tag Weekly Release
+run-name: "🏷️ Tag Weekly · $(date +%Y-W%U)"
 
 on:
   schedule:
@@ -14,7 +15,7 @@ concurrency:
 
 jobs:
   tag-and-release:
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/tag-weekly-release.yaml@v1.0.18
+    uses: openMF/mifos-x-actionhub/.github/workflows/tag-weekly-release-v2.yaml@v1.0.21
     with:
       version_strategy:      calver-week
       starting_rung:         beta

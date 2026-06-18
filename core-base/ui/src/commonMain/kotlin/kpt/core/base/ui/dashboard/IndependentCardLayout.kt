@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kpt.core.base.designsystem.theme.KptTheme
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.screen.ScreenContent
 
@@ -55,7 +55,7 @@ fun <T> IndependentCardLayout(
     modifier: Modifier = Modifier,
     refreshingIndicator: (@Composable () -> Unit)? = null,
     onDismiss: ((Int) -> Unit)? = null,
-    content: @Composable (index: Int, data: T, freshness: DataFreshness) -> Unit,
+    content: @Composable (index: Int, data: T, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     val spacing = KptTheme.spacing
     Column(

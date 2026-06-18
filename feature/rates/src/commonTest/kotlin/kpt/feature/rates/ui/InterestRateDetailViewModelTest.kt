@@ -18,7 +18,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.economic.InterestRateSeries
 import kpt.core.model.economic.RateObservation
@@ -96,7 +95,7 @@ class InterestRateDetailViewModelTest {
             observations = listOf(RateObservation(LocalDate(2026, 5, 25), 5.33)),
             source = "FRED",
         )
-        repo.state.value = ScreenState.Content(data = sample, freshness = DataFreshness.FRESH)
+        repo.state.value = ScreenState.Content(data = sample)
         dispatcher.scheduler.advanceUntilIdle()
 
         val state = vm.screenState.first { it is ScreenState.Content }

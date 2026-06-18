@@ -20,7 +20,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.economic.InterestRateSeries
 import kpt.core.model.economic.RateObservation
@@ -90,7 +89,7 @@ class InterestRatesViewModelTest {
         dispatcher.scheduler.advanceUntilIdle()
 
         val series = sampleSeries(seriesId = "DFF", name = "Federal Funds Rate", current = 5.33)
-        factory.emit(seriesId = "DFF", state = ScreenState.Content(series, DataFreshness.FRESH))
+        factory.emit(seriesId = "DFF", state = ScreenState.Content(series))
         dispatcher.scheduler.advanceUntilIdle()
 
         val state = vm.stateFlow.first { it.fedFunds is ScreenState.Content }
@@ -110,7 +109,7 @@ class InterestRatesViewModelTest {
 
         factory.emit(
             seriesId = "DFF",
-            state = ScreenState.Content(sampleSeries(seriesId = "DFF"), DataFreshness.FRESH),
+            state = ScreenState.Content(sampleSeries(seriesId = "DFF")),
         )
         factory.emit(
             seriesId = "DPRIME",

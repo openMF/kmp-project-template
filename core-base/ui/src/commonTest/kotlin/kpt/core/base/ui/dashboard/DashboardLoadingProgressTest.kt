@@ -12,7 +12,7 @@ package kpt.core.base.ui.dashboard
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -59,9 +59,9 @@ class DashboardLoadingProgressTest {
     @Test
     fun mixedContentAndLoading_countsLoadedOnly() = runTest {
         val states: List<ScreenState<String>> = listOf(
-            ScreenState.Content(data = "a", freshness = DataFreshness.FRESH),
+            ScreenState.Content(data = "a"),
             ScreenState.Loading,
-            ScreenState.Content(data = "b", freshness = DataFreshness.FRESH),
+            ScreenState.Content(data = "b"),
             ScreenState.Loading,
         )
         val result = flowOf(states).aggregateDashboardProgress().first()
@@ -74,9 +74,9 @@ class DashboardLoadingProgressTest {
     @Test
     fun allContent_marksIsAnyLoadingFalse_andAllLoaded() = runTest {
         val states: List<ScreenState<Int>> = listOf(
-            ScreenState.Content(data = 1, freshness = DataFreshness.FRESH),
-            ScreenState.Content(data = 2, freshness = DataFreshness.STALE),
-            ScreenState.Content(data = 3, freshness = DataFreshness.UPDATING),
+            ScreenState.Content(data = 1),
+            ScreenState.Content(data = 2),
+            ScreenState.Content(data = 3, freshnessSignal = FreshnessSignal.initial().copy(isRefreshing = true)),
         )
         val result = flowOf(states).aggregateDashboardProgress().first()
         assertEquals(3, result.loaded)
@@ -89,7 +89,7 @@ class DashboardLoadingProgressTest {
     @Test
     fun anyError_marksHasAnyErrorTrue() = runTest {
         val states: List<ScreenState<Any>> = listOf(
-            ScreenState.Content(data = "ok", freshness = DataFreshness.FRESH),
+            ScreenState.Content(data = "ok"),
             ScreenState.Error(error = RuntimeException("boom")),
         )
         val result = flowOf(states).aggregateDashboardProgress().first()
@@ -112,7 +112,7 @@ class DashboardLoadingProgressTest {
     @Test
     fun anyEmpty_marksHasAnyEmptyTrue() = runTest {
         val states: List<ScreenState<Any>> = listOf(
-            ScreenState.Content(data = "ok", freshness = DataFreshness.FRESH),
+            ScreenState.Content(data = "ok"),
             ScreenState.Empty,
         )
         val result = flowOf(states).aggregateDashboardProgress().first()
@@ -126,7 +126,7 @@ class DashboardLoadingProgressTest {
     fun pureConversion_matchesFlowExtension() {
         val states: List<ScreenState<Any>> = listOf(
             ScreenState.Loading,
-            ScreenState.Content(data = "x", freshness = DataFreshness.FRESH),
+            ScreenState.Content(data = "x"),
             ScreenState.Empty,
             ScreenState.Error(error = IllegalStateException()),
         )

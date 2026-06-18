@@ -11,7 +11,7 @@ package kpt.core.base.store.infra
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
 import kpt.core.base.store.freshness.FreshnessBand
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.DataOrigin
 import kpt.core.base.store.screen.StoreData
@@ -110,47 +110,53 @@ class DecisionEngineTest {
         val result = DecisionEngine.decide(data, available)
         assertIs<ScreenState.Content<String>>(result)
         assertEquals("hello", result.data)
-        assertEquals(DataFreshness.FRESH, result.freshness)
+        assertFalse(result.freshnessSignal.isRefreshing, "Expected not refreshing")
     }
 
+    // Phase A of data-freshness-redesign epic (2026-06-17): DecisionEngine no longer
+    // conflates network state into DataFreshness on the Content path. Network
+    // connectivity → ConnectivityBanner; per-card staleness → FreshnessSignal sibling.
+    // DecisionEngine.decide() Content path only encodes request-state (UPDATING during
+    // in-flight refresh) — never network state, never error.
+
     @Test
-    fun `has data + Unavailable = Content STALE`() {
+    fun `has data + Unavailable = Content FRESH (network state in ConnectivityBanner, not DataFreshness)`() {
         val data = dataStoreData("cached")
         val result = DecisionEngine.decide(data, unavailable)
         assertIs<ScreenState.Content<String>>(result)
-        assertEquals(DataFreshness.STALE, result.freshness)
+        assertFalse(result.freshnessSignal.isRefreshing, "Expected not refreshing")
     }
 
     @Test
-    fun `has data + CaptivePortal = Content STALE`() {
+    fun `has data + CaptivePortal = Content FRESH (network state in ConnectivityBanner, not DataFreshness)`() {
         val data = dataStoreData("cached")
         val result = DecisionEngine.decide(data, captivePortal)
         assertIs<ScreenState.Content<String>>(result)
-        assertEquals(DataFreshness.STALE, result.freshness)
+        assertFalse(result.freshnessSignal.isRefreshing, "Expected not refreshing")
     }
 
     @Test
-    fun `has data + refreshing = Content UPDATING`() {
+    fun `has data + refreshing = Content UPDATING (request-state, legitimate)`() {
         val data = dataStoreData("old", isRefreshing = true)
         val result = DecisionEngine.decide(data, available)
         assertIs<ScreenState.Content<String>>(result)
-        assertEquals(DataFreshness.UPDATING, result.freshness)
+        assertTrue(result.freshnessSignal.isRefreshing, "Expected refreshing")
     }
 
     @Test
-    fun `has data + error refresh failed = Content STALE`() {
+    fun `has data + error refresh failed = Content with FreshnessSignal lastError`() {
         val data = dataStoreData("stale", error = FakeIOException("refresh failed"))
         val result = DecisionEngine.decide(data, available)
         assertIs<ScreenState.Content<String>>(result)
-        assertEquals(DataFreshness.STALE, result.freshness)
+        assertFalse(result.freshnessSignal.isRefreshing, "Expected not refreshing")
     }
 
     @Test
-    fun `has data + refreshing + Unavailable = Content UPDATING refreshing wins`() {
+    fun `has data + refreshing + Unavailable = Content UPDATING (refreshing wins - network state ignored)`() {
         val data = dataStoreData("old", isRefreshing = true)
         val result = DecisionEngine.decide(data, unavailable)
         assertIs<ScreenState.Content<String>>(result)
-        assertEquals(DataFreshness.UPDATING, result.freshness)
+        assertTrue(result.freshnessSignal.isRefreshing, "Expected refreshing")
     }
 
     // === error categorization (delegates to categorize()) ===

@@ -19,7 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.ui.screen.DefaultEmptyContent
 import kpt.core.base.ui.screen.DefaultErrorContent
 import kpt.core.base.ui.screen.DefaultLoadingContent
@@ -61,7 +61,7 @@ fun <T : Any> PagingScreenContent(
         DefaultNoNetworkContent(onRetry, isCaptivePortal = captive)
     },
     error: @Composable (Throwable) -> Unit = { DefaultErrorContent(it, onRetry) },
-    content: @Composable (data: List<T>, freshness: DataFreshness) -> Unit,
+    content: @Composable (data: List<T>, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     val state by pagingStream.state.collectAsState(ScreenState.Loading)
 

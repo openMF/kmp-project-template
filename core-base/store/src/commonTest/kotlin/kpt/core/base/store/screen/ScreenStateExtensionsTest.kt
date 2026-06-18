@@ -25,13 +25,14 @@ class ScreenStateExtensionsTest {
     @Test
     fun `mapContent transforms only Content state`() = runTest {
         val flow = flowOf(
-            ScreenState.Content("hello", DataFreshness.FRESH),
+            ScreenState.Content("hello"),
         )
         flow.mapContent { data, _ -> data.length }.test {
             val item = awaitItem()
             assertIs<ScreenState.Content<Int>>(item)
             assertEquals(5, item.data)
-            assertEquals(DataFreshness.FRESH, item.freshness)
+            // FreshnessSignal default for the initial Content is not-refreshing.
+            assertEquals(false, item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -59,7 +60,7 @@ class ScreenStateExtensionsTest {
     @Test
     fun `emptyIfContent converts to Empty when predicate true`() = runTest {
         val flow = flowOf(
-            ScreenState.Content(emptyList<String>(), DataFreshness.FRESH),
+            ScreenState.Content(emptyList<String>()),
         )
         flow.emptyIfContent { it.isEmpty() }.test {
             assertIs<ScreenState.Empty>(awaitItem())
@@ -70,7 +71,7 @@ class ScreenStateExtensionsTest {
     @Test
     fun `emptyIfContent keeps Content when predicate false`() = runTest {
         val flow = flowOf(
-            ScreenState.Content(listOf("a"), DataFreshness.FRESH),
+            ScreenState.Content(listOf("a")),
         )
         flow.emptyIfContent { it.isEmpty() }.test {
             val item = awaitItem()
@@ -83,7 +84,7 @@ class ScreenStateExtensionsTest {
     @Test
     fun `combineContent merges external state with Content`() = runTest {
         val screenFlow = MutableStateFlow<ScreenState<List<String>>>(
-            ScreenState.Content(listOf("a", "b", "c"), DataFreshness.FRESH),
+            ScreenState.Content(listOf("a", "b", "c")),
         )
         val filterFlow = MutableStateFlow("a")
 
@@ -99,7 +100,7 @@ class ScreenStateExtensionsTest {
 
     @Test
     fun `dataOrNull returns data from Content`() {
-        val state: ScreenState<String> = ScreenState.Content("hello", DataFreshness.FRESH)
+        val state: ScreenState<String> = ScreenState.Content("hello")
         assertEquals("hello", state.dataOrNull)
     }
 
@@ -111,7 +112,7 @@ class ScreenStateExtensionsTest {
 
     @Test
     fun `hasContent returns true for Content`() {
-        val state: ScreenState<String> = ScreenState.Content("data", DataFreshness.STALE)
+        val state: ScreenState<String> = ScreenState.Content("data")
         assertTrue(state.hasContent)
     }
 
@@ -129,11 +130,12 @@ class ScreenStateExtensionsTest {
     }
 
     @Test
-    fun `asLocalScreenState wraps value in Content with FRESH`() {
+    fun `asLocalScreenState wraps value in Content with default FreshnessSignal`() {
         val state = "hello".asLocalScreenState()
         assertIs<ScreenState.Content<String>>(state)
         assertEquals("hello", state.data)
-        assertEquals(DataFreshness.FRESH, state.freshness)
+        // FreshnessSignal default initial — Initial band, not refreshing.
+        assertEquals(false, state.freshnessSignal.isRefreshing)
     }
 
     @Test
@@ -143,7 +145,8 @@ class ScreenStateExtensionsTest {
             val content = awaitItem()
             assertIs<ScreenState.Content<String>>(content)
             assertEquals("result", content.data)
-            assertEquals(DataFreshness.FRESH, content.freshness)
+            // Local-only wrap defaults to not-refreshing freshness signal.
+            assertEquals(false, content.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }

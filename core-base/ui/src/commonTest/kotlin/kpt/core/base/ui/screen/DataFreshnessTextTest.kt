@@ -58,29 +58,11 @@ class DataFreshnessTextTest {
         assertEquals("7d ago", formatDurationAgo(7.days))
     }
 
-    // ── buildStaleText: indicator copy when offline ───────────────────────
-
-    @Test
-    fun buildStaleText_nullFetchedAt_isPlainOffline_notMisleadingCachedDataMessage() {
-        // Regression guard: previous copy was "Offline — showing cached data" which
-        // the user found confusing because (a) it implies we have a timestamp we
-        // don't, and (b) appears even when serving from cold-restart SoT (the
-        // common case where lastFetchedAt is null). Plain "Offline" is honest.
-        assertEquals("Offline", buildStaleText(fetchedAt = null))
-    }
-
-    @Test
-    fun buildStaleText_recentFetch_showsTimestamp() {
-        val fiveMinutesAgo = Clock.System.now() - 5.minutes
-        val text = buildStaleText(fiveMinutesAgo)
-        assertEquals("Offline · Updated 5m ago", text)
-    }
-
-    @Test
-    fun buildStaleText_justNow_showsJustNow() {
-        val tenSecondsAgo = Clock.System.now() - 10.seconds
-        assertEquals("Offline · Updated just now", buildStaleText(tenSecondsAgo))
-    }
+    // ── buildStaleText tests removed 2026-06-17 (staleness-ui-consumer-ownership epic)
+    //    StaleBanner + its buildStaleText helper were deleted; feature screens own
+    //    their stale UI via the content lambda + per-card FreshnessIndicator info-icon.
+    //    Tests for that copy moved out with the banner. The remaining tests below
+    //    cover buildUpdatingText (the refreshing-banner copy still in scope).
 
     // ── buildUpdatingText: indicator copy during refresh ──────────────────
 

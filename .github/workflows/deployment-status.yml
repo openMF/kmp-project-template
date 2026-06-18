@@ -3,6 +3,7 @@
 # Reads deployment/PROMOTION_LOG.yaml + emits Markdown step summary.
 # Runs hourly + on manual dispatch.
 name: Deployment Status
+run-name: "📊 Deployment Status · ${{ github.ref_name }}"
 
 on:
   schedule:
@@ -11,7 +12,7 @@ on:
 
 jobs:
   status:
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/deployment-status.yaml@v1.0.18
+    uses: openMF/mifos-x-actionhub/.github/workflows/deployment-status-v2.yaml@v1.0.21
     with:
       promotion_log_path: 'deployment/PROMOTION_LOG.yaml'
       include_play_api:   false

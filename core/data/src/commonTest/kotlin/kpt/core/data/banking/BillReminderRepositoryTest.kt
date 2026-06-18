@@ -17,6 +17,7 @@ import kpt.core.data.banking.impl.BillReminderRepositoryImpl
 import kpt.core.model.banking.BillCategory
 import kpt.core.model.banking.BillReminder
 import kpt.core.model.banking.Recurrence
+import kpt.core.store.banking.impl.provideBillRemindersStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -47,7 +48,12 @@ class BillReminderRepositoryTest {
     }
     private val timeZone = TimeZone.UTC
     private val repo: BillReminderRepository =
-        BillReminderRepositoryImpl(dao, fixedClock, timeZone)
+        BillReminderRepositoryImpl(
+            billRemindersStore = provideBillRemindersStore(dao),
+            billReminderDao = dao,
+            clock = fixedClock,
+            timeZone = timeZone,
+        )
 
     @Test
     fun fixedClockResolvesToExpectedDate() {

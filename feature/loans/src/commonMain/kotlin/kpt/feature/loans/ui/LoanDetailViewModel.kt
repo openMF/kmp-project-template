@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kpt.core.base.store.combine.CombinedState
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitState
 import kpt.core.base.store.submit.submitHandler
@@ -63,7 +62,7 @@ class LoanDetailViewModel(
             if (loan == null) {
                 ScreenState.Empty
             } else {
-                ScreenState.Content(data = loan, freshness = DataFreshness.FRESH)
+                ScreenState.Content(data = loan)
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
@@ -91,7 +90,7 @@ class LoanDetailViewModel(
             if (loan == null) {
                 ScreenState.Empty
             } else {
-                ScreenState.Content(data = loan, freshness = DataFreshness.FRESH)
+                ScreenState.Content(data = loan)
             }
         }
         .transformWhile { state ->

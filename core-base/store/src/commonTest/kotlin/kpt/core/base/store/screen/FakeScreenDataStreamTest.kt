@@ -31,7 +31,7 @@ class FakeScreenDataStreamTest {
         yield() // let collector subscribe before emitting
 
         fake.emit(ScreenState.Loading)
-        fake.emit(ScreenState.Content("hello", DataFreshness.FRESH))
+        fake.emit(ScreenState.Content("hello"))
 
         job.join()
         assertIs<ScreenState.Loading>(states[0])
@@ -48,7 +48,7 @@ class FakeScreenDataStreamTest {
     @Test
     fun replayOneDeliversLatestStateToLateCollector() = runTest {
         val fake = FakeScreenDataStream<String>()
-        fake.emit(ScreenState.Content("latest", DataFreshness.FRESH))
+        fake.emit(ScreenState.Content("latest"))
 
         val state = fake.state.first { it is ScreenState.Content }
         assertIs<ScreenState.Content<String>>(state)
@@ -65,7 +65,7 @@ class FakeScreenDataStreamTest {
 
         fake.emit(ScreenState.Loading)
         fake.emit(ScreenState.NoNetwork())
-        fake.emit(ScreenState.Content("data", DataFreshness.FRESH))
+        fake.emit(ScreenState.Content("data"))
 
         job.join()
         assertIs<ScreenState.Loading>(states[0])
@@ -76,7 +76,7 @@ class FakeScreenDataStreamTest {
     @Test
     fun asStreamStateMatchesFakeState() = runTest {
         val fake = FakeScreenDataStream<String>()
-        fake.emit(ScreenState.Content("data", DataFreshness.FRESH))
+        fake.emit(ScreenState.Content("data"))
 
         val fromFake = fake.state.first { it is ScreenState.Content }
         val fromStream = fake.asStream.state.first { it is ScreenState.Content }

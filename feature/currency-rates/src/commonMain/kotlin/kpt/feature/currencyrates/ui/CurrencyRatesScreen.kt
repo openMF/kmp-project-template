@@ -33,8 +33,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
+import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
 import kpt.core.designsystem.theme.spacing
@@ -49,12 +51,22 @@ fun CurrencyRatesScreen(
 ) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val localState by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val freshness by viewModel.freshness.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Currency Rates") },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Currency Rates")
+                        FreshnessIndicator(
+                            signal = freshness,
+                            onRefresh = viewModel::onRetry,
+                            modifier = Modifier.padding(start = 4.dp),
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

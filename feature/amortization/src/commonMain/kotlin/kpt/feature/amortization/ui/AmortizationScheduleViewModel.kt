@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.banking.LoanRepository
@@ -55,7 +54,6 @@ class AmortizationScheduleViewModel(
                     loan.monthsRemaining <= 0 -> ScreenState.Empty
                     else -> ScreenState.Content(
                         data = computeSchedule(loan),
-                        freshness = DataFreshness.FRESH,
                     )
                 }
             }

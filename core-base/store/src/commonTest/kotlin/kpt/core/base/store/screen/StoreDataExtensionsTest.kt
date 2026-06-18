@@ -12,6 +12,8 @@ package kpt.core.base.store.screen
 import app.cash.turbine.test
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kpt.core.base.store.freshness.FreshnessBand
+import kpt.core.base.store.freshness.FreshnessSignal
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.StoreBuilder
 import kotlin.test.Test
@@ -87,13 +89,14 @@ class StoreDataExtensionsTest {
 
     @Test
     fun `combineScreenStates both Content combines data`() = runTest {
-        val a = kotlinx.coroutines.flow.flowOf(ScreenState.Content("hello", DataFreshness.FRESH))
-        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content(42, DataFreshness.FRESH))
+        val a = kotlinx.coroutines.flow.flowOf(ScreenState.Content("hello"))
+        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content(42))
 
         combineScreenStates(a, b) { s, n -> "$s:$n" }.test {
             val item = assertIs<ScreenState.Content<String>>(awaitItem())
             assertEquals("hello:42", item.data)
-            assertEquals(DataFreshness.FRESH, item.freshness)
+            // Default initial signal — not refreshing.
+            assertEquals(false, item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }
@@ -101,7 +104,7 @@ class StoreDataExtensionsTest {
     @Test
     fun `combineScreenStates NoNetwork wins over Content`() = runTest {
         val a = kotlinx.coroutines.flow.flowOf<ScreenState<String>>(ScreenState.NoNetwork())
-        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content("data", DataFreshness.FRESH))
+        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content("data"))
 
         combineScreenStates(a, b) { s, _ -> s }.test {
             assertIs<ScreenState.NoNetwork>(awaitItem())
@@ -112,7 +115,7 @@ class StoreDataExtensionsTest {
     @Test
     fun `combineScreenStates Loading wins over Content`() = runTest {
         val a = kotlinx.coroutines.flow.flowOf<ScreenState<String>>(ScreenState.Loading)
-        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content("data", DataFreshness.FRESH))
+        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content("data"))
 
         combineScreenStates(a, b) { s, _ -> s }.test {
             assertIs<ScreenState.Loading>(awaitItem())
@@ -121,25 +124,27 @@ class StoreDataExtensionsTest {
     }
 
     @Test
-    fun `combineScreenStates STALE from one source propagates to result`() = runTest {
-        val a = kotlinx.coroutines.flow.flowOf(ScreenState.Content("a", DataFreshness.FRESH))
-        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content("b", DataFreshness.STALE))
+    fun `combineScreenStates STALE band from one source propagates to result`() = runTest {
+        val staleSignal = FreshnessSignal.initial().copy(band = FreshnessBand.Stale)
+        val a = kotlinx.coroutines.flow.flowOf(ScreenState.Content("a", freshnessSignal = staleSignal))
+        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content("b"))
 
         combineScreenStates(a, b) { x, y -> x + y }.test {
             val item = assertIs<ScreenState.Content<String>>(awaitItem())
-            assertEquals(DataFreshness.STALE, item.freshness)
+            assertEquals(FreshnessBand.Stale, item.freshnessSignal.band)
             awaitComplete()
         }
     }
 
     @Test
-    fun `combineScreenStates UPDATING propagates when no source is STALE`() = runTest {
-        val a = kotlinx.coroutines.flow.flowOf(ScreenState.Content("a", DataFreshness.UPDATING))
-        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content("b", DataFreshness.FRESH))
+    fun `combineScreenStates isRefreshing propagates from any source`() = runTest {
+        val refreshingSignal = FreshnessSignal.initial().copy(isRefreshing = true)
+        val a = kotlinx.coroutines.flow.flowOf(ScreenState.Content("a", freshnessSignal = refreshingSignal))
+        val b = kotlinx.coroutines.flow.flowOf(ScreenState.Content("b"))
 
         combineScreenStates(a, b) { x, y -> x + y }.test {
             val item = assertIs<ScreenState.Content<String>>(awaitItem())
-            assertEquals(DataFreshness.UPDATING, item.freshness)
+            assertEquals(true, item.freshnessSignal.isRefreshing)
             awaitComplete()
         }
     }

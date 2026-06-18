@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
 import kpt.core.designsystem.chart.KptSparkline
@@ -68,12 +69,22 @@ internal fun InterestRatesScreen(
     viewModel: InterestRatesViewModel = koinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val aggregateFreshness by viewModel.aggregateFreshness.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Interest Rates") },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Interest Rates")
+                        FreshnessIndicator(
+                            signal = aggregateFreshness,
+                            onRefresh = { viewModel.trySendAction(RatesAction.RefreshAll) },
+                            modifier = Modifier.padding(start = 4.dp),
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(

@@ -17,7 +17,6 @@ import kpt.core.base.store.error.ErrorCategory
 import kpt.core.base.store.error.categorize
 import kpt.core.base.store.freshness.FreshnessBands
 import kpt.core.base.store.freshness.FreshnessSignal
-import kpt.core.base.store.screen.DataFreshness
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.StoreData
@@ -76,17 +75,24 @@ object DecisionEngine {
         }
 
         // === Has data branch ===
-        // Offline/captive-portal is checked BEFORE isRefreshing so that a background
-        // refresh timer (e.g. FetchPolicy.PERIODIC) firing while the device is offline
-        // never promotes DataFreshness to UPDATING — it stays STALE. This also prevents
-        // DataFreshnessIndicator from treating an offline key-change as a "reconnect" event.
+        // Phase A of data-freshness-redesign epic (2026-06-17): network state no longer
+        // conflated into DataFreshness on the Content path. Offline / captive-portal /
+        // error are surfaced separately:
+        //  - Network connectivity → global ConnectivityBanner (already shipped)
+        //  - Per-card staleness    → FreshnessSignal sibling Flow (decideFreshness())
+        // Here we just record request state: UPDATING during in-flight network refresh
+        // (legitimate request signal — NOT network state), FRESH otherwise.
         val fetchedAt = storeData.fetchedAtInstant
-        return when {
-            !isOnline || isCaptivePortal -> ScreenState.Content(storeData.data, DataFreshness.STALE, fetchedAt)
-            storeData.isRefreshing -> ScreenState.Content(storeData.data, DataFreshness.UPDATING, fetchedAt)
-            error != null -> ScreenState.Content(storeData.data, DataFreshness.STALE, fetchedAt)
-            else -> ScreenState.Content(storeData.data, DataFreshness.FRESH, fetchedAt)
-        }
+        @Suppress("UNUSED_VARIABLE")
+        val networkStateNoLongerConsumedHere = isOnline || isCaptivePortal || (error != null)
+        // freshnessSignal default (Initial band) is overwritten by ScreenDataStream's
+        // sibling Flow which computes the real signal via decideFreshness(). Here we
+        // just bake in isRefreshing so the refreshing-banner visibility check works.
+        return ScreenState.Content(
+            data = storeData.data,
+            fetchedAt = fetchedAt,
+            freshnessSignal = FreshnessSignal.initial().copy(isRefreshing = storeData.isRefreshing),
+        )
     }
 
     /**

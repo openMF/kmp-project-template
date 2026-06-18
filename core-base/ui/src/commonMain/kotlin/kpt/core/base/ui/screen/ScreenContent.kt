@@ -48,7 +48,7 @@ import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import kpt.core.base.designsystem.component.KptShimmerLoadingBox
 import kpt.core.base.designsystem.theme.KptTheme
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.captiveportal.rememberOpenCaptivePortalSignIn
 
@@ -57,7 +57,7 @@ private val DefaultVisualSize = 64.dp
 
 /**
  * Generic composable that renders any [ScreenState] with sensible defaults.
- * Animates between states with a fade transition. When content is [DataFreshness.UPDATING],
+ * Animates between states with a fade transition. When [ScreenState.Content.isRefreshing] is true,
  * invokes the [refreshingIndicator] slot above the content area. Pass `null` to suppress
  * the in-flight progress banner entirely.
  *
@@ -89,7 +89,7 @@ fun <T> ScreenContent(
         DefaultNoNetworkContent(onRetry, isCaptivePortal = captive, onDismiss = onDismiss)
     },
     error: @Composable (Throwable) -> Unit = { DefaultErrorContent(it, onRetry, onDismiss = onDismiss) },
-    content: @Composable (data: T, freshness: DataFreshness) -> Unit,
+    content: @Composable (data: T, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     AnimatedContent(
         targetState = state,
@@ -111,14 +111,14 @@ fun <T> ScreenContent(
             is ScreenState.Error -> error(current.error)
             is ScreenState.Unauthenticated -> error(IllegalStateException("Unauthenticated"))
             is ScreenState.Content -> {
-                // fillMaxSize so Content (freshness indicator + caller's content)
+                // fillMaxSize so Content (refreshing indicator + caller's content)
                 // gets the full available height — otherwise this Column wraps and
                 // a LazyColumn inside content may not get its requested fill.
                 Column(modifier = Modifier.fillMaxSize()) {
-                    if (current.freshness == DataFreshness.UPDATING) {
+                    if (current.freshnessSignal.isRefreshing) {
                         refreshingIndicator?.invoke()
                     }
-                    content(current.data, current.freshness)
+                    content(current.data, current.freshnessSignal)
                 }
             }
         }

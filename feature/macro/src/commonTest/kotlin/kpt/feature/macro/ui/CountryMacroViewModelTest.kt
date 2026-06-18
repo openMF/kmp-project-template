@@ -20,7 +20,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.yield
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessBand
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
@@ -200,22 +201,22 @@ class CountryMacroViewModelTest {
         fakeRepository.emit(
             "US",
             IndicatorKind.GDP,
-            contentState(IndicatorKind.GDP, freshness = DataFreshness.FRESH),
+            contentState(IndicatorKind.GDP, band = FreshnessBand.Stale),
         )
         fakeRepository.emit(
             "US",
             IndicatorKind.INFLATION_CPI,
-            contentState(IndicatorKind.INFLATION_CPI, freshness = DataFreshness.STALE),
+            contentState(IndicatorKind.INFLATION_CPI, band = FreshnessBand.Fresh),
         )
         fakeRepository.emit(
             "US",
             IndicatorKind.UNEMPLOYMENT,
-            contentState(IndicatorKind.UNEMPLOYMENT, freshness = DataFreshness.FRESH),
+            contentState(IndicatorKind.UNEMPLOYMENT, band = FreshnessBand.Fresh),
         )
 
         vm.stateFlow.test {
             val state = expectMostRecentItem()
-            assertEquals(DataFreshness.STALE, state.overallFreshness)
+            assertEquals(FreshnessBand.Stale, state.overallBand)
         }
     }
 
@@ -226,28 +227,28 @@ class CountryMacroViewModelTest {
         fakeRepository.emit(
             "US",
             IndicatorKind.GDP,
-            contentState(IndicatorKind.GDP, freshness = DataFreshness.FRESH),
+            contentState(IndicatorKind.GDP, band = FreshnessBand.Fresh),
         )
         fakeRepository.emit(
             "US",
             IndicatorKind.INFLATION_CPI,
-            contentState(IndicatorKind.INFLATION_CPI, freshness = DataFreshness.FRESH),
+            contentState(IndicatorKind.INFLATION_CPI, band = FreshnessBand.Fresh),
         )
         fakeRepository.emit(
             "US",
             IndicatorKind.UNEMPLOYMENT,
-            contentState(IndicatorKind.UNEMPLOYMENT, freshness = DataFreshness.FRESH),
+            contentState(IndicatorKind.UNEMPLOYMENT, band = FreshnessBand.Fresh),
         )
 
         vm.stateFlow.test {
             val state = expectMostRecentItem()
-            assertEquals(DataFreshness.FRESH, state.overallFreshness)
+            assertEquals(FreshnessBand.Fresh, state.overallBand)
         }
     }
 
     private fun contentState(
         kind: IndicatorKind,
-        freshness: DataFreshness = DataFreshness.FRESH,
+        band: FreshnessBand = FreshnessBand.Fresh,
         countryCode: String = "US",
     ): ScreenState.Content<MacroIndicator> = ScreenState.Content(
         data = MacroIndicator(
@@ -256,7 +257,7 @@ class CountryMacroViewModelTest {
             indicator = kind,
             observations = listOf(IndicatorObservation(year = 2024, value = 1.0)),
         ),
-        freshness = freshness,
+        freshnessSignal = FreshnessSignal.initial().copy(band = band),
     )
 }
 

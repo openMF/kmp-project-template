@@ -11,6 +11,8 @@ package kpt.feature.rates.ui
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.data.economic.EconomicRatesRepository
 import kpt.core.model.economic.InterestRateSeries
@@ -40,6 +42,14 @@ internal interface RateStreamFactory {
 /** Per-series stream handle returned by [RateStreamFactory.open]. */
 internal interface RateStream {
     val state: Flow<ScreenState<InterestRateSeries>>
+
+    /**
+     * Per-card freshness Flow — drives the [FreshnessIndicator] info icon.
+     * Defaults to a one-shot Initial signal for test fakes that don't model
+     * freshness; production implementation delegates to `ScreenDataStream.freshness`.
+     */
+    val freshness: Flow<FreshnessSignal> get() = flowOf(FreshnessSignal.initial())
+
     fun refresh()
 }
 
@@ -54,6 +64,7 @@ internal class DefaultRateStreamFactory(
         val stream = repository.interestRateSeriesStream(key = key, scope = scope)
         return object : RateStream {
             override val state: Flow<ScreenState<InterestRateSeries>> = stream.state
+            override val freshness: Flow<FreshnessSignal> = stream.freshness
             override fun refresh() = stream.refresh()
         }
     }

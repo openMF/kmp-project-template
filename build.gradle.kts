@@ -74,6 +74,7 @@ plugins {
     id("org.convention.fork.sync-config")
 }
 
+
 object DynamicVersion {
     fun setDynamicVersion(file: File, version: String) {
         val cleanedVersion = version.split('+')[0]
@@ -102,9 +103,15 @@ tasks.register("printModulePaths") {
 subprojects {
     configurations.all {
         resolutionStrategy.eachDependency {
-            // Replace Google androidx.lifecycle with JetBrains fork for non-Android targets
+            // Replace Google androidx.lifecycle with JetBrains fork for non-Android targets.
+            // Pin to the version shipped WITH compose-multiplatform 1.11.1 — Compose's
+            // emitted IR symbols (LocalViewModelStoreOwner etc.) require this exact
+            // version. Without strictly{}, Gradle prefers stable 2.9.6 over pre-release
+            // 2.11.0-beta01 and produces 'IrPropertySymbolImpl is already bound' on
+            // Kotlin/JS compile.
             if (requested.group == "org.jetbrains.androidx.lifecycle") {
-                useVersion("2.9.6")
+                useVersion("2.11.0-beta01")
+                because("Compose Multiplatform 1.11.1 bundles 2.11.0-beta01")
             }
             if (requested.group == "org.jetbrains.androidx.savedstate") {
                 useVersion("1.3.6")

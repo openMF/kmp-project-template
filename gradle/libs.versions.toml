@@ -74,6 +74,10 @@ spotlessVersion = "8.6.0"
 turbine = "1.2.1"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
+# AGP 9 migration (agp9-migration-build-logic epic T2/T3):
+# Type-safe libs.* accessors in convention plugin source files.
+# Verify latest on plugins.gradle.org before bumping.
+typesafeConventions = "0.5.0"
 
 # Kotlin KMP Dependencies
 kotlin = "2.3.21"
@@ -99,7 +103,7 @@ koinAnnotationsVersion = "2.3.1"
 kmptoolkit = "3.4.4"
 
 # CMP Libraries
-compose-plugin = "1.11.0"
+compose-plugin = "1.11.1"
 coil = "3.4.0"
 backHandlerVersion = "2.5.0"
 constraintLayout = "0.6.1"
@@ -115,7 +119,7 @@ compottie = "2.1.0"
 
 # Jetbrains CMP
 composeJB = "1.11.0"
-composeLifecycle = "2.9.6"
+composeLifecycle = "2.11.0-beta01"
 composeNavigation = "2.9.2"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.4.0"
@@ -382,6 +386,12 @@ kmp-flavors-convention = { id = "org.convention.kmp.flavors" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
+# AGP 9 unified KMP+Android plugin — used by KMPLibraryConventionPlugin + KMPCoreBaseLibraryConventionPlugin
+android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }
+# AGP 9 migration (T3): type-safe libs.* accessors in convention plugin source files.
+# When activated, convention plugins switch from libs.findVersion("compileSdk").get().requiredVersion
+# to the type-safe libs.versions.compileSdk.get() form.
+typesafe-conventions = { id = "dev.panuszewski.typesafe-conventions", version.ref = "typesafeConventions" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 

@@ -2,6 +2,7 @@
 #
 # 1st of month 03:30 UTC. Default strategy: calver-month (vYYYY.MM.0). Lands at Stage 3 (Production).
 name: Tag Monthly Release
+run-name: "🏷️ Tag Monthly · $(date +%Y.%m)"
 
 on:
   schedule:
@@ -14,7 +15,7 @@ concurrency:
 
 jobs:
   tag-and-release:
-    uses: openMF/mifos-x-actionhub/.github/workflows/v2/tag-monthly-release.yaml@v1.0.18
+    uses: openMF/mifos-x-actionhub/.github/workflows/tag-monthly-release-v2.yaml@v1.0.21
     with:
       version_strategy:      calver-month
       starting_rung:         production

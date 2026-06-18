@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.store.combine.internal.ScreenWithMutationStreamImpl
-import kpt.core.base.store.screen.DataFreshness
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitState
 import kpt.core.base.store.submit.submitHandler
@@ -61,7 +61,7 @@ class ScreenWithMutationStreamTest {
             assertTrue(!first.isSyncing)
 
             // Push Content into the read flow — Combined state should advance.
-            readFlow.value = ScreenState.Content("hello", DataFreshness.FRESH)
+            readFlow.value = ScreenState.Content("hello")
             val withContent = awaitItem()
             val content = withContent.read
             assertIs<ScreenState.Content<String>>(content)
@@ -74,7 +74,7 @@ class ScreenWithMutationStreamTest {
     @Test
     fun outboxPendingThreadsThrough() = runTest(UnconfinedTestDispatcher()) {
         val readFlow = MutableStateFlow<ScreenState<String>>(
-            ScreenState.Content("data", DataFreshness.FRESH),
+            ScreenState.Content("data"),
         )
         val pendingFlow = MutableStateFlow(0)
         val syncingFlow = MutableStateFlow(false)

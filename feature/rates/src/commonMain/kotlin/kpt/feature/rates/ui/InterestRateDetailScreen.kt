@@ -32,11 +32,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
+import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
 import kpt.core.designsystem.chart.KptAreaChart
@@ -62,12 +64,22 @@ internal fun InterestRateDetailScreen(
     viewModel: InterestRateDetailViewModel = koinViewModel { parametersOf(seriesId) },
 ) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+    val freshness by viewModel.freshness.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(viewModel.seriesKey.name) },
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(viewModel.seriesKey.name)
+                        FreshnessIndicator(
+                            signal = freshness,
+                            onRefresh = viewModel::onRefresh,
+                            modifier = Modifier.padding(start = 4.dp),
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(

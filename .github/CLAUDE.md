@@ -1,10 +1,32 @@
 # GitHub Actions - CI/CD Infrastructure
 
-**Last Updated:** 2026-02-13
-**Reusable Workflows:** `openMF/mifos-x-actionhub@v1.0.8`
+**Last Updated:** 2026-06-18
+**Reusable Workflows:** [openMF/mifos-x-actionhub — releases](https://github.com/openMF/mifos-x-actionhub/releases) (workflows pin specific tags; check actual `.github/workflows/*.yml` files for the live pin)
 **Custom Actions:** 13 total (4 Android, 4 iOS, 2 macOS, 1 Desktop, 1 Web, 1 Static Analysis)
 
 [← Back to Main](../CLAUDE.md)
+
+---
+
+> 📌 **About version pins in this document**
+>
+> Throughout this guide you'll see references like `@v1.0.8`, `@v1.0.2`, etc. — those are **the versions in use at the time this section was last reviewed**, not necessarily the current pin. The authoritative source for the version any workflow uses is **the workflow file itself**:
+>
+> ```bash
+> grep "openMF/mifos-x-actionhub" .github/workflows/*.yml
+> ```
+>
+> For the **latest available release** of each repo, browse:
+>
+> | Repo | Releases |
+> |---|---|
+> | `openMF/mifos-x-actionhub` (orchestrator) | [releases page](https://github.com/openMF/mifos-x-actionhub/releases) |
+> | `*-publish-android-kmp` | [releases](https://github.com/openMF/mifos-x-actionhub-publish-android-kmp/releases) |
+> | `*-publish-apple-kmp` (iOS + macOS) | [releases](https://github.com/openMF/mifos-x-actionhub-publish-apple-kmp/releases) |
+> | `*-publish-desktop-kmp` | [releases](https://github.com/openMF/mifos-x-actionhub-publish-desktop-kmp/releases) |
+> | `*-publish-web-kmp` | [releases](https://github.com/openMF/mifos-x-actionhub-publish-web-kmp/releases) |
+>
+> When bumping a pin, update the workflow `.yml` — **don't try to bump every doc reference**. The doc is descriptive; the workflow is authoritative.
 
 ---
 

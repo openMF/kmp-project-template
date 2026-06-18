@@ -16,12 +16,9 @@
 #      parse time. Fixed: bumped to @v1.0.24, which pins publish-desktop-kmp
 #      @v2.0.6 (the cross-repo fix landed in
 #      therajanmaurya/mifos-x-actionhub-publish-desktop-kmp PR #3).
-#   3. Secret name case mismatch — `secrets: inherit` doesn't case-fold. The
-#      chain reads lower_snake (canonical convention 2026-05+) but this
-#      consumer's GHA secrets are stored as UPPER_SNAKE (legacy). Fixed:
-#      explicit `secrets:` block mapping UPPER → lower at the wrapper boundary.
-#      Future: rename GHA secrets to canonical lower_snake, then this block
-#      collapses back to `secrets: inherit`.
+#   3. Secret naming canonical — GHA secrets renamed from UPPER_SNAKE legacy
+#      to canonical lower_snake_case matching the orchestrator chain's
+#      convention. `secrets: inherit` now Just Works without explicit mapping.
 #
 # Default mode (just click "Run workflow"):
 #   Android  → ladder up to internal (firebase + internal auto-fire if envs configured)
@@ -142,23 +139,7 @@ jobs:
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-    # === FIX 3: explicit UPPERCASE → lowercase translation ===
-    # GHA secrets are stored UPPER_SNAKE (legacy convention) but the orchestrator
-    # + publish-* chain reads them as lower_snake (canonical convention 2026-05+).
-    # `secrets: inherit` does NOT case-fold names, so without this explicit
-    # mapping every secret evaluates to empty and validate-secrets halts.
-    # TODO: once GHA secrets are renamed to canonical lower_snake (planned),
-    # collapse this block back to `secrets: inherit`.
-    secrets:
-      google_services:         ${{ secrets.GOOGLE_SERVICES }}
-      firebase_creds:          ${{ secrets.FIREBASE_CREDS }}
-      playstore_creds:         ${{ secrets.PLAYSTORE_CREDS }}
-      upload_keystore:         ${{ secrets.UPLOAD_KEYSTORE }}
-      keystore_password:       ${{ secrets.KEYSTORE_PASSWORD }}
-      keystore_alias:          ${{ secrets.KEYSTORE_ALIAS }}
-      keystore_alias_password: ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
-      appstore_key_id:         ${{ secrets.APPSTORE_KEY_ID }}
-      appstore_issuer_id:      ${{ secrets.APPSTORE_ISSUER_ID }}
-      appstore_auth_key:       ${{ secrets.APPSTORE_AUTH_KEY }}
-      match_password:          ${{ secrets.MATCH_PASSWORD }}
-      match_ssh_private_key:   ${{ secrets.MATCH_SSH_PRIVATE_KEY }}
+    # GHA secrets are stored in canonical lower_snake_case (matching the orchestrator
+    # + publish-* chain's reference convention since 2026-05+). `secrets: inherit`
+    # auto-forwards every secret of matching name to the called workflow.
+    secrets: inherit

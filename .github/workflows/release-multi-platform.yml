@@ -1,59 +1,50 @@
 # .github/workflows/release-multi-platform.yml
 #
-# Multi-platform release dispatcher. Self-contained for the parts of the
-# upstream actionhub chain that have known parse-time bugs.
+# Thin wrapper → openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.24
 #
-# Chain shape (as of 2026-06-18 — PR #199):
-#   Android │ iOS │ macOS │ Web  →  openMF/mifos-x-actionhub@v1.0.23  (clean)
-#   Desktop (Windows + Linux)    →  inline jobs in THIS file (escapes broken
-#                                   publish-desktop-kmp@v2.0.5 dynamic-uses bug)
+# All orchestration logic lives in the centralized reusable workflow.
+# This file just declares the dispatch inputs + passes secrets through.
 #
-# Three pre-existing bugs are fixed in this revision (PR #199):
-#   1. Input-name mismatch — the consumer was passing `*_rung` keys but the
-#      orchestrator declares `*_target`. GHA silently drops unknown inputs,
-#      so the dispatch UX values were ignored — orchestrator always used
-#      its own defaults. Now the consumer passes `*_target` correctly.
-#   2. publish-desktop-kmp@v2.0.5 parse failure — line 112 has
-#      `uses: …/${{ inputs.target }}@v2.0.0` which GHA rejects at parse
-#      time. The whole multi-platform release chain failed to load. Bypassed
-#      by passing `desktop_*_target: skip` to the orchestrator and inlining
-#      desktop logic with per-target static `uses:` + `if:` gates here.
-#   3. Secret-name case mismatch — the orchestrator + publish-* chain
-#      references secrets as lowercase_snake (canonical convention) but
-#      this consumer's GHA secrets are stored as UPPERCASE_SNAKE (legacy).
-#      `secrets: inherit` doesn't case-fold, so secrets evaluated to empty
-#      strings, failing validate-secrets across all platforms. Now mapped
-#      explicitly at the consumer→callee boundary (one line per secret).
+# History of fixes landed in this PR:
+#   1. Input-name mismatch — was passing `*_rung` but orchestrator declares
+#      `*_target`. GHA silently dropped unknown inputs, so the dispatch UI
+#      values were ignored — orchestrator was always using its own defaults.
+#      Fixed: `with:` block now maps `*_rung` → `*_target` correctly.
+#   2. Broken upstream pin — @v1.0.23 transitively pinned publish-desktop-kmp
+#      @v2.0.5 which had a `uses: …/${{ inputs.target }}@v2.0.0` dynamic-uses
+#      bug that GHA parser rejects. Even non-desktop dispatches failed at
+#      parse time. Fixed: bumped to @v1.0.24, which pins publish-desktop-kmp
+#      @v2.0.6 (the cross-repo fix landed in
+#      therajanmaurya/mifos-x-actionhub-publish-desktop-kmp PR #3).
+#   3. Secret name case mismatch — `secrets: inherit` doesn't case-fold. The
+#      chain reads lower_snake (canonical convention 2026-05+) but this
+#      consumer's GHA secrets are stored as UPPER_SNAKE (legacy). Fixed:
+#      explicit `secrets:` block mapping UPPER → lower at the wrapper boundary.
+#      Future: rename GHA secrets to canonical lower_snake, then this block
+#      collapses back to `secrets: inherit`.
 #
 # Default mode (just click "Run workflow"):
 #   Android  → ladder up to internal (firebase + internal auto-fire if envs configured)
 #   iOS      → ladder up to internal (firebase + TestFlight auto-fire)
 #   macOS    → ladder up to internal (Mac TestFlight)
-#   Windows  → prerelease (GH Pre-release)         [inline; needs Azure signing secrets]
-#   Linux    → prerelease (GH Pre-release)         [inline; no extra secrets needed]
+#   Windows  → prerelease (GH Pre-release)
+#   Linux    → prerelease (GH Pre-release)
 #   Web      → preview
 #   version_tag → auto-computed YYYY.M.D
+#
+# Promote with a single dispatch:
+#   Pick `<platform>_rung: production` → publish-* workflow runs ALL stages
+#   sequentially (firebase → internal → beta → production), pausing at each
+#   environment-gated stage with an in-graph "Approve and deploy" button.
 #
 # Required one-time setup in repo Settings → Environments:
 #   android-firebase, android-play-internal, android-play-beta, android-play-production
 #   ios-firebase, ios-testflight-internal, ios-testflight-external, ios-app-store
 #   mac-testflight-internal, mac-testflight-external, mac-app-store
-#   desktop-<artifact>-prerelease/beta/stable    (where <artifact> ∈ windows-msi-signed |
-#                                                  windows-exe | windows-microsoft-store |
-#                                                  linux-deb)
+#   desktop-<artifact>-prerelease/beta/stable
 #   web-<host>-preview/staging/production
-#
-# Required GHA secrets (already configured at upper-case; mapped to lowercase below):
-#   APPSTORE_AUTH_KEY · APPSTORE_ISSUER_ID · APPSTORE_KEY_ID
-#   FIREBASE_CREDS · GOOGLE_SERVICES · PLAYSTORE_CREDS
-#   UPLOAD_KEYSTORE · KEYSTORE_PASSWORD · KEYSTORE_ALIAS · KEYSTORE_ALIAS_PASSWORD
-#   MATCH_PASSWORD · MATCH_SSH_PRIVATE_KEY
-#
-# Required GHA secrets for Desktop Windows signing (NOT yet configured; needed
-# only when dispatching desktop_win_rung != 'skip' with signed targets):
-#   AZURE_CLIENT_ID · AZURE_TENANT_ID · AZURE_SUBSCRIPTION_ID
-#   AZURE_TRUSTED_SIGNING_ENDPOINT · AZURE_TRUSTED_SIGNING_ACCOUNT · AZURE_CERT_PROFILE_NAME
-#   MICROSOFT_STORE_CLIENT_ID · MICROSOFT_STORE_CLIENT_SECRET   (only for windows-microsoft-store)
+#   Configure required reviewers per environment to control where promote
+#   buttons appear in the workflow graph.
 
 name: Release · Multi-Platform
 run-name: "🚀 Release ${{ inputs.version_tag || format('auto-{0}', github.run_number) }} · Android=${{ inputs.android_rung }} · iOS=${{ inputs.ios_rung }}"
@@ -130,79 +121,34 @@ on:
         default: '0.10'
 
 jobs:
-  # ─────────────────────────────────────────────────────────────────────────────
-  # version-resolve — compute version ONCE, share with orchestrator + inline desktop
-  # ─────────────────────────────────────────────────────────────────────────────
-  # Mirrors the orchestrator's version-resolve job so inline desktop jobs and
-  # the orchestrator-called platforms tag the same version. Without this, the
-  # orchestrator's internal version-resolve runs in isolation (no output exposed
-  # to caller) and the inline desktop jobs would compute a divergent value.
-  version-resolve:
-    name: Resolve version
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.compute.outputs.version }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-      - id: compute
-        run: |
-          if [[ -n "${{ inputs.version_tag }}" ]]; then
-            VERSION="${{ inputs.version_tag }}"
-            echo "🔖 Using caller-provided version: $VERSION"
-          else
-            DATE=$(date -u +%Y.%-m.%-d)
-            VERSION="$DATE"
-            N=0
-            while git rev-parse "refs/tags/$VERSION" >/dev/null 2>&1 \
-               || git rev-parse "refs/tags/v$VERSION" >/dev/null 2>&1; do
-              N=$((N+1))
-              VERSION="${DATE}.${N}"
-              if [[ $N -gt 50 ]]; then
-                echo "❌ Too many collisions for $DATE — bail"
-                exit 1
-              fi
-            done
-            echo "🔖 Auto-computed version: $VERSION"
-          fi
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-  # ─────────────────────────────────────────────────────────────────────────────
-  # release — orchestrator call for Android + iOS + macOS + Web
-  # ─────────────────────────────────────────────────────────────────────────────
-  # Desktop targets passed as `skip` because publish-desktop-kmp@v2.0.5 has a
-  # parse-time bug (dynamic-uses on inputs.target). Inline desktop jobs below
-  # take over those platforms with per-target static `uses:` + `if:` gates.
   release:
-    name: Release (Android · iOS · macOS · Web)
-    needs: [version-resolve]
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.23
+    name: Release
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.24
     with:
-      version_tag:          ${{ needs.version-resolve.outputs.version }}
+      version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
       ios_package_name:     cmp-ios
       mac_package_name:     cmp-desktop
       shared_module:        cmp-shared
       desktop_package_name: cmp-desktop
       web_package_name:     cmp-web
-      # === FIX #1: rung → target name mapping (orchestrator's input names) ===
+      # === FIX 1: rung → target name mapping (orchestrator's declared input names) ===
       android_target:       ${{ inputs.android_rung }}
       ios_target:           ${{ inputs.ios_rung }}
       mac_target:           ${{ inputs.mac_rung }}
-      # === FIX #2: desktop skipped — handled by inline jobs below ===
-      desktop_win_target:   skip
-      desktop_linux_target: skip
+      desktop_win_target:   ${{ inputs.desktop_win_rung }}
       desktop_win_artifact: ${{ inputs.desktop_win_artifact }}
+      desktop_linux_target: ${{ inputs.desktop_linux_rung }}
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-    # === FIX #3: explicit UPPERCASE → lowercase translation ===
+    # === FIX 3: explicit UPPERCASE → lowercase translation ===
     # GHA secrets are stored UPPER_SNAKE (legacy convention) but the orchestrator
     # + publish-* chain reads them as lower_snake (canonical convention 2026-05+).
     # `secrets: inherit` does NOT case-fold names, so without this explicit
     # mapping every secret evaluates to empty and validate-secrets halts.
+    # TODO: once GHA secrets are renamed to canonical lower_snake (planned),
+    # collapse this block back to `secrets: inherit`.
     secrets:
       google_services:         ${{ secrets.GOOGLE_SERVICES }}
       firebase_creds:          ${{ secrets.FIREBASE_CREDS }}
@@ -216,162 +162,3 @@ jobs:
       appstore_auth_key:       ${{ secrets.APPSTORE_AUTH_KEY }}
       match_password:          ${{ secrets.MATCH_PASSWORD }}
       match_ssh_private_key:   ${{ secrets.MATCH_SSH_PRIVATE_KEY }}
-
-  # ===========================================================================
-  # DESKTOP WINDOWS — inline replacement for broken publish-desktop-kmp@v2.0.5
-  # ===========================================================================
-  # The upstream release.yaml at @v2.0.5 has:
-  #     uses: therajanmaurya/mifos-x-actionhub-publish-desktop-kmp/${{ inputs.target }}@v2.0.0
-  # which GitHub Actions rejects at parse time (uses: cannot interpolate inputs.X).
-  # Replicated here with per-target static `uses:` + `if:` gates — only the
-  # selected `desktop_win_artifact` step actually fires per dispatch.
-  desktop-win-validate-secrets:
-    name: Desktop Win · Preflight (validate Azure / MS-Store secrets)
-    needs: [version-resolve]
-    if: ${{ inputs.desktop_win_rung != 'skip' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check Windows signing secrets per artifact
-        env:
-          azure_client_id:                ${{ secrets.AZURE_CLIENT_ID }}
-          azure_tenant_id:                ${{ secrets.AZURE_TENANT_ID }}
-          azure_subscription_id:          ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          azure_trusted_signing_endpoint: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
-          azure_trusted_signing_account:  ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT }}
-          azure_cert_profile_name:        ${{ secrets.AZURE_CERT_PROFILE_NAME }}
-          microsoft_store_client_id:      ${{ secrets.MICROSOFT_STORE_CLIENT_ID }}
-          microsoft_store_client_secret:  ${{ secrets.MICROSOFT_STORE_CLIENT_SECRET }}
-        run: |
-          MISSING=()
-          case "${{ inputs.desktop_win_artifact }}" in
-            windows-msi-signed|windows-exe)
-              [[ -z "${azure_client_id:-}" ]]                && MISSING+=("AZURE_CLIENT_ID")
-              [[ -z "${azure_tenant_id:-}" ]]                && MISSING+=("AZURE_TENANT_ID")
-              [[ -z "${azure_subscription_id:-}" ]]          && MISSING+=("AZURE_SUBSCRIPTION_ID")
-              [[ -z "${azure_trusted_signing_endpoint:-}" ]] && MISSING+=("AZURE_TRUSTED_SIGNING_ENDPOINT")
-              [[ -z "${azure_trusted_signing_account:-}" ]]  && MISSING+=("AZURE_TRUSTED_SIGNING_ACCOUNT")
-              [[ -z "${azure_cert_profile_name:-}" ]]        && MISSING+=("AZURE_CERT_PROFILE_NAME")
-              ;;
-            windows-microsoft-store)
-              [[ -z "${azure_client_id:-}" ]]                && MISSING+=("AZURE_CLIENT_ID")
-              [[ -z "${azure_tenant_id:-}" ]]                && MISSING+=("AZURE_TENANT_ID")
-              [[ -z "${azure_subscription_id:-}" ]]          && MISSING+=("AZURE_SUBSCRIPTION_ID")
-              [[ -z "${azure_trusted_signing_endpoint:-}" ]] && MISSING+=("AZURE_TRUSTED_SIGNING_ENDPOINT")
-              [[ -z "${azure_trusted_signing_account:-}" ]]  && MISSING+=("AZURE_TRUSTED_SIGNING_ACCOUNT")
-              [[ -z "${azure_cert_profile_name:-}" ]]        && MISSING+=("AZURE_CERT_PROFILE_NAME")
-              [[ -z "${microsoft_store_client_id:-}" ]]      && MISSING+=("MICROSOFT_STORE_CLIENT_ID")
-              [[ -z "${microsoft_store_client_secret:-}" ]]  && MISSING+=("MICROSOFT_STORE_CLIENT_SECRET")
-              ;;
-          esac
-          if [[ ${#MISSING[@]} -gt 0 ]]; then
-            echo "❌ Desktop windows artifact=${{ inputs.desktop_win_artifact }} requires these secrets, MISSING:"
-            printf '   - %s\n' "${MISSING[@]}"
-            echo ""
-            echo "Add via: gh secret set <NAME> --repo ${{ github.repository }} < value"
-            exit 1
-          fi
-          echo "✅ Desktop Windows ${{ inputs.desktop_win_artifact }} secrets present"
-
-  desktop-win-stage-1-prerelease:
-    name: Desktop Win · Stage 1 (Prerelease)
-    needs: [version-resolve, desktop-win-validate-secrets]
-    if: ${{ inputs.desktop_win_rung != 'skip' && contains(fromJSON('["prerelease","beta","stable"]'), inputs.desktop_win_rung) }}
-    runs-on: windows-latest
-    environment: desktop-${{ inputs.desktop_win_artifact }}-prerelease
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build + sign + upload (windows-msi-signed)
-        if: ${{ inputs.desktop_win_artifact == 'windows-msi-signed' }}
-        uses: therajanmaurya/mifos-x-actionhub-publish-desktop-kmp/windows-msi-signed@v2.0.0
-        with:
-          desktop_package_name: cmp-desktop
-          github_tag:           ${{ needs.version-resolve.outputs.version }}
-          stage:                prerelease
-
-      - name: Build + sign + upload (windows-exe)
-        if: ${{ inputs.desktop_win_artifact == 'windows-exe' }}
-        uses: therajanmaurya/mifos-x-actionhub-publish-desktop-kmp/windows-exe@v2.0.0
-        with:
-          desktop_package_name: cmp-desktop
-          github_tag:           ${{ needs.version-resolve.outputs.version }}
-          stage:                prerelease
-
-      - name: Build + sign + upload (windows-microsoft-store)
-        if: ${{ inputs.desktop_win_artifact == 'windows-microsoft-store' }}
-        uses: therajanmaurya/mifos-x-actionhub-publish-desktop-kmp/windows-microsoft-store@v2.0.0
-        with:
-          desktop_package_name: cmp-desktop
-          github_tag:           ${{ needs.version-resolve.outputs.version }}
-          stage:                prerelease
-
-  desktop-win-stage-2-beta:
-    name: Desktop Win · Stage 2 (Promote to Beta — flag flip, no rebuild)
-    needs: [desktop-win-stage-1-prerelease]
-    if: ${{ inputs.desktop_win_rung == 'beta' || inputs.desktop_win_rung == 'stable' }}
-    runs-on: ubuntu-latest
-    environment: desktop-${{ inputs.desktop_win_artifact }}-beta
-    steps:
-      - uses: actions/checkout@v4
-      - name: Flip GH Release flags to beta
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release edit "${{ needs.version-resolve.outputs.version }}" --prerelease=false --latest=false
-
-  desktop-win-stage-3-stable:
-    name: Desktop Win · Stage 3 (Promote to Stable — 2 reviewers + wait, no rebuild)
-    needs: [desktop-win-stage-2-beta]
-    if: ${{ inputs.desktop_win_rung == 'stable' }}
-    runs-on: ubuntu-latest
-    environment: desktop-${{ inputs.desktop_win_artifact }}-stable
-    steps:
-      - uses: actions/checkout@v4
-      - name: Flip GH Release flags to stable
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release edit "${{ needs.version-resolve.outputs.version }}" --prerelease=false --latest=true
-
-  # ===========================================================================
-  # DESKTOP LINUX — inline replacement for broken publish-desktop-kmp@v2.0.5
-  # ===========================================================================
-  # linux-deb requires no extra secrets (per upstream validate-secrets).
-  desktop-linux-stage-1-prerelease:
-    name: Desktop Linux · Stage 1 (Prerelease)
-    needs: [version-resolve]
-    if: ${{ inputs.desktop_linux_rung != 'skip' && contains(fromJSON('["prerelease","beta","stable"]'), inputs.desktop_linux_rung) }}
-    runs-on: ubuntu-latest
-    environment: desktop-linux-deb-prerelease
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build + upload (linux-deb)
-        uses: therajanmaurya/mifos-x-actionhub-publish-desktop-kmp/linux-deb@v2.0.0
-        with:
-          desktop_package_name: cmp-desktop
-          github_tag:           ${{ needs.version-resolve.outputs.version }}
-          stage:                prerelease
-
-  desktop-linux-stage-2-beta:
-    name: Desktop Linux · Stage 2 (Promote to Beta)
-    needs: [desktop-linux-stage-1-prerelease]
-    if: ${{ inputs.desktop_linux_rung == 'beta' || inputs.desktop_linux_rung == 'stable' }}
-    runs-on: ubuntu-latest
-    environment: desktop-linux-deb-beta
-    steps:
-      - uses: actions/checkout@v4
-      - name: Flip GH Release flags to beta
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release edit "${{ needs.version-resolve.outputs.version }}" --prerelease=false --latest=false
-
-  desktop-linux-stage-3-stable:
-    name: Desktop Linux · Stage 3 (Promote to Stable)
-    needs: [desktop-linux-stage-2-beta]
-    if: ${{ inputs.desktop_linux_rung == 'stable' }}
-    runs-on: ubuntu-latest
-    environment: desktop-linux-deb-stable
-    steps:
-      - uses: actions/checkout@v4
-      - name: Flip GH Release flags to stable
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release edit "${{ needs.version-resolve.outputs.version }}" --prerelease=false --latest=true

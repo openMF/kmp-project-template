@@ -201,7 +201,13 @@ jobs:
           echo "KEY_PASSWORD=$KEYSTORE_ALIAS_PASSWORD" >> "$GITHUB_ENV"
         fi
         if [ -n "${KEYSTORE_PASSWORD:-}" ]; then
-          echo "KEYSTORE_PATH=$(pwd)/secrets/keystores/upload_keystore.keystore" >> "$GITHUB_ENV"
+          # IMPORTANT: pass RELATIVE path (relative to DEPLOYMENT_REPO_ROOT = repo root).
+          # deployment/_shared/config.rb's buildAndSignApp does
+          #   File.expand_path(File.join(DEPLOYMENT_REPO_ROOT, keystore))
+          # which concatenates (Ruby's File.join doesn't strip the leading / on the
+          # second arg) — so an absolute path here produces a duplicated /<root>/<abs>
+          # gradle property and signing validation fails to find the keystore.
+          echo "KEYSTORE_PATH=secrets/keystores/upload_keystore.keystore" >> "$GITHUB_ENV"
         fi
         echo "✅ pre_fastlane_script complete"
     # GHA secrets are stored in canonical lower_snake_case (matching the orchestrator

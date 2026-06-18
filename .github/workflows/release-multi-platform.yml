@@ -132,7 +132,7 @@ jobs:
       contents: write
       pages:    write
       id-token: write
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.28
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.30
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -151,6 +151,59 @@ jobs:
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
+      # === FIX 2: opt into RULE-DEPLOYMENT-MANIFEST-001 deployment/<platform>/<target>/lane.rb layout ===
+      # Our lanes live at deployment/Fastfile + deployment/<platform>/<target>/lane.rb,
+      # not at root fastlane/Fastfile. The publish-* @v2.0.11 wrappers support this
+      # via fastlane_mode=pre-materialized + fastlane_cwd=deployment + a consumer-
+      # provided pre_fastlane_script that inlines secret materialization.
+      fastlane_mode:        pre-materialized
+      fastlane_cwd:         deployment
+      pre_fastlane_script: |
+        set -euo pipefail
+        # Materialize Android keystore (when android_rung is active)
+        if [ -n "${UPLOAD_KEYSTORE_B64:-}" ]; then
+          mkdir -p secrets/keystores
+          echo "$UPLOAD_KEYSTORE_B64" | base64 -d > secrets/keystores/upload_keystore.keystore
+          echo "✅ Materialized Android keystore"
+        fi
+        # Materialize google-services.json into the Android module
+        if [ -n "${GOOGLE_SERVICES_B64:-}" ]; then
+          echo "$GOOGLE_SERVICES_B64" | base64 -d > cmp-android/google-services.json
+          echo "✅ Materialized google-services.json"
+        fi
+        # Materialize Firebase service-account JSON (Android + iOS share this)
+        if [ -n "${FIREBASE_CREDS_B64:-}" ]; then
+          mkdir -p secrets/firebase
+          # Lane reads it under both filenames depending on the platform/flavor:
+          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/firebaseAppDistributionServiceCredentialsFile.json
+          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/firebase/service-account.json
+          echo "✅ Materialized Firebase SA JSON"
+        fi
+        # Materialize iOS App Store Connect API .p8 key
+        if [ -n "${APPSTORE_AUTH_KEY_B64:-}" ]; then
+          mkdir -p secrets
+          echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/AuthKey.p8
+          echo "✅ Materialized App Store Connect .p8"
+        fi
+        # Materialize Match SSH key (iOS code-signing repo access)
+        if [ -n "${MATCH_GIT_PRIVATE_KEY:-}" ]; then
+          mkdir -p secrets ~/.ssh
+          echo "$MATCH_GIT_PRIVATE_KEY" | base64 -d > secrets/match_ci_key
+          chmod 600 secrets/match_ci_key
+          echo "✅ Materialized Match SSH key"
+        fi
+        # Map env-var names the deployment/Fastfile lanes expect
+        # (config.rb's get_android_signing_config reads KEY_ALIAS, KEY_PASSWORD)
+        if [ -n "${KEYSTORE_ALIAS:-}" ]; then
+          echo "KEY_ALIAS=$KEYSTORE_ALIAS" >> "$GITHUB_ENV"
+        fi
+        if [ -n "${KEYSTORE_ALIAS_PASSWORD:-}" ]; then
+          echo "KEY_PASSWORD=$KEYSTORE_ALIAS_PASSWORD" >> "$GITHUB_ENV"
+        fi
+        if [ -n "${KEYSTORE_PASSWORD:-}" ]; then
+          echo "KEYSTORE_PATH=$(pwd)/secrets/keystores/upload_keystore.keystore" >> "$GITHUB_ENV"
+        fi
+        echo "✅ pre_fastlane_script complete"
     # GHA secrets are stored in canonical lower_snake_case (matching the orchestrator
     # + publish-* chain's reference convention since 2026-05+). `secrets: inherit`
     # auto-forwards every secret of matching name to the called workflow.

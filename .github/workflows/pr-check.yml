@@ -32,6 +32,22 @@ jobs:
   ios:
     name: PR Check · iOS
     runs-on: macos-14
+    # iOS check is non-blocking until Compose Multiplatform 1.12 stable lands.
+    #
+    # Current state (compose 1.11.1, latest stable patch): UIViewLayoutRegion
+    # is an iOS 26 ObjC class referenced by CMPLayoutRegion. macos-14 has
+    # Xcode 16.1 (iOS 18 SDK) max — symbol doesn't exist → link fails with
+    # 'Undefined symbols for architecture arm64'.
+    #
+    # The fix landed in Compose Multiplatform 1.12.0-alpha02:
+    #   'iOS — Fix application build when using old Xcode 16 SDK'
+    #    JetBrains/compose-multiplatform-core#3054
+    # But 1.12.0-alpha02 breaks Kotlin/JS with an IR-level duplicate-symbol
+    # bug ('IrPropertySymbolImpl is already bound' on LocalViewModelStoreOwner)
+    # so we cannot adopt the pre-release yet.
+    #
+    # Re-enable as a required check once compose 1.12 STABLE ships.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4

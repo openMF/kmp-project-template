@@ -103,7 +103,7 @@ koinAnnotationsVersion = "2.3.1"
 kmptoolkit = "3.4.4"
 
 # CMP Libraries
-compose-plugin = "1.12.0-alpha02"
+compose-plugin = "1.11.1"
 coil = "3.4.0"
 backHandlerVersion = "2.5.0"
 constraintLayout = "0.6.1"
@@ -119,7 +119,7 @@ compottie = "2.1.0"
 
 # Jetbrains CMP
 composeJB = "1.11.0"
-composeLifecycle = "2.9.6"
+composeLifecycle = "2.11.0-beta01"
 composeNavigation = "2.9.2"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.4.0"

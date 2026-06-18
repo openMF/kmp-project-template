@@ -120,6 +120,18 @@ on:
 jobs:
   release:
     name: Release
+    # Permissions cascade through nested reusable workflows (this → orchestrator
+    # → publish-*-kmp). Declare here at the caller boundary so the deepest jobs
+    # — publish-web-kmp's gh-pages/cloudflare/netlify/vercel stages — can
+    # actually inherit what they require:
+    #   contents: write — gh release edit (desktop stages 2/3), gh-pages branch push (web)
+    #   pages:    write — actions/deploy-pages target (web gh-pages host)
+    #   id-token: write — OIDC for actions/deploy-pages (web gh-pages host)
+    # Other platforms (Android/iOS/Mac/Desktop-build) ignore the extra scopes.
+    permissions:
+      contents: write
+      pages:    write
+      id-token: write
     uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.24
     with:
       version_tag:          ${{ inputs.version_tag }}

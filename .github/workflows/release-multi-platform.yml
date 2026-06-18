@@ -1,6 +1,6 @@
 # .github/workflows/release-multi-platform.yml
 #
-# Thin wrapper → openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.26
+# Thin wrapper → openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.27
 #
 # All orchestration logic lives in the centralized reusable workflow.
 # This file just declares the dispatch inputs + passes secrets through.
@@ -132,7 +132,7 @@ jobs:
       contents: write
       pages:    write
       id-token: write
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.26
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.27
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android

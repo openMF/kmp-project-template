@@ -130,20 +130,55 @@ jobs:
           echo "✅ Materialized Play SA"
         fi
         if [ -n "${APPSTORE_AUTH_KEY_B64:-}" ]; then
-          mkdir -p secrets
-          echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/AuthKey.p8
+          mkdir -p secrets/appstore
+          # Write to both paths — Fastfile expects secrets/appstore/AuthKey.p8
+          # (deployment/_shared/config.rb appstore_helpers); legacy callers may
+          # still reference secrets/AuthKey.p8 (kept as backwards-compat).
+          echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/appstore/AuthKey.p8
+          chmod 600 secrets/appstore/AuthKey.p8
+          cp secrets/appstore/AuthKey.p8 secrets/AuthKey.p8
           echo "✅ Materialized App Store Connect .p8"
         fi
         if [ -n "${MATCH_GIT_PRIVATE_KEY:-}" ]; then
-          mkdir -p secrets ~/.ssh
-          echo "$MATCH_GIT_PRIVATE_KEY" | base64 -d > secrets/match_ci_key
-          chmod 600 secrets/match_ci_key
-          echo "✅ Materialized Match SSH key"
+          mkdir -p secrets/match ~/.ssh
+          # match_ssh_private_key vault entry is the FULL match bundle (tar.gz):
+          #   match/git_url, match/git_branch, match/match_ci_key (SSH key),
+          #   match/.match_password, match/certificates_password, match/keychain_password
+          # Decode + extract; copy SSH key into secrets/match/ (Fastfile expects this path
+          # per deployment/_shared/config.rb match_ssh_key_path); export MATCH_GIT_URL/BRANCH.
+          BUNDLE_DIR=$(mktemp -d)
+          echo "$MATCH_GIT_PRIVATE_KEY" | base64 -d > "$BUNDLE_DIR/bundle.tgz"
+          if tar -xzf "$BUNDLE_DIR/bundle.tgz" -C "$BUNDLE_DIR" 2>/dev/null; then
+            # It's a tar.gz bundle — extract SSH key + env vars
+            cp "$BUNDLE_DIR/match/match_ci_key" secrets/match/match_ci_key
+            chmod 600 secrets/match/match_ci_key
+            # Also write to legacy path for any callers still using it
+            cp "$BUNDLE_DIR/match/match_ci_key" secrets/match_ci_key
+            chmod 600 secrets/match_ci_key
+            if [ -f "$BUNDLE_DIR/match/git_url" ]; then
+              echo "MATCH_GIT_URL=$(cat $BUNDLE_DIR/match/git_url | tr -d '\n\r ')" >> "$GITHUB_ENV"
+            fi
+            if [ -f "$BUNDLE_DIR/match/git_branch" ]; then
+              echo "MATCH_GIT_BRANCH=$(cat $BUNDLE_DIR/match/git_branch | tr -d '\n\r ')" >> "$GITHUB_ENV"
+            fi
+            echo "✅ Materialized Match bundle (SSH key + git_url + git_branch)"
+          else
+            # Plain SSH key (legacy single-file format)
+            mv "$BUNDLE_DIR/bundle.tgz" secrets/match/match_ci_key
+            chmod 600 secrets/match/match_ci_key
+            cp secrets/match/match_ci_key secrets/match_ci_key
+            chmod 600 secrets/match_ci_key
+            echo "✅ Materialized Match SSH key (legacy single-file)"
+          fi
+          rm -rf "$BUNDLE_DIR"
         fi
         if [ -n "${KEYSTORE_ALIAS:-}" ]; then echo "KEY_ALIAS=$KEYSTORE_ALIAS" >> "$GITHUB_ENV"; fi
         if [ -n "${KEYSTORE_ALIAS_PASSWORD:-}" ]; then echo "KEY_PASSWORD=$KEYSTORE_ALIAS_PASSWORD" >> "$GITHUB_ENV"; fi
         if [ -n "${KEYSTORE_PASSWORD:-}" ]; then
           echo "KEYSTORE_PATH=secrets/keystores/upload_keystore.keystore" >> "$GITHUB_ENV"
         fi
+        # Firebase App IDs are provided as direct env vars by the chain repo
+        # (publish-{android,apple}-kmp release.yaml env block) — no propagation
+        # needed here. For act, pass via --env-file.
         echo "✅ pre_fastlane_script complete"
     secrets: inherit

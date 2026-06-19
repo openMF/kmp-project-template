@@ -117,34 +117,6 @@ on:
         type: string
         default: '0.10'
 
-      # ─── Local-dev (self-hosted) opt-ins ────────────────────────────────
-      # Set vars.DEFAULT_RUNNER_POOL = '["self-hosted","macOS"]' on the repo
-      # to make these default to local-runner mode. /ci local-actions pre-fills
-      # these for you.
-      runner_pool_linux:
-        description: 'JSON-array runs-on for Linux/Android jobs. `["self-hosted","macOS"]` to use local Mac runner.'
-        required: false
-        type: string
-        default: '["ubuntu-latest"]'
-      runner_pool_mac:
-        description: 'JSON-array runs-on for Apple jobs. `["self-hosted","macOS"]` to use local Mac runner.'
-        required: false
-        type: string
-        default: '["macos-14"]'
-      # Chain refs (publish_android_ref, publish_apple_ref) are still dispatch
-      # inputs because the orchestrator's `uses:` to publish-* CAN accept
-      # inputs.* (it's the consumer-to-orchestrator hop that's parse-time).
-      publish_android_ref:
-        description: 'Git ref of publish-android-kmp release.yaml. Default `dev` (per repo var) or tag.'
-        required: false
-        type: string
-        default: ''
-      publish_apple_ref:
-        description: 'Git ref of publish-apple-kmp release.yaml. Default `dev` (per repo var) or tag.'
-        required: false
-        type: string
-        default: ''
-
 jobs:
   release:
     name: Release
@@ -160,12 +132,11 @@ jobs:
       contents: write
       pages:    write
       id-token: write
-    # GHA doesn't allow `inputs.*` in workflow_call `uses:` refs (parse-time
-    # vs run-time). `vars.*` IS allowed — repo-level static config, perfect
-    # for flipping prod ↔ dev. Toggle via:
-    #   gh variable set DEFAULT_CHAIN_REF --body dev      # → use chain dev branches
-    #   gh variable set DEFAULT_CHAIN_REF --body v1.0.31  # → back to prod tag
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@${{ vars.DEFAULT_CHAIN_REF || 'v1.0.31' }}
+    # PROD pin — immutable. GHA forbids expressions in workflow_call uses:
+    # (parse-time literal only). For local-dev iteration use the companion
+    # workflow `release-multi-platform-local.yml`, which pins @dev and is
+    # dispatched by `/ci local-actions` against the fork.
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.31
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -184,13 +155,12 @@ jobs:
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-      # === FIX 3: thread runner_pool + publish_*_ref so dispatching with
-      # local mode or dev branch doesn't require editing any chain file ===
-      runner_pool_linux:    ${{ inputs.runner_pool_linux }}
-      runner_pool_mac:      ${{ inputs.runner_pool_mac }}
-      # If dispatch input is empty, fall back to DEFAULT_CHAIN_REF var, then 'v2.0.12'.
-      publish_android_ref:  ${{ inputs.publish_android_ref != '' && inputs.publish_android_ref || (vars.DEFAULT_CHAIN_REF || 'v2.0.12') }}
-      publish_apple_ref:    ${{ inputs.publish_apple_ref != '' && inputs.publish_apple_ref || (vars.DEFAULT_CHAIN_REF || 'v2.0.12') }}
+      # PROD pins — immutable, kept in lockstep with actionhub @v1.0.31.
+      # Local dispatches override these via release-multi-platform-local.yml.
+      runner_pool_linux:    '["ubuntu-latest"]'
+      runner_pool_mac:      '["macos-14"]'
+      publish_android_ref:  v2.0.12
+      publish_apple_ref:    v2.0.12
       # === FIX 2: opt into RULE-DEPLOYMENT-MANIFEST-001 deployment/<platform>/<target>/lane.rb layout ===
       # Our lanes live at deployment/Fastfile + deployment/<platform>/<target>/lane.rb,
       # not at root fastlane/Fastfile. The publish-* @v2.0.11 wrappers support this

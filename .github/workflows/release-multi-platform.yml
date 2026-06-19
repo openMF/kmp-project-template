@@ -136,7 +136,7 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.31
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.32
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -155,12 +155,11 @@ jobs:
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-      # PROD pins — immutable, kept in lockstep with actionhub @v1.0.31.
+      # PROD pins kept in lockstep with actionhub @v1.0.32 (which hardcodes
+      # @v2.0.12 internally — GHA forbids expressions in workflow_call uses:).
       # Local dispatches override these via release-multi-platform-local.yml.
       runner_pool_linux:    '["ubuntu-latest"]'
       runner_pool_mac:      '["macos-14"]'
-      publish_android_ref:  v2.0.12
-      publish_apple_ref:    v2.0.12
       # === FIX 2: opt into RULE-DEPLOYMENT-MANIFEST-001 deployment/<platform>/<target>/lane.rb layout ===
       # Our lanes live at deployment/Fastfile + deployment/<platform>/<target>/lane.rb,
       # not at root fastlane/Fastfile. The publish-* @v2.0.11 wrappers support this

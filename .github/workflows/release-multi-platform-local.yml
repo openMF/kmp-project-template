@@ -100,9 +100,9 @@ jobs:
       # All jobs on the self-hosted Mac runner — single executor, all platforms.
       runner_pool_linux:    '["self-hosted","macOS"]'
       runner_pool_mac:      '["self-hosted","macOS"]'
-      # Chain refs all on dev.
-      publish_android_ref:  dev
-      publish_apple_ref:    dev
+      # Chain refs all pinned to @dev INSIDE the orchestrator's release-multi-platform-v2.yaml
+      # on the `dev` branch (publish-android-kmp@dev + publish-apple-kmp@dev). No
+      # input needed here — the dev branch's workflow file hardcodes them.
       # RULE-DEPLOYMENT-MANIFEST-001 layout — same as prod workflow.
       fastlane_mode:        pre-materialized
       fastlane_cwd:         deployment

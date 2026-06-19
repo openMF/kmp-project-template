@@ -171,21 +171,23 @@ jobs:
           echo "$GOOGLE_SERVICES_B64" | base64 -d > cmp-android/google-services.json
           echo "✅ Materialized google-services.json"
         fi
-        # Materialize Play SA — single SoT serving BOTH Play Console publish
-        # AND Firebase App Distribution (2026-06-19 consolidation: the legacy
-        # separate firebase SA was retired; the play SA needs
-        # `Firebase App Distribution Admin` role on the Firebase project).
-        # GHA stores the same SA blob in PLAYSTORECREDS (canonical) — Android
-        # publish-* exposes it as PLAYSTORE_CREDS_B64.
+        # Materialize Firebase SA (firebase-adminsdk-o8x4a@…) for App Distribution
+        # — distinct from the Play Store SA. GHA secret: FIREBASE_CREDS
+        # (with underscore — publish-* chain's convention; the legacy
+        # `FIREBASECREDS` without underscore is NOT used by the chain).
+        if [ -n "${FIREBASE_CREDS_B64:-}" ]; then
+          mkdir -p secrets/firebase
+          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/firebase/service-account.json
+          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/firebaseAppDistributionServiceCredentialsFile.json
+          echo "✅ Materialized Firebase SA"
+        fi
+        # Materialize Play Store SA (fatslane-supply@…) for Play Console publish
+        # — distinct from the Firebase SA. GHA secret: PLAYSTORE_CREDS.
         if [ -n "${PLAYSTORE_CREDS_B64:-}" ]; then
-          mkdir -p secrets/play secrets/firebase
+          mkdir -p secrets/play
           echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/play/service-account.json
-          # Mirror to the legacy paths the lane / firebase plugin look up, so
-          # we don't have to patch every lane reader:
-          echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/firebase/service-account.json
-          echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/firebaseAppDistributionServiceCredentialsFile.json
           echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/playStorePublishServiceCredentialsFile.json
-          echo "✅ Materialized Play SA (used for Play + Firebase distribution)"
+          echo "✅ Materialized Play Store SA"
         fi
         # Materialize iOS App Store Connect API .p8 key
         if [ -n "${APPSTORE_AUTH_KEY_B64:-}" ]; then

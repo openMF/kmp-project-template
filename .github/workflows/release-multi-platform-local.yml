@@ -1,0 +1,149 @@
+# release-multi-platform-local.yml — self-hosted local-dev companion to
+# release-multi-platform.yml. Pinned to `@dev` everywhere so editing any
+# chain repo's dev branch in `workspaces/mifos-x/` ships to the next dispatch
+# instantly, no tag-cut required.
+#
+# Dispatched by `/ci local-actions` against the fork (where the self-hosted
+# runner is registered). NOT used by cloud production runs.
+#
+# Toggle inputs are the same shape as release-multi-platform.yml so behavior
+# diffs only in:
+#   1. workflow_call uses: → @dev (literal — GHA forbids expressions there)
+#   2. runner_pool defaults → ["self-hosted","macOS"] (everything on local Mac)
+#   3. publish_*_ref defaults → dev
+name: Release · Multi-Platform (Local Dev · self-hosted)
+run-name: "🛠️ Local release ${{ inputs.android_rung }} · iOS=${{ inputs.ios_rung }} · web=${{ inputs.web_rung }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag (leave EMPTY to auto-compute YYYY.M.D)'
+        required: false
+        type: string
+        default: ''
+      android_rung:
+        description: 'Android — top rung to reach'
+        required: false
+        type: choice
+        options: [skip, firebase, firebase+internal, internal, beta, production]
+        default: firebase
+      ios_rung:
+        description: 'iOS — top rung to reach'
+        required: false
+        type: choice
+        options: [skip, firebase, firebase+testflight, internal, beta, production]
+        default: skip
+      mac_rung:
+        description: 'macOS MAS — top rung to reach'
+        required: false
+        type: choice
+        options: [skip, internal, beta, production]
+        default: skip
+      desktop_win_rung:
+        description: 'Windows — skipped in local mode (jpackage is platform-tied)'
+        required: false
+        type: choice
+        options: [skip]
+        default: skip
+      desktop_linux_rung:
+        description: 'Linux DEB — skipped in local mode (jpackage is platform-tied)'
+        required: false
+        type: choice
+        options: [skip]
+        default: skip
+      web_rung:
+        description: 'Web — top rung'
+        required: false
+        type: choice
+        options: [skip, preview, staging, production]
+        default: skip
+      web_host:
+        description: 'Web host provider'
+        required: false
+        type: choice
+        options: [gh-pages, cloudflare-pages, netlify, vercel]
+        default: gh-pages
+      production_rollout:
+        description: 'Android staged rollout (0.0-1.0)'
+        required: false
+        type: string
+        default: '0.10'
+
+jobs:
+  release:
+    name: Release (local)
+    permissions:
+      contents: write
+      pages:    write
+      id-token: write
+    # DEV pin — points at the chain's rolling dev branch. Edit any chain
+    # repo's dev branch in workspaces/mifos-x/ and the next dispatch picks
+    # it up. No tag-cut needed for iteration.
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@dev
+    with:
+      version_tag:          ${{ inputs.version_tag }}
+      android_package_name: cmp-android
+      ios_package_name:     cmp-ios
+      mac_package_name:     cmp-desktop
+      shared_module:        cmp-shared
+      desktop_package_name: cmp-desktop
+      web_package_name:     cmp-web
+      android_target:       ${{ inputs.android_rung }}
+      ios_target:           ${{ inputs.ios_rung }}
+      mac_target:           ${{ inputs.mac_rung }}
+      desktop_win_target:   ${{ inputs.desktop_win_rung }}
+      desktop_linux_target: ${{ inputs.desktop_linux_rung }}
+      web_target:           ${{ inputs.web_rung }}
+      web_host:             ${{ inputs.web_host }}
+      production_rollout:   ${{ inputs.production_rollout }}
+      # All jobs on the self-hosted Mac runner — single executor, all platforms.
+      runner_pool_linux:    '["self-hosted","macOS"]'
+      runner_pool_mac:      '["self-hosted","macOS"]'
+      # Chain refs all on dev.
+      publish_android_ref:  dev
+      publish_apple_ref:    dev
+      # RULE-DEPLOYMENT-MANIFEST-001 layout — same as prod workflow.
+      fastlane_mode:        pre-materialized
+      fastlane_cwd:         deployment
+      pre_fastlane_script: |
+        set -euo pipefail
+        if [ -n "${UPLOAD_KEYSTORE_B64:-}" ]; then
+          mkdir -p secrets/keystores
+          echo "$UPLOAD_KEYSTORE_B64" | base64 -d > secrets/keystores/upload_keystore.keystore
+          echo "✅ Materialized Android keystore"
+        fi
+        if [ -n "${GOOGLE_SERVICES_B64:-}" ]; then
+          echo "$GOOGLE_SERVICES_B64" | base64 -d > cmp-android/google-services.json
+          echo "✅ Materialized google-services.json"
+        fi
+        if [ -n "${FIREBASE_CREDS_B64:-}" ]; then
+          mkdir -p secrets/firebase
+          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/firebase/service-account.json
+          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/firebaseAppDistributionServiceCredentialsFile.json
+          echo "✅ Materialized Firebase SA"
+        fi
+        if [ -n "${PLAYSTORE_CREDS_B64:-}" ]; then
+          mkdir -p secrets/play
+          echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/play/service-account.json
+          echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/playStorePublishServiceCredentialsFile.json
+          echo "✅ Materialized Play SA"
+        fi
+        if [ -n "${APPSTORE_AUTH_KEY_B64:-}" ]; then
+          mkdir -p secrets
+          echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/AuthKey.p8
+          echo "✅ Materialized App Store Connect .p8"
+        fi
+        if [ -n "${MATCH_GIT_PRIVATE_KEY:-}" ]; then
+          mkdir -p secrets ~/.ssh
+          echo "$MATCH_GIT_PRIVATE_KEY" | base64 -d > secrets/match_ci_key
+          chmod 600 secrets/match_ci_key
+          echo "✅ Materialized Match SSH key"
+        fi
+        if [ -n "${KEYSTORE_ALIAS:-}" ]; then echo "KEY_ALIAS=$KEYSTORE_ALIAS" >> "$GITHUB_ENV"; fi
+        if [ -n "${KEYSTORE_ALIAS_PASSWORD:-}" ]; then echo "KEY_PASSWORD=$KEYSTORE_ALIAS_PASSWORD" >> "$GITHUB_ENV"; fi
+        if [ -n "${KEYSTORE_PASSWORD:-}" ]; then
+          echo "KEYSTORE_PATH=secrets/keystores/upload_keystore.keystore" >> "$GITHUB_ENV"
+        fi
+        echo "✅ pre_fastlane_script complete"
+    secrets: inherit

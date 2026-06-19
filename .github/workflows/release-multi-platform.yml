@@ -117,6 +117,36 @@ on:
         type: string
         default: '0.10'
 
+      # ─── Local-dev (self-hosted) opt-ins ────────────────────────────────
+      # Set vars.DEFAULT_RUNNER_POOL = '["self-hosted","macOS"]' on the repo
+      # to make these default to local-runner mode. /ci local-actions pre-fills
+      # these for you.
+      runner_pool_linux:
+        description: 'JSON-array runs-on for Linux/Android jobs. `["self-hosted","macOS"]` to use local Mac runner.'
+        required: false
+        type: string
+        default: '["ubuntu-latest"]'
+      runner_pool_mac:
+        description: 'JSON-array runs-on for Apple jobs. `["self-hosted","macOS"]` to use local Mac runner.'
+        required: false
+        type: string
+        default: '["macos-14"]'
+      actionhub_ref:
+        description: 'Git ref of openMF/mifos-x-actionhub (tag for prod, `dev` for local iteration).'
+        required: false
+        type: string
+        default: 'v1.0.31'
+      publish_android_ref:
+        description: 'Git ref of publish-android-kmp release.yaml.'
+        required: false
+        type: string
+        default: 'v2.0.12'
+      publish_apple_ref:
+        description: 'Git ref of publish-apple-kmp release.yaml.'
+        required: false
+        type: string
+        default: 'v2.0.12'
+
 jobs:
   release:
     name: Release
@@ -132,7 +162,7 @@ jobs:
       contents: write
       pages:    write
       id-token: write
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.30
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@${{ inputs.actionhub_ref }}
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -151,6 +181,12 @@ jobs:
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
+      # === FIX 3: thread runner_pool + publish_*_ref so dispatching with
+      # local mode or dev branch doesn't require editing any chain file ===
+      runner_pool_linux:    ${{ inputs.runner_pool_linux }}
+      runner_pool_mac:      ${{ inputs.runner_pool_mac }}
+      publish_android_ref:  ${{ inputs.publish_android_ref }}
+      publish_apple_ref:    ${{ inputs.publish_apple_ref }}
       # === FIX 2: opt into RULE-DEPLOYMENT-MANIFEST-001 deployment/<platform>/<target>/lane.rb layout ===
       # Our lanes live at deployment/Fastfile + deployment/<platform>/<target>/lane.rb,
       # not at root fastlane/Fastfile. The publish-* @v2.0.11 wrappers support this

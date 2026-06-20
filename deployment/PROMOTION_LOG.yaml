@@ -31,6 +31,170 @@
 # ═════════════════════════════════════════════════════════════════════════════
 
 schema_version: "1.0"
-
 # Append rows to `events[]` ONLY. See contract above.
-events: []
+events:
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: android-firebase
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 0f6abbcdd415ce2b10e87bee3491c5b8d1d8e8ad
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: android-play-internal
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: bb289c721bbc813bbf946eaf877762faf6d6c3f1
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: android-play-beta
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 1ad2d1ef38b65345164c6b5a28f38d76d4ad33b1
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: ios-firebase
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: bab688e6ec058669bf2ec8a4b23aa3674baff5a8
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: ios-testflight
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 838eb94df580effe308df4968391c1fea9a6f94a
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: desktop-linux-deb
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 1cc072e0f727c02452809924190f9f6fbc6e9d0b
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: desktop-windows-exe
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 0307d4f37f2bb0c399b2018c3816dd311af1069c
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: desktop-macos-dmg-unsigned
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 5e7e3676aeb539808fd224e3856a4ce60fbb0998
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: web-gh-pages
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 7fc18f0e9e90da9a9c3793e4846e63bd9d98c18d
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run rehearsal (T4 fastlane-modernization)
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: desktop-mac-app-store
+    tier: 2
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 23fe94c310e7aada1c4ac9ba6e4ffd9aa0f09102
+    mode: dry-run
+    secrets_mode: vault
+    outcome: blocked
+    dry_run: true
+    notes: 'BLOCKED: production-tier requires --confirm (not passed for dry-run)'
+  - timestamp: "2026-06-20T11:01:26Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: desktop-mac-testflight
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: 93cf95253844d5ca56b94bcf682e99335d89411e
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: none
+    mode: dry-run
+    secrets_mode: vault
+    outcome: blocked
+    dry_run: true
+    notes: 'BLOCKED: no deployment/desktop/mac-testflight/ dir — manifest enabled_targets vs disk mismatch'

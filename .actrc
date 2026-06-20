@@ -13,3 +13,10 @@
 
 # Standard ubuntu runner image
 -P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+# Self-hosted + macOS labels resolve to the host (native execution, like the
+# real GHA self-hosted runner setup). Required for release-multi-platform-local.yml
+# which uses runs-on: ["self-hosted","macOS"] — matches both labels.
+-P self-hosted=-self-hosted
+-P macOS=-self-hosted
+-P ARM64=-self-hosted

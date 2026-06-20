@@ -637,7 +637,15 @@ end
 def generateVersion(platform: "firebase", **config)
   sh("#{DEPLOYMENT_REPO_ROOT}/gradlew versionFile 2>/dev/null || true") rescue nil
   version_name = VersionHelpers.gradle_version
-  version_code = sh("git rev-list --count HEAD 2>/dev/null || echo 1").strip.to_i rescue 1
+  # VERSION_CODE_OVERRIDE: pre-set ENV (e.g. by act --env-file) wins over
+  # git-rev-list. Lets iteration runs bump past the last successful upload
+  # without a real git commit on the source repo each time.
+  override = ENV["VERSION_CODE_OVERRIDE"].to_s.strip
+  version_code = if !override.empty?
+                   override.to_i
+                 else
+                   sh("git rev-list --count HEAD 2>/dev/null || echo 1").strip.to_i rescue 1
+                 end
 
   ENV["VERSION_NAME"] = version_name
   ENV["VERSION_CODE"] = version_code.to_s

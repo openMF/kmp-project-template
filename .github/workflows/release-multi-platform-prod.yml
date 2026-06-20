@@ -1,20 +1,24 @@
-# release-multi-platform-local.yml — self-hosted local-dev companion to
-# release-multi-platform.yml. Pinned to `@dev` everywhere so editing any
-# chain repo's dev branch in `workspaces/mifos-x/` ships to the next dispatch
-# instantly, no tag-cut required.
+# release-multi-platform-prod.yml — GHA-hosted production companion to
+# release-multi-platform-local.yml. Pinned to an immutable tag so any chain
+# repo change must be shipped via a tag-cut before it reaches production.
 #
-# Dispatched by `/ci local-actions` against the fork (where the self-hosted
-# runner is registered). NOT used by cloud production runs.
+# Triggered by:
+#   - push to main / dev branches (auto-deploy)
+#   - push of a v*.*.* tag (release cut)
+#   - workflow_dispatch (manual) — same inputs as local workflow
 #
-# Toggle inputs are the same shape as release-multi-platform.yml so behavior
-# diffs only in:
-#   1. workflow_call uses: → @dev (literal — GHA forbids expressions there)
-#   2. runner_pool defaults → ["self-hosted","macOS"] (everything on local Mac)
-#   3. publish_*_ref defaults → dev
-name: Release · Multi-Platform (Local Dev · self-hosted)
-run-name: "🛠️ Local release ${{ inputs.android_rung }} · iOS=${{ inputs.ios_rung }} · web=${{ inputs.web_rung }}"
+# Differences from the local (self-hosted) workflow:
+#   1. workflow_call uses: → @v1.0.32 (immutable tag, not a rolling branch ref)
+#   2. runner_pool defaults → ubuntu-latest / macos-latest (GHA hosted)
+#   3. push: trigger added (branches + tags)
+#   4. name / run-name updated
+name: Release · Multi-Platform (Production · upstream)
+run-name: "🚀 Production release ${{ inputs.android_rung }} · iOS=${{ inputs.ios_rung }} · web=${{ inputs.web_rung }}"
 
 on:
+  push:
+    branches: [main, dev]
+    tags: ['v*.*.*']
   workflow_dispatch:
     inputs:
       version_tag:
@@ -41,16 +45,16 @@ on:
         options: [skip, internal, beta, production]
         default: skip
       desktop_win_rung:
-        description: 'Windows — skipped in local mode (jpackage is platform-tied)'
+        description: 'Windows — top rung to reach'
         required: false
         type: choice
-        options: [skip]
+        options: [skip, release]
         default: skip
       desktop_linux_rung:
-        description: 'Linux DEB — skipped in local mode (jpackage is platform-tied)'
+        description: 'Linux DEB — top rung to reach'
         required: false
         type: choice
-        options: [skip]
+        options: [skip, release]
         default: skip
       web_rung:
         description: 'Web — top rung'
@@ -72,15 +76,14 @@ on:
 
 jobs:
   release:
-    name: Release (local)
+    name: Release (production)
     permissions:
       contents: write
       pages:    write
       id-token: write
-    # DEV pin — points at the chain's rolling dev branch. Edit any chain
-    # repo's dev branch in workspaces/mifos-x/ and the next dispatch picks
-    # it up. No tag-cut needed for iteration.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@dev
+    # PROD pin — immutable tag; chain repos must ship a new tag before
+    # any orchestrator change reaches production builds.
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.32
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -97,13 +100,10 @@ jobs:
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-      # All jobs on the self-hosted Mac runner — single executor, all platforms.
-      runner_pool_linux:    '["self-hosted","macOS"]'
-      runner_pool_mac:      '["self-hosted","macOS"]'
-      # Chain refs all pinned to @dev INSIDE the orchestrator's release-multi-platform-v2.yaml
-      # on the `dev` branch (publish-android-kmp@dev + publish-apple-kmp@dev). No
-      # input needed here — the dev branch's workflow file hardcodes them.
-      # RULE-DEPLOYMENT-MANIFEST-001 layout — same as prod workflow.
+      # GHA hosted runners — separate Linux (android/web/desktop-linux/desktop-win)
+      # and macOS (ios/mac/desktop-mac) pools.
+      runner_pool_linux:    '["ubuntu-latest"]'
+      runner_pool_mac:      '["macos-latest"]'
       fastlane_mode:        pre-materialized
       fastlane_cwd:         deployment
       pre_fastlane_script: |

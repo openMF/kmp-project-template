@@ -198,3 +198,18 @@ events:
     outcome: blocked
     dry_run: true
     notes: 'BLOCKED: no deployment/desktop/mac-testflight/ dir — manifest enabled_targets vs disk mismatch'
+  - timestamp: "2026-06-20T11:08:46Z"
+    actor: therajanmaurya@users.noreply.github.com
+    target: desktop-mac-testflight
+    tier: 1
+    version_from: none
+    version_to: 2.6.0
+    commit_sha: b71479a8c757fdc0dd7a32baa2226894fb013d39
+    ci_run_url: local
+    manifest_sha: 790a47e12095884ad5442a8531e1c1b0816e7315
+    secrets_sha: 23fe94c310e7aada1c4ac9ba6e4ffd9aa0f09102
+    mode: dry-run
+    secrets_mode: vault
+    outcome: success
+    dry_run: true
+    notes: STUB dry-run (lane desktop_testflight, path=deployment/desktop/mac-app-store/ per manifest override) — CORRECTS the earlier blocked row which mis-resolved the dir via a naive heuristic

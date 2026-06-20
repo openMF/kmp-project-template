@@ -16,9 +16,12 @@
 #      parse time. Fixed: bumped to @v1.0.24, which pins publish-desktop-kmp
 #      @v2.0.6 (the cross-repo fix landed in
 #      therajanmaurya/mifos-x-actionhub-publish-desktop-kmp PR #3).
-#   3. Secret naming canonical — GHA secrets renamed from UPPER_SNAKE legacy
-#      to canonical lower_snake_case matching the orchestrator chain's
-#      convention. `secrets: inherit` now Just Works without explicit mapping.
+#   3. Cross-org secret passing — this chain crosses an org boundary at every
+#      hop (therajanmaurya fork → openMF orchestrator → therajanmaurya publish).
+#      `secrets: inherit` does NOT carry secrets across an org boundary (verified
+#      2026-06-21: every secret arrived len=0 at the orchestrator), so secrets
+#      are passed EXPLICITLY via a `secrets:` map below. Do NOT switch back to
+#      `secrets: inherit` — it silently breaks signing ("keystore not found").
 #
 # Default mode (just click "Run workflow"):
 #   Android  → ladder up to internal (firebase + internal auto-fire if envs configured)

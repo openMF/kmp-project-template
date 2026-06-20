@@ -136,7 +136,7 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.32
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.37
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -229,7 +229,28 @@ jobs:
           echo "KEYSTORE_PATH=secrets/keystores/upload_keystore.keystore" >> "$GITHUB_ENV"
         fi
         echo "✅ pre_fastlane_script complete"
-    # GHA secrets are stored in canonical lower_snake_case (matching the orchestrator
-    # + publish-* chain's reference convention since 2026-05+). `secrets: inherit`
-    # auto-forwards every secret of matching name to the called workflow.
-    secrets: inherit
+    # EXPLICIT secret map (NOT inherit). This chain is cross-ORG at every hop:
+    # therajanmaurya/kmp-project-template (this fork) → openMF/mifos-x-actionhub
+    # (orchestrator) → therajanmaurya/...-publish-android-kmp. `secrets: inherit`
+    # does NOT carry secrets across an organization boundary — verified empirically
+    # 2026-06-21: every secret arrived len=0 at the orchestrator under inherit, so
+    # the pre_fastlane_script materialize guards no-op'd and signing failed
+    # ("keystore not found"). Explicit `${{ secrets.NAME }}` is the only reliable
+    # cross-org pattern. Fork secrets are UPPERCASE; orchestrator declares
+    # lower_snake_case — map each here. (GHA secret refs are case-insensitive.)
+    secrets:
+      google_services:              ${{ secrets.GOOGLE_SERVICES }}
+      firebase_creds:               ${{ secrets.FIREBASE_CREDS }}
+      playstore_creds:              ${{ secrets.PLAYSTORE_CREDS }}
+      upload_keystore:              ${{ secrets.UPLOAD_KEYSTORE }}
+      keystore_password:            ${{ secrets.KEYSTORE_PASSWORD }}
+      keystore_alias:               ${{ secrets.KEYSTORE_ALIAS }}
+      keystore_alias_password:      ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
+      firebase_android_app_id:      ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+      firebase_android_demo_app_id: ${{ secrets.FIREBASE_ANDROID_DEMO_APP_ID }}
+      appstore_key_id:              ${{ secrets.APPSTORE_KEY_ID }}
+      appstore_issuer_id:           ${{ secrets.APPSTORE_ISSUER_ID }}
+      appstore_auth_key:            ${{ secrets.APPSTORE_AUTH_KEY }}
+      match_password:               ${{ secrets.MATCH_PASSWORD }}
+      match_ssh_private_key:        ${{ secrets.MATCH_SSH_PRIVATE_KEY }}
+      SOPS_AGE_KEY:                 ${{ secrets.SOPS_AGE_KEY }}

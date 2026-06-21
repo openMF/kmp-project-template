@@ -77,14 +77,14 @@ on:
         required: false
         type: choice
         options: [skip, internal, beta, production]
-        default: internal
+        default: skip
 
       desktop_win_rung:
         description: 'Windows — top rung'
         required: false
         type: choice
         options: [skip, prerelease, beta, stable]
-        default: prerelease
+        default: skip
 
       desktop_win_artifact:
         description: 'Windows artifact format'
@@ -139,7 +139,7 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.37
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.38
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -257,3 +257,25 @@ jobs:
       match_password:               ${{ secrets.MATCH_PASSWORD }}
       match_ssh_private_key:        ${{ secrets.MATCH_SSH_PRIVATE_KEY }}
       SOPS_AGE_KEY:                 ${{ secrets.SOPS_AGE_KEY }}
+      # --- NEW: macOS .p12 signing (Tier-3, blocked-on-onboarding until certs provisioned) ---
+      mac_signing_certificate:            ${{ secrets.MAC_SIGNING_CERTIFICATE }}
+      mac_signing_certificate_password:   ${{ secrets.MAC_SIGNING_CERTIFICATE_PASSWORD }}
+      mac_installer_certificate:          ${{ secrets.MAC_INSTALLER_CERTIFICATE }}
+      mac_installer_certificate_password: ${{ secrets.MAC_INSTALLER_CERTIFICATE_PASSWORD }}
+      mac_provisioning_profile_base64:    ${{ secrets.MAC_PROVISIONING_PROFILE_BASE64 }}
+      keychain_password:                  ${{ secrets.KEYCHAIN_PASSWORD }}
+      # --- NEW: Web host tokens + Vercel project identity ---
+      cloudflare_api_token:         ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      netlify_auth_token:           ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      vercel_token:                 ${{ secrets.VERCEL_TOKEN }}
+      vercel_org_id:                ${{ secrets.VERCEL_ORG_ID }}
+      vercel_project_id:            ${{ secrets.VERCEL_PROJECT_ID }}
+      # --- NEW: Windows Azure Trusted Signing + Partner Center (Tier-3, blocked-on-onboarding) ---
+      azure_client_id:                ${{ secrets.AZURE_CLIENT_ID }}
+      azure_tenant_id:                ${{ secrets.AZURE_TENANT_ID }}
+      azure_subscription_id:          ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      azure_trusted_signing_endpoint: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
+      azure_trusted_signing_account:  ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT }}
+      azure_cert_profile_name:        ${{ secrets.AZURE_CERT_PROFILE_NAME }}
+      microsoft_store_client_id:      ${{ secrets.MICROSOFT_STORE_CLIENT_ID }}
+      microsoft_store_client_secret:  ${{ secrets.MICROSOFT_STORE_CLIENT_SECRET }}

@@ -12,6 +12,37 @@ platform :android do
     signing_config = FastlaneConfig.get_android_signing_config(options)
     build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
 
+    # --- Track-aware versionCode (Option B, epic multi-platform-release-completion D15, 2026-06-22) ---
+    # Query the LIVE Play tracks and set VERSION_CODE_OVERRIDE = global_max + 1 so the upload
+    # always clears the live ceiling, regardless of which repo builds. A fork's commit count is
+    # below the real app's accumulated live codes, which triggers Play's
+    #   "cannot rollout: existing users can't upgrade to the newly added APKs".
+    # We query production + beta + internal and take the GLOBAL max (a higher track can carry a
+    # higher code than internal). Reuses generateVersion's existing VERSION_CODE_OVERRIDE hook,
+    # so generateVersion stays generic. deployInternal is the ONLY lane that builds a fresh AAB;
+    # promoteToBeta / promote_to_production reuse the uploaded code and need no change.
+    play_json_key = File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json")
+    play_pkg      = FastlaneConfig::ProjectConfig.android_package_name
+    live_max = %w[production beta internal].flat_map do |track|
+      begin
+        google_play_track_version_codes(package_name: play_pkg, track: track, json_key: play_json_key)
+      rescue => e
+        UI.important("⚠️ Play track '#{track}' version-code query failed (#{e.message}); skipping it.")
+        []
+      end
+    end.map(&:to_i).max || 0
+    if live_max > 0
+      ENV["VERSION_CODE_OVERRIDE"] = (live_max + 1).to_s
+      UI.message("📈 Track-aware versionCode: live global max=#{live_max} → override=#{ENV['VERSION_CODE_OVERRIDE']}")
+    else
+      # New app (empty tracks) or API unreachable — fall back to commit_count × 10 (the legacy
+      # headroom scheme from multi-platform-build-and-publish.yaml). Logged loudly, never silent.
+      fallback = (sh("git rev-list --count HEAD", log: false).strip.to_i rescue 0) * 10
+      ENV["VERSION_CODE_OVERRIDE"] = fallback.to_s if fallback > 0
+      UI.important("⚠️ No live Play track codes (new app / API unreachable); fallback versionCode=commit_count×10=#{fallback}.")
+    end
+    # --- end track-aware versionCode ---
+
     generateVersion(platform: "playstore")
     releaseNotes = generateReleaseNote()
 

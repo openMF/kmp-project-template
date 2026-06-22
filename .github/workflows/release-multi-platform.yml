@@ -66,11 +66,11 @@ on:
         default: firebase+internal
 
       ios_rung:
-        description: 'iOS — top rung to reach'
+        description: 'iOS — top rung to reach (Firebase dropped 2026-06-22; TestFlight covers testing)'
         required: false
         type: choice
-        options: [skip, firebase, firebase+testflight, internal, beta, production]
-        default: firebase+testflight
+        options: [skip, internal, beta, production]
+        default: internal
 
       mac_rung:
         description: 'macOS MAS — top rung to reach'
@@ -145,7 +145,7 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.44
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.45
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android

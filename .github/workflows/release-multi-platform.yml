@@ -115,10 +115,10 @@ on:
         default: gh-pages
 
       production_rollout:
-        description: 'Android staged rollout (0.0-1.0, only used when android_rung=production)'
+        description: 'Android production rollout fraction (0.0-1.0; 1.0 = full release, <1.0 = staged). Only used when android_rung=production.'
         required: false
         type: string
-        default: '0.10'
+        default: '1.0'
 
 jobs:
   # Store-listing preflight + sync now live in the REUSABLE CHAIN, so every consumer inherits

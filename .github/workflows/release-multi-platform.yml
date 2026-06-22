@@ -207,11 +207,14 @@ jobs:
           echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/playStorePublishServiceCredentialsFile.json
           echo "✅ Materialized Play Store SA"
         fi
-        # Materialize iOS App Store Connect API .p8 key
+        # Materialize iOS App Store Connect API .p8 key.
+        # config.rb#ios_config reads it from secrets/appstore/AuthKey.p8 (key_filepath); the
+        # legacy secrets/AuthKey.p8 path is kept for back-compat. (2026-06-22 iOS path fix)
         if [ -n "${APPSTORE_AUTH_KEY_B64:-}" ]; then
-          mkdir -p secrets
+          mkdir -p secrets secrets/appstore
+          echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/appstore/AuthKey.p8
           echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/AuthKey.p8
-          echo "✅ Materialized App Store Connect .p8"
+          echo "✅ Materialized App Store Connect .p8 (secrets/appstore/AuthKey.p8 + legacy)"
         fi
         # Materialize Match SSH key (iOS code-signing repo access)
         if [ -n "${MATCH_GIT_PRIVATE_KEY:-}" ]; then

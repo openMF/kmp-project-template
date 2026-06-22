@@ -168,7 +168,9 @@ jobs:
       # @v2.0.12 internally — GHA forbids expressions in workflow_call uses:).
       # Local dispatches override these via release-multi-platform-local.yml.
       runner_pool_linux:    '["ubuntu-latest"]'
-      runner_pool_mac:      '["macos-14"]'
+      runner_pool_mac:      '["macos-15"]'   # macos-14 ships Xcode 16.1 (no CMP/UIViewLayoutRegion symbols);
+                                              # macos-15 has Xcode 26.x — the image the last green iOS build
+                                              # used (pr-check.yml). Compose MP 1.11 needs it. (2026-06-22)
       # === FIX 2: opt into RULE-DEPLOYMENT-MANIFEST-001 deployment/<platform>/<target>/lane.rb layout ===
       # Our lanes live at deployment/Fastfile + deployment/<platform>/<target>/lane.rb,
       # not at root fastlane/Fastfile. The publish-* @v2.0.11 wrappers support this

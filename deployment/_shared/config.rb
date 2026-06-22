@@ -412,25 +412,66 @@ def fetch_certificates_with_match(options = {})
   certs_pass = options[:certificates_password] || ENV["CERTIFICATES_PASSWORD"] || cfg[:certificates_password]
   ENV["CERTIFICATES_PASSWORD"] = certs_pass.to_s if certs_pass && ENV["CERTIFICATES_PASSWORD"].to_s.empty?
 
-  # DEFAULT readonly: true — valid certs/profiles already live in the Match repo, so just
-  # fetch + install them; NEVER touch the Dev Portal. This is what lets TestFlight/App Store
-  # deploy WITHOUT the team Account Holder accepting the latest Program License Agreement
-  # (non-readonly tries to revoke/create certs on the portal → "PLA Update available" 403).
-  # Pass readonly: false explicitly ONLY for the rare bootstrap that must mint a fresh cert.
-  # (2026-06-22 — Apple PLA pending; certs already valid in repo)
-  readonly = options.key?(:readonly) ? options[:readonly] : true
-  force    = options.key?(:force)    ? options[:force]    : !readonly
-
-  match(
+  base = {
     type:                     options[:match_type]       || cfg[:match_type],
     app_identifier:           options[:app_identifier]   || cfg[:app_identifier],
     git_url:                  options[:match_git_url]    || cfg[:match_git_url],
     git_branch:               options[:match_git_branch] || cfg[:match_git_branch],
     git_private_key:          File.exist?(ssh_key) ? ssh_key : nil,
     include_all_certificates: true,
-    readonly:                 readonly,
-    force:                    force,
-  )
+  }
+
+  # Explicit override — a caller can pin readonly (e.g. bootstrap passes readonly:false to mint).
+  if options.key?(:readonly)
+    ro = options[:readonly]
+    match(**base, readonly: ro, force: options.fetch(:force, !ro))
+    return
+  end
+
+  # FULLY-AUTOMATIC Match (auto readonly/force + auto-renew):
+  #   Phase 1 — readonly fetch. Installs whatever valid cert/profile already lives in the Match
+  #     repo. NO Dev Portal call → works even when the Apple PLA is pending. If it raises (repo
+  #     empty / cert revoked), fall through to renewal.
+  phase1_ok = begin
+    match(**base, readonly: true, force: false)
+    true
+  rescue StandardError => e
+    UI.important("readonly match could not install a cert/profile (#{e.message.to_s.lines.first&.strip}); will renew.")
+    false
+  end
+
+  #   Phase 2 — decide force LOCALLY (no portal): renew only when the AppStore cert/profile is
+  #     missing or expiring soon. readonly:false + force:true regenerates on the Dev Portal AND
+  #     commits the fresh assets back to the Match repo (auto-renew). Renewal is the ONLY path
+  #     that needs the portal/PLA — the valid-cert steady state never touches it. (2026-06-22)
+  if !phase1_ok || match_assets_expired?(cfg, options)
+    UI.important("⚠️ AppStore cert/profile expired or missing → AUTO-RENEWING on the Dev Portal " \
+                 "(requires the Apple Program License Agreement to be current for the account holder).")
+    match(**base, readonly: false, force: true)
+  else
+    UI.message("✅ Valid AppStore cert/profile already in the Match repo — readonly, no Dev Portal / PLA needed.")
+  end
+end
+
+# Drives the auto-renew decision WITHOUT a Dev Portal call: returns true when the AppStore
+# provisioning profile for this app (installed by Phase-1 readonly match) is missing or expires
+# within `min_days`. Parses the locally-installed .mobileprovision via `security cms`.
+def match_assets_expired?(cfg, options = {}, min_days = 7)
+  require "time"
+  app_id = options[:app_identifier] || cfg[:app_identifier]
+  dir = File.expand_path("~/Library/MobileDevice/Provisioning Profiles")
+  Dir.glob(File.join(dir, "*.mobileprovision")).each do |p|
+    xml = `security cms -D -i "#{p}" 2>/dev/null`
+    next unless xml.include?(app_id)
+    next if xml =~ %r{<key>get-task-allow</key>\s*<true}  # skip Development profiles
+    if xml =~ %r{<key>ExpirationDate</key>\s*<date>([^<]+)</date>}
+      return false if Time.parse(Regexp.last_match(1)) > Time.now + (min_days * 86_400)
+    end
+  end
+  true  # no valid (non-expired) distribution profile found for this app
+rescue StandardError => e
+  UI.important("match expiry check failed (#{e.message}); assuming VALID (readonly) to avoid an unneeded Dev Portal/PLA call.")
+  false
 end
 
 # Revoke iOS Distribution certificates from Apple Developer Portal to free slots for

@@ -54,12 +54,19 @@ platform :android do
     # AC32 FIX (Play Store requires AAB, not APK) — gradle bundle, not assemble.
     buildAndSignApp(taskName: "bundleProd", buildType: "Release", **signing_config)
 
+    # Full store-listing sync — EXPLICIT (was relying on supply's defaults). Pushes the complete
+    # listing AND all media alongside the AAB: title/short/full description, changelogs, the
+    # feature graphic, and phone / 7" / 10" screenshots from metadata_path. (2026-06-22)
     upload_to_play_store(
       track: "internal",
       aab: build_paths[:prod_aab_path],
       json_key: File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json"),
       package_name: FastlaneConfig::ProjectConfig.android_package_name,
       metadata_path: File.join(DEPLOYMENT_REPO_ROOT, "deployment/android/metadata"),
+      skip_upload_metadata:    false,  # title / short_description / full_description
+      skip_upload_changelogs:  false,  # changelogs/<locale>/default.txt
+      skip_upload_images:      false,  # featureGraphic / icon / promo graphics
+      skip_upload_screenshots: false,  # phone / sevenInch / tenInch screenshots
     )
   end
 end

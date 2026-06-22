@@ -121,30 +121,14 @@ on:
         default: '0.10'
 
 jobs:
-  # Store-listing preflight — CI mirror of /release STEP 1.7 (Store Listing Wizard).
-  # Validates the Play Store listing metadata (title / short / full description) is present
-  # and within store char limits BEFORE the gated, billable build runs — so the Play API
-  # never rejects the upload with "missing required field: title". Consumer-side gate; the
-  # release job depends on it. The deploy still uploads the listing via metadata_path.
-  # (2026-06-22)
-  store-listing-preflight:
-    name: Preflight · Store Listing
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Validate Play Store listing (Android)
-        if: ${{ inputs.android_rung != 'skip' }}
-        run: bash scripts/store-listing-preflight.sh android en-US deployment/android/metadata
-      - name: Validate App Store listing (iOS)
-        if: ${{ inputs.ios_rung != 'skip' }}
-        run: bash scripts/store-listing-preflight.sh ios en-US deployment/ios/appstore/metadata
-      - name: Skipped (no store target)
-        if: ${{ inputs.android_rung == 'skip' && inputs.ios_rung == 'skip' }}
-        run: echo "⏭️ Store-listing preflight skipped — no android/ios target"
-
+  # Store-listing preflight + sync now live in the REUSABLE CHAIN, so every consumer inherits
+  # them — no per-consumer job here (2026-06-22):
+  #   • preflight → publish-android-kmp `validate-store-listing` job (release.yaml@v2.0.19+)
+  #   • full sync (metadata + screenshots + feature graphic) → deployInternal's supply upload
+  #     (metadata_path + skip_upload_{metadata,changelogs,images,screenshots}: false)
+  # scripts/store-listing-preflight.sh stays as a LOCAL pre-push validation helper.
   release:
     name: Release
-    needs: [store-listing-preflight]
     # Permissions cascade through nested reusable workflows (this → orchestrator
     # → publish-*-kmp). Declare here at the caller boundary so the deepest jobs
     # — publish-web-kmp's gh-pages/cloudflare/netlify/vercel stages — can
@@ -161,7 +145,7 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.42
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.43
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android

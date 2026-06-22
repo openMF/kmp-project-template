@@ -121,8 +121,27 @@ on:
         default: '0.10'
 
 jobs:
+  # Store-listing preflight — CI mirror of /release STEP 1.7 (Store Listing Wizard).
+  # Validates the Play Store listing metadata (title / short / full description) is present
+  # and within store char limits BEFORE the gated, billable build runs — so the Play API
+  # never rejects the upload with "missing required field: title". Consumer-side gate; the
+  # release job depends on it. The deploy still uploads the listing via metadata_path.
+  # (2026-06-22)
+  store-listing-preflight:
+    name: Preflight · Store Listing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Play Store listing metadata
+        if: ${{ inputs.android_rung != 'skip' }}
+        run: bash scripts/store-listing-preflight.sh en-US deployment/android/metadata
+      - name: Skipped (no Android target)
+        if: ${{ inputs.android_rung == 'skip' }}
+        run: echo "⏭️ Store-listing preflight skipped — android_rung=skip"
+
   release:
     name: Release
+    needs: [store-listing-preflight]
     # Permissions cascade through nested reusable workflows (this → orchestrator
     # → publish-*-kmp). Declare here at the caller boundary so the deepest jobs
     # — publish-web-kmp's gh-pages/cloudflare/netlify/vercel stages — can

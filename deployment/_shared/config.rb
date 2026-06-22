@@ -642,7 +642,10 @@ def generateVersion(platform: "firebase", **config)
   # Run versionFile and SURFACE failures (was `2>/dev/null || true`, which hid reckon errors and
   # silently produced a 1.0.0 build). version.txt is written to the repo root by the task.
   begin
-    sh("cd #{DEPLOYMENT_REPO_ROOT} && ./gradlew versionFile --quiet --console=plain")
+    # --no-configuration-cache: config-cache is ON for this project, so a plain `versionFile`
+    # gets served a stale cached project.version (1.0.0) and overwrites the committed version.txt.
+    # Disabling it forces reckon to re-evaluate fresh against the just-fetched tags. (2026-06-22)
+    sh("cd #{DEPLOYMENT_REPO_ROOT} && ./gradlew versionFile --no-configuration-cache --console=plain")
   rescue => e
     UI.important("⚠️ ./gradlew versionFile failed: #{e.message.to_s.lines.first&.strip}")
   end

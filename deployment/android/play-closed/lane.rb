@@ -1,15 +1,13 @@
-# deployment/android/play-beta/lane.rb
-# Extracted from legacy `promoteToBeta` lane in fastlane/Fastfile.
-# Promotion-only lane (no build): moves the current internal track release to beta.
+# deployment/android/play-closed/lane.rb
+# Promotion-only lane (no build): moves the current internal track release to closed/alpha.
+# Mirror of promoteToBeta with track_promote_to: alpha. (2026-06-22)
 
 platform :android do
-  desc "Promote internal track to beta on Google Play"
-  lane :promoteToBeta do
+  desc "Promote internal track to closed testing (alpha) on Google Play"
+  lane :promoteToClosed do
     upload_to_play_store(
       track:                        "internal",
-      track_promote_to:             "beta",
-      # "completed" (was "draft") — a draft promote leaves the Open Testing track PAUSED so
-      # testers never receive it. completed = the beta release goes live. (2026-06-22 fix)
+      track_promote_to:             "alpha",
       track_promote_release_status: "completed",
       json_key:                     File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json"),
       package_name:                 FastlaneConfig::ProjectConfig.android_package_name,

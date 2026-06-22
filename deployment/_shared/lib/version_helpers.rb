@@ -6,9 +6,14 @@ module VersionHelpers
   module_function
 
   # Read the gradle-generated version.txt (produced by `./gradlew versionFile`).
-  # Falls back to "1.0.0" when the file is missing.
+  # Prefers the absolute repo-root path (the task writes there); falls back to the legacy
+  # relative paths, then "1.0.0". The relative `../version.txt` broke when the fastlane CWD
+  # wasn't the repo parent, silently yielding 1.0.0. (2026-06-22 fix)
   def gradle_version
-    File.read("../version.txt").strip
+    root = defined?(DEPLOYMENT_REPO_ROOT) ? DEPLOYMENT_REPO_ROOT : nil
+    candidates = [root && File.join(root, "version.txt"), "../version.txt", "version.txt"].compact
+    path = candidates.find { |p| File.exist?(p) && !File.read(p).strip.empty? }
+    path ? File.read(path).strip : "1.0.0"
   rescue StandardError
     "1.0.0"
   end

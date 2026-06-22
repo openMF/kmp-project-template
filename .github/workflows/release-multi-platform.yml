@@ -62,7 +62,7 @@ on:
         description: 'Android — top rung to reach (lower rungs auto-fire)'
         required: false
         type: choice
-        options: [skip, firebase, firebase+internal, internal, beta, production]
+        options: [skip, firebase, firebase+internal, internal, closed, beta, production]
         default: firebase+internal
 
       ios_rung:
@@ -115,12 +115,18 @@ on:
         default: gh-pages
 
       production_rollout:
-        description: 'Android staged rollout (0.0-1.0, only used when android_rung=production)'
+        description: 'Android production rollout fraction (0.0-1.0; 1.0 = full release, <1.0 = staged). Only used when android_rung=production.'
         required: false
         type: string
-        default: '0.10'
+        default: '1.0'
 
 jobs:
+  # Store-listing preflight + sync now live in the REUSABLE CHAIN, so every consumer inherits
+  # them — no per-consumer job here (2026-06-22):
+  #   • preflight → publish-android-kmp `validate-store-listing` job (release.yaml@v2.0.19+)
+  #   • full sync (metadata + screenshots + feature graphic) → deployInternal's supply upload
+  #     (metadata_path + skip_upload_{metadata,changelogs,images,screenshots}: false)
+  # scripts/store-listing-preflight.sh stays as a LOCAL pre-push validation helper.
   release:
     name: Release
     # Permissions cascade through nested reusable workflows (this → orchestrator
@@ -139,7 +145,7 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.39
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.44
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android

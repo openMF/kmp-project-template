@@ -635,8 +635,22 @@ end
 # Compute and export VERSION_NAME / VERSION_CODE for Android builds.
 # Must be called before buildAndSignApp so Gradle picks up the injected values.
 def generateVersion(platform: "firebase", **config)
-  sh("#{DEPLOYMENT_REPO_ROOT}/gradlew versionFile 2>/dev/null || true") rescue nil
+  # Give reckon the full tag history. The CI checkout is shallow, so without this reckon can't
+  # see the release tags and versionFile falls back to 0.0.1 / 1.0.0 inconsistently. Best-effort:
+  # a fresh clone may already be complete (--unshallow then errors → tolerated). (2026-06-22 fix)
+  sh("cd #{DEPLOYMENT_REPO_ROOT} && git fetch --tags --force --quiet 2>/dev/null; git fetch --unshallow --quiet 2>/dev/null || true") rescue nil
+  # Run versionFile and SURFACE failures (was `2>/dev/null || true`, which hid reckon errors and
+  # silently produced a 1.0.0 build). version.txt is written to the repo root by the task.
+  begin
+    # --no-configuration-cache: config-cache is ON for this project, so a plain `versionFile`
+    # gets served a stale cached project.version (1.0.0) and overwrites the committed version.txt.
+    # Disabling it forces reckon to re-evaluate fresh against the just-fetched tags. (2026-06-22)
+    sh("cd #{DEPLOYMENT_REPO_ROOT} && ./gradlew versionFile --no-configuration-cache --console=plain")
+  rescue => e
+    UI.important("⚠️ ./gradlew versionFile failed: #{e.message.to_s.lines.first&.strip}")
+  end
   version_name = VersionHelpers.gradle_version
+  UI.important("⚠️ versionName fell back to '#{version_name}' — reckon/versionFile did not produce version.txt; check git tag history in CI.") if %w[1.0.0 0.0.0].include?(version_name)
   # VERSION_CODE_OVERRIDE: pre-set ENV (e.g. by act --env-file) wins over
   # git-rev-list. Lets iteration runs bump past the last successful upload
   # without a real git commit on the source repo each time.

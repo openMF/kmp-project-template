@@ -132,12 +132,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate Play Store listing metadata
+      - name: Validate Play Store listing (Android)
         if: ${{ inputs.android_rung != 'skip' }}
-        run: bash scripts/store-listing-preflight.sh en-US deployment/android/metadata
-      - name: Skipped (no Android target)
-        if: ${{ inputs.android_rung == 'skip' }}
-        run: echo "⏭️ Store-listing preflight skipped — android_rung=skip"
+        run: bash scripts/store-listing-preflight.sh android en-US deployment/android/metadata
+      - name: Validate App Store listing (iOS)
+        if: ${{ inputs.ios_rung != 'skip' }}
+        run: bash scripts/store-listing-preflight.sh ios en-US deployment/ios/appstore/metadata
+      - name: Skipped (no store target)
+        if: ${{ inputs.android_rung == 'skip' && inputs.ios_rung == 'skip' }}
+        run: echo "⏭️ Store-listing preflight skipped — no android/ios target"
 
   release:
     name: Release

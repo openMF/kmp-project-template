@@ -354,6 +354,13 @@ def with_ios_preamble(options = {})
       File.chmod(0600, ssh_config) rescue nil
     end
   end
+
+  # Install CocoaPods when the iOS project uses them — the Xcode archive needs the generated
+  # Pods/ + .xcconfig/.xcfilelist. This config.rb preamble overrides deploy_helpers' (which ran
+  # cocoapods), so without this the archive fails "Unable to open Pods-iosApp.release.xcconfig".
+  # (2026-06-22)
+  podfile = File.join(DEPLOYMENT_REPO_ROOT, "cmp-ios", "Podfile")
+  cocoapods(podfile: podfile, try_repo_update_on_error: true) if File.exist?(podfile)
 end
 
 # Unlock (local) or create (CI) the keychain before Match imports certificates.

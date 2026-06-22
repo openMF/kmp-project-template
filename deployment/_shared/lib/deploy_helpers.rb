@@ -158,8 +158,8 @@ def fetch_certificates_with_match(options = {})
     type:            options[:match_type]     || "appstore",
     app_identifier:  options[:app_identifier] || cfg[:app_identifier],
     team_id:         options[:team_id]        || cfg[:team_id],
-    git_url:         options[:git_url]        || cfg[:git_url],
-    git_branch:      options[:git_branch]     || cfg[:git_branch],
+    git_url:         options[:git_url]        || cfg[:match_git_url],
+    git_branch:      options[:git_branch]     || cfg[:match_git_branch],
     git_private_key: ENV["MATCH_GIT_PRIVATE_KEY"] || cfg[:match_git_private_key],
     readonly:        true,
   )
@@ -194,8 +194,8 @@ def build_signed_ios(options = {})
     type:            options[:match_type]               || "adhoc",
     app_identifier:  options[:app_identifier]           || cfg[:app_identifier],
     team_id:         options[:team_id]                  || cfg[:team_id],
-    git_url:         options[:git_url]                  || cfg[:git_url],
-    git_branch:      options[:git_branch]               || cfg[:git_branch],
+    git_url:         options[:git_url]                  || cfg[:match_git_url],
+    git_branch:      options[:git_branch]               || cfg[:match_git_branch],
     git_private_key: ENV["MATCH_GIT_PRIVATE_KEY"]       || cfg[:match_git_private_key],
     readonly:        true,
   )

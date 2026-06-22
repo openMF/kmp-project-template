@@ -242,6 +242,15 @@ jobs:
           fi
           echo "✅ Materialized Match SSH key ($(wc -c < secrets/match_ci_key | tr -d ' ')B, valid)"
         fi
+        # Match certificate-repo coordinates (NON-secret). config.rb#ios_config reads
+        # MATCH_GIT_URL env or secrets/match/git_url — neither was set in CI → fastlane match
+        # failed with "No value found for git_url". Provide both. (2026-06-22)
+        mkdir -p secrets/match
+        echo "git@github.com:openMF/ios-provisioning-profile.git" > secrets/match/git_url
+        echo "master" > secrets/match/git_branch
+        echo "MATCH_GIT_URL=git@github.com:openMF/ios-provisioning-profile.git" >> "$GITHUB_ENV"
+        echo "MATCH_GIT_BRANCH=master" >> "$GITHUB_ENV"
+        echo "✅ Match repo: openMF/ios-provisioning-profile.git (master)"
         # Map env-var names the deployment/Fastfile lanes expect
         # (config.rb's get_android_signing_config reads KEY_ALIAS, KEY_PASSWORD)
         if [ -n "${KEYSTORE_ALIAS:-}" ]; then

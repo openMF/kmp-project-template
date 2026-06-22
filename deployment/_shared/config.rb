@@ -453,24 +453,38 @@ def fetch_certificates_with_match(options = {})
   end
 end
 
-# Drives the auto-renew decision WITHOUT a Dev Portal call: returns true when the AppStore
-# provisioning profile for this app (installed by Phase-1 readonly match) is missing or expires
-# within `min_days`. Parses the locally-installed .mobileprovision via `security cms`.
+# Drives the auto-renew decision WITHOUT a Dev Portal call: returns true ONLY when there is no
+# valid Apple Distribution signing identity available AND no unexpired AppStore profile on disk.
+# `security find-identity -v` lists ONLY non-expired codesigning identities, so a hit means the
+# cert is valid → stay readonly (no portal/PLA). Checks BOTH the legacy and the Xcode-16+/26
+# provisioning-profile directories. Defaults to NOT-expired on any uncertainty, so a valid cert
+# is never needlessly renewed (which would hit the PLA). (2026-06-22)
 def match_assets_expired?(cfg, options = {}, min_days = 7)
+  # 1) Valid (non-expired) Distribution cert in the keychain → certs are good.
+  ids = `security find-identity -v -p codesigning 2>/dev/null`
+  return false if ids =~ /Apple Distribution|iPhone Distribution|3rd Party Mac/
+
+  # 2) No cert hit → fall back to an unexpired AppStore profile on disk (either profile dir).
   require "time"
   app_id = options[:app_identifier] || cfg[:app_identifier]
-  dir = File.expand_path("~/Library/MobileDevice/Provisioning Profiles")
-  Dir.glob(File.join(dir, "*.mobileprovision")).each do |p|
-    xml = `security cms -D -i "#{p}" 2>/dev/null`
-    next unless xml.include?(app_id)
-    next if xml =~ %r{<key>get-task-allow</key>\s*<true}  # skip Development profiles
-    if xml =~ %r{<key>ExpirationDate</key>\s*<date>([^<]+)</date>}
-      return false if Time.parse(Regexp.last_match(1)) > Time.now + (min_days * 86_400)
+  dirs = [
+    File.expand_path("~/Library/Developer/Xcode/UserData/Provisioning Profiles"),
+    File.expand_path("~/Library/MobileDevice/Provisioning Profiles"),
+  ]
+  dirs.each do |dir|
+    Dir.glob(File.join(dir, "*.mobileprovision")).each do |p|
+      xml = `security cms -D -i "#{p}" 2>/dev/null`
+      next unless xml.include?(app_id)
+      next if xml =~ %r{<key>get-task-allow</key>\s*<true}  # skip Development profiles
+      if xml =~ %r{<key>ExpirationDate</key>\s*<date>([^<]+)</date>}
+        return false if Time.parse(Regexp.last_match(1)) > Time.now + (min_days * 86_400)
+      end
     end
   end
-  true  # no valid (non-expired) distribution profile found for this app
+  UI.important("No valid Apple Distribution identity or unexpired AppStore profile found — renewal needed.")
+  true
 rescue StandardError => e
-  UI.important("match expiry check failed (#{e.message}); assuming VALID (readonly) to avoid an unneeded Dev Portal/PLA call.")
+  UI.important("match validity check failed (#{e.message}); assuming VALID (readonly) to avoid an unneeded Dev Portal/PLA call.")
   false
 end
 

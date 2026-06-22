@@ -178,6 +178,16 @@ jobs:
       fastlane_cwd:         deployment
       pre_fastlane_script: |
         set -euo pipefail
+        # Select the newest installed Xcode. The macOS runner defaults to Xcode 15.4, but the
+        # Firebase pods use the Swift 6 `sending` keyword → need Xcode 16+ ("cannot find type
+        # 'sending' in scope"). System-wide xcode-select persists to the build step. (2026-06-22)
+        if [ -d /Applications ]; then
+          LATEST_XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1 || true)
+          if [ -n "${LATEST_XCODE:-}" ]; then
+            sudo xcode-select -s "$LATEST_XCODE/Contents/Developer" 2>/dev/null || true
+            echo "✅ Selected Xcode: $LATEST_XCODE ($(xcodebuild -version 2>/dev/null | head -1))"
+          fi
+        fi
         # Materialize Android keystore (when android_rung is active)
         if [ -n "${UPLOAD_KEYSTORE_B64:-}" ]; then
           mkdir -p secrets/keystores

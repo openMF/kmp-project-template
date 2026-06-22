@@ -62,7 +62,7 @@ on:
         description: 'Android — top rung to reach (lower rungs auto-fire)'
         required: false
         type: choice
-        options: [skip, firebase, firebase+internal, internal, beta, production]
+        options: [skip, firebase, firebase+internal, internal, closed, beta, production]
         default: firebase+internal
 
       ios_rung:
@@ -145,7 +145,7 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.43
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.44
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android

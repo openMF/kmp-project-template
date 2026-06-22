@@ -55,6 +55,18 @@ platforms:
           - android-signing
           - android-play-internal-publish
 
+      - canonical_name: android-play-closed
+        name: android-play-closed
+        tier: 1
+        path: "deployment/android/play-closed/"
+        platform: android
+        enabled: true
+        requires_confirm: false
+        runners: { local: "darwin", ci: "ubuntu-latest" }
+        required_capabilities:
+          - android-signing
+          - android-play-internal-publish
+
       - canonical_name: android-play-beta
         name: android-play-beta
         tier: 1

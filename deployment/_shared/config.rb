@@ -400,10 +400,13 @@ def fetch_certificates_with_match(options = {})
   certs_pass = options[:certificates_password] || ENV["CERTIFICATES_PASSWORD"] || cfg[:certificates_password]
   ENV["CERTIFICATES_PASSWORD"] = certs_pass.to_s if certs_pass && ENV["CERTIFICATES_PASSWORD"].to_s.empty?
 
-  # readonly: false + force: true when the stored cert is expired so Match revokes
-  # it, creates a fresh Distribution cert, saves it to the repo, and imports it.
-  # Set readonly: true (via options) once a valid cert exists in the Match repo.
-  readonly = options.key?(:readonly) ? options[:readonly] : false
+  # DEFAULT readonly: true — valid certs/profiles already live in the Match repo, so just
+  # fetch + install them; NEVER touch the Dev Portal. This is what lets TestFlight/App Store
+  # deploy WITHOUT the team Account Holder accepting the latest Program License Agreement
+  # (non-readonly tries to revoke/create certs on the portal → "PLA Update available" 403).
+  # Pass readonly: false explicitly ONLY for the rare bootstrap that must mint a fresh cert.
+  # (2026-06-22 — Apple PLA pending; certs already valid in repo)
+  readonly = options.key?(:readonly) ? options[:readonly] : true
   force    = options.key?(:force)    ? options[:force]    : !readonly
 
   match(

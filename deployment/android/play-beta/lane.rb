@@ -11,7 +11,7 @@ platform :android do
       # "completed" (was "draft") — a draft promote leaves the Open Testing track PAUSED so
       # testers never receive it. completed = the beta release goes live. (2026-06-22 fix)
       track_promote_release_status: "completed",
-      json_key:                     File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json"),
+      json_key:                     File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "android", "play", "service-account.json"),
       package_name:                 FastlaneConfig::ProjectConfig.android_package_name,
       skip_upload_changelogs:       true,
       skip_upload_metadata:         true,

@@ -77,7 +77,7 @@ platform :ios do
 
     gradle_version = get_version_from_gradle(sanitize_for_appstore: true)
 
-    latest_build_number = latest_testflight_build_number(
+    latest_build_number = latest_tf_build_number_resilient(
       app_identifier: options[:app_identifier] || ios_config[:app_identifier],
       api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
     )
@@ -134,7 +134,7 @@ platform :ios do
     load_api_key(options)
 
     # Resolve build: explicit option > latest TF build for this app.
-    build_number = options[:build_number]&.to_s || latest_testflight_build_number(
+    build_number = options[:build_number]&.to_s || latest_tf_build_number_resilient(
       app_identifier: ios_config[:app_identifier],
       api_key:        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
     ).to_s

@@ -98,7 +98,7 @@ platform :mac do
 
     load_api_key(options)
 
-    build_number = options[:build_number]&.to_s || latest_testflight_build_number(
+    build_number = options[:build_number]&.to_s || latest_tf_build_number_resilient(
       app_identifier: mac_bundle_id,
       api_key:        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
       platform:       "osx",
@@ -137,7 +137,7 @@ platform :mac do
       app_version  = options[:app_version]
       UI.important("📦 Using provided build #{build_number}")
     else
-      build_number = latest_testflight_build_number(
+      build_number = latest_tf_build_number_resilient(
         app_identifier: mac_bundle_id,
         api_key:        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
         platform:       "osx",

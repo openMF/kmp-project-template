@@ -44,6 +44,12 @@
 #                            (default: gh-pages). Repeatable via comma list.
 #   --wait-prod <minutes>    Optional wait timer (minutes) on the top rung
 #                            (production / app-store / stable) (default: 0).
+#   --production-only        Gate ONLY the external / production-facing stages
+#                            (closed/beta/production, testflight-external, app-store,
+#                            web staging/production, desktop beta/stable). Leaves the
+#                            internal / firebase / preview / prerelease TEST channels
+#                            ungated so routine test builds don't need an approval
+#                            click. RECOMMENDED for most teams.
 #   --dry-run                Print what would change; make no API calls.
 #
 # Firebase note: `android-firebase` / `ios-firebase` (App Distribution test
@@ -62,6 +68,7 @@ DESKTOP_TARGETS="linux-deb"
 WEB_HOSTS="gh-pages"
 WAIT_PROD=0
 DRY_RUN=false
+PRODUCTION_ONLY=false
 
 # ── Parse args ────────────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
@@ -72,6 +79,7 @@ while [[ $# -gt 0 ]]; do
     --desktop-target) DESKTOP_TARGETS="$2"; shift ;;
     --web-host)       WEB_HOSTS="$2"; shift ;;
     --wait-prod)      WAIT_PROD="$2"; shift ;;
+    --production-only) PRODUCTION_ONLY=true ;;
     --dry-run)        DRY_RUN=true ;;
     -h|--help)        sed -n '2,60p' "$0"; exit 0 ;;
     *) echo "❌ Unknown arg: $1" >&2; exit 2 ;;
@@ -133,7 +141,21 @@ if has web; then
   done
 fi
 
-[[ ${#ENVS[@]} -eq 0 ]] && { echo "❌ --only '$ONLY' selected no platforms" >&2; exit 2; }
+# --production-only: gate ONLY the external / production-facing stages; leave the
+# internal / firebase / preview / prerelease test channels ungated so routine test
+# distribution doesn't need an approval click. Recommended for most teams.
+if $PRODUCTION_ONLY; then
+  declare -a FILTERED=()
+  for e in "${ENVS[@]}"; do
+    case "$e" in
+      *-internal|*-firebase|*-preview|*-prerelease) ;;   # skip test channels
+      *) FILTERED+=("$e") ;;
+    esac
+  done
+  ENVS=("${FILTERED[@]}")
+fi
+
+[[ ${#ENVS[@]} -eq 0 ]] && { echo "❌ no environments selected (check --only / --production-only)" >&2; exit 2; }
 
 # Top-rung envs that get the optional wait timer.
 is_top_rung () {
@@ -148,6 +170,7 @@ echo " Configure release approval gates"
 echo "   repo:      $REPO"
 echo "   reviewer:  $REVIEWER (id=$REVIEWER_ID)"
 echo "   platforms: $ONLY"
+echo "   scope:     $($PRODUCTION_ONLY && echo 'production-facing stages only' || echo 'all stages (incl. internal/firebase)')"
 echo "   gates:     ${#ENVS[@]} environments"
 $DRY_RUN && echo "   MODE:      DRY-RUN (no changes)"
 echo "════════════════════════════════════════════════════════════════"

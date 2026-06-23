@@ -29,9 +29,9 @@ jobs:
       - name: Materialize secrets (manual-mode)
         if: ${{ secrets.SOPS_AGE_KEY == '' }}
         run: |
-          mkdir -p secrets/keystores secrets
+          mkdir -p secrets/android/keystores secrets
           echo "${{ secrets.ANDROID_RELEASE_KEYSTORE_B64 }}" | base64 -d > keystores/upload_keystore.keystore
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > secrets/firebaseAppDistributionServiceCredentialsFile.json
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}' > secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 
       - name: Run Fastlane (prod)
         if: ${{ inputs.flavor == 'prod' }}

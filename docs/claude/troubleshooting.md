@@ -370,7 +370,8 @@ bundle exec fastlane match appstore --readonly
 security find-identity -v -p codesigning
 
 # 4. Verify Match configuration
-cat secrets/shared_keys.env | grep MATCH
+cat gradle/fork.properties | grep apple.match
+cat secrets/apple/match/.match_password | wc -c   # verify password file exists
 
 # 5. Check Xcode signing settings
 open cmp-ios/iosApp.xcworkspace
@@ -382,8 +383,9 @@ bundle exec fastlane match appstore --force_for_new_devices
 ```
 
 **Files:**
-- `secrets/shared_keys.env`
-- `secrets/match_ci_key`
+- `gradle/fork.properties` (Match URL/branch)
+- `secrets/apple/match/match_ci_key`
+- `secrets/apple/match/.match_password`
 - `fastlane/Matchfile`
 
 ---
@@ -543,11 +545,11 @@ security find-identity -v -p codesigning
 # 3. Verify profile includes certificate
 # Xcode → Preferences → Accounts → Download Manual Profiles
 
-# 4. Check Match password
-cat secrets/shared_keys.env | grep MATCH_PASSWORD
+# 4. Check Match password file exists
+ls -la secrets/apple/match/.match_password
 
 # 5. Verify SSH key for Match repo
-ssh -T git@github.com -i secrets/match_ci_key
+ssh -T git@github.com -i secrets/apple/match/match_ci_key
 
 # 6. Run full iOS verification
 ./scripts/verify_ios_deployment.sh
@@ -1009,10 +1011,10 @@ Permission denied (publickey)
 
 ```bash
 # 1. Check Match SSH key exists
-ls -la secrets/match_ci_key
+ls -la secrets/apple/match/match_ci_key
 
 # 2. View public key
-cat secrets/match_ci_key.pub
+cat secrets/apple/match/match_ci_key.pub
 
 # 3. Add deploy key to Match repository
 # - Go to Match repo → Settings → Deploy keys
@@ -1020,7 +1022,7 @@ cat secrets/match_ci_key.pub
 # - Paste public key
 
 # 4. Test SSH connection
-ssh -T git@github.com -i secrets/match_ci_key
+ssh -T git@github.com -i secrets/apple/match/match_ci_key
 
 # 5. Verify in GitHub Actions
 # Check MATCH_SSH_PRIVATE_KEY secret is set
@@ -1142,7 +1144,7 @@ cd cmp-ios && pod deintegrate && pod install
 ./scripts/verify_ios_deployment.sh
 
 # 4. Check Firebase credentials
-ls -la secrets/firebaseAppDistributionServiceCredentialsFile.json
+ls -la secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 
 # 5. Test local deployment
 bundle exec fastlane android deployDemoApkOnFirebase

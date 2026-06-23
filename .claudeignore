@@ -65,7 +65,6 @@
 **/.env.local
 **/.env.*.local
 **/secrets.env
-**/shared_keys.env
 
 # ==============================================================================
 # CI/CD Artifacts

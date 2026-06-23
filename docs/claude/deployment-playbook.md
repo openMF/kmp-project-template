@@ -101,7 +101,7 @@ VARIANT="demo"
 
 ```bash
 # Verify secrets
-ls -la secrets/firebaseAppDistributionServiceCredentialsFile.json
+ls -la secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 ls -la cmp-android/google-services.json
 ls -la keystores/original-release-key.jks
 
@@ -159,7 +159,7 @@ bundle exec fastlane android deployDemoApkOnFirebase
 
 ```bash
 # Verify Play Store credentials
-ls -la secrets/playStorePublishServiceCredentialsFile.json
+ls -la secrets/android/playStorePublishServiceCredentialsFile.json
 
 # Verify keystores
 ./keystore-manager.sh view
@@ -331,7 +331,7 @@ bundle exec fastlane android promote_to_production
 bundle exec fastlane match adhoc --readonly
 
 # Check Firebase credentials
-ls -la secrets/firebaseAppDistributionServiceCredentialsFile.json
+ls -la secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 ls -la cmp-ios/GoogleService-Info.plist
 ```
 
@@ -633,7 +633,7 @@ Submitted → Waiting for Review → In Review → Processing → Ready for Sale
 security find-identity -v -p codesigning | grep "Developer ID"
 
 # Check secrets
-ls -la secrets/macos_*.p12
+ls -la secrets/desktop/macos_*.p12
 ```
 
 **2. Deploy**
@@ -691,7 +691,7 @@ Similar to iOS, Apple processes macOS builds (10-60 minutes)
 ```bash
 # Verify signing certificates (if configured)
 ls -la secrets/windows_*.p12
-ls -la secrets/macos_*.p12
+ls -la secrets/desktop/macos_*.p12
 ls -la secrets/linux_*.key
 
 # Test build locally

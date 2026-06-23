@@ -23,10 +23,10 @@ Run `/secrets pull --required-for ios-signing,ios-firebase-distribute`.
 
 | Alias                                              | Canonical                                                       |
 |----------------------------------------------------|-----------------------------------------------------------------|
-| `appstore_connect_api_key_p8`                      | `secrets/AuthKey.p8`                                            |
-| `match_git_ssh_private_key`                        | `secrets/match_ci_key`                                          |
+| `appstore_connect_api_key_p8`                      | `secrets/apple/appstore/AuthKey.p8`                                            |
+| `match_git_ssh_private_key`                        | `secrets/apple/match/match_ci_key`                                          |
 | `match_password`                                   | `ENV:MATCH_PASSWORD`                                            |
-| `firebase_app_distribution_service_account_json`   | `secrets/firebaseAppDistributionServiceCredentialsFile.json`    |
+| `firebase_app_distribution_service_account_json`   | `secrets/android/firebaseAppDistributionServiceCredentialsFile.json`    |
 
 ## Troubleshooting
 

@@ -25,7 +25,7 @@ jobs:
         run: |
           mkdir -p secrets keystores
           echo "${{ secrets.ANDROID_RELEASE_KEYSTORE_B64 }}" | base64 -d > keystores/upload_keystore.keystore
-          echo '${{ secrets.PLAYSTORE_PUBLISHER_JSON }}' > secrets/playStorePublishServiceCredentialsFile.json
+          echo '${{ secrets.PLAYSTORE_PUBLISHER_JSON }}' > secrets/android/playStorePublishServiceCredentialsFile.json
 
       - name: Deploy to Play internal
         run: bundle exec fastlane android deployInternal

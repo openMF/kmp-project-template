@@ -56,7 +56,7 @@ This guide covers complete secrets management for all platforms.
 ```
 
 **What sync does:**
-1. Reads `secrets/shared_keys.env` and extracts iOS string secrets
+1. Reads non-secret metadata from `gradle/fork.properties`
 2. Scans `secrets/` directory and encodes files to base64
 3. Updates `secrets.env` with all secrets (preserves existing data)
 4. Adds Desktop signing placeholders (optional, empty by default)
@@ -71,7 +71,7 @@ This guide covers complete secrets management for all platforms.
 **When to use sync:**
 - After iOS setup completes (automatic)
 - After adding new files to `secrets/` directory
-- After updating `shared_keys.env`
+- After updating `gradle/fork.properties` or any `secrets/<platform>/` file
 - To refresh/validate secrets.env
 
 ---
@@ -147,18 +147,26 @@ This guide covers complete secrets management for all platforms.
 **Structure:**
 
 ```
-secrets/
-├── firebaseAppDistributionServiceCredentialsFile.json  # Firebase creds
-├── google-services.json                               # Android Firebase config
-├── playStorePublishServiceCredentialsFile.json        # Play Store creds
-├── AuthKey.p8                                         # App Store Connect key
-├── match_ci_key                                       # Match SSH private key
-├── match_ci_key.pub                                   # Match SSH public key
-├── shared_keys.env                                    # iOS configuration
-├── macos_signing.p12                                  # macOS certificate
-├── macos_installer.p12                                # macOS installer cert
-├── windows_signing.pfx                                # Windows certificate
-└── linux_signing.key                                  # Linux key (optional)
+gradle/
+└── fork.properties                                    # Non-secret identity/metadata (committed)
+
+secrets/                                               # All gitignored
+├── apple/
+│   ├── appstore/AuthKey.p8                            # App Store Connect key
+│   ├── appstore/key_id                                # ASC Key ID
+│   ├── appstore/issuer_id                             # ASC Issuer ID
+│   └── match/
+│       ├── match_ci_key                               # Match SSH private key
+│       ├── match_ci_key.pub                           # Match SSH public key
+│       └── .match_password                            # Match encryption password
+├── ios/
+│   └── apn/APNAuthKey.p8                              # APN push key (optional)
+├── android/
+│   ├── firebase/service-account.json                  # Firebase creds
+│   ├── keystores/release.jks                          # Release keystore
+│   └── play/service-account.json                      # Play Store creds
+└── web/
+    └── cloudflare/api_token                           # Cloudflare token (example)
 ```
 
 **⚠️ NEVER COMMIT `secrets/` DIRECTORY** - Always in `.gitignore`
@@ -232,7 +240,7 @@ keystores/
 **Output:**
 - `cmp-android/google-services.json` (4 variants)
 - `cmp-ios/GoogleService-Info.plist`
-- `secrets/firebaseAppDistributionServiceCredentialsFile.json` (if configured)
+- `secrets/android/firebaseAppDistributionServiceCredentialsFile.json` (if configured)
 
 **Manual alternative:**
 1. Go to Firebase Console
@@ -240,7 +248,7 @@ keystores/
 3. Register Android app → Download `google-services.json`
 4. Register iOS app → Download `GoogleService-Info.plist`
 5. Project Settings → Service Accounts → Generate new private key
-6. Save as `secrets/firebaseAppDistributionServiceCredentialsFile.json`
+6. Save as `secrets/android/firebaseAppDistributionServiceCredentialsFile.json`
 
 ---
 
@@ -260,7 +268,7 @@ keystores/
 ```bash
 # Service Accounts → Your account → Keys → Add Key → JSON
 # Download JSON file
-# Save as: secrets/playStorePublishServiceCredentialsFile.json
+# Save as: secrets/android/playStorePublishServiceCredentialsFile.json
 ```
 
 **3. Grant Play Console Access**
@@ -291,10 +299,12 @@ keystores/
 - Match passphrase
 
 **Output:**
-- `secrets/AuthKey.p8` - App Store Connect API key
-- `secrets/match_ci_key` - SSH private key
-- `secrets/match_ci_key.pub` - SSH public key
-- `secrets/shared_keys.env` - Configuration
+- `secrets/apple/appstore/AuthKey.p8` - App Store Connect API key
+- `secrets/apple/appstore/key_id` - ASC Key ID
+- `secrets/apple/appstore/issuer_id` - ASC Issuer ID
+- `secrets/apple/match/match_ci_key` - SSH private key
+- `secrets/apple/match/match_ci_key.pub` - SSH public key
+- `gradle/fork.properties` - Non-secret identity/metadata
 
 **Manual setup:**
 
@@ -307,25 +317,25 @@ keystores/
 # - Name: "GitHub Actions"
 # - Access: "Admin" or "App Manager"
 # → Download .p8 file
-# Save as: secrets/AuthKey.p8
+# Save as: secrets/apple/appstore/AuthKey.p8
 # Note: Key ID and Issuer ID
 ```
 
 **2. Generate SSH Key for Match**
 
 ```bash
-ssh-keygen -t ed25519 -C "github-actions-match" -f secrets/match_ci_key -N ""
+ssh-keygen -t ed25519 -C "github-actions-match" -f secrets/apple/match/match_ci_key -N ""
 
 # Output:
-# - secrets/match_ci_key (private key)
-# - secrets/match_ci_key.pub (public key)
+# - secrets/apple/match/match_ci_key (private key)
+# - secrets/apple/match/match_ci_key.pub (public key)
 ```
 
 **3. Add SSH Key to Match Repository**
 
 ```bash
 # View public key
-cat secrets/match_ci_key.pub
+cat secrets/apple/match/match_ci_key.pub
 
 # Go to Match repository (GitHub)
 # → Settings → Deploy keys → Add deploy key
@@ -334,17 +344,17 @@ cat secrets/match_ci_key.pub
 # - ✅ Allow write access
 ```
 
-**4. Create shared_keys.env**
+**4. Write secret values as per-value files**
 
 ```bash
-cat > secrets/shared_keys.env <<EOF
-export APPSTORE_KEY_ID="ABC123XYZ"
-export APPSTORE_ISSUER_ID="12345678-1234-1234-1234-123456789012"
-export MATCH_GIT_URL="git@github.com:your-org/certificates.git"
-export MATCH_GIT_BRANCH="master"
-export MATCH_PASSWORD="your-secure-passphrase"
-export MATCH_TYPE="appstore"
-EOF
+# Secret values go as individual files — no single env bundle needed
+echo "ABC123XYZ" > secrets/apple/appstore/key_id
+echo "12345678-1234-1234-1234-123456789012" > secrets/apple/appstore/issuer_id
+openssl rand -base64 32 | tr -d '\n' > secrets/apple/match/.match_password
+
+# Non-secret identity/metadata goes in gradle/fork.properties
+cp gradle/fork.properties.template gradle/fork.properties
+# Then set: apple.match.git.url, apple.match.git.branch, org.email, etc.
 ```
 
 ---
@@ -459,7 +469,7 @@ base64 -i secrets/linux_signing.key -o secrets/linux_signing.key.b64
 # Individual secrets
 gh secret set KEYSTORE_FILE < keystores/original-release-key.jks.b64
 gh secret set GOOGLESERVICES < secrets/google-services.json.b64
-gh secret set FIREBASECREDS < secrets/firebaseAppDistributionServiceCredentialsFile.json.b64
+gh secret set FIREBASECREDS < secrets/android/firebaseAppDistributionServiceCredentialsFile.json.b64
 
 # String secrets
 echo "password123" | gh secret set KEYSTORE_PASSWORD
@@ -503,12 +513,12 @@ MACOS_INSTALLER_CERTIFICATE
 |-----------|-------------------|----------|
 | `keystores/original-release-key.jks` | `UPLOAD_KEYSTORE_FILE` or `KEYSTORE_FILE` | Base64 |
 | `secrets/google-services.json` | `GOOGLESERVICES` | Base64 |
-| `secrets/firebaseAppDistributionServiceCredentialsFile.json` | `FIREBASECREDS` | Base64 |
-| `secrets/playStorePublishServiceCredentialsFile.json` | `PLAYSTORECREDS` | Base64 |
-| `secrets/AuthKey.p8` | `APPSTORE_AUTH_KEY` | Base64 |
-| `secrets/match_ci_key` | `MATCH_SSH_PRIVATE_KEY` | Base64 |
-| `secrets/macos_signing.p12` | `MACOS_SIGNING_KEY` | Base64 |
-| `secrets/macos_installer.p12` | `MACOS_INSTALLER_CERTIFICATE` | Base64 |
+| `secrets/android/firebaseAppDistributionServiceCredentialsFile.json` | `FIREBASECREDS` | Base64 |
+| `secrets/android/playStorePublishServiceCredentialsFile.json` | `PLAYSTORECREDS` | Base64 |
+| `secrets/apple/appstore/AuthKey.p8` | `APPSTORE_AUTH_KEY` | Base64 |
+| `secrets/apple/match/match_ci_key` | `MATCH_SSH_PRIVATE_KEY` | Base64 |
+| `secrets/desktop/macos_signing.p12` | `MACOS_SIGNING_KEY` | Base64 |
+| `secrets/desktop/macos_installer.p12` | `MACOS_INSTALLER_CERTIFICATE` | Base64 |
 | `secrets/windows_signing.pfx` | `WINDOWS_SIGNING_KEY` | Base64 |
 
 ### String Secrets (Not Files)
@@ -520,7 +530,7 @@ MACOS_INSTALLER_CERTIFICATE
 | Alias password | `UPLOAD_KEYSTORE_ALIAS_PASSWORD` | From `secrets.env` |
 | App Store Key ID | `APPSTORE_KEY_ID` | From App Store Connect |
 | Issuer ID | `APPSTORE_ISSUER_ID` | From App Store Connect |
-| Match password | `MATCH_PASSWORD` | From `secrets/shared_keys.env` |
+| Match password | `MATCH_PASSWORD` | From `secrets/apple/match/.match_password` |
 | macOS signing password | `MACOS_SIGNING_PASSWORD` | From certificate export |
 
 ---
@@ -568,10 +578,10 @@ MACOS_INSTALLER_CERTIFICATE
 # Firebase Console → Project Settings → Service Accounts
 # → Generate new private key
 
-# 2. Save as secrets/firebaseAppDistributionServiceCredentialsFile.json
+# 2. Save as secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 
 # 3. Encode
-base64 -i secrets/firebaseAppDistributionServiceCredentialsFile.json -o firebasecreds.b64
+base64 -i secrets/android/firebaseAppDistributionServiceCredentialsFile.json -o firebasecreds.b64
 
 # 4. Update secret
 gh secret set FIREBASECREDS < firebasecreds.b64
@@ -611,10 +621,10 @@ bundle exec fastlane match appstore
 # → Users and Access → Keys → Generate new key
 
 # 2. Download new .p8 file
-# Save as: secrets/AuthKey.p8
+# Save as: secrets/apple/appstore/AuthKey.p8
 
 # 3. Update secrets
-base64 -i secrets/AuthKey.p8 -o authkey.b64
+base64 -i secrets/apple/appstore/AuthKey.p8 -o authkey.b64
 gh secret set APPSTORE_AUTH_KEY < authkey.b64
 
 # 4. Update Key ID and Issuer ID if changed
@@ -849,15 +859,15 @@ Permission denied (publickey)
 # → Check key exists with write access
 
 # 2. Test SSH connection
-ssh -T git@github.com -i secrets/match_ci_key
+ssh -T git@github.com -i secrets/apple/match/match_ci_key
 
 # 3. Re-generate key
-ssh-keygen -t ed25519 -C "github-actions" -f secrets/match_ci_key -N ""
-cat secrets/match_ci_key.pub
+ssh-keygen -t ed25519 -C "github-actions" -f secrets/apple/match/match_ci_key -N ""
+cat secrets/apple/match/match_ci_key.pub
 # → Add to Match repo deploy keys
 
 # 4. Re-encode and update secret
-base64 -i secrets/match_ci_key -o match_ci_key.b64
+base64 -i secrets/apple/match/match_ci_key -o match_ci_key.b64
 gh secret set MATCH_SSH_PRIVATE_KEY < match_ci_key.b64
 ```
 

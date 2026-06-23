@@ -21,4 +21,4 @@ Only the Play publisher service account — no keystore (no build).
 
 | Alias                                          | Path                                                         |
 |------------------------------------------------|--------------------------------------------------------------|
-| `google_play_publisher_service_account_json`   | `secrets/playStorePublishServiceCredentialsFile.json`        |
+| `google_play_publisher_service_account_json`   | `secrets/android/playStorePublishServiceCredentialsFile.json`        |

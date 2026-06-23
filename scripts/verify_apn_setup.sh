@@ -52,61 +52,78 @@ print_section "🔍 APN Configuration Verification"
 ERRORS=0
 WARNINGS=0
 
-# Check if shared_keys.env exists
-print_info "Checking configuration files..."
-if [ ! -f "secrets/shared_keys.env" ]; then
-    print_error "secrets/shared_keys.env not found"
-    print_info "Run: bash scripts/setup_ios_complete.sh"
+# Check if APN secret files exist
+print_info "Checking APN configuration files..."
+
+APN_KEY_ID_FILE="secrets/ios/apn/key_id"
+APN_TEAM_ID_FILE="secrets/ios/apn/team_id"
+APN_KEY_FILE_PATH="secrets/ios/apn/APNAuthKey.p8"
+
+if [ ! -f "$APN_KEY_ID_FILE" ]; then
+    print_error "APN key_id file not found: $APN_KEY_ID_FILE"
+    print_info "Run: bash scripts/setup_apn_key.sh"
     exit 1
 fi
-print_success "secrets/shared_keys.env exists"
+print_success "APN key_id file exists: $APN_KEY_ID_FILE"
 
-# Load configuration
-source secrets/shared_keys.env
+if [ ! -f "$APN_TEAM_ID_FILE" ]; then
+    print_error "APN team_id file not found: $APN_TEAM_ID_FILE"
+    print_info "Run: bash scripts/setup_apn_key.sh"
+    exit 1
+fi
+print_success "APN team_id file exists: $APN_TEAM_ID_FILE"
 
-# Check APN configuration in shared_keys.env
+# Read APN values from per-value files
+APN_KEY_ID=$(cat "$APN_KEY_ID_FILE" 2>/dev/null | tr -d '\n\r')
+APN_TEAM_ID=$(cat "$APN_TEAM_ID_FILE" 2>/dev/null | tr -d '\n\r')
+APN_KEY_PATH="$APN_KEY_FILE_PATH"
+
+# Read TEAM_ID from fork.properties for cross-check
+TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+
+# Check APN configuration
 print_section "📋 Checking APN Configuration"
 
 if [ -z "$APN_KEY_ID" ]; then
-    print_error "APN_KEY_ID not set in secrets/shared_keys.env"
+    print_error "APN key_id is empty: $APN_KEY_ID_FILE"
     print_info "Run: bash scripts/setup_apn_key.sh"
     ((ERRORS++))
 else
     # Validate format (10 characters)
     if [[ ! $APN_KEY_ID =~ ^[A-Z0-9]{10}$ ]]; then
-        print_error "APN_KEY_ID has invalid format: $APN_KEY_ID"
+        print_error "APN_KEY_ID has invalid format: (see $APN_KEY_ID_FILE)"
         print_info "Must be 10 characters (letters and numbers)"
         ((ERRORS++))
     else
-        print_success "APN_KEY_ID format valid: $APN_KEY_ID"
+        print_success "APN_KEY_ID format valid"
     fi
 fi
 
 if [ -z "$APN_TEAM_ID" ]; then
-    print_error "APN_TEAM_ID not set in secrets/shared_keys.env"
+    print_error "APN team_id is empty: $APN_TEAM_ID_FILE"
     ((ERRORS++))
 else
-    print_success "APN_TEAM_ID set: $APN_TEAM_ID"
+    print_success "APN_TEAM_ID set (from $APN_TEAM_ID_FILE)"
 
-    # Check if it matches TEAM_ID
-    if [ "$APN_TEAM_ID" != "$TEAM_ID" ]; then
-        print_warning "APN_TEAM_ID ($APN_TEAM_ID) differs from TEAM_ID ($TEAM_ID)"
+    # Check if it matches apple.team.id in fork.properties
+    if [ -n "$TEAM_ID" ] && [ "$APN_TEAM_ID" != "$TEAM_ID" ]; then
+        print_warning "APN team_id differs from apple.team.id in gradle/fork.properties"
         print_info "They should usually be the same"
         ((WARNINGS++))
     fi
 fi
 
-if [ -z "$APN_KEY_PATH" ]; then
-    print_error "APN_KEY_PATH not set in secrets/shared_keys.env"
+if [ ! -f "$APN_KEY_PATH" ]; then
+    print_error "APN key file not found: $APN_KEY_PATH"
     ((ERRORS++))
 else
-    print_success "APN_KEY_PATH set: $APN_KEY_PATH"
+    print_success "APN_KEY_PATH exists: $APN_KEY_PATH"
 fi
 
 # Check APN key file
 print_section "🔑 Checking APN Key File"
 
-APN_KEY_FILE="secrets/APNAuthKey.p8"
+APN_KEY_FILE="secrets/ios/apn/APNAuthKey.p8"
 
 if [ ! -f "$APN_KEY_FILE" ]; then
     print_error "APN key file not found: $APN_KEY_FILE"

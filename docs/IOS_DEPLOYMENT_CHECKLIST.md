@@ -135,26 +135,26 @@ grep -A1 "ITSAppUsesNonExemptEncryption" cmp-ios/iosApp/Info.plist
 - [ ] Check for macOS
 - [ ] Validate prerequisites (Xcode, Ruby, Bundler)
 - [ ] Validate required secret files
-- [ ] Load configuration from `secrets/shared_keys.env`
+- [ ] Load non-secret config from `gradle/fork.properties`; secrets from `secrets/<platform>/` files
 - [ ] Provide clear error messages
 
 ---
 
 ### 7. Secret Files ✓
 
-**Required Files in `secrets/`:**
-- [ ] `shared_keys.env` - Shared iOS configuration
-- [ ] `.match_password` - Match repository password
-- [ ] `match_ci_key` - SSH key for Match repository
-- [ ] `AuthKey.p8` - App Store Connect API key
-- [ ] `firebaseAppDistributionServiceCredentialsFile.json` - Firebase credentials
+**Required files in `gradle/fork.properties` (non-secret, copy from `.template`):**
+- [ ] `apple.team.id` - Apple Developer Team ID
+- [ ] `apple.match.git.url` - Match repository URL
+- [ ] `apple.match.git.branch` - Match repository branch
+- [ ] `org.email` / `org.first.name` / `org.last.name` / `org.phone` - Contact info
 
-**Environment Variables in shared_keys.env:**
-- [ ] `TEAM_ID` - Apple Developer Team ID
-- [ ] `APPSTORE_KEY_ID` - App Store Connect API Key ID
-- [ ] `APPSTORE_ISSUER_ID` - App Store Connect API Issuer ID
-- [ ] `MATCH_GIT_URL` - Match repository URL
-- [ ] `MATCH_GIT_BRANCH` - Match repository branch
+**Required secret files in `secrets/`:**
+- [ ] `secrets/apple/appstore/AuthKey.p8` - App Store Connect API key
+- [ ] `secrets/apple/appstore/key_id` - App Store Connect API Key ID
+- [ ] `secrets/apple/appstore/issuer_id` - App Store Connect API Issuer ID
+- [ ] `secrets/apple/match/match_ci_key` - SSH key for Match repository
+- [ ] `secrets/apple/match/.match_password` - Match repository password
+- [ ] `secrets/android/firebase/service-account.json` - Firebase credentials
 
 ---
 
@@ -296,10 +296,11 @@ bash scripts/check_ios_version.sh
 
 Configure these secrets in your GitHub repository:
 
-- `SHARED_KEYS_ENV` - Content of `secrets/shared_keys.env`
-- `MATCH_PASSWORD` - Match repository password
-- `MATCH_SSH_KEY` - SSH private key for Match repository
-- `APPSTORE_API_KEY` - App Store Connect API key (.p8 file content)
+- `MATCH_PASSWORD` - Content of `secrets/apple/match/.match_password`
+- `MATCH_SSH_KEY` - Content of `secrets/apple/match/match_ci_key`
+- `APPSTORE_AUTH_KEY` - Content of `secrets/apple/appstore/AuthKey.p8`
+- `APPSTORE_KEY_ID` - Content of `secrets/apple/appstore/key_id`
+- `APPSTORE_ISSUER_ID` - Content of `secrets/apple/appstore/issuer_id`
 
 ### Example Workflow
 
@@ -326,12 +327,11 @@ jobs:
 
       - name: Setup secrets
         run: |
-          mkdir -p secrets
-          echo "${{ secrets.SHARED_KEYS_ENV }}" > secrets/shared_keys.env
-          echo "${{ secrets.MATCH_PASSWORD }}" > secrets/.match_password
-          echo "${{ secrets.MATCH_SSH_KEY }}" > secrets/match_ci_key
-          echo "${{ secrets.APPSTORE_API_KEY }}" > secrets/AuthKey.p8
-          chmod 600 secrets/match_ci_key
+          mkdir -p secrets/apple/appstore secrets/apple/match secrets/ios/apn
+          echo "${{ secrets.MATCH_PASSWORD }}" > secrets/apple/match/.match_password
+          echo "${{ secrets.MATCH_SSH_KEY }}" > secrets/apple/match/match_ci_key
+          echo "${{ secrets.APPSTORE_API_KEY }}" > secrets/apple/appstore/AuthKey.p8
+          chmod 600 secrets/apple/match/match_ci_key
 
       - name: Deploy to App Store
         run: bash scripts/deploy_appstore.sh

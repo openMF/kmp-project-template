@@ -43,7 +43,7 @@ apple.team.id=YOUR_TEAM_ID
 # Fastlane Match git repo (SSH URL).
 # Private GitHub/GitLab repo that stores encrypted certificates + profiles.
 # Step 1: Create a private repo (e.g. acme/ios-provisioning).
-# Step 2: Add secrets/match/match_ci_key.pub as a deploy key with write access.
+# Step 2: Add secrets/apple/match/match_ci_key.pub as a deploy key with write access.
 # Step 3: Run: bundle exec fastlane match init --git_url <this-value>
 # Guide: deployment/BOOTSTRAP.md → Fastlane Match setup
 # ENV: MATCH_GIT_URL

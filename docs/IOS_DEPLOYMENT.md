@@ -109,9 +109,9 @@ bash scripts/deploy_testflight.sh
 - Up to 10,000 external testers
 - Create groups in App Store Connect → TestFlight → External Testing
 - Requires Beta App Review (24-48 hours)
-- Configure groups in `secrets/shared_keys.env`:
-  ```bash
-  export TESTFLIGHT_GROUPS="beta-testers,external-testers"
+- Configure groups in `gradle/fork.properties`:
+  ```properties
+  apple.tf.groups=beta-testers,external-testers
   ```
 
 ### Beta App Review Requirements
@@ -334,7 +334,7 @@ For critical production bugs:
 
 **Solution:**
 ```bash
-cat secrets/.match_password  # Verify password
+cat secrets/apple/match/.match_password  # Verify password
 # If lost, regenerate certificates (nuclear option)
 ```
 
@@ -360,8 +360,8 @@ bundle exec fastlane ios beta build_number:124
 #### Issue: "App Store Connect API authentication failed"
 
 **Solution:**
-1. Verify `secrets/AuthKey.p8` exists and is valid
-2. Check `APPSTORE_KEY_ID` and `APPSTORE_ISSUER_ID` in `secrets/shared_keys.env`
+1. Verify `secrets/apple/appstore/AuthKey.p8` exists and is valid
+2. Check `secrets/apple/appstore/key_id` and `secrets/apple/appstore/issuer_id` exist and contain the correct values
 3. Regenerate API key if revoked
 
 #### Issue: "Certificate not trusted"
@@ -388,12 +388,12 @@ bundle exec fastlane ios sync_certificates match_type:appstore
 #### Issue: "Missing Beta App Review Information"
 
 **Solution:**
-Update `secrets/shared_keys.env` with complete contact information:
-```bash
-export TESTFLIGHT_CONTACT_EMAIL="team@example.com"
-export TESTFLIGHT_FIRST_NAME="Your"
-export TESTFLIGHT_LAST_NAME="Name"
-export TESTFLIGHT_PHONE="+1234567890"
+Update `gradle/fork.properties` with complete contact information:
+```properties
+org.email=team@example.com
+org.first.name=Your
+org.last.name=Name
+org.phone=+1234567890
 ```
 
 #### Issue: "Beta review rejected"
@@ -515,7 +515,8 @@ bundle exec fastlane ios release                      # App Store only
 
 # Debugging
 bundle exec fastlane ios --help                       # Show all lanes
-cat secrets/shared_keys.env                           # View configuration
+cat gradle/fork.properties                                   # View non-secret config
+ls secrets/apple/ secrets/ios/                               # List secret files
 open https://appstoreconnect.apple.com                # Open App Store Connect
 ```
 

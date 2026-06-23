@@ -210,20 +210,26 @@ print_section "5. Required Secret Files"
 check "secrets directory exists" \
     "[ -d 'secrets' ]"
 
-warn "shared_keys.env exists" \
-    "[ -f 'secrets/shared_keys.env' ]"
+warn "fork.properties has apple.team.id" \
+    "grep -qE '^apple\\.team\\.id=' gradle/fork.properties"
+
+warn "secrets/apple/appstore/key_id exists" \
+    "[ -f 'secrets/apple/appstore/key_id' ]"
+
+warn "secrets/apple/appstore/issuer_id exists" \
+    "[ -f 'secrets/apple/appstore/issuer_id' ]"
 
 warn ".match_password exists" \
-    "[ -f 'secrets/.match_password' ]"
+    "[ -f 'secrets/apple/match/.match_password' ]"
 
 warn "match_ci_key (SSH key) exists" \
-    "[ -f 'secrets/match_ci_key' ]"
+    "[ -f 'secrets/apple/match/match_ci_key' ]"
 
 warn "AuthKey.p8 (App Store Connect API) exists" \
-    "[ -f 'secrets/AuthKey.p8' ]"
+    "[ -f 'secrets/apple/appstore/AuthKey.p8' ]"
 
 warn "Firebase credentials exist" \
-    "[ -f 'secrets/firebaseAppDistributionServiceCredentialsFile.json' ]"
+    "[ -f 'secrets/android/firebaseAppDistributionServiceCredentialsFile.json' ]"
 
 # ============================================================================
 # 6. Deployment Scripts

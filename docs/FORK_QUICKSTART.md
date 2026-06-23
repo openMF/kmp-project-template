@@ -159,31 +159,38 @@ iOS keystore equivalents (Fastlane Match, `.p8` keys) — see
 ### Path A (OSS fork — manual mode, default)
 
 ```bash
-# 1. Copy the schema mirror into the real secrets/ tree
-cp -n secrets_demo/shared_keys.env.template secrets/shared_keys.env
+# 1. Fill in non-secret identity/metadata
+cp -n gradle/fork.properties.template gradle/fork.properties
+# Edit gradle/fork.properties and set at minimum:
+#   apple.team.id, org.email, org.first.name, org.last.name, etc.
 
-# 2. Edit secrets/shared_keys.env and add at minimum:
-#    FRED_API_KEY=<your-key-here>
+# 2. Drop secret values as per-value files under secrets/<platform>/
+#    (see secrets_demo/ for the exact paths and placeholders)
+#    e.g. secrets/apple/appstore/key_id, secrets/apple/match/.match_password
 ```
 
-`secrets/` is gitignored; `secrets_demo/` is committed and carries
-placeholder files with magic markers (`# CLAUDE-PLACEHOLDER` for text,
-`CLAUDE-PLHLD-v1\0` for binary) so it's unambiguous which tree is safe to
-commit.
+`secrets/` is gitignored; `gradle/fork.properties.template` is committed and shows which
+keys to fill in. `secrets_demo/` is committed and carries placeholder files with magic
+markers (`# CLAUDE-PLACEHOLDER` for text, `CLAUDE-PLHLD-v1\0` for binary) so it's
+unambiguous which tree is safe to commit.
+
+`config.rb` resolves values in the order `ENV → secrets/<platform>/file → fork.properties → default`,
+so there is no `source shared_keys.env` step.
 
 ### Path B (vault mode — framework maintainers)
 
 ```bash
 /secrets request mifos_x_fred_api_key   # opens vault PR for the new alias
 # (admin merges the PR)
-/secrets pull                            # materializes to local.properties
+/secrets pull                            # materializes to local.properties + secrets/<platform>/
 ```
 
 Leave the key unset and the B7 Interest Rates screen renders an explicit
 "FRED key not configured" empty state rather than crashing.
 
 If your fork uses additional third-party APIs, add them via the same path:
-- **Path A:** append `KEY=value` lines to `secrets/shared_keys.env`.
+- **Path A:** add the secret as a file under `secrets/<platform>/` and the non-secret
+  metadata to `gradle/fork.properties`.
 - **Path B:** run `/secrets request <alias>` to open a vault PR.
 
 In both cases, wire the value through Koin (or BuildKonfig) the same way

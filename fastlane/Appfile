@@ -3,4 +3,4 @@
 # Deployment-specific Appfile (deployment/Appfile) is not used since --fastlane-dir
 # is not a valid Fastlane CLI flag; all config is loaded here instead.
 app_identifier("org.mifos.kmp.template")
-json_key_file("secrets/play/service-account.json")
+json_key_file("secrets/android/play/service-account.json")

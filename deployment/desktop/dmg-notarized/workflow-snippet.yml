@@ -42,14 +42,14 @@ jobs:
       - name: Materialize secrets (manual-mode)
         if: ${{ secrets.SOPS_AGE_KEY == '' }}
         run: |
-          mkdir -p secrets/appstore secrets/match
-          echo "${{ secrets.APPSTORE_AUTH_KEY_B64 }}" | base64 -d > secrets/appstore/AuthKey.p8
-          printf '%s' "${{ secrets.APPSTORE_KEY_ID }}"    > secrets/appstore/key_id
-          printf '%s' "${{ secrets.APPSTORE_ISSUER_ID }}" > secrets/appstore/issuer_id
-          echo "${{ secrets.MATCH_SSH_PRIVATE_KEY_B64 }}" | base64 -d > secrets/match/match_ci_key
-          printf '%s' "${{ secrets.MATCH_PASSWORD }}" > secrets/match/.match_password
-          chmod 600 secrets/match/match_ci_key
-          chmod 600 secrets/match/.match_password
+          mkdir -p secrets/apple/appstore secrets/apple/match
+          echo "${{ secrets.APPSTORE_AUTH_KEY_B64 }}" | base64 -d > secrets/apple/appstore/AuthKey.p8
+          printf '%s' "${{ secrets.APPSTORE_KEY_ID }}"    > secrets/apple/appstore/key_id
+          printf '%s' "${{ secrets.APPSTORE_ISSUER_ID }}" > secrets/apple/appstore/issuer_id
+          echo "${{ secrets.MATCH_SSH_PRIVATE_KEY_B64 }}" | base64 -d > secrets/apple/match/match_ci_key
+          printf '%s' "${{ secrets.MATCH_PASSWORD }}" > secrets/apple/match/.match_password
+          chmod 600 secrets/apple/match/match_ci_key
+          chmod 600 secrets/apple/match/.match_password
 
       - name: Build + sign + notarize + staple + upload via Fastlane
         env:

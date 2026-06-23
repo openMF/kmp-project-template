@@ -130,14 +130,14 @@ else
     print_success "secrets/ directory exists"
 fi
 
-# Check if shared_keys.env already exists
-if [ -f "secrets/shared_keys.env" ]; then
-    print_warning "secrets/shared_keys.env already exists"
+# Check if configuration already exists (detect via fork.properties key)
+if grep -qE "^apple\.team\.id=" gradle/fork.properties 2>/dev/null; then
+    print_warning "iOS configuration already exists in gradle/fork.properties"
     read -p "Do you want to overwrite it? [y/N]: " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        print_info "Using existing secrets/shared_keys.env"
-        print_info "You can edit it manually or delete it and run this script again"
+        print_info "Using existing iOS configuration"
+        print_info "You can edit gradle/fork.properties or delete relevant keys and run this script again"
         exit 0
     fi
 fi
@@ -231,9 +231,9 @@ while [ ! -f "$P8_PATH" ]; do
 done
 
 # Copy to secrets directory
-cp "$P8_PATH" "secrets/AuthKey.p8"
-chmod 600 "secrets/AuthKey.p8"
-print_success "Copied .p8 key to secrets/AuthKey.p8"
+cp "$P8_PATH" "secrets/apple/appstore/AuthKey.p8"
+chmod 600 "secrets/apple/appstore/AuthKey.p8"
+print_success "Copied .p8 key to secrets/apple/appstore/AuthKey.p8"
 echo
 
 # Fastlane Match Configuration
@@ -265,8 +265,8 @@ print_success "Match Branch: $MATCH_GIT_BRANCH"
 # SSH Key for Match
 print_step "5.3" "SSH Key for Match Repository"
 
-if [ -f "secrets/match_ci_key" ]; then
-    print_warning "SSH key already exists: secrets/match_ci_key"
+if [ -f "secrets/apple/match/match_ci_key" ]; then
+    print_warning "SSH key already exists: secrets/apple/match/match_ci_key"
     read -p "Do you want to generate a new one? [y/N]: " -n 1 -r
     echo
     GENERATE_NEW=$REPLY
@@ -276,15 +276,15 @@ fi
 
 if [[ $GENERATE_NEW =~ ^[Yy]$ ]]; then
     print_info "Generating new SSH key pair for Match..."
-    ssh-keygen -t ed25519 -C "fastlane-match-$TEAM_ID" -f "secrets/match_ci_key" -N ""
-    chmod 600 "secrets/match_ci_key"
-    chmod 644 "secrets/match_ci_key.pub"
-    print_success "Generated SSH key: secrets/match_ci_key"
+    ssh-keygen -t ed25519 -C "fastlane-match-$TEAM_ID" -f "secrets/apple/match/match_ci_key" -N ""
+    chmod 600 "secrets/apple/match/match_ci_key"
+    chmod 644 "secrets/apple/match/match_ci_key.pub"
+    print_success "Generated SSH key: secrets/apple/match/match_ci_key"
 fi
 
 print_info "Public key (add this as deploy key to Match repository):"
 echo
-cat "secrets/match_ci_key.pub"
+cat "secrets/apple/match/match_ci_key.pub"
 echo
 print_warning "IMPORTANT: Add the above public key as a deploy key to your Match repository"
 print_info "Steps:"
@@ -301,7 +301,7 @@ read -p "Press Enter after adding the deploy key..."
 
 # Test SSH connection
 print_info "Testing SSH connection to Match repository..."
-ssh -i secrets/match_ci_key -o StrictHostKeyChecking=no -T git@github.com 2>&1 | grep -q "successfully authenticated" && print_success "SSH connection successful" || print_warning "Could not verify SSH connection"
+ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no -T git@github.com 2>&1 | grep -q "successfully authenticated" && print_success "SSH connection successful" || print_warning "Could not verify SSH connection"
 echo
 
 # Match password
@@ -310,7 +310,7 @@ print_info "Match encrypts your certificates with a password"
 print_warning "IMPORTANT: Store this password securely! You'll need it on all machines and CI/CD"
 echo
 
-if [ -f "secrets/.match_password" ]; then
+if [ -f "secrets/apple/match/.match_password" ]; then
     print_warning "Match password file already exists"
     read -p "Do you want to generate a new password? [y/N]: " -n 1 -r
     echo
@@ -322,14 +322,14 @@ fi
 if [[ $GENERATE_NEW_PWD =~ ^[Yy]$ ]]; then
     # Generate secure random password
     MATCH_PASSWORD=$(openssl rand -base64 32)
-    echo "$MATCH_PASSWORD" > "secrets/.match_password"
-    chmod 600 "secrets/.match_password"
-    print_success "Generated Match password (stored in secrets/.match_password)"
+    echo "$MATCH_PASSWORD" > "secrets/apple/match/.match_password"
+    chmod 600 "secrets/apple/match/.match_password"
+    print_success "Generated Match password (stored in secrets/apple/match/.match_password)"
     echo
     print_warning "Match Password: $MATCH_PASSWORD"
     print_warning "Save this password in your password manager!"
 else
-    MATCH_PASSWORD=$(cat "secrets/.match_password")
+    MATCH_PASSWORD=$(cat "secrets/apple/match/.match_password")
     print_success "Using existing Match password"
 fi
 echo
@@ -380,74 +380,61 @@ APPSTORE_REVIEW_EMAIL=${APPSTORE_REVIEW_EMAIL:-$TESTFLIGHT_CONTACT_EMAIL}
 print_success "App Store review configuration collected"
 echo
 
-# Write shared_keys.env
-print_section "8️⃣  Generating Configuration File"
+# Write configuration to new two-source model
+print_section "8️⃣  Writing Configuration (fork.properties + secrets/ files)"
 
-cat > secrets/shared_keys.env << EOF
-# ==============================================================================
-# Shared iOS Keys - Generated by setup_ios_complete.sh
-# ==============================================================================
-# These keys are SHARED across all your iOS apps.
-# Load this file before running deployment scripts: source secrets/shared_keys.env
-# ==============================================================================
+# Helper: upsert a key=value in a .properties file
+_upsert_property() {
+    local file="$1" key="$2" value="$3"
+    if grep -qE "^${key}=" "$file" 2>/dev/null; then
+        # Update existing key (macOS-compatible sed)
+        sed -i '' "s|^${key}=.*|${key}=${value}|" "$file"
+    else
+        echo "${key}=${value}" >> "$file"
+    fi
+}
 
-# Apple Developer Team ID
-export TEAM_ID="$TEAM_ID"
+# Ensure directories exist
+mkdir -p "secrets/apple/appstore" "secrets/apple/match"
 
-# App Store Connect API (Shared across all apps)
-export APPSTORE_KEY_ID="$APPSTORE_KEY_ID"
-export APPSTORE_ISSUER_ID="$APPSTORE_ISSUER_ID"
-export APPSTORE_KEY_PATH="./secrets/AuthKey.p8"
+# Non-secret identity / metadata → gradle/fork.properties
+print_info "Writing non-secret metadata to gradle/fork.properties..."
+_upsert_property "gradle/fork.properties" "apple.team.id"           "$TEAM_ID"
+_upsert_property "gradle/fork.properties" "apple.match.git.url"     "$MATCH_GIT_URL"
+_upsert_property "gradle/fork.properties" "apple.match.git.branch"  "$MATCH_GIT_BRANCH"
+_upsert_property "gradle/fork.properties" "apple.tf.groups"         "$TESTFLIGHT_GROUPS"
+_upsert_property "gradle/fork.properties" "org.email"               "$TESTFLIGHT_CONTACT_EMAIL"
+_upsert_property "gradle/fork.properties" "org.first.name"          "$TESTFLIGHT_FIRST_NAME"
+_upsert_property "gradle/fork.properties" "org.last.name"           "$TESTFLIGHT_LAST_NAME"
+_upsert_property "gradle/fork.properties" "org.phone"               "$TESTFLIGHT_PHONE"
+_upsert_property "gradle/fork.properties" "org.marketing.url"       "https://example.com"
+_upsert_property "gradle/fork.properties" "org.privacy.url"         "https://example.com/privacy"
+_upsert_property "gradle/fork.properties" "org.support.url"         "https://example.com/support"
+print_success "Non-secret metadata written to gradle/fork.properties"
 
-# Fastlane Match Configuration (Shared certificate repository)
-export MATCH_GIT_URL="$MATCH_GIT_URL"
-export MATCH_GIT_BRANCH="$MATCH_GIT_BRANCH"
-export MATCH_SSH_KEY_PATH="./secrets/match_ci_key"
+# Secret values → per-value files under secrets/
+print_info "Writing secret values to secrets/ files..."
 
-# Match password is stored in: secrets/.match_password
-# Load it with: export MATCH_PASSWORD=\$(cat secrets/.match_password)
+# App Store Connect secrets
+printf '%s' "$APPSTORE_KEY_ID"    > "secrets/apple/appstore/key_id"
+printf '%s' "$APPSTORE_ISSUER_ID" > "secrets/apple/appstore/issuer_id"
+chmod 600 "secrets/apple/appstore/key_id" "secrets/apple/appstore/issuer_id"
+print_success "Written: secrets/apple/appstore/key_id, issuer_id"
 
-# TestFlight Beta Review Configuration
-export TESTFLIGHT_CONTACT_EMAIL="$TESTFLIGHT_CONTACT_EMAIL"
-export TESTFLIGHT_FIRST_NAME="$TESTFLIGHT_FIRST_NAME"
-export TESTFLIGHT_LAST_NAME="$TESTFLIGHT_LAST_NAME"
-export TESTFLIGHT_PHONE="$TESTFLIGHT_PHONE"
-export TESTFLIGHT_DEMO_EMAIL=""
-export TESTFLIGHT_DEMO_PASSWORD=""
+# Match secrets (MATCH_PASSWORD already written to .match_password above)
+print_success "Match password already in: secrets/apple/match/.match_password"
+print_success "Match SSH key already in:  secrets/apple/match/match_ci_key"
+# Write certificates_password and keychain_password as stubs (populated by match run)
+if [ ! -f "secrets/apple/match/certificates_password" ]; then
+    printf '' > "secrets/apple/match/certificates_password"
+    chmod 600 "secrets/apple/match/certificates_password"
+fi
+if [ ! -f "secrets/apple/match/keychain_password" ]; then
+    printf '%s' "$(openssl rand -base64 16)" > "secrets/apple/match/keychain_password"
+    chmod 600 "secrets/apple/match/keychain_password"
+fi
 
-# Beta Feedback Configuration
-export BETA_FEEDBACK_EMAIL="$BETA_FEEDBACK_EMAIL"
-
-# TestFlight Tester Groups (comma-separated)
-export TESTFLIGHT_GROUPS="$TESTFLIGHT_GROUPS"
-
-# App Store Review Configuration
-export APPSTORE_REVIEW_FIRST_NAME="$APPSTORE_REVIEW_FIRST_NAME"
-export APPSTORE_REVIEW_LAST_NAME="$APPSTORE_REVIEW_LAST_NAME"
-export APPSTORE_REVIEW_PHONE="$APPSTORE_REVIEW_PHONE"
-export APPSTORE_REVIEW_EMAIL="$APPSTORE_REVIEW_EMAIL"
-export APPSTORE_DEMO_EMAIL=""
-export APPSTORE_DEMO_PASSWORD=""
-
-# App Marketing URLs (customize per app or use shared defaults)
-export APP_MARKETING_URL="https://example.com"
-export APP_PRIVACY_URL="https://example.com/privacy"
-export APP_SUPPORT_URL="https://example.com/support"
-
-# Firebase Configuration (same file for all apps)
-export FIREBASE_SERVICE_CREDS="./secrets/firebaseAppDistributionServiceCredentialsFile.json"
-
-# ==============================================================================
-# Per-App Configuration (DON'T SET HERE - managed by fastlane-config)
-# ==============================================================================
-# These are set in fastlane-config/project_config.rb:
-# - APP_IDENTIFIER (iOS Bundle ID)
-# - FIREBASE_IOS_APP_ID
-# The customizer.sh script updates these when creating a new project.
-EOF
-
-chmod 600 secrets/shared_keys.env
-print_success "Created secrets/shared_keys.env"
+print_success "Configuration written to fork.properties + secrets/ files"
 echo
 
 # Auto-sync iOS secrets to secrets.env for GitHub Actions
@@ -466,8 +453,8 @@ print_info "This will sync your code signing certificates from the Match reposit
 print_info "If this is the first time, Match will create new certificates"
 echo
 
-# Load configuration
-source secrets/shared_keys.env
+# Load configuration from the new sources
+TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
 export MATCH_PASSWORD
 
 # Install Fastlane
@@ -499,10 +486,13 @@ echo "  ✓ TestFlight & App Store review info configured"
 echo
 
 print_info "Configuration files created:"
-echo "  ✓ secrets/shared_keys.env"
-echo "  ✓ secrets/AuthKey.p8"
-echo "  ✓ secrets/match_ci_key"
-echo "  ✓ secrets/.match_password"
+echo "  ✓ gradle/fork.properties (non-secret metadata)"
+echo "  ✓ secrets/apple/appstore/AuthKey.p8"
+echo "  ✓ secrets/apple/appstore/key_id"
+echo "  ✓ secrets/apple/appstore/issuer_id"
+echo "  ✓ secrets/apple/match/match_ci_key"
+echo "  ✓ secrets/apple/match/.match_password"
+echo "  ✓ secrets/apple/match/keychain_password"
 echo
 
 print_warning "IMPORTANT: Keep these files secure and NEVER commit them to git!"

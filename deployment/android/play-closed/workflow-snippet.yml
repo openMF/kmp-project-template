@@ -24,7 +24,7 @@ jobs:
         if: ${{ secrets.SOPS_AGE_KEY == '' }}
         run: |
           mkdir -p secrets
-          echo '${{ secrets.PLAYSTORE_PUBLISHER_JSON }}' > secrets/playStorePublishServiceCredentialsFile.json
+          echo '${{ secrets.PLAYSTORE_PUBLISHER_JSON }}' > secrets/android/playStorePublishServiceCredentialsFile.json
 
       - name: Promote to closed/alpha
         run: bundle exec fastlane android promoteToClosed

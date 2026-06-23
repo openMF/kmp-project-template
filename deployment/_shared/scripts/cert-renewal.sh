@@ -47,7 +47,7 @@
 #   APPSTORE_ISSUER_ID       issuer_id         (App Store Connect API issuer ID)
 #   APPSTORE_AUTH_KEY        AuthKey.p8        (p8 content — base64 or raw PEM)
 #
-#   When run from deployment/: secrets auto-discovered from secrets/match/ and secrets/appstore/.
+#   When run from deployment/: secrets auto-discovered from secrets/apple/match/ and secrets/apple/appstore/.
 #   When run from ios-provisioning-profile/: place secrets in a secrets/ subdirectory OR export
 #   the ENV vars directly before running the script.
 #
@@ -175,20 +175,20 @@ fi
 
 # ── Preflight validation ───────────────────────────────────────────────────────
 PREFLIGHT_OK=true
-[[ -z "$MATCH_PASSWORD_VAL" ]] && { error "MATCH_PASSWORD not set and secrets/match/.match_password not found"; PREFLIGHT_OK=false; }
-[[ -z "$MATCH_SSH_KEY" ]]      && { error "SSH key not found — set MATCH_GIT_PRIVATE_KEY or place key at secrets/match/match_ci_key"; PREFLIGHT_OK=false; }
-[[ -z "$APPSTORE_KEY_ID" ]]    && { error "APPSTORE_KEY_ID not set and secrets/appstore/key_id not found"; PREFLIGHT_OK=false; }
-[[ -z "$APPSTORE_ISSUER_ID" ]] && { error "APPSTORE_ISSUER_ID not set and secrets/appstore/issuer_id not found"; PREFLIGHT_OK=false; }
-[[ ! -f "$AUTH_KEY_PATH" ]]    && { error "AuthKey.p8 not found — set APPSTORE_AUTH_KEY or place file at secrets/appstore/AuthKey.p8"; PREFLIGHT_OK=false; }
+[[ -z "$MATCH_PASSWORD_VAL" ]] && { error "MATCH_PASSWORD not set and secrets/apple/match/.match_password not found"; PREFLIGHT_OK=false; }
+[[ -z "$MATCH_SSH_KEY" ]]      && { error "SSH key not found — set MATCH_GIT_PRIVATE_KEY or place key at secrets/apple/match/match_ci_key"; PREFLIGHT_OK=false; }
+[[ -z "$APPSTORE_KEY_ID" ]]    && { error "APPSTORE_KEY_ID not set and secrets/apple/appstore/key_id not found"; PREFLIGHT_OK=false; }
+[[ -z "$APPSTORE_ISSUER_ID" ]] && { error "APPSTORE_ISSUER_ID not set and secrets/apple/appstore/issuer_id not found"; PREFLIGHT_OK=false; }
+[[ ! -f "$AUTH_KEY_PATH" ]]    && { error "AuthKey.p8 not found — set APPSTORE_AUTH_KEY or place file at secrets/apple/appstore/AuthKey.p8"; PREFLIGHT_OK=false; }
 
 if ! "$PREFLIGHT_OK"; then
   echo ""
   echo "Set the missing secrets as ENV vars or place files in $(dirname "$SECRETS_DIR")/secrets/:"
-  echo "  secrets/match/.match_password"
-  echo "  secrets/match/match_ci_key"
-  echo "  secrets/appstore/key_id"
-  echo "  secrets/appstore/issuer_id"
-  echo "  secrets/appstore/AuthKey.p8"
+  echo "  secrets/apple/match/.match_password"
+  echo "  secrets/apple/match/match_ci_key"
+  echo "  secrets/apple/appstore/key_id"
+  echo "  secrets/apple/appstore/issuer_id"
+  echo "  secrets/apple/appstore/AuthKey.p8"
   exit 1
 fi
 

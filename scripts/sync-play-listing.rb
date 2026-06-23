@@ -27,7 +27,7 @@ end
 # ── Config ────────────────────────────────────────────────────────────────────
 
 REPO_ROOT     = Pathname.new(__FILE__).dirname.parent
-JSON_KEY      = REPO_ROOT / "secrets/play/service-account.json"
+JSON_KEY      = REPO_ROOT / "secrets/android/play/service-account.json"
 METADATA_ROOT = REPO_ROOT / "deployment/android/metadata"
 DRY_RUN       = ARGV.include?("--dry-run")
 

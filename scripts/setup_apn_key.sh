@@ -49,15 +49,15 @@ print_section() {
 # Print banner
 print_section "🔔 APN (Apple Push Notification) Key Setup"
 
-# Check if shared_keys.env exists
-if [ ! -f "secrets/shared_keys.env" ]; then
-    print_error "secrets/shared_keys.env not found"
-    print_info "Run the iOS setup wizard first: bash scripts/setup_ios_complete.sh"
-    exit 1
-fi
+# Ensure APN secrets directory exists
+mkdir -p "secrets/ios/apn"
 
-# Load existing configuration
-source secrets/shared_keys.env
+# Read TEAM_ID from fork.properties (non-secret identity)
+TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+if [ -z "$TEAM_ID" ]; then
+    print_warning "apple.team.id not found in gradle/fork.properties"
+    print_info "Run the iOS setup wizard first: bash scripts/setup_ios_complete.sh"
+fi
 
 # Introduction
 print_info "This script helps you configure Apple Push Notification (APN) keys"
@@ -108,7 +108,7 @@ echo
 print_info "Looking for APN .p8 key file..."
 
 # Find .p8 files
-P8_FILES=($(find . -maxdepth 2 -name "AuthKey_*.p8" 2>/dev/null | grep -v "secrets/AuthKey.p8"))
+P8_FILES=($(find . -maxdepth 2 -name "AuthKey_*.p8" 2>/dev/null | grep -v "secrets/apple/appstore/AuthKey.p8"))
 
 if [ ${#P8_FILES[@]} -eq 0 ]; then
     print_warning "No APN .p8 key files found in current directory"
@@ -140,38 +140,26 @@ if ! grep -q "BEGIN PRIVATE KEY" "$APN_P8_PATH"; then
 fi
 
 # Copy to secrets directory
-cp "$APN_P8_PATH" "secrets/APNAuthKey.p8"
-chmod 600 "secrets/APNAuthKey.p8"
-print_success "Copied APN key to secrets/APNAuthKey.p8"
+cp "$APN_P8_PATH" "secrets/ios/apn/APNAuthKey.p8"
+chmod 600 "secrets/ios/apn/APNAuthKey.p8"
+print_success "Copied APN key to secrets/ios/apn/APNAuthKey.p8"
 echo
 
-# Update shared_keys.env
-print_section "💾 Updating Configuration"
+# Write APN secrets to individual files
+print_section "💾 Writing APN Configuration Files"
 
-# Check if APN configuration already exists
-if grep -q "^export APN_KEY_ID=" secrets/shared_keys.env; then
-    print_info "Updating existing APN configuration..."
-    # Update existing values
-    sed -i.bak "s/^export APN_KEY_ID=.*/export APN_KEY_ID=\"$APN_KEY_ID\"/" secrets/shared_keys.env
-    sed -i.bak "s|^export APN_KEY_PATH=.*|export APN_KEY_PATH=\"./secrets/APNAuthKey.p8\"|" secrets/shared_keys.env
-    sed -i.bak "s/^export APN_TEAM_ID=.*/export APN_TEAM_ID=\"$TEAM_ID\"/" secrets/shared_keys.env
-    rm -f secrets/shared_keys.env.bak
-else
-    print_info "Adding APN configuration..."
-    # Add APN configuration block
-    cat >> secrets/shared_keys.env << EOF
+# Write key_id
+printf '%s' "$APN_KEY_ID" > "secrets/ios/apn/key_id"
+chmod 600 "secrets/ios/apn/key_id"
+print_success "Written: secrets/ios/apn/key_id"
 
-# ==============================================================================
-# APN (Apple Push Notification) Configuration
-# ==============================================================================
-# For Firebase Cloud Messaging on iOS
-export APN_KEY_ID="$APN_KEY_ID"
-export APN_KEY_PATH="./secrets/APNAuthKey.p8"
-export APN_TEAM_ID="$TEAM_ID"
-EOF
-fi
+# Write team_id
+printf '%s' "$TEAM_ID" > "secrets/ios/apn/team_id"
+chmod 600 "secrets/ios/apn/team_id"
+print_success "Written: secrets/ios/apn/team_id"
 
-print_success "Updated secrets/shared_keys.env with APN configuration"
+# APNAuthKey.p8 was already copied above
+print_success "APN configuration files written to secrets/ios/apn/"
 echo
 
 # Firebase Console Instructions
@@ -186,7 +174,7 @@ echo "  3. Click the gear icon → Project settings"
 echo "  4. Go to the 'Cloud Messaging' tab"
 echo "  5. Scroll to 'Apple app configuration'"
 echo "  6. Under 'APNs authentication key', click 'Upload'"
-echo "  7. Upload: secrets/APNAuthKey.p8"
+echo "  7. Upload: secrets/ios/apn/APNAuthKey.p8"
 echo "  8. Enter Key ID: $APN_KEY_ID"
 echo "  9. Enter Team ID: $TEAM_ID"
 echo "  10. Click 'Upload'"
@@ -205,15 +193,16 @@ echo
 print_info "Configuration Summary:"
 echo "  ✓ APN Key ID: $APN_KEY_ID"
 echo "  ✓ APN Team ID: $TEAM_ID"
-echo "  ✓ APN Key File: secrets/APNAuthKey.p8"
+echo "  ✓ APN Key File: secrets/ios/apn/APNAuthKey.p8"
 echo
 
 print_info "Files created/updated:"
-echo "  ✓ secrets/APNAuthKey.p8"
-echo "  ✓ secrets/shared_keys.env (updated with APN config)"
+echo "  ✓ secrets/ios/apn/APNAuthKey.p8"
+echo "  ✓ secrets/ios/apn/key_id"
+echo "  ✓ secrets/ios/apn/team_id"
 echo
 
-print_warning "IMPORTANT: Keep secrets/APNAuthKey.p8 secure and NEVER commit to git!"
+print_warning "IMPORTANT: Keep secrets/ios/apn/APNAuthKey.p8 secure and NEVER commit to git!"
 echo
 
 print_info "Next Steps:"

@@ -79,33 +79,33 @@ jobs:
           working-directory: deployment
 
       # ── Write secrets to filesystem ──────────────────────────────────────────
-      # cert-renewal.sh reads from secrets/match/ and secrets/appstore/ when
+      # cert-renewal.sh reads from secrets/apple/match/ and secrets/apple/appstore/ when
       # MATCH_PASSWORD / APPSTORE_* env vars are not set.
       - name: Write secrets
         run: |
-          mkdir -p secrets/match secrets/appstore
+          mkdir -p secrets/apple/match secrets/apple/appstore
 
-          printf '%s' "${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > secrets/match/match_ci_key
-          chmod 600 secrets/match/match_ci_key
+          printf '%s' "${{ secrets.MATCH_GIT_PRIVATE_KEY }}" > secrets/apple/match/match_ci_key
+          chmod 600 secrets/apple/match/match_ci_key
 
-          echo "${{ env.MATCH_GIT_URL }}"    > secrets/match/git_url
-          echo "${{ env.MATCH_GIT_BRANCH }}" > secrets/match/git_branch
-          printf '%s' "${{ secrets.MATCH_PASSWORD }}" > secrets/match/.match_password
-          chmod 600 secrets/match/.match_password
+          echo "${{ env.MATCH_GIT_URL }}"    > secrets/apple/match/git_url
+          echo "${{ env.MATCH_GIT_BRANCH }}" > secrets/apple/match/git_branch
+          printf '%s' "${{ secrets.MATCH_PASSWORD }}" > secrets/apple/match/.match_password
+          chmod 600 secrets/apple/match/.match_password
 
-          printf '%s' "${{ secrets.APPSTORE_KEY_ID }}"    > secrets/appstore/key_id
-          printf '%s' "${{ secrets.APPSTORE_ISSUER_ID }}" > secrets/appstore/issuer_id
+          printf '%s' "${{ secrets.APPSTORE_KEY_ID }}"    > secrets/apple/appstore/key_id
+          printf '%s' "${{ secrets.APPSTORE_ISSUER_ID }}" > secrets/apple/appstore/issuer_id
           if echo "${{ secrets.APPSTORE_AUTH_KEY }}" | grep -q "BEGIN PRIVATE KEY"; then
-            printf '%s' "${{ secrets.APPSTORE_AUTH_KEY }}" > secrets/appstore/AuthKey.p8
+            printf '%s' "${{ secrets.APPSTORE_AUTH_KEY }}" > secrets/apple/appstore/AuthKey.p8
           else
-            echo "${{ secrets.APPSTORE_AUTH_KEY }}" | base64 --decode > secrets/appstore/AuthKey.p8
+            echo "${{ secrets.APPSTORE_AUTH_KEY }}" | base64 --decode > secrets/apple/appstore/AuthKey.p8
           fi
-          chmod 600 secrets/appstore/key_id secrets/appstore/issuer_id secrets/appstore/AuthKey.p8
+          chmod 600 secrets/apple/appstore/key_id secrets/apple/appstore/issuer_id secrets/apple/appstore/AuthKey.p8
 
       # ── Clone ios-provisioning-profile to get canonical cert-renewal.sh ─────
       - name: Fetch cert-renewal.sh from ios-provisioning-profile
         run: |
-          GIT_SSH_COMMAND="ssh -i secrets/match/match_ci_key -o StrictHostKeyChecking=no" \
+          GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
             git clone --depth 1 --single-branch --branch "${{ env.MATCH_GIT_BRANCH }}" \
             "${{ env.MATCH_GIT_URL }}" /tmp/ios-prov-profile
           echo "✅ ios-provisioning-profile cloned to /tmp/ios-prov-profile"
@@ -131,7 +131,7 @@ jobs:
             "--type" "$TYPE"
             "--git-url"    "${{ env.MATCH_GIT_URL }}"
             "--git-branch" "${{ env.MATCH_GIT_BRANCH }}"
-            "--ssh-key"    "$(pwd)/secrets/match/match_ci_key"
+            "--ssh-key"    "$(pwd)/secrets/apple/match/match_ci_key"
             "--fastlane-cmd" "bundle exec fastlane"
             "--run-dir"    "$(pwd)/deployment"
           )
@@ -143,11 +143,11 @@ jobs:
       - name: Cleanup secrets
         if: always()
         run: |
-          rm -rf secrets/match/.match_password \
-                 secrets/match/match_ci_key \
-                 secrets/appstore/AuthKey.p8 \
-                 secrets/appstore/key_id \
-                 secrets/appstore/issuer_id \
+          rm -rf secrets/apple/match/.match_password \
+                 secrets/apple/match/match_ci_key \
+                 secrets/apple/appstore/AuthKey.p8 \
+                 secrets/apple/appstore/key_id \
+                 secrets/apple/appstore/issuer_id \
                  /tmp/ios-prov-profile
 
       # ── Failure notice ───────────────────────────────────────────────────────

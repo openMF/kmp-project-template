@@ -5,7 +5,7 @@
 # to Google Play Console without uploading a new APK/AAB.
 #
 # Prerequisites:
-#   - secrets/play/service-account.json  (Google Play service account key)
+#   - secrets/android/play/service-account.json  (Google Play service account key)
 #   - deployment/android/metadata/       (Fastlane supply metadata tree)
 #       en-US/title.txt, short_description.txt, full_description.txt
 #       images/phoneScreenshots/*.png
@@ -23,7 +23,7 @@ cd "$REPO_ROOT"
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-JSON_KEY="secrets/play/service-account.json"
+JSON_KEY="secrets/android/play/service-account.json"
 METADATA_PATH="deployment/android/metadata"
 PACKAGE_NAME="$(grep -E '^\s*appId\s*=' gradle/libs.versions.toml 2>/dev/null \
     | head -1 | sed 's/[^"]*"\([^"]*\)".*/\1/' || echo "")"

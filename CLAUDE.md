@@ -177,8 +177,8 @@ B7 Interest Rate Tracker + B8 Country Macro Snapshot screens:
 
 1. Sign up: https://fred.stlouisfed.org/docs/api/api_key.html (30 seconds)
 2. Provide the key one of two ways:
-   - **Path A:** copy `secrets/shared_keys.env.template` to
-     `secrets/shared_keys.env` (gitignored) and set `FRED_API_KEY=...`.
+   - **Path A:** add `FRED_API_KEY=<your-key>` to `local.properties` (gitignored,
+     matches the KMP ecosystem convention) — no shared env bundle needed.
    - **Path B:** run `/secrets request mifos_x_fred_api_key` from a
      project-bound session; the framework opens a vault PR proposing the
      new alias row. After it merges, `/secrets pull` materializes it.

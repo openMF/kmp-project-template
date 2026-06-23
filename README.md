@@ -166,11 +166,12 @@ The project uses a centralized configuration system for iOS deployment workflows
 **Configuration Files:**
 
 - `fastlane-config/project_config.rb` - Application-specific configuration
-- `secrets/shared_keys.env` - Team-wide credentials and secrets
+- `gradle/fork.properties` - Non-secret identity/metadata (team ID, contact info, URLs)
 
 **Configuration Loading:**
 
-- Local deployments read from `secrets/shared_keys.env`
+- Non-secret identity/metadata (team ID, contact info, URLs) lives in `gradle/fork.properties`
+- Secret values are per-file under `secrets/<platform>/...`; vault users run `/secrets pull`
 - CI/CD workflows extract configuration from `project_config.rb` and GitHub Secrets
 
 **Setup:**

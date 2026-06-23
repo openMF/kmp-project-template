@@ -91,7 +91,7 @@ vault preflight + PROMOTION_LOG audit but is **NOT** required for Path A.
    | `AuthKey.p8`                                                  | App Store Connect / TestFlight upload              |
    | `APNAuthKey.p8`                                               | Apple Push (if used)                               |
    | `match_ci_key` + `match_ci_key.pub`                           | Fastlane Match SSH (iOS code signing)              |
-   | `shared_keys.env` (from `shared_keys.env.template`)           | KMP shared env vars (incl. `FRED_API_KEY`)         |
+   | `gradle/fork.properties` (from `gradle/fork.properties.template`)  | Non-secret identity/metadata (`apple.team.id`, contacts, URLs) |
    | `cloudflare/CLOUDFLARE_API_TOKEN`                             | Cloudflare Pages deploy (web)                      |
 
 5. **Wire CI** by pasting the same files into GitHub Actions repo secrets
@@ -165,20 +165,20 @@ Everyone who needs to run `renewCerts` or any iOS lane locally needs:
 
 | What | Where | How to get it |
 |------|-------|---------------|
-| SSH private key with write access to `openMF/ios-provisioning-profile` | `secrets/match/match_ci_key` | Framework vault: `/secrets pull`; or request from team lead |
-| `MATCH_PASSWORD` | `secrets/match/.match_password` | Same vault / team lead |
-| `KEYCHAIN_PASSWORD` | `secrets/match/keychain_password` | Your macOS login keychain password |
-| `CERTIFICATES_PASSWORD` | `secrets/match/certificates_password` | Same as `MATCH_PASSWORD` in standard setups |
-| ASC API key | `secrets/appstore/AuthKey.p8` + `key_id` + `issuer_id` | Framework vault: `/secrets pull` |
+| SSH private key with write access to `openMF/ios-provisioning-profile` | `secrets/apple/match/match_ci_key` | Framework vault: `/secrets pull`; or request from team lead |
+| `MATCH_PASSWORD` | `secrets/apple/match/.match_password` | Same vault / team lead |
+| `KEYCHAIN_PASSWORD` | `secrets/apple/match/keychain_password` | Your macOS login keychain password |
+| `CERTIFICATES_PASSWORD` | `secrets/apple/match/certificates_password` | Same as `MATCH_PASSWORD` in standard setups |
+| ASC API key | `secrets/apple/appstore/AuthKey.p8` + `key_id` + `issuer_id` | Framework vault: `/secrets pull` |
 
 Once secrets are in place, clone the Match repo once so subsequent runs
 are fast (`git fetch + reset` instead of a full clone):
 
 ```bash
 # From repo root — one-time setup per machine
-GIT_SSH_COMMAND="ssh -i secrets/match/match_ci_key -o StrictHostKeyChecking=no" \
+GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
   git clone --depth 1 git@github.com:openMF/ios-provisioning-profile.git \
-  secrets/match/ios-provisioning-profile
+  secrets/apple/match/ios-provisioning-profile
 ```
 
 > The `secrets/` directory is gitignored — the clone never enters source control.
@@ -377,12 +377,13 @@ Both intents now migrate:
 - **Documentation** → this file. The `secrets/` vs `secrets_demo/` schema +
   Path A walkthrough above replaces the `.env.local.example` comment block.
 
-For OSS forks running Path A who don't want vault ceremony, the
-`secrets/shared_keys.env` file (copied from `secrets/shared_keys.env.template`)
-is the equivalent of the old `.env.local` — it carries `FRED_API_KEY=...` and
-is gitignored. The pre-commit secrets guard
-(`/secrets install-hook`) refuses any `.env*` file staged outside the vault
-repo, which closes the legacy-leak surface.
+For OSS forks running Path A who don't want vault ceremony:
+- Non-secret identity/metadata (team ID, contact info, URLs) goes in `gradle/fork.properties`
+  (copy from `gradle/fork.properties.template`, which is committed).
+- Secret values (API keys, passwords, certificates) are dropped as per-value files under
+  `secrets/<platform>/...` (all gitignored). The pre-commit secrets guard
+  (`/secrets install-hook`) refuses any `.env*` file staged outside the vault
+  repo, which closes the legacy-leak surface.
 
 ---
 

@@ -145,8 +145,8 @@ After `bash scripts/fetch-secrets-from-drive.sh`, the layout-aware materializati
 | File | What it is |
 |---|---|
 | `local.properties` | Env vars (STRIPE_SECRET_KEY, SENTRY_DSN, etc.) |
-| `secrets/keystores/release.jks` | Android signing keystore |
-| `secrets/keystores/keystore.properties` | Signing config |
+| `secrets/android/keystores/release.jks` | Android signing keystore |
+| `secrets/android/keystores/keystore.properties` | Signing config |
 | `composeApp/google-services.json` | Firebase Android |
 | `iosApp/iosApp/GoogleService-Info.plist` | Firebase iOS |
 | `secrets/fastlane/play-store-sa.json` | Play Store deploy SA |

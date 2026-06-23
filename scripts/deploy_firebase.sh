@@ -85,10 +85,9 @@ print_success "Bundler installed"
 print_section "📋 Validating Configuration"
 
 REQUIRED_FILES=(
-    "secrets/shared_keys.env"
-    "secrets/.match_password"
-    "secrets/match_ci_key"
-    "secrets/firebaseAppDistributionServiceCredentialsFile.json"
+    "secrets/apple/match/.match_password"
+    "secrets/apple/match/match_ci_key"
+    "secrets/android/firebaseAppDistributionServiceCredentialsFile.json"
 )
 
 MISSING_FILES=()
@@ -111,15 +110,20 @@ if [ ${#MISSING_FILES[@]} -gt 0 ]; then
     exit 1
 fi
 
-# Load shared configuration
-print_info "Loading iOS shared configuration..."
-source secrets/shared_keys.env
+# Load configuration from fork.properties and secrets/ files
+print_info "Loading iOS deployment configuration..."
+
+TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+MATCH_GIT_URL=$(grep -E "^apple\.match\.git\.url=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+MATCH_GIT_BRANCH=$(grep -E "^apple\.match\.git\.branch=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+
+export TEAM_ID MATCH_GIT_URL MATCH_GIT_BRANCH
 
 # Load Match password
-export MATCH_PASSWORD=$(cat secrets/.match_password)
+export MATCH_PASSWORD=$(cat secrets/apple/match/.match_password)
 
 # Setup SSH for Match
-export GIT_SSH_COMMAND="ssh -i secrets/match_ci_key -o IdentitiesOnly=yes"
+export GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o IdentitiesOnly=yes"
 
 print_success "Configuration loaded"
 

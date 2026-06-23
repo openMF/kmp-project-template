@@ -2,118 +2,125 @@ schema_version: '2.0'
 generated_at: '2026-06-05T00:00:00Z'
 placeholders:
 - path: appstore/AuthKey.p8
-  secrets_peer: secrets/appstore/AuthKey.p8
+  secrets_peer: secrets/apple/appstore/AuthKey.p8
   kind: text
   gha_secret: APPSTORE_AUTH_KEY
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: appstore/key_id
-  secrets_peer: secrets/appstore/key_id
+  secrets_peer: secrets/apple/appstore/key_id
   kind: text
   gha_secret: APPSTORE_KEY_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: appstore/issuer_id
-  secrets_peer: secrets/appstore/issuer_id
+  secrets_peer: secrets/apple/appstore/issuer_id
   kind: text
   gha_secret: APPSTORE_ISSUER_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: match/match_ci_key
-  secrets_peer: secrets/match/match_ci_key
+  secrets_peer: secrets/apple/match/match_ci_key
   kind: text
   gha_secret: MATCH_GIT_PRIVATE_KEY
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: match/match_ci_key.pub
-  secrets_peer: secrets/match/match_ci_key.pub
+  secrets_peer: secrets/apple/match/match_ci_key.pub
   kind: text
   gha_secret: null
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: match/.match_password
-  secrets_peer: secrets/match/.match_password
+  secrets_peer: secrets/apple/match/.match_password
   kind: text
   gha_secret: MATCH_PASSWORD
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: apn/APNAuthKey.p8
-  secrets_peer: secrets/apn/APNAuthKey.p8
+  secrets_peer: secrets/ios/apn/APNAuthKey.p8
   kind: text
   gha_secret: null
   optional: true
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
-- path: shared_keys.env
-  secrets_peer: secrets/shared_keys.env
+- path: ios/apn/key_id
+  secrets_peer: secrets/ios/apn/key_id
   kind: text
   gha_secret: null
+  optional: true
+  magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
+- path: ios/apn/team_id
+  secrets_peer: secrets/ios/apn/team_id
+  kind: text
+  gha_secret: null
+  optional: true
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: keystores/upload_keystore.properties
-  secrets_peer: secrets/keystores/upload_keystore.properties
+  secrets_peer: secrets/android/keystores/upload_keystore.properties
   kind: text
   gha_secret: null
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: keystores/upload_keystore.keystore
-  secrets_peer: secrets/keystores/upload_keystore.keystore
+  secrets_peer: secrets/android/keystores/upload_keystore.keystore
   kind: binary
   gha_secret: UPLOAD_KEYSTORE_FILE
   magic: CLAUDE-PLHLD-v1
 - path: firebase/service-account.json
-  secrets_peer: secrets/firebase/service-account.json
+  secrets_peer: secrets/android/firebase/service-account.json
   kind: text
   gha_secret: FIREBASECREDS
   magic: '"_comment": "CLAUDE-PLACEHOLDER'
 - path: firebase/google-services.json
-  secrets_peer: secrets/firebase/google-services.json
+  secrets_peer: secrets/android/firebase/google-services.json
   kind: text
   gha_secret: GOOGLESERVICES
   magic: '"_comment": "CLAUDE-PLACEHOLDER'
 - path: firebase/android_app_id
-  secrets_peer: secrets/firebase/android_app_id
+  secrets_peer: secrets/android/firebase/android_app_id
   kind: text
   gha_secret: FIREBASE_ANDROID_APP_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: firebase/android_demo_app_id
-  secrets_peer: secrets/firebase/android_demo_app_id
+  secrets_peer: secrets/android/firebase/android_demo_app_id
   kind: text
   gha_secret: FIREBASE_ANDROID_DEMO_APP_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: firebase/ios_app_id
-  secrets_peer: secrets/firebase/ios_app_id
+  secrets_peer: secrets/ios/firebase/ios_app_id
   kind: text
   gha_secret: FIREBASE_IOS_APP_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: play/service-account.json
-  secrets_peer: secrets/play/service-account.json
+  secrets_peer: secrets/android/play/service-account.json
   kind: text
   gha_secret: PLAYSTORECREDS
   magic: '"_comment": "CLAUDE-PLACEHOLDER'
 - path: cloudflare/api_token
-  secrets_peer: secrets/cloudflare/api_token
+  secrets_peer: secrets/web/cloudflare/api_token
   kind: text
   gha_secret: CLOUDFLARE_API_TOKEN
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: cloudflare/account_id
-  secrets_peer: secrets/cloudflare/account_id
+  secrets_peer: secrets/web/cloudflare/account_id
   kind: text
   gha_secret: CLOUDFLARE_ACCOUNT_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: netlify/auth_token
-  secrets_peer: secrets/netlify/auth_token
+  secrets_peer: secrets/web/netlify/auth_token
   kind: text
   gha_secret: NETLIFY_AUTH_TOKEN
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: netlify/site_id
-  secrets_peer: secrets/netlify/site_id
+  secrets_peer: secrets/web/netlify/site_id
   kind: text
   gha_secret: NETLIFY_SITE_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: vercel/token
-  secrets_peer: secrets/vercel/token
+  secrets_peer: secrets/web/vercel/token
   kind: text
   gha_secret: VERCEL_TOKEN
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: vercel/org_id
-  secrets_peer: secrets/vercel/org_id
+  secrets_peer: secrets/web/vercel/org_id
   kind: text
   gha_secret: VERCEL_ORG_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"
 - path: vercel/project_id
-  secrets_peer: secrets/vercel/project_id
+  secrets_peer: secrets/web/vercel/project_id
   kind: text
   gha_secret: VERCEL_PROJECT_ID
   magic: "# CLAUDE-PLACEHOLDER \u2014 do not commit this to secrets/"

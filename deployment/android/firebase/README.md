@@ -35,7 +35,7 @@ your bound project session. Or set the GHA manual-mode env vars listed in
 | Alias                                              | Path                                                            |
 |----------------------------------------------------|-----------------------------------------------------------------|
 | `kmp_template_release_keystore`                    | `keystores/upload_keystore.keystore`                           |
-| `firebase_app_distribution_service_account_json`   | `secrets/firebaseAppDistributionServiceCredentialsFile.json`    |
+| `firebase_app_distribution_service_account_json`   | `secrets/android/firebaseAppDistributionServiceCredentialsFile.json`    |
 
 ## Troubleshooting
 

@@ -272,7 +272,7 @@ steps:
   - run: |
       echo "${{ secrets.keystore_file }}" | base64 -d > keystores/original-release-key.jks
       echo "${{ secrets.google_services }}" | base64 -d > ${{ inputs.android_package_name }}/google-services.json
-      echo "${{ secrets.firebase_creds }}" | base64 -d > secrets/firebaseAppDistributionServiceCredentialsFile.json
+      echo "${{ secrets.firebase_creds }}" | base64 -d > secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 
   # 5. Run Fastlane lane
   - run: |
@@ -286,7 +286,7 @@ steps:
   - run: |
       rm -f keystores/original-release-key.jks
       rm -f ${{ inputs.android_package_name }}/google-services.json
-      rm -f secrets/firebaseAppDistributionServiceCredentialsFile.json
+      rm -f secrets/android/firebaseAppDistributionServiceCredentialsFile.json
     if: always()
 ```
 
@@ -333,7 +333,7 @@ steps:
   # 3. Setup App Store Connect API
   - run: |
       mkdir -p secrets
-      echo "${{ secrets.appstore_auth_key }}" | base64 -d > secrets/AuthKey.p8
+      echo "${{ secrets.appstore_auth_key }}" | base64 -d > secrets/apple/appstore/AuthKey.p8
 
   # 4. Install dependencies
   - run: bundle install
@@ -350,7 +350,7 @@ steps:
   # 6. Clean up secrets
   - run: |
       rm -rf ~/.ssh/match_ci_key
-      rm -rf secrets/AuthKey.p8
+      rm -rf secrets/apple/appstore/AuthKey.p8
       rm -f ${{ inputs.ios_package_name }}/GoogleService-Info.plist
     if: always()
 ```
@@ -909,7 +909,7 @@ Permission denied (publickey)
 **Fix:**
 ```bash
 # Add SSH key as secret
-gh secret set MATCH_SSH_PRIVATE_KEY < secrets/match_ci_key.b64
+gh secret set MATCH_SSH_PRIVATE_KEY < secrets/apple/match/match_ci_key.b64
 ```
 
 ---

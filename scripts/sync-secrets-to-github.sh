@@ -217,20 +217,28 @@ _sync_ios() {
   _set_from_file    "MATCH_PASSWORD"         "$SECRETS_DIR/match/.match_password"
   _set_from_file    "match_password"         "$SECRETS_DIR/match/.match_password"
 
-  # shared_keys.env — parse and set individual vars (FRED_API_KEY etc.)
-  local env_file="$SECRETS_DIR/shared_keys.env"
-  if [[ -f "$env_file" ]] && ! grep -q "CLAUDE-PLACEHOLDER" "$env_file"; then
-    echo "  Parsing $env_file …"
+  # iOS identity/metadata — read from gradle/fork.properties (non-secret)
+  local fork_props="gradle/fork.properties"
+  if [[ -f "$fork_props" ]]; then
+    echo "  Parsing $fork_props for non-secret iOS metadata …"
     while IFS='=' read -r key val; do
       [[ -z "$key" || "$key" =~ ^# ]] && continue
-      key="${key#export }"
-      val="${val%\"}"
-      val="${val#\"}"
       [[ -z "$val" || "$val" == "YOUR_"* || "$val" == "your_"* ]] && continue
-      # Push as IOS_ENV_<KEY> for iOS Fastlane consumption AND as plain <KEY> for cross-platform use
-      _set_secret "IOS_ENV_${key}" "$val" "shared_keys.env:${key}"
-      _set_secret "${key}"         "$val" "shared_keys.env:${key} (cross-platform)"
-    done < "$env_file"
+      _set_secret "IOS_ENV_${key}" "$val" "fork.properties:${key}"
+      _set_secret "${key}"         "$val" "fork.properties:${key} (cross-platform)"
+    done < "$fork_props"
+  fi
+
+  # iOS App Store Connect secrets — read from per-value files (secret)
+  if [[ -f "$SECRETS_DIR/apple/appstore/key_id" ]]; then
+    local _asc_key_id
+    _asc_key_id=$(cat "$SECRETS_DIR/apple/appstore/key_id" 2>/dev/null | tr -d '\n\r')
+    [[ -n "$_asc_key_id" ]] && _set_secret "APPSTORE_KEY_ID" "$_asc_key_id" "apple/appstore/key_id"
+  fi
+  if [[ -f "$SECRETS_DIR/apple/appstore/issuer_id" ]]; then
+    local _asc_issuer
+    _asc_issuer=$(cat "$SECRETS_DIR/apple/appstore/issuer_id" 2>/dev/null | tr -d '\n\r')
+    [[ -n "$_asc_issuer" ]] && _set_secret "APPSTORE_ISSUER_ID" "$_asc_issuer" "apple/appstore/issuer_id"
   fi
   echo ""
 }

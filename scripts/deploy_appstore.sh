@@ -90,10 +90,11 @@ print_success "Bundler installed"
 print_section "📋 Validating Configuration"
 
 REQUIRED_FILES=(
-    "secrets/shared_keys.env"
-    "secrets/.match_password"
-    "secrets/match_ci_key"
-    "secrets/AuthKey.p8"
+    "secrets/apple/appstore/key_id"
+    "secrets/apple/appstore/issuer_id"
+    "secrets/apple/appstore/AuthKey.p8"
+    "secrets/apple/match/.match_password"
+    "secrets/apple/match/match_ci_key"
 )
 
 MISSING_FILES=()
@@ -116,22 +117,34 @@ if [ ${#MISSING_FILES[@]} -gt 0 ]; then
     exit 1
 fi
 
-# Load shared configuration
-print_info "Loading iOS shared configuration..."
-source secrets/shared_keys.env
+# Load configuration from secrets/ files and fork.properties
+print_info "Loading iOS deployment configuration..."
+
+# Non-secret identity from fork.properties
+TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+MATCH_GIT_URL=$(grep -E "^apple\.match\.git\.url=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+MATCH_GIT_BRANCH=$(grep -E "^apple\.match\.git\.branch=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+
+# Secret values from per-file secrets
+APPSTORE_KEY_ID=$(cat secrets/apple/appstore/key_id 2>/dev/null | tr -d '\n\r')
+APPSTORE_ISSUER_ID=$(cat secrets/apple/appstore/issuer_id 2>/dev/null | tr -d '\n\r')
 
 # Validate App Store Connect API key configuration
 if [ -z "$APPSTORE_KEY_ID" ] || [ -z "$APPSTORE_ISSUER_ID" ]; then
     print_error "App Store Connect API credentials not configured"
-    print_info "Update secrets/shared_keys.env with APPSTORE_KEY_ID and APPSTORE_ISSUER_ID"
+    print_info "Ensure secrets/apple/appstore/key_id and secrets/apple/appstore/issuer_id exist"
     exit 1
 fi
 
 # Load Match password
-export MATCH_PASSWORD=$(cat secrets/.match_password)
+export MATCH_PASSWORD=$(cat secrets/apple/match/.match_password)
 
 # Setup SSH for Match
-export GIT_SSH_COMMAND="ssh -i secrets/match_ci_key -o IdentitiesOnly=yes"
+export GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o IdentitiesOnly=yes"
+
+# Export for fastlane
+export APPSTORE_KEY_ID APPSTORE_ISSUER_ID TEAM_ID MATCH_GIT_URL MATCH_GIT_BRANCH
+export APPSTORE_KEY_PATH="./secrets/apple/appstore/AuthKey.p8"
 
 print_success "Configuration loaded"
 

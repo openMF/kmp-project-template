@@ -85,7 +85,7 @@ gh repo create ios-certificates --private
 #### Generate SSH Key for Match:
 ```bash
 # The setup wizard does this automatically, or manually:
-ssh-keygen -t ed25519 -C "fastlane-match" -f secrets/match_ci_key -N ""
+ssh-keygen -t ed25519 -C "fastlane-match" -f secrets/apple/match/match_ci_key -N ""
 ```
 
 #### Add Deploy Key to Repository:
@@ -93,7 +93,7 @@ ssh-keygen -t ed25519 -C "fastlane-match" -f secrets/match_ci_key -N ""
 2. **Settings** → **Deploy keys**
 3. Click **Add deploy key**
 4. Title: `Fastlane Match CI`
-5. Paste the public key from `secrets/match_ci_key.pub`
+5. Paste the public key from `secrets/apple/match/match_ci_key.pub`
 6. ✅ Check **Allow write access** (Match needs to push certificates)
 7. Click **Add key**
 
@@ -103,7 +103,7 @@ Match encrypts your certificates with a password:
 
 ```bash
 # Generate secure password
-openssl rand -base64 32 > secrets/.match_password
+openssl rand -base64 32 > secrets/apple/match/.match_password
 ```
 
 **Important:** Store this password in your password manager! You'll need it on all machines and in CI/CD.
@@ -118,7 +118,8 @@ bash scripts/setup_ios_complete.sh
 
 The wizard will:
 - Collect all required information
-- Generate `secrets/shared_keys.env`
+- Populate `gradle/fork.properties` with non-secret identity/metadata
+- Write secret values as per-value files under `secrets/<platform>/`
 - Set up SSH keys for Match
 - Initialize Match (sync certificates)
 - Validate configuration
@@ -129,13 +130,14 @@ This project uses a **shared vs app-specific** configuration pattern:
 
 ### Shared Configuration (IOS_SHARED)
 
-Located in `fastlane-config/project_config.rb` and loaded from `secrets/shared_keys.env`:
+Located in `fastlane-config/project_config.rb`. Values are resolved from
+`ENV → secrets/<platform>/file → gradle/fork.properties → default`.
 
 **Same for ALL apps:**
-- Team ID
-- App Store Connect API credentials
-- Match repository URL
-- TestFlight & App Store review contact information
+- Team ID (non-secret: `gradle/fork.properties` → `apple.team.id`)
+- App Store Connect API credentials (secret: `secrets/apple/appstore/key_id`, `issuer_id`, `AuthKey.p8`)
+- Match repository URL/branch (non-secret: `gradle/fork.properties` → `apple.match.git.url/branch`)
+- TestFlight & App Store review contact information (non-secret: `gradle/fork.properties` → `org.*`)
 
 **Why shared?** When you create multiple apps from this template, they all use the same Apple Developer account and infrastructure.
 
@@ -161,16 +163,23 @@ When you run `customizer.sh` with a new package name:
 
 ## Files Created
 
-After setup, these files will exist (all gitignored):
+After setup, these files will exist:
 
 ```
-secrets/
-├── shared_keys.env              # Shared iOS configuration
-├── .match_password              # Match encryption password
-├── AuthKey.p8                   # App Store Connect API key
-├── match_ci_key                 # Match SSH private key
-├── match_ci_key.pub             # Match SSH public key
-└── shared_keys.env.template     # Template (can be committed)
+gradle/
+└── fork.properties              # Non-secret identity/metadata (committed if desired)
+
+secrets/                         # All gitignored
+├── apple/
+│   ├── appstore/AuthKey.p8      # App Store Connect API key
+│   ├── appstore/key_id          # ASC Key ID
+│   ├── appstore/issuer_id       # ASC Issuer ID
+│   └── match/
+│       ├── match_ci_key         # Match SSH private key
+│       ├── match_ci_key.pub     # Match SSH public key
+│       └── .match_password      # Match encryption password
+└── ios/
+    └── apn/APNAuthKey.p8        # APN push key (optional)
 ```
 
 ## Optional: APN Setup (Push Notifications)
@@ -212,13 +221,13 @@ bundle exec fastlane ios --help
 2. Check "Allow write access" is enabled
 3. Test SSH connection:
    ```bash
-   ssh -i secrets/match_ci_key -T git@github.com
+   ssh -i secrets/apple/match/match_ci_key -T git@github.com
    ```
 
 ### Issue: "Invalid Match password"
 
 **Solution:**
-1. Verify `secrets/.match_password` contains the correct password
+1. Verify `secrets/apple/match/.match_password` contains the correct password
 2. If lost, you'll need to revoke certificates and regenerate (contact Apple)
 
 ### Issue: "Certificate already exists"
@@ -238,7 +247,7 @@ bundle exec fastlane ios sync_certificates match_type:appstore
 ### Issue: "Team ID mismatch"
 
 **Solution:**
-Verify Team ID in `secrets/shared_keys.env` matches your Apple Developer account.
+Verify `apple.team.id` in `gradle/fork.properties` matches your Apple Developer account.
 
 ### Issue: "Build number conflict"
 
@@ -311,7 +320,8 @@ bundle exec fastlane ios sync_certificates match_type:appstore   # Sync App Stor
 
 # Debugging
 bundle exec fastlane ios --help            # Show all lanes
-cat secrets/shared_keys.env                # View configuration
+cat gradle/fork.properties                         # View non-secret config
+ls secrets/apple/ secrets/ios/                     # List secret files
 ls -la secrets/                            # List all secret files
 ```
 

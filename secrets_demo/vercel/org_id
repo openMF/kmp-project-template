@@ -1,5 +1,0 @@
-# CLAUDE-PLACEHOLDER — do not commit this to secrets/
-# Owning alias: vercel_org_id
-# Materialize to: secrets/vercel/org_id
-# Get from: Vercel team settings → General → Team ID
-VERCEL_ORG_ID=changeme-placeholder

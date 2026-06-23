@@ -232,7 +232,7 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 2. Inflates secrets to:
    - `{package_name}/google-services.json`
    - `keystores/upload_keystore.keystore`
-   - `secrets/firebaseAppDistributionServiceCredentialsFile.json`
+   - `secrets/android/firebaseAppDistributionServiceCredentialsFile.json`
 3. Calls Fastlane lane:
    - Prod: `bundle exec fastlane android deployReleaseApkOnFirebase`
    - Demo: `bundle exec fastlane android deployDemoApkOnFirebase`
@@ -262,7 +262,7 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 1. Inflates secrets to:
    - `{package_name}/google-services.json`
    - `keystores/upload_keystore.keystore`
-   - `secrets/playStorePublishServiceCredentialsFile.json`
+   - `secrets/android/playStorePublishServiceCredentialsFile.json`
 2. Calls Fastlane lane: `bundle exec fastlane android deployInternal`
    - Uploads AAB to internal track
 3. If `release_type == 'beta'`: `bundle exec fastlane android promoteToBeta`
@@ -287,7 +287,7 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 
 **What it does:**
 1. Installs Fastlane
-2. Inflates Play Store credentials to `secrets/playStorePublishServiceCredentialsFile.json`
+2. Inflates Play Store credentials to `secrets/android/playStorePublishServiceCredentialsFile.json`
 3. Calls: `bundle exec fastlane android promote_to_production`
 4. Cleans up secrets
 
@@ -321,8 +321,8 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 1. Sets up Ruby + Fastlane
 2. Sets up Xcode (default: 15.2)
 3. If Release:
-   - Writes App Store Connect API key to `secrets/AuthKey.p8`
-   - Configures SSH for Fastlane Match: `secrets/match_ci_key` + `~/.ssh/config`
+   - Writes App Store Connect API key to `secrets/apple/appstore/AuthKey.p8`
+   - Configures SSH for Fastlane Match: `secrets/apple/match/match_ci_key` + `~/.ssh/config`
    - Calls: `bundle exec fastlane ios build_signed_ios`
 4. If Debug:
    - Calls: `bundle exec fastlane ios build_ios` (no code signing)
@@ -352,9 +352,9 @@ uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0
 **What it does:**
 1. Installs Fastlane + `firebase_app_distribution`, `increment_build_number` plugins
 2. Writes secrets:
-   - `secrets/AuthKey.p8`
-   - `secrets/match_ci_key`
-   - `secrets/firebaseAppDistributionServiceCredentialsFile.json`
+   - `secrets/apple/appstore/AuthKey.p8`
+   - `secrets/apple/match/match_ci_key`
+   - `secrets/android/firebaseAppDistributionServiceCredentialsFile.json`
    - SSH config for Match
 3. Calls: `bundle exec fastlane ios deploy_on_firebase`
    - Auto-increments build number from latest Firebase release

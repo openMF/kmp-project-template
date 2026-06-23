@@ -85,10 +85,11 @@ print_success "Bundler installed"
 print_section "📋 Validating Configuration"
 
 REQUIRED_FILES=(
-    "secrets/shared_keys.env"
-    "secrets/.match_password"
-    "secrets/match_ci_key"
-    "secrets/AuthKey.p8"
+    "secrets/apple/appstore/key_id"
+    "secrets/apple/appstore/issuer_id"
+    "secrets/apple/appstore/AuthKey.p8"
+    "secrets/apple/match/.match_password"
+    "secrets/apple/match/match_ci_key"
 )
 
 MISSING_FILES=()
@@ -111,22 +112,33 @@ if [ ${#MISSING_FILES[@]} -gt 0 ]; then
     exit 1
 fi
 
-# Load shared configuration
-print_info "Loading iOS shared configuration..."
-source secrets/shared_keys.env
+# Load configuration from fork.properties and secrets/ files
+print_info "Loading iOS deployment configuration..."
+
+TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+MATCH_GIT_URL=$(grep -E "^apple\.match\.git\.url=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+MATCH_GIT_BRANCH=$(grep -E "^apple\.match\.git\.branch=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+TESTFLIGHT_GROUPS=$(grep -E "^apple\.tf\.groups=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+
+APPSTORE_KEY_ID=$(cat secrets/apple/appstore/key_id 2>/dev/null | tr -d '\n\r')
+APPSTORE_ISSUER_ID=$(cat secrets/apple/appstore/issuer_id 2>/dev/null | tr -d '\n\r')
 
 # Validate App Store Connect API key configuration
 if [ -z "$APPSTORE_KEY_ID" ] || [ -z "$APPSTORE_ISSUER_ID" ]; then
     print_error "App Store Connect API credentials not configured"
-    print_info "Update secrets/shared_keys.env with APPSTORE_KEY_ID and APPSTORE_ISSUER_ID"
+    print_info "Ensure secrets/apple/appstore/key_id and secrets/apple/appstore/issuer_id exist"
     exit 1
 fi
 
 # Load Match password
-export MATCH_PASSWORD=$(cat secrets/.match_password)
+export MATCH_PASSWORD=$(cat secrets/apple/match/.match_password)
 
 # Setup SSH for Match
-export GIT_SSH_COMMAND="ssh -i secrets/match_ci_key -o IdentitiesOnly=yes"
+export GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o IdentitiesOnly=yes"
+
+# Export for fastlane
+export APPSTORE_KEY_ID APPSTORE_ISSUER_ID TEAM_ID MATCH_GIT_URL MATCH_GIT_BRANCH TESTFLIGHT_GROUPS
+export APPSTORE_KEY_PATH="./secrets/apple/appstore/AuthKey.p8"
 
 print_success "Configuration loaded"
 
@@ -147,6 +159,12 @@ echo "  2. Build will be submitted for beta review by Apple"
 echo "  3. Review typically takes 24-48 hours"
 echo "  4. Once approved, testers will be notified automatically"
 echo
+
+TESTFLIGHT_CONTACT_EMAIL=$(grep -E "^org\.email=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+TESTFLIGHT_FIRST_NAME=$(grep -E "^org\.first\.name=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+TESTFLIGHT_LAST_NAME=$(grep -E "^org\.last\.name=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+TESTFLIGHT_PHONE=$(grep -E "^org\.phone=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+export TESTFLIGHT_CONTACT_EMAIL TESTFLIGHT_FIRST_NAME TESTFLIGHT_LAST_NAME TESTFLIGHT_PHONE
 
 print_warning "Beta Review Information:"
 echo "  - Contact Email: ${TESTFLIGHT_CONTACT_EMAIL:-team@mifos.org}"

@@ -32,7 +32,7 @@ print_info() {
 }
 
 # Default environment file paths (secrets/ is preferred, root is legacy)
-SECRETS_DIR_ENV_FILE="secrets/secrets.env"
+SECRETS_DIR_ENV_FILE="secrets/shared/secrets.env"
 ROOT_ENV_FILE="secrets.env"
 ENV_FILE=""  # Will be resolved after argument parsing
 
@@ -80,7 +80,7 @@ strip_quotes() {
 }
 
 # Resolve which secrets.env file to use
-# Priority: --env-file override > secrets/secrets.env > root secrets.env
+# Priority: --env-file override > secrets/shared/secrets.env > root secrets.env
 resolve_env_file() {
     # If user specified --env-file, use that
     if [[ -n "$ENV_FILE_OVERRIDE" ]]; then
@@ -97,7 +97,7 @@ resolve_env_file() {
     # Both exist - ask user to choose
     if [[ "$secrets_dir_exists" = true ]] && [[ "$root_exists" = true ]]; then
         echo -e "${YELLOW}Found secrets.env in two locations:${NC}"
-        echo -e "  ${CYAN}[1]${NC} secrets/secrets.env  (recommended)"
+        echo -e "  ${CYAN}[1]${NC} secrets/shared/secrets.env  (recommended)"
         echo -e "  ${CYAN}[2]${NC} secrets.env          (legacy/root)"
         echo ""
         read -r -p "Which file should be used? [1/2] (default: 1): " choice
@@ -196,7 +196,7 @@ show_help() {
     echo "  --env=environment         - GitHub environment name"
     echo "  --name=SECRET_NAME        - Secret name (for delete command)"
     echo "  --env-file=path           - Override secrets.env file path"
-    echo "                              (default: secrets/secrets.env, fallback: secrets.env)"
+    echo "                              (default: secrets/shared/secrets.env, fallback: secrets.env)"
     echo ""
     echo "Examples:"
     echo "  ./keystore-manager.sh generate"
@@ -364,34 +364,42 @@ create_secrets_dir() {
     fi
 }
 
-# Parse iOS string secrets from shared_keys.env
+# Parse iOS string secrets from the new two-source model:
+#   - Non-secret identity/metadata → gradle/fork.properties
+#   - Secret values → per-value files under secrets/apple/...
+#
+# DEPRECATED: this function previously read secrets/shared/shared_keys.env.
+# That file is being retired. All callers continue to work through this
+# function — only the read sources have changed. Do not remove this function;
+# it may still be called by callers outside this file.
 parse_shared_keys_env() {
-    local SHARED_KEYS_FILE="secrets/shared_keys.env"
+    local FORK_PROPS="gradle/fork.properties"
 
-    # Skip if file doesn't exist (Android-only setup)
-    if [[ ! -f "$SHARED_KEYS_FILE" ]]; then
-        print_info "shared_keys.env not found - skipping iOS secrets (Android-only project)"
+    # Skip if neither source is present (Android-only setup)
+    if [[ ! -f "$FORK_PROPS" ]] && [[ ! -f "secrets/apple/appstore/key_id" ]]; then
+        print_info "iOS configuration not found - skipping iOS secrets (Android-only project)"
         return 0
     fi
 
-    print_info "Parsing iOS secrets from shared_keys.env..."
+    print_info "Parsing iOS secrets from fork.properties + secrets/ files..."
 
     # Read MATCH_PASSWORD from .match_password file if it exists
     local MATCH_PWD=""
-    if [[ -f "secrets/.match_password" ]]; then
-        MATCH_PWD=$(head -n1 secrets/.match_password 2>/dev/null | tr -d '\n\r')
+    if [[ -f "secrets/apple/match/.match_password" ]]; then
+        MATCH_PWD=$(head -n1 secrets/apple/match/.match_password 2>/dev/null | tr -d '\n\r')
         print_success "Loaded MATCH_PASSWORD from .match_password file"
     else
-        print_warning "secrets/.match_password not found - MATCH_PASSWORD will be empty"
+        print_warning "secrets/apple/match/.match_password not found - MATCH_PASSWORD will be empty"
     fi
 
-    # Extract values from shared_keys.env
-    # Format: export KEY="value"
-    local APPSTORE_KEY_ID=$(grep '^export APPSTORE_KEY_ID=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
-    local APPSTORE_ISSUER_ID=$(grep '^export APPSTORE_ISSUER_ID=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
-    local NOTARIZATION_TEAM_ID=$(grep '^export TEAM_ID=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
-    local NOTARIZATION_APPLE_ID=$(grep '^export NOTARIZATION_APPLE_ID=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
-    local NOTARIZATION_PASSWORD=$(grep '^export NOTARIZATION_PASSWORD=' "$SHARED_KEYS_FILE" 2>/dev/null | cut -d'"' -f2)
+    # Extract non-secret identity from fork.properties
+    local NOTARIZATION_TEAM_ID=$(grep -E "^apple\.team\.id=" "$FORK_PROPS" 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
+
+    # Extract secret values from per-value files
+    local APPSTORE_KEY_ID=$(cat "secrets/apple/appstore/key_id" 2>/dev/null | tr -d '\n\r')
+    local APPSTORE_ISSUER_ID=$(cat "secrets/apple/appstore/issuer_id" 2>/dev/null | tr -d '\n\r')
+    local NOTARIZATION_APPLE_ID=""   # not yet migrated to a file; leave empty
+    local NOTARIZATION_PASSWORD=""   # not yet migrated to a file; leave empty
 
     # Validate critical values
     if [[ -z "$APPSTORE_KEY_ID" ]]; then
@@ -430,9 +438,9 @@ parse_macos_password_files() {
     local count=0
 
     # Read KEYCHAIN_PASSWORD from .keychain_password file
-    if [[ -f "secrets/.keychain_password" ]]; then
+    if [[ -f "secrets/apple/match/.keychain_password" ]]; then
         local val
-        val=$(head -n1 secrets/.keychain_password 2>/dev/null | tr -d '\n\r')
+        val=$(head -n1 secrets/apple/match/.keychain_password 2>/dev/null | tr -d '\n\r')
         if [[ -n "$val" ]]; then
             MACOS_PASSWORD_SECRETS["KEYCHAIN_PASSWORD"]="$val"
             count=$((count + 1))
@@ -441,13 +449,13 @@ parse_macos_password_files() {
             print_warning ".keychain_password file is empty"
         fi
     else
-        print_info "secrets/.keychain_password not found - KEYCHAIN_PASSWORD will remain as-is"
+        print_info "secrets/apple/match/.keychain_password not found - KEYCHAIN_PASSWORD will remain as-is"
     fi
 
     # Read CERTIFICATES_PASSWORD from .certificates_password file
-    if [[ -f "secrets/.certificates_password" ]]; then
+    if [[ -f "secrets/apple/match/.certificates_password" ]]; then
         local val
-        val=$(head -n1 secrets/.certificates_password 2>/dev/null | tr -d '\n\r')
+        val=$(head -n1 secrets/apple/match/.certificates_password 2>/dev/null | tr -d '\n\r')
         if [[ -n "$val" ]]; then
             MACOS_PASSWORD_SECRETS["CERTIFICATES_PASSWORD"]="$val"
             count=$((count + 1))
@@ -456,7 +464,7 @@ parse_macos_password_files() {
             print_warning ".certificates_password file is empty"
         fi
     else
-        print_info "secrets/.certificates_password not found - CERTIFICATES_PASSWORD will remain as-is"
+        print_info "secrets/apple/match/.certificates_password not found - CERTIFICATES_PASSWORD will remain as-is"
     fi
 
     print_success "Found $count of 2 macOS password secrets"
@@ -834,14 +842,14 @@ EOF
 # Place .p12 and .provisionprofile files in secrets/ directory, then run sync.
 #
 # Password files (read automatically by sync):
-#   secrets/.keychain_password              → KEYCHAIN_PASSWORD
-#   secrets/.certificates_password          → CERTIFICATES_PASSWORD
+#   secrets/apple/match/.keychain_password              → KEYCHAIN_PASSWORD
+#   secrets/apple/match/.certificates_password          → CERTIFICATES_PASSWORD
 #
 # Certificate/profile files (base64 encoded by sync):
-#   secrets/mac_app_distribution.p12        → MAC_APP_DISTRIBUTION_CERTIFICATE_B64
-#   secrets/mac_installer_distribution.p12  → MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64
-#   secrets/mac_embedded.provisionprofile   → MAC_EMBEDDED_PROVISION_B64
-#   secrets/mac_runtime.provisionprofile    → MAC_RUNTIME_PROVISION_B64
+#   secrets/desktop/mac_app_distribution.p12        → MAC_APP_DISTRIBUTION_CERTIFICATE_B64
+#   secrets/desktop/mac_installer_distribution.p12  → MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64
+#   secrets/desktop/mac_embedded.provisionprofile   → MAC_EMBEDDED_PROVISION_B64
+#   secrets/desktop/mac_runtime.provisionprofile    → MAC_RUNTIME_PROVISION_B64
 EOF
         then
             print_error "Failed to append macOS App Store section"
@@ -882,7 +890,7 @@ validate_sync_result() {
     fi
 
     # Check for iOS Configuration section header (if iOS project)
-    if [[ -f "secrets/shared_keys.env" ]]; then
+    if [[ -f "secrets/apple/appstore/key_id" ]] || grep -qE "^apple\.team\.id=" gradle/fork.properties 2>/dev/null; then
         if ! grep -q "^# iOS Configuration" "$SECRETS_FILE"; then
             format_errors+=("Missing iOS configuration section header (iOS project detected)")
         fi
@@ -992,7 +1000,7 @@ validate_sync_result() {
     done
 
     # Check iOS secrets if iOS project detected
-    if [[ -f "secrets/shared_keys.env" ]]; then
+    if [[ -f "secrets/apple/appstore/key_id" ]] || grep -qE "^apple\.team\.id=" gradle/fork.properties 2>/dev/null; then
         local required_ios=(
             "APPSTORE_KEY_ID"
             "APPSTORE_ISSUER_ID"
@@ -1265,7 +1273,7 @@ module FastlaneConfig
 
     ANDROID = {
       package_name: "cmp.android.app",
-      play_store_json_key: "secrets/playStorePublishServiceCredentialsFile.json",
+      play_store_json_key: "secrets/android/playStorePublishServiceCredentialsFile.json",
       apk_paths: {
         prod: "cmp-android/build/outputs/apk/prod/release/cmp-android-prod-release.apk",
         demo: "cmp-android/build/outputs/apk/demo/release/cmp-android-demo-release.apk"
@@ -1285,7 +1293,7 @@ module FastlaneConfig
     }
 
     SHARED = {
-      firebase_service_credentials: "secrets/firebaseAppDistributionServiceCredentialsFile.json"
+      firebase_service_credentials: "secrets/android/firebaseAppDistributionServiceCredentialsFile.json"
     }
   end
 end
@@ -1969,9 +1977,9 @@ case $COMMAND in
             print_info "Created backup: ${ENV_FILE}.backup"
         fi
 
-        # Step 1: Parse shared_keys.env (iOS string secrets)
+        # Step 1: Parse iOS string secrets from fork.properties + secrets/ files
         echo
-        print_info "[1/7] Parsing shared_keys.env for iOS string secrets..."
+        print_info "[1/7] Parsing iOS secrets from fork.properties + secrets/ files..."
         parse_shared_keys_env
 
         # Step 2: Parse macOS password files

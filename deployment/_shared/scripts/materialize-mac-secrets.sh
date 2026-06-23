@@ -17,7 +17,7 @@ set -euo pipefail
 bash "$(dirname "$0")/materialize-ios-secrets.sh"
 
 # Mac-specific cert .p12 (consumed by mac-app-store/lane.rb when Match isn't wired).
-[[ -n "${MAC_APP_STORE_CERT_B64:-}" ]] && echo "$MAC_APP_STORE_CERT_B64" | base64 -d > secrets/mac_app_store.p12
-[[ -n "${MAC_INSTALLER_CERT_B64:-}" ]] && echo "$MAC_INSTALLER_CERT_B64" | base64 -d > secrets/mac_installer.p12
+[[ -n "${MAC_APP_STORE_CERT_B64:-}" ]] && echo "$MAC_APP_STORE_CERT_B64" | base64 -d > secrets/desktop/macos/app_store.p12
+[[ -n "${MAC_INSTALLER_CERT_B64:-}" ]] && echo "$MAC_INSTALLER_CERT_B64" | base64 -d > secrets/desktop/macos/installer.p12
 
 echo "✅ macOS secrets materialized (manual-mode)"

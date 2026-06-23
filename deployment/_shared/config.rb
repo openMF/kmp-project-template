@@ -151,17 +151,17 @@ module FastlaneConfig
       app_identifier:                ForkIdentity::APP_ID,
       team_id:                       ForkIdentity::IOS_TEAM_ID,
       # ASC API key — ENV preferred (CI); file fallback (local/vault)
-      key_id:                        _c._secret("APPSTORE_KEY_ID",    "#{_s}/appstore/key_id"),
-      issuer_id:                     _c._secret("APPSTORE_ISSUER_ID", "#{_s}/appstore/issuer_id"),
-      key_filepath:                  File.join(DEPLOYMENT_REPO_ROOT, "#{_s}/appstore/AuthKey.p8"),
+      key_id:                        _c._secret("APPSTORE_KEY_ID",    "#{_s}/apple/appstore/key_id"),
+      issuer_id:                     _c._secret("APPSTORE_ISSUER_ID", "#{_s}/apple/appstore/issuer_id"),
+      key_filepath:                  File.join(DEPLOYMENT_REPO_ROOT, "#{_s}/apple/appstore/AuthKey.p8"),
       # Match certificate repository — ENV (CI) → secrets/ file → fork.properties → default
-      match_git_url:    _c._secret("MATCH_GIT_URL",    "#{_s}/match/git_url")    || _c._fork_prop("apple.match.git.url"),
-      match_git_branch: _c._secret("MATCH_GIT_BRANCH", "#{_s}/match/git_branch") || _c._fork_prop("apple.match.git.branch") || "master",
+      match_git_url:    _c._secret("MATCH_GIT_URL",    "#{_s}/apple/match/git_url")    || _c._fork_prop("apple.match.git.url"),
+      match_git_branch: _c._secret("MATCH_GIT_BRANCH", "#{_s}/apple/match/git_branch") || _c._fork_prop("apple.match.git.branch") || "master",
       match_type:                    "adhoc",
-      match_ssh_key_path:            "#{_s}/match/match_ci_key",
-      match_password:                _c._secret("MATCH_PASSWORD",          "#{_s}/match/.match_password"),
-      certificates_password:         _c._secret("CERTIFICATES_PASSWORD",   "#{_s}/match/certificates_password"),
-      keychain_password:             _c._secret("KEYCHAIN_PASSWORD",       "#{_s}/match/keychain_password"),
+      match_ssh_key_path:            "#{_s}/apple/match/match_ci_key",
+      match_password:                _c._secret("MATCH_PASSWORD",          "#{_s}/apple/match/.match_password"),
+      certificates_password:         _c._secret("CERTIFICATES_PASSWORD",   "#{_s}/apple/match/certificates_password"),
+      keychain_password:             _c._secret("KEYCHAIN_PASSWORD",       "#{_s}/apple/match/keychain_password"),
       # Provisioning profiles
       provisioning_profile_adhoc:    "#{ForkIdentity::APP_ID} AdHoc",
       provisioning_profile_appstore: "#{ForkIdentity::APP_ID} AppStore",
@@ -175,18 +175,18 @@ module FastlaneConfig
 
     TESTFLIGHT_CONFIG = {
       beta_app_review_info: {
-        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || "team@mifos.org",
-        contact_first_name:    _c._secret("TESTFLIGHT_FIRST_NAME")    || "Mifos",
-        contact_last_name:     _c._secret("TESTFLIGHT_LAST_NAME")     || "Team",
-        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || "+1234567890",
+        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || _c._fork_prop("org.email")      || "team@mifos.org",
+        contact_first_name:    _c._secret("TESTFLIGHT_FIRST_NAME")    || _c._fork_prop("org.first.name") || "Mifos",
+        contact_last_name:     _c._secret("TESTFLIGHT_LAST_NAME")     || _c._fork_prop("org.last.name")  || "Team",
+        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || _c._fork_prop("org.phone")      || "+1234567890",
         demo_account_required: false,
       }.freeze,
-      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || "team@mifos.org",
+      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || _c._fork_prop("org.email") || "team@mifos.org",
       beta_app_description:              "#{ForkIdentity::APP_DISPLAY_NAME} beta build",
       demo_account_required:             false,
       distribute_external:               true,
       notify_external_testers:           true,
-      groups:                            (_c._secret("TESTFLIGHT_GROUPS") || "internal-testers").split(",").map(&:strip),
+      groups:                            (_c._secret("TESTFLIGHT_GROUPS") || _c._fork_prop("apple.tf.groups") || "internal-testers").split(",").map(&:strip),
       skip_submission:                   false,
       skip_waiting_for_build_processing: true,
       submit_beta_review:                true,
@@ -209,10 +209,10 @@ module FastlaneConfig
       run_precheck_before_submit:         true,
       submission_information:             { add_id_info_uses_idfa: false }.freeze,
       app_review_information: {
-        first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || "Mifos",
-        last_name:  _c._secret("APPSTORE_REVIEW_LAST_NAME")  || "Team",
-        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || "+1234567890",
-        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || "review@mifos.org",
+        first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || _c._fork_prop("org.first.name") || "Mifos",
+        last_name:  _c._secret("APPSTORE_REVIEW_LAST_NAME")  || _c._fork_prop("org.last.name")  || "Team",
+        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || _c._fork_prop("org.phone")      || "+1234567890",
+        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || _c._fork_prop("org.email")      || "review@mifos.org",
       }.freeze,
     }.freeze
   end
@@ -238,7 +238,7 @@ module FastlaneConfig
     _s_abs = SECRETS_DIR_ABS     # absolute — for paths passed directly to fastlane actions
     base = {
       serviceCredsFile: ENV["FIREBASE_SERVICE_ACCOUNT_PATH"] ||
-                        "#{_s_abs}/firebase/service-account.json",
+                        "#{_s_abs}/android/firebase/service-account.json",
       groups: ENV["FIREBASE_GROUPS"] || nil,
     }
     case platform
@@ -247,23 +247,23 @@ module FastlaneConfig
       app_id = if flavor == :demo
                  ENV["FIREBASE_IOS_DEMO_APP_ID"] ||
                    _fork_prop("firebase.ios.demo.app.id") ||
-                   _secret_file("#{_s}/firebase/ios_demo_app_id") || ""
+                   _secret_file("#{_s}/apple/firebase/ios_demo_app_id") || ""
                else
                  ENV["FIREBASE_IOS_PROD_APP_ID"] ||
                    _fork_prop("firebase.ios.prod.app.id") ||
                    ENV["FIREBASE_IOS_APP_ID"] ||
                    _fork_prop("firebase.ios.app.id") ||
-                   _secret_file("#{_s}/firebase/ios_prod_app_id") ||
-                   _secret_file("#{_s}/firebase/ios_app_id") || ""
+                   _secret_file("#{_s}/apple/firebase/ios_prod_app_id") ||
+                   _secret_file("#{_s}/apple/firebase/ios_app_id") || ""
                end
       base.merge(appId: app_id)
     when :android
       app_id = if flavor == :demo
                  ENV["FIREBASE_ANDROID_DEMO_APP_ID"] ||
-                   _secret_file("#{_s}/firebase/android_demo_app_id") || ""
+                   _secret_file("#{_s}/android/firebase/android_demo_app_id") || ""
                else
                  ENV["FIREBASE_ANDROID_APP_ID"] ||
-                   _secret_file("#{_s}/firebase/android_app_id") || ""
+                   _secret_file("#{_s}/android/firebase/android_app_id") || ""
                end
       base.merge(appId: app_id)
     else
@@ -278,7 +278,7 @@ module FastlaneConfig
   # verifies upload signature, then re-signs with the Google-held app signing key).
   def self.get_android_signing_config(options = {})
     _s = SECRETS_DIR
-    props_path = "#{_s}/keystores/upload_keystore.properties"
+    props_path = "#{_s}/android/keystores/upload_keystore.properties"
     props = {}
     if File.exist?(File.join(DEPLOYMENT_REPO_ROOT, props_path))
       File.readlines(File.join(DEPLOYMENT_REPO_ROOT, props_path)).each do |line|
@@ -289,7 +289,7 @@ module FastlaneConfig
 
     # Read storeFile dynamically so forks can rename the keystore without
     # touching config.rb (storeFile key in upload_keystore.properties is canonical).
-    default_jks = "#{_s}/keystores/#{props.fetch("storeFile", "upload_keystore.keystore")}"
+    default_jks = "#{_s}/android/keystores/#{props.fetch("storeFile", "upload_keystore.keystore")}"
 
     {
       keystore_path:     options[:keystore_path]     ||
@@ -354,6 +354,18 @@ def with_ios_preamble(options = {})
       File.chmod(0600, ssh_config) rescue nil
     end
   end
+
+  # Install CocoaPods when the iOS project uses them — the Xcode archive needs the generated
+  # Pods/ + .xcconfig/.xcfilelist. This config.rb preamble overrides deploy_helpers' (which ran
+  # cocoapods), so without this the archive fails "Unable to open Pods-iosApp.release.xcconfig".
+  # KMP + CocoaPods: cmp_shared.podspec is generated by the Kotlin cocoapods plugin, so pod
+  # install fails "should run :generateDummyFramework first" unless these Gradle tasks run first
+  # (matches .github/workflows/pr-check.yml line 61). (2026-06-22)
+  podfile = File.join(DEPLOYMENT_REPO_ROOT, "cmp-ios", "Podfile")
+  if File.exist?(podfile)
+    sh("#{DEPLOYMENT_REPO_ROOT}/gradlew -p #{DEPLOYMENT_REPO_ROOT} :cmp-shared:podspec :cmp-shared:generateDummyFramework")
+    cocoapods(podfile: podfile, try_repo_update_on_error: true)
+  end
 end
 
 # Unlock (local) or create (CI) the keychain before Match imports certificates.
@@ -392,7 +404,7 @@ def fetch_certificates_with_match(options = {})
   ssh_key = File.join(DEPLOYMENT_REPO_ROOT, cfg[:match_ssh_key_path])
 
   # Match reads MATCH_PASSWORD automatically to decrypt the git-stored certs.
-  # Priority: call option → ENV → BUILD_CONFIG (file-backed via secrets/match/).
+  # Priority: call option → ENV → BUILD_CONFIG (file-backed via secrets/apple/match/).
   match_pass = options[:match_password] || ENV["MATCH_PASSWORD"] || cfg[:match_password]
   ENV["MATCH_PASSWORD"] = match_pass.to_s if match_pass && ENV["MATCH_PASSWORD"].to_s.empty?
 
@@ -400,22 +412,80 @@ def fetch_certificates_with_match(options = {})
   certs_pass = options[:certificates_password] || ENV["CERTIFICATES_PASSWORD"] || cfg[:certificates_password]
   ENV["CERTIFICATES_PASSWORD"] = certs_pass.to_s if certs_pass && ENV["CERTIFICATES_PASSWORD"].to_s.empty?
 
-  # readonly: false + force: true when the stored cert is expired so Match revokes
-  # it, creates a fresh Distribution cert, saves it to the repo, and imports it.
-  # Set readonly: true (via options) once a valid cert exists in the Match repo.
-  readonly = options.key?(:readonly) ? options[:readonly] : false
-  force    = options.key?(:force)    ? options[:force]    : !readonly
-
-  match(
+  base = {
     type:                     options[:match_type]       || cfg[:match_type],
     app_identifier:           options[:app_identifier]   || cfg[:app_identifier],
     git_url:                  options[:match_git_url]    || cfg[:match_git_url],
     git_branch:               options[:match_git_branch] || cfg[:match_git_branch],
     git_private_key:          File.exist?(ssh_key) ? ssh_key : nil,
     include_all_certificates: true,
-    readonly:                 readonly,
-    force:                    force,
-  )
+  }
+
+  # Explicit override — a caller can pin readonly (e.g. bootstrap passes readonly:false to mint).
+  if options.key?(:readonly)
+    ro = options[:readonly]
+    match(**base, readonly: ro, force: options.fetch(:force, !ro))
+    return
+  end
+
+  # FULLY-AUTOMATIC Match (auto readonly/force + auto-renew):
+  #   Phase 1 — readonly fetch. Installs whatever valid cert/profile already lives in the Match
+  #     repo. NO Dev Portal call → works even when the Apple PLA is pending. If it raises (repo
+  #     empty / cert revoked), fall through to renewal.
+  phase1_ok = begin
+    match(**base, readonly: true, force: false)
+    true
+  rescue StandardError => e
+    UI.important("readonly match could not install a cert/profile (#{e.message.to_s.lines.first&.strip}); will renew.")
+    false
+  end
+
+  #   Phase 2 — decide force LOCALLY (no portal): renew only when the AppStore cert/profile is
+  #     missing or expiring soon. readonly:false + force:true regenerates on the Dev Portal AND
+  #     commits the fresh assets back to the Match repo (auto-renew). Renewal is the ONLY path
+  #     that needs the portal/PLA — the valid-cert steady state never touches it. (2026-06-22)
+  if !phase1_ok || match_assets_expired?(cfg, options)
+    UI.important("⚠️ AppStore cert/profile expired or missing → AUTO-RENEWING on the Dev Portal " \
+                 "(requires the Apple Program License Agreement to be current for the account holder).")
+    match(**base, readonly: false, force: true)
+  else
+    UI.message("✅ Valid AppStore cert/profile already in the Match repo — readonly, no Dev Portal / PLA needed.")
+  end
+end
+
+# Drives the auto-renew decision WITHOUT a Dev Portal call: returns true ONLY when there is no
+# valid Apple Distribution signing identity available AND no unexpired AppStore profile on disk.
+# `security find-identity -v` lists ONLY non-expired codesigning identities, so a hit means the
+# cert is valid → stay readonly (no portal/PLA). Checks BOTH the legacy and the Xcode-16+/26
+# provisioning-profile directories. Defaults to NOT-expired on any uncertainty, so a valid cert
+# is never needlessly renewed (which would hit the PLA). (2026-06-22)
+def match_assets_expired?(cfg, options = {}, min_days = 7)
+  # 1) Valid (non-expired) Distribution cert in the keychain → certs are good.
+  ids = `security find-identity -v -p codesigning 2>/dev/null`
+  return false if ids =~ /Apple Distribution|iPhone Distribution|3rd Party Mac/
+
+  # 2) No cert hit → fall back to an unexpired AppStore profile on disk (either profile dir).
+  require "time"
+  app_id = options[:app_identifier] || cfg[:app_identifier]
+  dirs = [
+    File.expand_path("~/Library/Developer/Xcode/UserData/Provisioning Profiles"),
+    File.expand_path("~/Library/MobileDevice/Provisioning Profiles"),
+  ]
+  dirs.each do |dir|
+    Dir.glob(File.join(dir, "*.mobileprovision")).each do |p|
+      xml = `security cms -D -i "#{p}" 2>/dev/null`
+      next unless xml.include?(app_id)
+      next if xml =~ %r{<key>get-task-allow</key>\s*<true}  # skip Development profiles
+      if xml =~ %r{<key>ExpirationDate</key>\s*<date>([^<]+)</date>}
+        return false if Time.parse(Regexp.last_match(1)) > Time.now + (min_days * 86_400)
+      end
+    end
+  end
+  UI.important("No valid Apple Distribution identity or unexpired AppStore profile found — renewal needed.")
+  true
+rescue StandardError => e
+  UI.important("match validity check failed (#{e.message}); assuming VALID (readonly) to avoid an unneeded Dev Portal/PLA call.")
+  false
 end
 
 # Revoke iOS Distribution certificates from Apple Developer Portal to free slots for
@@ -481,14 +551,14 @@ end
 # Distribution certificate via the ASC API.
 #
 # PERSISTENT CLONE STRATEGY
-#   The clone lives at secrets/match/ios-provisioning-profile/ (gitignored).
+#   The clone lives at secrets/apple/match/ios-provisioning-profile/ (gitignored).
 #   • Local / colleagues: clone is reused across runs (git fetch + reset — fast).
 #   • GitHub Actions: starts clean each run, falls back to git clone --depth 1.
 #
 #   Colleague first-time setup:
-#     GIT_SSH_COMMAND="ssh -i secrets/match/match_ci_key -o StrictHostKeyChecking=no" \
+#     GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
 #       git clone --depth 1 git@github.com:openMF/ios-provisioning-profile.git \
-#       secrets/match/ios-provisioning-profile
+#       secrets/apple/match/ios-provisioning-profile
 #   Subsequent runs: the lane updates the clone automatically.
 #
 # Safe: does NOT revoke from Apple Developer Portal (expired certs are already unusable).
@@ -503,7 +573,7 @@ def purge_match_distribution_certs
   git_env = {"GIT_SSH_COMMAND" => "ssh -i #{ssh_key} -o StrictHostKeyChecking=no"}
 
   # Persistent clone — reused locally, cloned fresh on CI (secrets/ is gitignored).
-  match_local = File.join(DEPLOYMENT_REPO_ROOT, "secrets", "match", "ios-provisioning-profile")
+  match_local = File.join(DEPLOYMENT_REPO_ROOT, "secrets", "apple", "match", "ios-provisioning-profile")
 
   if Dir.exist?(File.join(match_local, ".git"))
     UI.message("Updating existing Match repo clone at #{match_local}...")
@@ -673,7 +743,7 @@ end
 # gradlew at root, not inside cmp-android/ — incompatible with gradle() action's
 # project_dir expectation.
 def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
-  keystore = signing_config[:keystore_path] || "secrets/keystores/upload_keystore.keystore"
+  keystore = signing_config[:keystore_path] || "secrets/android/keystores/upload_keystore.keystore"
   keystore_abs = File.expand_path(File.join(DEPLOYMENT_REPO_ROOT, keystore))
   gradlew    = File.join(DEPLOYMENT_REPO_ROOT, "gradlew")
   full_task  = ":cmp-android:#{taskName}#{buildType}"

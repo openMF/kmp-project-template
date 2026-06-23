@@ -91,7 +91,7 @@ vault preflight + PROMOTION_LOG audit but is **NOT** required for Path A.
    | `AuthKey.p8`                                                  | App Store Connect / TestFlight upload              |
    | `APNAuthKey.p8`                                               | Apple Push (if used)                               |
    | `match_ci_key` + `match_ci_key.pub`                           | Fastlane Match SSH (iOS code signing)              |
-   | `shared_keys.env` (from `shared_keys.env.template`)           | KMP shared env vars (incl. `FRED_API_KEY`)         |
+   | `gradle/fork.properties` (from `gradle/fork.properties.template`)  | Non-secret identity/metadata (`apple.team.id`, contacts, URLs) |
    | `cloudflare/CLOUDFLARE_API_TOKEN`                             | Cloudflare Pages deploy (web)                      |
 
 5. **Wire CI** by pasting the same files into GitHub Actions repo secrets
@@ -156,7 +156,7 @@ every iOS deploy lane fails with `"Your certificate '…' is not valid"`. The
 
 **When to run:**
 - A deploy fails with `"not valid, please check end date"` → run immediately.
-- Monthly CI schedule (`.github/workflows/ios-cert-renewal.yml`) handles the
+- Monthly CI schedule (`openMF/ios-provisioning-profile cron (cert-renewal.yml)`) handles the
   proactive case automatically on the 1st of every month.
 
 #### Colleague setup (one-time per machine)
@@ -165,27 +165,27 @@ Everyone who needs to run `renewCerts` or any iOS lane locally needs:
 
 | What | Where | How to get it |
 |------|-------|---------------|
-| SSH private key with write access to `openMF/ios-provisioning-profile` | `secrets/match/match_ci_key` | Framework vault: `/secrets pull`; or request from team lead |
-| `MATCH_PASSWORD` | `secrets/match/.match_password` | Same vault / team lead |
-| `KEYCHAIN_PASSWORD` | `secrets/match/keychain_password` | Your macOS login keychain password |
-| `CERTIFICATES_PASSWORD` | `secrets/match/certificates_password` | Same as `MATCH_PASSWORD` in standard setups |
-| ASC API key | `secrets/appstore/AuthKey.p8` + `key_id` + `issuer_id` | Framework vault: `/secrets pull` |
+| SSH private key with write access to `openMF/ios-provisioning-profile` | `secrets/apple/match/match_ci_key` | Framework vault: `/secrets pull`; or request from team lead |
+| `MATCH_PASSWORD` | `secrets/apple/match/.match_password` | Same vault / team lead |
+| `KEYCHAIN_PASSWORD` | `secrets/apple/match/keychain_password` | Your macOS login keychain password |
+| `CERTIFICATES_PASSWORD` | `secrets/apple/match/certificates_password` | Same as `MATCH_PASSWORD` in standard setups |
+| ASC API key | `secrets/apple/appstore/AuthKey.p8` + `key_id` + `issuer_id` | Framework vault: `/secrets pull` |
 
 Once secrets are in place, clone the Match repo once so subsequent runs
 are fast (`git fetch + reset` instead of a full clone):
 
 ```bash
 # From repo root — one-time setup per machine
-GIT_SSH_COMMAND="ssh -i secrets/match/match_ci_key -o StrictHostKeyChecking=no" \
+GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
   git clone --depth 1 git@github.com:openMF/ios-provisioning-profile.git \
-  secrets/match/ios-provisioning-profile
+  secrets/apple/match/ios-provisioning-profile
 ```
 
 > The `secrets/` directory is gitignored — the clone never enters source control.
 > The `renewCerts` lane auto-clones on first run if the directory is absent, so
 > this manual step is optional but speeds up subsequent runs.
 
-**GitHub Actions** — the `ios-cert-renewal.yml` workflow sets up all secrets
+**GitHub Actions** — the `cert-renewal.yml (openMF/ios-provisioning-profile)` workflow sets up all secrets
 and clones the Match repo automatically. Required repo secrets:
 `MATCH_GIT_PRIVATE_KEY`, `MATCH_PASSWORD`, `CERTIFICATES_PASSWORD`,
 `KEYCHAIN_PASSWORD`, `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`, `APPSTORE_AUTH_KEY`.
@@ -344,7 +344,7 @@ admin to push. Once the upstream tags land, a follow-up PR (the
 2. **Delete** the entire `fastlane/` directory (`git rm -r fastlane/`).
 3. **Delete** the entire `fastlane-config/` directory (`git rm -r
    fastlane-config/`).
-4. **Update** `docs/FORK_QUICKSTART.md` to remove any residual references to
+4. **Update** `docs/setup/FORK_QUICKSTART.md` to remove any residual references to
    `fastlane/` paths.
 5. **Update** `CLAUDE.md` `Architecture` block to drop the `fastlane/` row.
 6. **Re-run** `./gradlew check spotlessCheck detekt dependencyGuard` and the
@@ -377,12 +377,13 @@ Both intents now migrate:
 - **Documentation** → this file. The `secrets/` vs `secrets_demo/` schema +
   Path A walkthrough above replaces the `.env.local.example` comment block.
 
-For OSS forks running Path A who don't want vault ceremony, the
-`secrets/shared_keys.env` file (copied from `secrets/shared_keys.env.template`)
-is the equivalent of the old `.env.local` — it carries `FRED_API_KEY=...` and
-is gitignored. The pre-commit secrets guard
-(`/secrets install-hook`) refuses any `.env*` file staged outside the vault
-repo, which closes the legacy-leak surface.
+For OSS forks running Path A who don't want vault ceremony:
+- Non-secret identity/metadata (team ID, contact info, URLs) goes in `gradle/fork.properties`
+  (copy from `gradle/fork.properties.template`, which is committed).
+- Secret values (API keys, passwords, certificates) are dropped as per-value files under
+  `secrets/<platform>/...` (all gitignored). The pre-commit secrets guard
+  (`/secrets install-hook`) refuses any `.env*` file staged outside the vault
+  repo, which closes the legacy-leak surface.
 
 ---
 

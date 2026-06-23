@@ -33,11 +33,11 @@
 #   run with `match_readonly: false` from a maintainer machine.
 #
 # Secrets (resolved via _shared/config.rb#_secret — ENV first, secrets/ fallback):
-#   secrets/match/match_ci_key             — SSH key for Match git repo access
-#   secrets/match/.match_password          — Match encryption password
-#   secrets/appstore/AuthKey.p8            — ASC API key (Match cert issuance + notarize)
-#   secrets/appstore/key_id                — ASC key ID
-#   secrets/appstore/issuer_id             — ASC issuer ID
+#   secrets/apple/match/match_ci_key             — SSH key for Match git repo access
+#   secrets/apple/match/.match_password          — Match encryption password
+#   secrets/apple/appstore/AuthKey.p8            — ASC API key (Match cert issuance + notarize)
+#   secrets/apple/appstore/key_id                — ASC key ID
+#   secrets/apple/appstore/issuer_id             — ASC issuer ID
 #
 # Env vars (optional overrides):
 #   MAC_APP_IDENTIFIER  — macOS bundle ID (defaults to ForkIdentity::APP_ID)

@@ -27,4 +27,4 @@ Run `/secrets pull --required-for android-signing,android-play-internal-publish`
 | Alias                                            | Path                                                         |
 |--------------------------------------------------|--------------------------------------------------------------|
 | `kmp_template_release_keystore`                  | `keystores/upload_keystore.keystore`                        |
-| `google_play_publisher_service_account_json`     | `secrets/playStorePublishServiceCredentialsFile.json`        |
+| `google_play_publisher_service_account_json`     | `secrets/android/playStorePublishServiceCredentialsFile.json`        |

@@ -221,8 +221,8 @@ Run locally:
   cd deployment && bundle exec fastlane ios renewAllCerts force:true
   cd deployment && bundle exec fastlane ios renewAllCerts type:mac_installer_distribution
 
-This is the local equivalent of .github/workflows/ios-cert-renewal.yml.
-See deployment/_shared/scripts/cert-renewal.sh for a standalone bash runner
+This is the local equivalent of openMF/ios-provisioning-profile cron (cert-renewal.yml).
+See openMF/ios-provisioning-profile/cert-renewal.sh for a standalone bash runner
 that also works outside of this Fastlane context (e.g. from ios-provisioning-profile).
 
 

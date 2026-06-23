@@ -263,7 +263,7 @@ Synchronize all secrets to secrets.env
 ```
 
 **What it does:**
-1. Parse `shared_keys.env` for iOS string secrets
+1. Read non-secret metadata from `gradle/fork.properties`
 2. Encode `secrets/*` files to base64
 3. Update `secrets.env` with all platform secrets
 4. Add Desktop signing placeholders
@@ -276,7 +276,7 @@ Synchronize all secrets to secrets.env
 **Use cases:**
 - After iOS setup (automatic via `setup_ios_complete.sh`)
 - After adding new files to `secrets/` directory
-- After updating `shared_keys.env`
+- After updating `gradle/fork.properties` or any `secrets/<platform>/` file
 - To refresh/validate secrets.env
 
 **Features:**
@@ -388,16 +388,16 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/deploy_firebase.sh
+./scripts/deploy/deploy_firebase.sh
 ```
 
 **What it does:**
-1. Loads secrets from `secrets/shared_keys.env`
+1. Reads config from `gradle/fork.properties` + `secrets/apple/` files
 2. Calls Fastlane lane: `bundle exec fastlane ios deploy_on_firebase`
 3. Displays success message
 
 **Prerequisites:**
-- `secrets/shared_keys.env` exists (created by `setup_ios_complete.sh`)
+- `gradle/fork.properties` filled in and `secrets/apple/` files present
 - Fastlane installed
 - CocoaPods installed
 
@@ -411,11 +411,11 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/deploy_testflight.sh
+./scripts/deploy/deploy_testflight.sh
 ```
 
 **What it does:**
-1. Loads secrets from `secrets/shared_keys.env`
+1. Reads config from `gradle/fork.properties` + `secrets/apple/` files
 2. Calls Fastlane lane: `bundle exec fastlane ios beta`
 3. Displays success message
 
@@ -431,7 +431,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/deploy_appstore.sh
+./scripts/deploy/deploy_appstore.sh
 ```
 
 **What it does:**
@@ -439,7 +439,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
    - First confirmation: "Deploy to App Store? (y/n)"
    - Second confirmation: "This is PRODUCTION. Are you ABSOLUTELY sure? (yes/no)"
    - Requires typing "yes" (not just "y")
-2. Loads secrets from `secrets/shared_keys.env`
+2. Reads config from `gradle/fork.properties` + `secrets/apple/` files
 3. Calls Fastlane lane: `bundle exec fastlane ios release`
 4. Displays success message
 
@@ -462,7 +462,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 ```
 
 **What it does:**
@@ -484,25 +484,24 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
      - Passphrase
 
 3. **Generates SSH Key for Match:**
-   - Creates `secrets/match_ci_key` (private key)
-   - Creates `secrets/match_ci_key.pub` (public key)
+   - Creates `secrets/apple/match/match_ci_key` (private key)
+   - Creates `secrets/apple/match/match_ci_key.pub` (public key)
    - Instructions to add public key to Match repository deploy keys
 
-4. **Generates Secrets File:**
-   - Creates `secrets/shared_keys.env` with all configuration:
-     ```bash
-     TEAM_ID="xxx"
-     APPSTORE_KEY_ID="xxx"
-     APPSTORE_ISSUER_ID="xxx"
-     APPSTORE_KEY_PATH="./secrets/AuthKey.p8"
-     MATCH_GIT_URL="git@github.com:org/repo.git"
-     MATCH_GIT_BRANCH="master"
-     MATCH_SSH_KEY_PATH="./secrets/match_ci_key"
-     MATCH_PASSWORD="xxx"
+4. **Writes configuration:**
+   - Populates `gradle/fork.properties` with non-secret identity/metadata:
+     ```properties
+     apple.team.id=xxx
+     apple.match.git.url=git@github.com:org/repo.git
+     apple.match.git.branch=master
+     org.email=team@example.com
      ```
+   - Writes secret values as per-value files under `secrets/<platform>/`:
+     - `secrets/apple/appstore/key_id`, `issuer_id`
+     - `secrets/apple/match/.match_password`
 
 5. **Copies App Store Connect Key:**
-   - Copies `.p8` file to `secrets/AuthKey.p8`
+   - Copies `.p8` file to `secrets/apple/appstore/AuthKey.p8`
 
 6. **Verifies Configuration:**
    - Runs `verify_ios_deployment.sh` (70+ checks)
@@ -517,10 +516,11 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 **Line Count:** 518 lines
 
 **Output:**
-- `secrets/shared_keys.env`
-- `secrets/match_ci_key` (SSH private key)
-- `secrets/match_ci_key.pub` (SSH public key)
-- `secrets/AuthKey.p8` (App Store Connect API key)
+- `gradle/fork.properties` (non-secret identity/metadata)
+- `secrets/apple/appstore/key_id` and `secrets/apple/appstore/issuer_id`
+- `secrets/apple/match/match_ci_key` (SSH private key)
+- `secrets/apple/match/match_ci_key.pub` (SSH public key)
+- `secrets/apple/appstore/AuthKey.p8` (App Store Connect API key)
 
 ---
 
@@ -530,14 +530,14 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/setup_apn_key.sh
+./scripts/ios/setup_apn_key.sh
 ```
 
 **What it does:**
 1. Prompts for APN Key ID
 2. Prompts for APN .p8 file path
-3. Copies APN key to `secrets/`
-4. Updates `secrets/shared_keys.env` with APN configuration
+3. Copies APN key to `secrets/apple/apn/APNAuthKey.p8`
+4. Writes APN Key ID to `secrets/apple/apn/key_id` and Team ID to `secrets/apple/apn/team_id`
 5. Verifies setup with `verify_apn_setup.sh`
 
 **When needed:**
@@ -554,7 +554,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 ```
 
 **What it does:**
@@ -654,12 +654,12 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/verify_apn_setup.sh
+./scripts/ios/verify_apn_setup.sh
 ```
 
 **What it does:**
-1. Checks `APN_KEY_ID` in `secrets/shared_keys.env`
-2. Checks APN `.p8` file exists
+1. Checks `secrets/apple/apn/key_id` exists and is non-empty
+2. Checks APN `.p8` file exists at `secrets/apple/apn/APNAuthKey.p8`
 3. Validates file permissions
 4. Verifies key format
 
@@ -675,7 +675,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 ```
 
 **What it does:**
@@ -749,7 +749,7 @@ See [Version Handling Guide](../docs/claude/version-handling.md)
 
 **Use cases:**
 - Validate `secrets.env` after manual edits
-- Check `secrets/shared_keys.env` format
+- Check any `.env`-formatted file format
 
 ---
 
@@ -840,7 +840,7 @@ See [Version Handling Guide](../docs/claude/version-handling.md)
 ./keystore-manager.sh add
 
 # 6. Setup iOS (if needed)
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 ```
 
 ---
@@ -849,13 +849,13 @@ See [Version Handling Guide](../docs/claude/version-handling.md)
 
 ```bash
 # Deploy to Firebase
-./scripts/deploy_firebase.sh
+./scripts/deploy/deploy_firebase.sh
 
 # Deploy to TestFlight
-./scripts/deploy_testflight.sh
+./scripts/deploy/deploy_testflight.sh
 
 # Deploy to App Store (double confirmation required)
-./scripts/deploy_appstore.sh
+./scripts/deploy/deploy_appstore.sh
 ```
 
 ---
@@ -894,10 +894,10 @@ See [Version Handling Guide](../docs/claude/version-handling.md)
 ./scripts/check_environment.sh
 
 # Verify iOS deployment setup
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # Check version sanitization
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 
 # Validate environment file
 ./scripts/check_file_env_keys.sh secrets.env
@@ -1005,7 +1005,7 @@ ssh-keygen -V
 **Fix:**
 1. Get public key:
    ```bash
-   cat secrets/match_ci_key.pub
+   cat secrets/apple/match/match_ci_key.pub
    ```
 2. Go to Match repository → Settings → Deploy keys
 3. Add public key with write access
@@ -1016,14 +1016,17 @@ ssh-keygen -V
 
 #### 8. `deploy_firebase.sh` fails with "Secrets not found"
 
-**Cause:** `secrets/shared_keys.env` missing
+**Cause:** Required secret files missing under `secrets/apple/` or `gradle/fork.properties` not filled in.
 
 **Fix:**
 ```bash
 # Run iOS setup wizard
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 
-# OR manually create secrets/shared_keys.env
+# OR manually create the required files:
+# - gradle/fork.properties (from gradle/fork.properties.template)
+# - secrets/apple/appstore/key_id, issuer_id, AuthKey.p8
+# - secrets/apple/match/match_ci_key, .match_password
 ```
 
 ---
@@ -1037,7 +1040,7 @@ ssh-keygen -V
 - Each check has specific fix instructions
 - Re-run setup wizard if needed:
   ```bash
-  ./scripts/setup_ios_complete.sh
+  ./scripts/ios/setup_ios_complete.sh
   ```
 
 ---
@@ -1050,7 +1053,7 @@ ssh-keygen -V
 
 **Fix:**
 - Fastlane automatically sanitizes versions
-- Check with: `./scripts/check_ios_version.sh`
+- Check with: `./scripts/ios/check_ios_version.sh`
 - See [Version Handling Guide](../docs/claude/version-handling.md)
 
 ---

@@ -20,8 +20,8 @@ cp -r secrets_demo/* secrets/   # creates the directory structure
 #    Each subdirectory has a README.md explaining exactly how to get the credentials
 
 # 3. Sync to GitHub Actions
-bash scripts/sync-secrets-to-github.sh --dry-run   # preview what will be set
-bash scripts/sync-secrets-to-github.sh              # push to your fork's GHA secrets
+bash scripts/secrets/sync-secrets-to-github.sh --dry-run   # preview what will be set
+bash scripts/secrets/sync-secrets-to-github.sh              # push to your fork's GHA secrets
 
 # 4. Trigger a workflow
 gh workflow run .github/workflows/multi-platform-build-and-publish.yml
@@ -29,53 +29,77 @@ gh workflow run .github/workflows/multi-platform-build-and-publish.yml
 
 ## Layout
 
-### iOS / App Store
+> Every `secrets_demo/` path mirrors its `secrets/` peer 1:1 — same
+> platform-namespaced layout (`android/` · `apple/` · `desktop/` · `web/`).
+> Copy a subtree, fill the real value, done.
+
+### Apple — iOS + macOS (one shared Apple team)
 
 | secrets_demo/ path | secrets/ target | Credential | Per-secret guide |
 |---|---|---|---|
-| `appstore/AuthKey.p8` | `secrets/appstore/AuthKey.p8` | App Store Connect API key (.p8) | [appstore/README.md](appstore/README.md) |
-| `appstore/key_id` | `secrets/appstore/key_id` | ASC Key ID (10 chars) | [appstore/README.md](appstore/README.md) |
-| `appstore/issuer_id` | `secrets/appstore/issuer_id` | ASC Issuer ID (UUID) | [appstore/README.md](appstore/README.md) |
-| `match/match_ci_key` | `secrets/match/match_ci_key` | SSH private key for Match repo | [match/README.md](match/README.md) |
-| `match/match_ci_key.pub` | `secrets/match/match_ci_key.pub` | SSH public key (add to cert repo) | [match/README.md](match/README.md) |
-| `match/.match_password` | `secrets/match/.match_password` | Match encryption password | [match/README.md](match/README.md) |
-| `shared_keys.env.template` | `secrets/shared_keys.env` | iOS env vars (team ID, contacts) | Inline docs in template |
-| `APNAuthKey.p8` | `secrets/apn/APNAuthKey.p8` | APN push key (optional) | [Apple Developer](https://developer.apple.com/account/resources/authkeys/list) |
+| `apple/appstore/AuthKey.p8` | `secrets/apple/appstore/AuthKey.p8` | App Store Connect API key (.p8) | [apple/appstore/README.md](apple/appstore/README.md) |
+| `apple/appstore/key_id` | `secrets/apple/appstore/key_id` | ASC Key ID (10 chars) | [apple/appstore/README.md](apple/appstore/README.md) |
+| `apple/appstore/issuer_id` | `secrets/apple/appstore/issuer_id` | ASC Issuer ID (UUID) | [apple/appstore/README.md](apple/appstore/README.md) |
+| `apple/match/match_ci_key` | `secrets/apple/match/match_ci_key` | SSH private key for Match repo | [apple/match/README.md](apple/match/README.md) |
+| `apple/match/match_ci_key.pub` | `secrets/apple/match/match_ci_key.pub` | SSH public key (add to cert repo) | [apple/match/README.md](apple/match/README.md) |
+| `apple/match/.match_password` | `secrets/apple/match/.match_password` | Match encryption password | [apple/match/README.md](apple/match/README.md) |
+| `apple/apn/key_id` | `secrets/apple/apn/key_id` | APN Key ID (10 chars, optional) | [apple/apn/README.md](apple/apn/README.md) |
+| `apple/apn/team_id` | `secrets/apple/apn/team_id` | APN Team ID = Apple Dev Team (optional) | [apple/apn/README.md](apple/apn/README.md) |
+| `apple/apn/APNAuthKey.p8` | `secrets/apple/apn/APNAuthKey.p8` | APN push key (optional) | [Apple Developer](https://developer.apple.com/account/resources/authkeys/list) |
 
-### Android / Play Store
-
-| secrets_demo/ path | secrets/ target | Credential | Per-secret guide |
-|---|---|---|---|
-| `keystores/release.properties` | `secrets/keystores/release.properties` | Keystore passwords/alias | [keystores/README.md](keystores/README.md) |
-| *(generate)* | `secrets/keystores/release.jks` | Release keystore binary | [keystores/README.md](keystores/README.md) |
-| `play/service-account.json` | `secrets/play/service-account.json` | Play Store service account JSON | [play/README.md](play/README.md) |
-
-### Firebase (Android + iOS)
+### Android — Play Store + signing
 
 | secrets_demo/ path | secrets/ target | Credential | Per-secret guide |
 |---|---|---|---|
-| `firebase/service-account.json` | `secrets/firebase/service-account.json` | Firebase service account JSON | [firebase/README.md](firebase/README.md) |
-| `firebase/android_app_id` | `secrets/firebase/android_app_id` | Firebase Android prod App ID | [firebase/README.md](firebase/README.md) |
-| `firebase/android_demo_app_id` | `secrets/firebase/android_demo_app_id` | Firebase Android demo App ID | [firebase/README.md](firebase/README.md) |
-| `firebase/ios_app_id` | `secrets/firebase/ios_app_id` | Firebase iOS App ID | [firebase/README.md](firebase/README.md) |
+| `android/keystores/upload_keystore.properties` | `secrets/android/keystores/upload_keystore.properties` | Keystore passwords/alias | [android/keystores/README.md](android/keystores/README.md) |
+| `android/keystores/upload_keystore.keystore` | `secrets/android/keystores/upload_keystore.keystore` | Upload keystore binary | [android/keystores/README.md](android/keystores/README.md) |
+| `android/play/service-account.json` | `secrets/android/play/service-account.json` | Play Store service account JSON | [android/play/README.md](android/play/README.md) |
+
+### Firebase (Android + iOS — one Firebase project, all flavour packages)
+
+| secrets_demo/ path | secrets/ target | Credential | Per-secret guide |
+|---|---|---|---|
+| `android/firebase/service-account.json` | `secrets/android/firebase/service-account.json` | Firebase service account JSON | [android/firebase/README.md](android/firebase/README.md) |
+| `android/firebase/google-services.json` | `secrets/android/firebase/google-services.json` | google-services.json (all flavour packages) | [android/firebase/README.md](android/firebase/README.md) |
+| `android/firebase/android_app_id` | `secrets/android/firebase/android_app_id` | Firebase Android prod App ID | [android/firebase/README.md](android/firebase/README.md) |
+| `android/firebase/android_demo_app_id` | `secrets/android/firebase/android_demo_app_id` | Firebase Android demo App ID | [android/firebase/README.md](android/firebase/README.md) |
+| `apple/firebase/ios_app_id` | `secrets/apple/firebase/ios_app_id` | Firebase iOS App ID | — |
+| `apple/firebase/ios_demo_app_id` | `secrets/apple/firebase/ios_demo_app_id` | Firebase iOS demo App ID | — |
+| `apple/firebase/ios_prod_app_id` | `secrets/apple/firebase/ios_prod_app_id` | Firebase iOS prod App ID | — |
+
+### Desktop — signed release artifacts (placeholders — fill before a signed desktop release)
+
+| secrets_demo/ path | secrets/ target | Credential | Per-secret guide |
+|---|---|---|---|
+| `desktop/macos/app_store.p12` | `secrets/desktop/macos/app_store.p12` | Mac App Store cert (.p12) | [desktop/macos/README.md](desktop/macos/README.md) |
+| `desktop/macos/installer.p12` | `secrets/desktop/macos/installer.p12` | Mac Installer Distribution cert (.p12) | [desktop/macos/README.md](desktop/macos/README.md) |
+| `desktop/windows/code_signing.pfx` | `secrets/desktop/windows/code_signing.pfx` | Windows Authenticode cert (.pfx) | [desktop/windows/README.md](desktop/windows/README.md) |
+| `desktop/windows/code_signing_password` | `secrets/desktop/windows/code_signing_password` | .pfx password | [desktop/windows/README.md](desktop/windows/README.md) |
+| `desktop/linux/gpg_signing.key` | `secrets/desktop/linux/gpg_signing.key` | GPG private key (ASCII-armored) | [desktop/linux/README.md](desktop/linux/README.md) |
+| `desktop/linux/gpg_passphrase` | `secrets/desktop/linux/gpg_passphrase` | GPG key passphrase | [desktop/linux/README.md](desktop/linux/README.md) |
+
+> Desktop signing is **optional** — unsigned `cmp-desktop` artifacts (EXE/MSI/DMG/DEB)
+> build and publish to GitHub Releases without these. Fill them only when you want
+> OS-trusted signed installers (notarized macOS, Authenticode Windows, signed Linux pkgs).
 
 ### Web hosting
 
 | secrets_demo/ path | secrets/ target | Guide |
 |---|---|---|
-| `cloudflare/api_token` | `secrets/cloudflare/api_token` | [cloudflare/README.md](cloudflare/README.md) |
-| `cloudflare/account_id` | `secrets/cloudflare/account_id` | [cloudflare/README.md](cloudflare/README.md) |
-| `netlify/auth_token` | `secrets/netlify/auth_token` | [netlify/README.md](netlify/README.md) |
-| `netlify/site_id` | `secrets/netlify/site_id` | [netlify/README.md](netlify/README.md) |
-| `vercel/token` | `secrets/vercel/token` | [vercel/README.md](vercel/README.md) |
-| `vercel/org_id` | `secrets/vercel/org_id` | [vercel/README.md](vercel/README.md) |
-| `vercel/project_id` | `secrets/vercel/project_id` | [vercel/README.md](vercel/README.md) |
+| `web/cloudflare/api_token` | `secrets/web/cloudflare/api_token` | [web/cloudflare/README.md](web/cloudflare/README.md) |
+| `web/cloudflare/account_id` | `secrets/web/cloudflare/account_id` | [web/cloudflare/README.md](web/cloudflare/README.md) |
+| `web/netlify/auth_token` | `secrets/web/netlify/auth_token` | [web/netlify/README.md](web/netlify/README.md) |
+| `web/netlify/site_id` | `secrets/web/netlify/site_id` | [web/netlify/README.md](web/netlify/README.md) |
+| `web/vercel/token` | `secrets/web/vercel/token` | [web/vercel/README.md](web/vercel/README.md) |
+| `web/vercel/org_id` | `secrets/web/vercel/org_id` | [web/vercel/README.md](web/vercel/README.md) |
+| `web/vercel/project_id` | `secrets/web/vercel/project_id` | [web/vercel/README.md](web/vercel/README.md) |
 
 ## Three deployment modes
 
 ### Mode 1 — Local / manual
 
-Populate `secrets/` from the table above, then:
+Fill `gradle/fork.properties` (from `gradle/fork.properties.template`) with non-secret
+identity/metadata (team ID, contacts, URLs). Then populate `secrets/` from the table above:
 
 ```bash
 # Android
@@ -87,11 +111,11 @@ bundle exec fastlane --fastlane-dir deployment ios beta
 
 ### Mode 2 — GitHub Actions
 
-Run `scripts/sync-secrets-to-github.sh` once to push secrets to your fork's
+Run `scripts/secrets/sync-secrets-to-github.sh` once to push secrets to your fork's
 GHA repository secrets. Workflows read them automatically via `secrets.*`.
 
 ```bash
-bash scripts/sync-secrets-to-github.sh
+bash scripts/secrets/sync-secrets-to-github.sh
 ```
 
 ### Mode 3 — Framework /release command

@@ -26,6 +26,6 @@ module FirebaseHelpers
   def service_credentials_path(firebase_config)
     firebase_config[:serviceCredsFile] ||
       ENV["FIREBASE_SERVICE_ACCOUNT_PATH"] ||
-      "secrets/firebaseAppDistributionServiceCredentialsFile.json"
+      "secrets/android/firebaseAppDistributionServiceCredentialsFile.json"
   end
 end

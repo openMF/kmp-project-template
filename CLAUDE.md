@@ -9,7 +9,7 @@
 ## Quick Links
 
 🚀 **New fork? Start here:**
-- [Fork Quickstart](docs/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
+- [Fork Quickstart](docs/setup/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
 
 📖 **Domain-Specific Guides:**
 - [GitHub Actions & CI/CD](.github/CLAUDE.md) - Workflows, custom actions, secrets
@@ -177,8 +177,8 @@ B7 Interest Rate Tracker + B8 Country Macro Snapshot screens:
 
 1. Sign up: https://fred.stlouisfed.org/docs/api/api_key.html (30 seconds)
 2. Provide the key one of two ways:
-   - **Path A:** copy `secrets/shared_keys.env.template` to
-     `secrets/shared_keys.env` (gitignored) and set `FRED_API_KEY=...`.
+   - **Path A:** add `FRED_API_KEY=<your-key>` to `local.properties` (gitignored,
+     matches the KMP ecosystem convention) — no shared env bundle needed.
    - **Path B:** run `/secrets request mifos_x_fred_api_key` from a
      project-bound session; the framework opens a vault PR proposing the
      new alias row. After it merges, `/secrets pull` materializes it.
@@ -206,7 +206,7 @@ not configured" empty state rather than crashing.
 # OR follow detailed setup:
 ./keystore-manager.sh generate  # Generate Android keystores
 ./firebase-setup.sh             # Configure Firebase projects
-./scripts/setup_ios_complete.sh # iOS code signing setup
+./scripts/ios/setup_ios_complete.sh # iOS code signing setup
 ```
 
 ### 2. Daily Development
@@ -233,10 +233,10 @@ git commit -m "feat(android): add new feature"
 ./gradlew test
 
 # Verify iOS deployment configuration (iOS only)
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # Check version sanitization (iOS only)
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 ```
 
 ### 4. Deployment
@@ -269,9 +269,9 @@ git commit -m "feat(android): add new feature"
 
 **Via Bash Scripts (iOS only):**
 ```bash
-./scripts/deploy_firebase.sh
-./scripts/deploy_testflight.sh
-./scripts/deploy_appstore.sh  # Double confirmation required
+./scripts/deploy/deploy_firebase.sh
+./scripts/deploy/deploy_testflight.sh
+./scripts/deploy/deploy_appstore.sh  # Double confirmation required
 ```
 
 ---

@@ -59,13 +59,16 @@ declare -A EXCLUSIONS=(
     ["cmp-desktop"]="icons:dir build.gradle.kts:file"
     ["fastlane-config"]="project_config.rb:file extract_config.rb:file"
     [".github"]="workflows/sync-dirs.yaml:file"
-    ["root"]="secrets.env:file"
+    # ["root"]="secrets.env:file"  — REMOVED: secrets.env is retired (2026-06-23).
+    # Keystore DN now lives in gradle/fork.properties (non-secret, already synced
+    # via the fork.properties sync entry). Keystore passwords live in
+    # secrets/android/keystores/ per-value files (gitignored, not synced).
     # DO NOT REMOVE — preserves consumer-specific flavor extensions across syncs.
     # Each downstream consumer app (mifos-mobile, mifos-pay, mifos-x-field-officer-app,
     # mifos-x-group-banking, mifos-x-open-banking, reels-downloader-new, ...) may
     # create build-logic/convention/src/main/kotlin/local/LocalFlavors.kt to add
     # their own flavors / dimensions / overrides on top of the synced base.
-    # See docs/FLAVORS_EXTENSION.md for the pattern.
+    # See docs/architecture/FLAVORS_EXTENSION.md for the pattern.
     ["build-logic"]="convention/src/main/kotlin/local:dir"
 )
 

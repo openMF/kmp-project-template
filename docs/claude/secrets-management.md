@@ -34,36 +34,44 @@ This guide covers complete secrets management for all platforms.
 
 ---
 
-## Quick Start: Automatic Sync
+## Quick Start: New Model (secrets.env retired 2026-06-23)
+
+**Keystore secrets are now split into two canonical homes:**
+
+| What | Where | Secret? |
+|---|---|---|
+| Keystore DN (CN, OU, O, L, ST, C) | `gradle/fork.properties` (`legal.company.name`, `keystore.dn.*`) | No — commit the template; fill in fork.properties (gitignored) |
+| Keystore passwords | `secrets/android/keystores/{keystore_password,keystore_alias,keystore_alias_password}` | Yes — gitignored |
 
 **Template Projects (Recommended):**
 
 ```bash
-# 1. Run project setup (generates Android keystores + secrets.env)
+# 1. Run project setup — writes DN to fork.properties + passwords to secrets/android/keystores/
 ./setup-project.sh
 
-# 2. Run iOS setup (if needed - auto-syncs iOS secrets to secrets.env)
-./scripts/setup_ios_complete.sh
+# 2. Run iOS setup (if needed)
+./scripts/ios/setup_ios_complete.sh
 
-# Done! secrets.env is automatically synchronized with all platform secrets
+# 3. Push secrets to GitHub (new model — replaces keystore-manager.sh add)
+bash scripts/secrets/sync-secrets-to-github.sh --repo=owner/repo
 ```
 
-**Manual Sync:**
+**Manual Sync (legacy secrets.env bundle — still available for iOS/macOS secrets):**
 
 ```bash
-# Re-scan secrets/ directory and update secrets.env
+# Re-scan secrets/ directory and update secrets/shared/secrets.env
 ./keystore-manager.sh sync
 ```
 
 **What sync does:**
-1. Reads `secrets/shared_keys.env` and extracts iOS string secrets
+1. Reads non-secret metadata from `gradle/fork.properties`
 2. Scans `secrets/` directory and encodes files to base64
-3. Updates `secrets.env` with all secrets (preserves existing data)
+3. Updates `secrets/shared/secrets.env` with platform secrets (preserves existing data)
 4. Adds Desktop signing placeholders (optional, empty by default)
 5. Validates result (format, required secrets, base64 encoding)
 
 **Features:**
-- Automatic backup before sync (`secrets.env.backup`)
+- Automatic backup before sync (`secrets/shared/secrets.env.backup`)
 - Preserves existing secrets if source files are missing
 - Idempotent: safe to run multiple times
 - Validates format and base64 encoding after sync
@@ -71,8 +79,11 @@ This guide covers complete secrets management for all platforms.
 **When to use sync:**
 - After iOS setup completes (automatic)
 - After adding new files to `secrets/` directory
-- After updating `shared_keys.env`
-- To refresh/validate secrets.env
+- After updating `gradle/fork.properties` or any `secrets/<platform>/` file
+- To refresh/validate the secrets bundle for iOS/macOS upload flow
+
+> **Migration note:** `secrets.env` at the repo root is retired. The Android keystore
+> password values that lived there now live in `secrets/android/keystores/` per-value files.
 
 ---
 
@@ -147,18 +158,26 @@ This guide covers complete secrets management for all platforms.
 **Structure:**
 
 ```
-secrets/
-├── firebaseAppDistributionServiceCredentialsFile.json  # Firebase creds
-├── google-services.json                               # Android Firebase config
-├── playStorePublishServiceCredentialsFile.json        # Play Store creds
-├── AuthKey.p8                                         # App Store Connect key
-├── match_ci_key                                       # Match SSH private key
-├── match_ci_key.pub                                   # Match SSH public key
-├── shared_keys.env                                    # iOS configuration
-├── macos_signing.p12                                  # macOS certificate
-├── macos_installer.p12                                # macOS installer cert
-├── windows_signing.pfx                                # Windows certificate
-└── linux_signing.key                                  # Linux key (optional)
+gradle/
+└── fork.properties                                    # Non-secret identity/metadata (committed)
+
+secrets/                                               # All gitignored
+├── apple/
+│   ├── appstore/AuthKey.p8                            # App Store Connect key
+│   ├── appstore/key_id                                # ASC Key ID
+│   ├── appstore/issuer_id                             # ASC Issuer ID
+│   └── match/
+│       ├── match_ci_key                               # Match SSH private key
+│       ├── match_ci_key.pub                           # Match SSH public key
+│       └── .match_password                            # Match encryption password
+├── ios/
+│   └── apn/APNAuthKey.p8                              # APN push key (optional)
+├── android/
+│   ├── firebase/service-account.json                  # Firebase creds
+│   ├── keystores/release.jks                          # Release keystore
+│   └── play/service-account.json                      # Play Store creds
+└── web/
+    └── cloudflare/api_token                           # Cloudflare token (example)
 ```
 
 **⚠️ NEVER COMMIT `secrets/` DIRECTORY** - Always in `.gitignore`
@@ -197,22 +216,26 @@ keystores/
 ./keystore-manager.sh generate
 ```
 
-**Prompts:**
-- Company/Organization details (CN, OU, O, L, S, C)
-- Keystore passwords (or auto-generate)
+**Reads (new model — no prompts for DN or passwords):**
+- DN from `gradle/fork.properties` (`legal.company.name`, `keystore.dn.*` keys)
+- Passwords from `secrets/android/keystores/{keystore_password,keystore_alias,keystore_alias_password}`
+  (populated by `setup-project.sh` or `scripts/secrets/setup-secrets.sh android`)
 
 **Output:**
 ```
-✅ Generated original-release-key.jks
-✅ Generated upload-keystore.jks
-✅ Extracted certificates and keys
-✅ Saved configuration to secrets.env
+✅ Generated upload_keystore.keystore
+✅ Keystore written to keystores/upload_keystore.keystore
+✅ fastlane-config/project_config.rb updated
+✅ cmp-android/build.gradle.kts updated
+ℹ  Skipping legacy secrets.env update (retired). Secrets live in secrets/android/keystores/.
 ```
 
 **Files created:**
-- `keystores/original-release-key.jks`
-- `keystores/upload-keystore.jks`
-- `secrets.env` (configuration)
+- `keystores/upload_keystore.keystore`
+- `secrets/android/keystores/keystore_password` (password — gitignored)
+- `secrets/android/keystores/keystore_alias` (alias — gitignored)
+- `secrets/android/keystores/keystore_alias_password` (alias password — gitignored)
+- `gradle/fork.properties` (keystore DN + org identity — gitignored, non-secret)
 
 ---
 
@@ -232,7 +255,7 @@ keystores/
 **Output:**
 - `cmp-android/google-services.json` (4 variants)
 - `cmp-ios/GoogleService-Info.plist`
-- `secrets/firebaseAppDistributionServiceCredentialsFile.json` (if configured)
+- `secrets/android/firebaseAppDistributionServiceCredentialsFile.json` (if configured)
 
 **Manual alternative:**
 1. Go to Firebase Console
@@ -240,7 +263,7 @@ keystores/
 3. Register Android app → Download `google-services.json`
 4. Register iOS app → Download `GoogleService-Info.plist`
 5. Project Settings → Service Accounts → Generate new private key
-6. Save as `secrets/firebaseAppDistributionServiceCredentialsFile.json`
+6. Save as `secrets/android/firebaseAppDistributionServiceCredentialsFile.json`
 
 ---
 
@@ -260,7 +283,7 @@ keystores/
 ```bash
 # Service Accounts → Your account → Keys → Add Key → JSON
 # Download JSON file
-# Save as: secrets/playStorePublishServiceCredentialsFile.json
+# Save as: secrets/android/playStorePublishServiceCredentialsFile.json
 ```
 
 **3. Grant Play Console Access**
@@ -277,7 +300,7 @@ keystores/
 ### Step 4: Setup iOS (App Store Connect)
 
 ```bash
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 ```
 
 **Prompts:**
@@ -291,10 +314,12 @@ keystores/
 - Match passphrase
 
 **Output:**
-- `secrets/AuthKey.p8` - App Store Connect API key
-- `secrets/match_ci_key` - SSH private key
-- `secrets/match_ci_key.pub` - SSH public key
-- `secrets/shared_keys.env` - Configuration
+- `secrets/apple/appstore/AuthKey.p8` - App Store Connect API key
+- `secrets/apple/appstore/key_id` - ASC Key ID
+- `secrets/apple/appstore/issuer_id` - ASC Issuer ID
+- `secrets/apple/match/match_ci_key` - SSH private key
+- `secrets/apple/match/match_ci_key.pub` - SSH public key
+- `gradle/fork.properties` - Non-secret identity/metadata
 
 **Manual setup:**
 
@@ -307,25 +332,25 @@ keystores/
 # - Name: "GitHub Actions"
 # - Access: "Admin" or "App Manager"
 # → Download .p8 file
-# Save as: secrets/AuthKey.p8
+# Save as: secrets/apple/appstore/AuthKey.p8
 # Note: Key ID and Issuer ID
 ```
 
 **2. Generate SSH Key for Match**
 
 ```bash
-ssh-keygen -t ed25519 -C "github-actions-match" -f secrets/match_ci_key -N ""
+ssh-keygen -t ed25519 -C "github-actions-match" -f secrets/apple/match/match_ci_key -N ""
 
 # Output:
-# - secrets/match_ci_key (private key)
-# - secrets/match_ci_key.pub (public key)
+# - secrets/apple/match/match_ci_key (private key)
+# - secrets/apple/match/match_ci_key.pub (public key)
 ```
 
 **3. Add SSH Key to Match Repository**
 
 ```bash
 # View public key
-cat secrets/match_ci_key.pub
+cat secrets/apple/match/match_ci_key.pub
 
 # Go to Match repository (GitHub)
 # → Settings → Deploy keys → Add deploy key
@@ -334,17 +359,17 @@ cat secrets/match_ci_key.pub
 # - ✅ Allow write access
 ```
 
-**4. Create shared_keys.env**
+**4. Write secret values as per-value files**
 
 ```bash
-cat > secrets/shared_keys.env <<EOF
-export APPSTORE_KEY_ID="ABC123XYZ"
-export APPSTORE_ISSUER_ID="12345678-1234-1234-1234-123456789012"
-export MATCH_GIT_URL="git@github.com:your-org/certificates.git"
-export MATCH_GIT_BRANCH="master"
-export MATCH_PASSWORD="your-secure-passphrase"
-export MATCH_TYPE="appstore"
-EOF
+# Secret values go as individual files — no single env bundle needed
+echo "ABC123XYZ" > secrets/apple/appstore/key_id
+echo "12345678-1234-1234-1234-123456789012" > secrets/apple/appstore/issuer_id
+openssl rand -base64 32 | tr -d '\n' > secrets/apple/match/.match_password
+
+# Non-secret identity/metadata goes in gradle/fork.properties
+cp gradle/fork.properties.template gradle/fork.properties
+# Then set: apple.match.git.url, apple.match.git.branch, org.email, etc.
 ```
 
 ---
@@ -459,7 +484,7 @@ base64 -i secrets/linux_signing.key -o secrets/linux_signing.key.b64
 # Individual secrets
 gh secret set KEYSTORE_FILE < keystores/original-release-key.jks.b64
 gh secret set GOOGLESERVICES < secrets/google-services.json.b64
-gh secret set FIREBASECREDS < secrets/firebaseAppDistributionServiceCredentialsFile.json.b64
+gh secret set FIREBASECREDS < secrets/android/firebaseAppDistributionServiceCredentialsFile.json.b64
 
 # String secrets
 echo "password123" | gh secret set KEYSTORE_PASSWORD
@@ -503,24 +528,24 @@ MACOS_INSTALLER_CERTIFICATE
 |-----------|-------------------|----------|
 | `keystores/original-release-key.jks` | `UPLOAD_KEYSTORE_FILE` or `KEYSTORE_FILE` | Base64 |
 | `secrets/google-services.json` | `GOOGLESERVICES` | Base64 |
-| `secrets/firebaseAppDistributionServiceCredentialsFile.json` | `FIREBASECREDS` | Base64 |
-| `secrets/playStorePublishServiceCredentialsFile.json` | `PLAYSTORECREDS` | Base64 |
-| `secrets/AuthKey.p8` | `APPSTORE_AUTH_KEY` | Base64 |
-| `secrets/match_ci_key` | `MATCH_SSH_PRIVATE_KEY` | Base64 |
-| `secrets/macos_signing.p12` | `MACOS_SIGNING_KEY` | Base64 |
-| `secrets/macos_installer.p12` | `MACOS_INSTALLER_CERTIFICATE` | Base64 |
+| `secrets/android/firebaseAppDistributionServiceCredentialsFile.json` | `FIREBASECREDS` | Base64 |
+| `secrets/android/playStorePublishServiceCredentialsFile.json` | `PLAYSTORECREDS` | Base64 |
+| `secrets/apple/appstore/AuthKey.p8` | `APPSTORE_AUTH_KEY` | Base64 |
+| `secrets/apple/match/match_ci_key` | `MATCH_SSH_PRIVATE_KEY` | Base64 |
+| `secrets/desktop/macos/signing.p12` | `MACOS_SIGNING_KEY` | Base64 |
+| `secrets/desktop/macos/installer.p12` | `MACOS_INSTALLER_CERTIFICATE` | Base64 |
 | `secrets/windows_signing.pfx` | `WINDOWS_SIGNING_KEY` | Base64 |
 
 ### String Secrets (Not Files)
 
 | Value | GitHub Secret Name | Source |
 |-------|-------------------|--------|
-| Keystore password | `UPLOAD_KEYSTORE_FILE_PASSWORD` | From `secrets.env` |
-| Keystore alias | `UPLOAD_KEYSTORE_ALIAS` | From `secrets.env` |
-| Alias password | `UPLOAD_KEYSTORE_ALIAS_PASSWORD` | From `secrets.env` |
+| Keystore password | `UPLOAD_KEYSTORE_FILE_PASSWORD` | `secrets/android/keystores/keystore_password` |
+| Keystore alias | `UPLOAD_KEYSTORE_ALIAS` | `secrets/android/keystores/keystore_alias` |
+| Alias password | `UPLOAD_KEYSTORE_ALIAS_PASSWORD` | `secrets/android/keystores/keystore_alias_password` |
 | App Store Key ID | `APPSTORE_KEY_ID` | From App Store Connect |
 | Issuer ID | `APPSTORE_ISSUER_ID` | From App Store Connect |
-| Match password | `MATCH_PASSWORD` | From `secrets/shared_keys.env` |
+| Match password | `MATCH_PASSWORD` | From `secrets/apple/match/.match_password` |
 | macOS signing password | `MACOS_SIGNING_PASSWORD` | From certificate export |
 
 ---
@@ -568,10 +593,10 @@ MACOS_INSTALLER_CERTIFICATE
 # Firebase Console → Project Settings → Service Accounts
 # → Generate new private key
 
-# 2. Save as secrets/firebaseAppDistributionServiceCredentialsFile.json
+# 2. Save as secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 
 # 3. Encode
-base64 -i secrets/firebaseAppDistributionServiceCredentialsFile.json -o firebasecreds.b64
+base64 -i secrets/android/firebaseAppDistributionServiceCredentialsFile.json -o firebasecreds.b64
 
 # 4. Update secret
 gh secret set FIREBASECREDS < firebasecreds.b64
@@ -611,10 +636,10 @@ bundle exec fastlane match appstore
 # → Users and Access → Keys → Generate new key
 
 # 2. Download new .p8 file
-# Save as: secrets/AuthKey.p8
+# Save as: secrets/apple/appstore/AuthKey.p8
 
 # 3. Update secrets
-base64 -i secrets/AuthKey.p8 -o authkey.b64
+base64 -i secrets/apple/appstore/AuthKey.p8 -o authkey.b64
 gh secret set APPSTORE_AUTH_KEY < authkey.b64
 
 # 4. Update Key ID and Issuer ID if changed
@@ -821,14 +846,15 @@ Keystore was tampered with, or password was incorrect
 **Solutions:**
 
 ```bash
-# 1. View password from secrets.env
-cat secrets.env | grep KEYSTORE.*PASSWORD
+# 1. View password (new model — secrets.env is retired)
+cat secrets/android/keystores/keystore_password
 
 # 2. Test locally
-keytool -list -v -keystore keystores/original-release-key.jks
+keytool -list -v -keystore keystores/upload_keystore.keystore \
+  -storepass "$(cat secrets/android/keystores/keystore_password)"
 
 # 3. Re-generate keystore if password lost
-# ⚠️ Only for new apps!
+# ⚠️ Only for new apps — fill gradle/fork.properties + secrets/android/keystores/ first
 ./keystore-manager.sh generate
 ```
 
@@ -849,15 +875,15 @@ Permission denied (publickey)
 # → Check key exists with write access
 
 # 2. Test SSH connection
-ssh -T git@github.com -i secrets/match_ci_key
+ssh -T git@github.com -i secrets/apple/match/match_ci_key
 
 # 3. Re-generate key
-ssh-keygen -t ed25519 -C "github-actions" -f secrets/match_ci_key -N ""
-cat secrets/match_ci_key.pub
+ssh-keygen -t ed25519 -C "github-actions" -f secrets/apple/match/match_ci_key -N ""
+cat secrets/apple/match/match_ci_key.pub
 # → Add to Match repo deploy keys
 
 # 4. Re-encode and update secret
-base64 -i secrets/match_ci_key -o match_ci_key.b64
+base64 -i secrets/apple/match/match_ci_key -o match_ci_key.b64
 gh secret set MATCH_SSH_PRIVATE_KEY < match_ci_key.b64
 ```
 

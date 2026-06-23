@@ -122,12 +122,17 @@ rescue StandardError => e
   UI.warning("increment_version: #{e.message}")
 end
 
-# Standard iOS preamble: CocoaPods install when a Podfile is present.
+# Standard iOS preamble: generate the KMP podspec/dummy framework, then CocoaPods install.
 def with_ios_preamble(_options = {})
   podfile = "cmp-ios/Podfile"
-  cocoapods(podfile: podfile, try_repo_update_on_error: true) if File.exist?(podfile)
-rescue StandardError => e
-  UI.warning("with_ios_preamble: #{e.message}")
+  return unless File.exist?(podfile)
+  # KMP + CocoaPods: cmp_shared.podspec (Kotlin cocoapods plugin) raises unless the dummy
+  # framework is generated first → pod install fails "run :generateDummyFramework". Run the
+  # same Gradle tasks the project's pr-check.yml (line 61) uses. NOT inside the rescue — a
+  # missing framework must fail loud, not silently fall through to an "Unable to open
+  # Pods-iosApp.release.xcconfig" archive error. (2026-06-22)
+  sh("#{DEPLOYMENT_REPO_ROOT}/gradlew -p #{DEPLOYMENT_REPO_ROOT} :cmp-shared:podspec :cmp-shared:generateDummyFramework")
+  cocoapods(podfile: podfile, try_repo_update_on_error: true)
 end
 
 # Run Fastlane's setup_ci action only when executing inside a CI environment.
@@ -158,8 +163,8 @@ def fetch_certificates_with_match(options = {})
     type:            options[:match_type]     || "appstore",
     app_identifier:  options[:app_identifier] || cfg[:app_identifier],
     team_id:         options[:team_id]        || cfg[:team_id],
-    git_url:         options[:git_url]        || cfg[:git_url],
-    git_branch:      options[:git_branch]     || cfg[:git_branch],
+    git_url:         options[:git_url]        || cfg[:match_git_url],
+    git_branch:      options[:git_branch]     || cfg[:match_git_branch],
     git_private_key: ENV["MATCH_GIT_PRIVATE_KEY"] || cfg[:match_git_private_key],
     readonly:        true,
   )
@@ -194,8 +199,8 @@ def build_signed_ios(options = {})
     type:            options[:match_type]               || "adhoc",
     app_identifier:  options[:app_identifier]           || cfg[:app_identifier],
     team_id:         options[:team_id]                  || cfg[:team_id],
-    git_url:         options[:git_url]                  || cfg[:git_url],
-    git_branch:      options[:git_branch]               || cfg[:git_branch],
+    git_url:         options[:git_url]                  || cfg[:match_git_url],
+    git_branch:      options[:git_branch]               || cfg[:match_git_branch],
     git_private_key: ENV["MATCH_GIT_PRIVATE_KEY"]       || cfg[:match_git_private_key],
     readonly:        true,
   )

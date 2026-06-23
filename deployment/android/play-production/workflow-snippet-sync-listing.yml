@@ -31,8 +31,8 @@ jobs:
         env:
           PLAYSTORE_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAYSTORECREDS }}
         run: |
-          mkdir -p secrets/play
-          printf '%s' "$PLAYSTORE_SERVICE_ACCOUNT_JSON" > secrets/play/service-account.json
+          mkdir -p secrets/android/play
+          printf '%s' "$PLAYSTORE_SERVICE_ACCOUNT_JSON" > secrets/android/play/service-account.json
 
       - name: Sync Play Store listing
-        run: bash scripts/sync-play-listing.sh
+        run: bash scripts/store/sync-play-listing.sh

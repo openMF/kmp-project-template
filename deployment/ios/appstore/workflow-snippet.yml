@@ -31,9 +31,9 @@ jobs:
         if: ${{ secrets.SOPS_AGE_KEY == '' }}
         run: |
           mkdir -p secrets
-          echo "${{ secrets.APPSTORE_AUTH_KEY_B64 }}" | base64 -d > secrets/AuthKey.p8
-          echo "${{ secrets.MATCH_CI_KEY }}" > secrets/match_ci_key
-          chmod 600 secrets/match_ci_key
+          echo "${{ secrets.APPSTORE_AUTH_KEY_B64 }}" | base64 -d > secrets/apple/appstore/AuthKey.p8
+          echo "${{ secrets.MATCH_CI_KEY }}" > secrets/apple/match/match_ci_key
+          chmod 600 secrets/apple/match/match_ci_key
 
       - name: Install CocoaPods
         run: gem install cocoapods

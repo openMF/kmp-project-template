@@ -18,7 +18,7 @@
 # the UPLOAD key. One keystore family is materialized.
 set -euo pipefail
 
-mkdir -p secrets/keystores cmp-android/src/prod cmp-android/src/demo
+mkdir -p secrets/android/keystores cmp-android/src/prod cmp-android/src/demo
 
 # Google Services — required for prod + demo flavors.
 if [[ -n "${GOOGLESERVICES:-}" ]]; then
@@ -27,14 +27,14 @@ if [[ -n "${GOOGLESERVICES:-}" ]]; then
 fi
 
 # Play Store + Firebase distribution credentials.
-[[ -n "${PLAYSTORECREDS:-}"  ]] && printf '%s' "$PLAYSTORECREDS"  > secrets/playStorePublishServiceCredentialsFile.json
-[[ -n "${FIREBASECREDS:-}"   ]] && printf '%s' "$FIREBASECREDS"   > secrets/firebaseAppDistributionServiceCredentialsFile.json
+[[ -n "${PLAYSTORECREDS:-}"  ]] && printf '%s' "$PLAYSTORECREDS"  > secrets/android/playStorePublishServiceCredentialsFile.json
+[[ -n "${FIREBASECREDS:-}"   ]] && printf '%s' "$FIREBASECREDS"   > secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 
 # UPLOAD keystore — the ONE keystore the developer holds under Play App Signing.
-# Gradle's signingConfig reads from secrets/keystores/upload_keystore.keystore.
+# Gradle's signingConfig reads from secrets/android/keystores/upload_keystore.keystore.
 # Google's KMS holds the app signing key; it's never materialized locally.
 if [[ -n "${UPLOAD_KEYSTORE_FILE:-}" ]]; then
-  echo "$UPLOAD_KEYSTORE_FILE" | base64 -d > secrets/keystores/upload_keystore.keystore
+  echo "$UPLOAD_KEYSTORE_FILE" | base64 -d > secrets/android/keystores/upload_keystore.keystore
 fi
 
 echo "✅ Android secrets materialized (manual-mode)"

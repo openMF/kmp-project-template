@@ -48,7 +48,7 @@ cat docs/analysis/BUGS_AND_ISSUES.md
 | Platform | Quick Check Command |
 |----------|---------------------|
 | Android | `./gradlew :cmp-android:assembleDebug --stacktrace` |
-| iOS | `./scripts/verify_ios_deployment.sh` |
+| iOS | `./scripts/ios/verify_ios_deployment.sh` |
 | macOS | `./scripts/verify_macos_setup.sh` |
 | Desktop | `./gradlew :cmp-desktop:packageDebugDistributionForCurrentOS` |
 | Web | `./gradlew :cmp-web:jsBrowserDevelopmentWebpack` |
@@ -329,14 +329,17 @@ ls -la keystores/
 # 5. Test keystore password
 keytool -list -v -keystore keystores/original-release-key.jks
 
-# 6. Check secrets.env for credentials
-cat secrets.env | grep KEYSTORE
+# 6. Check keystore credentials (new model — secrets.env is retired)
+cat secrets/android/keystores/keystore_password
+cat secrets/android/keystores/keystore_alias
 ```
 
 **Files:**
-- `keystores/original-release-key.jks`
-- `keystores/upload-keystore.jks`
-- `secrets.env`
+- `keystores/upload_keystore.keystore`
+- `secrets/android/keystores/keystore_password`
+- `secrets/android/keystores/keystore_alias`
+- `secrets/android/keystores/keystore_alias_password`
+- `gradle/fork.properties` (keystore DN — non-secret)
 
 ---
 
@@ -359,7 +362,7 @@ Command CodeSign failed with a nonzero exit code
 
 ```bash
 # 1. Run comprehensive iOS verification
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # 2. Re-fetch Match certificates
 cd cmp-ios
@@ -370,7 +373,8 @@ bundle exec fastlane match appstore --readonly
 security find-identity -v -p codesigning
 
 # 4. Verify Match configuration
-cat secrets/shared_keys.env | grep MATCH
+cat gradle/fork.properties | grep apple.match
+cat secrets/apple/match/.match_password | wc -c   # verify password file exists
 
 # 5. Check Xcode signing settings
 open cmp-ios/iosApp.xcworkspace
@@ -382,8 +386,9 @@ bundle exec fastlane match appstore --force_for_new_devices
 ```
 
 **Files:**
-- `secrets/shared_keys.env`
-- `secrets/match_ci_key`
+- `gradle/fork.properties` (Match URL/branch)
+- `secrets/apple/match/match_ci_key`
+- `secrets/apple/match/.match_password`
 - `fastlane/Matchfile`
 
 ---
@@ -543,14 +548,14 @@ security find-identity -v -p codesigning
 # 3. Verify profile includes certificate
 # Xcode → Preferences → Accounts → Download Manual Profiles
 
-# 4. Check Match password
-cat secrets/shared_keys.env | grep MATCH_PASSWORD
+# 4. Check Match password file exists
+ls -la secrets/apple/match/.match_password
 
 # 5. Verify SSH key for Match repo
-ssh -T git@github.com -i secrets/match_ci_key
+ssh -T git@github.com -i secrets/apple/match/match_ci_key
 
 # 6. Run full iOS verification
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 ```
 
 ---
@@ -572,7 +577,7 @@ Invalid version format for App Store: 2026.1.1-beta.0.9
 
 ```bash
 # 1. Check version sanitization
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 
 # 2. View sanitization logic
 cat fastlane/Fastfile | grep -A 20 "sanitize_version_for_testflight"
@@ -1009,10 +1014,10 @@ Permission denied (publickey)
 
 ```bash
 # 1. Check Match SSH key exists
-ls -la secrets/match_ci_key
+ls -la secrets/apple/match/match_ci_key
 
 # 2. View public key
-cat secrets/match_ci_key.pub
+cat secrets/apple/match/match_ci_key.pub
 
 # 3. Add deploy key to Match repository
 # - Go to Match repo → Settings → Deploy keys
@@ -1020,7 +1025,7 @@ cat secrets/match_ci_key.pub
 # - Paste public key
 
 # 4. Test SSH connection
-ssh -T git@github.com -i secrets/match_ci_key
+ssh -T git@github.com -i secrets/apple/match/match_ci_key
 
 # 5. Verify in GitHub Actions
 # Check MATCH_SSH_PRIVATE_KEY secret is set
@@ -1139,10 +1144,10 @@ cd cmp-ios && pod deintegrate && pod install
 ./keystore-manager.sh add
 
 # 3. Verify iOS setup
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # 4. Check Firebase credentials
-ls -la secrets/firebaseAppDistributionServiceCredentialsFile.json
+ls -la secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 
 # 5. Test local deployment
 bundle exec fastlane android deployDemoApkOnFirebase

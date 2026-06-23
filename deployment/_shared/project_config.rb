@@ -119,7 +119,7 @@ module FastlaneConfig
     # ── Android ────────────────────────────────────────────────────────────────
     ANDROID = {
       package_name:        _app_id,
-      play_store_json_key: "secrets/play/service-account.json",
+      play_store_json_key: "secrets/android/play/service-account.json",
       apk_paths: {
         prod: "cmp-android/build/outputs/apk/prod/release/cmp-android-prod-release.apk",
         demo: "cmp-android/build/outputs/apk/demo/release/cmp-android-demo-release.apk",
@@ -169,14 +169,14 @@ module FastlaneConfig
         # ENV overrides: APPSTORE_KEY_ID / APPSTORE_ISSUER_ID / APPSTORE_KEY_PATH
         key_id:       ENV["APPSTORE_KEY_ID"]    || "",
         issuer_id:    ENV["APPSTORE_ISSUER_ID"] || "",
-        key_filepath: ENV["APPSTORE_KEY_PATH"]  || "secrets/appstore/AuthKey.p8",
+        key_filepath: ENV["APPSTORE_KEY_PATH"]  || "secrets/apple/appstore/AuthKey.p8",
       },
       code_signing: {
         match_type:            "adhoc",
         # ENV overrides: MATCH_GIT_URL / MATCH_GIT_BRANCH / MATCH_GIT_PRIVATE_KEY
         match_git_url:         _match_git_url,
         match_git_branch:      _match_git_branch,
-        match_git_private_key: ENV["MATCH_GIT_PRIVATE_KEY"] || "./secrets/match/match_ci_key",
+        match_git_private_key: ENV["MATCH_GIT_PRIVATE_KEY"] || "./secrets/apple/match/match_ci_key",
         provisioning_profiles: {
           adhoc:    "match AdHoc #{_app_id}",
           appstore: "match AppStore #{_app_id}",
@@ -268,7 +268,7 @@ module FastlaneConfig
 
     # ── Shared (both platforms) ────────────────────────────────────────────────
     SHARED = {
-      firebase_service_credentials: "secrets/firebase/service-account.json",
+      firebase_service_credentials: "secrets/android/firebase/service-account.json",
     }.freeze
 
     # ── Helpers ────────────────────────────────────────────────────────────────

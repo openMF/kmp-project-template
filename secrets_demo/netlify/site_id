@@ -1,5 +1,0 @@
-# CLAUDE-PLACEHOLDER — do not commit this to secrets/
-# Owning alias: netlify_site_id
-# Materialize to: secrets/netlify/site_id
-# Get from: Netlify site settings → Site information → Site ID
-NETLIFY_SITE_ID=changeme-placeholder

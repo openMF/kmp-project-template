@@ -107,7 +107,7 @@ Distribution, TestFlight, and App Store releases.
 Run the comprehensive iOS setup wizard:
 
 ```bash
-bash scripts/setup_ios_complete.sh
+bash scripts/ios/setup_ios_complete.sh
 ```
 
 The wizard will guide you through:
@@ -124,21 +124,21 @@ Three deployment targets are available:
 
 | Target         | Purpose              | Script                              |
 |----------------|----------------------|-------------------------------------|
-| **Firebase**   | Internal testing, QA | `bash scripts/deploy_firebase.sh`   |
-| **TestFlight** | Beta testing         | `bash scripts/deploy_testflight.sh` |
-| **App Store**  | Production release   | `bash scripts/deploy_appstore.sh`   |
+| **Firebase**   | Internal testing, QA | `bash scripts/deploy/deploy_firebase.sh`   |
+| **TestFlight** | Beta testing         | `bash scripts/deploy/deploy_testflight.sh` |
+| **App Store**  | Production release   | `bash scripts/deploy/deploy_appstore.sh`   |
 
 **Example:**
 
 ```bash
 # Deploy to Firebase for internal testing
-bash scripts/deploy_firebase.sh
+bash scripts/deploy/deploy_firebase.sh
 
 # Deploy to TestFlight for beta testing
-bash scripts/deploy_testflight.sh
+bash scripts/deploy/deploy_testflight.sh
 
 # Deploy to App Store for production
-bash scripts/deploy_appstore.sh
+bash scripts/deploy/deploy_appstore.sh
 ```
 
 ### Configuration Architecture
@@ -156,7 +156,7 @@ infrastructure.
 If your app uses Firebase Cloud Messaging:
 
 ```bash
-bash scripts/setup_apn_key.sh
+bash scripts/ios/setup_apn_key.sh
 ```
 
 ### GitHub Actions CI/CD
@@ -166,11 +166,12 @@ The project uses a centralized configuration system for iOS deployment workflows
 **Configuration Files:**
 
 - `fastlane-config/project_config.rb` - Application-specific configuration
-- `secrets/shared_keys.env` - Team-wide credentials and secrets
+- `gradle/fork.properties` - Non-secret identity/metadata (team ID, contact info, URLs)
 
 **Configuration Loading:**
 
-- Local deployments read from `secrets/shared_keys.env`
+- Non-secret identity/metadata (team ID, contact info, URLs) lives in `gradle/fork.properties`
+- Secret values are per-file under `secrets/<platform>/...`; vault users run `/secrets pull`
 - CI/CD workflows extract configuration from `project_config.rb` and GitHub Secrets
 
 **Setup:**
@@ -185,8 +186,8 @@ See [iOS Configuration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) for detailed
 
 ### Documentation
 
-- [Complete iOS Setup Guide](docs/IOS_SETUP.md) - Detailed setup instructions
-- [iOS Deployment Guide](docs/IOS_DEPLOYMENT.md) - Deployment workflows and best practices
+- [Complete iOS Setup Guide](docs/ios/IOS_SETUP.md) - Detailed setup instructions
+- [iOS Deployment Guide](docs/ios/IOS_DEPLOYMENT.md) - Deployment workflows and best practices
 - [GitHub Actions Configuration Guide](docs/GITHUB_ACTIONS_IOS_MIGRATION.md) - CI/CD setup and configuration
 
 ## 📁 Project Structure
@@ -203,17 +204,17 @@ The project follows a modular architecture:
 Our project includes comprehensive documentation to help you get started and understand the
 architecture:
 
-- [ ] [Setup Guide](docs/SETUP.md) - Detailed instructions for setting up your development
+- [ ] [Setup Guide](docs/setup/SETUP.md) - Detailed instructions for setting up your development
   environment
-- [ ] [Architecture Overview](docs/ARCHITECTURE.md) - Explanation of the project's structure and
+- [ ] [Architecture Overview](docs/architecture/ARCHITECTURE.md) - Explanation of the project's structure and
   design patterns
-- [ ] [Code Style Guide](docs/STYLE_GUIDE.md) - Coding conventions and best practices
-- [ ] [Source Set Hierarchy](docs/SOURCE_SET_HIERARCHY.md) - Guide to the Kotlin Multiplatform code
+- [ ] [Code Style Guide](docs/architecture/STYLE_GUIDE.md) - Coding conventions and best practices
+- [ ] [Source Set Hierarchy](docs/architecture/SOURCE_SET_HIERARCHY.md) - Guide to the Kotlin Multiplatform code
   sharing structure
-- [ ] [Sync Script](docs/SYNC_SCRIPT.md) - Information about keeping in sync with upstream changes
-- [ ] [Secrets Manager](docs/SECRETS_MANAGER.md) - Documentation for the keystore and secrets
+- [ ] [Sync Script](docs/setup/SYNC_SCRIPT.md) - Information about keeping in sync with upstream changes
+- [ ] [Secrets Manager](docs/secrets/SECRETS_MANAGER.md) - Documentation for the keystore and secrets
   management system
-- [ ] [Fastlane Configuration](docs/FASTLANE_CONFIGURATION.md) - Guide to automating deployments
+- [ ] [Fastlane Configuration](docs/deployment/FASTLANE_CONFIGURATION.md) - Guide to automating deployments
   with fastlane
 
 > Documentation is continuously improving. Check back for updates or contribute to enhancing our

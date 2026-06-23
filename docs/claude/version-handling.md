@@ -245,7 +245,7 @@ firebase_app_distribution(
   release_notes: changelog,
   groups: options[:groups] || ENV['FIREBASE_GROUPS'] || 'internal-testers',
   firebase_cli_path: '/usr/local/bin/firebase',
-  service_credentials_file: 'secrets/firebaseAppDistributionServiceCredentialsFile.json',
+  service_credentials_file: 'secrets/android/firebaseAppDistributionServiceCredentialsFile.json',
   apk_path: apk_path,
   # Version from Gradle used as-is (build metadata removed)
 )
@@ -256,7 +256,7 @@ firebase_app_distribution(
   release_notes: changelog,
   groups: options[:groups] || ENV['FIREBASE_GROUPS'] || 'internal-testers',
   firebase_cli_path: '/usr/local/bin/firebase',
-  service_credentials_file: '../../secrets/firebaseAppDistributionServiceCredentialsFile.json',
+  service_credentials_file: '../../secrets/android/firebaseAppDistributionServiceCredentialsFile.json',
   ipa_path: lane_context[SharedValues::IPA_OUTPUT_PATH],
   # Version from Gradle used as-is (build metadata removed)
 )

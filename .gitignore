@@ -75,14 +75,14 @@ keystores/*.jks
 
 version.txt
 fastlane/report.xml
-secrets/firebaseAppDistributionServiceCredentialsFile.json
-secrets/playStorePublishServiceCredentialsFile.json
+secrets/android/firebaseAppDistributionServiceCredentialsFile.json
+secrets/android/playStorePublishServiceCredentialsFile.json
 
 # Secrets and Configuration - NEVER COMMIT THESE!
-secrets.env
+# secrets.env — REMOVED: that file is retired (2026-06-23). Keystore passwords
+# now live in secrets/android/keystores/ (covered by secrets/ below).
 secrets/
 !secrets/.gitkeep
-!secrets/*.template
 .env.local
 !.env.local.example
 
@@ -91,12 +91,11 @@ gradle/fork.properties
 PROJECT_SETUP_INFO.txt
 
 # iOS Secrets - NEVER COMMIT THESE!
-secrets/shared_keys.env
-secrets/.match_password
-secrets/AuthKey*.p8
-secrets/APNAuthKey.p8
-secrets/match_ci_key
-secrets/match_ci_key.pub
+secrets/apple/match/.match_password
+secrets/apple/appstore/AuthKey*.p8
+secrets/ios/apn/APNAuthKey.p8
+secrets/apple/match/match_ci_key
+secrets/apple/match/match_ci_key.pub
 fastlane/metadata/
 fastlane/fastlane/metadata/
 fastlane/screenshots/
@@ -128,3 +127,7 @@ vendor/
 
 # Release state lives at workspace level (workspaces/{ws}/{project}/release-layer/), not in source.
 release-layer/
+
+# Generated fastlane reports (contain signing material) — never commit
+deployment/fastlane/report.xml
+deployment/fastlane/**/report.xml

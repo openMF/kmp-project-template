@@ -18,19 +18,19 @@ This is **optional** — skip it entirely if your app doesn't use push notificat
 
 | File | Content |
 |------|---------|
-| `secrets/ios/apn/APNAuthKey.p8` | The downloaded `.p8` file |
-| `secrets/ios/apn/key_id` | APN Key ID (10 characters) |
-| `secrets/ios/apn/team_id` | Apple Developer Team ID |
+| `secrets/apple/apn/APNAuthKey.p8` | The downloaded `.p8` file |
+| `secrets/apple/apn/key_id` | APN Key ID (10 characters) |
+| `secrets/apple/apn/team_id` | Apple Developer Team ID |
 
 `config.rb` reads these files directly — no env bundle needed.
 
 ## Commands
 
 ```bash
-mkdir -p secrets/ios/apn
-cp ~/Downloads/AuthKey_*.p8 secrets/ios/apn/APNAuthKey.p8
-echo "YOUR_APN_KEY_ID" > secrets/ios/apn/key_id
-echo "YOUR_TEAM_ID"    > secrets/ios/apn/team_id
+mkdir -p secrets/apple/apn
+cp ~/Downloads/AuthKey_*.p8 secrets/apple/apn/APNAuthKey.p8
+echo "YOUR_APN_KEY_ID" > secrets/apple/apn/key_id
+echo "YOUR_TEAM_ID"    > secrets/apple/apn/team_id
 ```
 
 ## Notes

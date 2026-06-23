@@ -516,7 +516,7 @@ bundle exec fastlane ios release                      # App Store only
 # Debugging
 bundle exec fastlane ios --help                       # Show all lanes
 cat gradle/fork.properties                                   # View non-secret config
-ls secrets/apple/ secrets/ios/                               # List secret files
+ls secrets/apple/ secrets/apple/                               # List secret files
 open https://appstoreconnect.apple.com                # Open App Store Connect
 ```
 

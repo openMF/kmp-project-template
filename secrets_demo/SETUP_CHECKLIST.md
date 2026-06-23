@@ -57,9 +57,9 @@ Edit `gradle/fork.properties` (copy from `gradle/fork.properties.template`) and 
 See [secrets_demo/apn/README.md](apn/README.md).
 
 - [ ] Create APN key at [Apple Developer → Keys](https://developer.apple.com/account/resources/authkeys/list)
-- [ ] Place `.p8` at `secrets/ios/apn/APNAuthKey.p8`
-- [ ] Write Key ID to `secrets/ios/apn/key_id`
-- [ ] Write Team ID to `secrets/ios/apn/team_id`
+- [ ] Place `.p8` at `secrets/apple/apn/APNAuthKey.p8`
+- [ ] Write Key ID to `secrets/apple/apn/key_id`
+- [ ] Write Team ID to `secrets/apple/apn/team_id`
 
 ---
 
@@ -69,8 +69,8 @@ See [secrets_demo/apn/README.md](apn/README.md).
 
 See [secrets_demo/keystores/README.md](keystores/README.md) for detailed steps.
 
-- [ ] Generate keystore: `keytool -genkey -keystore secrets/android/keystores/release.jks -alias release -keyalg RSA -keysize 4096 -validity 10000`
-- [ ] Create `secrets/android/keystores/release.properties` with `storePassword`, `keyAlias`, `keyPassword`
+- [ ] Generate keystore: `keytool -genkey -keystore secrets/android/keystores/upload_keystore.keystore -alias upload -keyalg RSA -keysize 4096 -validity 10000`
+- [ ] Create `secrets/android/keystores/upload_keystore.properties` with `storePassword`, `keyAlias`, `keyPassword`
 - [ ] **Back up the keystore** — you cannot recover it if lost
 
 ### 7. Google Play Service Account
@@ -91,7 +91,7 @@ See [secrets_demo/firebase/README.md](firebase/README.md) for detailed steps.
 - [ ] Place at `secrets/android/firebase/service-account.json`
 - [ ] Write Android prod App ID to `secrets/android/firebase/android_app_id`
 - [ ] Write Android demo App ID to `secrets/android/firebase/android_demo_app_id`
-- [ ] Write iOS App ID to `secrets/ios/firebase/ios_app_id`
+- [ ] Write iOS App ID to `secrets/apple/firebase/ios_app_id`
 - [ ] Set `apple.tf.groups` in `gradle/fork.properties` (Firebase tester group names)
 
 ---
@@ -106,6 +106,22 @@ See [secrets_demo/firebase/README.md](firebase/README.md) for detailed steps.
 
 ### Vercel
 - [ ] [vercel/README.md](vercel/README.md) → `secrets/web/vercel/token`, `secrets/web/vercel/org_id`, `secrets/web/vercel/project_id`
+
+---
+
+## Desktop — OPTIONAL (only for OS-trusted *signed* installers)
+
+Unsigned EXE/MSI/DMG/DEB build + publish to GitHub Releases without any of these.
+Fill them only when you want notarized/signed desktop artifacts.
+
+### macOS (.app / .pkg)
+- [ ] [desktop/macos/README.md](desktop/macos/README.md) → `secrets/desktop/macos/app_store.p12`, `secrets/desktop/macos/installer.p12`
+
+### Windows (Authenticode)
+- [ ] [desktop/windows/README.md](desktop/windows/README.md) → `secrets/desktop/windows/code_signing.pfx`, `secrets/desktop/windows/code_signing_password`
+
+### Linux (GPG-signed packages)
+- [ ] [desktop/linux/README.md](desktop/linux/README.md) → `secrets/desktop/linux/gpg_signing.key`, `secrets/desktop/linux/gpg_passphrase`
 
 ---
 

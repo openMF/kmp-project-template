@@ -55,9 +55,9 @@ WARNINGS=0
 # Check if APN secret files exist
 print_info "Checking APN configuration files..."
 
-APN_KEY_ID_FILE="secrets/ios/apn/key_id"
-APN_TEAM_ID_FILE="secrets/ios/apn/team_id"
-APN_KEY_FILE_PATH="secrets/ios/apn/APNAuthKey.p8"
+APN_KEY_ID_FILE="secrets/apple/apn/key_id"
+APN_TEAM_ID_FILE="secrets/apple/apn/team_id"
+APN_KEY_FILE_PATH="secrets/apple/apn/APNAuthKey.p8"
 
 if [ ! -f "$APN_KEY_ID_FILE" ]; then
     print_error "APN key_id file not found: $APN_KEY_ID_FILE"
@@ -123,7 +123,7 @@ fi
 # Check APN key file
 print_section "🔑 Checking APN Key File"
 
-APN_KEY_FILE="secrets/ios/apn/APNAuthKey.p8"
+APN_KEY_FILE="secrets/apple/apn/APNAuthKey.p8"
 
 if [ ! -f "$APN_KEY_FILE" ]; then
     print_error "APN key file not found: $APN_KEY_FILE"

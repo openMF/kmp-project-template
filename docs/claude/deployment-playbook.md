@@ -633,7 +633,7 @@ Submitted → Waiting for Review → In Review → Processing → Ready for Sale
 security find-identity -v -p codesigning | grep "Developer ID"
 
 # Check secrets
-ls -la secrets/desktop/macos_*.p12
+ls -la secrets/desktop/macos/*.p12
 ```
 
 **2. Deploy**
@@ -691,7 +691,7 @@ Similar to iOS, Apple processes macOS builds (10-60 minutes)
 ```bash
 # Verify signing certificates (if configured)
 ls -la secrets/windows_*.p12
-ls -la secrets/desktop/macos_*.p12
+ls -la secrets/desktop/macos/*.p12
 ls -la secrets/linux_*.key
 
 # Test build locally

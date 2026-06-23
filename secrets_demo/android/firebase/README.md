@@ -25,7 +25,7 @@ You also need the Firebase App ID for each platform:
 | `secrets/android/firebase/service-account.json` | Service account JSON | `FIREBASECREDS` |
 | `secrets/android/firebase/android_app_id` | Android prod App ID | `FIREBASE_ANDROID_APP_ID` |
 | `secrets/android/firebase/android_demo_app_id` | Android demo App ID | `FIREBASE_ANDROID_DEMO_APP_ID` |
-| `secrets/ios/firebase/ios_app_id` | iOS App ID | `FIREBASE_IOS_APP_ID` |
+| `secrets/apple/firebase/ios_app_id` | iOS App ID | `FIREBASE_IOS_APP_ID` |
 
 ## Commands
 
@@ -36,7 +36,7 @@ cp secrets_demo/firebase/service-account.json secrets/android/firebase/service-a
 
 echo "1:123456789:android:abc123" > secrets/android/firebase/android_app_id
 echo "1:123456789:android:def456" > secrets/android/firebase/android_demo_app_id
-echo "1:123456789:ios:ghi789"     > secrets/ios/firebase/ios_app_id
+echo "1:123456789:ios:ghi789"     > secrets/apple/firebase/ios_app_id
 
 # Sync to GitHub
 bash scripts/secrets/sync-secrets-to-github.sh --only firebase

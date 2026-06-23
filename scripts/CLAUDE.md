@@ -536,8 +536,8 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 **What it does:**
 1. Prompts for APN Key ID
 2. Prompts for APN .p8 file path
-3. Copies APN key to `secrets/ios/apn/APNAuthKey.p8`
-4. Writes APN Key ID to `secrets/ios/apn/key_id` and Team ID to `secrets/ios/apn/team_id`
+3. Copies APN key to `secrets/apple/apn/APNAuthKey.p8`
+4. Writes APN Key ID to `secrets/apple/apn/key_id` and Team ID to `secrets/apple/apn/team_id`
 5. Verifies setup with `verify_apn_setup.sh`
 
 **When needed:**
@@ -658,8 +658,8 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 ```
 
 **What it does:**
-1. Checks `secrets/ios/apn/key_id` exists and is non-empty
-2. Checks APN `.p8` file exists at `secrets/ios/apn/APNAuthKey.p8`
+1. Checks `secrets/apple/apn/key_id` exists and is non-empty
+2. Checks APN `.p8` file exists at `secrets/apple/apn/APNAuthKey.p8`
 3. Validates file permissions
 4. Verifies key format
 

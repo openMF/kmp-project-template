@@ -532,8 +532,8 @@ MACOS_INSTALLER_CERTIFICATE
 | `secrets/android/playStorePublishServiceCredentialsFile.json` | `PLAYSTORECREDS` | Base64 |
 | `secrets/apple/appstore/AuthKey.p8` | `APPSTORE_AUTH_KEY` | Base64 |
 | `secrets/apple/match/match_ci_key` | `MATCH_SSH_PRIVATE_KEY` | Base64 |
-| `secrets/desktop/macos_signing.p12` | `MACOS_SIGNING_KEY` | Base64 |
-| `secrets/desktop/macos_installer.p12` | `MACOS_INSTALLER_CERTIFICATE` | Base64 |
+| `secrets/desktop/macos/signing.p12` | `MACOS_SIGNING_KEY` | Base64 |
+| `secrets/desktop/macos/installer.p12` | `MACOS_INSTALLER_CERTIFICATE` | Base64 |
 | `secrets/windows_signing.pfx` | `WINDOWS_SIGNING_KEY` | Base64 |
 
 ### String Secrets (Not Files)

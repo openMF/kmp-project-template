@@ -321,7 +321,7 @@ bundle exec fastlane ios sync_certificates match_type:appstore   # Sync App Stor
 # Debugging
 bundle exec fastlane ios --help            # Show all lanes
 cat gradle/fork.properties                         # View non-secret config
-ls secrets/apple/ secrets/ios/                     # List secret files
+ls secrets/apple/ secrets/apple/                     # List secret files
 ls -la secrets/                            # List all secret files
 ```
 

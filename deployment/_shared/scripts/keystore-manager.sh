@@ -851,10 +851,10 @@ EOF
 #   secrets/apple/match/.certificates_password          → CERTIFICATES_PASSWORD
 #
 # Certificate/profile files (base64 encoded by sync):
-#   secrets/desktop/mac_app_distribution.p12        → MAC_APP_DISTRIBUTION_CERTIFICATE_B64
-#   secrets/desktop/mac_installer_distribution.p12  → MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64
-#   secrets/desktop/mac_embedded.provisionprofile   → MAC_EMBEDDED_PROVISION_B64
-#   secrets/desktop/mac_runtime.provisionprofile    → MAC_RUNTIME_PROVISION_B64
+#   secrets/desktop/macos/app_distribution.p12        → MAC_APP_DISTRIBUTION_CERTIFICATE_B64
+#   secrets/desktop/macos/installer_distribution.p12  → MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64
+#   secrets/desktop/macos/embedded.provisionprofile   → MAC_EMBEDDED_PROVISION_B64
+#   secrets/desktop/macos/runtime.provisionprofile    → MAC_RUNTIME_PROVISION_B64
 EOF
         then
             print_error "Failed to append macOS App Store section"

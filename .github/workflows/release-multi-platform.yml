@@ -191,7 +191,7 @@ jobs:
           fi
         fi
         # ── Secrets are materialized into PLATFORM-NAMESPACED dirs (2026-06-22) ──
-        #   secrets/android/  secrets/apple/  secrets/ios/  secrets/web/  secrets/shared/
+        #   secrets/android/  secrets/apple/  secrets/apple/  secrets/web/  secrets/shared/
         # Apple ASC key + Match are SHARED by iOS and macOS-desktop → secrets/apple/.
         # Materialize Android keystore (when android_rung is active)
         if [ -n "${UPLOAD_KEYSTORE_B64:-}" ]; then

@@ -327,7 +327,7 @@ jobs:
 
       - name: Setup secrets
         run: |
-          mkdir -p secrets/apple/appstore secrets/apple/match secrets/ios/apn
+          mkdir -p secrets/apple/appstore secrets/apple/match secrets/apple/apn
           echo "${{ secrets.MATCH_PASSWORD }}" > secrets/apple/match/.match_password
           echo "${{ secrets.MATCH_SSH_KEY }}" > secrets/apple/match/match_ci_key
           echo "${{ secrets.APPSTORE_API_KEY }}" > secrets/apple/appstore/AuthKey.p8

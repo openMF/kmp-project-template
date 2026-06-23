@@ -247,14 +247,14 @@ module FastlaneConfig
       app_id = if flavor == :demo
                  ENV["FIREBASE_IOS_DEMO_APP_ID"] ||
                    _fork_prop("firebase.ios.demo.app.id") ||
-                   _secret_file("#{_s}/ios/firebase/ios_demo_app_id") || ""
+                   _secret_file("#{_s}/apple/firebase/ios_demo_app_id") || ""
                else
                  ENV["FIREBASE_IOS_PROD_APP_ID"] ||
                    _fork_prop("firebase.ios.prod.app.id") ||
                    ENV["FIREBASE_IOS_APP_ID"] ||
                    _fork_prop("firebase.ios.app.id") ||
-                   _secret_file("#{_s}/ios/firebase/ios_prod_app_id") ||
-                   _secret_file("#{_s}/ios/firebase/ios_app_id") || ""
+                   _secret_file("#{_s}/apple/firebase/ios_prod_app_id") ||
+                   _secret_file("#{_s}/apple/firebase/ios_app_id") || ""
                end
       base.merge(appId: app_id)
     when :android

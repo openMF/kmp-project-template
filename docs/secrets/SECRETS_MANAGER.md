@@ -68,10 +68,13 @@ configurations across multiple environments and CI/CD pipelines.
 This command:
 
 1. Creates the `keystores` directory if it doesn't exist
-2. Generates both ORIGINAL (debug) and UPLOAD (release) keystores
-3. Updates `secrets.env` with base64-encoded keystores
-4. Updates fastlane config in `fastlane-config/android_config.rb`
-5. Updates Gradle config in `cmp-android/build.gradle.kts`
+2. Generates the UPLOAD keystore (Play App Signing — single keystore model)
+3. Reads keystore DN (CN/OU/O/L/ST/C) from `gradle/fork.properties` (`legal.company.name`
+   and `keystore.dn.*` keys) — **not** from `secrets.env` (retired)
+4. Reads passwords from `secrets/android/keystores/{keystore_password,keystore_alias,
+   keystore_alias_password}` per-value files — **not** from `secrets.env` (retired)
+5. Updates fastlane config in `fastlane-config/project_config.rb`
+6. Updates Gradle config in `cmp-android/build.gradle.kts`
 
 ### Viewing Secrets
 
@@ -79,8 +82,11 @@ This command:
 ./keystore-manager.sh view
 ```
 
-Displays all secrets from `secrets.env` in a nicely formatted table. For multiline values (like
-base64-encoded keystores), it shows `[MULTILINE VALUE]` instead of the actual content.
+Displays all secrets from `secrets/shared/secrets.env` in a nicely formatted table. For multiline
+values (like base64-encoded keystores), it shows `[MULTILINE VALUE]` instead of the actual content.
+
+> **Note:** This subcommand reads the legacy `secrets/shared/secrets.env` bundle which is still used
+> for iOS/macOS secrets. Android keystore passwords now live in `secrets/android/keystores/`.
 
 ### Adding Secrets to GitHub
 
@@ -88,8 +94,11 @@ base64-encoded keystores), it shows `[MULTILINE VALUE]` instead of the actual co
 ./keystore-manager.sh add --repo=username/repo
 ```
 
-Adds all secrets from `secrets.env` to the specified GitHub repository (excludes certificate
-information and local configuration values).
+**DEPRECATED.** Adds all secrets from `secrets/shared/secrets.env` to the specified GitHub
+repository (excludes certificate information and local configuration values).
+
+Prefer `scripts/secrets/sync-secrets-to-github.sh` which reads `secrets/` per-value files
+directly and does not require an intermediate `secrets.env` bundle.
 
 You can target a specific GitHub environment:
 
@@ -119,8 +128,8 @@ Deletes a specific secret from the GitHub repository.
 ./keystore-manager.sh delete-all --repo=username/repo
 ```
 
-Deletes all secrets defined in `secrets.env` from the GitHub repository (excluding certificate
-information and local configuration values).
+**DEPRECATED.** Deletes all secrets defined in `secrets/shared/secrets.env` from the GitHub
+repository (excluding certificate information and local configuration values).
 
 To also delete excluded secrets:
 
@@ -130,45 +139,23 @@ To also delete excluded secrets:
 
 ## Configuration
 
-### Environment File (secrets.env)
+### Secret Storage — New Model (2026-06-23)
 
-The `secrets.env` file contains all the keystore and secret information. Example structure:
+`secrets.env` at the repo root is **retired**. Secrets now have canonical homes:
 
-```
-# GitHub Secrets Environment File
-# Format: KEY=VALUE (use quotes for values with spaces)
-# Use <<EOF and EOF for multiline values
+| Category | File(s) | Secret? |
+|---|---|---|
+| Keystore password | `secrets/android/keystores/keystore_password` | Yes — gitignored |
+| Keystore alias | `secrets/android/keystores/keystore_alias` | Yes — gitignored |
+| Alias password | `secrets/android/keystores/keystore_alias_password` | Yes — gitignored |
+| Keystore DN (CN/OU/O/L/ST/C) | `gradle/fork.properties` (`legal.company.name`, `keystore.dn.*`) | No — gitignored template, non-secret values |
 
-# UPLOAD Keystore credentials (Release/Production)
-UPLOAD_KEYSTORE_FILE_PASSWORD=upload_keystore_password
-UPLOAD_KEYSTORE_ALIAS=upload_key
-UPLOAD_KEYSTORE_ALIAS_PASSWORD=upload_key_password
+To populate the password files run `scripts/secrets/setup-secrets.sh android` or have
+`setup-project.sh` write them automatically.
 
-# Local keystore generation settings (not sent to GitHub)
-UPLOAD_KEYSTORE_NAME=upload_keystore.keystore
-VALIDITY=25
-KEYALG=RSA
-KEYSIZE=2048
-OVERWRITE=false
-
-# Certificate information (Distinguished Name)
-# IMPORTANT: Use quotes for values with spaces
-COMPANY_NAME="Devikon Inc."
-DEPARTMENT="Mobile Development"
-ORGANIZATION="Devikon Inc."
-CITY="Kolkata"
-STATE="West Bengal"
-COUNTRY=IN
-
-# Base64 encoded keystores (added by the script)
-
-UPLOAD_KEYSTORE_FILE<<EOF
-MIICXQIBAAKBgQDASAEDHGOPsVNlHCYi6ofmoEOdG+7xDRa...
-EOF
-
-# Other secrets
-API_KEY=your_api_key_here
-```
+The legacy `secrets/shared/secrets.env` bundle is still used by the iOS/macOS sync flow
+(`keystore-manager.sh sync`) — it is not removed, only the Android keystore password section
+is retired from it.
 
 ### Files Updated by Script
 
@@ -211,16 +198,21 @@ After running the script, you should have the following directory structure:
 
 ```
 project/
-├── keystore-manager.sh        # The main script
-├── secrets.env                # Environment file with secrets
-├── keystores/                 # Directory containing keystore files
-│   ├── original.keystore      # Debug/development keystore
-│   └── upload.keystore        # Release/production keystore
-├── fastlane-config/           # Fastlane configuration directory
-│   └── android_config.rb      # Fastlane configuration for Android
-└── cmp-android/              
-    └── build.gradle.kts       # Gradle build file with signing config
+├── deployment/_shared/scripts/keystore-manager.sh  # The main script
+├── keystores/                                       # Keystore files (gitignored)
+│   └── upload_keystore.keystore                     # Upload keystore (Play App Signing)
+├── secrets/android/keystores/                       # Keystore passwords (gitignored)
+│   ├── keystore_password
+│   ├── keystore_alias
+│   └── keystore_alias_password
+├── gradle/fork.properties                           # Keystore DN + org identity (gitignored)
+├── fastlane-config/
+│   └── project_config.rb                            # Updated by keystore-manager.sh generate
+└── cmp-android/
+    └── build.gradle.kts                             # Updated by keystore-manager.sh generate
 ```
+
+> `secrets.env` at the repo root has been retired (2026-06-23).
 
 ## Troubleshooting
 
@@ -235,8 +227,8 @@ project/
       CLI: [https://cli.github.com/manual/installation](https://cli.github.com/manual/installation)
     - Log in with: `gh auth login`
 
-3. **Error with multiline values**
-    - Ensure all multiline blocks in `secrets.env` are properly closed with `EOF`
+3. **Error with multiline values (iOS/macOS sync)**
+    - Ensure all multiline blocks in `secrets/shared/secrets.env` are properly closed with `EOF`
     - Check for proper formatting: `KEY<<EOF` and `EOF` should be on separate lines
 
 4. **Configuration files not updated**
@@ -248,7 +240,8 @@ project/
 To verify that a keystore was generated correctly:
 
 ```bash
-keytool -list -v -keystore keystores/original.keystore -storepass your_password
+keytool -list -v -keystore keystores/upload_keystore.keystore \
+  -storepass "$(cat secrets/android/keystores/keystore_password)"
 ```
 
 ## FAQ
@@ -262,8 +255,9 @@ A: No. Certificate information (COMPANY_NAME, DEPARTMENT, etc.) is excluded from
 default.
 
 **Q: How do I change the keystore passwords?**  
-A: Edit the values in `secrets.env` and run `./keystore-manager.sh generate` with the OVERWRITE
-option set to true.
+A: Edit the per-value files in `secrets/android/keystores/` (keystore_password, keystore_alias,
+keystore_alias_password), then re-run `./keystore-manager.sh generate`. The script reads those
+files directly — `secrets.env` is retired.
 
 **Q: Can I use this script in CI/CD pipelines?**  
 A: Yes, the script is designed to work in both interactive and automated environments. For CI/CD,

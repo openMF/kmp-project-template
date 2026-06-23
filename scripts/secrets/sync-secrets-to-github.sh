@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/sync-secrets-to-github.sh
+# scripts/secrets/sync-secrets-to-github.sh
 #
 # Reads credentials from secrets/ and pushes them to GitHub Actions secrets.
 # Run this once after filling secrets/ to wire up your fork's CI pipeline.
@@ -9,18 +9,18 @@
 #   - secrets/ folder populated (copy from secrets_demo/, fill in real values)
 #
 # Usage:
-#   bash scripts/sync-secrets-to-github.sh
-#   bash scripts/sync-secrets-to-github.sh --repo owner/repo
-#   bash scripts/sync-secrets-to-github.sh --dry-run
-#   bash scripts/sync-secrets-to-github.sh --only ios
-#   bash scripts/sync-secrets-to-github.sh --only android
-#   bash scripts/sync-secrets-to-github.sh --only firebase
-#   bash scripts/sync-secrets-to-github.sh --only mac
-#   bash scripts/sync-secrets-to-github.sh --only windows
-#   bash scripts/sync-secrets-to-github.sh --only linux
-#   bash scripts/sync-secrets-to-github.sh --only microsoft-store
-#   bash scripts/sync-secrets-to-github.sh --only azure-signing
-#   bash scripts/sync-secrets-to-github.sh --only web
+#   bash scripts/secrets/sync-secrets-to-github.sh
+#   bash scripts/secrets/sync-secrets-to-github.sh --repo owner/repo
+#   bash scripts/secrets/sync-secrets-to-github.sh --dry-run
+#   bash scripts/secrets/sync-secrets-to-github.sh --only ios
+#   bash scripts/secrets/sync-secrets-to-github.sh --only android
+#   bash scripts/secrets/sync-secrets-to-github.sh --only firebase
+#   bash scripts/secrets/sync-secrets-to-github.sh --only mac
+#   bash scripts/secrets/sync-secrets-to-github.sh --only windows
+#   bash scripts/secrets/sync-secrets-to-github.sh --only linux
+#   bash scripts/secrets/sync-secrets-to-github.sh --only microsoft-store
+#   bash scripts/secrets/sync-secrets-to-github.sh --only azure-signing
+#   bash scripts/secrets/sync-secrets-to-github.sh --only web
 #
 # Play App Signing model (per https://support.google.com/googleplay/android-developer/answer/9842756):
 #   Google holds the app signing key; developer holds ONLY the upload key.
@@ -31,7 +31,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SECRETS_DIR="$REPO_ROOT/secrets"
 
 DRY_RUN=false

@@ -39,5 +39,5 @@ Or find them in the Vercel dashboard:
 echo "your-vercel-token"      > secrets/web/vercel/token
 echo "your-org-id"            > secrets/web/vercel/org_id
 echo "your-project-id"        > secrets/web/vercel/project_id
-bash scripts/sync-secrets-to-github.sh --only web
+bash scripts/secrets/sync-secrets-to-github.sh --only web
 ```

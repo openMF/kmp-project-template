@@ -30,7 +30,7 @@ Complete guide to setting up iOS deployment for your Kotlin Multiplatform projec
 Run the comprehensive iOS setup wizard:
 
 ```bash
-bash scripts/setup_ios_complete.sh
+bash scripts/ios/setup_ios_complete.sh
 ```
 
 This interactive wizard will guide you through:
@@ -113,7 +113,7 @@ openssl rand -base64 32 > secrets/apple/match/.match_password
 Now that you have all the prerequisites, run the setup wizard:
 
 ```bash
-bash scripts/setup_ios_complete.sh
+bash scripts/ios/setup_ios_complete.sh
 ```
 
 The wizard will:
@@ -187,7 +187,7 @@ secrets/                         # All gitignored
 If your app uses Firebase Cloud Messaging for push notifications:
 
 ```bash
-bash scripts/setup_apn_key.sh
+bash scripts/ios/setup_apn_key.sh
 ```
 
 ### Steps:
@@ -203,10 +203,10 @@ Verify your setup:
 
 ```bash
 # Verify APN configuration (if applicable)
-bash scripts/verify_apn_setup.sh
+bash scripts/ios/verify_apn_setup.sh
 
 # Test deployment to Firebase
-bash scripts/deploy_firebase.sh
+bash scripts/deploy/deploy_firebase.sh
 
 # Check Fastlane configuration
 bundle exec fastlane ios --help
@@ -279,12 +279,12 @@ Once setup is complete:
 
 1. **Test Firebase Deployment:**
    ```bash
-   bash scripts/deploy_firebase.sh
+   bash scripts/deploy/deploy_firebase.sh
    ```
 
 2. **Test TestFlight Deployment:**
    ```bash
-   bash scripts/deploy_testflight.sh
+   bash scripts/deploy/deploy_testflight.sh
    ```
 
 3. **Configure App Store Metadata:**
@@ -305,14 +305,14 @@ Once setup is complete:
 
 ```bash
 # Setup
-bash scripts/setup_ios_complete.sh        # Complete iOS setup
-bash scripts/setup_apn_key.sh             # Setup push notifications
-bash scripts/verify_apn_setup.sh          # Verify APN setup
+bash scripts/ios/setup_ios_complete.sh        # Complete iOS setup
+bash scripts/ios/setup_apn_key.sh             # Setup push notifications
+bash scripts/ios/verify_apn_setup.sh          # Verify APN setup
 
 # Deployment
-bash scripts/deploy_firebase.sh                       # Deploy to Firebase
-bash scripts/deploy_testflight.sh                     # Deploy to TestFlight
-bash scripts/deploy_appstore.sh                       # Deploy to App Store
+bash scripts/deploy/deploy_firebase.sh                       # Deploy to Firebase
+bash scripts/deploy/deploy_testflight.sh                     # Deploy to TestFlight
+bash scripts/deploy/deploy_appstore.sh                       # Deploy to App Store
 
 # Certificate Management
 bundle exec fastlane ios sync_certificates match_type:adhoc      # Sync AdHoc certs
@@ -327,4 +327,4 @@ ls -la secrets/                            # List all secret files
 
 ---
 
-**Ready to deploy?** See [IOS_DEPLOYMENT.md](./IOS_DEPLOYMENT.md) for deployment workflows and best practices.
+**Ready to deploy?** See [IOS_DEPLOYMENT.md](../ios/IOS_DEPLOYMENT.md) for deployment workflows and best practices.

@@ -7,7 +7,7 @@ This document provides a comprehensive checklist to verify that all iOS deployme
 Run the automated verification script:
 
 ```bash
-bash scripts/verify_ios_deployment.sh
+bash scripts/ios/verify_ios_deployment.sh
 ```
 
 This script will check all critical components and report pass/fail status.
@@ -33,7 +33,7 @@ This script will check all critical components and report pass/fail status.
 
 **Test Command:**
 ```bash
-bash scripts/check_ios_version.sh
+bash scripts/ios/check_ios_version.sh
 ```
 
 ---
@@ -124,11 +124,11 @@ grep -A1 "ITSAppUsesNonExemptEncryption" cmp-ios/iosApp/Info.plist
 ### 6. Deployment Scripts ✓
 
 **Required Scripts:**
-- `scripts/deploy_firebase.sh` - Firebase deployment
-- `scripts/deploy_testflight.sh` - TestFlight deployment
-- `scripts/deploy_appstore.sh` - App Store deployment
-- `scripts/check_ios_version.sh` - Version verification
-- `scripts/verify_ios_deployment.sh` - Deployment verification
+- `scripts/deploy/deploy_firebase.sh` - Firebase deployment
+- `scripts/deploy/deploy_testflight.sh` - TestFlight deployment
+- `scripts/deploy/deploy_appstore.sh` - App Store deployment
+- `scripts/ios/check_ios_version.sh` - Version verification
+- `scripts/ios/verify_ios_deployment.sh` - Deployment verification
 
 **All Scripts Must:**
 - [ ] Be executable (`chmod +x`)
@@ -161,10 +161,10 @@ grep -A1 "ITSAppUsesNonExemptEncryption" cmp-ios/iosApp/Info.plist
 ### 8. Documentation ✓
 
 **Required Documentation:**
-- [ ] `docs/IOS_DEPLOYMENT.md` - Deployment guide
-- [ ] `docs/IOS_SETUP.md` - Initial setup guide
-- [ ] `docs/IOS_DEPLOYMENT_CHECKLIST.md` - This checklist
-- [ ] `docs/FASTLANE_CONFIGURATION.md` - Fastlane configuration
+- [ ] `docs/ios/IOS_DEPLOYMENT.md` - Deployment guide
+- [ ] `docs/ios/IOS_SETUP.md` - Initial setup guide
+- [ ] `docs/ios/IOS_DEPLOYMENT_CHECKLIST.md` - This checklist
+- [ ] `docs/deployment/FASTLANE_CONFIGURATION.md` - Fastlane configuration
 
 ---
 
@@ -245,7 +245,7 @@ Failed: Incorrect, or missing copyright date
 ### Test 1: Version Check
 
 ```bash
-bash scripts/check_ios_version.sh
+bash scripts/ios/check_ios_version.sh
 ```
 
 **Expected Output:**
@@ -260,7 +260,7 @@ Verification: PASSED ✓
 ### Test 2: Deployment Verification
 
 ```bash
-bash scripts/verify_ios_deployment.sh
+bash scripts/ios/verify_ios_deployment.sh
 ```
 
 **Expected Output:**
@@ -276,14 +276,14 @@ iOS deployment configuration is ready for automatic deployment!
 
 ```bash
 # Check current version
-bash scripts/check_ios_version.sh
+bash scripts/ios/check_ios_version.sh
 
 # Make a commit
 git add .
 git commit -m "test: version progression"
 
 # Check new version (commit count should increment)
-bash scripts/check_ios_version.sh
+bash scripts/ios/check_ios_version.sh
 ```
 
 **Expected:** Commit count increments: `2026.1.13` → `2026.1.14`
@@ -334,7 +334,7 @@ jobs:
           chmod 600 secrets/apple/match/match_ci_key
 
       - name: Deploy to App Store
-        run: bash scripts/deploy_appstore.sh
+        run: bash scripts/deploy/deploy_appstore.sh
 ```
 
 ---
@@ -364,9 +364,9 @@ jobs:
 
 ## Additional Resources
 
-- [iOS Deployment Guide](./IOS_DEPLOYMENT.md)
-- [iOS Setup Guide](./IOS_SETUP.md)
-- [Fastlane Configuration](./FASTLANE_CONFIGURATION.md)
+- [iOS Deployment Guide](../ios/IOS_DEPLOYMENT.md)
+- [iOS Setup Guide](../ios/IOS_SETUP.md)
+- [Fastlane Configuration](../deployment/FASTLANE_CONFIGURATION.md)
 - [Fastlane Documentation](https://docs.fastlane.tools/)
 - [App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi)
 - [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)

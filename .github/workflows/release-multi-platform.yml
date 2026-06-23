@@ -126,7 +126,7 @@ jobs:
   #   • preflight → publish-android-kmp `validate-store-listing` job (release.yaml@v2.0.19+)
   #   • full sync (metadata + screenshots + feature graphic) → deployInternal's supply upload
   #     (metadata_path + skip_upload_{metadata,changelogs,images,screenshots}: false)
-  # scripts/store-listing-preflight.sh stays as a LOCAL pre-push validation helper.
+  # scripts/store/store-listing-preflight.sh stays as a LOCAL pre-push validation helper.
   release:
     name: Release
     # Permissions cascade through nested reusable workflows (this → orchestrator

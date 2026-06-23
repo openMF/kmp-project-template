@@ -52,7 +52,7 @@ keyPassword=YOUR_KEY_PASSWORD
 ## Sync to GitHub Actions
 
 ```bash
-bash scripts/sync-secrets-to-github.sh --only android
+bash scripts/secrets/sync-secrets-to-github.sh --only android
 ```
 
 Pushes 4 secrets to the repo's GHA settings:

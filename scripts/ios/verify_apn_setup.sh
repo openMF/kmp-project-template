@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Print functions
@@ -61,14 +61,14 @@ APN_KEY_FILE_PATH="secrets/ios/apn/APNAuthKey.p8"
 
 if [ ! -f "$APN_KEY_ID_FILE" ]; then
     print_error "APN key_id file not found: $APN_KEY_ID_FILE"
-    print_info "Run: bash scripts/setup_apn_key.sh"
+    print_info "Run: bash scripts/ios/setup_apn_key.sh"
     exit 1
 fi
 print_success "APN key_id file exists: $APN_KEY_ID_FILE"
 
 if [ ! -f "$APN_TEAM_ID_FILE" ]; then
     print_error "APN team_id file not found: $APN_TEAM_ID_FILE"
-    print_info "Run: bash scripts/setup_apn_key.sh"
+    print_info "Run: bash scripts/ios/setup_apn_key.sh"
     exit 1
 fi
 print_success "APN team_id file exists: $APN_TEAM_ID_FILE"
@@ -86,7 +86,7 @@ print_section "📋 Checking APN Configuration"
 
 if [ -z "$APN_KEY_ID" ]; then
     print_error "APN key_id is empty: $APN_KEY_ID_FILE"
-    print_info "Run: bash scripts/setup_apn_key.sh"
+    print_info "Run: bash scripts/ios/setup_apn_key.sh"
     ((ERRORS++))
 else
     # Validate format (10 characters)
@@ -127,7 +127,7 @@ APN_KEY_FILE="secrets/ios/apn/APNAuthKey.p8"
 
 if [ ! -f "$APN_KEY_FILE" ]; then
     print_error "APN key file not found: $APN_KEY_FILE"
-    print_info "Run: bash scripts/setup_apn_key.sh"
+    print_info "Run: bash scripts/ios/setup_apn_key.sh"
     ((ERRORS++))
 else
     print_success "APN key file exists: $APN_KEY_FILE"
@@ -218,7 +218,7 @@ else
     print_error "❌ Found $ERRORS error(s) and $WARNINGS warning(s)"
     echo
     print_info "Please fix the errors above before using APN"
-    print_info "Run: bash scripts/setup_apn_key.sh"
+    print_info "Run: bash scripts/ios/setup_apn_key.sh"
     exit 1
 fi
 

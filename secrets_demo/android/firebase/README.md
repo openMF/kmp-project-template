@@ -39,7 +39,7 @@ echo "1:123456789:android:def456" > secrets/android/firebase/android_demo_app_id
 echo "1:123456789:ios:ghi789"     > secrets/ios/firebase/ios_app_id
 
 # Sync to GitHub
-bash scripts/sync-secrets-to-github.sh --only firebase
+bash scripts/secrets/sync-secrets-to-github.sh --only firebase
 ```
 
 ## Tester groups

@@ -9,7 +9,7 @@
 3. Send your PUBLIC key to a maintainer; wait for them to add you as a recipient (next bundle push)
 4. Configure rclone for Mifos Drive (one-time, 5 min)
 5. Run `bash scripts/fetch-secrets-from-drive.sh`
-6. Run `bash scripts/sync-secrets-to-github.sh` to push into YOUR fork's GitHub Actions
+6. Run `bash scripts/secrets/sync-secrets-to-github.sh` to push into YOUR fork's GitHub Actions
 
 Total time: ~15 min one-time, then ~30 sec per refresh.
 
@@ -98,13 +98,13 @@ Output ends with:
 ```
 ✅ Secrets extracted to ./secrets/
 Next step: push to your fork's GitHub Actions secrets:
-   bash scripts/sync-secrets-to-github.sh --repo {your-user}/kmp-project-template
+   bash scripts/secrets/sync-secrets-to-github.sh --repo {your-user}/kmp-project-template
 ```
 
 ## Step 5 — Push to YOUR fork's GitHub Actions
 
 ```bash
-bash scripts/sync-secrets-to-github.sh --repo {your-github-username}/kmp-project-template
+bash scripts/secrets/sync-secrets-to-github.sh --repo {your-github-username}/kmp-project-template
 ```
 
 This uses `gh secret set` against your fork's repo — you need `gh auth login` first.
@@ -124,7 +124,7 @@ When the maintainer rotates a secret, they push a new bundle. You sync with:
 
 ```bash
 bash scripts/fetch-secrets-from-drive.sh
-bash scripts/sync-secrets-to-github.sh
+bash scripts/secrets/sync-secrets-to-github.sh
 ```
 
 30 seconds total. No re-config required.

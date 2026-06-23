@@ -268,6 +268,6 @@ modules, the project achieves high maintainability, testability, and scalability
 
 For more detailed information, refer to:
 
-- [Setup Guide](SETUP.md) for environment configuration
+- [Setup Guide](../setup/SETUP.md) for environment configuration
 - [Source Set Hierarchy](PROJECT_HIERARCHY_TEMPLATE.md) for code sharing structure
-- [Code Style Guide](STYLE_GUIDE.md) for coding conventions
+- [Code Style Guide](../architecture/STYLE_GUIDE.md) for coding conventions

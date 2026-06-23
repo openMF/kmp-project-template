@@ -66,7 +66,7 @@ bundle exec fastlane match init \
 ## Sync to GitHub
 
 ```bash
-bash scripts/sync-secrets-to-github.sh --only ios
+bash scripts/secrets/sync-secrets-to-github.sh --only ios
 ```
 
 ## Notes

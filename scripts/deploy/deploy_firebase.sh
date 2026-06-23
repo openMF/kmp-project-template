@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ==============================================================================
-# iOS TestFlight Deployment Script
+# iOS Firebase App Distribution Deployment Script
 # ==============================================================================
-# This script deploys your iOS app to TestFlight for beta testing
+# This script deploys your iOS app to Firebase App Distribution for testing
 # ==============================================================================
 
 set -e  # Exit on any error
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Print functions
@@ -47,7 +47,7 @@ print_section() {
 }
 
 # Print banner
-print_section "🚀 iOS TestFlight Beta Deployment"
+print_section "🚀 iOS Firebase App Distribution Deployment"
 
 # Check if running on macOS
 if [[ "$OSTYPE" != "darwin"* ]]; then
@@ -85,11 +85,9 @@ print_success "Bundler installed"
 print_section "📋 Validating Configuration"
 
 REQUIRED_FILES=(
-    "secrets/apple/appstore/key_id"
-    "secrets/apple/appstore/issuer_id"
-    "secrets/apple/appstore/AuthKey.p8"
     "secrets/apple/match/.match_password"
     "secrets/apple/match/match_ci_key"
+    "secrets/android/firebaseAppDistributionServiceCredentialsFile.json"
 )
 
 MISSING_FILES=()
@@ -108,7 +106,7 @@ if [ ${#MISSING_FILES[@]} -gt 0 ]; then
         echo "  - $file"
     done
     echo
-    print_info "Run the iOS setup wizard: bash scripts/setup_ios_complete.sh"
+    print_info "Run the iOS setup wizard: bash scripts/ios/setup_ios_complete.sh"
     exit 1
 fi
 
@@ -118,17 +116,8 @@ print_info "Loading iOS deployment configuration..."
 TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
 MATCH_GIT_URL=$(grep -E "^apple\.match\.git\.url=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
 MATCH_GIT_BRANCH=$(grep -E "^apple\.match\.git\.branch=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
-TESTFLIGHT_GROUPS=$(grep -E "^apple\.tf\.groups=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
 
-APPSTORE_KEY_ID=$(cat secrets/apple/appstore/key_id 2>/dev/null | tr -d '\n\r')
-APPSTORE_ISSUER_ID=$(cat secrets/apple/appstore/issuer_id 2>/dev/null | tr -d '\n\r')
-
-# Validate App Store Connect API key configuration
-if [ -z "$APPSTORE_KEY_ID" ] || [ -z "$APPSTORE_ISSUER_ID" ]; then
-    print_error "App Store Connect API credentials not configured"
-    print_info "Ensure secrets/apple/appstore/key_id and secrets/apple/appstore/issuer_id exist"
-    exit 1
-fi
+export TEAM_ID MATCH_GIT_URL MATCH_GIT_BRANCH
 
 # Load Match password
 export MATCH_PASSWORD=$(cat secrets/apple/match/.match_password)
@@ -136,44 +125,17 @@ export MATCH_PASSWORD=$(cat secrets/apple/match/.match_password)
 # Setup SSH for Match
 export GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o IdentitiesOnly=yes"
 
-# Export for fastlane
-export APPSTORE_KEY_ID APPSTORE_ISSUER_ID TEAM_ID MATCH_GIT_URL MATCH_GIT_BRANCH TESTFLIGHT_GROUPS
-export APPSTORE_KEY_PATH="./secrets/apple/appstore/AuthKey.p8"
-
 print_success "Configuration loaded"
 
 # Display configuration summary
 print_section "📱 Deployment Configuration"
 echo "Team ID: ${TEAM_ID}"
-echo "App Store Connect Key ID: ${APPSTORE_KEY_ID}"
 echo "Match Repository: ${MATCH_GIT_URL}"
 echo "Match Branch: ${MATCH_GIT_BRANCH}"
-echo "TestFlight Groups: ${TESTFLIGHT_GROUPS:-mifos-mobile-apps}"
-echo
-
-# Important warnings
-print_section "⚠️  Important Information"
-print_warning "TestFlight Deployment Process:"
-echo "  1. Build will be uploaded to App Store Connect"
-echo "  2. Build will be submitted for beta review by Apple"
-echo "  3. Review typically takes 24-48 hours"
-echo "  4. Once approved, testers will be notified automatically"
-echo
-
-TESTFLIGHT_CONTACT_EMAIL=$(grep -E "^org\.email=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
-TESTFLIGHT_FIRST_NAME=$(grep -E "^org\.first\.name=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
-TESTFLIGHT_LAST_NAME=$(grep -E "^org\.last\.name=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
-TESTFLIGHT_PHONE=$(grep -E "^org\.phone=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
-export TESTFLIGHT_CONTACT_EMAIL TESTFLIGHT_FIRST_NAME TESTFLIGHT_LAST_NAME TESTFLIGHT_PHONE
-
-print_warning "Beta Review Information:"
-echo "  - Contact Email: ${TESTFLIGHT_CONTACT_EMAIL:-team@mifos.org}"
-echo "  - Contact Name: ${TESTFLIGHT_FIRST_NAME:-Mifos} ${TESTFLIGHT_LAST_NAME:-Initiative}"
-echo "  - Contact Phone: ${TESTFLIGHT_PHONE:-+1234567890}"
 echo
 
 # Confirmation prompt
-print_warning "This will build and deploy your iOS app to TestFlight"
+print_warning "This will build and deploy your iOS app to Firebase App Distribution"
 read -p "Do you want to continue? [y/N]: " -n 1 -r
 echo
 
@@ -188,38 +150,21 @@ bundle install
 print_success "Dependencies installed"
 
 # Run Fastlane deployment
-print_section "🚀 Deploying to TestFlight"
-print_info "This process will:"
-echo "  1. Sync code signing certificates with Match"
-echo "  2. Increment version and build number"
-echo "  3. Build signed IPA"
-echo "  4. Upload to App Store Connect"
-echo "  5. Submit for beta review"
-echo
-
-bundle exec fastlane ios beta
+print_section "🚀 Deploying to Firebase"
+bundle exec fastlane ios deploy_on_firebase
 
 # Check if deployment was successful
 if [ $? -eq 0 ]; then
     print_section "✅ Deployment Successful!"
-    print_success "Your iOS app has been uploaded to TestFlight"
-    print_info "Next steps:"
-    echo "  1. Monitor beta review status in App Store Connect"
-    echo "  2. Check https://appstoreconnect.apple.com/"
-    echo "  3. Go to TestFlight → iOS → Builds"
-    echo "  4. Wait for 'Ready to Submit' → 'Waiting for Review' → 'In Review' → 'Approved'"
-    echo "  5. Once approved, testers will receive notifications"
-    echo
-    print_info "Beta review typically takes 24-48 hours"
+    print_success "Your iOS app has been deployed to Firebase App Distribution"
+    print_info "Testers will receive a notification with download instructions"
 else
     print_section "❌ Deployment Failed"
     print_error "Please check the error messages above"
     print_info "Common issues:"
     echo "  - Invalid Match password"
     echo "  - SSH key not added to Match repository"
-    echo "  - Invalid App Store Connect API key"
+    echo "  - Invalid Firebase credentials"
     echo "  - Certificate/provisioning profile issues"
-    echo "  - Build number conflicts (already uploaded)"
-    echo "  - Missing beta review information"
     exit 1
 fi

@@ -21,7 +21,7 @@
 # dependency-guard or non-Android targets because the resolution tree differs.
 #
 # Usage:
-#   bash scripts/ci-equivalent-check.sh
+#   bash scripts/ci/ci-equivalent-check.sh
 #
 # Exit code:
 #   0 = all gates green (safe to push)
@@ -29,7 +29,7 @@
 
 set -uo pipefail
 
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 
 YELLOW='\033[1;33m'
 GREEN='\033[1;32m'

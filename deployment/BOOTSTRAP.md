@@ -156,7 +156,7 @@ every iOS deploy lane fails with `"Your certificate '…' is not valid"`. The
 
 **When to run:**
 - A deploy fails with `"not valid, please check end date"` → run immediately.
-- Monthly CI schedule (`.github/workflows/ios-cert-renewal.yml`) handles the
+- Monthly CI schedule (`openMF/ios-provisioning-profile cron (cert-renewal.yml)`) handles the
   proactive case automatically on the 1st of every month.
 
 #### Colleague setup (one-time per machine)
@@ -185,7 +185,7 @@ GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyCheckin
 > The `renewCerts` lane auto-clones on first run if the directory is absent, so
 > this manual step is optional but speeds up subsequent runs.
 
-**GitHub Actions** — the `ios-cert-renewal.yml` workflow sets up all secrets
+**GitHub Actions** — the `cert-renewal.yml (openMF/ios-provisioning-profile)` workflow sets up all secrets
 and clones the Match repo automatically. Required repo secrets:
 `MATCH_GIT_PRIVATE_KEY`, `MATCH_PASSWORD`, `CERTIFICATES_PASSWORD`,
 `KEYCHAIN_PASSWORD`, `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`, `APPSTORE_AUTH_KEY`.
@@ -344,7 +344,7 @@ admin to push. Once the upstream tags land, a follow-up PR (the
 2. **Delete** the entire `fastlane/` directory (`git rm -r fastlane/`).
 3. **Delete** the entire `fastlane-config/` directory (`git rm -r
    fastlane-config/`).
-4. **Update** `docs/FORK_QUICKSTART.md` to remove any residual references to
+4. **Update** `docs/setup/FORK_QUICKSTART.md` to remove any residual references to
    `fastlane/` paths.
 5. **Update** `CLAUDE.md` `Architecture` block to drop the `fastlane/` row.
 6. **Re-run** `./gradlew check spotlessCheck detekt dependencyGuard` and the

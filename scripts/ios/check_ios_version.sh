@@ -33,7 +33,7 @@ print_section() {
 
 # Navigate to project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 print_section "📱 iOS Version Configuration Check"
@@ -131,5 +131,5 @@ echo
 print_info "To update version for next release:"
 echo "  1. Update version in Gradle (where project.version is defined)"
 echo "  2. Run: ./gradlew versionFile"
-echo "  3. Deploy: bash scripts/deploy_testflight.sh"
+echo "  3. Deploy: bash scripts/deploy/deploy_testflight.sh"
 echo

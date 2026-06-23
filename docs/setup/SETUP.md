@@ -103,7 +103,9 @@ If you plan to use CI/CD or need to manage keystores for Android app signing, co
 This will:
 - Generate debug and release keystores for Android
 - Update Gradle and Fastlane configurations
-- Create a `secrets.env` file with keystore credentials
+- Write keystore DN to `gradle/fork.properties` (non-secret)
+- Write keystore passwords to `secrets/android/keystores/` per-value files (gitignored)
+- Update Fastlane and Gradle configurations
 
 ## IDE Setup
 
@@ -225,9 +227,9 @@ If you need to sync your fork with the upstream repository:
 
 Once your environment is set up, you can:
 
-1. Explore the [Architecture Overview](ARCHITECTURE.md) to understand the project structure
+1. Explore the [Architecture Overview](../architecture/ARCHITECTURE.md) to understand the project structure
 2. Review the [Source Set Hierarchy](PROJECT_HIERARCHY_TEMPLATE.md) to learn about code sharing
-3. Check the [Code Style Guide](STYLE_GUIDE.md) for coding conventions
+3. Check the [Code Style Guide](../architecture/STYLE_GUIDE.md) for coding conventions
 4. Start developing your own features following the established patterns
 
 ## Additional Configuration

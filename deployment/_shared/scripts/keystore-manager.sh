@@ -180,14 +180,19 @@ show_help() {
     echo "  ./keystore-manager.sh [COMMAND] [OPTIONS]"
     echo ""
     echo "Commands:"
-    echo "  generate - Generate Android keystores and update secrets.env (default)"
-    echo "  encode-secrets - Encode files from secrets/ directory and update secrets.env"
+    echo "  generate - Generate Android keystores; reads DN from gradle/fork.properties,"
+    echo "             reads passwords from secrets/android/keystores/ files (default)"
+    echo "  encode-secrets - [DEPRECATED] Encode files from secrets/ directory and update"
+    echo "             secrets/shared/secrets.env. Use scripts/secrets/sync-secrets-to-github.sh"
+    echo "             (the modern replacement) to push secrets from secrets/ to GitHub."
     echo "  sync     - Validate secrets.env format and completeness"
     echo "  view     - View all secrets in the secrets.env file as a formatted table"
-    echo "  add      - Add secrets to a GitHub repository from secrets.env"
+    echo "  add      - [DEPRECATED] Add secrets to a GitHub repository from secrets.env."
+    echo "             Use scripts/secrets/sync-secrets-to-github.sh instead."
     echo "  list     - List all secrets in a GitHub repository"
     echo "  delete   - Delete a secret from a GitHub repository"
-    echo "  delete-all - Delete all secrets from a GitHub repository that are in secrets.env"
+    echo "  delete-all - [DEPRECATED] Delete all secrets from a GitHub repository that are"
+    echo "             in secrets.env. Use scripts/secrets/sync-secrets-to-github.sh instead."
     echo "               Use --include-excluded flag to also delete excluded secrets"
     echo "  help     - Show this help message"
     echo ""
@@ -1356,7 +1361,34 @@ update_gradle_config() {
     fi
 }
 
+# Read a single key from a Java-style properties file (key=value format).
+# Usage: _read_fork_prop "gradle/fork.properties" "keystore.dn.city"
+_read_fork_prop() {
+    local props_file="$1"
+    local key="$2"
+    grep "^${key}=" "$props_file" 2>/dev/null | cut -d= -f2- | tr -d '\n\r'
+}
+
+# Read a secret from a per-value file under secrets/android/keystores/.
+# Returns empty string (not an error) when the file is absent so the caller
+# can fall back to a default.
+_read_keystore_secret() {
+    local secret_name="$1"   # e.g. keystore_password
+    local secret_file="secrets/android/keystores/${secret_name}"
+    if [[ -f "$secret_file" ]]; then
+        cat "$secret_file" | tr -d '\n\r'
+    else
+        echo ""
+    fi
+}
+
 # Function to generate keystore
+# Reads:
+#   - DN components from gradle/fork.properties (keystore.dn.* + legal.company.name)
+#   - Passwords    from secrets/android/keystores/{keystore_password,keystore_alias,
+#                  keystore_alias_password}
+# Generation constants (VALIDITY=25, KEYALG=RSA, KEYSIZE=2048, OVERWRITE=false)
+# are hard-coded defaults here — they are not per-fork configuration.
 generate_keystore() {
     local env=$1
     local keystore_name=$2
@@ -1364,12 +1396,11 @@ generate_keystore() {
     local keystore_password=$4
     local key_password=$5
 
-    # Use common values for other parameters
-    local validity=${VALIDITY:-25}
-    local keyalg=${KEYALG:-"RSA"}
-    local keysize=${KEYSIZE:-2048}
-    local dname=${DNAME}
-    local overwrite=${OVERWRITE:-false}
+    # Hard-coded generation constants (not per-fork config)
+    local validity=25
+    local keyalg="RSA"
+    local keysize=2048
+    local overwrite=false
 
     # Path to save the keystore
     local keystore_path="keystores/$keystore_name"
@@ -1397,10 +1428,61 @@ generate_keystore() {
         fi
     fi
 
-    # Generate the keystore
-    if [ -n "$dname" ]; then
-        # If DNAME is provided, use it directly
-        echo -e "- Distinguished Name: $dname"
+    # ── Build Distinguished Name from gradle/fork.properties ──────────────────
+    # Non-secret cert identity lives in fork.properties (new home); passwords come
+    # from secrets/android/keystores/ per-value files (new home).
+    # Legacy: previously these values came from secrets.env (retired).
+    local FORK_PROPS="gradle/fork.properties"
+    DN_PARTS=()
+
+    # CN — legal.company.name (primary) or keystore.dn.cn (override if present)
+    local cn_val=$(_read_fork_prop "$FORK_PROPS" "keystore.dn.cn")
+    if [[ -z "$cn_val" ]]; then
+        cn_val=$(_read_fork_prop "$FORK_PROPS" "legal.company.name")
+    fi
+    if [[ -n "$cn_val" ]]; then
+        echo -e "- Company Name (CN): $cn_val"
+        DN_PARTS+=("CN=$cn_val")
+    fi
+
+    # OU — keystore.dn.org_unit
+    local ou_val=$(_read_fork_prop "$FORK_PROPS" "keystore.dn.org_unit")
+    if [[ -n "$ou_val" ]]; then
+        echo -e "- Org Unit (OU): $ou_val"
+        DN_PARTS+=("OU=$ou_val")
+    fi
+
+    # O — legal.company.name (same as CN by convention)
+    local o_val=$(_read_fork_prop "$FORK_PROPS" "legal.company.name")
+    if [[ -n "$o_val" ]]; then
+        echo -e "- Organization (O): $o_val"
+        DN_PARTS+=("O=$o_val")
+    fi
+
+    # L — keystore.dn.city
+    local l_val=$(_read_fork_prop "$FORK_PROPS" "keystore.dn.city")
+    if [[ -n "$l_val" ]]; then
+        echo -e "- City (L): $l_val"
+        DN_PARTS+=("L=$l_val")
+    fi
+
+    # ST — keystore.dn.state
+    local st_val=$(_read_fork_prop "$FORK_PROPS" "keystore.dn.state")
+    if [[ -n "$st_val" ]]; then
+        echo -e "- State (ST): $st_val"
+        DN_PARTS+=("ST=$st_val")
+    fi
+
+    # C — keystore.dn.country (default US)
+    local c_val=$(_read_fork_prop "$FORK_PROPS" "keystore.dn.country")
+    c_val="${c_val:-US}"
+    echo -e "- Country (C): $c_val"
+    DN_PARTS+=("C=$c_val")
+
+    # ── Invoke keytool ─────────────────────────────────────────────────────────
+    if [ ${#DN_PARTS[@]} -gt 0 ]; then
+        local DN
+        DN=$(IFS=,; echo "${DN_PARTS[*]}")
         keytool -genkey -v \
             -keystore "$keystore_path" \
             -alias "$key_alias" \
@@ -1409,101 +1491,18 @@ generate_keystore() {
             -validity $((validity*365)) \
             -storepass "$keystore_password" \
             -keypass "$key_password" \
-            -dname "$dname"
+            -dname "$DN"
     else
-        # If individual DN components are provided, construct the DN using the more descriptive names
-        DN_PARTS=()
-
-        # Map more descriptive environment variables to their DN counterparts
-        if [ -n "$COMPANY_NAME" ]; then
-            local clean_value=$(strip_quotes "$COMPANY_NAME")
-            echo -e "- Company Name (CN): $clean_value"
-            DN_PARTS+=("CN=$clean_value")
-        fi
-        if [ -n "$DEPARTMENT" ]; then
-            local clean_value=$(strip_quotes "$DEPARTMENT")
-            echo -e "- Department (OU): $clean_value"
-            DN_PARTS+=("OU=$clean_value")
-        fi
-        if [ -n "$ORGANIZATION" ]; then
-            local clean_value=$(strip_quotes "$ORGANIZATION")
-            echo -e "- Organization (O): $clean_value"
-            DN_PARTS+=("O=$clean_value")
-        fi
-        if [ -n "$CITY" ]; then
-            local clean_value=$(strip_quotes "$CITY")
-            echo -e "- City (L): $clean_value"
-            DN_PARTS+=("L=$clean_value")
-        fi
-        if [ -n "$STATE" ]; then
-            local clean_value=$(strip_quotes "$STATE")
-            echo -e "- State (ST): $clean_value"
-            DN_PARTS+=("ST=$clean_value")
-        fi
-        if [ -n "$COUNTRY" ]; then
-            local clean_value=$(strip_quotes "$COUNTRY")
-            echo -e "- Country (C): $clean_value"
-            DN_PARTS+=("C=$clean_value")
-        fi
-
-        # For backward compatibility, also check the traditional DN variable names
-        if [ -z "$COMPANY_NAME" ] && [ -n "$CN" ]; then
-            local clean_value=$(strip_quotes "$CN")
-            echo -e "- Company Name (CN): $clean_value"
-            DN_PARTS+=("CN=$clean_value")
-        fi
-        if [ -z "$DEPARTMENT" ] && [ -n "$OU" ]; then
-            local clean_value=$(strip_quotes "$OU")
-            echo -e "- Department (OU): $clean_value"
-            DN_PARTS+=("OU=$clean_value")
-        fi
-        if [ -z "$ORGANIZATION" ] && [ -n "$O" ]; then
-            local clean_value=$(strip_quotes "$O")
-            echo -e "- Organization (O): $clean_value"
-            DN_PARTS+=("O=$clean_value")
-        fi
-        if [ -z "$CITY" ] && [ -n "$L" ]; then
-            local clean_value=$(strip_quotes "$L")
-            echo -e "- City (L): $clean_value"
-            DN_PARTS+=("L=$clean_value")
-        fi
-        if [ -z "$STATE" ] && [ -n "$ST" ]; then
-            local clean_value=$(strip_quotes "$ST")
-            echo -e "- State (ST): $clean_value"
-            DN_PARTS+=("ST=$clean_value")
-        fi
-        if [ -z "$COUNTRY" ] && [ -n "$C" ]; then
-            local clean_value=$(strip_quotes "$C")
-            echo -e "- Country (C): $clean_value"
-            DN_PARTS+=("C=$clean_value")
-        fi
-
-        if [ ${#DN_PARTS[@]} -gt 0 ]; then
-            # Join the DN parts with commas
-            DN=$(IFS=,; echo "${DN_PARTS[*]}")
-
-            keytool -genkey -v \
-                -keystore "$keystore_path" \
-                -alias "$key_alias" \
-                -keyalg "$keyalg" \
-                -keysize "$keysize" \
-                -validity $((validity*365)) \
-                -storepass "$keystore_password" \
-                -keypass "$key_password" \
-                -dname "$DN"
-        else
-            # If no DN components are provided, use interactive mode for DN
-            echo -e "${BLUE}No Distinguished Name components found in environment file for $env. Using interactive mode for certificate information.${NC}"
-
-            keytool -genkey -v \
-                -keystore "$keystore_path" \
-                -alias "$key_alias" \
-                -keyalg "$keyalg" \
-                -keysize "$keysize" \
-                -validity $((validity*365)) \
-                -storepass "$keystore_password" \
-                -keypass "$key_password"
-        fi
+        # gradle/fork.properties not present — fall back to interactive DN entry
+        echo -e "${BLUE}gradle/fork.properties not found. Using interactive mode for certificate DN.${NC}"
+        keytool -genkey -v \
+            -keystore "$keystore_path" \
+            -alias "$key_alias" \
+            -keyalg "$keyalg" \
+            -keysize "$keysize" \
+            -validity $((validity*365)) \
+            -storepass "$keystore_password" \
+            -keypass "$key_password"
     fi
 
     # Check if keystore was successfully created
@@ -1524,21 +1523,54 @@ generate_keystore() {
 # Generate the single UPLOAD keystore. Play App Signing model — Google holds the app
 # signing key in KMS, developer only holds the upload key.
 # Per https://support.google.com/googleplay/android-developer/answer/9842756
+#
+# Password sources (new model — secrets.env is RETIRED):
+#   secrets/android/keystores/keystore_password       → UPLOAD_KEYSTORE_FILE_PASSWORD
+#   secrets/android/keystores/keystore_alias          → UPLOAD_KEYSTORE_ALIAS
+#   secrets/android/keystores/keystore_alias_password → UPLOAD_KEYSTORE_ALIAS_PASSWORD
+# If a file is absent the script falls back to a safe default so first-run works.
+# Run `scripts/secrets/setup-secrets.sh android` to populate those files.
+#
+# DN source (new model):
+#   gradle/fork.properties keys: legal.company.name, keystore.dn.{org_unit,city,state,country}
+#
+# DEPRECATED: update_secrets_env / encode-secrets / add-to-github gh-secret-set flow.
+#   Modern replacement: scripts/secrets/sync-secrets-to-github.sh
 generate_keystores() {
     check_keytool
     create_keystores_dir
 
-    UPLOAD_KEYSTORE_NAME=${UPLOAD_KEYSTORE_NAME:-"upload_keystore.keystore"}
-    UPLOAD_KEYSTORE_FILE_PASSWORD=${UPLOAD_KEYSTORE_FILE_PASSWORD:-"Keystore_password"}
-    UPLOAD_KEYSTORE_ALIAS=${UPLOAD_KEYSTORE_ALIAS:-"Keystore_Alias"}
-    UPLOAD_KEYSTORE_ALIAS_PASSWORD=${UPLOAD_KEYSTORE_ALIAS_PASSWORD:-"Alias_password"}
+    # Generation constants — hard-coded, not per-fork config
+    local UPLOAD_KEYSTORE_NAME="upload_keystore.keystore"
+
+    # Read passwords from per-value secret files (new model).
+    # Falls back to safe placeholder defaults when files are absent so keytool
+    # can complete; the caller is expected to populate the files before CI use.
+    local UPLOAD_KEYSTORE_FILE_PASSWORD
+    UPLOAD_KEYSTORE_FILE_PASSWORD=$(_read_keystore_secret "keystore_password")
+    UPLOAD_KEYSTORE_FILE_PASSWORD="${UPLOAD_KEYSTORE_FILE_PASSWORD:-Keystore_password}"
+
+    local UPLOAD_KEYSTORE_ALIAS
+    UPLOAD_KEYSTORE_ALIAS=$(_read_keystore_secret "keystore_alias")
+    UPLOAD_KEYSTORE_ALIAS="${UPLOAD_KEYSTORE_ALIAS:-Keystore_Alias}"
+
+    local UPLOAD_KEYSTORE_ALIAS_PASSWORD
+    UPLOAD_KEYSTORE_ALIAS_PASSWORD=$(_read_keystore_secret "keystore_alias_password")
+    UPLOAD_KEYSTORE_ALIAS_PASSWORD="${UPLOAD_KEYSTORE_ALIAS_PASSWORD:-Alias_password}"
 
     echo -e "${BLUE}🔑 Play App Signing mode: generating UPLOAD keystore${NC}"
+    print_info "Password source: secrets/android/keystores/ (new model)"
+    print_info "DN source: gradle/fork.properties (new model)"
     generate_keystore "UPLOAD" "$UPLOAD_KEYSTORE_NAME" "$UPLOAD_KEYSTORE_ALIAS" "$UPLOAD_KEYSTORE_FILE_PASSWORD" "$UPLOAD_KEYSTORE_ALIAS_PASSWORD"
     UPLOAD_RESULT=$?
 
     if [ $UPLOAD_RESULT -eq 0 ]; then
-        update_secrets_env "$UPLOAD_KEYSTORE_NAME"
+        # DEPRECATED: update_secrets_env wrote passwords + base64 keystore into
+        # secrets/shared/secrets.env (legacy bundle). That file is retired.
+        # Passwords now live permanently in secrets/android/keystores/ per-value files.
+        # The keystore file itself (keystores/upload_keystore.keystore) is the artifact.
+        # To push all secrets to GitHub use: scripts/secrets/sync-secrets-to-github.sh
+        print_info "Skipping legacy secrets.env update (retired). Secrets live in secrets/android/keystores/."
 
         # Update fastlane-config/project_config.rb with UPLOAD keystore information
         update_fastlane_config "$UPLOAD_KEYSTORE_NAME" "$UPLOAD_KEYSTORE_FILE_PASSWORD" "$UPLOAD_KEYSTORE_ALIAS" "$UPLOAD_KEYSTORE_ALIAS_PASSWORD"
@@ -1569,10 +1601,10 @@ generate_keystores() {
     echo -e "${BLUE}app signing key in KMS — you never need a local copy.${NC}"
 
     if [ $UPLOAD_RESULT -eq 0 ]; then
-        echo -e "${GREEN}$ENV_FILE has been updated with the upload keystore${NC}"
+        echo -e "${GREEN}Keystore written to: keystores/$UPLOAD_KEYSTORE_NAME${NC}"
         echo -e "${GREEN}fastlane-config/project_config.rb updated${NC}"
         echo -e "${GREEN}cmp-android/build.gradle.kts updated${NC}"
-        echo -e "${BLUE}Note: If you have files in secrets/ directory, they have been encoded and added to $ENV_FILE${NC}"
+        echo -e "${CYAN}Next step: run 'scripts/secrets/sync-secrets-to-github.sh' to push secrets to GitHub${NC}"
         return 0
     else
         return 1
@@ -1959,6 +1991,12 @@ case $COMMAND in
         generate_keystores
         ;;
     encode-secrets)
+        # DEPRECATED: the encode-secrets / secrets.env bundle flow is retired.
+        # Modern replacement: scripts/secrets/sync-secrets-to-github.sh
+        # That script reads secrets/ directly and pushes to GitHub without an
+        # intermediate secrets.env file. This code path is preserved for
+        # backward compatibility only and will be removed in a future release.
+        print_warning "encode-secrets is deprecated. Use scripts/secrets/sync-secrets-to-github.sh instead."
         create_secrets_dir
         encode_secrets_directory_files
         ;;
@@ -2037,6 +2075,10 @@ case $COMMAND in
         view_secrets
         ;;
     add)
+        # DEPRECATED: this subcommand reads secrets.env and calls gh secret set directly.
+        # Modern replacement: scripts/secrets/sync-secrets-to-github.sh
+        # That script reads secrets/ per-value files and does NOT require secrets.env.
+        print_warning "The 'add' subcommand is deprecated. Use scripts/secrets/sync-secrets-to-github.sh instead."
         if [ -z "$REPO" ]; then
             echo -e "${RED}Error: Repository is required.${NC}"
             echo -e "Usage: ./keystore-manager.sh add --repo=username/repo [--env=environment]"

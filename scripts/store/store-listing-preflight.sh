@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/store-listing-preflight.sh
+# scripts/store/store-listing-preflight.sh
 #
 # Store-listing PREFLIGHT — CI mirror of `/release` STEP 1.7 (Store Listing Wizard) validation.
 # Fails fast if the store listing metadata is missing or exceeds store character limits, so the

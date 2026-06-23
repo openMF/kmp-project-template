@@ -344,9 +344,15 @@ shared publicly.
 ### Configuration Files
 
 ```
-secrets.env                # Encrypted credentials (Base64)
-PROJECT_SETUP_INFO.txt     # Setup documentation
+secrets/android/keystores/keystore_password        # Keystore password (gitignored)
+secrets/android/keystores/keystore_alias           # Keystore alias (gitignored)
+secrets/android/keystores/keystore_alias_password  # Alias password (gitignored)
+gradle/fork.properties                             # Keystore DN + org identity (gitignored)
+PROJECT_SETUP_INFO.txt                             # Setup documentation
 ```
+
+> **Note:** `secrets.env` is retired (2026-06-23). Keystore passwords now live in
+> `secrets/android/keystores/` per-value files; keystore DN is in `gradle/fork.properties`.
 
 ### Firebase Configuration
 
@@ -472,7 +478,7 @@ Before committing to version control:
 1. **Review `.gitignore`**: Ensure sensitive files are excluded
    ```gitignore
    # Already included in template .gitignore
-   secrets.env
+   # secrets.env — retired; replaced by secrets/android/keystores/ per-value files
    secrets/*
    keystores/*.keystore
    local.properties
@@ -672,7 +678,7 @@ To reconfigure an existing project:
 2. **Delete generated files**:
    ```bash
    rm -rf keystores/
-   rm secrets.env
+   rm -rf secrets/android/keystores/
    rm PROJECT_SETUP_INFO.txt
    ```
 3. **Run setup again**: `./setup-project.sh`
@@ -767,11 +773,12 @@ To update Firebase settings:
 
 ### What if my company has different keystore requirements?
 
-You can modify the keystore generation settings in the script:
+You can modify the keystore generation settings:
 
-- Edit `secrets.env` before running keystore generation
-- Adjust `VALIDITY`, `KEYALG`, or `KEYSIZE` parameters
-- Provide custom DN (Distinguished Name) information
+- Edit `gradle/fork.properties` to set your DN fields (`keystore.dn.org_unit`, `keystore.dn.city`,
+  `keystore.dn.state`, `keystore.dn.country`, `legal.company.name`) before running keystore generation
+- Generation constants (VALIDITY=25 years, KEYALG=RSA, KEYSIZE=2048) are hard-coded defaults
+  in `deployment/_shared/scripts/keystore-manager.sh` and intentionally not per-fork config
 
 ### Do I need to run this script every time I clone the repository?
 
@@ -779,7 +786,8 @@ No. The script is only needed once during initial project setup. Team members cl
 need only:
 
 1. Set up their local environment (JDK, Android SDK, etc.)
-2. Place the `secrets.env` file (shared securely within the team)
+2. Obtain keystore password files from a secure team store and place them in
+   `secrets/android/keystores/` (keystore_password, keystore_alias, keystore_alias_password)
 3. Run a standard Gradle sync
 
 ### How do I share the configuration with my team?
@@ -792,8 +800,8 @@ need only:
 
 **Share securely outside version control**:
 
-- `secrets.env` file (use secure password manager or encrypted storage)
-- Keystore passwords (team password manager)
+- `secrets/android/keystores/` per-value files (use a secure team password manager or
+  encrypted storage — `secrets.env` is retired)
 - Actual keystore files (secure backup location, limited access)
 
 ### Can I automate this script for CI/CD?
@@ -801,6 +809,6 @@ need only:
 The script is interactive and requires user input. For automated environments:
 
 1. Use the individual component scripts with command-line arguments
-2. Pre-configure `secrets.env` file
+2. Pre-populate `secrets/android/keystores/` per-value files and `gradle/fork.properties`
 3. Set environment variables for credentials
 4. Use non-interactive modes where available

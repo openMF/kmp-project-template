@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Print functions
@@ -56,7 +56,7 @@ mkdir -p "secrets/ios/apn"
 TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
 if [ -z "$TEAM_ID" ]; then
     print_warning "apple.team.id not found in gradle/fork.properties"
-    print_info "Run the iOS setup wizard first: bash scripts/setup_ios_complete.sh"
+    print_info "Run the iOS setup wizard first: bash scripts/ios/setup_ios_complete.sh"
 fi
 
 # Introduction
@@ -206,7 +206,7 @@ print_warning "IMPORTANT: Keep secrets/ios/apn/APNAuthKey.p8 secure and NEVER co
 echo
 
 print_info "Next Steps:"
-echo "  1. Verify setup: bash scripts/verify_apn_setup.sh"
+echo "  1. Verify setup: bash scripts/ios/verify_apn_setup.sh"
 echo "  2. Test push notifications in your app"
 echo "  3. Check Firebase Console for delivery reports"
 echo

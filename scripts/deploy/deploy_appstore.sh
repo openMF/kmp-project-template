@@ -19,7 +19,7 @@ NC='\033[0m' # No Color
 
 # Script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Print functions
@@ -113,7 +113,7 @@ if [ ${#MISSING_FILES[@]} -gt 0 ]; then
         echo "  - $file"
     done
     echo
-    print_info "Run the iOS setup wizard: bash scripts/setup_ios_complete.sh"
+    print_info "Run the iOS setup wizard: bash scripts/ios/setup_ios_complete.sh"
     exit 1
 fi
 
@@ -216,7 +216,7 @@ for arg in "$@"; do
         AUTOMATIC_RELEASE="${arg#*=}"
         ;;
         --help)
-        echo "Usage: bash scripts/deploy_appstore.sh [OPTIONS]"
+        echo "Usage: bash scripts/deploy/deploy_appstore.sh [OPTIONS]"
         echo
         echo "Options:"
         echo "  --submit-for-review=true|false   Submit for review after upload (default: true)"

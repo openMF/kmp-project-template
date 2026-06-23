@@ -64,7 +64,7 @@
 **/.env
 **/.env.local
 **/.env.*.local
-**/secrets.env
+# **/secrets.env — REMOVED: secrets.env is retired (2026-06-23).
 
 # ==============================================================================
 # CI/CD Artifacts

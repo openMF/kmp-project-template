@@ -11,8 +11,8 @@ cp -r secrets_demo/* secrets/
 # 2. Work through the sections below, replacing placeholder files with real ones
 
 # 3. Sync everything to GitHub Actions
-bash scripts/sync-secrets-to-github.sh --dry-run   # preview first
-bash scripts/sync-secrets-to-github.sh              # push all secrets
+bash scripts/secrets/sync-secrets-to-github.sh --dry-run   # preview first
+bash scripts/secrets/sync-secrets-to-github.sh              # push all secrets
 ```
 
 ---
@@ -117,16 +117,16 @@ ls -la secrets/
 ls -la secrets/apple/appstore/ secrets/apple/match/ secrets/android/firebase/ secrets/android/play/ secrets/android/keystores/
 
 # Dry run to preview what will be set
-bash scripts/sync-secrets-to-github.sh --dry-run
+bash scripts/secrets/sync-secrets-to-github.sh --dry-run
 
 # Sync all
-bash scripts/sync-secrets-to-github.sh
+bash scripts/secrets/sync-secrets-to-github.sh
 
 # Or sync by category
-bash scripts/sync-secrets-to-github.sh --only ios
-bash scripts/sync-secrets-to-github.sh --only android
-bash scripts/sync-secrets-to-github.sh --only firebase
-bash scripts/sync-secrets-to-github.sh --only web
+bash scripts/secrets/sync-secrets-to-github.sh --only ios
+bash scripts/secrets/sync-secrets-to-github.sh --only android
+bash scripts/secrets/sync-secrets-to-github.sh --only firebase
+bash scripts/secrets/sync-secrets-to-github.sh --only web
 ```
 
 Once synced, trigger a workflow:

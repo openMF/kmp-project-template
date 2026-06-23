@@ -79,7 +79,8 @@ secrets/android/firebaseAppDistributionServiceCredentialsFile.json
 secrets/android/playStorePublishServiceCredentialsFile.json
 
 # Secrets and Configuration - NEVER COMMIT THESE!
-secrets.env
+# secrets.env — REMOVED: that file is retired (2026-06-23). Keystore passwords
+# now live in secrets/android/keystores/ (covered by secrets/ below).
 secrets/
 !secrets/.gitkeep
 .env.local

@@ -155,6 +155,23 @@ legal.effective.date=January 1, 2026
 # for data-related questions. May be the same as org.email.
 legal.contact.email=privacy@example.com
 
+# ── Android Keystore Distinguished Name (DN) — NON-SECRET ────────────────────
+# These values are the certificate identity baked into the keystore at generation
+# time. They are NOT secrets (no passwords here — those go in
+# secrets/android/keystores/{keystore_password,keystore_alias,keystore_alias_password}).
+# Read by: deployment/_shared/scripts/keystore-manager.sh (generate subcommand)
+#
+# CN — Common Name: inherited from legal.company.name (no separate key needed).
+# keystore.dn.org_unit — Organisational Unit (OU); e.g. "Mobile" or "Engineering".
+# keystore.dn.city     — Locality / City (L field in the DN).
+# keystore.dn.state    — State or Province (ST field).
+# keystore.dn.country  — Two-letter ISO 3166-1 country code (C field); default US.
+
+keystore.dn.org_unit=Mobile
+keystore.dn.city=Your City
+keystore.dn.state=Your State
+keystore.dn.country=US
+
 # ── Web Platform ──────────────────────────────────────────────────────────────
 
 # Cloudflare Pages project name (created in Cloudflare Dashboard → Pages).

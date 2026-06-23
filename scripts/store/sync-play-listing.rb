@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# scripts/sync-play-listing.rb
+# scripts/store/sync-play-listing.rb
 #
 # Upload Play Store store listing metadata + screenshots + feature graphic
 # directly via the Google Play Developer API (edits.listings / edits.images).
@@ -8,8 +8,8 @@
 # Uses google-apis-androidpublisher_v3 which ships with Fastlane.
 #
 # Usage:
-#   bundle exec ruby scripts/sync-play-listing.rb
-#   bundle exec ruby scripts/sync-play-listing.rb --dry-run
+#   bundle exec ruby scripts/store/sync-play-listing.rb
+#   bundle exec ruby scripts/store/sync-play-listing.rb --dry-run
 
 require "json"
 require "pathname"

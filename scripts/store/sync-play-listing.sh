@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/sync-play-listing.sh
+# scripts/store/sync-play-listing.sh
 #
 # Upload Play Store store listing (title, description, screenshots, feature graphic)
 # to Google Play Console without uploading a new APK/AAB.
@@ -12,13 +12,13 @@
 #       images/featureGraphic.png
 #
 # Usage:
-#   bash scripts/sync-play-listing.sh
-#   bash scripts/sync-play-listing.sh --dry-run     # validate config only
-#   bash scripts/sync-play-listing.sh --track beta  # target a specific track
+#   bash scripts/store/sync-play-listing.sh
+#   bash scripts/store/sync-play-listing.sh --dry-run     # validate config only
+#   bash scripts/store/sync-play-listing.sh --track beta  # target a specific track
 
 set -euo pipefail
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@ echo ""
 # the track before it can update metadata ("Could not find release for version code ''").
 # The direct API approach works on brand-new apps with no releases yet.
 
-"$BUNDLE_BIN" exec ruby "$REPO_ROOT/scripts/sync-play-listing.rb" "$@"
+"$BUNDLE_BIN" exec ruby "$REPO_ROOT/scripts/store/sync-play-listing.rb" "$@"
 
 echo ""
 echo "✓ Play Store listing updated for $PACKAGE_NAME"

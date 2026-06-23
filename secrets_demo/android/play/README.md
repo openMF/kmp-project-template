@@ -43,7 +43,7 @@ cp ~/Downloads/your-project-*.json secrets/android/play/service-account.json
 ## Sync to GitHub
 
 ```bash
-bash scripts/sync-secrets-to-github.sh --only play
+bash scripts/secrets/sync-secrets-to-github.sh --only play
 ```
 
 ## Notes

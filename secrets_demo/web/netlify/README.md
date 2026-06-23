@@ -29,5 +29,5 @@ Used for: deploying the web app to Netlify.
 ```bash
 echo "your-netlify-token" > secrets/web/netlify/auth_token
 echo "your-site-id"       > secrets/web/netlify/site_id
-bash scripts/sync-secrets-to-github.sh --only web
+bash scripts/secrets/sync-secrets-to-github.sh --only web
 ```

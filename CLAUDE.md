@@ -9,7 +9,7 @@
 ## Quick Links
 
 🚀 **New fork? Start here:**
-- [Fork Quickstart](docs/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
+- [Fork Quickstart](docs/setup/FORK_QUICKSTART.md) - Day-1 customization checklist for new forks
 
 📖 **Domain-Specific Guides:**
 - [GitHub Actions & CI/CD](.github/CLAUDE.md) - Workflows, custom actions, secrets
@@ -206,7 +206,7 @@ not configured" empty state rather than crashing.
 # OR follow detailed setup:
 ./keystore-manager.sh generate  # Generate Android keystores
 ./firebase-setup.sh             # Configure Firebase projects
-./scripts/setup_ios_complete.sh # iOS code signing setup
+./scripts/ios/setup_ios_complete.sh # iOS code signing setup
 ```
 
 ### 2. Daily Development
@@ -233,10 +233,10 @@ git commit -m "feat(android): add new feature"
 ./gradlew test
 
 # Verify iOS deployment configuration (iOS only)
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # Check version sanitization (iOS only)
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 ```
 
 ### 4. Deployment
@@ -269,9 +269,9 @@ git commit -m "feat(android): add new feature"
 
 **Via Bash Scripts (iOS only):**
 ```bash
-./scripts/deploy_firebase.sh
-./scripts/deploy_testflight.sh
-./scripts/deploy_appstore.sh  # Double confirmation required
+./scripts/deploy/deploy_firebase.sh
+./scripts/deploy/deploy_testflight.sh
+./scripts/deploy/deploy_appstore.sh  # Double confirmation required
 ```
 
 ---

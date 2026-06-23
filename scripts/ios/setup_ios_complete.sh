@@ -23,7 +23,7 @@ NC='\033[0m' # No Color
 
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Print functions
@@ -501,17 +501,17 @@ echo
 
 print_info "Next Steps:"
 echo "  1. Test deployment to Firebase:"
-echo "     bash scripts/deploy_firebase.sh"
+echo "     bash scripts/deploy/deploy_firebase.sh"
 echo
 echo "  2. Test deployment to TestFlight:"
-echo "     bash scripts/deploy_testflight.sh"
+echo "     bash scripts/deploy/deploy_testflight.sh"
 echo
 echo "  3. Deploy to App Store (when ready):"
-echo "     bash scripts/deploy_appstore.sh"
+echo "     bash scripts/deploy/deploy_appstore.sh"
 echo
 
 print_info "Optional: Setup APN for push notifications"
-echo "  bash scripts/setup_apn_key.sh"
+echo "  bash scripts/ios/setup_apn_key.sh"
 echo
 
 print_success "Happy deploying! 🚀"

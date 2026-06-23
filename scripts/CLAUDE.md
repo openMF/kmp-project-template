@@ -388,7 +388,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/deploy_firebase.sh
+./scripts/deploy/deploy_firebase.sh
 ```
 
 **What it does:**
@@ -411,7 +411,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/deploy_testflight.sh
+./scripts/deploy/deploy_testflight.sh
 ```
 
 **What it does:**
@@ -431,7 +431,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/deploy_appstore.sh
+./scripts/deploy/deploy_appstore.sh
 ```
 
 **What it does:**
@@ -462,7 +462,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 ```
 
 **What it does:**
@@ -530,7 +530,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/setup_apn_key.sh
+./scripts/ios/setup_apn_key.sh
 ```
 
 **What it does:**
@@ -554,7 +554,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 ```
 
 **What it does:**
@@ -654,7 +654,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/verify_apn_setup.sh
+./scripts/ios/verify_apn_setup.sh
 ```
 
 **What it does:**
@@ -675,7 +675,7 @@ UPLOAD_KEYSTORE_ALIAS_PASSWORD="xxx"
 
 **Usage:**
 ```bash
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 ```
 
 **What it does:**
@@ -840,7 +840,7 @@ See [Version Handling Guide](../docs/claude/version-handling.md)
 ./keystore-manager.sh add
 
 # 6. Setup iOS (if needed)
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 ```
 
 ---
@@ -849,13 +849,13 @@ See [Version Handling Guide](../docs/claude/version-handling.md)
 
 ```bash
 # Deploy to Firebase
-./scripts/deploy_firebase.sh
+./scripts/deploy/deploy_firebase.sh
 
 # Deploy to TestFlight
-./scripts/deploy_testflight.sh
+./scripts/deploy/deploy_testflight.sh
 
 # Deploy to App Store (double confirmation required)
-./scripts/deploy_appstore.sh
+./scripts/deploy/deploy_appstore.sh
 ```
 
 ---
@@ -894,10 +894,10 @@ See [Version Handling Guide](../docs/claude/version-handling.md)
 ./scripts/check_environment.sh
 
 # Verify iOS deployment setup
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # Check version sanitization
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 
 # Validate environment file
 ./scripts/check_file_env_keys.sh secrets.env
@@ -1021,7 +1021,7 @@ ssh-keygen -V
 **Fix:**
 ```bash
 # Run iOS setup wizard
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 
 # OR manually create the required files:
 # - gradle/fork.properties (from gradle/fork.properties.template)
@@ -1040,7 +1040,7 @@ ssh-keygen -V
 - Each check has specific fix instructions
 - Re-run setup wizard if needed:
   ```bash
-  ./scripts/setup_ios_complete.sh
+  ./scripts/ios/setup_ios_complete.sh
   ```
 
 ---
@@ -1053,7 +1053,7 @@ ssh-keygen -V
 
 **Fix:**
 - Fastlane automatically sanitizes versions
-- Check with: `./scripts/check_ios_version.sh`
+- Check with: `./scripts/ios/check_ios_version.sh`
 - See [Version Handling Guide](../docs/claude/version-handling.md)
 
 ---

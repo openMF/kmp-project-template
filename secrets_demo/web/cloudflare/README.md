@@ -34,7 +34,7 @@ Used for: deploying the web app to Cloudflare Pages.
 ```bash
 echo "your-api-token" > secrets/web/cloudflare/api_token
 echo "your-account-id" > secrets/web/cloudflare/account_id
-bash scripts/sync-secrets-to-github.sh --only web
+bash scripts/secrets/sync-secrets-to-github.sh --only web
 ```
 
 ## Notes

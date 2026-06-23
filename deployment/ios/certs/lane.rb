@@ -16,7 +16,7 @@
 # WHEN TO RUN
 #   • Immediately when `deployProdIpaOnFirebase` (or any iOS lane) fails with:
 #       "Your certificate '<ID>.cer' is not valid, please check end date"
-#   • Proactively via monthly GitHub Actions schedule (ios-cert-renewal.yml)
+#   • Proactively via monthly GitHub Actions schedule (cert-renewal.yml (openMF/ios-provisioning-profile))
 #
 # SIGNING PASSWORDS (resolved in priority order)
 #   KEYCHAIN_PASSWORD     — unlocks macOS login keychain (local) / creates CI keychain
@@ -79,8 +79,8 @@ platform :ios do
       cd deployment && bundle exec fastlane ios renewAllCerts force:true
       cd deployment && bundle exec fastlane ios renewAllCerts type:mac_installer_distribution
 
-    This is the local equivalent of .github/workflows/ios-cert-renewal.yml.
-    See deployment/_shared/scripts/cert-renewal.sh for a standalone bash runner
+    This is the local equivalent of openMF/ios-provisioning-profile cron (cert-renewal.yml).
+    See openMF/ios-provisioning-profile/cert-renewal.sh for a standalone bash runner
     that also works outside of this Fastlane context (e.g. from ios-provisioning-profile).
   DESC
   lane :renewAllCerts do |options|

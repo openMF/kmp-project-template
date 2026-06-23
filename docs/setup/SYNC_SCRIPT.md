@@ -153,7 +153,9 @@ declare -A EXCLUSIONS=(
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
     ["cmp-desktop"]="icons:dir"
     ["cmp-ios"]="iosApp/Assets.xcassets:dir"
-    ["root"]="secrets.env:file"
+    # ["root"]="secrets.env:file"  — REMOVED: secrets.env is retired (2026-06-23).
+    #   Keystore DN → gradle/fork.properties  (non-secret, synced separately)
+    #   Keystore passwords → secrets/android/keystores/ per-value files (gitignored)
 )
 ```
 

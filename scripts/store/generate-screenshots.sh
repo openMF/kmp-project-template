@@ -14,13 +14,13 @@
 #   Linux: google-chrome or chromium-browser in PATH
 #
 # Usage:
-#   ./scripts/generate-screenshots.sh             # all platforms
-#   ./scripts/generate-screenshots.sh android
-#   ./scripts/generate-screenshots.sh ios
-#   ./scripts/generate-screenshots.sh macos
+#   ./scripts/store/generate-screenshots.sh             # all platforms
+#   ./scripts/store/generate-screenshots.sh android
+#   ./scripts/store/generate-screenshots.sh ios
+#   ./scripts/store/generate-screenshots.sh macos
 
 set -euo pipefail
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 # ── Detect Chrome ──────────────────────────────────────────────────────────────

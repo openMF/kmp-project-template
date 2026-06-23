@@ -147,7 +147,7 @@ the public history. Use `./keystore-manager.sh encode-secrets` later to push
 encoded keystores into GitHub Actions secrets for CI builds.
 
 iOS keystore equivalents (Fastlane Match, `.p8` keys) — see
-`scripts/setup_ios_complete.sh` and the [Secrets Management Guide](claude/secrets-management.md).
+`scripts/ios/setup_ios_complete.sh` and the [Secrets Management Guide](claude/secrets-management.md).
 
 ## Step 4 — Populate secrets
 

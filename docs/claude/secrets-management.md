@@ -34,36 +34,44 @@ This guide covers complete secrets management for all platforms.
 
 ---
 
-## Quick Start: Automatic Sync
+## Quick Start: New Model (secrets.env retired 2026-06-23)
+
+**Keystore secrets are now split into two canonical homes:**
+
+| What | Where | Secret? |
+|---|---|---|
+| Keystore DN (CN, OU, O, L, ST, C) | `gradle/fork.properties` (`legal.company.name`, `keystore.dn.*`) | No — commit the template; fill in fork.properties (gitignored) |
+| Keystore passwords | `secrets/android/keystores/{keystore_password,keystore_alias,keystore_alias_password}` | Yes — gitignored |
 
 **Template Projects (Recommended):**
 
 ```bash
-# 1. Run project setup (generates Android keystores + secrets.env)
+# 1. Run project setup — writes DN to fork.properties + passwords to secrets/android/keystores/
 ./setup-project.sh
 
-# 2. Run iOS setup (if needed - auto-syncs iOS secrets to secrets.env)
-./scripts/setup_ios_complete.sh
+# 2. Run iOS setup (if needed)
+./scripts/ios/setup_ios_complete.sh
 
-# Done! secrets.env is automatically synchronized with all platform secrets
+# 3. Push secrets to GitHub (new model — replaces keystore-manager.sh add)
+bash scripts/secrets/sync-secrets-to-github.sh --repo=owner/repo
 ```
 
-**Manual Sync:**
+**Manual Sync (legacy secrets.env bundle — still available for iOS/macOS secrets):**
 
 ```bash
-# Re-scan secrets/ directory and update secrets.env
+# Re-scan secrets/ directory and update secrets/shared/secrets.env
 ./keystore-manager.sh sync
 ```
 
 **What sync does:**
 1. Reads non-secret metadata from `gradle/fork.properties`
 2. Scans `secrets/` directory and encodes files to base64
-3. Updates `secrets.env` with all secrets (preserves existing data)
+3. Updates `secrets/shared/secrets.env` with platform secrets (preserves existing data)
 4. Adds Desktop signing placeholders (optional, empty by default)
 5. Validates result (format, required secrets, base64 encoding)
 
 **Features:**
-- Automatic backup before sync (`secrets.env.backup`)
+- Automatic backup before sync (`secrets/shared/secrets.env.backup`)
 - Preserves existing secrets if source files are missing
 - Idempotent: safe to run multiple times
 - Validates format and base64 encoding after sync
@@ -72,7 +80,10 @@ This guide covers complete secrets management for all platforms.
 - After iOS setup completes (automatic)
 - After adding new files to `secrets/` directory
 - After updating `gradle/fork.properties` or any `secrets/<platform>/` file
-- To refresh/validate secrets.env
+- To refresh/validate the secrets bundle for iOS/macOS upload flow
+
+> **Migration note:** `secrets.env` at the repo root is retired. The Android keystore
+> password values that lived there now live in `secrets/android/keystores/` per-value files.
 
 ---
 
@@ -205,22 +216,26 @@ keystores/
 ./keystore-manager.sh generate
 ```
 
-**Prompts:**
-- Company/Organization details (CN, OU, O, L, S, C)
-- Keystore passwords (or auto-generate)
+**Reads (new model — no prompts for DN or passwords):**
+- DN from `gradle/fork.properties` (`legal.company.name`, `keystore.dn.*` keys)
+- Passwords from `secrets/android/keystores/{keystore_password,keystore_alias,keystore_alias_password}`
+  (populated by `setup-project.sh` or `scripts/secrets/setup-secrets.sh android`)
 
 **Output:**
 ```
-✅ Generated original-release-key.jks
-✅ Generated upload-keystore.jks
-✅ Extracted certificates and keys
-✅ Saved configuration to secrets.env
+✅ Generated upload_keystore.keystore
+✅ Keystore written to keystores/upload_keystore.keystore
+✅ fastlane-config/project_config.rb updated
+✅ cmp-android/build.gradle.kts updated
+ℹ  Skipping legacy secrets.env update (retired). Secrets live in secrets/android/keystores/.
 ```
 
 **Files created:**
-- `keystores/original-release-key.jks`
-- `keystores/upload-keystore.jks`
-- `secrets.env` (configuration)
+- `keystores/upload_keystore.keystore`
+- `secrets/android/keystores/keystore_password` (password — gitignored)
+- `secrets/android/keystores/keystore_alias` (alias — gitignored)
+- `secrets/android/keystores/keystore_alias_password` (alias password — gitignored)
+- `gradle/fork.properties` (keystore DN + org identity — gitignored, non-secret)
 
 ---
 
@@ -285,7 +300,7 @@ keystores/
 ### Step 4: Setup iOS (App Store Connect)
 
 ```bash
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 ```
 
 **Prompts:**
@@ -525,9 +540,9 @@ MACOS_INSTALLER_CERTIFICATE
 
 | Value | GitHub Secret Name | Source |
 |-------|-------------------|--------|
-| Keystore password | `UPLOAD_KEYSTORE_FILE_PASSWORD` | From `secrets.env` |
-| Keystore alias | `UPLOAD_KEYSTORE_ALIAS` | From `secrets.env` |
-| Alias password | `UPLOAD_KEYSTORE_ALIAS_PASSWORD` | From `secrets.env` |
+| Keystore password | `UPLOAD_KEYSTORE_FILE_PASSWORD` | `secrets/android/keystores/keystore_password` |
+| Keystore alias | `UPLOAD_KEYSTORE_ALIAS` | `secrets/android/keystores/keystore_alias` |
+| Alias password | `UPLOAD_KEYSTORE_ALIAS_PASSWORD` | `secrets/android/keystores/keystore_alias_password` |
 | App Store Key ID | `APPSTORE_KEY_ID` | From App Store Connect |
 | Issuer ID | `APPSTORE_ISSUER_ID` | From App Store Connect |
 | Match password | `MATCH_PASSWORD` | From `secrets/apple/match/.match_password` |
@@ -831,14 +846,15 @@ Keystore was tampered with, or password was incorrect
 **Solutions:**
 
 ```bash
-# 1. View password from secrets.env
-cat secrets.env | grep KEYSTORE.*PASSWORD
+# 1. View password (new model — secrets.env is retired)
+cat secrets/android/keystores/keystore_password
 
 # 2. Test locally
-keytool -list -v -keystore keystores/original-release-key.jks
+keytool -list -v -keystore keystores/upload_keystore.keystore \
+  -storepass "$(cat secrets/android/keystores/keystore_password)"
 
 # 3. Re-generate keystore if password lost
-# ⚠️ Only for new apps!
+# ⚠️ Only for new apps — fill gradle/fork.properties + secrets/android/keystores/ first
 ./keystore-manager.sh generate
 ```
 

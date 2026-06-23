@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # Script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Print functions
@@ -89,7 +89,7 @@ print_section "🔍 iOS Deployment Verification"
 print_section "1. Version Handling"
 
 check "Version check script exists" \
-    "[ -f 'scripts/check_ios_version.sh' ]"
+    "[ -f 'scripts/ios/check_ios_version.sh' ]"
 
 check "version.txt can be generated" \
     "cd '$PROJECT_ROOT' && ./gradlew versionFile > /dev/null 2>&1 && [ -f 'version.txt' ]"
@@ -237,28 +237,28 @@ warn "Firebase credentials exist" \
 print_section "6. Deployment Scripts"
 
 check "deploy_firebase.sh exists" \
-    "[ -f 'scripts/deploy_firebase.sh' ]"
+    "[ -f 'scripts/deploy/deploy_firebase.sh' ]"
 
 check "deploy_testflight.sh exists" \
-    "[ -f 'scripts/deploy_testflight.sh' ]"
+    "[ -f 'scripts/deploy/deploy_testflight.sh' ]"
 
 check "deploy_appstore.sh exists" \
-    "[ -f 'scripts/deploy_appstore.sh' ]"
+    "[ -f 'scripts/deploy/deploy_appstore.sh' ]"
 
 check "check_ios_version.sh exists" \
-    "[ -f 'scripts/check_ios_version.sh' ]"
+    "[ -f 'scripts/ios/check_ios_version.sh' ]"
 
 check "deploy_firebase.sh is executable" \
-    "[ -x 'scripts/deploy_firebase.sh' ]"
+    "[ -x 'scripts/deploy/deploy_firebase.sh' ]"
 
 check "deploy_testflight.sh is executable" \
-    "[ -x 'scripts/deploy_testflight.sh' ]"
+    "[ -x 'scripts/deploy/deploy_testflight.sh' ]"
 
 check "deploy_appstore.sh is executable" \
-    "[ -x 'scripts/deploy_appstore.sh' ]"
+    "[ -x 'scripts/deploy/deploy_appstore.sh' ]"
 
 check "check_ios_version.sh is executable" \
-    "[ -x 'scripts/check_ios_version.sh' ]"
+    "[ -x 'scripts/ios/check_ios_version.sh' ]"
 
 # ============================================================================
 # 7. Documentation
@@ -266,16 +266,16 @@ check "check_ios_version.sh is executable" \
 print_section "7. Documentation"
 
 check "IOS_DEPLOYMENT.md exists" \
-    "[ -f 'docs/IOS_DEPLOYMENT.md' ]"
+    "[ -f 'docs/ios/IOS_DEPLOYMENT.md' ]"
 
 check "IOS_SETUP.md exists" \
-    "[ -f 'docs/IOS_SETUP.md' ]"
+    "[ -f 'docs/ios/IOS_SETUP.md' ]"
 
 check "IOS_DEPLOYMENT_CHECKLIST.md exists" \
-    "[ -f 'docs/IOS_DEPLOYMENT_CHECKLIST.md' ]"
+    "[ -f 'docs/ios/IOS_DEPLOYMENT_CHECKLIST.md' ]"
 
 check "FASTLANE_CONFIGURATION.md exists" \
-    "[ -f 'docs/FASTLANE_CONFIGURATION.md' ]"
+    "[ -f 'docs/deployment/FASTLANE_CONFIGURATION.md' ]"
 
 # ============================================================================
 # 8. Metadata Configuration
@@ -353,7 +353,7 @@ if [ $FAILED_CHECKS -eq 0 ]; then
     if [ $WARNING_CHECKS -gt 0 ]; then
         print_info "Note: ${WARNING_CHECKS} optional checks failed (secret files)"
         print_info "These are expected if you haven't set up secrets yet"
-        print_info "Run: bash scripts/setup_ios_complete.sh"
+        print_info "Run: bash scripts/ios/setup_ios_complete.sh"
     fi
     exit 0
 else
@@ -362,6 +362,6 @@ else
     echo
     print_error "${FAILED_CHECKS} critical check(s) failed"
     print_info "Please review the errors above and fix the issues"
-    print_info "See docs/IOS_DEPLOYMENT_CHECKLIST.md for detailed troubleshooting"
+    print_info "See docs/ios/IOS_DEPLOYMENT_CHECKLIST.md for detailed troubleshooting"
     exit 1
 fi

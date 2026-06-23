@@ -20,8 +20,8 @@ cp -r secrets_demo/* secrets/   # creates the directory structure
 #    Each subdirectory has a README.md explaining exactly how to get the credentials
 
 # 3. Sync to GitHub Actions
-bash scripts/sync-secrets-to-github.sh --dry-run   # preview what will be set
-bash scripts/sync-secrets-to-github.sh              # push to your fork's GHA secrets
+bash scripts/secrets/sync-secrets-to-github.sh --dry-run   # preview what will be set
+bash scripts/secrets/sync-secrets-to-github.sh              # push to your fork's GHA secrets
 
 # 4. Trigger a workflow
 gh workflow run .github/workflows/multi-platform-build-and-publish.yml
@@ -89,11 +89,11 @@ bundle exec fastlane --fastlane-dir deployment ios beta
 
 ### Mode 2 — GitHub Actions
 
-Run `scripts/sync-secrets-to-github.sh` once to push secrets to your fork's
+Run `scripts/secrets/sync-secrets-to-github.sh` once to push secrets to your fork's
 GHA repository secrets. Workflows read them automatically via `secrets.*`.
 
 ```bash
-bash scripts/sync-secrets-to-github.sh
+bash scripts/secrets/sync-secrets-to-github.sh
 ```
 
 ### Mode 3 — Framework /release command

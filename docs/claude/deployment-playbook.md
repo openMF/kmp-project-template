@@ -60,7 +60,7 @@ This playbook provides step-by-step deployment procedures for all 5 platforms.
 
 #### iOS
 
-- [ ] **iOS setup complete** - Run `./scripts/verify_ios_deployment.sh`
+- [ ] **iOS setup complete** - Run `./scripts/ios/verify_ios_deployment.sh`
 - [ ] **Match certificates valid** - Run `bundle exec fastlane match adhoc --readonly`
 - [ ] **CocoaPods updated** - Run `cd cmp-ios && pod install`
 - [ ] **App Store Connect access** - Can login to App Store Connect
@@ -325,7 +325,7 @@ bundle exec fastlane android promote_to_production
 
 ```bash
 # Verify iOS setup
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # Check Match certificates
 bundle exec fastlane match adhoc --readonly
@@ -355,7 +355,7 @@ gh workflow run multi-platform-build-and-publish.yml \
 **Option B: Local Script**
 
 ```bash
-./scripts/deploy_firebase.sh
+./scripts/deploy/deploy_firebase.sh
 ```
 
 **Option C: Local Fastlane**
@@ -399,7 +399,7 @@ Firebase receives: 2026.1.1-beta.0.9 ✅ (pre-release OK)
 
 ```bash
 # Verify iOS setup
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # Check Match certificates (appstore profile needed)
 bundle exec fastlane match appstore --readonly
@@ -410,7 +410,7 @@ pod install
 cd ..
 
 # Check version
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 ```
 
 **2. Understand Version Sanitization**
@@ -447,7 +447,7 @@ gh workflow run multi-platform-build-and-publish.yml \
 **Option B: Local Script**
 
 ```bash
-./scripts/deploy_testflight.sh
+./scripts/deploy/deploy_testflight.sh
 ```
 
 **Option C: Local Fastlane**
@@ -531,10 +531,10 @@ fi
 ./gradlew test
 
 # iOS verification
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # Version check
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 ```
 
 **4. Deploy**
@@ -557,7 +557,7 @@ gh workflow run multi-platform-build-and-publish.yml \
 **Option B: Local Script**
 
 ```bash
-./scripts/deploy_appstore.sh
+./scripts/deploy/deploy_appstore.sh
 ```
 
 **Option C: Local Fastlane**

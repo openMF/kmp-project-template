@@ -36,7 +36,7 @@ nano secrets/apple/appstore/issuer_id    # paste your UUID Issuer ID
 cp ~/Downloads/AuthKey_*.p8 secrets/apple/appstore/AuthKey.p8
 
 # Sync to GitHub
-bash scripts/sync-secrets-to-github.sh --only ios
+bash scripts/secrets/sync-secrets-to-github.sh --only ios
 ```
 
 ## Notes

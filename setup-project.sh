@@ -233,36 +233,51 @@ collect_inputs() {
     fi
 }
 
-# Create secrets.env file for keystore generation
-create_secrets_env() {
-    print_info "Creating secrets.env configuration file"
-    
-    cat > secrets.env << EOF
-# Keystore Configuration
-UPLOAD_KEYSTORE_NAME="upload.keystore"
+# Write keystore DN identity to gradle/fork.properties (non-secret values).
+# Keystore passwords are written to secrets/android/keystores/ per-value files.
+# This replaces the retired create_secrets_env() function that wrote secrets.env.
+setup_keystore_config() {
+    print_info "Writing keystore DN to gradle/fork.properties"
 
-# Keystore Passwords
+    local FORK_PROPS="gradle/fork.properties"
 
-UPLOAD_KEYSTORE_FILE_PASSWORD="$KEYSTORE_PASSWORD"
-UPLOAD_KEYSTORE_ALIAS="$KEY_ALIAS"
-UPLOAD_KEYSTORE_ALIAS_PASSWORD="$KEYSTORE_PASSWORD"
+    # Copy template if not already present
+    if [ ! -f "$FORK_PROPS" ] && [ -f "gradle/fork.properties.template" ]; then
+        cp "gradle/fork.properties.template" "$FORK_PROPS"
+        print_info "Copied fork.properties.template → fork.properties"
+    fi
 
-# Certificate Information
-COMPANY_NAME="$COMPANY_NAME"
-DEPARTMENT="$DEPARTMENT"
-ORGANIZATION="$COMPANY_NAME"
-CITY="$CITY"
-STATE="$STATE"
-COUNTRY="$COUNTRY"
+    if [ -f "$FORK_PROPS" ]; then
+        # Update existing keys (or append if absent)
+        for key_pair in \
+            "keystore.dn.org_unit=${DEPARTMENT:-Mobile}" \
+            "keystore.dn.city=${CITY}" \
+            "keystore.dn.state=${STATE}" \
+            "keystore.dn.country=${COUNTRY:-US}"; do
+            local k="${key_pair%%=*}"
+            local v="${key_pair#*=}"
+            if grep -q "^${k}=" "$FORK_PROPS"; then
+                # Replace existing line (macOS-safe sed using a temp file)
+                local tmp
+                tmp=$(mktemp)
+                sed "s|^${k}=.*|${k}=${v}|" "$FORK_PROPS" > "$tmp" && mv "$tmp" "$FORK_PROPS"
+            else
+                echo "${k}=${v}" >> "$FORK_PROPS"
+            fi
+        done
+        print_success "Updated keystore DN keys in $FORK_PROPS"
+    else
+        print_warning "gradle/fork.properties not found — DN keys not written. Fill them in manually."
+    fi
 
-# Keystore Generation Settings
-VALIDITY=25
-KEYALG="RSA"
-KEYSIZE=2048
-OVERWRITE=false
-EOF
-    
-    print_success "Created secrets.env"
+    # Write keystore passwords to per-value secret files
+    local KEYSTORE_SECRETS_DIR="secrets/android/keystores"
+    mkdir -p "$KEYSTORE_SECRETS_DIR"
+    printf '%s' "$KEYSTORE_PASSWORD" > "$KEYSTORE_SECRETS_DIR/keystore_password"
+    printf '%s' "$KEY_ALIAS"         > "$KEYSTORE_SECRETS_DIR/keystore_alias"
+    printf '%s' "$KEYSTORE_PASSWORD" > "$KEYSTORE_SECRETS_DIR/keystore_alias_password"
+    print_success "Keystore passwords written to $KEYSTORE_SECRETS_DIR/"
+    print_info "To sync secrets to GitHub run: scripts/secrets/sync-secrets-to-github.sh"
 }
 
 # Step 1: Run customizer
@@ -352,7 +367,7 @@ run_ios_setup() {
     echo "  • Match repository for code signing"
     echo
     echo -e "${YELLOW}You can configure iOS now or run the setup wizard later:${NC}"
-    echo -e "  ${BLUE}bash scripts/setup_ios_complete.sh${NC}"
+    echo -e "  ${BLUE}bash scripts/ios/setup_ios_complete.sh${NC}"
     echo
 
     read -p "Configure iOS deployment now? [y/N]: " -n 1 -r
@@ -360,26 +375,26 @@ run_ios_setup() {
 
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         print_info "Skipping iOS setup"
-        print_info "Run later: bash scripts/setup_ios_complete.sh"
+        print_info "Run later: bash scripts/ios/setup_ios_complete.sh"
         return 0
     fi
 
     # Check if setup script exists
-    if [ ! -f "$SCRIPT_DIR/scripts/setup_ios_complete.sh" ]; then
-        print_warning "iOS setup script not found at scripts/setup_ios_complete.sh"
+    if [ ! -f "$SCRIPT_DIR/scripts/ios/setup_ios_complete.sh" ]; then
+        print_warning "iOS setup script not found at scripts/ios/setup_ios_complete.sh"
         return 0
     fi
 
     # Make executable
-    chmod +x "$SCRIPT_DIR/scripts/setup_ios_complete.sh"
+    chmod +x "$SCRIPT_DIR/scripts/ios/setup_ios_complete.sh"
 
     print_info "Launching iOS setup wizard..."
     echo
 
     # Run iOS setup
-    bash "$SCRIPT_DIR/scripts/setup_ios_complete.sh" || {
+    bash "$SCRIPT_DIR/scripts/ios/setup_ios_complete.sh" || {
         print_warning "iOS setup encountered issues"
-        print_info "You can run it manually later: bash scripts/setup_ios_complete.sh"
+        print_info "You can run it manually later: bash scripts/ios/setup_ios_complete.sh"
     }
 }
 
@@ -402,17 +417,22 @@ print_final_summary() {
     echo -e "  - Configuration files downloaded"
     echo
     echo -e "${CYAN}✓ Keystore & Security${NC}"
-    echo -e "  - Original and upload keystores generated"
+    echo -e "  - Upload keystore generated"
     echo -e "  - Configuration files updated with keystore info"
-    echo -e "  - secrets.env file created with encoded secrets"
+    echo -e "  - Keystore DN written to gradle/fork.properties (non-secret)"
+    echo -e "  - Keystore passwords written to secrets/android/keystores/ (gitignored)"
     echo
-    
+
     print_section "Important Files Created"
     echo -e "  ${BOLD}keystores/${NC}"
-    echo -e "    ├── original.keystore  ${YELLOW}(Keep this secure!)${NC}"
-    echo -e "    └── upload.keystore    ${YELLOW}(Keep this secure!)${NC}"
+    echo -e "    └── upload_keystore.keystore  ${YELLOW}(Keep this secure!)${NC}"
     echo
-    echo -e "  ${BOLD}secrets.env${NC}              ${CYAN}(Contains all secrets - base64 encoded)${NC}"
+    echo -e "  ${BOLD}secrets/android/keystores/${NC}  ${CYAN}(Keystore passwords — gitignored)${NC}"
+    echo -e "    ├── keystore_password"
+    echo -e "    ├── keystore_alias"
+    echo -e "    └── keystore_alias_password"
+    echo
+    echo -e "  ${BOLD}gradle/fork.properties${NC}  ${CYAN}(Keystore DN identity + org config — gitignored)${NC}"
     echo
     echo -e "  ${BOLD}cmp-android/${NC}"
     echo -e "    └── google-services.json"
@@ -447,13 +467,13 @@ print_final_summary() {
     echo -e "   iOS: Open Xcode and build the project"
     echo
     echo -e "${CYAN}5. ${BOLD}Set Up CI/CD (Optional)${NC}"
-    echo -e "   To add secrets to GitHub:"
-    echo -e "   ${CYAN}bash keystore-manager.sh add --repo=username/repo${NC}"
+    echo -e "   To push secrets to GitHub:"
+    echo -e "   ${CYAN}bash scripts/secrets/sync-secrets-to-github.sh --repo=username/repo${NC}"
     echo
     echo -e "${CYAN}6. ${BOLD}Version Control${NC}"
     echo -e "   ⚠️  ${YELLOW}NEVER commit these files:${NC}"
     echo -e "     - keystores/*.keystore"
-    echo -e "     - secrets.env"
+    echo -e "     - secrets/android/keystores/*"
     echo -e "     - secrets/*"
     echo
     echo -e "   ${GREEN}Safe to commit:${NC}"
@@ -514,9 +534,9 @@ Country: $COUNTRY
 
 ## Important Notes
 - Keep keystore files and passwords secure
-- Never commit keystores or secrets.env to version control
+- Never commit keystores or secrets/android/keystores/* to version control
 - Add required secret files to secrets/ directory
-- Run 'bash keystore-manager.sh encode-secrets' after adding secret files
+- Run 'bash scripts/secrets/sync-secrets-to-github.sh' to push secrets to GitHub
 EOF
     
     print_success "Configuration saved to $config_file"
@@ -532,9 +552,9 @@ main() {
     # Collect user inputs
     collect_inputs
     
-    # Create secrets.env
-    create_secrets_env
-    
+    # Write keystore DN to fork.properties + passwords to secrets/android/keystores/
+    setup_keystore_config
+
     # Step 1: Customization
     run_customizer
 

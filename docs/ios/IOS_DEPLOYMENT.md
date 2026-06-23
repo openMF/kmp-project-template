@@ -17,9 +17,9 @@ This project supports three iOS deployment targets:
 
 | Target | Purpose | Review Time | Script |
 |--------|---------|-------------|--------|
-| **Firebase** | Internal testing, QA | None | `bash scripts/deploy_firebase.sh` |
-| **TestFlight** | Beta testing (up to 10,000 testers) | 24-48 hours | `bash scripts/deploy_testflight.sh` |
-| **App Store** | Production release to public | 24-72 hours | `bash scripts/deploy_appstore.sh` |
+| **Firebase** | Internal testing, QA | None | `bash scripts/deploy/deploy_firebase.sh` |
+| **TestFlight** | Beta testing (up to 10,000 testers) | 24-48 hours | `bash scripts/deploy/deploy_testflight.sh` |
+| **App Store** | Production release to public | 24-72 hours | `bash scripts/deploy/deploy_appstore.sh` |
 
 ## Firebase App Distribution
 
@@ -35,7 +35,7 @@ Firebase is ideal for internal testing before submitting to Apple.
 ### Deploy to Firebase
 
 ```bash
-bash scripts/deploy_firebase.sh
+bash scripts/deploy/deploy_firebase.sh
 ```
 
 ### What Happens
@@ -72,7 +72,7 @@ TestFlight allows beta testing with up to 10,000 external testers (10,000 intern
 ### Deploy to TestFlight
 
 ```bash
-bash scripts/deploy_testflight.sh
+bash scripts/deploy/deploy_testflight.sh
 ```
 
 ### What Happens
@@ -142,16 +142,16 @@ Deploy to the App Store for public release.
 ### Deploy to App Store
 
 ```bash
-bash scripts/deploy_appstore.sh
+bash scripts/deploy/deploy_appstore.sh
 ```
 
 **With options:**
 ```bash
 # Don't auto-submit for review (manual submit later)
-bash scripts/deploy_appstore.sh --submit-for-review=false
+bash scripts/deploy/deploy_appstore.sh --submit-for-review=false
 
 # Manual release after approval (no auto-release)
-bash scripts/deploy_appstore.sh --automatic-release=false
+bash scripts/deploy/deploy_appstore.sh --automatic-release=false
 ```
 
 ### What Happens
@@ -313,12 +313,12 @@ For critical production bugs:
 
 3. **Deploy to TestFlight for quick verification:**
    ```bash
-   bash scripts/deploy_testflight.sh
+   bash scripts/deploy/deploy_testflight.sh
    ```
 
 4. **Once verified, deploy to App Store:**
    ```bash
-   bash scripts/deploy_appstore.sh
+   bash scripts/deploy/deploy_appstore.sh
    ```
 
 5. **Expedited Review:**
@@ -483,7 +483,7 @@ export MATCH_PASSWORD="${MATCH_PASSWORD}"
 export TEAM_ID="${TEAM_ID}"
 
 # Deploy
-bash scripts/deploy_testflight.sh
+bash scripts/deploy/deploy_testflight.sh
 ```
 
 ## Support Resources
@@ -498,9 +498,9 @@ bash scripts/deploy_testflight.sh
 
 ```bash
 # Deployment
-bash scripts/deploy_firebase.sh                      # Firebase (internal testing)
-bash scripts/deploy_testflight.sh                    # TestFlight (beta testing)
-bash scripts/deploy_appstore.sh                      # App Store (production)
+bash scripts/deploy/deploy_firebase.sh                      # Firebase (internal testing)
+bash scripts/deploy/deploy_testflight.sh                    # TestFlight (beta testing)
+bash scripts/deploy/deploy_appstore.sh                      # App Store (production)
 
 # Certificate Management
 bundle exec fastlane ios sync_certificates match_type:adhoc
@@ -522,4 +522,4 @@ open https://appstoreconnect.apple.com                # Open App Store Connect
 
 ---
 
-**Questions?** See [IOS_SETUP.md](./IOS_SETUP.md) for initial setup instructions.
+**Questions?** See [IOS_SETUP.md](../ios/IOS_SETUP.md) for initial setup instructions.

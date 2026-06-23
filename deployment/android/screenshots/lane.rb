@@ -18,14 +18,14 @@ platform :android do
     # which makes it unusable for fresh apps or listing-only updates.
     # The direct-API script bypasses this limitation via edits.images.upload.
     repo_root = File.expand_path("../../..", __dir__)
-    sh("bash #{repo_root}/scripts/sync-play-listing.sh")
+    sh("bash #{repo_root}/scripts/store/sync-play-listing.sh")
     UI.success("✅ Android screenshots + store listing uploaded to Play Store")
   end
 
   desc "Sync full Play Store listing (text + screenshots + feature graphic)"
   lane :sync_play_listing do
     repo_root = File.expand_path("../../..", __dir__)
-    sh("bash #{repo_root}/scripts/sync-play-listing.sh")
+    sh("bash #{repo_root}/scripts/store/sync-play-listing.sh")
   end
 
   desc "Alias for upload_android_screenshots"

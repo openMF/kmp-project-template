@@ -48,7 +48,7 @@ cat docs/analysis/BUGS_AND_ISSUES.md
 | Platform | Quick Check Command |
 |----------|---------------------|
 | Android | `./gradlew :cmp-android:assembleDebug --stacktrace` |
-| iOS | `./scripts/verify_ios_deployment.sh` |
+| iOS | `./scripts/ios/verify_ios_deployment.sh` |
 | macOS | `./scripts/verify_macos_setup.sh` |
 | Desktop | `./gradlew :cmp-desktop:packageDebugDistributionForCurrentOS` |
 | Web | `./gradlew :cmp-web:jsBrowserDevelopmentWebpack` |
@@ -329,14 +329,17 @@ ls -la keystores/
 # 5. Test keystore password
 keytool -list -v -keystore keystores/original-release-key.jks
 
-# 6. Check secrets.env for credentials
-cat secrets.env | grep KEYSTORE
+# 6. Check keystore credentials (new model — secrets.env is retired)
+cat secrets/android/keystores/keystore_password
+cat secrets/android/keystores/keystore_alias
 ```
 
 **Files:**
-- `keystores/original-release-key.jks`
-- `keystores/upload-keystore.jks`
-- `secrets.env`
+- `keystores/upload_keystore.keystore`
+- `secrets/android/keystores/keystore_password`
+- `secrets/android/keystores/keystore_alias`
+- `secrets/android/keystores/keystore_alias_password`
+- `gradle/fork.properties` (keystore DN — non-secret)
 
 ---
 
@@ -359,7 +362,7 @@ Command CodeSign failed with a nonzero exit code
 
 ```bash
 # 1. Run comprehensive iOS verification
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # 2. Re-fetch Match certificates
 cd cmp-ios
@@ -552,7 +555,7 @@ ls -la secrets/apple/match/.match_password
 ssh -T git@github.com -i secrets/apple/match/match_ci_key
 
 # 6. Run full iOS verification
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 ```
 
 ---
@@ -574,7 +577,7 @@ Invalid version format for App Store: 2026.1.1-beta.0.9
 
 ```bash
 # 1. Check version sanitization
-./scripts/check_ios_version.sh
+./scripts/ios/check_ios_version.sh
 
 # 2. View sanitization logic
 cat fastlane/Fastfile | grep -A 20 "sanitize_version_for_testflight"
@@ -1141,7 +1144,7 @@ cd cmp-ios && pod deintegrate && pod install
 ./keystore-manager.sh add
 
 # 3. Verify iOS setup
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 
 # 4. Check Firebase credentials
 ls -la secrets/android/firebaseAppDistributionServiceCredentialsFile.json

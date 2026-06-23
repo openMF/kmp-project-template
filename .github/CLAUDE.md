@@ -651,10 +651,10 @@ See [BUGS_AND_ISSUES.md](../docs/analysis/BUGS_AND_ISSUES.md#1-firebase-tester-g
 **Fix:**
 ```bash
 # Run iOS setup wizard
-./scripts/setup_ios_complete.sh
+./scripts/ios/setup_ios_complete.sh
 
 # Verify Match configuration
-./scripts/verify_ios_deployment.sh
+./scripts/ios/verify_ios_deployment.sh
 ```
 
 ---

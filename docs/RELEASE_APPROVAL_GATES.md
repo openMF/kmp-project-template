@@ -22,6 +22,8 @@ That's it. After this, any release dispatched on the repo **pauses for a manual
 "Approve and deploy"** before it publishes to a public store track (Play beta/production,
 TestFlight external, App Store, etc.). Internal/Firebase test builds stay un-gated.
 
+> Prefer the GitHub UI over the CLI? Skip the script — see **[Manual setup (GitHub UI)](#manual-setup-github-ui--no-script)** below. Same result, all clicks.
+
 ---
 
 ## Is this required? (No.)
@@ -106,6 +108,55 @@ Drop `--production-only` to also gate `*-internal`, `*-firebase`, `*-preview`,
 
 Add `--dry-run` to print exactly which environments would be configured without touching
 anything.
+
+---
+
+## Manual setup (GitHub UI — no script)
+
+Prefer clicking through the UI? Same result, no CLI. You still need **Admin** on the repo.
+
+1. Go to **`https://github.com/<owner>/<repo>/settings/environments`**
+   (or **Repo → Settings → Environments**).
+2. For **each** environment in the table below:
+   - If it isn't listed yet, click **New environment**, type the name **exactly** as shown
+     (names must match what the workflows reference), then **Configure environment**.
+     If it already exists from a prior run, just click it.
+   - Under **Deployment protection rules**, tick **Required reviewers**.
+   - Add 1–6 reviewers (people/teams with ≥ write access). For production/stable, add **2**.
+   - *(Optional)* tick **Wait timer** and set minutes (e.g. `30`) — a cool-off before deploy,
+     recommended on the top rung (production / app-store / stable).
+   - Click **Save protection rules**.
+
+### Environments to gate (production-facing — recommended)
+
+| Platform | Create + gate these environments |
+|---|---|
+| Android | `android-play-closed`, `android-play-beta`, `android-play-production` ⏱ |
+| iOS | `ios-testflight-external`, `ios-app-store` ⏱ |
+| macOS | `mac-testflight-external`, `mac-app-store` ⏱ |
+| Desktop | `desktop-linux-deb-beta`, `desktop-linux-deb-stable` ⏱ |
+| Web | `web-gh-pages-staging`, `web-gh-pages-production` ⏱ |
+
+⏱ = also worth a **wait timer** (top rung).
+
+**Leave ungated** (test channels — don't add reviewers): `*-internal`, `*-firebase`,
+`*-preview`, `*-prerelease`. Gating these forces an approval click on every test build.
+
+> ⚠️ **Name accuracy matters.** A reviewer on `android-play-prod` does nothing — the workflow
+> looks for `android-play-production`. Copy names from the table verbatim. Desktop/web names
+> embed the artifact/host slug (`desktop-<target>-<rung>`, `web-<host>-<rung>`); if your project
+> ships a different desktop artifact or web host, match the slug to the dispatch inputs.
+
+### Gate every stage instead?
+
+Also create + gate the test channels: `android-firebase`, `android-play-internal`,
+`ios-testflight-internal`, `mac-testflight-internal`, `desktop-<t>-prerelease`,
+`web-<host>-preview`. Most teams don't — it adds an approval click to routine testing.
+
+### One-time vs ongoing
+
+Environment protection rules are **persistent** — set once and every future run on this repo
+inherits them. You only revisit this when you want to change reviewers or scope.
 
 ---
 

@@ -64,24 +64,34 @@ module BuildSecrets
       end
     end
 
+    # candidate_paths returns REPO-ROOT-RELATIVE strings (roots are `secrets/live`
+    # etc.). Existence/read MUST be anchored on REPO_ROOT — NOT the process cwd —
+    # or resolution silently changes with the caller's directory: pre_fastlane_script
+    # runs at repo root (live found) while config.rb runs from deployment/ (live
+    # missed → wrong fall-through to the committed sample). Anchor here; still
+    # RETURN the relative string (consumers File.join it with DEPLOYMENT_REPO_ROOT).
+    def abs(p)
+      File.join(REPO_ROOT, p)
+    end
+
     # Resolved read path: first existing candidate, else the highest-precedence one.
     def path(key)
-      candidate_paths(key).find { |p| File.exist?(p) } || candidate_paths(key).last
+      candidate_paths(key).find { |p| File.exist?(abs(p)) } || candidate_paths(key).last
     end
 
     def exists?(key)
-      candidate_paths(key).any? { |p| File.exist?(p) }
+      candidate_paths(key).any? { |p| File.exist?(abs(p)) }
     end
 
     # String value: literal constant → its value; else env var first (CI), then
-    # the on-disk file (local fallback).
+    # the on-disk file (local fallback, REPO_ROOT-anchored like path()).
     def value(key)
       s = spec(key)
       return s["value"] if s["kind"] == "literal"
       env = ENV[s["source_env"].to_s]
       return env unless env.to_s.empty?
-      p = path(key)
-      File.exist?(p) ? File.read(p).strip : nil
+      a = abs(path(key))
+      File.exist?(a) ? File.read(a).strip : nil
     end
 
     # Flavor-aware applicationId — feeds the FB-PRE-3 app-id↔package preflight.

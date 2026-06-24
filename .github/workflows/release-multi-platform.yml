@@ -193,78 +193,36 @@ jobs:
         # ── Secrets are materialized into PLATFORM-NAMESPACED dirs (2026-06-22) ──
         #   secrets/android/  secrets/apple/  secrets/apple/  secrets/web/  secrets/shared/
         # Apple ASC key + Match are SHARED by iOS and macOS-desktop → secrets/apple/.
-        # Materialize Android keystore (when android_rung is active)
-        if [ -n "${UPLOAD_KEYSTORE_B64:-}" ]; then
-          mkdir -p secrets/android/keystores
-          echo "$UPLOAD_KEYSTORE_B64" | base64 -d > secrets/android/keystores/upload_keystore.keystore
-          echo "✅ Materialized Android keystore"
-        fi
-        # Materialize google-services.json into the Android module
-        if [ -n "${GOOGLE_SERVICES_B64:-}" ]; then
-          echo "$GOOGLE_SERVICES_B64" | base64 -d > cmp-android/google-services.json
-          echo "✅ Materialized google-services.json"
-        fi
-        # Materialize Firebase SA (firebase-adminsdk-o8x4a@…) for App Distribution
-        # — distinct from the Play Store SA. GHA secret: FIREBASE_CREDS
-        # (with underscore — publish-* chain's convention; the legacy
-        # `FIREBASECREDS` without underscore is NOT used by the chain).
-        if [ -n "${FIREBASE_CREDS_B64:-}" ]; then
-          mkdir -p secrets/android/firebase
-          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/android/firebase/service-account.json
-          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/android/firebaseAppDistributionServiceCredentialsFile.json
-          echo "✅ Materialized Firebase SA"
-        fi
-        # Materialize Play Store SA (fatslane-supply@…) for Play Console publish
-        # — distinct from the Firebase SA. GHA secret: PLAYSTORE_CREDS.
-        if [ -n "${PLAYSTORE_CREDS_B64:-}" ]; then
-          mkdir -p secrets/android/play
-          echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/android/play/service-account.json
-          echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/android/playStorePublishServiceCredentialsFile.json
-          echo "✅ Materialized Play Store SA"
-        fi
-        # Materialize iOS App Store Connect API .p8 key.
-        # config.rb#ios_config reads it from secrets/apple/appstore/AuthKey.p8 (key_filepath).
-        # The secret may be a RAW .p8 PEM OR base64 — auto-detect (a raw PEM begins with
-        # "-----BEGIN"). base64-decoding a raw PEM yields null-byte garbage → spaceship
-        # "string contains null byte". (2026-06-22)
+        # ── Materialize secrets via the resolver (secrets/LAYOUT.yaml is the SoT) ──
+        # Every path + encoding (base64, raw-PEM-or-base64, literals) is declared in
+        # LAYOUT.yaml; `build-secrets` owns decode + destination. NO inline paths here —
+        # reorganizing secrets/ is a LAYOUT.yaml edit, this workflow never changes.
+        BS="deployment/scripts/build-secrets"
+        mkdir -p ~/.ssh
+        "$BS" materialize upload_keystore          --from-env UPLOAD_KEYSTORE_B64  && echo "✅ Android keystore"
+        "$BS" materialize google_services          --from-env GOOGLE_SERVICES_B64  && echo "✅ google-services.json"
+        "$BS" materialize firebase_service_account --from-env FIREBASE_CREDS_B64   && echo "✅ Firebase SA"
+        "$BS" materialize play_service_account     --from-env PLAYSTORE_CREDS_B64  && echo "✅ Play Store SA"
+        "$BS" materialize appstore_auth_key        --from-env APPSTORE_AUTH_KEY_B64
+        "$BS" materialize match_ssh_key            --from-env MATCH_GIT_PRIVATE_KEY
+        "$BS" materialize match_git_url
+        "$BS" materialize match_git_branch
+        # Sanity-validate the resolved files (no secret VALUE is ever echoed).
         if [ -n "${APPSTORE_AUTH_KEY_B64:-}" ]; then
-          mkdir -p secrets/apple/appstore
-          case "$APPSTORE_AUTH_KEY_B64" in
-            -----BEGIN*) printf '%s\n' "$APPSTORE_AUTH_KEY_B64" > secrets/apple/appstore/AuthKey.p8 ;;  # raw PEM
-            *)           echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/apple/appstore/AuthKey.p8 ;;  # base64
-          esac
-          # Sanity: a valid .p8 is a PEM private key; fail loud if not (no value echoed).
-          if ! grep -q "PRIVATE KEY" secrets/apple/appstore/AuthKey.p8; then
-            echo "❌ APPSTORE_AUTH_KEY did not materialize to a valid PEM .p8 — check the secret encoding."
-            exit 1
-          fi
-          echo "✅ Materialized App Store Connect .p8 (valid PEM)"
+          grep -q "PRIVATE KEY" "$("$BS" path appstore_auth_key)" \
+            || { echo "❌ AuthKey.p8 is not a valid PEM — check APPSTORE_AUTH_KEY encoding."; exit 1; }
+          echo "✅ App Store Connect .p8 (valid PEM)"
         fi
-        # Materialize Match SSH key (Apple code-signing repo access). The secret may be a RAW
-        # OpenSSH key OR base64 — auto-detect (raw begins with "-----BEGIN ... OPENSSH"). Same
-        # encoding trap as the .p8: base64-decoding a raw key yields garbage. (2026-06-22)
         if [ -n "${MATCH_GIT_PRIVATE_KEY:-}" ]; then
-          mkdir -p secrets/apple/match ~/.ssh
-          case "$MATCH_GIT_PRIVATE_KEY" in
-            -----BEGIN*) printf '%s\n' "$MATCH_GIT_PRIVATE_KEY" > secrets/apple/match/match_ci_key ;;  # raw OpenSSH key
-            *)           echo "$MATCH_GIT_PRIVATE_KEY" | base64 -d > secrets/apple/match/match_ci_key ;;  # base64
-          esac
-          chmod 600 secrets/apple/match/match_ci_key
-          if ! grep -qa "OPENSSH PRIVATE KEY\|BEGIN.*PRIVATE KEY" secrets/apple/match/match_ci_key; then
-            echo "❌ MATCH_SSH_PRIVATE_KEY did not materialize to a valid OpenSSH key — check the secret (expected ~419B raw key, NOT the .tar.gz bundle)."
-            exit 1
-          fi
-          echo "✅ Materialized Match SSH key ($(wc -c < secrets/apple/match/match_ci_key | tr -d ' ')B, valid)"
+          MK="$("$BS" path match_ssh_key)"
+          grep -qa "OPENSSH PRIVATE KEY\|BEGIN.*PRIVATE KEY" "$MK" \
+            || { echo "❌ Match SSH key invalid (expected ~419B raw key, NOT a .tar.gz bundle)."; exit 1; }
+          echo "✅ Match SSH key ($(wc -c < "$MK" | tr -d ' ')B, valid)"
         fi
-        # Match certificate-repo coordinates (NON-secret). config.rb#ios_config reads
-        # MATCH_GIT_URL env or secrets/apple/match/git_url — neither was set in CI → fastlane match
-        # failed with "No value found for git_url". Provide both. (2026-06-22)
-        mkdir -p secrets/apple/match
-        echo "git@github.com:openMF/ios-provisioning-profile.git" > secrets/apple/match/git_url
-        echo "master" > secrets/apple/match/git_branch
-        echo "MATCH_GIT_URL=git@github.com:openMF/ios-provisioning-profile.git" >> "$GITHUB_ENV"
-        echo "MATCH_GIT_BRANCH=master" >> "$GITHUB_ENV"
-        echo "✅ Match repo: openMF/ios-provisioning-profile.git (master)"
+        # Match repo coordinates also exported as env (config.rb reads MATCH_GIT_URL/BRANCH env).
+        echo "MATCH_GIT_URL=$("$BS" value match_git_url)"       >> "$GITHUB_ENV"
+        echo "MATCH_GIT_BRANCH=$("$BS" value match_git_branch)" >> "$GITHUB_ENV"
+        echo "✅ Match repo: $("$BS" value match_git_url) ($("$BS" value match_git_branch))"
         # Map env-var names the deployment/Fastfile lanes expect
         # (config.rb's get_android_signing_config reads KEY_ALIAS, KEY_PASSWORD)
         if [ -n "${KEYSTORE_ALIAS:-}" ]; then

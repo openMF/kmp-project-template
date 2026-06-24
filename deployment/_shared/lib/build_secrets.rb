@@ -73,9 +73,12 @@ module BuildSecrets
       candidate_paths(key).any? { |p| File.exist?(p) }
     end
 
-    # String value: env var first (CI), then the on-disk file (local fallback).
+    # String value: literal constant → its value; else env var first (CI), then
+    # the on-disk file (local fallback).
     def value(key)
-      env = ENV[spec(key)["source_env"].to_s]
+      s = spec(key)
+      return s["value"] if s["kind"] == "literal"
+      env = ENV[s["source_env"].to_s]
       return env unless env.to_s.empty?
       p = path(key)
       File.exist?(p) ? File.read(p).strip : nil

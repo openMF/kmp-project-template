@@ -48,8 +48,10 @@ done
 # Every secrets-tree path the workflow uses MUST come from `$BS path <key>` — a
 # literal like `secrets/android/keystores/...` silently breaks the moment LAYOUT.yaml
 # restructures the tree (live/+sample/). Comment lines (doc) are exempt.
+# (single-file grep -n emits "NUM:content" — one colon — so anchor the comment
+#  exclusion at ^NUM: , NOT :NUM: like the grep -rn sites above.)
 if grep -nE 'secrets/(android|apple|desktop|web|shared)/[A-Za-z0-9_.-]' "$WF" 2>/dev/null \
-     | grep -vE ':[0-9]+:[[:space:]]*#'; then
+     | grep -vE '^[0-9]+:[[:space:]]*#'; then
   echo "❌ SR-11: workflow hardcodes a secrets/<platform>/ path — use \"\$BS\" path <key> instead"; fail=1
 fi
 

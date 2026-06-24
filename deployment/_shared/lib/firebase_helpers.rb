@@ -6,6 +6,7 @@
 #
 # Each consumer require_relative-s this file; the module functions are pure
 # helpers so they can be mixed into either :android or :ios platform scope.
+require_relative "build_secrets"
 
 module FirebaseHelpers
   module_function
@@ -26,6 +27,6 @@ module FirebaseHelpers
   def service_credentials_path(firebase_config)
     firebase_config[:serviceCredsFile] ||
       ENV["FIREBASE_SERVICE_ACCOUNT_PATH"] ||
-      "secrets/android/firebaseAppDistributionServiceCredentialsFile.json"
+      BuildSecrets.for.path(:firebase_service_account)   # one canonical path (drops the drifted 2nd filename)
   end
 end

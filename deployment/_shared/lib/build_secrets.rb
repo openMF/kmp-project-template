@@ -56,6 +56,9 @@ module BuildSecrets
       s = spec(key)
       if s["consume_at"]
         [s["consume_at"].gsub("{flavor}", @flavor).gsub("{variant}", @variant)]
+      elsif s["kind"] == "env_var"
+        # env-line secrets live at <root>/_env/<VAR> (matches materialize_dest)
+        @doc.fetch("precedence").map { |root| File.join(@doc["roots"].fetch(root), "_env", s.fetch("source_env")) }
       else
         @doc.fetch("precedence").map { |root| File.join(@doc["roots"].fetch(root), rel(key)) }
       end

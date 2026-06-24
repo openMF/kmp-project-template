@@ -21,7 +21,7 @@ platform :android do
     # higher code than internal). Reuses generateVersion's existing VERSION_CODE_OVERRIDE hook,
     # so generateVersion stays generic. deployInternal is the ONLY lane that builds a fresh AAB;
     # promoteToBeta / promote_to_production reuse the uploaded code and need no change.
-    play_json_key = File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json")
+    play_json_key = File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:play_service_account))
     play_pkg      = FastlaneConfig::ProjectConfig.android_package_name
     live_max = %w[production beta internal].flat_map do |track|
       begin
@@ -60,7 +60,7 @@ platform :android do
     upload_to_play_store(
       track: "internal",
       aab: build_paths[:prod_aab_path],
-      json_key: File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json"),
+      json_key: File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:play_service_account)),
       package_name: FastlaneConfig::ProjectConfig.android_package_name,
       metadata_path: File.join(DEPLOYMENT_REPO_ROOT, "deployment/android/metadata"),
       skip_upload_metadata:    false,  # title / short_description / full_description

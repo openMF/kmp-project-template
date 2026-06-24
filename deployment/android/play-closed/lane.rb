@@ -9,7 +9,7 @@ platform :android do
       track:                        "internal",
       track_promote_to:             "alpha",
       track_promote_release_status: "completed",
-      json_key:                     File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json"),
+      json_key:                     File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:play_service_account)),
       package_name:                 FastlaneConfig::ProjectConfig.android_package_name,
       skip_upload_changelogs:       true,
       skip_upload_metadata:         true,

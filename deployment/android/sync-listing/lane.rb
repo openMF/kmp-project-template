@@ -18,7 +18,7 @@ platform :android do
       track:              "internal",
       skip_upload_apk:    true,
       skip_upload_aab:    true,
-      json_key:           File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "play", "service-account.json"),
+      json_key:           File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:play_service_account)),
       package_name:       FastlaneConfig::ProjectConfig.android_package_name,
       metadata_path:      metadata_root,
       # sync_image_upload:  true is the default — uploads screenshots when present

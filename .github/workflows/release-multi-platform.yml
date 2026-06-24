@@ -127,8 +127,32 @@ jobs:
   #   • full sync (metadata + screenshots + feature graphic) → deployInternal's supply upload
   #     (metadata_path + skip_upload_{metadata,changelogs,images,screenshots}: false)
   # scripts/store/store-listing-preflight.sh stays as a LOCAL pre-push validation helper.
+
+  # Resolve the Android applicationId DYNAMICALLY from gradle/libs.versions.toml#appId so the
+  # firebase app-id↔package preflight (FB-PRE-3) stays correct as product flavors evolve.
+  # NEVER hardcode the applicationId here — multi-product-flavor support depends on this.
+  resolve-app-id:
+    name: Resolve applicationId
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      application_id: ${{ steps.appid.outputs.application_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: appid
+        shell: bash
+        run: |
+          APP_ID="$(grep -E '^appId[[:space:]]*=' gradle/libs.versions.toml | head -1 | sed -E 's/.*"([^"]+)".*/\1/')"
+          if [[ -z "$APP_ID" ]]; then
+            echo "❌ could not resolve appId from gradle/libs.versions.toml"; exit 1
+          fi
+          echo "application_id=$APP_ID" >> "$GITHUB_OUTPUT"
+          echo "✅ resolved applicationId = $APP_ID"
+
   release:
     name: Release
+    needs: [resolve-app-id]
     # Permissions cascade through nested reusable workflows (this → orchestrator
     # → publish-*-kmp). Declare here at the caller boundary so the deepest jobs
     # — publish-web-kmp's gh-pages/cloudflare/netlify/vercel stages — can
@@ -145,10 +169,13 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.45
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.46
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
+      # applicationId resolved dynamically (resolve-app-id job) — feeds the firebase
+      # app-id↔package preflight (FB-PRE-3). Stays correct across product flavors.
+      application_id:       ${{ needs.resolve-app-id.outputs.application_id }}
       ios_package_name:     cmp-ios
       mac_package_name:     cmp-desktop
       shared_module:        cmp-shared

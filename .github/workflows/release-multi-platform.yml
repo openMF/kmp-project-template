@@ -145,10 +145,13 @@ jobs:
     # (parse-time literal only). For local-dev iteration use the companion
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.45
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.46
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
+      # applicationId (prod flavor) — feeds the firebase app-id↔package preflight (FB-PRE-3)
+      # in publish-android-kmp release-firebase.yaml@v2.0.21.
+      application_id:       org.mifos.kmp.template
       ios_package_name:     cmp-ios
       mac_package_name:     cmp-desktop
       shared_module:        cmp-shared

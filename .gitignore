@@ -138,3 +138,8 @@ release-layer/
 # Generated fastlane reports (contain signing material) — never commit
 deployment/fastlane/report.xml
 deployment/fastlane/**/report.xml
+
+# Phase 7: commit the obviously-fake secrets/sample/ placeholders even though the global
+# *.keystore / *.key rules above would ignore them. (Real secrets live in gitignored secrets/live/.)
+!secrets/sample/android/keystores/upload_keystore.keystore
+!secrets/sample/desktop/linux/gpg_signing.key

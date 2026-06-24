@@ -81,8 +81,14 @@ secrets/android/playStorePublishServiceCredentialsFile.json
 # Secrets and Configuration - NEVER COMMIT THESE!
 # secrets.env — REMOVED: that file is retired (2026-06-23). Keystore passwords
 # now live in secrets/android/keystores/ (covered by secrets/ below).
-secrets/
+# Ignore secret CONTENTS (every subdir: android/ apple/ desktop/ _env/ …) but allow
+# re-including the layout contract. `secrets/*` (not `secrets/`) leaves the dir itself
+# un-excluded so a child can be re-included (git rule). Phase 7 restructure later
+# narrows this to `/secrets/live/` once sample/ is committed.
+secrets/*
 !secrets/.gitkeep
+# The secrets LAYOUT contract is the SoT for PATHS — it holds NO secret values.
+!secrets/LAYOUT.yaml
 .env.local
 !.env.local.example
 

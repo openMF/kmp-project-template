@@ -44,5 +44,14 @@ for f in $(grep -rlE 'sk_live_|sk_test_|-----BEGIN .*PRIVATE KEY-----' secrets/s
   grep -q "CLAUDE-PLACEHOLDER" "$f" || { echo "❌ SR-10: real-looking secret (no placeholder marker): $f"; fail=1; }
 done
 
-[ "$fail" = 0 ] && echo "✅ secrets-resolver guards pass (SR-7/8/9/10)"
+# ── SR-11: no hardcoded on-disk secrets/<platform>/ path in the workflow ──
+# Every secrets-tree path the workflow uses MUST come from `$BS path <key>` — a
+# literal like `secrets/android/keystores/...` silently breaks the moment LAYOUT.yaml
+# restructures the tree (live/+sample/). Comment lines (doc) are exempt.
+if grep -nE 'secrets/(android|apple|desktop|web|shared)/[A-Za-z0-9_.-]' "$WF" 2>/dev/null \
+     | grep -vE ':[0-9]+:[[:space:]]*#'; then
+  echo "❌ SR-11: workflow hardcodes a secrets/<platform>/ path — use \"\$BS\" path <key> instead"; fail=1
+fi
+
+[ "$fail" = 0 ] && echo "✅ secrets-resolver guards pass (SR-7/8/9/10/11)"
 exit $fail

@@ -238,7 +238,11 @@ jobs:
           # which concatenates (Ruby's File.join doesn't strip the leading / on the
           # second arg) — so an absolute path here produces a duplicated /<root>/<abs>
           # gradle property and signing validation fails to find the keystore.
-          echo "KEYSTORE_PATH=secrets/android/keystores/upload_keystore.keystore" >> "$GITHUB_ENV"
+          # RESOLVE THE PATH — never hardcode it. `$BS materialize upload_keystore`
+          # just wrote the keystore to secrets/live/… ; ask the resolver where it
+          # landed (live-wins-else-sample, relative). Hardcoding the flat path broke
+          # signing the instant secrets/ was restructured into live/+sample/.
+          echo "KEYSTORE_PATH=$("$BS" path upload_keystore)" >> "$GITHUB_ENV"
         fi
         echo "✅ pre_fastlane_script complete"
     # EXPLICIT secret map (NOT inherit). This chain is cross-ORG at every hop:

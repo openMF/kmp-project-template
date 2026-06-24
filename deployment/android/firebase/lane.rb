@@ -15,6 +15,10 @@ platform :android do
     firebase_config = FastlaneConfig.get_firebase_config(:android, :prod)
     build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
 
+    # Validate Firebase config BEFORE the ~6-min build (fail in seconds on app-id /
+    # package / service-account drift) — mirrors the Play + iOS live preflights.
+    FirebaseHelpers.preflight!(firebase_config, expected_application_id: FastlaneConfig::ProjectConfig.android_package_name)
+
     generateVersion(platform: "firebase", **firebase_config)
     releaseNotes = generateReleaseNote()
 
@@ -40,6 +44,10 @@ platform :android do
     signing_config = FastlaneConfig.get_android_signing_config(options)
     firebase_config = FastlaneConfig.get_firebase_config(:android, :demo)
     build_paths = FastlaneConfig::AndroidConfig::BUILD_PATHS
+
+    # Validate Firebase config BEFORE the ~6-min build (fail in seconds on app-id /
+    # package / service-account drift) — mirrors the Play + iOS live preflights.
+    FirebaseHelpers.preflight!(firebase_config, expected_application_id: "#{FastlaneConfig::ProjectConfig.android_package_name}.demo")
 
     generateVersion(platform: "firebase", **firebase_config)
     releaseNotes = generateReleaseNote()

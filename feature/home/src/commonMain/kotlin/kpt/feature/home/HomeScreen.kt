@@ -75,10 +75,58 @@ import kpt.core.designsystem.component.Urgency
 import kpt.core.designsystem.component.UrgencyDot
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.BillReminder
+import kpt.feature.home.generated.resources.Res
+import kpt.feature.home.generated.resources.screens_home_active_loans_plural
+import kpt.feature.home.generated.resources.screens_home_active_loans_singular
+import kpt.feature.home.generated.resources.screens_home_app_title
+import kpt.feature.home.generated.resources.screens_home_bills_card_title
+import kpt.feature.home.generated.resources.screens_home_bills_day_value
+import kpt.feature.home.generated.resources.screens_home_bills_empty
+import kpt.feature.home.generated.resources.screens_home_bills_total_label
+import kpt.feature.home.generated.resources.screens_home_exchange_card_title
+import kpt.feature.home.generated.resources.screens_home_loan_tile_footer
+import kpt.feature.home.generated.resources.screens_home_loans_carousel_title
+import kpt.feature.home.generated.resources.screens_home_loans_label
+import kpt.feature.home.generated.resources.screens_home_money_value
+import kpt.feature.home.generated.resources.screens_home_money_zero
+import kpt.feature.home.generated.resources.screens_home_monthly_emi_label
+import kpt.feature.home.generated.resources.screens_home_no_loans_message
+import kpt.feature.home.generated.resources.screens_home_outstanding_label
+import kpt.feature.home.generated.resources.screens_home_rates_card_title
+import kpt.feature.home.generated.resources.screens_home_rates_delta_flat
+import kpt.feature.home.generated.resources.screens_home_rates_delta_mortgage
+import kpt.feature.home.generated.resources.screens_home_rates_fed_funds_label
+import kpt.feature.home.generated.resources.screens_home_rates_mortgage_30y_label
+import kpt.feature.home.generated.resources.screens_home_rates_value_format
+import kpt.feature.home.generated.resources.screens_home_remaining_label
+import kpt.feature.home.generated.resources.screens_home_section_this_week
+import kpt.feature.home.generated.resources.screens_home_section_tools
+import kpt.feature.home.generated.resources.screens_home_section_tools_subtitle
+import kpt.feature.home.generated.resources.screens_home_see_all
+import kpt.feature.home.generated.resources.screens_home_settings_cd
+import kpt.feature.home.generated.resources.screens_home_tool_affordability_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_affordability_title
+import kpt.feature.home.generated.resources.screens_home_tool_amortization_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_amortization_title
+import kpt.feature.home.generated.resources.screens_home_tool_compare_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_compare_title
+import kpt.feature.home.generated.resources.screens_home_tool_currency_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_currency_title
+import kpt.feature.home.generated.resources.screens_home_tool_emi_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_emi_title
+import kpt.feature.home.generated.resources.screens_home_tool_history_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_history_title
+import kpt.feature.home.generated.resources.screens_home_tool_macro_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_macro_title
+import kpt.feature.home.generated.resources.screens_home_tool_wizard_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_wizard_title
+import kpt.feature.home.generated.resources.screens_home_total_outstanding_label
+import kpt.feature.home.generated.resources.screens_home_usd_label
 import kpt.feature.home.ui.HomeAction
 import kpt.feature.home.ui.HomeViewModel
 import kpt.feature.home.ui.LoansSummary
 import kpt.feature.home.ui.RatesQuickView
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,7 +156,7 @@ internal fun HomeScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Money Toolkit",
+                        text = stringResource(Res.string.screens_home_app_title),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold,
                         ),
@@ -118,7 +166,7 @@ internal fun HomeScreen(
                     IconButton(onClick = onSettingsClick) {
                         Icon(
                             imageVector = Icons.Filled.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = stringResource(Res.string.screens_home_settings_cd),
                         )
                     }
                 },
@@ -148,7 +196,7 @@ internal fun HomeScreen(
             LoansCarousel(state.loans, onLoanClick = onNavigateToLoans)
 
             // ── Quick stats grid (Bills + Rates) ─────────────────────────────
-            SectionHeader(title = "This week")
+            SectionHeader(title = stringResource(Res.string.screens_home_section_this_week))
 
             BillsQuickCard(
                 state = state.bills,
@@ -171,54 +219,54 @@ internal fun HomeScreen(
 
             // ── Tools grid ───────────────────────────────────────────────────
             SectionHeader(
-                title = "Tools",
-                supporting = "Calculators, comparisons, macro indicators",
+                title = stringResource(Res.string.screens_home_section_tools),
+                supporting = stringResource(Res.string.screens_home_section_tools_subtitle),
             )
             FeatureRow(
-                title = "EMI Calculator",
-                subtitle = "Monthly payment for any loan",
+                title = stringResource(Res.string.screens_home_tool_emi_title),
+                subtitle = stringResource(Res.string.screens_home_tool_emi_subtitle),
                 icon = Icons.Default.Calculate,
                 onClick = onNavigateToEmi,
             )
             FeatureRow(
-                title = "Affordability",
-                subtitle = "How much can I borrow safely?",
+                title = stringResource(Res.string.screens_home_tool_affordability_title),
+                subtitle = stringResource(Res.string.screens_home_tool_affordability_subtitle),
                 icon = Icons.Default.Savings,
                 onClick = onNavigateToAffordability,
             )
             FeatureRow(
-                title = "Amortization",
-                subtitle = "Full payment schedule",
+                title = stringResource(Res.string.screens_home_tool_amortization_title),
+                subtitle = stringResource(Res.string.screens_home_tool_amortization_subtitle),
                 icon = Icons.AutoMirrored.Default.TrendingUp,
                 onClick = onNavigateToAmortization,
             )
             FeatureRow(
-                title = "Compare Loans",
-                subtitle = "Side-by-side total cost",
+                title = stringResource(Res.string.screens_home_tool_compare_title),
+                subtitle = stringResource(Res.string.screens_home_tool_compare_subtitle),
                 icon = Icons.Default.Compare,
                 onClick = onNavigateToLoanComparison,
             )
             FeatureRow(
-                title = "Loan Wizard",
-                subtitle = "Step-by-step planner",
+                title = stringResource(Res.string.screens_home_tool_wizard_title),
+                subtitle = stringResource(Res.string.screens_home_tool_wizard_subtitle),
                 icon = Icons.Default.Tune,
                 onClick = onNavigateToLoanCalcWizard,
             )
             FeatureRow(
-                title = "Currency Rates",
-                subtitle = "Live exchange rates",
+                title = stringResource(Res.string.screens_home_tool_currency_title),
+                subtitle = stringResource(Res.string.screens_home_tool_currency_subtitle),
                 icon = Icons.Default.CurrencyExchange,
                 onClick = onNavigateToExchangeRates,
             )
             FeatureRow(
-                title = "Rate History",
-                subtitle = "Historical FX charts",
+                title = stringResource(Res.string.screens_home_tool_history_title),
+                subtitle = stringResource(Res.string.screens_home_tool_history_subtitle),
                 icon = Icons.AutoMirrored.Default.ReceiptLong,
                 onClick = onNavigateToRateHistory,
             )
             FeatureRow(
-                title = "Country Macro",
-                subtitle = "GDP, CPI, unemployment",
+                title = stringResource(Res.string.screens_home_tool_macro_title),
+                subtitle = stringResource(Res.string.screens_home_tool_macro_subtitle),
                 icon = Icons.Default.Public,
                 onClick = onNavigateToMacro,
             )
@@ -242,12 +290,12 @@ private fun HeroSnapshot(state: ScreenState<LoansSummary>) {
             empty = {
                 Column {
                     AmountDisplay(
-                        amountText = "$0.00",
-                        label = "Outstanding balance",
+                        amountText = stringResource(Res.string.screens_home_money_zero),
+                        label = stringResource(Res.string.screens_home_outstanding_label),
                     )
                     Spacer(Modifier.height(MaterialTheme.spacing.sm))
                     Text(
-                        text = "No active loans — start by adding one.",
+                        text = stringResource(Res.string.screens_home_no_loans_message),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
@@ -255,11 +303,21 @@ private fun HeroSnapshot(state: ScreenState<LoansSummary>) {
         ) { summary, _ ->
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)) {
                 AmountDisplay(
-                    amountText = "$${summary.totalOutstanding.formatGrouped(2)}",
-                    label = "Total outstanding",
+                    amountText = stringResource(
+                        Res.string.screens_home_money_value,
+                        summary.totalOutstanding.formatGrouped(2),
+                    ),
+                    label = stringResource(Res.string.screens_home_total_outstanding_label),
                     supporting = {
                         Text(
-                            text = "${summary.count} active loan${if (summary.count == 1) "" else "s"}",
+                            text = stringResource(
+                                if (summary.count == 1) {
+                                    Res.string.screens_home_active_loans_singular
+                                } else {
+                                    Res.string.screens_home_active_loans_plural
+                                },
+                                summary.count,
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     },
@@ -269,11 +327,14 @@ private fun HeroSnapshot(state: ScreenState<LoansSummary>) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     HeroStat(
-                        label = "Monthly EMI",
-                        value = "$${summary.totalMonthlyEmi.formatGrouped(2)}",
+                        label = stringResource(Res.string.screens_home_monthly_emi_label),
+                        value = stringResource(
+                            Res.string.screens_home_money_value,
+                            summary.totalMonthlyEmi.formatGrouped(2),
+                        ),
                     )
                     HeroStat(
-                        label = "Loans",
+                        label = stringResource(Res.string.screens_home_loans_label),
                         value = summary.count.toString(),
                     )
                 }
@@ -313,7 +374,7 @@ private fun LoansCarousel(
     val sp = MaterialTheme.spacing
     Column(verticalArrangement = Arrangement.spacedBy(sp.sm)) {
         Text(
-            text = "Your loans · ${loans.size}",
+            text = stringResource(Res.string.screens_home_loans_carousel_title, loans.size),
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -354,12 +415,15 @@ private fun LoanCarouselTile(
                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             )
             Text(
-                text = "Remaining",
+                text = stringResource(Res.string.screens_home_remaining_label),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             kpt.core.designsystem.component.MoneyText(
-                text = "$${loan.principalRemaining.formatGrouped(2)}",
+                text = stringResource(
+                    Res.string.screens_home_money_value,
+                    loan.principalRemaining.formatGrouped(2),
+                ),
                 tone = kpt.core.designsystem.component.MoneyTone.Negative,
                 style = MaterialTheme.typography.titleLarge,
             )
@@ -373,7 +437,11 @@ private fun LoanCarouselTile(
                 trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
             )
             Text(
-                text = "EMI $${loan.monthlyPayment.formatGrouped(2)} · ${(progress * 100).toInt()}% paid",
+                text = stringResource(
+                    Res.string.screens_home_loan_tile_footer,
+                    loan.monthlyPayment.formatGrouped(2),
+                    (progress * 100).toInt(),
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -404,15 +472,16 @@ private fun BillsQuickCard(
     onSeeAll: () -> Unit,
 ) {
     SectionCard(
-        title = "Upcoming Bills",
+        title = stringResource(Res.string.screens_home_bills_card_title),
         icon = Icons.Default.NotificationsActive,
         onSeeAll = onSeeAll,
     ) {
+        val emptyMessage = stringResource(Res.string.screens_home_bills_empty)
         ScreenContent(
             state = state,
             onRetry = {},
             modifier = Modifier.fillMaxWidth(),
-            empty = { WidgetEmpty("No bills due in the next 7 days.") },
+            empty = { WidgetEmpty(emptyMessage) },
         ) { bills, _ ->
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
                 val total = bills.sumOf { it.amount }
@@ -422,12 +491,15 @@ private fun BillsQuickCard(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Total due (next 7d)",
+                        text = stringResource(Res.string.screens_home_bills_total_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     MoneyText(
-                        text = "$${total.formatGrouped(2)}",
+                        text = stringResource(
+                            Res.string.screens_home_money_value,
+                            total.formatGrouped(2),
+                        ),
                         tone = MoneyTone.Negative,
                         style = MaterialTheme.typography.titleMedium,
                     )
@@ -445,12 +517,15 @@ private fun BillsQuickCard(
                             modifier = Modifier.weight(1f),
                         )
                         Text(
-                            text = "Day ${bill.dueDay}",
+                            text = stringResource(Res.string.screens_home_bills_day_value, bill.dueDay),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         MoneyText(
-                            text = "$${bill.amount.formatGrouped(2)}",
+                            text = stringResource(
+                                Res.string.screens_home_money_value,
+                                bill.amount.formatGrouped(2),
+                            ),
                             tone = MoneyTone.Negative,
                             style = MaterialTheme.typography.bodyMedium,
                         )
@@ -469,7 +544,7 @@ private fun RatesQuickCard(
     onSeeAll: () -> Unit,
 ) {
     SectionCard(
-        title = "Today's Rates",
+        title = stringResource(Res.string.screens_home_rates_card_title),
         icon = Icons.AutoMirrored.Default.TrendingUp,
         onSeeAll = onSeeAll,
         trailing = {
@@ -486,16 +561,22 @@ private fun RatesQuickCard(
         ) { rates, _ ->
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
                 RateRow(
-                    label = "Federal Funds",
-                    value = "${rates.fedFundsPercent.formatDecimal(2)}%",
+                    label = stringResource(Res.string.screens_home_rates_fed_funds_label),
+                    value = stringResource(
+                        Res.string.screens_home_rates_value_format,
+                        rates.fedFundsPercent.formatDecimal(2),
+                    ),
                     direction = RateDirection.Flat,
-                    delta = "—",
+                    delta = stringResource(Res.string.screens_home_rates_delta_flat),
                 )
                 RateRow(
-                    label = "30Y Mortgage",
-                    value = "${rates.mortgage30YPercent.formatDecimal(2)}%",
+                    label = stringResource(Res.string.screens_home_rates_mortgage_30y_label),
+                    value = stringResource(
+                        Res.string.screens_home_rates_value_format,
+                        rates.mortgage30YPercent.formatDecimal(2),
+                    ),
                     direction = RateDirection.Up,
-                    delta = "+0.05",
+                    delta = stringResource(Res.string.screens_home_rates_delta_mortgage),
                 )
             }
         }
@@ -510,7 +591,7 @@ private fun ExchangeRateCard(
     onSeeAll: () -> Unit,
 ) {
     SectionCard(
-        title = "USD Exchange",
+        title = stringResource(Res.string.screens_home_exchange_card_title),
         icon = Icons.Default.CurrencyExchange,
         onSeeAll = onSeeAll,
         trailing = {
@@ -545,7 +626,7 @@ private fun ExchangeRateCard(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                text = "USD",
+                                text = stringResource(Res.string.screens_home_usd_label),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -613,7 +694,7 @@ private fun SectionCard(
                 trailing?.invoke()
             }
             Text(
-                text = "See all",
+                text = stringResource(Res.string.screens_home_see_all),
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable(onClick = onSeeAll),

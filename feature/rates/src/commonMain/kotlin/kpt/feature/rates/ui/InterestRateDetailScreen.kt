@@ -45,6 +45,14 @@ import kpt.core.designsystem.chart.KptAreaChart
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.economic.InterestRateSeries
+import kpt.feature.rates.generated.resources.Res
+import kpt.feature.rates.generated.resources.screens_rates_back_cd
+import kpt.feature.rates.generated.resources.screens_rates_detail_current_label
+import kpt.feature.rates.generated.resources.screens_rates_detail_observations_label
+import kpt.feature.rates.generated.resources.screens_rates_detail_refresh_cd
+import kpt.feature.rates.generated.resources.screens_rates_detail_source_label
+import kpt.feature.rates.generated.resources.screens_rates_value_with_unit
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -84,7 +92,7 @@ internal fun InterestRateDetailScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.screens_rates_back_cd),
                         )
                     }
                 },
@@ -92,7 +100,7 @@ internal fun InterestRateDetailScreen(
                     IconButton(onClick = viewModel::onRefresh) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh",
+                            contentDescription = stringResource(Res.string.screens_rates_detail_refresh_cd),
                         )
                     }
                 },
@@ -115,11 +123,18 @@ internal fun InterestRateDetailScreen(
             ) {
                 HeroCard {
                     AmountDisplay(
-                        amountText = "${series.current.formatDecimal(2)}${series.unit}",
-                        label = "Current",
+                        amountText = stringResource(
+                            Res.string.screens_rates_value_with_unit,
+                            series.current.formatDecimal(2),
+                            series.unit,
+                        ),
+                        label = stringResource(Res.string.screens_rates_detail_current_label),
                         supporting = {
                             Text(
-                                text = "Source: ${series.source}",
+                                text = stringResource(
+                                    Res.string.screens_rates_detail_source_label,
+                                    series.source,
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                             )
                         },
@@ -127,7 +142,7 @@ internal fun InterestRateDetailScreen(
                 }
                 ChartCard(series)
                 Text(
-                    text = "Observations",
+                    text = stringResource(Res.string.screens_rates_detail_observations_label),
                     style = MaterialTheme.typography.titleMedium,
                 )
                 LazyColumn(modifier = Modifier.weight(1f)) {
@@ -143,7 +158,11 @@ internal fun InterestRateDetailScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                             Text(
-                                text = "${obs.value.formatDecimal(2)}${series.unit}",
+                                text = stringResource(
+                                    Res.string.screens_rates_value_with_unit,
+                                    obs.value.formatDecimal(2),
+                                    series.unit,
+                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                         }

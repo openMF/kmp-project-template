@@ -23,6 +23,9 @@ import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.showcase.generated.resources.Res
+import kpt.feature.showcase.generated.resources.screens_showcase_transition_demo_label
+import org.jetbrains.compose.resources.stringResource
 
 @Serializable
 data object TransitionGalleryRoute
@@ -61,6 +64,11 @@ private fun TransitionDemoScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = "Demo: ${variant.displayName}\n(auto-pops in 2s)")
+        Text(
+            text = stringResource(
+                Res.string.screens_showcase_transition_demo_label,
+                variant.displayName,
+            ),
+        )
     }
 }

@@ -21,10 +21,22 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.foundation)
             implementation(compose.materialIconsExtended)
+            // compose-resources — for stringResource()-based UI copy (i18n) per
+            // RULE-IMPL-NO-HARDCODED-STRING-001 (W2 of store5-superbrain-v2).
+            implementation(compose.components.resources)
         }
 
         commonTest.dependencies {
             implementation(libs.turbine)
         }
     }
+}
+
+// Compose-resources class generator config — exposes `Res.string.*` under
+// `kpt.feature.currencyrates.generated.resources` for the i18n backfill
+// (RULE-IMPL-NO-HARDCODED-STRING-001 / W2 store5-superbrain-v2).
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+    packageOfResClass = "kpt.feature.currencyrates.generated.resources"
 }

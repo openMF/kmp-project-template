@@ -41,6 +41,20 @@ import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
 import kpt.core.domain.calc.AmortizationRow
+import kpt.feature.calculators.generated.resources.Res
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_back_cd
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_emi_label
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_header_balance
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_header_interest
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_header_month
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_header_principal
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_interest_total_supporting
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_principal_label
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_rate_label
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_tenure_label
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_title
+import kpt.feature.calculators.generated.resources.screens_calc_amortization_title_with_source
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -61,12 +75,17 @@ fun AmortizationScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    val title = state.sourceLoanName?.let { "Amortization · $it" } ?: "Amortization"
+                    val title = state.sourceLoanName?.let {
+                        stringResource(Res.string.screens_calc_amortization_title_with_source, it)
+                    } ?: stringResource(Res.string.screens_calc_amortization_title)
                     Text(title)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_calc_amortization_back_cd),
+                        )
                     }
                 },
             )
@@ -94,7 +113,7 @@ fun AmortizationScreen(
                                 viewModel.trySendAction(AmortizationAction.UpdatePrincipal(v))
                             }
                         },
-                        label = { Text("Principal") },
+                        label = { Text(stringResource(Res.string.screens_calc_amortization_principal_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -105,7 +124,7 @@ fun AmortizationScreen(
                                 viewModel.trySendAction(AmortizationAction.UpdateRate(v))
                             }
                         },
-                        label = { Text("Annual Rate (%)") },
+                        label = { Text(stringResource(Res.string.screens_calc_amortization_rate_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -116,7 +135,7 @@ fun AmortizationScreen(
                                 viewModel.trySendAction(AmortizationAction.UpdateTenure(v))
                             }
                         },
-                        label = { Text("Tenure (months)") },
+                        label = { Text(stringResource(Res.string.screens_calc_amortization_tenure_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -126,11 +145,14 @@ fun AmortizationScreen(
             HeroCard {
                 AmountDisplay(
                     amountText = summary.emi.formatGrouped(2),
-                    label = "Monthly EMI",
+                    label = stringResource(Res.string.screens_calc_amortization_emi_label),
                     supporting = {
                         Text(
-                            text = "Interest ${summary.totalInterest.formatGrouped(2)} · " +
-                                "Total ${summary.totalPayment.formatGrouped(2)}",
+                            text = stringResource(
+                                Res.string.screens_calc_amortization_interest_total_supporting,
+                                summary.totalInterest.formatGrouped(2),
+                                summary.totalPayment.formatGrouped(2),
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     },
@@ -154,10 +176,22 @@ private fun AmortizationHeader() {
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text("#", style = MaterialTheme.typography.labelMedium)
-        Text("Principal", style = MaterialTheme.typography.labelMedium)
-        Text("Interest", style = MaterialTheme.typography.labelMedium)
-        Text("Balance", style = MaterialTheme.typography.labelMedium)
+        Text(
+            stringResource(Res.string.screens_calc_amortization_header_month),
+            style = MaterialTheme.typography.labelMedium,
+        )
+        Text(
+            stringResource(Res.string.screens_calc_amortization_header_principal),
+            style = MaterialTheme.typography.labelMedium,
+        )
+        Text(
+            stringResource(Res.string.screens_calc_amortization_header_interest),
+            style = MaterialTheme.typography.labelMedium,
+        )
+        Text(
+            stringResource(Res.string.screens_calc_amortization_header_balance),
+            style = MaterialTheme.typography.labelMedium,
+        )
     }
 }
 

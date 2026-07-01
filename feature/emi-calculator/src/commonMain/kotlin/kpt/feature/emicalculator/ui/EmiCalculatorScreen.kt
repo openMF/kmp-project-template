@@ -40,6 +40,16 @@ import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
+import kpt.feature.emicalculator.generated.resources.Res
+import kpt.feature.emicalculator.generated.resources.screens_emicalculator_back_cd
+import kpt.feature.emicalculator.generated.resources.screens_emicalculator_monthly_emi_label
+import kpt.feature.emicalculator.generated.resources.screens_emicalculator_principal_label
+import kpt.feature.emicalculator.generated.resources.screens_emicalculator_rate_label
+import kpt.feature.emicalculator.generated.resources.screens_emicalculator_tenure_label
+import kpt.feature.emicalculator.generated.resources.screens_emicalculator_title
+import kpt.feature.emicalculator.generated.resources.screens_emicalculator_total_interest_label
+import kpt.feature.emicalculator.generated.resources.screens_emicalculator_total_payment_label
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,10 +66,13 @@ fun EmiCalculatorScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("EMI Calculator") },
+                title = { Text(stringResource(Res.string.screens_emicalculator_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_emicalculator_back_cd),
+                        )
                     }
                 },
             )
@@ -90,7 +103,7 @@ fun EmiCalculatorScreen(
                                 viewModel.trySendAction(EmiAction.UpdatePrincipal(v))
                             }
                         },
-                        label = { Text("Principal Amount") },
+                        label = { Text(stringResource(Res.string.screens_emicalculator_principal_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -102,7 +115,7 @@ fun EmiCalculatorScreen(
                                 viewModel.trySendAction(EmiAction.UpdateRate(v))
                             }
                         },
-                        label = { Text("Annual Rate (%)") },
+                        label = { Text(stringResource(Res.string.screens_emicalculator_rate_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -114,7 +127,7 @@ fun EmiCalculatorScreen(
                                 viewModel.trySendAction(EmiAction.UpdateTenure(v))
                             }
                         },
-                        label = { Text("Tenure (months)") },
+                        label = { Text(stringResource(Res.string.screens_emicalculator_tenure_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -125,14 +138,17 @@ fun EmiCalculatorScreen(
                 HeroCard {
                     AmountDisplay(
                         amountText = result.emi.formatGrouped(2),
-                        label = "Monthly EMI",
+                        label = stringResource(Res.string.screens_emicalculator_monthly_emi_label),
                         supporting = {
                             Column(verticalArrangement = Arrangement.spacedBy(sp.xs)) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
-                                    Text("Total payment", style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        stringResource(Res.string.screens_emicalculator_total_payment_label),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                    )
                                     Text(
                                         result.totalPayment.formatGrouped(2),
                                         style = MaterialTheme.typography.bodyMedium,
@@ -142,7 +158,10 @@ fun EmiCalculatorScreen(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
-                                    Text("Total interest", style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        stringResource(Res.string.screens_emicalculator_total_interest_label),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                    )
                                     Text(
                                         result.totalInterest.formatGrouped(2),
                                         style = MaterialTheme.typography.bodyMedium,

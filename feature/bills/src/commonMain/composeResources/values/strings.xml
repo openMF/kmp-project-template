@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- ============================================================
+         RULE-IMPL-NO-HARDCODED-STRING-001 — feature/bills i18n surface
+         Naming convention: screens_bills_<screen>_<role>
+         (per training-layer/instructions/stream-first/latest/CORE_I18N.md)
+         Authored by W2 of plan-layer/active/store5-superbrain-v2/.
+         ============================================================ -->
+
+    <!-- ===== AddOrEditBillReminderScreen ===== -->
+    <string name="screens_bills_add_title">New bill reminder</string>
+    <string name="screens_bills_edit_title">Edit bill reminder</string>
+    <string name="screens_bills_addedit_back_cd">Back</string>
+    <string name="screens_bills_addedit_save_button">Save</string>
+    <string name="screens_bills_addedit_status_saving">Saving…</string>
+    <string name="screens_bills_addedit_status_saved">Saved ✓</string>
+    <string name="screens_bills_addedit_status_add_another">Add another</string>
+    <string name="screens_bills_addedit_status_offline">Saved offline — will sync when online.</string>
+    <string name="screens_bills_addedit_status_failed">Save failed: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">unknown error</string>
+    <string name="screens_bills_addedit_retry_button">Retry</string>
+    <string name="screens_bills_addedit_dismiss_button">Dismiss</string>
+    <string name="screens_bills_addedit_name_label">Name (e.g. Electricity)</string>
+    <string name="screens_bills_addedit_amount_label">Amount</string>
+    <string name="screens_bills_addedit_due_day_label">Due day of month (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">Recurrence</string>
+    <string name="screens_bills_addedit_category_title">Category</string>
+    <string name="screens_bills_addedit_remind_days_before_label">Remind days before</string>
+    <string name="screens_bills_addedit_enabled_label">Enabled</string>
+
+    <!-- ===== BillRemindersListScreen ===== -->
+    <string name="screens_bills_list_title">Bill Reminders</string>
+    <string name="screens_bills_list_back_cd">Back</string>
+    <string name="screens_bills_list_new_fab_text">New bill</string>
+    <string name="screens_bills_list_summary_label">Upcoming this month</string>
+    <string name="screens_bills_list_summary_due_single">%1$d bill due in next 7 days</string>
+    <string name="screens_bills_list_summary_due_plural">%1$d bills due in next 7 days</string>
+    <string name="screens_bills_list_mark_paid_cd">Mark paid</string>
+    <string name="screens_bills_list_paid_button">Paid</string>
+    <string name="screens_bills_list_reminders_disabled">Reminders disabled</string>
+</resources>

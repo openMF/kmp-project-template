@@ -26,6 +26,10 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.foundation)
             implementation(compose.materialIconsExtended)
+            // compose-resources — for stringResource()-based UI copy (i18n) per
+            // RULE-IMPL-NO-HARDCODED-STRING-001 (W2 of store5-superbrain-v2).
+            // Mirrors `feature/loans/build.gradle.kts` wiring.
+            implementation(compose.components.resources)
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
@@ -37,4 +41,14 @@ kotlin {
             implementation(libs.turbine)
         }
     }
+}
+
+// Compose-resources class generator config — mirrors `feature/loans/build.gradle.kts`
+// so `Res.string.*` is exposed under `kpt.feature.home.generated.resources`,
+// matching the source `import kpt.feature.home.generated.resources.Res`
+// inserted by RULE-IMPL-NO-HARDCODED-STRING-001 backfill.
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+    packageOfResClass = "kpt.feature.home.generated.resources"
 }

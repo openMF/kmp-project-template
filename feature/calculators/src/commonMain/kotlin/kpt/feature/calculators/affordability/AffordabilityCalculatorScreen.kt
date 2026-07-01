@@ -40,6 +40,17 @@ import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
+import kpt.feature.calculators.generated.resources.Res
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_back_cd
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_dti_label
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_income_label
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_max_emi_label
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_max_principal_label
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_obligations_label
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_rate_label
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_tenure_label
+import kpt.feature.calculators.generated.resources.screens_calc_affordability_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,10 +67,13 @@ fun AffordabilityCalculatorScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Affordability") },
+                title = { Text(stringResource(Res.string.screens_calc_affordability_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_calc_affordability_back_cd),
+                        )
                     }
                 },
             )
@@ -90,7 +104,7 @@ fun AffordabilityCalculatorScreen(
                                 viewModel.trySendAction(AffordabilityAction.UpdateIncome(v))
                             }
                         },
-                        label = { Text("Monthly Income") },
+                        label = { Text(stringResource(Res.string.screens_calc_affordability_income_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -101,7 +115,7 @@ fun AffordabilityCalculatorScreen(
                                 viewModel.trySendAction(AffordabilityAction.UpdateObligations(v))
                             }
                         },
-                        label = { Text("Existing Monthly Debt") },
+                        label = { Text(stringResource(Res.string.screens_calc_affordability_obligations_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -112,7 +126,7 @@ fun AffordabilityCalculatorScreen(
                                 viewModel.trySendAction(AffordabilityAction.UpdateDti(v / 100.0))
                             }
                         },
-                        label = { Text("DTI Ceiling (%)") },
+                        label = { Text(stringResource(Res.string.screens_calc_affordability_dti_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -123,7 +137,7 @@ fun AffordabilityCalculatorScreen(
                                 viewModel.trySendAction(AffordabilityAction.UpdateRate(v))
                             }
                         },
-                        label = { Text("Annual Rate (%)") },
+                        label = { Text(stringResource(Res.string.screens_calc_affordability_rate_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -134,7 +148,7 @@ fun AffordabilityCalculatorScreen(
                                 viewModel.trySendAction(AffordabilityAction.UpdateTenure(v))
                             }
                         },
-                        label = { Text("Tenure (months)") },
+                        label = { Text(stringResource(Res.string.screens_calc_affordability_tenure_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -144,14 +158,17 @@ fun AffordabilityCalculatorScreen(
             HeroCard {
                 AmountDisplay(
                     amountText = result.maxPrincipal.formatGrouped(2),
-                    label = "Max loan principal",
+                    label = stringResource(Res.string.screens_calc_affordability_max_principal_label),
                     supporting = {
                         Column(verticalArrangement = Arrangement.spacedBy(sp.xs)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
-                                Text("Max EMI", style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    text = stringResource(Res.string.screens_calc_affordability_max_emi_label),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
                                 Text(
                                     result.maxEmi.formatGrouped(2),
                                     style = MaterialTheme.typography.bodyMedium,

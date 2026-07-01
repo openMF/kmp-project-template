@@ -50,6 +50,12 @@ import kpt.core.designsystem.component.RateDirection
 import kpt.core.designsystem.theme.finance
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.economic.InterestRateSeries
+import kpt.feature.rates.generated.resources.Res
+import kpt.feature.rates.generated.resources.screens_rates_back_cd
+import kpt.feature.rates.generated.resources.screens_rates_list_title
+import kpt.feature.rates.generated.resources.screens_rates_refresh_all_cd
+import kpt.feature.rates.generated.resources.screens_rates_value_with_unit
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -77,7 +83,7 @@ internal fun InterestRatesScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Interest Rates")
+                        Text(stringResource(Res.string.screens_rates_list_title))
                         FreshnessIndicator(
                             signal = aggregateFreshness,
                             onRefresh = { viewModel.trySendAction(RatesAction.RefreshAll) },
@@ -89,7 +95,7 @@ internal fun InterestRatesScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.screens_rates_back_cd),
                         )
                     }
                 },
@@ -99,7 +105,7 @@ internal fun InterestRatesScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh all",
+                            contentDescription = stringResource(Res.string.screens_rates_refresh_all_cd),
                         )
                     }
                 },
@@ -201,7 +207,11 @@ private fun RateRowContent(
                 horizontalArrangement = Arrangement.spacedBy(sp.sm),
             ) {
                 Text(
-                    text = "${series.current.formatDecimal(2)}${series.unit}",
+                    text = stringResource(
+                        Res.string.screens_rates_value_with_unit,
+                        series.current.formatDecimal(2),
+                        series.unit,
+                    ),
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 delta?.let {

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- ============================================================
+         RULE-IMPL-NO-HARDCODED-STRING-001 — feature/rates i18n surface
+         Naming convention: screens_rates_<screen>_<role>
+         Authored by W2-6 of plan-layer/active/store5-superbrain-v2/.
+         ============================================================ -->
+
+    <!-- ===== Shared ===== -->
+    <string name="screens_rates_back_cd">Back</string>
+
+    <!-- ===== InterestRatesScreen ===== -->
+    <string name="screens_rates_list_title">Interest Rates</string>
+    <string name="screens_rates_refresh_all_cd">Refresh all</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+
+    <!-- ===== InterestRateDetailScreen ===== -->
+    <string name="screens_rates_detail_refresh_cd">Refresh</string>
+    <string name="screens_rates_detail_current_label">Current</string>
+    <string name="screens_rates_detail_source_label">Source: %1$s</string>
+    <string name="screens_rates_detail_observations_label">Observations</string>
+</resources>

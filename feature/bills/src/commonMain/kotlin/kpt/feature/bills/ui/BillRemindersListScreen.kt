@@ -56,6 +56,17 @@ import kpt.core.designsystem.component.UrgencyDot
 import kpt.core.designsystem.theme.finance
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.BillReminder
+import kpt.feature.bills.generated.resources.Res
+import kpt.feature.bills.generated.resources.screens_bills_list_back_cd
+import kpt.feature.bills.generated.resources.screens_bills_list_mark_paid_cd
+import kpt.feature.bills.generated.resources.screens_bills_list_new_fab_text
+import kpt.feature.bills.generated.resources.screens_bills_list_paid_button
+import kpt.feature.bills.generated.resources.screens_bills_list_reminders_disabled
+import kpt.feature.bills.generated.resources.screens_bills_list_summary_due_plural
+import kpt.feature.bills.generated.resources.screens_bills_list_summary_due_single
+import kpt.feature.bills.generated.resources.screens_bills_list_summary_label
+import kpt.feature.bills.generated.resources.screens_bills_list_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.Clock
 
@@ -77,7 +88,7 @@ fun BillRemindersListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Bill Reminders",
+                        text = stringResource(Res.string.screens_bills_list_title),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold,
                         ),
@@ -85,7 +96,10 @@ fun BillRemindersListScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_bills_list_back_cd),
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -97,7 +111,7 @@ fun BillRemindersListScreen(
             ExtendedFloatingActionButton(
                 onClick = onAddBillClick,
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("New bill") },
+                text = { Text(stringResource(Res.string.screens_bills_list_new_fab_text)) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             )
@@ -146,10 +160,14 @@ private fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
     HeroCard {
         AmountDisplay(
             amountText = formatCurrency(totalAmount),
-            label = "Upcoming this month",
+            label = stringResource(Res.string.screens_bills_list_summary_label),
             supporting = {
                 Text(
-                    text = "$upcomingCount bill${if (upcomingCount == 1) "" else "s"} due in next 7 days",
+                    text = if (upcomingCount == 1) {
+                        stringResource(Res.string.screens_bills_list_summary_due_single, upcomingCount)
+                    } else {
+                        stringResource(Res.string.screens_bills_list_summary_due_plural, upcomingCount)
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -231,17 +249,20 @@ private fun BillReminderRow(
             ) {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = "Mark paid",
+                    contentDescription = stringResource(Res.string.screens_bills_list_mark_paid_cd),
                     modifier = Modifier.padding(end = 4.dp),
                 )
-                Text("Paid", fontWeight = FontWeight.Medium)
+                Text(
+                    text = stringResource(Res.string.screens_bills_list_paid_button),
+                    fontWeight = FontWeight.Medium,
+                )
             }
         }
 
         if (!bill.enabled) {
             Spacer(Modifier.height(sp.xs))
             Text(
-                text = "Reminders disabled",
+                text = stringResource(Res.string.screens_bills_list_reminders_disabled),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.outline,
             )

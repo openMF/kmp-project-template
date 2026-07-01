@@ -46,6 +46,27 @@ import kpt.core.base.store.submit.SubmitState
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.BillCategory
 import kpt.core.model.banking.Recurrence
+import kpt.feature.bills.generated.resources.Res
+import kpt.feature.bills.generated.resources.screens_bills_add_title
+import kpt.feature.bills.generated.resources.screens_bills_addedit_amount_label
+import kpt.feature.bills.generated.resources.screens_bills_addedit_back_cd
+import kpt.feature.bills.generated.resources.screens_bills_addedit_category_title
+import kpt.feature.bills.generated.resources.screens_bills_addedit_dismiss_button
+import kpt.feature.bills.generated.resources.screens_bills_addedit_due_day_label
+import kpt.feature.bills.generated.resources.screens_bills_addedit_enabled_label
+import kpt.feature.bills.generated.resources.screens_bills_addedit_name_label
+import kpt.feature.bills.generated.resources.screens_bills_addedit_recurrence_title
+import kpt.feature.bills.generated.resources.screens_bills_addedit_remind_days_before_label
+import kpt.feature.bills.generated.resources.screens_bills_addedit_retry_button
+import kpt.feature.bills.generated.resources.screens_bills_addedit_save_button
+import kpt.feature.bills.generated.resources.screens_bills_addedit_status_add_another
+import kpt.feature.bills.generated.resources.screens_bills_addedit_status_failed
+import kpt.feature.bills.generated.resources.screens_bills_addedit_status_failed_unknown
+import kpt.feature.bills.generated.resources.screens_bills_addedit_status_offline
+import kpt.feature.bills.generated.resources.screens_bills_addedit_status_saved
+import kpt.feature.bills.generated.resources.screens_bills_addedit_status_saving
+import kpt.feature.bills.generated.resources.screens_bills_edit_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -71,7 +92,9 @@ fun AddOrEditBillReminderScreen(
     val form by viewModel.formState.collectAsStateWithLifecycle()
     val ui by viewModel.uiState.collectAsStateWithLifecycle()
     val submit = ui.submit
-    val title = if (billId == null) "New bill reminder" else "Edit bill reminder"
+    val title = stringResource(
+        if (billId == null) Res.string.screens_bills_add_title else Res.string.screens_bills_edit_title,
+    )
 
     Scaffold(
         modifier = modifier,
@@ -80,7 +103,10 @@ fun AddOrEditBillReminderScreen(
                 title = { Text(title) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_bills_addedit_back_cd),
+                        )
                     }
                 },
             )
@@ -136,7 +162,7 @@ fun AddOrEditBillReminderScreen(
                 if (submit is SubmitState.Submitting) {
                     CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
                 }
-                Text("Save")
+                Text(stringResource(Res.string.screens_bills_addedit_save_button))
             }
 
             SubmitStatusLine(
@@ -157,7 +183,7 @@ private fun SubmitStatusLine(
     when (submit) {
         is SubmitState.Idle -> Unit
         is SubmitState.Submitting -> Text(
-            "Saving…",
+            text = stringResource(Res.string.screens_bills_addedit_status_saving),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -168,28 +194,38 @@ private fun SubmitStatusLine(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Saved ✓",
+                    text = stringResource(Res.string.screens_bills_addedit_status_saved),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
-                Button(onClick = onDismiss) { Text("Add another") }
+                Button(onClick = onDismiss) {
+                    Text(stringResource(Res.string.screens_bills_addedit_status_add_another))
+                }
             }
         }
         is SubmitState.Failed -> {
             val isOffline = submit.draftSaved
+            val unknown = stringResource(Res.string.screens_bills_addedit_status_failed_unknown)
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = if (isOffline) {
-                        "Saved offline — will sync when online."
+                        stringResource(Res.string.screens_bills_addedit_status_offline)
                     } else {
-                        "Save failed: ${submit.error.message ?: "unknown error"}"
+                        stringResource(
+                            Res.string.screens_bills_addedit_status_failed,
+                            submit.error.message ?: unknown,
+                        )
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = onRetry) { Text("Retry") }
-                    Button(onClick = onDismiss) { Text("Dismiss") }
+                    Button(onClick = onRetry) {
+                        Text(stringResource(Res.string.screens_bills_addedit_retry_button))
+                    }
+                    Button(onClick = onDismiss) {
+                        Text(stringResource(Res.string.screens_bills_addedit_dismiss_button))
+                    }
                 }
             }
         }
@@ -215,7 +251,7 @@ private fun BasicInfoSection(
             OutlinedTextField(
                 value = form.name,
                 onValueChange = onNameChange,
-                label = { Text("Name (e.g. Electricity)") },
+                label = { Text(stringResource(Res.string.screens_bills_addedit_name_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isSubmitting,
@@ -223,7 +259,7 @@ private fun BasicInfoSection(
             OutlinedTextField(
                 value = if (form.amount == 0.0) "" else form.amount.toString(),
                 onValueChange = { value -> onAmountChange(value.toDoubleOrNull() ?: 0.0) },
-                label = { Text("Amount") },
+                label = { Text(stringResource(Res.string.screens_bills_addedit_amount_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isSubmitting,
@@ -231,7 +267,7 @@ private fun BasicInfoSection(
             OutlinedTextField(
                 value = form.dueDay.toString(),
                 onValueChange = { value -> onDueDayChange(value.toIntOrNull() ?: 1) },
-                label = { Text("Due day of month (1-31)") },
+                label = { Text(stringResource(Res.string.screens_bills_addedit_due_day_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isSubmitting,
@@ -254,7 +290,10 @@ private fun RecurrenceSection(
                 .padding(sp.md),
             verticalArrangement = Arrangement.spacedBy(sp.sm),
         ) {
-            Text("Recurrence", style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = stringResource(Res.string.screens_bills_addedit_recurrence_title),
+                style = MaterialTheme.typography.titleSmall,
+            )
             Recurrence.entries.forEach { rec ->
                 Row(
                     modifier = Modifier
@@ -294,7 +333,10 @@ private fun CategorySection(
                 .padding(sp.md),
             verticalArrangement = Arrangement.spacedBy(sp.sm),
         ) {
-            Text("Category", style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = stringResource(Res.string.screens_bills_addedit_category_title),
+                style = MaterialTheme.typography.titleSmall,
+            )
             androidx.compose.foundation.layout.FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(sp.sm),
@@ -337,7 +379,7 @@ private fun ReminderSettingsSection(
             OutlinedTextField(
                 value = reminderDaysBefore.toString(),
                 onValueChange = { value -> onReminderDaysBeforeChange(value.toIntOrNull() ?: 1) },
-                label = { Text("Remind days before") },
+                label = { Text(stringResource(Res.string.screens_bills_addedit_remind_days_before_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isSubmitting,
@@ -347,7 +389,10 @@ private fun ReminderSettingsSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Enabled", style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = stringResource(Res.string.screens_bills_addedit_enabled_label),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
                 Switch(
                     checked = enabled,
                     onCheckedChange = onEnabledChange,

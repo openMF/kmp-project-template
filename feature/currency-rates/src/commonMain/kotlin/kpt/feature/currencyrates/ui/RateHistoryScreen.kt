@@ -48,6 +48,15 @@ import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
 import kpt.core.common.formatTimeAgo
 import kpt.core.designsystem.theme.spacing
+import kpt.feature.currencyrates.generated.resources.Res
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_history_back_cd
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_history_currency_label
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_history_period_days
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_history_period_label
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_history_title
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_history_to_label
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_history_usd_label
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -74,7 +83,7 @@ fun RateHistoryScreen(
                     androidx.compose.foundation.layout.Row(
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                     ) {
-                        Text("Rate History")
+                        Text(stringResource(Res.string.screens_currencyrates_history_title))
                         FreshnessIndicator(
                             signal = freshness,
                             onRefresh = viewModel::onRetry,
@@ -83,7 +92,10 @@ fun RateHistoryScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_currencyrates_history_back_cd),
+                        )
                     }
                 },
             )
@@ -116,37 +128,18 @@ fun RateHistoryScreen(
                         .padding(horizontal = sp.lg),
                     verticalArrangement = Arrangement.spacedBy(sp.sm),
                 ) {
-                    AppCard(modifier = Modifier.padding(top = sp.sm)) {
-                        Column(
-                            modifier = Modifier.padding(sp.md),
-                            verticalArrangement = Arrangement.spacedBy(sp.sm),
-                        ) {
-                            Text("Currency", style = MaterialTheme.typography.labelMedium)
-                            FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
-                                currencies.forEach { code ->
-                                    FilterChip(
-                                        selected = localState.targetCurrency == code,
-                                        onClick = {
-                                            viewModel.trySendAction(HistoryAction.SelectCurrency(code))
-                                        },
-                                        label = { Text(code) },
-                                    )
-                                }
-                            }
-                            Text("Period", style = MaterialTheme.typography.labelMedium)
-                            FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
-                                periods.forEach { days ->
-                                    FilterChip(
-                                        selected = localState.periodDays == days,
-                                        onClick = {
-                                            viewModel.trySendAction(HistoryAction.SelectPeriod(days))
-                                        },
-                                        label = { Text("${days}d") },
-                                    )
-                                }
-                            }
-                        }
-                    }
+                    RateHistoryControls(
+                        currencies = currencies,
+                        periods = periods,
+                        selectedCurrency = localState.targetCurrency,
+                        selectedPeriod = localState.periodDays,
+                        onSelectCurrency = {
+                            viewModel.trySendAction(HistoryAction.SelectCurrency(it))
+                        },
+                        onSelectPeriod = {
+                            viewModel.trySendAction(HistoryAction.SelectPeriod(it))
+                        },
+                    )
 
                     // Header \u2014 "USD \u2192 $to ($startDate to $endDate)" rendered with a
                     // Material Icon for the arrow. Outfit (the project's bundled font)
@@ -157,7 +150,7 @@ fun RateHistoryScreen(
                         horizontalArrangement = Arrangement.spacedBy(sp.xs),
                     ) {
                         Text(
-                            text = "USD",
+                            text = stringResource(Res.string.screens_currencyrates_history_usd_label),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -168,7 +161,12 @@ fun RateHistoryScreen(
                             modifier = Modifier.size(12.dp),
                         )
                         Text(
-                            text = "${history.to} (${history.startDate} to ${history.endDate})",
+                            text = stringResource(
+                                Res.string.screens_currencyrates_history_to_label,
+                                history.to,
+                                history.startDate.toString(),
+                                history.endDate.toString(),
+                            ),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -233,5 +231,57 @@ private fun OfflineDataBanner(
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onErrorContainer,
         )
+    }
+}
+
+@Composable
+private fun RateHistoryControls(
+    currencies: List<String>,
+    periods: List<Int>,
+    selectedCurrency: String,
+    selectedPeriod: Int,
+    onSelectCurrency: (String) -> Unit,
+    onSelectPeriod: (Int) -> Unit,
+) {
+    val sp = MaterialTheme.spacing
+    AppCard(modifier = Modifier.padding(top = sp.sm)) {
+        Column(
+            modifier = Modifier.padding(sp.md),
+            verticalArrangement = Arrangement.spacedBy(sp.sm),
+        ) {
+            Text(
+                stringResource(Res.string.screens_currencyrates_history_currency_label),
+                style = MaterialTheme.typography.labelMedium,
+            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
+                currencies.forEach { code ->
+                    FilterChip(
+                        selected = selectedCurrency == code,
+                        onClick = { onSelectCurrency(code) },
+                        label = { Text(code) },
+                    )
+                }
+            }
+            Text(
+                stringResource(Res.string.screens_currencyrates_history_period_label),
+                style = MaterialTheme.typography.labelMedium,
+            )
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
+                periods.forEach { days ->
+                    FilterChip(
+                        selected = selectedPeriod == days,
+                        onClick = { onSelectPeriod(days) },
+                        label = {
+                            Text(
+                                stringResource(
+                                    Res.string.screens_currencyrates_history_period_days,
+                                    days,
+                                ),
+                            )
+                        },
+                    )
+                }
+            }
+        }
     }
 }

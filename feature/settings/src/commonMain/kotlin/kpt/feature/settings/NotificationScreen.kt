@@ -24,6 +24,10 @@ import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
+import kpt.feature.settings.generated.resources.Res
+import kpt.feature.settings.generated.resources.feature_settings_notifications_empty_message
+import kpt.feature.settings.generated.resources.feature_settings_notifications_empty_title
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun NotificationScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
@@ -60,12 +64,12 @@ internal fun NotificationScreenContent(modifier: Modifier = Modifier, onBackClic
                         modifier = Modifier.padding(sp.sm),
                     )
                     Text(
-                        text = "No notifications yet",
+                        text = stringResource(Res.string.feature_settings_notifications_empty_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = "You'll see bill reminders and rate alerts here.",
+                        text = stringResource(Res.string.feature_settings_notifications_empty_message),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

@@ -26,6 +26,10 @@ import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
+import kpt.feature.profile.generated.resources.Res
+import kpt.feature.profile.generated.resources.screens_profile_local_message
+import kpt.feature.profile.generated.resources.screens_profile_local_title
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun ProfileScreen(modifier: Modifier = Modifier) {
@@ -57,12 +61,12 @@ internal fun ProfileScreenContent(modifier: Modifier = Modifier) {
                         modifier = Modifier.size(64.dp),
                     )
                     Text(
-                        text = "Local profile",
+                        text = stringResource(Res.string.screens_profile_local_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = "Money Toolkit runs entirely on-device. No account required.",
+                        text = stringResource(Res.string.screens_profile_local_message),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

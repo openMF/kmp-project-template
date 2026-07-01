@@ -40,6 +40,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.model.banking.AmortizationRow
+import kpt.feature.amortization.generated.resources.Res
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_back_cd
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_header_balance
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_header_interest
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_header_month
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_header_principal
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_summary_title
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_summary_total_interest
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_summary_total_payments
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_summary_total_principal
+import kpt.feature.amortization.generated.resources.screens_amortization_schedule_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.math.roundToLong
@@ -58,10 +70,13 @@ fun AmortizationScheduleScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Payment Schedule") },
+                title = { Text(stringResource(Res.string.screens_amortization_schedule_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_amortization_schedule_back_cd),
+                        )
                     }
                 },
             )
@@ -109,10 +124,10 @@ private fun ScheduleTableHeader(modifier: Modifier = Modifier) {
             .padding(horizontal = 12.dp, vertical = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        HeaderCell(text = "#", weight = 0.6f)
-        HeaderCell(text = "Principal", weight = 1.3f)
-        HeaderCell(text = "Interest", weight = 1.3f)
-        HeaderCell(text = "Balance", weight = 1.3f)
+        HeaderCell(text = stringResource(Res.string.screens_amortization_schedule_header_month), weight = 0.6f)
+        HeaderCell(text = stringResource(Res.string.screens_amortization_schedule_header_principal), weight = 1.3f)
+        HeaderCell(text = stringResource(Res.string.screens_amortization_schedule_header_interest), weight = 1.3f)
+        HeaderCell(text = stringResource(Res.string.screens_amortization_schedule_header_balance), weight = 1.3f)
     }
 }
 
@@ -163,15 +178,21 @@ private fun ScheduleTotalRow(
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
-            text = "Summary",
+            text = stringResource(Res.string.screens_amortization_schedule_summary_title),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        SummaryLine(label = "Total payments", value = formatMoney(totalPayment))
-        SummaryLine(label = "Total principal", value = formatMoney(totalPrincipal))
         SummaryLine(
-            label = "Total interest",
+            label = stringResource(Res.string.screens_amortization_schedule_summary_total_payments),
+            value = formatMoney(totalPayment),
+        )
+        SummaryLine(
+            label = stringResource(Res.string.screens_amortization_schedule_summary_total_principal),
+            value = formatMoney(totalPrincipal),
+        )
+        SummaryLine(
+            label = stringResource(Res.string.screens_amortization_schedule_summary_total_interest),
             value = formatMoney(totalInterest),
             valueColor = MaterialTheme.colorScheme.error,
         )

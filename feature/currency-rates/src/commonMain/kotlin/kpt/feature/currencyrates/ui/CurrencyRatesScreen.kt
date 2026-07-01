@@ -40,6 +40,12 @@ import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
 import kpt.core.designsystem.theme.spacing
+import kpt.feature.currencyrates.generated.resources.Res
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_list_back_cd
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_list_base_label
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_list_search_placeholder
+import kpt.feature.currencyrates.generated.resources.screens_currencyrates_list_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +65,7 @@ fun CurrencyRatesScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Currency Rates")
+                        Text(stringResource(Res.string.screens_currencyrates_list_title))
                         FreshnessIndicator(
                             signal = freshness,
                             onRefresh = viewModel::onRetry,
@@ -69,7 +75,10 @@ fun CurrencyRatesScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_currencyrates_list_back_cd),
+                        )
                     }
                 },
             )
@@ -95,12 +104,18 @@ fun CurrencyRatesScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(sp.sm),
-                            placeholder = { Text("Search currency...") },
+                            placeholder = {
+                                Text(stringResource(Res.string.screens_currencyrates_list_search_placeholder))
+                            },
                             singleLine = true,
                         )
                     }
                     Text(
-                        text = "Base: ${data.base} \u2022 ${data.date}",
+                        text = stringResource(
+                            Res.string.screens_currencyrates_list_base_label,
+                            data.base,
+                            data.date.toString(),
+                        ),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = sp.xs),

@@ -46,6 +46,19 @@ import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.Loan
+import kpt.feature.loans.generated.resources.Res
+import kpt.feature.loans.generated.resources.screens_loans_list_active_count_plural
+import kpt.feature.loans.generated.resources.screens_loans_list_active_count_single
+import kpt.feature.loans.generated.resources.screens_loans_list_back_cd
+import kpt.feature.loans.generated.resources.screens_loans_list_delete_cancel
+import kpt.feature.loans.generated.resources.screens_loans_list_delete_confirm
+import kpt.feature.loans.generated.resources.screens_loans_list_delete_dialog_message
+import kpt.feature.loans.generated.resources.screens_loans_list_delete_dialog_title
+import kpt.feature.loans.generated.resources.screens_loans_list_monthly_emi_label
+import kpt.feature.loans.generated.resources.screens_loans_list_new_fab_text
+import kpt.feature.loans.generated.resources.screens_loans_list_title
+import kpt.feature.loans.generated.resources.screens_loans_list_total_outstanding_label
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +80,7 @@ fun PersonalLoansListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Personal Loans",
+                        stringResource(Res.string.screens_loans_list_title),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold,
                         ),
@@ -75,7 +88,10 @@ fun PersonalLoansListScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_loans_list_back_cd),
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -87,7 +103,7 @@ fun PersonalLoansListScreen(
             ExtendedFloatingActionButton(
                 onClick = onAddLoanClick,
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("New loan") },
+                text = { Text(stringResource(Res.string.screens_loans_list_new_fab_text)) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             )
@@ -125,16 +141,25 @@ fun PersonalLoansListScreen(
     pendingDelete?.let { target ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text("Delete loan?") },
-            text = { Text("'${target.name}' will be removed. This cannot be undone.") },
+            title = { Text(stringResource(Res.string.screens_loans_list_delete_dialog_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        Res.string.screens_loans_list_delete_dialog_message,
+                        target.name,
+                    ),
+                )
+            },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.onDeleteLoan(target.id)
                     pendingDelete = null
-                }) { Text("Delete") }
+                }) { Text(stringResource(Res.string.screens_loans_list_delete_confirm)) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { pendingDelete = null }) {
+                    Text(stringResource(Res.string.screens_loans_list_delete_cancel))
+                }
             },
         )
     }
@@ -146,10 +171,17 @@ private fun SummaryHero(ui: LoansListUiState) {
         Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)) {
             AmountDisplay(
                 amountText = formatMoney(ui.totalPrincipalRemaining),
-                label = "Total outstanding",
+                label = stringResource(Res.string.screens_loans_list_total_outstanding_label),
                 supporting = {
                     Text(
-                        text = "${ui.loans.size} active loan${if (ui.loans.size == 1) "" else "s"}",
+                        text = stringResource(
+                            if (ui.loans.size == 1) {
+                                Res.string.screens_loans_list_active_count_single
+                            } else {
+                                Res.string.screens_loans_list_active_count_plural
+                            },
+                            ui.loans.size,
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 },
@@ -161,7 +193,7 @@ private fun SummaryHero(ui: LoansListUiState) {
             ) {
                 Column {
                     Text(
-                        text = "Monthly EMI",
+                        text = stringResource(Res.string.screens_loans_list_monthly_emi_label),
                         style = MaterialTheme.typography.labelMedium,
                     )
                     Text(

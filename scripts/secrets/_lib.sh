@@ -114,14 +114,16 @@ secrets_platform_inputs() {
 # (mirrors deployment/_shared/config.rb's `_secret("VAR", "<path>")` second arg).
 # Lets the wizard persist a value locally instead of an ephemeral export.
 secrets_env_local_file() {
+  # Paths under secrets/live/ — the resolver root (secrets/LAYOUT.yaml roots.live);
+  # keeps Path-B (vault) materialization aligned with what build-secrets reads.
   case "$1" in
-    MATCH_PASSWORD)         echo "secrets/apple/match/.match_password" ;;
-    KEYCHAIN_PASSWORD)      echo "secrets/apple/match/keychain_password" ;;
-    CERTIFICATES_PASSWORD)  echo "secrets/apple/match/certificates_password" ;;
-    KEYSTORE_PASSWORD)      echo "secrets/android/keystores/keystore_password" ;;
-    KEYSTORE_ALIAS)         echo "secrets/android/keystores/keystore_alias" ;;
-    KEYSTORE_ALIAS_PASSWORD)echo "secrets/android/keystores/keystore_alias_password" ;;
-    *)                      echo "secrets/_env/$1" ;;
+    MATCH_PASSWORD)         echo "secrets/live/apple/match/.match_password" ;;
+    KEYCHAIN_PASSWORD)      echo "secrets/live/apple/match/keychain_password" ;;
+    CERTIFICATES_PASSWORD)  echo "secrets/live/apple/match/certificates_password" ;;
+    KEYSTORE_PASSWORD)      echo "secrets/live/android/keystores/keystore_password" ;;
+    KEYSTORE_ALIAS)         echo "secrets/live/android/keystores/keystore_alias" ;;
+    KEYSTORE_ALIAS_PASSWORD)echo "secrets/live/android/keystores/keystore_alias_password" ;;
+    *)                      echo "secrets/live/_env/$1" ;;
   esac
 }
 

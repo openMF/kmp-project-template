@@ -26,14 +26,14 @@ Used for: TestFlight uploads, App Store submissions, Match certificate managemen
 
 ```bash
 # Copy placeholder structure
-cp secrets_demo/appstore/AuthKey.p8   secrets/apple/appstore/AuthKey.p8
-cp secrets_demo/appstore/key_id       secrets/apple/appstore/key_id
-cp secrets_demo/appstore/issuer_id    secrets/apple/appstore/issuer_id
+cp secrets/sample/apple/appstore/AuthKey.p8   secrets/live/apple/appstore/AuthKey.p8
+cp secrets/sample/apple/appstore/key_id       secrets/live/apple/appstore/key_id
+cp secrets/sample/apple/appstore/issuer_id    secrets/live/apple/appstore/issuer_id
 
 # Then replace contents with real values
-nano secrets/apple/appstore/key_id       # paste your 10-char Key ID
-nano secrets/apple/appstore/issuer_id    # paste your UUID Issuer ID
-cp ~/Downloads/AuthKey_*.p8 secrets/apple/appstore/AuthKey.p8
+nano secrets/live/apple/appstore/key_id       # paste your 10-char Key ID
+nano secrets/live/apple/appstore/issuer_id    # paste your UUID Issuer ID
+cp ~/Downloads/AuthKey_*.p8 secrets/live/apple/appstore/AuthKey.p8
 
 # Sync to GitHub
 bash scripts/secrets/sync-secrets-to-github.sh --only ios

@@ -7,7 +7,7 @@
 # Secrets: read from secrets/ filesystem first, ENV fallback for CI.
 #
 # Usage:
-#   Local/manual  → cp secrets_demo/* secrets/, fill values, run fastlane
+#   Local/manual  → cp secrets/sample/* secrets/live/, fill values, run fastlane
 #   GitHub Actions → secrets injected as ENV vars by workflow-snippet.yml
 #   Framework     → /secrets pull materializes vault to secrets/, run fastlane
 
@@ -742,7 +742,11 @@ end
 # gradlew at root, not inside cmp-android/ — incompatible with gradle() action's
 # project_dir expectation.
 def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
-  keystore = signing_config[:keystore_path] || "secrets/android/keystores/upload_keystore.keystore"
+  # DRIFT FIX: was hardcoded "secrets/android/keystores/upload_keystore.keystore"
+  # (flat pre-restructure path — broke after secrets/{live,sample} split). CI passes
+  # keystore_path from `build-secrets path upload_keystore`; the local-run fallback
+  # must resolve through the SAME LAYOUT resolver (live-wins-else-sample), never hardcode.
+  keystore = signing_config[:keystore_path] || BuildSecrets.for.path(:upload_keystore)
   keystore_abs = File.expand_path(File.join(DEPLOYMENT_REPO_ROOT, keystore))
   gradlew    = File.join(DEPLOYMENT_REPO_ROOT, "gradlew")
   full_task  = ":cmp-android:#{taskName}#{buildType}"

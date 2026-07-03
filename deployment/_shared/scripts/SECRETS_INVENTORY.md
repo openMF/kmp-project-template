@@ -14,8 +14,8 @@ work unchanged once `/secrets pull` lands them.
 
 | gha_secret_var (GH Secret name) | Alias (SECRETS_ALIAS_REGISTRY.yaml) | materialize.at | Owning capability | Legacy? |
 |---|---|---|---|:-:|
-| FIREBASECREDS | firebase_service_account_json | secrets/android/firebase/service-account.json | firebase-app-distribute | ✅ |
-| PLAYSTORECREDS | play_publisher_service_account_json | secrets/android/play/service-account.json | android-play-internal-publish | ✅ |
+| FIREBASECREDS | firebase_service_account_json | secrets/live/android/firebase/firebaseAppDistributionServiceCredentialsFile.json | firebase-app-distribute | ✅ |
+| PLAYSTORECREDS | play_publisher_service_account_json | secrets/live/android/play/playStorePublishServiceCredentialsFile.json | android-play-internal-publish | ✅ |
 | APPSTORE_KEY_ID | appstore_key_id | secrets/apple/appstore/key_id | ios-app-store | ✅ |
 | APPSTORE_ISSUER_ID | appstore_key_issuer_id | secrets/apple/appstore/issuer_id | ios-app-store | ✅ |
 | APPSTORE_PRIVATE_KEY_P8 | appstore_private_key_p8 | secrets/apple/appstore/AuthKey.p8 | ios-app-store | ✅ |

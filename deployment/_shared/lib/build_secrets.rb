@@ -118,8 +118,32 @@ module BuildSecrets
     end
 
     # Materialize every secret whose source is present (used by `materialize-all`).
+    # `map{}.compact` (not `filter_map`) so this runs on macOS system Ruby 2.6 — the
+    # local `/secrets pull` delegates here, and filter_map is Ruby 2.7+.
     def materialize_all!
-      @doc.fetch("secrets").keys.filter_map { |k| materialize!(k) }
+      @doc.fetch("secrets").keys.map { |k| materialize!(k) }.compact
+    end
+
+    # Emit the vault-materialization plan: one row per LAYOUT secret carrying a
+    # `vault_alias`, as `vault_alias<TAB>source_env<TAB>b64` where b64=1 for `file`
+    # kinds (feed base64 → decode_file reproduces exact bytes incl. PEM trailing
+    # newline) and 0 for value/env_var (fed raw). `literal` secrets have no vault
+    # source so they never appear. `by_flavor` secrets emit one row per flavor
+    # override (each carries its own source_env + vault_alias). This is the ONLY
+    # place the framework's `/secrets pull` needs to consult to know what to decrypt
+    # and how to hand it back — build_secrets.rb stays the LAYOUT's single SoT.
+    def vault_plan
+      @doc.fetch("secrets").flat_map do |_key, s|
+        kind = s["kind"] || "value"
+        b64  = kind == "file" ? 1 : 0
+        if (fl = s["by_flavor"])
+          fl.values.map { |fv| fv["vault_alias"] && [fv["vault_alias"], fv["source_env"] || s["source_env"], b64] }.compact
+        elsif (va = s["vault_alias"])
+          [[va, s["source_env"], b64]]
+        else
+          []
+        end
+      end
     end
 
     private
@@ -180,8 +204,10 @@ if __FILE__ == $PROGRAM_NAME
     warn(dest ? "✓ materialized #{key} → #{dest}" : "· skip #{key} (source empty)")
   when "materialize-all"
     acc.materialize_all!.each { |d| warn "✓ #{d}" }
+  when "vault-plan"
+    acc.vault_plan.each { |a, e, b| puts "#{a}\t#{e}\t#{b}" }
   else
-    abort "usage: build-secrets {path|value|application-id|exists|materialize|materialize-all} " \
+    abort "usage: build-secrets {path|value|application-id|exists|materialize|materialize-all|vault-plan} " \
           "[key] [--flavor f] [--variant v] [--from-env VAR]"
   end
 end

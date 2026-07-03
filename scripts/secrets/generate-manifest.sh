@@ -38,9 +38,14 @@ HDR
     [ -n "$alias" ] || continue
     echo "  - alias: $alias"
     echo "    platforms: [${plats//,/, }]"
+    # materialize.at lands under secrets/live/ — the resolver root (secrets/LAYOUT.yaml
+    # roots.live) — so a Path-B (vault) pull writes where build-secrets reads. env: paths
+    # already resolve to secrets/live/ via secrets_env_local_file; file paths get the prefix here.
     case "$canon" in
-      env:*) echo "    materialize: { at: \"$(secrets_env_local_file "${canon#env:}")\", mode: env-line, env_var: ${canon#env:} }" ;;
-      *)     echo "    materialize: { at: \"$canon\", mode: file, permissions: \"0600\" }" ;;
+      env:*) at="$(secrets_env_local_file "${canon#env:}")"
+             echo "    materialize: { at: \"$at\", mode: env-line, env_var: ${canon#env:} }" ;;
+      *)     at="${canon/secrets\//secrets/live/}"
+             echo "    materialize: { at: \"$at\", mode: file, permissions: \"0600\" }" ;;
     esac
   done < <(secrets_all_vault_aliases)
 }

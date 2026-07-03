@@ -164,17 +164,18 @@ cp -n gradle/fork.properties.template gradle/fork.properties
 # Edit gradle/fork.properties and set at minimum:
 #   apple.team.id, org.email, org.first.name, org.last.name, etc.
 
-# 2. Drop secret values as per-value files under secrets/<platform>/
-#    (see secrets_demo/ for the exact paths and placeholders)
-#    e.g. secrets/apple/appstore/key_id, secrets/apple/match/.match_password
+# 2. Drop secret values as per-value files under secrets/live/<platform>/
+#    (see secrets/sample/ for the exact paths and placeholders)
+#    e.g. secrets/live/apple/appstore/key_id, secrets/live/apple/match/.match_password
 ```
 
-`secrets/` is gitignored; `gradle/fork.properties.template` is committed and shows which
-keys to fill in. `secrets_demo/` is committed and carries placeholder files with magic
+`secrets/live/` is gitignored; `gradle/fork.properties.template` is committed and shows which
+keys to fill in. `secrets/sample/` is committed and carries placeholder files with magic
 markers (`# CLAUDE-PLACEHOLDER` for text, `CLAUDE-PLHLD-v1\0` for binary) so it's
 unambiguous which tree is safe to commit.
 
-`config.rb` resolves values in the order `ENV → secrets/<platform>/file → fork.properties → default`,
+`build-secrets` resolves paths from `secrets/LAYOUT.yaml` (live-wins-else-sample) in the
+order `ENV → secrets/live/<platform>/file → fork.properties → default`,
 so there is no `source shared_keys.env` step.
 
 ### Path B (vault mode — framework maintainers)
@@ -182,14 +183,14 @@ so there is no `source shared_keys.env` step.
 ```bash
 /secrets request mifos_x_fred_api_key   # opens vault PR for the new alias
 # (admin merges the PR)
-/secrets pull                            # materializes to local.properties + secrets/<platform>/
+/secrets pull                            # materializes to local.properties + secrets/live/<platform>/
 ```
 
 Leave the key unset and the B7 Interest Rates screen renders an explicit
 "FRED key not configured" empty state rather than crashing.
 
 If your fork uses additional third-party APIs, add them via the same path:
-- **Path A:** add the secret as a file under `secrets/<platform>/` and the non-secret
+- **Path A:** add the secret as a file under `secrets/live/<platform>/` and the non-secret
   metadata to `gradle/fork.properties`.
 - **Path B:** run `/secrets request <alias>` to open a vault PR.
 

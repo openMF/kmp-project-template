@@ -10,7 +10,7 @@ Also used to fetch the latest Firebase build number for auto-increment.
 3. **Project Settings** (gear icon) → **Service accounts** tab
 4. Click **Generate new private key**
 5. Confirm and download the JSON file
-6. Copy it to `secrets/android/firebase/service-account.json`
+6. Copy it to `secrets/live/android/firebase/firebaseAppDistributionServiceCredentialsFile.json`
 
 ## Firebase App IDs
 
@@ -22,21 +22,21 @@ You also need the Firebase App ID for each platform:
 
 | File | Content | GHA Secret |
 |------|---------|------------|
-| `secrets/android/firebase/service-account.json` | Service account JSON | `FIREBASECREDS` |
-| `secrets/android/firebase/android_app_id` | Android prod App ID | `FIREBASE_ANDROID_APP_ID` |
-| `secrets/android/firebase/android_demo_app_id` | Android demo App ID | `FIREBASE_ANDROID_DEMO_APP_ID` |
-| `secrets/apple/firebase/ios_app_id` | iOS App ID | `FIREBASE_IOS_APP_ID` |
+| `secrets/live/android/firebase/firebaseAppDistributionServiceCredentialsFile.json` | Service account JSON | `FIREBASECREDS` |
+| `secrets/live/android/firebase/android_app_id` | Android prod App ID | `FIREBASE_ANDROID_APP_ID` |
+| `secrets/live/android/firebase/android_demo_app_id` | Android demo App ID | `FIREBASE_ANDROID_DEMO_APP_ID` |
+| `secrets/live/apple/firebase/ios_app_id` | iOS App ID | `FIREBASE_IOS_APP_ID` |
 
 ## Commands
 
 ```bash
-mkdir -p secrets/android/firebase
-cp secrets_demo/firebase/service-account.json secrets/android/firebase/service-account.json
+mkdir -p secrets/live/android/firebase
+cp secrets/sample/android/firebase/firebaseAppDistributionServiceCredentialsFile.json secrets/live/android/firebase/firebaseAppDistributionServiceCredentialsFile.json
 # Replace with real JSON from Firebase Console
 
-echo "1:123456789:android:abc123" > secrets/android/firebase/android_app_id
-echo "1:123456789:android:def456" > secrets/android/firebase/android_demo_app_id
-echo "1:123456789:ios:ghi789"     > secrets/apple/firebase/ios_app_id
+echo "1:123456789:android:abc123" > secrets/live/android/firebase/android_app_id
+echo "1:123456789:android:def456" > secrets/live/android/firebase/android_demo_app_id
+echo "1:123456789:ios:ghi789"     > secrets/live/apple/firebase/ios_app_id
 
 # Sync to GitHub
 bash scripts/secrets/sync-secrets-to-github.sh --only firebase

@@ -6,7 +6,7 @@
 #
 # Prerequisites:
 #   - gh CLI installed and authenticated (gh auth login)
-#   - secrets/ folder populated (copy from secrets_demo/, fill in real values)
+#   - secrets/ folder populated (copy from secrets/sample/, fill in real values)
 #
 # Usage:
 #   bash scripts/secrets/sync-secrets-to-github.sh
@@ -33,6 +33,17 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 SECRETS_DIR="$REPO_ROOT/secrets"
+
+# ── Resolve secret paths through the build-secrets resolver (Phase 7 SoT: secrets/LAYOUT.yaml) ──
+# NO static secret paths for LAYOUT-declared secrets — the resolver owns every path
+# (live-wins-else-sample), so a secrets/ layout change is a one-file LAYOUT.yaml edit with
+# zero impact on this script. `_p <layout-key>` → absolute path to the resolved file.
+BS="$REPO_ROOT/deployment/scripts/build-secrets"
+_p() {  # _p <layout-key> [flavor]  → absolute path to the resolved file
+  local rel
+  rel="$( cd "$REPO_ROOT" && "$BS" path "$1" ${2:+--flavor "$2"} 2>/dev/null )" || return 1
+  [ -n "$rel" ] && printf '%s/%s\n' "$REPO_ROOT" "$rel"
+}
 
 DRY_RUN=false
 REPO=""
@@ -66,7 +77,7 @@ fi
 
 if [[ ! -d "$SECRETS_DIR" ]]; then
   echo "❌  secrets/ not found at $SECRETS_DIR"
-  echo "    Copy secrets_demo/ → secrets/ and fill in real values first."
+  echo "    Copy secrets/sample/ → secrets/ and fill in real values first."
   exit 1
 fi
 
@@ -205,17 +216,21 @@ _set_keystore_family() {
 # ── iOS secrets ───────────────────────────────────────────────────────────────
 _sync_ios() {
   echo "📱 iOS / App Store"
+  # Paths resolved via build-secrets (LAYOUT SoT) — no static secrets/ literals.
+  local kid iss p8 mk mp
+  kid="$(_p appstore_key_id)"; iss="$(_p appstore_issuer_id)"; p8="$(_p appstore_auth_key)"
+  mk="$(_p match_ssh_key)";    mp="$(_p match_password)"
   # Dual-write each secret: legacy UPPERCASE + v2 lowercase
-  _set_from_file    "APPSTORE_KEY_ID"        "$SECRETS_DIR/appstore/key_id"
-  _set_from_file    "appstore_key_id"        "$SECRETS_DIR/appstore/key_id"
-  _set_from_file    "APPSTORE_ISSUER_ID"     "$SECRETS_DIR/appstore/issuer_id"
-  _set_from_file    "appstore_issuer_id"     "$SECRETS_DIR/appstore/issuer_id"
-  _set_from_binary  "APPSTORE_AUTH_KEY"      "$SECRETS_DIR/appstore/AuthKey.p8"
-  _set_from_binary  "appstore_auth_key"      "$SECRETS_DIR/appstore/AuthKey.p8"
-  _set_from_binary  "MATCH_GIT_PRIVATE_KEY"  "$SECRETS_DIR/match/match_ci_key"
-  _set_from_binary  "match_ssh_private_key"  "$SECRETS_DIR/match/match_ci_key"
-  _set_from_file    "MATCH_PASSWORD"         "$SECRETS_DIR/match/.match_password"
-  _set_from_file    "match_password"         "$SECRETS_DIR/match/.match_password"
+  _set_from_file    "APPSTORE_KEY_ID"        "$kid"
+  _set_from_file    "appstore_key_id"        "$kid"
+  _set_from_file    "APPSTORE_ISSUER_ID"     "$iss"
+  _set_from_file    "appstore_issuer_id"     "$iss"
+  _set_from_binary  "APPSTORE_AUTH_KEY"      "$p8"
+  _set_from_binary  "appstore_auth_key"      "$p8"
+  _set_from_binary  "MATCH_GIT_PRIVATE_KEY"  "$mk"
+  _set_from_binary  "match_ssh_private_key"  "$mk"
+  _set_from_file    "MATCH_PASSWORD"         "$mp"
+  _set_from_file    "match_password"         "$mp"
 
   # iOS identity/metadata — read from gradle/fork.properties (non-secret)
   local fork_props="gradle/fork.properties"
@@ -229,17 +244,8 @@ _sync_ios() {
     done < "$fork_props"
   fi
 
-  # iOS App Store Connect secrets — read from per-value files (secret)
-  if [[ -f "$SECRETS_DIR/apple/appstore/key_id" ]]; then
-    local _asc_key_id
-    _asc_key_id=$(cat "$SECRETS_DIR/apple/appstore/key_id" 2>/dev/null | tr -d '\n\r')
-    [[ -n "$_asc_key_id" ]] && _set_secret "APPSTORE_KEY_ID" "$_asc_key_id" "apple/appstore/key_id"
-  fi
-  if [[ -f "$SECRETS_DIR/apple/appstore/issuer_id" ]]; then
-    local _asc_issuer
-    _asc_issuer=$(cat "$SECRETS_DIR/apple/appstore/issuer_id" 2>/dev/null | tr -d '\n\r')
-    [[ -n "$_asc_issuer" ]] && _set_secret "APPSTORE_ISSUER_ID" "$_asc_issuer" "apple/appstore/issuer_id"
-  fi
+  # (removed: redundant re-read of apple/appstore/{key_id,issuer_id} — the resolver-backed
+  #  APPSTORE_KEY_ID / APPSTORE_ISSUER_ID above already resolve to the canonical path.)
   echo ""
 }
 
@@ -248,42 +254,53 @@ _sync_ios() {
 _sync_android() {
   echo "🤖 Android / Play Store (Play App Signing model — single UPLOAD keystore)"
 
-  # UPLOAD keystore (Play Console upload key) — the only keystore the developer holds
-  _set_keystore_family "UPLOAD" \
-    "$SECRETS_DIR/keystores/upload_keystore.properties" \
-    "$SECRETS_DIR/keystores/upload_keystore.keystore"
+  # UPLOAD keystore (Play Console upload key) — the only keystore the developer holds.
+  # Keystore FILE resolves via the LAYOUT; the sibling .properties (alias/passwords — not a
+  # LAYOUT secret) lives beside it, so anchor it to the resolved keystore dir (no static path).
+  local ks; ks="$(_p upload_keystore)"
+  _set_keystore_family "UPLOAD" "$(dirname "$ks")/upload_keystore.properties" "$ks"
 
   # google-services.json — required by all Android builds
-  _set_from_binary "GOOGLESERVICES"   "$SECRETS_DIR/firebase/google-services.json"
-  _set_from_binary "google_services"  "$SECRETS_DIR/firebase/google-services.json"
+  local gs; gs="$(_p google_services)"
+  _set_from_binary "GOOGLESERVICES"   "$gs"
+  _set_from_binary "google_services"  "$gs"
 
   # Firebase / Play Store service account JSON (dual-write)
-  _set_from_binary "FIREBASECREDS"  "$SECRETS_DIR/firebase/service-account.json"
-  _set_from_binary "firebase_creds" "$SECRETS_DIR/firebase/service-account.json"
-  _set_from_binary "PLAYSTORECREDS"  "$SECRETS_DIR/play/service-account.json"
-  _set_from_binary "playstore_creds" "$SECRETS_DIR/play/service-account.json"
+  local fbc psc; fbc="$(_p firebase_service_account)"; psc="$(_p play_service_account)"
+  _set_from_binary "FIREBASECREDS"  "$fbc"
+  _set_from_binary "firebase_creds" "$fbc"
+  _set_from_binary "PLAYSTORECREDS"  "$psc"
+  _set_from_binary "playstore_creds" "$psc"
   echo ""
 }
 
 # ── Firebase secrets ──────────────────────────────────────────────────────────
 _sync_firebase() {
   echo "🔥 Firebase"
-  _set_from_binary "FIREBASECREDS"          "$SECRETS_DIR/firebase/service-account.json"
-  _set_from_file   "FIREBASE_ANDROID_APP_ID"     "$SECRETS_DIR/firebase/android_app_id"
-  _set_from_file   "FIREBASE_ANDROID_DEMO_APP_ID" "$SECRETS_DIR/firebase/android_demo_app_id"
-  _set_from_file   "FIREBASE_IOS_APP_ID"     "$SECRETS_DIR/firebase/ios_app_id"
-  _set_from_file   "FIREBASE_IOS_DEMO_APP_ID" "$SECRETS_DIR/firebase/ios_demo_app_id"
-  _set_from_file   "FIREBASE_IOS_PROD_APP_ID" "$SECRETS_DIR/firebase/ios_prod_app_id"
+  _set_from_binary "FIREBASECREDS"           "$(_p firebase_service_account)"
+  _set_from_file   "FIREBASE_ANDROID_APP_ID"      "$(_p firebase_android_app_id)"
+  _set_from_file   "FIREBASE_ANDROID_DEMO_APP_ID" "$(_p firebase_android_app_id demo)"
+  _set_from_file   "FIREBASE_IOS_APP_ID"      "$(_p firebase_ios_app_id)"
+  _set_from_file   "FIREBASE_IOS_DEMO_APP_ID" "$(_p firebase_ios_demo_app_id)"
+  _set_from_file   "FIREBASE_IOS_PROD_APP_ID" "$(_p firebase_ios_prod_app_id)"
   echo ""
 }
 
 # ── Play Store secrets ────────────────────────────────────────────────────────
 _sync_play() {
   echo "▶  Play Store"
-  _set_from_binary "PLAYSTORECREDS" "$SECRETS_DIR/play/service-account.json"
+  _set_from_binary "PLAYSTORECREDS" "$(_p play_service_account)"
   echo ""
 }
 
+# ── NOTE (secrets-resolver alignment, Phase 7) ────────────────────────────────
+# The desktop (macOS/Windows/Linux) + Microsoft-Store + Azure-signing secrets below are
+# NOT yet declared in secrets/LAYOUT.yaml (those platforms are deferred per the epic), so
+# they still read static $SECRETS_DIR paths. The guard SR-12 already scans scripts/ for the
+# service-account class (so android/firebase/play stay resolver-only), but does NOT flag these
+# desktop $SECRETS_DIR paths. When a platform onboards: add its secrets to LAYOUT.yaml, migrate
+# these to `_p <layout-key>` (as iOS/Android/Firebase/Play/Web do above), then broaden SR-12's
+# pattern in scripts/ci/check-secrets-resolver.sh to cover the desktop $SECRETS_DIR paths.
 # ── macOS signing secrets (Mac App Store / TestFlight) ────────────────────────
 _sync_mac() {
   echo "🍏 macOS / App Store"
@@ -341,13 +358,13 @@ _sync_azure_signing() {
 # ── Web hosting secrets ───────────────────────────────────────────────────────
 _sync_web() {
   echo "🌐 Web / Hosting"
-  _set_from_file "CLOUDFLARE_API_TOKEN"  "$SECRETS_DIR/cloudflare/api_token"
-  _set_from_file "CLOUDFLARE_ACCOUNT_ID" "$SECRETS_DIR/cloudflare/account_id"
-  _set_from_file "NETLIFY_AUTH_TOKEN"    "$SECRETS_DIR/netlify/auth_token"
-  _set_from_file "NETLIFY_SITE_ID"       "$SECRETS_DIR/netlify/site_id"
-  _set_from_file "VERCEL_TOKEN"          "$SECRETS_DIR/vercel/token"
-  _set_from_file "VERCEL_ORG_ID"         "$SECRETS_DIR/vercel/org_id"
-  _set_from_file "VERCEL_PROJECT_ID"     "$SECRETS_DIR/vercel/project_id"
+  _set_from_file "CLOUDFLARE_API_TOKEN"  "$(_p cloudflare_pages_api_token)"
+  _set_from_file "CLOUDFLARE_ACCOUNT_ID" "$(_p cloudflare_account_id)"
+  _set_from_file "NETLIFY_AUTH_TOKEN"    "$(_p netlify_auth_token)"
+  _set_from_file "NETLIFY_SITE_ID"       "$(_p netlify_site_id)"
+  _set_from_file "VERCEL_TOKEN"          "$(_p vercel_token)"
+  _set_from_file "VERCEL_ORG_ID"         "$(_p vercel_org_id)"
+  _set_from_file "VERCEL_PROJECT_ID"     "$(_p vercel_project_id)"
   echo ""
 }
 

@@ -30,15 +30,15 @@ Used for: uploading AABs to Play Store internal/beta tracks, promoting releases.
 ### Step 3: Place the file
 
 ```bash
-mkdir -p secrets/android/play
-cp ~/Downloads/your-project-*.json secrets/android/play/service-account.json
+mkdir -p secrets/live/android/play
+cp ~/Downloads/your-project-*.json secrets/live/android/play/playStorePublishServiceCredentialsFile.json
 ```
 
 ## File
 
 | File | Content | GHA Secret |
 |------|---------|------------|
-| `secrets/android/play/service-account.json` | Service account JSON | `PLAYSTORECREDS` |
+| `secrets/live/android/play/playStorePublishServiceCredentialsFile.json` | Service account JSON | `PLAYSTORECREDS` |
 
 ## Sync to GitHub
 

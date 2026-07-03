@@ -5,8 +5,8 @@ Use this checklist when setting up a new fork. Complete the platforms you intend
 ## Quick start
 
 ```bash
-# 1. Copy the full structure into secrets/
-cp -r secrets_demo/* secrets/
+# 1. Copy the full structure into secrets/live/
+cp -r secrets/sample/* secrets/live/
 
 # 2. Work through the sections below, replacing placeholder files with real ones
 
@@ -21,12 +21,12 @@ bash scripts/secrets/sync-secrets-to-github.sh              # push all secrets
 
 ### 1. App Store Connect API Key
 
-See [secrets_demo/appstore/README.md](appstore/README.md) for detailed steps.
+See [secrets/sample/apple/appstore/README.md](apple/appstore/README.md) for detailed steps.
 
 - [ ] Create API key at [App Store Connect → Keys](https://appstoreconnect.apple.com/access/api)
-- [ ] Place `.p8` file at `secrets/apple/appstore/AuthKey.p8`
-- [ ] Write Key ID (10 chars) to `secrets/apple/appstore/key_id`
-- [ ] Write Issuer ID (UUID) to `secrets/apple/appstore/issuer_id`
+- [ ] Place `.p8` file at `secrets/live/apple/appstore/AuthKey.p8`
+- [ ] Write Key ID (10 chars) to `secrets/live/apple/appstore/key_id`
+- [ ] Write Issuer ID (UUID) to `secrets/live/apple/appstore/issuer_id`
 
 ### 2. Apple Developer Team ID
 
@@ -35,12 +35,12 @@ See [secrets_demo/appstore/README.md](appstore/README.md) for detailed steps.
 
 ### 3. Fastlane Match (Code Signing)
 
-See [secrets_demo/match/README.md](match/README.md) for detailed steps.
+See [secrets/sample/apple/match/README.md](apple/match/README.md) for detailed steps.
 
 - [ ] Create private GitHub repo for certificates (e.g. `your-org/ios-certificates`)
-- [ ] Generate SSH key: `ssh-keygen -t ed25519 -f secrets/apple/match/match_ci_key -N ""`
-- [ ] Add `secrets/apple/match/match_ci_key.pub` as deploy key to the cert repo (write access)
-- [ ] Generate password: `openssl rand -base64 32 | tr -d '\n' > secrets/apple/match/.match_password`
+- [ ] Generate SSH key: `ssh-keygen -t ed25519 -f secrets/live/apple/match/match_ci_key -N ""`
+- [ ] Add `secrets/live/apple/match/match_ci_key.pub` as deploy key to the cert repo (write access)
+- [ ] Generate password: `openssl rand -base64 32 | tr -d '\n' > secrets/live/apple/match/.match_password`
 - [ ] Set `apple.match.git.url=git@github.com:your-org/ios-certificates.git` in `gradle/fork.properties`
 - [ ] Run `bundle exec fastlane match init` once (first fork only)
 
@@ -54,12 +54,12 @@ Edit `gradle/fork.properties` (copy from `gradle/fork.properties.template`) and 
 
 ### 5. APN Push Notifications (optional)
 
-See [secrets_demo/apn/README.md](apn/README.md).
+See [secrets/sample/apple/apn/README.md](apple/apn/README.md).
 
 - [ ] Create APN key at [Apple Developer → Keys](https://developer.apple.com/account/resources/authkeys/list)
-- [ ] Place `.p8` at `secrets/apple/apn/APNAuthKey.p8`
-- [ ] Write Key ID to `secrets/apple/apn/key_id`
-- [ ] Write Team ID to `secrets/apple/apn/team_id`
+- [ ] Place `.p8` at `secrets/live/apple/apn/APNAuthKey.p8`
+- [ ] Write Key ID to `secrets/live/apple/apn/key_id`
+- [ ] Write Team ID to `secrets/live/apple/apn/team_id`
 
 ---
 
@@ -67,31 +67,31 @@ See [secrets_demo/apn/README.md](apn/README.md).
 
 ### 6. Release Keystore
 
-See [secrets_demo/keystores/README.md](keystores/README.md) for detailed steps.
+See [secrets/sample/android/keystores/README.md](android/keystores/README.md) for detailed steps.
 
-- [ ] Generate keystore: `keytool -genkey -keystore secrets/android/keystores/upload_keystore.keystore -alias upload -keyalg RSA -keysize 4096 -validity 10000`
-- [ ] Create `secrets/android/keystores/upload_keystore.properties` with `storePassword`, `keyAlias`, `keyPassword`
+- [ ] Generate keystore: `keytool -genkey -keystore secrets/live/android/keystores/upload_keystore.keystore -alias upload -keyalg RSA -keysize 4096 -validity 10000`
+- [ ] Create `secrets/live/android/keystores/upload_keystore.properties` with `storePassword`, `keyAlias`, `keyPassword`
 - [ ] **Back up the keystore** — you cannot recover it if lost
 
 ### 7. Google Play Service Account
 
-See [secrets_demo/play/README.md](play/README.md) for detailed steps.
+See [secrets/sample/android/play/README.md](android/play/README.md) for detailed steps.
 
 - [ ] Create service account in Google Cloud Console
 - [ ] Grant service account access in Play Console (Release Manager role)
-- [ ] Place JSON key at `secrets/android/play/service-account.json`
+- [ ] Place JSON key at `secrets/live/android/play/playStorePublishServiceCredentialsFile.json`
 
 ---
 
 ## Firebase — required for Firebase App Distribution (iOS + Android)
 
-See [secrets_demo/firebase/README.md](firebase/README.md) for detailed steps.
+See [secrets/sample/android/firebase/README.md](android/firebase/README.md) for detailed steps.
 
 - [ ] Download service account JSON from Firebase Console → Project Settings → Service Accounts
-- [ ] Place at `secrets/android/firebase/service-account.json`
-- [ ] Write Android prod App ID to `secrets/android/firebase/android_app_id`
-- [ ] Write Android demo App ID to `secrets/android/firebase/android_demo_app_id`
-- [ ] Write iOS App ID to `secrets/apple/firebase/ios_app_id`
+- [ ] Place at `secrets/live/android/firebase/firebaseAppDistributionServiceCredentialsFile.json`
+- [ ] Write Android prod App ID to `secrets/live/android/firebase/android_app_id`
+- [ ] Write Android demo App ID to `secrets/live/android/firebase/android_demo_app_id`
+- [ ] Write iOS App ID to `secrets/live/apple/firebase/ios_app_id`
 - [ ] Set `apple.tf.groups` in `gradle/fork.properties` (Firebase tester group names)
 
 ---
@@ -99,13 +99,13 @@ See [secrets_demo/firebase/README.md](firebase/README.md) for detailed steps.
 ## Web hosting — required for web deployment
 
 ### Cloudflare Pages
-- [ ] [cloudflare/README.md](cloudflare/README.md) → `secrets/web/cloudflare/api_token`, `secrets/web/cloudflare/account_id`
+- [ ] [cloudflare/README.md](web/cloudflare/README.md) → `secrets/live/web/cloudflare/api_token`, `secrets/live/web/cloudflare/account_id`
 
 ### Netlify
-- [ ] [netlify/README.md](netlify/README.md) → `secrets/web/netlify/auth_token`, `secrets/web/netlify/site_id`
+- [ ] [netlify/README.md](web/netlify/README.md) → `secrets/live/web/netlify/auth_token`, `secrets/live/web/netlify/site_id`
 
 ### Vercel
-- [ ] [vercel/README.md](vercel/README.md) → `secrets/web/vercel/token`, `secrets/web/vercel/org_id`, `secrets/web/vercel/project_id`
+- [ ] [vercel/README.md](web/vercel/README.md) → `secrets/live/web/vercel/token`, `secrets/live/web/vercel/org_id`, `secrets/live/web/vercel/project_id`
 
 ---
 
@@ -115,22 +115,22 @@ Unsigned EXE/MSI/DMG/DEB build + publish to GitHub Releases without any of these
 Fill them only when you want notarized/signed desktop artifacts.
 
 ### macOS (.app / .pkg)
-- [ ] [desktop/macos/README.md](desktop/macos/README.md) → `secrets/desktop/macos/app_store.p12`, `secrets/desktop/macos/installer.p12`
+- [ ] [desktop/macos/README.md](desktop/macos/README.md) → `secrets/live/desktop/macos/app_store.p12`, `secrets/live/desktop/macos/installer.p12`
 
 ### Windows (Authenticode)
-- [ ] [desktop/windows/README.md](desktop/windows/README.md) → `secrets/desktop/windows/code_signing.pfx`, `secrets/desktop/windows/code_signing_password`
+- [ ] [desktop/windows/README.md](desktop/windows/README.md) → `secrets/live/desktop/windows/code_signing.pfx`, `secrets/live/desktop/windows/code_signing_password`
 
 ### Linux (GPG-signed packages)
-- [ ] [desktop/linux/README.md](desktop/linux/README.md) → `secrets/desktop/linux/gpg_signing.key`, `secrets/desktop/linux/gpg_passphrase`
+- [ ] [desktop/linux/README.md](desktop/linux/README.md) → `secrets/live/desktop/linux/gpg_signing.key`, `secrets/live/desktop/linux/gpg_passphrase`
 
 ---
 
 ## Final step: sync to GitHub Actions
 
 ```bash
-# Verify secrets/ looks right
-ls -la secrets/
-ls -la secrets/apple/appstore/ secrets/apple/match/ secrets/android/firebase/ secrets/android/play/ secrets/android/keystores/
+# Verify secrets/live/ looks right
+ls -la secrets/live/
+ls -la secrets/live/apple/appstore/ secrets/live/apple/match/ secrets/live/android/firebase/ secrets/live/android/play/ secrets/live/android/keystores/
 
 # Dry run to preview what will be set
 bash scripts/secrets/sync-secrets-to-github.sh --dry-run

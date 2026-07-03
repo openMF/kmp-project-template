@@ -173,9 +173,9 @@ secrets/                                               # All gitignored
 ├── ios/
 │   └── apn/APNAuthKey.p8                              # APN push key (optional)
 ├── android/
-│   ├── firebase/service-account.json                  # Firebase creds
+│   ├── firebase/firebaseAppDistributionServiceCredentialsFile.json  # Firebase creds
 │   ├── keystores/release.jks                          # Release keystore
-│   └── play/service-account.json                      # Play Store creds
+│   └── play/playStorePublishServiceCredentialsFile.json            # Play Store creds
 └── web/
     └── cloudflare/api_token                           # Cloudflare token (example)
 ```

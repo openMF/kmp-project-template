@@ -194,7 +194,7 @@ echo "manual-preflight: PASS=$PASS  FAIL=$FAIL  TOTAL=$TOTAL"
 
 # ---- auto-init detector (G45 / T19) ---------------------------------------
 # If EVERY row reports MISSING or secrets/ doesn't exist, AND we're in a TTY,
-# offer to bootstrap from secrets_demo/.
+# offer to bootstrap from secrets/sample/.
 if [ "$FAIL" -eq "$TOTAL" ] || [ ! -d "$PROJECT_ROOT/secrets" ]; then
     if [ -t 0 ] && [ "${SKIP_AUTO_INIT:-0}" != "1" ]; then
         echo

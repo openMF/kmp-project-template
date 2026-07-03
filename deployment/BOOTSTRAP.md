@@ -77,14 +77,14 @@ vault preflight + PROMOTION_LOG audit but is **NOT** required for Path A.
    ./keystore-manager.sh generate
    ```
 
-4. **Populate `secrets/`** by copying the schema from `secrets_demo/` and
-   filling in real values. Every file in `secrets_demo/` ships a magic-marker
+4. **Populate `secrets/live/`** by copying `secrets/sample/` and filling in
+   real values. Every file in `secrets/sample/` ships a magic-marker
    placeholder (`# CLAUDE-PLACEHOLDER` text-files, `CLAUDE-PLHLD-v1\0` binaries)
    so it's unambiguous what's safe to commit and what is not.
 
    The 8 baseline files most forks need:
 
-   | secrets_demo/                                                 | Purpose                                            |
+   | secrets/sample/                                               | Purpose                                            |
    |---------------------------------------------------------------|----------------------------------------------------|
    | `firebaseAppDistributionServiceCredentialsFile.json`          | Firebase App Distribution (Android + iOS)          |
    | `playStorePublishServiceCredentialsFile.json`                 | Play Console upload                                |
@@ -165,20 +165,20 @@ Everyone who needs to run `renewCerts` or any iOS lane locally needs:
 
 | What | Where | How to get it |
 |------|-------|---------------|
-| SSH private key with write access to `openMF/ios-provisioning-profile` | `secrets/apple/match/match_ci_key` | Framework vault: `/secrets pull`; or request from team lead |
-| `MATCH_PASSWORD` | `secrets/apple/match/.match_password` | Same vault / team lead |
-| `KEYCHAIN_PASSWORD` | `secrets/apple/match/keychain_password` | Your macOS login keychain password |
-| `CERTIFICATES_PASSWORD` | `secrets/apple/match/certificates_password` | Same as `MATCH_PASSWORD` in standard setups |
-| ASC API key | `secrets/apple/appstore/AuthKey.p8` + `key_id` + `issuer_id` | Framework vault: `/secrets pull` |
+| SSH private key with write access to `openMF/ios-provisioning-profile` | `secrets/live/apple/match/match_ci_key` | Framework vault: `/secrets pull`; or request from team lead |
+| `MATCH_PASSWORD` | `secrets/live/apple/match/.match_password` | Same vault / team lead |
+| `KEYCHAIN_PASSWORD` | `secrets/live/apple/match/keychain_password` | Your macOS login keychain password |
+| `CERTIFICATES_PASSWORD` | `secrets/live/apple/match/certificates_password` | Same as `MATCH_PASSWORD` in standard setups |
+| ASC API key | `secrets/live/apple/appstore/AuthKey.p8` + `key_id` + `issuer_id` | Framework vault: `/secrets pull` |
 
 Once secrets are in place, clone the Match repo once so subsequent runs
 are fast (`git fetch + reset` instead of a full clone):
 
 ```bash
 # From repo root — one-time setup per machine
-GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
+GIT_SSH_COMMAND="ssh -i secrets/live/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
   git clone --depth 1 git@github.com:openMF/ios-provisioning-profile.git \
-  secrets/apple/match/ios-provisioning-profile
+  secrets/live/apple/match/ios-provisioning-profile
 ```
 
 > The `secrets/` directory is gitignored — the clone never enters source control.
@@ -374,14 +374,14 @@ Both intents now migrate:
   `/secrets pull` and `FredApiConfig` reads it via
   `BuildKonfig.FRED_API_KEY` (or `System.getenv("FRED_API_KEY")` as fallback
   in manual mode).
-- **Documentation** → this file. The `secrets/` vs `secrets_demo/` schema +
+- **Documentation** → this file. The `secrets/sample/` → `secrets/live/` layout +
   Path A walkthrough above replaces the `.env.local.example` comment block.
 
 For OSS forks running Path A who don't want vault ceremony:
 - Non-secret identity/metadata (team ID, contact info, URLs) goes in `gradle/fork.properties`
   (copy from `gradle/fork.properties.template`, which is committed).
 - Secret values (API keys, passwords, certificates) are dropped as per-value files under
-  `secrets/<platform>/...` (all gitignored). The pre-commit secrets guard
+  `secrets/live/<platform>/...` (all gitignored). The pre-commit secrets guard
   (`/secrets install-hook`) refuses any `.env*` file staged outside the vault
   repo, which closes the legacy-leak surface.
 
@@ -396,7 +396,7 @@ For OSS forks running Path A who don't want vault ceremony:
   `lane.rb` files.
 - `secrets-manifest.yaml` — Path B vault manifest (Path A forks may delete
   this file).
-- `secrets_demo/` — Path A schema-as-code mirror with magic markers.
+- `secrets/sample/` — Path A schema-as-code mirror with magic markers (copy to `secrets/live/` and fill real values; `build-secrets` resolves paths from `secrets/LAYOUT.yaml`).
 - `docs/guides/secrets/SECRETS_MANAGEMENT_GUIDE.md` — vault topology.
 - `RULE-DEPLOYMENT-MANIFEST-001` — manifest schema enforcement (DM1-DM8).
 - `RULE-SECRETS-VAULT-001` — vault-mandatory policy (SV1-SV31).

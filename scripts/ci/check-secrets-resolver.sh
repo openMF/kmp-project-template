@@ -6,6 +6,9 @@
 #   SR-8  source_env contract — every LAYOUT source_env is an env var the workflow exposes
 #   SR-9  sample completeness — every LAYOUT file/value/literal key has a committed sample file
 #   SR-10 no real secrets committed under secrets/sample (placeholder-marked files exempt)
+#   SR-11 no hardcoded secrets/<platform>/ path in the production workflow
+#   SR-12 no hardcoded service-account path/name anywhere (deployment + workflows + scripts) —
+#         the class the firebase/play rename exposed; every consumer resolves via build-secrets
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
 fail=0
@@ -55,5 +58,24 @@ if grep -nE 'secrets/(android|apple|desktop|web|shared)/[A-Za-z0-9_.-]' "$WF" 2>
   echo "❌ SR-11: workflow hardcodes a secrets/<platform>/ path — use \"\$BS\" path <key> instead"; fail=1
 fi
 
-[ "$fail" = 0 ] && echo "✅ secrets-resolver guards pass (SR-7/8/9/10/11)"
+# ── SR-12: no hardcoded service-account path/name — ANY consumer must resolve via
+#     build-secrets. Catches the class the firebase/play rename exposed (`secrets/android/
+#     {play,firebase}/…` literals + the bare old `service-account.json` filename). Scans the
+#     WIDER surface SR-7/SR-11 missed: deployment + .github/workflows + scripts. Exempt: the
+#     resolver itself, the path-declaration SoT (LAYOUT.yaml + secrets-needs.yaml +
+#     secrets-manifest.yaml — these DECLARE paths, they don't consume), comment lines, and the
+#     sample/live trees. Deferred desktop/ms/azure use `$SECRETS_DIR/<plat>/` — NOT this
+#     class — so they don't trip here; broaden further when those platforms get LAYOUT rows. ──
+SR12=$(grep -rnE 'secrets/android/(play|firebase)/[A-Za-z0-9_.-]|service-account\.json' \
+       deployment .github/workflows scripts \
+       --include='*.rb' --include='*.sh' --include='*.yml' --include='*.yaml' 2>/dev/null \
+     | grep -vE 'build_secrets\.rb|secrets/LAYOUT\.yaml|secrets-needs\.yaml|secrets-manifest\.yaml|/sample/|/live/' \
+     | grep -vE ':[0-9]+:[[:space:]]*#')
+if [ -n "$SR12" ]; then
+  echo "❌ SR-12: hardcoded service-account path/name (use \`build-secrets path <key>\`):"
+  echo "$SR12" | sed 's/^/    /'
+  fail=1
+fi
+
+[ "$fail" = 0 ] && echo "✅ secrets-resolver guards pass (SR-7/8/9/10/11/12)"
 exit $fail

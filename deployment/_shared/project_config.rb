@@ -25,6 +25,8 @@
 #   - fastlane/Fastfile                  (direct require — exposes constants to lanes)
 #   - deployment/Fastfile                (via Appfile load-order: Appfile runs first)
 
+require_relative "lib/build_secrets"   # secrets path resolver (secrets/LAYOUT.yaml SoT — no static paths)
+
 module FastlaneConfig
   module ProjectConfig
 
@@ -119,7 +121,7 @@ module FastlaneConfig
     # ── Android ────────────────────────────────────────────────────────────────
     ANDROID = {
       package_name:        _app_id,
-      play_store_json_key: "secrets/android/play/service-account.json",
+      play_store_json_key: BuildSecrets.for.path(:play_service_account),
       apk_paths: {
         prod: "cmp-android/build/outputs/apk/prod/release/cmp-android-prod-release.apk",
         demo: "cmp-android/build/outputs/apk/demo/release/cmp-android-demo-release.apk",
@@ -268,7 +270,7 @@ module FastlaneConfig
 
     # ── Shared (both platforms) ────────────────────────────────────────────────
     SHARED = {
-      firebase_service_credentials: "secrets/android/firebase/service-account.json",
+      firebase_service_credentials: BuildSecrets.for.path(:firebase_service_account),
     }.freeze
 
     # ── Helpers ────────────────────────────────────────────────────────────────

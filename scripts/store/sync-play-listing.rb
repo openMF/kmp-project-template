@@ -26,8 +26,9 @@ end
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
+require_relative "../../deployment/_shared/lib/build_secrets"  # secrets path resolver (LAYOUT SoT)
 REPO_ROOT     = Pathname.new(__FILE__).dirname.parent
-JSON_KEY      = REPO_ROOT / "secrets/android/play/service-account.json"
+JSON_KEY      = REPO_ROOT / BuildSecrets.for.path(:play_service_account)
 METADATA_ROOT = REPO_ROOT / "deployment/android/metadata"
 DRY_RUN       = ARGV.include?("--dry-run")
 

@@ -22,7 +22,7 @@ platform :ios do
       app_version  = options[:app_version] || ios_config[:primary_locale]  # caller must supply version when pinning build
       UI.important("📦 Using provided build #{build_number}")
     else
-      build_number = latest_testflight_build_number(
+      build_number = latest_tf_build_number_resilient(
         app_identifier: ios_config[:app_identifier],
         api_key:        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
       ).to_s
@@ -128,7 +128,7 @@ platform :ios do
       UI.important("📱 Using provided version/build: #{version} (#{next_build_number})")
     else
       gradle_version = get_version_from_gradle(sanitize_for_appstore: true)
-      latest_build_number = latest_testflight_build_number(
+      latest_build_number = latest_tf_build_number_resilient(
         app_identifier: options[:app_identifier] || ios_config[:app_identifier],
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
       )

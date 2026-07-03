@@ -487,6 +487,28 @@ rescue StandardError => e
   false
 end
 
+# Apple's App Store Connect API intermittently throws "A required agreement is missing or
+# has expired" on TestFlight reads (latest_testflight_build_number / pilot) even when ALL
+# agreements are current — a transient Apple-side bug seen across CI platforms and Xcode
+# versions (fastlane#29860, surfaced ~2026-06). It clears on retry. Wrap the read so a flake
+# RETRIES instead of failing the release. Versioning is unchanged: on success the real build
+# number (and the LATEST_TESTFLIGHT_VERSION side-effect) is returned exactly as before; only
+# after max_attempts genuine failures does it re-raise. NEVER falls back to a fabricated
+# build number (that could be LOWER than the live TF build → Apple rejects the upload). (2026-06-23)
+def latest_tf_build_number_resilient(max_attempts: 3, sleep_seconds: 20, **opts)
+  attempts = 0
+  begin
+    latest_testflight_build_number(**opts)
+  rescue StandardError => e
+    attempts += 1
+    raise if attempts >= max_attempts
+    UI.important("⚠️ latest_testflight_build_number flaked (#{e.message.to_s.lines.first&.strip}); " \
+                 "retry #{attempts}/#{max_attempts - 1} in #{sleep_seconds}s (Apple ASC transient, fastlane#29860)…")
+    sleep(sleep_seconds)
+    retry
+  end
+end
+
 # Revoke iOS Distribution certificates from Apple Developer Portal to free slots for
 # a fresh cert. Strategy (in order):
 #   1. Revoke all truly expired certs first (safe, they're already unusable).

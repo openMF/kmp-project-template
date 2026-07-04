@@ -31,6 +31,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.mobilenativefoundation.store.store5.Store
+import org.mobilenativefoundation.store.store5.StoreReadRequest
+import kpt.core.base.store.freshness.FreshnessBand
+import kpt.core.base.store.freshness.FreshnessBands
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.infra.DecisionEngine
 import kpt.core.base.store.infra.FetchedAtRepository
@@ -134,6 +137,23 @@ class ScreenDataStream<T> internal constructor(
 
     /** Retry loading (semantic alias for refresh — used on error/no-network screens). */
     fun retry() = refresh()
+
+    /**
+     * Force a fresh network fetch that bypasses the SWR band gate wired around
+     * [FetchPolicy.CACHE_FIRST_SWR] — used by pull-to-refresh and post-mutation
+     * invalidate paths where the caller has already asserted intent to burn a
+     * request. Distinct from [refresh] because it does NOT honor the
+     * `userRefreshDebounceMs` window; the caller is responsible for its own
+     * debouncing. Emits through the same [refreshTrigger] so `lastContent`
+     * preservation, the freshness banner, and captive-portal detection all
+     * layer in unchanged. Sibling to
+     * [kpt.core.base.store.screen.refreshFresh] on `Store<Key, Output>`,
+     * which exposes the same S5-5 fresh-fetch primitive at the repository
+     * layer.
+     */
+    fun refreshFresh() {
+        refreshTrigger.tryEmit(Unit)
+    }
 }
 
 /**
@@ -312,6 +332,84 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             }
         }
 
+    // CACHE_FIRST_SWR: on each cache emission, consult FreshnessBands and fire a
+    // background revalidation iff band ∈ {Stale, VeryStale}. Fresh/Initial are
+    // pass-through — the cache stays authoritative, no reload spinner.
+    //
+    // The revalidation is a SIDE-FETCH — an independent Store5 subscription to
+    // `stream(StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true))`.
+    // That path drives the fetcher AND writes the SourceOfTruth; the base
+    // storeFlow (built on `cached(key, refresh = false)`, see
+    // `streamDataForPolicy`) continuously observes the SoT and re-emits the
+    // swapped-in fresh value automatically. See `RoomChangeBusSwrTest` for the
+    // invariant this fix relies on: a SoT write DOES re-fan-out through an
+    // already-open `cached(refresh = false)` subscription.
+    //
+    // We intentionally do NOT re-use `refreshTrigger` for this — that trigger
+    // re-runs `flatMapLatest { streamDataForPolicy(CACHE_FIRST_SWR) }` which is
+    // still `cached(refresh = false)` (no network). That was the Phase 1 bug:
+    // the band gate emitted but no fetcher ever ran. The trigger is retained for
+    // `refresh()` / `retry()` / periodic ticker / reconnect refresh — all of
+    // which are legitimate re-subscription events; SWR revalidation is not.
+    //
+    // Anti-thrash: track the previously-observed band; only fire on the edge
+    // (non-stale → stale). Without this guard, the SoT re-emit that follows the
+    // side-fetch keeps `storeData.fetchedAtInstant` pinned at the mapper's
+    // initial cache-load stamp (Store5 SoT emissions carry
+    // `origin = SourceOfTruth`, not NETWORK, so `mapToStoreDataNoFallback`
+    // does not re-stamp fetchedAt) → band remains Stale → without the edge
+    // detector, every re-emit would fire another fetch, thrashing the network.
+    if (fetchPolicy is FetchPolicy.CACHE_FIRST_SWR) {
+        scope.launch {
+            var lastBand: FreshnessBand? = null
+            storeFlow.collect { storeData ->
+                val band = FreshnessBands.bandFor(
+                    now = kotlin.time.Clock.System.now(),
+                    lastSyncedAt = storeData.fetchedAtInstant,
+                    ttl = ttl,
+                    lastError = storeData.error,
+                )
+                val isStale = band == FreshnessBand.Stale || band == FreshnessBand.VeryStale
+                val wasStale = lastBand == FreshnessBand.Stale || lastBand == FreshnessBand.VeryStale
+                if (isStale && !wasStale) {
+                    scope.launch {
+                        try {
+                            this@asScreenStream
+                                .stream(
+                                    StoreReadRequest.fresh(
+                                        key = key,
+                                        fallBackToSourceOfTruth = true,
+                                    ),
+                                )
+                                .mapToStoreDataNoFallback(isEmpty)
+                                .collect { fresh ->
+                                    // Best-effort propagate the NETWORK stamp to
+                                    // the persistence layer so warm-reopen +
+                                    // future FreshnessBands checks see the fresh
+                                    // fetch time. The base flow will re-emit
+                                    // with the swapped-in value from the SoT
+                                    // write regardless.
+                                    if (fresh.origin == DataOrigin.NETWORK &&
+                                        fresh.fetchedAtInstant != null
+                                    ) {
+                                        fetchedAtRepository.write(cacheKey, fresh.fetchedAtInstant)
+                                        persistedFetchedAt = fresh.fetchedAtInstant
+                                    }
+                                }
+                        } catch (t: Throwable) {
+                            // SWR revalidation failure MUST NOT crash the
+                            // consumer's screen state pipeline. The base flow
+                            // continues serving the stale cache; on the next
+                            // reconnect / user-tap refresh, the error surfaces
+                            // via the standard mapping path.
+                        }
+                    }
+                }
+                lastBand = band
+            }
+        }
+    }
+
     // Combine with FULL debounced NetworkStatus for captive portal detection.
     // .onStart {} immediately emits NoNetwork when offline so that newly-created ViewModels
     // (e.g., detail pages navigated to while offline) show NoNetwork instead of Loading.
@@ -400,6 +498,10 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     var lastContent: StoreData<Output>? = null
     var currentCacheKey: String? = null
     var persistedFetchedAt: kotlin.time.Instant? = null
+    // Track the most-recently observed dynamic key so the CACHE_FIRST_SWR band
+    // gate below can target its side-fetch at the right key when the key flow
+    // emits mid-stream.
+    var lastObservedKey: Key? = null
 
     val storeFlow: Flow<StoreData<Output>> = combine(
         keyFlow,
@@ -414,6 +516,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             // ("No network · Showing previous data ↺") rather than a full-screen NoNetwork.
             // `lastContent` is updated to the new key's data once a successful fetch arrives.
             currentCacheKey = cacheKeyFor(key)
+            lastObservedKey = key
             // Re-seed persistedFetchedAt for the new key.
             persistedFetchedAt = fetchedAtRepository.read(currentCacheKey)
             streamDataForPolicy(key = key, policy = fetchPolicy, isEmpty = isEmpty)
@@ -445,6 +548,64 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                 enriched
             }
         }
+
+    // CACHE_FIRST_SWR band-gated background revalidation — see single-key
+    // overload for full rationale. Difference from single-key: `key` is dynamic
+    // (last value from keyFlow) so the side-fetch closes over the currently
+    // observed cache key via the shared `currentCacheKey`/`lastObservedKey`
+    // holders — set inside the flatMapLatest block above. If `keyFlow` swaps
+    // mid-fetch, the fresh() call still targets the key that was stale at fire
+    // time; flatMapLatest will cancel the base-flow branch for the old key on
+    // the next keyFlow emission, and a new stale-band check will fire fresh()
+    // for the new key on its own edge.
+    if (fetchPolicy is FetchPolicy.CACHE_FIRST_SWR) {
+        scope.launch {
+            var lastBand: FreshnessBand? = null
+            storeFlow.collect { storeData ->
+                val band = FreshnessBands.bandFor(
+                    now = kotlin.time.Clock.System.now(),
+                    lastSyncedAt = storeData.fetchedAtInstant,
+                    ttl = ttl,
+                    lastError = storeData.error,
+                )
+                val isStale = band == FreshnessBand.Stale || band == FreshnessBand.VeryStale
+                val wasStale = lastBand == FreshnessBand.Stale || lastBand == FreshnessBand.VeryStale
+                if (isStale && !wasStale) {
+                    val revalidateKey = lastObservedKey
+                    val revalidateCacheKey = currentCacheKey
+                    if (revalidateKey != null && revalidateCacheKey != null) {
+                        scope.launch {
+                            try {
+                                this@asScreenStream
+                                    .stream(
+                                        StoreReadRequest.fresh(
+                                            key = revalidateKey,
+                                            fallBackToSourceOfTruth = true,
+                                        ),
+                                    )
+                                    .mapToStoreDataNoFallback(isEmpty)
+                                    .collect { fresh ->
+                                        if (fresh.origin == DataOrigin.NETWORK &&
+                                            fresh.fetchedAtInstant != null
+                                        ) {
+                                            fetchedAtRepository.write(
+                                                revalidateCacheKey,
+                                                fresh.fetchedAtInstant,
+                                            )
+                                            persistedFetchedAt = fresh.fetchedAtInstant
+                                        }
+                                    }
+                            } catch (t: Throwable) {
+                                // Silent: SWR revalidation failures never crash
+                                // the consumer's screen state pipeline.
+                            }
+                        }
+                    }
+                }
+                lastBand = band
+            }
+        }
+    }
 
     val screenStateFlow: Flow<ScreenState<Output>> = combine(
         storeFlow,

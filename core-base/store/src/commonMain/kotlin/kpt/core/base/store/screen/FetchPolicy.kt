@@ -96,4 +96,21 @@ sealed interface FetchPolicy {
             require(intervalMillis > 0L) { "intervalMillis must be positive (got $intervalMillis)" }
         }
     }
+
+    /**
+     * Cache-first stale-while-revalidate: emit the cached value immediately
+     * (via [org.mobilenativefoundation.store.store5.StoreReadRequest.cached] with
+     * `refresh = false`), then consult
+     * [kpt.core.base.store.freshness.FreshnessBands.bandFor] on each cache
+     * emission and fire the background refresh **only** when the band is
+     * [kpt.core.base.store.freshness.FreshnessBand.Stale] or
+     * [kpt.core.base.store.freshness.FreshnessBand.VeryStale]. Pair with
+     * [ScreenDataStream.refreshFresh] for the sibling `refresh = true`
+     * fresh-fetch path (pull-to-refresh, post-mutation) — the pair together
+     * satisfies Store5 S5-5 (single source of truth for freshness).
+     *
+     * The [ScreenDataStream] global default is still [NETWORK_WITH_CACHE]; opt
+     * in per call site via `asScreenStream(fetchPolicy = CACHE_FIRST_SWR)`.
+     */
+    data object CACHE_FIRST_SWR : FetchPolicy
 }

@@ -34,6 +34,8 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.coreBase.store)
             implementation(projects.coreBase.designsystem)
+            implementation(projects.coreBase.datastore) // NEW — for ScreenUiStateStore (Phase 2)
+            implementation(libs.koin.compose) // NEW — for koinInject() in rememberRetainedScreenState
             implementation(libs.cmp.network.monitor.compose)
             implementation(libs.cmp.intent.launcher)
 

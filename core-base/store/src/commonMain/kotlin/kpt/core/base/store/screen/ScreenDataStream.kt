@@ -242,7 +242,12 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     cacheKey: String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
-    fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
+    // Phase-5 T10 FLIP (AC-21c) — app-wide default is now CACHE_FIRST_SWR.
+    // Previous value `NETWORK_WITH_CACHE` retired; call sites that need
+    // network-first pin `FetchPolicy.NETWORK_ONLY` explicitly (see e.g.
+    // `feature/currency-rates/.../CurrencyRatesViewModel.kt` — the only
+    // production site that pins NETWORK_ONLY today, unaffected by this flip).
+    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_FIRST_SWR,
     reconnectDebounceMs: Long = DEFAULT_RECONNECT_DEBOUNCE_MS,
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
     ttl: Duration = 24.hours,
@@ -461,7 +466,8 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     cacheKeyFor: (Key) -> String,
     scope: CoroutineScope,
     isEmpty: (Output) -> Boolean = { false },
-    fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
+    // Phase-5 T10 FLIP (AC-21c) — matches the single-key overload above.
+    fetchPolicy: FetchPolicy = FetchPolicy.CACHE_FIRST_SWR,
     reconnectDebounceMs: Long = DEFAULT_RECONNECT_DEBOUNCE_MS,
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
     ttl: Duration = 24.hours,

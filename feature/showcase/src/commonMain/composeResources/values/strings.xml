@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- ============================================================
+         RULE-IMPL-NO-HARDCODED-STRING-001 — feature/showcase i18n surface
+         Naming convention: screens_showcase_<screen>_<role>
+         Note: showcase is a DEV-ONLY screen tree; strings remain English
+         for engineer-facing diagnostics, but routed through stringResource
+         to satisfy the no-hardcoded-string discipline universally.
+         Authored by W2-6 of plan-layer/active/store5-superbrain-v2/.
+         ============================================================ -->
+
+    <!-- ===== StateGalleryScreen ===== -->
+    <string name="screens_showcase_state_gallery_intro">Visual smoke test for every ScreenState variant + each component-scale state primitive shipped by core/designsystem.</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (defaults — title + message)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error full-screen</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — captive portal CTA</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — plain offline</string>
+
+    <!-- ===== TransitionGalleryScreen ===== -->
+    <string name="screens_showcase_transition_gallery_intro">Tap each tile to push a demo screen using that transition. The destination auto-pops after 2s. Watch for blinks.</string>
+
+    <!-- ===== TransitionGalleryNavigation ===== -->
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(auto-pops in 2s)</string>
+</resources>

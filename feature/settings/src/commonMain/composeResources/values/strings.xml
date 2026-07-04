@@ -33,4 +33,16 @@
     <string name="feature_settings_change_language_text">Change Language</string>
     <string name="feature_settings_change_language_placeholder_text">Change Language</string>
     <string name="feature_settings_language_preference">Language</string>
+
+    <!-- ===== RULE-IMPL-NO-HARDCODED-STRING-001 backfill (W2-6 store5-superbrain-v2) ===== -->
+    <!-- SettingsScreen — dev-tools sheet + app-info row -->
+    <string name="feature_settings_dev_tools_title">Dev tools</string>
+    <string name="feature_settings_dev_transition_gallery">Transition Gallery</string>
+    <string name="feature_settings_dev_state_gallery">State Gallery</string>
+    <string name="feature_settings_dev_close">Close</string>
+    <string name="feature_settings_app_name">Money Toolkit</string>
+
+    <!-- NotificationScreen — empty state -->
+    <string name="feature_settings_notifications_empty_title">No notifications yet</string>
+    <string name="feature_settings_notifications_empty_message">You\'ll see bill reminders and rate alerts here.</string>
 </resources>

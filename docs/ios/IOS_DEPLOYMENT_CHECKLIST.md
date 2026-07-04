@@ -154,7 +154,7 @@ grep -A1 "ITSAppUsesNonExemptEncryption" cmp-ios/iosApp/Info.plist
 - [ ] `secrets/apple/appstore/issuer_id` - App Store Connect API Issuer ID
 - [ ] `secrets/apple/match/match_ci_key` - SSH key for Match repository
 - [ ] `secrets/apple/match/.match_password` - Match repository password
-- [ ] `secrets/android/firebase/service-account.json` - Firebase credentials
+- [ ] `secrets/live/android/firebase/firebaseAppDistributionServiceCredentialsFile.json` - Firebase credentials
 
 ---
 

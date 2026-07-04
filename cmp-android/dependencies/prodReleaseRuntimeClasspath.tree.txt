@@ -2539,6 +2539,7 @@
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    +--- project :feature:currency-rates
@@ -2581,7 +2582,8 @@
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
-|    |    |    \--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    \--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    +--- project :feature:emi-calculator
 |    |    |    +--- io.insert-koin:koin-bom:4.2.1 (*)
 |    |    |    +--- io.insert-koin:koin-android:4.2.1 (*)
@@ -2614,7 +2616,8 @@
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
-|    |    |    \--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    \--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    +--- project :feature:profile
 |    |    |    +--- io.insert-koin:koin-bom:4.2.1 (*)
 |    |    |    +--- io.insert-koin:koin-android:4.2.1 (*)
@@ -2765,6 +2768,7 @@
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    +--- project :feature:loans
 |    |    |    +--- io.insert-koin:koin-bom:4.2.1 (*)
@@ -2832,11 +2836,13 @@
 |    |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
 |    |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    |    +--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    +--- project :feature:amortization (*)
 |    |    +--- project :feature:rates
@@ -2874,6 +2880,7 @@
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    +--- project :feature:calculators
@@ -2910,7 +2917,8 @@
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
-|    |    |    \--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    \--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    +--- project :feature:macro
 |    |    |    +--- io.insert-koin:koin-bom:4.2.1 (*)
 |    |    |    +--- io.insert-koin:koin-android:4.2.1 (*)
@@ -2945,7 +2953,8 @@
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
-|    |    |    \--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    \--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    +--- project :feature:showcase
 |    |    |    +--- io.insert-koin:koin-bom:4.2.1 (*)
 |    |    |    +--- io.insert-koin:koin-android:4.2.1 (*)
@@ -2977,7 +2986,8 @@
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.11.1 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)
-|    |    |    \--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    \--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)

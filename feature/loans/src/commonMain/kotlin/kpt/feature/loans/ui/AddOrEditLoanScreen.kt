@@ -51,6 +51,32 @@ import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.base.store.submit.SubmitState
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.model.banking.LoanKind
+import kpt.feature.loans.generated.resources.Res
+import kpt.feature.loans.generated.resources.screens_loans_add_submit
+import kpt.feature.loans.generated.resources.screens_loans_add_title
+import kpt.feature.loans.generated.resources.screens_loans_addedit_annual_rate_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_back_cd
+import kpt.feature.loans.generated.resources.screens_loans_addedit_dismiss_button
+import kpt.feature.loans.generated.resources.screens_loans_addedit_kind_cd
+import kpt.feature.loans.generated.resources.screens_loans_addedit_kind_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_monthly_emi_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_months_remaining_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_name_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_next_due_date_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_principal_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_principal_remaining_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_retry_button
+import kpt.feature.loans.generated.resources.screens_loans_addedit_status_failed
+import kpt.feature.loans.generated.resources.screens_loans_addedit_status_failed_unknown
+import kpt.feature.loans.generated.resources.screens_loans_addedit_status_offline
+import kpt.feature.loans.generated.resources.screens_loans_addedit_status_saved
+import kpt.feature.loans.generated.resources.screens_loans_addedit_status_saving
+import kpt.feature.loans.generated.resources.screens_loans_addedit_tenure_label
+import kpt.feature.loans.generated.resources.screens_loans_addedit_total_interest_preview
+import kpt.feature.loans.generated.resources.screens_loans_addedit_total_paid_label
+import kpt.feature.loans.generated.resources.screens_loans_edit_submit
+import kpt.feature.loans.generated.resources.screens_loans_edit_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -93,10 +119,23 @@ fun AddOrEditLoanScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text(if (loanId == null) "Add Loan" else "Edit Loan") },
+                title = {
+                    Text(
+                        stringResource(
+                            if (loanId == null) {
+                                Res.string.screens_loans_add_title
+                            } else {
+                                Res.string.screens_loans_edit_title
+                            },
+                        ),
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_loans_addedit_back_cd),
+                        )
                     }
                 },
             )
@@ -115,7 +154,7 @@ fun AddOrEditLoanScreen(
             OutlinedTextField(
                 value = form.name,
                 onValueChange = viewModel::onNameChange,
-                label = { Text("Loan name") },
+                label = { Text(stringResource(Res.string.screens_loans_addedit_name_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = submit !is SubmitState.Submitting,
@@ -128,43 +167,43 @@ fun AddOrEditLoanScreen(
             )
 
             DoubleField(
-                label = "Original principal",
+                label = stringResource(Res.string.screens_loans_addedit_principal_label),
                 value = form.principal,
                 onChange = viewModel::onPrincipalChange,
                 enabled = submit !is SubmitState.Submitting,
             )
             DoubleField(
-                label = "Principal remaining",
+                label = stringResource(Res.string.screens_loans_addedit_principal_remaining_label),
                 value = form.principalRemaining,
                 onChange = viewModel::onPrincipalRemainingChange,
                 enabled = submit !is SubmitState.Submitting,
             )
             DoubleField(
-                label = "Annual interest rate (%)",
+                label = stringResource(Res.string.screens_loans_addedit_annual_rate_label),
                 value = form.annualRatePercent,
                 onChange = viewModel::onAnnualRatePercentChange,
                 enabled = submit !is SubmitState.Submitting,
             )
             IntField(
-                label = "Tenure (months)",
+                label = stringResource(Res.string.screens_loans_addedit_tenure_label),
                 value = form.tenureMonths,
                 onChange = viewModel::onTenureMonthsChange,
                 enabled = submit !is SubmitState.Submitting,
             )
             IntField(
-                label = "Months remaining",
+                label = stringResource(Res.string.screens_loans_addedit_months_remaining_label),
                 value = form.monthsRemaining,
                 onChange = viewModel::onMonthsRemainingChange,
                 enabled = submit !is SubmitState.Submitting,
             )
             DateField(
-                label = "Next due date (YYYY-MM-DD)",
+                label = stringResource(Res.string.screens_loans_addedit_next_due_date_label),
                 value = form.nextDueDate,
                 onChange = viewModel::onNextDueDateChange,
                 enabled = submit !is SubmitState.Submitting,
             )
             DoubleField(
-                label = "Total paid to date",
+                label = stringResource(Res.string.screens_loans_addedit_total_paid_label),
                 value = form.totalPaid,
                 onChange = viewModel::onTotalPaidChange,
                 enabled = submit !is SubmitState.Submitting,
@@ -183,7 +222,15 @@ fun AddOrEditLoanScreen(
                 if (submit is SubmitState.Submitting) {
                     CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
                 }
-                Text(if (loanId == null) "Save Loan" else "Update Loan")
+                Text(
+                    stringResource(
+                        if (loanId == null) {
+                            Res.string.screens_loans_add_submit
+                        } else {
+                            Res.string.screens_loans_edit_submit
+                        },
+                    ),
+                )
             }
 
             SubmitStatusLine(
@@ -208,12 +255,12 @@ private fun LoanKindDropdown(
             onValueChange = {},
             readOnly = true,
             enabled = enabled,
-            label = { Text("Kind") },
+            label = { Text(stringResource(Res.string.screens_loans_addedit_kind_label)) },
             trailingIcon = {
                 IconButton(onClick = { if (enabled) expanded = !expanded }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = "Choose loan kind",
+                        contentDescription = stringResource(Res.string.screens_loans_addedit_kind_cd),
                     )
                 }
             },
@@ -295,10 +342,13 @@ private fun ComputedPreviewCard(monthlyEmi: Double, totalInterest: Double) {
     HeroCard {
         AmountDisplay(
             amountText = formatMoney(monthlyEmi),
-            label = "Monthly EMI",
+            label = stringResource(Res.string.screens_loans_addedit_monthly_emi_label),
             supporting = {
                 Text(
-                    text = "Total interest: ${formatMoney(totalInterest)}",
+                    text = stringResource(
+                        Res.string.screens_loans_addedit_total_interest_preview,
+                        formatMoney(totalInterest),
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
@@ -315,30 +365,38 @@ private fun SubmitStatusLine(
     when (submit) {
         is SubmitState.Idle -> Unit
         is SubmitState.Submitting -> Text(
-            text = "Saving…",
+            text = stringResource(Res.string.screens_loans_addedit_status_saving),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         is SubmitState.Submitted<*> -> Text(
-            text = "Saved ✓",
+            text = stringResource(Res.string.screens_loans_addedit_status_saved),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.primary,
         )
         is SubmitState.Failed -> {
             val offline = submit.draftSaved
+            val unknownError = stringResource(Res.string.screens_loans_addedit_status_failed_unknown)
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
                     text = if (offline) {
-                        "Saved offline — will sync when online."
+                        stringResource(Res.string.screens_loans_addedit_status_offline)
                     } else {
-                        "Save failed: ${submit.error.message ?: "unknown error"}"
+                        stringResource(
+                            Res.string.screens_loans_addedit_status_failed,
+                            submit.error.message ?: unknownError,
+                        )
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = onRetry) { Text("Retry") }
-                    Button(onClick = onDismiss) { Text("Dismiss") }
+                    Button(onClick = onRetry) {
+                        Text(stringResource(Res.string.screens_loans_addedit_retry_button))
+                    }
+                    Button(onClick = onDismiss) {
+                        Text(stringResource(Res.string.screens_loans_addedit_dismiss_button))
+                    }
                 }
             }
         }

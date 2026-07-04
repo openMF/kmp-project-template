@@ -23,6 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
+import kpt.feature.showcase.generated.resources.Res
+import kpt.feature.showcase.generated.resources.screens_showcase_transition_gallery_intro
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Dev-only screen exhibiting every transition factory. Each row tile, when
@@ -50,8 +53,7 @@ fun TransitionGalleryScreen(
                 .padding(horizontal = sp.lg),
         ) {
             Text(
-                text = "Tap each tile to push a demo screen using that transition. " +
-                    "The destination auto-pops after 2s. Watch for blinks.",
+                text = stringResource(Res.string.screens_showcase_transition_gallery_intro),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(vertical = sp.md),
             )

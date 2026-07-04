@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- ============================================================
+         RULE-IMPL-NO-HARDCODED-STRING-001 — feature/emi-calculator i18n surface
+         Naming convention: screens_emicalculator_<role>
+         Authored by W2-6 of plan-layer/active/store5-superbrain-v2/.
+         ============================================================ -->
+
+    <string name="screens_emicalculator_title">EMI Calculator</string>
+    <string name="screens_emicalculator_back_cd">Back</string>
+    <string name="screens_emicalculator_principal_label">Principal Amount</string>
+    <string name="screens_emicalculator_rate_label">Annual Rate (%)</string>
+    <string name="screens_emicalculator_tenure_label">Tenure (months)</string>
+    <string name="screens_emicalculator_monthly_emi_label">Monthly EMI</string>
+    <string name="screens_emicalculator_total_payment_label">Total payment</string>
+    <string name="screens_emicalculator_total_interest_label">Total interest</string>
+</resources>

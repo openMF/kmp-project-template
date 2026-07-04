@@ -36,7 +36,13 @@ import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.economic.IndicatorKind
+import kpt.feature.macro.generated.resources.Res
+import kpt.feature.macro.generated.resources.screens_macro_back_cd
+import kpt.feature.macro.generated.resources.screens_macro_country_title
+import kpt.feature.macro.generated.resources.screens_macro_refresh_all_cd
+import kpt.feature.macro.generated.resources.screens_macro_stale_chip
 import kpt.feature.macro.ui.components.IndicatorCard
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -70,12 +76,12 @@ fun CountryMacroScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Country Macro") },
+                title = { Text(stringResource(Res.string.screens_macro_country_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.screens_macro_back_cd),
                         )
                     }
                 },
@@ -93,7 +99,10 @@ fun CountryMacroScreen(
                             .clickable(onClick = onPickCountry),
                     )
                     IconButton(onClick = { viewModel.trySendAction(MacroAction.RefreshAll) }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh all")
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = stringResource(Res.string.screens_macro_refresh_all_cd),
+                        )
                     }
                 },
             )
@@ -109,7 +118,7 @@ fun CountryMacroScreen(
         ) {
             if (uiState.overallBand == FreshnessBand.Stale || uiState.overallBand == FreshnessBand.VeryStale) {
                 StatusChip(
-                    text = "STALE — showing cached data",
+                    text = stringResource(Res.string.screens_macro_stale_chip),
                     intent = StatusChipIntent.Warning,
                     modifier = Modifier.padding(horizontal = sp.lg),
                 )

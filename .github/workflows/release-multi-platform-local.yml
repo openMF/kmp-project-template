@@ -118,15 +118,11 @@ jobs:
           echo "✅ Materialized google-services.json"
         fi
         if [ -n "${FIREBASE_CREDS_B64:-}" ]; then
-          mkdir -p secrets/android/firebase
-          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/android/firebase/service-account.json
-          echo "$FIREBASE_CREDS_B64" | base64 -d > secrets/android/firebaseAppDistributionServiceCredentialsFile.json
+          deployment/scripts/build-secrets materialize firebase_service_account --from-env FIREBASE_CREDS_B64
           echo "✅ Materialized Firebase SA"
         fi
         if [ -n "${PLAYSTORE_CREDS_B64:-}" ]; then
-          mkdir -p secrets/android/play
-          echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/android/play/service-account.json
-          echo "$PLAYSTORE_CREDS_B64" | base64 -d > secrets/android/playStorePublishServiceCredentialsFile.json
+          deployment/scripts/build-secrets materialize play_service_account --from-env PLAYSTORE_CREDS_B64
           echo "✅ Materialized Play SA"
         fi
         if [ -n "${APPSTORE_AUTH_KEY_B64:-}" ]; then

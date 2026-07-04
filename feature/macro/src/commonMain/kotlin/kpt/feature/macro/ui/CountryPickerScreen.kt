@@ -41,6 +41,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.model.economic.Country
+import kpt.feature.macro.generated.resources.Res
+import kpt.feature.macro.generated.resources.screens_macro_back_cd
+import kpt.feature.macro.generated.resources.screens_macro_picker_search_placeholder
+import kpt.feature.macro.generated.resources.screens_macro_picker_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -62,12 +67,12 @@ fun CountryPickerScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Select Country") },
+                title = { Text(stringResource(Res.string.screens_macro_picker_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.screens_macro_back_cd),
                         )
                     }
                 },
@@ -85,7 +90,7 @@ fun CountryPickerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Search country or ISO code") },
+                placeholder = { Text(stringResource(Res.string.screens_macro_picker_search_placeholder)) },
                 singleLine = true,
             )
             LazyColumn(modifier = Modifier.fillMaxSize()) {

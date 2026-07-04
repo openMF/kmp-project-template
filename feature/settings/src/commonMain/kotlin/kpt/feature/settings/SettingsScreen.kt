@@ -40,10 +40,15 @@ import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.settings.generated.resources.Res
+import kpt.feature.settings.generated.resources.feature_settings_app_name
 import kpt.feature.settings.generated.resources.feature_settings_change_language_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_language_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_text
+import kpt.feature.settings.generated.resources.feature_settings_dev_close
+import kpt.feature.settings.generated.resources.feature_settings_dev_state_gallery
+import kpt.feature.settings.generated.resources.feature_settings_dev_tools_title
+import kpt.feature.settings.generated.resources.feature_settings_dev_transition_gallery
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -152,7 +157,7 @@ private fun DevMenuDialog(
 ) {
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Dev tools") },
+        title = { Text(stringResource(Res.string.feature_settings_dev_tools_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
                 if (onTransitionGalleryClick != null) {
@@ -162,7 +167,7 @@ private fun DevMenuDialog(
                             onDismiss()
                             onTransitionGalleryClick()
                         },
-                    ) { Text("Transition Gallery") }
+                    ) { Text(stringResource(Res.string.feature_settings_dev_transition_gallery)) }
                 }
                 if (onStateGalleryClick != null) {
                     androidx.compose.material3.TextButton(
@@ -171,12 +176,14 @@ private fun DevMenuDialog(
                             onDismiss()
                             onStateGalleryClick()
                         },
-                    ) { Text("State Gallery") }
+                    ) { Text(stringResource(Res.string.feature_settings_dev_state_gallery)) }
                 }
             }
         },
         confirmButton = {
-            androidx.compose.material3.TextButton(onClick = onDismiss) { Text("Close") }
+            androidx.compose.material3.TextButton(onClick = onDismiss) {
+                Text(stringResource(Res.string.feature_settings_dev_close))
+            }
         },
     )
 }
@@ -211,7 +218,7 @@ private fun VersionLabel(
         modifier.fillMaxWidth()
     }
     Text(
-        text = "Money Toolkit",
+        text = stringResource(Res.string.feature_settings_app_name),
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,

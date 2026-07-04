@@ -24,6 +24,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kpt.feature.macro.generated.resources.Res
+import kpt.feature.macro.generated.resources.screens_macro_sparkline_empty
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Lightweight inline sparkline. Plots [values] horizontally as a polyline
@@ -75,7 +78,7 @@ private fun SparklineEmpty() {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "—",
+            text = stringResource(Res.string.screens_macro_sparkline_empty),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

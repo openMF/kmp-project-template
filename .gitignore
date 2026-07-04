@@ -81,8 +81,15 @@ secrets/android/playStorePublishServiceCredentialsFile.json
 # Secrets and Configuration - NEVER COMMIT THESE!
 # secrets.env — REMOVED: that file is retired (2026-06-23). Keystore passwords
 # now live in secrets/android/keystores/ (covered by secrets/ below).
-secrets/
+# Phase 7 layout: secrets/live/ (REAL secrets, gitignored) + secrets/sample/ (committed
+# fakes) + secrets/LAYOUT.yaml (the path contract). `secrets/*` (not `secrets/`) leaves the
+# dir un-excluded so children can be re-included (git rule); live/ stays ignored via `*`.
+secrets/*
 !secrets/.gitkeep
+# The secrets LAYOUT contract is the SoT for PATHS — holds NO secret values.
+!secrets/LAYOUT.yaml
+# Committed fake/sample secrets (structurally valid, obviously not real).
+!secrets/sample
 .env.local
 !.env.local.example
 
@@ -131,3 +138,8 @@ release-layer/
 # Generated fastlane reports (contain signing material) — never commit
 deployment/fastlane/report.xml
 deployment/fastlane/**/report.xml
+
+# Phase 7: commit the obviously-fake secrets/sample/ placeholders even though the global
+# *.keystore / *.key rules above would ignore them. (Real secrets live in gitignored secrets/live/.)
+!secrets/sample/android/keystores/upload_keystore.keystore
+!secrets/sample/desktop/linux/gpg_signing.key

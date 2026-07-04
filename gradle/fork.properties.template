@@ -243,3 +243,49 @@ store.macos.keywords=keyword1,keyword2,keyword3,keyword4
 # Mac App Store primary category.
 # Common values: Finance, Productivity, Utilities, Business
 store.macos.category=Productivity
+
+# ── Windows / Microsoft Store (MSIX) — NON-SECRET identity ───────────────────
+# The MSIX you ship to the Store must declare an <Identity> that EXACTLY matches
+# what Partner Center reserved for this app, or the submission is rejected. These
+# values are fork-specific and PUBLIC (embedded in every shipped package), so they
+# live here — never hardcoded in the workflow/action. The actual API credential
+# (client secret) is NOT here — it goes in secrets/ (see LAYOUT.yaml).
+#
+# Find all four at: Partner Center → your app → Product management → Product identity
+#   https://partner.microsoft.com/dashboard/apps-and-games/overview
+# Consumed by: ./gradlew syncForkConfig → deployment/desktop/microsoft-store/
+#   StoreBroker.config.json (${ENV:MS_APP_ID}) AND the generated AppxManifest.xml.
+# CI: set each ENV var directly (these are non-secret → GitHub Actions *variables*,
+#   not secrets). fork.properties is gitignored and not read on CI.
+
+# Store ID — the product's Store ID (e.g. 9NBLGGH4XXXX). Used as the submission
+# API's applicationId. Public (it's in your store URL).
+# ENV: MS_APP_ID
+windows.store.id=YOUR_STORE_ID
+
+# MSIX package identity Name — Partner Center "Package/Identity/Name"
+# (e.g. 12345YourPublisher.YourApp). Goes into AppxManifest <Identity Name="…">.
+# ENV: WINDOWS_MSIX_IDENTITY_NAME
+windows.msix.identity.name=YOUR_PUBLISHER.YOUR_APP
+
+# MSIX publisher — Partner Center "Package/Identity/Publisher"
+# (e.g. CN=ABCD1234-AB12-...). Goes into AppxManifest <Identity Publisher="…">.
+# ENV: WINDOWS_MSIX_PUBLISHER
+windows.msix.identity.publisher=CN=YOUR_PUBLISHER_ID
+
+# MSIX publisher display name — Partner Center "PublisherDisplayName".
+# Goes into AppxManifest <Properties><PublisherDisplayName>.
+# ENV: WINDOWS_MSIX_PUBLISHER_DISPLAY_NAME
+windows.msix.publisher.display.name=Your Display Name
+
+# Partner Center submission-API credential — the tenant + client are NON-SECRET
+# GUIDs (they appear in tokens/URLs), so they live here; ONLY the client SECRET is
+# a real secret → secrets/ (alias ms_partner_center_client_secret).
+# Find at: Partner Center → Account settings → User management → Azure AD applications
+#   https://partner.microsoft.com/dashboard/account/v3/usermanagement
+# AAD app tenant (Directory) GUID.
+# ENV: MS_PARTNER_CENTER_TENANT_ID
+windows.partner.center.tenant.id=YOUR_TENANT_GUID
+# AAD app (client) GUID — must have the Partner Center "Manager" role.
+# ENV: MS_PARTNER_CENTER_CLIENT_ID
+windows.partner.center.client.id=YOUR_CLIENT_GUID

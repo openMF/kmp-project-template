@@ -23,6 +23,16 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.foundation)
             implementation(compose.materialIconsExtended)
+            // compose-resources — for stringResource()-based UI copy (i18n) per
+            // RULE-IMPL-NO-HARDCODED-STRING-001 (W2 of store5-superbrain-v2).
+            implementation(compose.components.resources)
         }
     }
+}
+
+// Compose-resources class generator config — mirrors `feature/loans/build.gradle.kts`.
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+    packageOfResClass = "kpt.feature.showcase.generated.resources"
 }

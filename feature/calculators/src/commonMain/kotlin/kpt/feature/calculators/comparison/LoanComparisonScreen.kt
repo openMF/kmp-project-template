@@ -47,6 +47,22 @@ import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.emi.EmiResult
+import kpt.feature.calculators.generated.resources.Res
+import kpt.feature.calculators.generated.resources.screens_calc_compare_back_cd
+import kpt.feature.calculators.generated.resources.screens_calc_compare_best_badge
+import kpt.feature.calculators.generated.resources.screens_calc_compare_best_emi_label
+import kpt.feature.calculators.generated.resources.screens_calc_compare_best_emi_value
+import kpt.feature.calculators.generated.resources.screens_calc_compare_helper_text
+import kpt.feature.calculators.generated.resources.screens_calc_compare_principal_label
+import kpt.feature.calculators.generated.resources.screens_calc_compare_rate_label
+import kpt.feature.calculators.generated.resources.screens_calc_compare_result_emi
+import kpt.feature.calculators.generated.resources.screens_calc_compare_result_interest
+import kpt.feature.calculators.generated.resources.screens_calc_compare_result_total
+import kpt.feature.calculators.generated.resources.screens_calc_compare_savings_text
+import kpt.feature.calculators.generated.resources.screens_calc_compare_scenario_label
+import kpt.feature.calculators.generated.resources.screens_calc_compare_tenure_label
+import kpt.feature.calculators.generated.resources.screens_calc_compare_title
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -80,7 +96,7 @@ fun LoanComparisonScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Compare Loans",
+                        text = stringResource(Res.string.screens_calc_compare_title),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold,
                         ),
@@ -88,7 +104,10 @@ fun LoanComparisonScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_calc_compare_back_cd),
+                        )
                     }
                 },
             )
@@ -137,18 +156,26 @@ private fun ComparisonHero(analysis: LoanComparisonAnalysis) {
     }
     HeroCard {
         AmountDisplay(
-            amountText = cheapest?.emi?.formatGrouped(2)?.let { "$it/mo" } ?: "—",
-            label = "Best EMI · Scenario ${analysis.cheapestIndex + 1}",
+            amountText = cheapest?.emi?.formatGrouped(2)?.let {
+                stringResource(Res.string.screens_calc_compare_best_emi_value, it)
+            } ?: "—",
+            label = stringResource(
+                Res.string.screens_calc_compare_best_emi_label,
+                analysis.cheapestIndex + 1,
+            ),
             supporting = {
                 Column(verticalArrangement = Arrangement.spacedBy(sp.xs)) {
                     if (savings > 0) {
                         Text(
-                            text = "Saves ${savings.formatGrouped(2)} total vs. costliest",
+                            text = stringResource(
+                                Res.string.screens_calc_compare_savings_text,
+                                savings.formatGrouped(2),
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                     Text(
-                        text = "Edit any scenario below to see the comparison update live.",
+                        text = stringResource(Res.string.screens_calc_compare_helper_text),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
@@ -177,14 +204,17 @@ private fun ScenarioCard(
                 horizontalArrangement = Arrangement.spacedBy(sp.sm),
             ) {
                 Text(
-                    text = "Scenario ${index + 1}",
+                    text = stringResource(Res.string.screens_calc_compare_scenario_label, index + 1),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.SemiBold,
                     ),
                     modifier = Modifier.weight(1f),
                 )
                 if (isCheapest) {
-                    StatusChip(text = "Best", intent = StatusChipIntent.Success)
+                    StatusChip(
+                        text = stringResource(Res.string.screens_calc_compare_best_badge),
+                        intent = StatusChipIntent.Success,
+                    )
                 }
             }
 
@@ -194,7 +224,7 @@ private fun ScenarioCard(
                 onValueChange = {
                     it.toDoubleOrNull()?.let { v -> onChange(scenario.copy(principal = v)) }
                 },
-                label = { Text("Principal") },
+                label = { Text(stringResource(Res.string.screens_calc_compare_principal_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
@@ -212,7 +242,7 @@ private fun ScenarioCard(
                             onChange(scenario.copy(ratePercent = v))
                         }
                     },
-                    label = { Text("Rate (%)") },
+                    label = { Text(stringResource(Res.string.screens_calc_compare_rate_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     modifier = Modifier.weight(1f),
@@ -222,7 +252,7 @@ private fun ScenarioCard(
                     onValueChange = {
                         it.toIntOrNull()?.let { v -> onChange(scenario.copy(tenureMonths = v)) }
                     },
-                    label = { Text("Tenure (months)") },
+                    label = { Text(stringResource(Res.string.screens_calc_compare_tenure_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true,
                     modifier = Modifier.weight(1f),
@@ -264,9 +294,18 @@ private fun ResultStrip(result: EmiResult, highlight: Boolean) {
                 .padding(horizontal = sp.md, vertical = sp.sm),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            ResultCell(label = "EMI", value = result.emi.formatGrouped(2))
-            ResultCell(label = "Interest", value = result.totalInterest.formatGrouped(2))
-            ResultCell(label = "Total", value = result.totalPayment.formatGrouped(2))
+            ResultCell(
+                label = stringResource(Res.string.screens_calc_compare_result_emi),
+                value = result.emi.formatGrouped(2),
+            )
+            ResultCell(
+                label = stringResource(Res.string.screens_calc_compare_result_interest),
+                value = result.totalInterest.formatGrouped(2),
+            )
+            ResultCell(
+                label = stringResource(Res.string.screens_calc_compare_result_total),
+                value = result.totalPayment.formatGrouped(2),
+            )
         }
     }
 }

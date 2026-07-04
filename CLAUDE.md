@@ -165,8 +165,8 @@ The `template_version: "2.6.0"` epic (fastlane-modernization) replaced the
 legacy `.env.local.example` pattern with a structured secrets pipeline. Pick
 the path that matches your team:
 
-- **Path A — OSS fork (manual mode):** copy the schema from `secrets_demo/`
-  into `secrets/` and fill in real values; CI consumes them via the per-target
+- **Path A — OSS fork (manual mode):** copy `secrets/sample/` into `secrets/live/`
+  and fill in real values; CI consumes them via the per-target
   `deployment/<platform>/<target>/workflow-snippet.yml` manual flavor.
 - **Path B — Vault mode (maintainers):** run `/secrets pull` from a
   framework-bound session; secrets materialize to canonical filesystem

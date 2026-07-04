@@ -37,6 +37,18 @@ import kpt.core.designsystem.component.state.InlineErrorPill
 import kpt.core.designsystem.component.state.RowLoadingShimmer
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
+import kpt.feature.showcase.generated.resources.Res
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_content
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_empty
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_error
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_intro
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_loading
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_nonet
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_preview_empty
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_preview_error
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_preview_nonet_captive
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_preview_nonet_offline
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Dev-only screen exhibiting every [ScreenState] variant and each of the 5 component-scale
@@ -65,8 +77,7 @@ fun StateGalleryScreen(
             verticalArrangement = Arrangement.spacedBy(sp.lg),
         ) {
             Text(
-                text = "Visual smoke test for every ScreenState variant + each " +
-                    "component-scale state primitive shipped by core/designsystem.",
+                text = stringResource(Res.string.screens_showcase_state_gallery_intro),
                 style = MaterialTheme.typography.bodyMedium,
             )
 
@@ -102,19 +113,34 @@ fun StateGalleryScreen(
 
             // ── CardStateBox ────────────────────────────────────────────
             SectionHeader("CardStateBox — every variant")
-            Text("Loading", style = MaterialTheme.typography.labelMedium)
+            Text(
+                stringResource(Res.string.screens_showcase_state_gallery_loading),
+                style = MaterialTheme.typography.labelMedium,
+            )
             CardStateBox<String>(state = ScreenState.Loading) { Text(it) }
-            Text("Empty", style = MaterialTheme.typography.labelMedium)
+            Text(
+                stringResource(Res.string.screens_showcase_state_gallery_empty),
+                style = MaterialTheme.typography.labelMedium,
+            )
             CardStateBox<String>(state = ScreenState.Empty) { Text(it) }
-            Text("Error", style = MaterialTheme.typography.labelMedium)
+            Text(
+                stringResource(Res.string.screens_showcase_state_gallery_error),
+                style = MaterialTheme.typography.labelMedium,
+            )
             CardStateBox<String>(state = ScreenState.Error(RuntimeException("balance fetch failed"))) {
                 Text(it)
             }
-            Text("NoNetwork", style = MaterialTheme.typography.labelMedium)
+            Text(
+                stringResource(Res.string.screens_showcase_state_gallery_nonet),
+                style = MaterialTheme.typography.labelMedium,
+            )
             CardStateBox<String>(state = ScreenState.NoNetwork(isCaptivePortal = false)) {
                 Text(it)
             }
-            Text("Content", style = MaterialTheme.typography.labelMedium)
+            Text(
+                stringResource(Res.string.screens_showcase_state_gallery_content),
+                style = MaterialTheme.typography.labelMedium,
+            )
             CardStateBox<String>(
                 state = ScreenState.Content(
                     data = "Account: \$1,234.56",
@@ -124,7 +150,7 @@ fun StateGalleryScreen(
             // ── Full-screen states (compact preview) ─────────────────────
             SectionHeader("Full-screen state defaults (compact preview)")
 
-            PreviewBox(label = "Empty (defaults — title + message)") {
+            PreviewBox(label = stringResource(Res.string.screens_showcase_state_gallery_preview_empty)) {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -136,7 +162,7 @@ fun StateGalleryScreen(
                 }
             }
 
-            PreviewBox(label = "Error full-screen") {
+            PreviewBox(label = stringResource(Res.string.screens_showcase_state_gallery_preview_error)) {
                 DefaultErrorContent(
                     error = RuntimeException("Demo error: server unreachable"),
                     onRetry = {},
@@ -144,7 +170,7 @@ fun StateGalleryScreen(
                 )
             }
 
-            PreviewBox(label = "NoNetwork — captive portal CTA") {
+            PreviewBox(label = stringResource(Res.string.screens_showcase_state_gallery_preview_nonet_captive)) {
                 DefaultNoNetworkContent(
                     onRetry = {},
                     isCaptivePortal = true,
@@ -152,7 +178,7 @@ fun StateGalleryScreen(
                 )
             }
 
-            PreviewBox(label = "NoNetwork — plain offline") {
+            PreviewBox(label = stringResource(Res.string.screens_showcase_state_gallery_preview_nonet_offline)) {
                 DefaultNoNetworkContent(
                     onRetry = {},
                     isCaptivePortal = false,

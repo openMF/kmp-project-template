@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- ============================================================
+         RULE-IMPL-NO-HARDCODED-STRING-001 — feature/amortization i18n surface
+         Naming convention: screens_amortization_<screen>_<role>
+         (per training-layer/instructions/stream-first/latest/CORE_I18N.md)
+         Authored by W2 of plan-layer/active/store5-superbrain-v2/.
+         ============================================================ -->
+
+    <!-- ===== AmortizationScheduleScreen ===== -->
+    <string name="screens_amortization_schedule_title">Payment Schedule</string>
+    <string name="screens_amortization_schedule_back_cd">Back</string>
+    <string name="screens_amortization_schedule_header_month">#</string>
+    <string name="screens_amortization_schedule_header_principal">Principal</string>
+    <string name="screens_amortization_schedule_header_interest">Interest</string>
+    <string name="screens_amortization_schedule_header_balance">Balance</string>
+    <string name="screens_amortization_schedule_summary_title">Summary</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Total payments</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Total principal</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Total interest</string>
+</resources>

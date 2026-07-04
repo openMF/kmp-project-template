@@ -29,6 +29,16 @@ import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.economic.IndicatorKind
 import kpt.core.model.economic.MacroIndicator
+import kpt.feature.macro.generated.resources.Res
+import kpt.feature.macro.generated.resources.screens_macro_card_auth_required
+import kpt.feature.macro.generated.resources.screens_macro_card_captive_portal
+import kpt.feature.macro.generated.resources.screens_macro_card_empty
+import kpt.feature.macro.generated.resources.screens_macro_card_generic_error
+import kpt.feature.macro.generated.resources.screens_macro_card_latest_year
+import kpt.feature.macro.generated.resources.screens_macro_card_loading
+import kpt.feature.macro.generated.resources.screens_macro_card_offline
+import kpt.feature.macro.generated.resources.screens_macro_card_retry
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * A single indicator's at-a-glance card on the country-macro dashboard.
@@ -64,23 +74,24 @@ fun IndicatorCard(
                 is ScreenState.Loading -> LoadingBody()
                 is ScreenState.Content -> ContentBody(state.data)
                 is ScreenState.Empty -> InlineMessage(
-                    text = "No data published for this indicator.",
+                    text = stringResource(Res.string.screens_macro_card_empty),
                     onRetry = onRetry,
                 )
                 is ScreenState.NoNetwork -> InlineMessage(
                     text = if (state.isCaptivePortal) {
-                        "Behind a captive portal — sign in to continue."
+                        stringResource(Res.string.screens_macro_card_captive_portal)
                     } else {
-                        "Offline — connect to fetch this indicator."
+                        stringResource(Res.string.screens_macro_card_offline)
                     },
                     onRetry = onRetry,
                 )
                 is ScreenState.Error -> InlineMessage(
-                    text = state.error.message ?: "Couldn't load this indicator.",
+                    text = state.error.message
+                        ?: stringResource(Res.string.screens_macro_card_generic_error),
                     onRetry = onRetry,
                 )
                 is ScreenState.Unauthenticated -> InlineMessage(
-                    text = "Authentication required.",
+                    text = stringResource(Res.string.screens_macro_card_auth_required),
                     onRetry = onRetry,
                 )
             }
@@ -116,7 +127,7 @@ private fun ContentBody(indicator: MacroIndicator) {
             )
             indicator.latestYear()?.let { year ->
                 Text(
-                    text = "Latest: $year",
+                    text = stringResource(Res.string.screens_macro_card_latest_year, year.toString()),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -141,7 +152,7 @@ private fun LoadingBody() {
         contentAlignment = Alignment.CenterStart,
     ) {
         Text(
-            text = "Loading…",
+            text = stringResource(Res.string.screens_macro_card_loading),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -163,6 +174,6 @@ private fun InlineMessage(text: String, onRetry: () -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(end = 8.dp).fillMaxWidth(0.7f),
         )
-        TextButton(onClick = onRetry) { Text("Retry") }
+        TextButton(onClick = onRetry) { Text(stringResource(Res.string.screens_macro_card_retry)) }
     }
 }

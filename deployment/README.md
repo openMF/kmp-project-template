@@ -60,7 +60,7 @@ deployment/
 | Add a NEW per-target Fastfile to an existing platform | Add row to `DEPLOYMENT_MANIFEST.yaml#enabled_targets[]`, create `deployment/<platform>/<target>/{Fastfile,config.yaml,secrets-needs.yaml,README.md}`, run validator. |
 | Add a NEW platform (e.g. tvOS) | Bump `deployment-manifest.schema.json` platform enum + author per-platform helper module + add tier-A row(s). Schema change is a framework PR. |
 | Disable a target temporarily | Flip `enabled: true` → `false` for that row in `DEPLOYMENT_MANIFEST.yaml`. |
-| Require a secret that isn't in the vault yet | Add row to per-target `secrets-needs.yaml#manual_inputs[]` with `placeholder: secrets_demo/<path>`, drop a real placeholder file at that path, run `deployment/_shared/scripts/manual-preflight.sh`. |
+| Require a secret that isn't in the vault yet | Add row to per-target `secrets-needs.yaml#manual_inputs[]` with `placeholder: secrets/sample/<path>`, drop a real placeholder file at that path, run `deployment/_shared/scripts/manual-preflight.sh`. |
 | Promote a target from Tier-2 → Tier-1 | Update `tier` in the manifest, drop `requires_confirm`, document why in CHANGELOG. |
 
 ---

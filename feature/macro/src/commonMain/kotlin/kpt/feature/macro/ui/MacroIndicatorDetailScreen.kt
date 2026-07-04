@@ -47,9 +47,15 @@ import kpt.core.common.formatTimeAgo
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.economic.IndicatorKind
+import kpt.feature.macro.generated.resources.Res
+import kpt.feature.macro.generated.resources.screens_macro_back_cd
+import kpt.feature.macro.generated.resources.screens_macro_detail_source_label
+import kpt.feature.macro.generated.resources.screens_macro_detail_title
+import kpt.feature.macro.generated.resources.screens_macro_detail_year_by_year
 import kpt.feature.macro.ui.components.Sparkline
 import kpt.feature.macro.ui.components.displayName
 import kpt.feature.macro.ui.components.headlineValue
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.time.ExperimentalTime
@@ -80,12 +86,20 @@ fun MacroIndicatorDetailScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("${indicatorKind.displayName()} • $countryCode") },
+                title = {
+                    Text(
+                        stringResource(
+                            Res.string.screens_macro_detail_title,
+                            indicatorKind.displayName(),
+                            countryCode,
+                        ),
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(Res.string.screens_macro_back_cd),
                         )
                     }
                 },
@@ -120,7 +134,10 @@ fun MacroIndicatorDetailScreen(
                         label = indicatorKind.displayName(),
                         supporting = {
                             Text(
-                                text = "Source: ${indicator.source}",
+                                text = stringResource(
+                                    Res.string.screens_macro_detail_source_label,
+                                    indicator.source,
+                                ),
                                 style = MaterialTheme.typography.labelSmall,
                             )
                         },
@@ -136,7 +153,7 @@ fun MacroIndicatorDetailScreen(
                     )
                 }
                 Text(
-                    text = "Year-by-year",
+                    text = stringResource(Res.string.screens_macro_detail_year_by_year),
                     style = MaterialTheme.typography.titleSmall,
                 )
                 LazyColumn(modifier = Modifier.fillMaxSize()) {

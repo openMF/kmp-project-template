@@ -6,7 +6,7 @@
 platform :android do
   desc "Promote to production on Google Play (internal → production for first-time apps; beta → production otherwise)"
   lane :promote_to_production do
-    json_key = File.join(DEPLOYMENT_REPO_ROOT, FastlaneConfig::SECRETS_DIR, "android", "play", "service-account.json")
+    json_key = File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:play_service_account))
     pkg      = FastlaneConfig::ProjectConfig.android_package_name
 
     # Honor the caller's production_rollout (ENV ROLLOUT forwarded by the composite). Was

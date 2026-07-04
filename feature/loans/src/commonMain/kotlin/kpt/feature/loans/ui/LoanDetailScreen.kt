@@ -49,6 +49,29 @@ import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.Loan
+import kpt.feature.loans.generated.resources.Res
+import kpt.feature.loans.generated.resources.screens_loans_detail_annual_rate_label
+import kpt.feature.loans.generated.resources.screens_loans_detail_annual_rate_value
+import kpt.feature.loans.generated.resources.screens_loans_detail_back_cd
+import kpt.feature.loans.generated.resources.screens_loans_detail_delete_button
+import kpt.feature.loans.generated.resources.screens_loans_detail_delete_cancel
+import kpt.feature.loans.generated.resources.screens_loans_detail_delete_confirm
+import kpt.feature.loans.generated.resources.screens_loans_detail_delete_dialog_message
+import kpt.feature.loans.generated.resources.screens_loans_detail_delete_dialog_title
+import kpt.feature.loans.generated.resources.screens_loans_detail_edit_button
+import kpt.feature.loans.generated.resources.screens_loans_detail_monthly_payment_label
+import kpt.feature.loans.generated.resources.screens_loans_detail_months_remaining_value
+import kpt.feature.loans.generated.resources.screens_loans_detail_next_due_label
+import kpt.feature.loans.generated.resources.screens_loans_detail_original_principal_label
+import kpt.feature.loans.generated.resources.screens_loans_detail_principal_remaining_label
+import kpt.feature.loans.generated.resources.screens_loans_detail_schedule_button
+import kpt.feature.loans.generated.resources.screens_loans_detail_tenure_label
+import kpt.feature.loans.generated.resources.screens_loans_detail_tenure_progress_label
+import kpt.feature.loans.generated.resources.screens_loans_detail_tenure_progress_value
+import kpt.feature.loans.generated.resources.screens_loans_detail_tenure_value
+import kpt.feature.loans.generated.resources.screens_loans_detail_title
+import kpt.feature.loans.generated.resources.screens_loans_detail_total_paid_label
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -69,10 +92,13 @@ fun LoanDetailScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Loan Details") },
+                title = { Text(stringResource(Res.string.screens_loans_detail_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.screens_loans_detail_back_cd),
+                        )
                     }
                 },
             )
@@ -97,17 +123,19 @@ fun LoanDetailScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete loan?") },
-            text = { Text("This loan and its tracking history will be removed.") },
+            title = { Text(stringResource(Res.string.screens_loans_detail_delete_dialog_title)) },
+            text = { Text(stringResource(Res.string.screens_loans_detail_delete_dialog_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.onDelete()
                     showDeleteDialog = false
                     onBackClick()
-                }) { Text("Delete") }
+                }) { Text(stringResource(Res.string.screens_loans_detail_delete_confirm)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(Res.string.screens_loans_detail_delete_cancel))
+                }
             },
         )
     }
@@ -147,10 +175,13 @@ private fun LoanDetailContent(
         HeroCard {
             AmountDisplay(
                 amountText = formatMoney(loan.principalRemaining),
-                label = "Principal remaining",
+                label = stringResource(Res.string.screens_loans_detail_principal_remaining_label),
                 supporting = {
                     Text(
-                        text = "${loan.monthsRemaining} months remaining",
+                        text = stringResource(
+                            Res.string.screens_loans_detail_months_remaining_value,
+                            loan.monthsRemaining,
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 },
@@ -164,19 +195,43 @@ private fun LoanDetailContent(
                     .padding(sp.md),
                 verticalArrangement = Arrangement.spacedBy(sp.md),
             ) {
-                MetricRow(label = "Original principal", value = formatMoney(loan.principal))
-                MetricRow(label = "Monthly payment (EMI)", value = formatMoney(loan.monthlyPayment))
-                MetricRow(label = "Total paid to date", value = formatMoney(loan.totalPaid))
-                MetricRow(label = "Annual rate", value = "${loan.annualRatePercent}%")
-                MetricRow(label = "Next due date", value = loan.nextDueDate.toString())
-                MetricRow(label = "Tenure", value = "${loan.tenureMonths} months")
+                MetricRow(
+                    label = stringResource(Res.string.screens_loans_detail_original_principal_label),
+                    value = formatMoney(loan.principal),
+                )
+                MetricRow(
+                    label = stringResource(Res.string.screens_loans_detail_monthly_payment_label),
+                    value = formatMoney(loan.monthlyPayment),
+                )
+                MetricRow(
+                    label = stringResource(Res.string.screens_loans_detail_total_paid_label),
+                    value = formatMoney(loan.totalPaid),
+                )
+                MetricRow(
+                    label = stringResource(Res.string.screens_loans_detail_annual_rate_label),
+                    value = stringResource(
+                        Res.string.screens_loans_detail_annual_rate_value,
+                        loan.annualRatePercent.toString(),
+                    ),
+                )
+                MetricRow(
+                    label = stringResource(Res.string.screens_loans_detail_next_due_label),
+                    value = loan.nextDueDate.toString(),
+                )
+                MetricRow(
+                    label = stringResource(Res.string.screens_loans_detail_tenure_label),
+                    value = stringResource(
+                        Res.string.screens_loans_detail_tenure_value,
+                        loan.tenureMonths,
+                    ),
+                )
 
                 Spacer(modifier = Modifier.height(sp.xs))
 
                 val progress = tenureProgress(loan)
                 Column(verticalArrangement = Arrangement.spacedBy(sp.xs)) {
                     Text(
-                        text = "Tenure progress",
+                        text = stringResource(Res.string.screens_loans_detail_tenure_progress_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -185,7 +240,10 @@ private fun LoanDetailContent(
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Text(
-                        text = "${(progress * 100).toInt()}% complete",
+                        text = stringResource(
+                            Res.string.screens_loans_detail_tenure_progress_value,
+                            (progress * 100).toInt(),
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
@@ -197,13 +255,13 @@ private fun LoanDetailContent(
             horizontalArrangement = Arrangement.spacedBy(sp.sm),
         ) {
             Button(onClick = onEditClick, modifier = Modifier.weight(1f)) {
-                Text("Edit")
+                Text(stringResource(Res.string.screens_loans_detail_edit_button))
             }
             OutlinedButton(onClick = onAmortizationClick, modifier = Modifier.weight(1f)) {
-                Text("Schedule")
+                Text(stringResource(Res.string.screens_loans_detail_schedule_button))
             }
             OutlinedButton(onClick = onDeleteClick, modifier = Modifier.weight(1f)) {
-                Text("Delete")
+                Text(stringResource(Res.string.screens_loans_detail_delete_button))
             }
         }
         Spacer(modifier = Modifier.height(sp.sm))

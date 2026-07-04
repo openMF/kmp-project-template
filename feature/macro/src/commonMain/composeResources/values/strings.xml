@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- ============================================================
+         RULE-IMPL-NO-HARDCODED-STRING-001 — feature/macro i18n surface
+         Naming convention: screens_macro_<screen>_<role>
+         (per training-layer/instructions/stream-first/latest/CORE_I18N.md)
+         Authored by W2-6 of plan-layer/active/store5-superbrain-v2/.
+         ============================================================ -->
+
+    <!-- ===== Shared ===== -->
+    <string name="screens_macro_back_cd">Back</string>
+
+    <!-- ===== CountryMacroScreen ===== -->
+    <string name="screens_macro_country_title">Country Macro</string>
+    <string name="screens_macro_refresh_all_cd">Refresh all</string>
+    <string name="screens_macro_stale_chip">STALE — showing cached data</string>
+
+    <!-- ===== CountryPickerScreen ===== -->
+    <string name="screens_macro_picker_title">Select Country</string>
+    <string name="screens_macro_picker_search_placeholder">Search country or ISO code</string>
+
+    <!-- ===== MacroIndicatorDetailScreen ===== -->
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Source: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Year-by-year</string>
+
+    <!-- ===== IndicatorCard component ===== -->
+    <string name="screens_macro_card_empty">No data published for this indicator.</string>
+    <string name="screens_macro_card_captive_portal">Behind a captive portal — sign in to continue.</string>
+    <string name="screens_macro_card_offline">Offline — connect to fetch this indicator.</string>
+    <string name="screens_macro_card_generic_error">Couldn\'t load this indicator.</string>
+    <string name="screens_macro_card_auth_required">Authentication required.</string>
+    <string name="screens_macro_card_latest_year">Latest: %1$s</string>
+    <string name="screens_macro_card_loading">Loading…</string>
+    <string name="screens_macro_card_retry">Retry</string>
+
+    <!-- ===== Sparkline component ===== -->
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

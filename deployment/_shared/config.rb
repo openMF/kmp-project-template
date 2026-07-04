@@ -7,13 +7,14 @@
 # Secrets: read from secrets/ filesystem first, ENV fallback for CI.
 #
 # Usage:
-#   Local/manual  → cp secrets_demo/* secrets/, fill values, run fastlane
+#   Local/manual  → cp secrets/sample/* secrets/live/, fill values, run fastlane
 #   GitHub Actions → secrets injected as ENV vars by workflow-snippet.yml
 #   Framework     → /secrets pull materializes vault to secrets/, run fastlane
 
 require_relative "lib/appstore_helpers"
 require_relative "lib/firebase_helpers"
 require_relative "lib/version_helpers"
+require_relative "lib/build_secrets"   # secrets path/value resolver (secrets/LAYOUT.yaml is SoT)
 
 # ── Helpers: read libs.versions.toml + secrets/ ──────────────────────────────
 
@@ -124,7 +125,9 @@ module FastlaneConfig
 
     ANDROID = {
       package_name:        ForkIdentity::APP_ID,
-      play_store_json_key: "#{FastlaneConfig::SECRETS_DIR}/play/service-account.json",
+      # DRIFT FIX: was "secrets/play/service-account.json" (wrong — lanes/script use
+      # secrets/android/play/…). Resolver returns the canonical path from LAYOUT.yaml.
+      play_store_json_key: BuildSecrets.for.path(:play_service_account),
     }.freeze
 
     IOS = {
@@ -151,15 +154,15 @@ module FastlaneConfig
       app_identifier:                ForkIdentity::APP_ID,
       team_id:                       ForkIdentity::IOS_TEAM_ID,
       # ASC API key — ENV preferred (CI); file fallback (local/vault)
-      key_id:                        _c._secret("APPSTORE_KEY_ID",    "#{_s}/apple/appstore/key_id"),
-      issuer_id:                     _c._secret("APPSTORE_ISSUER_ID", "#{_s}/apple/appstore/issuer_id"),
-      key_filepath:                  File.join(DEPLOYMENT_REPO_ROOT, "#{_s}/apple/appstore/AuthKey.p8"),
+      key_id:                        BuildSecrets.for.value(:appstore_key_id),
+      issuer_id:                     BuildSecrets.for.value(:appstore_issuer_id),
+      key_filepath:                  File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:appstore_auth_key)),
       # Match certificate repository — ENV (CI) → secrets/ file → fork.properties → default
       match_git_url:    _c._secret("MATCH_GIT_URL",    "#{_s}/apple/match/git_url")    || _c._fork_prop("apple.match.git.url"),
       match_git_branch: _c._secret("MATCH_GIT_BRANCH", "#{_s}/apple/match/git_branch") || _c._fork_prop("apple.match.git.branch") || "master",
       match_type:                    "adhoc",
-      match_ssh_key_path:            "#{_s}/apple/match/match_ci_key",
-      match_password:                _c._secret("MATCH_PASSWORD",          "#{_s}/apple/match/.match_password"),
+      match_ssh_key_path:            BuildSecrets.for.path(:match_ssh_key),
+      match_password:                BuildSecrets.for.value(:match_password),
       certificates_password:         _c._secret("CERTIFICATES_PASSWORD",   "#{_s}/apple/match/certificates_password"),
       keychain_password:             _c._secret("KEYCHAIN_PASSWORD",       "#{_s}/apple/match/keychain_password"),
       # Provisioning profiles
@@ -238,7 +241,7 @@ module FastlaneConfig
     _s_abs = SECRETS_DIR_ABS     # absolute — for paths passed directly to fastlane actions
     base = {
       serviceCredsFile: ENV["FIREBASE_SERVICE_ACCOUNT_PATH"] ||
-                        "#{_s_abs}/android/firebase/service-account.json",
+                        File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for(flavor: flavor).path(:firebase_service_account)),
       groups: ENV["FIREBASE_GROUPS"] || nil,
     }
     case platform
@@ -258,13 +261,9 @@ module FastlaneConfig
                end
       base.merge(appId: app_id)
     when :android
-      app_id = if flavor == :demo
-                 ENV["FIREBASE_ANDROID_DEMO_APP_ID"] ||
-                   _secret_file("#{_s}/android/firebase/android_demo_app_id") || ""
-               else
-                 ENV["FIREBASE_ANDROID_APP_ID"] ||
-                   _secret_file("#{_s}/android/firebase/android_app_id") || ""
-               end
+      # by_flavor in LAYOUT.yaml maps prod→FIREBASE_ANDROID_APP_ID, demo→FIREBASE_ANDROID_DEMO_APP_ID
+      # (env-first, file fallback) — collapses the old per-flavor if/else.
+      app_id = BuildSecrets.for(flavor: flavor).value(:firebase_android_app_id) || ""
       base.merge(appId: app_id)
     else
       base
@@ -765,7 +764,11 @@ end
 # gradlew at root, not inside cmp-android/ — incompatible with gradle() action's
 # project_dir expectation.
 def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
-  keystore = signing_config[:keystore_path] || "secrets/android/keystores/upload_keystore.keystore"
+  # DRIFT FIX: was hardcoded "secrets/android/keystores/upload_keystore.keystore"
+  # (flat pre-restructure path — broke after secrets/{live,sample} split). CI passes
+  # keystore_path from `build-secrets path upload_keystore`; the local-run fallback
+  # must resolve through the SAME LAYOUT resolver (live-wins-else-sample), never hardcode.
+  keystore = signing_config[:keystore_path] || BuildSecrets.for.path(:upload_keystore)
   keystore_abs = File.expand_path(File.join(DEPLOYMENT_REPO_ROOT, keystore))
   gradlew    = File.join(DEPLOYMENT_REPO_ROOT, "gradlew")
   full_task  = ":cmp-android:#{taskName}#{buildType}"

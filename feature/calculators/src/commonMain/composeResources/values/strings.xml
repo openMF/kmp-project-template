@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- ============================================================
+         RULE-IMPL-NO-HARDCODED-STRING-001 — feature/calculators i18n surface
+         Naming convention: screens_calc_<screen>_<role>
+         (per training-layer/instructions/stream-first/latest/CORE_I18N.md)
+         Authored by W2 of plan-layer/active/store5-superbrain-v2/.
+         ============================================================ -->
+
+    <!-- ===== AffordabilityCalculatorScreen ===== -->
+    <string name="screens_calc_affordability_title">Affordability</string>
+    <string name="screens_calc_affordability_back_cd">Back</string>
+    <string name="screens_calc_affordability_income_label">Monthly Income</string>
+    <string name="screens_calc_affordability_obligations_label">Existing Monthly Debt</string>
+    <string name="screens_calc_affordability_dti_label">DTI Ceiling (%)</string>
+    <string name="screens_calc_affordability_rate_label">Annual Rate (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Tenure (months)</string>
+    <string name="screens_calc_affordability_max_principal_label">Max loan principal</string>
+    <string name="screens_calc_affordability_max_emi_label">Max EMI</string>
+
+    <!-- ===== AmortizationScreen (Calculator variant) ===== -->
+    <string name="screens_calc_amortization_title">Amortization</string>
+    <string name="screens_calc_amortization_title_with_source">Amortization · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Back</string>
+    <string name="screens_calc_amortization_principal_label">Principal</string>
+    <string name="screens_calc_amortization_rate_label">Annual Rate (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Tenure (months)</string>
+    <string name="screens_calc_amortization_emi_label">Monthly EMI</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Interest %1$s · Total %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">Principal</string>
+    <string name="screens_calc_amortization_header_interest">Interest</string>
+    <string name="screens_calc_amortization_header_balance">Balance</string>
+
+    <!-- ===== LoanComparisonScreen ===== -->
+    <string name="screens_calc_compare_title">Compare Loans</string>
+    <string name="screens_calc_compare_back_cd">Back</string>
+    <string name="screens_calc_compare_best_emi_label">Best EMI · Scenario %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/mo</string>
+    <string name="screens_calc_compare_savings_text">Saves %1$s total vs. costliest</string>
+    <string name="screens_calc_compare_helper_text">Edit any scenario below to see the comparison update live.</string>
+    <string name="screens_calc_compare_scenario_label">Scenario %1$d</string>
+    <string name="screens_calc_compare_best_badge">Best</string>
+    <string name="screens_calc_compare_principal_label">Principal</string>
+    <string name="screens_calc_compare_rate_label">Rate (%)</string>
+    <string name="screens_calc_compare_tenure_label">Tenure (months)</string>
+    <string name="screens_calc_compare_result_emi">EMI</string>
+    <string name="screens_calc_compare_result_interest">Interest</string>
+    <string name="screens_calc_compare_result_total">Total</string>
+
+    <!-- ===== LoanCalcWizardScreen ===== -->
+    <string name="screens_calc_wizard_resume_title">Resume unfinished wizard?</string>
+    <string name="screens_calc_wizard_resume_message">You have an in-progress loan-calc wizard at step %1$d. Continue where you left off, or discard?</string>
+    <string name="screens_calc_wizard_resume_continue">Continue</string>
+    <string name="screens_calc_wizard_resume_discard">Discard</string>
+    <string name="screens_calc_wizard_title">New Loan · Step %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Back</string>
+    <string name="screens_calc_wizard_step_principal_question">How much do you want to borrow?</string>
+    <string name="screens_calc_wizard_step_principal_label">Principal Amount</string>
+    <string name="screens_calc_wizard_step_tenure_question">Over how many months?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Tenure (months)</string>
+    <string name="screens_calc_wizard_step_rate_question">At what annual rate?</string>
+    <string name="screens_calc_wizard_step_rate_label">Annual Rate (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Monthly EMI</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Total payable: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Principal</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Tenure</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d months</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Rate</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Total interest</string>
+    <string name="screens_calc_wizard_step_name_message">Name this scenario so you can find it again in your loans.</string>
+    <string name="screens_calc_wizard_step_name_label">Scenario Name</string>
+    <string name="screens_calc_wizard_step_name_required">Required — type a name to enable Save.</string>
+    <string name="screens_calc_wizard_button_back">Back</string>
+    <string name="screens_calc_wizard_button_next">Next</string>
+    <string name="screens_calc_wizard_button_save">Save as Loan</string>
+</resources>

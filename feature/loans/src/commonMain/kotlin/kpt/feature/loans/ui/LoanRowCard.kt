@@ -33,6 +33,12 @@ import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.Loan
 import kpt.core.model.banking.LoanKind
+import kpt.feature.loans.generated.resources.Res
+import kpt.feature.loans.generated.resources.screens_loans_row_monthly_emi_label
+import kpt.feature.loans.generated.resources.screens_loans_row_next_due_value
+import kpt.feature.loans.generated.resources.screens_loans_row_progress_value
+import kpt.feature.loans.generated.resources.screens_loans_row_remaining_label
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Tappable row representing a single [Loan] in the list screen.
@@ -79,7 +85,7 @@ internal fun LoanRowCard(
         ) {
             Column {
                 Text(
-                    text = "Remaining",
+                    text = stringResource(Res.string.screens_loans_row_remaining_label),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -91,7 +97,7 @@ internal fun LoanRowCard(
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "Monthly EMI",
+                    text = stringResource(Res.string.screens_loans_row_monthly_emi_label),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -117,12 +123,18 @@ internal fun LoanRowCard(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = "${(progress * 100).toInt()}% paid",
+                text = stringResource(
+                    Res.string.screens_loans_row_progress_value,
+                    (progress * 100).toInt(),
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                text = "Next: ${loan.nextDueDate}",
+                text = stringResource(
+                    Res.string.screens_loans_row_next_due_value,
+                    loan.nextDueDate.toString(),
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

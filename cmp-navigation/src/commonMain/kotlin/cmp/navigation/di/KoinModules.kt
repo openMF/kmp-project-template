@@ -23,6 +23,7 @@ import kpt.core.store.di.appStoreModule
 import kpt.feature.amortization.di.AmortizationModule
 import kpt.feature.bills.di.BillsModule
 import kpt.feature.calculators.di.CalculatorsModule
+import kpt.feature.crypto.di.CryptoFeatureModule
 import kpt.feature.currencyrates.di.CurrencyRatesModule
 import kpt.feature.emicalculator.di.EmiCalculatorModule
 import kpt.feature.home.di.HomeModule
@@ -62,6 +63,7 @@ object KoinModules {
             RatesModule,
             CalculatorsModule,
             MacroModule,
+            CryptoFeatureModule,
         )
     }
 

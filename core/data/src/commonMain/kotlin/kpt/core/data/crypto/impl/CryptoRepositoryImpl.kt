@@ -13,6 +13,7 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.paging.PageKey
+import kpt.core.base.store.paging.PagingCursor
 import kpt.core.base.store.paging.PagingScreenStream
 import kpt.core.base.store.paging.asPagingScreenStream
 import kpt.core.base.store.screen.ScreenDataStream
@@ -29,13 +30,18 @@ class CryptoRepositoryImpl(
     private val fetchedAtRepository: FetchedAtRepository,
 ) : CryptoRepository {
 
-    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
+    override fun coinMarketsStream(
+        scope: CoroutineScope,
+        pageSize: Int,
+        initialCursorProvider: suspend () -> PagingCursor?,
+    ): PagingScreenStream<CoinMarket> =
         coinMarketsStore.asPagingScreenStream(
             networkMonitor = networkMonitor,
             fetchedAtRepository = fetchedAtRepository,
             cacheKey = "crypto:coinMarkets",
             scope = scope,
             pageSize = pageSize,
+            initialCursorProvider = initialCursorProvider,
         )
 
     override fun coinDetailStream(coinId: String, scope: CoroutineScope): ScreenDataStream<CoinDetail> =

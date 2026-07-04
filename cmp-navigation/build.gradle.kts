@@ -40,6 +40,7 @@ kotlin {
             implementation(projects.feature.rates)
             implementation(projects.feature.calculators)
             implementation(projects.feature.macro)
+            implementation(projects.feature.crypto)
             implementation(projects.feature.showcase)
 
             //put your multiplatform dependencies here

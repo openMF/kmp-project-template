@@ -1,0 +1,68 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+@file:Suppress("MatchingDeclarationName")
+
+package kpt.feature.crypto.navigation
+
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
+import androidx.navigation.navigation
+import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.composableWithPushTransitions
+import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.crypto.ui.CoinMarketsRoute
+
+/** Root of the crypto feature graph. Navigated to via [navigateToCrypto]. */
+@Serializable
+data object CryptoGraphRoute
+
+/**
+ * Nav destination for the CoinMarkets list.
+ *
+ * Named `CoinMarketsListRoute` (not the shorter `CoinMarketsRoute`) so it does
+ * not collide with the [CoinMarketsRoute] Composable — the file-structure
+ * contract of sub-plan T7 puts both under the same simple name; the Composable
+ * is the user-facing entry point (Phase 4 `File Structure` table row for
+ * `CoinMarketsRoute.kt`) and this destination adopts the sibling convention
+ * from `LoansNavigation.PersonalLoansListRoute`. See DEVIATIONS in the sub-plan
+ * hand-off notes.
+ */
+@Serializable
+data object CoinMarketsListRoute
+
+/** Convenience navigator so callers do not construct the route type by hand. */
+fun NavController.navigateToCrypto(navOptions: NavOptions? = null) {
+    navigate(route = CryptoGraphRoute, navOptions = navOptions)
+}
+
+/**
+ * Wires the crypto graph into the parent NavHost. Mirrors
+ * `LoansNavigation.loansGraph` shape verbatim so future sibling destinations
+ * (coin detail, watchlist) can be added inside the same
+ * `navigation<CryptoGraphRoute>` block.
+ *
+ * `onCoinClick` currently no-ops; the coin-detail destination arrives with the
+ * `CoinDetailRoute` sub-plan and re-uses `coinDetailStream` in
+ * `CryptoRepositoryImpl` (already wired at HEAD).
+ */
+fun NavGraphBuilder.cryptoGraph(navController: NavController) {
+    navigation<CryptoGraphRoute>(startDestination = CoinMarketsListRoute) {
+        composableWithPushTransitions<CoinMarketsListRoute> {
+            CoinMarketsRoute(
+                onBackClick = { navController.popBackStackSafely() },
+                onCoinClick = {
+                    // intentional-noop: CoinDetailRoute lands with a future sub-plan;
+                    // the store + repository ScreenDataStream are already wired.
+                },
+            )
+        }
+    }
+}

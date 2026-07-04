@@ -127,6 +127,7 @@ include(":feature:amortization")
 include(":feature:rates")
 include(":feature:calculators")
 include(":feature:macro")
+include(":feature:crypto")
 
 include(":core-base:analytics")
 include(":core-base:common")

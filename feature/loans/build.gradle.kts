@@ -31,7 +31,17 @@ kotlin {
             // Mirrors `core/store/build.gradle.kts` wiring.
             implementation(compose.components.resources)
 
-            implementation(libs.kotlinx.datetime)
+            // Phase 3 (store5-screen-state-persistence 03-vm-scoping) — koinNavViewModel()
+            // for NavBackStackEntry-scoped VM acquisition on the PersonalLoansListScreen
+            // acquisition site. Screens import it aliased as `retainedKoinViewModel` per
+            // the sub-plan's naming contract; the enumeration Kdoc lives in the
+            // `cmp-navigation/.../RetainedKoinViewModel.kt` sibling.
+            //
+            // NOTE (module-graph deviation from 03-vm-scoping.md): the sub-plan expected
+            // the alias to be re-exported from cmp-navigation. That would require a
+            // features → cmp-navigation edge (cyclic — cmp-navigation already depends on
+            // this module), so features consume the koin symbol directly instead.
+            implementation(libs.koin.compose.navigation)
         }
 
         commonTest.dependencies {

@@ -31,6 +31,13 @@ kotlin {
             // Mirrors `feature/loans/build.gradle.kts` wiring.
             implementation(compose.components.resources)
 
+            // Phase 3 (store5-screen-state-persistence 03-vm-scoping) — koinNavViewModel()
+            // for NavBackStackEntry-scoped VM acquisition on the HomeScreen bottom-nav-tab
+            // VM. Screens import it aliased as `retainedKoinViewModel` per the sub-plan's
+            // naming contract; enumeration Kdoc lives in
+            // `cmp-navigation/.../RetainedKoinViewModel.kt`. See feature/loans deviation note.
+            implementation(libs.koin.compose.navigation)
+
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
         }

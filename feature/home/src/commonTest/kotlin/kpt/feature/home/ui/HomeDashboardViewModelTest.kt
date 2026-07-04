@@ -15,6 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -94,6 +95,49 @@ class HomeDashboardViewModelTest {
             HomeViewModel.EXCHANGE_RATE_REFRESH_INTERVAL_MS,
             (policy as FetchPolicy.PERIODIC).intervalMillis,
             "Periodic interval must be exactly ${HomeViewModel.EXCHANGE_RATE_REFRESH_INTERVAL_MS} ms (5 minutes).",
+        )
+    }
+
+    /**
+     * **Nav-scoped VM regression (Phase 3 / AC-13 of 03-vm-scoping.md).**
+     *
+     * `HomeScreen` migrated to `retainedKoinViewModel()` — the same VM instance now
+     * survives across bottom-nav tab switches instead of being re-created. This test
+     * proves the 4-way `combineScreenStates` fan-in continues to emit correctly after
+     * a subscriber-count dip that lasts past the WhileSubscribed(5_000) stopTimeout
+     * used by [HomeViewModel.exchangeFreshness] and [HomeViewModel.ratesFreshness] —
+     * i.e. after the tab goes away for >5 s and then the user comes back.
+     *
+     * Note: `stateFlow` itself is a plain `MutableStateFlow.asStateFlow()` in
+     * [BaseViewModel] (no `stateIn(WhileSubscribed(...))`) so the state value is
+     * retained regardless of subscribers. The regression signal here is that
+     * re-collecting after the timeout still returns a well-formed
+     * [HomeUiState] identical to the last emission — i.e. the VM instance was
+     * NOT cleared by the nav-scope machinery and the freshness stops-and-restarts
+     * did not corrupt the aggregate state.
+     */
+    @Test
+    fun `combined state re-emits cache-first after subscriber dip (nav-scoped VM regression)`() = runTest {
+        val vm = buildViewModel()
+        dispatcher.scheduler.advanceUntilIdle()
+
+        // First collect — fan-in should have completed initial emission.
+        val first = vm.stateFlow.first()
+
+        // Simulate tab-switch: no active subscribers of `exchangeFreshness` /
+        // `ratesFreshness`; drive the scheduler past the 5 s WhileSubscribed
+        // stopTimeout (STATE_TIMEOUT_MS in HomeViewModel).
+        dispatcher.scheduler.advanceTimeBy(6_000L)
+        dispatcher.scheduler.advanceUntilIdle()
+
+        // Second collect (simulates tab return + re-subscribe).
+        val second = vm.stateFlow.first()
+
+        assertEquals(
+            first,
+            second,
+            "HomeUiState must be identical across a subscriber-count dip — a change here " +
+                "signals that nav-scoped VM caching lost or mutated the retained state.",
         )
     }
 

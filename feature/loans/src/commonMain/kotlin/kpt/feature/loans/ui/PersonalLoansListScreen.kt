@@ -59,7 +59,7 @@ import kpt.feature.loans.generated.resources.screens_loans_list_new_fab_text
 import kpt.feature.loans.generated.resources.screens_loans_list_title
 import kpt.feature.loans.generated.resources.screens_loans_list_total_outstanding_label
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +68,7 @@ fun PersonalLoansListScreen(
     onAddLoanClick: () -> Unit,
     onLoanClick: (loanId: String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PersonalLoansListViewModel = koinViewModel(),
+    viewModel: PersonalLoansListViewModel = retainedKoinViewModel(),
 ) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     var pendingDelete by remember { mutableStateOf<Loan?>(null) }

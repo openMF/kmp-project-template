@@ -127,7 +127,7 @@ import kpt.feature.home.ui.HomeViewModel
 import kpt.feature.home.ui.LoansSummary
 import kpt.feature.home.ui.RatesQuickView
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,7 +144,7 @@ internal fun HomeScreen(
     onNavigateToAmortization: () -> Unit,
     onNavigateToLoanComparison: () -> Unit,
     onNavigateToLoanCalcWizard: () -> Unit,
-    viewModel: HomeViewModel = koinViewModel(),
+    viewModel: HomeViewModel = retainedKoinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val exchangeFreshness by viewModel.exchangeFreshness.collectAsStateWithLifecycle()

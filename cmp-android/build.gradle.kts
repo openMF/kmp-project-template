@@ -112,9 +112,17 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.data)
     implementation(projects.core.datastore)
+    implementation(projects.sync)
 
     implementation(projects.coreBase.ui)
     implementation(projects.coreBase.platform)
+
+    // worker-kmp host wiring — Android factory + Koin module live here so
+    // cmp-android's onCreate can pass `this` as the Application context to
+    // androidWorkManagerFactory(). The `sync/` module only consumes WorkManager
+    // through Koin.
+    implementation(libs.worker.android)
+    implementation(libs.worker.koin)
 
     // Compose
     implementation(libs.androidx.core.ktx)

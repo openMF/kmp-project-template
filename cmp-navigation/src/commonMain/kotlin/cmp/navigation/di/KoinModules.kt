@@ -31,6 +31,7 @@ import kpt.feature.loans.di.LoansModule
 import kpt.feature.macro.di.MacroModule
 import kpt.feature.rates.di.RatesModule
 import kpt.feature.settings.SettingsModule
+import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -76,5 +77,6 @@ object KoinModules {
         DatastoreModule,
         featureModule,
         AppModule,
+        SyncModule,
     )
 }

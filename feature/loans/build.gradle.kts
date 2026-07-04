@@ -21,6 +21,8 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.coreBase.store)
             implementation(projects.feature.amortization)
+            // Cross-module sync API surface for LoanReminderUseCase (D18 demo).
+            implementation(projects.sync)
 
             implementation(compose.ui)
             implementation(compose.material3)

@@ -138,6 +138,11 @@ room = "3.0.0-alpha05"
 sqliteBundled = "2.6.2"
 sqliteWeb = "2.7.0-alpha05"
 
+# worker-kmp — single-API background + foreground worker scheduling across
+# Android / iOS / Desktop / Web. See https://github.com/MobileByteLabs/worker-kmp.
+# Pin tracks last published release on Maven Central.
+worker-version = "4.0.3"
+
 [libraries]
 kmp-product-flavors-plugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
 android-desugarJdkLibs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "androidDesugarJdkLibs" }
@@ -372,6 +377,15 @@ aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref
 aboutlibraries-compose-core = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
 aboutlibraries-compose-m3 = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutLibraries" }
 
+# worker-kmp
+worker-kmp         = { module = "io.github.mobilebytelabs:worker-kmp",         version.ref = "worker-version" }
+worker-compose-all = { module = "io.github.mobilebytelabs:worker-compose-all", version.ref = "worker-version" }
+worker-app-plugin  = { module = "io.github.mobilebytelabs:worker-app-plugin",  version.ref = "worker-version" }
+worker-android     = { module = "io.github.mobilebytelabs:worker-android",     version.ref = "worker-version" }
+worker-koin        = { module = "io.github.mobilebytelabs:worker-koin",        version.ref = "worker-version" }
+worker-sync        = { module = "io.github.mobilebytelabs:worker-sync",        version.ref = "worker-version" }
+worker-app-annotations = { module = "io.github.mobilebytelabs:worker-app-annotations", version.ref = "worker-version" }
+
 [bundles]
 androidx-compose-ui-test = [
     "androidx-compose-ui-test",
@@ -441,3 +455,8 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotlessVersion" }
 #Room 3 Plugin
 room = { id = "androidx.room3", version.ref = "room" }
 mifos-kmp-room = { id = "mifos.kmp.room" }
+
+# worker-kmp — apply `id("io.github.mobilebytelabs.worker-app")` to a CMP module
+# to codegen per-platform launchers (Android Application/Activity, iOS
+# MainViewController + xcodegen, JVM main, wasmJs main + index.html).
+worker-app = { id = "io.github.mobilebytelabs.worker-app", version.ref = "worker-version" }

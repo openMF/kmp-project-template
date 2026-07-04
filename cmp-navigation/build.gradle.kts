@@ -42,8 +42,9 @@ kotlin {
             implementation(projects.feature.macro)
             implementation(projects.feature.crypto)
             implementation(projects.feature.showcase)
+            implementation(projects.sync)
 
-            //put your multiplatform dependencies here
+            // put your multiplatform dependencies here
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
             implementation(compose.foundation)

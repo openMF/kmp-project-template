@@ -12,6 +12,7 @@ package cmp.android.app
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import cmp.shared.generated.WorkerKmpAuto
 import cmp.shared.utils.initKoin
 import coil3.ImageLoader
 import coil3.PlatformContext
@@ -30,11 +31,17 @@ import org.koin.core.component.inject
 
 /**
  * Android application class.
- * This class is used to initialize Koin modules for dependency injection in the Android application.
- * It sets up the Koin framework, providing the necessary dependencies for the app.
  *
- * @constructor Create empty Android app
- * @see Application
+ * Worker-kmp single-API setup (Shape 2 — bring-your-own-Application from the wiki guide):
+ * after `initKoin { androidContext(this@AndroidApp); ... }`, call `WorkerKmpAuto.install()`.
+ * The auto-generated `installWorkerKmpAndroid()` reads the Application from Koin's
+ * `androidContext()` binding, selects `androidWorkManagerFactory`, builds the worker
+ * registry from `@WorkerKmpWorkers` annotation sites, and calls `WorkerKmpHost.initialize`.
+ *
+ * Migrated from v3.1.x's hand-rolled `loadKoinModules(workKoinModule(WorkerConfig(),
+ * workerRegistry { register<…> { … } }, androidWorkManagerFactory(this)))` block plus the
+ * `Sync.initialize(get<WorkScheduler>())` call — both eliminated in v4.0.0 in favor of the
+ * single `WorkerKmpAuto.install()` line.
  */
 class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
 
@@ -47,9 +54,12 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
             androidLogger()
         }
 
+        // Single line — codegen handles factory selection + worker registry + Koin wiring
+        // + WorkerKmpHost.initialize. See @WorkerKmpWorkers annotation in cmp-shared's
+        // WorkerDeclarations.kt for the declared workers.
+        WorkerKmpAuto.install()
+
         // Restore the user's saved language preference to AppCompatDelegate.
-        // This ensures the app always launches with the user's chosen language,
-        // regardless of system settings or device language.
         restoreSavedLanguage()
     }
 
@@ -64,15 +74,12 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
             val userData = userDataRepository.userData.first()
             val savedLanguage = userData.appLanguage
 
-            // Convert the saved LanguageConfig to LocaleListCompat
             val desiredLocales = if (savedLanguage.localeName != null) {
                 LocaleListCompat.forLanguageTags(savedLanguage.localeName)
             } else {
-                // System default
                 LocaleListCompat.getEmptyLocaleList()
             }
 
-            // Only update if the current locale differs from saved preference
             val currentLocales = AppCompatDelegate.getApplicationLocales()
             if (currentLocales != desiredLocales) {
                 AppCompatDelegate.setApplicationLocales(desiredLocales)

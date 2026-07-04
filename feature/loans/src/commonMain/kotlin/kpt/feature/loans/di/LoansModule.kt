@@ -22,6 +22,13 @@ import org.koin.dsl.module
  * Wired into the app graph by `cmp-navigation/.../KoinModules.kt`
  * (`featureModule.includes(LoansModule)`). The `SubmitOutbox<Loan>` and `LoanRepository`
  * bindings consumed here are provided by `core/data/.../RepositoryModule.kt`.
+ *
+ * **D14 fence — the loans VMs stay factory-bound (`viewModel {}`), never singleton
+ * (`single<*ViewModel>`).** Nav-back-stack retention (Phase 03 `retainedKoinViewModel`)
+ * scopes each VM to the enclosing `NavBackStackEntry` so re-entry gets the same
+ * instance across nav pops without promoting the binding to a process-lifetime
+ * singleton — the latter would leak state across navigation boundaries and defeat
+ * scoped disposal. A `single<*ViewModel>` here would be refused by the fence gate.
  */
 val LoansModule = module {
     viewModel { PersonalLoansListViewModel(repository = get()) }

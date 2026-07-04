@@ -31,4 +31,28 @@ class CoinMarketsScreenUiTest {
         tags.forEach { assertTrue(it.isNotBlank(), "TestTag must be non-blank") }
         assertEquals(tags.size, tags.toSet().size, "TestTags must be unique")
     }
+
+    /**
+     * Phase-05 addendum: pins the new nested [TestTags.CoinMarkets] namespace at
+     * compile time. Removing / renaming any of these tags — or breaking the
+     * aliasing invariant between `LIST` and `CoinMarkets.PAGING_LIST` — is a
+     * CU-5 append-only violation.
+     */
+    @Test
+    fun nestedNamespaceTagsAreStableAndAliasFlatBaseline() {
+        val nested = listOf(
+            TestTags.CoinMarkets.PAGING_LIST,
+            TestTags.CoinMarkets.ROW,
+            TestTags.CoinMarkets.LOAD_MORE,
+            TestTags.CoinMarkets.SEARCH_FIELD,
+        )
+        nested.forEach { assertTrue(it.isNotBlank(), "Nested TestTag must be non-blank") }
+        assertEquals(nested.size, nested.toSet().size, "Nested TestTags must be unique")
+        // Aliasing invariant — the nested accessors match the flat Phase-4 baseline
+        // where semantics overlap, so the shipped `CoinMarketsScreen` body (which
+        // references the flat form) and Journey/Maestro selectors (which reach for
+        // the nested form) resolve to the same string constant.
+        assertEquals(TestTags.LIST, TestTags.CoinMarkets.PAGING_LIST)
+        assertEquals(TestTags.LOADING, TestTags.CoinMarkets.LOAD_MORE)
+    }
 }

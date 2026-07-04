@@ -9,6 +9,7 @@
  */
 package kpt.feature.home
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +27,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -51,10 +51,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -126,6 +128,7 @@ import kpt.feature.home.ui.HomeAction
 import kpt.feature.home.ui.HomeViewModel
 import kpt.feature.home.ui.LoansSummary
 import kpt.feature.home.ui.RatesQuickView
+import kpt.feature.home.ui.TestTags
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
@@ -179,12 +182,23 @@ internal fun HomeScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+        // AC-16 retention sample. HomeScreen's scroll container is a
+        // `Column(...verticalScroll(...))` (NOT a `LazyColumn`), so the
+        // `rememberRetainedScreenState` helper — which exposes a
+        // `LazyListState` only — does not fit here. Use `rememberSaveable`
+        // with `ScrollState.Saver` directly to survive config-change (rotation,
+        // dark-mode flip, bottom-nav tab-switch inside the same NavBackStackEntry).
+        // Process-death survival for this specific container is deferred to a
+        // follow-up phase (would either LazyColumn-migrate the dashboard or
+        // extend `rememberRetainedScreenState` with a ScrollState overload).
+        val scrollState = rememberSaveable(saver = ScrollState.Saver) { ScrollState(initial = 0) }
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = sp.lg)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState)
+                .testTag(TestTags.Home.DASHBOARD_SCROLL),
             verticalArrangement = Arrangement.spacedBy(sp.md),
         ) {
             Spacer(Modifier.height(sp.xs))

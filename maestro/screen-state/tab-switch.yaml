@@ -1,0 +1,49 @@
+# Copyright 2026 Mifos Initiative
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# AC-16 Scenario 3 — bottom-nav tab-switch retains per-tab state
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Walks Home → Loans → back to Home. Home's dashboard scroll position is
+# saved via `rememberSaveable(ScrollState.Saver)` (Phase-5 T3 deviation — the
+# `verticalScroll` container does not fit `rememberRetainedScreenState`'s
+# `LazyListState` API and process-death survival for the dashboard is
+# deferred to a follow-up phase; see the note in `HomeScreen.kt`).
+#
+# The loans list's scroll position is fully carried through
+# `rememberRetainedScreenState("loans_list")` — process-death safe — so the
+# tab-switch back to Loans lands on the same row the user left.
+appId: org.mifos.kmp.template
+name: screen-state — bottom-nav tab switch retains per-tab state
+tags:
+  - screen-state
+  - home
+  - loans
+  - retention
+---
+- launchApp:
+    clearState: false
+- assertVisible:
+    id: "home_dashboard_scroll"
+- scroll  # scroll the dashboard one page down
+- scroll  # ...and again
+- tapOn: "Personal Loans"
+- assertVisible:
+    id: "loans_list"
+- scrollUntilVisible:
+    element:
+      id: "loans_list_row_loan-20"
+    direction: DOWN
+    timeout: 10000
+- back  # bottom-nav back to Home
+- assertVisible:
+    id: "home_dashboard_scroll"  # Home still exists (nav retention)
+- tapOn: "Personal Loans"
+- assertVisible:
+    id: "loans_list_row_loan-20"  # loans scroll survived tab-switch

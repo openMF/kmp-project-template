@@ -143,17 +143,6 @@ fun CoinMarketsScreen(
     }
 }
 
-/**
- * Append-only test tag registry for [CoinMarketsScreen]. Consumed by both
- * Compose UiTests (`CoinMarketsScreenUiTest`) and future Maestro flows -
- * removing / renaming an entry breaks RULE-KMP-COMPOSE-UITEST-001 CU-5.
- */
-object TestTags {
-    const val LIST: String = "coinMarkets.list"
-    const val ROW: String = "coinMarkets.row"
-    const val LOADING: String = "coinMarkets.loading"
-}
-
 @Composable
 private fun CoinMarketRow(
     coin: CoinMarket,

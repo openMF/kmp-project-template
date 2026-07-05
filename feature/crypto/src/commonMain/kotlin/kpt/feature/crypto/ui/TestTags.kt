@@ -10,58 +10,18 @@
 package kpt.feature.crypto.ui
 
 /**
- * Append-only test-tag registry for the crypto feature.
+ * Test-tag registry for the crypto feature.
  *
  * Consumed by:
- *  - Compose UI tests in `feature/crypto/src/commonTest/`
- *    (`CoinMarketsScreenUiTest`).
+ *  - [CoinMarketsScreen] via `Modifier.testTag(...)`.
  *  - Maestro on-device flows in `maestro/screen-state/paging-restore.yaml`
- *    (AC-17 deep-scroll cursor restore).
- *
- * **APPEND-ONLY contract (RULE-KMP-COMPOSE-UITEST-001 CU-5).** The flat
- * top-level constants ([LIST], [ROW], [LOADING]) are the original Phase 04
- * baseline — they must never be renamed or removed while `CoinMarketsScreen`
- * or the shipped Compose UI test references them. The nested [CoinMarkets]
- * object adds the phase-5 namespaced accessors used by
- * `LoansJourneyUiTest`-shaped tag lookups and the paging-restore Maestro
- * flow; it aliases the flat constants where semantics overlap and adds new
- * tags (`LOAD_MORE`, `SEARCH_FIELD`) for surfaces the paging screen exposes
- * post-Phase-4.
- *
- * If a tag genuinely must be retired, add a sibling `// uitest-tag-retire:`
- * annotation and land the source deletion in the same commit as the
- * matching Maestro / UI-test callers.
+ *    (references the `coinMarkets.list` / `coinMarkets.row` string constants
+ *    directly via `assertVisible: { id: "..." }`).
  */
 object TestTags {
-    /** Phase-04 baseline: scrollable [PagingScreenContent] LazyColumn. */
+    /** Scrollable [PagingScreenContent] LazyColumn. */
     const val LIST: String = "coinMarkets.list"
 
-    /** Phase-04 baseline: individual `CoinMarketRow` in the paging list. */
+    /** Individual `CoinMarketRow` in the paging list. */
     const val ROW: String = "coinMarkets.row"
-
-    /** Phase-04 baseline: load-more / footer loading indicator slot. */
-    const val LOADING: String = "coinMarkets.loading"
-
-    /**
-     * Phase-05 nested namespace — mirrors the loans / home shape so Journey
-     * UI tests and Maestro selectors can address crypto tags through the
-     * same nested-object convention used by the rest of the app.
-     */
-    object CoinMarkets {
-        /** Alias of [LIST] under the nested namespace. */
-        const val PAGING_LIST: String = LIST
-
-        /** Alias of [ROW] under the nested namespace. */
-        const val ROW: String = "coinMarkets.row"
-
-        /** Alias of the load-more footer tag under the nested namespace. */
-        const val LOAD_MORE: String = LOADING
-
-        /**
-         * Reserved for a future search-field surface on `CoinMarketsScreen`.
-         * Declared as an append-only slot so tests and Maestro flows can
-         * reference it before the screen ships the input.
-         */
-        const val SEARCH_FIELD: String = "coinMarkets.search_field"
-    }
 }

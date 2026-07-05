@@ -18,10 +18,6 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.coreBase.store)
             implementation(projects.coreBase.ui)
-            // ScreenUiStateStore lives in core-base/datastore — the ViewModel
-            // reads/writes the paging cursor here on top of Phase 2's
-            // rememberRetainedScreenState (which owns scroll persistence).
-            implementation(projects.coreBase.datastore)
 
             implementation(compose.ui)
             implementation(compose.material3)
@@ -38,10 +34,6 @@ kotlin {
         commonTest.dependencies {
             // kotlin.test + kotlinx.coroutines.test come from the convention plugin.
             implementation(libs.turbine)
-            // NOTE: the full runComposeUiTest render test for RULE-KMP-COMPOSE-UITEST-001
-            // is deferred until compose.uiTest is wired into commonTest across all 6
-            // targets (no module in the fork does this yet). CoinMarketsScreenUiTest
-            // enforces the append-only TestTags contract at compile time in the interim.
         }
     }
 }

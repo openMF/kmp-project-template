@@ -22,7 +22,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.paging.PagingScreenStream
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.ui.retained.RetainedScreenState
 import kpt.core.base.ui.screen.DefaultEmptyContent
 import kpt.core.base.ui.screen.DefaultErrorContent
 import kpt.core.base.ui.screen.DefaultLoadingContent
@@ -113,8 +112,7 @@ fun <T : Any> PagingScreenContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     refreshingIndicator: (@Composable () -> Unit)? = null,
-    retainedState: RetainedScreenState? = null,
-    listState: LazyListState = retainedState?.listState ?: rememberLazyListState(),
+    listState: LazyListState = rememberLazyListState(),
     loadMoreThreshold: Int = 5,
     loadingMessage: String = "Loading more...",
     endMessage: String = "You're all caught up",

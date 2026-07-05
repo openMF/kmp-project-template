@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.paging
 
@@ -33,7 +33,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 /**
- * Paginated variant of [ScreenDataStream].
+ * Paginated variant of [kpt.core.base.store.screen.ScreenDataStream].
  * Manages page loading, appending, error surfacing, and unified state for infinite lists.
  *
  * Usage:
@@ -47,27 +47,11 @@ import kotlin.time.Instant
  * fun loadMore() = pagingStream.loadNextPage()
  * ```
  *
- * ## Deep-scroll restore (Phase 4)
- *
- * Callers that wish to survive process death across a paged list pass an
- * `initialCursorProvider` to [asPagingScreenStream]: a suspend lambda that
- * yields the last-persisted [PagingCursor] (or `null` for a first-time visit).
- * On construction, [loadInitialPage] awaits the provider inside `scope.launch`
- * — never blocking commonMain (Kotlin/JS and Kotlin/wasm have no
- * `runBlocking`) — and, when a cursor is returned, batch-calls
- * `store.loadPage(refresh = false)` for pages `0..cursor.lastPageLoaded`,
- * concatenating results. Because every requested page is already durable in
- * Room from the prior session, there is no network round-trip.
- *
- * The [cursorFlow] StateFlow updates on:
- *   - every successful [loadNextPage] (bumps `lastPageLoaded`),
- *   - every [updateScrollPosition] call from the Screen (bumps
- *     `scrollIndex` / `scrollOffset`).
- *
- * Consumers observe [cursorFlow] and write it back to their persistence layer
- * (typically the datastore-side `ScreenUiStateStore` via the feature
- * ViewModel) with a debounce; the shared 300 ms datastore debounce absorbs
- * any scroll storm.
+ * Scroll and UI position retention is a Compose concern — `rememberLazyListState()`
+ * (which uses `rememberSaveable` internally with `LazyListState.Saver`) plus the
+ * app-root `PersistentSaveableStateRegistry` provide cross-process-death survival
+ * automatically. This paging class no longer carries a durable cursor for
+ * deep-scroll restore.
  */
 @OptIn(ExperimentalTime::class)
 class PagingScreenStream<T : Any> internal constructor(
@@ -76,13 +60,6 @@ class PagingScreenStream<T : Any> internal constructor(
     val isLoadingMore: StateFlow<Boolean>,
     /** The most recent load-more error, or null. Cleared on next loadNextPage/refresh. */
     val loadMoreError: StateFlow<Throwable?>,
-    /**
-     * Durable paging cursor. Emits on every successful [loadNextPage] and every
-     * [updateScrollPosition] call. Seeded from the `initialCursorProvider`
-     * supplied to [asPagingScreenStream] (defaults to [PagingCursor.EMPTY] when
-     * no provider is supplied or the provider yields `null`).
-     */
-    val cursorFlow: StateFlow<PagingCursor>,
     private val scope: CoroutineScope,
     private val store: Store<PageKey, List<T>>,
     private val pageSize: Int,
@@ -93,8 +70,6 @@ class PagingScreenStream<T : Any> internal constructor(
     private val isInitialLoading: MutableStateFlow<Boolean>,
     private val error: MutableStateFlow<Throwable?>,
     private val currentPage: MutableStateFlow<Int>,
-    private val cursorMutable: MutableStateFlow<PagingCursor>,
-    private val initialCursorProvider: suspend () -> PagingCursor?,
     /** Wall-clock instant of last successful page load. Drives DataFreshnessIndicator timestamp. */
     private val lastFetchedAt: MutableStateFlow<Instant?>,
     private val networkMonitor: NetworkMonitor,
@@ -117,10 +92,6 @@ class PagingScreenStream<T : Any> internal constructor(
                     items.update { it + result.items }
                     currentPage.value = nextPage
                     hasMoreMutable.value = result.nextKey != null
-                    cursorMutable.value = cursorMutable.value.copy(
-                        lastPageLoaded = nextPage,
-                        query = query,
-                    )
                     // Only update on actual network success — cache hits keep the previous
                     // timestamp so DataFreshnessIndicator shows the real age of the data,
                     // not the moment we re-read from SoT.
@@ -166,73 +137,8 @@ class PagingScreenStream<T : Any> internal constructor(
 
     fun retry() = refresh()
 
-    /**
-     * Record the current scroll position so the persisted cursor can restore it
-     * across process death. Callers wire this to a `LaunchedEffect` on
-     * `LazyListState.firstVisibleItemIndex` / `firstVisibleItemScrollOffset`.
-     * Downstream persistence deduplicates via `distinctUntilChanged` — this
-     * setter itself is cheap.
-     */
-    fun updateScrollPosition(index: Int, offset: Int) {
-        cursorMutable.value = cursorMutable.value.copy(
-            scrollIndex = index,
-            scrollOffset = offset,
-        )
-    }
-
-    /**
-     * Deep-scroll restore (Phase 4): batch re-page `0..cursor.lastPageLoaded`
-     * from the already-durable Room pages via `store.loadPage(refresh = false)`
-     * — no network hit. On a mid-restore error, retain the pages loaded so far,
-     * surface the error, and leave `currentPage` at the last good page so the
-     * next `loadNextPage()` resumes correctly.
-     */
-    private suspend fun restoreFromCursor(cursor: PagingCursor) {
-        val restored = mutableListOf<T>()
-        var lastOk = -1
-        var restoreError: Throwable? = null
-        for (p in 0..cursor.lastPageLoaded) {
-            val key = PageKey(page = p, pageSize = pageSize, query = cursor.query)
-            val result = store.loadPage(key, refresh = false)
-            if (result is StorePageResult.Success) {
-                restored.addAll(result.items)
-                lastOk = p
-                hasMoreMutable.value = result.nextKey != null
-            } else if (result is StorePageResult.Error) {
-                restoreError = retypeIfOffline(result.error)
-                break
-            }
-        }
-        if (lastOk >= 0) {
-            items.value = restored
-            currentPage.value = lastOk
-            cursorMutable.value = cursor.copy(lastPageLoaded = lastOk)
-        }
-        if (restoreError != null) {
-            error.value = restoreError
-        }
-        isInitialLoading.value = false
-    }
-
     internal fun loadInitialPage(refresh: Boolean = false) {
         scope.launch {
-            // Deep-scroll restore path (Phase 4): resolve the persisted cursor
-            // inside this coroutine so callers pass a suspend provider — never
-            // block commonMain (no runBlocking on JS / wasmJs). When the
-            // provider yields a non-null cursor AND we aren't force-refreshing
-            // AND the policy allows cache reads, batch-re-page every page the
-            // user had loaded before restart. Every requested page is already
-            // durable in Room; store.loadPage(refresh = false) serves them
-            // immediately without a network hit.
-            val restoreCursor = if (!refresh && fetchPolicy != FetchPolicy.NETWORK_ONLY) {
-                initialCursorProvider()
-            } else {
-                null
-            }
-            if (restoreCursor != null && restoreCursor.lastPageLoaded >= 0) {
-                restoreFromCursor(restoreCursor)
-                return@launch
-            }
             // CACHE_ONLY: read from local SoT only — never hit the network.
             if (fetchPolicy == FetchPolicy.CACHE_ONLY) {
                 val pageKey = PageKey.first(pageSize = pageSize, query = query)
@@ -240,10 +146,6 @@ class PagingScreenStream<T : Any> internal constructor(
                     is StorePageResult.Success -> {
                         items.value = result.items
                         hasMoreMutable.value = result.nextKey != null
-                        cursorMutable.value = cursorMutable.value.copy(
-                            lastPageLoaded = 0,
-                            query = query,
-                        )
                     }
                     is StorePageResult.Error -> error.value = result.error
                 }
@@ -273,10 +175,6 @@ class PagingScreenStream<T : Any> internal constructor(
                 is StorePageResult.Success -> {
                     items.value = result.items
                     hasMoreMutable.value = result.nextKey != null
-                    cursorMutable.value = cursorMutable.value.copy(
-                        lastPageLoaded = 0,
-                        query = query,
-                    )
                     // Network-only fetchedAt update — see loadNextPage for rationale.
                     if (result.fromNetwork) {
                         val now = Clock.System.now()
@@ -319,14 +217,8 @@ class PagingScreenStream<T : Any> internal constructor(
  *   wire `RoomFetchedAtRepository` (`core/data`); tests use `FakeFetchedAtRepository`.
  * @param cacheKey Identifies this Store in the [fetchedAtRepository]. Convention:
  *   `"<feature>:<storeName>"` (e.g. `"crypto:coinMarkets"`).
- * @param initialCursorProvider Suspend lambda that yields the persisted
- *   [PagingCursor] for deep-scroll restore, or `null` for a first-time visit or a
- *   caller that does not persist the cursor. Resolved inside `loadInitialPage`'s
- *   coroutine so callers never block commonMain — Kotlin/JS and Kotlin/wasmJs have
- *   no `runBlocking`. Defaults to `{ null }` (no restore attempt, matches the
- *   pre-Phase-4 shape). See Phase 4 of `store5-screen-state-persistence`.
  */
-@Suppress("CyclomaticComplexMethod", "LongMethod", "LongParameterList")
+@Suppress("LongParameterList")
 fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     networkMonitor: NetworkMonitor,
     fetchedAtRepository: FetchedAtRepository,
@@ -335,7 +227,6 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     pageSize: Int = PageKey.DEFAULT_PAGE_SIZE,
     query: String? = null,
     fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
-    initialCursorProvider: suspend () -> PagingCursor? = { null },
 ): PagingScreenStream<Value> {
     val items = MutableStateFlow<List<Value>>(emptyList())
     val hasMore = MutableStateFlow(true)
@@ -344,7 +235,6 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     val error = MutableStateFlow<Throwable?>(null)
     val currentPage = MutableStateFlow(0)
     val lastFetchedAt = MutableStateFlow<Instant?>(null)
-    val cursorMutable = MutableStateFlow(PagingCursor.EMPTY)
     // Seed lastFetchedAt from persistence so warm-reopen (new ViewModel for the
     // same Store) shows the real age of cached data. Launches in scope so the
     // I/O doesn't block stream construction; UI shows null timestamp briefly.
@@ -390,7 +280,6 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         hasMore = hasMore.asStateFlow(),
         isLoadingMore = isLoadingMore.asStateFlow(),
         loadMoreError = error.asStateFlow(),
-        cursorFlow = cursorMutable.asStateFlow(),
         scope = scope,
         store = this,
         pageSize = pageSize,
@@ -401,8 +290,6 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         isInitialLoading = isInitialLoading,
         error = error,
         currentPage = currentPage,
-        cursorMutable = cursorMutable,
-        initialCursorProvider = initialCursorProvider,
         lastFetchedAt = lastFetchedAt,
         networkMonitor = networkMonitor,
         cacheKey = cacheKey,

@@ -43,7 +43,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.HeroCard
-import kpt.core.base.ui.retained.rememberRetainedScreenState
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
@@ -120,12 +119,11 @@ fun PersonalLoansListScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) { ui, _ ->
-            // AC-14 primary sample: retained scroll position survives config-change,
-            // navigation-away-then-back, and process-death via
-            // `rememberRetainedScreenState` (Phase 02 primitive).
-            val retained = rememberRetainedScreenState(routeKey = "loans_list")
+            // Scroll position survives config-change, tab-switch, and process-death
+            // via the default `rememberLazyListState()` (which uses `rememberSaveable`
+            // internally with `LazyListState.Saver`) paired with the app-root
+            // `PersistentSaveableStateRegistry` in `cmp.navigation.ComposeApp`.
             LazyColumn(
-                state = retained.listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = sp.lg)

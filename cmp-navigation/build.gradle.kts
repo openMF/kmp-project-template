@@ -58,6 +58,12 @@ kotlin {
             // Activity death). Resolves io.insert-koin:koin-compose-viewmodel-navigation
             // via gradle/libs.versions.toml:259; version is the shared Koin ref.
             implementation(libs.koin.compose.navigation)
+            // Provides `com.russhwolf.settings.Settings` referenced by
+            // `saveable/PersistentSaveableStateRegistry.kt` at the app root.
+            // The `named("plain")` binding itself is contributed by
+            // `core-base/datastore/DatastoreBaseModule` (transitively wired in
+            // via `core/datastore/DatastoreModule` in `KoinModules.allModules`).
+            implementation(libs.multiplatform.settings)
         }
 
         commonTest.dependencies {

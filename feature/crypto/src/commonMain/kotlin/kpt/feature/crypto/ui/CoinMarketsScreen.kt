@@ -28,15 +28,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.ui.paging.PagingScreenContent
-import kpt.core.base.ui.retained.rememberRetainedScreenState
 import kpt.core.model.crypto.CoinMarket
 import kpt.feature.crypto.generated.resources.Res
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_back_cd
@@ -45,51 +42,26 @@ import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_load_m
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import kotlin.math.abs
 import kotlin.math.round
 
 /**
- * CoinMarkets - the AC-17 deep-scroll-restore demo screen.
+ * CoinMarkets — CoinGecko-backed paged list.
  *
- * Composes [rememberRetainedScreenState] (Phase 2 helper - persists scroll
- * position across process death) with the Phase 4 paging cursor (persists
- * `lastPageLoaded` / `query` across process death). On re-entry the screen:
- *
- *   1. `rememberRetainedScreenState(routeKey)` restores the `LazyListState`
- *      to the saved `(firstVisibleItemIndex, firstVisibleItemScrollOffset)`.
- *   2. The [CoinMarketsViewModel] resolves the persisted paging cursor and
- *      hands it to the repository as `initialCursorProvider`. The stream
- *      batch-re-pages `0..lastPageLoaded` from the already-durable Room rows
- *      with zero network hit.
- *   3. `LaunchedEffect` on `listState.firstVisibleItemIndex` /
- *      `firstVisibleItemScrollOffset` forwards subsequent scroll deltas to the
- *      ViewModel so the store-level cursor stays in sync (deduped downstream at
- *      persistence time).
+ * The `PagingScreenContent` overload owns a `rememberLazyListState()` internally
+ * (which uses `rememberSaveable` with `LazyListState.Saver`). The app-root
+ * `PersistentSaveableStateRegistry` (see `cmp.navigation.saveable`) hooks that
+ * saveable into multiplatform-settings so scroll position survives process
+ * death on every KMP target — no per-screen retention code required.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinMarketsScreen(
-    routeKey: String,
     onBackClick: () -> Unit,
     onCoinClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CoinMarketsViewModel = koinViewModel(key = routeKey) { parametersOf(routeKey) },
+    viewModel: CoinMarketsViewModel = koinViewModel(),
 ) {
-    val retained = rememberRetainedScreenState(routeKey = routeKey)
-
-    LaunchedEffect(retained.listState, viewModel) {
-        // Single snapshot flow across the two scroll axes. Every delta lands
-        // on onScrollChanged, which forwards to pagingStream.updateScrollPosition;
-        // the VM's cursor collector distinctUntilChanged-filters redundant
-        // (lastPageLoaded, query) writes so we don't hammer the datastore on
-        // pure-scroll bursts.
-        snapshotFlow {
-            retained.listState.firstVisibleItemIndex to
-                retained.listState.firstVisibleItemScrollOffset
-        }.collect { (idx, off) -> viewModel.onScrollChanged(index = idx, offset = off) }
-    }
-
     val loadingLabel = stringResource(Res.string.screens_crypto_coin_markets_load_more_loading)
     val endLabel = stringResource(Res.string.screens_crypto_coin_markets_load_more_end)
     Scaffold(
@@ -128,7 +100,6 @@ fun CoinMarketsScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .testTag(TestTags.LIST),
-            retainedState = retained,
             loadingMessage = loadingLabel,
             endMessage = endLabel,
         ) { coins ->
@@ -191,7 +162,7 @@ private fun CoinMarketRow(
 }
 
 /**
- * Locale-free price formatter - safe on Kotlin/JS and Kotlin/wasmJs where
+ * Locale-free price formatter — safe on Kotlin/JS and Kotlin/wasmJs where
  * `java.util.Locale` is not available. Rounds to two decimals, prefixes `$`.
  * Consumer forks with a Money i18n library can override the row rendering.
  */
@@ -204,7 +175,7 @@ private fun formatPrice(value: Double): String {
 }
 
 /**
- * Locale-free percent formatter - two decimals, explicit sign. Same portability
+ * Locale-free percent formatter — two decimals, explicit sign. Same portability
  * constraint as [formatPrice].
  */
 private fun formatChange(pct: Double): String {

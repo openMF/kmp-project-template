@@ -10,7 +10,7 @@
 package kpt.feature.crypto.di
 
 import kpt.feature.crypto.ui.CoinMarketsViewModel
-import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /**
@@ -18,17 +18,8 @@ import org.koin.dsl.module
  *
  * Wired into the app graph by `cmp-navigation/.../KoinModules.kt`
  * (`featureModule.includes(CryptoFeatureModule)`). The `CryptoRepository`
- * binding is provided by `core/data/.../RepositoryModule.kt`; the
- * `ScreenUiStateStore` binding lives in `core-base/datastore/.../DatastoreBaseModule.kt`
- * (surfaced as a singleton) and is transitively wired via
- * `DatastoreModule` in the parent graph.
+ * binding is provided by `core/data/.../RepositoryModule.kt`.
  */
 val CryptoFeatureModule = module {
-    viewModel { params ->
-        CoinMarketsViewModel(
-            routeKey = params.get(),
-            repository = get(),
-            screenUiStateStore = get(),
-        )
-    }
+    viewModelOf(::CoinMarketsViewModel)
 }

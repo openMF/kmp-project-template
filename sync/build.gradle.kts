@@ -34,6 +34,11 @@ kotlin {
             // per-platform `expect/actual provideSyncManager(...)` files.
             implementation(libs.worker.sync)
 
+            // KMPNotifier — multiplatform local notifications (Android/iOS/Desktop/Web).
+            // The -local module is Firebase-free; it pulls kmpnotifier-core transitively.
+            // NotificationWorker renders through KMPNotifier.localNotifier (see SyncNotifier.kt).
+            implementation(libs.kmpnotifier.local)
+
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
         }

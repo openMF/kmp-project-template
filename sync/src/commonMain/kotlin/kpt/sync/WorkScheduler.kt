@@ -51,8 +51,8 @@ public interface WorkScheduler {
 
     /**
      * Schedule a one-shot notification fire-and-forget. The
-     * [NotificationWorker] renders the notification via the platform-specific
-     * `renderNotification` actual.
+     * [NotificationWorker] posts the notification via the multiplatform
+     * KMPNotifier `localNotifier` (see `SyncNotifier.kt`).
      *
      * @param delay non-negative; pass [Duration.ZERO] for immediate. Backed by
      *   `OneTimeWorkRequest.initialDelay`.

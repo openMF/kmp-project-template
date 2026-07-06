@@ -17,11 +17,8 @@ import io.github.mobilebytelabs.worker.WorkerContext
 
 /**
  * One-shot notification worker. Reads [NotificationContent] from `inputData`
- * + calls the per-platform [renderNotification] expect/actual.
- *
- * On Android the actual posts a `NotificationCompat` notification via
- * `NotificationManagerCompat`. On iOS/Desktop/Web the actuals log + return
- * (real per-platform notification rendering is a follow-up).
+ * + posts a local notification via [renderNotification] — backed by the
+ * multiplatform KMPNotifier library. See [initSyncNotifier] for the one-time setup.
  */
 public class NotificationWorker(
     context: WorkerContext,
@@ -45,9 +42,3 @@ public class NotificationWorker(
         }.getOrElse { WorkResult.failure("renderNotification threw: ${it.message}") }
     }
 }
-
-/**
- * Per-platform notification rendering hook. Android actual posts a real
- * NotificationCompat notification; other platforms log + no-op at v1.
- */
-internal expect fun renderNotification(content: NotificationContent)

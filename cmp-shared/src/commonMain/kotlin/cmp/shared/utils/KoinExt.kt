@@ -11,6 +11,7 @@ package cmp.shared.utils
 
 import cmp.navigation.di.KoinModules
 import cmp.shared.generated.WorkerKmpAuto
+import kpt.sync.initSyncNotifier
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.koinApplication
@@ -33,4 +34,8 @@ fun initKoin(config: KoinAppDeclaration? = null) {
     // single-API commonMain design: platform-neutral wiring lives here, not in a platform
     // app class. Declared worker set: cmp-shared/WorkerDeclarations.kt (@WorkerKmpWorkers).
     WorkerKmpAuto.install()
+
+    // KMPNotifier one-time setup — commonMain, every platform. NotificationWorker posts
+    // local notifications through KMPNotifier.localNotifier (all worker code lives in sync/).
+    initSyncNotifier()
 }

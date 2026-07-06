@@ -142,6 +142,8 @@ sqliteWeb = "2.7.0-alpha05"
 # Android / iOS / Desktop / Web. See https://github.com/MobileByteLabs/worker-kmp.
 # Pin tracks last published release on Maven Central.
 worker-version = "4.0.3"
+# KMPNotifier — Kotlin Multiplatform local + push notifications (Android/iOS/Desktop/Web).
+kmpnotifier = "2.0.0"
 
 [libraries]
 kmp-product-flavors-plugin = { group = "io.github.mobilebytelabs.kmpflavors", name = "flavor-plugin", version.ref = "kmpProductFlavors" }
@@ -385,6 +387,7 @@ worker-android     = { module = "io.github.mobilebytelabs:worker-android",     v
 worker-koin        = { module = "io.github.mobilebytelabs:worker-koin",        version.ref = "worker-version" }
 worker-sync        = { module = "io.github.mobilebytelabs:worker-sync",        version.ref = "worker-version" }
 worker-app-annotations = { module = "io.github.mobilebytelabs:worker-app-annotations", version.ref = "worker-version" }
+kmpnotifier-local  = { module = "io.github.mirzemehdi:kmpnotifier-local",       version.ref = "kmpnotifier" }
 
 [bundles]
 androidx-compose-ui-test = [

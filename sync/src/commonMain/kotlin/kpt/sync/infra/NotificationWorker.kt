@@ -32,8 +32,9 @@ public class NotificationWorker(
     }
 
     override suspend fun doWork(): WorkResult {
-        val title = inputData.getString(KEY_TITLE) ?: return WorkResult.failure("missing title")
-        val body = inputData.getString(KEY_BODY) ?: return WorkResult.failure("missing body")
+        val title = inputData.getString(KEY_TITLE)
+        val body = inputData.getString(KEY_BODY)
+        if (title == null || body == null) return WorkResult.failure("missing title or body")
         val channelId = inputData.getString(KEY_CHANNEL_ID)
         return runCatching {
             renderNotification(

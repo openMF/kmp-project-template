@@ -65,9 +65,12 @@ public class DataSyncWorker(
                     async { macroIndicatorsRepository.syncWith(this@DataSyncWorker) },
                 ).awaitAll().all { it }
             }
-        }.getOrElse { return WorkResult.retry() }
-        if (!ok) return WorkResult.retry()
-        persister.write(workingVersions)
-        return WorkResult.success()
+        }.getOrDefault(false)
+        return if (ok) {
+            persister.write(workingVersions)
+            WorkResult.success()
+        } else {
+            WorkResult.retry()
+        }
     }
 }

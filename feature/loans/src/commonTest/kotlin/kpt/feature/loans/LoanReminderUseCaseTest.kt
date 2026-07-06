@@ -36,7 +36,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 /**
- * D18 — `LoanReminderUseCase` is the cross-module regression test for the whole
+ * `LoanReminderUseCase` is the cross-module regression test for the whole
  * `sync/` library design: a consumer `feature/loans` class that touches ONLY the
  * public `kpt.sync.WorkScheduler` façade (no worker-kmp / DefaultWorkScheduler
  * internals). If the library's API shape regresses, this test breaks.

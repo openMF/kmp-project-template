@@ -15,7 +15,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * AC-31c — `ChangeListVersions` is the persisted sync-state record; it must
+ * `ChangeListVersions` is the persisted sync-state record; it must
  * round-trip through kotlinx.serialization (it is stored as a JSON string by
  * `DataStoreSyncStatePersister`).
  */

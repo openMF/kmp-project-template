@@ -10,7 +10,7 @@ This module is the **integration layer** between the template's `core/data` + `c
 |---------|------|---------|
 | `WorkScheduler` interface | `WorkScheduler.kt` | The cross-module API. 4 methods: `enqueueDataSync`, `scheduleNotification`, `observeWork`, `cancelWork`. |
 | `DefaultWorkScheduler` impl | `DefaultWorkScheduler.kt` | Thin façade over worker-kmp's `WorkManager`. Encodes KEEP unique-name policy for data sync + expedited-on-Foreground mode mapping. |
-| `DataSyncWorker` | `DataSyncWorker.kt` | `CoroutineWorker` + `Synchronizer`. Fans out to `currencyRepository.syncWith(this)` + `macroIndicatorsRepository.syncWith(this)` in parallel via explicit `awaitAll` — **no `getAll<Syncable>()` runtime discovery** (D5/D8). |
+| `DataSyncWorker` | `DataSyncWorker.kt` | `CoroutineWorker` + `Synchronizer`. Fans out to `currencyRepository.syncWith(this)` + `macroIndicatorsRepository.syncWith(this)` in parallel via explicit `awaitAll` — **no `getAll<Syncable>()` runtime discovery**. |
 | `NotificationWorker` | `NotificationWorker.kt` | `CoroutineWorker` that renders a notification via the per-platform `renderNotification` expect/actual (Android real; other platforms log-and-return via the shared `nonAndroidMain` actual). |
 | `SyncModule` (Koin) | `di/SyncModule.kt` | Binds `WorkScheduler` only. Sync-status observation is provided by the `cmp-worker-sync` library's `UniqueWorkObserver` (bound via `SyncObserverKoinModule`), which replaced the hand-rolled per-platform `SyncManager` expect/actuals in the worker-kmp v4.0.0 single-API migration. |
 
@@ -60,7 +60,7 @@ LaunchedEffect(Unit) {
 }
 ```
 
-## The D21 forced-refresh seam
+## The forced-refresh seam
 
 The two `Syncable` adopters force the underlying Store5 cache to re-fetch from network via Store5's
 one-shot **`store.stream(StoreReadRequest.fresh(key))`**, collecting the first terminal
@@ -75,7 +75,7 @@ terminal response, so the worker returns promptly.
 > is the canonical one-shot forced read (the same primitive `StorePagingSource` uses) and is the only
 > shape that both refreshes AND completes.
 
-This is the deliberate design choice noted in the upstream PR narrative: the integration ships **zero
+This is the deliberate design choice: the integration ships **zero
 edits to `core-base/store/**`** because the seam needed already exists at the Store5 library level. The
 repo simply issues a `fresh` stream read per pinned input from the read side.
 
@@ -86,7 +86,7 @@ repo simply issues a `fresh` stream read per pinned input from the read side.
 3. Add the repository as a constructor parameter to [`DataSyncWorker`](src/commonMain/kotlin/kpt/sync/DataSyncWorker.kt) and a third `async { repo.syncWith(this@DataSyncWorker) }` line in `doWork`.
 4. Nothing else — the worker registry + Koin injection are **codegen'd** from the `@WorkerKmpWorkers` declaration in [`cmp-shared/WorkerDeclarations.kt`](../cmp-shared/src/commonMain/kotlin/cmp/shared/WorkerDeclarations.kt); the new constructor param is auto-wired via `getKoin().get()`. No hand-edited registry, no per-platform app-class change.
 
-The explicit constructor surface is a deliberate trade-off — it adds friction for adding new Syncables but eliminates a class of runtime-discovery bugs and lets `DataSyncWorker.doWork()` be statically reasoned about (D8 of the integration epic). Three is the natural cap before refactoring to a registry pattern.
+The explicit constructor surface is a deliberate trade-off — it adds friction for adding new Syncables but eliminates a class of runtime-discovery bugs and lets `DataSyncWorker.doWork()` be statically reasoned about. Three is the natural cap before refactoring to a registry pattern.
 
 ## Out of scope (v1)
 

@@ -22,9 +22,7 @@ private const val TAG = "kpt.sync.NotificationWorker"
  *  - Notification channel created at App.onCreate
  *  - Optional `POST_NOTIFICATIONS` runtime permission on API 33+
  *
- * Kept as a stub at v1 so Phase 4 ships without dragging in the permission +
- * channel boilerplate. Sub-plan 06 / Phase 6 docs call this out as a known
- * follow-up in the upstream PR narrative.
+ * Kept as a stub at v1 to avoid the permission + channel boilerplate; a known follow-up.
  */
 internal actual fun renderNotification(content: NotificationContent) {
     Log.i(TAG, "renderNotification(title=${content.title}, body=${content.body}, channel=${content.channelId})")

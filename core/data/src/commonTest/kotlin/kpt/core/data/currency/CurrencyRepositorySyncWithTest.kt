@@ -24,10 +24,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * AC-28 / AC-31d — `CurrencyRepositoryImpl.syncWith` is the D21 forced-refresh
- * seam: for each pinned base currency it re-subscribes to `exchangeRatesStream`
- * under `FetchPolicy.NETWORK_ONLY`, which drives the Store5 fetcher (a real
- * network hit) and writes through SourceOfTruth. The test proves the fetcher is
+ * `CurrencyRepositoryImpl.syncWith` is the forced-refresh seam: for each pinned base currency
+ * it re-subscribes to `exchangeRatesStream` under `FetchPolicy.NETWORK_ONLY`, which drives
+ * the Store5 fetcher and writes through SourceOfTruth. The test proves the fetcher is
  * invoked once per pinned base and that a fresh sync timestamp is stamped.
  */
 class CurrencyRepositorySyncWithTest {

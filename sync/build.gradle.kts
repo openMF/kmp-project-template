@@ -31,8 +31,7 @@ kotlin {
             api(libs.worker.kmp)
 
             // worker-kmp v4.0.0 — UniqueWorkObserver replaces the hand-rolled
-            // per-platform `expect/actual provideSyncManager(...)` files (deleted in
-            // worker-kmp-single-api-completion epic, sub-plan 06).
+            // per-platform `expect/actual provideSyncManager(...)` files.
             implementation(libs.worker.sync)
 
             implementation(libs.kotlinx.coroutines.core)

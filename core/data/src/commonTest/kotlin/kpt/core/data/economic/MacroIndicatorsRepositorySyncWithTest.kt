@@ -24,10 +24,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * AC-29 / AC-31e — `MacroIndicatorsRepositoryImpl.syncWith` mirrors the currency
- * adopter: for each pinned (country, indicator) pair it re-subscribes to
- * `macroIndicatorStream` under `FetchPolicy.NETWORK_ONLY` (D21) and stamps a
- * fresh sync timestamp. Proves the World Bank fetcher fires once per pinned key.
+ * `MacroIndicatorsRepositoryImpl.syncWith` mirrors the currency adopter: for each pinned
+ * (country, indicator) pair it re-subscribes to `macroIndicatorStream` under
+ * `FetchPolicy.NETWORK_ONLY` and stamps a fresh sync timestamp. Proves the World Bank
+ * fetcher fires once per pinned key.
  */
 class MacroIndicatorsRepositorySyncWithTest {
 

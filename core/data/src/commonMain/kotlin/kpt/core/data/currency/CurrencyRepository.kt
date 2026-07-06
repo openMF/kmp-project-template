@@ -21,7 +21,7 @@ import kpt.core.model.currency.RateHistoryKey
 /**
  * Repository surface for exchange rates + historical rate data.
  *
- * Implements [Syncable] (D5/D8 of mifos-template-sync-integration) — the
+ * Implements [Syncable] — the
  * `sync/` module's `DataSyncWorker` calls [syncWith] in parallel with the
  * macro-indicators repo to force-refresh both Store5 caches on a schedule
  * or from a pull-to-refresh gesture.
@@ -46,5 +46,5 @@ interface CurrencyRepository : Syncable {
     // Syncable.syncWith(synchronizer) is implemented in CurrencyRepositoryImpl —
     // force-refreshes the exchangeRatesStore for each pinned base currency via
     // Store5's native `fresh(key)` (which bypasses cache + writes through
-    // SourceOfTruth automatically — the D21 forced-refresh seam).
+    // SourceOfTruth automatically — the forced-refresh seam).
 }

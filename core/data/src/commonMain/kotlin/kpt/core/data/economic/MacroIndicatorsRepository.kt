@@ -34,7 +34,7 @@ interface MacroIndicatorsRepository : Syncable {
      *
      * [fetchPolicy] defaults to [FetchPolicy.NETWORK_WITH_CACHE] for UI callers;
      * the `syncWith` forced-refresh seam passes [FetchPolicy.NETWORK_ONLY] to
-     * drive a network re-fetch through Store5's SourceOfTruth (D21).
+     * drive a network re-fetch through Store5's SourceOfTruth.
      */
     fun macroIndicatorStream(
         key: MacroIndicatorKey,
@@ -53,5 +53,5 @@ interface MacroIndicatorsRepository : Syncable {
 
     // Syncable.syncWith(synchronizer) is implemented in MacroIndicatorsRepositoryImpl —
     // force-refreshes each pinned (country, indicator) pair by re-collecting one
-    // emission from macroIndicatorStream(key, scope, NETWORK_ONLY). See GOAL.md D21 + Δ-3.
+    // emission from macroIndicatorStream(key, scope, NETWORK_ONLY).
 }

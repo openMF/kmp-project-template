@@ -117,13 +117,8 @@ dependencies {
     implementation(projects.coreBase.ui)
     implementation(projects.coreBase.platform)
 
-    // worker-kmp: NO direct dependency here. The Android WorkManager factory + Koin
-    // wiring arrive transitively via `projects.sync`, which applies the worker-compose
-    // convention (the `worker-compose-all` umbrella carries every platform factory).
-    // Single-API design: all worker code lives in `sync/` (commonMain); the only
-    // integration touch-points are `WorkerKmpAuto.install()` in the commonMain shared
-    // init (cmp-shared/utils/KoinExt.kt) + `@WorkerKmpWorkers` in cmp-shared.
-    // AndroidApp.onCreate merely binds the Android Koin context — it references no worker API.
+    // worker-kmp needs no direct dependency here — the Android factory + Koin wiring
+    // arrive transitively through `projects.sync` (worker-compose convention).
 
     // Compose
     implementation(libs.androidx.core.ktx)

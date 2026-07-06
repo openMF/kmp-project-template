@@ -26,9 +26,9 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 /**
- * AC-22 / AC-23 / AC-24 — `DefaultWorkScheduler` is a thin façade over worker-kmp's
- * `WorkManager`. These tests pin the delegation + `WorkHandle` contract that
- * sub-plan 05's `LoanReminderUseCase` (the library-design regression test) relies on.
+ * `DefaultWorkScheduler` is a thin façade over worker-kmp's `WorkManager`. These tests
+ * pin the delegation + `WorkHandle` contract that `LoanReminderUseCase` (the library-design
+ * regression test) relies on.
  */
 class DefaultWorkSchedulerTest {
 

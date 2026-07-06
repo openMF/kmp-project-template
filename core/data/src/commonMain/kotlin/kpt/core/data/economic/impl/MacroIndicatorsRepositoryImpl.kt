@@ -76,7 +76,7 @@ class MacroIndicatorsRepositoryImpl(
      * Forced-refresh seam called by `sync/` module's `DataSyncWorker`.
      *
      * For each pinned (country, indicator) pair (in parallel) issues Store5's one-shot
-     * `stream(StoreReadRequest.fresh(key))` — the D21 forced-refresh seam. `fresh`
+     * `stream(StoreReadRequest.fresh(key))` — the forced-refresh seam. `fresh`
      * bypasses the cache, hits World Bank via the fetcher, and writes through
      * SourceOfTruth automatically. A cold `stream(fresh)` completes on the first
      * terminal response so the worker returns promptly — unlike `asScreenStream`, whose

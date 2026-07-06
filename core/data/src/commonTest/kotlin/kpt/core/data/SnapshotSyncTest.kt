@@ -17,7 +17,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * AC-27 / AC-31b — `snapshotSync` is the algorithm both Phase-3 adopters
+ * `snapshotSync` is the algorithm both v1 adopters
  * (Frankfurter + World Bank are snapshot APIs) drive from `syncWith`: run the
  * fetcher, then stamp a fresh timestamp under the feature `name`.
  */

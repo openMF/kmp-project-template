@@ -30,14 +30,11 @@ import org.koin.core.component.inject
 
 /**
  * Android application class.
+ * This class is used to initialize Koin modules for dependency injection in the Android application.
+ * It sets up the Koin framework, providing the necessary dependencies for the app.
  *
- * This class carries NO worker-kmp code. The entire worker setup is wired once in
- * commonMain via `initKoin()` (see `cmp-shared/utils/KoinExt.kt`), which calls the
- * codegen-emitted `WorkerKmpAuto.install()` for every platform. On Android the generated
- * actual reads the `Application` from the `androidContext(this@AndroidApp)` bound below —
- * so the platform app class only provides the Android Koin context, exactly as it already
- * did. Keeping the worker wiring in commonMain is the single-API design: an Android-only
- * `install()` here would silently leave desktop / iOS / web without workers.
+ * @constructor Create empty Android app
+ * @see Application
  */
 class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
 
@@ -51,6 +48,8 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
         }
 
         // Restore the user's saved language preference to AppCompatDelegate.
+        // This ensures the app always launches with the user's chosen language,
+        // regardless of system settings or device language.
         restoreSavedLanguage()
     }
 
@@ -65,12 +64,15 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
             val userData = userDataRepository.userData.first()
             val savedLanguage = userData.appLanguage
 
+            // Convert the saved LanguageConfig to LocaleListCompat
             val desiredLocales = if (savedLanguage.localeName != null) {
                 LocaleListCompat.forLanguageTags(savedLanguage.localeName)
             } else {
+                // System default
                 LocaleListCompat.getEmptyLocaleList()
             }
 
+            // Only update if the current locale differs from saved preference
             val currentLocales = AppCompatDelegate.getApplicationLocales()
             if (currentLocales != desiredLocales) {
                 AppCompatDelegate.setApplicationLocales(desiredLocales)

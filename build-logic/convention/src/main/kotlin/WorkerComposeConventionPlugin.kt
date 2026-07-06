@@ -24,8 +24,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
  *     so consumers don't have to repeat the `@OptIn` annotation file-by-file.
  *
  * Apply this on the module that hosts the consumer-facing workers + the `WorkScheduler`
- * (in this template: the new `sync/` module from Phase 4 of the
- * mifos-template-sync-integration epic).
+ * (in this template: the new `sync/` module).
  *
  * Library pin: see `worker-version` in `gradle/libs.versions.toml`.
  */

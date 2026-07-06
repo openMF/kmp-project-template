@@ -28,8 +28,7 @@ import kpt.core.datastore.SyncStatePersister
  * collaborators ([CurrencyRepository], [MacroIndicatorsRepository]) can read +
  * write [ChangeListVersions] through `this` without an extra abstraction.
  *
- * **No `getAll<Syncable>()`** — per D5/D8 of mifos-template-sync-integration,
- * the two repos are constructor-injected as named interfaces. Adding a third
+ * **No `getAll<Syncable>()`** — the two repos are constructor-injected as named interfaces. Adding a third
  * Syncable (e.g. FRED interest rates) requires editing this class signature +
  * the [SyncModule] binding — not a runtime discovery.
  *

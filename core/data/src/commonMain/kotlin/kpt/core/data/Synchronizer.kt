@@ -52,20 +52,20 @@ interface NetworkChange {
  * Adopter contract. A [Syncable] knows how to bring its slice of local state
  * up to date with the network. At v1 the contract is intentionally minimal
  * (no payload arg) — the worker enqueues all-pinned-keys per adopter at fixed
- * defaults. Per-key payload extensibility (D23) is a follow-up.
+ * defaults. Per-key payload extensibility is a follow-up.
  */
 interface Syncable {
     suspend fun syncWith(synchronizer: Synchronizer): Boolean
 }
 
 /**
- * Delta-API algorithm. NiA-port (AC-26). Used when the server returns
+ * Delta-API algorithm. NiA-port. Used when the server returns
  * `[{id, version, isDelete}, ...]` from `?since=N` semantics — partitions
  * deletes/updates, fans out body fetch, bumps the version pointer.
  *
  * Kept available for the upstream Mifos Fineract PR conversation (Fineract's
  * `lastModifiedSince` matches this shape). Not invoked at v1 because the two
- * canonical Phase-3 adopters (Frankfurter, World Bank) are snapshot APIs.
+ * canonical v1 adopters (Frankfurter, World Bank) are snapshot APIs.
  */
 suspend fun <T : NetworkChange> Synchronizer.changeListSync(
     versionReader: suspend ChangeListVersions.() -> Int,
@@ -85,11 +85,11 @@ suspend fun <T : NetworkChange> Synchronizer.changeListSync(
 }
 
 /**
- * Snapshot-API algorithm. Used by both Phase-3 canonical adopters
+ * Snapshot-API algorithm. Used by both canonical adopters
  * ([CurrencyRepository] over Frankfurter; [MacroIndicatorsRepository] over
  * World Bank). The fetcher block triggers the actual network work — typically
  * by re-collecting one emission from the underlying repo stream under
- * `FetchPolicy.NETWORK_ONLY` (the D21 forced-refresh seam) — and on success
+ * `FetchPolicy.NETWORK_ONLY` (the forced-refresh seam) — and on success
  * stamps a timestamp under the given [name] key into [ChangeListVersions].
  */
 @OptIn(ExperimentalTime::class)

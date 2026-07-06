@@ -33,7 +33,7 @@ import org.mobilenativefoundation.store.store5.StoreReadResponse
 /**
  * Pinned base currencies that the [syncWith] forced-refresh fans out across.
  * At v1 these are hardcoded; payload-driven extensibility (per-key opt-in
- * from the worker enqueue side) is a follow-up. See GOAL.md D21 + Δ-3.
+ * from the worker enqueue side) is a follow-up.
  */
 private val PINNED_BASE_CURRENCIES = listOf("USD", "EUR", "INR")
 
@@ -73,7 +73,7 @@ class CurrencyRepositoryImpl(
      * Forced-refresh seam called by `sync/` module's `DataSyncWorker`.
      *
      * For each pinned base currency (in parallel) issues Store5's one-shot
-     * `stream(StoreReadRequest.fresh(key))` — the D21 forced-refresh seam. `fresh`
+     * `stream(StoreReadRequest.fresh(key))` — the forced-refresh seam. `fresh`
      * bypasses the cache, hits Frankfurter via the fetcher, and writes through
      * SourceOfTruth automatically. A cold `stream(fresh)` completes on the first
      * terminal response, so the worker returns promptly — unlike `asScreenStream`,

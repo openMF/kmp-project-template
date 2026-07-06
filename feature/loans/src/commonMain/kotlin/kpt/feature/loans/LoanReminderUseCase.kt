@@ -23,8 +23,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 /**
- * Cross-module proof-of-concept demonstrating consumer use of [WorkScheduler]
- * (D18 of mifos-template-sync-integration).
+ * Cross-module proof-of-concept demonstrating consumer use of [WorkScheduler].
  *
  * The `feature/loans` module has ZERO direct dep on `worker-kmp` / `sync/`'s
  * internals — it consumes only `kpt.sync.WorkScheduler` + the helper types

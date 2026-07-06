@@ -16,7 +16,7 @@ package kpt.sync
  * Those platforms have no shared system-notification tray in this template, so
  * the actual logs and returns — mirroring the Android stub in
  * `RenderNotificationAndroid.kt`. Providing a real per-platform notification is
- * called out as a known follow-up in the upstream PR narrative (sub-plan 06).
+ * a known follow-up.
  */
 internal actual fun renderNotification(content: NotificationContent) {
     println(

@@ -17,7 +17,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * AC-26 / AC-31a — `changeListSync` is the NiA-port delta algorithm (server
+ * `changeListSync` is the NiA-port delta algorithm (server
  * returns `[{id, version, isDelete}]`). Kept available for the upstream Mifos
  * Fineract PR conversation; verified here even though the v1 adopters use
  * `snapshotSync`.

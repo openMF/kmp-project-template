@@ -16,7 +16,11 @@ import kpt.core.model.crypto.CoinDetail
 import kpt.core.model.crypto.CoinMarket
 
 interface CryptoRepository {
-    fun coinMarketsStream(scope: CoroutineScope, pageSize: Int = 20): PagingScreenStream<CoinMarket>
+    /** Streams the CoinGecko coin-markets list as a paged screen stream. */
+    fun coinMarketsStream(
+        scope: CoroutineScope,
+        pageSize: Int = 20,
+    ): PagingScreenStream<CoinMarket>
 
     fun coinDetailStream(coinId: String, scope: CoroutineScope): ScreenDataStream<CoinDetail>
 }

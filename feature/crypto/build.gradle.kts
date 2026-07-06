@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Mifos Initiative
+ * Copyright 2026 Mifos Initiative
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,11 +14,8 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation(projects.core.common)
             implementation(projects.core.data)
             implementation(projects.core.model)
-            implementation(projects.core.store)
-            implementation(projects.core.ui)
             implementation(projects.coreBase.store)
             implementation(projects.coreBase.ui)
 
@@ -28,34 +25,23 @@ kotlin {
             implementation(compose.materialIconsExtended)
             // compose-resources — for stringResource()-based UI copy (i18n) per
             // RULE-IMPL-NO-HARDCODED-STRING-001 (W2 of store5-superbrain-v2).
-            // Mirrors `feature/loans/build.gradle.kts` wiring.
             implementation(compose.components.resources)
-
-            // Phase 3 (store5-screen-state-persistence 03-vm-scoping) — koinNavViewModel()
-            // for NavBackStackEntry-scoped VM acquisition on the HomeScreen bottom-nav-tab
-            // VM. Screens import it aliased as `retainedKoinViewModel` per the sub-plan's
-            // naming contract; enumeration Kdoc lives in
-            // `cmp-navigation/.../RetainedKoinViewModel.kt`. See feature/loans deviation note.
-            implementation(libs.koin.compose.navigation)
 
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
         }
 
         commonTest.dependencies {
-            implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
+            // kotlin.test + kotlinx.coroutines.test come from the convention plugin.
             implementation(libs.turbine)
         }
     }
 }
 
 // Compose-resources class generator config — mirrors `feature/loans/build.gradle.kts`
-// so `Res.string.*` is exposed under `kpt.feature.home.generated.resources`,
-// matching the source `import kpt.feature.home.generated.resources.Res`
-// inserted by RULE-IMPL-NO-HARDCODED-STRING-001 backfill.
+// so `Res.string.*` is exposed under `kpt.feature.crypto.generated.resources`.
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "kpt.feature.home.generated.resources"
+    packageOfResClass = "kpt.feature.crypto.generated.resources"
 }

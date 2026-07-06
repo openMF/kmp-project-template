@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.paging
 
@@ -33,7 +33,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 /**
- * Paginated variant of [ScreenDataStream].
+ * Paginated variant of [kpt.core.base.store.screen.ScreenDataStream].
  * Manages page loading, appending, error surfacing, and unified state for infinite lists.
  *
  * Usage:
@@ -46,6 +46,11 @@ import kotlin.time.Instant
  * val uiState = pagingStream.state  // Flow<ScreenState<List<Client>>>
  * fun loadMore() = pagingStream.loadNextPage()
  * ```
+ *
+ * Scroll and UI position retention is a Compose concern — `rememberLazyListState()`
+ * (which uses `rememberSaveable` internally with `LazyListState.Saver`) restores
+ * the list position across tab-switch and config-change automatically. This paging
+ * class carries no durable cursor of its own.
  */
 @OptIn(ExperimentalTime::class)
 class PagingScreenStream<T : Any> internal constructor(
@@ -212,7 +217,7 @@ class PagingScreenStream<T : Any> internal constructor(
  * @param cacheKey Identifies this Store in the [fetchedAtRepository]. Convention:
  *   `"<feature>:<storeName>"` (e.g. `"crypto:coinMarkets"`).
  */
-@Suppress("CyclomaticComplexMethod")
+@Suppress("LongParameterList")
 fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
     networkMonitor: NetworkMonitor,
     fetchedAtRepository: FetchedAtRepository,

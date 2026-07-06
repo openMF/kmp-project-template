@@ -10,10 +10,10 @@
 package kpt.core.base.datastore.di
 
 import com.russhwolf.settings.Settings
+import kpt.core.base.datastore.SecureSettingsFactory
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import kpt.core.base.datastore.SecureSettingsFactory
 
 /**
  * Platform-specific module that provides [SecureSettingsFactory].

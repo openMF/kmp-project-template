@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.HeroCard
@@ -59,7 +60,7 @@ import kpt.feature.loans.generated.resources.screens_loans_list_new_fab_text
 import kpt.feature.loans.generated.resources.screens_loans_list_title
 import kpt.feature.loans.generated.resources.screens_loans_list_total_outstanding_label
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +69,7 @@ fun PersonalLoansListScreen(
     onAddLoanClick: () -> Unit,
     onLoanClick: (loanId: String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PersonalLoansListViewModel = koinViewModel(),
+    viewModel: PersonalLoansListViewModel = retainedKoinViewModel(),
 ) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     var pendingDelete by remember { mutableStateOf<Loan?>(null) }
@@ -106,6 +107,7 @@ fun PersonalLoansListScreen(
                 text = { Text(stringResource(Res.string.screens_loans_list_new_fab_text)) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.testTag(TestTags.LoansList.FAB),
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -117,10 +119,15 @@ fun PersonalLoansListScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) { ui, _ ->
+            // Scroll position survives tab-switch and config-change via the default
+            // `rememberLazyListState()` (which uses `rememberSaveable` internally with
+            // `LazyListState.Saver`) — Navigation's per-tab `saveState`/`restoreState`
+            // and Android's saved-instance-state Bundle carry it. No per-screen code.
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = sp.lg),
+                    .padding(horizontal = sp.lg)
+                    .testTag(TestTags.LoansList.LIST),
                 contentPadding = PaddingValues(top = sp.sm, bottom = sp.xxl),
                 verticalArrangement = Arrangement.spacedBy(sp.md),
             ) {
@@ -132,6 +139,7 @@ fun PersonalLoansListScreen(
                         loan = loan,
                         onClick = { onLoanClick(loan.id) },
                         onLongPress = { pendingDelete = loan },
+                        modifier = Modifier.testTag("${TestTags.LoansList.ROW}_${loan.id}"),
                     )
                 }
             }
@@ -151,10 +159,13 @@ fun PersonalLoansListScreen(
                 )
             },
             confirmButton = {
-                TextButton(onClick = {
-                    viewModel.onDeleteLoan(target.id)
-                    pendingDelete = null
-                }) { Text(stringResource(Res.string.screens_loans_list_delete_confirm)) }
+                TextButton(
+                    onClick = {
+                        viewModel.onDeleteLoan(target.id)
+                        pendingDelete = null
+                    },
+                    modifier = Modifier.testTag(TestTags.LoansList.DELETE_CONFIRM),
+                ) { Text(stringResource(Res.string.screens_loans_list_delete_confirm)) }
             },
             dismissButton = {
                 TextButton(onClick = { pendingDelete = null }) {

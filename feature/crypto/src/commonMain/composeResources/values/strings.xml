@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- ============================================================
+         RULE-IMPL-NO-HARDCODED-STRING-001 - feature/crypto i18n surface
+         Naming convention: screens_crypto_<screen>_<role>
+         (per training-layer/instructions/stream-first/latest/CORE_I18N.md)
+         Authored by Phase 4 of plan-layer/project-plans/mifos-x/kmp-project-template/
+         active/store5-screen-state-persistence/04-paging-screen.md.
+         ============================================================ -->
+
+    <!-- ===== CoinMarketsScreen ===== -->
+    <string name="screens_crypto_coin_markets_title">Coin Markets</string>
+    <string name="screens_crypto_coin_markets_back_cd">Back</string>
+    <string name="screens_crypto_coin_markets_empty">No coins to show yet.</string>
+    <string name="screens_crypto_coin_markets_error_retry">Retry</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">Loading more…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">You\'re all caught up</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">Current price</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">24 hour change</string>
+</resources>

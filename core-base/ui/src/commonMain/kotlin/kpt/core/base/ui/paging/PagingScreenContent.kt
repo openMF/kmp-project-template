@@ -16,17 +16,17 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.store.freshness.FreshnessSignal
+import kpt.core.base.store.paging.PagingScreenStream
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.screen.DefaultEmptyContent
 import kpt.core.base.ui.screen.DefaultErrorContent
 import kpt.core.base.ui.screen.DefaultLoadingContent
 import kpt.core.base.ui.screen.DefaultNoNetworkContent
 import kpt.core.base.ui.screen.ScreenContent
-import kpt.core.base.store.paging.PagingScreenStream
-import kpt.core.base.store.screen.ScreenState
 
 /**
  * [ScreenContent] variant for paginated lists — slot-only overload for screens with
@@ -63,7 +63,7 @@ fun <T : Any> PagingScreenContent(
     error: @Composable (Throwable) -> Unit = { DefaultErrorContent(it, onRetry) },
     content: @Composable (data: List<T>, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
-    val state by pagingStream.state.collectAsState(ScreenState.Loading)
+    val state by pagingStream.state.collectAsStateWithLifecycle(ScreenState.Loading)
 
     ScreenContent(
         state = state,
@@ -124,10 +124,10 @@ fun <T : Any> PagingScreenContent(
     error: @Composable (Throwable) -> Unit = { DefaultErrorContent(it, onRetry) },
     lazyContent: LazyListScope.(items: List<T>) -> Unit,
 ) {
-    val state by pagingStream.state.collectAsState(ScreenState.Loading)
-    val isLoadingMore by pagingStream.isLoadingMore.collectAsState()
-    val hasMore by pagingStream.hasMore.collectAsState()
-    val loadMoreError by pagingStream.loadMoreError.collectAsState()
+    val state by pagingStream.state.collectAsStateWithLifecycle(ScreenState.Loading)
+    val isLoadingMore by pagingStream.isLoadingMore.collectAsStateWithLifecycle()
+    val hasMore by pagingStream.hasMore.collectAsStateWithLifecycle()
+    val loadMoreError by pagingStream.loadMoreError.collectAsStateWithLifecycle()
 
     val shouldLoadMore by rememberLoadMoreTrigger(
         listState = listState,

@@ -67,6 +67,16 @@ class KMPCoreBaseLibraryConventionPlugin: Plugin<Project> {
                     androidExt.namespace = moduleNamespace
                     androidExt.enableCoreLibraryDesugaring = true
                     androidExt.androidResources {
+                        // Official AGP-9 fix (JetBrains CMP-9547): the new
+                        // `com.android.kotlin.multiplatform.library` plugin does NOT process
+                        // Android resources by default, so Compose Multiplatform's
+                        // CopyResourcesToAndroidAssetsTask never gets its outputDirectory wired
+                        // and the module's composeResources (values/*.cvr) are silently dropped
+                        // from any consuming APK → MissingResourceException at launch. Enabling
+                        // android-resource processing here (once, for every core-base module via
+                        // the convention plugin) makes CMP package them correctly.
+                        // Ref: https://kotlinlang.org/docs/multiplatform/multiplatform-project-agp-9-migration.html
+                        enable = true
                         resourcePrefix = moduleResourcePrefix
                     }
                     // Enable BuildConfig generation for all core-base library modules.

@@ -44,6 +44,12 @@ fun ComposeApp(
         }
     }
 
+    // Bottom-nav tab-switch retention (per-tab back-stack + scroll) is handled by
+    // Navigation's own `saveState = true` / `restoreState = true` in the bottom-nav
+    // NavHost; rotation and system-initiated process death ride Android's standard
+    // saved-instance-state Bundle. No app-root SaveableStateRegistry override — the
+    // platform default is used, so Navigation's Bundle-typed back-stack state is
+    // never rejected. Feature modules carry zero retention code.
     KptTheme(
         darkTheme = uiState.darkTheme,
         androidTheme = uiState.isAndroidTheme,

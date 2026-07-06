@@ -27,6 +27,7 @@ import kpt.feature.calculators.navigation.navigateToAffordability
 import kpt.feature.calculators.navigation.navigateToAmortization
 import kpt.feature.calculators.navigation.navigateToLoanCalcWizard
 import kpt.feature.calculators.navigation.navigateToLoanComparison
+import kpt.feature.crypto.navigation.cryptoGraph
 import kpt.feature.currencyrates.navigation.currencyRatesGraph
 import kpt.feature.currencyrates.navigation.navigateToCurrencyRates
 import kpt.feature.currencyrates.navigation.navigateToRateHistory
@@ -103,6 +104,7 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         calculatorsGraph(navController) // B2/B3/B5/B6 — affordability + amortization + comparison + wizard
         ratesGraph(navController) // B7 — NETWORK_WITH_CACHE rate tracker
         macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
+        cryptoGraph(navController) // Phase 4 store5-screen-state-persistence — AC-17 deep-scroll restore
 
         // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).
         transitionGalleryGraph(navController)

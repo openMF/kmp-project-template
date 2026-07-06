@@ -26,6 +26,7 @@
 :feature:amortization
 :feature:bills
 :feature:calculators
+:feature:crypto
 :feature:currency-rates
 :feature:emi-calculator
 :feature:home
@@ -375,6 +376,8 @@ io.insert-koin:koin-annotations:4.2.1
 io.insert-koin:koin-bom:4.2.1
 io.insert-koin:koin-compose-android:4.2.1
 io.insert-koin:koin-compose-viewmodel-android:4.2.1
+io.insert-koin:koin-compose-viewmodel-navigation-android:4.2.1
+io.insert-koin:koin-compose-viewmodel-navigation:4.2.1
 io.insert-koin:koin-compose-viewmodel:4.2.1
 io.insert-koin:koin-compose:4.2.1
 io.insert-koin:koin-core-annotations-jvm:4.2.1

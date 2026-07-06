@@ -55,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -126,8 +127,9 @@ import kpt.feature.home.ui.HomeAction
 import kpt.feature.home.ui.HomeViewModel
 import kpt.feature.home.ui.LoansSummary
 import kpt.feature.home.ui.RatesQuickView
+import kpt.feature.home.ui.TestTags
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,7 +146,7 @@ internal fun HomeScreen(
     onNavigateToAmortization: () -> Unit,
     onNavigateToLoanComparison: () -> Unit,
     onNavigateToLoanCalcWizard: () -> Unit,
-    viewModel: HomeViewModel = koinViewModel(),
+    viewModel: HomeViewModel = retainedKoinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val exchangeFreshness by viewModel.exchangeFreshness.collectAsStateWithLifecycle()
@@ -179,12 +181,18 @@ internal fun HomeScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+        // `rememberScrollState()` internally uses `rememberSaveable` with
+        // `ScrollState.Saver`, so the dashboard scroll position survives tab-switch
+        // (Navigation `saveState`/`restoreState`) and config-change (Android's
+        // saved-instance-state Bundle). No per-screen retention code.
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(horizontal = sp.lg)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState)
+                .testTag(TestTags.Home.DASHBOARD_SCROLL),
             verticalArrangement = Arrangement.spacedBy(sp.md),
         ) {
             Spacer(Modifier.height(sp.xs))

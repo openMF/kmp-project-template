@@ -20,14 +20,14 @@
  *  See docs/FLAVORS_EXTENSION.md.
  * ================================================================================= */
 
-import com.android.build.api.dsl.CommonExtension
 import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import com.mobilebytelabs.kmpflavors.KmpFlavorPlugin
-import org.convention.configureFlavors
 import org.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.register
 
 /**
  * Convention plugin that wires `kmp-product-flavors` with the BASE flavor contract
@@ -40,9 +40,10 @@ import org.gradle.kotlin.dsl.configure
  * ## AGP bridge
  *
  * `bridgeAgpProductFlavors` and `bridgeAgpBuildTypes` default to `true` in the plugin
- * and use `androidComponents.finalizeDsl` — the correct AGP lifecycle hook (runs after
- * `kmpFlavors {}` DSL evaluation, before AGP variant resolution). No manual
- * `android { productFlavors {} }` block is needed in build-logic.
+ * and use `AgpProductFlavorRegistrar` (hooked via `pluginManager.withPlugin`) — the
+ * correct AGP lifecycle hook (fires synchronously before AGP's afterEvaluate). No manual
+ * `android { productFlavors {} }` block is needed in build-logic, including for pure
+ * `com.android.application` modules that do not apply `kotlin("multiplatform")`.
  *
  * Consumer apps extend this contract by creating
  * `build-logic/convention/src/main/kotlin/local/LocalFlavors.kt` — see
@@ -52,7 +53,7 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             // 1. Apply the upstream plugin (provides KmpFlavorExtension + codegen + source-set wiring
-            //    + AGP bridge via androidComponents.finalizeDsl).
+            //    + AGP bridge via AgpProductFlavorRegistrar.whenObjectAdded).
             pluginManager.apply(KmpFlavorPlugin::class.java)
 
             // 2. Configure the KMP-side flavor contract.
@@ -72,6 +73,8 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                         isDefault.set(true)
                         applicationIdSuffix.set(".demo")
                         bundleIdSuffix.set(".demo")
+                        desktopWindowTitleSuffix.set(" (Demo)")
+                        webTitleSuffix.set(" (Demo)")
                         buildConfigField("Boolean", "IS_DEMO_BUILD", "true")
                         buildConfigField("String", "BASE_URL", "\"https://demo.openmf.org\"")
                         buildConfigField("String", "DEMO_USERNAME", "\"demo\"")
@@ -116,24 +119,38 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                 LocalFlavorsLoader.applyIfPresent(this, target)
             }
 
-            // AGP-side registration for pure Android modules (e.g. cmp-android).
-            //
-            // KmpFlavorPlugin requires KotlinMultiplatformExtension. When that is not
-            // present (com.android.application modules without kotlin("multiplatform")),
-            // the plugin returns early and its built-in bridgeAgpProductFlavors never
-            // fires. We register the same demo/prod dimensions + flavors synchronously
-            // here via pluginManager.withPlugin so AGP receives them before variant
-            // resolution.
-            //
-            // For KMP library modules the plugin's own androidComponents.finalizeDsl
-            // bridge handles registration — configureFlavors() is idempotent and skips
-            // any flavor already present, so calling it here is safe for those modules
-            // too.
-            listOf("com.android.application", "com.android.library").forEach { agpId ->
-                pluginManager.withPlugin(agpId) {
-                    extensions.findByType(CommonExtension::class.java)
-                        ?.let { configureFlavors(it) }
-                }
+            // 3. Register xcconfig generator. Reads the live DSL at execution time so
+            //    adding / renaming / removing a flavor automatically updates xcconfigs
+            //    on the next iOS build — no manual sync step required.
+            registerIosFlavorXcconfigsTask()
+        }
+    }
+
+    private fun Project.registerIosFlavorXcconfigsTask() {
+        val ext = extensions.getByType<KmpFlavorExtension>()
+
+        val generateTask = tasks.register<GenerateIosFlavorXcconfigsTask>("generateIosFlavorXcconfigs") {
+            group       = "kmp-flavors"
+            description = "Auto-generate cmp-ios/Configs/{variant}.xcconfig from kmpFlavors DSL."
+
+            // Lazy providers — Gradle reads these at execution time after DSL is fully
+            // configured (including LocalFlavors.kt additions).
+            flavorBundleSuffixes.set(provider {
+                ext.flavors.associate { f -> f.name to (f.bundleIdSuffix.orNull ?: "") }
+            })
+            buildTypeBundleSuffixes.set(provider {
+                ext.buildTypes.associate { bt -> bt.name to (bt.bundleIdSuffix.orNull ?: "") }
+            })
+            // Relative to :cmp-shared — cmp-ios is a sibling module.
+            outputDir.set(layout.projectDirectory.dir("../cmp-ios/Configs"))
+        }
+
+        // Wire to iOS framework compilation so xcconfigs are always fresh before
+        // Xcode links the KMP framework (covers both Xcode-triggered and CLI builds).
+        tasks.configureEach {
+            if (name == "embedAndSignAppleFrameworkForXcode" ||
+                (name.startsWith("link") && name.contains("Framework") && name.contains("Ios"))) {
+                dependsOn(generateTask)
             }
         }
     }

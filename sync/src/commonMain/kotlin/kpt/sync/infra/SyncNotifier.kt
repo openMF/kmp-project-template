@@ -7,12 +7,13 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.sync
+package kpt.sync.infra
 
 import com.mmk.kmpnotifier.KMPNotifier
 import com.mmk.kmpnotifier.local.LocalNotifications
 import com.mmk.kmpnotifier.local.localNotifier
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
+import kpt.sync.NotificationContent
 
 /**
  * Local-notification support for the `sync/` module, backed by

@@ -9,7 +9,7 @@
  */
 @file:OptIn(ExperimentalUuidApi::class)
 
-package kpt.sync
+package kpt.sync.infra
 
 import io.github.mobilebytelabs.worker.ExistingPeriodicWorkPolicy
 import io.github.mobilebytelabs.worker.ExistingWorkPolicy
@@ -24,6 +24,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import kpt.sync.DATA_SYNC_WORK_NAME
+import kpt.sync.NotificationContent
 
 /**
  * `DefaultWorkScheduler` is a thin façade over worker-kmp's `WorkManager`. These tests

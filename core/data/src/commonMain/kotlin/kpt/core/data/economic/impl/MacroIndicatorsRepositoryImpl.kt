@@ -20,6 +20,7 @@ import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
+import kpt.core.base.store.screen.requireData
 import kpt.core.data.Synchronizer
 import kpt.core.data.economic.MacroIndicatorsRepository
 import kpt.core.data.snapshotSync
@@ -89,6 +90,7 @@ class MacroIndicatorsRepositoryImpl(
                     async {
                         macroIndicatorStore.stream(StoreReadRequest.fresh(key))
                             .first { it is StoreReadResponse.Data<*> || it is StoreReadResponse.Error }
+                            .requireData()
                     }
                 }.awaitAll()
             }

@@ -12,7 +12,7 @@ package kpt.sync.di
 import io.github.mobilebytelabs.worker.WorkManager
 import io.github.mobilebytelabs.worker.sync.UniqueWorkObserver
 import io.github.mobilebytelabs.worker.sync.di.SyncObserverKoinModule
-import kpt.sync.DefaultWorkScheduler
+import kpt.sync.infra.DefaultWorkScheduler
 import kpt.sync.WorkScheduler
 import org.koin.dsl.module
 

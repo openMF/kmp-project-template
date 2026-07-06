@@ -11,7 +11,7 @@ package cmp.shared.utils
 
 import cmp.navigation.di.KoinModules
 import cmp.shared.generated.WorkerKmpAuto
-import kpt.sync.initSyncNotifier
+import kpt.sync.infra.initSyncNotifier
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.koinApplication

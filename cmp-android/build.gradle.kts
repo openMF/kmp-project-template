@@ -117,9 +117,6 @@ dependencies {
     implementation(projects.coreBase.ui)
     implementation(projects.coreBase.platform)
 
-    // worker-kmp needs no direct dependency here — the Android factory + Koin wiring
-    // arrive transitively through `projects.sync` (worker-compose convention).
-
     // Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

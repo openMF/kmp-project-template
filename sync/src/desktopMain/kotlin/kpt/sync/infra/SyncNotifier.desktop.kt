@@ -7,9 +7,9 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.sync
+package kpt.sync.infra
 
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 
 internal actual fun syncNotifierConfiguration(): NotificationPlatformConfiguration =
-    NotificationPlatformConfiguration.Web()
+    NotificationPlatformConfiguration.Desktop()

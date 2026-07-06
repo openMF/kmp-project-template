@@ -9,7 +9,7 @@
  */
 @file:OptIn(io.github.mobilebytelabs.worker.ExperimentalWorkerApi::class)
 
-package kpt.sync
+package kpt.sync.infra
 
 import io.github.mobilebytelabs.worker.CoroutineWorker
 import io.github.mobilebytelabs.worker.WorkResult

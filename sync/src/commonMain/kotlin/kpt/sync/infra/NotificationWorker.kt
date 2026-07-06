@@ -9,11 +9,12 @@
  */
 @file:OptIn(io.github.mobilebytelabs.worker.ExperimentalWorkerApi::class)
 
-package kpt.sync
+package kpt.sync.infra
 
 import io.github.mobilebytelabs.worker.CoroutineWorker
 import io.github.mobilebytelabs.worker.WorkResult
 import io.github.mobilebytelabs.worker.WorkerContext
+import kpt.sync.NotificationContent
 
 /**
  * One-shot notification worker. Reads [NotificationContent] from `inputData`

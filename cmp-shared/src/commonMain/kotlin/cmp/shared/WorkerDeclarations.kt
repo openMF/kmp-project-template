@@ -10,8 +10,8 @@
 package cmp.shared
 
 import io.github.mobilebytelabs.worker.app.WorkerKmpWorkers
-import kpt.sync.DataSyncWorker
-import kpt.sync.NotificationWorker
+import kpt.sync.infra.DataSyncWorker
+import kpt.sync.infra.NotificationWorker
 
 /**
  * Worker registry declaration site for the Money Toolkit Mifos template.

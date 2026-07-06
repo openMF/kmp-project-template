@@ -20,6 +20,7 @@ import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
+import kpt.core.base.store.screen.requireData
 import kpt.core.data.Synchronizer
 import kpt.core.data.currency.CurrencyRepository
 import kpt.core.data.snapshotSync
@@ -90,6 +91,7 @@ class CurrencyRepositoryImpl(
                     async {
                         exchangeRatesStore.stream(StoreReadRequest.fresh(base))
                             .first { it is StoreReadResponse.Data<*> || it is StoreReadResponse.Error }
+                            .requireData()
                     }
                 }.awaitAll()
             }

@@ -19,9 +19,9 @@ import kpt.core.model.crypto.CoinMarket
  * Read-side ViewModel for [CoinMarketsScreen].
  *
  * Scroll position retention is a Compose concern — `rememberLazyListState()` uses
- * `rememberSaveable` internally, and the app-root `PersistentSaveableStateRegistry`
- * (see `cmp.navigation.saveable`) persists it across full process death on every
- * KMP target. The ViewModel carries no retention plumbing.
+ * `rememberSaveable` internally, so the list position survives tab-switch and
+ * config-change via Navigation's state-holder and Android's saved-instance-state
+ * Bundle. The ViewModel carries no retention plumbing.
  */
 class CoinMarketsViewModel(
     private val repository: CryptoRepository,

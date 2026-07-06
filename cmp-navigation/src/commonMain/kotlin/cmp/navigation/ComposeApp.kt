@@ -10,20 +10,14 @@
 package cmp.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.LocalSaveableStateRegistry
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.navigation.rootnav.RootNavScreen
-import cmp.navigation.saveable.rememberPersistentSaveableStateRegistry
-import com.russhwolf.settings.Settings
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.KptTheme
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.qualifier.named
 
 @Composable
 fun ComposeApp(
@@ -50,23 +44,20 @@ fun ComposeApp(
         }
     }
 
-    // Single app-root SaveableStateRegistry. Persists JSON-primitive saveables
-    // (LazyListState / ScrollState / rememberSaveable<Int|String|…>) to
-    // multiplatform-settings via `named("plain")`, so retention survives full
-    // process death on every KMP target with zero per-feature retention code.
-    val settings = koinInject<Settings>(named("plain"))
-    val registry = rememberPersistentSaveableStateRegistry(settings)
-
-    CompositionLocalProvider(LocalSaveableStateRegistry provides registry) {
-        KptTheme(
-            darkTheme = uiState.darkTheme,
-            androidTheme = uiState.isAndroidTheme,
-            useDynamicColor = uiState.isDynamicColorsEnabled,
-        ) {
-            RootNavScreen(
-                modifier = modifier,
-                onSplashScreenRemoved = onSplashScreenRemoved,
-            )
-        }
+    // Bottom-nav tab-switch retention (per-tab back-stack + scroll) is handled by
+    // Navigation's own `saveState = true` / `restoreState = true` in the bottom-nav
+    // NavHost; rotation and system-initiated process death ride Android's standard
+    // saved-instance-state Bundle. No app-root SaveableStateRegistry override — the
+    // platform default is used, so Navigation's Bundle-typed back-stack state is
+    // never rejected. Feature modules carry zero retention code.
+    KptTheme(
+        darkTheme = uiState.darkTheme,
+        androidTheme = uiState.isAndroidTheme,
+        useDynamicColor = uiState.isDynamicColorsEnabled,
+    ) {
+        RootNavScreen(
+            modifier = modifier,
+            onSplashScreenRemoved = onSplashScreenRemoved,
+        )
     }
 }

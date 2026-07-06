@@ -48,10 +48,9 @@ import kotlin.time.Instant
  * ```
  *
  * Scroll and UI position retention is a Compose concern — `rememberLazyListState()`
- * (which uses `rememberSaveable` internally with `LazyListState.Saver`) plus the
- * app-root `PersistentSaveableStateRegistry` provide cross-process-death survival
- * automatically. This paging class no longer carries a durable cursor for
- * deep-scroll restore.
+ * (which uses `rememberSaveable` internally with `LazyListState.Saver`) restores
+ * the list position across tab-switch and config-change automatically. This paging
+ * class carries no durable cursor of its own.
  */
 @OptIn(ExperimentalTime::class)
 class PagingScreenStream<T : Any> internal constructor(

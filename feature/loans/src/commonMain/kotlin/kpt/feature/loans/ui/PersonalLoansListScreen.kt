@@ -119,10 +119,10 @@ fun PersonalLoansListScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) { ui, _ ->
-            // Scroll position survives config-change, tab-switch, and process-death
-            // via the default `rememberLazyListState()` (which uses `rememberSaveable`
-            // internally with `LazyListState.Saver`) paired with the app-root
-            // `PersistentSaveableStateRegistry` in `cmp.navigation.ComposeApp`.
+            // Scroll position survives tab-switch and config-change via the default
+            // `rememberLazyListState()` (which uses `rememberSaveable` internally with
+            // `LazyListState.Saver`) — Navigation's per-tab `saveState`/`restoreState`
+            // and Android's saved-instance-state Bundle carry it. No per-screen code.
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

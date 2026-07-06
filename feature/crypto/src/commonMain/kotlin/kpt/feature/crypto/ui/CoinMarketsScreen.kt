@@ -49,10 +49,9 @@ import kotlin.math.round
  * CoinMarkets — CoinGecko-backed paged list.
  *
  * The `PagingScreenContent` overload owns a `rememberLazyListState()` internally
- * (which uses `rememberSaveable` with `LazyListState.Saver`). The app-root
- * `PersistentSaveableStateRegistry` (see `cmp.navigation.saveable`) hooks that
- * saveable into multiplatform-settings so scroll position survives process
- * death on every KMP target — no per-screen retention code required.
+ * (which uses `rememberSaveable` with `LazyListState.Saver`), so scroll position
+ * survives tab-switch and config-change via Navigation's state-holder and Android's
+ * saved-instance-state Bundle — no per-screen retention code required.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

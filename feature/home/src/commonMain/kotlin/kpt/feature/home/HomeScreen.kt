@@ -182,9 +182,9 @@ internal fun HomeScreen(
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         // `rememberScrollState()` internally uses `rememberSaveable` with
-        // `ScrollState.Saver`. Config-change is saved by the composition
-        // registry; full process-death survives via the app-root
-        // `PersistentSaveableStateRegistry` (see `cmp.navigation.ComposeApp`).
+        // `ScrollState.Saver`, so the dashboard scroll position survives tab-switch
+        // (Navigation `saveState`/`restoreState`) and config-change (Android's
+        // saved-instance-state Bundle). No per-screen retention code.
         val scrollState = rememberScrollState()
         Column(
             modifier = Modifier

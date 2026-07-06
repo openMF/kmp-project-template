@@ -12,7 +12,6 @@ package cmp.android.app
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import cmp.shared.generated.WorkerKmpAuto
 import cmp.shared.utils.initKoin
 import coil3.ImageLoader
 import coil3.PlatformContext
@@ -32,16 +31,13 @@ import org.koin.core.component.inject
 /**
  * Android application class.
  *
- * Worker-kmp single-API setup (Shape 2 — bring-your-own-Application from the wiki guide):
- * after `initKoin { androidContext(this@AndroidApp); ... }`, call `WorkerKmpAuto.install()`.
- * The auto-generated `installWorkerKmpAndroid()` reads the Application from Koin's
- * `androidContext()` binding, selects `androidWorkManagerFactory`, builds the worker
- * registry from `@WorkerKmpWorkers` annotation sites, and calls `WorkerKmpHost.initialize`.
- *
- * Migrated from v3.1.x's hand-rolled `loadKoinModules(workKoinModule(WorkerConfig(),
- * workerRegistry { register<…> { … } }, androidWorkManagerFactory(this)))` block plus the
- * `Sync.initialize(get<WorkScheduler>())` call — both eliminated in v4.0.0 in favor of the
- * single `WorkerKmpAuto.install()` line.
+ * This class carries NO worker-kmp code. The entire worker setup is wired once in
+ * commonMain via `initKoin()` (see `cmp-shared/utils/KoinExt.kt`), which calls the
+ * codegen-emitted `WorkerKmpAuto.install()` for every platform. On Android the generated
+ * actual reads the `Application` from the `androidContext(this@AndroidApp)` bound below —
+ * so the platform app class only provides the Android Koin context, exactly as it already
+ * did. Keeping the worker wiring in commonMain is the single-API design: an Android-only
+ * `install()` here would silently leave desktop / iOS / web without workers.
  */
 class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
 
@@ -53,11 +49,6 @@ class AndroidApp : Application(), SingletonImageLoader.Factory, KoinComponent {
             androidContext(this@AndroidApp)
             androidLogger()
         }
-
-        // Single line — codegen handles factory selection + worker registry + Koin wiring
-        // + WorkerKmpHost.initialize. See @WorkerKmpWorkers annotation in cmp-shared's
-        // WorkerDeclarations.kt for the declared workers.
-        WorkerKmpAuto.install()
 
         // Restore the user's saved language preference to AppCompatDelegate.
         restoreSavedLanguage()

@@ -18,8 +18,10 @@ import kpt.sync.NotificationWorker
  *
  * KSP processor (`cmp-worker-app-ksp`) reads this annotation and generates per-platform
  * `installWorkerKmp{Platform}()` files under `cmp-shared/build/generated/worker-kmp-app/...`.
- * The Android `Application.onCreate` calls `WorkerKmpAuto.install()` (the codegen-emitted
- * commonMain shim) which dispatches to the platform-specific install function.
+ * The commonMain `initKoin()` (cmp-shared/utils/KoinExt.kt) calls `WorkerKmpAuto.install()`
+ * (the codegen-emitted commonMain shim) ONCE — every platform (Android / iOS / Desktop / Web)
+ * funnels through `initKoin()`, so one call wires them all. It is NOT called from any single
+ * platform's app class — see docs/guides/framework/KMP_MULTIPLATFORM_ARCHITECTURE.md.
  *
  * To add a new worker:
  *   1. Add the class to the `workers = [...]` array below.

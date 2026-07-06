@@ -10,6 +10,7 @@
 package cmp.shared.utils
 
 import cmp.navigation.di.KoinModules
+import cmp.shared.generated.WorkerKmpAuto
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.koinApplication
@@ -23,4 +24,13 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         config?.invoke(this)
         modules(KoinModules.allModules)
     }
+
+    // worker-kmp single-API: ONE commonMain call wires the workers on EVERY platform
+    // (Android / iOS / Desktop / Web). It runs after startKoin so the codegen-emitted
+    // per-platform installer sees a started Koin — on Android the generated actual reads
+    // the Application from the `androidContext(...)` the caller bound inside `config`, so
+    // NO per-platform (cmp-android) worker code is required. This is the whole point of the
+    // single-API commonMain design: platform-neutral wiring lives here, not in a platform
+    // app class. Declared worker set: cmp-shared/WorkerDeclarations.kt (@WorkerKmpWorkers).
+    WorkerKmpAuto.install()
 }

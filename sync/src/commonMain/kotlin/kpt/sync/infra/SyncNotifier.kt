@@ -9,9 +9,7 @@
  */
 package kpt.sync.infra
 
-import com.mmk.kmpnotifier.KMPNotifier
-import com.mmk.kmpnotifier.local.LocalNotifications
-import com.mmk.kmpnotifier.local.localNotifier
+import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import kpt.sync.NotificationContent
 
@@ -20,6 +18,9 @@ import kpt.sync.NotificationContent
  * [KMPNotifier](https://github.com/mirzemehdi/KMPNotifier) — a Kotlin Multiplatform
  * notification library covering Android, iOS, Desktop and Web from commonMain.
  *
+ * Pinned to 1.6.1 (Kotlin 2.2.x klibs — backward-consumable by the template's Kotlin
+ * 2.3.x compiler); the newer 2.0.0 module split requires Kotlin 2.4.0.
+ *
  * [NotificationWorker] posts through [renderNotification], which is pure commonMain
  * (KMPNotifier is multiplatform, so no per-platform rendering code is needed). Only the
  * one-time [initSyncNotifier] setup varies per platform — see the `syncNotifierConfiguration`
@@ -27,15 +28,15 @@ import kpt.sync.NotificationContent
  * `cmp-shared/utils/KoinExt.kt`.
  */
 public fun initSyncNotifier() {
-    KMPNotifier.initialize(syncNotifierConfiguration(), LocalNotifications)
+    NotifierManager.initialize(syncNotifierConfiguration())
 }
 
 /**
- * Posts a local notification via KMPNotifier's multiplatform `localNotifier`.
+ * Posts a local notification via KMPNotifier's multiplatform local notifier.
  * Requires [initSyncNotifier] to have run once at app start.
  */
 internal fun renderNotification(content: NotificationContent) {
-    KMPNotifier.localNotifier.notify(title = content.title, body = content.body)
+    NotifierManager.getLocalNotifier().notify(title = content.title, body = content.body)
 }
 
 /**

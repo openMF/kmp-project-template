@@ -36,6 +36,6 @@ fun initKoin(config: KoinAppDeclaration? = null) {
     WorkerKmpAuto.install()
 
     // KMPNotifier one-time setup — commonMain, every platform. NotificationWorker posts
-    // local notifications through KMPNotifier.localNotifier (all worker code lives in sync/).
+    // local notifications through NotifierManager.getLocalNotifier() (all worker code lives in sync/).
     initSyncNotifier()
 }

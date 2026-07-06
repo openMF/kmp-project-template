@@ -20,12 +20,12 @@ import io.github.mobilebytelabs.worker.WorkManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kpt.sync.DATA_SYNC_WORK_NAME
+import kpt.sync.NotificationContent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-import kpt.sync.DATA_SYNC_WORK_NAME
-import kpt.sync.NotificationContent
 
 /**
  * `DefaultWorkScheduler` is a thin façade over worker-kmp's `WorkManager`. These tests

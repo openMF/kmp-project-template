@@ -10,10 +10,9 @@
 package kpt.sync.di
 
 import io.github.mobilebytelabs.worker.WorkManager
-import io.github.mobilebytelabs.worker.sync.UniqueWorkObserver
 import io.github.mobilebytelabs.worker.sync.di.SyncObserverKoinModule
-import kpt.sync.infra.DefaultWorkScheduler
 import kpt.sync.WorkScheduler
+import kpt.sync.infra.DefaultWorkScheduler
 import org.koin.dsl.module
 
 /**
@@ -22,7 +21,7 @@ import org.koin.dsl.module
  * Worker-kmp single-API migration (v4.0.0):
  *  - REMOVED: the hand-rolled `single<SyncManager> { provideSyncManager(get<WorkManager>()) }`
  *    binding + its 4 per-platform `expect/actual provideSyncManager(...)` files. Replaced by
- *    `cmp-worker-sync` library's [SyncObserverKoinModule] which binds [UniqueWorkObserver]
+ *    `cmp-worker-sync` library's [SyncObserverKoinModule] which binds `UniqueWorkObserver`
  *    via the same KMP-single-API path (commonMain-only, no per-platform actuals).
  *  - KEPT: the consumer-owned `single<WorkScheduler> { DefaultWorkScheduler(...) }` binding
  *    (consumer-domain — choice of how to expose scheduling API to feature modules).

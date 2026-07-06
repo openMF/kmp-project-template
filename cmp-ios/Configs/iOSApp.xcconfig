@@ -1,0 +1,6 @@
+// Umbrella xcconfig — included by every flavor build configuration.
+// $(CONFIGURATION) resolves to the active Xcode build configuration name
+// (e.g. demoDebug, demoRelease, prodDebug, prodRelease).
+// Each per-variant file defines KMPF_VARIANT so FRAMEWORK_SEARCH_PATHS
+// can resolve the correct KMP framework output directory.
+#include "$(CONFIGURATION).xcconfig"

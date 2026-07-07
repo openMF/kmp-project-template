@@ -244,11 +244,12 @@ jobs:
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
     #
-    # TODO(phase-6): bump to @v1.0.47 once actionhub ships the additive
-    # `flavor` / `build_type` inputs on release-multi-platform-v2.yaml. The
-    # `with:` block below already threads them; the @v1.0.46 orchestrator
-    # silently drops unknown inputs, so the pin bump is the sole flip.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.46
+    # @v1.0.47 ships the additive `flavor` / `build_type` inputs on
+    # release-multi-platform-v2.yaml (pinned to publish-android @v2.0.22 +
+    # publish-apple @v2.0.15, which carry the flavor dimension). The `with:`
+    # block below threads `matrix.flavor` / `matrix.build_type` from the
+    # resolve-variants job.
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.47
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -270,11 +271,9 @@ jobs:
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-      # kmp-product-flavors additive inputs (Phase 5). Resolved by the
-      # upstream `resolve-variants` job; `matrix.flavor` / `matrix.build_type`
-      # carry the concrete pair for this deploy leg. Accepted @v1.0.47+; the
-      # currently-pinned @v1.0.46 orchestrator silently ignores them (GHA
-      # workflow_call semantics for unknown inputs). Phase 6 flips the pin.
+      # kmp-product-flavors additive inputs. Resolved by the upstream
+      # `resolve-variants` job; `matrix.flavor` / `matrix.build_type` carry the
+      # concrete pair for this deploy leg. Accepted by the @v1.0.47 orchestrator.
       flavor:               ${{ matrix.flavor }}
       build_type:           ${{ matrix.build_type }}
       # PROD pins kept in lockstep with actionhub @v1.0.32 (which hardcodes

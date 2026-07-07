@@ -9,10 +9,10 @@
  */
 package kpt.core.data
 
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.coroutineScope
 import kpt.core.datastore.ChangeListVersions
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * Synchronization contract — ports Now in Android's `core/data/SyncUtilities.kt`.

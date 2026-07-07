@@ -9,7 +9,9 @@
  */
 package kpt.sync.infra
 
-import com.mmk.kmpnotifier.notification.NotifierManager
+import com.mmk.kmpnotifier.KMPNotifier
+import com.mmk.kmpnotifier.local.LocalNotifications
+import com.mmk.kmpnotifier.local.localNotifier
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import kpt.sync.NotificationContent
 
@@ -18,17 +20,14 @@ import kpt.sync.NotificationContent
  * [KMPNotifier](https://github.com/mirzemehdi/KMPNotifier) — a Kotlin Multiplatform
  * notification library covering Android, iOS, Desktop and Web from commonMain.
  *
- * Pinned to 1.6.1 (Kotlin 2.2.x klibs — backward-consumable by the template's Kotlin
- * 2.3.x compiler); the newer 2.0.0 module split requires Kotlin 2.4.0.
- *
- * [NotificationWorker] posts through [renderNotification], which is pure commonMain
- * (KMPNotifier is multiplatform, so no per-platform rendering code is needed). Only the
- * one-time [initSyncNotifier] setup varies per platform — see the `syncNotifierConfiguration`
- * actuals — and it is invoked once at app start from the shared commonMain init in
- * `cmp-shared/utils/KoinExt.kt`.
+ * Uses the 2.0.0 `kmpnotifier-local` module — the **Firebase-free** local-notification
+ * split (no FCM / no Firebase iOS pods). [renderNotification] is pure commonMain; only
+ * the one-time [initSyncNotifier] configuration varies per platform (see the
+ * `syncNotifierConfiguration` actuals). Invoked once at app start from the shared
+ * commonMain init in `cmp-shared/utils/KoinExt.kt`.
  */
 public fun initSyncNotifier() {
-    NotifierManager.initialize(syncNotifierConfiguration())
+    KMPNotifier.initialize(syncNotifierConfiguration(), LocalNotifications)
 }
 
 /**
@@ -36,7 +35,7 @@ public fun initSyncNotifier() {
  * Requires [initSyncNotifier] to have run once at app start.
  */
 internal fun renderNotification(content: NotificationContent) {
-    NotifierManager.getLocalNotifier().notify(title = content.title, body = content.body)
+    KMPNotifier.localNotifier.notify(title = content.title, body = content.body)
 }
 
 /**

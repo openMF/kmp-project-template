@@ -13,7 +13,7 @@ import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfig
 
 internal actual fun syncNotifierConfiguration(): NotificationPlatformConfiguration =
     NotificationPlatformConfiguration.Android(
-        // Framework fallback status-bar icon — a fork should override this with its own
+        // Framework fallback status-bar icon — a fork should override with its own
         // monochrome notification icon (R.drawable.…) for branded notifications.
         notificationIconResId = android.R.drawable.ic_dialog_info,
         notificationChannelData = NotificationPlatformConfiguration.Android.NotificationChannelData(

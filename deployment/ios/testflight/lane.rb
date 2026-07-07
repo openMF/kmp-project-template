@@ -1,6 +1,13 @@
 # deployment/ios/testflight/lane.rb
 # Imported by fastlane/Fastfile via `import` directive (AC64).
 # Extracted from legacy `beta` lane (iOS platform block).
+#
+# Phase 2 of `deploy-gha-product-flavors` epic (D5/D9): TestFlight lanes now
+# accept `flavor:` + `build_type:` options and derive the Xcode scheme from
+# `VariantResolver.resolve(...).ios_scheme` — the pre-Phase-2 hardcoded
+# fallback to `ios_config[:scheme]` ("iosApp") is replaced by the
+# convention-derived per-variant scheme (`prodRelease`, `demoStaging`, …).
+# All aliases + `uploadTestFlight` / `promoteToExternalBeta` are preserved.
 require_relative "../../_shared/lib/appstore_helpers"
 require_relative "../../_shared/lib/version_helpers"
 
@@ -51,9 +58,18 @@ platform :ios do
     UI.success("✅ Successfully uploaded to TestFlight!")
   end
 
-  desc "Upload beta build to TestFlight"
+  desc "Upload beta build to TestFlight (parameterized on flavor + build_type; scheme from resolver)"
   lane :beta do |options|
     options = sanitize_options(options)
+    flavor    = (options[:flavor]     || :prod).to_sym
+    build_ty  = (options[:build_type] || :release).to_sym
+
+    # Xcode scheme is derived by CONVENTION from the manifest — no more
+    # hardcoded "iosApp" default. The resolved scheme name matches the
+    # `.xcscheme` filenames shipped under
+    # `cmp-ios/iosApp.xcodeproj/xcshareddata/xcschemes/` (six today:
+    # {prod,demo}{Debug,Staging,Release}).
+    variant           = VariantResolver.resolve(flavor: flavor.to_s, build_type: build_ty.to_s)
     ios_config        = FastlaneConfig::IosConfig::BUILD_CONFIG
     testflight_config = FastlaneConfig::IosConfig::TESTFLIGHT_CONFIG
 
@@ -64,13 +80,14 @@ platform :ios do
 
     # Switch project from whatever signing state the previous lane left it in
     # (e.g. Manual+AdHoc from a Firebase deploy) to Manual+AppStore so xcodebuild
-    # archives with the AppStore profile Match just installed.
+    # archives with the AppStore profile Match just installed. Target is the
+    # resolved per-variant scheme, not a generic "iosApp".
     update_code_signing_settings(
       use_automatic_signing: false,
       path:                  ios_config[:project_path],
       team_id:               ios_config[:team_id],
       code_sign_identity:    "Apple Distribution",
-      targets:               [ios_config[:scheme]],
+      targets:               [variant.ios_scheme],
       bundle_identifier:     ios_config[:app_identifier],
       profile_name:          "match AppStore #{ios_config[:app_identifier]}",
     )
@@ -92,7 +109,13 @@ platform :ios do
     increment_version_number(xcodeproj: ios_config[:project_path], version_number: version)
     increment_build_number(xcodeproj: ios_config[:project_path], build_number: latest_build_number + 1)
 
-    build_ios_project(options.merge(provisioning_profile_name: ios_config[:provisioning_profile_appstore]))
+    build_ios_project(
+      options.merge(
+        scheme:                    variant.ios_scheme,
+        configuration:             build_ty.to_s.capitalize,
+        provisioning_profile_name: ios_config[:provisioning_profile_appstore],
+      ),
+    )
 
     releaseNotes = generateReleaseNote()
     locale = ios_config[:primary_locale]

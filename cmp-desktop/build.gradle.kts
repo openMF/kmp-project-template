@@ -7,9 +7,8 @@
  *
  * See https://github.com/openMF/mobile-wallet/blob/master/LICENSE.md
  */
-import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
-import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -20,7 +19,6 @@ plugins {
     // that would chain it — unlike feature/*, core/*, cmp-shared, cmp-navigation,
     // cmp-android which get kover via Android/KMP/CMP convention plugins).
     alias(libs.plugins.kover.convention)
-    alias(libs.plugins.kmp.flavors.convention)
 }
 
 kotlin {
@@ -46,22 +44,6 @@ val appName: String = libs.versions.desktopAppName.get()
 val packageNameSpace: String = libs.versions.appId.get()
 val appVersion: String = libs.versions.desktopPackageVersion.get()
 
-// Resolve the active flavor (Gradle property -PkmpFlavor=demo|prod; falls back to DSL default).
-val kmpFlavorExt = extensions.getByType<KmpFlavorExtension>()
-// cmp-desktop is a JVM-only module and only reads the flavor DSL (windowTitle / macBundleId
-// below) — it never references the generated KmpFlavorsRuntime class. Opt out of runtime
-// codegen: the plugin's `expect KmpFlavorsRuntime` has no `actual` for a plain jvm() target,
-// so self-generating it here breaks compileKotlinJvm. codegenHost=false = "consume the host's
-// output transitively / do not self-generate" (see KmpFlavorExtension.codegenHost KDoc).
-kmpFlavorExt.codegenHost.set(false)
-val activeFlavor: String = (findProperty("kmpFlavor") as? String)
-    ?: kmpFlavorExt.flavors.find { it.isDefault.getOrElse(false) }?.name
-    ?: "prod"
-val activeFlavorConfig = kmpFlavorExt.flavors.findByName(activeFlavor)
-
-val windowTitle = appName + (activeFlavorConfig?.desktopWindowTitleSuffix?.orNull ?: "")
-val macBundleId = packageNameSpace + (activeFlavorConfig?.applicationIdSuffix?.orNull ?: "")
-
 compose.desktop {
     application {
         mainClass = "MainKt"
@@ -71,10 +53,10 @@ compose.desktop {
         javaHome = javaToolchains.launcherFor {
             languageVersion.set(JavaLanguageVersion.of(libs.versions.jvmToolchain.get().toInt()))
         }.get().metadata.installationPath.asFile.absolutePath
-        jvmArgs("-Dapp.name=$windowTitle")
+        jvmArgs("-Dapp.name=$appName")
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Pkg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
-            packageName = windowTitle
+            packageName = appName
             packageVersion = appVersion
             description = "Desktop Application"
             copyright = "© 2024 Mifos Initiative. All rights reserved."
@@ -83,8 +65,8 @@ compose.desktop {
             includeAllModules = true
 
             macOS {
-                bundleID = macBundleId
-                dockName = windowTitle
+                bundleID = packageNameSpace
+                dockName = appName
                 appCategory = "public.app-category.finance"
                 iconFile.set(project.file("icons/ic_launcher.icns"))
                 // Mac App Store signing.
@@ -131,7 +113,7 @@ compose.desktop {
             }
 
             windows {
-                menuGroup = windowTitle
+                menuGroup = appName
                 shortcut = true
                 dirChooser = true
                 perUserInstall = true

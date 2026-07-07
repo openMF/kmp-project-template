@@ -7,10 +7,10 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.data
+package kpt.core.data.infra
 
 import kotlinx.serialization.json.Json
-import kpt.core.datastore.ChangeListVersions
+import kpt.core.datastore.infra.ChangeListVersions
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

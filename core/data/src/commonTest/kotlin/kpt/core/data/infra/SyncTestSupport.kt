@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.data
+package kpt.core.data.infra
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.datastore.ChangeListVersions
+import kpt.core.datastore.infra.ChangeListVersions
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 

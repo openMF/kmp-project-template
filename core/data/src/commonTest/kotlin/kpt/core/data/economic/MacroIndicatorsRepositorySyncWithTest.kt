@@ -10,10 +10,10 @@
 package kpt.core.data.economic
 
 import kotlinx.coroutines.test.runTest
-import kpt.core.data.InMemoryFetchedAtRepository
-import kpt.core.data.RecordingSynchronizer
 import kpt.core.data.economic.impl.MacroIndicatorsRepositoryImpl
-import kpt.core.data.onlineNetworkMonitor
+import kpt.core.data.infra.InMemoryFetchedAtRepository
+import kpt.core.data.infra.RecordingSynchronizer
+import kpt.core.data.infra.onlineNetworkMonitor
 import kpt.core.model.economic.IndicatorKind
 import kpt.core.model.economic.MacroIndicator
 import kpt.core.store.economic.impl.MacroIndicatorKey

@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.datastore
+package kpt.core.datastore.infra
 
 import kotlinx.serialization.Serializable
 

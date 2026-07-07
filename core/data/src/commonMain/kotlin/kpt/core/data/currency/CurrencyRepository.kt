@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.data.Syncable
+import kpt.core.data.infra.Syncable
 import kpt.core.model.currency.ExchangeRates
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RateHistoryKey

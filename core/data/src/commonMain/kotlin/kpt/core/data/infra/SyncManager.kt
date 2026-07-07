@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.data.util
+package kpt.core.data.infra
 
 import kotlinx.coroutines.flow.Flow
 

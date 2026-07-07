@@ -9,7 +9,7 @@
  */
 @file:OptIn(ExperimentalSerializationApi::class, ExperimentalSettingsApi::class)
 
-package kpt.core.datastore
+package kpt.core.datastore.infra
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings

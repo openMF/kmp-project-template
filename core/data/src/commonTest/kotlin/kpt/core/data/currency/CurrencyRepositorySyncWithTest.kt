@@ -10,10 +10,10 @@
 package kpt.core.data.currency
 
 import kotlinx.coroutines.test.runTest
-import kpt.core.data.InMemoryFetchedAtRepository
-import kpt.core.data.RecordingSynchronizer
 import kpt.core.data.currency.impl.CurrencyRepositoryImpl
-import kpt.core.data.onlineNetworkMonitor
+import kpt.core.data.infra.InMemoryFetchedAtRepository
+import kpt.core.data.infra.RecordingSynchronizer
+import kpt.core.data.infra.onlineNetworkMonitor
 import kpt.core.model.currency.ExchangeRates
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RateHistoryKey

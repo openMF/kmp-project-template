@@ -7,10 +7,10 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.data
+package kpt.core.data.infra
 
 import kotlinx.coroutines.coroutineScope
-import kpt.core.datastore.ChangeListVersions
+import kpt.core.datastore.infra.ChangeListVersions
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 

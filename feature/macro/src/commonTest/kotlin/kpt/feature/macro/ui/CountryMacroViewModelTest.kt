@@ -27,8 +27,8 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
-import kpt.core.data.Synchronizer
 import kpt.core.data.economic.MacroIndicatorsRepository
+import kpt.core.data.infra.Synchronizer
 import kpt.core.model.economic.IndicatorKind
 import kpt.core.model.economic.IndicatorObservation
 import kpt.core.model.economic.MacroIndicator

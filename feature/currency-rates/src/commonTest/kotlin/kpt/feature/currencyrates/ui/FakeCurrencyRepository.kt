@@ -20,8 +20,8 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
-import kpt.core.data.Synchronizer
 import kpt.core.data.currency.CurrencyRepository
+import kpt.core.data.infra.Synchronizer
 import kpt.core.model.currency.ExchangeRates
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RateHistoryKey

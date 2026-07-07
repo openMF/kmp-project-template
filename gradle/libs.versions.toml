@@ -141,7 +141,7 @@ sqliteWeb = "2.7.0-alpha05"
 # worker-kmp — single-API background + foreground worker scheduling across
 # Android / iOS / Desktop / Web. See https://github.com/MobileByteLabs/worker-kmp.
 # Pin tracks last published release on Maven Central.
-worker-version = "4.0.3"
+worker-version = "4.0.4"
 # KMPNotifier — Kotlin Multiplatform local + push notifications (Android/iOS/Desktop/Web).
 kmpnotifier = "1.6.1"
 

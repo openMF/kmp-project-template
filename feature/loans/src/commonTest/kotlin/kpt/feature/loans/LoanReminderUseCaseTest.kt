@@ -28,7 +28,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -84,6 +83,7 @@ class LoanReminderUseCaseTest {
     )
 
     private val zone = TimeZone.UTC
+
     // Fixed "now" = 2026-01-01T00:00Z so delay math is deterministic.
     private val fixedNow: Instant = LocalDate(2026, 1, 1).atStartOfDayIn(zone)
 

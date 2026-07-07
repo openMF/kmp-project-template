@@ -46,10 +46,7 @@ interface MacroIndicatorsRepository : Syncable {
      * Stream observations for a parameter-flow — typically driven by a UI
      * picker that lets the user switch countries / indicators.
      */
-    fun macroIndicatorStream(
-        keyFlow: Flow<MacroIndicatorKey>,
-        scope: CoroutineScope,
-    ): ScreenDataStream<MacroIndicator>
+    fun macroIndicatorStream(keyFlow: Flow<MacroIndicatorKey>, scope: CoroutineScope): ScreenDataStream<MacroIndicator>
 
     // Syncable.syncWith(synchronizer) is implemented in MacroIndicatorsRepositoryImpl —
     // force-refreshes each pinned (country, indicator) pair by re-collecting one

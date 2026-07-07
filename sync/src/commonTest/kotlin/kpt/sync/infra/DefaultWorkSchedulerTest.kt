@@ -67,8 +67,7 @@ class DefaultWorkSchedulerTest {
 
         override suspend fun cancelAllWorkByTag(tag: String) = Unit
         override fun getWorkInfosByTag(tag: String): Flow<List<WorkInfo>> = flowOf(emptyList())
-        override fun getWorkInfosForUniqueWorkFlow(uniqueWorkName: String): Flow<List<WorkInfo>> =
-            flowOf(emptyList())
+        override fun getWorkInfosForUniqueWorkFlow(uniqueWorkName: String): Flow<List<WorkInfo>> = flowOf(emptyList())
         override suspend fun getWorkInfoById(id: Uuid): WorkInfo? = null
     }
 

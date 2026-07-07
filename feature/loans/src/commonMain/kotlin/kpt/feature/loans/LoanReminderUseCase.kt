@@ -9,7 +9,6 @@
  */
 package kpt.feature.loans
 
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kpt.core.model.banking.Loan
@@ -67,8 +66,7 @@ public class LoanReminderUseCase(
     }
 
     /** Pull-to-refresh handler. Returns the in-flight (or just-enqueued) data sync handle. */
-    public suspend fun refreshLoansData(): WorkHandle =
-        scheduler.enqueueDataSync(mode = WorkMode.Background)
+    public suspend fun refreshLoansData(): WorkHandle = scheduler.enqueueDataSync(mode = WorkMode.Background)
 
     private fun formatAmount(value: Double): String {
         val rounded = (value * 100).toLong() / 100.0

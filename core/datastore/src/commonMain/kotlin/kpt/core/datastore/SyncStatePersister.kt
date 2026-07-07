@@ -39,11 +39,10 @@ class SettingsSyncStatePersister(
     private val plainSettings: Settings,
 ) : SyncStatePersister {
 
-    override suspend fun read(): ChangeListVersions =
-        plainSettings.decodeValueOrNull(
-            key = SYNC_VERSIONS_KEY,
-            serializer = ChangeListVersions.serializer(),
-        ) ?: ChangeListVersions()
+    override suspend fun read(): ChangeListVersions = plainSettings.decodeValueOrNull(
+        key = SYNC_VERSIONS_KEY,
+        serializer = ChangeListVersions.serializer(),
+    ) ?: ChangeListVersions()
 
     override suspend fun write(versions: ChangeListVersions) {
         plainSettings.encodeValue(

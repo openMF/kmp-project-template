@@ -30,9 +30,7 @@ import kotlin.time.ExperimentalTime
 interface Synchronizer {
     suspend fun getChangeListVersions(): ChangeListVersions
 
-    suspend fun updateChangeListVersions(
-        update: ChangeListVersions.() -> ChangeListVersions,
-    )
+    suspend fun updateChangeListVersions(update: ChangeListVersions.() -> ChangeListVersions)
 
     /** Convenience: call `someSyncable.sync()` to run [Syncable.syncWith] against this. */
     suspend fun Syncable.sync(): Boolean = this.syncWith(this@Synchronizer)
@@ -93,10 +91,7 @@ suspend fun <T : NetworkChange> Synchronizer.changeListSync(
  * stamps a timestamp under the given [name] key into [ChangeListVersions].
  */
 @OptIn(ExperimentalTime::class)
-suspend fun Synchronizer.snapshotSync(
-    name: String,
-    fetcher: suspend () -> Unit,
-): Boolean = coroutineScope {
+suspend fun Synchronizer.snapshotSync(name: String, fetcher: suspend () -> Unit): Boolean = coroutineScope {
     fetcher()
     updateChangeListVersions {
         copy(versions = versions + (name to Clock.System.now().epochSeconds))

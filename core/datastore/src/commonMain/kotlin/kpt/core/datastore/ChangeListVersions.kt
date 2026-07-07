@@ -28,6 +28,5 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class ChangeListVersions(val versions: Map<String, Long> = emptyMap()) {
-    fun set(name: String, version: Long): ChangeListVersions =
-        copy(versions = versions + (name to version))
+    fun set(name: String, version: Long): ChangeListVersions = copy(versions = versions + (name to version))
 }

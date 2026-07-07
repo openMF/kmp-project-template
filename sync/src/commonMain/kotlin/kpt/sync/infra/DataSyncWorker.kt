@@ -50,9 +50,7 @@ public class DataSyncWorker(
 
     override suspend fun getChangeListVersions(): ChangeListVersions = workingVersions
 
-    override suspend fun updateChangeListVersions(
-        update: ChangeListVersions.() -> ChangeListVersions,
-    ) {
+    override suspend fun updateChangeListVersions(update: ChangeListVersions.() -> ChangeListVersions) {
         workingVersions = workingVersions.update()
     }
 

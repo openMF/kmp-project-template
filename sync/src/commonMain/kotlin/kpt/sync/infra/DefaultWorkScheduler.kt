@@ -85,13 +85,12 @@ public class DefaultWorkScheduler(
         return WorkHandle(id = id, uniqueName = null)
     }
 
-    override fun observeWork(handle: WorkHandle): Flow<WorkStatus> =
-        workManager.getWorkInfosByTag(
-            tag = handle.uniqueName ?: NOTIFICATION_WORK_NAME_PREFIX,
-        ).map { infos ->
-            val match = infos.firstOrNull { it.id == handle.id }
-            match?.state?.toWorkStatus() ?: WorkStatus.Pending
-        }
+    override fun observeWork(handle: WorkHandle): Flow<WorkStatus> = workManager.getWorkInfosByTag(
+        tag = handle.uniqueName ?: NOTIFICATION_WORK_NAME_PREFIX,
+    ).map { infos ->
+        val match = infos.firstOrNull { it.id == handle.id }
+        match?.state?.toWorkStatus() ?: WorkStatus.Pending
+    }
 
     override suspend fun cancelWork(handle: WorkHandle) {
         workManager.cancelWorkById(handle.id)

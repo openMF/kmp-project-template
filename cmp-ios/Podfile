@@ -10,6 +10,10 @@ target 'iosApp' do
   pod 'FirebaseCore'
   pod 'FirebaseAnalytics'
   pod 'FirebaseCrashlytics'
+  # FirebaseMessaging: KMPNotifier (io.github.mobilebytelabs:kmpnotifier 1.6.x) bundles
+  # Firebase Cloud Messaging; its iosMain klib references FIRMessaging, which must be
+  # linked here or the iOS app fails at link time (Undefined symbol _OBJC_CLASS_$_FIRMessaging).
+  pod 'FirebaseMessaging'
 end
 
 post_install do |installer|

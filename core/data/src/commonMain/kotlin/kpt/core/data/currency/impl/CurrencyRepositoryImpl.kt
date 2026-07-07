@@ -49,15 +49,14 @@ class CurrencyRepositoryImpl(
         baseCurrency: String,
         scope: CoroutineScope,
         fetchPolicy: FetchPolicy,
-    ): ScreenDataStream<ExchangeRates> =
-        exchangeRatesStore.asScreenStream(
-            key = baseCurrency,
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = fetchedAtRepository,
-            cacheKey = "currency:exchangeRates:$baseCurrency",
-            scope = scope,
-            fetchPolicy = fetchPolicy,
-        )
+    ): ScreenDataStream<ExchangeRates> = exchangeRatesStore.asScreenStream(
+        key = baseCurrency,
+        networkMonitor = networkMonitor,
+        fetchedAtRepository = fetchedAtRepository,
+        cacheKey = "currency:exchangeRates:$baseCurrency",
+        scope = scope,
+        fetchPolicy = fetchPolicy,
+    )
 
     override fun rateHistoryStream(
         keyFlow: Flow<RateHistoryKey>,

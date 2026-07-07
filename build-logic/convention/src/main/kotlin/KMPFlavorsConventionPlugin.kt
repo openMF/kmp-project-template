@@ -61,6 +61,11 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
             //    so forks change the brand by editing ONE line.
             extensions.configure<KmpFlavorExtension> {
                 buildConfigPackage.set(libs.findVersion("appId").get().requiredVersion)
+                // App identity for KmpFlavorsRuntime — single-sourced from libs.versions.toml
+                // so forks rebrand by editing one line. appId gets the active flavor's id
+                // suffix appended; appDisplayName is the human-facing name.
+                appId.set(libs.findVersion("appId").get().requiredVersion)
+                appDisplayName.set(libs.findVersion("appDisplayName").get().requiredVersion)
                 enableBuildTypes.set(true)
 
                 flavorDimensions {

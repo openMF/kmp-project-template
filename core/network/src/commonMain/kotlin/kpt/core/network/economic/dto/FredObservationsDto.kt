@@ -49,11 +49,7 @@ data class FredObservationsDto(
      * @param unit Unit of measure (`"%"`, `"USD"`, …). Caller-supplied for the
      *   same reason as [name].
      */
-    fun toDomain(
-        seriesId: String,
-        name: String,
-        unit: String,
-    ): InterestRateSeries {
+    fun toDomain(seriesId: String, name: String, unit: String): InterestRateSeries {
         val parsed = observations.mapNotNull { it.toDomainOrNull() }
         return InterestRateSeries(
             seriesId = seriesId,

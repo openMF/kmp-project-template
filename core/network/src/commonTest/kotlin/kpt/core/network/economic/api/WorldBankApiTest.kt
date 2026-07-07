@@ -103,12 +103,11 @@ class WorldBankApiTest {
             .createWorldBankApi()
     }
 
-    private fun MockRequestHandleScope.respondJson(body: String): HttpResponseData =
-        respond(
-            content = ByteReadChannel(body),
-            status = HttpStatusCode.OK,
-            headers = headersOf(HttpHeaders.ContentType, "application/json"),
-        )
+    private fun MockRequestHandleScope.respondJson(body: String): HttpResponseData = respond(
+        content = ByteReadChannel(body),
+        status = HttpStatusCode.OK,
+        headers = headersOf(HttpHeaders.ContentType, "application/json"),
+    )
 
     private companion object {
         const val WORLD_BANK_GDP_RESPONSE = """

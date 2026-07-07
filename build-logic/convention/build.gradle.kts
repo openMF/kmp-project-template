@@ -34,6 +34,10 @@ dependencies {
     compileOnly(libs.firebase.performance.gradlePlugin)
     compileOnly(libs.kover.gradlePlugin)
     implementation(libs.kmp.product.flavors.plugin)
+    // worker-kmp app plugin — must be `implementation` (not `compileOnly`) so its
+    // META-INF/gradle-plugins descriptor is on the build-logic runtime classpath,
+    // letting WorkerComposeConventionPlugin apply it via pluginManager.apply(id).
+    implementation(libs.worker.app.plugin)
 }
 
 tasks {
@@ -137,6 +141,11 @@ gradlePlugin {
             id = "org.convention.fork.sync-config"
             implementationClass = "SyncForkConfigPlugin"
             description = "Registers syncForkConfig task — syncs libs.versions.toml identity to iOS xcconfig, local.properties, gradle.properties"
+        }
+        register("workerCompose") {
+            id = "org.convention.worker.compose"
+            implementationClass = "WorkerComposeConventionPlugin"
+            description = "Wires the worker-kmp app plugin + the worker-compose-all bundle into a Compose Multiplatform module. Use on the module that hosts the consumer-facing workers + WorkScheduler."
         }
     }
 }

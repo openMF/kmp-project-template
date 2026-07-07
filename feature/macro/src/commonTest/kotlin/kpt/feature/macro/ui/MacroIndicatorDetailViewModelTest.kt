@@ -21,10 +21,12 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.yield
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
+import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
 import kpt.core.data.economic.MacroIndicatorsRepository
+import kpt.core.data.infra.Synchronizer
 import kpt.core.model.economic.IndicatorKind
 import kpt.core.model.economic.IndicatorObservation
 import kpt.core.model.economic.MacroIndicator
@@ -103,6 +105,7 @@ class MacroIndicatorDetailViewModelTest {
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
 private class SingleKeyFakeRepository : MacroIndicatorsRepository {
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean = true
     val bus: MutableSharedFlow<ScreenState<MacroIndicator>> =
         MutableSharedFlow(replay = 1, extraBufferCapacity = 16)
     var requestedKey: MacroIndicatorKey? = null
@@ -110,6 +113,7 @@ private class SingleKeyFakeRepository : MacroIndicatorsRepository {
     override fun macroIndicatorStream(
         key: MacroIndicatorKey,
         scope: CoroutineScope,
+        fetchPolicy: FetchPolicy,
     ): ScreenDataStream<MacroIndicator> {
         requestedKey = key
         return screenDataStreamForTesting(state = bus)

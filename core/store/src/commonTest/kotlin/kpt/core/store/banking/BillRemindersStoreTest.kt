@@ -40,16 +40,14 @@ private class FakeBillReminderDao : BillReminderDao {
 
     override fun observeAll(): Flow<List<BillReminderEntity>> = reminders
 
-    override fun observeUpcoming(dueDays: Set<Int>): Flow<List<BillReminderEntity>> =
-        MutableStateFlow(
-            reminders.value.filter { it.enabled && it.dueDay in dueDays },
-        )
+    override fun observeUpcoming(dueDays: Set<Int>): Flow<List<BillReminderEntity>> = MutableStateFlow(
+        reminders.value.filter { it.enabled && it.dueDay in dueDays },
+    )
 
     override fun observeById(id: String): Flow<BillReminderEntity?> =
         MutableStateFlow(reminders.value.firstOrNull { it.id == id })
 
-    override suspend fun getById(id: String): BillReminderEntity? =
-        reminders.value.firstOrNull { it.id == id }
+    override suspend fun getById(id: String): BillReminderEntity? = reminders.value.firstOrNull { it.id == id }
 
     override fun count(): Flow<Int> = MutableStateFlow(reminders.value.size)
 

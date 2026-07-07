@@ -56,34 +56,26 @@ internal class FakeSubmitOutbox<P> : SubmitOutbox<P> {
         return id
     }
 
-    override suspend fun getPending(formKey: String): SubmitOutboxEntry<P>? =
-        state.value.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
+    override suspend fun getPending(formKey: String): SubmitOutboxEntry<P>? = state.value.firstOrNull {
+        it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
+    }
 
-    override suspend fun getPendingByUniqueKey(
-        formKey: String,
-        uniqueKey: String,
-    ): SubmitOutboxEntry<P>? =
+    override suspend fun getPendingByUniqueKey(formKey: String, uniqueKey: String): SubmitOutboxEntry<P>? =
         state.value.firstOrNull {
             it.formKey == formKey &&
                 it.uniqueKey == uniqueKey &&
                 it.status == SubmitOutboxStatus.PENDING
         }
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> =
-        state.map { rows ->
-            rows.firstOrNull {
-                it.formKey == formKey &&
-                    it.uniqueKey == null &&
-                    it.status == SubmitOutboxStatus.PENDING
-            }
+    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = state.map { rows ->
+        rows.firstOrNull {
+            it.formKey == formKey &&
+                it.uniqueKey == null &&
+                it.status == SubmitOutboxStatus.PENDING
         }
+    }
 
-    override fun observePendingByUniqueKey(
-        formKey: String,
-        uniqueKey: String,
-    ): Flow<SubmitOutboxEntry<P>?> =
+    override fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<SubmitOutboxEntry<P>?> =
         state.map { rows ->
             rows.firstOrNull {
                 it.formKey == formKey &&
@@ -92,12 +84,11 @@ internal class FakeSubmitOutbox<P> : SubmitOutbox<P> {
             }
         }
 
-    override fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>> =
-        state.map { rows ->
-            rows.filter {
-                it.formKey == formKey && it.status != SubmitOutboxStatus.SUBMITTED
-            }
+    override fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>> = state.map { rows ->
+        rows.filter {
+            it.formKey == formKey && it.status != SubmitOutboxStatus.SUBMITTED
         }
+    }
 
     override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> =
         state.value.filter { it.status == SubmitOutboxStatus.PENDING }

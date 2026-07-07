@@ -95,10 +95,7 @@ fun AmortizationScheduleScreen(
 }
 
 @Composable
-private fun AmortizationTable(
-    rows: List<AmortizationRow>,
-    modifier: Modifier = Modifier,
-) {
+private fun AmortizationTable(rows: List<AmortizationRow>, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item { ScheduleTableHeader() }
         item { HorizontalDivider(thickness = 1.5.dp) }
@@ -132,11 +129,7 @@ private fun ScheduleTableHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ScheduleRow(
-    row: AmortizationRow,
-    isEven: Boolean,
-    modifier: Modifier = Modifier,
-) {
+private fun ScheduleRow(row: AmortizationRow, isEven: Boolean, modifier: Modifier = Modifier) {
     val bg = if (isEven) {
         MaterialTheme.colorScheme.surface
     } else {
@@ -162,10 +155,7 @@ private fun ScheduleRow(
 }
 
 @Composable
-private fun ScheduleTotalRow(
-    rows: List<AmortizationRow>,
-    modifier: Modifier = Modifier,
-) {
+private fun ScheduleTotalRow(rows: List<AmortizationRow>, modifier: Modifier = Modifier) {
     val totalPrincipal = rows.sumOf { it.principal }
     val totalInterest = rows.sumOf { it.interest }
     val totalPayment = rows.sumOf { it.payment }
@@ -221,11 +211,7 @@ private fun SummaryLine(
 }
 
 @Composable
-private fun RowScope.HeaderCell(
-    text: String,
-    weight: Float,
-    modifier: Modifier = Modifier,
-) {
+private fun RowScope.HeaderCell(text: String, weight: Float, modifier: Modifier = Modifier) {
     Box(modifier = modifier.weight(weight)) {
         Text(
             text = text,

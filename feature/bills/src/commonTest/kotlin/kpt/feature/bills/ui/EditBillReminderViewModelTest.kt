@@ -216,8 +216,7 @@ class EditBillReminderViewModelTest {
         // the assertion. Pin to 2026-01-15 00:00 UTC so May/Aug/etc. due dates always
         // produce a positive triggerAtMs.
         clock = object : kotlin.time.Clock {
-            override fun now(): kotlin.time.Instant =
-                kotlin.time.Instant.fromEpochMilliseconds(1_736_899_200_000L)
+            override fun now(): kotlin.time.Instant = kotlin.time.Instant.fromEpochMilliseconds(1_736_899_200_000L)
         },
         timeZone = kotlinx.datetime.TimeZone.UTC,
     )

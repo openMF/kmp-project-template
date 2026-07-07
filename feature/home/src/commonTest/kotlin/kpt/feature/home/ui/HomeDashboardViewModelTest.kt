@@ -31,6 +31,7 @@ import kpt.core.data.banking.BillReminderRepository
 import kpt.core.data.banking.LoanRepository
 import kpt.core.data.currency.CurrencyRepository
 import kpt.core.data.economic.EconomicRatesRepository
+import kpt.core.data.infra.Synchronizer
 import kpt.core.model.banking.BillReminder
 import kpt.core.model.banking.Loan
 import kpt.core.model.currency.ExchangeRates
@@ -159,6 +160,7 @@ class HomeDashboardViewModelTest {
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
 private class FakeDashboardCurrencyRepository : CurrencyRepository {
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean = true
     private val source = MutableStateFlow<ScreenState<ExchangeRates>>(ScreenState.Loading)
     var lastFetchPolicy: FetchPolicy? = null
         private set
@@ -191,8 +193,7 @@ private object EmptyLoanRepository : LoanRepository {
     override suspend fun upsert(loan: Loan) = Unit
     override suspend fun delete(id: String) = Unit
     override fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeTotalPrincipalRemaining(): Flow<Double> =
-        throw UnsupportedOperationException()
+    override fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
@@ -200,13 +201,11 @@ private object EmptyBillReminderRepository : BillReminderRepository {
     private val empty = MutableStateFlow<List<BillReminder>>(emptyList())
     override fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> = empty
-    override fun observeById(id: String): Flow<BillReminder?> =
-        throw UnsupportedOperationException()
+    override fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
     override suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
     override suspend fun upsert(bill: BillReminder) = throw UnsupportedOperationException()
     override suspend fun delete(id: String) = throw UnsupportedOperationException()
-    override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> =
-        throw UnsupportedOperationException()
+    override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> = throw UnsupportedOperationException()
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 

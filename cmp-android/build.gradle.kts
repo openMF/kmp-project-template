@@ -112,6 +112,7 @@ dependencies {
     implementation(projects.core.model)
     implementation(projects.core.data)
     implementation(projects.core.datastore)
+    implementation(projects.sync)
 
     implementation(projects.coreBase.ui)
     implementation(projects.coreBase.platform)

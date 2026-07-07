@@ -14,6 +14,8 @@ import kpt.core.base.common.di.CommonModule
 import kpt.core.base.datastore.di.DatastoreBaseModule
 import kpt.core.datastore.UserPreferencesRepository
 import kpt.core.datastore.UserPreferencesRepositoryImpl
+import kpt.core.datastore.infra.SettingsSyncStatePersister
+import kpt.core.datastore.infra.SyncStatePersister
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -28,4 +30,10 @@ val DatastoreModule = module {
             dispatcher = get(),
         )
     } bind UserPreferencesRepository::class
+
+    // Sync state persister — Settings-backed (same store as user prefs).
+    // Read by Synchronizer at sync start; written on snapshot/changeList completion.
+    single<SyncStatePersister> {
+        SettingsSyncStatePersister(plainSettings = get<Settings>(named("plain")))
+    }
 }

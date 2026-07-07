@@ -52,10 +52,7 @@ fun NavGraphBuilder.transitionGalleryGraph(navController: NavController) {
 
 /** Destination screen for each transition demo. Auto-pops after 2s. */
 @Composable
-private fun TransitionDemoScreen(
-    variant: TransitionVariant,
-    onAutoPop: () -> Unit,
-) {
+private fun TransitionDemoScreen(variant: TransitionVariant, onAutoPop: () -> Unit) {
     LaunchedEffect(variant) {
         delay(2_000L)
         onAutoPop()

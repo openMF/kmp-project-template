@@ -91,9 +91,7 @@ fun provideInterestRateSeriesStore(
 // Inline mapping helpers — private to this file
 // ---------------------------------------------------------------------------
 
-private fun List<InterestRateSeriesEntity>.toInterestRateSeries(
-    key: InterestRateSeriesKey,
-): InterestRateSeries? {
+private fun List<InterestRateSeriesEntity>.toInterestRateSeries(key: InterestRateSeriesKey): InterestRateSeries? {
     if (isEmpty()) return null
     val observations = mapNotNull { entity ->
         runCatching { LocalDate.parse(entity.date) }.getOrNull()
@@ -108,12 +106,11 @@ private fun List<InterestRateSeriesEntity>.toInterestRateSeries(
     )
 }
 
-private fun InterestRateSeries.toEntities(updatedAt: Long): List<InterestRateSeriesEntity> =
-    observations.map { obs ->
-        InterestRateSeriesEntity(
-            seriesId = seriesId,
-            date = obs.date.toString(),
-            value = obs.value,
-            updatedAt = updatedAt,
-        )
-    }
+private fun InterestRateSeries.toEntities(updatedAt: Long): List<InterestRateSeriesEntity> = observations.map { obs ->
+    InterestRateSeriesEntity(
+        seriesId = seriesId,
+        date = obs.date.toString(),
+        value = obs.value,
+        updatedAt = updatedAt,
+    )
+}

@@ -186,10 +186,7 @@ fun MacroIndicatorDetailScreen(
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun OfflineDataBanner(
-    fetchedAt: Instant?,
-    modifier: Modifier = Modifier,
-) {
+private fun OfflineDataBanner(fetchedAt: Instant?, modifier: Modifier = Modifier) {
     val label = formatTimeAgo(fetchedAt)
         ?.let { "No network · Updated $it" }
         ?: "No network · Cached data"

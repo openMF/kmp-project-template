@@ -205,10 +205,7 @@ fun RateHistoryScreen(
 
 @OptIn(ExperimentalTime::class)
 @Composable
-private fun OfflineDataBanner(
-    fetchedAt: Instant?,
-    modifier: Modifier = Modifier,
-) {
+private fun OfflineDataBanner(fetchedAt: Instant?, modifier: Modifier = Modifier) {
     val label = formatTimeAgo(fetchedAt)
         ?.let { "No network \u00b7 Updated $it" }
         ?: "No network \u00b7 Cached data"

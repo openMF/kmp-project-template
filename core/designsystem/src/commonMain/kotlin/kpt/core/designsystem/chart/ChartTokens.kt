@@ -53,8 +53,7 @@ object ChartTokens {
 
     @Composable
     @ReadOnlyComposable
-    fun gridlineColor(): Color =
-        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+    fun gridlineColor(): Color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
 
     fun areaFillBrush(strokeColor: Color): Brush = Brush.verticalGradient(
         colors = listOf(

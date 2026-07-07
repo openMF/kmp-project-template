@@ -371,10 +371,7 @@ private fun HeroStat(label: String, value: String) {
  * already prompts them to add one. Tapping any tile navigates to the full Personal Loans screen.
  */
 @Composable
-private fun LoansCarousel(
-    state: ScreenState<LoansSummary>,
-    onLoanClick: () -> Unit,
-) {
+private fun LoansCarousel(state: ScreenState<LoansSummary>, onLoanClick: () -> Unit) {
     val content = state as? ScreenState.Content ?: return
     val loans = content.data.loans
     if (loans.isEmpty()) return
@@ -399,10 +396,7 @@ private fun LoansCarousel(
 
 /** Compact per-loan tile used by [LoansCarousel]. Sized to fit 2–2.5 cards on a phone screen. */
 @Composable
-private fun LoanCarouselTile(
-    loan: kpt.core.model.banking.Loan,
-    onClick: () -> Unit,
-) {
+private fun LoanCarouselTile(loan: kpt.core.model.banking.Loan, onClick: () -> Unit) {
     val sp = MaterialTheme.spacing
     val progress = if (loan.principal > 0) {
         (1.0 - (loan.principalRemaining / loan.principal)).toFloat().coerceIn(0f, 1f)
@@ -463,9 +457,7 @@ private fun LoanCarouselTile(
  * vs. student at a glance — same vocabulary as [PersonalLoansListScreen]'s LoanRowCard.
  */
 @Composable
-private fun loanKindAccent(
-    kind: kpt.core.model.banking.LoanKind,
-): androidx.compose.ui.graphics.Color? = when (kind) {
+private fun loanKindAccent(kind: kpt.core.model.banking.LoanKind): androidx.compose.ui.graphics.Color? = when (kind) {
     kpt.core.model.banking.LoanKind.MORTGAGE -> MaterialTheme.colorScheme.secondary
     kpt.core.model.banking.LoanKind.BUSINESS -> MaterialTheme.colorScheme.secondary
     kpt.core.model.banking.LoanKind.AUTO -> MaterialTheme.colorScheme.tertiary
@@ -475,10 +467,7 @@ private fun loanKindAccent(
 }
 
 @Composable
-private fun BillsQuickCard(
-    state: ScreenState<List<BillReminder>>,
-    onSeeAll: () -> Unit,
-) {
+private fun BillsQuickCard(state: ScreenState<List<BillReminder>>, onSeeAll: () -> Unit) {
     SectionCard(
         title = stringResource(Res.string.screens_home_bills_card_title),
         icon = Icons.Default.NotificationsActive,
@@ -714,12 +703,7 @@ private fun SectionCard(
 }
 
 @Composable
-private fun RateRow(
-    label: String,
-    value: String,
-    direction: RateDirection,
-    delta: String,
-) {
+private fun RateRow(label: String, value: String, direction: RateDirection, delta: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -757,12 +741,7 @@ private fun WidgetEmpty(message: String) {
 }
 
 @Composable
-private fun FeatureRow(
-    title: String,
-    subtitle: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-) {
+private fun FeatureRow(title: String, subtitle: String, icon: ImageVector, onClick: () -> Unit) {
     AppCard(
         modifier = Modifier.clickable(onClick = onClick),
         contentPadding = PaddingValues(MaterialTheme.spacing.lg),

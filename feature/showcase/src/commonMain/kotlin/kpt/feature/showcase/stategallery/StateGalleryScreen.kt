@@ -58,10 +58,7 @@ import org.jetbrains.compose.resources.stringResource
  * Not meant for production builds — gate the entry point on `!isReleaseBuild()`.
  */
 @Composable
-fun StateGalleryScreen(
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun StateGalleryScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
     val sp = MaterialTheme.spacing
     val defaults = LocalScreenStateDefaults.current
     KptScaffold(

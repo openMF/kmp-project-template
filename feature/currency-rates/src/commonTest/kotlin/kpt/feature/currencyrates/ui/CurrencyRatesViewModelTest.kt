@@ -243,12 +243,11 @@ class CurrencyRatesViewModelTest {
     )
 
     /** Minimal in-memory Store for the SpotRateLookupStore in tests. */
-    private fun fakeSpotRateStore(): Store<String, ExchangeRates> =
-        StoreBuilder.from<String, ExchangeRates>(
-            fetcher = Fetcher.of { _ ->
-                ExchangeRates(base = "USD", date = "2026-05-28", rates = emptyMap())
-            },
-        ).build()
+    private fun fakeSpotRateStore(): Store<String, ExchangeRates> = StoreBuilder.from<String, ExchangeRates>(
+        fetcher = Fetcher.of { _ ->
+            ExchangeRates(base = "USD", date = "2026-05-28", rates = emptyMap())
+        },
+    ).build()
 
     // endregion
 }

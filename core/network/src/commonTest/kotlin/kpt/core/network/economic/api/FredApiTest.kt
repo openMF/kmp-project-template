@@ -113,12 +113,11 @@ class FredApiTest {
             .createFredApi()
     }
 
-    private fun MockRequestHandleScope.respondJson(body: String): HttpResponseData =
-        respond(
-            content = ByteReadChannel(body),
-            status = HttpStatusCode.OK,
-            headers = headersOf(HttpHeaders.ContentType, "application/json"),
-        )
+    private fun MockRequestHandleScope.respondJson(body: String): HttpResponseData = respond(
+        content = ByteReadChannel(body),
+        status = HttpStatusCode.OK,
+        headers = headersOf(HttpHeaders.ContentType, "application/json"),
+    )
 
     private companion object {
         const val FRED_SAMPLE_RESPONSE = """

@@ -29,11 +29,9 @@ internal class FakeLoanDao : LoanDao {
         rows.sortedWith(compareBy({ it.nextDueDate }, { it.createdAtMs }))
     }
 
-    override fun observeById(id: String): Flow<LoanEntity?> =
-        state.map { rows -> rows.firstOrNull { it.id == id } }
+    override fun observeById(id: String): Flow<LoanEntity?> = state.map { rows -> rows.firstOrNull { it.id == id } }
 
-    override suspend fun getById(id: String): LoanEntity? =
-        state.value.firstOrNull { it.id == id }
+    override suspend fun getById(id: String): LoanEntity? = state.value.firstOrNull { it.id == id }
 
     override fun count(): Flow<Int> = state.map { it.size }
 

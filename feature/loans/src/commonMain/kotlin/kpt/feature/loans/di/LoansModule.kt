@@ -10,9 +10,11 @@
 package kpt.feature.loans.di
 
 import kpt.core.data.di.OutboxQualifiers
+import kpt.feature.loans.LoanReminderUseCase
 import kpt.feature.loans.ui.EditLoanViewModel
 import kpt.feature.loans.ui.LoanDetailViewModel
 import kpt.feature.loans.ui.PersonalLoansListViewModel
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -29,6 +31,10 @@ import org.koin.dsl.module
  * instance across nav pops without promoting the binding to a process-lifetime
  * singleton — the latter would leak state across navigation boundaries and defeat
  * scoped disposal. A `single<*ViewModel>` here would be refused by the fence gate.
+ *
+ * The [LoanReminderUseCase] binding is the cross-module proof-of-concept that
+ * consumes `kpt.sync.WorkScheduler` (provided by `sync/` module's `SyncModule`)
+ * to schedule due-date notifications + trigger background data sync.
  */
 val LoansModule = module {
     viewModel { PersonalLoansListViewModel(repository = get()) }
@@ -42,4 +48,7 @@ val LoansModule = module {
             loanId = params.getOrNull(),
         )
     }
+
+    // Cross-module use case — depends on WorkScheduler from kpt.sync.di.SyncModule.
+    singleOf(::LoanReminderUseCase)
 }

@@ -181,11 +181,10 @@ class LoanCalcWizardViewModel(
      * "Save as Loan" button visually (rather than silently no-op on tap, which leaves the user
      * unable to tell why nothing happened). Computed from the current [formState] snapshot.
      */
-    internal fun LoanCalcScenario.isReadyForSubmit(): Boolean =
-        principal > 0.0 &&
-            ratePercent >= 0.0 &&
-            tenureMonths > 0 &&
-            name.isNotBlank()
+    internal fun LoanCalcScenario.isReadyForSubmit(): Boolean = principal > 0.0 &&
+        ratePercent >= 0.0 &&
+        tenureMonths > 0 &&
+        name.isNotBlank()
 
     /** Persist the current wizard snapshot to the outbox keyed on [uniqueKey]. */
     private fun persistSnapshot() {

@@ -32,18 +32,17 @@ import org.mobilenativefoundation.store.store5.Store
  * `core-base/database/.../invalidation/README.md`). On Android/Desktop/iOS the wrap
  * is a microsecond no-op alongside Room's native invalidation.
  */
-fun provideBillRemindersStore(
-    dao: BillReminderDao,
-): Store<Unit, List<BillReminderEntity>> = StoreFactory.createOfflineStore(
-    sourceOfTruth = SourceOfTruth.of(
-        reader = { _: Unit -> daoFlow(BILL_REMINDERS_TABLE) { dao.observeAll() } },
-        writer = { _: Unit, reminders: List<BillReminderEntity> ->
-            reminders.forEach { dao.upsert(it) }
-        },
-        delete = { _: Unit -> dao.deleteAll() },
-        deleteAll = { dao.deleteAll() },
-    ),
-)
+fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillReminderEntity>> =
+    StoreFactory.createOfflineStore(
+        sourceOfTruth = SourceOfTruth.of(
+            reader = { _: Unit -> daoFlow(BILL_REMINDERS_TABLE) { dao.observeAll() } },
+            writer = { _: Unit, reminders: List<BillReminderEntity> ->
+                reminders.forEach { dao.upsert(it) }
+            },
+            delete = { _: Unit -> dao.deleteAll() },
+            deleteAll = { dao.deleteAll() },
+        ),
+    )
 
 /** Room `@Entity(tableName = …)` for [BillReminderEntity]. Shared with the repository's writes. */
 private const val BILL_REMINDERS_TABLE = "banking_bill_reminders"

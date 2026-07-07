@@ -46,6 +46,5 @@ internal class FakeEconomicRatesRepository : EconomicRatesRepository {
     override fun interestRateSeriesStream(
         keyFlow: Flow<InterestRateSeriesKey>,
         scope: CoroutineScope,
-    ): ScreenDataStream<InterestRateSeries> =
-        screenDataStreamForTesting(state = state, refreshTrigger = refreshTrigger)
+    ): ScreenDataStream<InterestRateSeries> = screenDataStreamForTesting(state = state, refreshTrigger = refreshTrigger)
 }

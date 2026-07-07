@@ -55,10 +55,7 @@ fun NavController.navigateToLoanComparison(navOptions: NavOptions? = null) {
     navigate(route = LoanComparisonRoute, navOptions = navOptions)
 }
 
-fun NavController.navigateToLoanCalcWizard(
-    scenarioId: String? = null,
-    navOptions: NavOptions? = null,
-) {
+fun NavController.navigateToLoanCalcWizard(scenarioId: String? = null, navOptions: NavOptions? = null) {
     navigate(route = LoanCalcWizardRoute(scenarioId), navOptions = navOptions)
 }
 

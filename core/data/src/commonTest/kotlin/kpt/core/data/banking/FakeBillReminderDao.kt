@@ -29,18 +29,16 @@ internal class FakeBillReminderDao : BillReminderDao {
         rows.sortedWith(compareBy({ it.dueDay }, { it.createdAtMs }))
     }
 
-    override fun observeUpcoming(dueDays: Set<Int>): Flow<List<BillReminderEntity>> =
-        state.map { rows ->
-            rows
-                .filter { it.enabled && it.dueDay in dueDays }
-                .sortedWith(compareBy({ it.dueDay }, { it.createdAtMs }))
-        }
+    override fun observeUpcoming(dueDays: Set<Int>): Flow<List<BillReminderEntity>> = state.map { rows ->
+        rows
+            .filter { it.enabled && it.dueDay in dueDays }
+            .sortedWith(compareBy({ it.dueDay }, { it.createdAtMs }))
+    }
 
     override fun observeById(id: String): Flow<BillReminderEntity?> =
         state.map { rows -> rows.firstOrNull { it.id == id } }
 
-    override suspend fun getById(id: String): BillReminderEntity? =
-        state.value.firstOrNull { it.id == id }
+    override suspend fun getById(id: String): BillReminderEntity? = state.value.firstOrNull { it.id == id }
 
     override fun count(): Flow<Int> = state.map { it.size }
 

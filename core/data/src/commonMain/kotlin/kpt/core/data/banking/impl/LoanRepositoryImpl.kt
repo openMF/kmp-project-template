@@ -39,10 +39,9 @@ internal class LoanRepositoryImpl(
     private val loanDao: LoanDao,
 ) : LoanRepository {
 
-    override fun observeAll(): Flow<List<Loan>> =
-        loansStore.stream(StoreReadRequest.cached(Unit, refresh = false))
-            .filterIsInstance<StoreReadResponse.Data<List<LoanEntity>>>()
-            .map { response -> response.value.map { it.toDomain() } }
+    override fun observeAll(): Flow<List<Loan>> = loansStore.stream(StoreReadRequest.cached(Unit, refresh = false))
+        .filterIsInstance<StoreReadResponse.Data<List<LoanEntity>>>()
+        .map { response -> response.value.map { it.toDomain() } }
 
     override fun observeById(id: String): Flow<Loan?> =
         daoFlow(LOANS_TABLE) { loanDao.observeById(id) }.map { it?.toDomain() }
@@ -61,10 +60,9 @@ internal class LoanRepositoryImpl(
         }
     }
 
-    override fun observeTotalMonthlyEmi(): Flow<Double> =
-        daoFlow(LOANS_TABLE) { loanDao.observeAll() }.map { rows ->
-            rows.sumOf { it.monthlyPayment }
-        }
+    override fun observeTotalMonthlyEmi(): Flow<Double> = daoFlow(LOANS_TABLE) { loanDao.observeAll() }.map { rows ->
+        rows.sumOf { it.monthlyPayment }
+    }
 
     override fun observeTotalPrincipalRemaining(): Flow<Double> =
         daoFlow(LOANS_TABLE) { loanDao.observeAll() }.map { rows ->

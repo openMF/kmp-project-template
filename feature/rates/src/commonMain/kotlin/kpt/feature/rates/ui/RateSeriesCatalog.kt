@@ -56,6 +56,5 @@ internal object RateSeriesCatalog {
     val all: List<InterestRateSeriesKey> = listOf(FedFunds, Prime, Mortgage30Y, Treasury10Y)
 
     /** Look up the canonical catalog entry for a [seriesId], or `null` for unknown IDs. */
-    fun findBySeriesId(seriesId: String): InterestRateSeriesKey? =
-        all.firstOrNull { it.seriesId == seriesId }
+    fun findBySeriesId(seriesId: String): InterestRateSeriesKey? = all.firstOrNull { it.seriesId == seriesId }
 }

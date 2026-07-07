@@ -39,11 +39,9 @@ private class FakeLoanDao : LoanDao {
 
     override fun observeAll(): Flow<List<LoanEntity>> = loans
 
-    override fun observeById(id: String): Flow<LoanEntity?> =
-        MutableStateFlow(loans.value.firstOrNull { it.id == id })
+    override fun observeById(id: String): Flow<LoanEntity?> = MutableStateFlow(loans.value.firstOrNull { it.id == id })
 
-    override suspend fun getById(id: String): LoanEntity? =
-        loans.value.firstOrNull { it.id == id }
+    override suspend fun getById(id: String): LoanEntity? = loans.value.firstOrNull { it.id == id }
 
     override fun count(): Flow<Int> = MutableStateFlow(loans.value.size)
 

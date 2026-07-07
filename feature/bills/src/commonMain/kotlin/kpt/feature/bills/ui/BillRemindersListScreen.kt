@@ -176,12 +176,7 @@ private fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
 }
 
 @Composable
-private fun BillReminderRow(
-    bill: BillReminder,
-    today: Int,
-    onMarkPaid: () -> Unit,
-    onClick: () -> Unit,
-) {
+private fun BillReminderRow(bill: BillReminder, today: Int, onMarkPaid: () -> Unit, onClick: () -> Unit) {
     val sp = MaterialTheme.spacing
     val diff = bill.dueDay - today
     val urgency = when {

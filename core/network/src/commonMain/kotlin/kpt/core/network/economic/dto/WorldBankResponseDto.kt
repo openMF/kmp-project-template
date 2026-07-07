@@ -53,10 +53,7 @@ data class WorldBankResponseDto(
      *   against the response's indicator code; mismatches log but don't fail
      *   (defensive against future World Bank schema changes).
      */
-    fun toDomain(
-        countryCode: String,
-        indicator: IndicatorKind,
-    ): MacroIndicator {
+    fun toDomain(countryCode: String, indicator: IndicatorKind): MacroIndicator {
         val countryName = observations.firstOrNull()?.country?.value
             ?: countryCode
         val parsed = observations

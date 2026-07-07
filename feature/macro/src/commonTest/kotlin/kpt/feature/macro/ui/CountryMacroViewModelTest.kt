@@ -23,10 +23,12 @@ import kotlinx.coroutines.yield
 import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
+import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
 import kpt.core.data.economic.MacroIndicatorsRepository
+import kpt.core.data.infra.Synchronizer
 import kpt.core.model.economic.IndicatorKind
 import kpt.core.model.economic.IndicatorObservation
 import kpt.core.model.economic.MacroIndicator
@@ -274,17 +276,14 @@ class CountryMacroViewModelTest {
  */
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
 private class KeyedFakeMacroIndicatorsRepository : MacroIndicatorsRepository {
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean = true
 
     private val buses: MutableMap<MacroIndicatorKey, MutableSharedFlow<ScreenState<MacroIndicator>>> =
         mutableMapOf()
 
     private val keyLog: MutableList<MacroIndicatorKey> = mutableListOf()
 
-    suspend fun emit(
-        countryCode: String,
-        kind: IndicatorKind,
-        state: ScreenState<MacroIndicator>,
-    ) {
+    suspend fun emit(countryCode: String, kind: IndicatorKind, state: ScreenState<MacroIndicator>) {
         val key = MacroIndicatorKey(countryCode, kind)
         bus(key).emit(state)
     }
@@ -294,14 +293,14 @@ private class KeyedFakeMacroIndicatorsRepository : MacroIndicatorsRepository {
         keyLog.clear()
     }
 
-    private fun bus(key: MacroIndicatorKey): MutableSharedFlow<ScreenState<MacroIndicator>> =
-        buses.getOrPut(key) {
-            MutableSharedFlow(replay = 1, extraBufferCapacity = 16)
-        }
+    private fun bus(key: MacroIndicatorKey): MutableSharedFlow<ScreenState<MacroIndicator>> = buses.getOrPut(key) {
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 16)
+    }
 
     override fun macroIndicatorStream(
         key: MacroIndicatorKey,
         scope: CoroutineScope,
+        fetchPolicy: FetchPolicy,
     ): ScreenDataStream<MacroIndicator> {
         keyLog += key
         return screenDataStreamForTesting(state = bus(key))

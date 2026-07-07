@@ -29,10 +29,7 @@ class CryptoRepositoryImpl(
     private val fetchedAtRepository: FetchedAtRepository,
 ) : CryptoRepository {
 
-    override fun coinMarketsStream(
-        scope: CoroutineScope,
-        pageSize: Int,
-    ): PagingScreenStream<CoinMarket> =
+    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
         coinMarketsStore.asPagingScreenStream(
             networkMonitor = networkMonitor,
             fetchedAtRepository = fetchedAtRepository,

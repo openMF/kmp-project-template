@@ -20,7 +20,7 @@ import org.gradle.work.DisableCachingByDefault
  * Exports the currently declared `kmpFlavors {}` DSL as a machine-readable
  * `variants.json` manifest — the **single derivation point** consumed by
  * every downstream deployment stage (fastlane `variant_resolver.rb`,
- * `.github/workflows/*.yml` `resolve-variants` job, and the
+ * the `resolve-variants` job in `.github/workflows`, and the
  * `openMF/mifos-x-actionhub` reusable workflow).
  *
  * ## Single source of truth chain
@@ -38,7 +38,7 @@ import org.gradle.work.DisableCachingByDefault
  * (`flavors: NamedDomainObjectContainer<FlavorConfig>` +
  * `buildTypes: NamedDomainObjectContainer<BuildTypeConfig>`) via lazy
  * `MapProperty` providers wired in [KMPFlavorsConventionPlugin]. No file
- * under `build-logic/flavor-plugin/**` is touched by this task — the
+ * under the `build-logic/flavor-plugin` module is touched by this task — the
  * kmp-product-flavors plugin remains untouched (epic decision D8).
  *
  * ## Fully dynamic (D9 anchor)

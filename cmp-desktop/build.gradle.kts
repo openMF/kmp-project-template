@@ -48,6 +48,12 @@ val appVersion: String = libs.versions.desktopPackageVersion.get()
 
 // Resolve the active flavor (Gradle property -PkmpFlavor=demo|prod; falls back to DSL default).
 val kmpFlavorExt = extensions.getByType<KmpFlavorExtension>()
+// cmp-desktop is a JVM-only module and only reads the flavor DSL (windowTitle / macBundleId
+// below) — it never references the generated KmpFlavorsRuntime class. Opt out of runtime
+// codegen: the plugin's `expect KmpFlavorsRuntime` has no `actual` for a plain jvm() target,
+// so self-generating it here breaks compileKotlinJvm. codegenHost=false = "consume the host's
+// output transitively / do not self-generate" (see KmpFlavorExtension.codegenHost KDoc).
+kmpFlavorExt.codegenHost.set(false)
 val activeFlavor: String = (findProperty("kmpFlavor") as? String)
     ?: kmpFlavorExt.flavors.find { it.isDefault.getOrElse(false) }?.name
     ?: "prod"

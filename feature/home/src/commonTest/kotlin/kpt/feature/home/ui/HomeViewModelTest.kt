@@ -332,25 +332,22 @@ class HomeViewModelTest {
         currencyRepository = currency,
     )
 
-    private fun sampleLoan(
-        id: String,
-        monthlyPayment: Double = 500.0,
-        principalRemaining: Double = 10_000.0,
-    ): Loan = Loan(
-        id = id,
-        name = "Loan $id",
-        kind = LoanKind.PERSONAL,
-        principal = principalRemaining,
-        principalRemaining = principalRemaining,
-        annualRatePercent = 6.5,
-        tenureMonths = 60,
-        monthsRemaining = 48,
-        monthlyPayment = monthlyPayment,
-        nextDueDate = LocalDate(2026, 6, 1),
-        totalPaid = 0.0,
-        createdAtMs = 0,
-        updatedAtMs = 0,
-    )
+    private fun sampleLoan(id: String, monthlyPayment: Double = 500.0, principalRemaining: Double = 10_000.0): Loan =
+        Loan(
+            id = id,
+            name = "Loan $id",
+            kind = LoanKind.PERSONAL,
+            principal = principalRemaining,
+            principalRemaining = principalRemaining,
+            annualRatePercent = 6.5,
+            tenureMonths = 60,
+            monthsRemaining = 48,
+            monthlyPayment = monthlyPayment,
+            nextDueDate = LocalDate(2026, 6, 1),
+            totalPaid = 0.0,
+            createdAtMs = 0,
+            updatedAtMs = 0,
+        )
 
     private fun sampleBill(id: String): BillReminder = BillReminder(
         id = id,
@@ -365,10 +362,7 @@ class HomeViewModelTest {
         updatedAtMs = 0,
     )
 
-    private fun sampleSeries(
-        seriesId: String,
-        current: Double,
-    ): InterestRateSeries = InterestRateSeries(
+    private fun sampleSeries(seriesId: String, current: Double): InterestRateSeries = InterestRateSeries(
         seriesId = seriesId,
         name = seriesId,
         current = current,
@@ -395,8 +389,7 @@ private class FakeLoanRepository(initial: List<Loan> = emptyList()) : LoanReposi
         rows.value = rows.value.filterNot { it.id == id }
     }
     override fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeTotalPrincipalRemaining(): Flow<Double> =
-        throw UnsupportedOperationException()
+    override fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
@@ -415,13 +408,11 @@ private class FakeBillReminderRepository : BillReminderRepository {
         lastRequestedWindow = maxDays
         return upcoming
     }
-    override fun observeById(id: String): Flow<BillReminder?> =
-        throw UnsupportedOperationException()
+    override fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
     override suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
     override suspend fun upsert(bill: BillReminder) = throw UnsupportedOperationException()
     override suspend fun delete(id: String) = throw UnsupportedOperationException()
-    override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> =
-        throw UnsupportedOperationException()
+    override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> = throw UnsupportedOperationException()
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 

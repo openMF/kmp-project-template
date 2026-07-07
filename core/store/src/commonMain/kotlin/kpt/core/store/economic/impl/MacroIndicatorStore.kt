@@ -31,23 +31,22 @@ import kotlin.time.Clock
 fun provideMacroIndicatorStore(
     api: WorldBankApi,
     networkMonitor: NetworkMonitor,
-): Store<MacroIndicatorKey, MacroIndicator> =
-    StoreFactory.createMemoryStore(
-        fetcher = Fetcher.of { key: MacroIndicatorKey ->
-            val today = Clock.System.todayIn(TimeZone.UTC)
-            val endYear = today.year
-            val startYear = endYear - key.years
-            networkMonitor.executeWithRetry(
-                RetryPolicy { maxAttempts = 1 },
-            ) {
-                api.indicator(
-                    countryCode = key.countryCode,
-                    indicator = key.indicator.worldBankCode,
-                    dateRange = "$startYear:$endYear",
-                ).toDomain(
-                    countryCode = key.countryCode,
-                    indicator = key.indicator,
-                )
-            }
-        },
-    )
+): Store<MacroIndicatorKey, MacroIndicator> = StoreFactory.createMemoryStore(
+    fetcher = Fetcher.of { key: MacroIndicatorKey ->
+        val today = Clock.System.todayIn(TimeZone.UTC)
+        val endYear = today.year
+        val startYear = endYear - key.years
+        networkMonitor.executeWithRetry(
+            RetryPolicy { maxAttempts = 1 },
+        ) {
+            api.indicator(
+                countryCode = key.countryCode,
+                indicator = key.indicator.worldBankCode,
+                dateRange = "$startYear:$endYear",
+            ).toDomain(
+                countryCode = key.countryCode,
+                indicator = key.indicator,
+            )
+        }
+    },
+)

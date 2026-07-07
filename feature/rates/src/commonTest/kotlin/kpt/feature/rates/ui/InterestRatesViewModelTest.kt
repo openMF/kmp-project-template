@@ -179,20 +179,17 @@ class InterestRatesViewModelTest {
         assertEquals(null, RateSeriesCatalog.findBySeriesId("UNKNOWN"))
     }
 
-    private fun sampleSeries(
-        seriesId: String,
-        name: String = "Sample",
-        current: Double = 4.5,
-    ): InterestRateSeries = InterestRateSeries(
-        seriesId = seriesId,
-        name = name,
-        current = current,
-        unit = "%",
-        observations = listOf(
-            RateObservation(LocalDate(2026, 5, 23), current),
-        ),
-        source = "FRED",
-    )
+    private fun sampleSeries(seriesId: String, name: String = "Sample", current: Double = 4.5): InterestRateSeries =
+        InterestRateSeries(
+            seriesId = seriesId,
+            name = name,
+            current = current,
+            unit = "%",
+            observations = listOf(
+                RateObservation(LocalDate(2026, 5, 23), current),
+            ),
+            source = "FRED",
+        )
 }
 
 /**

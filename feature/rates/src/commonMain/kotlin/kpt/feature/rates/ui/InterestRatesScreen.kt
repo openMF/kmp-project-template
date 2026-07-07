@@ -182,10 +182,7 @@ private fun RateRowCard(
 }
 
 @Composable
-private fun RateRowContent(
-    series: InterestRateSeries,
-    onClick: () -> Unit,
-) {
+private fun RateRowContent(series: InterestRateSeries, onClick: () -> Unit) {
     val sp = MaterialTheme.spacing
     val delta = computeOneDayDelta(series)
     Row(

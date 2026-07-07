@@ -125,12 +125,11 @@ class CurrencyConverterViewModelTest {
     )
 
     /** Minimal in-memory Store that never makes a real network call. */
-    private fun fakeSpotRateStore(): Store<String, ExchangeRates> =
-        StoreBuilder.from<String, ExchangeRates>(
-            fetcher = Fetcher.of { _ ->
-                ExchangeRates(base = "USD", date = "2026-05-28", rates = emptyMap())
-            },
-        ).build()
+    private fun fakeSpotRateStore(): Store<String, ExchangeRates> = StoreBuilder.from<String, ExchangeRates>(
+        fetcher = Fetcher.of { _ ->
+            ExchangeRates(base = "USD", date = "2026-05-28", rates = emptyMap())
+        },
+    ).build()
 
     // endregion
 }

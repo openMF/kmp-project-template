@@ -28,11 +28,7 @@ import kpt.core.designsystem.theme.finance
  * stealing focus from the row's text content.
  */
 @Composable
-fun UrgencyDot(
-    urgency: Urgency,
-    modifier: Modifier = Modifier,
-    size: Dp = 10.dp,
-) {
+fun UrgencyDot(urgency: Urgency, modifier: Modifier = Modifier, size: Dp = 10.dp) {
     val color = resolveUrgencyColor(urgency)
     Box(
         modifier = modifier

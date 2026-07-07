@@ -37,11 +37,7 @@ import androidx.compose.ui.unit.dp
  * card-bounded full state coverage.
  */
 @Composable
-fun InlineErrorPill(
-    message: String,
-    modifier: Modifier = Modifier,
-    onRetry: (() -> Unit)? = null,
-) {
+fun InlineErrorPill(message: String, modifier: Modifier = Modifier, onRetry: (() -> Unit)? = null) {
     Row(
         modifier = modifier
             .clip(CircleShape)

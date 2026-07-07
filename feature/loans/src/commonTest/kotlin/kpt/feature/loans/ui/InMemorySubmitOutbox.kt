@@ -75,39 +75,32 @@ internal class InMemorySubmitOutbox<P> : SubmitOutbox<P> {
         return id
     }
 
-    override suspend fun getPending(formKey: String): SubmitOutboxEntry<P>? =
-        _entries.value.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-
-    override suspend fun getPendingByUniqueKey(
-        formKey: String,
-        uniqueKey: String,
-    ): SubmitOutboxEntry<P>? = _entries.value.firstOrNull {
-        it.formKey == formKey && it.uniqueKey == uniqueKey && it.status == SubmitOutboxStatus.PENDING
+    override suspend fun getPending(formKey: String): SubmitOutboxEntry<P>? = _entries.value.firstOrNull {
+        it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
     }
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> =
+    override suspend fun getPendingByUniqueKey(formKey: String, uniqueKey: String): SubmitOutboxEntry<P>? =
+        _entries.value.firstOrNull {
+            it.formKey == formKey && it.uniqueKey == uniqueKey && it.status == SubmitOutboxStatus.PENDING
+        }
+
+    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
+        list.firstOrNull {
+            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
+        }
+    }
+
+    override fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<SubmitOutboxEntry<P>?> =
         _entries.map { list ->
             list.firstOrNull {
-                it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
+                it.formKey == formKey && it.uniqueKey == uniqueKey && it.status == SubmitOutboxStatus.PENDING
             }
         }
 
-    override fun observePendingByUniqueKey(
-        formKey: String,
-        uniqueKey: String,
-    ): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == uniqueKey && it.status == SubmitOutboxStatus.PENDING
-        }
+    override fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>> = _entries.map { list ->
+        list.filter { it.formKey == formKey && it.status in NON_TERMINAL_STATES }
+            .sortedByDescending { it.createdAtMs }
     }
-
-    override fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>> =
-        _entries.map { list ->
-            list.filter { it.formKey == formKey && it.status in NON_TERMINAL_STATES }
-                .sortedByDescending { it.createdAtMs }
-        }
 
     override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> =
         _entries.value.filter { it.status == SubmitOutboxStatus.PENDING }

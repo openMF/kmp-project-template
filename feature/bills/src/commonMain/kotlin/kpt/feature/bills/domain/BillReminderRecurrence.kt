@@ -108,8 +108,7 @@ internal object BillReminderRecurrence {
         else -> error("Invalid month: $month")
     }
 
-    private fun isLeapYear(year: Int): Boolean =
-        (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0)
+    private fun isLeapYear(year: Int): Boolean = (year % 4 == 0) && (year % 100 != 0 || year % 400 == 0)
 
     /**
      * Convert the next-due [LocalDate] into the epoch-millis instant at which the OS

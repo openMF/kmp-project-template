@@ -55,13 +55,12 @@ class NetworkTelemetry(
      * for it (there's no transition yet). Subsequent emissions are diffed
      * against the previous state.
      */
-    fun start(scope: CoroutineScope): Job =
-        monitor.networkStatus
-            .runningFold<NetworkStatus, Pair<NetworkStatus?, NetworkStatus>>(
-                initial = null to NetworkStatus.Unavailable,
-            ) { acc, current -> acc.second to current }
-            .onEach { (prev, curr) -> logTransition(prev, curr) }
-            .launchIn(scope)
+    fun start(scope: CoroutineScope): Job = monitor.networkStatus
+        .runningFold<NetworkStatus, Pair<NetworkStatus?, NetworkStatus>>(
+            initial = null to NetworkStatus.Unavailable,
+        ) { acc, current -> acc.second to current }
+        .onEach { (prev, curr) -> logTransition(prev, curr) }
+        .launchIn(scope)
 
     private fun logTransition(prev: NetworkStatus?, curr: NetworkStatus) {
         if (prev == null) return // first emission — no transition yet

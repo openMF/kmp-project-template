@@ -18,10 +18,7 @@ import androidx.compose.runtime.Composable
  * external caller in `CryptoNavigation.cryptoGraph`).
  */
 @Composable
-fun CoinMarketsRoute(
-    onBackClick: () -> Unit,
-    onCoinClick: (String) -> Unit,
-) {
+fun CoinMarketsRoute(onBackClick: () -> Unit, onCoinClick: (String) -> Unit) {
     CoinMarketsScreen(
         onBackClick = onBackClick,
         onCoinClick = onCoinClick,

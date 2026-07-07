@@ -27,11 +27,7 @@ import androidx.compose.ui.Modifier
  * fit naturally (alongside FilterChips, etc.).
  */
 @Composable
-fun ErrorChip(
-    message: String,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-) {
+fun ErrorChip(message: String, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
     AssistChip(
         onClick = onClick ?: {},
         enabled = onClick != null,

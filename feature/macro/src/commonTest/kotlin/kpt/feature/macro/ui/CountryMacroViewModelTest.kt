@@ -280,11 +280,7 @@ private class KeyedFakeMacroIndicatorsRepository : MacroIndicatorsRepository {
 
     private val keyLog: MutableList<MacroIndicatorKey> = mutableListOf()
 
-    suspend fun emit(
-        countryCode: String,
-        kind: IndicatorKind,
-        state: ScreenState<MacroIndicator>,
-    ) {
+    suspend fun emit(countryCode: String, kind: IndicatorKind, state: ScreenState<MacroIndicator>) {
         val key = MacroIndicatorKey(countryCode, kind)
         bus(key).emit(state)
     }
@@ -294,10 +290,9 @@ private class KeyedFakeMacroIndicatorsRepository : MacroIndicatorsRepository {
         keyLog.clear()
     }
 
-    private fun bus(key: MacroIndicatorKey): MutableSharedFlow<ScreenState<MacroIndicator>> =
-        buses.getOrPut(key) {
-            MutableSharedFlow(replay = 1, extraBufferCapacity = 16)
-        }
+    private fun bus(key: MacroIndicatorKey): MutableSharedFlow<ScreenState<MacroIndicator>> = buses.getOrPut(key) {
+        MutableSharedFlow(replay = 1, extraBufferCapacity = 16)
+    }
 
     override fun macroIndicatorStream(
         key: MacroIndicatorKey,

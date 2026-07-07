@@ -89,18 +89,16 @@ class CountryMacroViewModel(
     }
 
     /** Re-derive a [MacroUiState] with the named indicator's cell replaced. */
-    private fun MacroUiState.withIndicator(
-        kind: IndicatorKind,
-        state: ScreenState<MacroIndicator>,
-    ): MacroUiState = when (kind) {
-        IndicatorKind.GDP -> copy(gdp = state)
-        IndicatorKind.INFLATION_CPI -> copy(inflation = state)
-        IndicatorKind.UNEMPLOYMENT -> copy(unemployment = state)
-        // The toolkit's two extra IndicatorKinds (GDP_PER_CAPITA, GINI) are
-        // not surfaced on this screen; ignore so the compiler exhaustiveness
-        // check stays honest if the enum expands later.
-        IndicatorKind.GDP_PER_CAPITA, IndicatorKind.GINI -> this
-    }
+    private fun MacroUiState.withIndicator(kind: IndicatorKind, state: ScreenState<MacroIndicator>): MacroUiState =
+        when (kind) {
+            IndicatorKind.GDP -> copy(gdp = state)
+            IndicatorKind.INFLATION_CPI -> copy(inflation = state)
+            IndicatorKind.UNEMPLOYMENT -> copy(unemployment = state)
+            // The toolkit's two extra IndicatorKinds (GDP_PER_CAPITA, GINI) are
+            // not surfaced on this screen; ignore so the compiler exhaustiveness
+            // check stays honest if the enum expands later.
+            IndicatorKind.GDP_PER_CAPITA, IndicatorKind.GINI -> this
+        }
 
     companion object {
         /** Indicators rendered on the Country Macro Snapshot dashboard. */

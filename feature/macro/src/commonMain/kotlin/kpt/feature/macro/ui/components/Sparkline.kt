@@ -86,11 +86,7 @@ private fun SparklineEmpty() {
 }
 
 @Composable
-private fun SparklineCanvas(
-    values: List<Double?>,
-    color: Color,
-    strokeWidth: Dp,
-) {
+private fun SparklineCanvas(values: List<Double?>, color: Color, strokeWidth: Dp) {
     val finiteValues = values.mapNotNull { it }
     val minValue = finiteValues.min()
     val maxValue = finiteValues.max()

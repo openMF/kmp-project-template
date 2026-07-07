@@ -199,10 +199,7 @@ private fun DevMenuDialog(
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun VersionLabel(
-    onLongClick: (() -> Unit)?,
-    modifier: Modifier = Modifier,
-) {
+private fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifier) {
     // TODO: Replace literal with BuildKonfig-emitted version string once the
     // BuildKonfig plugin is wired into the consumer module (see core/network
     // FredApiConfig.kt for the threading pattern). For now we render a static

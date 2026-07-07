@@ -25,8 +25,7 @@ class AmortizationScheduleViewModelTest {
 
     private val repo = FakeLoanRepository()
 
-    private fun viewModel(loanId: String) =
-        AmortizationScheduleViewModel(repository = repo, loanId = loanId)
+    private fun viewModel(loanId: String) = AmortizationScheduleViewModel(repository = repo, loanId = loanId)
 
     // ── computeSchedule unit tests ───────────────────────────────────────────
 

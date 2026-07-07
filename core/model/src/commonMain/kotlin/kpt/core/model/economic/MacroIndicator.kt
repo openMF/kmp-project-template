@@ -76,7 +76,6 @@ enum class IndicatorKind(val worldBankCode: String) {
          * unknown. The DTO mapper uses this to attribute a response to the right
          * enum constant.
          */
-        fun fromWorldBankCode(code: String): IndicatorKind? =
-            entries.firstOrNull { it.worldBankCode == code }
+        fun fromWorldBankCode(code: String): IndicatorKind? = entries.firstOrNull { it.worldBankCode == code }
     }
 }

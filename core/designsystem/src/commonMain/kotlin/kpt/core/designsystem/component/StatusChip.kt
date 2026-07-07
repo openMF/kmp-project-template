@@ -30,11 +30,7 @@ import kpt.core.designsystem.theme.finance
  * accent).
  */
 @Composable
-fun StatusChip(
-    text: String,
-    intent: StatusChipIntent,
-    modifier: Modifier = Modifier,
-) {
+fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modifier) {
     val (container, content) = resolveChipColors(intent)
     Text(
         text = text,

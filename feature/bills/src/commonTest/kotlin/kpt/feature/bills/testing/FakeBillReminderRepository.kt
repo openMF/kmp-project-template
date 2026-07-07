@@ -44,8 +44,7 @@ internal class FakeBillReminderRepository : BillReminderRepository {
         rows.firstOrNull { it.id == id }
     }
 
-    override suspend fun getById(id: String): BillReminder? =
-        state.value.firstOrNull { it.id == id }
+    override suspend fun getById(id: String): BillReminder? = state.value.firstOrNull { it.id == id }
 
     override suspend fun upsert(bill: BillReminder) {
         state.value = state.value.filterNot { it.id == bill.id } + bill

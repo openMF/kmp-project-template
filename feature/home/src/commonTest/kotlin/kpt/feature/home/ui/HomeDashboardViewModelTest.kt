@@ -191,8 +191,7 @@ private object EmptyLoanRepository : LoanRepository {
     override suspend fun upsert(loan: Loan) = Unit
     override suspend fun delete(id: String) = Unit
     override fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeTotalPrincipalRemaining(): Flow<Double> =
-        throw UnsupportedOperationException()
+    override fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
@@ -200,13 +199,11 @@ private object EmptyBillReminderRepository : BillReminderRepository {
     private val empty = MutableStateFlow<List<BillReminder>>(emptyList())
     override fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> = empty
-    override fun observeById(id: String): Flow<BillReminder?> =
-        throw UnsupportedOperationException()
+    override fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
     override suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
     override suspend fun upsert(bill: BillReminder) = throw UnsupportedOperationException()
     override suspend fun delete(id: String) = throw UnsupportedOperationException()
-    override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> =
-        throw UnsupportedOperationException()
+    override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> = throw UnsupportedOperationException()
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 

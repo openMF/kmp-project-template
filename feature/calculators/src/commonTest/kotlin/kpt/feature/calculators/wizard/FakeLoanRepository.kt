@@ -27,11 +27,9 @@ internal class FakeLoanRepository : LoanRepository {
     var lastUpserted: Loan? = null
         private set
 
-    override fun observeAll(): Flow<List<Loan>> =
-        state.map { it.values.toList() }
+    override fun observeAll(): Flow<List<Loan>> = state.map { it.values.toList() }
 
-    override fun observeById(id: String): Flow<Loan?> =
-        state.map { it[id] }
+    override fun observeById(id: String): Flow<Loan?> = state.map { it[id] }
 
     override suspend fun getById(id: String): Loan? = state.value[id]
 
@@ -44,8 +42,7 @@ internal class FakeLoanRepository : LoanRepository {
         state.value = state.value - id
     }
 
-    override fun observeTotalMonthlyEmi(): Flow<Double> =
-        state.map { rows -> rows.values.sumOf { it.monthlyPayment } }
+    override fun observeTotalMonthlyEmi(): Flow<Double> = state.map { rows -> rows.values.sumOf { it.monthlyPayment } }
 
     override fun observeTotalPrincipalRemaining(): Flow<Double> =
         state.map { rows -> rows.values.sumOf { it.principalRemaining } }

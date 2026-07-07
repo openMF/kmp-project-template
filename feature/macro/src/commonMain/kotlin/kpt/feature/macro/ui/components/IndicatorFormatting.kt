@@ -51,8 +51,7 @@ fun MacroIndicator.headlineValue(): String {
  * value (e.g. "Latest: 2023"). Returns null when no usable observation
  * exists.
  */
-fun MacroIndicator.latestYear(): Int? =
-    observations.asReversed().firstOrNull { it.value != null }?.year
+fun MacroIndicator.latestYear(): Int? = observations.asReversed().firstOrNull { it.value != null }?.year
 
 private fun formatCurrencyCompact(value: Double): String {
     val abs = kotlin.math.abs(value)

@@ -47,12 +47,7 @@ import org.jetbrains.compose.resources.stringResource
  * the list screen wires to a delete-confirmation dialog.
  */
 @Composable
-internal fun LoanRowCard(
-    loan: Loan,
-    onClick: () -> Unit,
-    onLongPress: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
+internal fun LoanRowCard(loan: Loan, onClick: () -> Unit, onLongPress: () -> Unit, modifier: Modifier = Modifier) {
     val sp = MaterialTheme.spacing
     val progress = if (loan.principal > 0) {
         (1.0 - (loan.principalRemaining / loan.principal)).toFloat().coerceIn(0f, 1f)

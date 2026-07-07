@@ -41,11 +41,7 @@ import kpt.core.designsystem.theme.finance
  * Pass [delta] already-formatted (e.g. "+1.25%", "-$0.12", "—").
  */
 @Composable
-fun RateBadge(
-    delta: String,
-    direction: RateDirection,
-    modifier: Modifier = Modifier,
-) {
+fun RateBadge(delta: String, direction: RateDirection, modifier: Modifier = Modifier) {
     val (container, content, icon) = resolveRateColors(direction)
     Row(
         modifier = modifier

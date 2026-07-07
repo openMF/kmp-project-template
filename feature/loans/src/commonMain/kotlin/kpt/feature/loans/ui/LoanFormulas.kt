@@ -23,11 +23,7 @@ import kotlin.math.pow
  * - Zero or negative principal/tenure → returns `0.0` (caller validates).
  * - Zero interest rate → returns principal / tenureMonths (simple division).
  */
-internal fun computeMonthlyEmi(
-    principal: Double,
-    annualRatePercent: Double,
-    tenureMonths: Int,
-): Double = when {
+internal fun computeMonthlyEmi(principal: Double, annualRatePercent: Double, tenureMonths: Int): Double = when {
     principal <= 0.0 || tenureMonths <= 0 -> 0.0
     annualRatePercent <= 0.0 -> principal / tenureMonths
     else -> {
@@ -42,11 +38,7 @@ internal fun computeMonthlyEmi(
  *
  * `totalInterest = (EMI * n) - P`. Returns `0.0` if inputs are non-positive.
  */
-internal fun computeTotalInterest(
-    principal: Double,
-    annualRatePercent: Double,
-    tenureMonths: Int,
-): Double {
+internal fun computeTotalInterest(principal: Double, annualRatePercent: Double, tenureMonths: Int): Double {
     if (principal <= 0.0 || tenureMonths <= 0) return 0.0
     val emi = computeMonthlyEmi(principal, annualRatePercent, tenureMonths)
     return (emi * tenureMonths) - principal

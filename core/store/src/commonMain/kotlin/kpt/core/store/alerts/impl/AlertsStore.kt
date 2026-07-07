@@ -26,9 +26,7 @@ import org.mobilenativefoundation.store.store5.Store
  * Key: [Unit] — always returns all alerts (no per-alert keyed filter here;
  * per-id lookup goes through the repository directly).
  */
-fun provideAlertsStore(
-    dao: AlertDao,
-): Store<Unit, List<AlertEntity>> = StoreFactory.createOfflineStore(
+fun provideAlertsStore(dao: AlertDao): Store<Unit, List<AlertEntity>> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
         reader = { _: Unit -> dao.observeAll() },
         writer = { _: Unit, alerts: List<AlertEntity> -> dao.upsertAll(alerts) },

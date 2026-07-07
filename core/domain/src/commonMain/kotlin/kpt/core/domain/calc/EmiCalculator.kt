@@ -73,11 +73,7 @@ fun computeEmi(principal: Double, annualRatePercent: Double, tenureMonths: Int):
  * Returns an empty list for non-positive principal or tenure so a caller can
  * pipe straight into a `LazyColumn` without guarding.
  */
-fun amortizationSchedule(
-    principal: Double,
-    annualRatePercent: Double,
-    tenureMonths: Int,
-): List<AmortizationRow> {
+fun amortizationSchedule(principal: Double, annualRatePercent: Double, tenureMonths: Int): List<AmortizationRow> {
     if (principal <= 0.0 || tenureMonths <= 0) return emptyList()
     val monthlyRate = annualRatePercent / 12.0 / 100.0
     val emi = computeEmi(principal, annualRatePercent, tenureMonths).emi

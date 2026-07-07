@@ -31,9 +31,7 @@ import org.mobilenativefoundation.store.store5.Store
  * `core-base/database/.../invalidation/README.md`). On Android/Desktop/iOS the wrap
  * is a microsecond no-op alongside Room's native invalidation.
  */
-fun provideLoansStore(
-    dao: LoanDao,
-): Store<Unit, List<LoanEntity>> = StoreFactory.createOfflineStore(
+fun provideLoansStore(dao: LoanDao): Store<Unit, List<LoanEntity>> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
         reader = { _: Unit -> daoFlow(LOANS_TABLE) { dao.observeAll() } },
         writer = { _: Unit, loans: List<LoanEntity> -> loans.forEach { dao.upsert(it) } },

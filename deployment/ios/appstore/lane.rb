@@ -4,6 +4,13 @@
 # Implements the AC10/AC39 Info.plist write-then-restore pattern via
 # AppStoreHelpers.with_plist_backup() — the working tree stays clean after
 # the lane runs (success OR failure).
+#
+# Phase 2 of `deploy-gha-product-flavors` epic (D5/D9): `release` accepts
+# `flavor:` + `build_type:` options and drives the Xcode scheme through
+# `VariantResolver.resolve(...).ios_scheme` instead of the hardcoded
+# `ios_config[:scheme]` fallback ("iosApp"). `promoteToAppStore` +
+# `uploadAppStore` remain flavor-neutral because they operate on an
+# already-built IPA / an existing TestFlight build.
 require_relative "../../_shared/lib/appstore_helpers"
 require_relative "../../_shared/lib/version_helpers"
 
@@ -101,9 +108,15 @@ platform :ios do
     UI.success("✅ Successfully uploaded to App Store!")
   end
 
-  desc "Upload iOS application to App Store"
+  desc "Upload iOS application to App Store (parameterized on flavor + build_type; scheme from resolver)"
   lane :release do |options|
     options          = sanitize_options(options)
+    flavor    = (options[:flavor]     || :prod).to_sym
+    build_ty  = (options[:build_type] || :release).to_sym
+
+    # Convention-derived Xcode scheme (`{flavor}{BuildType}`) — replaces the
+    # pre-Phase-2 hardcoded `ios_config[:scheme]` ("iosApp") fallback.
+    variant          = VariantResolver.resolve(flavor: flavor.to_s, build_type: build_ty.to_s)
     ios_config       = FastlaneConfig::IosConfig::BUILD_CONFIG
     appstore_config  = FastlaneConfig::IosConfig::APPSTORE_CONFIG
 
@@ -117,7 +130,7 @@ platform :ios do
       path:                  ios_config[:project_path],
       team_id:               ios_config[:team_id],
       code_sign_identity:    "Apple Distribution",
-      targets:               [ios_config[:scheme]],
+      targets:               [variant.ios_scheme],
       bundle_identifier:     ios_config[:app_identifier],
       profile_name:          "match AppStore #{ios_config[:app_identifier]}",
     )
@@ -153,7 +166,13 @@ platform :ios do
         end,
       )
 
-      build_ios_project(options.merge(provisioning_profile_name: ios_config[:provisioning_profile_appstore]))
+      build_ios_project(
+        options.merge(
+          scheme:                    variant.ios_scheme,
+          configuration:             build_ty.to_s.capitalize,
+          provisioning_profile_name: ios_config[:provisioning_profile_appstore],
+        ),
+      )
 
       releaseNotes = generateReleaseNote()
       locale = ios_config[:primary_locale]

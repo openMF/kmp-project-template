@@ -128,6 +128,17 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
             //    adding / renaming / removing a flavor automatically updates xcconfigs
             //    on the next iOS build — no manual sync step required.
             registerIosFlavorXcconfigsTask()
+
+            // 4. Register `exportKmpFlavorsManifest` — the consumer-side gradle task
+            //    that materialises the DSL into `build/kmp-flavors/variants.json`, the
+            //    single machine-readable derivation point consumed by fastlane, the
+            //    `resolve-variants` GHA job, and the `openMF/mifos-x-actionhub`
+            //    reusable workflow (epic `deploy-gha-product-flavors`, decisions D8/D9).
+            //    Reads the live DSL at execution time so adding / renaming / removing a
+            //    flavor auto-propagates to every CI stage on the next `resolve-variants`
+            //    invocation — no committed derived list, no hand-maintained catalog,
+            //    zero drift surface. Zero change to `build-logic/flavor-plugin/**`.
+            registerExportKmpFlavorsManifestTask()
         }
     }
 
@@ -157,6 +168,49 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                 (name.startsWith("link") && name.contains("Framework") && name.contains("Ios"))) {
                 dependsOn(generateTask)
             }
+        }
+    }
+
+    /**
+     * Registers the `exportKmpFlavorsManifest` task — sibling of
+     * [registerIosFlavorXcconfigsTask]. Emits `build/kmp-flavors/variants.json`
+     * from the currently declared `kmpFlavors {}` DSL.
+     *
+     * The three `MapProperty` inputs are wired to **lazy providers** that pull
+     * from the plugin's public [KmpFlavorExtension] surface at execution time
+     * — so the manifest picks up every DSL change (including
+     * `local/LocalFlavors.kt` extensions) on the next run without any manual
+     * refresh step.
+     *
+     * The task is **not** hooked to any downstream build task: it's driven
+     * explicitly by the `resolve-variants` GHA job (`.github/workflows/…`) and
+     * by fastlane's `variant_resolver.rb` at CI runtime — the manifest is a CI
+     * derivation artifact, not a build-time dependency of the app modules
+     * themselves.
+     */
+    private fun Project.registerExportKmpFlavorsManifestTask() {
+        val ext = extensions.getByType<KmpFlavorExtension>()
+
+        tasks.register<ExportKmpFlavorsManifestTask>("exportKmpFlavorsManifest") {
+            group       = "kmp-flavors"
+            description = "Emit variants.json from the kmpFlavors {} DSL (single derivation point for CI/CD)."
+
+            // Lazy providers — Gradle reads these at execution time after DSL is fully
+            // configured (including LocalFlavors.kt additions). `orNull ?: ""` ensures
+            // flavors / build-types that declare no suffix serialise as the empty
+            // string rather than dropping out of the map, so downstream consumers see
+            // a total function from name → suffix.
+            flavorAppIdSuffixes.set(provider {
+                ext.flavors.associate { f -> f.name to (f.applicationIdSuffix.orNull ?: "") }
+            })
+            flavorBundleIdSuffixes.set(provider {
+                ext.flavors.associate { f -> f.name to (f.bundleIdSuffix.orNull ?: "") }
+            })
+            buildTypeAppIdSuffixes.set(provider {
+                ext.buildTypes.associate { bt -> bt.name to (bt.applicationIdSuffix.orNull ?: "") }
+            })
+
+            outputFile.set(layout.buildDirectory.file("kmp-flavors/variants.json"))
         }
     }
 }

@@ -23,9 +23,11 @@ import kotlinx.coroutines.yield
 import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
+import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
+import kpt.core.data.Synchronizer
 import kpt.core.data.economic.MacroIndicatorsRepository
 import kpt.core.model.economic.IndicatorKind
 import kpt.core.model.economic.IndicatorObservation
@@ -274,6 +276,7 @@ class CountryMacroViewModelTest {
  */
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
 private class KeyedFakeMacroIndicatorsRepository : MacroIndicatorsRepository {
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean = true
 
     private val buses: MutableMap<MacroIndicatorKey, MutableSharedFlow<ScreenState<MacroIndicator>>> =
         mutableMapOf()
@@ -297,6 +300,7 @@ private class KeyedFakeMacroIndicatorsRepository : MacroIndicatorsRepository {
     override fun macroIndicatorStream(
         key: MacroIndicatorKey,
         scope: CoroutineScope,
+        fetchPolicy: FetchPolicy,
     ): ScreenDataStream<MacroIndicator> {
         keyLog += key
         return screenDataStreamForTesting(state = bus(key))

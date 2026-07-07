@@ -28,6 +28,7 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
+import kpt.core.data.Synchronizer
 import kpt.core.data.banking.BillReminderRepository
 import kpt.core.data.banking.LoanRepository
 import kpt.core.data.currency.CurrencyRepository
@@ -457,6 +458,7 @@ private class FakeEconomicRatesRepository(
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
 private class FakeCurrencyRepository : CurrencyRepository {
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean = true
     private val source = MutableStateFlow<ScreenState<ExchangeRates>>(ScreenState.Loading)
     var refreshCount: Int = 0
         private set

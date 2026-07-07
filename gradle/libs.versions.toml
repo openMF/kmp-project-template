@@ -1,6 +1,6 @@
 [versions]
 buildkonfig = "0.21.2"
-kmpProductFlavors = "2.4.2"
+kmpProductFlavors = "2.8.1"
 
 # ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──────────────────
 appId            = "org.mifos.kmp.template"   # Android applicationId + iOS bundle ID
@@ -25,7 +25,7 @@ firebaseBom = "34.14.0"
 firebaseCrashlyticsPlugin = "3.0.7"
 firebasePerfPlugin = "2.0.2"
 androidxMacroBenchmark = "1.5.0-alpha06"
-githubApi = "1.329"
+githubApi = "1.330"
 gmsPlugin = "4.4.4"
 
 # AndroidX Dependencies
@@ -41,15 +41,15 @@ androidxMetrics = "1.0.0"
 androidxProfileinstaller = "1.4.1"
 androidxTracing = "1.3.0"
 appcompatVersion = "1.7.1"
-calfPermissions = "0.11.0"
+calfPermissions = "0.12.0"
 coreKtxVersion = "1.18.0"
 
-jacksonCore = "2.19.2"
-junitJupiterApi = "5.13.4"
-junitPlatformLauncherVersion = "1.13.4"
-okhttp = "5.3.2"
+jacksonCore = "2.22.0"
+junitJupiterApi = "5.14.4"
+junitPlatformLauncherVersion = "1.14.4"
+okhttp = "5.4.0"
 robolectric = "4.16.1"
-roborazzi = "1.63.0"
+roborazzi = "1.67.0"
 
 # Testing Dependencies
 junitVersion = "4.13.2"
@@ -61,8 +61,8 @@ bouncycastle = "1.84"
 
 # Utility Dependencies
 dependencyGuard = "0.5.0"
-googleOss = "17.3.0"
-googleOssPlugin = "0.10.10"
+googleOss = "17.5.1"
+googleOssPlugin = "0.12.0"
 review = "2.0.2"
 appUpdate = "2.1.0"
 integrity = "1.6.0"
@@ -70,7 +70,7 @@ integrity = "1.6.0"
 # Static Analysis & Code Formatting
 ktlint = "12.1.1"
 detekt = "1.23.8"
-spotlessVersion = "8.6.0"
+spotlessVersion = "8.8.0"
 turbine = "1.2.1"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
@@ -86,39 +86,39 @@ kotlinInject = "0.9.0"
 kotlinxBrowser = "0.5.0"
 kotlinxCoroutines = "1.11.0"
 kotlinxDatetime = "0.8.0"
-kotlinxImmutable = "0.4.0"
-kotlinxSerializationJson = "1.9.0"
+kotlinxImmutable = "0.5.1"
+kotlinxSerializationJson = "1.11.0"
 ksp = "2.3.9"
 
 # Ktor & Ktorfit
-ktorVersion = "3.5.0"
+ktorVersion = "3.5.1"
 ktorfit = "2.7.5"
 
 # Koin CMP Dependencies
-koin = "4.2.1"
+koin = "4.2.2"
 koinAnnotationsVersion = "2.3.1"
 
 
 # KMP Toolkit Libraries
-kmptoolkit = "3.4.4"
+kmptoolkit = "3.5.3"
 
 # CMP Libraries
 compose-plugin = "1.11.1"
-coil = "3.4.0"
+coil = "3.5.0"
 backHandlerVersion = "2.5.0"
 constraintLayout = "0.6.1"
 multiplatformSettings = "1.3.0"
 mokoPermission = "0.20.1"
-qroseVersion = "1.0.1"
+qroseVersion = "1.1.2"
 okioVersion = "3.17.0"
-kermit = "2.0.8"
-fileKit = "0.14.0"
-uiBackhandler = "1.11.0"
+kermit = "2.1.0"
+fileKit = "0.14.2"
+uiBackhandler = "1.11.1"
 wire = "6.2.0"
-compottie = "2.1.0"
+compottie = "2.2.4"
 
 # Jetbrains CMP
-composeJB = "1.11.0"
+composeJB = "1.11.1"
 composeLifecycle = "2.11.0-beta01"
 composeNavigation = "2.9.2"
 jbCoreBundle = "1.0.1"
@@ -134,9 +134,9 @@ desktopPackageVersion = "1.0.0"
 store = "5.1.0-alpha08"
 
 #Room 3
-room = "3.0.0-alpha05"
-sqliteBundled = "2.6.2"
-sqliteWeb = "2.7.0-alpha05"
+room = "3.0.0"
+sqliteBundled = "2.7.0"
+sqliteWeb = "2.7.0"
 
 # worker-kmp — single-API background + foreground worker scheduling across
 # Android / iOS / Desktop / Web. See https://github.com/MobileByteLabs/worker-kmp.

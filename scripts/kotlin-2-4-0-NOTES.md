@@ -52,8 +52,20 @@ a pure catalog bump) — filed as a follow-up. **Resolution:** reverted Bucket B
 working pre-release; room now joins the deliberately-held set. All other 32 bumps retained.
 
 Non-compile checks: Spotless ✅ (ktlint-14 needs **no** reformat), Detekt ✅. Dependency Guard ❌
-(baseline stale — regenerated at finalization, AC-11). Kover ❌ (downstream of the build failure /
-Maven-Central flake, F6 — re-evaluated once compile is green).
+(baseline stale — regenerated at finalization, AC-11).
+
+**Second CI run (room reverted + baseline regenerated):** compile matrix green — Android ✅,
+Desktop macOS/Ubuntu/Windows ✅, iOS ✅, Dependency Guard ✅, Spotless/Detekt ✅. Two remained:
+
+- **Web** ❌ = `:kotlinStoreYarnLock` — stale JS lockfile (AC-9 finalization). Regenerated `yarn.lock`.
+- **Kover** ❌ = a REAL compile error on the `dev`-flavor desktop target (not covered by the prod PR
+  Check jobs): `KmpFlavorsRuntime.desktop.kt 'actual object … has no corresponding expected
+  declaration'`. **Cause:** `kmpProductFlavors 2.4.2 → 2.8.1` changed the plugin's generated
+  expect/actual shape (breaking multi-minor jump). **Resolution:** reverted `kmpProductFlavors` to
+  2.4.2 (kmptoolkit 3.5.3 retained). Adopting kmpflavors 2.8.x is a follow-up.
+
+Net retained: **31 of 35 bumps** (Bucket A minus kmpProductFlavors + Bucket C + Tier-3).
+Deferred with follow-ups: room3 3.0.0, sqlite 2.7.0, kmpProductFlavors 2.8.1.
 
 ## Verification strategy
 

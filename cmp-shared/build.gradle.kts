@@ -95,6 +95,18 @@ kotlin {
         ios.deploymentTarget = "16.0"
         podfile = project.file("../cmp-ios/Podfile")
 
+        // Map the product-flavor Xcode build configurations (demoDebug / prodRelease / …)
+        // to a Kotlin/Native build type. Without this, the Kotlin CocoaPods plugin cannot
+        // identify debug-vs-release for a non-standard CONFIGURATION name and fails the
+        // ComposeApp framework build ("Could not identify build type for Kotlin framework").
+        // Rule: *Debug → DEBUG, everything else (*Staging / *Release) → RELEASE.
+        xcodeConfigurationToNativeBuildType["demoDebug"] = NativeBuildType.DEBUG
+        xcodeConfigurationToNativeBuildType["prodDebug"] = NativeBuildType.DEBUG
+        xcodeConfigurationToNativeBuildType["demoStaging"] = NativeBuildType.RELEASE
+        xcodeConfigurationToNativeBuildType["prodStaging"] = NativeBuildType.RELEASE
+        xcodeConfigurationToNativeBuildType["demoRelease"] = NativeBuildType.RELEASE
+        xcodeConfigurationToNativeBuildType["prodRelease"] = NativeBuildType.RELEASE
+
         framework {
             baseName = "ComposeApp"
             isStatic = true

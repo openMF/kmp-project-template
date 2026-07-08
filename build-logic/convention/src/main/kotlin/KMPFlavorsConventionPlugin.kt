@@ -68,6 +68,18 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                 appDisplayName.set(libs.findVersion("appDisplayName").get().requiredVersion)
                 enableBuildTypes.set(true)
 
+                // iOS xcconfig generation + variants.json export are provided by the plugin
+                // (kmp-product-flavors 2.8.3+). Identity stays in Config.xcconfig
+                // ($(APP_BUNDLE_ID) / $(TEAM_ID), synced from libs.versions.toml via
+                // syncForkConfig), so the per-variant xcconfigs reference those vars and Pods
+                // settings flow in per-configuration. Replaces the former hand-maintained
+                // GenerateIosFlavorXcconfigsTask + ExportKmpFlavorsManifestTask in build-logic.
+                iosXcconfigGeneration.set(true)
+                iosManifestExport.set(true)
+                iosBundleIdBaseExpr.set("\$(APP_BUNDLE_ID)")
+                iosDevelopmentTeamExpr.set("\$(TEAM_ID)")
+                iosCocoapodsIntegration.set(true)
+
                 flavorDimensions {
                     register("contentType") { priority.set(0) }
                 }
@@ -124,93 +136,12 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                 LocalFlavorsLoader.applyIfPresent(this, target)
             }
 
-            // 3. Register xcconfig generator. Reads the live DSL at execution time so
-            //    adding / renaming / removing a flavor automatically updates xcconfigs
-            //    on the next iOS build — no manual sync step required.
-            registerIosFlavorXcconfigsTask()
-
-            // 4. Register `exportKmpFlavorsManifest` — the consumer-side gradle task
-            //    that materialises the DSL into `build/kmp-flavors/variants.json`, the
-            //    single machine-readable derivation point consumed by fastlane, the
-            //    `resolve-variants` GHA job, and the `openMF/mifos-x-actionhub`
-            //    reusable workflow (epic `deploy-gha-product-flavors`, decisions D8/D9).
-            //    Reads the live DSL at execution time so adding / renaming / removing a
-            //    flavor auto-propagates to every CI stage on the next `resolve-variants`
-            //    invocation — no committed derived list, no hand-maintained catalog,
-            //    zero drift surface. Zero change to `build-logic/flavor-plugin/**`.
-            registerExportKmpFlavorsManifestTask()
+            // iOS xcconfig generation + variants.json export (generateIosFlavorXcconfigs /
+            // kmpFlavorsBootstrapXcode / exportKmpFlavorsManifest) are registered by the
+            // kmp-product-flavors plugin itself, driven by the ios* DSL flags set above —
+            // no hand-maintained build-logic tasks. (Was: registerIosFlavorXcconfigsTask() +
+            // registerExportKmpFlavorsManifestTask(), removed in the 2.8.3 adoption.)
         }
     }
 
-    private fun Project.registerIosFlavorXcconfigsTask() {
-        val ext = extensions.getByType<KmpFlavorExtension>()
-
-        val generateTask = tasks.register<GenerateIosFlavorXcconfigsTask>("generateIosFlavorXcconfigs") {
-            group       = "kmp-flavors"
-            description = "Auto-generate cmp-ios/Configs/{variant}.xcconfig from kmpFlavors DSL."
-
-            // Lazy providers — Gradle reads these at execution time after DSL is fully
-            // configured (including LocalFlavors.kt additions).
-            flavorBundleSuffixes.set(provider {
-                ext.flavors.associate { f -> f.name to (f.bundleIdSuffix.orNull ?: "") }
-            })
-            buildTypeBundleSuffixes.set(provider {
-                ext.buildTypes.associate { bt -> bt.name to (bt.bundleIdSuffix.orNull ?: "") }
-            })
-            // Relative to :cmp-shared — cmp-ios is a sibling module.
-            outputDir.set(layout.projectDirectory.dir("../cmp-ios/Configs"))
-        }
-
-        // Wire to iOS framework compilation so xcconfigs are always fresh before
-        // Xcode links the KMP framework (covers both Xcode-triggered and CLI builds).
-        tasks.configureEach {
-            if (name == "embedAndSignAppleFrameworkForXcode" ||
-                (name.startsWith("link") && name.contains("Framework") && name.contains("Ios"))) {
-                dependsOn(generateTask)
-            }
-        }
-    }
-
-    /**
-     * Registers the `exportKmpFlavorsManifest` task — sibling of
-     * [registerIosFlavorXcconfigsTask]. Emits `build/kmp-flavors/variants.json`
-     * from the currently declared `kmpFlavors {}` DSL.
-     *
-     * The three `MapProperty` inputs are wired to **lazy providers** that pull
-     * from the plugin's public [KmpFlavorExtension] surface at execution time
-     * — so the manifest picks up every DSL change (including
-     * `local/LocalFlavors.kt` extensions) on the next run without any manual
-     * refresh step.
-     *
-     * The task is **not** hooked to any downstream build task: it's driven
-     * explicitly by the `resolve-variants` GHA job (`.github/workflows/…`) and
-     * by fastlane's `variant_resolver.rb` at CI runtime — the manifest is a CI
-     * derivation artifact, not a build-time dependency of the app modules
-     * themselves.
-     */
-    private fun Project.registerExportKmpFlavorsManifestTask() {
-        val ext = extensions.getByType<KmpFlavorExtension>()
-
-        tasks.register<ExportKmpFlavorsManifestTask>("exportKmpFlavorsManifest") {
-            group       = "kmp-flavors"
-            description = "Emit variants.json from the kmpFlavors {} DSL (single derivation point for CI/CD)."
-
-            // Lazy providers — Gradle reads these at execution time after DSL is fully
-            // configured (including LocalFlavors.kt additions). `orNull ?: ""` ensures
-            // flavors / build-types that declare no suffix serialise as the empty
-            // string rather than dropping out of the map, so downstream consumers see
-            // a total function from name → suffix.
-            flavorAppIdSuffixes.set(provider {
-                ext.flavors.associate { f -> f.name to (f.applicationIdSuffix.orNull ?: "") }
-            })
-            flavorBundleIdSuffixes.set(provider {
-                ext.flavors.associate { f -> f.name to (f.bundleIdSuffix.orNull ?: "") }
-            })
-            buildTypeAppIdSuffixes.set(provider {
-                ext.buildTypes.associate { bt -> bt.name to (bt.applicationIdSuffix.orNull ?: "") }
-            })
-
-            outputFile.set(layout.buildDirectory.file("kmp-flavors/variants.json"))
-        }
-    }
 }

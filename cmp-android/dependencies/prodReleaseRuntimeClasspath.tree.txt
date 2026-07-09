@@ -2345,6 +2345,7 @@
 |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
+|    |    |    |    |    +--- io.github.jan-tennert.supabase:postgrest-kt:3.6.0 (*)
 |    |    |    |    |    +--- project :core:datastore
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)

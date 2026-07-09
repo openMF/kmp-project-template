@@ -9,6 +9,8 @@
  */
 package kpt.core.base.network
 
+import kotlin.jvm.JvmInline
+
 /**
  * Interface for providing dynamic URL configuration at runtime.
  *
@@ -50,29 +52,42 @@ interface DynamicUrlConfigProvider {
 }
 
 /**
- * Extension of [DynamicUrlConfigProvider] for applications with multiple
- * URL types (e.g., main API, self-service API, interbank API).
+ * Open, extensible identifier for a named API endpoint.
+ *
+ * This is deliberately **not** a closed enum: `core-base` ships only the generic [MAIN] default,
+ * and each project defines its own endpoint names at the `core/` level with vocabulary that fits
+ * its domain — e.g. `PRODUCTION`, `STAGING`, `SERVER1`, `PAYMENT_GATEWAY`. See the `AppUrlTypes`
+ * example in `core/network`.
+ *
+ * ```kotlin
+ * // in core/ (your project) — name them however you like, add as many as you need
+ * object AppUrlTypes {
+ *     val MAIN    = UrlType.MAIN
+ *     val SERVER1 = UrlType("SERVER1")
+ *     val STAGING = UrlType("STAGING")
+ * }
+ * ```
+ */
+@JvmInline
+value class UrlType(val key: String) {
+    companion object {
+        /** The single generic default. Every project has at least this one. */
+        val MAIN: UrlType = UrlType("MAIN")
+    }
+}
+
+/**
+ * Extension of [DynamicUrlConfigProvider] for applications that expose more than one endpoint
+ * (identified by an open [UrlType] — the project names them in `core/`).
  */
 interface MultiUrlConfigProvider : DynamicUrlConfigProvider {
     /**
-     * URL type identifier for different API endpoints.
-     */
-    enum class UrlType {
-        /** Main API endpoint */
-        MAIN,
-        /** Self-service API endpoint */
-        SELF_SERVICE,
-        /** Interbank/third-party API endpoint */
-        INTERBANK,
-    }
-
-    /**
-     * Returns the base URL for the specified URL type.
+     * Returns the base URL for the specified [type].
      */
     fun getBaseUrl(type: UrlType): String
 
     /**
-     * Default implementation returns MAIN URL type.
+     * Default implementation returns the [UrlType.MAIN] URL.
      */
     override fun getBaseUrl(): String = getBaseUrl(UrlType.MAIN)
 }

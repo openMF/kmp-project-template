@@ -14,6 +14,7 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.ktrofit)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.kmp.supabase.config)
     id("kotlinx-serialization")
     id("com.google.devtools.ksp")
 }
@@ -24,24 +25,23 @@ val localProps = Properties().apply {
 }
 
 buildkonfig {
+    // packageName mirrors the module's Kotlin source package (module scope) so the generated
+    // `kpt.core.network.BuildKonfig` is imported without ceremony.
     packageName = "kpt.core.network"
     defaultConfigs {
         buildConfigField(
             STRING, "FRED_API_KEY",
             System.getenv("FRED_API_KEY") ?: localProps.getProperty("FRED_API_KEY", ""),
         )
-        // Optional Supabase project for dynamic server config (SupabaseConfigClient).
-        // Empty by default — the template ships no Supabase project; forks set these in
-        // local.properties (or SUPABASE_URL / SUPABASE_ANON_KEY env vars) to enable it.
-        buildConfigField(
-            STRING, "SUPABASE_URL",
-            System.getenv("SUPABASE_URL") ?: localProps.getProperty("SUPABASE_URL", ""),
-        )
-        buildConfigField(
-            STRING, "SUPABASE_ANON_KEY",
-            System.getenv("SUPABASE_ANON_KEY") ?: localProps.getProperty("SUPABASE_ANON_KEY", ""),
-        )
     }
+}
+
+// Supabase credentials are sourced dynamically from the gitignored `secrets/supabaseCredentialsFile.json`
+// (url + anonKey) via the shared SupabaseConfigConventionPlugin — the project's established secrets
+// mechanism — which generates `kpt.core.network.config.SupabaseCredentials`. When the file is absent
+// (the toolkit ships no Supabase project) it generates empty creds, so SupabaseConfigClient stays inert.
+supabaseConfig {
+    packageName = "kpt.core.network.config"
 }
 
 androidComponents {

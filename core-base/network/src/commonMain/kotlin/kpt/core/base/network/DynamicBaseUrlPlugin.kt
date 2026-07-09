@@ -37,20 +37,21 @@ import io.ktor.util.AttributeKey
  *
  * ## Usage with MultiUrlConfigProvider
  *
+ * The [UrlType] is open — the project names its endpoints in `core/` (see `AppUrlTypes`):
+ *
  * ```kotlin
- * // For self-service API client
- * val selfServiceClient = httpClient {
+ * // one client per named endpoint
+ * val server1Client = httpClient {
  *     install(DynamicBaseUrlPlugin) {
  *         multiConfigProvider = myMultiConfigProvider
- *         urlType = MultiUrlConfigProvider.UrlType.SELF_SERVICE
+ *         urlType = AppUrlTypes.SERVER1   // == UrlType("SERVER1")
  *     }
  * }
  *
- * // For interbank API client
- * val interbankClient = httpClient {
+ * val stagingClient = httpClient {
  *     install(DynamicBaseUrlPlugin) {
  *         multiConfigProvider = myMultiConfigProvider
- *         urlType = MultiUrlConfigProvider.UrlType.INTERBANK
+ *         urlType = AppUrlTypes.STAGING
  *     }
  * }
  * ```
@@ -58,7 +59,7 @@ import io.ktor.util.AttributeKey
 class DynamicBaseUrlPlugin private constructor(
     private val configProvider: DynamicUrlConfigProvider?,
     private val multiConfigProvider: MultiUrlConfigProvider?,
-    private val urlType: MultiUrlConfigProvider.UrlType,
+    private val urlType: UrlType,
 ) {
     companion object Plugin : HttpClientPlugin<DynamicBaseUrlConfig, DynamicBaseUrlPlugin> {
         override val key: AttributeKey<DynamicBaseUrlPlugin> =
@@ -143,9 +144,9 @@ class DynamicBaseUrlConfig {
 
     /**
      * The URL type to use when [multiConfigProvider] is set.
-     * Defaults to [MultiUrlConfigProvider.UrlType.MAIN].
+     * Defaults to [UrlType.MAIN].
      */
-    var urlType: MultiUrlConfigProvider.UrlType = MultiUrlConfigProvider.UrlType.MAIN
+    var urlType: UrlType = UrlType.MAIN
 }
 
 /**

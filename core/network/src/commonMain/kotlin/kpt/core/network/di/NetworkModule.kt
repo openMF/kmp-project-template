@@ -15,7 +15,6 @@ import kpt.core.base.network.SupabaseCredentials
 import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import kpt.core.network.BuildKonfig
-import kpt.core.network.config.BuildKonfigSupabaseCredentials
 import kpt.core.network.crypto.api.CoinGeckoApi
 import kpt.core.network.currency.api.FrankfurterApi
 import kpt.core.network.currency.config.FrankfurterApiConfig
@@ -25,6 +24,7 @@ import kpt.core.network.economic.config.FredApiConfig
 import kpt.core.network.economic.config.WorldBankApiConfig
 import kpt.core.network.infra.FintechApiClient
 import org.koin.dsl.module
+import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
 // NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
 // FrankfurterApiConfig, WorldBankApiConfig), each carrying a `baseUrl: String` field that
@@ -37,17 +37,20 @@ import org.koin.dsl.module
 // provides the same fork-customisation surface without the buildscript complexity.
 // Dynamic server config (consumer-facing, from core-base/network):
 //   - SupabaseConfigClient is registered below so forks can fetch runtime server config from a
-//     Supabase `app_config`-style table. It stays inert (isConfigured == false) until a fork sets
-//     SUPABASE_URL / SUPABASE_ANON_KEY (local.properties or env) or overrides the
-//     `single<SupabaseCredentials>` binding.
+//     Supabase `app_config`-style table. Its credentials are generated from the gitignored
+//     `secrets/supabaseCredentialsFile.json` (SupabaseConfigConventionPlugin); absent that file the
+//     creds are empty, so the client stays inert (isConfigured == false). Forks drop in the file, or
+//     override the `single<SupabaseCredentials>` binding.
 //   - DynamicBaseUrlPlugin is an opt-in of setupDefaultHttpClient(...): a fork implements
-//     DynamicUrlConfigProvider (reads its selected server) and passes it as
+//     DynamicUrlConfigProvider (reads its selected server, keyed by AppUrlTypes) and passes it as
 //     `dynamicUrlProvider = get()` on any client that should switch base URL at runtime. The
 //     toolkit's own fixed-URL APIs (FRED / World Bank / CoinGecko / Frankfurter) don't use it.
 val NetworkModule = module {
 
-    // Supabase-backed dynamic config — overridable by forks. Empty creds by default (no project).
-    single<SupabaseCredentials> { BuildKonfigSupabaseCredentials() }
+    // Supabase-backed dynamic config — overridable by forks. The credentials object is generated
+    // from secrets/supabaseCredentialsFile.json by SupabaseConfigConventionPlugin (empty when the
+    // file is absent, so the client stays inert until a fork provides a project).
+    single<SupabaseCredentials> { GeneratedSupabaseCredentials }
     single { SupabaseConfigClient(credentials = get()) }
 
     single<FredApiConfig> {

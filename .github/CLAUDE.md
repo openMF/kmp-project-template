@@ -42,13 +42,23 @@
 
 ## Overview
 
-This project uses **reusable workflows** from `openMF/mifos-x-actionhub` repository. All workflows are version-pinned to `@v1.0.8` for stability.
+This project uses the **v2 reusable workflows** from the `openMF/mifos-x-actionhub`
+repository. Each local wrapper is a thin file that declares dispatch inputs + passes
+secrets through; all orchestration lives in the centralized reusable workflow.
+
+> **Version pins are per-workflow and change over time — the workflow file itself is
+> authoritative.** As of this writing the v2 reusable workflows are pinned around
+> `@v1.0.21`, with `release-multi-platform-v2` at `@v1.0.47`. To read the exact pin any
+> local wrapper uses:
+> ```bash
+> grep -H 'uses: openMF/mifos-x-actionhub' .github/workflows/*.yml
+> ```
 
 **Architecture:**
 ```
-Local Workflows (.github/workflows/)
-    ↓
-Reusable Workflows (mifos-x-actionhub/.github/workflows/)
+Local wrapper workflows (.github/workflows/*.yml)
+    ↓  uses: …/mifos-x-actionhub/.github/workflows/<name>-v2.yaml@<pin>
+Reusable v2 workflows (mifos-x-actionhub/.github/workflows/)
     ↓
 Custom Actions (mifos-x-actionhub-*/)
     ↓
@@ -59,123 +69,64 @@ Fastlane Lanes (fastlane/Fastfile)
 
 ## Workflows
 
-### 1. `multi-platform-build-and-publish.yml`
+The current release model is the actionhub **v2 rung-ladder** with **environment-gated
+approvals** — not the older `multi-platform-build-and-publish.yml` / `promote-to-production.yml`
+pair (those no longer exist). The local `.github/workflows/` directory holds these wrappers:
 
-**Purpose:** Production deployment across all 5 platforms
+| Workflow | Reusable (v2) | Trigger | Purpose |
+|---|---|---|---|
+| `release-multi-platform.yml` | `release-multi-platform-v2` | `workflow_dispatch` | Main release. Per-platform **rung** inputs (`<platform>_rung`) — pick the TOP rung to reach; lower rungs auto-fire. |
+| `release-android-only.yml` | `publish-android` (direct) | `workflow_dispatch` | Android-only minimal graph — bypasses the large multi-platform reusable graph (avoids a fork-side `startup_failure`). |
+| `pr-check.yml` | `pr-check-v2` | `pull_request` | PR validation — static analysis + per-platform debug builds. |
+| `quality-gate.yml` | *(local, no reusable)* | `pull_request` | Spotless + Detekt + Dependency Guard + Kover. Kept local (the reusable v2 bundles SBOM unconditionally, which breaks on Gradle 9 + KMP 2.3). |
+| `tag-weekly-release.yml` | `tag-weekly-release-v2` | `cron '0 4 * * 0'` + dispatch | Sunday Beta tag (`vYYYY.W##.0`, calver-week) → lands at **Stage 2 (Beta)**. |
+| `tag-monthly-release.yml` | `tag-monthly-release-v2` | `cron '30 3 1 * *'` + dispatch | Monthly Production tag (`vYYYY.MM.0`, calver-month) → lands at **Stage 3 (Production)**. |
+| `rollback.yml` | `rollback-v2` | `workflow_dispatch` | Per-platform release rollback. `reason` required (audit). Each platform job uses a `rollback-<platform>` environment with required reviewers. |
+| `deployment-status.yml` | `deployment-status-v2` | `cron '0 * * * *'` + dispatch | Hourly rung-matrix dashboard rendered from `deployment/PROMOTION_LOG.yaml` into the run's step summary. |
 
-**Trigger:**
-- Manual dispatch (`workflow_dispatch`)
-- Inputs: `release_type` (internal/beta), platform toggles, package names
+> Exact pins live in the wrapper files (see the Overview grep). Each wrapper is thin —
+> it maps its `workflow_dispatch` inputs onto the reusable workflow's `with:` block and
+> passes `secrets: inherit`; the orchestration is entirely in the reusable v2 workflow.
 
-**Reusable Workflow:**
-```yaml
-uses: openMF/mifos-x-actionhub/.github/workflows/multi-platform-build-and-publish.yaml@v1.0.8
+### Rung ladder (how a release promotes)
+
+Promotion is **not** a separate workflow anymore — it's expressed as a rung on the main
+release dispatch. For each platform you pick `<platform>_rung` = the **top rung to reach**,
+and every lower rung fires first:
+
+```
+internal  →  beta / testflight-external  →  production / app-store / stable
 ```
 
-**Jobs (10):**
+- `release-multi-platform.yml` maps the dispatch `*_rung` inputs to the orchestrator's
+  `*_target` inputs (a historical `*_rung`→`*_target` name mismatch was fixed here).
+- Android supports a staged rollout fraction (`android_staged_rollout`, `0.0–1.0`) used
+  only when `android_rung: production`.
+- Picking `production` runs the whole ladder for that platform in one dispatch.
 
-| # | Job Name | Platform | Custom Action | Purpose |
-|---|----------|----------|---------------|---------|
-| 1 | `publish_android_on_firebase` | Android | `android-firebase-publish@v1.0.0` | Deploy APK to Firebase |
-| 2 | `publish_android_on_playstore` | Android | `publish-android-playstore-beta@v1.0.0` | Deploy AAB to Play Store (internal/beta) |
-| 3 | `publish_ios_app_to_firebase` | iOS | `publish-ios-firebase@v1.0.3` | Deploy IPA to Firebase |
-| 4 | `publish_ios_app_to_testflight` | iOS | `publish-ios-testflight@v1.0.1` | Upload to TestFlight |
-| 5 | `publish_ios_app_to_appstore` | iOS | `publish-ios-appstore@v1.0.1` | Submit to App Store |
-| 6 | `publish_macos_app_to_testflight` | macOS | `publish-macos-testflight-kmp@v1.0.0` | macOS TestFlight |
-| 7 | `publish_macos_app_to_appstore` | macOS | `publish-macos-appstore-kmp@v1.0.0` | macOS App Store |
-| 8 | `publish_desktop_external` | Desktop | `publish-desktop-app-kmp@v1.0.1` | Matrix: Windows/macOS/Linux |
-| 9 | `publish_web` | Web | `web-publish-kmp@v1.0.1` | Deploy to GitHub Pages |
-| 10 | `github_release` | All | N/A | Create pre-release with artifacts |
+### Environment-gated approvals
 
-**Workflow Inputs:**
+Each store/distribution stage in the reusable workflow declares `environment: <name>`
+(e.g. `android-play-production`, `ios-app-store`, `web-<host>-production`). GitHub pauses
+that stage behind an in-graph **"Approve and deploy"** button **only if the environment
+has required reviewers** — otherwise the job runs immediately with no prompt.
 
-```yaml
-inputs:
-  release_type:           # 'internal' or 'beta'
-  target_branch:          # default: 'dev'
+Those reviewers are configured per-repo by
+[`scripts/configure-release-environments.sh`](../scripts/configure-release-environments.sh)
+(admin-only API). Prefer a **team** reviewer so any team member can approve and the gate
+survives personnel changes:
 
-  # Package names
-  android_package_name:   # e.g., 'cmp-android'
-  ios_package_name:       # e.g., 'cmp-ios'
-  desktop_package_name:   # e.g., 'cmp-desktop'
-  web_package_name:       # e.g., 'cmp-web'
-
-  # Distribution toggles
-  distribute_ios_firebase:   # boolean
-  distribute_ios_testflight: # boolean
-  distribute_ios_appstore:   # boolean
-
-  # Configuration
-  use_cocoapods:          # boolean (iOS dependency manager)
-  shared_module:          # 'cmp-shared'
-  metadata_path:          # './fastlane/metadata'
-  xcode-version:          # '15.2'
-  java-version:           # '17'
+```bash
+# Gate only the public/production-facing stages, team-approved, 30-min wait on the top rung.
+bash scripts/configure-release-environments.sh \
+  --repo openMF/kmp-project-template \
+  --reviewer-team openMF/<release-approvers-team-slug> \
+  --production-only \
+  --wait-prod 30
 ```
 
-**Required Secrets:** 30+ (see [Secrets](#secrets) section)
-
----
-
-### 2. `pr-check.yml`
-
-**Purpose:** PR validation with static analysis and debug builds
-
-**Trigger:**
-- Pull request events (opened, synchronize, reopened)
-
-**Reusable Workflow:**
-```yaml
-uses: openMF/mifos-x-actionhub/.github/workflows/pr-check.yaml@v1.0.8
-```
-
-**Jobs (5):**
-
-| # | Job Name | Custom Action | Purpose |
-|---|----------|---------------|---------|
-| 1 | `checks` | `static-analysis-check@v1.0.1` | Spotless, Detekt, Dependency Guard |
-| 2 | `build_android_app` | `build-android-app@v1.0.2` | Build debug Android APK |
-| 3 | `build_desktop_app` | `build-desktop-app-kmp@v1.0.1` | Matrix: ubuntu/macos/windows |
-| 4 | `build_web_app` | `build-web-app-kmp@v1.0.1` | Build web app |
-| 5 | `build_ios_app` | `build-ios-app@v1.0.3` | Build unsigned iOS IPA (optional) |
-
-**Workflow Inputs:**
-
-```yaml
-inputs:
-  build_ios:              # boolean (default: true)
-  android_package_name:   # e.g., 'cmp-android'
-  desktop_package_name:   # e.g., 'cmp-desktop'
-  web_package_name:       # e.g., 'cmp-web'
-  ios_package_name:       # e.g., 'cmp-ios'
-  use_cocoapods:          # boolean
-  shared_module:          # 'cmp-shared'
-```
-
-**Required Secrets:** None (debug builds only)
-
----
-
-### 3. `promote-to-production.yml`
-
-**Purpose:** Promote Play Store beta track → production
-
-**Trigger:**
-- Manual dispatch
-- Release published
-
-**Reusable Workflow:**
-```yaml
-uses: openMF/mifos-x-actionhub/.github/workflows/promote-to-production.yaml@v1.0.8
-```
-
-**Jobs (1):**
-
-| Job Name | Custom Action | Purpose |
-|----------|---------------|---------|
-| `play_promote_production` | `publish-android-playstore-production@v1.0.0` | Promote beta → production |
-
-**⚠️ Known Issue:** No validation that beta release exists before promotion. See [BUGS_AND_ISSUES.md](../docs/analysis/BUGS_AND_ISSUES.md#5-production-promotion-has-no-validation).
+**Required Secrets:** the release dispatch needs the full platform secret set (30+ — see
+[Secrets](#secrets)); `pr-check.yml` / `quality-gate.yml` need none (debug + static only).
 
 **Required Secrets:** `PLAYSTORECREDS`
 

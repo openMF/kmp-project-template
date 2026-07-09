@@ -10,12 +10,12 @@
 package kpt.core.database
 
 import androidx.room3.AutoMigration
+import androidx.room3.ColumnTypeConverters
 import androidx.room3.ConstructedBy
 import androidx.room3.Database
 import androidx.room3.DeleteTable
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
-import androidx.room3.ColumnTypeConverters
 import androidx.room3.migration.AutoMigrationSpec
 import kpt.core.database.alerts.AlertDao
 import kpt.core.database.alerts.AlertEntity

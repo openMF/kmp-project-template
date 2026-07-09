@@ -20,7 +20,7 @@ import org.convention.libs
  *
  * This plugin:
  * 1. Reads credentials from `secrets/supabaseCredentialsFile.json`
- * 2. Generates a `SupabaseCredentials` object implementing `template.core.base.network.SupabaseCredentials`
+ * 2. Generates a `SupabaseCredentials` object implementing `kpt.core.base.network.SupabaseCredentials`
  * 3. Adds the generated source to the commonMain source set
  * 4. Adds the supabase-postgrest dependency
  *
@@ -52,7 +52,7 @@ import org.convention.libs
  *
  * The plugin generates:
  * ```kotlin
- * object SupabaseCredentials : template.core.base.network.SupabaseCredentials {
+ * object SupabaseCredentials : kpt.core.base.network.SupabaseCredentials {
  *     override val url = "https://your-project.supabase.co"
  *     override val anonKey = "your-anon-key"
  * }
@@ -119,7 +119,7 @@ class SupabaseConfigConventionPlugin : Plugin<Project> {
                         | */
                         |package $currentPackage
                         |
-                        |import template.core.base.network.SupabaseCredentials as BaseSupabaseCredentials
+                        |import kpt.core.base.network.SupabaseCredentials as BaseSupabaseCredentials
                         |
                         |/**
                         | * Generated Supabase credentials from secrets/supabaseCredentialsFile.json

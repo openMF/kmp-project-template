@@ -95,7 +95,7 @@ ktorVersion = "3.5.1"
 ktorfit = "2.7.5"
 
 # Supabase
-supabase = "3.1.1"
+supabase = "3.6.0"
 
 # Koin CMP Dependencies
 koin = "4.2.2"

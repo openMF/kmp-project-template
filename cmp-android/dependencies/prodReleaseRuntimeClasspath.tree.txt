@@ -2243,6 +2243,97 @@
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 (*)
 |    |    |    |    |    |    |         \--- io.ktor:ktor-client-okhttp:3.5.0 -> 3.5.1 (*)
 |    |    |    |    |    |    +--- co.touchlab:kermit:2.1.0 (*)
+|    |    |    |    |    |    +--- io.github.jan-tennert.supabase:postgrest-kt:3.6.0
+|    |    |    |    |    |    |    \--- io.github.jan-tennert.supabase:postgrest-kt-android:3.6.0
+|    |    |    |    |    |    |         +--- io.github.jan-tennert.supabase:auth-kt:3.6.0
+|    |    |    |    |    |    |         |    \--- io.github.jan-tennert.supabase:auth-kt-android:3.6.0
+|    |    |    |    |    |    |         |         +--- androidx.startup:startup-runtime:1.2.0 (*)
+|    |    |    |    |    |    |         |         +--- androidx.browser:browser:1.10.0 (*)
+|    |    |    |    |    |    |         |         +--- io.github.jan-tennert.supabase:supabase-kt:3.6.0
+|    |    |    |    |    |    |         |         |    \--- io.github.jan-tennert.supabase:supabase-kt-android:3.6.0
+|    |    |    |    |    |    |         |         |         +--- androidx.lifecycle:lifecycle-process:2.10.0 -> 2.11.0-beta01 (*)
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 -> 0.8.0 (*)
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
+|    |    |    |    |    |    |         |         |         +--- co.touchlab:kermit:2.1.0 (*)
+|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-client-core:3.4.3 -> 3.5.1 (*)
+|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-client-content-negotiation:3.4.3 -> 3.5.1 (*)
+|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-serialization-kotlinx-json:3.4.3 -> 3.5.1 (*)
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0 -> 0.5.1
+|    |    |    |    |    |    |         |         |         |    \--- org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.5.1
+|    |    |    |    |    |    |         |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         +--- com.squareup.okio:okio:3.17.0 (*)
+|    |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         +--- com.russhwolf:multiplatform-settings-no-arg:1.3.0
+|    |    |    |    |    |    |         |         |    \--- com.russhwolf:multiplatform-settings-no-arg-android:1.3.0
+|    |    |    |    |    |    |         |         |         +--- androidx.startup:startup-runtime:1.2.0 (*)
+|    |    |    |    |    |    |         |         |         +--- com.russhwolf:multiplatform-settings:1.3.0
+|    |    |    |    |    |    |         |         |         |    \--- com.russhwolf:multiplatform-settings-android:1.3.0
+|    |    |    |    |    |    |         |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         +--- com.russhwolf:multiplatform-settings-coroutines:1.3.0
+|    |    |    |    |    |    |         |         |    \--- com.russhwolf:multiplatform-settings-coroutines-android:1.3.0
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         |         +--- com.russhwolf:multiplatform-settings:1.3.0 (*)
+|    |    |    |    |    |    |         |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0 -> 1.11.0 (*)
+|    |    |    |    |    |    |         |         +--- dev.whyoleg.cryptography:cryptography-core:0.6.0
+|    |    |    |    |    |    |         |         |    \--- dev.whyoleg.cryptography:cryptography-core-jvm:0.6.0
+|    |    |    |    |    |    |         |         |         +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0
+|    |    |    |    |    |    |         |         |         |    +--- dev.whyoleg.cryptography:cryptography-bigint:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         |    +--- dev.whyoleg.cryptography:cryptography-random:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         |    +--- dev.whyoleg.cryptography:cryptography-core:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         |    +--- dev.whyoleg.cryptography:cryptography-provider-jdk:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         |    +--- dev.whyoleg.cryptography:cryptography-provider-optimal:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         |    +--- dev.whyoleg.cryptography:cryptography-provider-base:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         |    +--- dev.whyoleg.cryptography:cryptography-serialization-pem:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         |    +--- dev.whyoleg.cryptography:cryptography-serialization-asn1:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         |    \--- dev.whyoleg.cryptography:cryptography-serialization-asn1-modules:0.6.0 (c)
+|    |    |    |    |    |    |         |         |         +--- dev.whyoleg.cryptography:cryptography-bigint:0.6.0
+|    |    |    |    |    |    |         |         |         |    \--- dev.whyoleg.cryptography:cryptography-bigint-jvm:0.6.0
+|    |    |    |    |    |    |         |         |         |         +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0 (*)
+|    |    |    |    |    |    |         |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         |         +--- dev.whyoleg.cryptography:cryptography-random:0.6.0
+|    |    |    |    |    |    |         |         |         |    \--- dev.whyoleg.cryptography:cryptography-random-jvm:0.6.0
+|    |    |    |    |    |    |         |         |         |         +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0 (*)
+|    |    |    |    |    |    |         |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-io-core:0.9.0 (*)
+|    |    |    |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |         \--- dev.whyoleg.cryptography:cryptography-provider-optimal:0.6.0
+|    |    |    |    |    |    |         |              \--- dev.whyoleg.cryptography:cryptography-provider-optimal-jvm:0.6.0
+|    |    |    |    |    |    |         |                   +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0 (*)
+|    |    |    |    |    |    |         |                   +--- dev.whyoleg.cryptography:cryptography-core:0.6.0 (*)
+|    |    |    |    |    |    |         |                   +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |                   \--- dev.whyoleg.cryptography:cryptography-provider-jdk:0.6.0
+|    |    |    |    |    |    |         |                        \--- dev.whyoleg.cryptography:cryptography-provider-jdk-jvm:0.6.0
+|    |    |    |    |    |    |         |                             +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0 (*)
+|    |    |    |    |    |    |         |                             +--- dev.whyoleg.cryptography:cryptography-core:0.6.0 (*)
+|    |    |    |    |    |    |         |                             +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |                             \--- dev.whyoleg.cryptography:cryptography-provider-base:0.6.0
+|    |    |    |    |    |    |         |                                  \--- dev.whyoleg.cryptography:cryptography-provider-base-jvm:0.6.0
+|    |    |    |    |    |    |         |                                       +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0 (*)
+|    |    |    |    |    |    |         |                                       +--- dev.whyoleg.cryptography:cryptography-core:0.6.0 (*)
+|    |    |    |    |    |    |         |                                       +--- dev.whyoleg.cryptography:cryptography-serialization-pem:0.6.0
+|    |    |    |    |    |    |         |                                       |    \--- dev.whyoleg.cryptography:cryptography-serialization-pem-jvm:0.6.0
+|    |    |    |    |    |    |         |                                       |         +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0 (*)
+|    |    |    |    |    |    |         |                                       |         +--- org.jetbrains.kotlinx:kotlinx-io-core:0.9.0 (*)
+|    |    |    |    |    |    |         |                                       |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |                                       +--- dev.whyoleg.cryptography:cryptography-serialization-asn1:0.6.0
+|    |    |    |    |    |    |         |                                       |    \--- dev.whyoleg.cryptography:cryptography-serialization-asn1-jvm:0.6.0
+|    |    |    |    |    |    |         |                                       |         +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0 (*)
+|    |    |    |    |    |    |         |                                       |         +--- dev.whyoleg.cryptography:cryptography-bigint:0.6.0 (*)
+|    |    |    |    |    |    |         |                                       |         +--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.10.0 -> 1.11.0 (*)
+|    |    |    |    |    |    |         |                                       |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |                                       +--- dev.whyoleg.cryptography:cryptography-serialization-asn1-modules:0.6.0
+|    |    |    |    |    |    |         |                                       |    \--- dev.whyoleg.cryptography:cryptography-serialization-asn1-modules-jvm:0.6.0
+|    |    |    |    |    |    |         |                                       |         +--- dev.whyoleg.cryptography:cryptography-bom:0.6.0 (*)
+|    |    |    |    |    |    |         |                                       |         +--- dev.whyoleg.cryptography:cryptography-serialization-asn1:0.6.0 (*)
+|    |    |    |    |    |    |         |                                       |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |                                       +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.0 (*)
+|    |    |    |    |    |    |         |                                       \--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0 -> 1.11.0 (*)
+|    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-reflect:2.3.21
+|    |    |    |    |    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
+|    |    |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
@@ -2273,23 +2364,13 @@
 |    |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    |    |    |    |    |    +--- project :core-base:common (*)
 |    |    |    |    |    |    |    +--- project :core-base:security (*)
-|    |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-no-arg:1.3.0
-|    |    |    |    |    |    |    |    \--- com.russhwolf:multiplatform-settings-no-arg-android:1.3.0
-|    |    |    |    |    |    |    |         +--- androidx.startup:startup-runtime:1.2.0 (*)
-|    |    |    |    |    |    |    |         +--- com.russhwolf:multiplatform-settings:1.3.0
-|    |    |    |    |    |    |    |         |    \--- com.russhwolf:multiplatform-settings-android:1.3.0
-|    |    |    |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.4.0 (*)
-|    |    |    |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.4.0 (*)
+|    |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-no-arg:1.3.0 (*)
 |    |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-serialization:1.3.0
 |    |    |    |    |    |    |    |    \--- com.russhwolf:multiplatform-settings-serialization-android:1.3.0
 |    |    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.4.0 (*)
 |    |    |    |    |    |    |    |         +--- com.russhwolf:multiplatform-settings:1.3.0 (*)
 |    |    |    |    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.3 -> 1.11.0 (*)
-|    |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-coroutines:1.3.0
-|    |    |    |    |    |    |    |    \--- com.russhwolf:multiplatform-settings-coroutines-android:1.3.0
-|    |    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.4.0 (*)
-|    |    |    |    |    |    |    |         +--- com.russhwolf:multiplatform-settings:1.3.0 (*)
-|    |    |    |    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0 -> 1.11.0 (*)
+|    |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-coroutines:1.3.0 (*)
 |    |    |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-no-arg:1.3.0 (*)
@@ -2383,9 +2464,7 @@
 |    |         +--- androidx.core:core-ktx:1.2.0 -> 1.19.0 (*)
 |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.24 -> 2.4.0 (*)
 |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.2 (*)
-|    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1
-|    |    \--- org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.5.1
-|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 -> 2.4.0 (*)
+|    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1 (*)
 |    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.4
 |    |    \--- io.github.mobilebytelabs:worker-app-annotations-android:4.0.4
 |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)

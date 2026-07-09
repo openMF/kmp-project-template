@@ -22,6 +22,7 @@ kotlin {
             api(libs.ktorfit.lib)
             api(libs.kermit.logging)
             implementation(projects.coreBase.security)
+            api(libs.supabase.postgrest)
         }
 
         androidMain.dependencies {

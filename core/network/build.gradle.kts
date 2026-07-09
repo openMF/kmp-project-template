@@ -30,6 +30,17 @@ buildkonfig {
             STRING, "FRED_API_KEY",
             System.getenv("FRED_API_KEY") ?: localProps.getProperty("FRED_API_KEY", ""),
         )
+        // Optional Supabase project for dynamic server config (SupabaseConfigClient).
+        // Empty by default — the template ships no Supabase project; forks set these in
+        // local.properties (or SUPABASE_URL / SUPABASE_ANON_KEY env vars) to enable it.
+        buildConfigField(
+            STRING, "SUPABASE_URL",
+            System.getenv("SUPABASE_URL") ?: localProps.getProperty("SUPABASE_URL", ""),
+        )
+        buildConfigField(
+            STRING, "SUPABASE_ANON_KEY",
+            System.getenv("SUPABASE_ANON_KEY") ?: localProps.getProperty("SUPABASE_ANON_KEY", ""),
+        )
     }
 }
 

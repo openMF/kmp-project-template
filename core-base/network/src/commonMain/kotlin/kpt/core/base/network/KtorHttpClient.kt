@@ -114,6 +114,7 @@ fun setupDefaultHttpClient(
     certificatePinConfig: CertificatePinConfig = CertificatePinConfig.default(),
     proxiedHosts: List<String> = emptyList(),
     corsProxyBaseUrl: String = "https://corsproxy.io",
+    dynamicUrlProvider: DynamicUrlConfigProvider? = null,
 ): HttpClientConfig<*>.() -> Unit = {
     val refreshMutex = Mutex()
 
@@ -197,6 +198,16 @@ fun setupDefaultHttpClient(
 
     install(ContentNegotiation) {
         json(jsonConfig)
+    }
+
+    // Runtime base-URL switching (opt-in). When a [DynamicUrlConfigProvider] is supplied, the
+    // [DynamicBaseUrlPlugin] rewrites each request's host/scheme from the provider at call time —
+    // the [baseUrl] above becomes a static fallback. Consumers wire a provider in their DI (see
+    // core/network NetworkModule); default null keeps the plain static-URL behaviour (no regression).
+    if (dynamicUrlProvider != null) {
+        install(DynamicBaseUrlPlugin) {
+            configProvider = dynamicUrlProvider
+        }
     }
 
     installProxyPlugin(proxiedHosts, corsProxyBaseUrl)

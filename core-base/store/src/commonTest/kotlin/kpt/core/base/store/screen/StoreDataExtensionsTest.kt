@@ -10,11 +10,13 @@
 package kpt.core.base.store.screen
 
 import app.cash.turbine.test
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
 import org.mobilenativefoundation.store.store5.Fetcher
+import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.StoreBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -59,30 +61,38 @@ class StoreDataExtensionsTest {
 
     @Test
     fun `skipMemoryData with refresh=false returns cached data without new fetch`() = runTest {
+        // The invariant — refresh=false serves cached data without a network call — is only
+        // well-defined for a SourceOfTruth-backed store. Use one (mirrors LoadPageRefreshSemanticsTest)
+        // and seed the SoT directly, so the assertion is deterministic and never depends on the timing
+        // of an async fetch write-through or on memory-cache eviction (the prior memory-only version
+        // raced under coverage instrumentation).
+        val sotData = mutableMapOf<String, String>()
         var fetchCount = 0
         val store = StoreBuilder
-            .from<String, String>(fetcher = Fetcher.of { key ->
-                fetchCount++
-                "fetched:$key"
-            })
+            .from<String, String, String>(
+                fetcher = Fetcher.of { key ->
+                    fetchCount++
+                    "fetched:$key"
+                },
+                sourceOfTruth = SourceOfTruth.of(
+                    reader = { key -> flow { emit(sotData[key]) } },
+                    writer = { key, value -> sotData[key] = value },
+                ),
+            )
             .build()
 
-        // Prime cache
-        store.streamData("key").test {
-            awaitItem()
-            cancelAndIgnoreRemainingEvents()
-        }
+        // Seed the SoT directly so refresh=false has cached data to short-circuit on.
+        sotData["key"] = "fetched:key"
 
-        val preFetchCount = fetchCount
-
-        // skipMemoryData(refresh=false) reads from SourceOfTruth only, no new network call
+        // refresh=false serves the SoT value; it must NOT fall through to the fetcher.
         store.skipMemoryData("key", refresh = false).test {
+            var item = awaitItem()
+            if (item.isEmpty) item = awaitItem()
+            assertEquals("fetched:key", item.data)
             cancelAndIgnoreRemainingEvents()
         }
 
-        // For a memory-only store with no SourceOfTruth, refresh=false may emit nothing;
-        // the important invariant is that no additional network fetch is made.
-        assertEquals(preFetchCount, fetchCount, "skipMemoryData(refresh=false) must not trigger a new network fetch")
+        assertEquals(0, fetchCount, "skipMemoryData(refresh=false) must serve SoT-cached data without a network fetch")
     }
 
     // ─── combineScreenStates priority ────────────────────────────────────────

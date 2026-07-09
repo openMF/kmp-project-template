@@ -119,7 +119,7 @@ the per-feature branding, or selectively remove features they don't need.
 - Koin (dependency injection)
 
 **CI/CD:**
-- GitHub Actions with **reusable workflows** (`openMF/mifos-x-actionhub@v1.0.8`)
+- GitHub Actions with the **v2 reusable workflows** from `openMF/mifos-x-actionhub` (per-workflow pins — the wrapper file is authoritative; see `.github/CLAUDE.md`)
 - **13 custom actions** (4 Android, 4 iOS, 2 macOS, 1 Desktop, 1 Web, 1 Static Analysis)
 - **Fastlane** (8 lanes across 8 deployment targets in `deployment/<platform>/<target>/lane.rb`)
 - **17 bash scripts** for setup, deployment, and verification
@@ -242,9 +242,11 @@ git commit -m "feat(android): add new feature"
 ### 4. Deployment
 
 **Via GitHub Actions (Recommended):**
-1. Push to `dev` branch
-2. Trigger `multi-platform-build-and-publish` workflow
-3. Select deployment targets via workflow inputs
+1. Trigger the **`Release · Multi-Platform`** workflow (`release-multi-platform.yml`)
+2. For each platform pick the top **rung** to reach (`<platform>_rung`: internal → beta → production); lower rungs auto-fire
+3. Production-facing stages pause for approval if the environment has required reviewers (set up via `scripts/configure-release-environments.sh`)
+
+See `.github/CLAUDE.md` for the full rung-ladder + environment-gate model.
 
 **Via Fastlane (Local/Manual):**
 ```bash

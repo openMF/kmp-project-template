@@ -18,8 +18,11 @@ platform :ios do
       try_repo_update_on_error: true
     )
 
+    # kmp-product-flavors adoption replaced the single `iosApp` scheme with
+    # per-variant schemes (demoDebug / demoRelease / prodDebug / prodRelease).
+    # The PR check just needs one debug variant to compile — use prodDebug.
     build_ios_app(
-      scheme:            "iosApp",
+      scheme:            "prodDebug",
       workspace:         "cmp-ios/iosApp.xcworkspace",
       output_name:       "iosApp.ipa",
       output_directory:  "cmp-ios/build",

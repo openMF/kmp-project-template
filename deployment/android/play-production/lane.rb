@@ -2,11 +2,27 @@
 # Extracted from legacy `promote_to_production` lane in fastlane/Fastfile.
 # Promotion-only lane (no build): moves the current beta track release to production.
 # Gated by `requires_confirm: true` in config.yaml (AC34).
+#
+# Phase 2 of `deploy-gha-product-flavors` epic: promotion-only lane, so no
+# `assemble*` / `bundle*` flavor hardcode existed and none is introduced. The
+# only Phase-2 change is: uniform `options`-hash parameterization with a
+# `flavor:` key (D5) + route the Play service-account secret through the
+# resolver's `.secrets` accessor (D6) — so ALL secret paths flow through the
+# same `BuildSecrets.for(flavor:)` delegation the build lanes use. The two
+# `upload_to_play_store` calls (primary beta→production, fallback
+# internal→production for first-time apps with no country targeting) both
+# consume the same `json_key` variable — no per-flavor branching survives on
+# the primary dispatch path.
 
 platform :android do
   desc "Promote to production on Google Play (internal → production for first-time apps; beta → production otherwise)"
-  lane :promote_to_production do
-    json_key = File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:play_service_account))
+  lane :promote_to_production do |options|
+    options  = sanitize_options(options)
+    flavor   = (options[:flavor]     || :prod).to_sym
+    build_ty = (options[:build_type] || :release).to_sym
+
+    variant  = VariantResolver.resolve(flavor: flavor.to_s, build_type: build_ty.to_s)
+    json_key = File.join(DEPLOYMENT_REPO_ROOT, variant.secrets.path(:play_service_account))
     pkg      = FastlaneConfig::ProjectConfig.android_package_name
 
     # Honor the caller's production_rollout (ENV ROLLOUT forwarded by the composite). Was
@@ -49,5 +65,4 @@ platform :android do
       end
     end
   end
-
 end

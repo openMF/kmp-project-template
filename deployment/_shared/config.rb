@@ -15,6 +15,9 @@ require_relative "lib/appstore_helpers"
 require_relative "lib/firebase_helpers"
 require_relative "lib/version_helpers"
 require_relative "lib/build_secrets"   # secrets path/value resolver (secrets/LAYOUT.yaml is SoT)
+require_relative "variant_resolver"    # (flavor, buildType) → gradle_task / artifact / ios_scheme
+                                       # by convention (Phase 2 of deploy-gha-product-flavors epic;
+                                       # delegates all secret paths to BuildSecrets.for(flavor:))
 
 # ── Helpers: read libs.versions.toml + secrets/ ──────────────────────────────
 
@@ -221,16 +224,52 @@ module FastlaneConfig
   end
 
   # --------------------------------------------------------------------------
-  # AndroidConfig — build artifact paths + Play Store metadata path
+  # AndroidConfig — Play Store metadata path + per-flavor Play track policy.
+  #
+  # Artifact paths are NO LONGER stored as per-flavor constants — every lane
+  # derives its APK/AAB path by convention through
+  # `VariantResolver.resolve(flavor:, build_type:).apk_path` / `.aab_path`
+  # (single derivation point, D9/AC-3). The former `BUILD_PATHS` symbolic
+  # constant has been removed entirely.
   # --------------------------------------------------------------------------
   module AndroidConfig
     METADATA_PATH = "deployment/android/metadata".freeze
 
-    BUILD_PATHS = {
-      prod_apk_path: File.join(DEPLOYMENT_REPO_ROOT, "cmp-android/build/outputs/apk/prod/release/cmp-android-prod-release.apk"),
-      demo_apk_path: File.join(DEPLOYMENT_REPO_ROOT, "cmp-android/build/outputs/apk/demo/release/cmp-android-demo-release.apk"),
-      prod_aab_path: File.join(DEPLOYMENT_REPO_ROOT, "cmp-android/build/outputs/bundle/prodRelease/cmp-android-prod-release.aab"),
+    # Per-flavor Play track destination — the mechanism that makes demo's Play
+    # publication config, not a Ruby conditional (AC-12). Each flavor maps to
+    # a Play track string (`"internal"` / `"beta"` / `"production"`) that
+    # `deployInternal` passes to `upload_to_play_store`, or to `nil` when the
+    # flavor is Firebase-only and MUST NOT be uploaded to Play. `deployInternal`
+    # errors loudly on `nil` — a silent skip would hide a mis-configuration.
+    #
+    # Override order (highest → lowest):
+    #   1. `PLAY_TRACKS_BY_FLAVOR` env var — CSV of `flavor=track` pairs
+    #      (blank value ⇒ Firebase-only). Example:
+    #        PLAY_TRACKS_BY_FLAVOR="prod=internal,demo="
+    #      threads clean through workflow-dispatch env inputs.
+    #   2. `android.play.tracks.by_flavor` `fork.properties` key — same CSV
+    #      shape as the env var. Local override for a colleague fork.
+    #   3. Default hash below: prod → "internal", demo → "internal".
+    #
+    # Any flavor not in the resolved hash is undefined ⇒ `deployInternal`
+    # errors ("no Play track configured"). Add a flavor to `kmpFlavors {}` DSL
+    # AND to this map (via env var / fork.properties / editing the default) —
+    # the DSL alone is not enough because Play publication is a policy choice.
+    DEFAULT_PLAY_TRACKS_BY_FLAVOR = {
+      "prod" => "internal",
+      "demo" => "internal",
     }.freeze
+
+    def self.play_tracks_by_flavor
+      csv = FastlaneConfig._secret("PLAY_TRACKS_BY_FLAVOR") ||
+            FastlaneConfig._fork_prop("android.play.tracks.by_flavor")
+      return DEFAULT_PLAY_TRACKS_BY_FLAVOR if csv.nil? || csv.strip.empty?
+      csv.split(",").each_with_object({}) do |pair, acc|
+        k, v = pair.split("=", 2).map { |s| s.to_s.strip }
+        next if k.nil? || k.empty?
+        acc[k] = (v.nil? || v.empty?) ? nil : v
+      end
+    end
   end
 
   # --------------------------------------------------------------------------
@@ -682,12 +721,16 @@ rescue
 end
 
 # Build iOS project using build_app (gym). Supports ad-hoc and app-store exports.
+# `configuration:` was hardcoded pre-Phase-2 — parameterized so lanes can pass
+# the resolved build-type (e.g. "Staging" → the Staging xcconfig) that
+# `VariantResolver.resolve(...).ios_scheme` was built against; defaults to
+# "Release" to preserve pre-Phase-2 caller behavior.
 def build_ios_project(options = {})
   cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
   build_app(
-    scheme:           options[:scheme]    || cfg[:scheme],
-    workspace:        options[:workspace] || cfg[:workspace],
-    configuration:    "Release",
+    scheme:           options[:scheme]        || cfg[:scheme],
+    workspace:        options[:workspace]     || cfg[:workspace],
+    configuration:    options[:configuration] || "Release",
     output_name:      "iosApp.ipa",
     output_directory: File.join(DEPLOYMENT_REPO_ROOT, "cmp-ios/build"),
     export_method:    options[:export_method] || "app-store",

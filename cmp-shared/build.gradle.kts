@@ -8,6 +8,7 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 
+import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 
 plugins {
@@ -94,6 +95,28 @@ kotlin {
                 .substringBefore("+")
         ios.deploymentTarget = "16.0"
         podfile = project.file("../cmp-ios/Podfile")
+
+        // Map every {flavor}{BuildType} Xcode build configuration to a Kotlin/Native build
+        // type, derived DYNAMICALLY from the kmpFlavors DSL — no hardcoded config list, so
+        // adding / renaming / removing a flavor or build type auto-propagates here on the
+        // next build. Without this the Kotlin CocoaPods plugin cannot identify
+        // debug-vs-release for a non-standard CONFIGURATION name and fails the ComposeApp
+        // framework build ("Could not identify build type for Kotlin framework"). The
+        // config name mirrors GenerateIosFlavorXcconfigsTask ({flavor}{BuildType}); a
+        // debuggable build type → DEBUG, otherwise → RELEASE.
+        project.extensions.getByType<KmpFlavorExtension>().let { flavorsExt ->
+            for (flavor in flavorsExt.flavors) {
+                for (buildType in flavorsExt.buildTypes) {
+                    val configName = flavor.name + buildType.name.replaceFirstChar { it.uppercase() }
+                    xcodeConfigurationToNativeBuildType[configName] =
+                        if (buildType.isDebuggable.getOrElse(false)) {
+                            NativeBuildType.DEBUG
+                        } else {
+                            NativeBuildType.RELEASE
+                        }
+                }
+            }
+        }
 
         framework {
             baseName = "ComposeApp"

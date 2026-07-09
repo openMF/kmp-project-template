@@ -283,12 +283,8 @@ module FastlaneConfig
   # ── AndroidConfig (mirrors pre-restructure fastlane-config/android_config.rb) ──
 
   module AndroidConfig
-    BUILD_PATHS = {
-      prod_apk_path: ProjectConfig::ANDROID[:apk_paths][:prod],
-      demo_apk_path: ProjectConfig::ANDROID[:apk_paths][:demo],
-      prod_aab_path: ProjectConfig::ANDROID[:aab_path],
-      demo_aab_path: "cmp-android/build/outputs/bundle/demoRelease/cmp-android-demo-release.aab",
-    }.freeze
+    # Artifact paths derive by convention via VariantResolver (D9/AC-3) — the
+    # former per-flavor BUILD_PATHS constant has been removed.
 
     FIREBASE = {
       prod: {

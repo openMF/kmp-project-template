@@ -22,18 +22,29 @@
 #     "Must have admin rights to Repository.").
 #
 # Usage:
+#   bash scripts/configure-release-environments.sh --repo owner/repo --reviewer-team <org>/<slug>
 #   bash scripts/configure-release-environments.sh --repo owner/repo --reviewer <login-or-id>
-#   bash scripts/configure-release-environments.sh --repo openMF/kmp-project-template --reviewer therajanmaurya
+#   bash scripts/configure-release-environments.sh --repo openMF/kmp-project-template --reviewer-team openMF/mobile-release-approvers
 #   bash scripts/configure-release-environments.sh --repo owner/repo --reviewer 5724482 --dry-run
-#   bash scripts/configure-release-environments.sh --repo owner/repo --reviewer me --only android,ios
-#   bash scripts/configure-release-environments.sh --repo owner/repo --reviewer me --desktop-target windows-msi-signed --web-host cloudflare-pages
+#   bash scripts/configure-release-environments.sh --repo owner/repo --reviewer-team openMF/mobile-release-approvers --only android,ios
+#   bash scripts/configure-release-environments.sh --repo owner/repo --reviewer-team openMF/mobile --reviewer me   # team + a fallback individual
 #
 # Flags:
 #   --repo owner/repo        Target repo (REQUIRED). Where releases are dispatched.
-#   --reviewer <id|login>    Required reviewer added to every gated environment
-#                            (REQUIRED). Accepts a numeric user id, a @login, or
-#                            the literal `me` (resolves to the authenticated user).
-#                            The reviewer needs >=write access on the target repo.
+#   --reviewer-team <org>/<slug>
+#                            Required-reviewer TEAM added to every gated environment.
+#                            RECOMMENDED over --reviewer: any member of the team can
+#                            approve, so there is no single-approver bottleneck and the
+#                            gate survives personnel changes (resilient over time). The
+#                            team needs >=write access on the target repo.
+#   --reviewer <id|login>    Required-reviewer USER added to every gated environment.
+#                            Accepts a numeric user id, a @login, or the literal `me`
+#                            (resolves to the authenticated user). The user needs >=write
+#                            access on the target repo.
+#
+#                            At least one of --reviewer-team / --reviewer is REQUIRED;
+#                            both may be given (a team plus a named fallback reviewer).
+#                            Prefer --reviewer-team for shared/org repos.
 #   --only <list>            Comma-separated platform subset to gate:
 #                            android,ios,mac,desktop,web (default: all).
 #   --desktop-target <slug>  Desktop artifact slug used in env names
@@ -57,12 +68,19 @@
 # distribution, not a store release. Add them by hand if your team wants them
 # gated too.
 #
+# Team vs individual: prefer --reviewer-team for shared/org repos. A team reviewer
+# means any team member can approve (no single point of failure), the gate keeps
+# working across personnel changes, and — because THIS script sets the team on the
+# environment — the config never drifts from what the org intends (vs. adding the
+# team by hand after a --reviewer run, which leaves script + environment out of sync).
+#
 # Idempotent: re-running re-applies the same reviewer set (PUT replaces config).
 
 set -euo pipefail
 
 REPO=""
 REVIEWER=""
+REVIEWER_TEAM=""
 ONLY="android,ios,mac,desktop,web"
 DESKTOP_TARGETS="linux-deb"
 WEB_HOSTS="gh-pages"
@@ -75,24 +93,32 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --repo)           REPO="$2"; shift ;;
     --reviewer)       REVIEWER="$2"; shift ;;
+    --reviewer-team)  REVIEWER_TEAM="$2"; shift ;;
     --only)           ONLY="$2"; shift ;;
     --desktop-target) DESKTOP_TARGETS="$2"; shift ;;
     --web-host)       WEB_HOSTS="$2"; shift ;;
     --wait-prod)      WAIT_PROD="$2"; shift ;;
     --production-only) PRODUCTION_ONLY=true ;;
     --dry-run)        DRY_RUN=true ;;
-    -h|--help)        sed -n '2,60p' "$0"; exit 0 ;;
+    -h|--help)        sed -n '2,77p' "$0"; exit 0 ;;
     *) echo "❌ Unknown arg: $1" >&2; exit 2 ;;
   esac
   shift
 done
 
-[[ -z "$REPO" ]]     && { echo "❌ --repo owner/repo is required" >&2; exit 2; }
-[[ -z "$REVIEWER" ]] && { echo "❌ --reviewer <id|login|me> is required" >&2; exit 2; }
+[[ -z "$REPO" ]] && { echo "❌ --repo owner/repo is required" >&2; exit 2; }
+[[ -z "$REVIEWER" && -z "$REVIEWER_TEAM" ]] && {
+  echo "❌ at least one of --reviewer-team <org>/<slug> or --reviewer <id|login|me> is required" >&2
+  echo "   (prefer --reviewer-team for shared/org repos — no single-approver bottleneck)" >&2
+  exit 2
+}
 
 command -v gh >/dev/null || { echo "❌ gh CLI not found — install + 'gh auth login'" >&2; exit 3; }
 
-# ── Resolve reviewer → numeric user id ────────────────────────────────────────
+# ── Resolve reviewers → the `reviewers` JSON array ────────────────────────────
+# GitHub's environment protection API accepts reviewers of type User AND Team
+# ({"type":"Team","id":<team_id>}). We resolve whichever of --reviewer / --reviewer-team
+# was given into numeric ids and build one reviewers array reused for every environment.
 resolve_reviewer_id () {
   local r="$1"
   if [[ "$r" == "me" ]]; then
@@ -103,8 +129,33 @@ resolve_reviewer_id () {
     gh api "users/${r#@}" -q '.id'
   fi
 }
-REVIEWER_ID="$(resolve_reviewer_id "$REVIEWER")"
-[[ -z "$REVIEWER_ID" ]] && { echo "❌ Could not resolve reviewer '$REVIEWER' to a user id" >&2; exit 4; }
+
+declare -a REVIEWER_ENTRIES=()   # JSON objects: {"type":"Team|User","id":N}
+REVIEWER_LABEL=""                # human-readable summary line
+
+if [[ -n "$REVIEWER_TEAM" ]]; then
+  [[ "$REVIEWER_TEAM" == */* ]] || { echo "❌ --reviewer-team must be <org>/<slug> (e.g. openMF/mobile-release-approvers)" >&2; exit 2; }
+  TEAM_ORG="${REVIEWER_TEAM%%/*}"
+  TEAM_SLUG="${REVIEWER_TEAM##*/}"
+  TEAM_ID="$(gh api "orgs/${TEAM_ORG}/teams/${TEAM_SLUG}" -q '.id' 2>/dev/null || true)"
+  [[ -z "$TEAM_ID" ]] && {
+    echo "❌ Could not resolve team '$REVIEWER_TEAM' to a team id." >&2
+    echo "   Check the <org>/<slug> is correct and your token can read the org's teams." >&2
+    exit 4
+  }
+  REVIEWER_ENTRIES+=("$(printf '{"type":"Team","id":%s}' "$TEAM_ID")")
+  REVIEWER_LABEL="team ${REVIEWER_TEAM} (id=${TEAM_ID})"
+fi
+
+if [[ -n "$REVIEWER" ]]; then
+  REVIEWER_ID="$(resolve_reviewer_id "$REVIEWER")"
+  [[ -z "$REVIEWER_ID" ]] && { echo "❌ Could not resolve reviewer '$REVIEWER' to a user id" >&2; exit 4; }
+  REVIEWER_ENTRIES+=("$(printf '{"type":"User","id":%s}' "$REVIEWER_ID")")
+  REVIEWER_LABEL="${REVIEWER_LABEL:+$REVIEWER_LABEL + }user ${REVIEWER} (id=${REVIEWER_ID})"
+fi
+
+# Join the entries into the reviewers array body reused for every PUT.
+REVIEWERS_JSON="$(IFS=,; echo "${REVIEWER_ENTRIES[*]}")"
 
 # ── Admin pre-flight (fail fast with a clear message) ─────────────────────────
 PERM="$(gh api "repos/$REPO" -q '.permissions.admin' 2>/dev/null || echo "unknown")"
@@ -168,7 +219,7 @@ is_top_rung () {
 echo "════════════════════════════════════════════════════════════════"
 echo " Configure release approval gates"
 echo "   repo:      $REPO"
-echo "   reviewer:  $REVIEWER (id=$REVIEWER_ID)"
+echo "   reviewer:  $REVIEWER_LABEL"
 echo "   platforms: $ONLY"
 echo "   scope:     $($PRODUCTION_ONLY && echo 'production-facing stages only' || echo 'all stages (incl. internal/firebase)')"
 echo "   gates:     ${#ENVS[@]} environments"
@@ -179,7 +230,7 @@ fail=0
 for env in "${ENVS[@]}"; do
   wait=0
   is_top_rung "$env" && wait="$WAIT_PROD"
-  body="$(printf '{"wait_timer":%s,"reviewers":[{"type":"User","id":%s}],"deployment_branch_policy":null}' "$wait" "$REVIEWER_ID")"
+  body="$(printf '{"wait_timer":%s,"reviewers":[%s],"deployment_branch_policy":null}' "$wait" "$REVIEWERS_JSON")"
   if $DRY_RUN; then
     printf "  [dry-run] PUT %-32s reviewers=1 wait=%smin\n" "$env" "$wait"
     continue
@@ -188,7 +239,7 @@ for env in "${ENVS[@]}"; do
         | python3 -c "import sys,json; d=json.load(sys.stdin); print(sum(len(r.get('reviewers',[])) for r in d.get('protection_rules',[]) if r.get('type')=='required_reviewers'))" 2>/dev/null); then
     printf "  ✅ %-32s reviewers=%s wait=%smin\n" "$env" "${revs:-?}" "$wait"
   else
-    printf "  ❌ %-32s FAILED (admin required? reviewer lacks write?)\n" "$env"
+    printf "  ❌ %-32s FAILED (admin required? reviewer/team lacks write?)\n" "$env"
     fail=1
   fi
 done
@@ -196,7 +247,7 @@ done
 echo "════════════════════════════════════════════════════════════════"
 if [[ $fail -ne 0 ]]; then
   echo "⚠️  Some environments failed. Most common cause: you lack ADMIN on $REPO,"
-  echo "    or the reviewer (id=$REVIEWER_ID) does not have >=write access there."
+  echo "    or the reviewer/team ($REVIEWER_LABEL) does not have >=write access there."
   exit 5
 fi
 $DRY_RUN || echo "✅ Done. Dispatched releases on $REPO now pause at each store stage for approval."

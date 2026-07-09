@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-adoption-doc-verify.py — drift gate for adoption docs.
+verify-adoption-doc.py — drift gate for adoption docs.
 
 Extracts every executable ```bash block from an adoption doc, runs each,
 fails the run if any block exits non-zero. This makes the doc's
@@ -21,9 +21,9 @@ To skip a specific block without removing it from the doc, prefix the
 first line with `# adoption-verify: skip`.
 
 Usage:
-  scripts/adoption-doc-verify.py docs/adoption/v2.7/library.md
-  scripts/adoption-doc-verify.py docs/adoption/v2.7/library.md docs/ADOPTION_KMP_PRODUCT_FLAVORS.md
-  scripts/adoption-doc-verify.py --strict docs/...   (fail on any block error, not just exit code)
+  scripts/ci/verify-adoption-doc.py docs/adoption/v2.7/library.md
+  scripts/ci/verify-adoption-doc.py docs/adoption/v2.7/library.md docs/ADOPTION_KMP_PRODUCT_FLAVORS.md
+  scripts/ci/verify-adoption-doc.py --strict docs/...   (fail on any block error, not just exit code)
 
 Exit codes:
   0 — all blocks passed
@@ -117,8 +117,8 @@ def main() -> int:
         epilog=textwrap.dedent(
             """\
             Examples:
-              scripts/adoption-doc-verify.py docs/adoption/v2.7/library.md
-              scripts/adoption-doc-verify.py --cwd samples/kmp-project-template \\
+              scripts/ci/verify-adoption-doc.py docs/adoption/v2.7/library.md
+              scripts/ci/verify-adoption-doc.py --cwd samples/kmp-project-template \\
                   samples/kmp-project-template/docs/ADOPTION_KMP_PRODUCT_FLAVORS.md
             """
         ),

@@ -423,10 +423,10 @@ This template IS the reference implementation that the library's consumer.md §1
 
 ## Drift detection (local tool)
 
-This doc IS the single source of truth for how this template adopts `kmp-product-flavors`. Every verify block above is executable via [`scripts/adoption-doc-verify.py`](../scripts/adoption-doc-verify.py) — run locally before any change that touches `build-logic/convention/`, `gradle/libs.versions.toml`, or `cmp-navigation/`:
+This doc IS the single source of truth for how this template adopts `kmp-product-flavors`. Every verify block above is executable via [`scripts/ci/verify-adoption-doc.py`](../scripts/ci/verify-adoption-doc.py) — run locally before any change that touches `build-logic/convention/`, `gradle/libs.versions.toml`, or `cmp-navigation/`:
 
 ```bash
-python3 scripts/adoption-doc-verify.py docs/ADOPTION_KMP_PRODUCT_FLAVORS.md
+python3 scripts/ci/verify-adoption-doc.py docs/ADOPTION_KMP_PRODUCT_FLAVORS.md
 ```
 
 If a block fails, the fix is binary: revert the implementation change (file rename, alias move, dimension removal) IF unintended, OR update the verify block + corresponding section of this doc IF intentional.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/ci/canary-throwaway-flavor.sh
+# scripts/ci/verify-dynamic-flavor-propagation.sh
 #
 # AC-9 dynamic-propagation canary (deploy-gha-product-flavors epic, D9).
 #
@@ -13,7 +13,7 @@
 # the new variant is present, assert the derivation surfaces (deployment/**, .github/**,
 # variant_resolver.rb) are byte-untouched, then restore and assert clean revert.
 #
-# Run from the template repo root:  bash scripts/ci/canary-throwaway-flavor.sh
+# Run from the template repo root:  bash scripts/ci/verify-dynamic-flavor-propagation.sh
 # Exit 0 = invariant holds; non-zero = a hardcoded flavor list leaked somewhere.
 set -euo pipefail
 
@@ -54,7 +54,7 @@ package local
 import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import org.gradle.api.Project
 
-// TEMPORARY — written by scripts/ci/canary-throwaway-flavor.sh. Restored on exit.
+// TEMPORARY — written by scripts/ci/verify-dynamic-flavor-propagation.sh. Restored on exit.
 object LocalFlavors {
     fun apply(ext: KmpFlavorExtension, project: Project) {
         ext.flavors.register("canary") {

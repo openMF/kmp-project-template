@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/ci/verify-workflow-scope.sh
+# scripts/ci/verify-workflow-token-scope.sh
 #
 # Pre-push gate for `.github/workflows/*` edits — enforces AC-11 of
 # deploy-gha-product-flavors (Phase 5 authored; Phase 6 executes).

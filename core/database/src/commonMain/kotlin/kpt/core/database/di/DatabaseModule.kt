@@ -20,7 +20,7 @@ import org.koin.dsl.module
  * into [ChargeTypeConverters] before any database access. Bound with `createdAtStart = true`
  * so the install runs eagerly at Koin start, ahead of the first [AppDatabase] resolution.
  *
- * Room 3 KMP instantiates `@TypeConverters` classes via no-arg constructor, so the
+ * Room 3 KMP instantiates `@ColumnTypeConverters` classes via no-arg constructor, so the
  * encryptor cannot be passed in by constructor — it's injected post-construction through
  * the [ChargeTypeConverters.install] static method.
  */

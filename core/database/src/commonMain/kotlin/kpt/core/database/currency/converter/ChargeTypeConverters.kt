@@ -9,7 +9,7 @@
  */
 package kpt.core.database.currency.converter
 
-import androidx.room3.TypeConverter
+import androidx.room3.ColumnTypeConverter
 import co.touchlab.kermit.Logger
 import kotlinx.serialization.json.Json
 import kpt.core.base.security.FieldEncryptor
@@ -63,7 +63,7 @@ class ChargeTypeConverters {
     }
 
     /** Deserializes a JSON string to a nullable-int list. */
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromIntList(value: String): ArrayList<Int?> {
         return try {
             Json.decodeFromString(decryptString(value))
@@ -74,7 +74,7 @@ class ChargeTypeConverters {
     }
 
     /** Serializes a nullable-int list to a JSON string. */
-    @TypeConverter
+    @ColumnTypeConverter
     fun toIntList(list: ArrayList<Int?>): String {
         return encryptString(Json.encodeToString(list))
     }

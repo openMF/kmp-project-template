@@ -9,7 +9,7 @@
  */
 package kpt.core.database.banking.converter
 
-import androidx.room3.TypeConverter
+import androidx.room3.ColumnTypeConverter
 import kotlinx.datetime.LocalDate
 import kpt.core.model.banking.BillCategory
 import kpt.core.model.banking.LoanKind
@@ -26,39 +26,39 @@ import kpt.core.model.banking.Recurrence
  * - [LocalDate] persists as ISO-8601 string (`YYYY-MM-DD`) via
  *   [kotlinx.datetime.LocalDate]'s default `toString` / `parse`.
  *
- * Registered on [kpt.core.database.AppDatabase] via `@TypeConverters`.
+ * Registered on [kpt.core.database.AppDatabase] via `@ColumnTypeConverters`.
  */
 class BankingTypeConverters {
 
     // --- LoanKind ---
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromLoanKind(value: LoanKind): String = value.name
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun toLoanKind(value: String): LoanKind = LoanKind.valueOf(value)
 
     // --- Recurrence ---
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromRecurrence(value: Recurrence): String = value.name
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun toRecurrence(value: String): Recurrence = Recurrence.valueOf(value)
 
     // --- BillCategory ---
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromBillCategory(value: BillCategory): String = value.name
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun toBillCategory(value: String): BillCategory = BillCategory.valueOf(value)
 
     // --- LocalDate (ISO-8601 string) ---
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun fromLocalDate(value: LocalDate): String = value.toString()
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun toLocalDate(value: String): LocalDate = LocalDate.parse(value)
 }

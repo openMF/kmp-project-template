@@ -2022,50 +2022,50 @@
 |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    +--- project :core-base:database
-|    |    |    |    |    |    +--- androidx.sqlite:sqlite-bundled:2.6.2 -> 2.7.0-alpha05
-|    |    |    |    |    |    |    \--- androidx.sqlite:sqlite-bundled-android:2.7.0-alpha05
-|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite:2.7.0-alpha05
-|    |    |    |    |    |    |         |    \--- androidx.sqlite:sqlite-android:2.7.0-alpha05
+|    |    |    |    |    |    +--- androidx.sqlite:sqlite-bundled:2.7.0
+|    |    |    |    |    |    |    \--- androidx.sqlite:sqlite-bundled-android:2.7.0
+|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite:2.7.0
+|    |    |    |    |    |    |         |    \--- androidx.sqlite:sqlite-android:2.7.0
 |    |    |    |    |    |    |         |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
 |    |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.0 (*)
-|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite-async:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite-framework:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0-alpha05 (c)
+|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite-async:2.7.0 (c)
+|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite-framework:2.7.0 (c)
+|    |    |    |    |    |    |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0 (c)
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.0 (*)
-|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite-async:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         \--- androidx.sqlite:sqlite-framework:2.7.0-alpha05 (c)
-|    |    |    |    |    |    +--- androidx.room3:room3-runtime:3.0.0-alpha05
-|    |    |    |    |    |    |    \--- androidx.room3:room3-runtime-android:3.0.0-alpha05
+|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite:2.7.0 (c)
+|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite-async:2.7.0 (c)
+|    |    |    |    |    |    |         \--- androidx.sqlite:sqlite-framework:2.7.0 (c)
+|    |    |    |    |    |    +--- androidx.room3:room3-runtime:3.0.0
+|    |    |    |    |    |    |    \--- androidx.room3:room3-runtime-android:3.0.0
 |    |    |    |    |    |    |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
 |    |    |    |    |    |    |         +--- androidx.annotation:annotation-experimental:1.5.0 -> 1.5.1 (*)
 |    |    |    |    |    |    |         +--- androidx.collection:collection:1.5.0 (*)
-|    |    |    |    |    |    |         +--- androidx.room3:room3-common:3.0.0-alpha05
-|    |    |    |    |    |    |         |    \--- androidx.room3:room3-common-jvm:3.0.0-alpha05
+|    |    |    |    |    |    |         +--- androidx.room3:room3-common:3.0.0
+|    |    |    |    |    |    |         |    \--- androidx.room3:room3-common-jvm:3.0.0
 |    |    |    |    |    |    |         |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
 |    |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.0 (*)
-|    |    |    |    |    |    |         |         \--- androidx.room3:room3-runtime:3.0.0-alpha05 (c)
-|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite:2.7.0-alpha05 (*)
-|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite-async:2.7.0-alpha05
-|    |    |    |    |    |    |         |    \--- androidx.sqlite:sqlite-async-android:2.7.0-alpha05
-|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0-alpha05 (*)
+|    |    |    |    |    |    |         |         \--- androidx.room3:room3-runtime:3.0.0 (c)
+|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite:2.7.0 (*)
+|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite-async:2.7.0
+|    |    |    |    |    |    |         |    \--- androidx.sqlite:sqlite-async-android:2.7.0
+|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0 (*)
 |    |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.0 (*)
-|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite-framework:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite-framework:2.7.0-alpha05
-|    |    |    |    |    |    |         |    \--- androidx.sqlite:sqlite-framework-android:2.7.0-alpha05
+|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0 (c)
+|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite-framework:2.7.0 (c)
+|    |    |    |    |    |    |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0 (c)
+|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite-framework:2.7.0
+|    |    |    |    |    |    |         |    \--- androidx.sqlite:sqlite-framework-android:2.7.0
 |    |    |    |    |    |    |         |         +--- androidx.annotation:annotation:1.8.1 -> 1.10.0 (*)
-|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0-alpha05 (*)
+|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0 (*)
 |    |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.0 (*)
-|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite-async:2.7.0-alpha05 (c)
-|    |    |    |    |    |    |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0-alpha05 (c)
+|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0 (c)
+|    |    |    |    |    |    |         |         +--- androidx.sqlite:sqlite-async:2.7.0 (c)
+|    |    |    |    |    |    |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0 (c)
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.0 (*)
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0 -> 1.11.0 (*)
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0 -> 1.11.0 (*)
 |    |    |    |    |    |    |         +--- org.jspecify:jspecify:1.0.0
-|    |    |    |    |    |    |         \--- androidx.room3:room3-common:3.0.0-alpha05 (c)
+|    |    |    |    |    |    |         \--- androidx.room3:room3-common:3.0.0 (c)
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
@@ -2076,7 +2076,7 @@
 |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
-|    |    |    |    |    +--- androidx.room3:room3-runtime:3.0.0-alpha05 (*)
+|    |    |    |    |    +--- androidx.room3:room3-runtime:3.0.0 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    +--- co.touchlab:kermit:2.1.0 (*)
 |    |    |    |    |    +--- project :core:model
@@ -2756,8 +2756,8 @@
 |    |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.0 (*)
 |    |    |    |    |    |    |         |         +--- androidx.room:room-runtime:2.7.0 (c)
 |    |    |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.10 -> 2.4.0 (c)
-|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite:2.5.0 -> 2.7.0-alpha05 (*)
-|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite-framework:2.5.0 -> 2.7.0-alpha05 (*)
+|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite:2.5.0 -> 2.7.0 (*)
+|    |    |    |    |    |    |         +--- androidx.sqlite:sqlite-framework:2.5.0 -> 2.7.0 (*)
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.0 (*)
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3 -> 1.11.0 (*)
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.11.0 (*)

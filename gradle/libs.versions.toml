@@ -134,9 +134,9 @@ desktopPackageVersion = "1.0.0"
 store = "5.1.0-alpha08"
 
 #Room 3
-room = "3.0.0-alpha05"
-sqliteBundled = "2.6.2"
-sqliteWeb = "2.7.0-alpha05"
+room = "3.0.0"
+sqliteBundled = "2.7.0"
+sqliteWeb = "2.7.0"
 
 # worker-kmp — single-API background + foreground worker scheduling across
 # Android / iOS / Desktop / Web. See https://github.com/MobileByteLabs/worker-kmp.

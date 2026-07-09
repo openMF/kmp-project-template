@@ -9,21 +9,21 @@
  */
 package kpt.core.database.crypto.converter
 
-import androidx.room3.TypeConverter
+import androidx.room3.ColumnTypeConverter
 import kotlinx.serialization.json.Json
 
 class FintechTypeConverters {
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun mapToString(map: Map<String, Double>): String = Json.encodeToString(map)
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun stringToMap(json: String): Map<String, Double> = Json.decodeFromString(json)
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun ratePointsToString(list: List<RatePointPair>): String = Json.encodeToString(list)
 
-    @TypeConverter
+    @ColumnTypeConverter
     fun stringToRatePoints(json: String): List<RatePointPair> = Json.decodeFromString(json)
 }
 

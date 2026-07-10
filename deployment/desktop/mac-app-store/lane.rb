@@ -215,49 +215,17 @@ platform :mac do
   end
 
   def _setup_mac_signing_keychain_ci(options, mac_bundle_id)
-    # Composite action (mifos-x-actionhub-publish-macos-on-appstore-testflight-kmp) runs
-    # before this lane: creates build.keychain, imports both the App Distribution cert
-    # (-T /usr/bin/codesign) and the Installer Distribution cert (-T /usr/bin/productsign),
-    # runs set-key-partition-list, and places the provisioning profile at
-    # ~/Library/MobileDevice/Provisioning Profiles/macos.provisionprofile.
-    # The lane resolves the keychain path and identities from there.
-
-    # security create-keychain build.keychain → file is build.keychain-db on macOS 12+.
-    keychain_path = ["build.keychain-db", "build.keychain"].map { |name|
-      File.expand_path("~/Library/Keychains/#{name}")
-    }.find { |p| File.exist?(p) }
-
-    unless keychain_path
-      # Fallback: query default-keychain (composite action called default-keychain -s).
-      keychain_path = sh(
-        "security default-keychain 2>/dev/null | tr -d '\" \t\n'",
-        log: false,
-      ).strip.then { |p| p.empty? ? nil : p }
-    end
-
-    if keychain_path
-      ENV["MAC_KEYCHAIN_PATH"] = keychain_path
-      UI.message("🔐 CI keychain: #{keychain_path}")
-    else
-      UI.error("CI: could not locate build.keychain — codesign may fail")
-    end
-
-    identity = ENV["MATCH_CODESIGNING_IDENTITY"].to_s.strip
-    if identity.empty?
-      find_args = keychain_path ? keychain_path.shellescape : ""
-      identity = sh(
-        "security find-identity -v -p codesigning #{find_args} 2>/dev/null" \
-        " | grep 'Apple Distribution\\|3rd Party Mac Developer' | head -1" \
-        " | sed 's/.*\"\\(.*\\)\".*/\\1/'",
-        log: false,
-      ).strip
-    end
-    UI.user_error!("No Apple Distribution identity found on CI") if identity.empty?
-    ENV["MAC_SIGNING_IDENTITY"] = identity
-    UI.message("🔏 Signing identity: #{identity}")
-
-    # Resolve provisioning profile placed by the composite action.
-    _resolve_mac_provisioning_profile(mac_bundle_id)
+    # macOS certs are managed by Fastlane Match (openMF/ios-provisioning-profile,
+    # OpenSSL-encrypted) — exactly like iOS. The tier-3 composite action now only
+    # provides MATCH_PASSWORD + MATCH_GIT_PRIVATE_KEY (+ the ASC API key) and runs
+    # this lane; there is NO manual .p12 import (the MAC_*_CERTIFICATE_B64 secrets
+    # were not plain p12s — they are Match-encrypted, which `security import` rejects
+    # as "Unknown format"). Match installs the Apple Distribution + Mac Installer
+    # Distribution certs into the runner's login.keychain-db (readonly) — the same
+    # code path as local dev: git_private_key falls back to the MATCH_GIT_PRIVATE_KEY
+    # env when no repo-local ssh key exists, and GitHub macOS runners ship an
+    # unlocked login.keychain-db.
+    _setup_mac_signing_keychain_local(options, mac_bundle_id)
   end
 
   def _setup_mac_signing_keychain_local(options, mac_bundle_id)

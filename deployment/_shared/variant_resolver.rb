@@ -55,6 +55,7 @@ module VariantResolver
   # between stages (edge case; the manifest is a few hundred bytes).
   def self.load_manifest
     path = manifest_path
+    ensure_manifest!(path)
     unless File.exist?(path)
       raise <<~ERR
         VariantResolver: manifest not found at #{path}
@@ -64,6 +65,27 @@ module VariantResolver
       ERR
     end
     JSON.parse(File.read(path))
+  end
+
+  # Self-heal the manifest. Deploy lanes run inside a platform build job on its
+  # OWN runner — a different runner from the `validate-flavor` job that first
+  # emits the manifest — so the gradle `@OutputFile` is not present yet. When the
+  # manifest is missing at its DEFAULT location (no VARIANTS_MANIFEST override to
+  # a pre-staged path), regenerate it on demand via the same gradle task.
+  # Idempotent + fast (a lightweight @DisableCachingByDefault task); the JDK and
+  # gradle wrapper are already provisioned because the build job just assembled
+  # the app. This removes the need for a manifest-staging step in every tier-3
+  # build action — every fastlane platform (Android Firebase/Play, iOS TestFlight/
+  # App Store, macOS) resolves its variant without a "manifest not found" failure.
+  def self.ensure_manifest!(path)
+    return if File.exist?(path)
+    return if ENV["VARIANTS_MANIFEST"] # explicit override → caller owns staging
+    root = BuildSecrets::REPO_ROOT
+    gradlew = File.join(root, Gem.win_platform? ? "gradlew.bat" : "gradlew")
+    return unless File.exist?(gradlew)
+    Dir.chdir(root) do
+      system(gradlew, ":cmp-shared:exportKmpFlavorsManifest", "-q")
+    end
   end
 
   # Resolve `(flavor, build_type)` into a fully-derived `Variant` value object.

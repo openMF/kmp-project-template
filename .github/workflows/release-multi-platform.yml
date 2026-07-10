@@ -361,12 +361,15 @@ jobs:
       match_password:               ${{ secrets.MATCH_PASSWORD }}
       match_ssh_private_key:        ${{ secrets.MATCH_SSH_PRIVATE_KEY }}
       SOPS_AGE_KEY:                 ${{ secrets.SOPS_AGE_KEY }}
-      # --- NEW: macOS .p12 signing (Tier-3, blocked-on-onboarding until certs provisioned) ---
-      mac_signing_certificate:            ${{ secrets.MAC_SIGNING_CERTIFICATE }}
+      # macOS .p12 signing (Tier-3). Certs are provisioned as base64 secrets (managed via the
+      # openMF/ios-provisioning-profile fastlane-match repo, exported for the manual mac keychain
+      # import). App-distribution cert + installer-distribution cert + the embedded provisioning
+      # profile. The p12s are password-less (the tier-3 import uses `-P ""`).
+      mac_signing_certificate:            ${{ secrets.MAC_APP_DISTRIBUTION_CERTIFICATE_B64 }}
       mac_signing_certificate_password:   ${{ secrets.MAC_SIGNING_CERTIFICATE_PASSWORD }}
-      mac_installer_certificate:          ${{ secrets.MAC_INSTALLER_CERTIFICATE }}
+      mac_installer_certificate:          ${{ secrets.MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64 }}
       mac_installer_certificate_password: ${{ secrets.MAC_INSTALLER_CERTIFICATE_PASSWORD }}
-      mac_provisioning_profile_base64:    ${{ secrets.MAC_PROVISIONING_PROFILE_BASE64 }}
+      mac_provisioning_profile_base64:    ${{ secrets.MAC_EMBEDDED_PROVISION_B64 }}
       keychain_password:                  ${{ secrets.KEYCHAIN_PASSWORD }}
       # --- NEW: Web host tokens + Vercel project identity ---
       cloudflare_api_token:         ${{ secrets.CLOUDFLARE_API_TOKEN }}

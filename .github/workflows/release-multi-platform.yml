@@ -147,28 +147,6 @@ jobs:
   #     (metadata_path + skip_upload_{metadata,changelogs,images,screenshots}: false)
   # scripts/store/store-listing-preflight.sh stays as a LOCAL pre-push validation helper.
 
-  # Resolve the Android applicationId DYNAMICALLY from gradle/libs.versions.toml#appId so the
-  # firebase app-id↔package preflight (FB-PRE-3) stays correct as product flavors evolve.
-  # NEVER hardcode the applicationId here — multi-product-flavor support depends on this.
-  resolve-app-id:
-    name: Resolve applicationId
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    outputs:
-      application_id: ${{ steps.appid.outputs.application_id }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: appid
-        shell: bash
-        run: |
-          APP_ID="$(grep -E '^appId[[:space:]]*=' gradle/libs.versions.toml | head -1 | sed -E 's/.*"([^"]+)".*/\1/')"
-          if [[ -z "$APP_ID" ]]; then
-            echo "❌ could not resolve appId from gradle/libs.versions.toml"; exit 1
-          fi
-          echo "application_id=$APP_ID" >> "$GITHUB_OUTPUT"
-          echo "✅ resolved applicationId = $APP_ID"
-
   # Resolve `(flavor, build_type)` against the DSL manifest — the single
   # derivation point that stays truthful even as flavors are added / renamed
   # in `kmpFlavors {}` (D9 zero-hardcode). Runs BEFORE any platform build so
@@ -220,7 +198,7 @@ jobs:
 
   release:
     name: Release
-    needs: [resolve-app-id, resolve-variants]
+    needs: [resolve-variants]
     strategy:
       # One deploy per (flavor, build_type) — populated by `resolve-variants`.
       # `flavor=all` fans out into every declared flavor; a single-flavor
@@ -253,9 +231,11 @@ jobs:
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
-      # applicationId resolved dynamically (resolve-app-id job) — feeds the firebase
-      # app-id↔package preflight (FB-PRE-3). Stays correct across product flavors.
-      application_id:       ${{ needs.resolve-app-id.outputs.application_id }}
+      # NOTE: applicationId is NOT threaded as an input — release-multi-platform-v2.yaml@v1.0.47
+      # (latest actionhub tag) declares no `application_id` input; it resolves the Android app-id
+      # for the firebase preflight from `firebase_android_app_id` / `firebase_android_demo_app_id`
+      # (inherited secrets) per flavor. Passing `application_id` made the whole workflow invalid at
+      # startup ("Invalid workflow file"). Product-flavor selection flows via `flavor`/`build_type`.
       ios_package_name:     cmp-ios
       mac_package_name:     cmp-desktop
       shared_module:        cmp-shared

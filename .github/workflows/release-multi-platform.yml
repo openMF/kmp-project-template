@@ -123,15 +123,21 @@ on:
       # ── kmp-product-flavors dimension (deploy-gha-product-flavors Phase 5) ──
       # Free-text (NOT `type: choice`) per GOAL D10 — zero drift surface. The
       # authoritative flavor list lives in `build-logic/convention/…/KMPFlavorsConventionPlugin.kt`
-      # `kmpFlavors {}` DSL; the `resolve-variants` job below re-emits
+      # `kmpFlavors {}` DSL; the `validate-flavor` job below re-emits
       # `cmp-shared/build/kmp-flavors/variants.json` from the DSL and validates
       # this input against it at dispatch time. Adding / renaming / removing a
       # flavor in the DSL auto-propagates to CI with zero workflow edit (D9).
+      #
+      # SINGLE flavor per dispatch → one clean per-platform environment-gated
+      # deployment (the pre-flavor design). Release multiple flavors by
+      # dispatching once per flavor; do NOT matrix-wrap the gated release —
+      # GitHub Environments are repo-level singletons, so a flavor matrix
+      # collides on the shared per-platform approval gates and cancels legs.
       flavor:
-        description: 'flavor: demo | prod | all — validated at runtime against the DSL manifest (all → fan out to every declared flavor)'
+        description: 'flavor: demo | prod — single flavor per dispatch, validated at runtime against the DSL manifest'
         required: false
         type: string
-        default: 'all'
+        default: 'prod'
 
       build_type:
         description: 'build_type: release | staging | debug — validated at runtime against the DSL manifest'
@@ -147,19 +153,18 @@ jobs:
   #     (metadata_path + skip_upload_{metadata,changelogs,images,screenshots}: false)
   # scripts/store/store-listing-preflight.sh stays as a LOCAL pre-push validation helper.
 
-  # Resolve `(flavor, build_type)` against the DSL manifest — the single
+  # Validate `(flavor, build_type)` against the DSL manifest — the single
   # derivation point that stays truthful even as flavors are added / renamed
   # in `kmpFlavors {}` (D9 zero-hardcode). Runs BEFORE any platform build so
   # an invalid dispatch (`flavor=nonesuch`) fails fast without burning runner
-  # minutes. Expands `flavor=all` into a JSON matrix consumed by the release
-  # job's `strategy.matrix` — one flavored deploy per matrix leg.
-  resolve-variants:
-    name: Resolve product flavors
+  # minutes. FAIL-FAST VALIDATION ONLY — emits no matrix; the gated release
+  # runs single-pass for the one dispatched flavor (per-platform environment
+  # gates must never be matrix-duplicated).
+  validate-flavor:
+    name: Validate product flavor
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    outputs:
-      matrix: ${{ steps.resolve.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -171,7 +176,7 @@ jobs:
         # `cmp-shared/build/kmp-flavors/variants.json`. Task is @DisableCachingByDefault
         # so it regenerates every run; no cache staleness class exists.
         run: ./gradlew :cmp-shared:exportKmpFlavorsManifest -q
-      - id: resolve
+      - id: validate
         shell: bash
         env:
           FLAVOR: ${{ inputs.flavor }}
@@ -182,29 +187,22 @@ jobs:
           test -f "$MANIFEST" || { echo "❌ manifest missing at $MANIFEST"; exit 1; }
           VALID_FLAVORS=$(jq -r '.flavors[].name' "$MANIFEST" | paste -sd, -)
           VALID_TYPES=$(jq   -r '.buildTypes[].name' "$MANIFEST" | paste -sd, -)
-          if [[ "$FLAVOR" != "all" ]] && ! jq -e --arg f "$FLAVOR" '.flavors[]|select(.name==$f)' "$MANIFEST" >/dev/null; then
-            echo "❌ unknown flavor '$FLAVOR' — valid: [$VALID_FLAVORS,all]"; exit 1
+          if ! jq -e --arg f "$FLAVOR" '.flavors[]|select(.name==$f)' "$MANIFEST" >/dev/null; then
+            echo "❌ unknown flavor '$FLAVOR' — valid: [$VALID_FLAVORS] (single flavor per dispatch)"; exit 1
           fi
           if ! jq -e --arg b "$BUILD_TYPE" '.buildTypes[]|select(.name==$b)' "$MANIFEST" >/dev/null; then
             echo "❌ unknown build_type '$BUILD_TYPE' — valid: [$VALID_TYPES]"; exit 1
           fi
-          if [[ "$FLAVOR" == "all" ]]; then
-            MATRIX=$(jq -c --arg b "$BUILD_TYPE" '{include:[.flavors[]|{flavor:.name,build_type:$b}]}' "$MANIFEST")
-          else
-            MATRIX=$(jq -c --arg f "$FLAVOR" --arg b "$BUILD_TYPE" '{include:[{flavor:$f,build_type:$b}]}' <<<'{}')
-          fi
-          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
-          echo "✅ resolved matrix: $MATRIX"
+          echo "✅ validated flavor='$FLAVOR' build_type='$BUILD_TYPE' against the DSL manifest"
 
   release:
     name: Release
-    needs: [resolve-variants]
-    strategy:
-      # One deploy per (flavor, build_type) — populated by `resolve-variants`.
-      # `flavor=all` fans out into every declared flavor; a single-flavor
-      # dispatch produces a matrix of length 1 (uniform code path either way).
-      matrix: ${{ fromJson(needs.resolve-variants.outputs.matrix) }}
-      fail-fast: false
+    # Single-pass, per-platform environment-gated deployment for the ONE dispatched
+    # flavor (validated above). NO strategy.matrix — matrix-wrapping the gated
+    # release duplicates every platform job per flavor and collides on the shared
+    # repo-level Environments + concurrency groups (which cancels legs). Release
+    # multiple flavors by dispatching once per flavor.
+    needs: [validate-flavor]
     # Permissions cascade through nested reusable workflows (this → orchestrator
     # → publish-*-kmp). Declare here at the caller boundary so the deepest jobs
     # — publish-web-kmp's gh-pages/cloudflare/netlify/vercel stages — can
@@ -222,11 +220,11 @@ jobs:
     # workflow `release-multi-platform-local.yml`, which pins @dev and is
     # dispatched by `/ci local-actions` against the fork.
     #
-    # @v1.0.47 ships the additive `flavor` / `build_type` inputs on
-    # release-multi-platform-v2.yaml (pinned to publish-android @v2.0.22 +
-    # publish-apple @v2.0.15, which carry the flavor dimension). The `with:`
-    # block below threads `matrix.flavor` / `matrix.build_type` from the
-    # resolve-variants job.
+    # @v1.0.49 ships the additive `flavor` / `build_type` inputs on
+    # release-multi-platform-v2.yaml (pins publish-android @v2.0.22, publish-apple
+    # @v2.0.15, publish-desktop @v2.0.8, publish-web @v2.0.10 — all carry the flavor
+    # dimension). The `with:` block below threads the single dispatched
+    # `inputs.flavor` / `inputs.build_type` straight through.
     uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.49
     with:
       version_tag:          ${{ inputs.version_tag }}
@@ -251,11 +249,12 @@ jobs:
       web_target:           ${{ inputs.web_rung }}
       web_host:             ${{ inputs.web_host }}
       production_rollout:   ${{ inputs.production_rollout }}
-      # kmp-product-flavors additive inputs. Resolved by the upstream
-      # `resolve-variants` job; `matrix.flavor` / `matrix.build_type` carry the
-      # concrete pair for this deploy leg. Accepted by the @v1.0.47 orchestrator.
-      flavor:               ${{ matrix.flavor }}
-      build_type:           ${{ matrix.build_type }}
+      # kmp-product-flavors additive inputs — SINGLE flavor per dispatch (validated
+      # by the upstream `validate-flavor` job). Threaded straight from the dispatch
+      # inputs into v2, which threads to each platform build. No matrix: the
+      # per-platform environment-gated ladder runs once for this flavor.
+      flavor:               ${{ inputs.flavor }}
+      build_type:           ${{ inputs.build_type }}
       # PROD pins kept in lockstep with actionhub @v1.0.32 (which hardcodes
       # @v2.0.12 internally — GHA forbids expressions in workflow_call uses:).
       # Local dispatches override these via release-multi-platform-local.yml.

@@ -216,27 +216,64 @@ platform :mac do
 
   def _setup_mac_signing_keychain_ci(options, mac_bundle_id)
     # macOS certs are managed by Fastlane Match (openMF/ios-provisioning-profile,
-    # OpenSSL-encrypted) — exactly like iOS. The tier-3 composite action now only
+    # OpenSSL-encrypted) — exactly like iOS. The tier-3 composite action only
     # provides MATCH_PASSWORD + MATCH_GIT_PRIVATE_KEY (+ the ASC API key) and runs
     # this lane; there is NO manual .p12 import (the MAC_*_CERTIFICATE_B64 secrets
     # were not plain p12s — they are Match-encrypted, which `security import` rejects
-    # as "Unknown format"). Match installs the Apple Distribution + Mac Installer
-    # Distribution certs into the runner's login.keychain-db (readonly) — the same
-    # code path as local dev: git_private_key falls back to the MATCH_GIT_PRIVATE_KEY
-    # env when no repo-local ssh key exists, and GitHub macOS runners ship an
-    # unlocked login.keychain-db.
-    _setup_mac_signing_keychain_local(options, mac_bundle_id)
+    # as "Unknown format").
+    #
+    # CI MUST use a DEDICATED keychain with a KNOWN password — not login.keychain-db.
+    # Match (readonly) imports the private key but can only run
+    # `security set-key-partition-list` (which grants codesign non-interactive access)
+    # when it owns the keychain password. Without that grant, codesign blocks FOREVER
+    # on a headless UI ACL prompt → the 6-hour timeout observed in run 29113565899
+    # (build + Match + provisioning all succeeded; codesign hung on "replacing existing
+    # signature"). A dedicated keychain closes that.
+    kc_name     = "signing_temp.keychain-db"
+    kc_password = ENV["MAC_KEYCHAIN_TEMP_PASSWORD"].to_s.empty? ? "mbl-ci-mac-signing" : ENV["MAC_KEYCHAIN_TEMP_PASSWORD"]
+    kc_path     = File.expand_path("~/Library/Keychains/#{kc_name}")
+
+    create_keychain(
+      name:             kc_name,
+      password:         kc_password,
+      default_keychain: true,
+      unlock:           true,
+      timeout:          21_600,   # 6h — outlive the whole build; never auto-lock mid-codesign
+      lock_when_sleeps: false,
+      add_to_search_list: true,
+    )
+    UI.message("🔐 Created dedicated CI signing keychain: #{kc_path}")
+
+    _setup_mac_signing_keychain_local(
+      options, mac_bundle_id,
+      keychain_path:     kc_path,
+      keychain_name:     kc_name,
+      keychain_password: kc_password,
+    )
+
+    # Belt-and-braces: Match already grants `apple-tool:,apple:` when it owns the
+    # keychain password; explicitly add `codesign:` + `productsign:` so BOTH the .app
+    # codesign and the installer productsign are guaranteed non-interactive (a missing
+    # grant is what hung run 29113565899 for 6h). Idempotent; never fails the lane.
+    sh(
+      "security set-key-partition-list -S apple-tool:,apple:,codesign:,productsign: " \
+      "-s -k #{kc_password.shellescape} #{kc_path.shellescape} >/dev/null 2>&1 || true",
+      log: false,
+    )
+    UI.message("🔓 Granted codesign/productsign partition access on #{kc_name}")
   end
 
-  def _setup_mac_signing_keychain_local(options, mac_bundle_id)
+  def _setup_mac_signing_keychain_local(options, mac_bundle_id, keychain_path: nil, keychain_name: nil, keychain_password: nil)
     cfg        = FastlaneConfig::IosConfig::BUILD_CONFIG
     ssh_key    = File.join(DEPLOYMENT_REPO_ROOT, cfg[:match_ssh_key_path])
     match_pass = options[:match_password] || ENV["MATCH_PASSWORD"] || cfg[:match_password]
 
     ENV["MATCH_PASSWORD"] = match_pass.to_s if match_pass && ENV["MATCH_PASSWORD"].to_s.empty?
 
-    login_kc = File.expand_path("~/Library/Keychains/login.keychain-db")
-    UI.user_error!("login.keychain-db not found at #{login_kc}") unless File.exist?(login_kc)
+    # CI passes a dedicated keychain (with a known password so Match sets the
+    # key-partition-list); local dev falls back to the unlocked login.keychain-db.
+    login_kc = keychain_path || File.expand_path("~/Library/Keychains/login.keychain-db")
+    UI.user_error!("signing keychain not found at #{login_kc}") unless File.exist?(login_kc)
 
     # ── Step 0: Remove duplicate Apple Distribution certs ──────────────────────────
     # Match re-installs its cert on every run, causing "ambiguous" errors when a
@@ -252,6 +289,15 @@ platform :mac do
       api_key:         Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
       readonly:        true,
     }
+
+    # When a dedicated keychain is supplied (CI), install the cert THERE and let Match
+    # run `security set-key-partition-list` (it can, because it owns the password) so
+    # codesign later signs the .app non-interactively. Omitted for local dev → Match
+    # installs into the already-unlocked login.keychain-db.
+    if keychain_name
+      match_base[:keychain_name]     = keychain_name
+      match_base[:keychain_password] = keychain_password
+    end
 
     # ── Step 1a: Match appstore — installs Apple Distribution cert + provisioning profile ─
     match(**match_base.merge(type: "appstore", platform: "macos"))

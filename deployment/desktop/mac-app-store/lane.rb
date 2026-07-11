@@ -438,10 +438,19 @@ platform :mac do
     saved_env = {}
     %w[MAC_SIGNING_IDENTITY MAC_KEYCHAIN_PATH MAC_PROVISIONING_PROFILE_PATH].each { |k| saved_env[k] = ENV.delete(k) }
 
+    # Thread the active flavor into the Compose Desktop build. cmp-desktop/build.gradle.kts
+    # resolves `findProperty("kmpFlavor")` → falls back to the DSL default (demo) when
+    # absent. Without -PkmpFlavor a prod-requested release silently builds the DEMO
+    # variant (bundle org.mifos.kmp.template.demo) → upload_to_testflight can't find the
+    # app on App Store Connect AND it misaligns with the prod Match provisioning profile.
+    flavor = (options[:flavor] || ENV["FLAVOR"]).to_s.strip
+    gradle_args = [gradlew, "-p", repo_root, ":cmp-desktop:createReleaseDistributable",
+                   "--no-daemon", "--no-configuration-cache"]
+    gradle_args << "-PkmpFlavor=#{flavor}" unless flavor.empty?
+
     begin
-      UI.message("Building unsigned .app bundle (createReleaseDistributable)...")
-      sh(gradlew, "-p", repo_root, ":cmp-desktop:createReleaseDistributable",
-         "--no-daemon", "--no-configuration-cache")
+      UI.message("Building unsigned .app bundle (createReleaseDistributable, flavor=#{flavor.empty? ? '(default)' : flavor})...")
+      sh(*gradle_args)
     ensure
       saved_env.each { |k, v| ENV[k] = v if v }
     end

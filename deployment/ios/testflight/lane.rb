@@ -124,28 +124,30 @@ platform :ios do
       locale    => { whats_new: releaseNotes },
     }
 
+    # Stage 1 = INTERNAL TestFlight only. External distribution + Apple's beta review
+    # are owned by Stage 2 (`promoteToExternalBeta`). Beta review — and therefore the
+    # app-level "Test Information" (BetaAppLocalization: beta_app_description /
+    # beta_app_feedback_email / localized_app_info) — is required ONLY for external
+    # testing. Passing that app-level metadata here forced Spaceship to update a
+    # BetaAppLocalization that doesn't exist yet on a fresh app record, raising
+    # `betaAppLocalizations not found for this app`. Internal uploads need none of it:
+    # this mirrors the macOS `desktop_testflight` lane, which uploads cleanly because
+    # it sets zero app-level beta metadata. Only BUILD-level "What to Test"
+    # (localized_build_info) is set — it's created together with the new build.
     pilot(
-      api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
-      beta_app_feedback_email: testflight_config[:beta_app_feedback_email],
-      beta_app_description: testflight_config[:beta_app_description],
-      demo_account_required: testflight_config[:demo_account_required],
-      distribute_external: testflight_config[:distribute_external],
-      notify_external_testers: testflight_config[:notify_external_testers],
-      groups: testflight_config[:groups],
-      skip_submission: testflight_config[:skip_submission],
+      api_key:                           Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+      distribute_external:               false,   # external distribution is Stage 2
+      notify_external_testers:           false,
+      submit_beta_review:                false,   # no beta review on the internal rung
+      skip_submission:                   true,
       skip_waiting_for_build_processing: testflight_config[:skip_waiting_for_build_processing],
-      submit_beta_review: testflight_config[:submit_beta_review],
-      expire_previous_builds: testflight_config[:expire_previous_builds],
-      reject_build_waiting_for_review: testflight_config[:reject_build_waiting_for_review],
-      wait_processing_interval: testflight_config[:wait_processing_interval],
-      wait_processing_timeout_duration: testflight_config[:wait_processing_timeout_duration],
-      uses_non_exempt_encryption: testflight_config[:uses_non_exempt_encryption],
-      changelog: releaseNotes,
-      localized_app_info: testflight_config[:localized_app_info],
-      localized_build_info: localized_build_info,
+      expire_previous_builds:            testflight_config[:expire_previous_builds],
+      uses_non_exempt_encryption:        testflight_config[:uses_non_exempt_encryption],
+      changelog:                         releaseNotes,
+      localized_build_info:              localized_build_info,
     )
 
-    UI.success("✅ Successfully uploaded to TestFlight!")
+    UI.success("✅ Successfully uploaded to TestFlight (internal)!")
   end
 
   desc "Stage 1 → Stage 2 promotion: distribute an already-uploaded TF build to external testers (no rebuild, no re-upload). Triggers Apple's beta review (~24h)."

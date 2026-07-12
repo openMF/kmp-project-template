@@ -495,41 +495,46 @@ platform :mac do
       UI.important("⚠️  No provisioning profile — Mac App Store upload will fail.")
     end
 
-    # ── Step 4: Sign .app with codesign (--deep signs all nested content) ────────
+    # ── Step 4: INSIDE-OUT codesign (App Store distribution) ─────────────────────
+    # `codesign --deep` does NOT reliably re-sign the bundled JVM runtime + skiko
+    # dylibs with the submitting team's identity — they keep their upstream
+    # (JetBrains/JDK) signature, so App Store processing rejects the build with
+    # ITMS-90238 "code failed to satisfy specified code requirement(s)" on every
+    # nested *.dylib. Apple requires each nested Mach-O to be signed individually,
+    # DEEPEST-FIRST, then the container, so each seal includes its children.
     keychain_arg = keychain.strip.empty? ? "" : "--keychain #{keychain.shellescape}"
+    jvm_helper_entitlements = File.join(repo_root, "cmp-desktop/jvm-helper.entitlements")
+    ent_for_helpers = File.exist?(jvm_helper_entitlements) ? "--entitlements #{jvm_helper_entitlements.shellescape}" : ""
+
+    # 4a. Every nested Mach-O LIBRARY (.dylib/.so/.jnilib) — libraries carry no
+    #     entitlements. `--timestamp` is required for App Store distribution.
+    libs = Dir.glob("#{app_path}/Contents/**/*.{dylib,so,jnilib}").select { |f| File.file?(f) }
+    # 4b. JVM runtime EXECUTABLES (java, jspawnhelper, keytool …) — Mach-O binaries
+    #     with the executable bit that are not libraries; sign with inherit+sandbox.
+    jvm_runtime = File.join(app_path, "Contents", "runtime")
+    execs = Dir.glob("#{jvm_runtime}/**/*").select do |f|
+      File.file?(f) && File.executable?(f) && !f.end_with?(".dylib", ".so", ".jnilib")
+    end
+
+    # Deepest-first so a parent's seal is computed over already-signed children.
+    libs.sort_by { |f| -f.count("/") }.each do |lib|
+      sh("codesign --force --timestamp --sign #{identity.shellescape} #{keychain_arg} #{lib.shellescape}", log: false)
+    end
+    execs.sort_by { |f| -f.count("/") }.each do |helper|
+      sh("codesign --force --timestamp --sign #{identity.shellescape} #{keychain_arg} #{ent_for_helpers} #{helper.shellescape}", log: false)
+    end
+    UI.message("🔏 Inside-out signed #{libs.size} nested libraries + #{execs.size} runtime executables")
+
+    # 4c. Sign the main app bundle LAST — App Store entitlements + embedded profile.
+    #     No --deep: the nested code is already signed above.
     sh(
-      "codesign --force --deep --sign #{identity.shellescape} #{keychain_arg} " \
+      "codesign --force --timestamp --sign #{identity.shellescape} #{keychain_arg} " \
       "--entitlements #{entitlements.shellescape} #{app_path.shellescape}",
     )
 
-    # ── Step 4.5: Re-sign JVM runtime helpers with sandbox + inherit ──────────────
-    # After --deep, sign jspawnhelper (and any other plain executables in the JVM
-    # runtime) with the sandbox+inherit entitlements plist, then re-sign the top-level
-    # bundle (without --deep) to rebuild the sealed-resource hash over the updated
-    # helpers. Order matters: deep → sign helpers → re-sign bundle → verify.
-    jvm_helper_entitlements = File.join(repo_root, "cmp-desktop/jvm-helper.entitlements")
-    jvm_runtime = File.join(app_path, "Contents", "runtime")
-    if File.exist?(jvm_runtime) && File.exist?(jvm_helper_entitlements)
-      helpers = Dir.glob("#{jvm_runtime}/**/*").select { |f| File.file?(f) && File.executable?(f) }
-      unless helpers.empty?
-        helpers.each do |helper|
-          sh(
-            "codesign --force --sign #{identity.shellescape} #{keychain_arg} " \
-            "--entitlements #{jvm_helper_entitlements.shellescape} #{helper.shellescape}",
-            log: false,
-          )
-        end
-        UI.message("🔏 Signed #{helpers.size} JVM runtime helper(s) with sandbox entitlement")
-        # Rebuild the bundle seal to include the updated helper signatures.
-        sh(
-          "codesign --force --sign #{identity.shellescape} #{keychain_arg} " \
-          "--entitlements #{entitlements.shellescape} #{app_path.shellescape}",
-        )
-      end
-    end
-
-    sh("codesign --verify --deep --strict #{app_path.shellescape}")
-    UI.success("✅ App bundle signed")
+    # Verify no nested binary is still signed by a foreign identity.
+    sh("codesign --verify --deep --strict --verbose=2 #{app_path.shellescape}")
+    UI.success("✅ App bundle signed (inside-out, App Store distribution)")
 
     # ── Step 5: Create PKG with productbuild ─────────────────────────────────────
     # productbuild uses the system keychain search list (no --keychain option).

@@ -76,6 +76,14 @@ platform :ios do
     with_ios_preamble(options)
     setup_ci_if_needed
     load_api_key(options)
+
+    # Auto-sync + verify App Store Connect store config BEFORE the ~15-min build:
+    # fail fast if the app record is missing, and create/update the TestFlight "Test
+    # Information" (BetaAppLocalization) from TESTFLIGHT_CONFIG so the external-beta
+    # promotion never fails with `betaAppLocalizations not found`. Fully automatic —
+    # the TestFlight parallel to the Play Store listing sync that runs with the AAB.
+    ensure_testflight_store_config(app_identifier: ios_config[:app_identifier])
+
     fetch_certificates_with_match(options.merge(match_type: "appstore"))
 
     # Switch project from whatever signing state the previous lane left it in
@@ -163,6 +171,10 @@ platform :ios do
       app_identifier: ios_config[:app_identifier],
       api_key:        Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
     ).to_s
+
+    # External beta review REQUIRES the app-level Test Information — sync it from
+    # config first so this promotion never fails for a fresh app record.
+    ensure_testflight_store_config(app_identifier: ios_config[:app_identifier])
 
     external_groups = options[:groups] ||
                       testflight_config[:external_groups] ||

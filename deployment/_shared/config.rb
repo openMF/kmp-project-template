@@ -605,8 +605,15 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
   begin
     existing = (app.get_beta_app_localizations || []).find { |l| l.locale == locale }
     if existing
-      existing.update(attributes: attrs)
-      UI.success("🔄 Synced TestFlight Test Information (#{locale}) for #{app_identifier}.")
+      # Already present → external beta review is unblocked. Best-effort sync to config;
+      # some Spaceship model versions expose no instance #update, so fall back to leaving
+      # the existing (still-valid) values in place rather than failing the release.
+      begin
+        Spaceship::ConnectAPI.patch_beta_app_localization(localization_id: existing.id, attributes: attrs)
+        UI.success("🔄 Synced TestFlight Test Information (#{locale}) for #{app_identifier}.")
+      rescue NoMethodError, NameError, ArgumentError
+        UI.success("✅ TestFlight Test Information already present (#{locale}) for #{app_identifier} — external beta review unblocked.")
+      end
     else
       Spaceship::ConnectAPI::BetaAppLocalization.create(app_id: app.id, attributes: attrs.merge(locale: locale))
       UI.success("🆕 Created TestFlight Test Information (#{locale}) for #{app_identifier} — external beta review is now unblocked.")

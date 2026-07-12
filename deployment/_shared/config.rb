@@ -548,6 +548,77 @@ def latest_tf_build_number_resilient(max_attempts: 3, sleep_seconds: 20, **opts)
   end
 end
 
+# ─────────────────────────────────────────────────────────────────────────────
+# ensure_testflight_store_config — auto-sync + verify App Store Connect store
+# config from fastlane config BEFORE any TestFlight upload/promotion.
+# ─────────────────────────────────────────────────────────────────────────────
+# Makes the whole TestFlight release fully automatic: no manual App Store Connect
+# setup is ever required. Runs as a preflight in every TF lane (internal upload +
+# external promotion, iOS + macOS):
+#   1. VERIFIES the app record exists on ASC (fail-fast with a clear message instead
+#      of dying deep in `pilot`/`deliver` — the "app not found" class).
+#   2. SYNCS the app-level "Test Information" (BetaAppLocalization: description,
+#      feedback email, marketing / privacy URLs) from TESTFLIGHT_CONFIG — creating it
+#      when the app record has none (the `betaAppLocalizations not found` class) and
+#      updating it to match config otherwise. External beta review REQUIRES this, and
+#      pre-creating it means an external promotion never fails for a fresh app.
+# Requires load_api_key to have run first (populates Spaceship::ConnectAPI.token).
+# Idempotent + config-driven; opt out per-run with SKIP_TESTFLIGHT_STORE_SYNC=1.
+def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
+  return UI.important("⏭  TestFlight store-config sync skipped (SKIP_TESTFLIGHT_STORE_SYNC=1).") \
+    if ENV["SKIP_TESTFLIGHT_STORE_SYNC"].to_s == "1"
+
+  require "spaceship"
+  config ||= FastlaneConfig::IosConfig::TESTFLIGHT_CONFIG
+  locale ||= (FastlaneConfig::IosConfig::BUILD_CONFIG[:primary_locale] rescue nil) || "en-US"
+  UI.user_error!("No ASC API token — call load_api_key before ensure_testflight_store_config") unless Spaceship::ConnectAPI.token
+
+  # ── 1. Verify the app record exists (fail-fast, clear guidance) ──
+  app = begin
+    Spaceship::ConnectAPI::App.find(app_identifier)
+  rescue => e
+    UI.important("⚠️  ASC app lookup flaked: #{e.message.to_s.lines.first&.strip}")
+    nil
+  end
+  UI.user_error!(
+    "App '#{app_identifier}' not found on App Store Connect. Create the app record " \
+    "(same bundle id) in App Store Connect → My Apps → + → New App, or fix the " \
+    "bundle id in gradle/libs.versions.toml, then re-run.",
+  ) unless app
+
+  # ── 2. Sync app-level Test Information (BetaAppLocalization) from config ──
+  li        = (config[:localized_app_info] || {})[locale] || {}
+  attrs     = {}
+  desc      = (config[:beta_app_description]   || li[:description]).to_s
+  email     = (config[:beta_app_feedback_email] || li[:feedback_email]).to_s
+  marketing = (li[:marketing_url]      || li[:marketingUrl]).to_s
+  privacy   = (li[:privacy_policy_url] || li[:privacyPolicyUrl]).to_s
+  attrs[:description]      = desc      unless desc.empty?
+  attrs[:feedbackEmail]    = email     unless email.empty?
+  attrs[:marketingUrl]     = marketing unless marketing.empty?
+  attrs[:privacyPolicyUrl] = privacy   unless privacy.empty?
+
+  if attrs.empty?
+    return UI.message("ℹ️  No TestFlight Test Information in config to sync for #{app_identifier}.")
+  end
+
+  begin
+    existing = (app.get_beta_app_localizations || []).find { |l| l.locale == locale }
+    if existing
+      existing.update(attributes: attrs)
+      UI.success("🔄 Synced TestFlight Test Information (#{locale}) for #{app_identifier}.")
+    else
+      Spaceship::ConnectAPI::BetaAppLocalization.create(app_id: app.id, attributes: attrs.merge(locale: locale))
+      UI.success("🆕 Created TestFlight Test Information (#{locale}) for #{app_identifier} — external beta review is now unblocked.")
+    end
+  rescue => e
+    # Never let a Test-Information sync hiccup block an internal upload; surface loudly.
+    UI.important("⚠️  Could not sync TestFlight Test Information for #{app_identifier}: " \
+                 "#{e.message.to_s.lines.first&.strip}. Internal upload continues; " \
+                 "external promotion may need it set on App Store Connect.")
+  end
+end
+
 # Revoke iOS Distribution certificates from Apple Developer Portal to free slots for
 # a fresh cert. Strategy (in order):
 #   1. Revoke all truly expired certs first (safe, they're already unusable).

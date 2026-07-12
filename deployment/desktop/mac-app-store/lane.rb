@@ -51,6 +51,12 @@ platform :mac do
     mac_bundle_id = ENV["MAC_APP_IDENTIFIER"] || ENV["MAC_BUNDLE_ID"] || ForkIdentity::APP_ID
 
     load_api_key(options)
+
+    # Auto-sync + verify ASC store config before the build (see config.rb) — fail fast
+    # on a missing app record + create/update TestFlight Test Information so a later
+    # Mac external-beta promotion never hits `betaAppLocalizations not found`.
+    ensure_testflight_store_config(app_identifier: mac_bundle_id)
+
     with_ios_preamble(options)
     setup_mac_signing_keychain(options, mac_bundle_id)
 
@@ -97,6 +103,9 @@ platform :mac do
     mac_bundle_id = ENV["MAC_APP_IDENTIFIER"] || ENV["MAC_BUNDLE_ID"] || ForkIdentity::APP_ID
 
     load_api_key(options)
+
+    # External beta review requires app-level Test Information — sync from config first.
+    ensure_testflight_store_config(app_identifier: mac_bundle_id)
 
     build_number = options[:build_number]&.to_s || latest_tf_build_number_resilient(
       app_identifier: mac_bundle_id,
@@ -178,6 +187,12 @@ platform :mac do
     mac_bundle_id = ENV["MAC_APP_IDENTIFIER"] || ENV["MAC_BUNDLE_ID"] || ForkIdentity::APP_ID
 
     load_api_key(options)
+
+    # Auto-sync + verify ASC store config before the build (see config.rb) — fail fast
+    # on a missing app record + create/update TestFlight Test Information so a later
+    # Mac external-beta promotion never hits `betaAppLocalizations not found`.
+    ensure_testflight_store_config(app_identifier: mac_bundle_id)
+
     with_ios_preamble(options)
     setup_mac_signing_keychain(options, mac_bundle_id)
 

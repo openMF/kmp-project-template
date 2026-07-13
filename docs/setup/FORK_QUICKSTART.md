@@ -28,6 +28,18 @@ bash customizer.sh com.myapp.example MyAwesomeApp "My Awesome App" ABCDE12345
 That's it. The script:
 1. Rewrites the 5 identity lines in `gradle/libs.versions.toml`
 2. Runs `./gradlew syncForkConfig` to propagate changes to all platform config files
+3. **Removes the demo showcase by default** — deletes the Money-Toolkit demo (10 feature
+   modules + all demo data/domain packages) and resets the database schema, leaving a
+   clean, branded, compiling framework shell for you to build on. This is the whole point
+   of forking: you start from *your* app, not the template's demo.
+
+> **Want to keep the demo** (to study the framework's reference features first)? Append
+> `--keep-demo`:
+> ```bash
+> bash customizer.sh com.myapp.example MyAwesomeApp "My Awesome App" ABCDE12345 --keep-demo
+> ```
+> You can remove it later at any time with `bash customizer.sh --clean --apply` (see
+> [Remove the demo showcase](#optional--remove-the-demo-showcase-customizersh---clean)).
 
 ### Option B — Edit `libs.versions.toml` directly
 

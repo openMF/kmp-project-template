@@ -3,18 +3,24 @@
 # Kotlin Multiplatform Project Customizer
 #
 # Usage:
-#   bash customizer.sh <package_id> <project_name> [app_display_name] [ios_team_id]
+#   bash customizer.sh <package_id> <project_name> [app_display_name] [ios_team_id] [--keep-demo]
+#   bash customizer.sh --clean [--apply]            # standalone demo removal (no identity change)
 #
 # Example:
 #   bash customizer.sh com.mybank.app MyBankApp "My Bank" ABCDE12345
+#   bash customizer.sh com.mybank.app MyBankApp "My Bank" ABCDE12345 --keep-demo
 #
-# What this does:
+# What this does (identity mode):
 #   1. Writes fork identity into gradle/libs.versions.toml (the single source of truth)
 #   2. Runs ./gradlew syncForkConfig to propagate to iOS Config.xcconfig,
 #      local.properties (Fastlane), and gradle.properties (rootProject.name)
+#   3. Removes the demo showcase (scripts/remove-demo.sh) so the fork starts from a
+#      clean, branded framework shell — this is the DEFAULT. Pass --keep-demo to retain
+#      the Money-Toolkit demo (for exploring the framework's reference features).
 #
-# That's it. No source file scanning, no package renaming, no sync-dirs conflicts.
-# The convention plugin derives all module namespaces from baseNamespace automatically.
+# No source file scanning, no package renaming, no sync-dirs conflicts. The convention
+# plugin derives all module namespaces from baseNamespace automatically. baseNamespace and
+# fork identity are never touched by the demo removal.
 #
 
 set -e
@@ -46,6 +52,21 @@ if [[ "${1:-}" == "--clean" ]]; then
   bash "$(dirname "$0")/scripts/remove-demo.sh" "$@"
   exit $?
 fi
+
+# ── Flags (extracted before positional parsing so they can appear anywhere) ──
+# Identity mode removes the demo showcase BY DEFAULT (the point of the separation:
+# forking = starting clean). --keep-demo retains it; --no-format forwards to the strip.
+KEEP_DEMO=0
+STRIP_FORMAT_FLAG=""
+POSITIONAL=()
+for a in "$@"; do
+  case "$a" in
+    --keep-demo) KEEP_DEMO=1 ;;
+    --no-format) STRIP_FORMAT_FLAG="--no-format" ;;
+    *)           POSITIONAL+=("$a") ;;
+  esac
+done
+set -- "${POSITIONAL[@]+"${POSITIONAL[@]}"}"
 
 # ── Args ─────────────────────────────────────────────────────────────────────
 if [[ $# -lt 2 ]]; then
@@ -103,6 +124,20 @@ if ./gradlew syncForkConfig --quiet; then
   print_success "gradle.properties updated (rootProject.name)"
 else
   print_warning "syncForkConfig failed — you may need to run it manually after Gradle syncs."
+fi
+
+# ── Remove the demo showcase (DEFAULT — forking = clean start) ────────────────
+if [[ "$KEEP_DEMO" -eq 0 ]]; then
+  echo
+  print_info "Removing demo showcase (default — pass --keep-demo to retain it)…"
+  if bash "$(dirname "$0")/scripts/remove-demo.sh" --apply --all $STRIP_FORMAT_FLAG; then
+    print_success "Demo showcase removed — clean, branded framework shell ready"
+  else
+    print_warning "Demo removal reported an issue — review the scripts/remove-demo.sh output above."
+  fi
+else
+  echo
+  print_info "Keeping demo showcase (--keep-demo)."
 fi
 
 echo

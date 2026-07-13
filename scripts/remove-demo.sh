@@ -21,11 +21,13 @@
 set -euo pipefail
 
 APPLY=0
+FORMAT=1
 for arg in "$@"; do
   case "$arg" in
     --apply) APPLY=1 ;;
     --all)   : ;;                    # only supported scope today; per-feature is a later enhancement
     --dry-run) APPLY=0 ;;
+    --no-format) FORMAT=0 ;;         # skip closing spotlessApply (fast iteration)
     *) echo "remove-demo.sh: unknown arg '$arg'" >&2; exit 2 ;;
   esac
 done

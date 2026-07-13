@@ -34,7 +34,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.ui.paging.PagingScreenContent
-import kpt.core.model.crypto.CoinMarket
+import kpt.core.model.demo.crypto.CoinMarket
 import kpt.feature.crypto.generated.resources.Res
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_back_cd
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_load_more_end

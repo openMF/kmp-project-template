@@ -12,8 +12,8 @@ package kpt.feature.amortization.ui
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kpt.core.data.banking.LoanRepository
-import kpt.core.model.banking.Loan
+import kpt.core.data.demo.banking.LoanRepository
+import kpt.core.model.demo.banking.Loan
 
 internal class FakeLoanRepository : LoanRepository {
 

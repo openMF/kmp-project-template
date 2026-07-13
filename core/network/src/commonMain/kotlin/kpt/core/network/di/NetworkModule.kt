@@ -15,14 +15,14 @@ import kpt.core.base.network.SupabaseCredentials
 import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import kpt.core.network.BuildKonfig
-import kpt.core.network.crypto.api.CoinGeckoApi
-import kpt.core.network.currency.api.FrankfurterApi
-import kpt.core.network.currency.config.FrankfurterApiConfig
-import kpt.core.network.economic.api.FredApi
-import kpt.core.network.economic.api.WorldBankApi
-import kpt.core.network.economic.config.FredApiConfig
-import kpt.core.network.economic.config.WorldBankApiConfig
-import kpt.core.network.infra.FintechApiClient
+import kpt.core.network.demo.FintechApiClient
+import kpt.core.network.demo.crypto.api.CoinGeckoApi
+import kpt.core.network.demo.currency.api.FrankfurterApi
+import kpt.core.network.demo.currency.config.FrankfurterApiConfig
+import kpt.core.network.demo.economic.api.FredApi
+import kpt.core.network.demo.economic.api.WorldBankApi
+import kpt.core.network.demo.economic.config.FredApiConfig
+import kpt.core.network.demo.economic.config.WorldBankApiConfig
 import org.koin.dsl.module
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
@@ -53,6 +53,7 @@ val NetworkModule = module {
     single<SupabaseCredentials> { GeneratedSupabaseCredentials }
     single { SupabaseConfigClient(credentials = get()) }
 
+    // demo:begin — customizer --clean strips the demo API configs + FintechApiClient + APIs
     single<FredApiConfig> {
         FredApiConfig(apiKey = BuildKonfig.FRED_API_KEY.takeIf { it.isNotBlank() })
     }
@@ -109,4 +110,5 @@ val NetworkModule = module {
     single<CoinGeckoApi> { get<FintechApiClient>().coinGeckoApi }
     single<FredApi> { get<FintechApiClient>().fredApi }
     single<WorldBankApi> { get<FintechApiClient>().worldBankApi }
+    // demo:end
 }

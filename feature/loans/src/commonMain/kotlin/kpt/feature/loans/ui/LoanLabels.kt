@@ -9,7 +9,7 @@
  */
 package kpt.feature.loans.ui
 
-import kpt.core.model.banking.LoanKind
+import kpt.core.model.demo.banking.LoanKind
 import kotlin.math.roundToLong
 
 /**

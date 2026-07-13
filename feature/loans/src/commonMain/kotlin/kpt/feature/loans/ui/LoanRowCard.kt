@@ -31,8 +31,8 @@ import kpt.core.designsystem.component.MoneyText
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.banking.Loan
-import kpt.core.model.banking.LoanKind
+import kpt.core.model.demo.banking.Loan
+import kpt.core.model.demo.banking.LoanKind
 import kpt.feature.loans.generated.resources.Res
 import kpt.feature.loans.generated.resources.screens_loans_row_monthly_emi_label
 import kpt.feature.loans.generated.resources.screens_loans_row_next_due_value

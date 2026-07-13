@@ -17,20 +17,22 @@ import kpt.core.base.common.di.CommonModule
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.submit.OfflineSubmitSyncer
 import kpt.core.base.store.submit.SubmitOutbox
-import kpt.core.data.alerts.AlertsRepository
-import kpt.core.data.alerts.impl.AlertsRepositoryImpl
-import kpt.core.data.banking.BillReminderRepository
-import kpt.core.data.banking.LoanRepository
-import kpt.core.data.banking.impl.BillReminderRepositoryImpl
-import kpt.core.data.banking.impl.LoanRepositoryImpl
-import kpt.core.data.crypto.CryptoRepository
-import kpt.core.data.crypto.impl.CryptoRepositoryImpl
-import kpt.core.data.currency.CurrencyRepository
-import kpt.core.data.currency.impl.CurrencyRepositoryImpl
-import kpt.core.data.economic.EconomicRatesRepository
-import kpt.core.data.economic.MacroIndicatorsRepository
-import kpt.core.data.economic.impl.EconomicRatesRepositoryImpl
-import kpt.core.data.economic.impl.MacroIndicatorsRepositoryImpl
+import kpt.core.data.demo.alerts.AlertsRepository
+import kpt.core.data.demo.alerts.impl.AlertsRepositoryImpl
+import kpt.core.data.demo.banking.BillReminderRepository
+import kpt.core.data.demo.banking.LoanRepository
+import kpt.core.data.demo.banking.impl.BillReminderRepositoryImpl
+import kpt.core.data.demo.banking.impl.LoanRepositoryImpl
+import kpt.core.data.demo.crypto.CryptoRepository
+import kpt.core.data.demo.crypto.impl.CryptoRepositoryImpl
+import kpt.core.data.demo.currency.CurrencyRepository
+import kpt.core.data.demo.currency.impl.CurrencyRepositoryImpl
+import kpt.core.data.demo.economic.EconomicRatesRepository
+import kpt.core.data.demo.economic.MacroIndicatorsRepository
+import kpt.core.data.demo.economic.impl.EconomicRatesRepositoryImpl
+import kpt.core.data.demo.economic.impl.MacroIndicatorsRepositoryImpl
+import kpt.core.data.demo.watchlist.WatchlistRepository
+import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
 import kpt.core.data.infra.NetworkMonitor
 import kpt.core.data.infra.impl.RoomFetchedAtRepository
 import kpt.core.data.infra.impl.RoomSubmitOutbox
@@ -38,15 +40,13 @@ import kpt.core.data.user.UserDataRepository
 import kpt.core.data.user.UserLogoutManager
 import kpt.core.data.user.impl.UserDataRepositoryImpl
 import kpt.core.data.user.impl.UserLogoutManagerImpl
-import kpt.core.data.watchlist.WatchlistRepository
-import kpt.core.data.watchlist.impl.WatchlistRepositoryImpl
 import kpt.core.database.AppDatabase
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
-import kpt.core.model.alerts.PriceAlert
-import kpt.core.model.banking.BillReminder
-import kpt.core.model.banking.Loan
-import kpt.core.model.banking.LoanCalcScenario
+import kpt.core.model.demo.alerts.PriceAlert
+import kpt.core.model.demo.banking.BillReminder
+import kpt.core.model.demo.banking.Loan
+import kpt.core.model.demo.banking.LoanCalcScenario
 import kpt.core.network.di.NetworkModule
 import kpt.core.store.AppStoreRegistry
 import org.koin.core.module.Module
@@ -67,6 +67,10 @@ val DataModule = module {
     // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
     single { get<AppDatabase>().draftDao }
 
+    // App-scoped CoroutineScope for cross-VM long-running coroutines (framework infra).
+    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+
+    // demo:begin — customizer --clean strips all demo repositories, outboxes, syncers + their DAOs
     // Personal watchlist — local-only persistence for the SubmitHandler showcase.
     single { get<AppDatabase>().watchlistDao }
     single<WatchlistRepository> { WatchlistRepositoryImpl(get()) }
@@ -142,8 +146,11 @@ val DataModule = module {
         )
     }
 
+    // demo:end
+
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 
+    // demo:begin — customizer --clean strips the demo fintech/economic/alerts repositories + syncer
     // Fintech Repositories
     single<CurrencyRepository> {
         CurrencyRepositoryImpl(
@@ -193,9 +200,6 @@ val DataModule = module {
         RoomSubmitOutbox(dao = get(), serializer = PriceAlert.serializer())
     }
 
-    // App-scoped CoroutineScope for cross-VM long-running coroutines (e.g., OfflineSubmitSyncer).
-    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
-
     // Eager singleton — starts watching network online events at Koin start; retries
     // any pending alerts when connectivity returns. For the local-only alerts feature,
     // the submit block commits directly to the repository (simulating offline resilience).
@@ -209,10 +213,12 @@ val DataModule = module {
         syncer.start()
         syncer
     }
+    // demo:end
 }
 
 expect val platformModule: Module
 
+// demo:begin — marker singletons for the demo submit syncers (stripped with the demo repos)
 /**
  * Marker singleton wrapping the Loan offline submit syncer.
  *
@@ -228,3 +234,4 @@ internal class LoanSubmitSyncer internal constructor(
 internal class BillReminderSubmitSyncer internal constructor(
     @Suppress("unused") val syncer: OfflineSubmitSyncer<BillReminder, BillReminder>,
 )
+// demo:end

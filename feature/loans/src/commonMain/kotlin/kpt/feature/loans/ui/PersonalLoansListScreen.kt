@@ -46,7 +46,7 @@ import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.banking.Loan
+import kpt.core.model.demo.banking.Loan
 import kpt.feature.loans.generated.resources.Res
 import kpt.feature.loans.generated.resources.screens_loans_list_active_count_plural
 import kpt.feature.loans.generated.resources.screens_loans_list_active_count_single

@@ -54,10 +54,12 @@ object KoinModules {
 
     private val featureModule = module {
         includes(
-            CurrencyRatesModule,
-            EmiCalculatorModule,
+            // shell (framework) — kept
             HomeModule,
             SettingsModule,
+            // demo:begin — customizer --clean strips these demo feature modules
+            CurrencyRatesModule,
+            EmiCalculatorModule,
             BillsModule,
             LoansModule,
             AmortizationModule,
@@ -65,6 +67,7 @@ object KoinModules {
             CalculatorsModule,
             MacroModule,
             CryptoFeatureModule,
+            // demo:end
         )
     }
 

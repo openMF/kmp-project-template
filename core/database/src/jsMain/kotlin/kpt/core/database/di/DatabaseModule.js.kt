@@ -18,7 +18,7 @@ import org.koin.dsl.module
 actual val platformModule: Module = module {
     single {
         AppDatabaseFactory()
-            .createDatabase<AppDatabase>(databaseName = "app_database")
+            .createDatabase<AppDatabase>(databaseName = AppDatabase.DATABASE_NAME)
             .setQueryCoroutineContext(Dispatchers.Default)
             .build()
     }

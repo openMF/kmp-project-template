@@ -58,7 +58,7 @@ expect class BillReminderScheduler : NotificationScheduler<BillReminderSchedule>
 /**
  * Platform-neutral payload describing a single bill-reminder notification.
  *
- * Producers (feature ViewModels) build this from a [kpt.core.model.banking.BillReminder]
+ * Producers (feature ViewModels) build this from a [kpt.core.model.demo.banking.BillReminder]
  * by computing the next concrete `triggerAtMs` instant; the scheduler stays domain-agnostic
  * so it can be reused for any future "fire one notification at X time" surface.
  *

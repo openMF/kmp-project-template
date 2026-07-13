@@ -29,6 +29,7 @@ SYNC_DIRS=(
     "cmp-web"
     "cmp-shared"
     "core-base"
+    "core"          # framework-only: **/demo/** + the core/store seam are excluded by convention (is_excluded)
     "build-logic"
     "fastlane"
     "fastlane-config"
@@ -170,6 +171,19 @@ is_excluded() {
 
     # Remove ./ from the beginning of the path if it exists
     full_path="${full_path#./}"
+
+    # ── Convention exclusions (showcase-framework-separation) ───────────────
+    # core/ is synced framework-only. Never overwrite a fork's removed demo
+    # (**/demo/**) or the per-fork core/store seam files (D8). These are matched
+    # by convention (pattern), not the exact-path EXCLUSIONS map above.
+    case "$full_path" in
+        */demo/*)                       return 0 ;;  # demo showcase packages
+        */demo)                         return 0 ;;  # a demo/ dir itself
+        core/store/*AppScreenStateDefaults.kt) return 0 ;;  # fork seam (D8)
+        core/store/*AppErrorMapper.kt)         return 0 ;;
+        core/store/*AppStoreRegistry.kt)       return 0 ;;
+        core/store/*StoreModule.kt)            return 0 ;;
+    esac
 
     # Check for root-level exclusions
     if [ -n "${EXCLUSIONS["root"]}" ] && [[ "$check_type" == "file" ]]; then

@@ -44,6 +44,8 @@ import kotlin.time.Duration.Companion.minutes
  * qualifier-name collisions across feature modules.
  */
 object AppStoreRegistry : StoreRegistry() {
+    // demo:begin — customizer --clean strips the demo store qualifiers + TTLs, leaving an
+    // empty registry for the fork to populate with its own stores.
     val ExchangeRates = store("exchangeRates")
     val RateHistory = store("rateHistory")
     val CoinMarkets = store("coinMarkets")
@@ -94,4 +96,5 @@ object AppStoreRegistry : StoreRegistry() {
         "interestRateSeries" to Ttl.INTEREST_RATE_SERIES,
         "macroIndicator" to Ttl.MACRO_INDICATOR,
     )
+    // demo:end
 }

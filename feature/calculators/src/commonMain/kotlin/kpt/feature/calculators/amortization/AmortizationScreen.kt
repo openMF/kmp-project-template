@@ -40,7 +40,7 @@ import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
-import kpt.core.domain.calc.AmortizationRow
+import kpt.core.domain.demo.calc.AmortizationRow
 import kpt.feature.calculators.generated.resources.Res
 import kpt.feature.calculators.generated.resources.screens_calc_amortization_back_cd
 import kpt.feature.calculators.generated.resources.screens_calc_amortization_emi_label

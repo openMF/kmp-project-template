@@ -46,7 +46,7 @@ import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.emi.EmiResult
+import kpt.core.model.demo.emi.EmiResult
 import kpt.feature.calculators.generated.resources.Res
 import kpt.feature.calculators.generated.resources.screens_calc_compare_back_cd
 import kpt.feature.calculators.generated.resources.screens_calc_compare_best_badge

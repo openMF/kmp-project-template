@@ -29,11 +29,13 @@ kotlin {
             implementation(projects.coreBase.platform)
             implementation(projects.coreBase.security)
 
+            // shell (framework) — kept
             implementation(projects.feature.home)
-            implementation(projects.feature.currencyRates)
-            implementation(projects.feature.emiCalculator)
             implementation(projects.feature.profile)
             implementation(projects.feature.settings)
+            // demo:begin — customizer --clean strips these demo feature dependencies
+            implementation(projects.feature.currencyRates)
+            implementation(projects.feature.emiCalculator)
             implementation(projects.feature.bills)
             implementation(projects.feature.loans)
             implementation(projects.feature.amortization)
@@ -42,6 +44,7 @@ kotlin {
             implementation(projects.feature.macro)
             implementation(projects.feature.crypto)
             implementation(projects.feature.showcase)
+            // demo:end
             implementation(projects.sync)
 
             // put your multiplatform dependencies here

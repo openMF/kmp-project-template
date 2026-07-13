@@ -40,7 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kpt.core.model.economic.Country
+import kpt.core.model.demo.economic.Country
 import kpt.feature.macro.generated.resources.Res
 import kpt.feature.macro.generated.resources.screens_macro_back_cd
 import kpt.feature.macro.generated.resources.screens_macro_picker_search_placeholder

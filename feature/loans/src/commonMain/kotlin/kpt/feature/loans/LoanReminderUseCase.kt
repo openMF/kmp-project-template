@@ -11,7 +11,7 @@ package kpt.feature.loans
 
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
-import kpt.core.model.banking.Loan
+import kpt.core.model.demo.banking.Loan
 import kpt.sync.NotificationContent
 import kpt.sync.WorkHandle
 import kpt.sync.WorkMode

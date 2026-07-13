@@ -10,8 +10,8 @@
 package kpt.feature.macro.ui.components
 
 import kpt.core.common.formatDecimal
-import kpt.core.model.economic.IndicatorKind
-import kpt.core.model.economic.MacroIndicator
+import kpt.core.model.demo.economic.IndicatorKind
+import kpt.core.model.demo.economic.MacroIndicator
 
 /**
  * Localised display name for an [IndicatorKind] — what the IndicatorCard's

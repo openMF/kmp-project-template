@@ -31,11 +31,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.store.freshness.FreshnessBand
-import kpt.core.data.economic.SupportedCountries
+import kpt.core.data.demo.economic.SupportedCountries
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.economic.IndicatorKind
+import kpt.core.model.demo.economic.IndicatorKind
 import kpt.feature.macro.generated.resources.Res
 import kpt.feature.macro.generated.resources.screens_macro_back_cd
 import kpt.feature.macro.generated.resources.screens_macro_country_title

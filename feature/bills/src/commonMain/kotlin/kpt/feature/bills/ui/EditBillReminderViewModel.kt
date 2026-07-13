@@ -19,10 +19,10 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.base.ui.viewmodel.BaseDraftMutationViewModel
-import kpt.core.data.banking.BillReminderRepository
-import kpt.core.model.banking.BillCategory
-import kpt.core.model.banking.BillReminder
-import kpt.core.model.banking.Recurrence
+import kpt.core.data.demo.banking.BillReminderRepository
+import kpt.core.model.demo.banking.BillCategory
+import kpt.core.model.demo.banking.BillReminder
+import kpt.core.model.demo.banking.Recurrence
 import kpt.core.platform.notification.bill.BillReminderSchedule
 import kpt.feature.bills.domain.BillReminderRecurrence
 import kpt.feature.bills.notification.BillNotificationGateway

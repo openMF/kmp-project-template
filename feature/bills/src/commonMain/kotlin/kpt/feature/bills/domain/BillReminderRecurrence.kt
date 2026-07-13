@@ -16,8 +16,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
-import kpt.core.model.banking.BillReminder
-import kpt.core.model.banking.Recurrence
+import kpt.core.model.demo.banking.BillReminder
+import kpt.core.model.demo.banking.Recurrence
 import kotlin.time.Clock
 
 /**

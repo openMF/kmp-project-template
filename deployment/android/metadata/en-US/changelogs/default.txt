@@ -1,8 +1,5 @@
-What's new in 2026.6.1:
+First release of Money Toolkit.
 
-• Faster loan, bill, and rate screens — data loads more reliably on slow connections
-• Smoother first-launch experience with better offline data handling
-• More stable app — fixed edge-case crashes and improved background data refresh
-• Improved build pipeline for faster, more reliable future updates
+Track loans, calculate EMIs, set bill reminders, compare loan offers, view live interest rates and currency exchange rates.
 
 100% offline — no login, no account, no ads.

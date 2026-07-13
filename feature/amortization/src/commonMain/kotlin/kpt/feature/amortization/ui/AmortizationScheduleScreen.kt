@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.screen.ScreenContent
-import kpt.core.model.banking.AmortizationRow
+import kpt.core.model.demo.banking.AmortizationRow
 import kpt.feature.amortization.generated.resources.Res
 import kpt.feature.amortization.generated.resources.screens_amortization_schedule_back_cd
 import kpt.feature.amortization.generated.resources.screens_amortization_schedule_header_balance

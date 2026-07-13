@@ -10,8 +10,8 @@
 package kpt.feature.loans.ui
 
 import kotlinx.datetime.LocalDate
-import kpt.core.model.banking.Loan
-import kpt.core.model.banking.LoanKind
+import kpt.core.model.demo.banking.Loan
+import kpt.core.model.demo.banking.LoanKind
 
 internal fun sampleLoan(
     id: String,

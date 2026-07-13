@@ -44,7 +44,7 @@ import kpt.core.common.formatDecimal
 import kpt.core.designsystem.chart.KptAreaChart
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.economic.InterestRateSeries
+import kpt.core.model.demo.economic.InterestRateSeries
 import kpt.feature.rates.generated.resources.Res
 import kpt.feature.rates.generated.resources.screens_rates_back_cd
 import kpt.feature.rates.generated.resources.screens_rates_detail_current_label

@@ -27,8 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.model.economic.IndicatorKind
-import kpt.core.model.economic.MacroIndicator
+import kpt.core.model.demo.economic.IndicatorKind
+import kpt.core.model.demo.economic.MacroIndicator
 import kpt.feature.macro.generated.resources.Res
 import kpt.feature.macro.generated.resources.screens_macro_card_auth_required
 import kpt.feature.macro.generated.resources.screens_macro_card_captive_portal

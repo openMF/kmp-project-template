@@ -16,9 +16,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.data.banking.LoanRepository
-import kpt.core.model.banking.AmortizationRow
-import kpt.core.model.banking.Loan
+import kpt.core.data.demo.banking.LoanRepository
+import kpt.core.model.demo.banking.AmortizationRow
+import kpt.core.model.demo.banking.Loan
 
 /**
  * ViewModel for [AmortizationScheduleScreen].

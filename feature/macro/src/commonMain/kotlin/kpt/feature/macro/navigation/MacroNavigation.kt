@@ -17,7 +17,7 @@ import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
-import kpt.core.model.economic.IndicatorKind
+import kpt.core.model.demo.economic.IndicatorKind
 import kpt.feature.macro.ui.CountryMacroScreen
 import kpt.feature.macro.ui.CountryPickerScreen
 import kpt.feature.macro.ui.MacroIndicatorDetailScreen

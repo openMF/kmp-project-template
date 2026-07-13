@@ -12,8 +12,8 @@ package kpt.feature.crypto.ui
 import androidx.lifecycle.viewModelScope
 import kpt.core.base.store.paging.PagingScreenStream
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.data.crypto.CryptoRepository
-import kpt.core.model.crypto.CoinMarket
+import kpt.core.data.demo.crypto.CryptoRepository
+import kpt.core.model.demo.crypto.CoinMarket
 
 /**
  * Read-side ViewModel for [CoinMarketsScreen].

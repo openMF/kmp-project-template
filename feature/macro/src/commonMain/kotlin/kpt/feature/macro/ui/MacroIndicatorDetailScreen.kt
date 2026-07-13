@@ -46,7 +46,7 @@ import kpt.core.common.formatDecimal
 import kpt.core.common.formatTimeAgo
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.economic.IndicatorKind
+import kpt.core.model.demo.economic.IndicatorKind
 import kpt.feature.macro.generated.resources.Res
 import kpt.feature.macro.generated.resources.screens_macro_back_cd
 import kpt.feature.macro.generated.resources.screens_macro_detail_source_label
@@ -68,7 +68,7 @@ import kotlin.time.Instant
  * it, a table of year/value rows for users who want exact numbers. The
  * dashboard's per-card sparkline is a 10-year hint; this screen surfaces
  * the entire range the toolkit fetches (25 years by default — see
- * [kpt.core.store.economic.impl.MacroIndicatorKey.years]).
+ * [kpt.core.store.demo.economic.impl.MacroIndicatorKey.years]).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -24,8 +24,8 @@ import org.koin.core.qualifier.named
  * regardless of the generic parameter. At first `.saveByUniqueKey(payload)` call, the
  * wrong serializer fires:
  *
- *   `ClassCastException: kpt.core.model.banking.LoanCalcScenario
- *    cannot be cast to kpt.core.model.alerts.PriceAlert`
+ *   `ClassCastException: kpt.core.model.demo.banking.LoanCalcScenario
+ *    cannot be cast to kpt.core.model.demo.alerts.PriceAlert`
  *
  * Fix: every outbox `single<>` registration declares `qualifier = OutboxQualifiers.X`
  * and every consumer uses `get(qualifier = OutboxQualifiers.X)`. Then the lookup keys
@@ -44,15 +44,17 @@ import org.koin.core.qualifier.named
  * `ClassCastException-at-first-save` shows up at runtime.
  */
 object OutboxQualifiers {
-    /** `SubmitOutbox<kpt.core.model.banking.Loan>`. */
+    // demo:begin — demo submit-outbox qualifiers (stripped with the demo features)
+    /** `SubmitOutbox<kpt.core.model.demo.banking.Loan>`. */
     val Loan = named("outbox.loan")
 
-    /** `SubmitOutbox<kpt.core.model.banking.BillReminder>`. */
+    /** `SubmitOutbox<kpt.core.model.demo.banking.BillReminder>`. */
     val BillReminder = named("outbox.billReminder")
 
-    /** `SubmitOutbox<kpt.core.model.banking.LoanCalcScenario>`. */
+    /** `SubmitOutbox<kpt.core.model.demo.banking.LoanCalcScenario>`. */
     val LoanCalcScenario = named("outbox.loanCalcScenario")
 
-    /** `SubmitOutbox<kpt.core.model.alerts.PriceAlert>`. */
+    /** `SubmitOutbox<kpt.core.model.demo.alerts.PriceAlert>`. */
     val PriceAlert = named("outbox.priceAlert")
+    // demo:end
 }

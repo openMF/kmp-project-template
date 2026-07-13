@@ -30,7 +30,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.model.currency.ExchangeRates
+import kpt.core.model.demo.currency.ExchangeRates
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreBuilder

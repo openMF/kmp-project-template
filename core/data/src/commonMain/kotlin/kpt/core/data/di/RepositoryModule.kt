@@ -31,6 +31,8 @@ import kpt.core.data.demo.economic.EconomicRatesRepository
 import kpt.core.data.demo.economic.MacroIndicatorsRepository
 import kpt.core.data.demo.economic.impl.EconomicRatesRepositoryImpl
 import kpt.core.data.demo.economic.impl.MacroIndicatorsRepositoryImpl
+import kpt.core.data.demo.watchlist.WatchlistRepository
+import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
 import kpt.core.data.infra.NetworkMonitor
 import kpt.core.data.infra.impl.RoomFetchedAtRepository
 import kpt.core.data.infra.impl.RoomSubmitOutbox
@@ -38,8 +40,6 @@ import kpt.core.data.user.UserDataRepository
 import kpt.core.data.user.UserLogoutManager
 import kpt.core.data.user.impl.UserDataRepositoryImpl
 import kpt.core.data.user.impl.UserLogoutManagerImpl
-import kpt.core.data.demo.watchlist.WatchlistRepository
-import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
 import kpt.core.database.AppDatabase
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule

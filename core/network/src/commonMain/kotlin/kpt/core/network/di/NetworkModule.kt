@@ -15,6 +15,7 @@ import kpt.core.base.network.SupabaseCredentials
 import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import kpt.core.network.BuildKonfig
+import kpt.core.network.demo.FintechApiClient
 import kpt.core.network.demo.crypto.api.CoinGeckoApi
 import kpt.core.network.demo.currency.api.FrankfurterApi
 import kpt.core.network.demo.currency.config.FrankfurterApiConfig
@@ -22,7 +23,6 @@ import kpt.core.network.demo.economic.api.FredApi
 import kpt.core.network.demo.economic.api.WorldBankApi
 import kpt.core.network.demo.economic.config.FredApiConfig
 import kpt.core.network.demo.economic.config.WorldBankApiConfig
-import kpt.core.network.demo.FintechApiClient
 import org.koin.dsl.module
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 

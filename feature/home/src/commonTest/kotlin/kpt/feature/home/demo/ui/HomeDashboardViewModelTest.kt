@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.feature.home.ui
+package kpt.feature.home.demo.ui
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

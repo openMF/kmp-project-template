@@ -26,6 +26,7 @@ internal fun NavController.navigateToAuthenticatedNavBar(navOptions: NavOptions?
 
 internal fun NavGraphBuilder.authenticatedNavbarGraph(
     navigateToSettingsScreen: () -> Unit,
+    // demo:begin
     navigateToLoans: () -> Unit,
     navigateToBills: () -> Unit,
     navigateToRates: () -> Unit,
@@ -37,10 +38,12 @@ internal fun NavGraphBuilder.authenticatedNavbarGraph(
     navigateToAmortization: () -> Unit,
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
+    // demo:end
 ) {
     composableWithStayTransitions<AuthenticatedNavbarRoute> {
         AuthenticatedNavbarNavigationScreen(
             navigateToSettingsScreen = navigateToSettingsScreen,
+            // demo:begin
             navigateToLoans = navigateToLoans,
             navigateToBills = navigateToBills,
             navigateToRates = navigateToRates,
@@ -52,6 +55,7 @@ internal fun NavGraphBuilder.authenticatedNavbarGraph(
             navigateToAmortization = navigateToAmortization,
             navigateToLoanComparison = navigateToLoanComparison,
             navigateToLoanCalcWizard = navigateToLoanCalcWizard,
+            // demo:end
         )
     }
 }

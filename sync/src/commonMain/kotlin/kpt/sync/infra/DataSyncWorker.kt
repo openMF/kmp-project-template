@@ -39,8 +39,10 @@ import kpt.core.datastore.infra.SyncStatePersister
  */
 public class DataSyncWorker(
     context: WorkerContext,
+    // demo:begin
     private val currencyRepository: CurrencyRepository,
     private val macroIndicatorsRepository: MacroIndicatorsRepository,
+    // demo:end
     private val persister: SyncStatePersister,
 ) : CoroutineWorker(context), Synchronizer {
 
@@ -56,6 +58,7 @@ public class DataSyncWorker(
 
     override suspend fun doWork(): WorkResult {
         workingVersions = persister.read()
+        // demo:begin
         val ok = runCatching {
             coroutineScope {
                 listOf(
@@ -64,11 +67,9 @@ public class DataSyncWorker(
                 ).awaitAll().all { it }
             }
         }.getOrDefault(false)
-        return if (ok) {
-            persister.write(workingVersions)
-            WorkResult.success()
-        } else {
-            WorkResult.retry()
-        }
+        if (!ok) return WorkResult.retry()
+        // demo:end
+        persister.write(workingVersions)
+        return WorkResult.success()
     }
 }

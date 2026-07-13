@@ -60,6 +60,7 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
     ) {
         authenticatedNavbarGraph(
             navigateToSettingsScreen = navController::navigateToSettings,
+            // demo:begin
             navigateToLoans = { navController.navigateToLoans() },
             navigateToBills = { navController.navigateToBills() },
             navigateToRates = { navController.navigateToRates() },
@@ -71,10 +72,12 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             navigateToAmortization = { navController.navigateToAmortization() },
             navigateToLoanComparison = { navController.navigateToLoanComparison() },
             navigateToLoanCalcWizard = { navController.navigateToLoanCalcWizard() },
+            // demo:end
         )
 
         notificationDestination(onBackClick = { navController.popBackStackSafely() })
 
+        // demo:begin
         // Dev-only entry points to the showcase galleries (only wired in non-release builds).
         // Released builds receive null → SettingsScreen hides the dev menu entirely.
         // See feature/showcase for the gallery destinations.
@@ -88,12 +91,16 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         } else {
             null
         }
+        // demo:end
         settingsDestination(
             onBackClick = { navController.popBackStackSafely() },
+            // demo:begin
             onTransitionGalleryClick = onTransitionGalleryClick,
             onStateGalleryClick = onStateGalleryClick,
+            // demo:end
         )
 
+        // demo:begin
         // Money Toolkit feature graphs — generic personal-finance utilities.
         currencyRatesGraph(navController)
         emiCalculatorDestination(onBackClick = { navController.popBackStackSafely() })
@@ -111,5 +118,6 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
 
         // Dev-only state gallery (Phase 02 Task 17 — ScreenState variants + component-scale primitives).
         stateGalleryGraph(navController)
+        // demo:end
     }
 }

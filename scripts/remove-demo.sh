@@ -68,6 +68,7 @@ if [ "$APPLY" -eq 1 ]; then
   find . -name '*.kt' -not -path '*/build/*' -print0 | while IFS= read -r -d '' f; do
     sed -i '' -E \
       -e '/^import kpt\.core\.[a-z]+\.demo\./d' \
+      -e '/^import kpt\.feature\.[a-z]+\.demo\./d' \
       -e "/^import kpt\\.feature\\.(${DEMO_PKGS})[.]/d" \
       "$f"
   done
@@ -98,27 +99,11 @@ if [ -f "$DB" ]; then
   [ "$APPLY" -eq 1 ] && sed -i '' 's/const val VERSION = [0-9][0-9]*/const val VERSION = 1/' "$DB"
 fi
 
-# ── 7. Swap the demo-coupled app shell (home dashboard + nav) for a placeholder ───────
-#     The home screen's composable takes navigateTo{Loans,Bills,Rates,…} callbacks and the
-#     nav host registers the demo graphs, so both must be replaced (not just stripped) to
-#     leave a compiling shell. Pre-authored shell files live under scripts/shell/.
-echo "swap app shell (home + nav) for placeholder:"
-SHELL_SRC="scripts/shell"
-declare -a SHELL_MAP=(
-  "$SHELL_SRC/AuthenticatedNavigation.shell.kt:cmp-navigation/src/commonMain/kotlin/cmp/navigation/authenticated/AuthenticatedNavigation.kt"
-  "$SHELL_SRC/HomeScreen.shell.kt:feature/home/src/commonMain/kotlin/kpt/feature/home/HomeScreen.kt"
-)
-for pair in "${SHELL_MAP[@]}"; do
-  src="${pair%%:*}"; dst="${pair#*:}"
-  if [ -f "$src" ]; then
-    say "cp $src → $dst"
-    [ "$APPLY" -eq 1 ] && cp "$src" "$dst"
-  else
-    say "(placeholder shell $src not yet authored — SKIP; shell will not compile until it exists)"
-  fi
-done
-
-# ── 8. Formatter pass to drop the now-unused demo imports left by the block strip ─────
+# ── 7. Formatter pass to drop the now-unused demo imports left by the block strip ─────
+#     The app shell (home dashboard + nav) needs NO swap: the demo dashboard lives under
+#     feature/home/demo/ (deleted in step 4) and the framework HomeScreen shell + nav files
+#     carry `// demo:begin … // demo:end` blocks (stripped in step 3). The stripped shell —
+#     top bar + settings entry point + empty home body — compiles as-is for the fork to fill.
 if [ "$APPLY" -eq 1 ] && [ "$FORMAT" -eq 1 ]; then
   say "run ./gradlew spotlessApply (drops now-unused imports left by the strip)"
   ./gradlew spotlessApply --console=plain -q || true

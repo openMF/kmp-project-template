@@ -71,7 +71,7 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
  * ## Demo demarcation (showcase-framework-separation)
  * The `infra` entities/DAOs (`Bookkeeper·Draft·FetchedAt`) are framework — always kept.
  * The demo entities/DAOs/converters + the `@AutoMigration` history + the `@DeleteTable`
- * spec are wrapped in `// demo:begin … // demo:end` markers. `customizer --clean`
+ * spec are wrapped in demo-marked blocks. `customizer --clean`
  * deletes the `core/database/demo/` packages AND strips these blocks (and resets `VERSION` to a
  * fresh-fork baseline of `1`, dropping the migration history that only existing installs
  * need) — leaving a valid framework-only `@Database` that compiles. The Room 3 impl itself

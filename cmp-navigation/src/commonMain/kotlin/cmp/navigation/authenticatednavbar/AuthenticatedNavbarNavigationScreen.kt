@@ -47,6 +47,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 internal fun AuthenticatedNavbarNavigationScreen(
     navigateToSettingsScreen: () -> Unit,
+    // demo:begin
     navigateToLoans: () -> Unit,
     navigateToBills: () -> Unit,
     navigateToRates: () -> Unit,
@@ -58,6 +59,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
     navigateToAmortization: () -> Unit,
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
+    // demo:end
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberKptNavController(
         name = "AuthenticatedNavbarScreen",
@@ -90,6 +92,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
         navController = navController,
         modifier = modifier,
         navigateToSettingsScreen = navigateToSettingsScreen,
+        // demo:begin
         navigateToLoans = navigateToLoans,
         navigateToBills = navigateToBills,
         navigateToRates = navigateToRates,
@@ -101,6 +104,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
         navigateToAmortization = navigateToAmortization,
         navigateToLoanComparison = navigateToLoanComparison,
         navigateToLoanCalcWizard = navigateToLoanCalcWizard,
+        // demo:end
         onAction = remember(viewModel) {
             { viewModel.trySendAction(it) }
         },
@@ -111,6 +115,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
 internal fun AuthenticatedNavbarNavigationScreenContent(
     navController: NavHostController,
     navigateToSettingsScreen: () -> Unit,
+    // demo:begin
     navigateToLoans: () -> Unit,
     navigateToBills: () -> Unit,
     navigateToRates: () -> Unit,
@@ -122,6 +127,7 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
     navigateToAmortization: () -> Unit,
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
+    // demo:end
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
@@ -177,6 +183,7 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
             // TOP LEVEL DESTINATIONS
             homeGraph(
                 onSettingsClick = navigateToSettingsScreen,
+                // demo:begin
                 onNavigateToLoans = navigateToLoans,
                 onNavigateToBills = navigateToBills,
                 onNavigateToRates = navigateToRates,
@@ -188,6 +195,7 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                 onNavigateToAmortization = navigateToAmortization,
                 onNavigateToLoanComparison = navigateToLoanComparison,
                 onNavigateToLoanCalcWizard = navigateToLoanCalcWizard,
+                // demo:end
             )
 
             profileDestination()

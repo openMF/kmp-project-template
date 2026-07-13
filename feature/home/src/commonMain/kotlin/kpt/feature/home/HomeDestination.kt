@@ -28,6 +28,7 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.homeGraph(
     onSettingsClick: () -> Unit,
+    // demo:begin
     onNavigateToLoans: () -> Unit,
     onNavigateToBills: () -> Unit,
     onNavigateToRates: () -> Unit,
@@ -39,6 +40,7 @@ fun NavGraphBuilder.homeGraph(
     onNavigateToAmortization: () -> Unit,
     onNavigateToLoanComparison: () -> Unit,
     onNavigateToLoanCalcWizard: () -> Unit,
+    // demo:end
 ) {
     navigation<HomeDestination>(
         startDestination = HomeRoute,
@@ -46,6 +48,7 @@ fun NavGraphBuilder.homeGraph(
         composableWithStayTransitions<HomeRoute> {
             HomeScreen(
                 onSettingsClick = onSettingsClick,
+                // demo:begin
                 onNavigateToLoans = onNavigateToLoans,
                 onNavigateToBills = onNavigateToBills,
                 onNavigateToRates = onNavigateToRates,
@@ -57,6 +60,7 @@ fun NavGraphBuilder.homeGraph(
                 onNavigateToAmortization = onNavigateToAmortization,
                 onNavigateToLoanComparison = onNavigateToLoanComparison,
                 onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
+                // demo:end
             )
         }
     }

@@ -79,7 +79,7 @@ while IFS= read -r d; do
   [ -z "$d" ] && continue
   say "rm -rf ${d#./}"
   [ "$APPLY" -eq 1 ] && rm -rf "$d"
-done < <(find core -type d -name demo -not -path '*/build/*' 2>/dev/null)
+done < <(find core feature -type d -name demo -not -path '*/build/*' 2>/dev/null)
 
 # ── 5. Delete demo feature modules ────────────────────────────────────────────────────
 echo "delete demo feature modules:"

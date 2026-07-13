@@ -36,6 +36,9 @@ private object ChargeTypeConvertersInstalled
  */
 val DatabaseModule = module {
     includes(platformModule)
+    // infra (framework) — always kept
+    single { get<AppDatabase>().bookkeeperDao }
+    // demo:begin — customizer --clean strips the demo converters install + demo DAO providers
     single(createdAtStart = true) {
         ChargeTypeConverters.install(get<FieldEncryptor>())
         ChargeTypeConvertersInstalled
@@ -44,11 +47,11 @@ val DatabaseModule = module {
     single { get<AppDatabase>().coinMarketDao }
     single { get<AppDatabase>().coinDetailDao }
     single { get<AppDatabase>().rateHistoryDao }
-    single { get<AppDatabase>().bookkeeperDao }
     single { get<AppDatabase>().loanDao }
     single { get<AppDatabase>().billReminderDao }
     single { get<AppDatabase>().alertDao }
     single { get<AppDatabase>().interestRateSeriesDao }
+    // demo:end
 }
 
 /**

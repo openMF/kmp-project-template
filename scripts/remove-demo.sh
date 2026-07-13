@@ -55,6 +55,22 @@ while IFS= read -r f; do
   fi
 done <<< "$MARKED_FILES"
 
+# ── 3b. Remove dangling demo imports left in surviving files by the block strip ───────
+#     (an `import kpt.core.<m>.demo.…` or `import kpt.feature.<demoFeature>.…` whose target
+#      was just deleted is an unresolved-reference compile error, not a warning — drop them.)
+echo "remove dangling demo imports:"
+DEMO_PKGS=$(echo "$DEMO_FEATURES" | tr -d '-' | paste -sd'|' -)
+[ -z "$DEMO_PKGS" ] && DEMO_PKGS="__none__"
+say "strip 'import kpt.core.*.demo.*' + demo-feature imports from surviving .kt files"
+if [ "$APPLY" -eq 1 ]; then
+  find . -name '*.kt' -not -path '*/build/*' -print0 | while IFS= read -r -d '' f; do
+    sed -i '' -E \
+      -e '/^import kpt\.core\.[a-z]+\.demo\./d' \
+      -e "/^import kpt\\.feature\\.(${DEMO_PKGS})[.]/d" \
+      "$f"
+  done
+fi
+
 # ── 4. Delete every **/demo/** package directory under core/ ──────────────────────────
 echo "delete demo packages:"
 while IFS= read -r d; do

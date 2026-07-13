@@ -67,6 +67,10 @@ val DataModule = module {
     // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
     single { get<AppDatabase>().draftDao }
 
+    // App-scoped CoroutineScope for cross-VM long-running coroutines (framework infra).
+    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+
+    // demo:begin — customizer --clean strips all demo repositories, outboxes, syncers + their DAOs
     // Personal watchlist — local-only persistence for the SubmitHandler showcase.
     single { get<AppDatabase>().watchlistDao }
     single<WatchlistRepository> { WatchlistRepositoryImpl(get()) }
@@ -142,8 +146,11 @@ val DataModule = module {
         )
     }
 
+    // demo:end
+
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 
+    // demo:begin — customizer --clean strips the demo fintech/economic/alerts repositories + syncer
     // Fintech Repositories
     single<CurrencyRepository> {
         CurrencyRepositoryImpl(
@@ -193,9 +200,6 @@ val DataModule = module {
         RoomSubmitOutbox(dao = get(), serializer = PriceAlert.serializer())
     }
 
-    // App-scoped CoroutineScope for cross-VM long-running coroutines (e.g., OfflineSubmitSyncer).
-    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
-
     // Eager singleton — starts watching network online events at Koin start; retries
     // any pending alerts when connectivity returns. For the local-only alerts feature,
     // the submit block commits directly to the repository (simulating offline resilience).
@@ -209,10 +213,12 @@ val DataModule = module {
         syncer.start()
         syncer
     }
+    // demo:end
 }
 
 expect val platformModule: Module
 
+// demo:begin — marker singletons for the demo submit syncers (stripped with the demo repos)
 /**
  * Marker singleton wrapping the Loan offline submit syncer.
  *
@@ -228,3 +234,4 @@ internal class LoanSubmitSyncer internal constructor(
 internal class BillReminderSubmitSyncer internal constructor(
     @Suppress("unused") val syncer: OfflineSubmitSyncer<BillReminder, BillReminder>,
 )
+// demo:end

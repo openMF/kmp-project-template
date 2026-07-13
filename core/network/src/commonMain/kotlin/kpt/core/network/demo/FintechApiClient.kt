@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.network.infra
+package kpt.core.network.demo
 
 import de.jensklingenberg.ktorfit.Ktorfit
 import kpt.core.network.demo.crypto.api.CoinGeckoApi

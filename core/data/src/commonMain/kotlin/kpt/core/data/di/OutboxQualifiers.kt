@@ -44,6 +44,7 @@ import org.koin.core.qualifier.named
  * `ClassCastException-at-first-save` shows up at runtime.
  */
 object OutboxQualifiers {
+    // demo:begin — demo submit-outbox qualifiers (stripped with the demo features)
     /** `SubmitOutbox<kpt.core.model.demo.banking.Loan>`. */
     val Loan = named("outbox.loan")
 
@@ -55,4 +56,5 @@ object OutboxQualifiers {
 
     /** `SubmitOutbox<kpt.core.model.demo.alerts.PriceAlert>`. */
     val PriceAlert = named("outbox.priceAlert")
+    // demo:end
 }

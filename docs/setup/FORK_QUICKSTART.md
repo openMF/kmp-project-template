@@ -214,6 +214,54 @@ and launch successfully. If the install fails:
 
 ---
 
+## Optional — Remove the demo showcase (`customizer.sh --clean`)
+
+The template ships a full Money-Toolkit demo (loans, bills, interest rates,
+calculators, crypto, …) so a fresh clone runs a real app out of the box. When
+you're ready to build your own product on the framework, remove the **entire**
+demo in one command:
+
+```bash
+bash customizer.sh --clean            # preview (dry-run) — prints exactly what will change
+bash customizer.sh --clean --apply    # perform the removal
+```
+
+This leaves a **minimal, compiling shell**: the app scaffold, navigation, DI,
+the Room database, and the `home` / `profile` / `settings` tabs (home becomes an
+empty `Scaffold` with a title bar + settings action for you to fill). Everything
+demo is gone — 10 feature modules, all demo data/domain packages, and the demo
+database schema (auto-reset to `VERSION = 1`, so a fresh fork starts clean).
+
+> `--clean` never touches `baseNamespace` or your fork identity (Step 1) — it
+> removes demo **features** only.
+
+### The convention (so *your* features stay removable + syncable)
+
+The separation runs on two mechanical conventions. Follow them and your own
+demo/sample code stays cleanly removable, while framework improvements keep
+flowing in via [`sync-dirs`](SYNC_SCRIPT.md) without ever clobbering your demo:
+
+- **Demo domain code lives under a `demo/` package segment** —
+  `kpt.core.<module>.demo.<domain>` (e.g. `kpt.core.data.demo.banking`). The
+  `**/demo/**` glob is what `--clean` deletes and what `sync-dirs` excludes.
+  Framework code **never** references a `demo/` package outside a demo-marked block.
+- **Demo edits in shared/central files are wrapped in `// demo:begin … // demo:end`
+  markers** — in the `@Database`, the Koin modules, the store registry,
+  `settings.gradle.kts`, and the home/nav shell. `--clean` strips these blocks and
+  leaves the surrounding framework code valid and compiling.
+- **Demo feature modules are `include(...)`d inside the `settings.gradle.kts`
+  demo-marked block** — `--clean` deletes both the module directories and their includes.
+
+A CI gate — `scripts/verify-demo-convention.sh`, wired into the **Quality Gate**
+workflow — fails the build on any drift from these rules, so the `--clean` removal
+stays safe as the codebase evolves. Run it locally any time:
+
+```bash
+bash scripts/verify-demo-convention.sh
+```
+
+---
+
 ## Beyond Day 1
 
 Once Steps 1–5 are done you have a renamed, signed, running demo build. The

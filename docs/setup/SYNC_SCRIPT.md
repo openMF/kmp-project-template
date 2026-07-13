@@ -159,6 +159,30 @@ declare -A EXCLUSIONS=(
 )
 ```
 
+### Demo⇄framework separation — sync contract
+
+`sync-dirs.sh` syncs the framework layers — including **`core/`** — so forks
+receive architecture improvements automatically. To make that safe alongside the
+removable demo showcase (see
+[FORK_QUICKSTART → Remove the demo showcase](FORK_QUICKSTART.md#optional--remove-the-demo-showcase-customizersh---clean)),
+`is_excluded()` skips two classes of path so a sync **never overwrites your own
+demo/sample code or your fork's customization seam**:
+
+- **`*/demo/*` (and any `demo/` leaf)** — every demo domain package lives under a
+  `demo/` segment (`kpt.core.<module>.demo.<domain>`). Excluding the glob means the
+  template's demo never lands in your fork via sync, and your own `demo/` code is
+  never clobbered. This is the same `**/demo/**` glob `customizer.sh --clean` deletes.
+- **The `core/store` customization seam** — `AppScreenStateDefaults.kt`,
+  `AppErrorMapper.kt`, `AppStoreRegistry.kt`, and `StoreModule.kt` are the files a
+  fork edits to brand state visuals and register its own stores (see
+  `core/store/README.md`). They are excluded so template updates to `core/` don't
+  revert your branding.
+
+Everything else under `core/` (the `infra` layer, framework services, base
+contracts) syncs normally. The `scripts/verify-demo-convention.sh` gate (C5) fails
+CI if the `*/demo/*` exclusion is ever dropped from `sync-dirs.sh`, keeping this
+contract intact.
+
 ### Branching Strategy
 
 The sync process uses a dedicated branching strategy:

@@ -20,6 +20,16 @@ on:
   workflow_dispatch:
 
 jobs:
+  demo-convention:
+    name: Demo Convention
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Pure bash + grep + find — no Java/Gradle. Fails on any demo⇄framework
+      # separation drift so `customizer.sh --clean` stays a safe, source-valid removal.
+      - name: Verify demo⇄framework separation convention
+        run: bash scripts/verify-demo-convention.sh
+
   spotless:
     name: Spotless
     runs-on: ubuntu-latest

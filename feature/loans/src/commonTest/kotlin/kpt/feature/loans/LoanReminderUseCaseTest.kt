@@ -17,8 +17,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
-import kpt.core.model.banking.Loan
-import kpt.core.model.banking.LoanKind
+import kpt.core.model.demo.banking.Loan
+import kpt.core.model.demo.banking.LoanKind
 import kpt.sync.NotificationContent
 import kpt.sync.WorkHandle
 import kpt.sync.WorkMode

@@ -10,7 +10,7 @@
 package kpt.feature.calculators.wizard
 
 import kotlinx.serialization.json.Json
-import kpt.core.model.banking.LoanCalcScenario
+import kpt.core.model.demo.banking.LoanCalcScenario
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -21,7 +21,7 @@ import kotlin.test.fail
  * Regression guard for the 2026-05-25 production crash:
  *
  *   `java.lang.ClassCastException: kpt.feature.calculators.wizard.LoanCalcScenario
- *    cannot be cast to kpt.core.model.alerts.PriceAlert`
+ *    cannot be cast to kpt.core.model.demo.alerts.PriceAlert`
  *
  * Root cause: `CalculatorsModule` requested `outbox: SubmitOutbox<LoanCalcScenario>` from
  * Koin, but no matching `single<SubmitOutbox<LoanCalcScenario>>` was registered. Koin fell

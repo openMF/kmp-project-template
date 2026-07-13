@@ -48,7 +48,7 @@ import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.banking.Loan
+import kpt.core.model.demo.banking.Loan
 import kpt.feature.loans.generated.resources.Res
 import kpt.feature.loans.generated.resources.screens_loans_detail_annual_rate_label
 import kpt.feature.loans.generated.resources.screens_loans_detail_annual_rate_value

@@ -17,8 +17,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.data.banking.BillReminderRepository
-import kpt.core.model.banking.BillReminder
+import kpt.core.data.demo.banking.BillReminderRepository
+import kpt.core.model.demo.banking.BillReminder
 import kpt.feature.bills.notification.BillNotificationGateway
 import kotlin.time.Clock
 

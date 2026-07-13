@@ -10,16 +10,16 @@
 package kpt.core.store.di
 
 import kpt.core.store.AppStoreRegistry
-import kpt.core.store.alerts.impl.provideAlertsStore
-import kpt.core.store.banking.impl.provideBillRemindersStore
-import kpt.core.store.banking.impl.provideLoansStore
-import kpt.core.store.crypto.impl.provideCoinDetailStore
-import kpt.core.store.crypto.impl.provideCoinMarketsStore
-import kpt.core.store.currency.impl.provideExchangeRatesStore
-import kpt.core.store.currency.impl.provideRateHistoryStore
-import kpt.core.store.economic.impl.provideInterestRateSeriesStore
-import kpt.core.store.economic.impl.provideMacroIndicatorStore
-import kpt.core.store.exchange.impl.provideSpotRateLookupStore
+import kpt.core.store.demo.alerts.impl.provideAlertsStore
+import kpt.core.store.demo.banking.impl.provideBillRemindersStore
+import kpt.core.store.demo.banking.impl.provideLoansStore
+import kpt.core.store.demo.crypto.impl.provideCoinDetailStore
+import kpt.core.store.demo.crypto.impl.provideCoinMarketsStore
+import kpt.core.store.demo.currency.impl.provideExchangeRatesStore
+import kpt.core.store.demo.currency.impl.provideRateHistoryStore
+import kpt.core.store.demo.economic.impl.provideInterestRateSeriesStore
+import kpt.core.store.demo.economic.impl.provideMacroIndicatorStore
+import kpt.core.store.demo.exchange.impl.provideSpotRateLookupStore
 import kpt.core.store.infra.StoreCacheManager
 import kpt.core.store.infra.impl.StoreCacheManagerImpl
 import org.koin.core.module.Module
@@ -48,6 +48,7 @@ val appStoreModule: Module = module {
         )
     }
 
+    // demo:begin — customizer --clean strips all demo stores + their logout registration
     // Fintech Stores (internal — exposed only through repositories)
     single(AppStoreRegistry.ExchangeRates) { provideExchangeRatesStore(get(), get(), get()) }
     single(AppStoreRegistry.RateHistory) { provideRateHistoryStore(get(), get(), get()) }
@@ -93,4 +94,5 @@ val appStoreModule: Module = module {
         mgr.register(get(AppStoreRegistry.BillReminders))
         mgr.register(get(AppStoreRegistry.SpotRate))
     }
+    // demo:end
 }

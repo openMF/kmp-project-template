@@ -49,7 +49,7 @@ import kpt.core.designsystem.component.RateBadge
 import kpt.core.designsystem.component.RateDirection
 import kpt.core.designsystem.theme.finance
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.economic.InterestRateSeries
+import kpt.core.model.demo.economic.InterestRateSeries
 import kpt.feature.rates.generated.resources.Res
 import kpt.feature.rates.generated.resources.screens_rates_back_cd
 import kpt.feature.rates.generated.resources.screens_rates_list_title

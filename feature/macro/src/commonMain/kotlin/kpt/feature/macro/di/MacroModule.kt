@@ -9,7 +9,7 @@
  */
 package kpt.feature.macro.di
 
-import kpt.core.model.economic.IndicatorKind
+import kpt.core.model.demo.economic.IndicatorKind
 import kpt.feature.macro.ui.CountryMacroViewModel
 import kpt.feature.macro.ui.CountryPickerViewModel
 import kpt.feature.macro.ui.MacroIndicatorDetailViewModel
@@ -25,7 +25,7 @@ import org.koin.dsl.module
  * - [MacroIndicatorDetailViewModel] takes (countryCode, indicatorKind) as
  *   parameters — one VM per detail screen, scoped to the back-stack entry.
  * - [CountryPickerViewModel] has no parameters; it reads only from
- *   [kpt.core.data.economic.SupportedCountries].
+ *   [kpt.core.data.demo.economic.SupportedCountries].
  */
 val MacroModule = module {
     viewModel { (countryCode: String) ->

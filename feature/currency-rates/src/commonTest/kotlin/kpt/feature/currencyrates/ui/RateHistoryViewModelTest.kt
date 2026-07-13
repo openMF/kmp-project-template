@@ -17,8 +17,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.model.currency.RateHistory
-import kpt.core.model.currency.RateHistoryKey
+import kpt.core.model.demo.currency.RateHistory
+import kpt.core.model.demo.currency.RateHistoryKey
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

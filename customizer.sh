@@ -37,6 +37,16 @@ if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
   print_error "Bash 4+ required. macOS ships with Bash 3 — run: brew install bash"
 fi
 
+# ── --clean: strip the demo showcase (showcase-framework-separation) ─────────
+# Delegates to scripts/remove-demo.sh. Dry-run by default; pass --apply to perform.
+# Removal only — does NOT read or write the app-namespace identity key (out of scope).
+if [[ "${1:-}" == "--clean" ]]; then
+  shift
+  print_info "Demo-showcase removal (customizer --clean)…"
+  bash "$(dirname "$0")/scripts/remove-demo.sh" "$@"
+  exit $?
+fi
+
 # ── Args ─────────────────────────────────────────────────────────────────────
 if [[ $# -lt 2 ]]; then
   echo -e "${BOLD}Usage:${NC} bash customizer.sh <package_id> <project_name> [app_display_name] [ios_team_id]"

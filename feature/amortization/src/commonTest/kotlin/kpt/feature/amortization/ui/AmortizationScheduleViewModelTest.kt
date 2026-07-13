@@ -13,8 +13,8 @@ import app.cash.turbine.test
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.model.banking.Loan
-import kpt.core.model.banking.LoanKind
+import kpt.core.model.demo.banking.Loan
+import kpt.core.model.demo.banking.LoanKind
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals

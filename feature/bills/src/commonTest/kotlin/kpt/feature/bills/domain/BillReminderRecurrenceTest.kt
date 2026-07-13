@@ -11,9 +11,9 @@ package kpt.feature.bills.domain
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kpt.core.model.banking.BillCategory
-import kpt.core.model.banking.BillReminder
-import kpt.core.model.banking.Recurrence
+import kpt.core.model.demo.banking.BillCategory
+import kpt.core.model.demo.banking.BillReminder
+import kpt.core.model.demo.banking.Recurrence
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

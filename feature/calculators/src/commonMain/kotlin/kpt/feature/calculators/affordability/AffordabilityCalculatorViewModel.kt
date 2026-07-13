@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.domain.calc.AffordabilityResult
-import kpt.core.domain.calc.maxAffordableLoan
+import kpt.core.domain.demo.calc.AffordabilityResult
+import kpt.core.domain.demo.calc.maxAffordableLoan
 
 /**
  * Pure-compute VM for B5 Affordability Calculator. Demonstrates the "no Store,

@@ -11,7 +11,7 @@ package kpt.core.database.di
 
 import kpt.core.base.security.FieldEncryptor
 import kpt.core.database.AppDatabase
-import kpt.core.database.currency.converter.ChargeTypeConverters
+import kpt.core.database.demo.currency.converter.ChargeTypeConverters
 import org.koin.core.module.Module
 import org.koin.dsl.module
 

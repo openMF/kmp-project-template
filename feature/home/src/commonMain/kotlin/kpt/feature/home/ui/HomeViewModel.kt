@@ -22,13 +22,13 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.combineScreenStates
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.data.banking.BillReminderRepository
-import kpt.core.data.banking.LoanRepository
-import kpt.core.data.currency.CurrencyRepository
-import kpt.core.data.economic.EconomicRatesRepository
-import kpt.core.model.banking.BillReminder
-import kpt.core.model.currency.ExchangeRates
-import kpt.core.store.economic.impl.InterestRateSeriesKey
+import kpt.core.data.demo.banking.BillReminderRepository
+import kpt.core.data.demo.banking.LoanRepository
+import kpt.core.data.demo.currency.CurrencyRepository
+import kpt.core.data.demo.economic.EconomicRatesRepository
+import kpt.core.model.demo.banking.BillReminder
+import kpt.core.model.demo.currency.ExchangeRates
+import kpt.core.store.demo.economic.impl.InterestRateSeriesKey
 
 /**
  * **Money Toolkit home dashboard ViewModel.**
@@ -258,7 +258,7 @@ data class LoansSummary(
      * horizontally-scrollable carousel below the totals so users can flip through every loan
      * without leaving the dashboard.
      */
-    val loans: List<kpt.core.model.banking.Loan> = emptyList(),
+    val loans: List<kpt.core.model.demo.banking.Loan> = emptyList(),
 )
 
 /**

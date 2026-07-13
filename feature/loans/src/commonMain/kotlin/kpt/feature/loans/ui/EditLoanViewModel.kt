@@ -18,9 +18,9 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.base.ui.viewmodel.BaseDraftMutationViewModel
-import kpt.core.data.banking.LoanRepository
-import kpt.core.model.banking.Loan
-import kpt.core.model.banking.LoanKind
+import kpt.core.data.demo.banking.LoanRepository
+import kpt.core.model.demo.banking.Loan
+import kpt.core.model.demo.banking.LoanKind
 import kotlin.random.Random
 import kotlin.time.Clock
 

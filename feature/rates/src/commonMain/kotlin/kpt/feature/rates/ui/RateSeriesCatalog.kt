@@ -9,7 +9,7 @@
  */
 package kpt.feature.rates.ui
 
-import kpt.core.store.economic.impl.InterestRateSeriesKey
+import kpt.core.store.demo.economic.impl.InterestRateSeriesKey
 
 /**
  * The four default FRED series shown by the B7 Interest Rate Tracker.

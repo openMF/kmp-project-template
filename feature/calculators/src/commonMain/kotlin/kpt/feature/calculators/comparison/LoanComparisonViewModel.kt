@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.domain.calc.computeEmi
-import kpt.core.model.emi.EmiResult
+import kpt.core.domain.demo.calc.computeEmi
+import kpt.core.model.demo.emi.EmiResult
 
 /**
  * VM for B6 Loan Comparison.
@@ -24,7 +24,7 @@ import kpt.core.model.emi.EmiResult
  * Manages exactly 3 loan scenarios side-by-side and emits a derived analysis
  * (per-scenario [EmiResult] + index of the cheapest by total payable).
  *
- * The "save scenario" feature wires into [kpt.core.data.banking.LoanRepository]
+ * The "save scenario" feature wires into [kpt.core.data.demo.banking.LoanRepository]
  * (see B6 plan) — left to the screen layer to bridge: convert a scenario to a
  * `Loan` and call `upsert`.
  */

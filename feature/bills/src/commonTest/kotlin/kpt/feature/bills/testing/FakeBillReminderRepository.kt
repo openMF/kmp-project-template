@@ -12,10 +12,10 @@ package kpt.feature.bills.testing
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import kpt.core.data.banking.BillReminderRepository
-import kpt.core.model.banking.BillCategory
-import kpt.core.model.banking.BillReminder
-import kpt.core.model.banking.Recurrence
+import kpt.core.data.demo.banking.BillReminderRepository
+import kpt.core.model.demo.banking.BillCategory
+import kpt.core.model.demo.banking.BillReminder
+import kpt.core.model.demo.banking.Recurrence
 
 /**
  * In-memory [BillReminderRepository] for ViewModel-level unit tests.

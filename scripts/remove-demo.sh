@@ -117,7 +117,11 @@ for pair in "${SHELL_MAP[@]}"; do
 done
 
 # ── 8. Formatter pass to drop the now-unused demo imports left by the block strip ─────
-say "run ./gradlew spotlessApply (drops now-unused demo imports)"
-[ "$APPLY" -eq 1 ] && ./gradlew spotlessApply --console=plain -q || true
+if [ "$APPLY" -eq 1 ] && [ "$FORMAT" -eq 1 ]; then
+  say "run ./gradlew spotlessApply (drops now-unused imports left by the strip)"
+  ./gradlew spotlessApply --console=plain -q || true
+else
+  say "spotless SKIPPED (--no-format or dry-run)"
+fi
 
 echo "remove-demo: done ($MODE)."

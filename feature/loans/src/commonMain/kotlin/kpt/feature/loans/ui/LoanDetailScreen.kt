@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
@@ -89,7 +90,7 @@ fun LoanDetailScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.LoanDetail.SCAFFOLD),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.screens_loans_detail_title)) },

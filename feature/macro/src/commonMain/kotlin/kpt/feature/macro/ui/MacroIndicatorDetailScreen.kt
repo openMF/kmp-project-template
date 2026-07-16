@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
@@ -83,7 +84,7 @@ fun MacroIndicatorDetailScreen(
 ) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.MacroIndicatorDetail.SCREEN),
         topBar = {
             TopAppBar(
                 title = {

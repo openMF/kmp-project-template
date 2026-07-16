@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.designsystem.icon.AppIcons
@@ -32,7 +33,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun NotificationScreen(modifier: Modifier = Modifier, onBackClick: () -> Unit) {
     NotificationScreenContent(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.Notification.SCREEN),
         onBackClick = onBackClick,
     )
 }

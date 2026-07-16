@@ -64,7 +64,7 @@ fun CoinMarketsScreen(
     val loadingLabel = stringResource(Res.string.screens_crypto_coin_markets_load_more_loading)
     val endLabel = stringResource(Res.string.screens_crypto_coin_markets_load_more_end)
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.SCREEN),
         topBar = {
             TopAppBar(
                 title = {

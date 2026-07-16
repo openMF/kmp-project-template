@@ -21,8 +21,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
+import kpt.feature.showcase.TestTags
 import kpt.feature.showcase.generated.resources.Res
 import kpt.feature.showcase.generated.resources.screens_showcase_transition_gallery_intro
 import org.jetbrains.compose.resources.stringResource
@@ -45,7 +47,7 @@ fun TransitionGalleryScreen(
     KptScaffold(
         onNavigationIconClick = onBackClick,
         title = "Transition Gallery (dev)",
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.TransitionGallery.SCREEN),
     ) {
         Column(
             modifier = Modifier

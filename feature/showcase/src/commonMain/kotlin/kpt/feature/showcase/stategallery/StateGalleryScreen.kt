@@ -25,8 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.base.store.screen.ScreenState
+import kpt.feature.showcase.TestTags
 import kpt.core.base.ui.screen.DefaultErrorContent
 import kpt.core.base.ui.screen.DefaultNoNetworkContent
 import kpt.core.base.ui.screen.LocalScreenStateDefaults
@@ -64,7 +66,7 @@ fun StateGalleryScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
     KptScaffold(
         onNavigationIconClick = onBackClick,
         title = "State Gallery (dev)",
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.StateGallery.SCREEN),
     ) {
         Column(
             modifier = Modifier

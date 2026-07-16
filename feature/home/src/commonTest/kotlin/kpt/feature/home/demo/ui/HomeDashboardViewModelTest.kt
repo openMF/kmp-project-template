@@ -159,7 +159,7 @@ class HomeDashboardViewModelTest {
 // region Minimal test doubles (file-private)
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
-private class FakeDashboardCurrencyRepository : CurrencyRepository {
+internal class FakeDashboardCurrencyRepository : CurrencyRepository {
     override suspend fun syncWith(synchronizer: Synchronizer): Boolean = true
     private val source = MutableStateFlow<ScreenState<ExchangeRates>>(ScreenState.Loading)
     var lastFetchPolicy: FetchPolicy? = null
@@ -185,7 +185,7 @@ private class FakeDashboardCurrencyRepository : CurrencyRepository {
     )
 }
 
-private object EmptyLoanRepository : LoanRepository {
+internal object EmptyLoanRepository : LoanRepository {
     private val empty = MutableStateFlow<List<Loan>>(emptyList())
     override fun observeAll(): Flow<List<Loan>> = empty
     override fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
@@ -197,7 +197,7 @@ private object EmptyLoanRepository : LoanRepository {
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
-private object EmptyBillReminderRepository : BillReminderRepository {
+internal object EmptyBillReminderRepository : BillReminderRepository {
     private val empty = MutableStateFlow<List<BillReminder>>(emptyList())
     override fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> = empty
@@ -210,7 +210,7 @@ private object EmptyBillReminderRepository : BillReminderRepository {
 }
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
-private object LoadingEconomicRatesRepository : EconomicRatesRepository {
+internal object LoadingEconomicRatesRepository : EconomicRatesRepository {
     override fun interestRateSeriesStream(
         key: InterestRateSeriesKey,
         scope: CoroutineScope,

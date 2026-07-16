@@ -30,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kpt.core.base.analytics.AnalyticsHelper
@@ -98,7 +99,9 @@ internal fun SettingsScreen(
     }
 
     SettingsScreenContent(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .testTag(TestTags.Settings.SCREEN),
         onBackClick = onBackClick,
         onThemeCardClick = {
             analyticsHelper.logSettingsDialogVisible(true)

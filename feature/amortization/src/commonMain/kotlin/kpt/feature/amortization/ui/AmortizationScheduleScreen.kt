@@ -28,6 +28,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.platform.testTag
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -67,7 +68,7 @@ fun AmortizationScheduleScreen(
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.AmortizationSchedule.SCREEN),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.screens_amortization_schedule_title)) },

@@ -21,6 +21,12 @@ object TestTags {
 
     /** Tags for `HomeScreen` (the bottom-nav home dashboard). */
     object Home {
+        /**
+         * Root [Scaffold] surface of `HomeScreen` — always rendered regardless
+         * of dashboard loading state. Stable target for Compose UI tests.
+         */
+        const val SCREEN: String = "home.screen"
+
         /** The vertically-scrollable dashboard `Column`. */
         const val DASHBOARD_SCROLL: String = "home_dashboard_scroll"
     }

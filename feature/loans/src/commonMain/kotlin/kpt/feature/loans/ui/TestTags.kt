@@ -13,11 +13,19 @@ package kpt.feature.loans.ui
  * Append-only test-tag registry for the personal-loans feature.
  *
  * Consumed by:
- *  - Compose UI tests in `feature/loans/src/commonTest/`
- *    (`PersonalLoansListScreenUiTest`, `LoansJourneyUiTest`).
+ *  - Per-screen Compose UI tests in `feature/loans/src/commonTest/`
+ *    (`PersonalLoansListScreenUiTest`, `LoanDetailScreenUiTest`,
+ *    `AddOrEditLoanScreenUiTest`).
  *  - Maestro on-device flows under `maestro/screen-state/` — Maestro
  *    resolves these string constants via `assertVisible: { id: "..." }`
  *    matchers on Android's `Modifier.testTag(...)` semantics.
+ *
+ * Journey-level (multi-screen) coverage is NOT an in-process Compose test here:
+ * feature ScreenContent is `internal` and not reachable cross-module from a
+ * nav/host test, so per RULE-KMP-COMPOSE-UITEST-001 CU-4 a loans journey is
+ * covered by a device-runnable Maestro flow (`journey-maestro-gen`), executed
+ * on device per RULE-IMPL-BEHAVIOR-EXECUTED-001 BE-3 — never by making
+ * ScreenContent public.
  *
  * **APPEND-ONLY contract (RULE-KMP-COMPOSE-UITEST-001 CU-5).** Removing or
  * renaming any string breaks the build (test-side compile reference) and the
@@ -45,5 +53,17 @@ object TestTags {
 
         /** Confirm button in the delete-loan alert dialog. */
         const val DELETE_CONFIRM: String = "loans_list_delete_confirm"
+    }
+
+    /** Tags for [LoanDetailScreen]. */
+    object LoanDetail {
+        /** Root [Scaffold] — always visible once the screen is composed. */
+        const val SCAFFOLD: String = "loan_detail_scaffold"
+    }
+
+    /** Tags for [AddOrEditLoanScreen]. */
+    object AddOrEditLoan {
+        /** Root [Scaffold] — always visible once the screen is composed. */
+        const val SCAFFOLD: String = "addedit_loan_scaffold"
     }
 }

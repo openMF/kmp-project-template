@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.HeroCard
@@ -34,7 +35,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun ProfileScreen(modifier: Modifier = Modifier) {
     ProfileScreenContent(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .testTag(TestTags.Profile.SCREEN),
     )
 }
 

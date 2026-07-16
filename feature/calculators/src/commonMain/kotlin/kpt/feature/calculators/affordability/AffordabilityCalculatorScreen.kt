@@ -33,9 +33,11 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
+import kpt.feature.calculators.TestTags
 import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
@@ -64,7 +66,7 @@ fun AffordabilityCalculatorScreen(
     val result by viewModel.affordability.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.Affordability.SCREEN),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.screens_calc_affordability_title)) },

@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.data.demo.economic.SupportedCountries
@@ -73,7 +74,7 @@ fun CountryMacroScreen(
 
     val sp = MaterialTheme.spacing
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.CountryMacro.SCREEN),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.screens_macro_country_title)) },

@@ -59,6 +59,19 @@ country-level macro indicators. Fork to brand and extend.</p>
 - **Sync Capabilities**: Tools to stay in sync with upstream template changes
 - **Secrets Management**: Secure handling of keystores and sensitive information
 
+### Target matrix
+
+Every module gets `android` / `desktop` / `iosArm64` / `iosSimulatorArm64` / `js` / `wasmJs` from
+the shared KMP-library convention. `iosX64` (Intel simulator) and `watchosArm64` /
+`watchosSimulatorArm64` are opt-in on top of that — Compose Multiplatform ships no `iosX64`/watchOS
+UI target, so any module pulling in Compose (directly or transitively) can't add them.
+
+| Target                                | Availability                                                                         |
+|----------------------------------------|---------------------------------------------------------------------------------------|
+| `android`, `desktop`, `iosArm64`, `iosSimulatorArm64`, `js`, `wasmJs` | Every `kmp.library` / `kmp.core.base.library` module |
+| `iosX64` (Intel simulator)            | Opt-in via `kmp.library.iosx64` — `core-base:common`, `core-base:observability`, `core-base:store`, `core:auth`, `core:common`, `core:model` (Compose- and Room-free, no transitive dependency on either) |
+| `watchosArm64`, `watchosSimulatorArm64` | Opt-in via `kmp.library.watchos` — `core-base:common`, `core-base:observability` |
+
 ## 🚀 Getting Started
 
 ### Prerequisites

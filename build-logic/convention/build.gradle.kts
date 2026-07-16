@@ -102,6 +102,12 @@ gradlePlugin {
             implementationClass = "KMPCoreBaseLibraryConventionPlugin"
         }
 
+        register("kmpLibraryWatchos") {
+            id = "org.convention.kmp.library.watchos"
+            implementationClass = "KMPLibraryWatchosConventionPlugin"
+            description = "Adds watchosArm64/watchosSimulatorArm64 on top of a kmp.library(.core.base) module. Opt-in only — see plugin kdoc."
+        }
+
         // Static Analysis & Formatting Plugins
         register("detekt") {
             id = "org.convention.detekt.plugin"

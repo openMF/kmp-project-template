@@ -9,6 +9,8 @@
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    // Compose-free, no platform-SDK deps — safe for watchOS (see plugin kdoc).
+    alias(libs.plugins.kmp.library.watchos.convention)
 }
 
 kotlin {

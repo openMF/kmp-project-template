@@ -63,10 +63,12 @@
 #                            click. RECOMMENDED for most teams.
 #   --dry-run                Print what would change; make no API calls.
 #
-# Firebase note: `android-firebase` / `ios-firebase` (App Distribution test
-# channels) are intentionally NOT gated by default — they are pre-store test
-# distribution, not a store release. Add them by hand if your team wants them
-# gated too.
+# Firebase note: `android-firebase` / `ios-firebase` (App Distribution) ARE gated by
+# default — Stage 0 is the FIRST deploy point, so gating it makes EVERY rung require an
+# approval click. The publish-* ladder workflows already declare
+# `environment: <platform>-firebase` on the Stage-0 job, so setting these reviewers is
+# all that's needed. Pass --production-only to leave Firebase (and the other
+# internal/preview/prerelease TEST channels) ungated.
 #
 # Team vs individual: prefer --reviewer-team for shared/org repos. A team reviewer
 # means any team member can approve (no single point of failure), the gate keeps
@@ -100,7 +102,7 @@ while [[ $# -gt 0 ]]; do
     --wait-prod)      WAIT_PROD="$2"; shift ;;
     --production-only) PRODUCTION_ONLY=true ;;
     --dry-run)        DRY_RUN=true ;;
-    -h|--help)        sed -n '2,77p' "$0"; exit 0 ;;
+    -h|--help)        sed -n '2,79p' "$0"; exit 0 ;;
     *) echo "❌ Unknown arg: $1" >&2; exit 2 ;;
   esac
   shift
@@ -167,14 +169,17 @@ if [[ "$PERM" != "true" ]]; then
 fi
 
 # ── Build the gate list per --only ────────────────────────────────────────────
+# Firebase Stage-0 (`*-firebase`) is listed FIRST — it is the earliest deploy point, and
+# gating it makes EVERY rung require an approval click. `--production-only` strips it (and
+# the other test channels) below.
 declare -a ENVS=()
 has () { [[ ",$ONLY," == *",$1,"* ]]; }
 
 if has android; then
-  ENVS+=(android-play-internal android-play-closed android-play-beta android-play-production)
+  ENVS+=(android-firebase android-play-internal android-play-closed android-play-beta android-play-production)
 fi
 if has ios; then
-  ENVS+=(ios-testflight-internal ios-testflight-external ios-app-store)
+  ENVS+=(ios-firebase ios-testflight-internal ios-testflight-external ios-app-store)
 fi
 if has mac; then
   ENVS+=(mac-testflight-internal mac-testflight-external mac-app-store)
@@ -221,7 +226,7 @@ echo " Configure release approval gates"
 echo "   repo:      $REPO"
 echo "   reviewer:  $REVIEWER_LABEL"
 echo "   platforms: $ONLY"
-echo "   scope:     $($PRODUCTION_ONLY && echo 'production-facing stages only' || echo 'all stages (incl. internal/firebase)')"
+echo "   scope:     $($PRODUCTION_ONLY && echo 'production-facing stages only (Firebase/internal/preview left ungated)' || echo 'all stages incl. Firebase Stage 0 — approval at every point')"
 echo "   gates:     ${#ENVS[@]} environments"
 $DRY_RUN && echo "   MODE:      DRY-RUN (no changes)"
 echo "════════════════════════════════════════════════════════════════"

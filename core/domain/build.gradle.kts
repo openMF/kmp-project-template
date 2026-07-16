@@ -9,6 +9,9 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
+    // NOT applying kmp.library.iosx64.convention: depends on core:data, which is itself excluded
+    // (transitively depends on Compose Multiplatform modules — see
+    // KMPLibraryIosX64ConventionPlugin kdoc).
 }
 
 kotlin {

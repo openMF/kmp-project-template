@@ -444,6 +444,7 @@ kmp-koin-convention = { id = "org.convention.kmp.koin" }
 kmp-library-convention = { id = "org.convention.kmp.library" }
 kmp-core-base-library-convention = { id = "org.convention.kmp.core.base.library" }
 kmp-library-watchos-convention = { id = "org.convention.kmp.library.watchos" }
+kmp-library-iosx64-convention = { id = "org.convention.kmp.library.iosx64" }
 
 android-application-firebase = { id = "org.convention.android.application.firebase" }
 android-lint = { id = "org.convention.android.application.lint" }

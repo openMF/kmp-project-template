@@ -9,6 +9,8 @@
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    // Compose-free — safe for the Intel simulator target (see plugin kdoc).
+    alias(libs.plugins.kmp.library.iosx64.convention)
 }
 
 kotlin {

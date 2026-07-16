@@ -11,6 +11,8 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    // NOT applying kmp.library.iosx64.convention: androidx.room3:room3-runtime:3.0.0 publishes no
+    // iosX64 klib (see KMPLibraryIosX64ConventionPlugin kdoc).
 }
 
 kotlin {

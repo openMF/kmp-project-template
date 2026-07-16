@@ -9,6 +9,8 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
+    // NOT applying kmp.library.iosx64.convention: depends on core:analytics + core:store, both
+    // Compose Multiplatform modules with no iosX64 klib (see KMPLibraryIosX64ConventionPlugin kdoc).
 }
 
 androidComponents {

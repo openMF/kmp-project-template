@@ -9,6 +9,8 @@
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    // NOT applying kmp.library.iosx64.convention: depends on core-base:security, a Compose
+    // Multiplatform module with no iosX64 klib (see KMPLibraryIosX64ConventionPlugin kdoc).
 }
 
 kotlin {

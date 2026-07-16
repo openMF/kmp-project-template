@@ -108,6 +108,12 @@ gradlePlugin {
             description = "Adds watchosArm64/watchosSimulatorArm64 on top of a kmp.library(.core.base) module. Opt-in only — see plugin kdoc."
         }
 
+        register("kmpLibraryIosX64") {
+            id = "org.convention.kmp.library.iosx64"
+            implementationClass = "KMPLibraryIosX64ConventionPlugin"
+            description = "Adds the iosX64 (Intel simulator) target on top of a kmp.library(.core.base) module. Opt-in only — Compose Multiplatform modules must not apply it, see plugin kdoc."
+        }
+
         // Static Analysis & Formatting Plugins
         register("detekt") {
             id = "org.convention.detekt.plugin"

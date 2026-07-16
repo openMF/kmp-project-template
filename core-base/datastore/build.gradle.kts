@@ -9,6 +9,10 @@
  */
 plugins {
     alias(libs.plugins.kmp.core.base.library.convention)
+    // NOT applying kmp.library.iosx64.convention: depends on core-base:security, a Compose
+    // Multiplatform module with no iosX64 klib (see KMPLibraryIosX64ConventionPlugin kdoc) — the
+    // project() dependency itself fails variant matching for iosX64, independent of this module's
+    // own deps.
     // Explicit for local-visibility; also applied by KMPCoreBaseLibraryConventionPlugin.
     // Applying twice is idempotent (Gradle no-ops the second apply via hasPlugin gate).
     alias(libs.plugins.kotlin.serialization)

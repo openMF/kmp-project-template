@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import kpt.core.base.database.invalidation.daoFlow
+import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.base.store.submit.SubmitOutboxEntry
 import kpt.core.base.store.submit.SubmitOutboxStatus
@@ -43,41 +45,44 @@ class RoomSubmitOutbox<P>(
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    override suspend fun save(formKey: String, payload: P): Long {
+    override suspend fun save(formKey: String, payload: P): Long = notifyingWrite(DRAFTS_TABLE) {
         val nowMs = currentTimeMillis()
         val existing = dao.getPendingByFormKey(formKey)
         if (existing != null) {
             dao.updatePayload(existing.id, json.encodeToString(serializer, payload), nowMs)
-            return existing.id
+            existing.id
+        } else {
+            val entity = DraftEntity(
+                formKey = formKey,
+                uniqueKey = null,
+                payloadJson = json.encodeToString(serializer, payload),
+                status = SubmitOutboxStatus.PENDING.name,
+                createdAtMs = nowMs,
+                updatedAtMs = nowMs,
+            )
+            dao.insert(entity)
         }
-        val entity = DraftEntity(
-            formKey = formKey,
-            uniqueKey = null,
-            payloadJson = json.encodeToString(serializer, payload),
-            status = SubmitOutboxStatus.PENDING.name,
-            createdAtMs = nowMs,
-            updatedAtMs = nowMs,
-        )
-        return dao.insert(entity)
     }
 
-    override suspend fun saveByUniqueKey(formKey: String, uniqueKey: String, payload: P): Long {
-        val nowMs = currentTimeMillis()
-        val existing = dao.getPendingByUniqueKey(formKey, uniqueKey)
-        if (existing != null) {
-            dao.updatePayload(existing.id, json.encodeToString(serializer, payload), nowMs)
-            return existing.id
+    override suspend fun saveByUniqueKey(formKey: String, uniqueKey: String, payload: P): Long =
+        notifyingWrite(DRAFTS_TABLE) {
+            val nowMs = currentTimeMillis()
+            val existing = dao.getPendingByUniqueKey(formKey, uniqueKey)
+            if (existing != null) {
+                dao.updatePayload(existing.id, json.encodeToString(serializer, payload), nowMs)
+                existing.id
+            } else {
+                val entity = DraftEntity(
+                    formKey = formKey,
+                    uniqueKey = uniqueKey,
+                    payloadJson = json.encodeToString(serializer, payload),
+                    status = SubmitOutboxStatus.PENDING.name,
+                    createdAtMs = nowMs,
+                    updatedAtMs = nowMs,
+                )
+                dao.insert(entity)
+            }
         }
-        val entity = DraftEntity(
-            formKey = formKey,
-            uniqueKey = uniqueKey,
-            payloadJson = json.encodeToString(serializer, payload),
-            status = SubmitOutboxStatus.PENDING.name,
-            createdAtMs = nowMs,
-            updatedAtMs = nowMs,
-        )
-        return dao.insert(entity)
-    }
 
     override suspend fun getPending(formKey: String): SubmitOutboxEntry<P>? =
         dao.getPendingByFormKey(formKey)?.toEntry()
@@ -86,28 +91,32 @@ class RoomSubmitOutbox<P>(
         dao.getPendingByUniqueKey(formKey, uniqueKey)?.toEntry()
 
     override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> =
-        dao.observePendingByFormKey(formKey).map { it?.toEntry() }
+        daoFlow(DRAFTS_TABLE) { dao.observePendingByFormKey(formKey) }.map { it?.toEntry() }
 
     override fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<SubmitOutboxEntry<P>?> =
-        dao.observePendingByUniqueKey(formKey, uniqueKey).map { it?.toEntry() }
+        daoFlow(DRAFTS_TABLE) { dao.observePendingByUniqueKey(formKey, uniqueKey) }.map { it?.toEntry() }
 
     override fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>> =
-        dao.observeAllByFormKey(formKey).map { rows -> rows.mapNotNull { it.toEntry() } }
+        daoFlow(DRAFTS_TABLE) { dao.observeAllByFormKey(formKey) }.map { rows -> rows.mapNotNull { it.toEntry() } }
 
     override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> = dao.getAllPending().mapNotNull { it.toEntry() }
 
-    override suspend fun markRetrying(id: Long) = dao.markRetrying(id, currentTimeMillis())
+    override suspend fun markRetrying(id: Long) =
+        notifyingWrite(DRAFTS_TABLE) { dao.markRetrying(id, currentTimeMillis()) }
 
-    override suspend fun markSubmitted(id: Long) = dao.markSubmitted(id, currentTimeMillis())
+    override suspend fun markSubmitted(id: Long) =
+        notifyingWrite(DRAFTS_TABLE) { dao.markSubmitted(id, currentTimeMillis()) }
 
-    override suspend fun markFailed(id: Long, error: String?) = dao.markFailed(id, currentTimeMillis(), error)
+    override suspend fun markFailed(id: Long, error: String?) =
+        notifyingWrite(DRAFTS_TABLE) { dao.markFailed(id, currentTimeMillis(), error) }
 
-    override suspend fun deleteByFormKey(formKey: String) = dao.deleteByFormKey(formKey)
+    override suspend fun deleteByFormKey(formKey: String) =
+        notifyingWrite(DRAFTS_TABLE) { dao.deleteByFormKey(formKey) }
 
     override suspend fun deleteByUniqueKey(formKey: String, uniqueKey: String) =
-        dao.deleteByUniqueKey(formKey, uniqueKey)
+        notifyingWrite(DRAFTS_TABLE) { dao.deleteByUniqueKey(formKey, uniqueKey) }
 
-    override suspend fun deleteAll() = dao.deleteAll()
+    override suspend fun deleteAll() = notifyingWrite(DRAFTS_TABLE) { dao.deleteAll() }
 
     private fun DraftEntity.toEntry(): SubmitOutboxEntry<P>? = runCatching {
         SubmitOutboxEntry(
@@ -123,3 +132,6 @@ class RoomSubmitOutbox<P>(
 }
 
 private fun currentTimeMillis(): Long = kotlin.time.Clock.System.now().toEpochMilliseconds()
+
+/** Room `@Entity(tableName = …)` for [DraftEntity] — drives the wasmJs invalidation bridge. */
+private const val DRAFTS_TABLE = "framework_submit_drafts"

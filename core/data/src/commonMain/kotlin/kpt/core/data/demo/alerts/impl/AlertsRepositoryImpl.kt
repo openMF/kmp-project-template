@@ -12,6 +12,7 @@ package kpt.core.data.demo.alerts.impl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
+import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.data.demo.alerts.AlertsRepository
 import kpt.core.database.demo.alerts.AlertDao
 import kpt.core.database.demo.alerts.AlertEntity
@@ -32,12 +33,21 @@ internal class AlertsRepositoryImpl(
             .map { response -> response.value.map { it.toPriceAlert() } }
 
     override suspend fun submitAlert(alert: PriceAlert): PriceAlert {
-        alertDao.upsert(alert.toAlertEntity())
+        notifyingWrite(ALERTS_TABLE) {
+            alertDao.upsert(alert.toAlertEntity())
+        }
         return alert
     }
 
     override suspend fun deleteAlert(id: String) {
-        alertDao.deleteById(id)
+        notifyingWrite(ALERTS_TABLE) {
+            alertDao.deleteById(id)
+        }
+    }
+
+    private companion object {
+        /** Room `@Entity(tableName = …)` for [AlertEntity]. Shared with [provideAlertsStore]'s reader. */
+        const val ALERTS_TABLE = "alerts"
     }
 }
 

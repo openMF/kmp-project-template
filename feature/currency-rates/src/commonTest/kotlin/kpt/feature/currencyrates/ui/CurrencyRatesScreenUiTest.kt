@@ -90,7 +90,9 @@ private object UiTestNetworkMonitor : NetworkMonitor {
 private class UiTestFetchedAtRepository : FetchedAtRepository {
     private val map = mutableMapOf<String, Instant>()
     override suspend fun read(storeKey: String): Instant? = map[storeKey]
-    override suspend fun write(storeKey: String, instant: Instant) { map[storeKey] = instant }
+    override suspend fun write(storeKey: String, instant: Instant) {
+        map[storeKey] = instant
+    }
 }
 
 /** Minimal in-memory [Store] that returns a static [ExchangeRates] without any network call. */

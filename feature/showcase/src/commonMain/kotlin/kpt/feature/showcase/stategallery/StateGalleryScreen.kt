@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.base.store.screen.ScreenState
-import kpt.feature.showcase.TestTags
 import kpt.core.base.ui.screen.DefaultErrorContent
 import kpt.core.base.ui.screen.DefaultNoNetworkContent
 import kpt.core.base.ui.screen.LocalScreenStateDefaults
@@ -39,6 +38,7 @@ import kpt.core.designsystem.component.state.InlineErrorPill
 import kpt.core.designsystem.component.state.RowLoadingShimmer
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
+import kpt.feature.showcase.TestTags
 import kpt.feature.showcase.generated.resources.Res
 import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_content
 import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_empty

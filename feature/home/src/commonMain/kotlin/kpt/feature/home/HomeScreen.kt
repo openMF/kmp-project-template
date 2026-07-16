@@ -29,10 +29,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import kpt.feature.home.demo.HomeDashboard
 import kpt.feature.home.demo.ui.HomeViewModel
-import kpt.feature.home.ui.TestTags
 import kpt.feature.home.generated.resources.Res
 import kpt.feature.home.generated.resources.screens_home_app_title
 import kpt.feature.home.generated.resources.screens_home_settings_cd
+import kpt.feature.home.ui.TestTags
 import org.jetbrains.compose.resources.stringResource
 
 /**

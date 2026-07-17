@@ -38,6 +38,7 @@ SYNC_DIRS=(
     "fastlane-config"
     "spotless"       # shared copyright/format config
     "gradle/wrapper" # Gradle wrapper (properties + jar) — pins the version across forks; NOT gradle/ root (libs.versions.toml is consumer-local + auto-healed)
+    "maestro/screen-state" # framework E2E — core-base/ui screen-state retention flows (list-back, paging-restore, scroll-appkill, tab-switch); consumer feature flows live in other maestro/ subdirs + are preserved
     "scripts"
     "config"
     ".github"
@@ -70,6 +71,7 @@ SYNC_FILES=(
     # --- fork identity SCHEMA (the .template is committed + syncable; the filled-in
     #     gradle/fork.properties is gitignored + fork-local — NEVER synced) ---
     "gradle/fork.properties.template"
+    "gradle/gradle-daemon-jvm.properties"  # pins the Gradle daemon JVM toolchain (17) + foojay URLs across forks
 )
 
 # Define exclusions for directories and files

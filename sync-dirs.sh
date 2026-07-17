@@ -31,7 +31,7 @@ SYNC_DIRS=(
     "cmp-navigation" # shared root-nav module (include(":cmp-navigation")) — was missing pre-2026-07
     "sync"           # shared :sync module (include(":sync")) — was missing pre-2026-07
     "core-base"
-    "core"          # framework-only: **/demo/** + the core/store seam are excluded by convention (is_excluded)
+    "core"          # framework infra (incl. core/*/infra) syncs; **/demo/** + core/store seam preserved per-fork by sync_directory's convention block (base-branch re-assert)
     "build-logic"
     "deployment"     # 18-target deploy infra — consumer store metadata/screenshots + manifest/log excluded below
     "fastlane"
@@ -323,6 +323,26 @@ sync_directory() {
                 rm -rf "temp_$dir"
                 return 1
             }
+
+            # ── Convention exclusions on a DIRECTORY sync (the is_excluded rules:
+            #    **/demo/** + the core/store seam). Without this, a whole-dir sync of
+            #    `core`/`core-base` clobbers the fork's branded seam files and re-adds
+            #    demo packages the fork removed via `customizer --clean`. Re-assert the
+            #    fork's own state from the base branch (BASE_BRANCH) for every synced
+            #    path the convention flags: restore the fork's version if it had one,
+            #    else drop the upstream-added file the fork never had.
+            while IFS= read -r conv_f; do
+                [ -z "$conv_f" ] && continue
+                if is_excluded "$dir" "$conv_f" "file"; then
+                    if git cat-file -e "${BASE_BRANCH}:${conv_f}" 2>/dev/null; then
+                        git checkout "$BASE_BRANCH" -- "$conv_f" 2>/dev/null \
+                            && print_step "Preserved fork's ${BOLD}$conv_f${NC} (convention)"
+                    else
+                        git rm -f --quiet "$conv_f" 2>/dev/null || rm -f "$conv_f"
+                        print_step "Dropped upstream-added ${BOLD}$conv_f${NC} (fork removed it)"
+                    fi
+                fi
+            done < <(git diff --name-only "$BASE_BRANCH" -- "$dir" 2>/dev/null)
 
             # Restore excluded files and directories
             if [ -n "${EXCLUSIONS[$dir]}" ]; then

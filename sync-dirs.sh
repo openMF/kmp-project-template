@@ -612,6 +612,30 @@ if [ "$DRY_RUN" = false ]; then
     preserve_root_files
 fi
 
+# ── customization-surface advisory (fork-ownership contract) ──────────────────
+# Non-breaking: reports which about-to-be-synced paths are `merge`-owned per
+# customization-surface.yaml, so a maintainer can confirm the EXCLUSIONS map
+# preserves fork edits (e.g. AndroidManifest permissions). The mechanical sync
+# below is UNCHANGED — the contract is the declared source of truth the merge
+# engine adopts next. Fully guarded so it can never abort a sync.
+CS_READER="$(dirname "$0")/scripts/customization-surface.sh"
+if [ -f "$CS_READER" ] && [ -f "$(dirname "$0")/customization-surface.yaml" ]; then
+    # shellcheck source=/dev/null
+    source "$CS_READER" 2>/dev/null || true
+    if declare -F cs_match_g >/dev/null 2>&1; then
+        echo -e "\n${BLUE}${BOLD}Fork-ownership contract — merge-owned paths in the sync surface${NC}"
+        cs_merge_hits=0
+        while IFS= read -r _csf; do
+            cs_match_g "$_csf" || continue
+            if [ "${CS_M_OWNER:-}" = "merge" ]; then
+                echo -e "  ${YELLOW}merge${NC} $_csf ${YELLOW}(${CS_M_STRAT:-3way} — do NOT blind-overwrite)${NC}"
+                cs_merge_hits=$((cs_merge_hits + 1))
+            fi
+        done < <(git ls-files -- "${SYNC_DIRS[@]}" 2>/dev/null)
+        [ "$cs_merge_hits" -gt 0 ] && echo -e "  ${YELLOW}⚠ $cs_merge_hits merge-owned path(s) — verify EXCLUSIONS preserves fork edits (permissions, catalog, nav).${NC}"
+    fi
+fi
+
 # Sync directories
 echo -e "\n${BLUE}${BOLD}Syncing directories...${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"

@@ -9,6 +9,7 @@
  */
 package kpt.core.store.demo.alerts.impl
 
+import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.demo.alerts.AlertDao
 import kpt.core.database.demo.alerts.AlertEntity
@@ -25,12 +26,22 @@ import org.mobilenativefoundation.store.store5.Store
  *
  * Key: [Unit] — always returns all alerts (no per-alert keyed filter here;
  * per-id lookup goes through the repository directly).
+ *
+ * The DAO reader is wrapped with [daoFlow] so wasmJs collectors re-emit after writes
+ * even when Room 3 alpha05's async InvalidationTracker fails to fan out (see
+ * `core-base/database/.../invalidation/README.md`). The paired write notification is
+ * emitted by `AlertsRepositoryImpl`'s [kpt.core.base.database.invalidation.notifyingWrite]
+ * on `alertDao.upsert` / `deleteById`. On Android/Desktop/iOS the wrap is a microsecond
+ * no-op alongside Room's native invalidation.
  */
 fun provideAlertsStore(dao: AlertDao): Store<Unit, List<AlertEntity>> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
-        reader = { _: Unit -> dao.observeAll() },
+        reader = { _: Unit -> daoFlow(ALERTS_TABLE) { dao.observeAll() } },
         writer = { _: Unit, alerts: List<AlertEntity> -> dao.upsertAll(alerts) },
         delete = { _: Unit -> dao.deleteAll() },
         deleteAll = { dao.deleteAll() },
     ),
 )
+
+/** Room `@Entity(tableName = …)` for [AlertEntity]. Shared with the repository's writes. */
+private const val ALERTS_TABLE = "alerts"

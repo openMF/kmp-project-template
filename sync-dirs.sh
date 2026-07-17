@@ -41,6 +41,7 @@ SYNC_DIRS=(
     "maestro/screen-state" # framework E2E — core-base/ui screen-state retention flows (list-back, paging-restore, scroll-appkill, tab-switch); consumer feature flows live in other maestro/ subdirs + are preserved
     "scripts"
     "config"
+    "secrets"        # secrets SCAFFOLD only — secrets/sample/** placeholder tree + LAYOUT.yaml sync; real secrets/live/** is gitignored + fork-local + excluded below (never synced)
     ".github"
     ".run"
 )
@@ -93,6 +94,12 @@ declare -A EXCLUSIONS=(
     # gitignored (never synced). Add new consumer-owned deployment paths here if they appear.
     ["deployment"]="android/metadata:dir android/screenshots:dir ios/appstore/metadata:dir ios/screenshots:dir desktop/mac-app-store/metadata:dir desktop/mac-app-store/screenshots:dir fastlane/metadata:dir DEPLOYMENT_MANIFEST.yaml:file PROMOTION_LOG.yaml:file"
     [".github"]="workflows/sync-dirs.yaml:file"
+    # Secrets — sync the STRUCTURE (secrets/sample/** placeholder scaffold + LAYOUT.yaml)
+    # so forks inherit the canonical layout, but NEVER the real values: secrets/live/ is
+    # gitignored + fork-local (preserved-then-restored here as defense-in-depth even though
+    # git checkout never touches gitignored paths), and .sync-meta.json is per-fork vault
+    # sync state (SV33) — both excluded.
+    ["secrets"]="live:dir .sync-meta.json:file"
     # ["root"]="secrets.env:file"  — REMOVED: secrets.env is retired (2026-06-23).
     # Keystore DN now lives in gradle/fork.properties — that file is GITIGNORED and
     # fork-local (each fork's filled-in identity), so it is NEVER synced. Only the

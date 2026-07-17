@@ -373,6 +373,31 @@ sync_directory() {
                 fi
             done < <(git diff --name-only "$BASE_BRANCH" -- "$dir" 2>/dev/null)
 
+            # ── 3-way merge for merge-owned files (customization-surface contract) ──
+            # Replaces a blind upstream clobber with a real merge so fork edits (e.g.
+            # AndroidManifest permissions) survive a template update. ours=fork
+            # (BASE_BRANCH), theirs=upstream (temp_branch), base=merge-base. Guarded:
+            # no-op on forks that don't ship the reader.
+            if declare -F cs_match_g >/dev/null 2>&1 && declare -F cs_merge >/dev/null 2>&1; then
+                local _mbase; _mbase="$(git merge-base "$BASE_BRANCH" "$temp_branch" 2>/dev/null)"
+                while IFS= read -r _mf; do
+                    [ -z "$_mf" ] && continue
+                    cs_match_g "$_mf"; [ "${CS_M_OWNER:-}" = "merge" ] || continue
+                    local _o _b _t; _o="$(mktemp)"; _b="$(mktemp)"; _t="$(mktemp)"
+                    if git show "$BASE_BRANCH:$_mf" > "$_o" 2>/dev/null \
+                       && git show "$temp_branch:$_mf" > "$_t" 2>/dev/null; then
+                        git show "${_mbase}:$_mf" > "$_b" 2>/dev/null || cp "$_o" "$_b"
+                        mkdir -p "$(dirname "$_mf")"
+                        if cs_merge "${CS_M_STRAT:-3way}" "$_o" "$_b" "$_t" "$_mf"; then
+                            print_step "Merged (${CS_M_STRAT:-3way}) ${BOLD}$_mf${NC} — fork edits preserved"
+                        else
+                            print_warning "CONFLICT in ${BOLD}$_mf${NC} (${CS_M_STRAT:-3way}) — resolve markers before committing the sync"
+                        fi
+                    fi
+                    rm -f "$_o" "$_b" "$_t"
+                done < <(git diff --name-only "$BASE_BRANCH" "$temp_branch" -- "$dir" 2>/dev/null)
+            fi
+
             # Restore excluded files and directories
             if [ -n "${EXCLUSIONS[$dir]}" ]; then
                 local IFS=' '

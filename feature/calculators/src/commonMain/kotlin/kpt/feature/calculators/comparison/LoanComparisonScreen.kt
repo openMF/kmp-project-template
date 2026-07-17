@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.demo.emi.EmiResult
+import kpt.feature.calculators.TestTags
 import kpt.feature.calculators.generated.resources.Res
 import kpt.feature.calculators.generated.resources.screens_calc_compare_back_cd
 import kpt.feature.calculators.generated.resources.screens_calc_compare_best_badge
@@ -91,7 +93,7 @@ fun LoanComparisonScreen(
     val analysis by viewModel.analysis.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.Comparison.SCREEN),
         topBar = {
             TopAppBar(
                 title = {

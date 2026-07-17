@@ -32,6 +32,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +42,7 @@ import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
 import kpt.core.domain.demo.calc.AmortizationRow
+import kpt.feature.calculators.TestTags
 import kpt.feature.calculators.generated.resources.Res
 import kpt.feature.calculators.generated.resources.screens_calc_amortization_back_cd
 import kpt.feature.calculators.generated.resources.screens_calc_amortization_emi_label
@@ -71,7 +73,7 @@ fun AmortizationScreen(
     val summary by viewModel.summary.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.Amortization.SCREEN),
         topBar = {
             TopAppBar(
                 title = {

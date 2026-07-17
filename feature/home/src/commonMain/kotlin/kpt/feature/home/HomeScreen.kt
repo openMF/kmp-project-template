@@ -25,11 +25,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import kpt.feature.home.demo.HomeDashboard
+import kpt.feature.home.demo.ui.HomeViewModel
 import kpt.feature.home.generated.resources.Res
 import kpt.feature.home.generated.resources.screens_home_app_title
 import kpt.feature.home.generated.resources.screens_home_settings_cd
+import kpt.feature.home.ui.TestTags
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -57,9 +60,12 @@ internal fun HomeScreen(
     onNavigateToAmortization: () -> Unit,
     onNavigateToLoanComparison: () -> Unit,
     onNavigateToLoanCalcWizard: () -> Unit,
+    /** Injected for Compose UI tests; production callers use the default. */
+    dashboardViewModel: HomeViewModel? = null,
     // demo:end
 ) {
     Scaffold(
+        modifier = Modifier.testTag(TestTags.Home.SCREEN),
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -89,19 +95,36 @@ internal fun HomeScreen(
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
             // demo:begin
-            HomeDashboard(
-                onNavigateToLoans = onNavigateToLoans,
-                onNavigateToBills = onNavigateToBills,
-                onNavigateToRates = onNavigateToRates,
-                onNavigateToExchangeRates = onNavigateToExchangeRates,
-                onNavigateToRateHistory = onNavigateToRateHistory,
-                onNavigateToMacro = onNavigateToMacro,
-                onNavigateToEmi = onNavigateToEmi,
-                onNavigateToAffordability = onNavigateToAffordability,
-                onNavigateToAmortization = onNavigateToAmortization,
-                onNavigateToLoanComparison = onNavigateToLoanComparison,
-                onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
-            )
+            if (dashboardViewModel != null) {
+                HomeDashboard(
+                    onNavigateToLoans = onNavigateToLoans,
+                    onNavigateToBills = onNavigateToBills,
+                    onNavigateToRates = onNavigateToRates,
+                    onNavigateToExchangeRates = onNavigateToExchangeRates,
+                    onNavigateToRateHistory = onNavigateToRateHistory,
+                    onNavigateToMacro = onNavigateToMacro,
+                    onNavigateToEmi = onNavigateToEmi,
+                    onNavigateToAffordability = onNavigateToAffordability,
+                    onNavigateToAmortization = onNavigateToAmortization,
+                    onNavigateToLoanComparison = onNavigateToLoanComparison,
+                    onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
+                    viewModel = dashboardViewModel,
+                )
+            } else {
+                HomeDashboard(
+                    onNavigateToLoans = onNavigateToLoans,
+                    onNavigateToBills = onNavigateToBills,
+                    onNavigateToRates = onNavigateToRates,
+                    onNavigateToExchangeRates = onNavigateToExchangeRates,
+                    onNavigateToRateHistory = onNavigateToRateHistory,
+                    onNavigateToMacro = onNavigateToMacro,
+                    onNavigateToEmi = onNavigateToEmi,
+                    onNavigateToAffordability = onNavigateToAffordability,
+                    onNavigateToAmortization = onNavigateToAmortization,
+                    onNavigateToLoanComparison = onNavigateToLoanComparison,
+                    onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
+                )
+            }
             // demo:end
         }
     }

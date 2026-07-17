@@ -34,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -67,7 +68,7 @@ fun AmortizationScheduleScreen(
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.AmortizationSchedule.SCREEN),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.screens_amortization_schedule_title)) },

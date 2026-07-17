@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
@@ -154,7 +155,7 @@ fun AddOrEditBillReminderScreen(
 
             Button(
                 onClick = viewModel::onSubmit,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag(TestTags.AddOrEditBill.SAVE_BUTTON),
                 enabled = submit !is SubmitState.Submitting &&
                     form.name.isNotBlank() &&
                     form.amount > 0.0,

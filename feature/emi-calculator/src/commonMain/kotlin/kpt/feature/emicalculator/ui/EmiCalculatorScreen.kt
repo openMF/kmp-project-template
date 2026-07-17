@@ -33,6 +33,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
@@ -63,7 +64,7 @@ fun EmiCalculatorScreen(
     val emiResult by viewModel.emiResult.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.EmiCalculator.SCREEN),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.screens_emicalculator_title)) },

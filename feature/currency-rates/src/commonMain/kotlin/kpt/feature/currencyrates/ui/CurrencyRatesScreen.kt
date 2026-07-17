@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,7 +61,7 @@ fun CurrencyRatesScreen(
     val freshness by viewModel.freshness.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.CurrencyRates.ROOT),
         topBar = {
             TopAppBar(
                 title = {

@@ -19,6 +19,12 @@ package kpt.feature.crypto.ui
  *    directly via `assertVisible: { id: "..." }`).
  */
 object TestTags {
+    /**
+     * Root [Scaffold] surface — always rendered regardless of paging state.
+     * Stable assertion target for Compose UI tests.
+     */
+    const val SCREEN: String = "coinMarkets.screen"
+
     /** Scrollable [PagingScreenContent] LazyColumn. */
     const val LIST: String = "coinMarkets.list"
 

@@ -35,6 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +45,7 @@ import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.demo.banking.LoanCalcScenario
+import kpt.feature.calculators.TestTags
 import kpt.feature.calculators.generated.resources.Res
 import kpt.feature.calculators.generated.resources.screens_calc_wizard_back_cd
 import kpt.feature.calculators.generated.resources.screens_calc_wizard_button_back
@@ -113,7 +115,7 @@ fun LoanCalcWizardScreen(
     }
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.testTag(TestTags.Wizard.SCREEN),
         topBar = {
             val lastStep = LoanCalcWizardViewModel.LAST_STEP
             val titleText = stringResource(

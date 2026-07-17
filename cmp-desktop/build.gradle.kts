@@ -46,6 +46,22 @@ val appName: String = libs.versions.desktopAppName.get()
 val packageNameSpace: String = libs.versions.appId.get()
 val appVersion: String = libs.versions.desktopPackageVersion.get()
 
+// macOS CFBundleVersion (the *build* number, distinct from the marketing version).
+// TestFlight / App Store REJECT an upload whose CFBundleVersion is not strictly greater
+// than the previously uploaded one. Compose Desktop leaves `packageBuildVersion` unset by
+// default, so CFBundleVersion falls back to `packageVersion` (e.g. "1.0.0") on every build —
+// the 2nd+ macOS TestFlight upload then 409s ("bundle version must be higher than … '1.0.0'").
+// Derive a monotonic build number so each upload is unique + increasing:
+//   1. explicit `-PmacBuildVersion=<n>` (lets a lane / local build override), else
+//   2. the CI run number (`GITHUB_RUN_NUMBER`, monotonic per workflow run) as `1.0.<n>`, else
+//   3. fall back to `appVersion` (local DMG builds are never uploaded to Apple).
+// The marketing version (`packageVersion` / CFBundleShortVersionString) is unchanged.
+val macBuildVersion: String =
+    (findProperty("macBuildVersion") as? String)?.takeIf { it.isNotBlank() }
+        ?: providers.environmentVariable("GITHUB_RUN_NUMBER").orNull
+            ?.takeIf { it.isNotBlank() }?.let { "1.0.$it" }
+        ?: appVersion
+
 // Resolve the active flavor (Gradle property -PkmpFlavor=demo|prod; falls back to DSL default).
 val kmpFlavorExt = extensions.getByType<KmpFlavorExtension>()
 val activeFlavor: String = (findProperty("kmpFlavor") as? String)
@@ -78,6 +94,9 @@ compose.desktop {
 
             macOS {
                 bundleID = macBundleId
+                // CFBundleVersion — must strictly increase per TestFlight/App Store upload.
+                // See `macBuildVersion` above for the derivation + why this is required.
+                packageBuildVersion = macBuildVersion
                 dockName = windowTitle
                 appCategory = "public.app-category.finance"
                 iconFile.set(project.file("icons/ic_launcher.icns"))

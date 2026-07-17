@@ -53,6 +53,23 @@ SYNC_FILES=(
     "gradlew.bat"
     "compose_compiler_config.conf"  # compose compiler config referenced by AndroidCompose.kt
     "sync-dirs.sh"                  # self-propagate: each sync updates the consumer's own copy for next time
+    # --- blueprint infra files (2026-07 audit: full white-label blueprint coverage) ---
+    ".editorconfig"                 # shared formatting rules
+    ".gitattributes"                # shared line-ending / linguist rules
+    ".gitignore"                    # shared ignore baseline (build dirs, sync-*.log, secrets, local.properties)
+    ".actrc"                        # act (local GitHub Actions) config — pairs with .github/
+    ".ruby-version"                 # Ruby pin for Fastlane — pairs with Gemfile/Gemfile.lock
+    ".kover-floor.yml"              # coverage-floor config — pairs with config/ (kover)
+    ".claudeignore"                 # Claude tooling ignore baseline
+    # --- blueprint setup / customization scripts (root-level, not under scripts/) ---
+    "setup-project.sh"              # master fork setup script
+    "customizer.sh"                 # fork customization driver
+    "keystore-manager.sh"           # keystore generate/encode/add operations
+    "firebase-setup.sh"             # Firebase project configuration
+    "generateModuleGraphs.sh"       # module dependency-graph generator
+    # --- fork identity SCHEMA (the .template is committed + syncable; the filled-in
+    #     gradle/fork.properties is gitignored + fork-local — NEVER synced) ---
+    "gradle/fork.properties.template"
 )
 
 # Define exclusions for directories and files
@@ -75,8 +92,10 @@ declare -A EXCLUSIONS=(
     ["deployment"]="android/metadata:dir android/screenshots:dir ios/appstore/metadata:dir ios/screenshots:dir desktop/mac-app-store/metadata:dir desktop/mac-app-store/screenshots:dir fastlane/metadata:dir DEPLOYMENT_MANIFEST.yaml:file PROMOTION_LOG.yaml:file"
     [".github"]="workflows/sync-dirs.yaml:file"
     # ["root"]="secrets.env:file"  — REMOVED: secrets.env is retired (2026-06-23).
-    # Keystore DN now lives in gradle/fork.properties (non-secret, already synced
-    # via the fork.properties sync entry). Keystore passwords live in
+    # Keystore DN now lives in gradle/fork.properties — that file is GITIGNORED and
+    # fork-local (each fork's filled-in identity), so it is NEVER synced. Only the
+    # committed schema gradle/fork.properties.template syncs (see SYNC_FILES above).
+    # Keystore passwords live in
     # secrets/android/keystores/ per-value files (gitignored, not synced).
     # DO NOT REMOVE — preserves consumer-specific flavor extensions across syncs.
     # Each downstream consumer app (mifos-mobile, mifos-pay, mifos-x-field-officer-app,

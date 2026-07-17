@@ -28,11 +28,16 @@ SYNC_DIRS=(
     "cmp-ios"
     "cmp-web"
     "cmp-shared"
+    "cmp-navigation" # shared root-nav module (include(":cmp-navigation")) — was missing pre-2026-07
+    "sync"           # shared :sync module (include(":sync")) — was missing pre-2026-07
     "core-base"
     "core"          # framework-only: **/demo/** + the core/store seam are excluded by convention (is_excluded)
     "build-logic"
+    "deployment"     # 18-target deploy infra — consumer store metadata/screenshots + manifest/log excluded below
     "fastlane"
     "fastlane-config"
+    "spotless"       # shared copyright/format config
+    "gradle/wrapper" # Gradle wrapper (properties + jar) — pins the version across forks; NOT gradle/ root (libs.versions.toml is consumer-local + auto-healed)
     "scripts"
     "config"
     ".github"
@@ -44,6 +49,10 @@ SYNC_FILES=(
     "Gemfile.lock"
     "ci-prepush.bat"
     "ci-prepush.sh"
+    "gradlew"                       # wrapper launcher scripts — pin the Gradle version with gradle/wrapper
+    "gradlew.bat"
+    "compose_compiler_config.conf"  # compose compiler config referenced by AndroidCompose.kt
+    "sync-dirs.sh"                  # self-propagate: each sync updates the consumer's own copy for next time
 )
 
 # Define exclusions for directories and files
@@ -59,6 +68,11 @@ declare -A EXCLUSIONS=(
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
     ["cmp-desktop"]="icons:dir build.gradle.kts:file"
     ["fastlane-config"]="project_config.rb:file extract_config.rb:file"
+    # Deployment — sync the lane logic (_shared, Fastfile, per-target lane.rb, scripts) but
+    # PRESERVE each consumer's store listings (metadata + screenshots), their per-project
+    # deployment manifest, and their append-only promotion log. Secrets under deployment are
+    # gitignored (never synced). Add new consumer-owned deployment paths here if they appear.
+    ["deployment"]="android/metadata:dir android/screenshots:dir ios/appstore/metadata:dir ios/screenshots:dir desktop/mac-app-store/metadata:dir desktop/mac-app-store/screenshots:dir fastlane/metadata:dir DEPLOYMENT_MANIFEST.yaml:file PROMOTION_LOG.yaml:file"
     [".github"]="workflows/sync-dirs.yaml:file"
     # ["root"]="secrets.env:file"  — REMOVED: secrets.env is retired (2026-06-23).
     # Keystore DN now lives in gradle/fork.properties (non-secret, already synced

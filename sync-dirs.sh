@@ -28,13 +28,21 @@ SYNC_DIRS=(
     "cmp-ios"
     "cmp-web"
     "cmp-shared"
+    "cmp-navigation" # shared root-nav module (include(":cmp-navigation")) — was missing pre-2026-07
+    "sync"           # shared :sync module (include(":sync")) — was missing pre-2026-07
     "core-base"
-    "core"          # framework-only: **/demo/** + the core/store seam are excluded by convention (is_excluded)
+    "core"          # framework infra (incl. core/*/infra) syncs; **/demo/** + core/store seam preserved per-fork by sync_directory's convention block (base-branch re-assert)
     "build-logic"
+    "deployment"     # 18-target deploy infra — consumer store metadata/screenshots + manifest/log excluded below
     "fastlane"
     "fastlane-config"
+    "spotless"       # shared copyright/format config
+    "gradle/wrapper" # Gradle wrapper (properties + jar) — pins the version across forks; NOT gradle/ root (libs.versions.toml is consumer-local + auto-healed)
+    "maestro/screen-state" # framework E2E — core-base/ui screen-state retention flows (list-back, paging-restore, scroll-appkill, tab-switch); consumer feature flows live in other maestro/ subdirs + are preserved
     "scripts"
     "config"
+    "secrets"        # secrets SCAFFOLD only — secrets/sample/** placeholder tree + LAYOUT.yaml sync; real secrets/live/** is gitignored + fork-local + excluded below (never synced)
+    "docs"           # blueprint documentation — architecture patterns, claude pattern guides, deploy/ios/secrets/setup references; fork-ADDED docs survive (checkout never deletes fork-only files), template docs refresh
     ".github"
     ".run"
 )
@@ -44,6 +52,28 @@ SYNC_FILES=(
     "Gemfile.lock"
     "ci-prepush.bat"
     "ci-prepush.sh"
+    "gradlew"                       # wrapper launcher scripts — pin the Gradle version with gradle/wrapper
+    "gradlew.bat"
+    "compose_compiler_config.conf"  # compose compiler config referenced by AndroidCompose.kt
+    "sync-dirs.sh"                  # self-propagate: each sync updates the consumer's own copy for next time
+    # --- blueprint infra files (2026-07 audit: full white-label blueprint coverage) ---
+    ".editorconfig"                 # shared formatting rules
+    ".gitattributes"                # shared line-ending / linguist rules
+    ".gitignore"                    # shared ignore baseline (build dirs, sync-*.log, secrets, local.properties)
+    ".actrc"                        # act (local GitHub Actions) config — pairs with .github/
+    ".ruby-version"                 # Ruby pin for Fastlane — pairs with Gemfile/Gemfile.lock
+    ".kover-floor.yml"              # coverage-floor config — pairs with config/ (kover)
+    ".claudeignore"                 # Claude tooling ignore baseline
+    # --- blueprint setup / customization scripts (root-level, not under scripts/) ---
+    "setup-project.sh"              # master fork setup script
+    "customizer.sh"                 # fork customization driver
+    "keystore-manager.sh"           # keystore generate/encode/add operations
+    "firebase-setup.sh"             # Firebase project configuration
+    "generateModuleGraphs.sh"       # module dependency-graph generator
+    # --- fork identity SCHEMA (the .template is committed + syncable; the filled-in
+    #     gradle/fork.properties is gitignored + fork-local — NEVER synced) ---
+    "gradle/fork.properties.template"
+    "gradle/gradle-daemon-jvm.properties"  # pins the Gradle daemon JVM toolchain (17) + foojay URLs across forks
 )
 
 # Define exclusions for directories and files
@@ -59,10 +89,23 @@ declare -A EXCLUSIONS=(
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
     ["cmp-desktop"]="icons:dir build.gradle.kts:file"
     ["fastlane-config"]="project_config.rb:file extract_config.rb:file"
+    # Deployment — sync the lane logic (_shared, Fastfile, per-target lane.rb, scripts) but
+    # PRESERVE each consumer's store listings (metadata + screenshots), their per-project
+    # deployment manifest, and their append-only promotion log. Secrets under deployment are
+    # gitignored (never synced). Add new consumer-owned deployment paths here if they appear.
+    ["deployment"]="android/metadata:dir android/screenshots:dir ios/appstore/metadata:dir ios/screenshots:dir desktop/mac-app-store/metadata:dir desktop/mac-app-store/screenshots:dir fastlane/metadata:dir DEPLOYMENT_MANIFEST.yaml:file PROMOTION_LOG.yaml:file"
     [".github"]="workflows/sync-dirs.yaml:file"
+    # Secrets — sync the STRUCTURE (secrets/sample/** placeholder scaffold + LAYOUT.yaml)
+    # so forks inherit the canonical layout, but NEVER the real values: secrets/live/ is
+    # gitignored + fork-local (preserved-then-restored here as defense-in-depth even though
+    # git checkout never touches gitignored paths), and .sync-meta.json is per-fork vault
+    # sync state (SV33) — both excluded.
+    ["secrets"]="live:dir .sync-meta.json:file"
     # ["root"]="secrets.env:file"  — REMOVED: secrets.env is retired (2026-06-23).
-    # Keystore DN now lives in gradle/fork.properties (non-secret, already synced
-    # via the fork.properties sync entry). Keystore passwords live in
+    # Keystore DN now lives in gradle/fork.properties — that file is GITIGNORED and
+    # fork-local (each fork's filled-in identity), so it is NEVER synced. Only the
+    # committed schema gradle/fork.properties.template syncs (see SYNC_FILES above).
+    # Keystore passwords live in
     # secrets/android/keystores/ per-value files (gitignored, not synced).
     # DO NOT REMOVE — preserves consumer-specific flavor extensions across syncs.
     # Each downstream consumer app (mifos-mobile, mifos-pay, mifos-x-field-officer-app,
@@ -309,6 +352,26 @@ sync_directory() {
                 rm -rf "temp_$dir"
                 return 1
             }
+
+            # ── Convention exclusions on a DIRECTORY sync (the is_excluded rules:
+            #    **/demo/** + the core/store seam). Without this, a whole-dir sync of
+            #    `core`/`core-base` clobbers the fork's branded seam files and re-adds
+            #    demo packages the fork removed via `customizer --clean`. Re-assert the
+            #    fork's own state from the base branch (BASE_BRANCH) for every synced
+            #    path the convention flags: restore the fork's version if it had one,
+            #    else drop the upstream-added file the fork never had.
+            while IFS= read -r conv_f; do
+                [ -z "$conv_f" ] && continue
+                if is_excluded "$dir" "$conv_f" "file"; then
+                    if git cat-file -e "${BASE_BRANCH}:${conv_f}" 2>/dev/null; then
+                        git checkout "$BASE_BRANCH" -- "$conv_f" 2>/dev/null \
+                            && print_step "Preserved fork's ${BOLD}$conv_f${NC} (convention)"
+                    else
+                        git rm -f --quiet "$conv_f" 2>/dev/null || rm -f "$conv_f"
+                        print_step "Dropped upstream-added ${BOLD}$conv_f${NC} (fork removed it)"
+                    fi
+                fi
+            done < <(git diff --name-only "$BASE_BRANCH" -- "$dir" 2>/dev/null)
 
             # Restore excluded files and directories
             if [ -n "${EXCLUSIONS[$dir]}" ]; then

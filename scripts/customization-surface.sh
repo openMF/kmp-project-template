@@ -103,6 +103,69 @@ cs_resolve_owner()    { cs_match_g "$1"; printf '%s' "$CS_M_OWNER"; }
 cs_resolve_strategy() { cs_match_g "$1"; printf '%s' "$CS_M_STRAT"; }
 cs_is_default()       { cs_match_g "$1"; [ "$CS_M_DEFAULT" = "1" ]; }
 
+# 3-way merge driver for a `merge`-owned file. This is the general merge strategy
+# behind manifest-union / catalog-3way / include-union / kotlin-3way / strings-union:
+# git merge-file cleanly unions non-overlapping additions (e.g. a fork's extra
+# <uses-permission> lines) and only emits conflict markers on a true overlap.
+#
+#   cs_merge_3way <ours> <base> <theirs> [<out>]
+#     ours   = the fork's current file        base = common ancestor
+#     theirs = the upstream/template file      out  = result (default: ours, in place)
+#   returns  0 clean · 1 merged WITH conflict markers (needs review) · 2 error
+cs_merge_3way() {
+  local ours="$1" base="$2" theirs="$3" out="${4:-$1}" rc tmp
+  [ -f "$ours" ] && [ -f "$base" ] && [ -f "$theirs" ] || {
+    echo "cs_merge_3way: need existing <ours> <base> <theirs>" >&2; return 2; }
+  tmp="$(mktemp)"
+  # -p prints the merged result (does not mutate inputs); exit = conflict count.
+  git merge-file -p "$ours" "$base" "$theirs" > "$tmp"; rc=$?
+  if [ "$rc" -ge 128 ]; then rm -f "$tmp"; echo "cs_merge_3way: git merge-file error ($rc)" >&2; return 2; fi
+  mv "$tmp" "$out"
+  [ "$rc" -eq 0 ] && return 0 || return 1
+}
+
+# Semantic AndroidManifest union — the `manifest-union` strategy. A textual 3-way
+# spurious-conflicts when fork + template both insert permission lines at the same
+# spot, so union by android:name instead: take THEIRS (the template's structurally
+# updated manifest) and inject every <uses-permission>/<uses-feature> line present
+# in OURS whose android:name theirs lacks. Always clean (returns 0).
+#
+#   cs_merge_manifest <ours> <theirs> [<out>]
+cs_merge_manifest() {
+  local ours="$1" theirs="$2" out="${3:-$1}" tmp add
+  [ -f "$ours" ] && [ -f "$theirs" ] || { echo "cs_merge_manifest: need <ours> <theirs>" >&2; return 2; }
+  local theirs_names; theirs_names="$(grep -oE 'android:name="[^"]*"' "$theirs" 2>/dev/null | sort -u)"
+  # Extract each uses-permission/uses-feature ELEMENT (robust to one-per-line AND
+  # multiple-per-line manifests); add the ones whose android:name theirs lacks.
+  add="$(grep -oE '<uses-(permission|feature)[^>]*/?>' "$ours" 2>/dev/null | while IFS= read -r el; do
+        nm="$(printf '%s' "$el" | grep -oE 'android:name="[^"]*"' | head -1)"
+        [ -n "$nm" ] || continue
+        printf '%s\n' "$theirs_names" | grep -qxF "$nm" || printf '    %s\n' "$el"
+      done)"
+  if [ -z "$add" ]; then cp "$theirs" "$out"; return 0; fi
+  local addf; addf="$(mktemp)"; printf '%s\n' "$add" > "$addf"
+  tmp="$(mktemp)"
+  # Read the injected lines from a file (awk -v cannot carry newlines).
+  awk -v addf="$addf" '
+    function dumpadd(   l) { while ((getline l < addf) > 0) print l; close(addf) }
+    /<application/ && !ins { dumpadd(); ins=1 }
+    /<\/manifest>/ && !ins { dumpadd(); ins=1 }
+    { print }
+  ' "$theirs" > "$tmp"
+  mv "$tmp" "$out"; rm -f "$addf"
+  return 0
+}
+
+# Strategy dispatcher used by sync-dirs.sh for a `merge`-owned file.
+#   cs_merge <strategy> <ours> <base> <theirs> [<out>]
+cs_merge() {
+  local strat="$1" ours="$2" base="$3" theirs="$4" out="${5:-$2}"
+  case "$strat" in
+    manifest-union) cs_merge_manifest "$ours" "$theirs" "$out" ;;
+    *)              cs_merge_3way "$ours" "$base" "$theirs" "$out" ;;
+  esac
+}
+
 # ── CLI ──
 cs_main() {
   local cmd="${1:-}"; shift || true
@@ -137,8 +200,11 @@ cs_main() {
       fi
       echo "✅ every tracked path has an explicit owner"
       ;;
+    merge)
+      cs_merge "$@"   # <strategy> <ours> <base> <theirs> [<out>]
+      ;;
     *)
-      echo "usage: customization-surface.sh {resolve <path>|report|verify}" >&2
+      echo "usage: customization-surface.sh {resolve <path>|report|verify|merge <strategy> <ours> <base> <theirs> [out]}" >&2
       return 2
       ;;
   esac

@@ -65,14 +65,34 @@ cs_resolve_owner    "gradle/libs.versions.toml"   # → merge
 cs_resolve_strategy "gradle/libs.versions.toml"   # → catalog-3way
 ```
 
-## How `sync-dirs.sh` uses it (today)
+## How `sync-dirs.sh` uses it
 
-`sync-dirs.sh` sources the reader and, before the mechanical sync, prints the
-**`merge`-owned paths in the sync surface** as an advisory — so a maintainer can
-confirm the `EXCLUSIONS` map preserves fork edits. This step is fully guarded and
-**cannot abort a sync**. The mechanical `SYNC_DIRS` / `EXCLUSIONS` behaviour is
-**unchanged** in this step; the contract is the declared source of truth the merge
-engine adopts next.
+1. **Advisory report** — before the sync, `sync-dirs.sh` sources the reader and
+   prints the `merge`-owned paths in the sync surface (fully guarded, cannot abort).
+2. **3-way merge of `merge`-owned files** — after checking out the upstream copy of
+   a directory, for every file that changed between the fork base and upstream and
+   resolves to `owner: merge`, `sync-dirs.sh` runs `cs_merge <strategy> ours base
+   theirs` instead of taking the blind upstream copy:
+   - `ours` = fork's current file (`BASE_BRANCH`)
+   - `theirs` = upstream file (`temp_branch`)
+   - `base` = `git merge-base BASE_BRANCH temp_branch`
+
+   `manifest-union` runs a **semantic** union (union `<uses-permission>` /
+   `<uses-feature>` by `android:name`, keeping the template's structural update) so a
+   fork's `RECORD_AUDIO` survives a template manifest change. The other strategies
+   (`catalog-3way`, `include-union`, `kotlin-3way`, `strings-union`) run `git
+   merge-file`, which cleanly unions non-overlapping edits and emits conflict markers
+   **only on a true overlap** — surfaced with a `CONFLICT` warning for review, never
+   silently shipped.
+
+The `template`/`fork` mechanical behaviour (`SYNC_DIRS` + `EXCLUSIONS`) is unchanged;
+the contract adds the `merge` path handling that previously didn't exist. Guarded so
+forks that don't ship the reader are unaffected.
+
+Proof: `tests/customization-surface/merge-3way-test.sh` — a fork's `RECORD_AUDIO` +
+`FOREGROUND_SERVICE_MICROPHONE` survive a template update that adds
+`POST_NOTIFICATIONS`, clean, no markers; a true same-line conflict returns rc=1 with
+markers.
 
 ## Recommended CI wiring
 
@@ -86,10 +106,11 @@ never silently clobber a fork later):
 
 ## Roadmap (follow-ups)
 
-1. **Merge engine adoption** — `sync-dirs.sh` consults the contract per path
-   (template → copy, fork → skip, merge → 3-way) and retires the ad-hoc
-   `EXCLUSIONS` map. `merge` strategies (`manifest-union`, `strings-union`,
-   `catalog-3way`, `include-union`, `kotlin-3way`) become real merge drivers.
+1. ~~Merge engine adoption~~ — **done**: `sync-dirs.sh` 3-way merges `merge`-owned
+   files (`manifest-union` semantic + `git merge-file` for the rest). Remaining:
+   fold the `fork`/`template` decisions into the same contract lookup and retire the
+   hand-maintained `EXCLUSIONS` map (the reader can already answer `fork` → skip /
+   `template` → copy; `EXCLUSIONS` becomes redundant).
 2. **`syncForkConfig` alignment** — the plugin reads the same contract to know
    which generated files it owns vs must not clobber.
 

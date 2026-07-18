@@ -1,0 +1,218 @@
+# customization-surface.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# Fork-ownership contract for kmp-project-template.
+#
+# A fork of this template runs `sync-dirs.sh` to pull template updates while
+# keeping its own branding + features. This file is the SINGLE declared source of
+# truth for "who owns this path?" — replacing the ownership knowledge previously
+# scattered across sync-dirs.sh (SYNC_DIRS + EXCLUSIONS), customizer.sh, and the
+# syncForkConfig copy map.
+#
+# Every path resolves to exactly one owner:
+#
+#   template — the template is the SOLE author. `sync-dirs.sh` OVERWRITES the fork's
+#              copy. A fork edit here is drift and will be clobbered — a genuine fix
+#              belongs UPSTREAM as a PR to openMF/kmp-project-template.
+#
+#   fork     — the fork is the SOLE author. sync NEVER touches it (branding, demo,
+#              the core/store seam, generated Config.xcconfig, local flavors, icons,
+#              store listings, fork identity).
+#
+#   merge    — BOTH author. sync must do a 3-way MERGE, never a blind copy. This is
+#              where the "fork permissions silently dropped on sync" class lives:
+#              AndroidManifest.xml is template-shipped AND fork-extended.
+#
+# Precedence: FIRST matching rule wins. Rules are ordered most-specific → most-
+# general, so the narrow `merge`/`fork` carve-outs win over the broad `template`
+# module globs that follow them.
+#
+# Glob syntax: `*` matches within one path segment; `**` matches across segments;
+# `**/x` matches `x` at any depth (including the root).
+#
+# Coverage is enforced by `scripts/customization-surface.sh --verify` (CI): every
+# tracked path must match a NON-default rule, so a new template file can never land
+# unclassified and silently clobber a fork later.
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: 1
+
+rules:
+  # ── merge-required (declared FIRST — must win over the template module globs) ──
+  # AndroidManifest: template ships the base manifest; forks add permissions
+  # (RECORD_AUDIO, FOREGROUND_SERVICE_*, etc). A blind copy DROPS the fork's — the
+  # exact loss class this contract exists to close.
+  - glob: "**/AndroidManifest.xml"
+    owner: merge
+    strategy: manifest-union
+  # String resources: template base keys + fork-added keys must union.
+  - glob: "**/composeResources/**/strings.xml"
+    owner: merge
+    strategy: strings-union
+  # Version catalog: fork pins versions + adds libs; template adds/bumps. Already a
+  # 3-way merge in sync-dirs.sh STEP 4.5 — declared here so the ownership is explicit.
+  - glob: "gradle/libs.versions.toml"
+    owner: merge
+    strategy: catalog-3way
+  # Settings: fork includes its own :feature:* modules; template adds core modules.
+  - glob: "settings.gradle.kts"
+    owner: merge
+    strategy: include-union
+  # Root navigation host: template owns the scaffold; forks wire feature routes in.
+  - glob: "cmp-navigation/**/*Navigation*.kt"
+    owner: merge
+    strategy: kotlin-3way
+  - glob: "cmp-navigation/**/RootNav*.kt"
+    owner: merge
+    strategy: kotlin-3way
+
+  # ── fork-owned (carve-outs INSIDE otherwise-template dirs; declared before template) ──
+  - glob: "branding/**"
+    owner: fork
+  - glob: "feature/**"
+    owner: fork
+  - glob: "core/store/**"          # the store seam — fork-authored MutableStore wiring
+    owner: fork
+  - glob: "**/demo/**"             # demo data
+    owner: fork
+  - glob: "core/**/src/**/local/**"
+    owner: fork
+  - glob: "build-logic/**/kotlin/local/**"   # LocalFlavors.kt fork flavor extensions
+    owner: fork
+  - glob: "cmp-android/src/main/res/**"
+    owner: fork
+  - glob: "cmp-android/src/main/ic_launcher-playstore.png"
+    owner: fork
+  - glob: "cmp-android/**/google-services.json"
+    owner: fork
+  - glob: "cmp-android/dependencies/**"       # dependency-guard baseline
+    owner: fork
+  - glob: "cmp-ios/iosApp/Assets.xcassets/**" # app icon + colors
+    owner: fork
+  - glob: "cmp-ios/Configuration/Config.xcconfig"  # syncForkConfig-generated identity
+    owner: fork
+  - glob: "cmp-web/src/jsMain/resources/**"
+    owner: fork
+  - glob: "cmp-web/src/wasmJsMain/resources/**"
+    owner: fork
+  - glob: "cmp-desktop/icons/**"
+    owner: fork
+  - glob: "cmp-desktop/build.gradle.kts"      # fork desktop packaging (dock name, dmg)
+    owner: fork
+  - glob: "fastlane-config/project_config.rb"
+    owner: fork
+  - glob: "fastlane-config/extract_config.rb"
+    owner: fork
+  - glob: "deployment/**/metadata/**"         # store listings
+    owner: fork
+  - glob: "deployment/**/screenshots/**"
+    owner: fork
+  - glob: "deployment/**/DEPLOYMENT_MANIFEST.yaml"
+    owner: fork
+  - glob: "deployment/**/PROMOTION_LOG.yaml"  # append-only promotion history
+    owner: fork
+  - glob: "secrets/live/**"                   # real secrets (gitignored)
+    owner: fork
+  - glob: "secrets/**/.sync-meta.json"        # per-fork vault sync state (SV33)
+    owner: fork
+  - glob: ".github/workflows/sync-dirs.yaml"  # fork's own sync workflow
+    owner: fork
+  - glob: "gradle/fork.properties"            # filled-in identity (gitignored)
+    owner: fork
+  - glob: "local.properties"
+    owner: fork
+  - glob: "README.md"                         # rebranded per fork from the idea-plan
+    owner: fork
+  - glob: "CLAUDE.md"                          # fork project instructions
+    owner: fork
+
+  # ── template-owned (the broad sync surface — lowest precedence, declared LAST) ──
+  - glob: "build-logic/**"
+    owner: template
+  - glob: "cmp-android/**"
+    owner: template
+  - glob: "cmp-desktop/**"
+    owner: template
+  - glob: "cmp-ios/**"
+    owner: template
+  - glob: "cmp-web/**"
+    owner: template
+  - glob: "cmp-shared/**"
+    owner: template
+  - glob: "cmp-navigation/**"
+    owner: template
+  - glob: "sync/**"
+    owner: template
+  - glob: "core-base/**"
+    owner: template
+  - glob: "core/**"
+    owner: template
+  - glob: "deployment/**"
+    owner: template
+  - glob: "fastlane/**"
+    owner: template
+  - glob: "fastlane-config/**"
+    owner: template
+  - glob: "spotless/**"
+    owner: template
+  - glob: "gradle/wrapper/**"
+    owner: template
+  - glob: "maestro/screen-state/**"
+    owner: template
+  - glob: "scripts/**"
+    owner: template
+  - glob: "config/**"
+    owner: template
+  - glob: "secrets/sample/**"
+    owner: template
+  - glob: "secrets/**"                        # LAYOUT.yaml + scaffold (live/ is fork above)
+    owner: template
+  - glob: "docs/**"
+    owner: template
+  - glob: ".github/**"
+    owner: template
+  - glob: ".run/**"
+    owner: template
+  # root-level template files (mirror sync-dirs.sh SYNC_FILES)
+  - { glob: "Gemfile",                       owner: template }
+  - { glob: "Gemfile.lock",                  owner: template }
+  - { glob: "ci-prepush.sh",                 owner: template }
+  - { glob: "ci-prepush.bat",                owner: template }
+  - { glob: "gradlew",                       owner: template }
+  - { glob: "gradlew.bat",                   owner: template }
+  - { glob: "compose_compiler_config.conf",  owner: template }
+  - { glob: "sync-dirs.sh",                  owner: template }
+  - { glob: "customizer.sh",                 owner: template }
+  - { glob: "setup-project.sh",              owner: template }
+  - { glob: "keystore-manager.sh",           owner: template }
+  - { glob: "firebase-setup.sh",             owner: template }
+  - { glob: "generateModuleGraphs.sh",       owner: template }
+  - { glob: "gradle/fork.properties.template", owner: template }
+  - { glob: "gradle/gradle-daemon-jvm.properties", owner: template }
+  - { glob: ".editorconfig",                 owner: template }
+  - { glob: ".gitattributes",                owner: template }
+  - { glob: ".gitignore",                    owner: template }
+  - { glob: ".actrc",                        owner: template }
+  - { glob: ".ruby-version",                 owner: template }
+  - { glob: ".kover-floor.yml",              owner: template }
+  - { glob: ".claudeignore",                 owner: template }
+  - { glob: "customization-surface.yaml",    owner: template }  # this contract self-syncs
+  - { glob: "version.txt",                   owner: template }
+  - { glob: "lib-integrate.properties",      owner: template }
+  - { glob: "secrets-manifest.yaml",         owner: template }
+  - { glob: "gradle.properties",             owner: template }
+  - { glob: "build.gradle.kts",              owner: template }
+  - { glob: "kotlin-js-store/**",            owner: template }
+  - { glob: "legal/**",                      owner: template }
+  - { glob: "META-INF/**",                   owner: template }
+  - { glob: "config",                        owner: template }
+  - { glob: "CODE_OF_CONDUCT.md",            owner: template }
+  - { glob: "CONTRIBUTING.md",               owner: template }
+  - { glob: "LICENSE",                       owner: template }
+
+  # ── default: any path not matched above ──
+  # Runtime treats an unmatched path as fork-owned (SAFE — never clobber an unknown
+  # fork file). `--verify` flags anything that reaches this rule so a human classifies
+  # it explicitly (a new template file must not rely on the default).
+  - glob: "**"
+    owner: fork
+    default: true

@@ -64,6 +64,33 @@ rules:
   - glob: "cmp-navigation/**/RootNav*.kt"
     owner: merge
     strategy: kotlin-3way
+  # Nav DI + tab registry: template ships the base graph; forks add their feature
+  # modules + bottom-nav tabs. Blind copy drops them (the awaazly 2026-07-19 loss class).
+  - glob: "cmp-navigation/**/di/*.kt"
+    owner: merge
+    strategy: kotlin-3way
+  - glob: "cmp-navigation/**/*TabItem*.kt"
+    owner: merge
+    strategy: kotlin-3way
+  # Room database registry: template ships the base @Database; forks add their own
+  # entities/DAOs to the SAME AppDatabase.kt. Must merge, never overwrite.
+  - glob: "**/AppDatabase.kt"
+    owner: merge
+    strategy: kotlin-3way
+  # Android FileProvider paths: template ships base <paths>; forks add feature paths
+  # (exports/recordings/imports). Blind copy drops them → runtime FileProvider crash.
+  - glob: "**/res/xml/provider_paths.xml"
+    owner: merge
+    strategy: kotlin-3way
+  # App entry point: template ships the base Activity; forks wire app-init/SDK hooks.
+  - glob: "**/MainActivity.kt"
+    owner: merge
+    strategy: kotlin-3way
+  # Android app build script: template updates plugins/config; forks add deps + flavors.
+  # Merge (conflicts surface) beats a blind overwrite that silently drops every fork dep.
+  - glob: "cmp-android/build.gradle.kts"
+    owner: merge
+    strategy: kotlin-3way
 
   # ── fork-owned (carve-outs INSIDE otherwise-template dirs; declared before template) ──
   - glob: "branding/**"

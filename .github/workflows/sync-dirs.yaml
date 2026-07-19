@@ -70,6 +70,7 @@ jobs:
             "fastlane-config"
             "scripts"
             "config"
+            "secrets"
             ".github"
             ".run"
           )
@@ -91,7 +92,12 @@ jobs:
             ["fastlane-config"]="project_config.rb extract_config.rb"
             [".github"]="workflows/sync-dirs.yaml"
             ["build-logic"]="convention/src/main/kotlin/local"
-            ["root"]="secrets.env"
+            # Secrets: sync the SCAFFOLD only (secrets/sample/** + LAYOUT.yaml) so
+            # forks inherit the canonical layout, but NEVER real values —
+            # secrets/live/ is gitignored + fork-local (real secrets), and
+            # .sync-meta.json is per-fork sync state. Matches sync-dirs.sh.
+            # (secrets.env removed — that file was retired 2026-06-23.)
+            ["secrets"]="live .sync-meta.json"
           )
 
           # Function to check if path should be excluded
@@ -410,6 +416,7 @@ jobs:
             - fastlane-config (excluding project_config.rb, extract_config.rb)
             - scripts
             - config
+            - secrets (scaffold only — excludes secrets/live/ real values + .sync-meta.json)
             - .github (excluding workflows/sync-dirs.yaml — self-overwrite guard)
             - .run
 
@@ -419,8 +426,8 @@ jobs:
             - ci-prepush.bat
             - ci-prepush.sh
 
-            **Root-level exclusions:**
-            - secrets.env
+            **Secrets:** scaffold only — secrets/sample/ + secrets/LAYOUT.yaml sync;
+            secrets/live/ (real values) and .sync-meta.json are never synced.
 
             ---
             Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

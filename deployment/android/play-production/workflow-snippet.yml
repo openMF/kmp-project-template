@@ -32,7 +32,7 @@ jobs:
         if: ${{ secrets.SOPS_AGE_KEY == '' }}
         run: |
           mkdir -p secrets
-          echo '${{ secrets.PLAYSTORE_PUBLISHER_JSON }}' > secrets/android/playStorePublishServiceCredentialsFile.json
+          echo '${{ secrets.PLAYSTORE_PUBLISHER_JSON }}' > secrets/live/android/playStorePublishServiceCredentialsFile.json
 
       - name: Promote to production
         run: bundle exec fastlane android promote_to_production

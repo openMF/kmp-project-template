@@ -231,9 +231,9 @@ while [ ! -f "$P8_PATH" ]; do
 done
 
 # Copy to secrets directory
-cp "$P8_PATH" "secrets/apple/appstore/AuthKey.p8"
-chmod 600 "secrets/apple/appstore/AuthKey.p8"
-print_success "Copied .p8 key to secrets/apple/appstore/AuthKey.p8"
+cp "$P8_PATH" "secrets/live/apple/appstore/AuthKey.p8"
+chmod 600 "secrets/live/apple/appstore/AuthKey.p8"
+print_success "Copied .p8 key to secrets/live/apple/appstore/AuthKey.p8"
 echo
 
 # Fastlane Match Configuration
@@ -265,8 +265,8 @@ print_success "Match Branch: $MATCH_GIT_BRANCH"
 # SSH Key for Match
 print_step "5.3" "SSH Key for Match Repository"
 
-if [ -f "secrets/apple/match/match_ci_key" ]; then
-    print_warning "SSH key already exists: secrets/apple/match/match_ci_key"
+if [ -f "secrets/live/apple/match/match_ci_key" ]; then
+    print_warning "SSH key already exists: secrets/live/apple/match/match_ci_key"
     read -p "Do you want to generate a new one? [y/N]: " -n 1 -r
     echo
     GENERATE_NEW=$REPLY
@@ -276,15 +276,15 @@ fi
 
 if [[ $GENERATE_NEW =~ ^[Yy]$ ]]; then
     print_info "Generating new SSH key pair for Match..."
-    ssh-keygen -t ed25519 -C "fastlane-match-$TEAM_ID" -f "secrets/apple/match/match_ci_key" -N ""
-    chmod 600 "secrets/apple/match/match_ci_key"
-    chmod 644 "secrets/apple/match/match_ci_key.pub"
-    print_success "Generated SSH key: secrets/apple/match/match_ci_key"
+    ssh-keygen -t ed25519 -C "fastlane-match-$TEAM_ID" -f "secrets/live/apple/match/match_ci_key" -N ""
+    chmod 600 "secrets/live/apple/match/match_ci_key"
+    chmod 644 "secrets/live/apple/match/match_ci_key.pub"
+    print_success "Generated SSH key: secrets/live/apple/match/match_ci_key"
 fi
 
 print_info "Public key (add this as deploy key to Match repository):"
 echo
-cat "secrets/apple/match/match_ci_key.pub"
+cat "secrets/live/apple/match/match_ci_key.pub"
 echo
 print_warning "IMPORTANT: Add the above public key as a deploy key to your Match repository"
 print_info "Steps:"
@@ -301,7 +301,7 @@ read -p "Press Enter after adding the deploy key..."
 
 # Test SSH connection
 print_info "Testing SSH connection to Match repository..."
-ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no -T git@github.com 2>&1 | grep -q "successfully authenticated" && print_success "SSH connection successful" || print_warning "Could not verify SSH connection"
+ssh -i secrets/live/apple/match/match_ci_key -o StrictHostKeyChecking=no -T git@github.com 2>&1 | grep -q "successfully authenticated" && print_success "SSH connection successful" || print_warning "Could not verify SSH connection"
 echo
 
 # Match password
@@ -310,7 +310,7 @@ print_info "Match encrypts your certificates with a password"
 print_warning "IMPORTANT: Store this password securely! You'll need it on all machines and CI/CD"
 echo
 
-if [ -f "secrets/apple/match/.match_password" ]; then
+if [ -f "secrets/live/apple/match/.match_password" ]; then
     print_warning "Match password file already exists"
     read -p "Do you want to generate a new password? [y/N]: " -n 1 -r
     echo
@@ -322,14 +322,14 @@ fi
 if [[ $GENERATE_NEW_PWD =~ ^[Yy]$ ]]; then
     # Generate secure random password
     MATCH_PASSWORD=$(openssl rand -base64 32)
-    echo "$MATCH_PASSWORD" > "secrets/apple/match/.match_password"
-    chmod 600 "secrets/apple/match/.match_password"
-    print_success "Generated Match password (stored in secrets/apple/match/.match_password)"
+    echo "$MATCH_PASSWORD" > "secrets/live/apple/match/.match_password"
+    chmod 600 "secrets/live/apple/match/.match_password"
+    print_success "Generated Match password (stored in secrets/live/apple/match/.match_password)"
     echo
     print_warning "Match Password: $MATCH_PASSWORD"
     print_warning "Save this password in your password manager!"
 else
-    MATCH_PASSWORD=$(cat "secrets/apple/match/.match_password")
+    MATCH_PASSWORD=$(cat "secrets/live/apple/match/.match_password")
     print_success "Using existing Match password"
 fi
 echo
@@ -395,7 +395,7 @@ _upsert_property() {
 }
 
 # Ensure directories exist
-mkdir -p "secrets/apple/appstore" "secrets/apple/match"
+mkdir -p "secrets/live/apple/appstore" "secrets/live/apple/match"
 
 # Non-secret identity / metadata → gradle/fork.properties
 print_info "Writing non-secret metadata to gradle/fork.properties..."
@@ -416,22 +416,22 @@ print_success "Non-secret metadata written to gradle/fork.properties"
 print_info "Writing secret values to secrets/ files..."
 
 # App Store Connect secrets
-printf '%s' "$APPSTORE_KEY_ID"    > "secrets/apple/appstore/key_id"
-printf '%s' "$APPSTORE_ISSUER_ID" > "secrets/apple/appstore/issuer_id"
-chmod 600 "secrets/apple/appstore/key_id" "secrets/apple/appstore/issuer_id"
-print_success "Written: secrets/apple/appstore/key_id, issuer_id"
+printf '%s' "$APPSTORE_KEY_ID"    > "secrets/live/apple/appstore/key_id"
+printf '%s' "$APPSTORE_ISSUER_ID" > "secrets/live/apple/appstore/issuer_id"
+chmod 600 "secrets/live/apple/appstore/key_id" "secrets/live/apple/appstore/issuer_id"
+print_success "Written: secrets/live/apple/appstore/key_id, issuer_id"
 
 # Match secrets (MATCH_PASSWORD already written to .match_password above)
-print_success "Match password already in: secrets/apple/match/.match_password"
-print_success "Match SSH key already in:  secrets/apple/match/match_ci_key"
+print_success "Match password already in: secrets/live/apple/match/.match_password"
+print_success "Match SSH key already in:  secrets/live/apple/match/match_ci_key"
 # Write certificates_password and keychain_password as stubs (populated by match run)
-if [ ! -f "secrets/apple/match/certificates_password" ]; then
-    printf '' > "secrets/apple/match/certificates_password"
-    chmod 600 "secrets/apple/match/certificates_password"
+if [ ! -f "secrets/live/apple/match/certificates_password" ]; then
+    printf '' > "secrets/live/apple/match/certificates_password"
+    chmod 600 "secrets/live/apple/match/certificates_password"
 fi
-if [ ! -f "secrets/apple/match/keychain_password" ]; then
-    printf '%s' "$(openssl rand -base64 16)" > "secrets/apple/match/keychain_password"
-    chmod 600 "secrets/apple/match/keychain_password"
+if [ ! -f "secrets/live/apple/match/keychain_password" ]; then
+    printf '%s' "$(openssl rand -base64 16)" > "secrets/live/apple/match/keychain_password"
+    chmod 600 "secrets/live/apple/match/keychain_password"
 fi
 
 print_success "Configuration written to fork.properties + secrets/ files"
@@ -487,12 +487,12 @@ echo
 
 print_info "Configuration files created:"
 echo "  ✓ gradle/fork.properties (non-secret metadata)"
-echo "  ✓ secrets/apple/appstore/AuthKey.p8"
-echo "  ✓ secrets/apple/appstore/key_id"
-echo "  ✓ secrets/apple/appstore/issuer_id"
-echo "  ✓ secrets/apple/match/match_ci_key"
-echo "  ✓ secrets/apple/match/.match_password"
-echo "  ✓ secrets/apple/match/keychain_password"
+echo "  ✓ secrets/live/apple/appstore/AuthKey.p8"
+echo "  ✓ secrets/live/apple/appstore/key_id"
+echo "  ✓ secrets/live/apple/appstore/issuer_id"
+echo "  ✓ secrets/live/apple/match/match_ci_key"
+echo "  ✓ secrets/live/apple/match/.match_password"
+echo "  ✓ secrets/live/apple/match/keychain_password"
 echo
 
 print_warning "IMPORTANT: Keep these files secure and NEVER commit them to git!"

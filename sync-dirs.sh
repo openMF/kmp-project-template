@@ -106,7 +106,7 @@ declare -A EXCLUSIONS=(
     # fork-local (each fork's filled-in identity), so it is NEVER synced. Only the
     # committed schema gradle/fork.properties.template syncs (see SYNC_FILES above).
     # Keystore passwords live in
-    # secrets/android/keystores/ per-value files (gitignored, not synced).
+    # secrets/live/android/keystores/ per-value files (gitignored, not synced).
     # DO NOT REMOVE — preserves consumer-specific flavor extensions across syncs.
     # Each downstream consumer app (mifos-mobile, mifos-pay, mifos-x-field-officer-app,
     # mifos-x-group-banking, mifos-x-open-banking, reels-downloader-new, ...) may

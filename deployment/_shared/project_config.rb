@@ -171,14 +171,14 @@ module FastlaneConfig
         # ENV overrides: APPSTORE_KEY_ID / APPSTORE_ISSUER_ID / APPSTORE_KEY_PATH
         key_id:       ENV["APPSTORE_KEY_ID"]    || "",
         issuer_id:    ENV["APPSTORE_ISSUER_ID"] || "",
-        key_filepath: ENV["APPSTORE_KEY_PATH"]  || "secrets/apple/appstore/AuthKey.p8",
+        key_filepath: ENV["APPSTORE_KEY_PATH"]  || "secrets/live/apple/appstore/AuthKey.p8",
       },
       code_signing: {
         match_type:            "adhoc",
         # ENV overrides: MATCH_GIT_URL / MATCH_GIT_BRANCH / MATCH_GIT_PRIVATE_KEY
         match_git_url:         _match_git_url,
         match_git_branch:      _match_git_branch,
-        match_git_private_key: ENV["MATCH_GIT_PRIVATE_KEY"] || "./secrets/apple/match/match_ci_key",
+        match_git_private_key: ENV["MATCH_GIT_PRIVATE_KEY"] || "./secrets/live/apple/match/match_ci_key",
         provisioning_profiles: {
           adhoc:    "match AdHoc #{_app_id}",
           appstore: "match AppStore #{_app_id}",

@@ -213,23 +213,23 @@ check "secrets directory exists" \
 warn "fork.properties has apple.team.id" \
     "grep -qE '^apple\\.team\\.id=' gradle/fork.properties"
 
-warn "secrets/apple/appstore/key_id exists" \
-    "[ -f 'secrets/apple/appstore/key_id' ]"
+warn "secrets/live/apple/appstore/key_id exists" \
+    "[ -f 'secrets/live/apple/appstore/key_id' ]"
 
-warn "secrets/apple/appstore/issuer_id exists" \
-    "[ -f 'secrets/apple/appstore/issuer_id' ]"
+warn "secrets/live/apple/appstore/issuer_id exists" \
+    "[ -f 'secrets/live/apple/appstore/issuer_id' ]"
 
 warn ".match_password exists" \
-    "[ -f 'secrets/apple/match/.match_password' ]"
+    "[ -f 'secrets/live/apple/match/.match_password' ]"
 
 warn "match_ci_key (SSH key) exists" \
-    "[ -f 'secrets/apple/match/match_ci_key' ]"
+    "[ -f 'secrets/live/apple/match/match_ci_key' ]"
 
 warn "AuthKey.p8 (App Store Connect API) exists" \
-    "[ -f 'secrets/apple/appstore/AuthKey.p8' ]"
+    "[ -f 'secrets/live/apple/appstore/AuthKey.p8' ]"
 
 warn "Firebase credentials exist" \
-    "[ -f 'secrets/android/firebaseAppDistributionServiceCredentialsFile.json' ]"
+    "[ -f 'secrets/live/android/firebaseAppDistributionServiceCredentialsFile.json' ]"
 
 # ============================================================================
 # 6. Deployment Scripts

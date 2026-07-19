@@ -50,7 +50,7 @@ print_section() {
 print_section "🔔 APN (Apple Push Notification) Key Setup"
 
 # Ensure APN secrets directory exists
-mkdir -p "secrets/apple/apn"
+mkdir -p "secrets/live/apple/apn"
 
 # Read TEAM_ID from fork.properties (non-secret identity)
 TEAM_ID=$(grep -E "^apple\.team\.id=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
@@ -108,7 +108,7 @@ echo
 print_info "Looking for APN .p8 key file..."
 
 # Find .p8 files
-P8_FILES=($(find . -maxdepth 2 -name "AuthKey_*.p8" 2>/dev/null | grep -v "secrets/apple/appstore/AuthKey.p8"))
+P8_FILES=($(find . -maxdepth 2 -name "AuthKey_*.p8" 2>/dev/null | grep -v "secrets/live/apple/appstore/AuthKey.p8"))
 
 if [ ${#P8_FILES[@]} -eq 0 ]; then
     print_warning "No APN .p8 key files found in current directory"
@@ -140,26 +140,26 @@ if ! grep -q "BEGIN PRIVATE KEY" "$APN_P8_PATH"; then
 fi
 
 # Copy to secrets directory
-cp "$APN_P8_PATH" "secrets/apple/apn/APNAuthKey.p8"
-chmod 600 "secrets/apple/apn/APNAuthKey.p8"
-print_success "Copied APN key to secrets/apple/apn/APNAuthKey.p8"
+cp "$APN_P8_PATH" "secrets/live/apple/apn/APNAuthKey.p8"
+chmod 600 "secrets/live/apple/apn/APNAuthKey.p8"
+print_success "Copied APN key to secrets/live/apple/apn/APNAuthKey.p8"
 echo
 
 # Write APN secrets to individual files
 print_section "💾 Writing APN Configuration Files"
 
 # Write key_id
-printf '%s' "$APN_KEY_ID" > "secrets/apple/apn/key_id"
-chmod 600 "secrets/apple/apn/key_id"
-print_success "Written: secrets/apple/apn/key_id"
+printf '%s' "$APN_KEY_ID" > "secrets/live/apple/apn/key_id"
+chmod 600 "secrets/live/apple/apn/key_id"
+print_success "Written: secrets/live/apple/apn/key_id"
 
 # Write team_id
-printf '%s' "$TEAM_ID" > "secrets/apple/apn/team_id"
-chmod 600 "secrets/apple/apn/team_id"
-print_success "Written: secrets/apple/apn/team_id"
+printf '%s' "$TEAM_ID" > "secrets/live/apple/apn/team_id"
+chmod 600 "secrets/live/apple/apn/team_id"
+print_success "Written: secrets/live/apple/apn/team_id"
 
 # APNAuthKey.p8 was already copied above
-print_success "APN configuration files written to secrets/apple/apn/"
+print_success "APN configuration files written to secrets/live/apple/apn/"
 echo
 
 # Firebase Console Instructions
@@ -174,7 +174,7 @@ echo "  3. Click the gear icon → Project settings"
 echo "  4. Go to the 'Cloud Messaging' tab"
 echo "  5. Scroll to 'Apple app configuration'"
 echo "  6. Under 'APNs authentication key', click 'Upload'"
-echo "  7. Upload: secrets/apple/apn/APNAuthKey.p8"
+echo "  7. Upload: secrets/live/apple/apn/APNAuthKey.p8"
 echo "  8. Enter Key ID: $APN_KEY_ID"
 echo "  9. Enter Team ID: $TEAM_ID"
 echo "  10. Click 'Upload'"
@@ -193,16 +193,16 @@ echo
 print_info "Configuration Summary:"
 echo "  ✓ APN Key ID: $APN_KEY_ID"
 echo "  ✓ APN Team ID: $TEAM_ID"
-echo "  ✓ APN Key File: secrets/apple/apn/APNAuthKey.p8"
+echo "  ✓ APN Key File: secrets/live/apple/apn/APNAuthKey.p8"
 echo
 
 print_info "Files created/updated:"
-echo "  ✓ secrets/apple/apn/APNAuthKey.p8"
-echo "  ✓ secrets/apple/apn/key_id"
-echo "  ✓ secrets/apple/apn/team_id"
+echo "  ✓ secrets/live/apple/apn/APNAuthKey.p8"
+echo "  ✓ secrets/live/apple/apn/key_id"
+echo "  ✓ secrets/live/apple/apn/team_id"
 echo
 
-print_warning "IMPORTANT: Keep secrets/apple/apn/APNAuthKey.p8 secure and NEVER commit to git!"
+print_warning "IMPORTANT: Keep secrets/live/apple/apn/APNAuthKey.p8 secure and NEVER commit to git!"
 echo
 
 print_info "Next Steps:"

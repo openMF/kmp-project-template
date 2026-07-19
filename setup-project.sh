@@ -234,7 +234,7 @@ collect_inputs() {
 }
 
 # Write keystore DN identity to gradle/fork.properties (non-secret values).
-# Keystore passwords are written to secrets/android/keystores/ per-value files.
+# Keystore passwords are written to secrets/live/android/keystores/ per-value files.
 # This replaces the retired create_secrets_env() function that wrote secrets.env.
 setup_keystore_config() {
     print_info "Writing keystore DN to gradle/fork.properties"
@@ -271,7 +271,7 @@ setup_keystore_config() {
     fi
 
     # Write keystore passwords to per-value secret files
-    local KEYSTORE_SECRETS_DIR="secrets/android/keystores"
+    local KEYSTORE_SECRETS_DIR="secrets/live/android/keystores"
     mkdir -p "$KEYSTORE_SECRETS_DIR"
     printf '%s' "$KEYSTORE_PASSWORD" > "$KEYSTORE_SECRETS_DIR/keystore_password"
     printf '%s' "$KEY_ALIAS"         > "$KEYSTORE_SECRETS_DIR/keystore_alias"
@@ -420,14 +420,14 @@ print_final_summary() {
     echo -e "  - Upload keystore generated"
     echo -e "  - Configuration files updated with keystore info"
     echo -e "  - Keystore DN written to gradle/fork.properties (non-secret)"
-    echo -e "  - Keystore passwords written to secrets/android/keystores/ (gitignored)"
+    echo -e "  - Keystore passwords written to secrets/live/android/keystores/ (gitignored)"
     echo
 
     print_section "Important Files Created"
     echo -e "  ${BOLD}keystores/${NC}"
     echo -e "    └── upload_keystore.keystore  ${YELLOW}(Keep this secure!)${NC}"
     echo
-    echo -e "  ${BOLD}secrets/android/keystores/${NC}  ${CYAN}(Keystore passwords — gitignored)${NC}"
+    echo -e "  ${BOLD}secrets/live/android/keystores/${NC}  ${CYAN}(Keystore passwords — gitignored)${NC}"
     echo -e "    ├── keystore_password"
     echo -e "    ├── keystore_alias"
     echo -e "    └── keystore_alias_password"
@@ -473,7 +473,7 @@ print_final_summary() {
     echo -e "${CYAN}6. ${BOLD}Version Control${NC}"
     echo -e "   ⚠️  ${YELLOW}NEVER commit these files:${NC}"
     echo -e "     - keystores/*.keystore"
-    echo -e "     - secrets/android/keystores/*"
+    echo -e "     - secrets/live/android/keystores/*"
     echo -e "     - secrets/*"
     echo
     echo -e "   ${GREEN}Safe to commit:${NC}"
@@ -534,7 +534,7 @@ Country: $COUNTRY
 
 ## Important Notes
 - Keep keystore files and passwords secure
-- Never commit keystores or secrets/android/keystores/* to version control
+- Never commit keystores or secrets/live/android/keystores/* to version control
 - Add required secret files to secrets/ directory
 - Run 'bash scripts/secrets/sync-secrets-to-github.sh' to push secrets to GitHub
 EOF
@@ -552,7 +552,7 @@ main() {
     # Collect user inputs
     collect_inputs
     
-    # Write keystore DN to fork.properties + passwords to secrets/android/keystores/
+    # Write keystore DN to fork.properties + passwords to secrets/live/android/keystores/
     setup_keystore_config
 
     # Step 1: Customization

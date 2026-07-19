@@ -27,11 +27,11 @@
 #           from ~/Library/Keychains/build.keychain-db and resolves identities from it.
 #
 # Secrets (all read via config.rb _secret helper — ENV first, secrets/ fallback):
-#   secrets/apple/appstore/AuthKey.p8          — ASC API key
-#   secrets/apple/appstore/key_id              — ASC key ID
-#   secrets/apple/appstore/issuer_id           — ASC issuer ID
-#   secrets/apple/match/match_ci_key           — SSH key for Match git repo (local only)
-#   secrets/apple/match/.match_password        — Match encryption password (local only)
+#   secrets/live/apple/appstore/AuthKey.p8          — ASC API key
+#   secrets/live/apple/appstore/key_id              — ASC key ID
+#   secrets/live/apple/appstore/issuer_id           — ASC issuer ID
+#   secrets/live/apple/match/match_ci_key           — SSH key for Match git repo (local only)
+#   secrets/live/apple/match/.match_password        — Match encryption password (local only)
 #
 # Env vars (optional overrides):
 #   MAC_APP_IDENTIFIER             — macOS bundle ID (defaults to ForkIdentity::APP_ID)

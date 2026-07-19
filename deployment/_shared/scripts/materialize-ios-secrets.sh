@@ -13,24 +13,24 @@
 #   FIREBASECREDS                Firebase App Distribution SA JSON (optional — firebase lane only)
 set -euo pipefail
 
-mkdir -p secrets/apple/appstore secrets/apple/match secrets
+mkdir -p secrets/live/apple/appstore secrets/live/apple/match secrets
 
 # App Store Connect API key (drives Match + pilot + deliver + notarize).
-[[ -n "${APPSTORE_AUTH_KEY_B64:-}" ]] && echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/apple/appstore/AuthKey.p8
-[[ -n "${APPSTORE_KEY_ID:-}"       ]] && printf '%s' "$APPSTORE_KEY_ID"     > secrets/apple/appstore/key_id
-[[ -n "${APPSTORE_ISSUER_ID:-}"    ]] && printf '%s' "$APPSTORE_ISSUER_ID"  > secrets/apple/appstore/issuer_id
+[[ -n "${APPSTORE_AUTH_KEY_B64:-}" ]] && echo "$APPSTORE_AUTH_KEY_B64" | base64 -d > secrets/live/apple/appstore/AuthKey.p8
+[[ -n "${APPSTORE_KEY_ID:-}"       ]] && printf '%s' "$APPSTORE_KEY_ID"     > secrets/live/apple/appstore/key_id
+[[ -n "${APPSTORE_ISSUER_ID:-}"    ]] && printf '%s' "$APPSTORE_ISSUER_ID"  > secrets/live/apple/appstore/issuer_id
 
 # Match repo access.
 if [[ -n "${MATCH_SSH_PRIVATE_KEY_B64:-}" ]]; then
-  echo "$MATCH_SSH_PRIVATE_KEY_B64" | base64 -d > secrets/apple/match/match_ci_key
-  chmod 600 secrets/apple/match/match_ci_key
+  echo "$MATCH_SSH_PRIVATE_KEY_B64" | base64 -d > secrets/live/apple/match/match_ci_key
+  chmod 600 secrets/live/apple/match/match_ci_key
 fi
 if [[ -n "${MATCH_PASSWORD:-}" ]]; then
-  printf '%s' "$MATCH_PASSWORD" > secrets/apple/match/.match_password
-  chmod 600 secrets/apple/match/.match_password
+  printf '%s' "$MATCH_PASSWORD" > secrets/live/apple/match/.match_password
+  chmod 600 secrets/live/apple/match/.match_password
 fi
 
 # Firebase distribution (only firebase lane).
-[[ -n "${FIREBASECREDS:-}" ]] && printf '%s' "$FIREBASECREDS" > secrets/android/firebaseAppDistributionServiceCredentialsFile.json
+[[ -n "${FIREBASECREDS:-}" ]] && printf '%s' "$FIREBASECREDS" > secrets/live/android/firebaseAppDistributionServiceCredentialsFile.json
 
 echo "✅ iOS secrets materialized (manual-mode)"

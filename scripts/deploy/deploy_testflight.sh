@@ -85,11 +85,11 @@ print_success "Bundler installed"
 print_section "📋 Validating Configuration"
 
 REQUIRED_FILES=(
-    "secrets/apple/appstore/key_id"
-    "secrets/apple/appstore/issuer_id"
-    "secrets/apple/appstore/AuthKey.p8"
-    "secrets/apple/match/.match_password"
-    "secrets/apple/match/match_ci_key"
+    "secrets/live/apple/appstore/key_id"
+    "secrets/live/apple/appstore/issuer_id"
+    "secrets/live/apple/appstore/AuthKey.p8"
+    "secrets/live/apple/match/.match_password"
+    "secrets/live/apple/match/match_ci_key"
 )
 
 MISSING_FILES=()
@@ -120,25 +120,25 @@ MATCH_GIT_URL=$(grep -E "^apple\.match\.git\.url=" gradle/fork.properties 2>/dev
 MATCH_GIT_BRANCH=$(grep -E "^apple\.match\.git\.branch=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
 TESTFLIGHT_GROUPS=$(grep -E "^apple\.tf\.groups=" gradle/fork.properties 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
 
-APPSTORE_KEY_ID=$(cat secrets/apple/appstore/key_id 2>/dev/null | tr -d '\n\r')
-APPSTORE_ISSUER_ID=$(cat secrets/apple/appstore/issuer_id 2>/dev/null | tr -d '\n\r')
+APPSTORE_KEY_ID=$(cat secrets/live/apple/appstore/key_id 2>/dev/null | tr -d '\n\r')
+APPSTORE_ISSUER_ID=$(cat secrets/live/apple/appstore/issuer_id 2>/dev/null | tr -d '\n\r')
 
 # Validate App Store Connect API key configuration
 if [ -z "$APPSTORE_KEY_ID" ] || [ -z "$APPSTORE_ISSUER_ID" ]; then
     print_error "App Store Connect API credentials not configured"
-    print_info "Ensure secrets/apple/appstore/key_id and secrets/apple/appstore/issuer_id exist"
+    print_info "Ensure secrets/live/apple/appstore/key_id and secrets/live/apple/appstore/issuer_id exist"
     exit 1
 fi
 
 # Load Match password
-export MATCH_PASSWORD=$(cat secrets/apple/match/.match_password)
+export MATCH_PASSWORD=$(cat secrets/live/apple/match/.match_password)
 
 # Setup SSH for Match
-export GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o IdentitiesOnly=yes"
+export GIT_SSH_COMMAND="ssh -i secrets/live/apple/match/match_ci_key -o IdentitiesOnly=yes"
 
 # Export for fastlane
 export APPSTORE_KEY_ID APPSTORE_ISSUER_ID TEAM_ID MATCH_GIT_URL MATCH_GIT_BRANCH TESTFLIGHT_GROUPS
-export APPSTORE_KEY_PATH="./secrets/apple/appstore/AuthKey.p8"
+export APPSTORE_KEY_PATH="./secrets/live/apple/appstore/AuthKey.p8"
 
 print_success "Configuration loaded"
 

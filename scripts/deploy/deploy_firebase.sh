@@ -85,9 +85,9 @@ print_success "Bundler installed"
 print_section "📋 Validating Configuration"
 
 REQUIRED_FILES=(
-    "secrets/apple/match/.match_password"
-    "secrets/apple/match/match_ci_key"
-    "secrets/android/firebaseAppDistributionServiceCredentialsFile.json"
+    "secrets/live/apple/match/.match_password"
+    "secrets/live/apple/match/match_ci_key"
+    "secrets/live/android/firebaseAppDistributionServiceCredentialsFile.json"
 )
 
 MISSING_FILES=()
@@ -120,10 +120,10 @@ MATCH_GIT_BRANCH=$(grep -E "^apple\.match\.git\.branch=" gradle/fork.properties 
 export TEAM_ID MATCH_GIT_URL MATCH_GIT_BRANCH
 
 # Load Match password
-export MATCH_PASSWORD=$(cat secrets/apple/match/.match_password)
+export MATCH_PASSWORD=$(cat secrets/live/apple/match/.match_password)
 
 # Setup SSH for Match
-export GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o IdentitiesOnly=yes"
+export GIT_SSH_COMMAND="ssh -i secrets/live/apple/match/match_ci_key -o IdentitiesOnly=yes"
 
 print_success "Configuration loaded"
 

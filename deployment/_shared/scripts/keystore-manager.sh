@@ -181,7 +181,7 @@ show_help() {
     echo ""
     echo "Commands:"
     echo "  generate - Generate Android keystores; reads DN from gradle/fork.properties,"
-    echo "             reads passwords from secrets/android/keystores/ files (default)"
+    echo "             reads passwords from secrets/live/android/keystores/ files (default)"
     echo "  encode-secrets - [DEPRECATED] Encode files from secrets/ directory and update"
     echo "             secrets/shared/secrets.env. Use scripts/secrets/sync-secrets-to-github.sh"
     echo "             (the modern replacement) to push secrets from secrets/ to GitHub."
@@ -371,7 +371,7 @@ create_secrets_dir() {
 
 # Parse iOS string secrets from the new two-source model:
 #   - Non-secret identity/metadata → gradle/fork.properties
-#   - Secret values → per-value files under secrets/apple/...
+#   - Secret values → per-value files under secrets/live/apple/...
 #
 # DEPRECATED: this function previously read secrets/shared/shared_keys.env.
 # That file is being retired. All callers continue to work through this
@@ -381,7 +381,7 @@ parse_shared_keys_env() {
     local FORK_PROPS="gradle/fork.properties"
 
     # Skip if neither source is present (Android-only setup)
-    if [[ ! -f "$FORK_PROPS" ]] && [[ ! -f "secrets/apple/appstore/key_id" ]]; then
+    if [[ ! -f "$FORK_PROPS" ]] && [[ ! -f "secrets/live/apple/appstore/key_id" ]]; then
         print_info "iOS configuration not found - skipping iOS secrets (Android-only project)"
         return 0
     fi
@@ -390,19 +390,19 @@ parse_shared_keys_env() {
 
     # Read MATCH_PASSWORD from .match_password file if it exists
     local MATCH_PWD=""
-    if [[ -f "secrets/apple/match/.match_password" ]]; then
-        MATCH_PWD=$(head -n1 secrets/apple/match/.match_password 2>/dev/null | tr -d '\n\r')
+    if [[ -f "secrets/live/apple/match/.match_password" ]]; then
+        MATCH_PWD=$(head -n1 secrets/live/apple/match/.match_password 2>/dev/null | tr -d '\n\r')
         print_success "Loaded MATCH_PASSWORD from .match_password file"
     else
-        print_warning "secrets/apple/match/.match_password not found - MATCH_PASSWORD will be empty"
+        print_warning "secrets/live/apple/match/.match_password not found - MATCH_PASSWORD will be empty"
     fi
 
     # Extract non-secret identity from fork.properties
     local NOTARIZATION_TEAM_ID=$(grep -E "^apple\.team\.id=" "$FORK_PROPS" 2>/dev/null | cut -d= -f2- | tr -d '\n\r')
 
     # Extract secret values from per-value files
-    local APPSTORE_KEY_ID=$(cat "secrets/apple/appstore/key_id" 2>/dev/null | tr -d '\n\r')
-    local APPSTORE_ISSUER_ID=$(cat "secrets/apple/appstore/issuer_id" 2>/dev/null | tr -d '\n\r')
+    local APPSTORE_KEY_ID=$(cat "secrets/live/apple/appstore/key_id" 2>/dev/null | tr -d '\n\r')
+    local APPSTORE_ISSUER_ID=$(cat "secrets/live/apple/appstore/issuer_id" 2>/dev/null | tr -d '\n\r')
     local NOTARIZATION_APPLE_ID=""   # not yet migrated to a file; leave empty
     local NOTARIZATION_PASSWORD=""   # not yet migrated to a file; leave empty
 
@@ -443,9 +443,9 @@ parse_macos_password_files() {
     local count=0
 
     # Read KEYCHAIN_PASSWORD from .keychain_password file
-    if [[ -f "secrets/apple/match/.keychain_password" ]]; then
+    if [[ -f "secrets/live/apple/match/.keychain_password" ]]; then
         local val
-        val=$(head -n1 secrets/apple/match/.keychain_password 2>/dev/null | tr -d '\n\r')
+        val=$(head -n1 secrets/live/apple/match/.keychain_password 2>/dev/null | tr -d '\n\r')
         if [[ -n "$val" ]]; then
             MACOS_PASSWORD_SECRETS["KEYCHAIN_PASSWORD"]="$val"
             count=$((count + 1))
@@ -454,13 +454,13 @@ parse_macos_password_files() {
             print_warning ".keychain_password file is empty"
         fi
     else
-        print_info "secrets/apple/match/.keychain_password not found - KEYCHAIN_PASSWORD will remain as-is"
+        print_info "secrets/live/apple/match/.keychain_password not found - KEYCHAIN_PASSWORD will remain as-is"
     fi
 
     # Read CERTIFICATES_PASSWORD from .certificates_password file
-    if [[ -f "secrets/apple/match/.certificates_password" ]]; then
+    if [[ -f "secrets/live/apple/match/.certificates_password" ]]; then
         local val
-        val=$(head -n1 secrets/apple/match/.certificates_password 2>/dev/null | tr -d '\n\r')
+        val=$(head -n1 secrets/live/apple/match/.certificates_password 2>/dev/null | tr -d '\n\r')
         if [[ -n "$val" ]]; then
             MACOS_PASSWORD_SECRETS["CERTIFICATES_PASSWORD"]="$val"
             count=$((count + 1))
@@ -469,7 +469,7 @@ parse_macos_password_files() {
             print_warning ".certificates_password file is empty"
         fi
     else
-        print_info "secrets/apple/match/.certificates_password not found - CERTIFICATES_PASSWORD will remain as-is"
+        print_info "secrets/live/apple/match/.certificates_password not found - CERTIFICATES_PASSWORD will remain as-is"
     fi
 
     print_success "Found $count of 2 macOS password secrets"
@@ -847,14 +847,14 @@ EOF
 # Place .p12 and .provisionprofile files in secrets/ directory, then run sync.
 #
 # Password files (read automatically by sync):
-#   secrets/apple/match/.keychain_password              → KEYCHAIN_PASSWORD
-#   secrets/apple/match/.certificates_password          → CERTIFICATES_PASSWORD
+#   secrets/live/apple/match/.keychain_password              → KEYCHAIN_PASSWORD
+#   secrets/live/apple/match/.certificates_password          → CERTIFICATES_PASSWORD
 #
 # Certificate/profile files (base64 encoded by sync):
-#   secrets/desktop/macos/app_distribution.p12        → MAC_APP_DISTRIBUTION_CERTIFICATE_B64
-#   secrets/desktop/macos/installer_distribution.p12  → MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64
-#   secrets/desktop/macos/embedded.provisionprofile   → MAC_EMBEDDED_PROVISION_B64
-#   secrets/desktop/macos/runtime.provisionprofile    → MAC_RUNTIME_PROVISION_B64
+#   secrets/live/desktop/macos/app_distribution.p12        → MAC_APP_DISTRIBUTION_CERTIFICATE_B64
+#   secrets/live/desktop/macos/installer_distribution.p12  → MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64
+#   secrets/live/desktop/macos/embedded.provisionprofile   → MAC_EMBEDDED_PROVISION_B64
+#   secrets/live/desktop/macos/runtime.provisionprofile    → MAC_RUNTIME_PROVISION_B64
 EOF
         then
             print_error "Failed to append macOS App Store section"
@@ -895,7 +895,7 @@ validate_sync_result() {
     fi
 
     # Check for iOS Configuration section header (if iOS project)
-    if [[ -f "secrets/apple/appstore/key_id" ]] || grep -qE "^apple\.team\.id=" gradle/fork.properties 2>/dev/null; then
+    if [[ -f "secrets/live/apple/appstore/key_id" ]] || grep -qE "^apple\.team\.id=" gradle/fork.properties 2>/dev/null; then
         if ! grep -q "^# iOS Configuration" "$SECRETS_FILE"; then
             format_errors+=("Missing iOS configuration section header (iOS project detected)")
         fi
@@ -1005,7 +1005,7 @@ validate_sync_result() {
     done
 
     # Check iOS secrets if iOS project detected
-    if [[ -f "secrets/apple/appstore/key_id" ]] || grep -qE "^apple\.team\.id=" gradle/fork.properties 2>/dev/null; then
+    if [[ -f "secrets/live/apple/appstore/key_id" ]] || grep -qE "^apple\.team\.id=" gradle/fork.properties 2>/dev/null; then
         local required_ios=(
             "APPSTORE_KEY_ID"
             "APPSTORE_ISSUER_ID"
@@ -1278,7 +1278,7 @@ module FastlaneConfig
 
     ANDROID = {
       package_name: "cmp.android.app",
-      play_store_json_key: "secrets/android/playStorePublishServiceCredentialsFile.json",
+      play_store_json_key: "secrets/live/android/playStorePublishServiceCredentialsFile.json",
       apk_paths: {
         prod: "cmp-android/build/outputs/apk/prod/release/cmp-android-prod-release.apk",
         demo: "cmp-android/build/outputs/apk/demo/release/cmp-android-demo-release.apk"
@@ -1298,7 +1298,7 @@ module FastlaneConfig
     }
 
     SHARED = {
-      firebase_service_credentials: "secrets/android/firebaseAppDistributionServiceCredentialsFile.json"
+      firebase_service_credentials: "secrets/live/android/firebaseAppDistributionServiceCredentialsFile.json"
     }
   end
 end
@@ -1369,12 +1369,12 @@ _read_fork_prop() {
     grep "^${key}=" "$props_file" 2>/dev/null | cut -d= -f2- | tr -d '\n\r'
 }
 
-# Read a secret from a per-value file under secrets/android/keystores/.
+# Read a secret from a per-value file under secrets/live/android/keystores/.
 # Returns empty string (not an error) when the file is absent so the caller
 # can fall back to a default.
 _read_keystore_secret() {
     local secret_name="$1"   # e.g. keystore_password
-    local secret_file="secrets/android/keystores/${secret_name}"
+    local secret_file="secrets/live/android/keystores/${secret_name}"
     if [[ -f "$secret_file" ]]; then
         cat "$secret_file" | tr -d '\n\r'
     else
@@ -1385,7 +1385,7 @@ _read_keystore_secret() {
 # Function to generate keystore
 # Reads:
 #   - DN components from gradle/fork.properties (keystore.dn.* + legal.company.name)
-#   - Passwords    from secrets/android/keystores/{keystore_password,keystore_alias,
+#   - Passwords    from secrets/live/android/keystores/{keystore_password,keystore_alias,
 #                  keystore_alias_password}
 # Generation constants (VALIDITY=25, KEYALG=RSA, KEYSIZE=2048, OVERWRITE=false)
 # are hard-coded defaults here — they are not per-fork configuration.
@@ -1430,7 +1430,7 @@ generate_keystore() {
 
     # ── Build Distinguished Name from gradle/fork.properties ──────────────────
     # Non-secret cert identity lives in fork.properties (new home); passwords come
-    # from secrets/android/keystores/ per-value files (new home).
+    # from secrets/live/android/keystores/ per-value files (new home).
     # Legacy: previously these values came from secrets.env (retired).
     local FORK_PROPS="gradle/fork.properties"
     DN_PARTS=()
@@ -1525,9 +1525,9 @@ generate_keystore() {
 # Per https://support.google.com/googleplay/android-developer/answer/9842756
 #
 # Password sources (new model — secrets.env is RETIRED):
-#   secrets/android/keystores/keystore_password       → UPLOAD_KEYSTORE_FILE_PASSWORD
-#   secrets/android/keystores/keystore_alias          → UPLOAD_KEYSTORE_ALIAS
-#   secrets/android/keystores/keystore_alias_password → UPLOAD_KEYSTORE_ALIAS_PASSWORD
+#   secrets/live/android/keystores/keystore_password       → UPLOAD_KEYSTORE_FILE_PASSWORD
+#   secrets/live/android/keystores/keystore_alias          → UPLOAD_KEYSTORE_ALIAS
+#   secrets/live/android/keystores/keystore_alias_password → UPLOAD_KEYSTORE_ALIAS_PASSWORD
 # If a file is absent the script falls back to a safe default so first-run works.
 # Run `scripts/secrets/setup-secrets.sh android` to populate those files.
 #
@@ -1559,7 +1559,7 @@ generate_keystores() {
     UPLOAD_KEYSTORE_ALIAS_PASSWORD="${UPLOAD_KEYSTORE_ALIAS_PASSWORD:-Alias_password}"
 
     echo -e "${BLUE}🔑 Play App Signing mode: generating UPLOAD keystore${NC}"
-    print_info "Password source: secrets/android/keystores/ (new model)"
+    print_info "Password source: secrets/live/android/keystores/ (new model)"
     print_info "DN source: gradle/fork.properties (new model)"
     generate_keystore "UPLOAD" "$UPLOAD_KEYSTORE_NAME" "$UPLOAD_KEYSTORE_ALIAS" "$UPLOAD_KEYSTORE_FILE_PASSWORD" "$UPLOAD_KEYSTORE_ALIAS_PASSWORD"
     UPLOAD_RESULT=$?
@@ -1567,10 +1567,10 @@ generate_keystores() {
     if [ $UPLOAD_RESULT -eq 0 ]; then
         # DEPRECATED: update_secrets_env wrote passwords + base64 keystore into
         # secrets/shared/secrets.env (legacy bundle). That file is retired.
-        # Passwords now live permanently in secrets/android/keystores/ per-value files.
+        # Passwords now live permanently in secrets/live/android/keystores/ per-value files.
         # The keystore file itself (keystores/upload_keystore.keystore) is the artifact.
         # To push all secrets to GitHub use: scripts/secrets/sync-secrets-to-github.sh
-        print_info "Skipping legacy secrets.env update (retired). Secrets live in secrets/android/keystores/."
+        print_info "Skipping legacy secrets.env update (retired). Secrets live in secrets/live/android/keystores/."
 
         # Update fastlane-config/project_config.rb with UPLOAD keystore information
         update_fastlane_config "$UPLOAD_KEYSTORE_NAME" "$UPLOAD_KEYSTORE_FILE_PASSWORD" "$UPLOAD_KEYSTORE_ALIAS" "$UPLOAD_KEYSTORE_ALIAS_PASSWORD"

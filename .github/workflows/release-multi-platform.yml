@@ -282,8 +282,8 @@ jobs:
           fi
         fi
         # ── Secrets are materialized into PLATFORM-NAMESPACED dirs (2026-06-22) ──
-        #   secrets/android/  secrets/apple/  secrets/apple/  secrets/web/  secrets/shared/
-        # Apple ASC key + Match are SHARED by iOS and macOS-desktop → secrets/apple/.
+        #   secrets/live/android/  secrets/live/apple/  secrets/live/apple/  secrets/web/  secrets/shared/
+        # Apple ASC key + Match are SHARED by iOS and macOS-desktop → secrets/live/apple/.
         # ── Materialize secrets via the resolver (secrets/LAYOUT.yaml is the SoT) ──
         # Every path + encoding (base64, raw-PEM-or-base64, literals) is declared in
         # LAYOUT.yaml; `build-secrets` owns decode + destination. NO inline paths here —

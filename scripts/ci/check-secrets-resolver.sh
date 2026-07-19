@@ -58,15 +58,19 @@ if grep -nE 'secrets/(android|apple|desktop|web|shared)/[A-Za-z0-9_.-]' "$WF" 2>
   echo "❌ SR-11: workflow hardcodes a secrets/<platform>/ path — use \"\$BS\" path <key> instead"; fail=1
 fi
 
-# ── SR-12: no hardcoded service-account path/name — ANY consumer must resolve via
-#     build-secrets. Catches the class the firebase/play rename exposed (`secrets/android/
-#     {play,firebase}/…` literals + the bare old `service-account.json` filename). Scans the
-#     WIDER surface SR-7/SR-11 missed: deployment + .github/workflows + scripts. Exempt: the
-#     resolver itself, the path-declaration SoT (LAYOUT.yaml + secrets-needs.yaml +
-#     secrets-manifest.yaml — these DECLARE paths, they don't consume), comment lines, and the
-#     sample/live trees. Deferred desktop/ms/azure use `$SECRETS_DIR/<plat>/` — NOT this
-#     class — so they don't trip here; broaden further when those platforms get LAYOUT rows. ──
-SR12=$(grep -rnE 'secrets/android/(play|firebase)/[A-Za-z0-9_.-]|service-account\.json' \
+# ── SR-12: no hardcoded on-disk secret path (any stale flat `secrets/<platform>/…`) or
+#     service-account name — ANY consumer must resolve via build-secrets. Broadened from the
+#     firebase/play-only literal to catch the WHOLE class the live/+sample/ split exposed:
+#     any `secrets/(android|apple|desktop)/…` that is NOT rooted at secrets/live/ or
+#     secrets/sample/ (the resolver composes roots.live/roots.sample + LAYOUT rel: paths, so a
+#     flat literal silently breaks the moment the tree restructures) + the bare old
+#     `service-account.json` filename. Scans the WIDER surface SR-7/SR-11 missed: deployment +
+#     .github/workflows + scripts. Exempt: the resolver itself, the path-declaration SoT
+#     (LAYOUT.yaml + secrets-needs.yaml + secrets-manifest.yaml — these DECLARE paths, they
+#     don't consume), comment lines, and the sample/live trees. Out-of-scope roots
+#     (`secrets/shared/secrets.env`, `secrets/web/…`) + deferred `$SECRETS_DIR/<plat>/` are NOT
+#     this class — so they don't trip here; add their platforms once they get LAYOUT rows. ──
+SR12=$(grep -rnE 'secrets/(android|apple|desktop)/[A-Za-z0-9_.-]|service-account\.json' \
        deployment .github/workflows scripts \
        --include='*.rb' --include='*.sh' --include='*.yml' --include='*.yaml' 2>/dev/null \
      | grep -vE 'build_secrets\.rb|secrets/LAYOUT\.yaml|secrets-needs\.yaml|secrets-manifest\.yaml|/sample/|/live/' \

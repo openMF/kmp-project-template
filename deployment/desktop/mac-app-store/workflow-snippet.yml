@@ -34,9 +34,9 @@ jobs:
         if: ${{ secrets.SOPS_AGE_KEY == '' }}
         run: |
           mkdir -p secrets
-          echo "${{ secrets.APPSTORE_AUTH_KEY_B64 }}" | base64 -d > secrets/apple/appstore/AuthKey.p8
-          echo "${{ secrets.MAC_APP_STORE_CERT_B64 }}" | base64 -d > secrets/desktop/macos/app_store.p12
-          echo "${{ secrets.MAC_INSTALLER_CERT_B64 }}" | base64 -d > secrets/desktop/macos/installer.p12
+          echo "${{ secrets.APPSTORE_AUTH_KEY_B64 }}" | base64 -d > secrets/live/apple/appstore/AuthKey.p8
+          echo "${{ secrets.MAC_APP_STORE_CERT_B64 }}" | base64 -d > secrets/live/desktop/macos/app_store.p12
+          echo "${{ secrets.MAC_INSTALLER_CERT_B64 }}" | base64 -d > secrets/live/desktop/macos/installer.p12
 
       - name: Build macOS distributable
         run: ./gradlew :cmp-desktop:packageReleaseDmg

@@ -129,7 +129,7 @@ module FastlaneConfig
     ANDROID = {
       package_name:        ForkIdentity::APP_ID,
       # DRIFT FIX: was "secrets/play/service-account.json" (wrong — lanes/script use
-      # secrets/android/play/…). Resolver returns the canonical path from LAYOUT.yaml.
+      # secrets/live/android/play/…). Resolver returns the canonical path from LAYOUT.yaml.
       play_store_json_key: BuildSecrets.for.path(:play_service_account),
     }.freeze
 
@@ -442,7 +442,7 @@ def fetch_certificates_with_match(options = {})
   ssh_key = File.join(DEPLOYMENT_REPO_ROOT, cfg[:match_ssh_key_path])
 
   # Match reads MATCH_PASSWORD automatically to decrypt the git-stored certs.
-  # Priority: call option → ENV → BUILD_CONFIG (file-backed via secrets/apple/match/).
+  # Priority: call option → ENV → BUILD_CONFIG (file-backed via secrets/live/apple/match/).
   match_pass = options[:match_password] || ENV["MATCH_PASSWORD"] || cfg[:match_password]
   ENV["MATCH_PASSWORD"] = match_pass.to_s if match_pass && ENV["MATCH_PASSWORD"].to_s.empty?
 
@@ -689,14 +689,14 @@ end
 # Distribution certificate via the ASC API.
 #
 # PERSISTENT CLONE STRATEGY
-#   The clone lives at secrets/apple/match/ios-provisioning-profile/ (gitignored).
+#   The clone lives at secrets/live/apple/match/ios-provisioning-profile/ (gitignored).
 #   • Local / colleagues: clone is reused across runs (git fetch + reset — fast).
 #   • GitHub Actions: starts clean each run, falls back to git clone --depth 1.
 #
 #   Colleague first-time setup:
-#     GIT_SSH_COMMAND="ssh -i secrets/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
+#     GIT_SSH_COMMAND="ssh -i secrets/live/apple/match/match_ci_key -o StrictHostKeyChecking=no" \
 #       git clone --depth 1 git@github.com:openMF/ios-provisioning-profile.git \
-#       secrets/apple/match/ios-provisioning-profile
+#       secrets/live/apple/match/ios-provisioning-profile
 #   Subsequent runs: the lane updates the clone automatically.
 #
 # Safe: does NOT revoke from Apple Developer Portal (expired certs are already unusable).
@@ -885,7 +885,7 @@ end
 # gradlew at root, not inside cmp-android/ — incompatible with gradle() action's
 # project_dir expectation.
 def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
-  # DRIFT FIX: was hardcoded "secrets/android/keystores/upload_keystore.keystore"
+  # DRIFT FIX: was hardcoded "secrets/live/android/keystores/upload_keystore.keystore"
   # (flat pre-restructure path — broke after secrets/{live,sample} split). CI passes
   # keystore_path from `build-secrets path upload_keystore`; the local-run fallback
   # must resolve through the SAME LAYOUT resolver (live-wins-else-sample), never hardcode.

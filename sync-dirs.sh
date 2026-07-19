@@ -19,6 +19,7 @@ DEFAULT_UPSTREAM_URL="https://github.com/openMF/kmp-project-template.git"
 # Script options
 DRY_RUN=false
 FORCE=false
+ONLY_ITEMS=""   # --only <a,b,c>: restrict the sync to this subset of SYNC_DIRS/SYNC_FILES
 LOG_FILE="sync-$(date +%d%m%Y-%H%M%S).log"
 
 # Directories and files to sync
@@ -128,11 +129,15 @@ show_help() {
     echo "  -h, --help      Display this help message and exit"
     echo "  --dry-run       Show what would be done without making changes"
     echo "  -f, --force     Skip confirmation prompts and proceed automatically"
+    echo "  --only <list>   Restrict the sync to a comma/space-separated subset of the declared"
+    echo "                  SYNC_DIRS/SYNC_FILES (e.g. --only build-logic,gradle/wrapper,spotless)."
+    echo "                  Use it when a diverged fork only wants specific infra refreshed."
     echo
     echo -e "${BOLD}Examples:${NC}"
     echo "  ./sync-dirs.sh              # Run with interactive prompts"
     echo "  ./sync-dirs.sh --dry-run    # Test run without changes"
     echo "  ./sync-dirs.sh --force      # Run with no prompts"
+    echo "  ./sync-dirs.sh --only build-logic,gradle/wrapper --dry-run   # only that infra subset"
 }
 
 # Logging function
@@ -537,11 +542,33 @@ while [[ $# -gt 0 ]]; do
             FORCE=true
             shift
             ;;
+        --only)
+            ONLY_ITEMS="${2:-}"
+            [ -z "$ONLY_ITEMS" ] && handle_error "--only requires a comma/space-separated list of dirs/files (e.g. --only build-logic,gradle/wrapper)"
+            shift 2
+            ;;
         *)
             handle_error "Unknown option: $1. Use --help for usage information."
             ;;
     esac
 done
+
+# --only: restrict SYNC_DIRS/SYNC_FILES to the named subset (targeted sync for diverged forks
+# that only want specific infra refreshed). Each named item MUST already be a declared SYNC_DIR
+# or SYNC_FILE — this narrows the canonical set, it never adds un-vetted paths.
+if [ -n "$ONLY_ITEMS" ]; then
+    ONLY_ITEMS="${ONLY_ITEMS//,/ }"
+    declare -a _KEEP_DIRS=() _KEEP_FILES=()
+    for _want in $ONLY_ITEMS; do
+        _found=false
+        for _d in "${SYNC_DIRS[@]}";  do [ "$_d" = "$_want" ] && { _KEEP_DIRS+=("$_want");  _found=true; break; }; done
+        for _f in "${SYNC_FILES[@]}"; do [ "$_f" = "$_want" ] && { _KEEP_FILES+=("$_want"); _found=true; break; }; done
+        [ "$_found" = false ] && handle_error "--only: '$_want' is not a declared SYNC_DIR or SYNC_FILE. Choose from: ${SYNC_DIRS[*]} ${SYNC_FILES[*]}"
+    done
+    SYNC_DIRS=("${_KEEP_DIRS[@]}")
+    SYNC_FILES=("${_KEEP_FILES[@]}")
+    echo -e "${YELLOW}${BOLD}Targeted sync (--only):${NC} ${SYNC_DIRS[*]} ${SYNC_FILES[*]}"
+fi
 
 # Check git configuration
 if ! git config user.name > /dev/null || ! git config user.email > /dev/null; then

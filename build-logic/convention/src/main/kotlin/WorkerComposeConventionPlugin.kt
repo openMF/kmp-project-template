@@ -36,6 +36,19 @@ class WorkerComposeConventionPlugin : Plugin<Project> {
             // (see build-logic/convention/build.gradle.kts).
             pluginManager.apply("io.github.mobilebytelabs.worker-app")
 
+            // worker-app's per-platform codegen tasks (workerKmpAppCodegen*) capture the
+            // Project at execution time, which Gradle 9.5's configuration cache rejects —
+            // failing e.g. :core:database:desktopTest under the Kover coverage run
+            // ("cannot serialize object of type 'DefaultProject'"). Opt these tasks out of
+            // the configuration cache gracefully: codegen still runs, it just isn't cached.
+            // Proper fix is upstream in MobileByteLabs/worker-kmp; this is the template-side
+            // workaround so config-cache builds (Kover) stay green.
+            tasks.matching { it.name.startsWith("workerKmpAppCodegen") }.configureEach {
+                notCompatibleWithConfigurationCache(
+                    "worker-app codegen captures Project (upstream: MobileByteLabs/worker-kmp)"
+                )
+            }
+
             // 2 + 3. Add umbrella + koin-compose to commonMain.
             dependencies {
                 add("commonMainImplementation", libs.findLibrary("worker-compose-all").get())

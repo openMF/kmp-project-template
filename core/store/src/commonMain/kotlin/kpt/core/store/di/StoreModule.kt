@@ -13,6 +13,8 @@ import kpt.core.store.AppStoreRegistry
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
 import kpt.core.store.demo.banking.impl.provideBillRemindersStore
 import kpt.core.store.demo.banking.impl.provideLoansStore
+import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoReadStore
+import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoStore
 import kpt.core.store.demo.crypto.impl.provideCoinDetailStore
 import kpt.core.store.demo.crypto.impl.provideCoinMarketsStore
 import kpt.core.store.demo.currency.impl.provideExchangeRatesStore
@@ -53,6 +55,8 @@ val appStoreModule: Module = module {
     single(AppStoreRegistry.ExchangeRates) { provideExchangeRatesStore(get(), get(), get()) }
     single(AppStoreRegistry.RateHistory) { provideRateHistoryStore(get(), get(), get()) }
     single(AppStoreRegistry.CoinMarkets) { provideCoinMarketsStore(get(), get(), get()) }
+    single(AppStoreRegistry.CloudTodo) { provideCloudTodoReadStore(get(), get()) }
+    single(AppStoreRegistry.CloudTodoMutable) { provideCloudTodoStore(api = get(), dao = get(), bookkeeper = get()) }
     single(AppStoreRegistry.CoinDetail) { provideCoinDetailStore(get(), get(), get()) }
 
     // Economic Stores (Banking Utility Toolkit — FRED + World Bank)
@@ -86,6 +90,7 @@ val appStoreModule: Module = module {
         mgr.register(get(AppStoreRegistry.ExchangeRates))
         mgr.register(get(AppStoreRegistry.RateHistory))
         mgr.register(get(AppStoreRegistry.CoinMarkets))
+        mgr.register(get(AppStoreRegistry.CloudTodo))
         mgr.register(get(AppStoreRegistry.CoinDetail))
         mgr.register(get(AppStoreRegistry.InterestRateSeries))
         mgr.register(get(AppStoreRegistry.MacroIndicator))

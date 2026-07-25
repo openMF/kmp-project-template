@@ -44,6 +44,7 @@ val DatabaseModule = module {
         ChargeTypeConvertersInstalled
     }
     single { get<AppDatabase>().exchangeRatesDao }
+    single { get<AppDatabase>().cloudTodoDao }
     single { get<AppDatabase>().coinMarketDao }
     single { get<AppDatabase>().coinDetailDao }
     single { get<AppDatabase>().rateHistoryDao }

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.submit.SubmitState
+import kpt.core.base.ui.submit.MutationScreenContent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.demo.banking.BillCategory
 import kpt.core.model.demo.banking.Recurrence
@@ -115,68 +116,86 @@ fun AddOrEditBillReminderScreen(
     ) { padding ->
         val sp = MaterialTheme.spacing
         val isSubmitting = submit is SubmitState.Submitting
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .imePadding()
-                .navigationBarsPadding()
-                .padding(sp.lg),
-            verticalArrangement = Arrangement.spacedBy(sp.md),
-        ) {
-            BasicInfoSection(
-                form = form,
-                isSubmitting = isSubmitting,
-                onNameChange = viewModel::onNameChange,
-                onAmountChange = viewModel::onAmountChange,
-                onDueDayChange = viewModel::onDueDayChange,
-            )
-
-            RecurrenceSection(
-                selected = form.recurrence,
-                isSubmitting = isSubmitting,
-                onChange = viewModel::onRecurrenceChange,
-            )
-
-            CategorySection(
-                selected = form.category,
-                isSubmitting = isSubmitting,
-                onChange = viewModel::onCategoryChange,
-            )
-
-            ReminderSettingsSection(
-                reminderDaysBefore = form.reminderDaysBefore,
-                enabled = form.enabled,
-                isSubmitting = isSubmitting,
-                onReminderDaysBeforeChange = viewModel::onReminderDaysBeforeChange,
-                onEnabledChange = viewModel::onEnabledChange,
-            )
-
-            Button(
-                onClick = viewModel::onSubmit,
-                modifier = Modifier.fillMaxWidth().testTag(TestTags.AddOrEditBill.SAVE_BUTTON),
-                enabled = submit !is SubmitState.Submitting &&
-                    form.name.isNotBlank() &&
-                    form.amount > 0.0,
-            ) {
-                if (submit is SubmitState.Submitting) {
-                    CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
+        // Framework mutation-screen form: MutationScreenContent owns the read/load gate
+        // (ScreenContent over ui.screen — Loading while an existing bill hydrates), the
+        // Submitting scrim overlay, and the terminal result-handler. The persistent inline
+        // status line is supplied via the `submitStatus` slot so the "Saved / add another" +
+        // "Failed / retry / offline" affordances render in-place (not a transient snackbar).
+        MutationScreenContent(
+            state = ui,
+            onRetry = viewModel::onRetry,
+            onSubmitted = { /* inline submitStatus surfaces the Saved + "add another" affordance */ },
+            modifier = Modifier.padding(padding),
+            submitStatus = { submitState ->
+                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = sp.lg, vertical = sp.md)) {
+                    SubmitStatusLine(
+                        submit = submitState,
+                        onRetry = viewModel::onRetry,
+                        onDismiss = viewModel::onDismissResult,
+                    )
                 }
-                Text(stringResource(Res.string.screens_bills_addedit_save_button))
-            }
+            },
+        ) { _, _ ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
+                    .navigationBarsPadding()
+                    .padding(sp.lg),
+                verticalArrangement = Arrangement.spacedBy(sp.md),
+            ) {
+                BasicInfoSection(
+                    form = form,
+                    isSubmitting = isSubmitting,
+                    onNameChange = viewModel::onNameChange,
+                    onAmountChange = viewModel::onAmountChange,
+                    onDueDayChange = viewModel::onDueDayChange,
+                )
 
-            SubmitStatusLine(
-                submit = submit,
-                onRetry = viewModel::onRetry,
-                onDismiss = viewModel::onDismissResult,
-            )
+                RecurrenceSection(
+                    selected = form.recurrence,
+                    isSubmitting = isSubmitting,
+                    onChange = viewModel::onRecurrenceChange,
+                )
+
+                CategorySection(
+                    selected = form.category,
+                    isSubmitting = isSubmitting,
+                    onChange = viewModel::onCategoryChange,
+                )
+
+                ReminderSettingsSection(
+                    reminderDaysBefore = form.reminderDaysBefore,
+                    enabled = form.enabled,
+                    isSubmitting = isSubmitting,
+                    onReminderDaysBeforeChange = viewModel::onReminderDaysBeforeChange,
+                    onEnabledChange = viewModel::onEnabledChange,
+                )
+
+                Button(
+                    onClick = viewModel::onSubmit,
+                    modifier = Modifier.fillMaxWidth().testTag(TestTags.AddOrEditBill.SAVE_BUTTON),
+                    enabled = submit !is SubmitState.Submitting &&
+                        form.name.isNotBlank() &&
+                        form.amount > 0.0,
+                ) {
+                    if (submit is SubmitState.Submitting) {
+                        CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
+                    }
+                    Text(stringResource(Res.string.screens_bills_addedit_save_button))
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun SubmitStatusLine(submit: SubmitState<*>, onRetry: () -> Unit, onDismiss: () -> Unit) {
+private fun SubmitStatusLine(
+    submit: SubmitState<*>,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     when (submit) {
         is SubmitState.Idle -> Unit
         is SubmitState.Submitting -> Text(

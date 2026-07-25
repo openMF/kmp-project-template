@@ -3,12 +3,6 @@
 -dontwarn org.conscrypt.**
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
-
-# Ktor's IntellijIdeaDebugDetector references JVM-only java.lang.management.* (absent
-# on Android). Safe to ignore — used only for debugger detection. Without these,
-# `:cmp-android:minifyProdReleaseWithR8` fails on every fork's prod release build.
--dontwarn java.lang.management.ManagementFactory
--dontwarn java.lang.management.RuntimeMXBean
 -keep class * extends androidx.room.RoomDatabase { <init>(); }
 
 # Security module — keep expect/actual classes that use reflection or JNI

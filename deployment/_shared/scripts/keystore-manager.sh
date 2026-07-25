@@ -1397,9 +1397,9 @@ generate_keystore() {
     local key_password=$5
 
     # Hard-coded generation constants (not per-fork config)
-    local validity=25
+    local validity=1000  # ~1000 years — upload key must outlive the app
     local keyalg="RSA"
-    local keysize=2048
+    local keysize=4096
     local overwrite=false
 
     # Path to save the keystore
@@ -1485,24 +1485,28 @@ generate_keystore() {
         DN=$(IFS=,; echo "${DN_PARTS[*]}")
         keytool -genkey -v \
             -keystore "$keystore_path" \
-            -alias "$key_alias" \
+            -storetype PKCS12 \
+              -alias "$key_alias" \
             -keyalg "$keyalg" \
             -keysize "$keysize" \
-            -validity $((validity*365)) \
+            -sigalg SHA256withRSA \
+              -validity $((validity*365)) \
             -storepass "$keystore_password" \
-            -keypass "$key_password" \
+            -keypass "$keystore_password" \  # PKCS12: key pw == store pw
             -dname "$DN"
     else
         # gradle/fork.properties not present — fall back to interactive DN entry
         echo -e "${BLUE}gradle/fork.properties not found. Using interactive mode for certificate DN.${NC}"
         keytool -genkey -v \
             -keystore "$keystore_path" \
-            -alias "$key_alias" \
+            -storetype PKCS12 \
+              -alias "$key_alias" \
             -keyalg "$keyalg" \
             -keysize "$keysize" \
-            -validity $((validity*365)) \
+            -sigalg SHA256withRSA \
+              -validity $((validity*365)) \
             -storepass "$keystore_password" \
-            -keypass "$key_password"
+            -keypass "$keystore_password"  # PKCS12: key pw == store pw
     fi
 
     # Check if keystore was successfully created

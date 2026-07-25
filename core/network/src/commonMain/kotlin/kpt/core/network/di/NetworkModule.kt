@@ -16,6 +16,8 @@ import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import kpt.core.network.BuildKonfig
 import kpt.core.network.demo.FintechApiClient
+import kpt.core.network.demo.cloudtodo.api.JsonPlaceholderApi
+import kpt.core.network.demo.cloudtodo.api.createJsonPlaceholderApi
 import kpt.core.network.demo.crypto.api.CoinGeckoApi
 import kpt.core.network.demo.currency.api.FrankfurterApi
 import kpt.core.network.demo.currency.config.FrankfurterApiConfig
@@ -110,5 +112,21 @@ val NetworkModule = module {
     single<CoinGeckoApi> { get<FintechApiClient>().coinGeckoApi }
     single<FredApi> { get<FintechApiClient>().fredApi }
     single<WorldBankApi> { get<FintechApiClient>().worldBankApi }
+
+    // cloud-todo — jsonplaceholder is the only WRITABLE demo backend (POST/PUT accepted), used to
+    // showcase the Store5 MUTABLE (offline-write) archetype (`provideCloudTodoStore`).
+    single<JsonPlaceholderApi> {
+        Ktorfit.Builder()
+            .httpClient(
+                client = httpClient(
+                    setupDefaultHttpClient(
+                        baseUrl = "https://jsonplaceholder.typicode.com/",
+                        loggableHosts = listOf("jsonplaceholder.typicode.com"),
+                    ),
+                ),
+            )
+            .build()
+            .createJsonPlaceholderApi()
+    }
     // demo:end
 }

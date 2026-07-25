@@ -26,38 +26,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
-import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.demo.economic.IndicatorKind
 import kpt.core.model.demo.economic.MacroIndicator
 import kpt.feature.macro.generated.resources.Res
-import kpt.feature.macro.generated.resources.screens_macro_card_auth_required
-import kpt.feature.macro.generated.resources.screens_macro_card_captive_portal
-import kpt.feature.macro.generated.resources.screens_macro_card_empty
-import kpt.feature.macro.generated.resources.screens_macro_card_generic_error
 import kpt.feature.macro.generated.resources.screens_macro_card_latest_year
 import kpt.feature.macro.generated.resources.screens_macro_card_loading
-import kpt.feature.macro.generated.resources.screens_macro_card_offline
 import kpt.feature.macro.generated.resources.screens_macro_card_retry
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * A single indicator's at-a-glance card on the country-macro dashboard.
- *
- * Renders one of four UI shapes based on [state]:
- * - **Loading** — placeholder rows
- * - **Content** — name, headline value, 10-year sparkline trail, latest-year subtitle
- * - **Error** — error message + per-indicator retry button (so other cards stay live)
- * - **Empty / NoNetwork / Unauthenticated** — short message + retry
- *
- * The card's [onClick] navigates to the indicator's full-history detail screen.
+ * Persistent per-card frame for a macro indicator: the [AppCard] shell + accent stripe +
+ * title, rendered identically across every [ScreenState]. Pass to
+ * [IndependentCardLayout]'s `cardChrome` so the framework composable owns the
+ * loading/empty/error/content dispatch while this owns the card's constant chrome.
+ * [content] is the state body ([MacroLoadingBody] / [MacroContentBody] / [MacroInlineMessage]).
  */
 @Composable
-fun IndicatorCard(
+fun MacroIndicatorCardChrome(
     indicatorKind: IndicatorKind,
-    state: ScreenState<MacroIndicator>,
-    onRetry: () -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
     AppCard(
         modifier = modifier
@@ -70,31 +59,7 @@ fun IndicatorCard(
                 text = indicatorKind.displayName(),
                 style = MaterialTheme.typography.titleMedium,
             )
-            when (state) {
-                is ScreenState.Loading -> LoadingBody()
-                is ScreenState.Content -> ContentBody(state.data)
-                is ScreenState.Empty -> InlineMessage(
-                    text = stringResource(Res.string.screens_macro_card_empty),
-                    onRetry = onRetry,
-                )
-                is ScreenState.NoNetwork -> InlineMessage(
-                    text = if (state.isCaptivePortal) {
-                        stringResource(Res.string.screens_macro_card_captive_portal)
-                    } else {
-                        stringResource(Res.string.screens_macro_card_offline)
-                    },
-                    onRetry = onRetry,
-                )
-                is ScreenState.Error -> InlineMessage(
-                    text = state.error.message
-                        ?: stringResource(Res.string.screens_macro_card_generic_error),
-                    onRetry = onRetry,
-                )
-                is ScreenState.Unauthenticated -> InlineMessage(
-                    text = stringResource(Res.string.screens_macro_card_auth_required),
-                    onRetry = onRetry,
-                )
-            }
+            content()
         }
     }
 }
@@ -104,7 +69,7 @@ fun IndicatorCard(
  * GDP / Inflation / Unemployment at a glance without re-reading the title.
  */
 @Composable
-private fun IndicatorKind.accentColor(): Color = when (this) {
+internal fun IndicatorKind.accentColor(): Color = when (this) {
     IndicatorKind.GDP -> MaterialTheme.colorScheme.secondary // emerald — growth
     IndicatorKind.INFLATION_CPI -> MaterialTheme.colorScheme.tertiary // amber — warning
     IndicatorKind.UNEMPLOYMENT -> MaterialTheme.colorScheme.error // rose — concern
@@ -113,7 +78,7 @@ private fun IndicatorKind.accentColor(): Color = when (this) {
 }
 
 @Composable
-private fun ContentBody(indicator: MacroIndicator) {
+fun MacroContentBody(indicator: MacroIndicator) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -143,7 +108,7 @@ private fun ContentBody(indicator: MacroIndicator) {
 }
 
 @Composable
-private fun LoadingBody() {
+fun MacroLoadingBody() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -160,7 +125,7 @@ private fun LoadingBody() {
 }
 
 @Composable
-private fun InlineMessage(text: String, onRetry: () -> Unit) {
+fun MacroInlineMessage(text: String, onRetry: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

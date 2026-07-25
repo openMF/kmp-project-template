@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.base.ui.viewmodel.BaseDraftMutationViewModel
 import kpt.core.data.demo.banking.BillReminderRepository
@@ -63,9 +64,12 @@ class EditBillReminderViewModel(
     val formState: StateFlow<BillReminderFormState> = _formState.asStateFlow()
 
     init {
-        // If we were handed an existing billId, hydrate the form from the repo once.
-        // We don't expose this as a Flow because the form is "owned" by the user from
-        // that moment on — re-emitting committed rows would clobber in-progress edits.
+        // `BaseDraftMutationViewModel<T, R>` couples T as BOTH the screen read-model AND the submit
+        // payload (`SubmitOutbox<T>` / `performSubmit(T)`), so T stays `BillReminder`. The editable
+        // body still lives in `_formState`; `mutableScreenState` only gates "form ready" —
+        // Loading while an existing bill hydrates (edit), then Content(snapshot); Content(snapshot)
+        // immediately for create. MutationScreenContent's content slot ignores the read payload
+        // (the form renders `_formState`), so the snapshot is a "ready" sentinel, not display data.
         if (billId != null) {
             viewModelScope.launch {
                 repository.getById(billId)?.let { existing ->
@@ -79,8 +83,29 @@ class EditBillReminderViewModel(
                         reminderDaysBefore = existing.reminderDaysBefore,
                     )
                 }
+                mutableScreenState.value = ScreenState.Content(formSnapshot())
             }
+        } else {
+            mutableScreenState.value = ScreenState.Content(formSnapshot())
         }
+    }
+
+    /** A BillReminder snapshot of the current form — the "form ready" sentinel for the screen state. */
+    private fun formSnapshot(): BillReminder {
+        val form = _formState.value
+        val now = clock.now().toEpochMilliseconds()
+        return BillReminder(
+            id = billId ?: FORM_KEY_NEW,
+            name = form.name,
+            amount = form.amount,
+            dueDay = form.dueDay,
+            recurrence = form.recurrence,
+            category = form.category,
+            enabled = form.enabled,
+            reminderDaysBefore = form.reminderDaysBefore,
+            createdAtMs = now,
+            updatedAtMs = now,
+        )
     }
 
     fun onNameChange(value: String) {

@@ -62,6 +62,8 @@ object AppStoreRegistry : StoreRegistry() {
 
     // Banking Utility Toolkit — spot exchange-rate lookup (NETWORK_ONLY callsite)
     val SpotRate = store("spotRate")
+    val CloudTodo = store("cloudTodo")
+    val CloudTodoMutable = store("cloudTodoMutable")
 
     /** TTL durations — financial data has different freshness requirements. */
     object Ttl {

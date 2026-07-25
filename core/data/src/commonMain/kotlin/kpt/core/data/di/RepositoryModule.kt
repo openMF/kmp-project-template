@@ -23,6 +23,8 @@ import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.data.demo.banking.impl.BillReminderRepositoryImpl
 import kpt.core.data.demo.banking.impl.LoanRepositoryImpl
+import kpt.core.data.demo.cloudtodo.CloudTodoRepository
+import kpt.core.data.demo.cloudtodo.impl.CloudTodoRepositoryImpl
 import kpt.core.data.demo.crypto.CryptoRepository
 import kpt.core.data.demo.crypto.impl.CryptoRepositoryImpl
 import kpt.core.data.demo.currency.CurrencyRepository
@@ -34,6 +36,7 @@ import kpt.core.data.demo.economic.impl.MacroIndicatorsRepositoryImpl
 import kpt.core.data.demo.watchlist.WatchlistRepository
 import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
 import kpt.core.data.infra.NetworkMonitor
+import kpt.core.data.infra.impl.RoomBookkeeper
 import kpt.core.data.infra.impl.RoomFetchedAtRepository
 import kpt.core.data.infra.impl.RoomSubmitOutbox
 import kpt.core.data.user.UserDataRepository
@@ -49,10 +52,12 @@ import kpt.core.model.demo.banking.Loan
 import kpt.core.model.demo.banking.LoanCalcScenario
 import kpt.core.network.di.NetworkModule
 import kpt.core.store.AppStoreRegistry
+import kpt.core.store.demo.cloudtodo.impl.CloudTodoKey
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import org.mobilenativefoundation.store.store5.Bookkeeper
 
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
@@ -164,6 +169,20 @@ val DataModule = module {
         CryptoRepositoryImpl(
             coinMarketsStore = get(AppStoreRegistry.CoinMarkets),
             coinDetailStore = get(AppStoreRegistry.CoinDetail),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
+
+    // cloud-todo — MUTABLE (offline-write) archetype. RoomBookkeeper (owned by core/data) records
+    // failed writes for retry-on-reconnect; it's injected into the core/store MutableStore via Koin.
+    single<Bookkeeper<CloudTodoKey>> {
+        RoomBookkeeper(dao = get(), keySerializer = { "cloudTodo:${it.id}" })
+    }
+    single<CloudTodoRepository> {
+        CloudTodoRepositoryImpl(
+            readStore = get(AppStoreRegistry.CloudTodo),
+            writeStore = get(AppStoreRegistry.CloudTodoMutable),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

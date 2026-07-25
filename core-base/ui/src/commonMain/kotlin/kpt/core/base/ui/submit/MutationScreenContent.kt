@@ -49,6 +49,7 @@ fun <T, R> MutationScreenContent(
     modifier: Modifier = Modifier,
     refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: kpt.core.base.store.error.ErrorCategory) -> Unit)? = null,
+    submitStatus: (@Composable (submitState: SubmitState<R>) -> Unit)? = null,
     content: @Composable (data: T, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     SubmitResultHandler(
@@ -57,13 +58,32 @@ fun <T, R> MutationScreenContent(
         onFailed = onFailed,
     )
     Box(modifier = modifier.fillMaxSize()) {
-        ScreenContent(
-            state = screenState,
-            onRetry = onRetry,
-            modifier = Modifier.fillMaxSize(),
-            refreshingIndicator = refreshingIndicator,
-            content = content,
-        )
+        if (submitStatus != null) {
+            // Form-friendly layout: the read/edit content fills the space, a PERSISTENT inline
+            // submit-status strip (Saving / Saved / Failed-with-retry) is pinned below it. Use
+            // this for input screens that surface submit feedback in-place rather than as a
+            // transient snackbar. The scrim overlay still layers on top while Submitting.
+            Column(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f)) {
+                    ScreenContent(
+                        state = screenState,
+                        onRetry = onRetry,
+                        modifier = Modifier.fillMaxSize(),
+                        refreshingIndicator = refreshingIndicator,
+                        content = content,
+                    )
+                }
+                submitStatus(submitState)
+            }
+        } else {
+            ScreenContent(
+                state = screenState,
+                onRetry = onRetry,
+                modifier = Modifier.fillMaxSize(),
+                refreshingIndicator = refreshingIndicator,
+                content = content,
+            )
+        }
         SubmitProgressOverlay(state = submitState)
     }
 }
@@ -90,6 +110,7 @@ fun <T, R> MutationScreenContent(
     modifier: Modifier = Modifier,
     refreshingIndicator: (@Composable () -> Unit)? = null,
     onFailed: ((error: Throwable, category: kpt.core.base.store.error.ErrorCategory) -> Unit)? = null,
+    submitStatus: (@Composable (submitState: SubmitState<R>) -> Unit)? = null,
     content: @Composable (data: T, freshnessSignal: FreshnessSignal) -> Unit,
 ) {
     MutationScreenContent(
@@ -100,6 +121,7 @@ fun <T, R> MutationScreenContent(
         modifier = modifier,
         refreshingIndicator = refreshingIndicator,
         onFailed = onFailed,
+        submitStatus = submitStatus,
         content = content,
     )
 }

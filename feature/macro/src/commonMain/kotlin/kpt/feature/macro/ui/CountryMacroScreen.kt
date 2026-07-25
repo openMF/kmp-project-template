@@ -32,6 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.store.freshness.FreshnessBand
+import kpt.core.base.ui.dashboard.DashboardProgressBar
+import kpt.core.base.ui.dashboard.IndependentCardLayout
+import kpt.core.base.ui.dashboard.toDashboardProgressState
 import kpt.core.data.demo.economic.SupportedCountries
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
@@ -39,10 +42,17 @@ import kpt.core.designsystem.theme.spacing
 import kpt.core.model.demo.economic.IndicatorKind
 import kpt.feature.macro.generated.resources.Res
 import kpt.feature.macro.generated.resources.screens_macro_back_cd
+import kpt.feature.macro.generated.resources.screens_macro_card_captive_portal
+import kpt.feature.macro.generated.resources.screens_macro_card_empty
+import kpt.feature.macro.generated.resources.screens_macro_card_generic_error
+import kpt.feature.macro.generated.resources.screens_macro_card_offline
 import kpt.feature.macro.generated.resources.screens_macro_country_title
 import kpt.feature.macro.generated.resources.screens_macro_refresh_all_cd
 import kpt.feature.macro.generated.resources.screens_macro_stale_chip
-import kpt.feature.macro.ui.components.IndicatorCard
+import kpt.feature.macro.ui.components.MacroContentBody
+import kpt.feature.macro.ui.components.MacroIndicatorCardChrome
+import kpt.feature.macro.ui.components.MacroInlineMessage
+import kpt.feature.macro.ui.components.MacroLoadingBody
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -124,24 +134,56 @@ fun CountryMacroScreen(
                     modifier = Modifier.padding(horizontal = sp.lg),
                 )
             }
-            IndicatorCard(
-                indicatorKind = IndicatorKind.GDP,
-                state = uiState.gdp,
-                onRetry = { viewModel.trySendAction(MacroAction.RetryGdp) },
-                onClick = { onOpenIndicator(IndicatorKind.GDP) },
+
+            // Store5 multi-source dashboard, framework-composable form: the three indicators are
+            // homogeneous ScreenState<MacroIndicator> cards. IndependentCardLayout owns each card's
+            // loading/empty/no-network/error/content dispatch (per-card, so one slow/failed indicator
+            // never blanks the others); MacroIndicatorCardChrome supplies the persistent card frame;
+            // the compact per-card slots keep the dense look. DashboardProgressBar shows "X of Y loaded".
+            val macroStates = listOf(uiState.gdp, uiState.inflation, uiState.unemployment)
+            val macroKinds = listOf(IndicatorKind.GDP, IndicatorKind.INFLATION_CPI, IndicatorKind.UNEMPLOYMENT)
+            val macroRetries = listOf(MacroAction.RetryGdp, MacroAction.RetryInflation, MacroAction.RetryUnemployment)
+
+            DashboardProgressBar(
+                state = macroStates.toDashboardProgressState(),
+                modifier = Modifier.padding(horizontal = sp.lg),
             )
-            IndicatorCard(
-                indicatorKind = IndicatorKind.INFLATION_CPI,
-                state = uiState.inflation,
-                onRetry = { viewModel.trySendAction(MacroAction.RetryInflation) },
-                onClick = { onOpenIndicator(IndicatorKind.INFLATION_CPI) },
-            )
-            IndicatorCard(
-                indicatorKind = IndicatorKind.UNEMPLOYMENT,
-                state = uiState.unemployment,
-                onRetry = { viewModel.trySendAction(MacroAction.RetryUnemployment) },
-                onClick = { onOpenIndicator(IndicatorKind.UNEMPLOYMENT) },
-            )
+
+            IndependentCardLayout(
+                states = macroStates,
+                onRetry = { index -> viewModel.trySendAction(macroRetries[index]) },
+                cardChrome = { index, card ->
+                    MacroIndicatorCardChrome(
+                        indicatorKind = macroKinds[index],
+                        onClick = { onOpenIndicator(macroKinds[index]) },
+                    ) { card() }
+                },
+                loading = { MacroLoadingBody() },
+                empty = { index ->
+                    MacroInlineMessage(
+                        text = stringResource(Res.string.screens_macro_card_empty),
+                        onRetry = { viewModel.trySendAction(macroRetries[index]) },
+                    )
+                },
+                noNetwork = { index, isCaptivePortal ->
+                    MacroInlineMessage(
+                        text = if (isCaptivePortal) {
+                            stringResource(Res.string.screens_macro_card_captive_portal)
+                        } else {
+                            stringResource(Res.string.screens_macro_card_offline)
+                        },
+                        onRetry = { viewModel.trySendAction(macroRetries[index]) },
+                    )
+                },
+                error = { index, throwable ->
+                    MacroInlineMessage(
+                        text = throwable.message ?: stringResource(Res.string.screens_macro_card_generic_error),
+                        onRetry = { viewModel.trySendAction(macroRetries[index]) },
+                    )
+                },
+            ) { _, data, _ ->
+                MacroContentBody(data)
+            }
         }
     }
 }

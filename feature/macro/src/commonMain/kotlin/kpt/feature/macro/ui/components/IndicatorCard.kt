@@ -78,9 +78,9 @@ internal fun IndicatorKind.accentColor(): Color = when (this) {
 }
 
 @Composable
-fun MacroContentBody(indicator: MacroIndicator) {
+fun MacroContentBody(indicator: MacroIndicator, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -108,9 +108,9 @@ fun MacroContentBody(indicator: MacroIndicator) {
 }
 
 @Composable
-fun MacroLoadingBody() {
+fun MacroLoadingBody(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(64.dp)
             .padding(top = 8.dp),
@@ -125,9 +125,9 @@ fun MacroLoadingBody() {
 }
 
 @Composable
-fun MacroInlineMessage(text: String, onRetry: () -> Unit) {
+fun MacroInlineMessage(text: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,

@@ -127,12 +127,13 @@ fun AddOrEditBillReminderScreen(
             onSubmitted = { /* inline submitStatus surfaces the Saved + "add another" affordance */ },
             modifier = Modifier.padding(padding),
             submitStatus = { submitState ->
-                SubmitStatusLine(
-                    submit = submitState,
-                    onRetry = viewModel::onRetry,
-                    onDismiss = viewModel::onDismissResult,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = sp.lg, vertical = sp.md),
-                )
+                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = sp.lg, vertical = sp.md)) {
+                    SubmitStatusLine(
+                        submit = submitState,
+                        onRetry = viewModel::onRetry,
+                        onDismiss = viewModel::onDismissResult,
+                    )
+                }
             },
         ) { _, _ ->
             Column(
@@ -190,7 +191,11 @@ fun AddOrEditBillReminderScreen(
 }
 
 @Composable
-private fun SubmitStatusLine(submit: SubmitState<*>, onRetry: () -> Unit, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
+private fun SubmitStatusLine(
+    submit: SubmitState<*>,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     when (submit) {
         is SubmitState.Idle -> Unit
         is SubmitState.Submitting -> Text(

@@ -103,12 +103,24 @@ fun <T> IndependentCardLayout(
                 noNetwork = if (noNetwork != null) {
                     { captive -> noNetwork(index, captive) }
                 } else {
-                    { captive -> DefaultNoNetworkContent(onRetry = { onRetry(index) }, isCaptivePortal = captive, onDismiss = cardDismiss) }
+                    { captive ->
+                        DefaultNoNetworkContent(
+                            onRetry = { onRetry(index) },
+                            isCaptivePortal = captive,
+                            onDismiss = cardDismiss,
+                        )
+                    }
                 },
                 error = if (error != null) {
                     { throwable -> error(index, throwable) }
                 } else {
-                    { throwable -> DefaultErrorContent(throwable, onRetry = { onRetry(index) }, onDismiss = cardDismiss) }
+                    { throwable ->
+                        DefaultErrorContent(
+                            throwable,
+                            onRetry = { onRetry(index) },
+                            onDismiss = cardDismiss,
+                        )
+                    }
                 },
                 ) { data, freshness ->
                     content(index, data, freshness)

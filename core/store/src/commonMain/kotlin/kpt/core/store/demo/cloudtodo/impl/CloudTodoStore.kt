@@ -28,9 +28,6 @@ import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.Updater
 import org.mobilenativefoundation.store.store5.UpdaterResult
 
-/** Single-todo key (jsonplaceholder addresses todos by numeric id). */
-data class CloudTodoKey(val id: Int)
-
 /**
  * cloud-todo READ store (`createStore`) — the offline-first read half of the MUTABLE archetype.
  * In Store5 5.1 `MutableStore` is NOT a `Store` subtype (separate read hierarchy), so the

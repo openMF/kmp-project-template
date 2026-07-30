@@ -416,9 +416,14 @@ def setup_ios_keychain(options = {})
   keychain_pass = options[:keychain_password] ||
                   ENV["KEYCHAIN_PASSWORD"] ||
                   cfg[:keychain_password]
-  return unless keychain_pass
 
   if ENV["CI"].to_s != ""
+    # CI: create an isolated, throwaway build keychain for Match to import into.
+    # The password is EPHEMERAL — a per-run random value when none is supplied — so
+    # NO persisted keychain secret is required (the fastlane setup_ci pattern). All
+    # Apple signing material comes from the fastlane-match provisioning repo.
+    require "securerandom"
+    keychain_pass ||= SecureRandom.hex(24)
     create_keychain(
       name:             "build.keychain-db",
       password:         keychain_pass,
@@ -428,6 +433,10 @@ def setup_ios_keychain(options = {})
       lock_when_sleeps: false,
     )
   else
+    # Local: the developer's login keychain is already unlocked in their session, so
+    # Match imports into it with NO secret at all. Only unlock explicitly when a
+    # password was deliberately provided (e.g. a locked-session CI-like local run).
+    return unless keychain_pass
     unlock_keychain(
       path:        File.expand_path("~/Library/Keychains/login.keychain-db"),
       password:    keychain_pass,

@@ -84,6 +84,12 @@ platform :ios do
     # the TestFlight parallel to the Play Store listing sync that runs with the AAB.
     ensure_testflight_store_config(app_identifier: ios_config[:app_identifier])
 
+    # Ensure the ACCOUNT-LEVEL internal + external tester groups exist and are populated (from the reusable
+    # _org/testflight-testers.yaml). Internal groups are has_access_to_all_builds, so this build reaches
+    # internal testers automatically once it finishes processing — no per-build assignment needed. External
+    # testers are wired here and distributed later by `promoteToExternalBeta` (Apple beta review). Best-effort.
+    sync_testflight_testers(app_identifier: ios_config[:app_identifier])
+
     fetch_certificates_with_match(options.merge(match_type: "appstore"))
 
     # Switch project from whatever signing state the previous lane left it in
@@ -95,7 +101,7 @@ platform :ios do
       path:                  ios_config[:project_path],
       team_id:               ios_config[:team_id],
       code_sign_identity:    "Apple Distribution",
-      targets:               [variant.ios_scheme],
+      targets:               ["iosApp"],  # Xcode TARGET name (fixed in KMP template), NOT the scheme (prodRelease/…) — a scheme here matches no target → update is a silent no-op → archive hunts a Development profile
       bundle_identifier:     ios_config[:app_identifier],
       profile_name:          "match AppStore #{ios_config[:app_identifier]}",
     )
@@ -175,8 +181,15 @@ platform :ios do
     # External beta review REQUIRES the app-level Test Information — sync it from
     # config first so this promotion never fails for a fresh app record.
     ensure_testflight_store_config(app_identifier: ios_config[:app_identifier])
+    # Ensure the external tester groups + testers exist (from the account-level registry) before distributing.
+    sync_testflight_testers(app_identifier: ios_config[:app_identifier])
 
+    # External groups come from the ACCOUNT-LEVEL registry (reused across apps), then explicit option, then
+    # legacy config, then a sane default.
+    registry_external = ((FastlaneConfig::IosConfig::TESTFLIGHT_TESTERS[:external] || {})[:groups] || [])
+                          .map { |g| g[:name] }.compact
     external_groups = options[:groups] ||
+                      (registry_external unless registry_external.empty?) ||
                       testflight_config[:external_groups] ||
                       ["External Beta"]
 

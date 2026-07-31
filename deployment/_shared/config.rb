@@ -118,6 +118,35 @@ module FastlaneConfig
     nil
   end
 
+  # Locate + parse the ACCOUNT-LEVEL TestFlight testers registry (reused across every workspace app).
+  # Resolution order: ENV override → per-app deployment/testflight-testers.yaml → walk UP from the source
+  # repo to the enclosing workspace `_org/testflight-testers.yaml`. /idea-deploy is LOCAL/direct, so the
+  # `_org/` dir is present on disk; in CI point TESTFLIGHT_TESTERS_FILE at it. Returns {} when absent.
+  def _load_testers_registry
+    require "yaml"
+    path = ENV["TESTFLIGHT_TESTERS_FILE"].to_s
+    path = "" unless File.exist?(path)
+    if path.empty?
+      local = File.join(DEPLOYMENT_REPO_ROOT, "deployment", "testflight-testers.yaml")
+      path = local if File.exist?(local)
+    end
+    if path.empty?
+      dir = DEPLOYMENT_REPO_ROOT
+      12.times do
+        cand = File.join(dir, "_org", "testflight-testers.yaml")
+        if File.exist?(cand) then path = cand; break end
+        parent = File.expand_path("..", dir)
+        break if parent == dir
+        dir = parent
+      end
+    end
+    return {} if path.empty?
+    (YAML.load_file(path) || {})
+  rescue StandardError => e
+    warn "⚠️  testflight-testers registry parse failed: #{e.message}"
+    {}
+  end
+
   public
 
   # --------------------------------------------------------------------------
@@ -149,6 +178,8 @@ module FastlaneConfig
   module IosConfig
     _s = FastlaneConfig::SECRETS_DIR
     _c = FastlaneConfig  # alias for brevity — calls FastlaneConfig._secret(...)
+    _bs = BuildSecrets.for  # canonical resolver: LAYOUT.yaml + secrets/live/ path + ENV-first
+    _nz = ->(v) { (v.nil? || v.to_s.strip.empty?) ? nil : v.to_s.strip }  # nil-if-blank
 
     BUILD_CONFIG = {
       scheme:                        "iosApp",
@@ -160,9 +191,17 @@ module FastlaneConfig
       key_id:                        BuildSecrets.for.value(:appstore_key_id),
       issuer_id:                     BuildSecrets.for.value(:appstore_issuer_id),
       key_filepath:                  File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:appstore_auth_key)),
-      # Match certificate repository — ENV (CI) → secrets/ file → fork.properties → default
-      match_git_url:    _c._secret("MATCH_GIT_URL",    "#{_s}/apple/match/git_url")    || _c._fork_prop("apple.match.git.url"),
-      match_git_branch: _c._secret("MATCH_GIT_BRANCH", "#{_s}/apple/match/git_branch") || _c._fork_prop("apple.match.git.branch") || "master",
+      # Match certificate repository — resolve via the CANONICAL BuildSecrets resolver (LAYOUT.yaml →
+      # secrets/live/apple/match/… + ENV-first), exactly like :match_ssh_key below. The old
+      # `_c._secret("…","#{_s}/apple/match/git_branch")` form dropped the `live/` flavor segment (the file is
+      # at secrets/live/apple/match/git_branch, NOT secrets/apple/…), so the lookup MISSED and silently fell
+      # through to the fork.properties default. When that default named a branch the provisioning repo does
+      # not have, Match checked out an empty orphan branch → certs/distribution/ came back empty → "No code
+      # signing identity found and cannot create a new one because you enabled readonly", even though the
+      # repo carries a valid cert+key+profile. The last-resort `|| "dev"` matches the provisioning repo's
+      # default branch so a fresh fork works with zero config; each fork overrides via its own LAYOUT/fork.properties. (fix 2026-07-31)
+      match_git_url:    _nz.call(_bs.value(:match_git_url))    || _c._fork_prop("apple.match.git.url"),
+      match_git_branch: _nz.call(_bs.value(:match_git_branch)) || _c._fork_prop("apple.match.git.branch") || "dev",
       match_type:                    "adhoc",
       match_ssh_key_path:            BuildSecrets.for.path(:match_ssh_key),
       match_password:                BuildSecrets.for.value(:match_password),
@@ -203,6 +242,20 @@ module FastlaneConfig
       uses_non_exempt_encryption:        false,
       localized_app_info:                {},
     }.freeze
+
+    # ACCOUNT-LEVEL testers registry (workspace _org/testflight-testers.yaml). Symbolized for lane use.
+    # Reused across every workspace app; sync_testflight_testers() ensures the groups + testers on ASC.
+    TESTFLIGHT_TESTERS = begin
+      raw = FastlaneConfig._load_testers_registry
+      sym = ->(o) {
+        case o
+        when Hash  then o.each_with_object({}) { |(k, v), h| h[k.to_s.to_sym] = sym.call(v) }
+        when Array then o.map { |e| sym.call(e) }
+        else o
+        end
+      }
+      sym.call(raw || {})
+    end.freeze
 
     APPSTORE_CONFIG = {
       submit_for_review:                  true,
@@ -631,6 +684,66 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
     UI.important("⚠️  Could not sync TestFlight Test Information for #{app_identifier}: " \
                  "#{e.message.to_s.lines.first&.strip}. Internal upload continues; " \
                  "external promotion may need it set on App Store Connect.")
+  end
+end
+
+# Ensure the ACCOUNT-LEVEL TestFlight tester groups exist on App Store Connect and the registered testers
+# are assigned — so an uploaded build actually reaches internal + external testers instead of sitting
+# undistributed. Reads the reusable `_org/testflight-testers.yaml` (via TESTFLIGHT_TESTERS). Idempotent,
+# best-effort (rescued per group — a tester-sync hiccup NEVER blocks the upload). Internal groups are created
+# with has_access_to_all_builds=true, so internal testers receive EVERY new build automatically the moment
+# it finishes processing; external groups are wired here and distributed by `promoteToExternalBeta`.
+# Requires load_api_key first (populates Spaceship::ConnectAPI.token). Opt out: SKIP_TESTFLIGHT_TESTER_SYNC=1.
+def sync_testflight_testers(app_identifier:, registry: nil)
+  return UI.important("⏭  TestFlight tester sync skipped (SKIP_TESTFLIGHT_TESTER_SYNC=1).") \
+    if ENV["SKIP_TESTFLIGHT_TESTER_SYNC"].to_s == "1"
+
+  require "spaceship"
+  registry ||= FastlaneConfig::IosConfig::TESTFLIGHT_TESTERS
+  if registry.nil? || registry.empty?
+    return UI.message("ℹ️  No _org/testflight-testers.yaml registry found — skipping tester sync " \
+                      "(add it to wire internal + external testers account-wide).")
+  end
+  UI.user_error!("No ASC API token — call load_api_key before sync_testflight_testers") unless Spaceship::ConnectAPI.token
+
+  app = begin
+    Spaceship::ConnectAPI::App.find(app_identifier)
+  rescue => e
+    return UI.important("⚠️  ASC app lookup flaked for tester sync: #{e.message.to_s.lines.first&.strip}")
+  end
+  return UI.important("⚠️  App '#{app_identifier}' not found on ASC — skipping tester sync.") unless app
+
+  # Build a flat list of {name, internal, testers[]} from the registry (internal block + external groups[]).
+  specs = []
+  if (intl = registry[:internal]) && (intl[:testers] || []).any?
+    specs << { name: (intl[:group] || "Internal Testers"), internal: true, testers: intl[:testers] }
+  end
+  ((registry[:external] || {})[:groups] || []).each do |g|
+    specs << { name: g[:name], internal: false, testers: (g[:testers] || []) }
+  end
+  return UI.message("ℹ️  testers registry present but empty — nothing to sync.") if specs.empty?
+
+  specs.each do |gs|
+    begin
+      grp = (app.get_beta_groups(filter: { name: gs[:name] }) || []).first
+      grp ||= app.create_beta_group(
+        group_name:                gs[:name],
+        is_internal_group:         gs[:internal],
+        has_access_to_all_builds:  gs[:internal] ? true : nil,
+      )
+      testers = (gs[:testers] || []).map { |t|
+        { email: t[:email].to_s, firstName: (t[:first_name] || t[:firstName]).to_s, lastName: (t[:last_name] || t[:lastName]).to_s }
+      }.reject { |t| t[:email].empty? }
+      if testers.any?
+        grp.post_bulk_beta_tester_assignments(beta_testers: testers)
+        UI.success("👥 Synced #{testers.count} #{gs[:internal] ? 'internal' : 'external'} tester(s) → group '#{gs[:name]}'.")
+      else
+        UI.message("ℹ️  Group '#{gs[:name]}' ensured (no testers listed).")
+      end
+    rescue => e
+      UI.important("⚠️  Tester sync for group '#{gs[:name]}' hiccuped: #{e.message.to_s.lines.first&.strip}. " \
+                   "Upload continues — add/verify testers in App Store Connect → TestFlight if needed.")
+    end
   end
 end
 

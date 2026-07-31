@@ -51,14 +51,17 @@ platform :ios do
     # so xcodebuild finds the AdHoc profile Match just installed instead of looking
     # for a Development profile and failing.
     #
-    # `targets:` receives the resolved variant scheme (`prodRelease`,
-    # `demoStaging`, …) — same string that build_app's `scheme:` gets.
+    # `targets:` receives the Xcode TARGET name (`iosApp`), which is FIXED in the KMP
+    # template and independent of the flavor. It is NOT the scheme (`prodRelease`,
+    # `demoStaging`, …) that build_app's `scheme:` gets — passing a scheme name here
+    # matches no target, so update_code_signing_settings silently no-ops and the
+    # archive falls back to hunting a Development profile (the 2026-07-31 archive bug).
     update_code_signing_settings(
       use_automatic_signing: false,
       path:                  ios_config[:project_path],
       team_id:               ios_config[:team_id],
       code_sign_identity:    "Apple Distribution",
-      targets:               [variant.ios_scheme],
+      targets:               ["iosApp"],  # Xcode TARGET name (fixed in KMP template), NOT the scheme (prodRelease/…) — a scheme here matches no target → update is a silent no-op → archive hunts a Development profile
       bundle_identifier:     ios_config[:app_identifier],
       profile_name:          "match AdHoc #{ios_config[:app_identifier]}",
     )

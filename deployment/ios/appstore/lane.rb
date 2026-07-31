@@ -130,7 +130,7 @@ platform :ios do
       path:                  ios_config[:project_path],
       team_id:               ios_config[:team_id],
       code_sign_identity:    "Apple Distribution",
-      targets:               [variant.ios_scheme],
+      targets:               ["iosApp"],  # Xcode TARGET name (fixed in KMP template), NOT the scheme (prodRelease/…) — a scheme here matches no target → update is a silent no-op → archive hunts a Development profile
       bundle_identifier:     ios_config[:app_identifier],
       profile_name:          "match AppStore #{ios_config[:app_identifier]}",
     )

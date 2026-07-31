@@ -235,6 +235,14 @@ store.ios.keywords=keyword1,keyword2,keyword3,keyword4
 # Full list: https://developer.apple.com/app-store/categories/
 store.ios.category=Finance
 
+# ── Store locale (primary listing language) ──────────────────────────────────
+
+# Primary store-listing locale (BCP-47, e.g. en-US, fr-FR). The metadata subdir
+# name under deployment/<platform>/metadata/, and the locale the sync-listing lane
+# targets. Read by FastlaneConfig::AndroidConfig::PRIMARY_LOCALE (falls back to en-US).
+# ENV: STORE_PRIMARY_LOCALE
+store.primary.locale=en-US
+
 # ── Store Metadata — macOS App Store ─────────────────────────────────────────
 
 # Keywords for Mac App Store search (comma-separated, same rules as iOS).

@@ -389,7 +389,12 @@ end
 
 # Run Fastlane's setup_ci action when running on CI.
 def setup_ci_if_needed
-  setup_ci(force: true) if ENV["CI"]
+  # ALWAYS run fastlane's setup_ci — it creates a throwaway keychain and wires Match to it, so the
+  # shared Distribution cert imports there, NOT the developer's login keychain. Makes the
+  # ios-provisioning-profile Match repo self-sufficient headless/interactive/CI, zero per-member setup,
+  # no keychain password. Gating on ENV["CI"] left local runs on the (locked) login keychain → Match
+  # found no identity and tried to mint a new cert → Apple cert cap. (fix 2026-07-31)
+  setup_ci(force: true)
 end
 
 # Load App Store Connect API key into lane context.
@@ -435,43 +440,13 @@ def with_ios_preamble(options = {})
   end
 end
 
-# Unlock (local) or create (CI) the keychain before Match imports certificates.
-# Call this before fetch_certificates_with_match.
-# options:
-#   :keychain_password — macOS login keychain password (unlocks so Match can import)
-#   ENV["KEYCHAIN_PASSWORD"] — CI / local env override
+# Prepare the keychain for Match — delegates to fastlane's standard ephemeral `setup_ci` keychain.
+# NEVER the developer's login keychain and NO custom keychain: Match imports the shared cert from the
+# fastlane-match provisioning repo into fastlane's throwaway `fastlane_tmp_keychain`, which is
+# auto-created, isolated, and cleaned up — identical headless/interactive/CI, zero per-member setup.
+# (2026-07-31)
 def setup_ios_keychain(options = {})
-  cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
-  keychain_pass = options[:keychain_password] ||
-                  ENV["KEYCHAIN_PASSWORD"] ||
-                  cfg[:keychain_password]
-
-  if ENV["CI"].to_s != ""
-    # CI: create an isolated, throwaway build keychain for Match to import into.
-    # The password is EPHEMERAL — a per-run random value when none is supplied — so
-    # NO persisted keychain secret is required (the fastlane setup_ci pattern). All
-    # Apple signing material comes from the fastlane-match provisioning repo.
-    require "securerandom"
-    keychain_pass ||= SecureRandom.hex(24)
-    create_keychain(
-      name:             "build.keychain-db",
-      password:         keychain_pass,
-      default_keychain: true,
-      unlock:           true,
-      timeout:          false,
-      lock_when_sleeps: false,
-    )
-  else
-    # Local: the developer's login keychain is already unlocked in their session, so
-    # Match imports into it with NO secret at all. Only unlock explicitly when a
-    # password was deliberately provided (e.g. a locked-session CI-like local run).
-    return unless keychain_pass
-    unlock_keychain(
-      path:        File.expand_path("~/Library/Keychains/login.keychain-db"),
-      password:    keychain_pass,
-      set_default: true,
-    )
-  end
+  setup_ci(force: true)
 end
 
 # Run Fastlane Match to fetch/refresh certificates and provisioning profiles.
@@ -504,28 +479,23 @@ def fetch_certificates_with_match(options = {})
     return
   end
 
-  # FULLY-AUTOMATIC Match (auto readonly/force + auto-renew):
-  #   Phase 1 — readonly fetch. Installs whatever valid cert/profile already lives in the Match
-  #     repo. NO Dev Portal call → works even when the Apple PLA is pending. If it raises (repo
-  #     empty / cert revoked), fall through to renewal.
-  phase1_ok = begin
+  # SINGLE SOURCE OF TRUTH — readonly ONLY, NO fallback to minting/renewal. All signing material comes
+  # STRICTLY from the fastlane-match provisioning repo. A deploy lane NEVER creates or renews a
+  # cert/profile on the Apple Dev Portal — that fallback is what tries to mint a new Distribution cert
+  # and hits Apple's cert cap. If the repo lacks a valid, installable cert+key/profile for this app,
+  # FAIL LOUDLY: fix the provisioning repo (its cert-renewal.sh — the ONLY sanctioned place a cert is
+  # minted), not the deploy. Deliberate minting stays available via the explicit `readonly: false`
+  # override above (cert-renewal / bootstrap only), never as an automatic deploy-time fallback. (2026-07-31)
+  begin
     match(**base, readonly: true, force: false)
-    true
+    UI.success("✅ Signing pulled readonly from the fastlane-match provisioning repo (no Dev Portal, no mint).")
   rescue StandardError => e
-    UI.important("readonly match could not install a cert/profile (#{e.message.to_s.lines.first&.strip}); will renew.")
-    false
-  end
-
-  #   Phase 2 — decide force LOCALLY (no portal): renew only when the AppStore cert/profile is
-  #     missing or expiring soon. readonly:false + force:true regenerates on the Dev Portal AND
-  #     commits the fresh assets back to the Match repo (auto-renew). Renewal is the ONLY path
-  #     that needs the portal/PLA — the valid-cert steady state never touches it. (2026-06-22)
-  if !phase1_ok || match_assets_expired?(cfg, options)
-    UI.important("⚠️ AppStore cert/profile expired or missing → AUTO-RENEWING on the Dev Portal " \
-                 "(requires the Apple Program License Agreement to be current for the account holder).")
-    match(**base, readonly: false, force: true)
-  else
-    UI.message("✅ Valid AppStore cert/profile already in the Match repo — readonly, no Dev Portal / PLA needed.")
+    UI.user_error!(
+      "Match (readonly) could not install a valid signing identity for #{base[:app_identifier]} " \
+      "(#{e.message.to_s.lines.first&.strip}). The provisioning repo must carry a valid cert (with its " \
+      "private key) + profile for this app. Fix it with the provisioning repo's cert-renewal.sh — NO " \
+      "cert is minted from a deploy lane (no fallback)."
+    )
   end
 end
 

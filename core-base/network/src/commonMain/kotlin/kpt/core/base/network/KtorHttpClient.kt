@@ -106,6 +106,11 @@ fun setupDefaultHttpClient(
         isLenient = true
         ignoreUnknownKeys = true
         explicitNulls = false
+        // Cross-version tolerance: an unrecognized enum value (e.g. a server enum the client
+        // doesn't model yet) OR an explicit JSON null on a non-null field with a default coerces
+        // to that default instead of throwing a SerializationException. Many DTOs already document
+        // a `*.UNKNOWN`/default fallback that only works with this flag enabled.
+        coerceInputValues = true
     },
     basicCredentialsProvider: (() -> BasicAuthCredentials)? = null,
     digestCredentialsProvider: (() -> DigestAuthCredentials)? = null,

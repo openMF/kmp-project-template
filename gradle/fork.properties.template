@@ -52,10 +52,23 @@ apple.match.git.url=git@github.com:YOUR_ORG/ios-provisioning.git
 # ENV: MATCH_GIT_BRANCH
 apple.match.git.branch=dev
 
-# TestFlight external tester groups (comma-separated for multiple groups).
-# Create at: App Store Connect → TestFlight → Builds → External Groups
-# ENV: TESTFLIGHT_GROUPS
-apple.tf.groups=beta-testers
+# ══ BETA TESTERS ═══════════════════════════════════════════════════════════════
+# Tester GROUPS are pre-created on each store; deployment/ attaches EVERY build to them
+# automatically. iOS internal testers must be Apple-team members (ASC → Users & Access);
+# everyone else is an iOS EXTERNAL tester (Apple beta review ~24h) and self-joins via the
+# group's PUBLIC LINK. macOS shares the same ASC groups. Manage Android testers in a Google Group.
+#
+# iOS + macOS · App Store Connect (TestFlight) — groups auto-created by deployment/ if missing.
+# Values are the ASC beta-group NAMES.
+apple.testers.internal.group=Internal Testers
+apple.testers.external.group=External Beta
+# Enable a self-join public TestFlight link on the external group (share it / site "Join beta").
+apple.testers.external.public.link=true
+#
+# Android · Play Store — Google Group email attached to each testing track (Play native;
+# manage members in the Google Group). Leave blank to skip. e.g. beta@your-domain.com
+play.testers.internal.googlegroup=
+play.testers.closed.googlegroup=
 
 # ── Firebase App Distribution ─────────────────────────────────────────────────
 # App IDs are NOT secrets — safe to commit. They identify your Firebase app.

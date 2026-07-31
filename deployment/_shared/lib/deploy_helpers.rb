@@ -137,7 +137,9 @@ end
 
 # Run Fastlane's setup_ci action only when executing inside a CI environment.
 def setup_ci_if_needed
-  setup_ci if ENV["CI"]
+  # ALWAYS run setup_ci (throwaway keychain + Match wired to it), so signing never depends on the
+  # developer's login keychain — self-sufficient headless/interactive/CI. (fix 2026-07-31)
+  setup_ci(force: true)
 rescue StandardError => e
   UI.warning("setup_ci_if_needed: #{e.message}")
 end

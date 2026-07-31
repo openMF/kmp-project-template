@@ -48,9 +48,9 @@ apple.team.id=YOUR_TEAM_ID
 # Guide: deployment/BOOTSTRAP.md → Fastlane Match setup
 # ENV: MATCH_GIT_URL
 apple.match.git.url=git@github.com:YOUR_ORG/ios-provisioning.git
-# Branch in the Match certificate repo (default: master).
+# Branch in the Match certificate repo — single source of truth is `dev`.
 # ENV: MATCH_GIT_BRANCH
-apple.match.git.branch=master
+apple.match.git.branch=dev
 
 # TestFlight external tester groups (comma-separated for multiple groups).
 # Create at: App Store Connect → TestFlight → Builds → External Groups

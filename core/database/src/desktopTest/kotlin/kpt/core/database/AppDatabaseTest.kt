@@ -58,10 +58,12 @@ class AppDatabaseTest {
 
     @Test
     fun databaseVersionIsCurrent() {
-        // Bumped to 10 in the v9→v10 migration that added `interest_rate_series`.
+        // Bumped to 11 in the v10→v11 change that added the `cloud_todos` table (#274).
         // Update this constant when bumping AppDatabase.VERSION so the guardrail
-        // stays meaningful.
-        assertEquals(10, AppDatabase.VERSION)
+        // stays meaningful. NOTE: #274 added the entity + version but omitted the
+        // AutoMigration(10→11) + 11.json schema export — a fresh install is fine, but an
+        // in-place v10→v11 upgrade needs that migration completed in a follow-up.
+        assertEquals(11, AppDatabase.VERSION)
     }
 
     @Test

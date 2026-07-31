@@ -1,0 +1,16 @@
+# testflight-testers.yaml — ACCOUNT-LEVEL TestFlight testers registry (copy to your workspace `_org/`).
+# Reused by every app's `/idea-deploy ios`; sync_testflight_testers() ensures these groups + testers on ASC.
+#   internal — ASC team users (≤100, no beta review); has_access_to_all_builds → get EVERY build automatically.
+#   external — public groups; Apple beta review (~24h), distributed by promoteToExternalBeta.
+# Resolution: $TESTFLIGHT_TESTERS_FILE → this repo's deployment/testflight-testers.yaml → workspace _org/.
+schema_version: 1
+scope: organization
+internal:
+  group: "Internal Testers"
+  testers:
+    - { email: "you@example.com", first_name: "Your", last_name: "Name" }
+external:
+  groups:
+    - name: "External Beta"
+      testers:
+        - { email: "tester@example.com", first_name: "Beta", last_name: "Tester" }

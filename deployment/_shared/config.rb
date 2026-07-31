@@ -118,6 +118,35 @@ module FastlaneConfig
     nil
   end
 
+  # Locate + parse the ACCOUNT-LEVEL TestFlight testers registry (reused across every workspace app).
+  # Resolution order: ENV override → per-app deployment/testflight-testers.yaml → walk UP from the source
+  # repo to the enclosing workspace `_org/testflight-testers.yaml`. /idea-deploy is LOCAL/direct, so the
+  # `_org/` dir is present on disk; in CI point TESTFLIGHT_TESTERS_FILE at it. Returns {} when absent.
+  def _load_testers_registry
+    require "yaml"
+    path = ENV["TESTFLIGHT_TESTERS_FILE"].to_s
+    path = "" unless File.exist?(path)
+    if path.empty?
+      local = File.join(DEPLOYMENT_REPO_ROOT, "deployment", "testflight-testers.yaml")
+      path = local if File.exist?(local)
+    end
+    if path.empty?
+      dir = DEPLOYMENT_REPO_ROOT
+      12.times do
+        cand = File.join(dir, "_org", "testflight-testers.yaml")
+        if File.exist?(cand) then path = cand; break end
+        parent = File.expand_path("..", dir)
+        break if parent == dir
+        dir = parent
+      end
+    end
+    return {} if path.empty?
+    (YAML.load_file(path) || {})
+  rescue StandardError => e
+    warn "⚠️  testflight-testers registry parse failed: #{e.message}"
+    {}
+  end
+
   public
 
   # --------------------------------------------------------------------------
@@ -149,6 +178,8 @@ module FastlaneConfig
   module IosConfig
     _s = FastlaneConfig::SECRETS_DIR
     _c = FastlaneConfig  # alias for brevity — calls FastlaneConfig._secret(...)
+    _bs = BuildSecrets.for  # canonical resolver: LAYOUT.yaml + secrets/live/ path + ENV-first
+    _nz = ->(v) { (v.nil? || v.to_s.strip.empty?) ? nil : v.to_s.strip }  # nil-if-blank
 
     BUILD_CONFIG = {
       scheme:                        "iosApp",
@@ -160,9 +191,17 @@ module FastlaneConfig
       key_id:                        BuildSecrets.for.value(:appstore_key_id),
       issuer_id:                     BuildSecrets.for.value(:appstore_issuer_id),
       key_filepath:                  File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:appstore_auth_key)),
-      # Match certificate repository — ENV (CI) → secrets/ file → fork.properties → default
-      match_git_url:    _c._secret("MATCH_GIT_URL",    "#{_s}/apple/match/git_url")    || _c._fork_prop("apple.match.git.url"),
-      match_git_branch: _c._secret("MATCH_GIT_BRANCH", "#{_s}/apple/match/git_branch") || _c._fork_prop("apple.match.git.branch") || "master",
+      # Match certificate repository — resolve via the CANONICAL BuildSecrets resolver (LAYOUT.yaml →
+      # secrets/live/apple/match/… + ENV-first), exactly like :match_ssh_key below. The old
+      # `_c._secret("…","#{_s}/apple/match/git_branch")` form dropped the `live/` flavor segment (the file is
+      # at secrets/live/apple/match/git_branch, NOT secrets/apple/…), so the lookup MISSED and silently fell
+      # through to the fork.properties default. When that default named a branch the provisioning repo does
+      # not have, Match checked out an empty orphan branch → certs/distribution/ came back empty → "No code
+      # signing identity found and cannot create a new one because you enabled readonly", even though the
+      # repo carries a valid cert+key+profile. The last-resort `|| "dev"` matches the provisioning repo's
+      # default branch so a fresh fork works with zero config; each fork overrides via its own LAYOUT/fork.properties. (fix 2026-07-31)
+      match_git_url:    _nz.call(_bs.value(:match_git_url))    || _c._fork_prop("apple.match.git.url"),
+      match_git_branch: _nz.call(_bs.value(:match_git_branch)) || _c._fork_prop("apple.match.git.branch") || "dev",
       match_type:                    "adhoc",
       match_ssh_key_path:            BuildSecrets.for.path(:match_ssh_key),
       match_password:                BuildSecrets.for.value(:match_password),
@@ -204,6 +243,20 @@ module FastlaneConfig
       localized_app_info:                {},
     }.freeze
 
+    # ACCOUNT-LEVEL testers registry (workspace _org/testflight-testers.yaml). Symbolized for lane use.
+    # Reused across every workspace app; sync_testflight_testers() ensures the groups + testers on ASC.
+    TESTFLIGHT_TESTERS = begin
+      raw = FastlaneConfig._load_testers_registry
+      sym = ->(o) {
+        case o
+        when Hash  then o.each_with_object({}) { |(k, v), h| h[k.to_s.to_sym] = sym.call(v) }
+        when Array then o.map { |e| sym.call(e) }
+        else o
+        end
+      }
+      sym.call(raw || {})
+    end.freeze
+
     APPSTORE_CONFIG = {
       submit_for_review:                  true,
       automatic_release:                  true,
@@ -237,9 +290,25 @@ module FastlaneConfig
     # Primary Play Store listing locale (the metadata subdir under METADATA_PATH).
     # Android-owned — platform-wise config, do NOT borrow IosConfig for an Android lane.
     # Fork-configurable via gradle/fork.properties `store.primary.locale` (falls back to en-US).
-    # Replaces the broken `FastlaneConfig::SHARED[:primary_locale]` reference (SHARED was undefined)
-    # the android sync-listing lane used — which raised NameError on any local Play listing sync. (2026-07-31)
-    PRIMARY_LOCALE = (_fork_prop("store.primary.locale") || "en-US").freeze
+    # Replaces the broken `FastlaneConfig::SHARED[:primary_locale]` reference (SHARED was undefined).
+    # Read INLINE (not via the top-level `_fork_prop` helper): fastlane imports config.rb into its
+    # FastFile class, so top-level defs become FastFile methods, unreachable from inside this nested
+    # module at load time (NoMethodError). Self-contained read avoids that. (fix 2026-07-31)
+    PRIMARY_LOCALE = begin
+      _loc = "en-US"
+      _fp = File.join(DEPLOYMENT_REPO_ROOT, "gradle", "fork.properties")
+      if File.exist?(_fp)
+        File.foreach(_fp) do |line|
+          k, v = line.strip.split("=", 2)
+          next unless k && v
+          if k.strip == "store.primary.locale" && !v.strip.empty?
+            _loc = v.strip
+            break
+          end
+        end
+      end
+      _loc
+    end.freeze
 
     # Per-flavor Play track destination — the mechanism that makes demo's Play
     # publication config, not a Ruby conditional (AC-12). Each flavor maps to
@@ -373,7 +442,12 @@ end
 
 # Run Fastlane's setup_ci action when running on CI.
 def setup_ci_if_needed
-  setup_ci(force: true) if ENV["CI"]
+  # ALWAYS run fastlane's setup_ci — it creates a throwaway keychain and wires Match to it, so the
+  # shared Distribution cert imports there, NOT the developer's login keychain. Makes the
+  # ios-provisioning-profile Match repo self-sufficient headless/interactive/CI, zero per-member setup,
+  # no keychain password. Gating on ENV["CI"] left local runs on the (locked) login keychain → Match
+  # found no identity and tried to mint a new cert → Apple cert cap. (fix 2026-07-31)
+  setup_ci(force: true)
 end
 
 # Load App Store Connect API key into lane context.
@@ -419,43 +493,13 @@ def with_ios_preamble(options = {})
   end
 end
 
-# Unlock (local) or create (CI) the keychain before Match imports certificates.
-# Call this before fetch_certificates_with_match.
-# options:
-#   :keychain_password — macOS login keychain password (unlocks so Match can import)
-#   ENV["KEYCHAIN_PASSWORD"] — CI / local env override
+# Prepare the keychain for Match — delegates to fastlane's standard ephemeral `setup_ci` keychain.
+# NEVER the developer's login keychain and NO custom keychain: Match imports the shared cert from the
+# fastlane-match provisioning repo into fastlane's throwaway `fastlane_tmp_keychain`, which is
+# auto-created, isolated, and cleaned up — identical headless/interactive/CI, zero per-member setup.
+# (2026-07-31)
 def setup_ios_keychain(options = {})
-  cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
-  keychain_pass = options[:keychain_password] ||
-                  ENV["KEYCHAIN_PASSWORD"] ||
-                  cfg[:keychain_password]
-
-  if ENV["CI"].to_s != ""
-    # CI: create an isolated, throwaway build keychain for Match to import into.
-    # The password is EPHEMERAL — a per-run random value when none is supplied — so
-    # NO persisted keychain secret is required (the fastlane setup_ci pattern). All
-    # Apple signing material comes from the fastlane-match provisioning repo.
-    require "securerandom"
-    keychain_pass ||= SecureRandom.hex(24)
-    create_keychain(
-      name:             "build.keychain-db",
-      password:         keychain_pass,
-      default_keychain: true,
-      unlock:           true,
-      timeout:          false,
-      lock_when_sleeps: false,
-    )
-  else
-    # Local: the developer's login keychain is already unlocked in their session, so
-    # Match imports into it with NO secret at all. Only unlock explicitly when a
-    # password was deliberately provided (e.g. a locked-session CI-like local run).
-    return unless keychain_pass
-    unlock_keychain(
-      path:        File.expand_path("~/Library/Keychains/login.keychain-db"),
-      password:    keychain_pass,
-      set_default: true,
-    )
-  end
+  setup_ci(force: true)
 end
 
 # Run Fastlane Match to fetch/refresh certificates and provisioning profiles.
@@ -488,28 +532,23 @@ def fetch_certificates_with_match(options = {})
     return
   end
 
-  # FULLY-AUTOMATIC Match (auto readonly/force + auto-renew):
-  #   Phase 1 — readonly fetch. Installs whatever valid cert/profile already lives in the Match
-  #     repo. NO Dev Portal call → works even when the Apple PLA is pending. If it raises (repo
-  #     empty / cert revoked), fall through to renewal.
-  phase1_ok = begin
+  # SINGLE SOURCE OF TRUTH — readonly ONLY, NO fallback to minting/renewal. All signing material comes
+  # STRICTLY from the fastlane-match provisioning repo. A deploy lane NEVER creates or renews a
+  # cert/profile on the Apple Dev Portal — that fallback is what tries to mint a new Distribution cert
+  # and hits Apple's cert cap. If the repo lacks a valid, installable cert+key/profile for this app,
+  # FAIL LOUDLY: fix the provisioning repo (its cert-renewal.sh — the ONLY sanctioned place a cert is
+  # minted), not the deploy. Deliberate minting stays available via the explicit `readonly: false`
+  # override above (cert-renewal / bootstrap only), never as an automatic deploy-time fallback. (2026-07-31)
+  begin
     match(**base, readonly: true, force: false)
-    true
+    UI.success("✅ Signing pulled readonly from the fastlane-match provisioning repo (no Dev Portal, no mint).")
   rescue StandardError => e
-    UI.important("readonly match could not install a cert/profile (#{e.message.to_s.lines.first&.strip}); will renew.")
-    false
-  end
-
-  #   Phase 2 — decide force LOCALLY (no portal): renew only when the AppStore cert/profile is
-  #     missing or expiring soon. readonly:false + force:true regenerates on the Dev Portal AND
-  #     commits the fresh assets back to the Match repo (auto-renew). Renewal is the ONLY path
-  #     that needs the portal/PLA — the valid-cert steady state never touches it. (2026-06-22)
-  if !phase1_ok || match_assets_expired?(cfg, options)
-    UI.important("⚠️ AppStore cert/profile expired or missing → AUTO-RENEWING on the Dev Portal " \
-                 "(requires the Apple Program License Agreement to be current for the account holder).")
-    match(**base, readonly: false, force: true)
-  else
-    UI.message("✅ Valid AppStore cert/profile already in the Match repo — readonly, no Dev Portal / PLA needed.")
+    UI.user_error!(
+      "Match (readonly) could not install a valid signing identity for #{base[:app_identifier]} " \
+      "(#{e.message.to_s.lines.first&.strip}). The provisioning repo must carry a valid cert (with its " \
+      "private key) + profile for this app. Fix it with the provisioning repo's cert-renewal.sh — NO " \
+      "cert is minted from a deploy lane (no fallback)."
+    )
   end
 end
 
@@ -645,6 +684,66 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
     UI.important("⚠️  Could not sync TestFlight Test Information for #{app_identifier}: " \
                  "#{e.message.to_s.lines.first&.strip}. Internal upload continues; " \
                  "external promotion may need it set on App Store Connect.")
+  end
+end
+
+# Ensure the ACCOUNT-LEVEL TestFlight tester groups exist on App Store Connect and the registered testers
+# are assigned — so an uploaded build actually reaches internal + external testers instead of sitting
+# undistributed. Reads the reusable `_org/testflight-testers.yaml` (via TESTFLIGHT_TESTERS). Idempotent,
+# best-effort (rescued per group — a tester-sync hiccup NEVER blocks the upload). Internal groups are created
+# with has_access_to_all_builds=true, so internal testers receive EVERY new build automatically the moment
+# it finishes processing; external groups are wired here and distributed by `promoteToExternalBeta`.
+# Requires load_api_key first (populates Spaceship::ConnectAPI.token). Opt out: SKIP_TESTFLIGHT_TESTER_SYNC=1.
+def sync_testflight_testers(app_identifier:, registry: nil)
+  return UI.important("⏭  TestFlight tester sync skipped (SKIP_TESTFLIGHT_TESTER_SYNC=1).") \
+    if ENV["SKIP_TESTFLIGHT_TESTER_SYNC"].to_s == "1"
+
+  require "spaceship"
+  registry ||= FastlaneConfig::IosConfig::TESTFLIGHT_TESTERS
+  if registry.nil? || registry.empty?
+    return UI.message("ℹ️  No _org/testflight-testers.yaml registry found — skipping tester sync " \
+                      "(add it to wire internal + external testers account-wide).")
+  end
+  UI.user_error!("No ASC API token — call load_api_key before sync_testflight_testers") unless Spaceship::ConnectAPI.token
+
+  app = begin
+    Spaceship::ConnectAPI::App.find(app_identifier)
+  rescue => e
+    return UI.important("⚠️  ASC app lookup flaked for tester sync: #{e.message.to_s.lines.first&.strip}")
+  end
+  return UI.important("⚠️  App '#{app_identifier}' not found on ASC — skipping tester sync.") unless app
+
+  # Build a flat list of {name, internal, testers[]} from the registry (internal block + external groups[]).
+  specs = []
+  if (intl = registry[:internal]) && (intl[:testers] || []).any?
+    specs << { name: (intl[:group] || "Internal Testers"), internal: true, testers: intl[:testers] }
+  end
+  ((registry[:external] || {})[:groups] || []).each do |g|
+    specs << { name: g[:name], internal: false, testers: (g[:testers] || []) }
+  end
+  return UI.message("ℹ️  testers registry present but empty — nothing to sync.") if specs.empty?
+
+  specs.each do |gs|
+    begin
+      grp = (app.get_beta_groups(filter: { name: gs[:name] }) || []).first
+      grp ||= app.create_beta_group(
+        group_name:                gs[:name],
+        is_internal_group:         gs[:internal],
+        has_access_to_all_builds:  gs[:internal] ? true : nil,
+      )
+      testers = (gs[:testers] || []).map { |t|
+        { email: t[:email].to_s, firstName: (t[:first_name] || t[:firstName]).to_s, lastName: (t[:last_name] || t[:lastName]).to_s }
+      }.reject { |t| t[:email].empty? }
+      if testers.any?
+        grp.post_bulk_beta_tester_assignments(beta_testers: testers)
+        UI.success("👥 Synced #{testers.count} #{gs[:internal] ? 'internal' : 'external'} tester(s) → group '#{gs[:name]}'.")
+      else
+        UI.message("ℹ️  Group '#{gs[:name]}' ensured (no testers listed).")
+      end
+    rescue => e
+      UI.important("⚠️  Tester sync for group '#{gs[:name]}' hiccuped: #{e.message.to_s.lines.first&.strip}. " \
+                   "Upload continues — add/verify testers in App Store Connect → TestFlight if needed.")
+    end
   end
 end
 

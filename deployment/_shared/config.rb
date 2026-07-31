@@ -237,9 +237,25 @@ module FastlaneConfig
     # Primary Play Store listing locale (the metadata subdir under METADATA_PATH).
     # Android-owned — platform-wise config, do NOT borrow IosConfig for an Android lane.
     # Fork-configurable via gradle/fork.properties `store.primary.locale` (falls back to en-US).
-    # Replaces the broken `FastlaneConfig::SHARED[:primary_locale]` reference (SHARED was undefined)
-    # the android sync-listing lane used — which raised NameError on any local Play listing sync. (2026-07-31)
-    PRIMARY_LOCALE = (_fork_prop("store.primary.locale") || "en-US").freeze
+    # Replaces the broken `FastlaneConfig::SHARED[:primary_locale]` reference (SHARED was undefined).
+    # Read INLINE (not via the top-level `_fork_prop` helper): fastlane imports config.rb into its
+    # FastFile class, so top-level defs become FastFile methods, unreachable from inside this nested
+    # module at load time (NoMethodError). Self-contained read avoids that. (fix 2026-07-31)
+    PRIMARY_LOCALE = begin
+      _loc = "en-US"
+      _fp = File.join(DEPLOYMENT_REPO_ROOT, "gradle", "fork.properties")
+      if File.exist?(_fp)
+        File.foreach(_fp) do |line|
+          k, v = line.strip.split("=", 2)
+          next unless k && v
+          if k.strip == "store.primary.locale" && !v.strip.empty?
+            _loc = v.strip
+            break
+          end
+        end
+      end
+      _loc
+    end.freeze
 
     # Per-flavor Play track destination — the mechanism that makes demo's Play
     # publication config, not a Ruby conditional (AC-12). Each flavor maps to

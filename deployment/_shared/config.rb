@@ -315,8 +315,15 @@ module FastlaneConfig
   # Reads UPLOAD keystore credentials (Play App Signing model — Play Console
   # verifies upload signature, then re-signs with the Google-held app signing key).
   def self.get_android_signing_config(options = {})
-    _s = SECRETS_DIR
-    props_path = "#{_s}/android/keystores/upload_keystore.properties"
+    # Resolve the keystore + its .properties through the LAYOUT resolver
+    # (live-wins-else-sample) — NOT the raw SECRETS_DIR base, which misses the
+    # `live/` segment after the secrets/{live,sample} split and yields a
+    # non-existent `secrets/android/keystores/…` path (breaks local signed
+    # builds). Matches the same resolver buildAndSignApp uses for its fallback
+    # (BuildSecrets.for.path). (fix 2026-07-31)
+    ks_rel     = BuildSecrets.for.path(:upload_keystore)
+    ks_dir     = File.dirname(ks_rel)
+    props_path = "#{ks_dir}/upload_keystore.properties"
     props = {}
     if File.exist?(File.join(DEPLOYMENT_REPO_ROOT, props_path))
       File.readlines(File.join(DEPLOYMENT_REPO_ROOT, props_path)).each do |line|
@@ -327,7 +334,7 @@ module FastlaneConfig
 
     # Read storeFile dynamically so forks can rename the keystore without
     # touching config.rb (storeFile key in upload_keystore.properties is canonical).
-    default_jks = "#{_s}/android/keystores/#{props.fetch("storeFile", "upload_keystore.keystore")}"
+    default_jks = "#{ks_dir}/#{props.fetch("storeFile", "upload_keystore.keystore")}"
 
     {
       keystore_path:     options[:keystore_path]     ||

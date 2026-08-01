@@ -102,7 +102,6 @@ include(":cmp-web")
 include(":cmp-navigation")
 
 include(":core:analytics")
-include(":core:auth")
 include(":core:common")
 include(":core:data")
 include(":core:database")

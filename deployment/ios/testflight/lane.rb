@@ -184,12 +184,11 @@ platform :ios do
     # Ensure the external tester groups + testers exist (from the account-level registry) before distributing.
     sync_testflight_testers(app_identifier: ios_config[:app_identifier])
 
-    # External groups come from the ACCOUNT-LEVEL registry (reused across apps), then explicit option, then
-    # legacy config, then a sane default.
-    registry_external = ((FastlaneConfig::IosConfig::TESTFLIGHT_TESTERS[:external] || {})[:groups] || [])
-                          .map { |g| g[:name] }.compact
+    # External group comes from gradle/fork.properties (apple.testers.external.group), then explicit
+    # option, then a sane default.
+    fp_external = FastlaneConfig::IosConfig::TESTERS[:ios][:external_group]
     external_groups = options[:groups] ||
-                      (registry_external unless registry_external.empty?) ||
+                      (fp_external ? [fp_external] : nil) ||
                       testflight_config[:external_groups] ||
                       ["External Beta"]
 

@@ -118,35 +118,6 @@ module FastlaneConfig
     nil
   end
 
-  # Locate + parse the ACCOUNT-LEVEL TestFlight testers registry (reused across every workspace app).
-  # Resolution order: ENV override → per-app deployment/testflight-testers.yaml → walk UP from the source
-  # repo to the enclosing workspace `_org/testflight-testers.yaml`. /idea-deploy is LOCAL/direct, so the
-  # `_org/` dir is present on disk; in CI point TESTFLIGHT_TESTERS_FILE at it. Returns {} when absent.
-  def _load_testers_registry
-    require "yaml"
-    path = ENV["TESTFLIGHT_TESTERS_FILE"].to_s
-    path = "" unless File.exist?(path)
-    if path.empty?
-      local = File.join(DEPLOYMENT_REPO_ROOT, "deployment", "testflight-testers.yaml")
-      path = local if File.exist?(local)
-    end
-    if path.empty?
-      dir = DEPLOYMENT_REPO_ROOT
-      12.times do
-        cand = File.join(dir, "_org", "testflight-testers.yaml")
-        if File.exist?(cand) then path = cand; break end
-        parent = File.expand_path("..", dir)
-        break if parent == dir
-        dir = parent
-      end
-    end
-    return {} if path.empty?
-    (YAML.load_file(path) || {})
-  rescue StandardError => e
-    warn "⚠️  testflight-testers registry parse failed: #{e.message}"
-    {}
-  end
-
   public
 
   # --------------------------------------------------------------------------
@@ -243,19 +214,24 @@ module FastlaneConfig
       localized_app_info:                {},
     }.freeze
 
-    # ACCOUNT-LEVEL testers registry (workspace _org/testflight-testers.yaml). Symbolized for lane use.
-    # Reused across every workspace app; sync_testflight_testers() ensures the groups + testers on ASC.
-    TESTFLIGHT_TESTERS = begin
-      raw = FastlaneConfig._load_testers_registry
-      sym = ->(o) {
-        case o
-        when Hash  then o.each_with_object({}) { |(k, v), h| h[k.to_s.to_sym] = sym.call(v) }
-        when Array then o.map { |e| sym.call(e) }
-        else o
-        end
-      }
-      sym.call(raw || {})
-    end.freeze
+    # BETA TESTERS — per-platform tester groups, sourced entirely from gradle/fork.properties
+    # (template documents the keys; the fork fills real values). deployment/ auto-syncs every build to
+    # these groups. The groups are pre-created on each store; iOS internal testers must be Apple-team
+    # members, everyone else is an iOS EXTERNAL tester (Apple review) — the public link lets them self-join.
+    TESTERS = {
+      ios: {
+        internal_group:       _nz.call(_c._fork_prop("apple.testers.internal.group")) || "Internal Testers",
+        external_group:       _nz.call(_c._fork_prop("apple.testers.external.group")) || _nz.call(_c._fork_prop("apple.tf.groups")) || "External Beta",
+        external_public_link: (_nz.call(_c._fork_prop("apple.testers.external.public.link")) || "true").to_s.downcase == "true",
+      },
+      play: {
+        internal_googlegroup: _nz.call(_c._fork_prop("play.testers.internal.googlegroup")),
+        closed_googlegroup:   _nz.call(_c._fork_prop("play.testers.closed.googlegroup")),
+      },
+      firebase: {
+        groups: (_nz.call(_c._fork_prop("firebase.groups")) || "").split(",").map(&:strip).reject(&:empty?),
+      },
+    }.freeze
 
     APPSTORE_CONFIG = {
       submit_for_review:                  true,
@@ -687,23 +663,20 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
   end
 end
 
-# Ensure the ACCOUNT-LEVEL TestFlight tester groups exist on App Store Connect and the registered testers
-# are assigned — so an uploaded build actually reaches internal + external testers instead of sitting
-# undistributed. Reads the reusable `_org/testflight-testers.yaml` (via TESTFLIGHT_TESTERS). Idempotent,
-# best-effort (rescued per group — a tester-sync hiccup NEVER blocks the upload). Internal groups are created
-# with has_access_to_all_builds=true, so internal testers receive EVERY new build automatically the moment
-# it finishes processing; external groups are wired here and distributed by `promoteToExternalBeta`.
-# Requires load_api_key first (populates Spaceship::ConnectAPI.token). Opt out: SKIP_TESTFLIGHT_TESTER_SYNC=1.
-def sync_testflight_testers(app_identifier:, registry: nil)
+# Ensure the App Store Connect TestFlight tester GROUPS exist (from gradle/fork.properties `apple.testers.*`)
+# so an uploaded build reaches testers instead of sitting undistributed. Fully config-driven — NO tester
+# email lists live here: iOS INTERNAL testers are Apple-team members (managed in ASC → Users & Access; the
+# internal group has has_access_to_all_builds=true so they get EVERY build instantly, no review), and iOS
+# EXTERNAL testers self-join via the group's PUBLIC LINK (one Apple beta review, then every build). The
+# public link is the ASC analog of the Play/Firebase tester group. Idempotent, best-effort (rescued — a
+# hiccup NEVER blocks the upload). Requires load_api_key first. Opt out: SKIP_TESTFLIGHT_TESTER_SYNC=1.
+# Shared by iOS + macOS TestFlight lanes.
+def sync_testflight_testers(app_identifier:, config: nil)
   return UI.important("⏭  TestFlight tester sync skipped (SKIP_TESTFLIGHT_TESTER_SYNC=1).") \
     if ENV["SKIP_TESTFLIGHT_TESTER_SYNC"].to_s == "1"
 
   require "spaceship"
-  registry ||= FastlaneConfig::IosConfig::TESTFLIGHT_TESTERS
-  if registry.nil? || registry.empty?
-    return UI.message("ℹ️  No _org/testflight-testers.yaml registry found — skipping tester sync " \
-                      "(add it to wire internal + external testers account-wide).")
-  end
+  cfg = config || FastlaneConfig::IosConfig::TESTERS[:ios]
   UI.user_error!("No ASC API token — call load_api_key before sync_testflight_testers") unless Spaceship::ConnectAPI.token
 
   app = begin
@@ -713,15 +686,11 @@ def sync_testflight_testers(app_identifier:, registry: nil)
   end
   return UI.important("⚠️  App '#{app_identifier}' not found on ASC — skipping tester sync.") unless app
 
-  # Build a flat list of {name, internal, testers[]} from the registry (internal block + external groups[]).
+  # internal group (team-only, auto every build) + external group (self-join public link).
   specs = []
-  if (intl = registry[:internal]) && (intl[:testers] || []).any?
-    specs << { name: (intl[:group] || "Internal Testers"), internal: true, testers: intl[:testers] }
-  end
-  ((registry[:external] || {})[:groups] || []).each do |g|
-    specs << { name: g[:name], internal: false, testers: (g[:testers] || []) }
-  end
-  return UI.message("ℹ️  testers registry present but empty — nothing to sync.") if specs.empty?
+  specs << { name: cfg[:internal_group], internal: true,  public: false } if cfg[:internal_group].to_s != ""
+  specs << { name: cfg[:external_group], internal: false, public: cfg[:external_public_link] } if cfg[:external_group].to_s != ""
+  return UI.message("ℹ️  No apple.testers.* groups in fork.properties — skipping ASC tester sync.") if specs.empty?
 
   specs.each do |gs|
     begin
@@ -730,20 +699,55 @@ def sync_testflight_testers(app_identifier:, registry: nil)
         group_name:                gs[:name],
         is_internal_group:         gs[:internal],
         has_access_to_all_builds:  gs[:internal] ? true : nil,
+        public_link_enabled:       gs[:public] ? true : nil,
+        public_link_limit_enabled: gs[:public] ? true : nil,
+        public_link_limit:         gs[:public] ? 10_000 : nil,
       )
-      testers = (gs[:testers] || []).map { |t|
-        { email: t[:email].to_s, firstName: (t[:first_name] || t[:firstName]).to_s, lastName: (t[:last_name] || t[:lastName]).to_s }
-      }.reject { |t| t[:email].empty? }
-      if testers.any?
-        grp.post_bulk_beta_tester_assignments(beta_testers: testers)
-        UI.success("👥 Synced #{testers.count} #{gs[:internal] ? 'internal' : 'external'} tester(s) → group '#{gs[:name]}'.")
-      else
-        UI.message("ℹ️  Group '#{gs[:name]}' ensured (no testers listed).")
+      kind = gs[:internal] ? "internal (team, every build)" : "external (public-link self-join, after review)"
+      UI.success("👥 ASC beta group ensured: '#{gs[:name]}' — #{kind}.")
+      if !gs[:internal] && gs[:public]
+        link = (grp.respond_to?(:public_link) && grp.public_link) || nil
+        UI.success("🔗 Public TestFlight join link for '#{gs[:name]}': #{link}") if link
       end
     rescue => e
-      UI.important("⚠️  Tester sync for group '#{gs[:name]}' hiccuped: #{e.message.to_s.lines.first&.strip}. " \
-                   "Upload continues — add/verify testers in App Store Connect → TestFlight if needed.")
+      UI.important("⚠️  ASC group '#{gs[:name]}' sync hiccuped: #{e.message.to_s.lines.first&.strip}. " \
+                   "Upload continues — verify in App Store Connect → TestFlight if needed.")
     end
+  end
+end
+
+# Attach the configured Google Group (fork.properties play.testers.<track>.googlegroup) to a Play testing
+# track, so every upload to that track reaches the group's members. UNLIKE ASC, this binding PERSISTS on the
+# track — a one-time (idempotent) setup, re-asserted here so a fresh app/track is wired with zero Console
+# clicks. Manage membership in the Google Group itself. Best-effort (rescued — never blocks the AAB upload);
+# no-op when the fork leaves the group blank. `track` = internal|closed. Opt out: SKIP_PLAY_TESTER_SYNC=1.
+def sync_play_testers(package_name:, track:, json_key: nil, google_group: nil)
+  return if ENV["SKIP_PLAY_TESTER_SYNC"].to_s == "1"
+  key = track.to_s == "closed" ? :closed_googlegroup : :internal_googlegroup
+  group = google_group || FastlaneConfig::IosConfig::TESTERS[:play][key]
+  return UI.message("ℹ️  No play.testers.#{track}.googlegroup in fork.properties — skipping Play tester sync.") \
+    if group.nil? || group.to_s.strip.empty?
+  json_key ||= FastlaneConfig::ProjectConfig::ANDROID[:play_store_json_key]
+  json_key = File.join(DEPLOYMENT_REPO_ROOT, json_key) unless json_key.to_s.start_with?("/")
+  return UI.important("⚠️  Play service-account json not found (#{json_key}) — skipping Play tester sync.") \
+    unless File.exist?(json_key.to_s)
+
+  begin
+    require "google/apis/androidpublisher_v3"
+    require "googleauth"
+    svc = Google::Apis::AndroidpublisherV3::AndroidPublisherService.new
+    svc.authorization = Google::Auth::ServiceAccountCredentials.make_creds(
+      json_key_io: File.open(json_key),
+      scope: "https://www.googleapis.com/auth/androidpublisher",
+    )
+    edit = svc.insert_edit(package_name)
+    testers = Google::Apis::AndroidpublisherV3::Testers.new(google_groups: [group])
+    svc.update_edit_tester(package_name, edit.id, track.to_s, testers)
+    svc.commit_edit(package_name, edit.id)
+    UI.success("👥 Play '#{track}' track testers → Google Group '#{group}' (persists for every future upload).")
+  rescue => e
+    UI.important("⚠️  Play tester sync (#{track} → #{group}) hiccuped: #{e.message.to_s.lines.first&.strip}. " \
+                 "Upload continues — set the group once in Play Console → Testing → #{track} → Testers if needed.")
   end
 end
 

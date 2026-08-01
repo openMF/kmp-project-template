@@ -56,6 +56,9 @@ platform :mac do
     # on a missing app record + create/update TestFlight Test Information so a later
     # Mac external-beta promotion never hits `betaAppLocalizations not found`.
     ensure_testflight_store_config(app_identifier: mac_bundle_id)
+    # Same account-level TestFlight groups as iOS (from fork.properties apple.testers.*): internal (team,
+    # every build) + external (public-link self-join). macOS shares the ASC app + tester model with iOS.
+    sync_testflight_testers(app_identifier: mac_bundle_id)
 
     with_ios_preamble(options)
     setup_mac_signing_keychain(options, mac_bundle_id)
@@ -192,6 +195,9 @@ platform :mac do
     # on a missing app record + create/update TestFlight Test Information so a later
     # Mac external-beta promotion never hits `betaAppLocalizations not found`.
     ensure_testflight_store_config(app_identifier: mac_bundle_id)
+    # Same account-level TestFlight groups as iOS (from fork.properties apple.testers.*): internal (team,
+    # every build) + external (public-link self-join). macOS shares the ASC app + tester model with iOS.
+    sync_testflight_testers(app_identifier: mac_bundle_id)
 
     with_ios_preamble(options)
     setup_mac_signing_keychain(options, mac_bundle_id)

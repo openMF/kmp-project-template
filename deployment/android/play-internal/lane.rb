@@ -106,5 +106,14 @@ platform :android do
       skip_upload_images:      false,  # featureGraphic / icon / promo graphics
       skip_upload_screenshots: false,  # phone / sevenInch / tenInch screenshots
     )
+
+    # Attach the configured Google Group (fork.properties play.testers.<track>.googlegroup) to this Play
+    # track so every upload reaches the group — a persistent, idempotent binding. `internal` track uses
+    # play.testers.internal.googlegroup; `beta`/`closed` uses play.testers.closed.googlegroup. No-op if blank.
+    sync_play_testers(
+      package_name: FastlaneConfig::ProjectConfig.android_package_name,
+      track:        (track.to_s == "internal" ? "internal" : "closed"),
+      json_key:     play_json_key,
+    )
   end
 end

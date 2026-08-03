@@ -26,7 +26,7 @@ object TestTags {
         const val SCREEN: String = "calc_affordability_screen"
     }
 
-    /** Tags for [kpt.feature.calculators.amortization.AmortizationScreen]. */
+    /** Tags for [kpt.feature.calculators.amortizationcalc.AmortizationScreen]. */
     object Amortization {
         /** Root scaffold — always rendered regardless of input state. */
         const val SCREEN: String = "calc_amortization_screen"

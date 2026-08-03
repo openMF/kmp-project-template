@@ -42,7 +42,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun LanguageDialog(onDismiss: () -> Unit, viewModel: SettingsViewmodel = koinViewModel()) {
+fun LanguageDialog(onDismiss: () -> Unit, viewModel: SettingsViewModel = koinViewModel()) {
     val settingsUiState by viewModel.settingsUiState.collectAsStateWithLifecycle()
     LanguageDialog(
         onDismiss = onDismiss,

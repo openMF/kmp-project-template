@@ -20,6 +20,7 @@ import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
 import kpt.core.base.security.isReleaseBuild
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.alerts.navigation.alertsGraph
 import kpt.feature.bills.navigation.billsGraph
 import kpt.feature.bills.navigation.navigateToBills
 import kpt.feature.calculators.navigation.calculatorsGraph
@@ -39,6 +40,7 @@ import kpt.feature.macro.navigation.macroGraph
 import kpt.feature.macro.navigation.navigateToMacroGraph
 import kpt.feature.rates.navigation.navigateToRates
 import kpt.feature.rates.navigation.ratesGraph
+import kpt.feature.watchlist.navigation.watchlistGraph
 import kpt.feature.settings.navigateToSettings
 import kpt.feature.settings.notificationDestination
 import kpt.feature.settings.settingsDestination
@@ -112,6 +114,8 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         ratesGraph(navController) // B7 — NETWORK_WITH_CACHE rate tracker
         macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
         cryptoGraph(navController) // Phase 4 store5-screen-state-persistence — AC-17 deep-scroll restore
+        alertsGraph(navController) // submit_offline_write demo — DraftSubmitHandler + OfflineSubmitSyncer (E3 repurpose)
+        watchlistGraph(navController) // read_local_list demo — offline Room-backed reactive list (E3 repurpose)
 
         // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).
         transitionGalleryGraph(navController)

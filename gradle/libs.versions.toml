@@ -103,7 +103,8 @@ koinAnnotationsVersion = "4.2.2"
 
 
 # KMP Toolkit Libraries
-kmptoolkit = "3.5.3"
+# 3.5.9: cmp-network-monitor accuracy overhaul + Android seed fix (MobileByteLabs/KmpToolkit#150).
+kmptoolkit = "3.5.9"
 
 # CMP Libraries
 compose-plugin = "1.11.1"

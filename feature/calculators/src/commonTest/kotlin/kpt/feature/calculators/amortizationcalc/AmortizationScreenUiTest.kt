@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.feature.calculators.amortization
+package kpt.feature.calculators.amortizationcalc
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
@@ -22,7 +22,7 @@ import kotlin.test.Test
  * Compose Multiplatform UI test for [AmortizationScreen].
  *
  * Uses the module-internal [FakeLoanRepository] (already used by
- * [kpt.feature.calculators.amortization.AmortizationViewModelTest]) and
+ * [kpt.feature.calculators.amortizationcalc.AmortizationViewModelTest]) and
  * passes `loanId = null` for the standalone "enter from scratch" mode.
  * Wraps in [KptTheme] and asserts the root Scaffold (RULE-KMP-COMPOSE-UITEST-001
  * CU-1..CU-3).

@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.feature.calculators.amortization
+package kpt.feature.calculators.amortizationcalc
 
 import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers

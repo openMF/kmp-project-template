@@ -97,8 +97,22 @@ rules:
     owner: fork
   - glob: "feature/**"
     owner: fork
-  - glob: "core/store/**"          # the store seam — fork-authored MutableStore wiring
+  # core/store seam — ONLY the 5 seam files are fork-authored (white-label-template-completion E0/T1, LD-2).
+  # The rest of core/store (economic/**, banking/**, …) is template architecture that MUST receive upstream fixes.
+  - glob: "core/store/**/AppScreenStateDefaults.kt"
     owner: fork
+  - glob: "core/store/**/AppErrorMapper.kt"
+    owner: fork
+  - glob: "core/store/**/AppStoreRegistry.kt"
+    owner: fork
+  - glob: "core/store/**/di/StoreModule.kt"
+    owner: fork
+  - glob: "core/store/**/appStoreModule*.kt"
+    owner: fork
+  - glob: "core/store/economic/**"   # template store architecture (ExchangeRatesStore, …)
+    owner: template
+  - glob: "core/store/banking/**"    # template store architecture (InterestRateSeriesStore, …)
+    owner: template
   - glob: "**/demo/**"             # demo data
     owner: fork
   - glob: "core/**/src/**/local/**"
@@ -133,8 +147,10 @@ rules:
     owner: fork
   - glob: "deployment/**/screenshots/**"
     owner: fork
-  - glob: "deployment/**/DEPLOYMENT_MANIFEST.yaml"
+  - glob: "deployment/**/og-images/**"        # per-brand social-share images — E0/T1 (was clobbered)
     owner: fork
+  - glob: "deployment/**/DEPLOYMENT_MANIFEST.yaml"
+    owner: merge   # E0/T4: new template targets propagate; fork keeps enabled/tier
   - glob: "deployment/**/PROMOTION_LOG.yaml"  # append-only promotion history
     owner: fork
   - glob: "secrets/live/**"                   # real secrets (gitignored)
@@ -225,11 +241,12 @@ rules:
   - { glob: "customization-surface.yaml",    owner: template }  # this contract self-syncs
   - { glob: "version.txt",                   owner: template }
   - { glob: "lib-integrate.properties",      owner: template }
-  - { glob: "secrets-manifest.yaml",         owner: template }
-  - { glob: "gradle.properties",             owner: template }
+  - { glob: "secrets-manifest.yaml",         owner: fork }      # per-fork generated (project id + alias list) — E0/T1
+  - { glob: "gradle.properties",             owner: fork }      # holds fork.project.name (SyncForkConfigPlugin) — E0/T1
   - { glob: "build.gradle.kts",              owner: template }
   - { glob: "kotlin-js-store/**",            owner: template }
   - { glob: "legal/**",                      owner: template }
+  - { glob: "tests/**",                      owner: template }   # test harness — E0/T1 (closes the classification gap)
   - { glob: "META-INF/**",                   owner: template }
   - { glob: "config",                        owner: template }
   - { glob: "CODE_OF_CONDUCT.md",            owner: template }

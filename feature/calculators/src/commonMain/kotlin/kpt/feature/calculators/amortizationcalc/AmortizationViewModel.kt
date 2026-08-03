@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.feature.calculators.amortization
+package kpt.feature.calculators.amortizationcalc
 
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted

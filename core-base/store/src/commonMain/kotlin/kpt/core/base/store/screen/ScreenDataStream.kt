@@ -376,7 +376,13 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                 )
                 val isStale = band == FreshnessBand.Stale || band == FreshnessBand.VeryStale
                 val wasStale = lastBand == FreshnessBand.Stale || lastBand == FreshnessBand.VeryStale
-                if (isStale && !wasStale) {
+                // Gate the SWR revalidation on ONLINE: never fire a doomed background fetch
+                // while offline (or on a falsely-'Available' no-plan / captive-portal link). This
+                // side-fetch is already decoupled from rendering, so offline it only wastes a
+                // guaranteed-to-fail network attempt (and can leave a spurious error stamp). The
+                // reconnect trigger re-emits storeFlow, so the gate re-fires once the network is back.
+                val isOnline = networkStatusFlow.value is NetworkStatus.Available
+                if (isOnline && isStale && !wasStale) {
                     scope.launch {
                         try {
                             this@asScreenStream
@@ -576,7 +582,13 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                 )
                 val isStale = band == FreshnessBand.Stale || band == FreshnessBand.VeryStale
                 val wasStale = lastBand == FreshnessBand.Stale || lastBand == FreshnessBand.VeryStale
-                if (isStale && !wasStale) {
+                // Gate the SWR revalidation on ONLINE: never fire a doomed background fetch
+                // while offline (or on a falsely-'Available' no-plan / captive-portal link). This
+                // side-fetch is already decoupled from rendering, so offline it only wastes a
+                // guaranteed-to-fail network attempt (and can leave a spurious error stamp). The
+                // reconnect trigger re-emits storeFlow, so the gate re-fires once the network is back.
+                val isOnline = networkStatusFlow.value is NetworkStatus.Available
+                if (isOnline && isStale && !wasStale) {
                     val revalidateKey = lastObservedKey
                     val revalidateCacheKey = currentCacheKey
                     if (revalidateKey != null && revalidateCacheKey != null) {

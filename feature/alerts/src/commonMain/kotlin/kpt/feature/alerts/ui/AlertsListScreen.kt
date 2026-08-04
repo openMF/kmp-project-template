@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.feature.alerts.ui
 
@@ -40,6 +40,7 @@ import kpt.feature.alerts.generated.resources.screens_alerts_create_cd
 import kpt.feature.alerts.generated.resources.screens_alerts_delete_cd
 import kpt.feature.alerts.generated.resources.screens_alerts_row_above
 import kpt.feature.alerts.generated.resources.screens_alerts_row_below
+import kpt.feature.alerts.generated.resources.screens_alerts_row_pct_change
 import kpt.feature.alerts.generated.resources.screens_alerts_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -109,6 +110,7 @@ private fun AlertRow(
     val directionLabel = when (alert.direction) {
         AlertDirection.ABOVE -> stringResource(Res.string.screens_alerts_row_above)
         AlertDirection.BELOW -> stringResource(Res.string.screens_alerts_row_below)
+        AlertDirection.PCT_CHANGE -> stringResource(Res.string.screens_alerts_row_pct_change)
     }
     ListItem(
         modifier = modifier.fillMaxWidth(),

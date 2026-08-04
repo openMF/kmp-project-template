@@ -64,7 +64,7 @@ const val DEFAULT_USER_REFRESH_DEBOUNCE_MS: Long = 1_000L
  *
  * Eliminates all ViewModel boilerplate:
  * - No manual network observation (auto-refreshes on reconnect)
- * - No manual DataState → UI state mapping (DecisionEngine handles it)
+ * - No manual raw-state → UI state mapping (DecisionEngine handles it)
  * - No manual retry/refresh logic (built-in)
  * - No WiFi↔Cell handoff flicker (debounced at 300ms)
  * - Preserves existing content during pull-to-refresh (lastContent cache)

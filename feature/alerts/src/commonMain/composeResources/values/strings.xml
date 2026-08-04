@@ -5,6 +5,8 @@
     This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
     If a copy of the MPL was not distributed with this file,
     You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->
 <resources>
     <string name="screens_alerts_title">Price Alerts</string>
@@ -13,6 +15,7 @@
     <string name="screens_alerts_delete_cd">Delete alert</string>
     <string name="screens_alerts_row_above">Above</string>
     <string name="screens_alerts_row_below">Below</string>
+    <string name="screens_alerts_row_pct_change">% change</string>
     <string name="screens_alert_create_title">New Price Alert</string>
     <string name="screens_alert_create_back_cd">Back</string>
     <string name="screens_alert_create_coin_label">Coin</string>

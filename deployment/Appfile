@@ -3,7 +3,7 @@
 # Identity values read from FastlaneConfig, which parses gradle/libs.versions.toml.
 # config.rb is imported by Fastfile before this file is evaluated.
 #
-# Entry point: bundle exec fastlane --fastlane-dir deployment <platform> <lane>
+# Entry point: cd deployment && bundle exec fastlane <platform> <lane>
 
 # Android
 json_key_file(FastlaneConfig::ProjectConfig::ANDROID[:play_store_json_key])

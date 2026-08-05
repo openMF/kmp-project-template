@@ -9,10 +9,12 @@
  */
 package kpt.core.store.demo.banking.impl
 
+import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.demo.banking.dao.BillReminderDao
 import kpt.core.database.demo.banking.entity.BillReminderEntity
+import kpt.core.model.demo.banking.BillReminder
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
@@ -32,12 +34,15 @@ import org.mobilenativefoundation.store.store5.Store
  * `core-base/database/.../invalidation/README.md`). On Android/Desktop/iOS the wrap
  * is a microsecond no-op alongside Room's native invalidation.
  */
-fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillReminderEntity>> =
+fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillReminder>> =
     StoreFactory.createOfflineStore(
         sourceOfTruth = SourceOfTruth.of(
-            reader = { _: Unit -> daoFlow(BILL_REMINDERS_TABLE) { dao.observeAll() } },
-            writer = { _: Unit, reminders: List<BillReminderEntity> ->
-                reminders.forEach { dao.upsert(it) }
+            // Emit the DOMAIN model — entity→domain map lives in the SourceOfTruth (read-path contract).
+            reader = { _: Unit ->
+                daoFlow(BILL_REMINDERS_TABLE) { dao.observeAll() }.map { rows -> rows.map(BillReminderEntity::toDomain) }
+            },
+            writer = { _: Unit, reminders: List<BillReminder> ->
+                reminders.forEach { dao.upsert(it.toEntity()) }
             },
             delete = { _: Unit -> dao.deleteAll() },
             deleteAll = { dao.deleteAll() },

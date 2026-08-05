@@ -15,6 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -177,6 +178,9 @@ internal class FakeDashboardCurrencyRepository : CurrencyRepository {
         )
     }
 
+    override fun spotRateStream(baseCurrency: String, online: Boolean, scope: CoroutineScope): ScreenDataStream<ExchangeRates> =
+        screenDataStreamForTesting(state = source)
+
     override fun rateHistoryStream(
         keyFlow: Flow<RateHistoryKey>,
         scope: CoroutineScope,
@@ -185,9 +189,14 @@ internal class FakeDashboardCurrencyRepository : CurrencyRepository {
     )
 }
 
+@OptIn(ExperimentalScreenDataStreamTestingApi::class)
 internal object EmptyLoanRepository : LoanRepository {
     private val empty = MutableStateFlow<List<Loan>>(emptyList())
     override fun observeAll(): Flow<List<Loan>> = empty
+    override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
+        screenDataStreamForTesting(empty.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
+    override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
+        screenDataStreamForTesting(empty.map { ScreenState.Empty })
     override fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
     override suspend fun getById(id: String): Loan? = null
     override suspend fun upsert(loan: Loan) = Unit
@@ -197,9 +206,12 @@ internal object EmptyLoanRepository : LoanRepository {
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
+@OptIn(ExperimentalScreenDataStreamTestingApi::class)
 internal object EmptyBillReminderRepository : BillReminderRepository {
     private val empty = MutableStateFlow<List<BillReminder>>(emptyList())
     override fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
+    override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
+        screenDataStreamForTesting(empty.map { ScreenState.Empty })
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> = empty
     override fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
     override suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()

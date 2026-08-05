@@ -53,6 +53,7 @@ object AppStoreRegistry : StoreRegistry() {
 
     // Banking Utility Toolkit — offline-local stores (OFFLINE_LOCAL_ONLY archetype)
     val Alerts = store("alerts")
+    val Watchlist = store("watchlist")
     val Loans = store("loans")
     val BillReminders = store("billReminders")
 

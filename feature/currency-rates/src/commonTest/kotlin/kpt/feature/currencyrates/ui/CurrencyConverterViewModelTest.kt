@@ -120,8 +120,6 @@ class CurrencyConverterViewModelTest {
     ): CurrencyRatesViewModel = CurrencyRatesViewModel(
         currencyRepository = FakeCurrencyRepository(),
         networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAt,
-        spotRateStore = spotRateStore,
     )
 
     /** Minimal in-memory Store that never makes a real network call. */

@@ -41,6 +41,7 @@ private val PINNED_BASE_CURRENCIES = listOf("USD", "EUR", "INR")
 class CurrencyRepositoryImpl(
     private val exchangeRatesStore: Store<String, ExchangeRates>,
     private val rateHistoryStore: Store<RateHistoryKey, RateHistory>,
+    private val spotRateStore: Store<String, ExchangeRates>,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
 ) : CurrencyRepository {
@@ -56,6 +57,19 @@ class CurrencyRepositoryImpl(
         cacheKey = "currency:exchangeRates:$baseCurrency",
         scope = scope,
         fetchPolicy = fetchPolicy,
+    )
+
+    override fun spotRateStream(
+        baseCurrency: String,
+        online: Boolean,
+        scope: CoroutineScope,
+    ): ScreenDataStream<ExchangeRates> = spotRateStore.asScreenStream(
+        key = baseCurrency,
+        networkMonitor = networkMonitor,
+        fetchedAtRepository = fetchedAtRepository,
+        cacheKey = "currency:spotRate:$baseCurrency",
+        scope = scope,
+        fetchPolicy = if (online) FetchPolicy.NETWORK_ONLY else FetchPolicy.CACHE_ONLY,
     )
 
     override fun rateHistoryStream(

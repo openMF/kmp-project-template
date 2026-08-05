@@ -122,7 +122,7 @@ fun BillRemindersListScreen(
     ) { padding ->
         ScreenContent(
             state = screenState,
-            onRetry = {},
+            onRetry = viewModel::onRetry,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),

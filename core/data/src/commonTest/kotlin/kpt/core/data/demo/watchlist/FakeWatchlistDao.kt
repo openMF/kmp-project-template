@@ -47,4 +47,8 @@ internal class FakeWatchlistDao : WatchlistDao {
     override suspend fun delete(coinId: String) {
         rows.removeAll { it.coinId == coinId }
     }
+
+    override suspend fun deleteAll() {
+        rows.clear()
+    }
 }

@@ -233,21 +233,10 @@ class CurrencyRatesViewModelTest {
     private fun buildViewModel(
         repo: FakeCurrencyRepository = FakeCurrencyRepository(),
         networkMonitor: FakeNetworkMonitor = FakeNetworkMonitor(online = true),
-        fetchedAt: FakeTestFetchedAtRepository = FakeTestFetchedAtRepository(),
-        spotRateStore: Store<String, ExchangeRates> = fakeSpotRateStore(),
     ): CurrencyRatesViewModel = CurrencyRatesViewModel(
         currencyRepository = repo,
         networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAt,
-        spotRateStore = spotRateStore,
     )
-
-    /** Minimal in-memory Store for the SpotRateLookupStore in tests. */
-    private fun fakeSpotRateStore(): Store<String, ExchangeRates> = StoreBuilder.from<String, ExchangeRates>(
-        fetcher = Fetcher.of { _ ->
-            ExchangeRates(base = "USD", date = "2026-05-28", rates = emptyMap())
-        },
-    ).build()
 
     // endregion
 }

@@ -9,10 +9,12 @@
  */
 package kpt.core.store.demo.banking.impl
 
+import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.demo.banking.dao.LoanDao
 import kpt.core.database.demo.banking.entity.LoanEntity
+import kpt.core.model.demo.banking.Loan
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
@@ -31,11 +33,27 @@ import org.mobilenativefoundation.store.store5.Store
  * `core-base/database/.../invalidation/README.md`). On Android/Desktop/iOS the wrap
  * is a microsecond no-op alongside Room's native invalidation.
  */
-fun provideLoansStore(dao: LoanDao): Store<Unit, List<LoanEntity>> = StoreFactory.createOfflineStore(
+fun provideLoansStore(dao: LoanDao): Store<Unit, List<Loan>> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
-        reader = { _: Unit -> daoFlow(LOANS_TABLE) { dao.observeAll() } },
-        writer = { _: Unit, loans: List<LoanEntity> -> loans.forEach { dao.upsert(it) } },
+        // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
+        reader = { _: Unit -> daoFlow(LOANS_TABLE) { dao.observeAll() }.map { rows -> rows.map(LoanEntity::toDomain) } },
+        writer = { _: Unit, loans: List<Loan> -> loans.forEach { dao.upsert(it.toEntity()) } },
         delete = { _: Unit -> dao.deleteAll() },
+        deleteAll = { dao.deleteAll() },
+    ),
+)
+
+/**
+ * Keyed per-loan detail [Store] (`Store<String, Loan>`) — emits the DOMAIN [Loan] for a single id,
+ * or no-data (→ Empty) when absent. Backs `LoanRepository.loanDetailStream` so single-loan read
+ * screens (e.g. the amortization schedule) consume a `ScreenDataStream` instead of hand-folding a
+ * `Flow<Loan?>`. Repository-internal (not DI-registered) — reads the same DAO the list store clears.
+ */
+fun provideLoanDetailStore(dao: LoanDao): Store<String, Loan> = StoreFactory.createOfflineStore(
+    sourceOfTruth = SourceOfTruth.of(
+        reader = { id: String -> daoFlow(LOANS_TABLE) { dao.observeById(id) }.map { it?.toDomain() } },
+        writer = { _: String, _: Loan -> Unit },
+        delete = { id: String -> dao.deleteById(id) },
         deleteAll = { dao.deleteAll() },
     ),
 )

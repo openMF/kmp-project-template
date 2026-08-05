@@ -20,8 +20,6 @@ val CurrencyRatesModule = module {
         CurrencyRatesViewModel(
             currencyRepository = get(),
             networkMonitor = get(),
-            fetchedAtRepository = get(),
-            spotRateStore = get(qualifier = AppStoreRegistry.SpotRate),
         )
     }
     viewModel { RateHistoryViewModel(get()) }

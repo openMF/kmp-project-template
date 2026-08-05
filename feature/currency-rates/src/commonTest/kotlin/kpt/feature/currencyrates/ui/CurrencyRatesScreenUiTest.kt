@@ -57,8 +57,6 @@ class CurrencyRatesScreenUiTest {
         val viewModel = CurrencyRatesViewModel(
             currencyRepository = FakeCurrencyRepository(),
             networkMonitor = UiTestNetworkMonitor,
-            fetchedAtRepository = UiTestFetchedAtRepository(),
-            spotRateStore = uiTestSpotRateStore(),
         )
         setContent {
             KptTheme {

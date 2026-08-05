@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.combineContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.model.demo.banking.BillReminder
@@ -45,23 +46,21 @@ class BillRemindersListViewModel(
      * Composite [ScreenState] for the dashboard. `Empty` when zero bills exist; `Content`
      * otherwise — the per-tile splits live inside [BillRemindersUiState].
      */
-    val screenState: StateFlow<ScreenState<BillRemindersUiState>> = combine(
-        repository.observeAll(),
+    private val stream = repository.billRemindersStream(viewModelScope)
+
+    private val upcomingTiles = combine(
         repository.observeUpcoming(UPCOMING_WINDOW_DAYS),
         repository.observeTotalUpcomingAmount(TOTAL_WINDOW_DAYS),
-    ) { all, upcoming, total ->
-        if (all.isEmpty()) {
-            ScreenState.Empty
-        } else {
-            ScreenState.Content(
-                data = BillRemindersUiState(
-                    all = all,
-                    upcoming = upcoming,
-                    totalUpcomingAmount = total,
-                ),
-            )
+    ) { upcoming, total -> upcoming to total }
+
+    val screenState: StateFlow<ScreenState<BillRemindersUiState>> = stream.state
+        .combineContent(upcomingTiles) { all, (upcoming, total), _ ->
+            BillRemindersUiState(all = all, upcoming = upcoming, totalUpcomingAmount = total)
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_TIMEOUT_MS), ScreenState.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_TIMEOUT_MS), ScreenState.Loading)
+
+    /** Re-run the read (no-op refresh for the offline-local store; wired for ScreenContent). */
+    fun onRetry() = stream.retry()
 
     override fun handleAction(action: BillRemindersAction) {
         when (action) {

@@ -11,6 +11,7 @@ package kpt.core.store.di
 
 import kpt.core.store.AppStoreRegistry
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
+import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
 import kpt.core.store.demo.banking.impl.provideBillRemindersStore
 import kpt.core.store.demo.banking.impl.provideLoansStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoReadStore
@@ -72,6 +73,9 @@ val appStoreModule: Module = module {
     single(AppStoreRegistry.Alerts) {
         provideAlertsStore(dao = get())
     }
+    single(AppStoreRegistry.Watchlist) {
+        provideWatchlistStore(dao = get())
+    }
     single(AppStoreRegistry.Loans) {
         provideLoansStore(dao = get())
     }
@@ -95,6 +99,7 @@ val appStoreModule: Module = module {
         mgr.register(get(AppStoreRegistry.InterestRateSeries))
         mgr.register(get(AppStoreRegistry.MacroIndicator))
         mgr.register(get(AppStoreRegistry.Alerts))
+        mgr.register(get(AppStoreRegistry.Watchlist))
         mgr.register(get(AppStoreRegistry.Loans))
         mgr.register(get(AppStoreRegistry.BillReminders))
         mgr.register(get(AppStoreRegistry.SpotRate))

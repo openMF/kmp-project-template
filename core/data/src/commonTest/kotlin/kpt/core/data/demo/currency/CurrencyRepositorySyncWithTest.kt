@@ -45,14 +45,18 @@ class CurrencyRepositorySyncWithTest {
             )
             .build()
 
-        // Not exercised by syncWith — a placeholder store to satisfy the constructor.
+        // Not exercised by syncWith — placeholder stores to satisfy the constructor.
         val rateHistoryStore = StoreBuilder
             .from(Fetcher.of<RateHistoryKey, RateHistory> { error("rateHistoryStore is not used by syncWith") })
+            .build()
+        val spotRateStore = StoreBuilder
+            .from(Fetcher.of<String, ExchangeRates> { error("spotRateStore is not used by syncWith") })
             .build()
 
         val repo = CurrencyRepositoryImpl(
             exchangeRatesStore = exchangeRatesStore,
             rateHistoryStore = rateHistoryStore,
+            spotRateStore = spotRateStore,
             networkMonitor = onlineNetworkMonitor(),
             fetchedAtRepository = InMemoryFetchedAtRepository(),
         )

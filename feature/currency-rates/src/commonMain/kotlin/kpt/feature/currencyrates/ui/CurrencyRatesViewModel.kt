@@ -19,16 +19,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.store.freshness.FreshnessSignal
-import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.store.screen.asScreenStream
 import kpt.core.base.store.screen.combineContent
 import kpt.core.base.store.screen.emptyIfContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.currency.CurrencyRepository
 import kpt.core.model.demo.currency.ExchangeRates
-import org.mobilenativefoundation.store.store5.Store
 
 /**
  * **Archetype showcase: CACHE_ONLY + NETWORK_ONLY**
@@ -42,10 +38,8 @@ import org.mobilenativefoundation.store.store5.Store
  * this archetype pattern. See [AppStoreRegistry.SpotRate] for the store registration.
  */
 class CurrencyRatesViewModel(
-    currencyRepository: CurrencyRepository,
+    private val currencyRepository: CurrencyRepository,
     private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
-    private val spotRateStore: Store<String, ExchangeRates>,
 ) : BaseViewModel<RatesLocalState, Nothing, RatesAction>(RatesLocalState()) {
 
     private val stream = currencyRepository.exchangeRatesStream(
@@ -95,15 +89,7 @@ class CurrencyRatesViewModel(
         networkMonitor.networkStatus
             .map { status -> status is NetworkStatus.Available }
             .flatMapLatest { isOnline ->
-                val policy = if (isOnline) FetchPolicy.NETWORK_ONLY else FetchPolicy.CACHE_ONLY
-                spotRateStore.asScreenStream(
-                    key = "USD",
-                    networkMonitor = networkMonitor,
-                    fetchedAtRepository = fetchedAtRepository,
-                    cacheKey = "currency:spotRate:USD",
-                    scope = viewModelScope,
-                    fetchPolicy = policy,
-                ).state
+                currencyRepository.spotRateStream(baseCurrency = "USD", online = isOnline, scope = viewModelScope).state
             }
             .stateIn(
                 scope = viewModelScope,

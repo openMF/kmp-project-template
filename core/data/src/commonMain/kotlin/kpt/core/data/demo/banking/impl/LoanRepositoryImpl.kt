@@ -9,15 +9,23 @@
  */
 package kpt.core.data.demo.banking.impl
 
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.database.invalidation.notifyingWrite
+import kpt.core.base.store.infra.FetchedAtRepository
+import kpt.core.base.store.screen.FetchPolicy
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.database.demo.banking.dao.LoanDao
-import kpt.core.database.demo.banking.entity.LoanEntity
 import kpt.core.model.demo.banking.Loan
+import kpt.core.store.demo.banking.impl.provideLoanDetailStore
+import kpt.core.store.demo.banking.impl.toDomain
+import kpt.core.store.demo.banking.impl.toEntity
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
@@ -25,23 +33,47 @@ import org.mobilenativefoundation.store.store5.StoreReadResponse
 /**
  * Local-only impl of [LoanRepository].
  *
- * Writes are wrapped with [notifyingWrite] and direct-DAO `Flow` reads are wrapped with
- * [daoFlow] so the wasmJs target's long-lived collectors (e.g. the Home dashboard's
- * outstanding-balance tile) re-emit after writes even when Room 3 alpha05's async
- * InvalidationTracker fails to fan out. On Android/Desktop/iOS the wraps are a
- * microsecond-cost no-op alongside Room's native invalidation.
- *
- * See `core-base/database/.../invalidation/README.md` for the rationale, integration
- * recipe, and removal plan.
+ * Read-path contract: [loansStream] builds the offline-local [ScreenDataStream] (CACHE_ONLY) over
+ * the domain-emitting [kpt.core.store.demo.banking.impl.provideLoansStore]; read screens consume
+ * `.state`. Direct-DAO `Flow` reads (`observeById`, the dashboard aggregates) are wrapped with
+ * [daoFlow] and writes with [notifyingWrite] so the wasmJs target's long-lived collectors re-emit
+ * after writes even when Room 3 alpha05's async InvalidationTracker fails to fan out (no-op on
+ * Android/Desktop/iOS). See `core-base/database/.../invalidation/README.md`.
  */
 internal class LoanRepositoryImpl(
-    private val loansStore: Store<Unit, List<LoanEntity>>,
+    private val loansStore: Store<Unit, List<Loan>>,
     private val loanDao: LoanDao,
+    private val networkMonitor: NetworkMonitor,
+    private val fetchedAtRepository: FetchedAtRepository,
 ) : LoanRepository {
 
     override fun observeAll(): Flow<List<Loan>> = loansStore.stream(StoreReadRequest.cached(Unit, refresh = false))
-        .filterIsInstance<StoreReadResponse.Data<List<LoanEntity>>>()
-        .map { response -> response.value.map { it.toDomain() } }
+        .filterIsInstance<StoreReadResponse.Data<List<Loan>>>()
+        .map { response -> response.value }
+
+    override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
+        loansStore.asScreenStream(
+            key = Unit,
+            networkMonitor = networkMonitor,
+            fetchedAtRepository = fetchedAtRepository,
+            cacheKey = "loans",
+            scope = scope,
+            fetchPolicy = FetchPolicy.CACHE_ONLY,
+            isEmpty = { it.isEmpty() },
+        )
+
+    // Repository-internal keyed detail store — a single loan as a ScreenDataStream (absent id → Empty).
+    private val loanDetailStore = provideLoanDetailStore(loanDao)
+
+    override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
+        loanDetailStore.asScreenStream(
+            key = id,
+            networkMonitor = networkMonitor,
+            fetchedAtRepository = fetchedAtRepository,
+            cacheKey = "loan:$id",
+            scope = scope,
+            fetchPolicy = FetchPolicy.CACHE_ONLY,
+        )
 
     override fun observeById(id: String): Flow<Loan?> =
         daoFlow(LOANS_TABLE) { loanDao.observeById(id) }.map { it?.toDomain() }
@@ -72,39 +104,7 @@ internal class LoanRepositoryImpl(
     override fun observeCount(): Flow<Int> = daoFlow(LOANS_TABLE) { loanDao.count() }
 
     private companion object {
-        /** Room `@Entity(tableName = …)` for [LoanEntity]. */
+        /** Room `@Entity(tableName = …)` for [kpt.core.database.demo.banking.entity.LoanEntity]. */
         const val LOANS_TABLE = "banking_loans"
     }
 }
-
-private fun LoanEntity.toDomain(): Loan = Loan(
-    id = id,
-    name = name,
-    kind = kind,
-    principal = principal,
-    principalRemaining = principalRemaining,
-    annualRatePercent = annualRatePercent,
-    tenureMonths = tenureMonths,
-    monthsRemaining = monthsRemaining,
-    monthlyPayment = monthlyPayment,
-    nextDueDate = nextDueDate,
-    totalPaid = totalPaid,
-    createdAtMs = createdAtMs,
-    updatedAtMs = updatedAtMs,
-)
-
-private fun Loan.toEntity(): LoanEntity = LoanEntity(
-    id = id,
-    name = name,
-    kind = kind,
-    principal = principal,
-    principalRemaining = principalRemaining,
-    annualRatePercent = annualRatePercent,
-    tenureMonths = tenureMonths,
-    monthsRemaining = monthsRemaining,
-    monthlyPayment = monthlyPayment,
-    nextDueDate = nextDueDate,
-    totalPaid = totalPaid,
-    createdAtMs = createdAtMs,
-    updatedAtMs = updatedAtMs,
-)

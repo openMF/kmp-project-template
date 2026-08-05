@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.screen.ScreenContent
-import kpt.core.data.demo.watchlist.WatchlistItem
+import kpt.core.model.demo.watchlist.WatchlistItem
 import kpt.feature.watchlist.generated.resources.Res
 import kpt.feature.watchlist.generated.resources.screens_watchlist_back_cd
 import kpt.feature.watchlist.generated.resources.screens_watchlist_remove_cd
@@ -71,7 +71,7 @@ fun WatchlistScreen(
     ) { padding ->
         ScreenContent(
             state = state,
-            onRetry = { },
+            onRetry = viewModel::onRetry,
             modifier = Modifier.fillMaxSize().padding(padding),
         ) { items, _ ->
             LazyColumn(

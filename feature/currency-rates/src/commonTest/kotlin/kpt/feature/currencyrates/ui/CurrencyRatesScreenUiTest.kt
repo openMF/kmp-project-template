@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.designsystem.theme.KptTheme
 import kpt.core.model.demo.currency.ExchangeRates
 import org.mobilenativefoundation.store.store5.StoreBuilder

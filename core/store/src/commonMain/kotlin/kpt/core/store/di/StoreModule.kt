@@ -11,7 +11,6 @@ package kpt.core.store.di
 
 import kpt.core.store.AppStoreRegistry
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
-import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
 import kpt.core.store.demo.banking.impl.provideBillRemindersStore
 import kpt.core.store.demo.banking.impl.provideLoansStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoReadStore
@@ -23,6 +22,7 @@ import kpt.core.store.demo.currency.impl.provideRateHistoryStore
 import kpt.core.store.demo.economic.impl.provideInterestRateSeriesStore
 import kpt.core.store.demo.economic.impl.provideMacroIndicatorStore
 import kpt.core.store.demo.exchange.impl.provideSpotRateLookupStore
+import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
 import kpt.core.store.infra.StoreCacheManager
 import kpt.core.store.infra.impl.StoreCacheManagerImpl
 import org.koin.core.module.Module

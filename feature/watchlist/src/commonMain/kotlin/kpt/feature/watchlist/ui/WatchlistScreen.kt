@@ -26,10 +26,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.model.demo.watchlist.WatchlistItem
 import kpt.feature.watchlist.generated.resources.Res
@@ -51,8 +49,6 @@ fun WatchlistScreen(
     modifier: Modifier = Modifier,
     viewModel: WatchlistViewModel = koinViewModel(),
 ) {
-    val state by viewModel.screenState.collectAsStateWithLifecycle()
-
     Scaffold(
         modifier = modifier.testTag(TestTags.Watchlist.SCREEN),
         topBar = {
@@ -70,8 +66,7 @@ fun WatchlistScreen(
         },
     ) { padding ->
         ScreenContent(
-            state = state,
-            onRetry = viewModel::onRetry,
+            stream = viewModel.watchlist,
             modifier = Modifier.fillMaxSize().padding(padding),
         ) { items, _ ->
             LazyColumn(

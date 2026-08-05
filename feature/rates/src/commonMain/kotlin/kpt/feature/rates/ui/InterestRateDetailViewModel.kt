@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.store.freshness.FreshnessSignal
-import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.economic.EconomicRatesRepository
 import kpt.core.model.demo.economic.InterestRateSeries
@@ -37,20 +37,18 @@ internal class InterestRateDetailViewModel(
     private val key: InterestRateSeriesKey = RateSeriesCatalog.findBySeriesId(seriesId)
         ?: InterestRateSeriesKey(seriesId = seriesId, name = seriesId)
 
-    private val stream = repository.interestRateSeriesStream(
+    /** The repository-built stream — the screen renders it directly via `ScreenContent(stream)`. */
+    val series: ScreenDataStream<InterestRateSeries> = repository.interestRateSeriesStream(
         key = key,
         scope = viewModelScope,
     )
-
-    val screenState: StateFlow<ScreenState<InterestRateSeries>> = stream.state
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
     /**
      * Per-screen freshness — drives the TopAppBar [FreshnessIndicator] info icon.
      * Pure time-based staleness; network connectivity is rendered separately by
      * the global `ConnectivityBanner`.
      */
-    val freshness: StateFlow<FreshnessSignal> = stream.freshness
+    val freshness: StateFlow<FreshnessSignal> = series.freshness
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FreshnessSignal.initial())
 
     /** Resolved key — exposed so the screen can show the human-readable series name. */
@@ -65,7 +63,7 @@ internal class InterestRateDetailViewModel(
     }
 
     override fun handleAction(action: DetailAction) = when (action) {
-        DetailAction.Retry, DetailAction.Refresh -> stream.refresh()
+        DetailAction.Retry, DetailAction.Refresh -> series.refresh()
     }
 }
 

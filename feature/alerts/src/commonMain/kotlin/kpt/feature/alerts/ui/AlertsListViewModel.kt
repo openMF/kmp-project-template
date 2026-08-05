@@ -10,34 +10,24 @@
 package kpt.feature.alerts.ui
 
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.store.screen.emptyIfContent
+import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.alerts.AlertsRepository
 import kpt.core.model.demo.alerts.PriceAlert
 
 /**
- * Read-side ViewModel for the price-alerts list. Consumes the repository's offline-local
- * [AlertsRepository.alertsStream] ([kpt.core.base.store.screen.ScreenDataStream]) `.state`; the
- * Store already decided Loading/Empty/Content, so the VM only marks the empty list. Deleting an
- * alert re-emits as soon as Room propagates.
+ * Read-side ViewModel for the price-alerts list. A pure passthrough — it exposes the repository's
+ * offline-local [AlertsRepository.alertsStream] ([ScreenDataStream]) directly; the screen consumes
+ * it via `ScreenContent(stream = viewModel.alerts)`, so state (Loading/Empty/Content) is owned by
+ * the stream and never set here. Deleting an alert re-emits as soon as Room propagates.
  */
 class AlertsListViewModel(
     private val repository: AlertsRepository,
 ) : BaseViewModel<Unit, Nothing, AlertsListAction>(Unit) {
 
-    private val stream = repository.alertsStream(viewModelScope)
-
-    val screenState: StateFlow<ScreenState<List<PriceAlert>>> = stream.state
-        .emptyIfContent { it.isEmpty() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STATE_TIMEOUT_MS), ScreenState.Loading)
-
-    /** Re-run the read (no-op refresh for the offline-local store; wired for ScreenContent). */
-    fun onRetry() = stream.retry()
+    /** The repository-built stream (its `isEmpty` already yields Empty for a cleared list). */
+    val alerts: ScreenDataStream<List<PriceAlert>> = repository.alertsStream(viewModelScope)
 
     override fun handleAction(action: AlertsListAction) {
         when (action) {
@@ -48,10 +38,6 @@ class AlertsListViewModel(
     /** Convenience emitter so the screen calls `onDelete(id)` instead of `trySendAction`. */
     fun onDelete(id: String) {
         trySendAction(AlertsListAction.Delete(id))
-    }
-
-    private companion object {
-        const val STATE_TIMEOUT_MS = 5_000L
     }
 }
 

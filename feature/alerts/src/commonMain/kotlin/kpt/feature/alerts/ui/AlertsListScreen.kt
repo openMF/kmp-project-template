@@ -27,10 +27,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.model.demo.alerts.AlertDirection
 import kpt.core.model.demo.alerts.PriceAlert
@@ -58,8 +56,6 @@ fun AlertsListScreen(
     modifier: Modifier = Modifier,
     viewModel: AlertsListViewModel = koinViewModel(),
 ) {
-    val state by viewModel.screenState.collectAsStateWithLifecycle()
-
     Scaffold(
         modifier = modifier.testTag(TestTags.AlertsList.SCREEN),
         topBar = {
@@ -88,8 +84,7 @@ fun AlertsListScreen(
         },
     ) { padding ->
         ScreenContent(
-            state = state,
-            onRetry = viewModel::onRetry,
+            stream = viewModel.alerts,
             modifier = Modifier.fillMaxSize().padding(padding),
         ) { alerts, _ ->
             LazyColumn(modifier = Modifier.fillMaxSize()) {

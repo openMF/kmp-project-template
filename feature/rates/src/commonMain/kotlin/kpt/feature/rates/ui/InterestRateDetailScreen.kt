@@ -72,7 +72,6 @@ internal fun InterestRateDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: InterestRateDetailViewModel = koinViewModel { parametersOf(seriesId) },
 ) {
-    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val freshness by viewModel.freshness.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -109,7 +108,7 @@ internal fun InterestRateDetailScreen(
         },
     ) { padding ->
         ScreenContent(
-            state = screenState,
+            stream = viewModel.series,
             onRetry = viewModel::onRetry,
             modifier = Modifier
                 .fillMaxSize()

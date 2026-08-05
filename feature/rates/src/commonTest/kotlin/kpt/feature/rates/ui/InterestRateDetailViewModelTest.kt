@@ -77,7 +77,7 @@ class InterestRateDetailViewModelTest {
     fun initialScreenStateIsLoading() = runTest {
         val repo = FakeEconomicRatesRepository()
         val vm = InterestRateDetailViewModel(seriesId = "DFF", repository = repo)
-        val state = vm.screenState.first()
+        val state = vm.series.state.first()
         assertEquals(ScreenState.Loading, state)
     }
 
@@ -98,7 +98,7 @@ class InterestRateDetailViewModelTest {
         repo.state.value = ScreenState.Content(data = sample)
         dispatcher.scheduler.advanceUntilIdle()
 
-        val state = vm.screenState.first { it is ScreenState.Content }
+        val state = vm.series.state.first { it is ScreenState.Content }
         assertTrue(state is ScreenState.Content)
         assertSame(sample, state.data)
     }

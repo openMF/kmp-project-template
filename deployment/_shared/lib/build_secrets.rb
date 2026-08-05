@@ -150,6 +150,23 @@ module BuildSecrets
       end
     end
 
+    # Provider format: emit `export VAR='value'` lines for every env-consumed secret (kind env_var /
+    # value), each value read via the env-first/file-fallback resolver. A deploy step runs
+    # `eval "$(build-secrets export-env)"` instead of sourcing secrets/live/_env/* — so the vault-backed
+    # files under secrets/live/ are the single source of truth and env is just one on-demand format.
+    # (map/compact, not filter_map, for system Ruby 2.6 — same as materialize_all!.)
+    def export_env
+      @doc.fetch("secrets").map do |key, s|
+        kind = s["kind"]
+        next nil unless kind == "env_var" || kind == "value"
+        senv = s["source_env"]
+        next nil if senv.nil? || senv.empty?
+        v = value(key).to_s
+        next nil if v.empty?
+        "export #{senv}='#{v.gsub("'", "'\\''")}'"
+      end.compact
+    end
+
     private
 
     def materialize_dest(key, s)
@@ -220,8 +237,10 @@ if __FILE__ == $PROGRAM_NAME
     acc.materialize_all!.each { |d| warn "✓ #{d}" }
   when "vault-plan"
     acc.vault_plan.each { |a, e, b| puts "#{a}\t#{e}\t#{b}" }
+  when "export-env"
+    puts acc.export_env
   else
-    abort "usage: build-secrets {path|value|application-id|exists|materialize|materialize-all|vault-plan} " \
+    abort "usage: build-secrets {path|value|application-id|exists|materialize|materialize-all|vault-plan|export-env} " \
           "[key] [--flavor f] [--variant v] [--from-env VAR]"
   end
 end

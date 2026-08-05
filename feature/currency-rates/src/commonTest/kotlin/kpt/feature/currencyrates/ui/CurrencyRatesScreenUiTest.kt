@@ -27,12 +27,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.designsystem.theme.KptTheme
 import kpt.core.model.demo.currency.ExchangeRates
-import org.mobilenativefoundation.store.store5.Fetcher
-import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreBuilder
 import kotlin.test.Test
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * Compose Multiplatform UI test for [CurrencyRatesScreen] — verifies the root
@@ -82,23 +78,5 @@ private object UiTestNetworkMonitor : NetworkMonitor {
         MutableSharedFlow<NetworkChangeEvent>().asSharedFlow()
     override fun close() = Unit
 }
-
-/** In-memory [FetchedAtRepository] stub — never throws, returns null on cold start. */
-@OptIn(ExperimentalTime::class)
-private class UiTestFetchedAtRepository : FetchedAtRepository {
-    private val map = mutableMapOf<String, Instant>()
-    override suspend fun read(storeKey: String): Instant? = map[storeKey]
-    override suspend fun write(storeKey: String, instant: Instant) {
-        map[storeKey] = instant
-    }
-}
-
-/** Minimal in-memory [Store] that returns a static [ExchangeRates] without any network call. */
-private fun uiTestSpotRateStore(): Store<String, ExchangeRates> =
-    StoreBuilder.from<String, ExchangeRates>(
-        fetcher = Fetcher.of { _ ->
-            ExchangeRates(base = "USD", date = "2026-07-16", rates = emptyMap())
-        },
-    ).build()
 
 // endregion

@@ -27,18 +27,11 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.model.demo.currency.ExchangeRates
-import org.mobilenativefoundation.store.store5.Fetcher
-import org.mobilenativefoundation.store.store5.Store
-import org.mobilenativefoundation.store.store5.StoreBuilder
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * Focused archetype showcase tests for the **CACHE_ONLY + NETWORK_ONLY** policy routing
@@ -115,19 +108,10 @@ class CurrencyConverterViewModelTest {
 
     private fun buildViewModel(
         networkMonitor: NetworkMonitor,
-        spotRateStore: Store<String, ExchangeRates> = fakeSpotRateStore(),
-        fetchedAt: FakeConverterFetchedAtRepository = FakeConverterFetchedAtRepository(),
     ): CurrencyRatesViewModel = CurrencyRatesViewModel(
         currencyRepository = FakeCurrencyRepository(),
         networkMonitor = networkMonitor,
     )
-
-    /** Minimal in-memory Store that never makes a real network call. */
-    private fun fakeSpotRateStore(): Store<String, ExchangeRates> = StoreBuilder.from<String, ExchangeRates>(
-        fetcher = Fetcher.of { _ ->
-            ExchangeRates(base = "USD", date = "2026-05-28", rates = emptyMap())
-        },
-    ).build()
 
     // endregion
 }
@@ -151,15 +135,6 @@ private object OfflineNetworkMonitor : NetworkMonitor {
     override val networkChanges: SharedFlow<NetworkChangeEvent> =
         MutableSharedFlow<NetworkChangeEvent>().asSharedFlow()
     override fun close() = Unit
-}
-
-@OptIn(ExperimentalTime::class)
-private class FakeConverterFetchedAtRepository : FetchedAtRepository {
-    private val map = mutableMapOf<String, Instant>()
-    override suspend fun read(storeKey: String): Instant? = map[storeKey]
-    override suspend fun write(storeKey: String, instant: Instant) {
-        map[storeKey] = instant
-    }
 }
 
 // endregion

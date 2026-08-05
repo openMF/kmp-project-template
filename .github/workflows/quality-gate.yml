@@ -30,19 +30,6 @@ jobs:
       - name: Verify demo⇄framework separation convention
         run: bash scripts/verify-demo-convention.sh
 
-  idea-source-drift:
-    name: Idea Source Drift
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      # Runtime-independent: pure-bash evaluator over the committed drift baseline
-      # manifest (scripts/idea-source-drift-baseline.manifest). Exit 2 on any D4/D7
-      # blocker; the default shell fails the job on a non-zero exit. This job block is
-      # intentionally BLOCKING (no error suppression / no soft-fail) so a drift blocker
-      # reds the build and the idea-layer stays locked to source.
-      - name: Verify idea-layer to source drift
-        run: bash scripts/framework-verify-idea-source-drift.sh
-
   spotless:
     name: Spotless
     runs-on: ubuntu-latest

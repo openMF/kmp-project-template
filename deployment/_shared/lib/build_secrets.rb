@@ -136,7 +136,11 @@ module BuildSecrets
       @doc.fetch("secrets").flat_map do |_key, s|
         kind = s["kind"] || "value"
         b64  = kind == "file" ? 1 : 0
-        if (fl = s["by_flavor"])
+        if kind == "properties"
+          # Each assembled key that is vault-backed needs its value handed back as an env var
+          # (materialize_body reads ENV[source_env]); `literal` keys carry no vault source.
+          (s["keys"] || []).map { |k| k["vault_alias"] && [k["vault_alias"], k["source_env"], 0] }.compact
+        elsif (fl = s["by_flavor"])
           fl.values.map { |fv| fv["vault_alias"] && [fv["vault_alias"], fv["source_env"] || s["source_env"], b64] }.compact
         elsif (va = s["vault_alias"])
           [[va, s["source_env"], b64]]
@@ -165,6 +169,16 @@ module BuildSecrets
         raw = ENV[(from_env || s["source_env"]).to_s]
         return nil if raw.to_s.empty?
         decode_file(raw, s["encoding"])
+      when "properties"
+        # Assemble a KEY=VALUE .properties file at the platform path (single source of truth) from
+        # vault-backed keys (value read from ENV[source_env]) + `literal` keys. Materialized to
+        # `rel:` (NOT _env), e.g. android/keystores/upload_keystore.properties — the exact file
+        # config.rb#get_android_signing_config reads. Heals the "signing creds only in _env" gap.
+        (s["keys"] || []).map { |k|
+          next nil unless k["name"]
+          v = k.key?("literal") ? k["literal"] : ENV[k["source_env"].to_s]
+          "#{k['name']}=#{v}"
+        }.compact.join("\n")
       else
         raise "unknown kind '#{kind}'"
       end

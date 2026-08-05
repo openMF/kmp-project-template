@@ -89,7 +89,7 @@ fun AlertsListScreen(
     ) { padding ->
         ScreenContent(
             state = state,
-            onRetry = { },
+            onRetry = viewModel::onRetry,
             modifier = Modifier.fillMaxSize().padding(padding),
         ) { alerts, _ ->
             LazyColumn(modifier = Modifier.fillMaxSize()) {

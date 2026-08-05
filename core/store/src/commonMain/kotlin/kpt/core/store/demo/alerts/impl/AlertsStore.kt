@@ -9,10 +9,12 @@
  */
 package kpt.core.store.demo.alerts.impl
 
+import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.demo.alerts.AlertDao
 import kpt.core.database.demo.alerts.AlertEntity
+import kpt.core.model.demo.alerts.PriceAlert
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
@@ -34,10 +36,11 @@ import org.mobilenativefoundation.store.store5.Store
  * on `alertDao.upsert` / `deleteById`. On Android/Desktop/iOS the wrap is a microsecond
  * no-op alongside Room's native invalidation.
  */
-fun provideAlertsStore(dao: AlertDao): Store<Unit, List<AlertEntity>> = StoreFactory.createOfflineStore(
+fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
-        reader = { _: Unit -> daoFlow(ALERTS_TABLE) { dao.observeAll() } },
-        writer = { _: Unit, alerts: List<AlertEntity> -> dao.upsertAll(alerts) },
+        // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
+        reader = { _: Unit -> daoFlow(ALERTS_TABLE) { dao.observeAll() }.map { rows -> rows.map(AlertEntity::toPriceAlert) } },
+        writer = { _: Unit, alerts: List<PriceAlert> -> dao.upsertAll(alerts.map(PriceAlert::toAlertEntity)) },
         delete = { _: Unit -> dao.deleteAll() },
         deleteAll = { dao.deleteAll() },
     ),

@@ -193,13 +193,13 @@ module FastlaneConfig
 
     TESTFLIGHT_CONFIG = {
       beta_app_review_info: {
-        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || _c._fork_prop("org.email")      || "" # E0/T5: no mifos fallback — fork supplies org.email,
+        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || _c._fork_prop("org.email")      || "", # E0/T5: no mifos fallback — fork supplies org.email
         contact_first_name:    _c._secret("TESTFLIGHT_FIRST_NAME")    || _c._fork_prop("org.first.name") || "Mifos",
         contact_last_name:     _c._secret("TESTFLIGHT_LAST_NAME")     || _c._fork_prop("org.last.name")  || "Team",
-        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || _c._fork_prop("org.phone")      || "" # E0/T5: no mifos fallback — fork supplies org.phone,
+        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || _c._fork_prop("org.phone")      || "", # E0/T5: no mifos fallback — fork supplies org.phone
         demo_account_required: false,
       }.freeze,
-      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || _c._fork_prop("org.email") || "" # E0/T5: no mifos fallback — fork supplies org.email,
+      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || _c._fork_prop("org.email") || "", # E0/T5: no mifos fallback — fork supplies org.email
       beta_app_description:              "#{ForkIdentity::APP_DISPLAY_NAME} beta build",
       demo_account_required:             false,
       distribute_external:               true,
@@ -248,8 +248,8 @@ module FastlaneConfig
       app_review_information: {
         first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || _c._fork_prop("org.first.name") || "Mifos",
         last_name:  _c._secret("APPSTORE_REVIEW_LAST_NAME")  || _c._fork_prop("org.last.name")  || "Team",
-        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || _c._fork_prop("org.phone")      || "" # E0/T5: no mifos fallback — fork supplies org.phone,
-        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || _c._fork_prop("org.email")      || "" # E0/T5: no mifos fallback — fork supplies org.email,
+        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || _c._fork_prop("org.phone")      || "", # E0/T5: no mifos fallback — fork supplies org.phone
+        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || _c._fork_prop("org.email")      || "", # E0/T5: no mifos fallback — fork supplies org.email
       }.freeze,
     }.freeze
   end

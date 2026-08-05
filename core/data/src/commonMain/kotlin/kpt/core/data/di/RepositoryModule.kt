@@ -211,6 +211,8 @@ val DataModule = module {
         AlertsRepositoryImpl(
             alertsStore = get(AppStoreRegistry.Alerts),
             alertDao = get(),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
         )
     }
 

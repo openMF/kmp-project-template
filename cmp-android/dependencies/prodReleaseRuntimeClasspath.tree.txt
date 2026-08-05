@@ -2466,8 +2466,8 @@
 |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.24 -> 2.4.0 (*)
 |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.2 (*)
 |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1 (*)
-|    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.4
-|    |    \--- io.github.mobilebytelabs:worker-app-annotations-android:4.0.4
+|    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.6
+|    |    \--- io.github.mobilebytelabs:worker-app-annotations-android:4.0.6
 |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
 |    +--- project :cmp-navigation
 |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
@@ -2944,8 +2944,8 @@
 |    |    |    |    +--- io.insert-koin:koin-androidx-compose:4.2.2 (*)
 |    |    |    |    +--- io.insert-koin:koin-androidx-navigation:4.2.2 (*)
 |    |    |    |    +--- io.insert-koin:koin-core-viewmodel:4.2.2 (*)
-|    |    |    |    +--- io.github.mobilebytelabs:worker-kmp:4.0.4
-|    |    |    |    |    \--- io.github.mobilebytelabs:worker-kmp-jvm:4.0.4
+|    |    |    |    +--- io.github.mobilebytelabs:worker-kmp:4.0.6
+|    |    |    |    |    \--- io.github.mobilebytelabs:worker-kmp-jvm:4.0.6
 |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |         +--- co.touchlab:kermit:2.0.6 -> 2.1.0 (*)
@@ -2971,22 +2971,22 @@
 |    |    |    |    +--- org.jetbrains.androidx.core:core-bundle:1.0.1 (*)
 |    |    |    |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.2 (*)
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1 (*)
-|    |    |    |    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.4 (*)
-|    |    |    |    +--- io.github.mobilebytelabs:worker-compose-all:4.0.4
-|    |    |    |    |    \--- io.github.mobilebytelabs:worker-compose-all-android:4.0.4
-|    |    |    |    |         +--- io.github.mobilebytelabs:worker-android:4.0.4
-|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-android-android:4.0.4
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.4 (*)
+|    |    |    |    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.6 (*)
+|    |    |    |    +--- io.github.mobilebytelabs:worker-compose-all:4.0.6
+|    |    |    |    |    \--- io.github.mobilebytelabs:worker-compose-all-android:4.0.6
+|    |    |    |    |         +--- io.github.mobilebytelabs:worker-android:4.0.6
+|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-android-android:4.0.6
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
 |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
 |    |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 -> 1.11.0 (*)
 |    |    |    |    |         |         +--- androidx.work:work-runtime-ktx:2.11.0 -> 2.11.2 (*)
 |    |    |    |    |         |         +--- org.jetbrains.compose.runtime:runtime:1.11.0 -> 1.11.1 (*)
 |    |    |    |    |         |         +--- androidx.activity:activity-compose:1.13.0 (*)
 |    |    |    |    |         |         \--- io.insert-koin:koin-android:4.0.4 -> 4.2.2 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:worker-kmp:4.0.4 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:worker-compose:4.0.4
-|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-compose-android:4.0.4
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.4 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:worker-compose:4.0.6
+|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-compose-android:4.0.6
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
 |    |    |    |    |         |         +--- org.jetbrains.compose.runtime:runtime:1.11.0 -> 1.11.1 (*)
 |    |    |    |    |         |         +--- org.jetbrains.compose.ui:ui:1.11.0 -> 1.11.1 (*)
 |    |    |    |    |         |         +--- org.jetbrains.compose.foundation:foundation:1.11.0 -> 1.11.1 (*)
@@ -2994,33 +2994,33 @@
 |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
 |    |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 -> 1.11.0 (*)
 |    |    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:worker-koin:4.0.4
-|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-koin-jvm:4.0.4
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.4 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:worker-koin:4.0.6
+|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-koin-jvm:4.0.6
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
 |    |    |    |    |         |         +--- io.insert-koin:koin-core:4.0.4 -> 4.2.2 (*)
 |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:worker-sync:4.0.4
-|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-sync-jvm:4.0.4
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.4 (*)
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-koin:4.0.4 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:worker-sync:4.0.6
+|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-sync-jvm:4.0.6
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-koin:4.0.6 (*)
 |    |    |    |    |         |         +--- io.insert-koin:koin-core:4.0.4 -> 4.2.2 (*)
 |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
 |    |    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:worker-scheduler:4.0.4
-|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-scheduler-android:4.0.4
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-android:4.0.4 (*)
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.4 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:worker-scheduler:4.0.6
+|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-scheduler-android:4.0.6
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-android:4.0.6 (*)
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
 |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
 |    |    |    |    |         |         +--- androidx.work:work-runtime-ktx:2.11.0 -> 2.11.2 (*)
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-koin:4.0.4 (*)
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-koin:4.0.6 (*)
 |    |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
 |    |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1 -> 1.11.0 (*)
 |    |    |    |    |         |         \--- io.insert-koin:koin-core:4.0.4 -> 4.2.2 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:worker-store5:4.0.4
-|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-store5-jvm:4.0.4
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.4 (*)
-|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-scheduler:4.0.4 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:worker-store5:4.0.6
+|    |    |    |    |         |    \--- io.github.mobilebytelabs:worker-store5-jvm:4.0.6
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
+|    |    |    |    |         |         +--- io.github.mobilebytelabs:worker-scheduler:4.0.6 (*)
 |    |    |    |    |         |         +--- org.mobilenativefoundation.store:store5:5.1.0-alpha06 -> 5.1.0-alpha08 (*)
 |    |    |    |    |         |         +--- io.insert-koin:koin-core:4.0.4 -> 4.2.2 (*)
 |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
@@ -3028,7 +3028,7 @@
 |    |    |    |    +--- project :core:common (*)
 |    |    |    |    +--- project :core:datastore (*)
 |    |    |    |    +--- project :core:model (*)
-|    |    |    |    +--- io.github.mobilebytelabs:worker-sync:4.0.4 (*)
+|    |    |    |    +--- io.github.mobilebytelabs:worker-sync:4.0.6 (*)
 |    |    |    |    +--- io.github.mirzemehdi:kmpnotifier-local:2.0.0
 |    |    |    |    |    \--- io.github.mirzemehdi:kmpnotifier-local-android:2.0.0
 |    |    |    |    |         +--- io.github.mirzemehdi:kmpnotifier-core:2.0.0
@@ -3241,8 +3241,8 @@
 |    +--- org.jetbrains.compose.components:components-resources:1.11.1 (*)
 |    +--- project :core-base:platform (*)
 |    +--- io.coil-kt.coil3:coil-compose-core:3.5.0 (*)
-|    +--- io.github.mobilebytelabs:worker-kmp:4.0.4 (*)
-|    +--- io.github.mobilebytelabs:worker-compose-all:4.0.4 (*)
+|    +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
+|    +--- io.github.mobilebytelabs:worker-compose-all:4.0.6 (*)
 |    +--- project :sync (*)
 |    \--- project :core:datastore (*)
 +--- project :core:ui (*)

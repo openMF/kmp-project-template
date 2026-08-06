@@ -320,6 +320,14 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                     storeData.copy(fetchedAtInstant = persistedFetchedAt)
                 else -> storeData
             }
+            // Offline-local (CACHE_ONLY) has NO network fetcher, so there is no
+            // "refresh in flight" during which to preserve the previous content — every
+            // SoT emission is authoritative. An empty read is a genuine deletion and MUST
+            // surface as empty (so DecisionEngine renders Empty), not a stale-content flash.
+            if (fetchPolicy == FetchPolicy.CACHE_ONLY) {
+                lastContent = enriched
+                return@map enriched
+            }
             val cached = lastContent
             if (!enriched.isEmpty) {
                 lastContent = enriched
@@ -430,7 +438,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         storeFlow,
         networkStatusFlow,
     ) { storeData, status ->
-        DecisionEngine.decide(storeData, status)
+        DecisionEngine.decide(storeData, status, fetchPolicy)
     }.onStart {
         val current = networkStatusFlow.value
         if (current !is NetworkStatus.Available) {
@@ -544,6 +552,13 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
                     storeData.copy(fetchedAtInstant = persistedFetchedAt)
                 else -> storeData
             }
+            // Offline-local (CACHE_ONLY): no network refresh to carry content across — every
+            // SoT emission is authoritative, so an empty read surfaces as empty (→ Empty),
+            // never a stale-content carry-forward. See the single-key overload.
+            if (fetchPolicy == FetchPolicy.CACHE_ONLY) {
+                lastContent = enriched
+                return@map enriched
+            }
             val carry = lastContent
             if (!enriched.isEmpty) {
                 lastContent = enriched
@@ -629,7 +644,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         storeFlow,
         networkStatusFlow,
     ) { storeData, status ->
-        DecisionEngine.decide(storeData, status)
+        DecisionEngine.decide(storeData, status, fetchPolicy)
     }.onStart {
         val current = networkStatusFlow.value
         if (current !is NetworkStatus.Available) {

@@ -14,36 +14,29 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.common)
             implementation(projects.core.data)
             implementation(projects.core.model)
             implementation(projects.coreBase.store)
             implementation(projects.coreBase.ui)
-            // Hosts the embedded add-to-watchlist star toggle on each CoinMarkets row.
-            implementation(projects.feature.addToWatchlist)
 
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)
             implementation(compose.materialIconsExtended)
-            // compose-resources — for stringResource()-based UI copy (i18n) per
-            // RULE-IMPL-NO-HARDCODED-STRING-001 (W2 of store5-superbrain-v2).
             implementation(compose.components.resources)
-
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.kotlinx.datetime)
         }
 
         commonTest.dependencies {
-            // kotlin.test + kotlinx.coroutines.test come from the convention plugin.
             implementation(libs.turbine)
         }
     }
 }
 
-// Compose-resources class generator config — mirrors `feature/loans/build.gradle.kts`
-// so `Res.string.*` is exposed under `kpt.feature.crypto.generated.resources`.
+// Compose-resources class generator config — mirrors `feature/watchlist/build.gradle.kts`
+// so `Res.string.*` is exposed under `kpt.feature.addtowatchlist.generated.resources`.
 compose.resources {
     publicResClass = true
     generateResClass = always
-    packageOfResClass = "kpt.feature.crypto.generated.resources"
+    packageOfResClass = "kpt.feature.addtowatchlist.generated.resources"
 }

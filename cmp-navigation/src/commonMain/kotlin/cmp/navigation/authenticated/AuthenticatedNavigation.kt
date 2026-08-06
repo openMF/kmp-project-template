@@ -29,6 +29,7 @@ import kpt.feature.calculators.navigation.navigateToAmortization
 import kpt.feature.calculators.navigation.navigateToLoanCalcWizard
 import kpt.feature.calculators.navigation.navigateToLoanComparison
 import kpt.feature.crypto.navigation.cryptoGraph
+import kpt.feature.crypto.navigation.navigateToCrypto
 import kpt.feature.currencyrates.navigation.currencyRatesGraph
 import kpt.feature.currencyrates.navigation.navigateToCurrencyRates
 import kpt.feature.currencyrates.navigation.navigateToRateHistory
@@ -74,6 +75,7 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             navigateToAmortization = { navController.navigateToAmortization() },
             navigateToLoanComparison = { navController.navigateToLoanComparison() },
             navigateToLoanCalcWizard = { navController.navigateToLoanCalcWizard() },
+            navigateToCrypto = { navController.navigateToCrypto() },
             // demo:end
         )
 

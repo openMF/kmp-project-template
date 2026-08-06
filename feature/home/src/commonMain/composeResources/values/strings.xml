@@ -78,6 +78,8 @@
     <string name="screens_home_tool_history_subtitle">Historical FX charts</string>
     <string name="screens_home_tool_macro_title">Country Macro</string>
     <string name="screens_home_tool_macro_subtitle">GDP, CPI, unemployment</string>
+    <string name="screens_home_tool_crypto_title">Coin Markets</string>
+    <string name="screens_home_tool_crypto_subtitle">Live crypto prices + watchlist</string>
 
     <!-- ===== HomeScreen — Empty state ===== -->
     <string name="screens_home_money_zero">$0.00</string>

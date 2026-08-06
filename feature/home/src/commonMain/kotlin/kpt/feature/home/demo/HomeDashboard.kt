@@ -104,6 +104,8 @@ import kpt.feature.home.generated.resources.screens_home_tool_affordability_subt
 import kpt.feature.home.generated.resources.screens_home_tool_affordability_title
 import kpt.feature.home.generated.resources.screens_home_tool_amortization_subtitle
 import kpt.feature.home.generated.resources.screens_home_tool_amortization_title
+import kpt.feature.home.generated.resources.screens_home_tool_crypto_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_crypto_title
 import kpt.feature.home.generated.resources.screens_home_tool_compare_subtitle
 import kpt.feature.home.generated.resources.screens_home_tool_compare_title
 import kpt.feature.home.generated.resources.screens_home_tool_currency_subtitle
@@ -135,6 +137,7 @@ internal fun HomeDashboard(
     onNavigateToAmortization: () -> Unit,
     onNavigateToLoanComparison: () -> Unit,
     onNavigateToLoanCalcWizard: () -> Unit,
+    onNavigateToCrypto: () -> Unit,
     viewModel: HomeViewModel = retainedKoinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -237,6 +240,12 @@ internal fun HomeDashboard(
             subtitle = stringResource(Res.string.screens_home_tool_macro_subtitle),
             icon = Icons.Default.Public,
             onClick = onNavigateToMacro,
+        )
+        FeatureRow(
+            title = stringResource(Res.string.screens_home_tool_crypto_title),
+            subtitle = stringResource(Res.string.screens_home_tool_crypto_subtitle),
+            icon = Icons.AutoMirrored.Default.TrendingUp,
+            onClick = onNavigateToCrypto,
         )
 
         Spacer(Modifier.height(sp.lg))

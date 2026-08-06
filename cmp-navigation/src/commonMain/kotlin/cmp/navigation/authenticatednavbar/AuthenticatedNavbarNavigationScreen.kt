@@ -59,6 +59,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
     navigateToAmortization: () -> Unit,
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
+    navigateToCrypto: () -> Unit,
     // demo:end
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberKptNavController(
@@ -104,6 +105,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
         navigateToAmortization = navigateToAmortization,
         navigateToLoanComparison = navigateToLoanComparison,
         navigateToLoanCalcWizard = navigateToLoanCalcWizard,
+        navigateToCrypto = navigateToCrypto,
         // demo:end
         onAction = remember(viewModel) {
             { viewModel.trySendAction(it) }
@@ -127,6 +129,7 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
     navigateToAmortization: () -> Unit,
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
+    navigateToCrypto: () -> Unit,
     // demo:end
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -195,6 +198,7 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                 onNavigateToAmortization = navigateToAmortization,
                 onNavigateToLoanComparison = navigateToLoanComparison,
                 onNavigateToLoanCalcWizard = navigateToLoanCalcWizard,
+                onNavigateToCrypto = navigateToCrypto,
                 // demo:end
             )
 

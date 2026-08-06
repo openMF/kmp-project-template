@@ -1,0 +1,47 @@
+# Copyright 2026 Mifos Initiative
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# add-to-watchlist — the embedded `submit_offline_write` star toggle (device E2E)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# The AddToWatchlistStar is hosted on every feature/crypto CoinMarkets row. It
+# renders from repository.contains(coinId): outline star (contentDescription
+# "Add to watchlist") when untracked, filled star ("Remove from watchlist") when
+# tracked. Tapping toggles membership via SubmitHandler -> local Room write;
+# contains() re-emits and the star flips — no network, offline-only.
+#
+# This flow proves the toggle round-trips on-device: untracked -> tap -> tracked
+# -> tap -> untracked. `clearState: true` starts every coin untracked so the
+# first assertion is deterministic (also serves as the am force-stop / fresh
+# composition guarantee, IA3-7).
+appId: org.mifos.kmp.template
+name: add-to-watchlist — star toggles offline watchlist membership on a CoinMarkets row
+tags:
+  - watchlist
+  - add-to-watchlist
+  - crypto
+  - offline-write
+---
+- launchApp:
+    clearState: true
+# "Coin Markets" tool tile on the Home dashboard (feature/home tools grid).
+- scrollUntilVisible:
+    element: "Coin Markets"
+    direction: DOWN
+- tapOn: "Coin Markets"
+# The AddToWatchlistStar exposes its state via contentDescription (surfaced to a11y),
+# which is the stable selector — Compose testTags are not exposed as resource-ids here.
+# Untracked: every row's star renders the outline "Add to watchlist" affordance.
+- assertVisible: "Add to watchlist"
+# Toggle ON — tap the first star; local Room write, contains() re-emits, star fills.
+- tapOn: "Add to watchlist"
+- assertVisible: "Remove from watchlist"
+# Toggle OFF — tap the now-filled star; membership removed, star returns to outline.
+- tapOn: "Remove from watchlist"
+- assertVisible: "Add to watchlist"

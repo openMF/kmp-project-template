@@ -20,6 +20,7 @@ import kpt.core.data.di.DataModule
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.store.di.appStoreModule
+import kpt.feature.addtowatchlist.di.AddToWatchlistModule
 import kpt.feature.alerts.di.AlertsModule
 import kpt.feature.amortization.di.AmortizationModule
 import kpt.feature.bills.di.BillsModule
@@ -71,6 +72,7 @@ object KoinModules {
             CryptoFeatureModule,
             AlertsModule,
             WatchlistModule,
+            AddToWatchlistModule,
             // demo:end
         )
     }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="screens_watchlist_star_add_cd">Add to watchlist</string>
+    <string name="screens_watchlist_star_remove_cd">Remove from watchlist</string>
+</resources>

@@ -450,7 +450,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 ## Platform-Specific Notes
 
 ### Android
-- **Package:** read from `gradle/libs.versions.toml` → `appId` key (currently `org.mifos.kmp.template`). Do NOT use `APP_ID_BASE` in `gradle.properties` — that is a fork-rename placeholder, not the runtime applicationId.
+- **Package (applicationId):** authored in `gradle/fork.properties#app.id` (the single source of truth); `syncForkConfig` writes it into `gradle/libs.versions.toml#appId`, which the build reads. Edit `app.id` there — don't hand-edit the catalog, and don't use `APP_ID_BASE` in `gradle.properties` (a fork-rename placeholder, not the runtime applicationId).
 - **Min SDK:** 24, **Target SDK:** 34
 - **Flavors:** `prod`, `demo`
 - **Build Types:** `debug`, `release`
@@ -458,7 +458,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 - **Firebase:** 2 apps registered (prod + demo), 4 variants in google-services.json
 
 ### iOS
-- **Bundle ID:** read from `gradle/libs.versions.toml` → `appId` key (currently `org.mifos.kmp.template`). Same key as Android — both platforms share the single `appId` source of truth.
+- **Bundle ID:** authored in `gradle/fork.properties#app.id` (the single source of truth) — same value as the Android applicationId; `syncForkConfig` writes it into `gradle/libs.versions.toml#appId`, which the build reads. Edit `app.id` there — don't hand-edit the catalog.
 - **Min Version:** iOS 15.0, **Target:** iOS 17.0
 - **Code Signing:** Fastlane Match (adhoc for Firebase, appstore for TestFlight/App Store)
 - **CocoaPods:** Required for iOS dependencies

@@ -141,6 +141,17 @@ else
 fi
 
 echo
+# ── Project health — surface anything still template-default ──────────────────
+# fork.properties is the project-level source of truth; run the sanity harness so the fork
+# immediately sees what customization left un-forked (signing/org identity, store copy).
+# Non-fatal here — CI's quality-gate is the hard gate; this is guidance right after forking.
+if [[ -f "$(dirname "$0")/scripts/health/project-health.sh" ]]; then
+  print_info "Running project health check (gradle/fork.properties sanity)…"
+  bash "$(dirname "$0")/scripts/health/project-health.sh" \
+    || print_warning "Project health flagged items above — set them in gradle/fork.properties before releasing."
+  echo
+fi
+
 echo -e "${GREEN}${BOLD}✨ Customization complete!${NC}"
 echo
 echo -e "${YELLOW}Next steps:${NC}"

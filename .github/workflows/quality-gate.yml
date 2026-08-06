@@ -29,13 +29,14 @@ jobs:
       # separation drift so `customizer.sh --clean` stays a safe, source-valid removal.
       - name: Verify demo⇄framework separation convention
         run: bash scripts/verify-demo-convention.sh
-      # Fork-identity guard — fails a FORK whose gradle/fork.properties still carries the template's
-      # (openMF / Mifos) signing + org identity, so a fork never ships with the wrong Apple team / Match
-      # repo (which Apple rejects with 90288). The upstream template itself sets TEMPLATE_SELF_BUILD=1.
-      - name: Verify fork identity (not the template's)
+      # Project health — reads gradle/fork.properties (the project-level single source of truth) and
+      # runs every scripts/health/checks/*.sh: fork-identity (FAILs a fork still on the template's
+      # openMF/Mifos signing+org identity — Apple 90288) + store-listing (WARNs on un-authored copy).
+      # The upstream template itself sets TEMPLATE_SELF_BUILD=1 so its fork-only checks skip.
+      - name: Project health (fork.properties sanity)
         env:
           TEMPLATE_SELF_BUILD: ${{ github.repository == 'openMF/kmp-project-template' && '1' || '' }}
-        run: bash scripts/verify-fork-identity.sh
+        run: bash scripts/health/project-health.sh
 
   spotless:
     name: Spotless

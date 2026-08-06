@@ -28,20 +28,14 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.demo.currency.ExchangeRates
-import org.mobilenativefoundation.store.store5.Fetcher
-import org.mobilenativefoundation.store.store5.Store
-import org.mobilenativefoundation.store.store5.StoreBuilder
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /**
  * Locks the [CurrencyRatesViewModel] contract:
@@ -233,21 +227,10 @@ class CurrencyRatesViewModelTest {
     private fun buildViewModel(
         repo: FakeCurrencyRepository = FakeCurrencyRepository(),
         networkMonitor: FakeNetworkMonitor = FakeNetworkMonitor(online = true),
-        fetchedAt: FakeTestFetchedAtRepository = FakeTestFetchedAtRepository(),
-        spotRateStore: Store<String, ExchangeRates> = fakeSpotRateStore(),
     ): CurrencyRatesViewModel = CurrencyRatesViewModel(
         currencyRepository = repo,
         networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAt,
-        spotRateStore = spotRateStore,
     )
-
-    /** Minimal in-memory Store for the SpotRateLookupStore in tests. */
-    private fun fakeSpotRateStore(): Store<String, ExchangeRates> = StoreBuilder.from<String, ExchangeRates>(
-        fetcher = Fetcher.of { _ ->
-            ExchangeRates(base = "USD", date = "2026-05-28", rates = emptyMap())
-        },
-    ).build()
 
     // endregion
 }
@@ -284,20 +267,6 @@ private class FakeNetworkMonitor(online: Boolean) : NetworkMonitor {
     }
 
     override fun close() = Unit
-}
-
-/**
- * Minimal [FetchedAtRepository] test double backed by an in-memory map.
- */
-@OptIn(ExperimentalTime::class)
-private class FakeTestFetchedAtRepository : FetchedAtRepository {
-    private val map = mutableMapOf<String, Instant>()
-
-    override suspend fun read(storeKey: String): Instant? = map[storeKey]
-
-    override suspend fun write(storeKey: String, instant: Instant) {
-        map[storeKey] = instant
-    }
 }
 
 // endregion

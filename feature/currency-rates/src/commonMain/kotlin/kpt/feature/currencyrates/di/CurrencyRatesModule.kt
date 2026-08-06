@@ -9,7 +9,6 @@
  */
 package kpt.feature.currencyrates.di
 
-import kpt.core.store.AppStoreRegistry
 import kpt.feature.currencyrates.ui.CurrencyRatesViewModel
 import kpt.feature.currencyrates.ui.RateHistoryViewModel
 import org.koin.core.module.dsl.viewModel
@@ -20,8 +19,6 @@ val CurrencyRatesModule = module {
         CurrencyRatesViewModel(
             currencyRepository = get(),
             networkMonitor = get(),
-            fetchedAtRepository = get(),
-            spotRateStore = get(qualifier = AppStoreRegistry.SpotRate),
         )
     }
     viewModel { RateHistoryViewModel(get()) }

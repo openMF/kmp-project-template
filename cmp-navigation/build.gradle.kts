@@ -44,6 +44,9 @@ kotlin {
             implementation(projects.feature.macro)
             implementation(projects.feature.crypto)
             implementation(projects.feature.showcase)
+            implementation(projects.feature.alerts)
+            implementation(projects.feature.watchlist)
+            implementation(projects.feature.addToWatchlist)
             // demo:end
             implementation(projects.sync)
 

@@ -359,10 +359,13 @@ strings hardcoded across `cmp-android/build.gradle.kts`, `cmp-ios/`,
 these five properties + does substitutions across the consumer build files in a
 single pass.
 
-> **Source of truth: `gradle/libs.versions.toml`** — the `appId`, `appDisplayName`,
-> `baseNamespace`, `desktopAppName`, and `projectName` keys are what the build system
-> actually reads at runtime. `gradle.properties` holds fork-rename placeholders for
-> the future `scripts/fork-rename.sh` script. When in doubt, read `libs.versions.toml`.
+> **Source of truth for `appId`: `gradle/fork.properties` (`app.id`)** — authored there, then
+> `./gradlew syncForkConfig` writes it back into `gradle/libs.versions.toml#appId` (the catalog the
+> build reads via `libs.versions.appId`). Edit `app.id` in fork.properties, never the catalog line;
+> `scripts/product-health/checks/appid-consistency.sh` FAILs CI if the two drift. The other build-time
+> keys (`appDisplayName`, `baseNamespace`, `desktopAppName`, `projectName`) are still authored in
+> `libs.versions.toml` (syncForkConfig reads fork.properties first for them, then the catalog).
+> `gradle.properties` holds fork-rename placeholders for the future `scripts/fork-rename.sh`.
 
 | Property | `gradle.properties` | `libs.versions.toml` (runtime SoT) | Consumer (planned) |
 | -------- | ------------------- | ----------------------------------- | ------------------ |
@@ -447,7 +450,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 ## Platform-Specific Notes
 
 ### Android
-- **Package:** read from `gradle/libs.versions.toml` → `appId` key (currently `org.mifos.kmp.template`). Do NOT use `APP_ID_BASE` in `gradle.properties` — that is a fork-rename placeholder, not the runtime applicationId.
+- **Package (applicationId):** authored in `gradle/fork.properties#app.id` (the single source of truth); `syncForkConfig` writes it into `gradle/libs.versions.toml#appId`, which the build reads. Edit `app.id` there — don't hand-edit the catalog, and don't use `APP_ID_BASE` in `gradle.properties` (a fork-rename placeholder, not the runtime applicationId).
 - **Min SDK:** 24, **Target SDK:** 34
 - **Flavors:** `prod`, `demo`
 - **Build Types:** `debug`, `release`
@@ -455,7 +458,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 - **Firebase:** 2 apps registered (prod + demo), 4 variants in google-services.json
 
 ### iOS
-- **Bundle ID:** read from `gradle/libs.versions.toml` → `appId` key (currently `org.mifos.kmp.template`). Same key as Android — both platforms share the single `appId` source of truth.
+- **Bundle ID:** authored in `gradle/fork.properties#app.id` (the single source of truth) — same value as the Android applicationId; `syncForkConfig` writes it into `gradle/libs.versions.toml#appId`, which the build reads. Edit `app.id` there — don't hand-edit the catalog.
 - **Min Version:** iOS 15.0, **Target:** iOS 17.0
 - **Code Signing:** Fastlane Match (adhoc for Firebase, appstore for TestFlight/App Store)
 - **CocoaPods:** Required for iOS dependencies

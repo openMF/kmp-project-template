@@ -9,7 +9,8 @@
  */
 package kpt.core.data.demo.alerts
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.model.demo.alerts.PriceAlert
 
 /**
@@ -29,8 +30,8 @@ import kpt.core.model.demo.alerts.PriceAlert
  */
 interface AlertsRepository {
 
-    /** Reactive list of server-committed alerts, newest first. */
-    fun alertsStream(): Flow<List<PriceAlert>>
+    /** Reactive list of committed alerts as a Store5-backed [ScreenDataStream] (offline-local). */
+    fun alertsStream(scope: CoroutineScope): ScreenDataStream<List<PriceAlert>>
 
     /**
      * Direct API submit — used by `DraftSubmitHandler`'s block parameter and by

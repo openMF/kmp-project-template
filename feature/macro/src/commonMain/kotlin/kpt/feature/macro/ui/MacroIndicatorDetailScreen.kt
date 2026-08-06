@@ -37,11 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.base.store.freshness.FreshnessBand
-import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
 import kpt.core.common.formatTimeAgo
@@ -82,7 +80,6 @@ fun MacroIndicatorDetailScreen(
         parametersOf(countryCode, indicatorKind)
     },
 ) {
-    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier.testTag(TestTags.MacroIndicatorDetail.SCREEN),
         topBar = {
@@ -108,14 +105,14 @@ fun MacroIndicatorDetailScreen(
         },
     ) { padding ->
         ScreenContent(
-            state = screenState,
+            stream = viewModel.indicator,
             onRetry = viewModel::onRetry,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) { indicator, freshnessSignal ->
             if (freshnessSignal.band == FreshnessBand.Stale || freshnessSignal.band == FreshnessBand.VeryStale) {
-                val fetchedAt = (screenState as? ScreenState.Content)?.fetchedAt
+                val fetchedAt = freshnessSignal.lastSyncedAt
                 OfflineDataBanner(
                     fetchedAt = fetchedAt,
                     modifier = Modifier.padding(

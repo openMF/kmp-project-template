@@ -38,6 +38,7 @@ internal fun NavGraphBuilder.authenticatedNavbarGraph(
     navigateToAmortization: () -> Unit,
     navigateToLoanComparison: () -> Unit,
     navigateToLoanCalcWizard: () -> Unit,
+    navigateToCrypto: () -> Unit,
     // demo:end
 ) {
     composableWithStayTransitions<AuthenticatedNavbarRoute> {
@@ -55,6 +56,7 @@ internal fun NavGraphBuilder.authenticatedNavbarGraph(
             navigateToAmortization = navigateToAmortization,
             navigateToLoanComparison = navigateToLoanComparison,
             navigateToLoanCalcWizard = navigateToLoanCalcWizard,
+            navigateToCrypto = navigateToCrypto,
             // demo:end
         )
     }

@@ -78,7 +78,14 @@ val DataModule = module {
     // demo:begin — customizer --clean strips all demo repositories, outboxes, syncers + their DAOs
     // Personal watchlist — local-only persistence for the SubmitHandler showcase.
     single { get<AppDatabase>().watchlistDao }
-    single<WatchlistRepository> { WatchlistRepositoryImpl(get()) }
+    single<WatchlistRepository> {
+        WatchlistRepositoryImpl(
+            watchlistStore = get(AppStoreRegistry.Watchlist),
+            dao = get(),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
+        )
+    }
 
     // Banking domain — purely local Loan + Bill Reminder persistence.
     // No remote sync; the DraftSubmitHandler outboxes below give the UX
@@ -89,12 +96,16 @@ val DataModule = module {
         LoanRepositoryImpl(
             loansStore = get(AppStoreRegistry.Loans),
             loanDao = get(),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
         )
     }
     single<BillReminderRepository> {
         BillReminderRepositoryImpl(
             billRemindersStore = get(AppStoreRegistry.BillReminders),
             billReminderDao = get(),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
         )
     }
 
@@ -161,6 +172,7 @@ val DataModule = module {
         CurrencyRepositoryImpl(
             exchangeRatesStore = get(AppStoreRegistry.ExchangeRates),
             rateHistoryStore = get(AppStoreRegistry.RateHistory),
+            spotRateStore = get(AppStoreRegistry.SpotRate),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
@@ -211,6 +223,8 @@ val DataModule = module {
         AlertsRepositoryImpl(
             alertsStore = get(AppStoreRegistry.Alerts),
             alertDao = get(),
+            networkMonitor = get(),
+            fetchedAtRepository = get(),
         )
     }
 

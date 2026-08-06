@@ -20,6 +20,7 @@ import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import kotlinx.serialization.Serializable
 import kpt.core.base.security.isReleaseBuild
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.alerts.navigation.alertsGraph
 import kpt.feature.bills.navigation.billsGraph
 import kpt.feature.bills.navigation.navigateToBills
 import kpt.feature.calculators.navigation.calculatorsGraph
@@ -28,6 +29,7 @@ import kpt.feature.calculators.navigation.navigateToAmortization
 import kpt.feature.calculators.navigation.navigateToLoanCalcWizard
 import kpt.feature.calculators.navigation.navigateToLoanComparison
 import kpt.feature.crypto.navigation.cryptoGraph
+import kpt.feature.crypto.navigation.navigateToCrypto
 import kpt.feature.currencyrates.navigation.currencyRatesGraph
 import kpt.feature.currencyrates.navigation.navigateToCurrencyRates
 import kpt.feature.currencyrates.navigation.navigateToRateHistory
@@ -46,6 +48,7 @@ import kpt.feature.showcase.stategallery.StateGalleryRoute
 import kpt.feature.showcase.stategallery.stateGalleryGraph
 import kpt.feature.showcase.transitions.TransitionGalleryRoute
 import kpt.feature.showcase.transitions.transitionGalleryGraph
+import kpt.feature.watchlist.navigation.watchlistGraph
 
 @Serializable
 internal data object AuthenticatedGraphRoute
@@ -72,6 +75,7 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             navigateToAmortization = { navController.navigateToAmortization() },
             navigateToLoanComparison = { navController.navigateToLoanComparison() },
             navigateToLoanCalcWizard = { navController.navigateToLoanCalcWizard() },
+            navigateToCrypto = { navController.navigateToCrypto() },
             // demo:end
         )
 
@@ -112,6 +116,8 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         ratesGraph(navController) // B7 — NETWORK_WITH_CACHE rate tracker
         macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
         cryptoGraph(navController) // Phase 4 store5-screen-state-persistence — AC-17 deep-scroll restore
+        alertsGraph(navController) // submit_offline_write demo (E3)
+        watchlistGraph(navController) // read_local_list demo (E3)
 
         // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).
         transitionGalleryGraph(navController)

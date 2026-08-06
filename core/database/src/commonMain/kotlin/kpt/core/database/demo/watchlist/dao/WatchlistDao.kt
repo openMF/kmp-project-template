@@ -39,4 +39,8 @@ interface WatchlistDao {
     /** Remove a coin from the watchlist. No-op if absent. */
     @Query("DELETE FROM personal_watchlist WHERE coinId = :coinId")
     suspend fun delete(coinId: String)
+
+    /** Clear the whole watchlist — used by the Store's `deleteAll` (logout cache clear). */
+    @Query("DELETE FROM personal_watchlist")
+    suspend fun deleteAll()
 }

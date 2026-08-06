@@ -60,6 +60,7 @@ internal fun HomeScreen(
     onNavigateToAmortization: () -> Unit,
     onNavigateToLoanComparison: () -> Unit,
     onNavigateToLoanCalcWizard: () -> Unit,
+    onNavigateToCrypto: () -> Unit,
     /** Injected for Compose UI tests; production callers use the default. */
     dashboardViewModel: HomeViewModel? = null,
     // demo:end
@@ -108,6 +109,7 @@ internal fun HomeScreen(
                     onNavigateToAmortization = onNavigateToAmortization,
                     onNavigateToLoanComparison = onNavigateToLoanComparison,
                     onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
+                    onNavigateToCrypto = onNavigateToCrypto,
                     viewModel = dashboardViewModel,
                 )
             } else {
@@ -123,6 +125,7 @@ internal fun HomeScreen(
                     onNavigateToAmortization = onNavigateToAmortization,
                     onNavigateToLoanComparison = onNavigateToLoanComparison,
                     onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
+                    onNavigateToCrypto = onNavigateToCrypto,
                 )
             }
             // demo:end

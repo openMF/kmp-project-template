@@ -40,6 +40,7 @@ fun NavGraphBuilder.homeGraph(
     onNavigateToAmortization: () -> Unit,
     onNavigateToLoanComparison: () -> Unit,
     onNavigateToLoanCalcWizard: () -> Unit,
+    onNavigateToCrypto: () -> Unit,
     // demo:end
 ) {
     navigation<HomeDestination>(
@@ -60,6 +61,7 @@ fun NavGraphBuilder.homeGraph(
                 onNavigateToAmortization = onNavigateToAmortization,
                 onNavigateToLoanComparison = onNavigateToLoanComparison,
                 onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
+                onNavigateToCrypto = onNavigateToCrypto,
                 // demo:end
             )
         }

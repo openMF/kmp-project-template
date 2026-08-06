@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -377,10 +378,15 @@ class HomeViewModelTest {
 
 // region Fakes — kept private to the test compilation to avoid leakage.
 
+@OptIn(ExperimentalScreenDataStreamTestingApi::class)
 private class FakeLoanRepository(initial: List<Loan> = emptyList()) : LoanRepository {
     private val rows = MutableStateFlow(initial)
 
     override fun observeAll(): Flow<List<Loan>> = rows
+    override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
+        screenDataStreamForTesting(rows.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
+    override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
+        screenDataStreamForTesting(rows.map { r -> r.firstOrNull { it.id == id }?.let { ScreenState.Content(it) } ?: ScreenState.Empty })
     override fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
     override suspend fun getById(id: String): Loan? = throw UnsupportedOperationException()
     override suspend fun upsert(loan: Loan) {
@@ -394,6 +400,7 @@ private class FakeLoanRepository(initial: List<Loan> = emptyList()) : LoanReposi
     override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
+@OptIn(ExperimentalScreenDataStreamTestingApi::class)
 private class FakeBillReminderRepository : BillReminderRepository {
     private val upcoming = MutableStateFlow<List<BillReminder>>(emptyList())
     var lastRequestedWindow: Int = -1
@@ -405,6 +412,8 @@ private class FakeBillReminderRepository : BillReminderRepository {
     }
 
     override fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
+    override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
+        screenDataStreamForTesting(upcoming.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> {
         lastRequestedWindow = maxDays
         return upcoming
@@ -443,7 +452,7 @@ private class FakeEconomicRatesRepository(
         // refresh() / retry() dispatches. The viewModelScope keeps this collector
         // alive for the lifetime of the VM under test.
         trigger
-            .onEach { refreshes.merge(key.seriesId, 1) { acc, _ -> acc + 1 } }
+            .onEach { refreshes[key.seriesId] = (refreshes[key.seriesId] ?: 0) + 1 }
             .launchIn(scope)
         return screenDataStreamForTesting(state = source, refreshTrigger = trigger)
     }
@@ -480,6 +489,9 @@ private class FakeCurrencyRepository : CurrencyRepository {
         trigger.onEach { refreshCount += 1 }.launchIn(scope)
         return screenDataStreamForTesting(state = source, refreshTrigger = trigger)
     }
+
+    override fun spotRateStream(baseCurrency: String, online: Boolean, scope: CoroutineScope): ScreenDataStream<ExchangeRates> =
+        screenDataStreamForTesting(state = source)
 
     override fun rateHistoryStream(
         keyFlow: Flow<RateHistoryKey>,

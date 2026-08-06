@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.combineContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.model.demo.banking.Loan
@@ -23,35 +24,35 @@ import kpt.core.model.demo.banking.Loan
 /**
  * Read-side ViewModel for [PersonalLoansListScreen].
  *
- * Combines `observeAll()`, `observeTotalMonthlyEmi()`, and `observeTotalPrincipalRemaining()`
- * from [LoanRepository] into a single [LoansListUiState] surface, projected as a
- * [ScreenState]. Empty portfolio → [ScreenState.Empty]; any loans → [ScreenState.Content].
- *
- * `DataFreshness.FRESH` is used unconditionally because the data is purely local — there is
- * no network fetch to be STALE about. Future remote-sync forks should swap to a Store5-backed
- * stream that carries real freshness.
+ * Consumes the repository's offline-local [LoanRepository.loansStream]
+ * ([kpt.core.base.store.screen.ScreenDataStream]) `.state` and folds in the two dashboard totals
+ * (`observeTotalMonthlyEmi` / `observeTotalPrincipalRemaining`) via [combineContent] to build the
+ * [LoansListUiState]. The Store decides Loading/Empty/Content (empty portfolio → Empty); the VM
+ * never hand-lifts a Flow into ScreenState.
  */
 class PersonalLoansListViewModel(
     private val repository: LoanRepository,
 ) : BaseViewModel<Unit, Nothing, LoansListAction>(Unit) {
 
-    val screenState: StateFlow<ScreenState<LoansListUiState>> = combine(
-        repository.observeAll(),
+    private val stream = repository.loansStream(viewModelScope)
+
+    private val totals = combine(
         repository.observeTotalMonthlyEmi(),
         repository.observeTotalPrincipalRemaining(),
-    ) { loans, totalEmi, totalRemaining ->
-        if (loans.isEmpty()) {
-            ScreenState.Empty
-        } else {
-            ScreenState.Content(
-                data = LoansListUiState(
-                    loans = loans,
-                    totalMonthlyEmi = totalEmi,
-                    totalPrincipalRemaining = totalRemaining,
-                ),
+    ) { emi, remaining -> emi to remaining }
+
+    val screenState: StateFlow<ScreenState<LoansListUiState>> = stream.state
+        .combineContent(totals) { loans, (totalEmi, totalRemaining), _ ->
+            LoansListUiState(
+                loans = loans,
+                totalMonthlyEmi = totalEmi,
+                totalPrincipalRemaining = totalRemaining,
             )
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
+
+    /** Re-run the read (no-op refresh for the offline-local store; wired for ScreenContent). */
+    fun onRetry() = stream.retry()
 
     override fun handleAction(action: LoansListAction) {
         when (action) {

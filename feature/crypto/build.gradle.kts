@@ -18,6 +18,8 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.coreBase.store)
             implementation(projects.coreBase.ui)
+            // Hosts the embedded add-to-watchlist star toggle on each CoinMarkets row.
+            implementation(projects.feature.addToWatchlist)
 
             implementation(compose.ui)
             implementation(compose.material3)

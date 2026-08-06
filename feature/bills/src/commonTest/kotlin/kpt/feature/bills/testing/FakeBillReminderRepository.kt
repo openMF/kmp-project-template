@@ -7,11 +7,17 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+@file:OptIn(kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi::class)
+
 package kpt.feature.bills.testing
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.screenDataStreamForTesting
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.model.demo.banking.BillCategory
 import kpt.core.model.demo.banking.BillReminder
@@ -31,6 +37,9 @@ internal class FakeBillReminderRepository : BillReminderRepository {
 
     /** Current snapshot — useful for raw assertions. */
     val current: List<BillReminder> get() = state.value
+
+    override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
+        screenDataStreamForTesting(state.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
 
     override fun observeAll(): Flow<List<BillReminder>> = state.map { rows ->
         rows.sortedBy { it.dueDay }

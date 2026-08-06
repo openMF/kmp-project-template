@@ -9,7 +9,10 @@
  */
 package kpt.core.data.demo.watchlist
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.model.demo.watchlist.WatchlistItem
 
 /**
  * User's personal watchlist of coins — purely local persistence, no remote sync.
@@ -22,8 +25,8 @@ import kotlinx.coroutines.flow.Flow
  */
 interface WatchlistRepository {
 
-    /** Observe the full watchlist (newest-added first). Reactive — emits on every change. */
-    fun watchlist(): Flow<List<WatchlistItem>>
+    /** Observe the watchlist as a Store5-backed [ScreenDataStream] (offline-local, newest-added first). */
+    fun watchlistStream(scope: CoroutineScope): ScreenDataStream<List<WatchlistItem>>
 
     /** Reactive in-membership check. Used by the star toggle to render filled/outline. */
     fun contains(coinId: String): Flow<Boolean>
@@ -34,14 +37,3 @@ interface WatchlistRepository {
     /** Remove a coin. Idempotent — no-op if not present. */
     suspend fun remove(coinId: String)
 }
-
-/**
- * UI-facing projection of a watchlist row.
- *
- * @property coinId CoinGecko identifier (look up details via CryptoRepository).
- * @property addedAtMs Epoch millis when the user added the coin.
- */
-data class WatchlistItem(
-    val coinId: String,
-    val addedAtMs: Long,
-)

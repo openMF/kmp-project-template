@@ -10,11 +10,7 @@
 package kpt.feature.macro.ui
 
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.economic.MacroIndicatorsRepository
 import kpt.core.model.demo.economic.IndicatorKind
@@ -36,21 +32,19 @@ class MacroIndicatorDetailViewModel(
     repository: MacroIndicatorsRepository,
 ) : BaseViewModel<Unit, Nothing, MacroDetailAction>(Unit) {
 
-    private val stream: ScreenDataStream<MacroIndicator> = repository.macroIndicatorStream(
+    /** The repository-built stream — the screen renders it directly via `ScreenContent(stream)`. */
+    val indicator: ScreenDataStream<MacroIndicator> = repository.macroIndicatorStream(
         key = MacroIndicatorKey(countryCode = countryCode, indicator = indicatorKind),
         scope = viewModelScope,
     )
-
-    val screenState: StateFlow<ScreenState<MacroIndicator>> = stream.state
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
     fun onRetry() {
         trySendAction(MacroDetailAction.Retry)
     }
 
     override fun handleAction(action: MacroDetailAction) = when (action) {
-        MacroDetailAction.Retry -> stream.retry()
-        MacroDetailAction.Refresh -> stream.refresh()
+        MacroDetailAction.Retry -> indicator.retry()
+        MacroDetailAction.Refresh -> indicator.refresh()
     }
 }
 

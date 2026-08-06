@@ -7,11 +7,17 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+@file:OptIn(kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi::class)
+
 package kpt.feature.loans.ui
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.screenDataStreamForTesting
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.model.demo.banking.Loan
 
@@ -31,6 +37,25 @@ internal class FakeLoanRepository : LoanRepository {
     override fun observeAll(): Flow<List<Loan>> = state.map { rows ->
         rows.sortedWith(compareBy({ it.nextDueDate }, { it.createdAtMs }))
     }
+
+    override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
+        // Mirror production: the DAO sorts `nextDueDate ASC, createdAtMs ASC`, so the stream must too.
+        screenDataStreamForTesting(
+            state.map { rows ->
+                if (rows.isEmpty()) {
+                    ScreenState.Empty
+                } else {
+                    ScreenState.Content(rows.sortedWith(compareBy({ it.nextDueDate }, { it.createdAtMs })))
+                }
+            },
+        )
+
+    override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
+        screenDataStreamForTesting(
+            state.map { rows ->
+                rows.firstOrNull { it.id == id }?.let { ScreenState.Content(it) } ?: ScreenState.Empty
+            },
+        )
 
     override fun observeById(id: String): Flow<Loan?> = state.map { rows -> rows.firstOrNull { it.id == id } }
 

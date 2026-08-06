@@ -128,6 +128,9 @@ include(":feature:rates")
 include(":feature:calculators")
 include(":feature:macro")
 include(":feature:crypto")
+include(":feature:watchlist")
+include(":feature:add-to-watchlist")
+include(":feature:alerts")
 // demo:end
 
 include(":core-base:analytics")

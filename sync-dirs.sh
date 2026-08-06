@@ -3,6 +3,22 @@
 # sync-dirs.sh
 # Script to sync directories and files from upstream repository
 
+# Repo root (this script lives at the template repo ROOT) — used to source the
+# customization-surface contract library (white-label-template-completion E0/T3).
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# ── Atomic self-guard (E0/T3, FIX-01-R2-ATOMIC) ──────────────────────────────
+# The operative-contract flip preserves fork paths by reading customization-surface.yaml. If a consumer
+# pulled this mechanism flip WITHOUT the T1 ownership fix (mid-atomic-window), the contract is wrong and
+# preserving off it would clobber. HALT before any sync rather than silently clobber.
+if [ -f "$SCRIPT_DIR/scripts/customization-surface.sh" ]; then
+    if ! bash "$SCRIPT_DIR/scripts/customization-surface.sh" require-flip-preconditions >/dev/null 2>&1; then
+        echo "❌ sync-dirs.sh HALT: customization-surface.yaml ownership rows (E0/T1) are not present in this tree." >&2
+        echo "   You pulled the fork-preservation flip without the ownership fix. Re-sync to land both atomically." >&2
+        exit 1
+    fi
+fi
+
 # Colors and formatting
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -232,6 +248,18 @@ is_excluded() {
         core/store/*AppStoreRegistry.kt)       return 0 ;;
         core/store/*StoreModule.kt)            return 0 ;;
     esac
+
+    # ── Contract-driven preservation (white-label-template-completion E0/T3, LD-2 operative flip) ──
+    # customization-surface.yaml is now the OPERATIVE SoT: if the contract says this path is fork-owned,
+    # preserve it — even without a hardcoded EXCLUSIONS entry. Closes the og-images/gradle.properties/
+    # secrets-manifest clobber class. ADDITIVE — the hardcoded exclusions below still apply as a superset.
+    # Invoked as a SUBPROCESS (not sourced) so customization-surface.sh's bash-4 syntax runs under its own
+    # `bash` regardless of sync-dirs.sh's /bin/bash version (macOS 3.2 portability). Result memoized.
+    if [ -x "$SCRIPT_DIR/scripts/customization-surface.sh" ] || [ -f "$SCRIPT_DIR/scripts/customization-surface.sh" ]; then
+        local _cs_owner
+        _cs_owner="$(bash "$SCRIPT_DIR/scripts/customization-surface.sh" resolve "$full_path" 2>/dev/null | awk 'NR==1{print $2}')"
+        [ "$_cs_owner" = "fork" ] && return 0   # contract says fork-owned → preserve
+    fi
 
     # Check for root-level exclusions
     if [ -n "${EXCLUSIONS["root"]}" ] && [[ "$check_type" == "file" ]]; then

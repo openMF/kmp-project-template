@@ -9,7 +9,9 @@
  */
 package kpt.core.data.demo.banking
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.model.demo.banking.BillReminder
 
 /**
@@ -23,6 +25,9 @@ interface BillReminderRepository {
 
     /** Observe every bill reminder (enabled and disabled), day-of-month order. */
     fun observeAll(): Flow<List<BillReminder>>
+
+    /** Observe all reminders as a Store5-backed [ScreenDataStream] (offline-local) for read screens. */
+    fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>>
 
     /**
      * Observe enabled bill reminders whose `dueDay` falls within the next

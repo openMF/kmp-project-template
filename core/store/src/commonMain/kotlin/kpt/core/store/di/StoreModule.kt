@@ -22,6 +22,7 @@ import kpt.core.store.demo.currency.impl.provideRateHistoryStore
 import kpt.core.store.demo.economic.impl.provideInterestRateSeriesStore
 import kpt.core.store.demo.economic.impl.provideMacroIndicatorStore
 import kpt.core.store.demo.exchange.impl.provideSpotRateLookupStore
+import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
 import kpt.core.store.infra.StoreCacheManager
 import kpt.core.store.infra.impl.StoreCacheManagerImpl
 import org.koin.core.module.Module
@@ -72,6 +73,9 @@ val appStoreModule: Module = module {
     single(AppStoreRegistry.Alerts) {
         provideAlertsStore(dao = get())
     }
+    single(AppStoreRegistry.Watchlist) {
+        provideWatchlistStore(dao = get())
+    }
     single(AppStoreRegistry.Loans) {
         provideLoansStore(dao = get())
     }
@@ -95,6 +99,7 @@ val appStoreModule: Module = module {
         mgr.register(get(AppStoreRegistry.InterestRateSeries))
         mgr.register(get(AppStoreRegistry.MacroIndicator))
         mgr.register(get(AppStoreRegistry.Alerts))
+        mgr.register(get(AppStoreRegistry.Watchlist))
         mgr.register(get(AppStoreRegistry.Loans))
         mgr.register(get(AppStoreRegistry.BillReminders))
         mgr.register(get(AppStoreRegistry.SpotRate))

@@ -13,7 +13,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
@@ -54,17 +53,13 @@ class LoanDetailViewModel(
 ) : BaseViewModel<Unit, Nothing, LoanDetailAction>(Unit) {
 
     /**
-     * Continuous reactive stream — emits every time the loan row changes in Room.
-     * Used by the screen's read-only detail view.
+     * Continuous reactive stream — emits every time the loan row changes in Room. Consumes the
+     * repository's per-loan [kpt.core.base.store.screen.ScreenDataStream] (absent id → Empty); the
+     * screen's read-only detail view renders against `.state`.
      */
-    val screenState: StateFlow<ScreenState<Loan>> = repository.observeById(loanId)
-        .map { loan ->
-            if (loan == null) {
-                ScreenState.Empty
-            } else {
-                ScreenState.Content(data = loan)
-            }
-        }
+    private val detailStream = repository.loanDetailStream(loanId, viewModelScope)
+
+    val screenState: StateFlow<ScreenState<Loan>> = detailStream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
     /**
@@ -80,19 +75,11 @@ class LoanDetailViewModel(
      * stops. This is the recommended pattern for all edit-capable screens whose source
      * is a reactive local store (Room DAOs, DataStore, etc.).
      *
-     * Note: the backing implementation uses [transformWhile] rather than calling the
-     * Store5 [asLoadOnceStream] extension directly because the loan repository exposes a
-     * `Flow<Loan?>` (Room DAO) rather than a `Store<String, Loan>`. The semantics are
-     * identical; forks with a per-entity Store should prefer the extension directly.
+     * Note: this applies [transformWhile] over the repository's per-loan `ScreenDataStream.state`
+     * (terminate on first Content); the semantics mirror
+     * [kpt.core.base.store.screen.asLoadOnceStream].
      */
-    val loadOnceScreenState: StateFlow<ScreenState<Loan>> = repository.observeById(loanId)
-        .map { loan ->
-            if (loan == null) {
-                ScreenState.Empty
-            } else {
-                ScreenState.Content(data = loan)
-            }
-        }
+    val loadOnceScreenState: StateFlow<ScreenState<Loan>> = detailStream.state
         .transformWhile { state ->
             emit(state)
             // Stop the upstream flow after the first Content — further Room emissions

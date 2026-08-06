@@ -75,4 +75,18 @@ internal class FakeCurrencyRepository : CurrencyRepository {
             refreshTrigger = rateHistoryRefresh,
         )
     }
+
+    /** Latest connectivity flag the ViewModel supplied to [spotRateStream] — assert on this. */
+    var lastSpotOnline: Boolean? = null
+        private set
+    val spotRateState: MutableStateFlow<ScreenState<ExchangeRates>> = MutableStateFlow(ScreenState.Loading)
+
+    override fun spotRateStream(
+        baseCurrency: String,
+        online: Boolean,
+        scope: CoroutineScope,
+    ): ScreenDataStream<ExchangeRates> {
+        lastSpotOnline = online
+        return screenDataStreamForTesting(state = spotRateState)
+    }
 }

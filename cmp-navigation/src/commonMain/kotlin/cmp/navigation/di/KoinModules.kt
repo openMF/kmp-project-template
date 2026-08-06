@@ -20,6 +20,8 @@ import kpt.core.data.di.DataModule
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.store.di.appStoreModule
+import kpt.feature.addtowatchlist.di.AddToWatchlistModule
+import kpt.feature.alerts.di.AlertsModule
 import kpt.feature.amortization.di.AmortizationModule
 import kpt.feature.bills.di.BillsModule
 import kpt.feature.calculators.di.CalculatorsModule
@@ -31,6 +33,7 @@ import kpt.feature.loans.di.LoansModule
 import kpt.feature.macro.di.MacroModule
 import kpt.feature.rates.di.RatesModule
 import kpt.feature.settings.SettingsModule
+import kpt.feature.watchlist.di.WatchlistModule
 import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -67,6 +70,9 @@ object KoinModules {
             CalculatorsModule,
             MacroModule,
             CryptoFeatureModule,
+            AlertsModule,
+            WatchlistModule,
+            AddToWatchlistModule,
             // demo:end
         )
     }

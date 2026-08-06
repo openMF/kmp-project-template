@@ -136,7 +136,11 @@ module BuildSecrets
       @doc.fetch("secrets").flat_map do |_key, s|
         kind = s["kind"] || "value"
         b64  = kind == "file" ? 1 : 0
-        if (fl = s["by_flavor"])
+        if kind == "properties"
+          # Each assembled key that is vault-backed needs its value handed back as an env var
+          # (materialize_body reads ENV[source_env]); `literal` keys carry no vault source.
+          (s["keys"] || []).map { |k| k["vault_alias"] && [k["vault_alias"], k["source_env"], 0] }.compact
+        elsif (fl = s["by_flavor"])
           fl.values.map { |fv| fv["vault_alias"] && [fv["vault_alias"], fv["source_env"] || s["source_env"], b64] }.compact
         elsif (va = s["vault_alias"])
           [[va, s["source_env"], b64]]
@@ -144,6 +148,23 @@ module BuildSecrets
           []
         end
       end
+    end
+
+    # Provider format: emit `export VAR='value'` lines for every env-consumed secret (kind env_var /
+    # value), each value read via the env-first/file-fallback resolver. A deploy step runs
+    # `eval "$(build-secrets export-env)"` instead of sourcing secrets/live/_env/* — so the vault-backed
+    # files under secrets/live/ are the single source of truth and env is just one on-demand format.
+    # (map/compact, not filter_map, for system Ruby 2.6 — same as materialize_all!.)
+    def export_env
+      @doc.fetch("secrets").map do |key, s|
+        kind = s["kind"]
+        next nil unless kind == "env_var" || kind == "value"
+        senv = s["source_env"]
+        next nil if senv.nil? || senv.empty?
+        v = value(key).to_s
+        next nil if v.empty?
+        "export #{senv}='#{v.gsub("'", "'\\''")}'"
+      end.compact
     end
 
     private
@@ -165,6 +186,16 @@ module BuildSecrets
         raw = ENV[(from_env || s["source_env"]).to_s]
         return nil if raw.to_s.empty?
         decode_file(raw, s["encoding"])
+      when "properties"
+        # Assemble a KEY=VALUE .properties file at the platform path (single source of truth) from
+        # vault-backed keys (value read from ENV[source_env]) + `literal` keys. Materialized to
+        # `rel:` (NOT _env), e.g. android/keystores/upload_keystore.properties — the exact file
+        # config.rb#get_android_signing_config reads. Heals the "signing creds only in _env" gap.
+        (s["keys"] || []).map { |k|
+          next nil unless k["name"]
+          v = k.key?("literal") ? k["literal"] : ENV[k["source_env"].to_s]
+          "#{k['name']}=#{v}"
+        }.compact.join("\n")
       else
         raise "unknown kind '#{kind}'"
       end
@@ -206,8 +237,10 @@ if __FILE__ == $PROGRAM_NAME
     acc.materialize_all!.each { |d| warn "✓ #{d}" }
   when "vault-plan"
     acc.vault_plan.each { |a, e, b| puts "#{a}\t#{e}\t#{b}" }
+  when "export-env"
+    puts acc.export_env
   else
-    abort "usage: build-secrets {path|value|application-id|exists|materialize|materialize-all|vault-plan} " \
+    abort "usage: build-secrets {path|value|application-id|exists|materialize|materialize-all|vault-plan|export-env} " \
           "[key] [--flavor f] [--variant v] [--from-env VAR]"
   end
 end

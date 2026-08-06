@@ -124,7 +124,9 @@ module FastlaneConfig
   # ProjectConfig — identity + service-account paths consumed by Appfile
   # --------------------------------------------------------------------------
   module ProjectConfig
-    ORGANIZATION_NAME = "Mifos Initiative".freeze
+    # E0/T5 (white-label): no template identity literal — a fork overrides via ENV['ORGANIZATION_NAME']
+    # (or fork.properties org.name, read at call sites). Neutral default, never mifos.
+    ORGANIZATION_NAME = (ENV["ORGANIZATION_NAME"] || "Your Organization").freeze
 
     ANDROID = {
       package_name:        ForkIdentity::APP_ID,
@@ -191,13 +193,13 @@ module FastlaneConfig
 
     TESTFLIGHT_CONFIG = {
       beta_app_review_info: {
-        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || _c._fork_prop("org.email")      || "team@mifos.org",
+        contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || _c._fork_prop("org.email")      || "", # E0/T5: no mifos fallback — fork supplies org.email
         contact_first_name:    _c._secret("TESTFLIGHT_FIRST_NAME")    || _c._fork_prop("org.first.name") || "Mifos",
         contact_last_name:     _c._secret("TESTFLIGHT_LAST_NAME")     || _c._fork_prop("org.last.name")  || "Team",
-        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || _c._fork_prop("org.phone")      || "+1234567890",
+        contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || _c._fork_prop("org.phone")      || "", # E0/T5: no mifos fallback — fork supplies org.phone
         demo_account_required: false,
       }.freeze,
-      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || _c._fork_prop("org.email") || "team@mifos.org",
+      beta_app_feedback_email:           _c._secret("BETA_FEEDBACK_EMAIL") || _c._fork_prop("org.email") || "", # E0/T5: no mifos fallback — fork supplies org.email
       beta_app_description:              "#{ForkIdentity::APP_DISPLAY_NAME} beta build",
       demo_account_required:             false,
       distribute_external:               true,
@@ -246,8 +248,8 @@ module FastlaneConfig
       app_review_information: {
         first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || _c._fork_prop("org.first.name") || "Mifos",
         last_name:  _c._secret("APPSTORE_REVIEW_LAST_NAME")  || _c._fork_prop("org.last.name")  || "Team",
-        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || _c._fork_prop("org.phone")      || "+1234567890",
-        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || _c._fork_prop("org.email")      || "review@mifos.org",
+        phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || _c._fork_prop("org.phone")      || "", # E0/T5: no mifos fallback — fork supplies org.phone
+        email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || _c._fork_prop("org.email")      || "", # E0/T5: no mifos fallback — fork supplies org.email
       }.freeze,
     }.freeze
   end
@@ -478,6 +480,27 @@ def setup_ios_keychain(options = {})
   setup_ci(force: true)
 end
 
+# DSA-7 (RULE-DEPLOY-SIGNING-AUTO-001) — make Match signing fully NON-INTERACTIVE: no
+# "<app> wants to use the fastlane_tmp_keychain-db keychain / enter the keychain password"
+# dialog. After `match(readonly:true)` imports the shared Distribution cert + key into
+# `setup_ci`'s throwaway keychain, add codesign (and the apple tooling) to the key's ACL
+# partition list so `codesign`/`xcodebuild` use the key WITHOUT a per-signature prompt.
+# `setup_ci` exports MATCH_KEYCHAIN_NAME/PASSWORD; the tmp keychain's password is empty by
+# default. Fail-soft: a missing keychain (e.g. non-macOS/CI variance) just logs and continues —
+# the signing itself is already validated by the match import above.
+def suppress_codesign_keychain_prompt
+  kc_name = ENV["MATCH_KEYCHAIN_NAME"].to_s.empty? ? "fastlane_tmp_keychain" : ENV["MATCH_KEYCHAIN_NAME"]
+  kc_pass = ENV["MATCH_KEYCHAIN_PASSWORD"].to_s
+  kc_path = kc_name.include?("/") ? kc_name : File.expand_path("~/Library/Keychains/#{kc_name}-db")
+  kc_path = File.expand_path("~/Library/Keychains/#{kc_name}-db") unless File.exist?(kc_path)
+  unless File.exist?(kc_path)
+    UI.important("set-key-partition-list: keychain #{kc_name} not found — skipping (signing already imported).")
+    return
+  end
+  sh(%(security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "#{kc_pass}" "#{kc_path}" >/dev/null 2>&1)) rescue nil
+  UI.message("🔓 codesign key-partition-list set on #{kc_name} — signing is prompt-free.")
+end
+
 # Run Fastlane Match to fetch/refresh certificates and provisioning profiles.
 def fetch_certificates_with_match(options = {})
   cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
@@ -517,6 +540,7 @@ def fetch_certificates_with_match(options = {})
   # override above (cert-renewal / bootstrap only), never as an automatic deploy-time fallback. (2026-07-31)
   begin
     match(**base, readonly: true, force: false)
+    suppress_codesign_keychain_prompt
     UI.success("✅ Signing pulled readonly from the fastlane-match provisioning repo (no Dev Portal, no mint).")
   rescue StandardError => e
     UI.user_error!(

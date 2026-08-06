@@ -10,50 +10,64 @@
 package kpt.core.data.demo.watchlist
 
 import app.cash.turbine.test
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.test.runTest
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
+import kpt.core.data.infra.InMemoryFetchedAtRepository
+import kpt.core.data.infra.onlineNetworkMonitor
+import kpt.core.model.demo.watchlist.WatchlistItem
+import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Locks the wasmJs invalidation-bridge wiring for [WatchlistRepositoryImpl].
+ * Locks the wasmJs invalidation-bridge wiring for the watchlist surface — reads flow through the
+ * Store5 `SourceOfTruth` + the repository's `ScreenDataStream` (`watchlistStream(scope)` →
+ * `watchlistStore.asScreenStream(...)`); writes go through `notifyingWrite(WATCHLIST_TABLE)`.
  *
- * [FakeWatchlistDao] returns **cold snapshot** flows that never self-re-emit, faithfully
- * modelling Room 3 alpha05 on wasmJs (the `InvalidationTracker` does not fan out to a live
- * collector after a write). The ONLY way these assertions can pass is if:
- *  - reads are wrapped in `daoFlow(WATCHLIST_TABLE) { ... }` (re-subscribes on the bus), AND
- *  - writes are wrapped in `notifyingWrite(WATCHLIST_TABLE) { ... }` (publishes the bus signal).
- *
- * On the pre-fix code — raw `dao.observeAll()` reads + raw `dao.insert()`/`dao.delete()`
- * writes — the collector would see only the initial emission and every `awaitItem()` after
- * a mutation would time out. This is the regression guard for that defect class.
+ * [FakeWatchlistDao] returns **cold snapshot** flows that never self-re-emit (modelling Room 3
+ * alpha05 on wasmJs). The assertions can only pass because the Store reader is wrapped in
+ * `daoFlow(WATCHLIST_TABLE)` and the writes publish the paired bus signal. Regression guard.
  */
 class WatchlistReactiveInvalidationTest {
 
     private val dao = FakeWatchlistDao()
-    private val repo: WatchlistRepository = WatchlistRepositoryImpl(dao)
+    private val repo: WatchlistRepository = WatchlistRepositoryImpl(
+        watchlistStore = provideWatchlistStore(dao),
+        dao = dao,
+        networkMonitor = onlineNetworkMonitor(),
+        fetchedAtRepository = InMemoryFetchedAtRepository(),
+    )
 
     @Test
     fun watchlistReEmitsAfterAdd() = runTest {
-        repo.watchlist().test {
-            assertEquals(emptyList(), awaitItem().map { it.coinId })
-            repo.add("btc")
-            assertEquals(setOf("btc"), awaitItem().map { it.coinId }.toSet())
-            repo.add("eth")
-            assertEquals(setOf("btc", "eth"), awaitItem().map { it.coinId }.toSet())
-            cancelAndIgnoreRemainingEvents()
-        }
+        repo.watchlistStream(backgroundScope).state
+            .mapNotNull { it.coinIdsOrNull() }
+            .distinctUntilChanged()
+            .test {
+                assertEquals(emptySet(), awaitItem())
+                repo.add("btc")
+                assertEquals(setOf("btc"), awaitItem())
+                repo.add("eth")
+                assertEquals(setOf("btc", "eth"), awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
     }
 
     @Test
     fun watchlistReEmitsAfterRemove() = runTest {
         repo.add("btc")
-        repo.watchlist().test {
-            assertEquals(setOf("btc"), awaitItem().map { it.coinId }.toSet())
-            repo.remove("btc")
-            assertEquals(emptySet(), awaitItem().map { it.coinId }.toSet())
-            cancelAndIgnoreRemainingEvents()
-        }
+        repo.watchlistStream(backgroundScope).state
+            .mapNotNull { it.coinIdsOrNull() }
+            .distinctUntilChanged()
+            .test {
+                assertEquals(setOf("btc"), awaitItem())
+                repo.remove("btc")
+                assertEquals(emptySet(), awaitItem())
+                cancelAndIgnoreRemainingEvents()
+            }
     }
 
     @Test
@@ -67,4 +81,11 @@ class WatchlistReactiveInvalidationTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+}
+
+/** Extract coin ids from a `ScreenState` list (Content → ids, Empty → ∅, Loading/Error → null-skip). */
+private fun ScreenState<List<WatchlistItem>>.coinIdsOrNull(): Set<String>? = when (this) {
+    is ScreenState.Content -> data.map { it.coinId }.toSet()
+    ScreenState.Empty -> emptySet()
+    else -> null
 }

@@ -9,6 +9,8 @@
  */
 package kpt.core.data.demo.banking.impl
 
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOf
@@ -18,10 +20,15 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.database.invalidation.notifyingWrite
+import kpt.core.base.store.infra.FetchedAtRepository
+import kpt.core.base.store.screen.FetchPolicy
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.database.demo.banking.dao.BillReminderDao
-import kpt.core.database.demo.banking.entity.BillReminderEntity
 import kpt.core.model.demo.banking.BillReminder
+import kpt.core.store.demo.banking.impl.toDomain
+import kpt.core.store.demo.banking.impl.toEntity
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
@@ -30,34 +37,38 @@ import kotlin.time.Clock
 /**
  * Local-only impl of [BillReminderRepository].
  *
- * The "upcoming" window math (today + N days → set of day-of-month integers)
- * runs in the repository so the DAO stays trivial and portable across SQLite
- * engines. [Clock] + [TimeZone] are injected so tests can fix "today".
- *
- * [observeAll] delegates to [billRemindersStore] so any write through the Store's
- * SourceOfTruth is reflected here reactively. All other reads and all writes go
- * directly to [billReminderDao] (filtered reads, per-id lookup, upsert, delete).
- *
- * Writes are wrapped with [notifyingWrite] and direct-DAO `Flow` reads are wrapped with
- * [daoFlow] so the wasmJs target's long-lived collectors (e.g. the Home dashboard's
- * "Upcoming Bills" tile) re-emit after writes even when Room 3 alpha05's async
- * InvalidationTracker fails to fan out. On Android/Desktop/iOS the wraps are a
- * microsecond-cost no-op alongside Room's native invalidation.
- *
- * See `core-base/database/.../invalidation/README.md` for the rationale, integration
- * recipe, and removal plan.
+ * Read-path contract: [billRemindersStream] builds the offline-local [ScreenDataStream] (CACHE_ONLY)
+ * over the domain-emitting [kpt.core.store.demo.banking.impl.provideBillRemindersStore]; read screens
+ * consume `.state`. The "upcoming" window math runs in the repository; [Clock] + [TimeZone] are
+ * injected so tests can fix "today". Direct-DAO `Flow` reads (`observeUpcoming`, `observeById`, the
+ * dashboard aggregates) are wrapped with [daoFlow] and writes with [notifyingWrite] so the wasmJs
+ * target's long-lived collectors re-emit after writes even when Room 3 alpha05's async
+ * InvalidationTracker fails to fan out (no-op on Android/Desktop/iOS).
  */
 internal class BillReminderRepositoryImpl(
-    private val billRemindersStore: Store<Unit, List<BillReminderEntity>>,
+    private val billRemindersStore: Store<Unit, List<BillReminder>>,
     private val billReminderDao: BillReminderDao,
+    private val networkMonitor: NetworkMonitor,
+    private val fetchedAtRepository: FetchedAtRepository,
     private val clock: Clock = Clock.System,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BillReminderRepository {
 
     override fun observeAll(): Flow<List<BillReminder>> =
         billRemindersStore.stream(StoreReadRequest.cached(Unit, refresh = false))
-            .filterIsInstance<StoreReadResponse.Data<List<BillReminderEntity>>>()
-            .map { response -> response.value.map { it.toDomain() } }
+            .filterIsInstance<StoreReadResponse.Data<List<BillReminder>>>()
+            .map { response -> response.value }
+
+    override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
+        billRemindersStore.asScreenStream(
+            key = Unit,
+            networkMonitor = networkMonitor,
+            fetchedAtRepository = fetchedAtRepository,
+            cacheKey = "billReminders",
+            scope = scope,
+            fetchPolicy = FetchPolicy.CACHE_ONLY,
+            isEmpty = { it.isEmpty() },
+        )
 
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> {
         val window = upcomingDayWindow(maxDays)
@@ -114,7 +125,7 @@ internal class BillReminderRepositoryImpl(
     }
 
     private companion object {
-        /** Room `@Entity(tableName = …)` for [BillReminderEntity]. */
+        /** Room `@Entity(tableName = …)` for the bill-reminders table. */
         const val BILL_REMINDERS_TABLE = "banking_bill_reminders"
     }
 }
@@ -126,29 +137,3 @@ private fun LocalDate.nextDay(): LocalDate {
     // kotlinx-datetime's plus operator is supported but slower than raw arithmetic.
     return LocalDate.fromEpochDays(this.toEpochDays() + 1)
 }
-
-private fun BillReminderEntity.toDomain(): BillReminder = BillReminder(
-    id = id,
-    name = name,
-    amount = amount,
-    dueDay = dueDay,
-    recurrence = recurrence,
-    category = category,
-    enabled = enabled,
-    reminderDaysBefore = reminderDaysBefore,
-    createdAtMs = createdAtMs,
-    updatedAtMs = updatedAtMs,
-)
-
-private fun BillReminder.toEntity(): BillReminderEntity = BillReminderEntity(
-    id = id,
-    name = name,
-    amount = amount,
-    dueDay = dueDay,
-    recurrence = recurrence,
-    category = category,
-    enabled = enabled,
-    reminderDaysBefore = reminderDaysBefore,
-    createdAtMs = createdAtMs,
-    updatedAtMs = updatedAtMs,
-)

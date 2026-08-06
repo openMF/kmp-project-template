@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.ui.paging.PagingScreenContent
 import kpt.core.model.demo.crypto.CoinMarket
+import kpt.feature.addtowatchlist.ui.AddToWatchlistStar
 import kpt.feature.crypto.generated.resources.Res
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_back_cd
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_load_more_end
@@ -136,22 +137,27 @@ private fun CoinMarketRow(coin: CoinMarket, onClick: () -> Unit, modifier: Modif
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = formatPrice(coin.currentPrice),
-                style = MaterialTheme.typography.titleSmall.copy(
-                    fontWeight = FontWeight.SemiBold,
-                ),
-            )
-            Text(
-                text = formatChange(coin.priceChangePercent24h),
-                style = MaterialTheme.typography.bodySmall,
-                color = if (coin.priceChangePercent24h >= 0.0) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.error
-                },
-            )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = formatPrice(coin.currentPrice),
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                )
+                Text(
+                    text = formatChange(coin.priceChangePercent24h),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (coin.priceChangePercent24h >= 0.0) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    },
+                )
+            }
+            // Embedded write-side widget — toggles this coin's watchlist membership.
+            // The IconButton consumes its own tap, so it does NOT trigger the row's nav onClick.
+            AddToWatchlistStar(coinId = coin.id)
         }
     }
 }

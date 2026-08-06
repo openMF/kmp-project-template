@@ -212,7 +212,7 @@ private class FakeRateStreamFactory : RateStreamFactory {
         return object : RateStream {
             override val state: Flow<ScreenState<InterestRateSeries>> = flow
             override fun refresh() {
-                refreshes.merge(key.seriesId, 1) { acc, _ -> acc + 1 }
+                refreshes[key.seriesId] = (refreshes[key.seriesId] ?: 0) + 1
             }
         }
     }

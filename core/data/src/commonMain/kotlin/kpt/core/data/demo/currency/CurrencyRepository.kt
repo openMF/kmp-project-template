@@ -43,6 +43,13 @@ interface CurrencyRepository : Syncable {
 
     fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>
 
+    /**
+     * Spot conversion-rate stream with a connectivity-driven [FetchPolicy]: [online] `true` →
+     * [FetchPolicy.NETWORK_ONLY] (always fresh), `false` → [FetchPolicy.CACHE_ONLY] (no error
+     * flicker offline). The caller re-requests on each connectivity flip (`flatMapLatest`).
+     */
+    fun spotRateStream(baseCurrency: String, online: Boolean, scope: CoroutineScope): ScreenDataStream<ExchangeRates>
+
     // Syncable.syncWith(synchronizer) is implemented in CurrencyRepositoryImpl —
     // force-refreshes the exchangeRatesStore for each pinned base currency via
     // Store5's native `fresh(key)` (which bypasses cache + writes through

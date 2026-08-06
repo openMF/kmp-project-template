@@ -11,7 +11,9 @@
 #   bash customizer.sh com.mybank.app MyBankApp "My Bank" ABCDE12345 --keep-demo
 #
 # What this does (identity mode):
-#   1. Writes fork identity into gradle/libs.versions.toml (the single source of truth)
+#   1. Writes app.id into gradle/fork.properties (its single source of truth) + mirrors the
+#      remaining build-time identity (appDisplayName/baseNamespace/projectName/iosTeamId) into
+#      gradle/libs.versions.toml. syncForkConfig keeps libs.versions.toml#appId synced from app.id.
 #   2. Runs ./gradlew syncForkConfig to propagate to iOS Config.xcconfig,
 #      local.properties (Fastlane), and gradle.properties (rootProject.name)
 #   3. Removes the demo showcase (scripts/remove-demo.sh) so the fork starts from a
@@ -116,6 +118,20 @@ find . -name "*.bak" -not -path "*/build/*" -delete
 
 print_success "libs.versions.toml updated"
 
+# ── Author app.id into gradle/fork.properties (its single source of truth) ────
+# app.id is authored in fork.properties; syncForkConfig writes it back into libs.versions.toml.
+# We set BOTH here so there is never a drift window even if syncForkConfig is skipped.
+FORK_PROPS="gradle/fork.properties"
+[[ -f "$FORK_PROPS" ]] || { cp gradle/fork.properties.template "$FORK_PROPS" 2>/dev/null && print_info "Created $FORK_PROPS from template"; }
+if [[ -f "$FORK_PROPS" ]]; then
+  if grep -qE '^app\.id=' "$FORK_PROPS"; then
+    sed -i.bak "s|^app\.id=.*|app.id=$PACKAGE|" "$FORK_PROPS" && rm -f "$FORK_PROPS.bak"
+  else
+    printf '\napp.id=%s\n' "$PACKAGE" >> "$FORK_PROPS"
+  fi
+  print_success "fork.properties app.id=$PACKAGE (source of truth)"
+fi
+
 # ── Regenerate all platform config files ─────────────────────────────────────
 print_info "Running ./gradlew syncForkConfig..."
 if ./gradlew syncForkConfig --quiet; then
@@ -141,6 +157,17 @@ else
 fi
 
 echo
+# ── Project health — surface anything still template-default ──────────────────
+# fork.properties is the project-level source of truth; run the sanity harness so the fork
+# immediately sees what customization left un-forked (signing/org identity, store copy).
+# Non-fatal here — CI's quality-gate is the hard gate; this is guidance right after forking.
+if [[ -f "$(dirname "$0")/scripts/product-health/product-health.sh" ]]; then
+  print_info "Running product health check (gradle/fork.properties sanity)…"
+  bash "$(dirname "$0")/scripts/product-health/product-health.sh" \
+    || print_warning "Project health flagged items above — set them in gradle/fork.properties before releasing."
+  echo
+fi
+
 echo -e "${GREEN}${BOLD}✨ Customization complete!${NC}"
 echo
 echo -e "${YELLOW}Next steps:${NC}"
@@ -149,4 +176,4 @@ echo "  2. Update fastlane-config/project_config.rb Firebase App IDs"
 echo "  3. Replace cmp-ios/iosApp/Assets.xcassets with your app icon"
 echo "  4. Run ./gradlew build to verify everything compiles"
 echo
-echo -e "  To update identity later: edit ${BOLD}gradle/libs.versions.toml${NC} → run ${BOLD}./gradlew syncForkConfig${NC}"
+echo -e "  To update identity later: edit ${BOLD}gradle/fork.properties${NC} → run ${BOLD}./gradlew syncForkConfig${NC}"

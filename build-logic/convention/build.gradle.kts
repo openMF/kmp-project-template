@@ -38,6 +38,10 @@ dependencies {
     // META-INF/gradle-plugins descriptor is on the build-logic runtime classpath,
     // letting WorkerComposeConventionPlugin apply it via pluginManager.apply(id).
     implementation(libs.worker.app.plugin)
+    // roborazzi gradle plugin — `implementation` so its plugin descriptor is on the build-logic
+    // runtime classpath, letting CMPFeatureConventionPlugin apply it via pluginManager.apply(id)
+    // to give every feature module the device-free verifyRoborazziDesktop render tier.
+    implementation(libs.roborazzi.gradlePlugin)
 }
 
 tasks {

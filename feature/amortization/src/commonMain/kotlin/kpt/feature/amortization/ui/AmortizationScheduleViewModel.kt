@@ -12,9 +12,10 @@ package kpt.feature.amortization.ui
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.emptyIfContent
+import kpt.core.base.store.screen.mapContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.model.demo.banking.AmortizationRow
@@ -40,28 +41,27 @@ import kpt.core.model.demo.banking.Loan
  * ViewModel scoped to the navigation entry.
  */
 class AmortizationScheduleViewModel(
-    private val repository: LoanRepository,
-    private val loanId: String,
+    repository: LoanRepository,
+    loanId: String,
 ) : BaseViewModel<Unit, Nothing, Nothing>(Unit) {
 
     override fun handleAction(action: Nothing): Unit = Unit
 
-    val screenState: StateFlow<ScreenState<List<AmortizationRow>>> =
-        repository.observeById(loanId)
-            .map { loan ->
-                when {
-                    loan == null -> ScreenState.Empty
-                    loan.monthsRemaining <= 0 -> ScreenState.Empty
-                    else -> ScreenState.Content(
-                        data = computeSchedule(loan),
-                    )
-                }
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = ScreenState.Loading,
-            )
+    // Read-path contract: consume the repository's per-loan ScreenDataStream (absent loan → Empty)
+    // and project the computed schedule via mapContent; a fully-paid loan yields no rows → Empty.
+    private val stream = repository.loanDetailStream(loanId, viewModelScope)
+
+    val screenState: StateFlow<ScreenState<List<AmortizationRow>>> = stream.state
+        .mapContent { loan, _ -> if (loan.monthsRemaining <= 0) emptyList() else computeSchedule(loan) }
+        .emptyIfContent { it.isEmpty() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = ScreenState.Loading,
+        )
+
+    /** Re-run the read (no-op refresh for the offline-local store; wired for ScreenContent). */
+    fun onRetry() = stream.retry()
 }
 
 /**

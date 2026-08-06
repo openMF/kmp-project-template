@@ -167,6 +167,26 @@ cs_merge() {
 }
 
 # ── CLI ──
+# white-label-template-completion E0/T1 — the closed set of ownership rows the boundary flip depends on.
+# Asserts each via cs_resolve_owner (no brittle count literal). Returns 0 iff all hold.
+cs_require_flip_preconditions() {
+  local bad=0
+  _cs_expect() { # <path> <expected-owner>
+    local got; got="$(cs_resolve_owner "$1")"
+    [ "$got" = "$2" ] || { echo "❌ flip-precondition: $1 owner=$got, expected $2"; bad=1; }
+  }
+  _cs_expect "deployment/web/og-images/01_home.png"                fork
+  _cs_expect "gradle.properties"                                   fork
+  _cs_expect "secrets-manifest.yaml"                               fork
+  _cs_expect "secrets/live/keystore.jks"                           fork
+  _cs_expect "tests/anything.sh"                                   template
+  _cs_expect "core/store/AppStoreRegistry.kt"                      fork
+  _cs_expect "core/store/economic/ExchangeRatesStore.kt"          template
+  _cs_expect "core/store/banking/InterestRateSeriesStore.kt"      template
+  [ "$bad" -eq 0 ] && echo "✅ T1 flip preconditions hold (og-images/secrets-manifest/gradle.properties/tests + core/store seam-only fork)"
+  return "$bad"
+}
+
 cs_main() {
   local cmd="${1:-}"; shift || true
   case "$cmd" in
@@ -198,7 +218,15 @@ cs_main() {
         echo "❌ $unclassified path(s) unclassified — add an explicit rule to customization-surface.yaml"
         return 1
       fi
-      echo "✅ every tracked path has an explicit owner"
+      # white-label-template-completion E0/T1 flip-precondition assertions (closed-set, not a count literal)
+      if ! cs_require_flip_preconditions; then return 1; fi
+      echo "✅ every tracked path has an explicit owner + T1 flip preconditions hold"
+      ;;
+    require-flip-preconditions)
+      # E0/T1 (FIX-01-R2-ATOMIC): exit 0 iff every T1 ownership row is present + correct — the atomic
+      # self-guard T3's sync-dirs.sh flip calls before preserving, so a consumer that pulled the
+      # mechanism flip WITHOUT the ownership fix HALTs (no clobber).
+      cs_require_flip_preconditions
       ;;
     merge)
       cs_merge "$@"   # <strategy> <ours> <base> <theirs> [<out>]

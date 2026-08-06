@@ -95,7 +95,7 @@ class MacroIndicatorDetailViewModelTest {
         )
         repo.bus.emit(content)
 
-        vm.screenState.test {
+        vm.indicator.state.test {
             val state = expectMostRecentItem()
             val asContent = assertIs<ScreenState.Content<MacroIndicator>>(state)
             assertEquals(2, asContent.data.observations.size)

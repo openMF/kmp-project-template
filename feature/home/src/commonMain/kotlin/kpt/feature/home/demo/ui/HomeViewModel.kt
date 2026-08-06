@@ -20,7 +20,10 @@ import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.asLocalScreenStream
 import kpt.core.base.store.screen.combineScreenStates
+import kpt.core.base.store.screen.emptyIfContent
+import kpt.core.base.store.screen.mapContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.data.demo.banking.LoanRepository
@@ -133,35 +136,26 @@ class HomeViewModel(
             .onEach { state -> updateState { copy(rates = state) } }
             .launchIn(viewModelScope)
 
-        // Loans summary widget: pure-local Flow → ScreenState. No retry surface
-        // (Room is the only source), so just Empty / Content.
-        loanRepository.observeAll()
-            .onEach { loans ->
-                val next = if (loans.isEmpty()) {
-                    ScreenState.Empty
-                } else {
-                    val summary = LoansSummary(
-                        count = loans.size,
-                        totalMonthlyEmi = loans.sumOf { it.monthlyPayment },
-                        totalOutstanding = loans.sumOf { it.principalRemaining },
-                        loans = loans,
-                    )
-                    ScreenState.Content(data = summary)
-                }
-                updateState { copy(loans = next) }
+        // Loans summary widget: consume the repository's ScreenDataStream (empty portfolio → Empty
+        // via the Store) and project the list into a LoansSummary via mapContent.
+        loanRepository.loansStream(viewModelScope).state
+            .mapContent { loans, _ ->
+                LoansSummary(
+                    count = loans.size,
+                    totalMonthlyEmi = loans.sumOf { it.monthlyPayment },
+                    totalOutstanding = loans.sumOf { it.principalRemaining },
+                    loans = loans,
+                )
             }
+            .onEach { state -> updateState { copy(loans = state) } }
             .launchIn(viewModelScope)
 
-        // Upcoming bills (next 7 days) — same pure-local projection.
+        // Upcoming bills (next 7 days) — a FILTERED local projection (a distinct DAO query, not the
+        // bills Store's full-list read), so it lifts via asLocalScreenStream + emptyIfContent.
         billReminderRepository.observeUpcoming(maxDays = UPCOMING_BILLS_WINDOW_DAYS)
-            .onEach { bills ->
-                val next = if (bills.isEmpty()) {
-                    ScreenState.Empty
-                } else {
-                    ScreenState.Content(data = bills)
-                }
-                updateState { copy(bills = next) }
-            }
+            .asLocalScreenStream()
+            .emptyIfContent { it.isEmpty() }
+            .onEach { state -> updateState { copy(bills = state) } }
             .launchIn(viewModelScope)
     }
 

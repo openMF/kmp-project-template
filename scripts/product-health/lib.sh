@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/health/lib.sh — shared helpers for the project-health harness.
+# scripts/product-health/lib.sh — shared helpers for the product-health harness.
 #
 # gradle/fork.properties is the SINGLE SOURCE OF TRUTH for project-level data (identity,
 # signing, testers, firebase, store listing, legal). EVERY health check reads it through

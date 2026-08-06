@@ -14,9 +14,14 @@
 #   gradle/fork.properties.template  — committed (this file — the schema)
 #   gradle/fork.properties           — gitignored (your filled-in values)
 #
-# APP BUILD-TIME VALUES (appId, appDisplayName, projectName, iosTeamId, etc.)
-# also live in gradle/libs.versions.toml — Gradle reads them at compile time.
-# Keep both files consistent. syncForkConfig validates they match.
+# APP BUNDLE ID (app.id) is AUTHORED HERE — this file is its single source of truth.
+# ./gradlew syncForkConfig writes it back into gradle/libs.versions.toml#appId (the
+# version catalog the build reads via libs.versions.appId). You never hand-edit the
+# catalog's appId — edit app.id here and re-run syncForkConfig. product-health's
+# appid-consistency check FAILs if the two ever drift.
+#
+# Other build-time values (appDisplayName, baseNamespace, projectName, iosTeamId) still
+# live in gradle/libs.versions.toml; syncForkConfig reads this file first for them too.
 #
 # CI SETUP: Set ENV vars directly — fork.properties is not needed on CI.
 #           See each key for its ENV var. The 6 TOML values are always available
@@ -31,6 +36,14 @@
 #   API keys, passwords, keystores, .p8 files, service-account JSON.
 #   Those go in secrets/ — see deployment/BOOTSTRAP.md.
 # ─────────────────────────────────────────────────────────────────────────────
+
+# ── App Identity ──────────────────────────────────────────────────────────────
+
+# App bundle id — Android applicationId AND iOS/macOS bundle id (single value for both).
+# THIS is the source of truth; ./gradlew syncForkConfig writes it into libs.versions.toml#appId.
+# Reverse-DNS, lowercase. Example: com.yourcompany.yourapp
+# ENV: APP_BUNDLE_ID
+app.id=com.yourcompany.yourapp
 
 # ── Apple Platform ────────────────────────────────────────────────────────────
 

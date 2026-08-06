@@ -86,10 +86,19 @@ abstract class SyncForkConfigTask : DefaultTask() {
             return ""
         }
 
-        // Build-time fields (TOML-primary — always in the committed file)
+        // Build-time fields. app.id is AUTHORED in fork.properties (its single source of truth);
+        // appDisplayName/projectName still read fork.properties-first then fall back to TOML.
         val appId          = get("app.id",           "APP_BUNDLE_ID",   "appId")
         val appDisplayName = get("app.display.name", "APP_DISPLAY_NAME","appDisplayName")
         val projectName    = get("project.name",     "PROJECT_NAME",    "projectName")
+
+        // ── 2b. Write app.id BACK into gradle/libs.versions.toml#appId ─────────
+        // The whole build reads the bundle id via libs.versions.appId; fork.properties#app.id is the
+        // authored SoT. Sync the catalog from it so a fork edits app.id in ONE place. No-op when they
+        // already agree (e.g. the upstream template). product-health's appid-consistency check guards drift.
+        if (appId.isNotBlank()) {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "appId", appId)
+        }
 
         // Apple
         val appleTeamId   = get("apple.team.id",     "APPLE_TEAM_ID",   "iosTeamId")
@@ -355,6 +364,29 @@ abstract class SyncForkConfigTask : DefaultTask() {
 
         // ── 7. Fork icons ─────────────────────────────────────────────────────
         copyForkIcons(root)
+    }
+
+    /**
+     * Replace `key = "..."` in libs.versions.toml with [value], preserving the leading alignment
+     * and any trailing inline `# comment`. No-op when the file is missing, the key isn't found, or
+     * the value already matches (so the committed catalog only churns on a real fork identity change).
+     */
+    private fun patchTomlVersion(toml: File, key: String, value: String) {
+        if (!toml.exists()) return
+        val lines = toml.readLines()
+        // ^(indent + key + spaces + = + spaces)("old")(rest incl. inline comment)$  — key match is exact
+        // (\b guards against appId matching a longer key), so appDisplayName is never touched.
+        val re = Regex("^(\\s*" + Regex.escape(key) + "\\s*=\\s*)\"[^\"]*\"(.*)$")
+        var hit = false
+        val out = lines.map { line ->
+            val m = re.find(line) ?: return@map line
+            hit = true
+            "${m.groupValues[1]}\"$value\"${m.groupValues[2]}"
+        }
+        if (hit && out != lines) {
+            toml.writeText(out.joinToString("\n") + "\n")
+            logger.lifecycle("syncForkConfig: patched gradle/libs.versions.toml $key=\"$value\" (from fork.properties)")
+        }
     }
 
     private fun parseTomlVersions(toml: File): Map<String, String> {

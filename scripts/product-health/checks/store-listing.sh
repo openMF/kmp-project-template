@@ -8,7 +8,7 @@
 # it needs human authoring, so it must not block a build — but it must be visible on every health run.
 # exit 0 PASS / 2 WARN. Self-skips (PASS) on the upstream template (TEMPLATE_SELF_BUILD=1).
 set -uo pipefail
-# shellcheck source=scripts/health/lib.sh
+# shellcheck source=scripts/product-health/lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
 
 if [ "${TEMPLATE_SELF_BUILD:-}" = "1" ]; then

@@ -7,7 +7,7 @@
 # certs, and Apple rejects the upload (90288 entitlements-mismatch). This check catches it before a
 # broken release. exit 0 PASS / 1 FAIL. Self-skips (PASS) on the upstream template (TEMPLATE_SELF_BUILD=1).
 set -uo pipefail
-# shellcheck source=scripts/health/lib.sh
+# shellcheck source=scripts/product-health/lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
 
 if [ "${TEMPLATE_SELF_BUILD:-}" = "1" ]; then

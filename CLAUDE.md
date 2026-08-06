@@ -359,10 +359,13 @@ strings hardcoded across `cmp-android/build.gradle.kts`, `cmp-ios/`,
 these five properties + does substitutions across the consumer build files in a
 single pass.
 
-> **Source of truth: `gradle/libs.versions.toml`** — the `appId`, `appDisplayName`,
-> `baseNamespace`, `desktopAppName`, and `projectName` keys are what the build system
-> actually reads at runtime. `gradle.properties` holds fork-rename placeholders for
-> the future `scripts/fork-rename.sh` script. When in doubt, read `libs.versions.toml`.
+> **Source of truth for `appId`: `gradle/fork.properties` (`app.id`)** — authored there, then
+> `./gradlew syncForkConfig` writes it back into `gradle/libs.versions.toml#appId` (the catalog the
+> build reads via `libs.versions.appId`). Edit `app.id` in fork.properties, never the catalog line;
+> `scripts/product-health/checks/appid-consistency.sh` FAILs CI if the two drift. The other build-time
+> keys (`appDisplayName`, `baseNamespace`, `desktopAppName`, `projectName`) are still authored in
+> `libs.versions.toml` (syncForkConfig reads fork.properties first for them, then the catalog).
+> `gradle.properties` holds fork-rename placeholders for the future `scripts/fork-rename.sh`.
 
 | Property | `gradle.properties` | `libs.versions.toml` (runtime SoT) | Consumer (planned) |
 | -------- | ------------------- | ----------------------------------- | ------------------ |

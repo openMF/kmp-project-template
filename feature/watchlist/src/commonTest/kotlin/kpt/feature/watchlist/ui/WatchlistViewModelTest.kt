@@ -5,20 +5,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.feature.watchlist.ui
 
-import kpt.core.base.store.screen.ScreenState
-import kpt.core.model.demo.watchlist.WatchlistItem
-import kpt.feature.watchlist.testing.FakeWatchlistRepository
-import kpt.feature.watchlist.testing.item
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.model.demo.watchlist.WatchlistItem
+import kpt.feature.watchlist.testing.FakeWatchlistRepository
+import kpt.feature.watchlist.testing.item
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -48,6 +48,7 @@ class WatchlistViewModelTest {
     fun nonEmptyRepository_streamSettlesToContentNewestFirst() = runTest {
         val vm = WatchlistViewModel(FakeWatchlistRepository(listOf(item("btc"), item("eth"))))
         val state = vm.watchlist.state.first { it is ScreenState.Content<*> }
+
         @Suppress("UNCHECKED_CAST")
         val content = state as ScreenState.Content<List<WatchlistItem>>
         assertEquals(listOf("btc", "eth"), content.data.map { it.coinId })

@@ -36,7 +36,9 @@ internal class FakeLoanRepository : LoanRepository {
 
     override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
         screenDataStreamForTesting(
-            state.map { rows -> rows.firstOrNull { it.id == id }?.let { ScreenState.Content(it) } ?: ScreenState.Empty },
+            state.map { rows ->
+                rows.firstOrNull { it.id == id }?.let { ScreenState.Content(it) } ?: ScreenState.Empty
+            },
         )
 
     override fun observeById(id: String): Flow<Loan?> = state.map { rows -> rows.firstOrNull { it.id == id } }

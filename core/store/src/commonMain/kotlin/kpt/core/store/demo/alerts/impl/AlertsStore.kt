@@ -39,7 +39,9 @@ import org.mobilenativefoundation.store.store5.Store
 fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
         // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
-        reader = { _: Unit -> daoFlow(ALERTS_TABLE) { dao.observeAll() }.map { rows -> rows.map(AlertEntity::toPriceAlert) } },
+        reader = { _: Unit ->
+            daoFlow(ALERTS_TABLE) { dao.observeAll() }.map { rows -> rows.map(AlertEntity::toPriceAlert) }
+        },
         writer = { _: Unit, alerts: List<PriceAlert> -> dao.upsertAll(alerts.map(PriceAlert::toAlertEntity)) },
         delete = { _: Unit -> dao.deleteAll() },
         deleteAll = { dao.deleteAll() },

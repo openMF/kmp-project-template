@@ -39,7 +39,8 @@ fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillRemind
         sourceOfTruth = SourceOfTruth.of(
             // Emit the DOMAIN model — entity→domain map lives in the SourceOfTruth (read-path contract).
             reader = { _: Unit ->
-                daoFlow(BILL_REMINDERS_TABLE) { dao.observeAll() }.map { rows -> rows.map(BillReminderEntity::toDomain) }
+                daoFlow(BILL_REMINDERS_TABLE) { dao.observeAll() }
+                    .map { rows -> rows.map(BillReminderEntity::toDomain) }
             },
             writer = { _: Unit, reminders: List<BillReminder> ->
                 reminders.forEach { dao.upsert(it.toEntity()) }

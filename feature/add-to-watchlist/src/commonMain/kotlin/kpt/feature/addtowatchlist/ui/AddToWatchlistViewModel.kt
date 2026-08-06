@@ -5,18 +5,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.feature.addtowatchlist.ui
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.store.submit.SubmitState
 import kpt.core.base.store.submit.submitHandler
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.watchlist.WatchlistRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 
 /**
  * The WRITE side of the Personal Crypto Watchlist — the canonical `submit_offline_write`

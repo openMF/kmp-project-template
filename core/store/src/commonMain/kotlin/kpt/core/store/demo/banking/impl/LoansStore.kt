@@ -36,7 +36,9 @@ import org.mobilenativefoundation.store.store5.Store
 fun provideLoansStore(dao: LoanDao): Store<Unit, List<Loan>> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
         // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
-        reader = { _: Unit -> daoFlow(LOANS_TABLE) { dao.observeAll() }.map { rows -> rows.map(LoanEntity::toDomain) } },
+        reader = { _: Unit ->
+            daoFlow(LOANS_TABLE) { dao.observeAll() }.map { rows -> rows.map(LoanEntity::toDomain) }
+        },
         writer = { _: Unit, loans: List<Loan> -> loans.forEach { dao.upsert(it.toEntity()) } },
         delete = { _: Unit -> dao.deleteAll() },
         deleteAll = { dao.deleteAll() },

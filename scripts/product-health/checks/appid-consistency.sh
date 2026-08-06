@@ -12,6 +12,16 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
 : "${FORK_PROPERTIES:?appid-consistency: FORK_PROPERTIES not set (run via product-health.sh)}"
 : "${HEALTH_ROOT:?appid-consistency: HEALTH_ROOT not set (run via product-health.sh)}"
 
+# gradle/fork.properties is gitignored (per-fork), so on CI / a fresh clone health_resolve_sot falls
+# back to gradle/fork.properties.template — a placeholder (app.id=com.yourcompany.yourapp), NOT a
+# materialized fork config. There is nothing to cross-check: the catalog is the sole appId source and
+# fork-identity.sh already guards it. PASS. (The invariant is only meaningful for a real fork.properties.)
+case "${FORK_PROPERTIES}" in
+  *fork.properties.template)
+    echo "fork.properties not materialized (using .template placeholder) — catalog is the sole appId source (ok)"
+    exit 0 ;;
+esac
+
 fp_appid="$(fp_get app.id)"
 # No app.id authored in fork.properties → this fork hasn't consolidated appId yet; the catalog is the
 # sole source and fork-identity.sh already guards it. Nothing to cross-check. PASS.

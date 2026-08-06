@@ -104,10 +104,10 @@ import kpt.feature.home.generated.resources.screens_home_tool_affordability_subt
 import kpt.feature.home.generated.resources.screens_home_tool_affordability_title
 import kpt.feature.home.generated.resources.screens_home_tool_amortization_subtitle
 import kpt.feature.home.generated.resources.screens_home_tool_amortization_title
-import kpt.feature.home.generated.resources.screens_home_tool_crypto_subtitle
-import kpt.feature.home.generated.resources.screens_home_tool_crypto_title
 import kpt.feature.home.generated.resources.screens_home_tool_compare_subtitle
 import kpt.feature.home.generated.resources.screens_home_tool_compare_title
+import kpt.feature.home.generated.resources.screens_home_tool_crypto_subtitle
+import kpt.feature.home.generated.resources.screens_home_tool_crypto_title
 import kpt.feature.home.generated.resources.screens_home_tool_currency_subtitle
 import kpt.feature.home.generated.resources.screens_home_tool_currency_title
 import kpt.feature.home.generated.resources.screens_home_tool_emi_subtitle

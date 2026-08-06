@@ -23,6 +23,7 @@
 :core:platform
 :core:store
 :core:ui
+:feature:add-to-watchlist
 :feature:alerts
 :feature:amortization
 :feature:bills

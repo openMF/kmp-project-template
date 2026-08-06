@@ -5,14 +5,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.feature.addtowatchlist.ui
 
 import app.cash.turbine.test
-import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.data.demo.watchlist.WatchlistRepository
-import kpt.core.model.demo.watchlist.WatchlistItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +20,9 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.data.demo.watchlist.WatchlistRepository
+import kpt.core.model.demo.watchlist.WatchlistItem
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -52,7 +52,7 @@ class AddToWatchlistViewModelTest {
         vm.isTracked.test {
             assertEquals(false, awaitItem()) // seed: not tracked
             vm.onToggle()
-            assertEquals(true, awaitItem())  // contains() re-emits after add()
+            assertEquals(true, awaitItem()) // contains() re-emits after add()
             cancelAndIgnoreRemainingEvents()
         }
         assertEquals(listOf("btc"), repo.addCalls)
@@ -67,7 +67,7 @@ class AddToWatchlistViewModelTest {
         vm.isTracked.test {
             // stateIn seeds `false` (its initialValue), THEN contains() emits the real tracked=true.
             assertEquals(false, awaitItem()) // seed (initialValue)
-            assertEquals(true, awaitItem())  // real membership settles to tracked
+            assertEquals(true, awaitItem()) // real membership settles to tracked
             vm.onToggle()
             assertEquals(false, awaitItem()) // contains() re-emits after remove()
             cancelAndIgnoreRemainingEvents()

@@ -310,3 +310,10 @@ windows.partner.center.tenant.id=YOUR_TENANT_GUID
 # AAD app (client) GUID — must have the Partner Center "Manager" role.
 # ENV: MS_PARTNER_CENTER_CLIENT_ID
 windows.partner.center.client.id=YOUR_CLIENT_GUID
+
+# Desktop / Mac App Store packaging identity (RULE-WORKSPACE-ORG-IDENTITY-001 WOI-3).
+# build.gradle.kts reads these — override them for your fork so the desktop build never ships the
+# template's "Mifos Initiative" identity. copyright defaults to "© <year> <org.name>".
+org.copyright=
+app.description=
+mac.app.category=public.app-category.productivity

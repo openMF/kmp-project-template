@@ -10,6 +10,7 @@
 import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -45,6 +46,16 @@ kotlin {
 val appName: String = libs.versions.desktopAppName.get()
 val packageNameSpace: String = libs.versions.appId.get()
 val appVersion: String = libs.versions.desktopPackageVersion.get()
+
+// Fork identity tokens — sourced from gradle/fork.properties (RULE-WORKSPACE-ORG-IDENTITY-001 WOI-3).
+// NEVER hardcode vendor/copyright/category here — a fork that doesn't override them would ship THIS
+// template's identity (e.g. "Mifos Initiative"). Defaults below are the template's own last resort.
+val forkProps = Properties().apply {
+    val f = rootProject.file("gradle/fork.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+fun forkProp(key: String, default: String): String =
+    (forkProps.getProperty(key)?.trim().takeUnless { it.isNullOrEmpty() }) ?: default
 
 // macOS CFBundleVersion (the *build* number, distinct from the marketing version).
 // TestFlight / App Store REJECT an upload whose CFBundleVersion is not strictly greater
@@ -86,9 +97,9 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Pkg, TargetFormat.Msi, TargetFormat.Exe, TargetFormat.Deb)
             packageName = windowTitle
             packageVersion = appVersion
-            description = "Desktop Application"
-            copyright = "© 2024 Mifos Initiative. All rights reserved."
-            vendor = "Mifos Initiative"
+            description = forkProp("app.description", "$appName desktop")
+            copyright = forkProp("org.copyright", "© 2026 ${forkProp("org.name", "Mifos Initiative")}. All rights reserved.")
+            vendor = forkProp("org.name", "Mifos Initiative")
             licenseFile.set(project.file("../LICENSE"))
             includeAllModules = true
 
@@ -98,7 +109,9 @@ compose.desktop {
                 // See `macBuildVersion` above for the derivation + why this is required.
                 packageBuildVersion = macBuildVersion
                 dockName = windowTitle
-                appCategory = "public.app-category.finance"
+                // LSApplicationCategoryType — token-driven (fork.properties), else Compose writes "Unknown"
+                // and altool rejects with 90249. Per RULE-WORKSPACE-ORG-IDENTITY-001 WOI-3.
+                appCategory = forkProp("mac.app.category", "public.app-category.finance")
                 iconFile.set(project.file("icons/ic_launcher.icns"))
                 // Mac App Store signing.
                 // MAC_SIGNING_IDENTITY: identity string passed by Fastlane lane via -P property.

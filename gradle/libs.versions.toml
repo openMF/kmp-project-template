@@ -50,6 +50,7 @@ junitPlatformLauncherVersion = "1.14.4"
 okhttp = "5.4.0"
 robolectric = "4.16.1"
 roborazzi = "1.67.0"
+composablePreviewScanner = "0.9.1"
 
 # Testing Dependencies
 junitVersion = "4.13.2"
@@ -379,6 +380,15 @@ gitlive-firebase-performance = { module = "dev.gitlive:firebase-performance", ve
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
 roborazzi-accessibility-check = { group = "io.github.takahirom.roborazzi", name = "roborazzi-accessibility-check", version.ref = "roborazzi" }
+# Device-free CMP render tier (SCREENSHOT_TEST.md CMP-PRIMARY path): roborazzi-compose-desktop renders
+# commonMain @Preview from desktopTest (JVM, no Robolectric/emulator); NEVER the plain `roborazzi` AAR
+# (no JVM variant) and NEVER commonTest (breaks js/wasm). CommonComposablePreviewScanner auto-discovers previews.
+roborazzi-composeDesktop = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose-desktop", version.ref = "roborazzi" }
+composablePreviewScanner-common = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "common", version.ref = "composablePreviewScanner" }
+composablePreviewScanner-jvm = { group = "io.github.sergio-sastre.ComposablePreviewScanner", name = "jvm", version.ref = "composablePreviewScanner" }
+# Gradle-plugin marker so CMPFeatureConventionPlugin can pluginManager.apply("io.github.takahirom.roborazzi")
+# — must be `implementation` on build-logic/convention (like worker-app-plugin), not compileOnly.
+roborazzi-gradlePlugin = { group = "io.github.takahirom.roborazzi", name = "roborazzi-gradle-plugin", version.ref = "roborazzi" }
 
 store5 = { group = "org.mobilenativefoundation.store", name = "store5", version.ref = "store" }
 store5-cache = { group = "org.mobilenativefoundation.store", name = "cache5", version.ref = "store" }

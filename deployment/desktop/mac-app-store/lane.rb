@@ -323,6 +323,23 @@ platform :mac do
     # ── Step 1a: Match appstore — installs Apple Distribution cert + provisioning profile ─
     match(**match_base.merge(type: "appstore", platform: "macos"))
 
+    # ── Step 1a.5: resolve the keychain that ACTUALLY holds the identity ─────────────
+    # `setup_ci` (via with_ios_preamble/setup_ios_keychain) can install Match's cert into
+    # `fastlane_tmp_keychain-db` instead of login.keychain-db — then a login-keychain-only lookup
+    # returns EMPTY even though the cert is in the search list (2026-08-06 M1 false-abort). Walk the
+    # keychain search list and use whichever one holds a VALID Apple Distribution identity for BOTH the
+    # SHA-1 lookup and codesign's --keychain. setup_ci already unlocked + set key-partition-list there.
+    search_kcs = [login_kc, *(`security list-keychains 2>/dev/null`.scan(/"([^"]+)"/).flatten)].uniq
+    signing_kc = search_kcs.find do |kc|
+      File.exist?(kc) &&
+        !`security find-identity -v -p codesigning #{kc.shellescape} 2>/dev/null`
+          .scan(/Apple Distribution|3rd Party Mac Developer Application/).empty?
+    end
+    if signing_kc && signing_kc != login_kc
+      UI.important("🔎 Apple Distribution identity is in #{File.basename(signing_kc)} (not login.keychain) — using it for signing")
+      login_kc = signing_kc
+    end
+
     # ── Step 2: Set MAC_KEYCHAIN_PATH immediately after appstore Match ────────────
     ENV["MAC_KEYCHAIN_PATH"] = login_kc
     UI.message("🔐 Keychain: #{login_kc}")
@@ -333,40 +350,65 @@ platform :mac do
 
     # ── Step 3: Capture app-signing SHA1 before installer Match muddies keychain ──
     # Use SHA1 over display name to avoid "ambiguous" codesign errors.
+    # SHA1 via `find-identity -v -p codesigning` (lists ONLY valid, non-expired signing identities as
+    # `N) <SHA1> "name"`). Robust against the cert+p12 double-import that leaves duplicate keychain entries:
+    # the old `find-certificate | grep 'SHA-1 hash:' | tail -1 | awk` returned EMPTY on that duplicate.
     app_sha1 = sh(
-      "security find-certificate -c 'Apple Distribution' -Z #{login_kc.shellescape} 2>/dev/null" \
-      " | grep 'SHA-1 hash:' | tail -1 | awk '{print $3}'",
+      "security find-identity -v -p codesigning #{login_kc.shellescape} 2>/dev/null" \
+      " | grep -E 'Apple Distribution|3rd Party Mac Developer Application' | head -1 | awk '{print $2}'",
       log: false,
     ).strip
-    UI.user_error!("No Apple Distribution cert SHA1 found in login.keychain-db") if app_sha1.empty?
+    if app_sha1.empty?
+      app_sha1 = sh(
+        "security find-certificate -c 'Apple Distribution' -a -Z #{login_kc.shellescape} 2>/dev/null" \
+        " | awk '/SHA-1 hash:/{print $3; exit}'",
+        log: false,
+      ).strip
+    end
+    UI.user_error!("No Apple Distribution signing identity found in the keychain search list (checked find-identity + find-certificate across #{search_kcs.map { |k| File.basename(k) }.join(', ')})") if app_sha1.empty?
     ENV["MAC_SIGNING_IDENTITY"] = app_sha1
     UI.message("🔏 App signing SHA1: #{app_sha1}")
+
+    # Capture the Apple Team ID from the app-signing identity name ("… (TEAMID)"). A machine that builds
+    # multiple orgs carries several teams' installer certs; the installer cert MUST match THIS app's team.
+    team_id = `security find-identity -v -p codesigning 2>/dev/null`.lines
+              .grep(/#{Regexp.escape(app_sha1)}/).first.to_s[/\(([A-Z0-9]{10})\)/, 1]
+    UI.message("🏷  App signing team: #{team_id || 'unknown'}")
 
     # ── Step 1b: Match mac_installer_distribution — installs installer cert ────────
     # Snapshot SHA1s before so we can diff to find the exact installer cert SHA1,
     # regardless of whether it is named "3rd Party Mac Developer Installer" or
     # "Apple Distribution" in the keychain.
     sha1s_before_installer = _list_identity_sha1s(login_kc)
-    match(**match_base.merge(type: "mac_installer_distribution", platform: "macos"))
+    # skip_provisioning_profiles: installer certs sign the .pkg via `productbuild` and need NO provisioning
+    # profile (ios-provisioning-profile CLAUDE.md gotcha #4). Without this, Match tries to fetch a
+    # non-existent `Unknown_<bundle>.provisionprofile` and (readonly) aborts "No matching provisioning
+    # profiles found … cannot create because readonly" (2026-08-06 M1 Step-1b).
+    match(**match_base.merge(type: "mac_installer_distribution", platform: "macos", skip_provisioning_profiles: true))
     sha1s_after_installer  = _list_identity_sha1s(login_kc)
     new_installer_sha1s    = sha1s_after_installer - sha1s_before_installer
 
-    # ── Step 4: Store installer identity ──────────────────────────────────────────
-    if new_installer_sha1s.any?
+    # ── Step 4: Store installer identity — TEAM-MATCHED across the full search list ────────────────
+    # A machine that builds multiple orgs carries several teams' installer certs; picking the wrong-team
+    # one → Apple rejects the PKG (90237). Match the app's team; search the whole list (the cert may be in
+    # fastlane_tmp_keychain or login.keychain). Installer certs are `-p basic`, NOT `-p codesigning`.
+    installer_lines = search_kcs.flat_map do |kc|
+      `security find-identity -v -p basic #{kc.shellescape} 2>/dev/null`.lines.grep(/Installer/i)
+    end
+    chosen_installer = installer_lines.find { |l| team_id && l.include?("(#{team_id})") }&.[](/"([^"]+)"/, 1)
+    if chosen_installer
+      ENV["MAC_INSTALLER_IDENTITY"] = chosen_installer
+      UI.message("📦 Installer (team #{team_id}): #{chosen_installer}")
+    elsif new_installer_sha1s.any?
       ENV["MAC_INSTALLER_IDENTITY"] = new_installer_sha1s.first
-      UI.message("📦 Installer SHA1: #{new_installer_sha1s.first}")
+      UI.message("📦 Installer SHA1 (newly installed): #{new_installer_sha1s.first}")
     else
-      # Fallback: name-based search for known installer cert patterns
-      installer = sh(
-        "security find-identity -v -p basic #{login_kc.shellescape} 2>/dev/null" \
-        " | grep -iE 'installer|3rd party mac' | head -1 | sed 's/.*\"\\(.*\\)\".*/\\1/'",
-        log: false,
-      ).strip
-      unless installer.empty?
-        ENV["MAC_INSTALLER_IDENTITY"] = installer
-        UI.message("📦 Installer (name): #{installer}")
+      first = installer_lines.first&.[](/"([^"]+)"/, 1)
+      if first
+        UI.important("⚠️  No team-#{team_id} installer cert found; falling back to #{first}")
+        ENV["MAC_INSTALLER_IDENTITY"] = first
       else
-        UI.important("⚠️  No installer cert found — PKG will be unsigned (local dev only).")
+        UI.user_error!("No '3rd Party Mac Developer Installer' cert for team #{team_id} in the keychain search list — the PKG cannot be signed. Fix the provisioning repo (cert-renewal.sh).")
       end
     end
   end

@@ -39,7 +39,16 @@ internal class FakeLoanRepository : LoanRepository {
     }
 
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
-        screenDataStreamForTesting(state.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
+        // Mirror production: the DAO sorts `nextDueDate ASC, createdAtMs ASC`, so the stream must too.
+        screenDataStreamForTesting(
+            state.map { rows ->
+                if (rows.isEmpty()) {
+                    ScreenState.Empty
+                } else {
+                    ScreenState.Content(rows.sortedWith(compareBy({ it.nextDueDate }, { it.createdAtMs })))
+                }
+            },
+        )
 
     override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
         screenDataStreamForTesting(

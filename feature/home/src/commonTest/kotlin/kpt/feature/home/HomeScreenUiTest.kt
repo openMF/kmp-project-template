@@ -59,6 +59,7 @@ class HomeScreenUiTest {
                     onNavigateToAmortization = {},
                     onNavigateToLoanComparison = {},
                     onNavigateToLoanCalcWizard = {},
+                    onNavigateToCrypto = {},
                     dashboardViewModel = viewModel,
                 )
             }

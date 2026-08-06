@@ -50,6 +50,7 @@ class HomeDashboardUiTest {
                     onNavigateToAmortization = {},
                     onNavigateToLoanComparison = {},
                     onNavigateToLoanCalcWizard = {},
+                    onNavigateToCrypto = {},
                     viewModel = viewModel,
                 )
             }

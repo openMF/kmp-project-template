@@ -65,10 +65,10 @@ object DecisionEngine {
             // "`isEmpty` yields Empty for zero rows" contract exercised by
             // WatchlistReactiveInvalidationTest / AlertsReactiveInvalidationTest and documented
             // on the watchlist/alerts ViewModels.
-            if (fetchPolicy == FetchPolicy.CACHE_ONLY && error == null) {
-                return ScreenState.Empty
-            }
             return when {
+                // Offline-local ([CACHE_ONLY]) with no DB error → terminal Empty (folded here to
+                // keep decide() within the ReturnCount limit; behaviour identical to a guard clause).
+                fetchPolicy == FetchPolicy.CACHE_ONLY && error == null -> ScreenState.Empty
                 isCaptivePortal -> ScreenState.NoNetwork(isCaptivePortal = true)
                 !isOnline -> ScreenState.NoNetwork()
                 error != null -> when (categorize(error)) {

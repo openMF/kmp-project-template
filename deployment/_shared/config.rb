@@ -19,6 +19,169 @@ require_relative "variant_resolver"    # (flavor, buildType) → gradle_task / a
                                        # by convention (Phase 2 of deploy-gha-product-flavors epic;
                                        # delegates all secret paths to BuildSecrets.for(flavor:))
 
+require "yaml"
+
+# ── AppProfile — fork-owned white-label SoT (app-profile/) ────────────────────
+# Lazily loads app-profile/app.yaml + platforms/**/*.yaml, deep-merges them into
+# ONE nested hash, and resolves the SAME flat dotted gradle/fork.properties
+# namespace the lanes already use via AppProfile.get(dotted_key). `_fork_prop`
+# tries this FIRST (non-nil / non-empty), then falls back to gradle/fork.properties.
+# Fail-soft: if app-profile/ is absent (or a file is malformed), get() returns nil
+# for everything and `_fork_prop` behaves EXACTLY as before. Lanes are unchanged.
+module AppProfile
+  module_function
+
+  # Walk up from this file's dir to the first ancestor containing app-profile/.
+  def _root
+    return @_root if defined?(@_root)
+    @_root = nil
+    dir = __dir__
+    while dir && dir != "/"
+      cand = File.join(dir, "app-profile")
+      if File.directory?(cand)
+        @_root = cand
+        break
+      end
+      parent = File.dirname(dir)
+      break if parent == dir
+      dir = parent
+    end
+    @_root
+  end
+
+  def _deep_merge(a, b)
+    return b unless a.is_a?(Hash) && b.is_a?(Hash)
+    out = a.dup
+    b.each do |k, v|
+      out[k] = (out[k].is_a?(Hash) && v.is_a?(Hash)) ? _deep_merge(out[k], v) : v
+    end
+    out
+  end
+
+  # Merged hash of app.yaml + every platforms/**/*.yaml (string keys, deep-merged).
+  def _data
+    return @_data if defined?(@_data)
+    @_data = {}
+    root = _root
+    return @_data unless root
+    files = []
+    app = File.join(root, "app.yaml")
+    files << app if File.exist?(app)
+    files.concat(Dir.glob(File.join(root, "platforms", "**", "*.yaml")).sort)
+    files.each do |f|
+      begin
+        y = YAML.respond_to?(:unsafe_load_file) ? YAML.unsafe_load_file(f) : YAML.load_file(f)
+        @_data = _deep_merge(@_data, y) if y.is_a?(Hash)
+      rescue StandardError
+        # fail-soft: a malformed profile file must never crash a deploy.
+      end
+    end
+    @_data
+  rescue StandardError
+    @_data = {}
+  end
+
+  # Flat gradle/fork.properties key → dotted path in the merged app-profile hash.
+  # Every non-legacy fork.properties key resolves deterministically; unmapped → nil
+  # (so `_fork_prop` falls through to gradle/fork.properties for legacy keys like
+  # `apple.tf.groups`).
+  MAP = {
+    # ── identity / app ──
+    "app.id"                             => "identity.app_id",
+    "app.description"                    => "store.app_description",
+    # ── org ──
+    "org.name"                           => "org.name",
+    "org.email"                          => "org.email",
+    "org.first.name"                     => "org.first_name",
+    "org.last.name"                      => "org.last_name",
+    "org.phone"                          => "org.phone",
+    "org.copyright"                      => "org.copyright",
+    "org.marketing.url"                  => "org.marketing_url",
+    "org.privacy.url"                    => "org.privacy_url",
+    "org.support.url"                    => "org.support_url",
+    # ── legal ──
+    "legal.company.name"                 => "legal.company_name",
+    "legal.jurisdiction"                 => "legal.jurisdiction",
+    "legal.effective.date"               => "legal.effective_date",
+    "legal.contact.email"                => "legal.contact_email",
+    # ── keystore DN ──
+    "keystore.dn.org_unit"               => "keystore_dn.org_unit",
+    "keystore.dn.city"                   => "keystore_dn.city",
+    "keystore.dn.state"                  => "keystore_dn.state",
+    "keystore.dn.country"                => "keystore_dn.country",
+    # ── store (common: iOS + macOS + Android) ──
+    "store.primary.locale"               => "store.primary_locale",
+    "store.title"                        => "store.title",
+    "store.subtitle"                     => "store.subtitle",
+    "store.promotional.text"             => "store.promotional_text",
+    "store.release.notes"                => "store.release_notes",
+    "store.description"                  => "store.description",
+    "store.copyright"                    => "store.copyright",
+    "store.ios.age.rating"               => "store.age_rating",
+    "store.review.notes"                 => "store.review.notes",
+    "store.review.demo.user"             => "store.review.demo_user",
+    "store.review.demo.password"         => "store.review.demo_password",
+    # ── android ──
+    "store.android.category"             => "android.category",
+    "store.android.short.description"    => "android.short_description",
+    "store.android.changelog"            => "android.changelog",
+    "store.android.video.url"            => "android.video_url",
+    "android.play.tracks.by_flavor"      => "android.play_tracks_by_flavor",
+    "firebase.android.prod.app.id"       => "android.firebase.app_id_prod",
+    "firebase.android.demo.app.id"       => "android.firebase.app_id_demo",
+    "firebase.groups"                    => "android.firebase.groups",
+    "play.testers.internal.googlegroup"  => "android.play_testers.internal_googlegroup",
+    "play.testers.closed.googlegroup"    => "android.play_testers.closed_googlegroup",
+    # ── apple (shared iOS + macOS) ──
+    "apple.team.id"                      => "apple.team_id",
+    "apple.match.git.url"                => "apple.match.git.url",
+    "apple.match.git.branch"             => "apple.match.git.branch",
+    "firebase.ios.prod.app.id"           => "apple.firebase.ios_app_id_prod",
+    "firebase.ios.demo.app.id"           => "apple.firebase.ios_app_id_demo",
+    "firebase.ios.app.id"                => "apple.firebase.ios_app_id",
+    "apple.testers.internal.group"       => "apple.testers.internal_group",
+    "apple.testers.external.group"       => "apple.testers.external_group",
+    "apple.testers.external.public.link" => "apple.testers.external_public_link",
+    "store.ios.keywords"                 => "apple.keywords",
+    "store.ios.category"                 => "apple.category",
+    # ── apple / iOS-only ──
+    "store.ios.secondary.category"       => "apple.ios.secondary_category",
+    "store.ios.apple.tv.privacy.url"     => "apple.ios.apple_tv_privacy_url",
+    # ── apple / macOS-only ──
+    "store.macos.keywords"               => "apple.macos.keywords",
+    "store.macos.category"               => "apple.macos.category",
+    "store.macos.secondary.category"     => "apple.macos.secondary_category",
+    "mac.app.category"                   => "apple.macos.app_category",
+    # ── web ──
+    "web.cloudflare.project"             => "web.cloudflare_project",
+    # ── desktop / Windows / Microsoft Store ──
+    "store.windows.ms.app.id"            => "desktop.windows.ms_app_id",
+    "store.windows.ms.publish.mode"      => "desktop.windows.ms_publish_mode",
+    "store.windows.ms.visibility"        => "desktop.windows.ms_visibility",
+    "windows.store.id"                   => "desktop.windows.store_id",
+    "windows.msix.identity.name"         => "desktop.windows.msix_identity_name",
+    "windows.msix.identity.publisher"    => "desktop.windows.msix_publisher",
+    "windows.msix.publisher.display.name" => "desktop.windows.msix_publisher_display_name",
+    "windows.partner.center.tenant.id"   => "desktop.windows.partner_center.tenant_id",
+    "windows.partner.center.client.id"   => "desktop.windows.partner_center.client_id",
+  }.freeze
+
+  # Resolve a flat fork.properties key against the merged app-profile hash.
+  # Returns nil for an unmapped key or a missing path; scalar leaves are stringified
+  # to mirror fork.properties' string return shape.
+  def get(key)
+    path = MAP[key]
+    return nil unless path
+    node = _data
+    path.split(".").each do |seg|
+      return nil unless node.is_a?(Hash) && node.key?(seg)
+      node = node[seg]
+    end
+    return nil if node.is_a?(Hash) || node.is_a?(Array)
+    node.nil? ? nil : node.to_s
+  end
+end
+
 # ── Helpers: read libs.versions.toml + secrets/ ──────────────────────────────
 
 DEPLOYMENT_REPO_ROOT = File.expand_path("../..", __dir__).freeze
@@ -45,9 +208,12 @@ def _secret(env_var, file_path = nil)
   ENV[env_var] || (file_path ? _secret_file(file_path) : nil)
 end
 
-# Read a key from gradle/fork.properties (local, gitignored).
-# Returns nil when the file is absent (CI uses ENV vars directly).
+# Read a key from the fork-owned white-label SoT (app-profile/) FIRST, then fall
+# back to gradle/fork.properties (local, gitignored). Returns nil when neither has
+# the key (CI uses ENV vars directly).
 def _fork_prop(key)
+  ap = AppProfile.get(key)
+  return ap if ap && !ap.to_s.strip.empty?
   props = File.join(DEPLOYMENT_REPO_ROOT, "gradle", "fork.properties")
   return nil unless File.exist?(props)
   File.readlines(props).each do |line|
@@ -108,6 +274,8 @@ module FastlaneConfig
   end
 
   def _fork_prop(key)
+    ap = AppProfile.get(key)
+    return ap if ap && !ap.to_s.strip.empty?
     props = File.join(DEPLOYMENT_REPO_ROOT, "gradle", "fork.properties")
     return nil unless File.exist?(props)
     File.readlines(props).each do |line|

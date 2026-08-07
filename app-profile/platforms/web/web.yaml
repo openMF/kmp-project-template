@@ -1,0 +1,4 @@
+# app-profile/platforms/web/web.yaml — Web deploy (Cloudflare Pages / hosting) values.
+web:
+  cloudflare_project: mifos-x-web            # web.cloudflare.project (Cloudflare Pages project name)
+  base_url: https://github.com/openMF/kmp-project-template   # public site base (from org.support_url / marketing_url)

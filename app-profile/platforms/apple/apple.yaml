@@ -1,0 +1,18 @@
+# app-profile/platforms/apple/apple.yaml — Apple-shared (iOS + macOS: signing, Firebase, TestFlight, ASC).
+# Only values that DIFFER from the common app.yaml live here.
+apple:
+  team_id: L432S2FZP5                        # apple.team.id
+  match:
+    git:
+      url: git@github.com:openMF/ios-provisioning-profile.git   # apple.match.git.url
+      branch: dev                            # apple.match.git.branch
+  firebase:
+    ios_app_id_prod: 1:728434912738:ios:1d81f8e53ca7a6f31a1dbb   # firebase.ios.prod.app.id
+    ios_app_id_demo: 1:728434912738:ios:1d81f8e53ca7a6f31a1dbb   # firebase.ios.demo.app.id
+    ios_app_id: 1:728434912738:ios:1d81f8e53ca7a6f31a1dbb        # firebase.ios.app.id (legacy single-flavor key)
+  testers:
+    internal_group: Internal Testers         # apple.testers.internal.group
+    external_group: mifos-mobile-apps        # apple.testers.external.group
+    external_public_link: "true"             # apple.testers.external.public.link
+  keywords: EMI calculator,debt,bill reminder,interest rate,amortization,budget,currency,mortgage  # store.ios.keywords
+  category: Finance                          # store.ios.category

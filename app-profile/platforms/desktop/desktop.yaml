@@ -1,0 +1,16 @@
+# app-profile/platforms/desktop/desktop.yaml — Desktop store packaging (Microsoft Store / Windows).
+# Windows / Microsoft Store values are placeholders (YOUR_*) until the fork ships to the MS Store —
+# the deployment-whitelabel health check WARNs (not FAILs) on unset distribution placeholders.
+desktop:
+  windows:
+    store_id: ""                             # windows.store.id (Partner Center App identity Store ID, 9XXXXXXXX)
+    ms_app_id: ""                            # store.windows.ms.app.id (StoreBroker App ID)
+    ms_publish_mode: Manual                  # store.windows.ms.publish.mode (Manual | Immediate | SpecificDate)
+    ms_visibility: Public                    # store.windows.ms.visibility (Public | Hidden | Private)
+    msix_identity_name: YOUR_MSIX_IDENTITY_NAME              # windows.msix.identity.name
+    msix_publisher: YOUR_MSIX_PUBLISHER                      # windows.msix.identity.publisher (CN=…)
+    msix_publisher_display_name: YOUR_PUBLISHER_DISPLAY_NAME # windows.msix.publisher.display.name
+    partner_center:
+      tenant_id: YOUR_PARTNER_CENTER_TENANT_ID   # windows.partner.center.tenant.id
+      client_id: YOUR_PARTNER_CENTER_CLIENT_ID   # windows.partner.center.client.id
+  linux: {}                                  # no linux-specific store metadata today

@@ -1,0 +1,7 @@
+# app-profile/platforms/apple/ios/ios.yaml — iOS-ONLY overrides (deep-merged under `apple.ios`).
+# Empty stub: this fork has no iOS-specific overrides today. Keys documented for forks that need them.
+apple:
+  ios:
+    secondary_category: ""                   # store.ios.secondary.category (optional)
+    apple_tv_privacy_url: ""                 # store.ios.apple.tv.privacy.url (only if targeting tvOS)
+    # keywords_override: ""                   # override apple.keywords for iOS specifically (rare)

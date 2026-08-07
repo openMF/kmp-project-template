@@ -93,6 +93,11 @@ rules:
     strategy: kotlin-3way
 
   # ── fork-owned (carve-outs INSIDE otherwise-template dirs; declared before template) ──
+  # app-profile/ — the fork-owned white-label deployment SoT (text + media, per platform).
+  # deployment/ LOGIC stays template-owned and reads this via _shared/config.rb (AppProfile.get);
+  # sync NEVER rewrites app-profile/**.
+  - glob: "app-profile/**"
+    owner: fork
   - glob: "branding/**"
     owner: fork
   - glob: "feature/**"
@@ -159,7 +164,7 @@ rules:
     owner: fork
   - glob: ".github/workflows/sync-dirs.yaml"  # fork's own sync workflow
     owner: fork
-  - glob: "gradle/fork.properties"            # filled-in identity (gitignored)
+  - glob: "gradle/fork.properties"            # derived build-bridge from app-profile/app.yaml (do not hand-edit); gitignored
     owner: fork
   - glob: "local.properties"
     owner: fork

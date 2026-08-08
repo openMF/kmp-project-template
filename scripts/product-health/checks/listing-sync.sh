@@ -81,8 +81,19 @@ if [ -f "$HELPER" ]; then
   [ "$ls6" = "PASS" ] || { echo "❌ LS-6: drift-logic canary did not pass (got: $ls6)."; fail=1; }
 fi
 
+# ── LS-7 — CI promotion snippets materialize the listing (GHA end-to-end) ─────
+# deployment/**/metadata is gitignored, so a promotion GHA job (which does NOT build) must run
+# syncForkConfig itself before the drift-checked sync in the lane can push anything. Assert each
+# no-build promotion snippet materializes the listing (syncForkConfig) so the GHA path syncs too.
+for snip in android/play-beta android/play-closed android/play-production; do
+  f="$DEP/$snip/workflow-snippet.yml"
+  [ -f "$f" ] || continue
+  grep -q "syncForkConfig" "$f" \
+    || { echo "❌ LS-7: $snip/workflow-snippet.yml does not materialize the listing (syncForkConfig) — a GHA promote would ship a stale/empty listing."; fail=1; }
+done
+
 if [ "$fail" = 0 ]; then
-  echo "✅ listing-sync: shared helper (LS-1) + both-Fastfile import (LS-2) + Play-promotion sync (LS-3) + iOS/mac drift-gate (LS-4) + gitignored cache (LS-5) + drift-logic (LS-6) intact"
+  echo "✅ listing-sync: shared helper (LS-1) + both-Fastfile import (LS-2) + Play-promotion sync (LS-3) + iOS/mac drift-gate (LS-4) + gitignored cache (LS-5) + drift-logic (LS-6) + GHA-promote-materialize (LS-7) intact"
   exit 0
 fi
 exit 1

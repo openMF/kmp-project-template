@@ -2,3 +2,5 @@
 web:
   cloudflare_project: mifos-x-web            # web.cloudflare.project (Cloudflare Pages project name)
   base_url: https://github.com/openMF/kmp-project-template   # public site base (from org.support_url / marketing_url)
+  custom_domain: ""                          # web.custom.domain (optional — Cloudflare Pages custom domain)
+  env: {}                                    # web.env (map of build-time env vars — unmapped, read direct)

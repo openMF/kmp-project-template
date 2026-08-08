@@ -67,7 +67,9 @@ module AppProfile
     files = []
     app = File.join(root, "app.yaml")
     files << app if File.exist?(app)
-    files.concat(Dir.glob(File.join(root, "platforms", "**", "*.yaml")).sort)
+    # Merge ONLY the <platform>.yaml CONFIG files — never the app-content/ store DECLARATIONS
+    # (questionnaire answers read by their own consumers, not identity/store config keys).
+    files.concat(Dir.glob(File.join(root, "platforms", "**", "*.yaml")).reject { |f| f.include?("/app-content/") }.sort)
     files.each do |f|
       begin
         y = YAML.respond_to?(:unsafe_load_file) ? YAML.unsafe_load_file(f) : YAML.load_file(f)
@@ -154,16 +156,64 @@ module AppProfile
     "mac.app.category"                   => "apple.macos.app_category",
     # ── web ──
     "web.cloudflare.project"             => "web.cloudflare_project",
-    # ── desktop / Windows / Microsoft Store ──
-    "store.windows.ms.app.id"            => "desktop.windows.ms_app_id",
-    "store.windows.ms.publish.mode"      => "desktop.windows.ms_publish_mode",
-    "store.windows.ms.visibility"        => "desktop.windows.ms_visibility",
-    "windows.store.id"                   => "desktop.windows.store_id",
-    "windows.msix.identity.name"         => "desktop.windows.msix_identity_name",
-    "windows.msix.identity.publisher"    => "desktop.windows.msix_publisher",
-    "windows.msix.publisher.display.name" => "desktop.windows.msix_publisher_display_name",
-    "windows.partner.center.tenant.id"   => "desktop.windows.partner_center.tenant_id",
-    "windows.partner.center.client.id"   => "desktop.windows.partner_center.client_id",
+    # ── Windows / Microsoft Store (platforms/windows/windows.yaml, top-level `windows:`) ──
+    "store.windows.ms.app.id"            => "windows.ms_app_id",
+    "store.windows.ms.publish.mode"      => "windows.ms_publish_mode",
+    "store.windows.ms.visibility"        => "windows.ms_visibility",
+    "windows.store.id"                   => "windows.store_id",
+    "windows.msix.identity.name"         => "windows.msix_identity_name",
+    "windows.msix.identity.publisher"    => "windows.msix_publisher",
+    "windows.msix.publisher.display.name" => "windows.msix_publisher_display_name",
+    "windows.partner.center.tenant.id"   => "windows.partner_center.tenant_id",
+    "windows.partner.center.client.id"   => "windows.partner_center.client_id",
+    # ── Ubuntu / Linux (platforms/ubuntu/ubuntu.yaml, top-level `ubuntu:`) ──
+    "ubuntu.snap.name"                   => "ubuntu.snap.name",
+    "ubuntu.snap.grade"                  => "ubuntu.snap.grade",
+    "ubuntu.snap.confinement"            => "ubuntu.snap.confinement",
+    "ubuntu.snap.channel"                => "ubuntu.snap.channel",
+    "ubuntu.flathub.app.id"              => "ubuntu.flathub.app_id",
+    "ubuntu.deb.package"                 => "ubuntu.deb.package",
+    "ubuntu.deb.section"                 => "ubuntu.deb.section",
+    "ubuntu.deb.maintainer"              => "ubuntu.deb.maintainer",
+    "ubuntu.deb.homepage"                => "ubuntu.deb.homepage",
+    # ── apple / trade representative contact information ──
+    "store.apple.trade.first.name"       => "apple.trade_representative.first_name",
+    "store.apple.trade.last.name"        => "apple.trade_representative.last_name",
+    "store.apple.trade.address.line1"    => "apple.trade_representative.address_line1",
+    "store.apple.trade.address.line2"    => "apple.trade_representative.address_line2",
+    "store.apple.trade.address.line3"    => "apple.trade_representative.address_line3",
+    "store.apple.trade.city"             => "apple.trade_representative.city_name",
+    "store.apple.trade.state"            => "apple.trade_representative.state",
+    "store.apple.trade.country"          => "apple.trade_representative.country",
+    "store.apple.trade.postal.code"      => "apple.trade_representative.postal_code",
+    "store.apple.trade.phone"            => "apple.trade_representative.phone_number",
+    "store.apple.trade.email"            => "apple.trade_representative.email_address",
+    "store.apple.trade.displayed"        => "apple.trade_representative.is_displayed_on_app_store",
+    # ── deploy-surface completeness (MS Store / winget / snap / flathub / aur / homebrew / ios-subcats / web) ──
+    "win.store.name"                     => "windows.store.name",
+    "win.store.short.description"        => "windows.store.short_description",
+    "win.store.description"              => "windows.store.description",
+    "win.store.category"                 => "windows.store.category",
+    "win.store.privacy.url"              => "windows.store.privacy_url",
+    "win.winget.package.id"              => "windows.winget.package_id",
+    "win.winget.publisher"               => "windows.winget.publisher",
+    "win.winget.name"                    => "windows.winget.name",
+    "win.winget.moniker"                 => "windows.winget.moniker",
+    "ubuntu.snap.summary"                => "ubuntu.snap.summary",
+    "ubuntu.snap.description"            => "ubuntu.snap.description",
+    "ubuntu.flathub.developer"           => "ubuntu.flathub.developer",
+    "ubuntu.flathub.name"                => "ubuntu.flathub.name",
+    "ubuntu.flathub.summary"             => "ubuntu.flathub.summary",
+    "ubuntu.flathub.description"         => "ubuntu.flathub.description",
+    "ubuntu.aur.package.name"            => "ubuntu.aur.package_name",
+    "ubuntu.aur.source.type"             => "ubuntu.aur.source_type",
+    "mac.homebrew.cask.name"             => "apple.macos.homebrew.cask_name",
+    "mac.homebrew.tagline"               => "apple.macos.homebrew.tagline",
+    "store.ios.primary.first.subcategory" => "apple.ios.primary_first_sub_category",
+    "store.ios.primary.second.subcategory" => "apple.ios.primary_second_sub_category",
+    "store.ios.secondary.first.subcategory" => "apple.ios.secondary_first_sub_category",
+    "store.ios.secondary.second.subcategory" => "apple.ios.secondary_second_sub_category",
+    "web.custom.domain"                  => "web.custom_domain",
   }.freeze
 
   # Resolve a flat fork.properties key against the merged app-profile hash.

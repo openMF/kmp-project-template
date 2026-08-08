@@ -161,6 +161,11 @@ platform :mac do
     UI.message("🚀 Submitting Mac build #{build_number} for App Store review...")
     UI.message("   automatic_release: true  (goes live on approval — no manual step)")
 
+    # Drift-checked listing sync (parity with Android/iOS): re-upload metadata + screenshots only when
+    # the app-profile-derived Mac listing changed since the last push. (RULE-DEPLOY-LISTING-SYNC-ALL-STATES-001)
+    mac_listing_changed = store_listing_needs_sync?("mac", MAC_APP_STORE_METADATA_PATH)
+    UI.message(mac_listing_changed ? "🔄 Mac App Store listing changed — will upload metadata + screenshots" : "✓ Mac App Store listing unchanged — skipping metadata re-upload")
+
     deliver(
       platform:                             "osx",
       api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
@@ -168,6 +173,8 @@ platform :mac do
       app_version:                          app_version,
       build_number:                         build_number,
       skip_binary_upload:                   true,
+      skip_metadata:                        !mac_listing_changed,
+      skip_screenshots:                     !mac_listing_changed,
       metadata_path:                        MAC_APP_STORE_METADATA_PATH,
       screenshots_path:                     MAC_APP_STORE_SCREENSHOTS_PATH,
       overwrite_screenshots:                true,
@@ -180,6 +187,8 @@ platform :mac do
       run_precheck_before_submit:           false,
       force:                                true,
     )
+
+    record_store_listing_synced("mac", MAC_APP_STORE_METADATA_PATH) if mac_listing_changed
 
     UI.success("✅ Mac build #{build_number} submitted for App Store review — will auto-release on approval.")
   end

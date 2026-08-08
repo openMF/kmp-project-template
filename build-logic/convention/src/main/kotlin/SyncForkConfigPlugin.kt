@@ -22,7 +22,7 @@ import java.io.File
  *   - local.properties          (Fastlane bridge — gitignored)
  *   - gradle.properties
  *   - All store metadata .txt files (App Store iOS, App Store macOS, Play Store)
- *   - Platform app icons (from branding/icons/)
+ *   - Platform app icons (from app-profile/icons/)
  *
  * Apply from root build.gradle.kts:
  *   plugins { id("org.convention.fork.sync-config") }
@@ -38,7 +38,7 @@ class SyncForkConfigPlugin : Plugin<Project> {
             // Always re-run — reads gitignored fork.properties, not tracked by Gradle.
             outputs.upToDateWhen { false }
             projectRootDir.set(target.layout.projectDirectory)
-            iconBrandingDir.set(target.layout.projectDirectory.dir("branding/icons"))
+            iconSourceDir.set(target.layout.projectDirectory.dir("app-profile/icons"))
             iosAppIconDir.set(target.layout.projectDirectory.dir("cmp-ios/iosApp/Assets.xcassets/AppIcon.appiconset"))
             jsResourcesDir.set(target.layout.projectDirectory.dir("cmp-web/src/jsMain/resources"))
             wasmJsResourcesDir.set(target.layout.projectDirectory.dir("cmp-web/src/wasmJsMain/resources"))
@@ -52,7 +52,7 @@ class SyncForkConfigPlugin : Plugin<Project> {
 abstract class SyncForkConfigTask : DefaultTask() {
 
     @get:Internal abstract val projectRootDir:     DirectoryProperty
-    @get:Internal abstract val iconBrandingDir:    DirectoryProperty
+    @get:Internal abstract val iconSourceDir:    DirectoryProperty
     @get:Internal abstract val iosAppIconDir:      DirectoryProperty
     @get:Internal abstract val jsResourcesDir:     DirectoryProperty
     @get:Internal abstract val wasmJsResourcesDir: DirectoryProperty
@@ -149,6 +149,20 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val reviewDemoPassword = get("store.review.demo.password")
         val iosAgeRating       = get("store.ios.age.rating").ifBlank { "4+" }
 
+        // Store — Apple trade representative contact information (App Store Connect requirement)
+        val tradeFirstName  = get("store.apple.trade.first.name")
+        val tradeLastName   = get("store.apple.trade.last.name")
+        val tradeAddr1      = get("store.apple.trade.address.line1")
+        val tradeAddr2      = get("store.apple.trade.address.line2")
+        val tradeAddr3      = get("store.apple.trade.address.line3")
+        val tradeCity       = get("store.apple.trade.city")
+        val tradeState      = get("store.apple.trade.state")
+        val tradeCountry    = get("store.apple.trade.country")
+        val tradePostal     = get("store.apple.trade.postal.code")
+        val tradePhone      = get("store.apple.trade.phone")
+        val tradeEmail      = get("store.apple.trade.email")
+        val tradeDisplayed  = get("store.apple.trade.displayed")
+
         // Store — Android
         val androidChangelog  = get("store.android.changelog")
         val androidShortDesc  = get("store.android.short.description")
@@ -170,7 +184,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val msAppId      = get("store.windows.ms.app.id", "MS_APP_ID")
         val msPublishMode = get("store.windows.ms.publish.mode").ifBlank { "Manual" }
         val msVisibility  = get("store.windows.ms.visibility").ifBlank { "Public" }
-        // MSIX packaging identity (Package.appxmanifest) — app-profile desktop.windows.msix_*.
+        // MSIX packaging identity (Package.appxmanifest) — app-profile windows.msix_*.
         val msixIdentityName    = get("windows.msix.identity.name")
         val msixIdentityPub     = get("windows.msix.identity.publisher")
         val msixPublisherDisplay = get("windows.msix.publisher.display.name")
@@ -311,6 +325,10 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // it is on disk and differs from the primary locale — back-compat for forks whose Deliver
         // config still points at en-GB. writeIfPresent already skips a missing parent dir.
         fun writeLocalized(metaRoot: String, name: String, value: String) {
+            // Ensure the primary-locale dir exists so the listing derives even when the template ships
+            // only a legacy locale (e.g. mac-app-store/metadata has en-GB but no en-US) — otherwise
+            // writeIfPresent skips (parent-dir-missing) and the fork's macOS store name/desc stays blank.
+            if (value.isNotBlank()) File(root, "$metaRoot/$primaryLocale").mkdirs()
             writeIfPresent("$metaRoot/$primaryLocale/$name", value)
             if (primaryLocale != "en-GB" && File(root, "$metaRoot/en-GB").isDirectory) {
                 writeIfPresent("$metaRoot/en-GB/$name", value)
@@ -376,6 +394,22 @@ abstract class SyncForkConfigTask : DefaultTask() {
         writeAlways("deployment/ios/appstore/metadata/$primaryLocale/apple_tv_privacy_policy.txt", iosAppleTvPrivacyUrl)
         writeRatingConfig("deployment/ios/appstore/metadata/app_store_rating_config.json")
 
+        // ── iOS trade representative contact information (App Store Connect) ──
+        val tradeIos = "deployment/ios/appstore/metadata/trade_representative_contact_information"
+        File(root, tradeIos).mkdirs()
+        writeIfPresent("$tradeIos/first_name.txt",   tradeFirstName)
+        writeIfPresent("$tradeIos/last_name.txt",    tradeLastName)
+        writeIfPresent("$tradeIos/address_line1.txt", tradeAddr1)
+        writeAlways("$tradeIos/address_line2.txt",    tradeAddr2)
+        writeAlways("$tradeIos/address_line3.txt",    tradeAddr3)
+        writeIfPresent("$tradeIos/city_name.txt",    tradeCity)
+        writeIfPresent("$tradeIos/state.txt",        tradeState)
+        writeIfPresent("$tradeIos/country.txt",      tradeCountry)
+        writeIfPresent("$tradeIos/postal_code.txt",  tradePostal)
+        writeIfPresent("$tradeIos/phone_number.txt", tradePhone)
+        writeIfPresent("$tradeIos/email_address.txt", tradeEmail)
+        writeAlways("$tradeIos/is_displayed_on_app_store.txt", tradeDisplayed)
+
         // ── macOS App Store ───────────────────────────────────────────────────
         // Locale-scoped files → primaryLocale dir (was hardcoded en-GB) via writeLocalized (G5).
         writeLocalized("deployment/desktop/mac-app-store/metadata", "name.txt",             storeTitle)
@@ -402,6 +436,22 @@ abstract class SyncForkConfigTask : DefaultTask() {
         writeAlways("deployment/desktop/mac-app-store/metadata/review_information/demo_user.txt",     reviewDemoUser)
         writeAlways("deployment/desktop/mac-app-store/metadata/review_information/demo_password.txt", reviewDemoPassword)
         writeRatingConfig("deployment/desktop/mac-app-store/metadata/app_store_rating_config.json")
+
+        // ── macOS trade representative contact information (App Store Connect) ─
+        val tradeMac = "deployment/desktop/mac-app-store/metadata/trade_representative_contact_information"
+        File(root, tradeMac).mkdirs()
+        writeIfPresent("$tradeMac/first_name.txt",   tradeFirstName)
+        writeIfPresent("$tradeMac/last_name.txt",    tradeLastName)
+        writeIfPresent("$tradeMac/address_line1.txt", tradeAddr1)
+        writeAlways("$tradeMac/address_line2.txt",    tradeAddr2)
+        writeAlways("$tradeMac/address_line3.txt",    tradeAddr3)
+        writeIfPresent("$tradeMac/city_name.txt",    tradeCity)
+        writeIfPresent("$tradeMac/state.txt",        tradeState)
+        writeIfPresent("$tradeMac/country.txt",      tradeCountry)
+        writeIfPresent("$tradeMac/postal_code.txt",  tradePostal)
+        writeIfPresent("$tradeMac/phone_number.txt", tradePhone)
+        writeIfPresent("$tradeMac/email_address.txt", tradeEmail)
+        writeAlways("$tradeMac/is_displayed_on_app_store.txt", tradeDisplayed)
 
         // ── Android Play Store ────────────────────────────────────────────────
         // Locale-scoped files → primaryLocale dir (default en-US) — G5. Android uses en-US today,
@@ -440,6 +490,47 @@ abstract class SyncForkConfigTask : DefaultTask() {
         )
 
         logger.lifecycle("syncForkConfig: wrote $written store metadata files")
+
+        // ── 6d. Fork media fan-out (platforms-first, extends the icon pattern) ─
+        fun deriveForkMedia() {
+            // platforms/<p>/media/ is the fork-owned media SoT → deployment/<p>/metadata images (extends the icon pattern).
+            val map = mapOf(
+                "android" to "deployment/android/metadata",
+                "apple/ios" to "deployment/ios/appstore/metadata",
+                "apple/macos" to "deployment/desktop/mac-app-store/metadata",
+                "windows" to "deployment/windows/metadata",
+                "ubuntu" to "deployment/linux/metadata",
+            )
+            for ((platRel, metaRel) in map) {
+                val src = File(root, "app-profile/platforms/$platRel/media")
+                if (!src.isDirectory) continue
+                // Skip a media dir with no real assets (only .gitkeep) — don't seed empty deployment metadata dirs.
+                if (src.walkTopDown().none { it.isFile && it.name != ".gitkeep" }) continue
+                val dst = File(root, metaRel); dst.mkdirs()
+                src.copyRecursively(dst, overwrite = true)
+            }
+            // Play caps screenshots at 8 per form-factor per locale — trim deployment/android/metadata; extras → _over8/.
+            val androidMeta = File(root, "deployment/android/metadata")
+            androidMeta.listFiles()?.filter { it.isDirectory }?.forEach { locale ->
+                listOf("phoneScreenshots", "sevenInchScreenshots", "tenInchScreenshots").forEach { form ->
+                    val dir = File(locale, "images/$form")
+                    if (dir.isDirectory) {
+                        val imgs = dir.listFiles { f -> f.isFile && f.name.matches(Regex(".*\\.(png|jpe?g)$", RegexOption.IGNORE_CASE)) }?.sortedBy { it.name } ?: emptyList()
+                        if (imgs.size > 8) { val over = File(locale, "images/_over8/$form"); over.mkdirs(); imgs.drop(8).forEach { it.renameTo(File(over, it.name)) } }
+                    }
+                }
+            }
+        }
+        deriveForkMedia()
+
+        // ── 6e. Copy managed structured docs to deployment ─────────────────────
+        fun copyIfExists(srcRel: String, dstRel: String) {
+            val s = File(root, srcRel); if (!s.isFile) return
+            val d = File(root, dstRel); d.parentFile?.mkdirs(); s.copyTo(d, overwrite = true)
+        }
+        copyIfExists("app-profile/platforms/apple/ios/app-content/app_privacy_details.json", "deployment/ios/appstore/metadata/app_privacy_details.json")
+        copyIfExists("app-profile/platforms/apple/macos/app-content/app_privacy_details.json", "deployment/desktop/mac-app-store/metadata/app_privacy_details.json")
+        copyIfExists("app-profile/platforms/android/app-content/data-safety.csv", "deployment/android/app-content/data-safety.csv")
 
         // ── 6b. Fork-unique database filename (core/database/DatabaseConfig.kt) ─
         // Derive a per-fork on-disk DB name from appId (dots → underscores) so two
@@ -507,7 +598,10 @@ abstract class SyncForkConfigTask : DefaultTask() {
         File(dir, "app.yaml").takeIf { it.isFile }?.let { files += it }
         File(dir, "platforms").takeIf { it.isDirectory }
             ?.walkTopDown()
-            ?.filter { it.isFile && it.extension == "yaml" }
+            // Merge ONLY the <platform>.yaml CONFIG files — never the app-content/ store DECLARATIONS
+            // (content-rating/age-rating/privacy/export-compliance are questionnaire answers read by
+            //  their own consumers, not identity/store config keys — they must not pollute the map).
+            ?.filter { it.isFile && it.extension == "yaml" && !it.path.contains("/app-content/") }
             ?.sortedBy { it.path }
             ?.forEach { files += it }
         var merged = emptyMap<String, Any?>()
@@ -665,9 +759,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
     }
 
     private fun copyForkIcons(root: File) {
-        val src = iconBrandingDir.get().asFile
+        val src = iconSourceDir.get().asFile
         if (!src.exists()) {
-            logger.lifecycle("syncForkConfig: branding/icons/ not present — skipping icon copy (template defaults preserved)")
+            logger.lifecycle("syncForkConfig: app-profile/icons/ not present — skipping icon copy (template defaults preserved)")
             return
         }
 
@@ -686,22 +780,22 @@ abstract class SyncForkConfigTask : DefaultTask() {
             dstDir.mkdirs()
             val to = File(dstDir, dstName)
             from.copyTo(to, overwrite = true)
-            logger.lifecycle("syncForkConfig: copied branding/icons/$srcName → ${to.relativeTo(root)}")
+            logger.lifecycle("syncForkConfig: copied app-profile/icons/$srcName → ${to.relativeTo(root)}")
             copied++
         }
 
-        val androidSrc = File(src, "android")
+        val androidSrc = File(src, "android/res")
         if (androidSrc.isDirectory && androidSrc.list()?.isNotEmpty() == true) {
             val androidDst = androidResDir.get().asFile
             androidSrc.copyRecursively(androidDst, overwrite = true)
-            logger.lifecycle("syncForkConfig: copied branding/icons/android/ → ${androidDst.relativeTo(root)}/ (recursive)")
+            logger.lifecycle("syncForkConfig: copied app-profile/icons/android/res/ → ${androidDst.relativeTo(root)}/ (recursive)")
             copied++
         } else {
-            logger.lifecycle("syncForkConfig: branding/icons/android/ not present — use Android Studio Image Asset Studio (one-time per fork, commit the result).")
+            logger.lifecycle("syncForkConfig: app-profile/icons/android/res/ not present — use Android Studio Image Asset Studio (one-time per fork, commit the result).")
         }
 
         if (copied == 0) {
-            logger.lifecycle("syncForkConfig: branding/icons/ contained no recognised files — template defaults preserved")
+            logger.lifecycle("syncForkConfig: app-profile/icons/ contained no recognised files — template defaults preserved")
         }
     }
 
@@ -779,16 +873,64 @@ abstract class SyncForkConfigTask : DefaultTask() {
             "mac.app.category" to "apple.macos.app_category",
             // ── web ──
             "web.cloudflare.project" to "web.cloudflare_project",
-            // ── desktop / Windows / Microsoft Store ──
-            "store.windows.ms.app.id" to "desktop.windows.ms_app_id",
-            "store.windows.ms.publish.mode" to "desktop.windows.ms_publish_mode",
-            "store.windows.ms.visibility" to "desktop.windows.ms_visibility",
-            "windows.store.id" to "desktop.windows.store_id",
-            "windows.msix.identity.name" to "desktop.windows.msix_identity_name",
-            "windows.msix.identity.publisher" to "desktop.windows.msix_publisher",
-            "windows.msix.publisher.display.name" to "desktop.windows.msix_publisher_display_name",
-            "windows.partner.center.tenant.id" to "desktop.windows.partner_center.tenant_id",
-            "windows.partner.center.client.id" to "desktop.windows.partner_center.client_id",
+            // ── Windows / Microsoft Store (platforms/windows/windows.yaml, top-level `windows:`) ──
+            "store.windows.ms.app.id" to "windows.ms_app_id",
+            "store.windows.ms.publish.mode" to "windows.ms_publish_mode",
+            "store.windows.ms.visibility" to "windows.ms_visibility",
+            "windows.store.id" to "windows.store_id",
+            "windows.msix.identity.name" to "windows.msix_identity_name",
+            "windows.msix.identity.publisher" to "windows.msix_publisher",
+            "windows.msix.publisher.display.name" to "windows.msix_publisher_display_name",
+            "windows.partner.center.tenant.id" to "windows.partner_center.tenant_id",
+            "windows.partner.center.client.id" to "windows.partner_center.client_id",
+            // ── Ubuntu / Linux (platforms/ubuntu/ubuntu.yaml, top-level `ubuntu:`) ──
+            "ubuntu.snap.name" to "ubuntu.snap.name",
+            "ubuntu.snap.grade" to "ubuntu.snap.grade",
+            "ubuntu.snap.confinement" to "ubuntu.snap.confinement",
+            "ubuntu.snap.channel" to "ubuntu.snap.channel",
+            "ubuntu.flathub.app.id" to "ubuntu.flathub.app_id",
+            "ubuntu.deb.package" to "ubuntu.deb.package",
+            "ubuntu.deb.section" to "ubuntu.deb.section",
+            "ubuntu.deb.maintainer" to "ubuntu.deb.maintainer",
+            "ubuntu.deb.homepage" to "ubuntu.deb.homepage",
+            // ── apple / trade representative contact information ──
+            "store.apple.trade.first.name" to "apple.trade_representative.first_name",
+            "store.apple.trade.last.name" to "apple.trade_representative.last_name",
+            "store.apple.trade.address.line1" to "apple.trade_representative.address_line1",
+            "store.apple.trade.address.line2" to "apple.trade_representative.address_line2",
+            "store.apple.trade.address.line3" to "apple.trade_representative.address_line3",
+            "store.apple.trade.city" to "apple.trade_representative.city_name",
+            "store.apple.trade.state" to "apple.trade_representative.state",
+            "store.apple.trade.country" to "apple.trade_representative.country",
+            "store.apple.trade.postal.code" to "apple.trade_representative.postal_code",
+            "store.apple.trade.phone" to "apple.trade_representative.phone_number",
+            "store.apple.trade.email" to "apple.trade_representative.email_address",
+            "store.apple.trade.displayed" to "apple.trade_representative.is_displayed_on_app_store",
+            // ── deploy-surface completeness (MS Store / winget / snap / flathub / aur / homebrew / ios-subcats / web) ──
+            "win.store.name" to "windows.store.name",
+            "win.store.short.description" to "windows.store.short_description",
+            "win.store.description" to "windows.store.description",
+            "win.store.category" to "windows.store.category",
+            "win.store.privacy.url" to "windows.store.privacy_url",
+            "win.winget.package.id" to "windows.winget.package_id",
+            "win.winget.publisher" to "windows.winget.publisher",
+            "win.winget.name" to "windows.winget.name",
+            "win.winget.moniker" to "windows.winget.moniker",
+            "ubuntu.snap.summary" to "ubuntu.snap.summary",
+            "ubuntu.snap.description" to "ubuntu.snap.description",
+            "ubuntu.flathub.developer" to "ubuntu.flathub.developer",
+            "ubuntu.flathub.name" to "ubuntu.flathub.name",
+            "ubuntu.flathub.summary" to "ubuntu.flathub.summary",
+            "ubuntu.flathub.description" to "ubuntu.flathub.description",
+            "ubuntu.aur.package.name" to "ubuntu.aur.package_name",
+            "ubuntu.aur.source.type" to "ubuntu.aur.source_type",
+            "mac.homebrew.cask.name" to "apple.macos.homebrew.cask_name",
+            "mac.homebrew.tagline" to "apple.macos.homebrew.tagline",
+            "store.ios.primary.first.subcategory" to "apple.ios.primary_first_sub_category",
+            "store.ios.primary.second.subcategory" to "apple.ios.primary_second_sub_category",
+            "store.ios.secondary.first.subcategory" to "apple.ios.secondary_first_sub_category",
+            "store.ios.secondary.second.subcategory" to "apple.ios.secondary_second_sub_category",
+            "web.custom.domain" to "web.custom_domain",
         )
     }
 }

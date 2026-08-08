@@ -1,1 +1,0 @@
-loan tracker,EMI calculator,finance,desktop,bill reminder,interest rate,amortization,budget

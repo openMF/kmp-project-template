@@ -24,6 +24,9 @@ platform :android do
       # sync_image_upload:  true is the default — uploads screenshots when present
     )
 
+    # Record the pushed hash so a subsequent deploy lane's drift-checked sync correctly skips.
+    record_store_listing_synced("android", metadata_root)
+
     UI.success("✅ Play Store listing synced (no binary uploaded)")
   end
 end

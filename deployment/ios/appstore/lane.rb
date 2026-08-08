@@ -40,6 +40,13 @@ platform :ios do
     UI.message("🚀 Submitting build #{build_number} for App Store review...")
     UI.message("   automatic_release: #{appstore_config[:automatic_release]}  (goes live on approval — no manual step)")
 
+    # Drift-checked listing sync (parity with Android/mac): re-upload the app-profile-derived
+    # metadata + screenshots ONLY when they changed since the last push (or were never pushed) — an
+    # unchanged listing skips the re-upload but the build is still submitted. Defaults toward syncing
+    # (never-synced / CI → true). (RULE-DEPLOY-LISTING-SYNC-ALL-STATES-001)
+    ios_listing_changed = store_listing_needs_sync?("ios", ios_config[:metadata_path])
+    UI.message(ios_listing_changed ? "🔄 App Store listing changed — will upload metadata + screenshots" : "✓ App Store listing unchanged — skipping metadata re-upload")
+
     deliver(
       api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
       app_identifier:                       ios_config[:app_identifier],
@@ -47,7 +54,9 @@ platform :ios do
       build_number:                         build_number,
       # No binary — use the build already on TestFlight
       skip_binary_upload:                   true,
-      # Metadata + screenshots (keeps listing in sync)
+      # Metadata + screenshots (keeps listing in sync) — gated on drift
+      skip_metadata:                        !ios_listing_changed,
+      skip_screenshots:                     !ios_listing_changed,
       metadata_path:                        ios_config[:metadata_path],
       screenshots_path:                     ios_config[:screenshots_path],
       overwrite_screenshots:                true,
@@ -63,6 +72,9 @@ platform :ios do
       run_precheck_before_submit:           false,
       force:                                true,
     )
+
+    # Record the listing hash so a later submit skips the metadata re-upload when unchanged.
+    record_store_listing_synced("ios", ios_config[:metadata_path]) if ios_listing_changed
 
     UI.success("✅ Build #{build_number} submitted for App Store review — will auto-release on approval.")
   end
@@ -85,13 +97,18 @@ platform :ios do
     FileUtils.mkdir_p(File.dirname(release_notes_path))
     File.write(release_notes_path, releaseNotes)
 
+    # Drift-checked listing sync (parity): default skip_metadata/skip_screenshots to "sync only when
+    # the app-profile-derived listing changed since the last push" — an explicit option still wins.
+    # (RULE-DEPLOY-LISTING-SYNC-ALL-STATES-001)
+    ios_listing_changed = store_listing_needs_sync?("ios", ios_config[:metadata_path])
+
     deliver(
       api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
       ipa:                                  ipa_path,
       metadata_path:                        ios_config[:metadata_path],
       screenshots_path:                     ios_config[:screenshots_path],
-      skip_metadata:                        options.key?(:skip_metadata) ? options[:skip_metadata] : false,
-      skip_screenshots:                     options.key?(:skip_screenshots) ? options[:skip_screenshots] : false,
+      skip_metadata:                        options.key?(:skip_metadata) ? options[:skip_metadata] : !ios_listing_changed,
+      skip_screenshots:                     options.key?(:skip_screenshots) ? options[:skip_screenshots] : !ios_listing_changed,
       skip_binary_upload:                   options[:skip_binary_upload] || false,
       skip_app_version_update:              options.key?(:skip_app_version_update) ? options[:skip_app_version_update] : options[:skip_binary_upload] || false,
       overwrite_screenshots:                true,
@@ -104,6 +121,8 @@ platform :ios do
       force:                                appstore_config[:force],
       submission_information:               appstore_config[:submission_information],
     )
+
+    record_store_listing_synced("ios", ios_config[:metadata_path]) if ios_listing_changed && !(options.key?(:skip_metadata) && options[:skip_metadata])
 
     UI.success("✅ Successfully uploaded to App Store!")
   end

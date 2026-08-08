@@ -394,18 +394,18 @@ core-base-store-coverage epic for the seam rationale.
 App icons follow the same source-of-truth → `syncForkConfig` propagation pattern
 as the text fields above, just for binary files:
 
-- **Drop fork-specific icons** into `branding/icons/` (one file per platform —
-  see `branding/icons/README.md` for the exact name → destination mapping).
+- **Drop fork-specific icons** into `app-profile/icons/` (one file per platform —
+  see `app-profile/icons/README.md` for the exact name → destination mapping).
 - **Run** `./gradlew syncForkConfig`. The task copies whichever files are
   present into the canonical platform locations
   (`cmp-ios/iosApp/Assets.xcassets/AppIcon.appiconset/AppIcon.png`,
   `cmp-web/src/{js,wasmJs}Main/resources/favicon.ico`,
   `cmp-desktop/icons/ic_launcher.{icns,ico,png}`).
-- **Missing source = no-op.** An empty `branding/icons/` keeps the template
+- **Missing source = no-op.** An empty `app-profile/icons/` keeps the template
   defaults — every drop is opt-in.
 - **Android adaptive icons** require Android Studio's Image Asset Studio (one
   time per fork, commit the result). Alternatively drop a pre-built res tree
-  into `branding/icons/android/` to have `syncForkConfig` copy it across.
+  into `app-profile/icons/android/` to have `syncForkConfig` copy it across.
 
 Implementation: `build-logic/convention/src/main/kotlin/SyncForkConfigPlugin.kt`.
 

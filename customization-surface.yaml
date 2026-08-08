@@ -93,12 +93,11 @@ rules:
     strategy: kotlin-3way
 
   # ── fork-owned (carve-outs INSIDE otherwise-template dirs; declared before template) ──
-  # app-profile/ — the fork-owned white-label deployment SoT (text + media, per platform).
-  # deployment/ LOGIC stays template-owned and reads this via _shared/config.rb (AppProfile.get);
-  # sync NEVER rewrites app-profile/**.
+  # app-profile/ — the fork-owned white-label deployment SoT (identity, text, media, icons, per platform).
+  # This is the ONLY fork-owned deployment surface. deployment/ LOGIC stays template-owned and reads this
+  # via _shared/config.rb (AppProfile.get) + syncForkConfig; sync NEVER rewrites app-profile/**.
+  # (branding/icons was dissolved into app-profile/icons — there is no separate branding/ dir.)
   - glob: "app-profile/**"
-    owner: fork
-  - glob: "branding/**"
     owner: fork
   - glob: "feature/**"
     owner: fork
@@ -148,15 +147,24 @@ rules:
     owner: fork
   - glob: "fastlane-config/extract_config.rb"
     owner: fork
-  - glob: "deployment/**/metadata/**"         # store listings
-    owner: fork
-  - glob: "deployment/**/screenshots/**"
-    owner: fork
-  - glob: "deployment/**/og-images/**"        # per-brand social-share images — E0/T1 (was clobbered)
-    owner: fork
+  # Store-listing text + media are DERIVED from app-profile/ by syncForkConfig — the SoT is
+  # app-profile/app.yaml + platforms/<p>/*.yaml (text) and app-profile/platforms/<p>/media (media).
+  # deployment/**/metadata is a generated materialization fastlane's metadata_path reads; NEVER
+  # hand-edit it. owner:generated → /kmp-project-template-sync ignores it (regenerated, not preserved).
+  - glob: "deployment/**/metadata/**"         # store listings — DERIVED from app-profile
+    owner: generated
+  - glob: "deployment/**/screenshots/**"      # DERIVED from app-profile/platforms/<p>/media
+    owner: generated
+  - glob: "deployment/**/og-images/**"        # DERIVED from app-profile/platforms/web/media
+    owner: generated
+  # deployment/ is a TEMPLATE-OWNED module, synced exactly like core-base/ (RULE-TEMPLATE-MODULE-FIX-
+  # UPSTREAM-001 routes any deployment/ fix upstream). The ONLY non-template carve-outs are: DERIVED
+  # artifacts above (owner:generated — regenerated from app-profile, never hand-edited), the target
+  # CATALOG below (owner:merge — template adds targets, fork's enabled/tier), and the runtime deploy LOG
+  # (owner:fork — per-fork history, not logic). ALL fork DATA lives in app-profile/ — deployment/ holds none.
   - glob: "deployment/**/DEPLOYMENT_MANIFEST.yaml"
     owner: merge   # E0/T4: new template targets propagate; fork keeps enabled/tier
-  - glob: "deployment/**/PROMOTION_LOG.yaml"  # append-only promotion history
+  - glob: "deployment/**/PROMOTION_LOG.yaml"  # runtime deploy history (append-only) — not logic
     owner: fork
   - glob: "secrets/live/**"                   # real secrets (gitignored)
     owner: fork

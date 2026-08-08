@@ -70,6 +70,9 @@ platform :desktop do
         force:                                true,
       )
 
+      # Record the pushed hash so a subsequent mac deploy lane's drift-checked sync correctly skips.
+      record_store_listing_synced("mac", mac_metadata_path)
+
       UI.success("✅ Mac App Store listing synced (no binary uploaded)")
     end
 

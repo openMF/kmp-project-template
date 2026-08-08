@@ -1,1 +1,0 @@
-Loan tracker, EMI calculator, bill reminders & interest rates. Offline.

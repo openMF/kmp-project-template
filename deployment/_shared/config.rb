@@ -1257,18 +1257,27 @@ def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
   # keystore_path from `build-secrets path upload_keystore`; the local-run fallback
   # must resolve through the SAME LAYOUT resolver (live-wins-else-sample), never hardcode.
   keystore = signing_config[:keystore_path] || BuildSecrets.for.path(:upload_keystore)
-  keystore_abs = File.expand_path(File.join(DEPLOYMENT_REPO_ROOT, keystore))
+  # Resolve to absolute WITHOUT doubling: File.join(repo_root, <absolute>) concatenates into a
+  # doubled, non-existent path — only prepend the repo root when `keystore` is relative.
+  keystore_abs = keystore.start_with?("/") ? keystore : File.expand_path(File.join(DEPLOYMENT_REPO_ROOT, keystore))
   gradlew    = File.join(DEPLOYMENT_REPO_ROOT, "gradlew")
   full_task  = ":cmp-android:#{taskName}#{buildType}"
 
+  # Signing goes through the ENVIRONMENT, never `-P` CLI args (RULE-DEPLOY-SIGNING-NO-CLI-LEAK-001).
+  # Gradle CLI args are echoed by fastlane's `sh` AND visible in `ps` — passing
+  # `-Pandroid.injected.signing.store.password=…` leaked the store password to a build log on
+  # 2026-08-08. cmp-android/build.gradle.kts's release signingConfig reads exactly these env vars via
+  # System.getenv; the gradle child inherits the env, but it is NOT printed in the command line.
+  # Only pre-existing env values are honored as a fallback (e.g. CI's pre_fastlane_script exports).
+  ENV["KEYSTORE_PATH"]           = keystore_abs
+  ENV["KEYSTORE_PASSWORD"]       = signing_config[:keystore_password] || ENV["KEYSTORE_PASSWORD"] || ""
+  ENV["KEYSTORE_ALIAS"]          = signing_config[:key_alias]         || ENV["KEYSTORE_ALIAS"] || "release"
+  ENV["KEYSTORE_ALIAS_PASSWORD"] = signing_config[:key_password]      || ENV["KEYSTORE_ALIAS_PASSWORD"] || ""
+
   # -p tells Gradle to use repo root as project dir, overriding whatever cwd
-  # Fastlane sets (deployment/fastlane/) when running the lane.
+  # Fastlane sets (deployment/fastlane/) when running the lane. NO signing on the command line.
   sh(
     gradlew, "-p", DEPLOYMENT_REPO_ROOT, full_task,
-    "-Pandroid.injected.signing.store.file=#{keystore_abs}",
-    "-Pandroid.injected.signing.store.password=#{signing_config[:keystore_password] || ''}",
-    "-Pandroid.injected.signing.key.alias=#{signing_config[:key_alias] || 'release'}",
-    "-Pandroid.injected.signing.key.password=#{signing_config[:key_password] || ''}",
     "-PVERSION_NAME=#{ENV['VERSION_NAME'] || '1.0.0'}",
     "-PVERSION_CODE=#{ENV['VERSION_CODE'] || '1'}",
   )

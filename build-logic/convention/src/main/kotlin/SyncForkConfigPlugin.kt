@@ -507,8 +507,26 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 // Skip a media dir with no real assets (only .gitkeep) — don't seed empty deployment metadata dirs.
                 if (src.walkTopDown().none { it.isFile && it.name != ".gitkeep" }) continue
                 val dst = File(root, metaRel); dst.mkdirs()
+                // MIRROR, not merge: remove the previously-derived media subtrees (images/ for Play,
+                // screenshots/ for iOS/mac/Windows/Linux) before copying, so a prior generation's files
+                // (renamed/removed screenshots, an _over8/ overflow) do NOT linger and get uploaded.
+                // The .txt store-metadata (written separately by writeLocalized) lives outside these
+                // dirs and is untouched. (2026-08-08: derived metadata had stale 01_home.png + v1 01.png
+                // + _over8/ mixed → Play "phoneScreenshots - Invalid request".)
+                dst.walkTopDown()
+                    .filter { it.isDirectory && (it.name == "images" || it.name == "screenshots") }
+                    .toList()
+                    .forEach { it.deleteRecursively() }
                 src.copyRecursively(dst, overwrite = true)
             }
+            // Strip STRAY image-type dirs at the metadata ROOT. fastlane supply reads EVERY metadata-root
+            // subdir as a LOCALE, so a root-level `phoneScreenshots` becomes language "phoneScreenshots"
+            // → get_edit_listing 400 "Invalid request" (2026-08-08). Screenshot dirs belong ONLY under
+            // <locale>/images/<type>/. These are stale from an old layout (the mirror above cleans
+            // images/screenshots subtrees, not these root-level type dirs). Real locale dirs (en-US) stay.
+            listOf("phoneScreenshots", "sevenInchScreenshots", "tenInchScreenshots", "tvScreenshots",
+                   "wearScreenshots", "images", "screenshots")
+                .forEach { File(root, "deployment/android/metadata/$it").deleteRecursively() }
             // Play caps screenshots at 8 per form-factor per locale — trim deployment/android/metadata; extras → _over8/.
             val androidMeta = File(root, "deployment/android/metadata")
             androidMeta.listFiles()?.filter { it.isDirectory }?.forEach { locale ->

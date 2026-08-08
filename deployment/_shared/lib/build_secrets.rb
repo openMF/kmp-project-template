@@ -86,7 +86,14 @@ module BuildSecrets
     # String value: literal constant → its value; else env var first (CI), then
     # the on-disk file (local fallback, REPO_ROOT-anchored like path()).
     def value(key)
-      s = spec(key)
+      # An UNKNOWN key resolves to nil — consistent with a missing on-disk file → nil below. `.value`
+      # is for OPTIONAL secret VALUES (ENV-first, file-fallback); a key that isn't registered for this
+      # project must NOT hard-raise and abort config.rb load. It was doing exactly that: config.rb's
+      # `module IosConfig` eagerly resolves `:appstore_key_id` at LOAD, so an Android deploy (which never
+      # touches iOS) aborted with `unknown secret 'appstore_key_id'` (2026-08-08). `.path` still raises —
+      # a structural path is required. The real consumer (an iOS lane) validates a nil at deploy time.
+      s = begin; spec(key); rescue; nil; end
+      return nil if s.nil?
       return s["value"] if s["kind"] == "literal"
       env = ENV[s["source_env"].to_s]
       return env unless env.to_s.empty?

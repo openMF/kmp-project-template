@@ -367,8 +367,13 @@ module FastlaneConfig
   # IosConfig — build paths, ASC API, Match, TestFlight, App Store settings
   # --------------------------------------------------------------------------
   module IosConfig
-    _s = FastlaneConfig::SECRETS_DIR
-    _c = FastlaneConfig  # alias for brevity — calls FastlaneConfig._secret(...)
+    # Binding-robust self-reference (2026-08-08): fastlane's `import` intermittently re-parses this file
+    # in a NON-top-level binding (e.g. inside CredentialsManager::AppfileConfig), where the unqualified
+    # `FastlaneConfig` nesting lookup fails with `uninitialized constant …::FastlaneConfig` and aborts
+    # the whole config.rb load — breaking even an Android deploy that never touches IosConfig. Resolve the
+    # enclosing module by identity via Module.nesting (always correct regardless of the absolute namespace).
+    _c = Module.nesting.find { |m| m.name.to_s.split("::").last == "FastlaneConfig" } || FastlaneConfig
+    _s = _c::SECRETS_DIR
     _bs = BuildSecrets.for  # canonical resolver: LAYOUT.yaml + secrets/live/ path + ENV-first
     _nz = ->(v) { (v.nil? || v.to_s.strip.empty?) ? nil : v.to_s.strip }  # nil-if-blank
 
@@ -614,11 +619,18 @@ module FastlaneConfig
       keystore_password: options[:keystore_password] ||
                          ENV["KEYSTORE_PASSWORD"]    ||
                          props["storePassword"]      || "",
+      # Honor BOTH env conventions: KEY_ALIAS (CI pre_fastlane_script) AND KEYSTORE_ALIAS
+      # (build.gradle.kts + buildAndSignApp / vault materialization). props (upload_keystore.properties)
+      # is the file source. The literal "release" is a LAST-RESORT default — it is WRONG for keystores
+      # whose alias differs (e.g. mifos-kmp-release); honoring the env prevents a silent wrong-alias
+      # signing failure when the .properties file is absent (RULE-DEPLOY-VAULT-SIGNING-001).
       key_alias:         options[:key_alias]         ||
                          ENV["KEY_ALIAS"]            ||
+                         ENV["KEYSTORE_ALIAS"]       ||
                          props["keyAlias"]           || "release",
       key_password:      options[:key_password]      ||
                          ENV["KEY_PASSWORD"]         ||
+                         ENV["KEYSTORE_ALIAS_PASSWORD"] ||
                          props["keyPassword"]        || "",
     }
   end

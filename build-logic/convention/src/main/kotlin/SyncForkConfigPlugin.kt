@@ -805,8 +805,20 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val androidSrc = File(src, "android/res")
         if (androidSrc.isDirectory && androidSrc.list()?.isNotEmpty() == true) {
             val androidDst = androidResDir.get().asFile
+            // MIRROR the launcher icon: app-profile/icons/android/res is the SoT (adaptive-only —
+            // ic_launcher_foreground.webp per density + anydpi-v26 XML + values/ic_launcher_background.xml).
+            // Strip ALL stale ic_launcher* first so a prior template's legacy square/round webp
+            // (ic_launcher.webp / ic_launcher_round.webp) and old drawable vector adaptive
+            // (drawable/ic_launcher_foreground.xml / _background.xml) do NOT coexist with the promoted
+            // set — otherwise the device shows the wrong icon and res carries duplicate launcher defs.
+            // ONLY ic_launcher* files are removed; every other resource (colors/themes/other drawables)
+            // is untouched. (2026-08-09)
+            androidDst.walkTopDown()
+                .filter { it.isFile && it.name.startsWith("ic_launcher") }
+                .toList()
+                .forEach { it.delete() }
             androidSrc.copyRecursively(androidDst, overwrite = true)
-            logger.lifecycle("syncForkConfig: copied app-profile/icons/android/res/ → ${androidDst.relativeTo(root)}/ (recursive)")
+            logger.lifecycle("syncForkConfig: mirrored app-profile/icons/android/res/ → ${androidDst.relativeTo(root)}/ (stale ic_launcher* stripped)")
             copied++
         } else {
             logger.lifecycle("syncForkConfig: app-profile/icons/android/res/ not present — use Android Studio Image Asset Studio (one-time per fork, commit the result).")

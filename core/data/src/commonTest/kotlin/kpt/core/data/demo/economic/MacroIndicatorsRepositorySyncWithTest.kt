@@ -47,6 +47,10 @@ class MacroIndicatorsRepositorySyncWithTest {
                     )
                 },
             )
+            // Tie the Store5 fetcher to runTest's scheduler so the forced NETWORK_ONLY refresh runs
+            // under virtual time (no real-dispatcher race) — `fetchedKeys` is then fully populated
+            // before the assertion. Without this the store's default scope makes the test flaky.
+            .scope(backgroundScope)
             .build()
 
         val repo = MacroIndicatorsRepositoryImpl(

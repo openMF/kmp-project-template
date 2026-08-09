@@ -117,11 +117,37 @@ module BuildSecrets
       body = materialize_body(key, s, kind, from_env)
       return nil if body.nil? || body.empty?
 
+      new_body = (kind == "file" ? body : "#{body.chomp}\n")
+
+      # NEVER clobber a git-TRACKED destination. A `consume_at` that points at a committed reference
+      # (e.g. cmp-android/google-services.json ships a COMPLETE per-flavor reference so the template
+      # builds out-of-box) is the build's source of truth. Overwriting it with the vault copy — which
+      # may be a SUBSET (missing a flavored applicationId) — silently breaks the flavored build at
+      # compile time, far from the `/secrets pull` that caused it (2026-08-09: the vault
+      # google-services carried 2 of 6 variants → demoDebug link failure). Materialize only to
+      # untracked/gitignored destinations (secrets/live/**, _env/**, local.properties, …). A fork
+      # that wants a vault-driven file must `git rm --cached` it first (make it untracked).
+      if git_tracked?(dest)
+        return dest if File.exist?(abs(dest)) && File.read(abs(dest)) == new_body  # identical — no-op
+        warn "  ↳ skip #{key}: #{dest} is git-tracked — keeping the committed reference " \
+             "(vault copy differs; not clobbering the build source-of-truth)"
+        return nil
+      end
+
       FileUtils.mkdir_p(File.dirname(dest))
       # Files keep their bytes verbatim; line-oriented values get a trailing newline.
-      File.write(dest, kind == "file" ? body : "#{body.chomp}\n")
+      File.write(dest, new_body)
       File.chmod(s["mode"].to_i(8), dest) if s["mode"]
       dest
+    end
+
+    # Is `dest` (repo-root-relative) a git-TRACKED file? A committed file is authoritative — the
+    # `/secrets pull` materialize must not overwrite it. Fails SAFE to false (allow materialize)
+    # when git is unavailable. system(out:/err:) redirection is Ruby 2.6-compatible.
+    def git_tracked?(dest)
+      rel = dest.sub(%r{\A#{Regexp.escape(REPO_ROOT)}/}, "")
+      system("git", "-C", REPO_ROOT, "ls-files", "--error-unmatch", "--", rel,
+             out: File::NULL, err: File::NULL)
     end
 
     # Materialize every secret whose source is present (used by `materialize-all`).

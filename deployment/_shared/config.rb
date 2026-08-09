@@ -658,6 +658,38 @@ def setup_ci_if_needed
   setup_ci(force: true)
 end
 
+# Delete any lingering fastlane_tmp keychain and RESTORE the developer's login keychain as the macOS
+# default + search list. setup_ci creates fastlane_tmp, makes it DEFAULT, and unlocks it; if a LOCAL run
+# dies before delete_keychain (a build error, or a hard kill), fastlane_tmp stays DEFAULT forever →
+# unrelated apps (Bitwarden, Xcode) get endless "wants to use fastlane_tmp_keychain" password prompts.
+# We keep setup_ci (local iOS Match needs the throwaway keychain — CI-gating it broke Match, fix
+# 2026-07-31), and make cleanup GUARANTEED instead: called start-of-run (before_all, clears leftovers
+# from a prior killed run) AND end-of-run (Fastfile after_all + error). Idempotent, failure-safe.
+# GUARD on RUNNER_ENVIRONMENT, NOT ENV["CI"]: a SELF-HOSTED GitHub Actions runner (this repo runs one
+# on a dev's Mac — `actions.runner.…local-mac.plist`) sets CI=true but is a PERSISTENT machine, so
+# skipping cleanup there is exactly what leaves fastlane_tmp default → endless prompts. Skip ONLY a
+# truly-ephemeral github-hosted runner (torn down anyway). (2026-08-08)
+def cleanup_ci_keychain
+  return if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"  # ephemeral GH-hosted runner — nothing to protect
+  home  = ENV["HOME"].to_s
+  login = "#{home}/Library/Keychains/login.keychain-db"
+  tmp   = "#{home}/Library/Keychains/fastlane_tmp_keychain-db"
+  # SURGICAL — touch ONLY the keychain we created (fastlane_tmp). NEVER rewrite the whole search list
+  # (`list-keychains -s login` would DROP the user's other keychains — system/custom) and NEVER force
+  # the default unless fastlane_tmp actually holds it.
+  # (1) Restore login as default ONLY IF fastlane_tmp is the CURRENT default (that's the prompt cause).
+  if File.exist?(login) && `security default-keychain -d user 2>/dev/null`.to_s.include?("fastlane_tmp_keychain")
+    system("security", "default-keychain", "-d", "user", "-s", login, out: File::NULL, err: File::NULL)
+  end
+  # (2) delete-keychain removes ONLY fastlane_tmp from the search list AND deletes its file (the rest of
+  # the search list is left intact) — same as fastlane's own delete_keychain. rm is a last-resort fallback.
+  if File.exist?(tmp)
+    system("security", "delete-keychain", tmp, out: File::NULL, err: File::NULL) || (File.delete(tmp) rescue nil)
+  end
+rescue
+  nil
+end
+
 # Load App Store Connect API key into lane context.
 def load_api_key(options = {})
   cfg = FastlaneConfig::IosConfig::BUILD_CONFIG

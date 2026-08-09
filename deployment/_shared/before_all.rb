@@ -10,6 +10,11 @@
 # whichever Fastfile fastlane loads. Runs once per invocation (SYNC_FORK_DONE latch — /idea-deploy
 # STEP 1.7.0 already sets it when it pre-syncs). Fail-soft: a gradle hiccup never blocks a deploy.
 before_all do
+  # START-CLEAN: remove any fastlane_tmp keychain left DEFAULT by a prior run that died before
+  # delete_keychain (build error / hard kill), and restore the developer's login keychain as default —
+  # otherwise unrelated apps keep prompting for fastlane_tmp. Idempotent, no-op on CI / Android.
+  cleanup_ci_keychain rescue nil
+
   # Locate repo root (dir holding app-profile/app.yaml) by walking up from cwd — robust to whatever
   # cwd fastlane sets for the loaded Fastfile (deployment/ for CI, repo root for local).
   repo_root = Dir.pwd
@@ -29,4 +34,16 @@ before_all do
     end
     ENV["SYNC_FORK_DONE"] = "1"
   end
+end
+
+# END-CLEAN: guaranteed fastlane_tmp keychain teardown after EVERY lane — on success (after_all) AND on
+# failure/exception (error). Pairs with the setup_ci create_keychain so a local run never leaves
+# fastlane_tmp as the macOS default keychain. (A hard SIGKILL still can't run these — the before_all
+# start-clean above catches that leftover on the next run.) Idempotent, no-op on CI / Android.
+after_all do |_lane, _options|
+  cleanup_ci_keychain rescue nil
+end
+
+error do |_lane, _exception, _options|
+  cleanup_ci_keychain rescue nil
 end

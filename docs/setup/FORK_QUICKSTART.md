@@ -47,14 +47,16 @@ Open `gradle/libs.versions.toml` and change only the six lines in the fork
 identity block (near the top of the `[versions]` section):
 
 ```toml
-# ── Fork Identity — edit ONLY these 6 lines, then run ./gradlew syncForkConfig ──
+# ── Fork Identity — edit ONLY these 5 lines, then run ./gradlew syncForkConfig ──
 appId            = "com.myapp.example"   # Android applicationId + iOS bundle ID
 appDisplayName   = "My Awesome App"      # Android app_name, iOS CFBundleDisplayName
-baseNamespace    = "com.myapp"           # prefix for all module R-class namespaces
 desktopAppName   = "MyAwesomeAppDesktop" # JVM package name, dock name
 projectName      = "my-awesome-app"      # rootProject.name, Fastlane PROJECT_NAME
 iosTeamId        = "ABCDE12345"          # Apple Developer Team ID
 ```
+
+> Module Android namespaces (`kpt.*`) are a fixed framework label — **not** a fork setting. You do
+> NOT rename them; leave them as-is (see the table below).
 
 Then propagate to all platform config files:
 
@@ -79,7 +81,7 @@ Then propagate to all platform config files:
 |---------|----------------|
 | Android `applicationId` | `appId` via `cmp-android/build.gradle.kts` |
 | Android `app_name` | `appDisplayName` via `resValue` in `build.gradle.kts` |
-| All 38 library module namespaces | `baseNamespace` + module path (derived by convention plugin) |
+| All 38 library module namespaces | `org.convention.BASE_MODULE_NAMESPACE` (`kpt`, framework-owned) + module path — derived by convention plugin, not a fork setting |
 | iOS bundle ID | `Config.xcconfig` → `APP_BUNDLE_ID` → `project.pbxproj` |
 | iOS display name | `Config.xcconfig` → `APP_NAME` → Info.plist `CFBundleDisplayName` |
 | iOS team | `Config.xcconfig` → `TEAM_ID` → Xcode signing settings |
@@ -244,7 +246,7 @@ empty `Scaffold` with a title bar + settings action for you to fill). Everything
 demo is gone — 10 feature modules, all demo data/domain packages, and the demo
 database schema (auto-reset to `VERSION = 1`, so a fresh fork starts clean).
 
-> `--clean` never touches `baseNamespace` or your fork identity (Step 1) — it
+> `--clean` never touches module namespaces or your fork identity (Step 1) — it
 > removes demo **features** only.
 
 ### The convention (so *your* features stay removable + syncable)
@@ -323,9 +325,9 @@ identity block was introduced, follow these steps once to adopt the new system.
 
 | Before (legacy) | After (identity block) |
 |----------------|----------------------|
-| Identity split across `gradle.properties`, `cmp-android/build.gradle.kts`, `cmp-ios/Configuration/Config.xcconfig`, `local.properties`, `settings.gradle.kts` | All identity in 6 lines of `gradle/libs.versions.toml` |
+| Identity split across `gradle.properties`, `cmp-android/build.gradle.kts`, `cmp-ios/Configuration/Config.xcconfig`, `local.properties`, `settings.gradle.kts` | All identity in 5 lines of `gradle/libs.versions.toml` |
 | `Config.xcconfig` used `BUNDLE_ID` / `APP_NAME` keys (no `TEAM_ID`) | `Config.xcconfig` uses `APP_BUNDLE_ID` / `APP_NAME` / `TEAM_ID` |
-| Module `build.gradle.kts` files each declared an explicit `namespace` | `namespace` derived by convention plugin from `baseNamespace` + module path |
+| Module `build.gradle.kts` files each declared an explicit `namespace` | `namespace` derived by convention plugin from `org.convention.BASE_MODULE_NAMESPACE` (`kpt`, framework-owned) + module path |
 | `scripts/white-label/customize.sh` renamed Kotlin source packages | `scripts/white-label/customize.sh` only edits `libs.versions.toml` + calls `syncForkConfig` |
 
 ### Migration steps
@@ -341,7 +343,6 @@ identity block was introduced, follow these steps once to adopt the new system.
    ```toml
    appId            = "com.myapp.example"
    appDisplayName   = "My Awesome App"
-   baseNamespace    = "com.myapp"
    desktopAppName   = "MyAwesomeAppDesktop"
    projectName      = "my-awesome-app"
    iosTeamId        = "ABCDE12345"
@@ -362,8 +363,8 @@ identity block was introduced, follow these steps once to adopt the new system.
 6. **Remove explicit `namespace` from library module `build.gradle.kts` files**
    — if your fork has `namespace = "com.myapp.feature.loans"` etc. in each
    module, remove them. The convention plugin in the updated `build-logic`
-   derives every namespace from `baseNamespace + module path`. Run
-   `./gradlew :cmp-android:assembleDebug` to confirm no namespace conflicts.
+   derives every namespace from the framework-owned `BASE_MODULE_NAMESPACE` (`kpt`) + module path.
+   Run `./gradlew :cmp-android:assembleDebug` to confirm no namespace conflicts.
 
 7. **Commit** — the only files that should now carry your fork's package
    identity are `gradle/libs.versions.toml`, `cmp-ios/Configuration/Config.xcconfig`,

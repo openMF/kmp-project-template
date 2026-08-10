@@ -14,8 +14,9 @@ import java.io.File
  *
  * Single source of truth:
  *   gradle/fork.properties    — deployment identity + store metadata (gitignored)
- *   gradle/libs.versions.toml — 6 build-time Gradle values (appId, appDisplayName,
- *                               baseNamespace, desktopAppName, projectName, iosTeamId)
+ *   gradle/libs.versions.toml — 5 build-time Gradle values (appId, appDisplayName,
+ *                               desktopAppName, projectName, iosTeamId). Module namespaces are a
+ *                               fixed framework label (org.convention.BASE_MODULE_NAMESPACE), not here.
  *
  * Propagates ALL fork identity to:
  *   - cmp-ios/Configuration/Config.xcconfig

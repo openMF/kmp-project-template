@@ -363,9 +363,14 @@ single pass.
 > `./gradlew syncForkConfig` writes it back into `gradle/libs.versions.toml#appId` (the catalog the
 > build reads via `libs.versions.appId`). Edit `app.id` in fork.properties, never the catalog line;
 > `scripts/product-health/checks/appid-consistency.sh` FAILs CI if the two drift. The other build-time
-> keys (`appDisplayName`, `baseNamespace`, `desktopAppName`, `projectName`) are still authored in
+> keys (`appDisplayName`, `desktopAppName`, `projectName`) are still authored in
 > `libs.versions.toml` (syncForkConfig reads fork.properties first for them, then the catalog).
 > `gradle.properties` holds fork-rename placeholders for the future `scripts/fork-rename.sh`.
+>
+> **Module namespaces are NOT a fork property.** Every module's Android `namespace` (R-class) derives
+> from the framework-owned constant `org.convention.BASE_MODULE_NAMESPACE` (`kpt`) in `build-logic` —
+> it matches the hardcoded `kpt.*` Kotlin package root, has no per-fork meaning, and is deliberately
+> kept OUT of `libs.versions.toml` so it never causes a catalog-merge conflict during a template sync.
 
 | Property | `gradle.properties` | `libs.versions.toml` (runtime SoT) | Consumer (planned) |
 | -------- | ------------------- | ----------------------------------- | ------------------ |
@@ -373,7 +378,6 @@ single pass.
 | `APP_NAME` | `Money Toolkit` | `appDisplayName = "Money Toolkit"` | Android `app_name`, iOS `CFBundleDisplayName` |
 | `APP_VERSION_BASE` | `1.0.0` | _(not in toml — Gradle computes `YYYY.M.D` from git)_ | Base for version string generation |
 | `APP_BUNDLE_DISPLAY_NAME` | `Money Toolkit` | `desktopAppName = "Money Toolkit"` | iOS Springboard label; macOS `CFBundleName` |
-| `APP_BRAND_PREFIX` | `Kpt` | `baseNamespace = "kpt"` | Kotlin-namespace prefix (e.g. `KptTheme`, `KptProgress`) |
 
 **Today**: forks edit these properties **and** every consumer file by hand.
 **Roadmap**: a `scripts/fork-rename.sh` (TBD) will accept new values and write

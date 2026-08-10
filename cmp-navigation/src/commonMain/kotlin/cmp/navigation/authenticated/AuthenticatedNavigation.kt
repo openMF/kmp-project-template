@@ -11,14 +11,13 @@
 
 package cmp.navigation.authenticated
 
-import cmp.navigation.registry.FeatureRegistry
-
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
+import cmp.navigation.registry.FeatureRegistry
 import kotlinx.serialization.Serializable
 import kpt.core.base.security.isReleaseBuild
 import kpt.core.base.ui.nav.popBackStackSafely

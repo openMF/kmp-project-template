@@ -12,7 +12,7 @@
 #
 # What this does (identity mode):
 #   1. Writes app.id into gradle/fork.properties (its single source of truth) + mirrors the
-#      remaining build-time identity (appDisplayName/baseNamespace/projectName/iosTeamId) into
+#      remaining build-time identity (appDisplayName/projectName/iosTeamId) into
 #      gradle/libs.versions.toml. syncForkConfig keeps libs.versions.toml#appId synced from app.id.
 #   2. Runs ./gradlew syncForkConfig to propagate to iOS Config.xcconfig,
 #      local.properties (Fastlane), and gradle.properties (rootProject.name)
@@ -20,9 +20,9 @@
 #      clean, branded framework shell — this is the DEFAULT. Pass --keep-demo to retain
 #      the Money-Toolkit demo (for exploring the framework's reference features).
 #
-# No source file scanning, no package renaming, no sync-dirs conflicts. The convention
-# plugin derives all module namespaces from baseNamespace automatically. baseNamespace and
-# fork identity are never touched by the demo removal.
+# No source file scanning, no package renaming, no sync-dirs conflicts. The convention plugin
+# derives all module namespaces from the framework-owned BASE_MODULE_NAMESPACE constant (kpt) —
+# a fixed template label never exposed to the consumer. Fork identity is never touched by the demo removal.
 #
 
 set -e
@@ -85,8 +85,8 @@ PROJECT_NAME=$2
 APPNAME=${3:-$PROJECT_NAME}
 TEAM_ID=${4:-"XXXXXXXXXX"}
 
-# Derive baseNamespace: com.mybank.app → com.mybank
-BASE_NS=$(echo "$PACKAGE" | rev | cut -d. -f2- | rev)
+# NOTE: module Android namespaces (kpt.*) are a FRAMEWORK-owned label, fixed in build-logic
+# (org.convention.BASE_MODULE_NAMESPACE) — NOT exposed to the consumer, so nothing to derive/write here.
 
 LIBS_TOML="gradle/libs.versions.toml"
 
@@ -100,7 +100,6 @@ echo -e "${BLUE}║        Kotlin Multiplatform Project Customizer       ║${NC
 echo -e "${BLUE}╚══════════════════════════════════════════════════════╝${NC}"
 echo
 print_info "Package ID:       $PACKAGE"
-print_info "Base namespace:   $BASE_NS"
 print_info "Project name:     $PROJECT_NAME"
 print_info "Display name:     $APPNAME"
 print_info "iOS Team ID:      $TEAM_ID"
@@ -111,7 +110,6 @@ print_info "Updating $LIBS_TOML..."
 
 sed -i.bak "s|appId[[:space:]]*=.*|appId            = \"$PACKAGE\"|"             "$LIBS_TOML"
 sed -i.bak "s|appDisplayName[[:space:]]*=.*|appDisplayName   = \"$APPNAME\"|"    "$LIBS_TOML"
-sed -i.bak "s|baseNamespace[[:space:]]*=.*|baseNamespace    = \"$BASE_NS\"|"     "$LIBS_TOML"
 sed -i.bak "s|projectName[[:space:]]*=.*|projectName      = \"$PROJECT_NAME\"|"  "$LIBS_TOML"
 sed -i.bak "s|iosTeamId[[:space:]]*=.*|iosTeamId        = \"$TEAM_ID\"|"         "$LIBS_TOML"
 find . -name "*.bak" -not -path "*/build/*" -delete

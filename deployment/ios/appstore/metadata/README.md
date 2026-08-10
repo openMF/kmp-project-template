@@ -3,6 +3,15 @@
 Fork-owned media SoT for the App Store Connect listing. `syncForkConfig` /
 `idea-store-assets-generate` read from these subfolders; do not rename them.
 
+> **Deliver reads FLAT — do not deploy these subfolders as-is.** fastlane `deliver`
+> globs `screenshots/<locale>/*.png` and infers each device by image RESOLUTION; it
+> does **not** recurse into device subfolders. The per-device folders below are the
+> authoring/rendering SoT only. `syncForkConfig.deriveForkMedia()` FLATTENS them into
+> the deploy tree as `deployment/ios/appstore/metadata/screenshots/<locale>/<device>-<NN>.png`
+> — that flat form is what `deliver` uploads. A nested `<locale>/<device>/` tree in the
+> deploy dir = **zero** screenshots uploaded (silent vacuous success).
+> See RULE-STORE-DELIVER-FLAT-SCREENSHOTS-001.
+
 ## Screenshot subfolders
 
 ASC groups screenshots by display size class, not device model — one

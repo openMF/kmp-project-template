@@ -467,7 +467,11 @@ module FastlaneConfig
       force:                              true,
       precheck_include_in_app_purchases:  false,
       run_precheck_before_submit:         true,
-      submission_information:             { add_id_info_uses_idfa: false }.freeze,
+      # export_compliance_uses_encryption:false ⇒ app declares NO non-exempt encryption (HTTPS/TLS only is
+      # exempt, Category 5 Part 2 — matches app-profile app-content/export-compliance.yaml
+      # itsappusesnonexemptencryption:false). Required to submit a never-submitted version, else deliver
+      # aborts "Export compliance is required to submit". add_id_info_uses_idfa:false ⇒ no IDFA.
+      submission_information:             { add_id_info_uses_idfa: false, export_compliance_uses_encryption: false }.freeze,
       app_review_information: {
         first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || _c._fork_prop("org.first.name") || "Mifos",
         last_name:  _c._secret("APPSTORE_REVIEW_LAST_NAME")  || _c._fork_prop("org.last.name")  || "Team",

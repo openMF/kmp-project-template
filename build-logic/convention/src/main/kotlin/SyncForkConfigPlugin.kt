@@ -538,6 +538,63 @@ abstract class SyncForkConfigTask : DefaultTask() {
                     }
                 }
             }
+            // Mac App Store caps screenshots at 10 per DISPLAY TYPE — and mac-1280..mac-2880 are all the
+            // SAME display type (APP_DESKTOP), unlike iOS where each iphone/ipad folder is a DISTINCT type.
+            // The app-profile SoT renders every size family (per STORE_ASSET_SPECS asc_macos); a verbatim
+            // copy would hand deliver 4×7 = 28 APP_DESKTOP shots → "over 10" rejection. Keep ONLY the
+            // largest size family present per locale (best quality; ASC downscales within the 16:10 family).
+            val macShots = File(root, "deployment/desktop/mac-app-store/metadata/screenshots")
+            if (macShots.isDirectory) {
+                val macSizeRank = listOf("mac-2880", "mac-2560", "mac-1440", "mac-1280")
+                macShots.listFiles()?.filter { it.isDirectory }?.forEach { locale ->
+                    val present = macSizeRank.filter { fam ->
+                        File(locale, fam).let { d -> d.isDirectory && (d.listFiles { f -> f.isFile && f.name.matches(Regex(".*\\.(png|jpe?g)$", RegexOption.IGNORE_CASE)) }?.isNotEmpty() == true) }
+                    }
+                    present.drop(1).forEach { File(locale, it).deleteRecursively() }
+                }
+            }
+            // deliver (App Store iOS + macOS) reads screenshots FLAT per locale: it globs
+            // "<screenshots_path>/<locale>/*.png" and infers each device by image RESOLUTION — it does NOT
+            // recurse into device subfolders (Deliver::Loader.language_folders + LanguageFolder#file_paths).
+            // The SoT organises shots in per-device folders for rendering; FLATTEN each
+            // <locale>/<device>/<NN>.png → <locale>/<device>-<NN>.png so deliver actually sees them. Without
+            // this deliver finds ZERO screenshots and silently "uploads all" (nothing). Supply/Android is
+            // exempt — Play's <locale>/images/<type>/ subfolders ARE the documented supply layout.
+            // (2026-08-10: iOS + macOS listing media never actually pushed — device subfolders invisible to deliver.)
+            fun flattenDeliverScreenshots(shotsRel: String) {
+                val shots = File(root, shotsRel)
+                if (!shots.isDirectory) return
+                shots.listFiles()?.filter { it.isDirectory }?.forEach { localeDir ->
+                    localeDir.listFiles()?.filter { it.isDirectory }?.forEach { deviceDir ->
+                        deviceDir.listFiles { f -> f.isFile && f.name.matches(Regex(".*\\.(png|jpe?g)$", RegexOption.IGNORE_CASE)) }
+                            ?.forEach { img -> img.copyTo(File(localeDir, "${deviceDir.name}-${img.name}"), overwrite = true) }
+                        deviceDir.deleteRecursively()
+                    }
+                }
+            }
+            flattenDeliverScreenshots("deployment/ios/appstore/metadata/screenshots")
+            flattenDeliverScreenshots("deployment/desktop/mac-app-store/metadata/screenshots")
+
+            // deliver uploads screenshots to the version localization matching each screenshots/<locale>/
+            // folder. The text metadata is dual-written (writeLocalized: primary locale + legacy en-GB),
+            // but the media SoT is single-locale (en-US). If the ASC app's DISPLAYED localization is en-GB
+            // (Apple registers many accounts as English U.K.), en-US-only screenshots upload to an en-US
+            // localization the store never shows → the listing renders the OLD/empty en-GB set. Mirror the
+            // primary-locale screenshots into EVERY other metadata locale that has none, so deliver
+            // populates en-GB too. (2026-08-10: iOS showed stale + macOS empty screenshots despite upload.)
+            fun mirrorScreenshotLocales(metaRel: String) {
+                val meta = File(root, metaRel)
+                val shotsRoot = File(meta, "screenshots")
+                if (!shotsRoot.isDirectory) return
+                val shotLocales = shotsRoot.listFiles()?.filter { it.isDirectory }?.map { it.name } ?: return
+                val primary = shotLocales.firstOrNull() ?: return
+                val localeRe = Regex("[a-z]{2}-[A-Z]{2}")
+                meta.listFiles()
+                    ?.filter { it.isDirectory && localeRe.matches(it.name) && it.name !in shotLocales }
+                    ?.forEach { locDir -> File(shotsRoot, primary).copyRecursively(File(shotsRoot, locDir.name), overwrite = true) }
+            }
+            mirrorScreenshotLocales("deployment/ios/appstore/metadata")
+            mirrorScreenshotLocales("deployment/desktop/mac-app-store/metadata")
         }
         deriveForkMedia()
 
@@ -799,6 +856,20 @@ abstract class SyncForkConfigTask : DefaultTask() {
             val to = File(dstDir, dstName)
             from.copyTo(to, overwrite = true)
             logger.lifecycle("syncForkConfig: copied app-profile/icons/$srcName → ${to.relativeTo(root)}")
+            copied++
+        }
+
+        // Web link-preview image (og:image / twitter:image → ./og-image.png in index.html). SoT is
+        // app-profile/platforms/web/media/og-images/og-image.png → both web resource roots. The >1KB guard
+        // skips the .gitkeep-sized placeholder stubs so a fork never ships a broken 0-byte preview; without
+        // a real og-image the token falls back to a 404 (no wrong-brand image), which beats the template's
+        // hardcoded mobile-wallet github URL. (2026-08-10 web white-label.)
+        val ogSrc = File(root, "app-profile/platforms/web/media/og-images/og-image.png")
+        if (ogSrc.isFile && ogSrc.length() > 1024L) {
+            listOf(jsResourcesDir.get().asFile, wasmJsResourcesDir.get().asFile).forEach { dir ->
+                dir.mkdirs(); ogSrc.copyTo(File(dir, "og-image.png"), overwrite = true)
+            }
+            logger.lifecycle("syncForkConfig: copied app-profile web og-image → cmp-web/{js,wasmJs}Main/resources/og-image.png")
             copied++
         }
 

@@ -140,6 +140,14 @@ One-shot: create proper Mac Installer Distribution cert in Apple Developer Porta
 
 Stage 1 → Stage 2 promotion: distribute an already-uploaded Mac TF build to external testers (no rebuild). Triggers Apple's beta review (~24h).
 
+### mac syncMacListing
+
+```sh
+[bundle exec] fastlane mac syncMacListing
+```
+
+Sync Mac App Store listing (metadata + screenshots) — no binary upload, no submission (parity with ios upload_ios_screenshots).
+
 ### mac promoteMacToAppStore
 
 ```sh

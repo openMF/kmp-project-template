@@ -40,6 +40,8 @@
 #   MAC_PROVISIONING_PROFILE_PATH  — .provisionprofile path embedded into app bundle
 #   MAC_APP_STORE_CONNECT_APP_ID   — Numeric ASC app ID for the macOS app
 
+require_relative "../../_shared/lib/appstore_helpers"
+
 MAC_APP_STORE_METADATA_PATH    = File.join(DEPLOYMENT_REPO_ROOT, "deployment/desktop/mac-app-store/metadata").freeze
 MAC_APP_STORE_SCREENSHOTS_PATH = File.join(DEPLOYMENT_REPO_ROOT, "deployment/desktop/mac-app-store/metadata/screenshots").freeze
 MAC_APP_STORE_PRIMARY_LOCALE   = "en-GB".freeze
@@ -137,6 +139,43 @@ platform :mac do
     UI.success("✅ Mac build #{build_number} submitted for beta review — external testers receive it on approval (~24h).")
   end
 
+  desc "Sync Mac App Store listing (metadata + screenshots) — no binary upload, no submission (parity with ios upload_ios_screenshots)."
+  lane :syncMacListing do |options|
+    options       = sanitize_options(options)
+    mac_bundle_id = ENV["MAC_APP_IDENTIFIER"] || ENV["MAC_BUNDLE_ID"] || ForkIdentity::APP_ID
+    load_api_key(options)
+
+    # deliver only runs under an officially-supported platform (:ios/:mac/:android) — this lane is under
+    # platform :mac (the desktop syncListing lane's :desktop context makes deliver abort "not supported").
+    # A LISTING sync must NOT push app-level identity (name/subtitle) — App Store names are globally
+    # unique + set once; re-pushing a taken name aborts "app name already used on a different account"
+    # (same class as the iOS promoteToAppStore heal). Hide name/subtitle so only version-level content
+    # (description / keywords / screenshots) syncs.
+    AppStoreHelpers.without_app_identity_metadata(MAC_APP_STORE_METADATA_PATH) do
+      deliver(
+        platform:                             "osx",
+        api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+        app_identifier:                       mac_bundle_id,
+        metadata_path:                        MAC_APP_STORE_METADATA_PATH,
+        screenshots_path:                     MAC_APP_STORE_SCREENSHOTS_PATH,
+        skip_binary_upload:                   true,
+        # NOTE: deliver has no `skip_submission` (that is a pilot param). Not submitting == leaving
+        # submit_for_review at its false default. Passing skip_submission aborts "invalid parameters".
+        submit_for_review:                    false,
+        skip_metadata:                        false,
+        skip_screenshots:                     false,
+        overwrite_screenshots:                true,
+        skip_app_version_update:              true,
+        ignore_language_directory_validation: true,
+        run_precheck_before_submit:           false,
+        force:                                true,
+      )
+    end
+
+    record_store_listing_synced("mac", MAC_APP_STORE_METADATA_PATH)
+    UI.success("✅ Mac App Store listing synced (metadata + screenshots — no binary, no submission)")
+  end
+
   desc "Promote an existing Mac TestFlight build to Mac App Store review — no rebuild, no re-upload."
   lane :promoteMacToAppStore do |options|
     options       = sanitize_options(options)
@@ -166,27 +205,35 @@ platform :mac do
     mac_listing_changed = store_listing_needs_sync?("mac", MAC_APP_STORE_METADATA_PATH)
     UI.message(mac_listing_changed ? "🔄 Mac App Store listing changed — will upload metadata + screenshots" : "✓ Mac App Store listing unchanged — skipping metadata re-upload")
 
-    deliver(
-      platform:                             "osx",
-      api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
-      app_identifier:                       mac_bundle_id,
-      app_version:                          app_version,
-      build_number:                         build_number,
-      skip_binary_upload:                   true,
-      skip_metadata:                        !mac_listing_changed,
-      skip_screenshots:                     !mac_listing_changed,
-      metadata_path:                        MAC_APP_STORE_METADATA_PATH,
-      screenshots_path:                     MAC_APP_STORE_SCREENSHOTS_PATH,
-      overwrite_screenshots:                true,
-      ignore_language_directory_validation: true,
-      skip_app_version_update:              true,
-      submit_for_review:                    true,
-      automatic_release:                    true,
-      phased_release:                       false,
-      reject_if_possible:                   true,
-      run_precheck_before_submit:           false,
-      force:                                true,
-    )
+    # A PROMOTE must never push app-level identity (name/subtitle) — the globally-unique app name aborts
+    # deliver ("already used on a different account"). Hide it so only version-level listing syncs (parity
+    # with the iOS promoteToAppStore lane + syncMacListing). (2026-08-10)
+    AppStoreHelpers.without_app_identity_metadata(MAC_APP_STORE_METADATA_PATH) do
+      deliver(
+        platform:                             "osx",
+        api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+        app_identifier:                       mac_bundle_id,
+        app_version:                          app_version,
+        build_number:                         build_number,
+        skip_binary_upload:                   true,
+        skip_metadata:                        !mac_listing_changed,
+        skip_screenshots:                     !mac_listing_changed,
+        metadata_path:                        MAC_APP_STORE_METADATA_PATH,
+        screenshots_path:                     MAC_APP_STORE_SCREENSHOTS_PATH,
+        overwrite_screenshots:                true,
+        ignore_language_directory_validation: true,
+        skip_app_version_update:              true,
+        submit_for_review:                    true,
+        # Export-compliance + IDFA answers — required to submit a never-submitted Mac version, else deliver
+        # aborts "Export compliance is required to submit". Shared with iOS (one ASC app record).
+        submission_information:               FastlaneConfig::IosConfig::APPSTORE_CONFIG[:submission_information],
+        automatic_release:                    true,
+        phased_release:                       false,
+        reject_if_possible:                   true,
+        run_precheck_before_submit:           false,
+        force:                                true,
+      )
+    end
 
     record_store_listing_synced("mac", MAC_APP_STORE_METADATA_PATH) if mac_listing_changed
 
@@ -516,9 +563,27 @@ platform :mac do
     # variant (bundle org.mifos.kmp.template.demo) → upload_to_testflight can't find the
     # app on App Store Connect AND it misaligns with the prod Match provisioning profile.
     flavor = (options[:flavor] || ENV["FLAVOR"]).to_s.strip
+
+    # CFBundleVersion must STRICTLY increase per TestFlight/App Store upload. Compose Desktop leaves it
+    # unset → build.gradle.kts falls back to the static packageVersion ("1.0.0") UNLESS -PmacBuildVersion
+    # is passed. Only CI set it (via GITHUB_RUN_NUMBER); a LOCAL /idea-deploy set neither, so every mac
+    # upload 409'd ("bundle version must be higher than … '1.0.0'"). Derive a monotonic build number from
+    # the git commit count (same basis as Android's versionCode) so local uploads are unique + increasing.
+    # Override with MAC_BUILD_VERSION when a specific value is needed. (2026-08-10)
+    require "shellwords"
+    mac_build_version = ENV["MAC_BUILD_VERSION"].to_s.strip
+    if mac_build_version.empty?
+      count = `git -C #{repo_root.shellescape} rev-list --count HEAD 2>/dev/null`.strip
+      mac_build_version = "1.0.#{count}" unless count.empty?
+    end
+
     gradle_args = [gradlew, "-p", repo_root, ":cmp-desktop:createReleaseDistributable",
                    "--no-daemon", "--no-configuration-cache"]
     gradle_args << "-PkmpFlavor=#{flavor}" unless flavor.empty?
+    unless mac_build_version.to_s.empty?
+      gradle_args << "-PmacBuildVersion=#{mac_build_version}"
+      UI.message("🔢 macOS CFBundleVersion → #{mac_build_version} (monotonic, from git commit count) — avoids the '1.0.0' upload 409")
+    end
 
     begin
       UI.message("Building unsigned .app bundle (createReleaseDistributable, flavor=#{flavor.empty? ? '(default)' : flavor})...")

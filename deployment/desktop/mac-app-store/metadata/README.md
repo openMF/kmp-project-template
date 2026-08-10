@@ -3,6 +3,14 @@
 Fork-owned media SoT for the Mac App Store listing. `syncForkConfig` /
 `idea-store-assets-generate` read from these subfolders; do not rename them.
 
+> **Deliver reads FLAT + one size family.** fastlane `deliver` globs
+> `screenshots/<locale>/*.png` (device inferred by RESOLUTION; no subfolder recursion),
+> and `mac-1280…mac-2880` are all ONE display type (`APP_DESKTOP`, capped at 10).
+> `syncForkConfig.deriveForkMedia()` keeps only the LARGEST size family present and
+> FLATTENS it to `deployment/desktop/mac-app-store/metadata/screenshots/<locale>/<device>-<NN>.png`.
+> The per-device folders below are the authoring/rendering SoT only.
+> See RULE-STORE-DELIVER-FLAT-SCREENSHOTS-001.
+
 ## Screenshots — per-device folders (SoT)
 
 Taxonomy is the framework SoT `core/registries/STORE_ASSET_SPECS.yaml`

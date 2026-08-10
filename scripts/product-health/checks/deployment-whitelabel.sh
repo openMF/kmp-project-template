@@ -167,6 +167,25 @@ if [ -f "$dp_name" ] && [ -n "$sot_title" ] && [ "$(cat "$dp_name")" != "$sot_ti
   echo "⚠️  B9: deployment/ios/appstore/metadata/en-US/name.txt drifted from app-profile store.title ('$sot_title') — run ./gradlew syncForkConfig."; warn=1
 fi
 
+# ── B10 — deliver screenshots must be FLAT per locale (App Store iOS + macOS) (WARN) ──
+# deliver globs "<screenshots_path>/<locale>/*.png" and infers each device by image RESOLUTION — it does
+# NOT recurse into device subfolders (Deliver::Loader). A <locale>/<device>/NN.png tree is INVISIBLE to
+# deliver, so it "successfully uploads all" ZERO screenshots (silent vacuous success — the listing ships
+# with no media). syncForkConfig flattens the per-device SoT to <locale>/<device>-NN.png; assert it held.
+for base in deployment/ios/appstore/metadata/screenshots deployment/desktop/mac-app-store/metadata/screenshots; do
+  d="$HEALTH_ROOT/$base"
+  [ -d "$d" ] || continue
+  nested="$(find "$d" -mindepth 2 -type d 2>/dev/null | head -1)"
+  if [ -n "$nested" ]; then
+    echo "⚠️  B10: $base has nested device subfolder(s) (e.g. ${nested#"$HEALTH_ROOT"/}) — deliver reads <locale>/*.png FLAT and would see ZERO screenshots. Run ./gradlew syncForkConfig."; warn=1
+  fi
+  for loc in "$d"/*/; do
+    [ -d "$loc" ] || continue
+    cnt="$(find "$loc" -maxdepth 1 -type f \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) 2>/dev/null | wc -l | tr -d ' ')"
+    [ "$cnt" -eq 0 ] && { echo "⚠️  B10: $base/$(basename "$loc") holds 0 flat screenshots — deliver would upload none."; warn=1; }
+  done
+done
+
 if [ "$fail" -ne 0 ]; then
   echo "→ Fix: author app-profile/app.yaml for your fork + tokenize any hardcoded identity in deployment/**."
   exit 1

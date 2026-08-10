@@ -278,7 +278,7 @@ File google-services.json is missing
 ls -la cmp-android/google-services.json
 
 # 2. Run Firebase setup if missing
-./firebase-setup.sh
+scripts/white-label/firebase.sh
 
 # 3. Or download manually from Firebase Console
 # - Go to Firebase Console
@@ -315,10 +315,10 @@ No key with alias 'MyKey' found in keystore
 
 ```bash
 # 1. Generate keystores if missing
-./keystore-manager.sh generate
+scripts/white-label/keystore.sh generate
 
 # 2. View keystore info
-./keystore-manager.sh view
+scripts/white-label/keystore.sh view
 
 # 3. Check signing configuration in build.gradle.kts
 cat cmp-android/build.gradle.kts | grep -A 20 "signingConfigs"
@@ -913,7 +913,7 @@ gh secret set KEYSTORE_FILE < keystores/original-release-key.jks.b64
 gh secret set UPLOAD_KEYSTORE_FILE < keystores/original-release-key.jks.b64
 
 # Or use keystore-manager which handles both
-./keystore-manager.sh add
+scripts/white-label/keystore.sh add
 ```
 
 **See:** [BUGS_AND_ISSUES.md#2](../analysis/BUGS_AND_ISSUES.md#2-signing-parameter-naming-inconsistency-critical)
@@ -941,10 +941,10 @@ Error: Secret FIREBASECREDS not found
 gh secret list
 
 # 2. Add missing secrets
-./keystore-manager.sh add
+scripts/white-label/keystore.sh add
 
 # 3. Or manually encode and add
-./keystore-manager.sh encode-secrets
+scripts/white-label/keystore.sh encode-secrets
 # Copy output and add via GitHub UI
 
 # 4. Verify secret name matches workflow
@@ -1138,10 +1138,10 @@ cd cmp-ios && pod deintegrate && pod install
 
 ```bash
 # 1. Verify all secrets
-./keystore-manager.sh view
+scripts/white-label/keystore.sh view
 
 # 2. Re-add all secrets
-./keystore-manager.sh add
+scripts/white-label/keystore.sh add
 
 # 3. Verify iOS setup
 ./scripts/ios/verify_ios_deployment.sh

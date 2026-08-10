@@ -4,7 +4,7 @@
 # Reads gradle/fork.properties (the project-level SINGLE SOURCE OF TRUTH) and runs every
 # scripts/product-health/checks/*.sh against it. This is the ONE place a fork learns whether its
 # customization is complete + correct: signing/org identity re-forked, appId consolidated, store
-# listing authored. Runs in CI (quality-gate.yml) and at the end of customizer.sh so a fresh fork
+# listing authored. Runs in CI (quality-gate.yml) and at the end of scripts/white-label/customize.sh so a fresh fork
 # gets an immediate sanity report. Pure bash — no Gradle, no network.
 #
 # Check contract (each checks/*.sh): exit 0 = PASS · exit 1 = FAIL (blocks) · exit 2 = WARN

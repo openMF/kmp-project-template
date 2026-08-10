@@ -42,6 +42,8 @@ android {
             // - Local-dev: developer drops their real upload_keystore.keystore into secrets/live/android/keystores/
             // - CI: materialize-android-secrets.sh decodes UPLOAD_KEYSTORE_FILE GHA secret to the same path
             // - KEYSTORE_PATH env var overrides (advanced use)
+            // Release signing is read from the env — /idea-deploy materializes it from the vault
+            // before a deploy. The literal fallbacks below are a local-debug convenience.
             storeFile = file(System.getenv("KEYSTORE_PATH") ?: run {
                 val live = "../secrets/live/android/keystores/upload_keystore.keystore"
                 val sample = "../secrets/sample/android/keystores/upload_keystore.keystore"

@@ -1,9 +1,19 @@
 # ═════════════════════════════════════════════════════════════════════════════
 # DEPLOYMENT_MANIFEST.yaml — kmp-project-template
 #
-# Source-of-truth manifest enumerating every deploy target across all platforms.
+# Source-of-truth manifest enumerating every deploy TARGET across all platforms.
 # Per-target enable/disable surface — consumers fork this file and flip
 # `enabled: true` for targets they actually ship.
+#
+# Relationship to app-profile/app.yaml#targets (fork-owned PLATFORM intent):
+#   • app-profile/app.yaml#targets  → which PLATFORMS a fork ships (coarse, one row per
+#                                      platform: android/ios/macos/web/desktop; owner: fork).
+#   • THIS file (DEPLOYMENT_MANIFEST) → which TARGETS exist per platform (fine, one row per
+#                                       deploy target; owner: merge — new template targets
+#                                       propagate on sync, the fork keeps its enabled/tier).
+#   A target is ACTIVE iff its platform is enabled in app.yaml#targets AND the target's own
+#   `enabled:` is true here. The two coexist at different granularity — neither replaces the
+#   other. (macOS targets live under the `desktop` platform below — no separate `macos` block.)
 #
 # Schema:     core/schemas/deployment-manifest.schema.json
 # Validator:  core/scripts/deployment-manifest-validate.sh

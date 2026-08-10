@@ -1,0 +1,41 @@
+# app-profile/platforms/windows/windows.yaml — Microsoft Store packaging (Windows / MSIX).
+# Template default = the Money Toolkit MS Store identity. A FORK overrides msix_identity_name /
+# msix_publisher / msix_publisher_display_name (+ store_id / partner_center) with its own values.
+# Partner Center ids stay unset (YOUR_*) until the fork wires MS Store CI — the deployment-whitelabel
+# health check WARNs (not FAILs) on unset distribution placeholders.
+# Deep-merged under `windows.*` (top-level key), consumed via APP_PROFILE_MAP (windows.* flat keys).
+windows:
+  store_id: ""                             # windows.store.id (Partner Center App identity Store ID, 9XXXXXXXX)
+  ms_app_id: ""                            # store.windows.ms.app.id (StoreBroker App ID)
+  ms_publish_mode: Manual                  # store.windows.ms.publish.mode (Manual | Immediate | SpecificDate)
+  ms_visibility: Public                    # store.windows.ms.visibility (Public | Hidden | Private)
+  msix_identity_name: MifosInitiative.MoneyToolkit        # windows.msix.identity.name
+  msix_publisher: CN=Mifos Initiative                     # windows.msix.identity.publisher (CN=…)
+  msix_publisher_display_name: Mifos Initiative           # windows.msix.publisher.display.name
+  partner_center:
+    tenant_id: YOUR_PARTNER_CENTER_TENANT_ID   # windows.partner.center.tenant.id
+    client_id: YOUR_PARTNER_CENTER_CLIENT_ID   # windows.partner.center.client.id
+  store:                                     # Microsoft Store listing TEXT (win.store.*)
+    name: Money Toolkit                      # win.store.name
+    short_description: 'Track loans, calculate EMIs, and set bill reminders — 100% offline. No login, no ads.'   # win.store.short.description (<=100 chars)
+    description: 'Track your loans, calculate EMIs, set bill reminders, and watch live interest rates — all 100% offline. No login. No account. No internet required.\n\nMoney Toolkit is a free personal finance companion for everyday financial decisions. Every calculation happens on your device. Your data never leaves your PC.\n\n— TOOLS INCLUDED —\n\nLoan Tracker — add and manage personal loans; track principal, interest rate, EMI amount, and due date, stored locally.\nEMI Calculator — enter loan amount, annual interest rate, and tenure to get your monthly payment instantly. Works offline.\nAffordability Calculator — enter your income and maximum monthly EMI to see the largest loan you can safely take on.\nBill Reminders — recurring reminders for rent, electricity, subscriptions, and loan payments.\nAmortization Schedule — month-by-month repayment breakdown for any loan.\nLoan Comparison — compare total cost, monthly payment, and total interest side-by-side.\nInterest Rates — live US Federal Reserve benchmark rates via the free FRED API.\nCountry Macro Data — GDP growth, inflation (CPI), and unemployment rates from World Bank Open Data.\nCurrency Exchange Rates — live foreign exchange rates for any base currency.\n\n— WHY MONEY TOOLKIT —\n\nNo login or account. Works offline. No ads, no tracking, no analytics. No subscription — free forever. Open source, MIT licensed.\n\nBuilt by the Mifos Initiative, a nonprofit with 15+ years of experience building financial tools for underserved communities worldwide.\n\nGitHub: https://github.com/openMF/kmp-project-template'   # win.store.description (<=10000 chars)
+    features:                                # win.store.features (list — unmapped, read direct)
+      - Offline loan tracker
+      - EMI calculator
+      - Bill reminders
+      - Live interest rates
+    search_terms:                            # win.store.search.terms (list, <=7 — unmapped, read direct)
+      - loan
+      - EMI
+      - finance
+      - budget
+      - offline
+      - bills
+      - interest
+    category: Finance                        # win.store.category
+    privacy_url: https://raw.githubusercontent.com/openMF/kmp-project-template/main/legal/output/privacy-policy.md   # win.store.privacy.url
+  winget:
+    package_id: MifosInitiative.MoneyToolkit   # win.winget.package.id (Publisher.AppName)
+    publisher: Mifos Initiative                # win.winget.publisher
+    name: Money Toolkit                        # win.winget.name
+    moniker: money-toolkit                     # win.winget.moniker

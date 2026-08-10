@@ -1,6 +1,6 @@
 # StoreData API — Unified Offline-First Data Layer
 
-> **Module:** `core-base/store` (synced to all consumer apps via sync-dirs.sh)
+> **Module:** `core-base/store` (synced to all consumer apps via scripts/white-label/sync-dirs.sh)
 > **Package:** `template.core.base.store`
 > **Store 5 Version:** 5.1.0-alpha08
 

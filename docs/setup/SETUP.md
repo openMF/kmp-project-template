@@ -52,7 +52,7 @@ cd kmp-project-template
 The project includes a customization script that will update package names, application IDs, and other project identifiers to match your organization's naming conventions.
 
 ```bash
-./customizer.sh org.example.myapp MyKMPProject
+scripts/white-label/customize.sh org.example.myapp MyKMPProject
 ```
 
 Parameters:
@@ -97,7 +97,7 @@ cd ..
 If you plan to use CI/CD or need to manage keystores for Android app signing, configure the Secrets Manager:
 
 ```bash
-./keystore-manager.sh generate
+scripts/white-label/keystore.sh generate
 ```
 
 This will:
@@ -217,10 +217,10 @@ If you need to sync your fork with the upstream repository:
 
 ```bash
 # Basic sync with the provided script
-./sync-dirs.sh
+scripts/white-label/sync-dirs.sh
 
 # Sync with preview (dry run)
-./sync-dirs.sh --dry-run
+scripts/white-label/sync-dirs.sh --dry-run
 ```
 
 ## Next Steps

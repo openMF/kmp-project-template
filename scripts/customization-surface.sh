@@ -16,7 +16,7 @@
 #                                                        # path only matches the default
 # ─────────────────────────────────────────────────────────────────────────────
 # NOTE: shell options are set only on direct execution (bottom), NOT on source —
-# sourcing must not leak `set -u`/`pipefail` into a caller like sync-dirs.sh.
+# sourcing must not leak `set -u`/`pipefail` into a caller like scripts/white-label/sync-dirs.sh.
 
 CS_SELF="${BASH_SOURCE[0]}"
 CS_ROOT="$(cd "$(dirname "$CS_SELF")/.." && pwd)"
@@ -156,7 +156,7 @@ cs_merge_manifest() {
   return 0
 }
 
-# Strategy dispatcher used by sync-dirs.sh for a `merge`-owned file.
+# Strategy dispatcher used by scripts/white-label/sync-dirs.sh for a `merge`-owned file.
 #   cs_merge <strategy> <ours> <base> <theirs> [<out>]
 cs_merge() {
   local strat="$1" ours="$2" base="$3" theirs="$4" out="${5:-$2}"
@@ -175,7 +175,10 @@ cs_require_flip_preconditions() {
     local got; got="$(cs_resolve_owner "$1")"
     [ "$got" = "$2" ] || { echo "❌ flip-precondition: $1 owner=$got, expected $2"; bad=1; }
   }
-  _cs_expect "deployment/web/og-images/01_home.png"                fork
+  # og-images are DERIVED store media (glob `deployment/**/og-images/** → generated`): regenerated from
+  # app-profile, never hand-edited, so sync IGNORES them. Assert `generated` — this both reflects the
+  # reclassification AND proves the generated-class row is present in the contract.
+  _cs_expect "deployment/web/og-images/01_home.png"                generated
   _cs_expect "gradle.properties"                                   fork
   _cs_expect "secrets-manifest.yaml"                               fork
   _cs_expect "secrets/live/keystore.jks"                           fork
@@ -183,7 +186,7 @@ cs_require_flip_preconditions() {
   _cs_expect "core/store/AppStoreRegistry.kt"                      fork
   _cs_expect "core/store/economic/ExchangeRatesStore.kt"          template
   _cs_expect "core/store/banking/InterestRateSeriesStore.kt"      template
-  [ "$bad" -eq 0 ] && echo "✅ T1 flip preconditions hold (og-images/secrets-manifest/gradle.properties/tests + core/store seam-only fork)"
+  [ "$bad" -eq 0 ] && echo "✅ T1 flip preconditions hold (og-images generated · secrets-manifest/gradle.properties/keystore + core/store seam fork · tests/core-store-impl template)"
   return "$bad"
 }
 
@@ -224,7 +227,7 @@ cs_main() {
       ;;
     require-flip-preconditions)
       # E0/T1 (FIX-01-R2-ATOMIC): exit 0 iff every T1 ownership row is present + correct — the atomic
-      # self-guard T3's sync-dirs.sh flip calls before preserving, so a consumer that pulled the
+      # self-guard T3's scripts/white-label/sync-dirs.sh flip calls before preserving, so a consumer that pulled the
       # mechanism flip WITHOUT the ownership fix HALTs (no clobber).
       cs_require_flip_preconditions
       ;;

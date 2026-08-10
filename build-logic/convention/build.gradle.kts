@@ -29,6 +29,9 @@ dependencies {
     compileOnly(libs.ktlint.gradlePlugin)
     compileOnly(libs.spotless.gradle)
     implementation(libs.truth)
+    // SnakeYAML — lets SyncForkConfigPlugin parse app-profile/app.yaml + platforms/**/*.yaml
+    // (the fork-owned white-label SoT). Not in the version catalog; literal coordinate.
+    implementation("org.yaml:snakeyaml:2.2")
     compileOnly(libs.androidx.room.gradle.plugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.firebase.performance.gradlePlugin)

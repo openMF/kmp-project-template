@@ -2,15 +2,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Fork-ownership contract for kmp-project-template.
 #
-# A fork of this template runs `sync-dirs.sh` to pull template updates while
+# A fork of this template runs `scripts/white-label/sync-dirs.sh` to pull template updates while
 # keeping its own branding + features. This file is the SINGLE declared source of
 # truth for "who owns this path?" — replacing the ownership knowledge previously
-# scattered across sync-dirs.sh (SYNC_DIRS + EXCLUSIONS), customizer.sh, and the
+# scattered across scripts/white-label/sync-dirs.sh (SYNC_DIRS + EXCLUSIONS), scripts/white-label/customize.sh, and the
 # syncForkConfig copy map.
 #
 # Every path resolves to exactly one owner:
 #
-#   template — the template is the SOLE author. `sync-dirs.sh` OVERWRITES the fork's
+#   template — the template is the SOLE author. `scripts/white-label/sync-dirs.sh` OVERWRITES the fork's
 #              copy. A fork edit here is drift and will be clobbered — a genuine fix
 #              belongs UPSTREAM as a PR to openMF/kmp-project-template.
 #
@@ -49,7 +49,7 @@ rules:
     owner: merge
     strategy: strings-union
   # Version catalog: fork pins versions + adds libs; template adds/bumps. Already a
-  # 3-way merge in sync-dirs.sh STEP 4.5 — declared here so the ownership is explicit.
+  # 3-way merge in scripts/white-label/sync-dirs.sh STEP 4.5 — declared here so the ownership is explicit.
   - glob: "gradle/libs.versions.toml"
     owner: merge
     strategy: catalog-3way
@@ -93,7 +93,11 @@ rules:
     strategy: kotlin-3way
 
   # ── fork-owned (carve-outs INSIDE otherwise-template dirs; declared before template) ──
-  - glob: "branding/**"
+  # app-profile/ — the fork-owned white-label deployment SoT (identity, text, media, icons, per platform).
+  # This is the ONLY fork-owned deployment surface. deployment/ LOGIC stays template-owned and reads this
+  # via _shared/config.rb (AppProfile.get) + syncForkConfig; sync NEVER rewrites app-profile/**.
+  # (branding/icons was dissolved into app-profile/icons — there is no separate branding/ dir.)
+  - glob: "app-profile/**"
     owner: fork
   - glob: "feature/**"
     owner: fork
@@ -108,6 +112,17 @@ rules:
   - glob: "core/store/**/di/StoreModule.kt"
     owner: fork
   - glob: "core/store/**/appStoreModule*.kt"
+    owner: fork
+  # Feature registry seam — the fork-owned white-label extension point for feature contributions
+  # (Koin modules, nav destinations, workers). The template infra (KoinModules, AuthenticatedNavigation,
+  # WorkerDeclarations) READS this seam; a fork adds/removes features by editing ONLY this file, so the
+  # infra modules stay full-copy `owner: template`. Same seam pattern as the core/store block above. (2026-08-10)
+  - glob: "cmp-navigation/**/registry/FeatureRegistry.kt"
+    owner: fork
+  # Worker seam — the fork-owned @WorkerKmpWorkers site (cmp-shared). The template WorkerDeclarations.kt
+  # (base workers) stays owner:template; the KSP processor aggregates both. A fork declares its workers
+  # here, so a sync full-copies cmp-shared while the fork's workers survive.
+  - glob: "cmp-shared/**/ForkWorkerDeclarations.kt"
     owner: fork
   - glob: "core/store/economic/**"   # template store architecture (ExchangeRatesStore, …)
     owner: template
@@ -143,15 +158,24 @@ rules:
     owner: fork
   - glob: "fastlane-config/extract_config.rb"
     owner: fork
-  - glob: "deployment/**/metadata/**"         # store listings
-    owner: fork
-  - glob: "deployment/**/screenshots/**"
-    owner: fork
-  - glob: "deployment/**/og-images/**"        # per-brand social-share images — E0/T1 (was clobbered)
-    owner: fork
+  # Store-listing text + media are DERIVED from app-profile/ by syncForkConfig — the SoT is
+  # app-profile/app.yaml + platforms/<p>/*.yaml (text) and app-profile/platforms/<p>/media (media).
+  # deployment/**/metadata is a generated materialization fastlane's metadata_path reads; NEVER
+  # hand-edit it. owner:generated → /kmp-project-template-sync ignores it (regenerated, not preserved).
+  - glob: "deployment/**/metadata/**"         # store listings — DERIVED from app-profile
+    owner: generated
+  - glob: "deployment/**/screenshots/**"      # DERIVED from app-profile/platforms/<p>/media
+    owner: generated
+  - glob: "deployment/**/og-images/**"        # DERIVED from app-profile/platforms/web/media
+    owner: generated
+  # deployment/ is a TEMPLATE-OWNED module, synced exactly like core-base/ (RULE-TEMPLATE-MODULE-FIX-
+  # UPSTREAM-001 routes any deployment/ fix upstream). The ONLY non-template carve-outs are: DERIVED
+  # artifacts above (owner:generated — regenerated from app-profile, never hand-edited), the target
+  # CATALOG below (owner:merge — template adds targets, fork's enabled/tier), and the runtime deploy LOG
+  # (owner:fork — per-fork history, not logic). ALL fork DATA lives in app-profile/ — deployment/ holds none.
   - glob: "deployment/**/DEPLOYMENT_MANIFEST.yaml"
     owner: merge   # E0/T4: new template targets propagate; fork keeps enabled/tier
-  - glob: "deployment/**/PROMOTION_LOG.yaml"  # append-only promotion history
+  - glob: "deployment/**/PROMOTION_LOG.yaml"  # runtime deploy history (append-only) — not logic
     owner: fork
   - glob: "secrets/live/**"                   # real secrets (gitignored)
     owner: fork
@@ -159,7 +183,7 @@ rules:
     owner: fork
   - glob: ".github/workflows/sync-dirs.yaml"  # fork's own sync workflow
     owner: fork
-  - glob: "gradle/fork.properties"            # filled-in identity (gitignored)
+  - glob: "gradle/fork.properties"            # derived build-bridge from app-profile/app.yaml (do not hand-edit); gitignored
     owner: fork
   - glob: "local.properties"
     owner: fork
@@ -215,7 +239,7 @@ rules:
     owner: template
   - glob: ".run/**"
     owner: template
-  # root-level template files (mirror sync-dirs.sh SYNC_FILES)
+  # root-level template files (mirror scripts/white-label/sync-dirs.sh SYNC_FILES)
   - { glob: "Gemfile",                       owner: template }
   - { glob: "Gemfile.lock",                  owner: template }
   - { glob: "ci-prepush.sh",                 owner: template }
@@ -223,11 +247,11 @@ rules:
   - { glob: "gradlew",                       owner: template }
   - { glob: "gradlew.bat",                   owner: template }
   - { glob: "compose_compiler_config.conf",  owner: template }
-  - { glob: "sync-dirs.sh",                  owner: template }
-  - { glob: "customizer.sh",                 owner: template }
+  - { glob: "scripts/white-label/sync-dirs.sh",                  owner: template }
+  - { glob: "scripts/white-label/customize.sh",                 owner: template }
   - { glob: "setup-project.sh",              owner: template }
-  - { glob: "keystore-manager.sh",           owner: template }
-  - { glob: "firebase-setup.sh",             owner: template }
+  - { glob: "scripts/white-label/keystore.sh",           owner: template }
+  - { glob: "scripts/white-label/firebase.sh",             owner: template }
   - { glob: "generateModuleGraphs.sh",       owner: template }
   - { glob: "gradle/fork.properties.template", owner: template }
   - { glob: "gradle/gradle-daemon-jvm.properties", owner: template }

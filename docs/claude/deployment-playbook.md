@@ -46,7 +46,7 @@ This playbook provides step-by-step deployment procedures for all 5 platforms.
 - [ ] **On correct branch** - `dev` for beta, `main`/`master` for production
 - [ ] **Version correct** - Run `./gradlew printVersionInfo`
 - [ ] **Changelog updated** - Release notes prepared
-- [ ] **Secrets configured** - Run `./keystore-manager.sh view`
+- [ ] **Secrets configured** - Run `scripts/white-label/keystore.sh view`
 - [ ] **Team notified** - Announce deployment in team chat
 
 ### Platform-Specific Checklists
@@ -162,7 +162,7 @@ bundle exec fastlane android deployDemoApkOnFirebase
 ls -la secrets/android/playStorePublishServiceCredentialsFile.json
 
 # Verify keystores
-./keystore-manager.sh view
+scripts/white-label/keystore.sh view
 
 # Check version will increment
 ./gradlew printVersionInfo

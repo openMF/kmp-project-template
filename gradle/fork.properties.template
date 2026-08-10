@@ -20,8 +20,9 @@
 # catalog's appId — edit app.id here and re-run syncForkConfig. product-health's
 # appid-consistency check FAILs if the two ever drift.
 #
-# Other build-time values (appDisplayName, baseNamespace, projectName, iosTeamId) still
-# live in gradle/libs.versions.toml; syncForkConfig reads this file first for them too.
+# Other build-time values (appDisplayName, projectName, iosTeamId) still live in
+# gradle/libs.versions.toml; syncForkConfig reads this file first for them too.
+# (Module namespaces are a fixed framework label — org.convention.BASE_MODULE_NAMESPACE — not here.)
 #
 # CI SETUP: Set ENV vars directly — fork.properties is not needed on CI.
 #           See each key for its ENV var. The 6 TOML values are always available

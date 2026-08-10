@@ -17,30 +17,22 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
+import cmp.navigation.registry.FeatureRegistry
 import kotlinx.serialization.Serializable
 import kpt.core.base.security.isReleaseBuild
 import kpt.core.base.ui.nav.popBackStackSafely
-import kpt.feature.alerts.navigation.alertsGraph
-import kpt.feature.bills.navigation.billsGraph
 import kpt.feature.bills.navigation.navigateToBills
-import kpt.feature.calculators.navigation.calculatorsGraph
 import kpt.feature.calculators.navigation.navigateToAffordability
 import kpt.feature.calculators.navigation.navigateToAmortization
 import kpt.feature.calculators.navigation.navigateToLoanCalcWizard
 import kpt.feature.calculators.navigation.navigateToLoanComparison
-import kpt.feature.crypto.navigation.cryptoGraph
 import kpt.feature.crypto.navigation.navigateToCrypto
-import kpt.feature.currencyrates.navigation.currencyRatesGraph
 import kpt.feature.currencyrates.navigation.navigateToCurrencyRates
 import kpt.feature.currencyrates.navigation.navigateToRateHistory
-import kpt.feature.emicalculator.navigation.emiCalculatorDestination
 import kpt.feature.emicalculator.navigation.navigateToEmiCalculator
-import kpt.feature.loans.navigation.loansGraph
 import kpt.feature.loans.navigation.navigateToLoans
-import kpt.feature.macro.navigation.macroGraph
 import kpt.feature.macro.navigation.navigateToMacroGraph
 import kpt.feature.rates.navigation.navigateToRates
-import kpt.feature.rates.navigation.ratesGraph
 import kpt.feature.settings.navigateToSettings
 import kpt.feature.settings.notificationDestination
 import kpt.feature.settings.settingsDestination
@@ -48,7 +40,6 @@ import kpt.feature.showcase.stategallery.StateGalleryRoute
 import kpt.feature.showcase.stategallery.stateGalleryGraph
 import kpt.feature.showcase.transitions.TransitionGalleryRoute
 import kpt.feature.showcase.transitions.transitionGalleryGraph
-import kpt.feature.watchlist.navigation.watchlistGraph
 
 @Serializable
 internal data object AuthenticatedGraphRoute
@@ -104,20 +95,12 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             // demo:end
         )
 
-        // demo:begin
-        // Money Toolkit feature graphs — generic personal-finance utilities.
-        currencyRatesGraph(navController)
-        emiCalculatorDestination(onBackClick = { navController.popBackStackSafely() })
+        // Fork feature routes — from the fork-owned FeatureRegistry seam (white-label: the template infra
+        // never edits this; a fork adds/removes routes in cmp-navigation/registry/FeatureRegistry.kt).
+        // `this` here is the NavGraphBuilder receiver of the enclosing navigation{} block.
+        FeatureRegistry.featureDestinations.invoke(this, navController)
 
-        // Banking utility toolkit — local-only personal tools.
-        loansGraph(navController) // B1 — multi-formKey draft showcase
-        billsGraph(navController) // B4 — multi-formKey + platform notification scheduler
-        calculatorsGraph(navController) // B2/B3/B5/B6 — affordability + amortization + comparison + wizard
-        ratesGraph(navController) // B7 — NETWORK_WITH_CACHE rate tracker
-        macroGraph(navController) // B8 — multi-source combine (GDP / CPI / Unemployment)
-        cryptoGraph(navController) // Phase 4 store5-screen-state-persistence — AC-17 deep-scroll restore
-        alertsGraph(navController) // submit_offline_write demo (E3)
-        watchlistGraph(navController) // read_local_list demo (E3)
+        // demo:begin
 
         // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).
         transitionGalleryGraph(navController)

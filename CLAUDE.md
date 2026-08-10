@@ -204,8 +204,8 @@ not configured" empty state rather than crashing.
 ./setup-project.sh  # Master setup script
 
 # OR follow detailed setup:
-./keystore-manager.sh generate  # Generate Android keystores
-./firebase-setup.sh             # Configure Firebase projects
+scripts/white-label/keystore.sh generate  # Generate Android keystores
+scripts/white-label/firebase.sh             # Configure Firebase projects
 ./scripts/ios/setup_ios_complete.sh # iOS code signing setup
 ```
 
@@ -363,9 +363,14 @@ single pass.
 > `./gradlew syncForkConfig` writes it back into `gradle/libs.versions.toml#appId` (the catalog the
 > build reads via `libs.versions.appId`). Edit `app.id` in fork.properties, never the catalog line;
 > `scripts/product-health/checks/appid-consistency.sh` FAILs CI if the two drift. The other build-time
-> keys (`appDisplayName`, `baseNamespace`, `desktopAppName`, `projectName`) are still authored in
+> keys (`appDisplayName`, `desktopAppName`, `projectName`) are still authored in
 > `libs.versions.toml` (syncForkConfig reads fork.properties first for them, then the catalog).
 > `gradle.properties` holds fork-rename placeholders for the future `scripts/fork-rename.sh`.
+>
+> **Module namespaces are NOT a fork property.** Every module's Android `namespace` (R-class) derives
+> from the framework-owned constant `org.convention.BASE_MODULE_NAMESPACE` (`kpt`) in `build-logic` —
+> it matches the hardcoded `kpt.*` Kotlin package root, has no per-fork meaning, and is deliberately
+> kept OUT of `libs.versions.toml` so it never causes a catalog-merge conflict during a template sync.
 
 | Property | `gradle.properties` | `libs.versions.toml` (runtime SoT) | Consumer (planned) |
 | -------- | ------------------- | ----------------------------------- | ------------------ |
@@ -373,7 +378,6 @@ single pass.
 | `APP_NAME` | `Money Toolkit` | `appDisplayName = "Money Toolkit"` | Android `app_name`, iOS `CFBundleDisplayName` |
 | `APP_VERSION_BASE` | `1.0.0` | _(not in toml — Gradle computes `YYYY.M.D` from git)_ | Base for version string generation |
 | `APP_BUNDLE_DISPLAY_NAME` | `Money Toolkit` | `desktopAppName = "Money Toolkit"` | iOS Springboard label; macOS `CFBundleName` |
-| `APP_BRAND_PREFIX` | `Kpt` | `baseNamespace = "kpt"` | Kotlin-namespace prefix (e.g. `KptTheme`, `KptProgress`) |
 
 **Today**: forks edit these properties **and** every consumer file by hand.
 **Roadmap**: a `scripts/fork-rename.sh` (TBD) will accept new values and write
@@ -394,18 +398,18 @@ core-base-store-coverage epic for the seam rationale.
 App icons follow the same source-of-truth → `syncForkConfig` propagation pattern
 as the text fields above, just for binary files:
 
-- **Drop fork-specific icons** into `branding/icons/` (one file per platform —
-  see `branding/icons/README.md` for the exact name → destination mapping).
+- **Drop fork-specific icons** into `app-profile/icons/` (one file per platform —
+  see `app-profile/icons/README.md` for the exact name → destination mapping).
 - **Run** `./gradlew syncForkConfig`. The task copies whichever files are
   present into the canonical platform locations
   (`cmp-ios/iosApp/Assets.xcassets/AppIcon.appiconset/AppIcon.png`,
   `cmp-web/src/{js,wasmJs}Main/resources/favicon.ico`,
   `cmp-desktop/icons/ic_launcher.{icns,ico,png}`).
-- **Missing source = no-op.** An empty `branding/icons/` keeps the template
+- **Missing source = no-op.** An empty `app-profile/icons/` keeps the template
   defaults — every drop is opt-in.
 - **Android adaptive icons** require Android Studio's Image Asset Studio (one
   time per fork, commit the result). Alternatively drop a pre-built res tree
-  into `branding/icons/android/` to have `syncForkConfig` copy it across.
+  into `app-profile/icons/android/` to have `syncForkConfig` copy it across.
 
 Implementation: `build-logic/convention/src/main/kotlin/SyncForkConfigPlugin.kt`.
 
@@ -423,7 +427,7 @@ See [Version Handling Guide](docs/claude/version-handling.md) for details.
 
 ### Secret Management
 - **NEVER commit:** `secrets/`, `keystores/`, `*.keystore`, `*.p8`, `*.p12`, `.env`
-- **Use:** `keystore-manager.sh` for all secret operations
+- **Use:** `scripts/white-label/keystore.sh` for all secret operations
 - **GitHub Secrets:** 30+ secrets required for full deployment pipeline
 - **File-to-Secret Mapping:**
   - `firebaseAppDistributionServiceCredentialsFile.json` → `FIREBASECREDS`
@@ -510,9 +514,9 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 ./gradlew jsBrowserDistribution
 
 # Secrets management
-./keystore-manager.sh view              # View current secrets
-./keystore-manager.sh encode-secrets    # Encode secrets for GitHub Actions
-./keystore-manager.sh add               # Add secrets to GitHub (requires gh CLI)
+scripts/white-label/keystore.sh view              # View current secrets
+scripts/white-label/keystore.sh encode-secrets    # Encode secrets for GitHub Actions
+scripts/white-label/keystore.sh add               # Add secrets to GitHub (requires gh CLI)
 ```
 
 ---

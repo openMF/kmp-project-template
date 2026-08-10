@@ -43,6 +43,10 @@ class CurrencyRepositorySyncWithTest {
                     ExchangeRates(base = base, date = "2026-01-01", rates = mapOf("USD" to 1.0))
                 },
             )
+            // Tie the Store5 fetcher to runTest's scheduler so the forced NETWORK_ONLY refresh runs
+            // under virtual time (no real-dispatcher race) — `fetchedBases` is then fully populated
+            // before the assertion. Without this the store's default scope makes the test flaky.
+            .scope(backgroundScope)
             .build()
 
         // Not exercised by syncWith — placeholder stores to satisfy the constructor.

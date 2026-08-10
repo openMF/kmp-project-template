@@ -1,1 +1,0 @@
-EMI calculator,debt,bill reminder,interest rate,amortization,budget,currency,mortgage

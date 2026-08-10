@@ -86,7 +86,14 @@ module BuildSecrets
     # String value: literal constant → its value; else env var first (CI), then
     # the on-disk file (local fallback, REPO_ROOT-anchored like path()).
     def value(key)
-      s = spec(key)
+      # An UNKNOWN key resolves to nil — consistent with a missing on-disk file → nil below. `.value`
+      # is for OPTIONAL secret VALUES (ENV-first, file-fallback); a key that isn't registered for this
+      # project must NOT hard-raise and abort config.rb load. It was doing exactly that: config.rb's
+      # `module IosConfig` eagerly resolves `:appstore_key_id` at LOAD, so an Android deploy (which never
+      # touches iOS) aborted with `unknown secret 'appstore_key_id'` (2026-08-08). `.path` still raises —
+      # a structural path is required. The real consumer (an iOS lane) validates a nil at deploy time.
+      s = begin; spec(key); rescue; nil; end
+      return nil if s.nil?
       return s["value"] if s["kind"] == "literal"
       env = ENV[s["source_env"].to_s]
       return env unless env.to_s.empty?
@@ -110,11 +117,37 @@ module BuildSecrets
       body = materialize_body(key, s, kind, from_env)
       return nil if body.nil? || body.empty?
 
+      new_body = (kind == "file" ? body : "#{body.chomp}\n")
+
+      # NEVER clobber a git-TRACKED destination. A `consume_at` that points at a committed reference
+      # (e.g. cmp-android/google-services.json ships a COMPLETE per-flavor reference so the template
+      # builds out-of-box) is the build's source of truth. Overwriting it with the vault copy — which
+      # may be a SUBSET (missing a flavored applicationId) — silently breaks the flavored build at
+      # compile time, far from the `/secrets pull` that caused it (2026-08-09: the vault
+      # google-services carried 2 of 6 variants → demoDebug link failure). Materialize only to
+      # untracked/gitignored destinations (secrets/live/**, _env/**, local.properties, …). A fork
+      # that wants a vault-driven file must `git rm --cached` it first (make it untracked).
+      if git_tracked?(dest)
+        return dest if File.exist?(abs(dest)) && File.read(abs(dest)) == new_body  # identical — no-op
+        warn "  ↳ skip #{key}: #{dest} is git-tracked — keeping the committed reference " \
+             "(vault copy differs; not clobbering the build source-of-truth)"
+        return nil
+      end
+
       FileUtils.mkdir_p(File.dirname(dest))
       # Files keep their bytes verbatim; line-oriented values get a trailing newline.
-      File.write(dest, kind == "file" ? body : "#{body.chomp}\n")
+      File.write(dest, new_body)
       File.chmod(s["mode"].to_i(8), dest) if s["mode"]
       dest
+    end
+
+    # Is `dest` (repo-root-relative) a git-TRACKED file? A committed file is authoritative — the
+    # `/secrets pull` materialize must not overwrite it. Fails SAFE to false (allow materialize)
+    # when git is unavailable. system(out:/err:) redirection is Ruby 2.6-compatible.
+    def git_tracked?(dest)
+      rel = dest.sub(%r{\A#{Regexp.escape(REPO_ROOT)}/}, "")
+      system("git", "-C", REPO_ROOT, "ls-files", "--error-unmatch", "--", rel,
+             out: File::NULL, err: File::NULL)
     end
 
     # Materialize every secret whose source is present (used by `materialize-all`).

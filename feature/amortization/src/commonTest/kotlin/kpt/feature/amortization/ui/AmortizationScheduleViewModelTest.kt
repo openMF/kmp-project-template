@@ -10,11 +10,17 @@
 package kpt.feature.amortization.ui
 
 import app.cash.turbine.test
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.demo.banking.Loan
 import kpt.core.model.demo.banking.LoanKind
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -22,6 +28,22 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class AmortizationScheduleViewModelTest {
+
+    // Pin Dispatchers.Main to the test scheduler so the ViewModel's viewModelScope runs under
+    // runTest's virtual clock (not the real Main dispatcher) — without this the Turbine assertions
+    // race the ViewModel's Store5-backed emission and flake under Kover/CI. The other 22 ViewModel
+    // tests already do this; this one was the lone omission (the desktopTest flake).
+    private val dispatcher = StandardTestDispatcher()
+
+    @BeforeTest
+    fun setUp() {
+        Dispatchers.setMain(dispatcher)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     private val repo = FakeLoanRepository()
 

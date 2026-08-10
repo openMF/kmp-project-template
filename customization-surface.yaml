@@ -113,6 +113,17 @@ rules:
     owner: fork
   - glob: "core/store/**/appStoreModule*.kt"
     owner: fork
+  # Feature registry seam — the fork-owned white-label extension point for feature contributions
+  # (Koin modules, nav destinations, workers). The template infra (KoinModules, AuthenticatedNavigation,
+  # WorkerDeclarations) READS this seam; a fork adds/removes features by editing ONLY this file, so the
+  # infra modules stay full-copy `owner: template`. Same seam pattern as the core/store block above. (2026-08-10)
+  - glob: "cmp-navigation/**/registry/FeatureRegistry.kt"
+    owner: fork
+  # Worker seam — the fork-owned @WorkerKmpWorkers site (cmp-shared). The template WorkerDeclarations.kt
+  # (base workers) stays owner:template; the KSP processor aggregates both. A fork declares its workers
+  # here, so a sync full-copies cmp-shared while the fork's workers survive.
+  - glob: "cmp-shared/**/ForkWorkerDeclarations.kt"
+    owner: fork
   - glob: "core/store/economic/**"   # template store architecture (ExchangeRatesStore, …)
     owner: template
   - glob: "core/store/banking/**"    # template store architecture (InterestRateSeriesStore, …)

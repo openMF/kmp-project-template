@@ -20,20 +20,9 @@ import kpt.core.data.di.DataModule
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.store.di.appStoreModule
-import kpt.feature.addtowatchlist.di.AddToWatchlistModule
-import kpt.feature.alerts.di.AlertsModule
-import kpt.feature.amortization.di.AmortizationModule
-import kpt.feature.bills.di.BillsModule
-import kpt.feature.calculators.di.CalculatorsModule
-import kpt.feature.crypto.di.CryptoFeatureModule
-import kpt.feature.currencyrates.di.CurrencyRatesModule
-import kpt.feature.emicalculator.di.EmiCalculatorModule
+import cmp.navigation.registry.FeatureRegistry
 import kpt.feature.home.di.HomeModule
-import kpt.feature.loans.di.LoansModule
-import kpt.feature.macro.di.MacroModule
-import kpt.feature.rates.di.RatesModule
 import kpt.feature.settings.SettingsModule
-import kpt.feature.watchlist.di.WatchlistModule
 import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -56,25 +45,11 @@ object KoinModules {
     }
 
     private val featureModule = module {
-        includes(
-            // shell (framework) — kept
-            HomeModule,
-            SettingsModule,
-            // demo:begin — customizer --clean strips these demo feature modules
-            CurrencyRatesModule,
-            EmiCalculatorModule,
-            BillsModule,
-            LoansModule,
-            AmortizationModule,
-            RatesModule,
-            CalculatorsModule,
-            MacroModule,
-            CryptoFeatureModule,
-            AlertsModule,
-            WatchlistModule,
-            AddToWatchlistModule,
-            // demo:end
-        )
+        // Framework SHELL modules — always present.
+        includes(HomeModule, SettingsModule)
+        // Fork features — from the fork-owned FeatureRegistry seam (white-label: the template infra
+        // NEVER edits this; a fork adds/removes features by editing cmp-navigation/registry/FeatureRegistry.kt).
+        includes(*FeatureRegistry.featureKoinModules.toTypedArray())
     }
 
     val allModules = listOf(

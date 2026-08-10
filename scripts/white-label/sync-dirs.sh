@@ -628,29 +628,46 @@ done
 IFS="$OLD_IFS"  # Restore original IFS
 echo
 
-# Check if upstream remote exists
-if ! git remote | grep -q '^upstream$'; then
-    print_warning "Upstream remote not found."
-    if [ "$DRY_RUN" = false ]; then
-        echo -e "${YELLOW}Default upstream URL:${NC} ${BOLD}$DEFAULT_UPSTREAM_URL${NC}"
-        if [ "$FORCE" = false ]; then
-            echo -e "${YELLOW}Press Enter to use default URL or input a different one:${NC}"
-            read -r custom_url
-        else
-            custom_url=""
-        fi
-
-        upstream_url=${custom_url:-$DEFAULT_UPSTREAM_URL}
-        print_step "Adding upstream remote: ${BOLD}$upstream_url${NC}"
-        git remote add upstream "$upstream_url" || handle_error "Failed to add upstream remote"
-        show_progress
+# Resolve the TEMPLATE remote. The sync source is ALWAYS the template repo — but a consumer app may use
+# its own `upstream` remote for its OWN upstream (e.g. openMF/mifos-x-group-banking), NOT the template.
+# So find whichever remote points at the template URL (backward-compatible: a direct fork's `upstream`
+# IS the template); if none, add a dedicated `template` remote. Override name via TEMPLATE_REMOTE_NAME,
+# URL via TEMPLATE_URL.
+DEFAULT_UPSTREAM_URL="${TEMPLATE_URL:-$DEFAULT_UPSTREAM_URL}"
+# Normalize a git URL to `host/owner/repo` so SSH, scp-like, and HTTPS forms of the SAME repo compare
+# equal (e.g. git@github.com:openMF/kmp-project-template.git ≡ https://github.com/openMF/kmp-project-template).
+# Portable sed only (no GNU \L) — runs on macOS (BSD sed) + Linux CI.
+_norm_url() {
+    echo "$1" | sed -E '
+        s|\.git$||
+        s|/$||
+        s|^[a-zA-Z][a-zA-Z0-9+.-]*://||
+        s|^[^@/]+@||
+        s|^([^/:]+):|\1/|
+    '
+}
+TEMPLATE_REMOTE=""
+for _r in $(git remote); do
+    if [ "$(_norm_url "$(git remote get-url "$_r" 2>/dev/null)")" = "$(_norm_url "$DEFAULT_UPSTREAM_URL")" ]; then
+        TEMPLATE_REMOTE="$_r"; break
     fi
+done
+if [ -z "$TEMPLATE_REMOTE" ]; then
+    TEMPLATE_REMOTE="${TEMPLATE_REMOTE_NAME:-template}"
+    print_warning "No remote points at the template — using dedicated remote '${BOLD}$TEMPLATE_REMOTE${NC}' → $DEFAULT_UPSTREAM_URL"
+    # A git remote is config-only (no working-tree/history change) and is a read-side prerequisite for
+    # computing the diff — so it is added even on --dry-run, which must fetch the template to show what
+    # WOULD sync. Skipping it in dry-run would make the fetch below fail on a fork with no template remote.
+    git remote get-url "$TEMPLATE_REMOTE" >/dev/null 2>&1 \
+        || git remote add "$TEMPLATE_REMOTE" "$DEFAULT_UPSTREAM_URL" \
+        || handle_error "Failed to add $TEMPLATE_REMOTE remote"
+    show_progress
 fi
 
-# Fetch from upstream
-print_step "Fetching from upstream..."
-if ! git fetch upstream; then
-    handle_error "Failed to fetch from upstream"
+# Fetch from the template
+print_step "Fetching from template remote (${BOLD}$TEMPLATE_REMOTE${NC})..."
+if ! git fetch "$TEMPLATE_REMOTE"; then
+    handle_error "Failed to fetch from $TEMPLATE_REMOTE"
 fi
 show_progress
 
@@ -676,7 +693,7 @@ if [ "$DRY_RUN" = false ]; then
     # Create temporary branch for upstream changes
     TEMP_BRANCH="temp-${SYNC_BRANCH}"
     print_step "Creating temporary branch: ${BOLD}$TEMP_BRANCH${NC}"
-    if ! git checkout -b "$TEMP_BRANCH" "upstream/$BASE_BRANCH"; then
+    if ! git checkout -b "$TEMP_BRANCH" "$TEMPLATE_REMOTE/$BASE_BRANCH"; then
         handle_error "Failed to create temporary branch"
     fi
     show_progress

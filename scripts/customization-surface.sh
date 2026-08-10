@@ -175,7 +175,10 @@ cs_require_flip_preconditions() {
     local got; got="$(cs_resolve_owner "$1")"
     [ "$got" = "$2" ] || { echo "❌ flip-precondition: $1 owner=$got, expected $2"; bad=1; }
   }
-  _cs_expect "deployment/web/og-images/01_home.png"                fork
+  # og-images are DERIVED store media (glob `deployment/**/og-images/** → generated`): regenerated from
+  # app-profile, never hand-edited, so sync IGNORES them. Assert `generated` — this both reflects the
+  # reclassification AND proves the generated-class row is present in the contract.
+  _cs_expect "deployment/web/og-images/01_home.png"                generated
   _cs_expect "gradle.properties"                                   fork
   _cs_expect "secrets-manifest.yaml"                               fork
   _cs_expect "secrets/live/keystore.jks"                           fork
@@ -183,7 +186,7 @@ cs_require_flip_preconditions() {
   _cs_expect "core/store/AppStoreRegistry.kt"                      fork
   _cs_expect "core/store/economic/ExchangeRatesStore.kt"          template
   _cs_expect "core/store/banking/InterestRateSeriesStore.kt"      template
-  [ "$bad" -eq 0 ] && echo "✅ T1 flip preconditions hold (og-images/secrets-manifest/gradle.properties/tests + core/store seam-only fork)"
+  [ "$bad" -eq 0 ] && echo "✅ T1 flip preconditions hold (og-images generated · secrets-manifest/gradle.properties/keystore + core/store seam fork · tests/core-store-impl template)"
   return "$bad"
 }
 

@@ -3,12 +3,12 @@
 # Kotlin Multiplatform Project Customizer
 #
 # Usage:
-#   bash customizer.sh <package_id> <project_name> [app_display_name] [ios_team_id] [--keep-demo]
-#   bash customizer.sh --clean [--apply]            # standalone demo removal (no identity change)
+#   bash scripts/white-label/customize.sh <package_id> <project_name> [app_display_name] [ios_team_id] [--keep-demo]
+#   bash scripts/white-label/customize.sh --clean [--apply]            # standalone demo removal (no identity change)
 #
 # Example:
-#   bash customizer.sh com.mybank.app MyBankApp "My Bank" ABCDE12345
-#   bash customizer.sh com.mybank.app MyBankApp "My Bank" ABCDE12345 --keep-demo
+#   bash scripts/white-label/customize.sh com.mybank.app MyBankApp "My Bank" ABCDE12345
+#   bash scripts/white-label/customize.sh com.mybank.app MyBankApp "My Bank" ABCDE12345 --keep-demo
 #
 # What this does (identity mode):
 #   1. Writes app.id into gradle/fork.properties (its single source of truth) + mirrors the
@@ -72,11 +72,11 @@ set -- "${POSITIONAL[@]+"${POSITIONAL[@]}"}"
 
 # ── Args ─────────────────────────────────────────────────────────────────────
 if [[ $# -lt 2 ]]; then
-  echo -e "${BOLD}Usage:${NC} bash customizer.sh <package_id> <project_name> [app_display_name] [ios_team_id]"
+  echo -e "${BOLD}Usage:${NC} bash scripts/white-label/customize.sh <package_id> <project_name> [app_display_name] [ios_team_id]"
   echo
   echo -e "${BOLD}Examples:${NC}"
-  echo "  bash customizer.sh com.mybank.app MyBankApp"
-  echo "  bash customizer.sh com.mybank.app MyBankApp \"My Bank\" ABCDE12345"
+  echo "  bash scripts/white-label/customize.sh com.mybank.app MyBankApp"
+  echo "  bash scripts/white-label/customize.sh com.mybank.app MyBankApp \"My Bank\" ABCDE12345"
   exit 2
 fi
 
@@ -161,9 +161,9 @@ echo
 # fork.properties is the project-level source of truth; run the sanity harness so the fork
 # immediately sees what customization left un-forked (signing/org identity, store copy).
 # Non-fatal here — CI's quality-gate is the hard gate; this is guidance right after forking.
-if [[ -f "$(dirname "$0")/scripts/product-health/product-health.sh" ]]; then
+if [[ -f "$(dirname "$0")/../product-health/product-health.sh" ]]; then
   print_info "Running product health check (gradle/fork.properties sanity)…"
-  bash "$(dirname "$0")/scripts/product-health/product-health.sh" \
+  bash "$(dirname "$0")/../product-health/product-health.sh" \
     || print_warning "Project health flagged items above — set them in gradle/fork.properties before releasing."
   echo
 fi

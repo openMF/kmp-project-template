@@ -2,15 +2,15 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Fork-ownership contract for kmp-project-template.
 #
-# A fork of this template runs `sync-dirs.sh` to pull template updates while
+# A fork of this template runs `scripts/white-label/sync-dirs.sh` to pull template updates while
 # keeping its own branding + features. This file is the SINGLE declared source of
 # truth for "who owns this path?" — replacing the ownership knowledge previously
-# scattered across sync-dirs.sh (SYNC_DIRS + EXCLUSIONS), customizer.sh, and the
+# scattered across scripts/white-label/sync-dirs.sh (SYNC_DIRS + EXCLUSIONS), scripts/white-label/customize.sh, and the
 # syncForkConfig copy map.
 #
 # Every path resolves to exactly one owner:
 #
-#   template — the template is the SOLE author. `sync-dirs.sh` OVERWRITES the fork's
+#   template — the template is the SOLE author. `scripts/white-label/sync-dirs.sh` OVERWRITES the fork's
 #              copy. A fork edit here is drift and will be clobbered — a genuine fix
 #              belongs UPSTREAM as a PR to openMF/kmp-project-template.
 #
@@ -49,7 +49,7 @@ rules:
     owner: merge
     strategy: strings-union
   # Version catalog: fork pins versions + adds libs; template adds/bumps. Already a
-  # 3-way merge in sync-dirs.sh STEP 4.5 — declared here so the ownership is explicit.
+  # 3-way merge in scripts/white-label/sync-dirs.sh STEP 4.5 — declared here so the ownership is explicit.
   - glob: "gradle/libs.versions.toml"
     owner: merge
     strategy: catalog-3way
@@ -228,7 +228,7 @@ rules:
     owner: template
   - glob: ".run/**"
     owner: template
-  # root-level template files (mirror sync-dirs.sh SYNC_FILES)
+  # root-level template files (mirror scripts/white-label/sync-dirs.sh SYNC_FILES)
   - { glob: "Gemfile",                       owner: template }
   - { glob: "Gemfile.lock",                  owner: template }
   - { glob: "ci-prepush.sh",                 owner: template }
@@ -236,11 +236,11 @@ rules:
   - { glob: "gradlew",                       owner: template }
   - { glob: "gradlew.bat",                   owner: template }
   - { glob: "compose_compiler_config.conf",  owner: template }
-  - { glob: "sync-dirs.sh",                  owner: template }
-  - { glob: "customizer.sh",                 owner: template }
+  - { glob: "scripts/white-label/sync-dirs.sh",                  owner: template }
+  - { glob: "scripts/white-label/customize.sh",                 owner: template }
   - { glob: "setup-project.sh",              owner: template }
-  - { glob: "keystore-manager.sh",           owner: template }
-  - { glob: "firebase-setup.sh",             owner: template }
+  - { glob: "scripts/white-label/keystore.sh",           owner: template }
+  - { glob: "scripts/white-label/firebase.sh",             owner: template }
   - { glob: "generateModuleGraphs.sh",       owner: template }
   - { glob: "gradle/fork.properties.template", owner: template }
   - { glob: "gradle/gradle-daemon-jvm.properties", owner: template }

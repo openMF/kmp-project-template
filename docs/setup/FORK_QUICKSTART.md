@@ -18,10 +18,10 @@ You never touch Android source files, iOS source files, Fastlane config, or
 `settings.gradle.kts` — a single Gradle task bridges the catalog to every
 platform automatically.
 
-### Option A — One-shot via `customizer.sh` (recommended)
+### Option A — One-shot via `scripts/white-label/customize.sh` (recommended)
 
 ```bash
-bash customizer.sh com.myapp.example MyAwesomeApp "My Awesome App" ABCDE12345
+bash scripts/white-label/customize.sh com.myapp.example MyAwesomeApp "My Awesome App" ABCDE12345
 #                  <package_id>       <project_name> [display_name]  [ios_team_id]
 ```
 
@@ -36,9 +36,9 @@ That's it. The script:
 > **Want to keep the demo** (to study the framework's reference features first)? Append
 > `--keep-demo`:
 > ```bash
-> bash customizer.sh com.myapp.example MyAwesomeApp "My Awesome App" ABCDE12345 --keep-demo
+> bash scripts/white-label/customize.sh com.myapp.example MyAwesomeApp "My Awesome App" ABCDE12345 --keep-demo
 > ```
-> You can remove it later at any time with `bash customizer.sh --clean --apply` (see
+> You can remove it later at any time with `bash scripts/white-label/customize.sh --clean --apply` (see
 > [Remove the demo showcase](#optional--remove-the-demo-showcase-customizersh---clean)).
 
 ### Option B — Edit `libs.versions.toml` directly
@@ -99,7 +99,7 @@ app. You do not rename source packages.
 ./gradlew syncForkConfig
 ```
 
-Or re-run `customizer.sh` with the new values.
+Or re-run `scripts/white-label/customize.sh` with the new values.
 
 ## Step 2 — Override the 4 customization-point Koin bindings
 
@@ -150,12 +150,12 @@ Koin module with the values you want.
 ## Step 3 — Generate Android keystores
 
 ```bash
-./keystore-manager.sh generate
+scripts/white-label/keystore.sh generate
 ```
 
 Creates `keystores/upload_keystore.keystore` (and the UPLOAD variant for Play
 Console). The `keystores/` directory is `.gitignore`'d — values never reach
-the public history. Use `./keystore-manager.sh encode-secrets` later to push
+the public history. Use `scripts/white-label/keystore.sh encode-secrets` later to push
 encoded keystores into GitHub Actions secrets for CI builds.
 
 iOS keystore equivalents (Fastlane Match, `.p8` keys) — see
@@ -226,7 +226,7 @@ and launch successfully. If the install fails:
 
 ---
 
-## Optional — Remove the demo showcase (`customizer.sh --clean`)
+## Optional — Remove the demo showcase (`scripts/white-label/customize.sh --clean`)
 
 The template ships a full Money-Toolkit demo (loans, bills, interest rates,
 calculators, crypto, …) so a fresh clone runs a real app out of the box. When
@@ -234,8 +234,8 @@ you're ready to build your own product on the framework, remove the **entire**
 demo in one command:
 
 ```bash
-bash customizer.sh --clean            # preview (dry-run) — prints exactly what will change
-bash customizer.sh --clean --apply    # perform the removal
+bash scripts/white-label/customize.sh --clean            # preview (dry-run) — prints exactly what will change
+bash scripts/white-label/customize.sh --clean --apply    # perform the removal
 ```
 
 This leaves a **minimal, compiling shell**: the app scaffold, navigation, DI,
@@ -326,13 +326,13 @@ identity block was introduced, follow these steps once to adopt the new system.
 | Identity split across `gradle.properties`, `cmp-android/build.gradle.kts`, `cmp-ios/Configuration/Config.xcconfig`, `local.properties`, `settings.gradle.kts` | All identity in 6 lines of `gradle/libs.versions.toml` |
 | `Config.xcconfig` used `BUNDLE_ID` / `APP_NAME` keys (no `TEAM_ID`) | `Config.xcconfig` uses `APP_BUNDLE_ID` / `APP_NAME` / `TEAM_ID` |
 | Module `build.gradle.kts` files each declared an explicit `namespace` | `namespace` derived by convention plugin from `baseNamespace` + module path |
-| `customizer.sh` renamed Kotlin source packages | `customizer.sh` only edits `libs.versions.toml` + calls `syncForkConfig` |
+| `scripts/white-label/customize.sh` renamed Kotlin source packages | `scripts/white-label/customize.sh` only edits `libs.versions.toml` + calls `syncForkConfig` |
 
 ### Migration steps
 
 1. **Pull the updated template** (via sync-dirs PR or manual merge of
    `build-logic/`, `cmp-android/build.gradle.kts`, `cmp-desktop/build.gradle.kts`,
-   root `build.gradle.kts`, `settings.gradle.kts`, `customizer.sh`).
+   root `build.gradle.kts`, `settings.gradle.kts`, `scripts/white-label/customize.sh`).
 
 2. **Add the identity block to your `gradle/libs.versions.toml`** — insert
    these six lines near the top of the `[versions]` section, replacing your

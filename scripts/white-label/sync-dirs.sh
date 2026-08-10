@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# sync-dirs.sh
+# scripts/white-label/sync-dirs.sh
 # Script to sync directories and files from upstream repository
 
 # Repo root (this script lives at the template repo ROOT) — used to source the
@@ -11,9 +11,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The operative-contract flip preserves fork paths by reading customization-surface.yaml. If a consumer
 # pulled this mechanism flip WITHOUT the T1 ownership fix (mid-atomic-window), the contract is wrong and
 # preserving off it would clobber. HALT before any sync rather than silently clobber.
-if [ -f "$SCRIPT_DIR/scripts/customization-surface.sh" ]; then
-    if ! bash "$SCRIPT_DIR/scripts/customization-surface.sh" require-flip-preconditions >/dev/null 2>&1; then
-        echo "❌ sync-dirs.sh HALT: customization-surface.yaml ownership rows (E0/T1) are not present in this tree." >&2
+if [ -f "$SCRIPT_DIR/../customization-surface.sh" ]; then
+    if ! bash "$SCRIPT_DIR/../customization-surface.sh" require-flip-preconditions >/dev/null 2>&1; then
+        echo "❌ scripts/white-label/sync-dirs.sh HALT: customization-surface.yaml ownership rows (E0/T1) are not present in this tree." >&2
         echo "   You pulled the fork-preservation flip without the ownership fix. Re-sync to land both atomically." >&2
         exit 1
     fi
@@ -72,7 +72,7 @@ SYNC_FILES=(
     "gradlew"                       # wrapper launcher scripts — pin the Gradle version with gradle/wrapper
     "gradlew.bat"
     "compose_compiler_config.conf"  # compose compiler config referenced by AndroidCompose.kt
-    "sync-dirs.sh"                  # self-propagate: each sync updates the consumer's own copy for next time
+    "scripts/white-label/sync-dirs.sh"                  # self-propagate: each sync updates the consumer's own copy for next time
     # --- blueprint infra files (2026-07 audit: full white-label blueprint coverage) ---
     ".editorconfig"                 # shared formatting rules
     ".gitattributes"                # shared line-ending / linguist rules
@@ -83,9 +83,9 @@ SYNC_FILES=(
     ".claudeignore"                 # Claude tooling ignore baseline
     # --- blueprint setup / customization scripts (root-level, not under scripts/) ---
     "setup-project.sh"              # master fork setup script
-    "customizer.sh"                 # fork customization driver
-    "keystore-manager.sh"           # keystore generate/encode/add operations
-    "firebase-setup.sh"             # Firebase project configuration
+    "scripts/white-label/customize.sh"                 # fork customization driver
+    "scripts/white-label/keystore.sh"           # keystore generate/encode/add operations
+    "scripts/white-label/firebase.sh"             # Firebase project configuration
     "generateModuleGraphs.sh"       # module dependency-graph generator
     # --- fork identity SCHEMA (the .template is committed + syncable; the filled-in
     #     gradle/fork.properties is gitignored + fork-local — NEVER synced) ---
@@ -254,10 +254,10 @@ is_excluded() {
     # preserve it — even without a hardcoded EXCLUSIONS entry. Closes the og-images/gradle.properties/
     # secrets-manifest clobber class. ADDITIVE — the hardcoded exclusions below still apply as a superset.
     # Invoked as a SUBPROCESS (not sourced) so customization-surface.sh's bash-4 syntax runs under its own
-    # `bash` regardless of sync-dirs.sh's /bin/bash version (macOS 3.2 portability). Result memoized.
-    if [ -x "$SCRIPT_DIR/scripts/customization-surface.sh" ] || [ -f "$SCRIPT_DIR/scripts/customization-surface.sh" ]; then
+    # `bash` regardless of scripts/white-label/sync-dirs.sh's /bin/bash version (macOS 3.2 portability). Result memoized.
+    if [ -x "$SCRIPT_DIR/../customization-surface.sh" ] || [ -f "$SCRIPT_DIR/../customization-surface.sh" ]; then
         local _cs_owner
-        _cs_owner="$(bash "$SCRIPT_DIR/scripts/customization-surface.sh" resolve "$full_path" 2>/dev/null | awk 'NR==1{print $2}')"
+        _cs_owner="$(bash "$SCRIPT_DIR/../customization-surface.sh" resolve "$full_path" 2>/dev/null | awk 'NR==1{print $2}')"
         [ "$_cs_owner" = "fork" ] && return 0   # contract says fork-owned → preserve
     fi
 

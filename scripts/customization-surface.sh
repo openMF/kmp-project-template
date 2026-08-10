@@ -16,7 +16,7 @@
 #                                                        # path only matches the default
 # ─────────────────────────────────────────────────────────────────────────────
 # NOTE: shell options are set only on direct execution (bottom), NOT on source —
-# sourcing must not leak `set -u`/`pipefail` into a caller like sync-dirs.sh.
+# sourcing must not leak `set -u`/`pipefail` into a caller like scripts/white-label/sync-dirs.sh.
 
 CS_SELF="${BASH_SOURCE[0]}"
 CS_ROOT="$(cd "$(dirname "$CS_SELF")/.." && pwd)"
@@ -156,7 +156,7 @@ cs_merge_manifest() {
   return 0
 }
 
-# Strategy dispatcher used by sync-dirs.sh for a `merge`-owned file.
+# Strategy dispatcher used by scripts/white-label/sync-dirs.sh for a `merge`-owned file.
 #   cs_merge <strategy> <ours> <base> <theirs> [<out>]
 cs_merge() {
   local strat="$1" ours="$2" base="$3" theirs="$4" out="${5:-$2}"
@@ -224,7 +224,7 @@ cs_main() {
       ;;
     require-flip-preconditions)
       # E0/T1 (FIX-01-R2-ATOMIC): exit 0 iff every T1 ownership row is present + correct — the atomic
-      # self-guard T3's sync-dirs.sh flip calls before preserving, so a consumer that pulled the
+      # self-guard T3's scripts/white-label/sync-dirs.sh flip calls before preserving, so a consumer that pulled the
       # mechanism flip WITHOUT the ownership fix HALTs (no clobber).
       cs_require_flip_preconditions
       ;;

@@ -95,7 +95,7 @@ jobs:
             # Secrets: sync the SCAFFOLD only (secrets/sample/** + LAYOUT.yaml) so
             # forks inherit the canonical layout, but NEVER real values —
             # secrets/live/ is gitignored + fork-local (real secrets), and
-            # .sync-meta.json is per-fork sync state. Matches sync-dirs.sh.
+            # .sync-meta.json is per-fork sync state. Matches scripts/white-label/sync-dirs.sh.
             # (secrets.env removed — that file was retired 2026-06-23.)
             ["secrets"]="live .sync-meta.json"
           )

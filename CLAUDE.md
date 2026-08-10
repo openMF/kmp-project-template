@@ -204,8 +204,8 @@ not configured" empty state rather than crashing.
 ./setup-project.sh  # Master setup script
 
 # OR follow detailed setup:
-./keystore-manager.sh generate  # Generate Android keystores
-./firebase-setup.sh             # Configure Firebase projects
+scripts/white-label/keystore.sh generate  # Generate Android keystores
+scripts/white-label/firebase.sh             # Configure Firebase projects
 ./scripts/ios/setup_ios_complete.sh # iOS code signing setup
 ```
 
@@ -423,7 +423,7 @@ See [Version Handling Guide](docs/claude/version-handling.md) for details.
 
 ### Secret Management
 - **NEVER commit:** `secrets/`, `keystores/`, `*.keystore`, `*.p8`, `*.p12`, `.env`
-- **Use:** `keystore-manager.sh` for all secret operations
+- **Use:** `scripts/white-label/keystore.sh` for all secret operations
 - **GitHub Secrets:** 30+ secrets required for full deployment pipeline
 - **File-to-Secret Mapping:**
   - `firebaseAppDistributionServiceCredentialsFile.json` → `FIREBASECREDS`
@@ -510,9 +510,9 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 ./gradlew jsBrowserDistribution
 
 # Secrets management
-./keystore-manager.sh view              # View current secrets
-./keystore-manager.sh encode-secrets    # Encode secrets for GitHub Actions
-./keystore-manager.sh add               # Add secrets to GitHub (requires gh CLI)
+scripts/white-label/keystore.sh view              # View current secrets
+scripts/white-label/keystore.sh encode-secrets    # Encode secrets for GitHub Actions
+scripts/white-label/keystore.sh add               # Add secrets to GitHub (requires gh CLI)
 ```
 
 ---

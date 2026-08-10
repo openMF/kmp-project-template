@@ -15,7 +15,7 @@ The project includes a robust synchronization system that allows you to:
 
 ## Sync Directories Script
 
-The `sync-dirs.sh` script is a powerful utility that synchronizes directories and files from the
+The `scripts/white-label/sync-dirs.sh` script is a powerful utility that synchronizes directories and files from the
 upstream repository while preserving your local customizations.
 
 ### Key Features
@@ -47,16 +47,16 @@ upstream repository while preserving your local customizations.
 
 ```bash
 # Basic sync
-./sync-dirs.sh
+scripts/white-label/sync-dirs.sh
 
 # Dry run to preview changes
-./sync-dirs.sh --dry-run
+scripts/white-label/sync-dirs.sh --dry-run
 
 # Force sync without prompts
-./sync-dirs.sh --force
+scripts/white-label/sync-dirs.sh --force
 
 # Both dry run and force mode
-./sync-dirs.sh --dry-run --force
+scripts/white-label/sync-dirs.sh --dry-run --force
 ```
 
 ### Options
@@ -161,7 +161,7 @@ declare -A EXCLUSIONS=(
 
 ### Demo⇄framework separation — sync contract
 
-`sync-dirs.sh` syncs the framework layers — including **`core/`** — so forks
+`scripts/white-label/sync-dirs.sh` syncs the framework layers — including **`core/`** — so forks
 receive architecture improvements automatically. To make that safe alongside the
 removable demo showcase (see
 [FORK_QUICKSTART → Remove the demo showcase](FORK_QUICKSTART.md#optional--remove-the-demo-showcase-customizersh---clean)),
@@ -171,7 +171,7 @@ demo/sample code or your fork's customization seam**:
 - **`*/demo/*` (and any `demo/` leaf)** — every demo domain package lives under a
   `demo/` segment (`kpt.core.<module>.demo.<domain>`). Excluding the glob means the
   template's demo never lands in your fork via sync, and your own `demo/` code is
-  never clobbered. This is the same `**/demo/**` glob `customizer.sh --clean` deletes.
+  never clobbered. This is the same `**/demo/**` glob `scripts/white-label/customize.sh --clean` deletes.
 - **The `core/store` customization seam** — `AppScreenStateDefaults.kt`,
   `AppErrorMapper.kt`, `AppStoreRegistry.kt`, and `StoreModule.kt` are the files a
   fork edits to brand state visuals and register its own stores (see
@@ -180,7 +180,7 @@ demo/sample code or your fork's customization seam**:
 
 Everything else under `core/` (the `infra` layer, framework services, base
 contracts) syncs normally. The `scripts/verify-demo-convention.sh` gate (C5) fails
-CI if the `*/demo/*` exclusion is ever dropped from `sync-dirs.sh`, keeping this
+CI if the `*/demo/*` exclusion is ever dropped from `scripts/white-label/sync-dirs.sh`, keeping this
 contract intact.
 
 ### Branching Strategy

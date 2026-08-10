@@ -74,7 +74,7 @@ Ensure your project includes the latest `core-base` modules from `kmp-project-te
 
 ```bash
 # Manual sync (if not using GitHub Action)
-./sync-dirs.sh --check
+scripts/white-label/sync-dirs.sh --check
 ```
 
 ---

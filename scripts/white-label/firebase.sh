@@ -75,8 +75,8 @@ get_package_from_version_catalog() {
 # Validate arguments
 if [[ $# -lt 2 ]]; then
     echo -e "${RED}${WARNING} Invalid arguments${NC}"
-    echo -e "${CYAN}Usage: bash firebase-setup.sh <firebase-project-id> <ios-bundle-id>${NC}"
-    echo -e "${CYAN}Example: bash firebase-setup.sh my-app-12345 com.example.myapp${NC}"
+    echo -e "${CYAN}Usage: bash scripts/white-label/firebase.sh <firebase-project-id> <ios-bundle-id>${NC}"
+    echo -e "${CYAN}Example: bash scripts/white-label/firebase.sh my-app-12345 com.example.myapp${NC}"
     echo
     echo -e "${YELLOW}Note: Android package name will be read from gradle/libs.versions.toml${NC}"
     exit 1

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# keystore-manager.sh — DEPRECATED thin shim (AC87 of fastlane-modernization epic)
+# scripts/white-label/keystore.sh — DEPRECATED thin shim (AC87 of fastlane-modernization epic)
 #
 # This file forwards to its new home under deployment/_shared/scripts/.
 # Removed at template_version >= 2.7.0 (see fastlane-modernization sub-plan 06).

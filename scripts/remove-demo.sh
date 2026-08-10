@@ -2,7 +2,7 @@
 #
 # remove-demo.sh — strip the kmp-project-template demo showcase, leaving a clean fork.
 #
-# Invoked by `customizer.sh --clean`. Convention (showcase-framework-separation epic):
+# Invoked by `scripts/white-label/customize.sh --clean`. Convention (showcase-framework-separation epic):
 #   • demo domain code lives under **/demo/** packages,
 #   • demo feature modules are include()d inside a `// demo:begin … // demo:end` block
 #     in settings.gradle.kts,

@@ -40,6 +40,11 @@ platform :ios do
     UI.message("🚀 Submitting build #{build_number} for App Store review...")
     UI.message("   automatic_release: #{appstore_config[:automatic_release]}  (goes live on approval — no manual step)")
 
+    # HEAL 1 — ensure an EDITABLE App Store version exists for this build's version BEFORE deliver, so a
+    # promote never aborts with "could not find an editable version" (the case where every App Store
+    # version is READY_FOR_SALE and none matches the build's marketing version). Idempotent create.
+    AppStoreHelpers.ensure_editable_appstore_version!(ios_config[:app_identifier], app_version)
+
     # Drift-checked listing sync (parity with Android/mac): re-upload the app-profile-derived
     # metadata + screenshots ONLY when they changed since the last push (or were never pushed) — an
     # unchanged listing skips the re-upload but the build is still submitted. Defaults toward syncing
@@ -47,31 +52,36 @@ platform :ios do
     ios_listing_changed = store_listing_needs_sync?("ios", ios_config[:metadata_path])
     UI.message(ios_listing_changed ? "🔄 App Store listing changed — will upload metadata + screenshots" : "✓ App Store listing unchanged — skipping metadata re-upload")
 
-    deliver(
-      api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
-      app_identifier:                       ios_config[:app_identifier],
-      app_version:                          app_version,
-      build_number:                         build_number,
-      # No binary — use the build already on TestFlight
-      skip_binary_upload:                   true,
-      # Metadata + screenshots (keeps listing in sync) — gated on drift
-      skip_metadata:                        !ios_listing_changed,
-      skip_screenshots:                     !ios_listing_changed,
-      metadata_path:                        ios_config[:metadata_path],
-      screenshots_path:                     ios_config[:screenshots_path],
-      overwrite_screenshots:                true,
-      ignore_language_directory_validation: true,
-      skip_app_version_update:              true,
-      # Review + release settings
-      submit_for_review:                    true,
-      automatic_release:                    appstore_config[:automatic_release],
-      phased_release:                       appstore_config[:phased_release],
-      reject_if_possible:                   appstore_config[:reject_if_possible],
-      app_review_information:               appstore_config[:app_review_information].dup,
-      submission_information:               appstore_config[:submission_information],
-      run_precheck_before_submit:           false,
-      force:                                true,
-    )
+    # HEAL 2 — a promote NEVER changes app-level identity (name/subtitle). Hide those files around
+    # deliver so it syncs ONLY version-level listing and never aborts on the globally-unique app-name
+    # conflict ("app name already used on a different account"). Restored after (success OR failure).
+    AppStoreHelpers.without_app_identity_metadata(ios_config[:metadata_path]) do
+      deliver(
+        api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+        app_identifier:                       ios_config[:app_identifier],
+        app_version:                          app_version,
+        build_number:                         build_number,
+        # No binary — use the build already on TestFlight
+        skip_binary_upload:                   true,
+        # Metadata + screenshots (keeps listing in sync) — gated on drift
+        skip_metadata:                        !ios_listing_changed,
+        skip_screenshots:                     !ios_listing_changed,
+        metadata_path:                        ios_config[:metadata_path],
+        screenshots_path:                     ios_config[:screenshots_path],
+        overwrite_screenshots:                true,
+        ignore_language_directory_validation: true,
+        skip_app_version_update:              true,
+        # Review + release settings
+        submit_for_review:                    true,
+        automatic_release:                    appstore_config[:automatic_release],
+        phased_release:                       appstore_config[:phased_release],
+        reject_if_possible:                   appstore_config[:reject_if_possible],
+        app_review_information:               appstore_config[:app_review_information].dup,
+        submission_information:               appstore_config[:submission_information],
+        run_precheck_before_submit:           false,
+        force:                                true,
+      )
+    end
 
     # Record the listing hash so a later submit skips the metadata re-upload when unchanged.
     record_store_listing_synced("ios", ios_config[:metadata_path]) if ios_listing_changed

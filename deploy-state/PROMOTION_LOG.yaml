@@ -1,5 +1,10 @@
 # ═════════════════════════════════════════════════════════════════════════════
-# PROMOTION_LOG.yaml — append-only deploy audit log (kmp-project-template)
+# deploy-state/PROMOTION_LOG.yaml — append-only deploy audit log (kmp-project-template)
+#
+# Relocated out of deployment/ (E1 / D-2, epic pure-white-label-store5-network) so
+# deployment/** full-copies from the template with ZERO exclusions. This runtime
+# history is fork-owned (owner: fork — deploy-state/** in customization-surface.yaml);
+# sync NEVER touches it. Writer: deployment/_shared/scripts/promotion-log-append.sh.
 #
 # Authority: schema lifted from `/server promote` v1.1.
 # Schema:    core/schemas/promotion-log.schema.json (v1.1)

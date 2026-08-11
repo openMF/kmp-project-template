@@ -53,12 +53,11 @@ jobs:
         with:
           ruby-version: '3.3'
           bundler-cache: true
-      - name: Generate podspec + placeholder framework
-        # podspec has a raise-if-missing check on
-        # build/cocoapods/framework/ComposeApp.framework. generateDummyFramework
-        # produces a placeholder so `pod install` passes; xcodebuild's
-        # script_phase later swaps in the real framework via syncFramework.
-        run: ./gradlew :cmp-shared:podspec :cmp-shared:generateDummyFramework
+      - name: Assemble ComposeApp XCFramework
+        # E6 — SwiftPM/XCFramework (no CocoaPods). Assemble the release XCFramework the
+        # iosApp.xcodeproj archive links against; the `[KMP] Embed and Sign ComposeApp
+        # XCFramework` Run-Script phase re-assembles + embeds it during the build too.
+        run: ./gradlew :cmp-shared:assembleComposeAppReleaseXCFramework
       - name: fastlane ios build_ios (unsigned)
         # Canonical PR-check lane in fastlane/Fastfile. Same path PR #185 used.
         run: bundle exec fastlane ios build_ios

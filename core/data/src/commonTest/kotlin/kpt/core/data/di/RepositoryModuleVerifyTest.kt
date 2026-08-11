@@ -12,16 +12,23 @@
 package kpt.core.data.di
 
 import kpt.core.base.store.submit.SubmitOutbox
+import kpt.core.data.demo.di.DemoRepositoryModule
 import org.koin.core.qualifier.Qualifier
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
- * Verifies that every `SubmitOutbox<T>` declared in [DataModule] is registered
+ * Verifies that every `SubmitOutbox<T>` declared in [DemoRepositoryModule] is registered
  * under its corresponding [OutboxQualifiers] entry. Catches regressions
  * where a new payload type is added to [OutboxQualifiers] but the matching
  * `single<>` registration is missing — or vice versa.
+ *
+ * NOTE (E1 / C1): the demo `SubmitOutbox<*>` bindings were relocated out of the infra
+ * aggregator [DataModule] (`RepositoryModule.kt`) into the fork-owned
+ * [DemoRepositoryModule] (`kpt/core/data/demo/di/DemoRepositoryModule.kt`); this test
+ * introspects that module's mappings now. The [OutboxQualifiers] naming contract stays in
+ * `kpt.core.data.di` (no demo imports), consumed by the demo feature modules.
  *
  * Failure mode if not caught: `ClassCastException` at first
  * `.saveByUniqueKey(payload)` call on the mis-registered outbox.
@@ -62,18 +69,18 @@ class RepositoryModuleVerifyTest {
     }
 
     /**
-     * Asserts that [DataModule]'s mapping table contains exactly one
+     * Asserts that [DemoRepositoryModule]'s mapping table contains exactly one
      * `InstanceFactory` whose [org.koin.core.definition.BeanDefinition] has
      * `primaryType == SubmitOutbox::class` AND `qualifier == expected`.
      */
     private fun assertSubmitOutboxBoundUnderQualifier(expected: Qualifier) {
-        val match = DataModule.mappings.values.firstOrNull { factory ->
+        val match = DemoRepositoryModule.mappings.values.firstOrNull { factory ->
             val def = factory.beanDefinition
             def.primaryType == SubmitOutbox::class && def.qualifier == expected
         }
         assertNotNull(
             match,
-            "DataModule must register a SubmitOutbox<*> single<> under qualifier $expected — " +
+            "DemoRepositoryModule must register a SubmitOutbox<*> single<> under qualifier $expected — " +
                 "missing or mis-qualified binding. See OutboxQualifiers KDoc.",
         )
         // Sanity — the qualifier value matches what callers use (e.g. `get(qualifier = X)`).

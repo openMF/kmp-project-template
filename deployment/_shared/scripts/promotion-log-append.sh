@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # deployment/_shared/scripts/promotion-log-append.sh
 #
-# Append a single row to deployment/PROMOTION_LOG.yaml#events[] per
+# Append a single row to deploy-state/PROMOTION_LOG.yaml#events[] per
 # RULE-DEPLOYMENT-MANIFEST-001 DM6 (append-only audit log, 12-field schema).
+# The log was relocated OUT of deployment/ (E1 / D-2) to a fork-owned
+# deploy-state/ dir so deployment/** full-copies with zero exclusions.
 # Called by every release-{platform}.yml workflow on successful lane dispatch.
 #
 # Usage:
@@ -38,7 +40,7 @@ done
 [[ -n "$RUN_ID"   ]] || RUN_ID="local"
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-LOG="$REPO_ROOT/deployment/PROMOTION_LOG.yaml"
+LOG="$REPO_ROOT/deploy-state/PROMOTION_LOG.yaml"
 MANIFEST="$REPO_ROOT/deployment/DEPLOYMENT_MANIFEST.yaml"
 
 [[ -f "$LOG"      ]] || { echo "Missing PROMOTION_LOG.yaml" >&2; exit 1; }

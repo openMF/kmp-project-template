@@ -465,7 +465,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 - **Bundle ID:** authored in `gradle/fork.properties#app.id` (the single source of truth) — same value as the Android applicationId; `syncForkConfig` writes it into `gradle/libs.versions.toml#appId`, which the build reads. Edit `app.id` there — don't hand-edit the catalog.
 - **Min Version:** iOS 15.0, **Target:** iOS 17.0
 - **Code Signing:** Fastlane Match (adhoc for Firebase, appstore for TestFlight/App Store)
-- **CocoaPods:** Required for iOS dependencies
+- **Shared framework integration:** SwiftPM / XCFramework (`cmp-ios/Package.swift` binary target + the `[KMP] Embed and Sign ComposeApp XCFramework` Xcode Run-Script phase). No CocoaPods / Ruby pod toolchain.
 
 ### macOS
 - **Code Signing:** Manual keychain setup with .p12 certificates

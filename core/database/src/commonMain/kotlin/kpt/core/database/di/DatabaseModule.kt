@@ -9,50 +9,27 @@
  */
 package kpt.core.database.di
 
-import kpt.core.base.security.FieldEncryptor
 import kpt.core.database.AppDatabase
-import kpt.core.database.demo.currency.converter.ChargeTypeConverters
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
 /**
- * Marker singleton — its instantiation has the side effect of wiring [FieldEncryptor]
- * into [ChargeTypeConverters] before any database access. Bound with `createdAtStart = true`
- * so the install runs eagerly at Koin start, ahead of the first [AppDatabase] resolution.
- *
- * Room 3 KMP instantiates `@ColumnTypeConverters` classes via no-arg constructor, so the
- * encryptor cannot be passed in by constructor — it's injected post-construction through
- * the [ChargeTypeConverters.install] static method.
- */
-private object ChargeTypeConvertersInstalled
-
-/**
- * Koin module that provides the [AppDatabase] instance and all DAO singletons.
+ * Koin module that provides the [AppDatabase] instance and the framework-infra DAO singletons.
  *
  * Delegates platform-specific database construction to [platformModule], which each
  * source set (`androidMain`, `desktopMain`, `nativeMain`, `jsMain`, `wasmJsMain`)
  * implements using the appropriate [AppDatabaseFactory][kpt.core.base.database.AppDatabaseFactory]
  * and SQLite driver.
+ *
+ * INFRA-ONLY, owner: template (E1 / C3). The demo DAO providers + the ChargeTypeConverters install
+ * relocated to the fork-owned [kpt.core.database.demo.di.DemoDatabaseModule]; this aggregator carries
+ * ZERO `kpt.core.*.demo.*` imports so a template sync can blind-copy it without re-introducing demo
+ * wiring a fork already stripped.
  */
 val DatabaseModule = module {
     includes(platformModule)
     // infra (framework) — always kept
     single { get<AppDatabase>().bookkeeperDao }
-    // demo:begin — customizer --clean strips the demo converters install + demo DAO providers
-    single(createdAtStart = true) {
-        ChargeTypeConverters.install(get<FieldEncryptor>())
-        ChargeTypeConvertersInstalled
-    }
-    single { get<AppDatabase>().exchangeRatesDao }
-    single { get<AppDatabase>().cloudTodoDao }
-    single { get<AppDatabase>().coinMarketDao }
-    single { get<AppDatabase>().coinDetailDao }
-    single { get<AppDatabase>().rateHistoryDao }
-    single { get<AppDatabase>().loanDao }
-    single { get<AppDatabase>().billReminderDao }
-    single { get<AppDatabase>().alertDao }
-    single { get<AppDatabase>().interestRateSeriesDao }
-    // demo:end
 }
 
 /**

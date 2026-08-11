@@ -20,6 +20,7 @@ kotlin {
             // Core Modules
             implementation(projects.core.data)
             implementation(projects.core.database)
+            implementation(projects.core.network) // E1: FeatureRegistry wires the relocated DemoNetworkModule (core/network/demo/di)
             implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.core.datastore)

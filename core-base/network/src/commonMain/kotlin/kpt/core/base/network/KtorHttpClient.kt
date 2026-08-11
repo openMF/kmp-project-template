@@ -86,6 +86,12 @@ internal expect fun HttpClientConfig<*>.installProxyPlugin(
  *   after `?` — corsproxy.io format: `https://proxy/?<original-url>`. corsproxy.io is the
  *   default (free, sets CORS headers on all responses). Replace with a self-hosted proxy in
  *   production.
+ * @param multiUrlProvider Optional [MultiUrlConfigProvider] for apps that expose more than one
+ *   named endpoint. When supplied, [DynamicBaseUrlPlugin] resolves the base URL per [urlType] at
+ *   call time. Takes precedence over [dynamicUrlProvider]. Default null preserves the plain
+ *   static-URL path (no regression).
+ * @param urlType The named endpoint to resolve from [multiUrlProvider]. Ignored unless
+ *   [multiUrlProvider] is set. Defaults to [UrlType.MAIN].
  *
  * @return A configuration lambda to be passed into the Ktor [HttpClient].
  */
@@ -119,6 +125,8 @@ fun setupDefaultHttpClient(
     certificatePinConfig: CertificatePinConfig = CertificatePinConfig.default(),
     proxiedHosts: List<String> = emptyList(),
     corsProxyBaseUrl: String = "https://corsproxy.io",
+    multiUrlProvider: MultiUrlConfigProvider? = null,
+    urlType: UrlType = UrlType.MAIN,
     dynamicUrlProvider: DynamicUrlConfigProvider? = null,
 ): HttpClientConfig<*>.() -> Unit = {
     val refreshMutex = Mutex()
@@ -205,12 +213,19 @@ fun setupDefaultHttpClient(
         json(jsonConfig)
     }
 
-    // Runtime base-URL switching (opt-in). When a [DynamicUrlConfigProvider] is supplied, the
-    // [DynamicBaseUrlPlugin] rewrites each request's host/scheme from the provider at call time —
-    // the [baseUrl] above becomes a static fallback. Consumers wire a provider in their DI (see
-    // core/network NetworkModule); default null keeps the plain static-URL behaviour (no regression).
-    if (dynamicUrlProvider != null) {
-        install(DynamicBaseUrlPlugin) {
+    // Runtime base-URL switching (opt-in). The [DynamicBaseUrlPlugin] rewrites each request's
+    // host/scheme at call time — the [baseUrl] above becomes a static fallback. A
+    // [MultiUrlConfigProvider] + [urlType] resolves the base URL per named endpoint (multi-server
+    // apps); a plain [DynamicUrlConfigProvider] keeps the single-URL behaviour. Consumers wire a
+    // provider in their DI (see core/network NetworkModule); both default null, so the plain
+    // static-URL path is unchanged (no regression).
+    when {
+        multiUrlProvider != null -> install(DynamicBaseUrlPlugin) {
+            multiConfigProvider = multiUrlProvider
+            this.urlType = urlType
+        }
+
+        dynamicUrlProvider != null -> install(DynamicBaseUrlPlugin) {
             configProvider = dynamicUrlProvider
         }
     }

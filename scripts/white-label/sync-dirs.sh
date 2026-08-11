@@ -50,7 +50,7 @@ SYNC_DIRS=(
     "core-base"
     "core"          # framework infra (incl. core/*/infra) syncs; **/demo/** + core/store seam preserved per-fork by sync_directory's convention block (base-branch re-assert)
     "build-logic"
-    "deployment"     # 18-target deploy infra — consumer store metadata/screenshots + manifest/log excluded below
+    "deployment"     # 18-target deploy infra — FULL-COPY, zero exclusions (fork state relocated to app-profile/deploy-targets.yaml + deploy-state/; E1/D-3)
     "fastlane"
     "fastlane-config"
     "spotless"       # shared copyright/format config
@@ -106,11 +106,17 @@ declare -A EXCLUSIONS=(
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
     ["cmp-desktop"]="icons:dir build.gradle.kts:file"
     ["fastlane-config"]="project_config.rb:file extract_config.rb:file"
-    # Deployment — sync the lane logic (_shared, Fastfile, per-target lane.rb, scripts) but
-    # PRESERVE each consumer's store listings (metadata + screenshots), their per-project
-    # deployment manifest, and their append-only promotion log. Secrets under deployment are
-    # gitignored (never synced). Add new consumer-owned deployment paths here if they appear.
-    ["deployment"]="android/metadata:dir android/screenshots:dir ios/appstore/metadata:dir ios/screenshots:dir desktop/mac-app-store/metadata:dir desktop/mac-app-store/screenshots:dir fastlane/metadata:dir DEPLOYMENT_MANIFEST.yaml:file PROMOTION_LOG.yaml:file"
+    # Deployment — FULL-COPY, ZERO exclusions (E1 / D-3, epic pure-white-label-store5-network).
+    # deployment/** is a pure TEMPLATE-OWNED module now: all fork DATA was relocated OUT —
+    #   • per-target enabled/tier state  → app-profile/deploy-targets.yaml   (owner: fork)
+    #   • append-only promotion history  → deploy-state/PROMOTION_LOG.yaml    (owner: fork)
+    #   • store listings + screenshots   → DERIVED from app-profile/ by `./gradlew syncForkConfig`
+    #                                       (template ships placeholders; regenerated post-sync).
+    # DEPLOYMENT_MANIFEST.yaml is a pure catalog of available targets (owner: template). With no
+    # fork data left under deployment/, it full-copies exactly like core-base/**. See
+    # customization-surface.yaml (deployment/** → template) + the mandatory post-sync
+    # syncForkConfig regenerate step declared in /kmp-project-template-sync.
+    ["deployment"]=""
     [".github"]="workflows/sync-dirs.yaml:file"
     # Secrets — sync the STRUCTURE (secrets/sample/** placeholder scaffold + LAYOUT.yaml)
     # so forks inherit the canonical layout, but NEVER the real values: secrets/live/ is
@@ -341,6 +347,165 @@ preserve_excluded_paths() {
     fi
 }
 
+# ── Contract-keyed merge strategies (pure-white-label-store5-network E0/T4) ──────────
+# Two root config files carry template updates a fork MUST receive but that a blind
+# copy would clobber. The customization-surface contract declares their strategy; these
+# implement it for real (no stub) so template module-includes AND version bumps reach forks:
+#
+#   settings.gradle.kts        → include-union   (union the include(":module") declarations)
+#   gradle/libs.versions.toml  → catalog-3way    (genuine BASE/OURS/THEIRS per-key merge)
+#
+# Both dispatch off the declared `strategy:` in customization-surface.yaml, so contract
+# and engine agree. They REPLACE the old skip-of-settings.gradle.kts + the one-way
+# heal_libs_versions_toml (kept below only as a fallback for forks without the reader).
+
+# include-union: union the fork's and the template's `include(...)` module declarations.
+# Start from the TEMPLATE file (it carries pluginManagement / dependencyResolutionManagement
+# / structural updates), then append every include(...) line the fork has that the template
+# lacks — so template-added modules reach the fork AND fork-local :feature:* includes survive.
+#   merge_settings_include_union <ours> <base> <theirs> [<out>]
+merge_settings_include_union() {
+    local ours="$1" theirs="$3" out="${4:-$1}"
+    [ -f "$ours" ]   || { [ -f "$theirs" ] && cp "$theirs" "$out"; return 0; }
+    [ -f "$theirs" ] || { cp "$ours" "$out"; return 0; }
+    local tmp fork_only last
+    tmp="$(mktemp)"
+    cp "$theirs" "$tmp"
+    fork_only="$(comm -23 \
+        <(grep -E '^[[:space:]]*include\(' "$ours"   | sed 's/[[:space:]]*$//' | sort -u) \
+        <(grep -E '^[[:space:]]*include\(' "$theirs" | sed 's/[[:space:]]*$//' | sort -u))"
+    if [ -n "$fork_only" ]; then
+        last="$(grep -nE '^[[:space:]]*include\(' "$tmp" | tail -1 | cut -d: -f1)"
+        if [ -n "$last" ]; then
+            { head -n "$last" "$tmp"; printf '%s\n' "$fork_only"; tail -n +"$((last + 1))" "$tmp"; } > "${tmp}.2"
+            mv "${tmp}.2" "$tmp"
+        else
+            printf '%s\n' "$fork_only" >> "$tmp"
+        fi
+        print_step "include-union: preserved $(printf '%s\n' "$fork_only" | grep -c . ) fork-local module include(s) in ${BOLD}$(basename "$out")${NC}"
+    fi
+    mv "$tmp" "$out"
+    return 0
+}
+
+# catalog-3way: a genuine per-key 3-way merge of a Gradle version catalog across its
+# [versions] / [libraries] / [plugins] / [bundles] sections.
+#   base = last-synced template catalog · ours = fork · theirs = new template
+# Per key (standard 3-way semantics, applied key-wise not line-wise so unrelated additions
+# never spurious-conflict):
+#   • key only in theirs, not in base  → template-ADDED  → add
+#   • key only in ours                 → fork-added/pin  → keep
+#   • both, ours == base (fork untouched), theirs != base → template BUMPED → take theirs (major surfaced)
+#   • both, theirs == base (template untouched)          → fork PINNED     → keep ours
+#   • both diverged (ours != base, theirs != base, ≠)    → CONFLICT        → keep ours + surface
+# The fork's file formatting/comments are preserved (we walk OURS and only swap bumped values
+# + append template-added keys). Returns 0 clean · 1 if a real conflict was surfaced.
+merge_libs_catalog_3way() {
+    local ours="$1" base="$2" theirs="$3" out="${4:-$1}"
+    [ -f "$ours" ] && [ -f "$theirs" ] || { [ -f "$theirs" ] && cp "$theirs" "$out"; return 0; }
+    [ -f "$base" ] || cp "$ours" "$base"
+    local merged notes rc=0
+    merged="$(mktemp)"; notes="$(mktemp)"
+    awk -v basef="$base" -v theirsf="$theirs" '
+      function trim(s){ gsub(/^[ \t]+|[ \t]+$/,"",s); return s }
+      function keyof(line,   p){ if(line ~ /^[ \t]*[A-Za-z0-9_.\-]+[ \t]*=/){ p=index(line,"="); return trim(substr(line,1,p-1)) } return "" }
+      function valof(line,   p){ p=index(line,"="); return trim(substr(line,p+1)) }
+      function major(v,   x){ x=v; sub(/^[^0-9]*/,"",x); sub(/[^0-9].*$/,"",x); return x }
+      function flushadd(sec,   m,arr,j,kk,key){
+        if(sec=="") return
+        m=split(tkeys[sec],arr,SUBSEP)
+        for(j=1;j<=m;j++){ kk=arr[j]; if(kk=="") continue; key=sec SUBSEP kk
+          if(!(key in oursseen) && !(key in baseseen)) print theirsline[key] }
+      }
+      BEGIN{
+        while((getline l < basef) > 0){
+          if(l ~ /^[ \t]*\[/){ bsec=trim(l); continue }
+          k=keyof(l); if(k!=""){ base[bsec SUBSEP k]=valof(l); baseseen[bsec SUBSEP k]=1 }
+        }
+        close(basef)
+        while((getline l < theirsf) > 0){
+          if(l ~ /^[ \t]*\[/){ tsec=trim(l); if(!(tsec in tsectseen)){ tsectseen[tsec]=1; tsorder[++tnsec]=tsec } continue }
+          k=keyof(l); if(k!=""){ key=tsec SUBSEP k; theirs[key]=valof(l); theirsline[key]=l; theirsseen[key]=1; tkeys[tsec]=tkeys[tsec] SUBSEP k }
+        }
+        close(theirsf)
+      }
+      {
+        line=$0
+        if(line ~ /^[ \t]*\[/){ flushadd(cursec); cursec=trim(line); ourssect[cursec]=1; print line; next }
+        k=keyof(line)
+        if(k==""){ print line; next }
+        key=cursec SUBSEP k; oursseen[key]=1; o=valof(line)
+        if(key in theirsseen){
+          t=theirs[key]; hasb=(key in baseseen); b=(hasb?base[key]:"")
+          if(o==t){ print line }
+          else if(hasb && o==b){ print theirsline[key]; if(major(o)!=major(t)) print "MAJOR\t" k "\t" o " -> " t > "/dev/stderr" }
+          else if(hasb && t==b){ print line }
+          else { print line; print "CONFLICT\t" k "\t" o " | " t > "/dev/stderr" }
+        } else { print line }
+        next
+      }
+      END{
+        flushadd(cursec)
+        for(i=1;i<=tnsec;i++){ s=tsorder[i]; if(!(s in ourssect)){ print s
+          m=split(tkeys[s],arr,SUBSEP); for(j=1;j<=m;j++){ kk=arr[j]; if(kk=="") continue; key=s SUBSEP kk; if(!(key in baseseen)) print theirsline[key] } } }
+      }
+    ' "$ours" > "$merged" 2>"$notes"
+    mv "$merged" "$out"
+    grep -q '^CONFLICT' "$notes" 2>/dev/null && rc=1
+    while IFS="$(printf '\t')" read -r kind key detail; do
+        [ "$kind" = "MAJOR" ]    && print_warning "catalog-3way: MAJOR version bump on ${BOLD}$key${NC} ($detail) — review before release"
+        [ "$kind" = "CONFLICT" ] && print_warning "catalog-3way: CONFLICT on ${BOLD}$key${NC} (fork kept: $detail) — reconcile manually"
+    done < "$notes"
+    rm -f "$notes"
+    return $rc
+}
+
+# Drive the two contract-keyed root-file merges (settings.gradle.kts + libs.versions.toml)
+# after the directory sync, replacing the old one-way heal_libs_versions_toml. Resolves each
+# file's strategy from the contract; ours=BASE_BRANCH, theirs=TEMP_BRANCH, base=merge-base.
+# Falls back to heal_libs_versions_toml on a fork that ships no contract reader.
+merge_contract_root_files() {
+    if ! declare -F cs_match_g >/dev/null 2>&1; then
+        if [ -f "$SCRIPT_DIR/../customization-surface.sh" ]; then
+            # shellcheck source=/dev/null
+            source "$SCRIPT_DIR/../customization-surface.sh" 2>/dev/null || true
+        fi
+    fi
+    if ! declare -F cs_match_g >/dev/null 2>&1; then
+        print_warning "No customization-surface reader — falling back to one-way libs heal."
+        heal_libs_versions_toml
+        return
+    fi
+
+    echo -e "\n${BLUE}${BOLD}Contract-keyed root merges (settings include-union + catalog-3way)...${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n"
+
+    local mbase; mbase="$(git merge-base "$BASE_BRANCH" "$TEMP_BRANCH" 2>/dev/null)"
+    local f strat o b t rc
+    for f in "settings.gradle.kts" "gradle/libs.versions.toml"; do
+        cs_match_g "$f"
+        [ "${CS_M_OWNER:-}" = "merge" ] || continue
+        git show "$TEMP_BRANCH:$f" >/dev/null 2>&1 || { print_warning "Template has no $f — skipping."; continue; }
+        strat="${CS_M_STRAT:-3way}"
+        o="$(mktemp)"; b="$(mktemp)"; t="$(mktemp)"
+        git show "$BASE_BRANCH:$f" > "$o" 2>/dev/null || cp "$f" "$o" 2>/dev/null || : > "$o"
+        git show "$TEMP_BRANCH:$f" > "$t" 2>/dev/null
+        git show "${mbase}:$f"     > "$b" 2>/dev/null || cp "$o" "$b"
+        mkdir -p "$(dirname "$f")"
+        case "$strat" in
+            include-union) merge_settings_include_union "$o" "$b" "$t" "$f"; rc=$? ;;
+            catalog-3way)  merge_libs_catalog_3way      "$o" "$b" "$t" "$f"; rc=$? ;;
+            *)             cs_merge "$strat" "$o" "$b" "$t" "$f"; rc=$? ;;
+        esac
+        if [ "${rc:-0}" -eq 0 ]; then
+            print_step "Merged (${strat}) ${BOLD}$f${NC} — template update + fork edits reconciled"
+        else
+            print_warning "Merged (${strat}) ${BOLD}$f${NC} WITH conflicts — resolve before committing the sync"
+        fi
+        rm -f "$o" "$b" "$t"
+    done
+}
+
 # Function to sync directory with exclusions
 sync_directory() {
     local dir=$1
@@ -421,10 +586,20 @@ sync_directory() {
                        && git show "$temp_branch:$_mf" > "$_t" 2>/dev/null; then
                         git show "${_mbase}:$_mf" > "$_b" 2>/dev/null || cp "$_o" "$_b"
                         mkdir -p "$(dirname "$_mf")"
-                        if cs_merge "${CS_M_STRAT:-3way}" "$_o" "$_b" "$_t" "$_mf"; then
-                            print_step "Merged (${CS_M_STRAT:-3way}) ${BOLD}$_mf${NC} — fork edits preserved"
+                        # Route the contract-declared strategy: the two structure-aware unions
+                        # (include-union / catalog-3way) use their dedicated engines; everything
+                        # else (manifest-union / kotlin-3way / strings-union / xml-union / 3way)
+                        # goes through cs_merge.
+                        local _ms="${CS_M_STRAT:-3way}" _mrc
+                        case "$_ms" in
+                            include-union) merge_settings_include_union "$_o" "$_b" "$_t" "$_mf"; _mrc=$? ;;
+                            catalog-3way)  merge_libs_catalog_3way      "$_o" "$_b" "$_t" "$_mf"; _mrc=$? ;;
+                            *)             cs_merge "$_ms" "$_o" "$_b" "$_t" "$_mf"; _mrc=$? ;;
+                        esac
+                        if [ "${_mrc:-0}" -eq 0 ]; then
+                            print_step "Merged (${_ms}) ${BOLD}$_mf${NC} — fork edits preserved"
                         else
-                            print_warning "CONFLICT in ${BOLD}$_mf${NC} (${CS_M_STRAT:-3way}) — resolve markers before committing the sync"
+                            print_warning "CONFLICT in ${BOLD}$_mf${NC} (${_ms}) — resolve markers before committing the sync"
                         fi
                     fi
                     rm -f "$_o" "$_b" "$_t"
@@ -870,9 +1045,11 @@ if [ "$DRY_RUN" = false ]; then
     cleanup_temp_dirs
     rm -rf temp_files
 
-    # Self-heal the version catalog BEFORE we drop the temp branch (we need it
-    # to access upstream's libs.versions.toml).
-    heal_libs_versions_toml
+    # E0/T4: contract-keyed root merges (settings.gradle.kts include-union +
+    # gradle/libs.versions.toml catalog-3way) so template module-includes AND version
+    # bumps reach the fork. Runs BEFORE we drop the temp branch (needs upstream's copies).
+    # Replaces the old one-way heal_libs_versions_toml (retained as a no-reader fallback).
+    merge_contract_root_files
 
     # Cleanup temporary branch
     print_step "Cleaning up temporary branch..."

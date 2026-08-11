@@ -124,7 +124,7 @@ Required secrets (from `deployment/android/firebase-app-distribution/secrets-nee
 ### Path A — example: iOS TestFlight
 
 ```bash
-# Local (requires Xcode + CocoaPods)
+# Local (requires Xcode — SwiftPM/XCFramework, no CocoaPods)
 cd deployment && bundle exec fastlane ios beta
 
 # CI

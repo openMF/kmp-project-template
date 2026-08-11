@@ -116,6 +116,11 @@ mokoPermission = "0.20.1"
 qroseVersion = "1.1.2"
 okioVersion = "3.17.0"
 kermit = "2.1.0"
+# SKIE — Swift-friendly export of the KMP ComposeApp framework (E6 SwiftPM/XCFramework
+# migration). Pin the SKIE release whose supported-Kotlin range covers this repo's
+# `kotlin` version above; bump in lock-step with a Kotlin upgrade (SKIE gates the
+# compiler version and fails fast on a mismatch). See 07-ios-swiftpm.md.
+skie = "0.10.4"
 fileKit = "0.14.2"
 uiBackhandler = "1.11.1"
 wire = "6.2.0"
@@ -427,7 +432,11 @@ android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version
 # to the type-safe libs.versions.compileSdk.get() form.
 typesafe-conventions = { id = "dev.panuszewski.typesafe-conventions", version.ref = "typesafeConventions" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+# SKIE — applied in cmp-shared/build.gradle.kts to Swift-enhance the exported
+# ComposeApp framework/XCFramework (E6). Replaces the Kotlin CocoaPods plugin
+# (`org.jetbrains.kotlin.native.cocoapods`), which was removed with the CocoaPods
+# → SwiftPM/XCFramework migration.
+skie = { id = "co.touchlab.skie", version.ref = "skie" }
 
 android-application-convention = { id = "org.convention.android.application" }
 android-application-compose-convention = { id = "org.convention.android.application.compose" }

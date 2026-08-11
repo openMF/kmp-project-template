@@ -9,22 +9,10 @@
  */
 package kpt.core.network.di
 
-import de.jensklingenberg.ktorfit.Ktorfit
+import kpt.core.base.network.MultiUrlConfigProvider
 import kpt.core.base.network.SupabaseConfigClient
 import kpt.core.base.network.SupabaseCredentials
-import kpt.core.base.network.httpClient
-import kpt.core.base.network.setupDefaultHttpClient
-import kpt.core.network.BuildKonfig
-import kpt.core.network.demo.FintechApiClient
-import kpt.core.network.demo.cloudtodo.api.JsonPlaceholderApi
-import kpt.core.network.demo.cloudtodo.api.createJsonPlaceholderApi
-import kpt.core.network.demo.crypto.api.CoinGeckoApi
-import kpt.core.network.demo.currency.api.FrankfurterApi
-import kpt.core.network.demo.currency.config.FrankfurterApiConfig
-import kpt.core.network.demo.economic.api.FredApi
-import kpt.core.network.demo.economic.api.WorldBankApi
-import kpt.core.network.demo.economic.config.FredApiConfig
-import kpt.core.network.demo.economic.config.WorldBankApiConfig
+import kpt.core.network.config.AppMultiUrlConfigProvider
 import org.koin.dsl.module
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
@@ -47,86 +35,20 @@ import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentia
 //     DynamicUrlConfigProvider (reads its selected server, keyed by AppUrlTypes) and passes it as
 //     `dynamicUrlProvider = get()` on any client that should switch base URL at runtime. The
 //     toolkit's own fixed-URL APIs (FRED / World Bank / CoinGecko / Frankfurter) don't use it.
+// INFRA-ONLY, owner: template (E1 / C2). The demo API configs + FintechApiClient + demo API bindings
+// relocated to the fork-owned [kpt.core.network.demo.di.DemoNetworkModule]; this aggregator carries
+// ZERO `kpt.core.*.demo.*` imports so a template sync can blind-copy it without re-introducing demo
+// wiring a fork already stripped.
 val NetworkModule = module {
+
+    // Unified access-point provider — resolves every named UrlType to its REST base URL from the
+    // declarative AccessPointRegistry. Clients thread it via
+    // setupDefaultHttpClient(multiUrlProvider = get(), urlType = AppUrlTypes.<NAME>).
+    single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider() }
 
     // Supabase-backed dynamic config — overridable by forks. The credentials object is generated
     // from secrets/supabaseCredentialsFile.json by SupabaseConfigConventionPlugin (empty when the
     // file is absent, so the client stays inert until a fork provides a project).
     single<SupabaseCredentials> { GeneratedSupabaseCredentials }
     single { SupabaseConfigClient(credentials = get()) }
-
-    // demo:begin — customizer --clean strips the demo API configs + FintechApiClient + APIs
-    single<FredApiConfig> {
-        FredApiConfig(apiKey = BuildKonfig.FRED_API_KEY.takeIf { it.isNotBlank() })
-    }
-    single<FrankfurterApiConfig> { FrankfurterApiConfig.Default }
-    single<WorldBankApiConfig> { WorldBankApiConfig.Default }
-
-    single {
-        FintechApiClient(
-            frankfurterKtorfit = Ktorfit.Builder()
-                .httpClient(
-                    client = httpClient(
-                        setupDefaultHttpClient(
-                            baseUrl = get<FrankfurterApiConfig>().baseUrl,
-                            loggableHosts = listOf("api.frankfurter.dev"),
-                        ),
-                    ),
-                )
-                .build(),
-            coinGeckoKtorfit = Ktorfit.Builder()
-                .httpClient(
-                    client = httpClient(
-                        setupDefaultHttpClient(
-                            baseUrl = CoinGeckoApi.BASE_URL,
-                            loggableHosts = listOf("api.coingecko.com"),
-                        ),
-                    ),
-                )
-                .build(),
-            fredKtorfit = Ktorfit.Builder()
-                .httpClient(
-                    client = httpClient(
-                        setupDefaultHttpClient(
-                            baseUrl = get<FredApiConfig>().baseUrl,
-                            loggableHosts = listOf("api.stlouisfed.org"),
-                            proxiedHosts = listOf("api.stlouisfed.org"),
-                        ),
-                    ),
-                )
-                .build(),
-            worldBankKtorfit = Ktorfit.Builder()
-                .httpClient(
-                    client = httpClient(
-                        setupDefaultHttpClient(
-                            baseUrl = get<WorldBankApiConfig>().baseUrl,
-                            loggableHosts = listOf("api.worldbank.org"),
-                        ),
-                    ),
-                )
-                .build(),
-        )
-    }
-
-    single<FrankfurterApi> { get<FintechApiClient>().frankfurterApi }
-    single<CoinGeckoApi> { get<FintechApiClient>().coinGeckoApi }
-    single<FredApi> { get<FintechApiClient>().fredApi }
-    single<WorldBankApi> { get<FintechApiClient>().worldBankApi }
-
-    // cloud-todo — jsonplaceholder is the only WRITABLE demo backend (POST/PUT accepted), used to
-    // showcase the Store5 MUTABLE (offline-write) archetype (`provideCloudTodoStore`).
-    single<JsonPlaceholderApi> {
-        Ktorfit.Builder()
-            .httpClient(
-                client = httpClient(
-                    setupDefaultHttpClient(
-                        baseUrl = "https://jsonplaceholder.typicode.com/",
-                        loggableHosts = listOf("jsonplaceholder.typicode.com"),
-                    ),
-                ),
-            )
-            .build()
-            .createJsonPlaceholderApi()
-    }
-    // demo:end
 }

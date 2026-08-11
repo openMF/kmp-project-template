@@ -25,7 +25,10 @@ buildscript {
 }
 
 plugins {
-    alias(libs.plugins.kotlinCocoapods) apply false
+    // SKIE — declared on the root classpath (apply false) so cmp-shared can apply it
+    // for the Swift-enhanced XCFramework export (E6). Replaces the removed Kotlin
+    // CocoaPods plugin (`libs.plugins.kotlinCocoapods`).
+    alias(libs.plugins.skie) apply false
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.android.test) apply false

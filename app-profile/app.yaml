@@ -12,6 +12,17 @@ identity:
   app_name: Money Toolkit
   namespace: org.mifos.kmp.template
 
+# Per-flavor network endpoints + demo credentials + log tag. syncForkConfig emits these into
+# gradle/fork.properties (network.base.url.{demo,prod} / demo.username / demo.password / log.tag),
+# which KMPFlavorsConventionPlugin reads into per-flavor BuildConfig (BASE_URL / DEMO_USERNAME /
+# DEMO_PASSWORD / LOG_TAG). Blank falls back to the template default baked into the plugin. (B4)
+network:
+  demo_base_url: https://demo.openmf.org
+  prod_base_url: https://api.openmf.org
+  demo_username: demo
+  demo_password: demo
+  log_tag: KMPTemplate
+
 org:
   name: Mifos Initiative
   email: team@mifos.org

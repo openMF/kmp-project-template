@@ -352,17 +352,20 @@ See [Store Implementation Guide](docs/claude/store-implementation.md) for full e
 ## Fork branding
 
 Every brand-touching value — app id, display name, version, org details, endpoints,
-credentials, icons — is single-sourced from the fork-owned **`gradle/fork.properties`**
-(never synced by the template). Edit it there, run `./gradlew syncForkConfig`, and the
-value propagates to wherever the build actually reads it (catalog / xcconfig / BuildKonfig
-/ BuildConfig).
+credentials, icons — is single-sourced from **`app-profile/`** (`app.yaml` +
+`platforms/**/*.yaml`), the fork-owned SoT. Edit it there, run `./gradlew syncForkConfig`,
+and it propagates: syncForkConfig regenerates the derived build-bridge
+`gradle/fork.properties` (headed *"GENERATED from app-profile — do not hand-edit"*) and
+writes on to `gradle/libs.versions.toml`, `Config.xcconfig`, per-module `BuildKonfig`, and
+per-flavor `BuildConfig`. `fork.properties` is a generated intermediate, not the SoT.
 
-> **Source of truth for `appId`: `gradle/fork.properties` (`app.id`)** — authored there, then
-> `./gradlew syncForkConfig` writes it back into `gradle/libs.versions.toml#appId` (the catalog the
-> build reads via `libs.versions.appId`). Edit `app.id` in fork.properties, never the catalog line;
-> `scripts/product-health/checks/appid-consistency.sh` FAILs CI if the two drift. The other build-time
-> keys (`appDisplayName`, `desktopAppName`, `projectName`) are still authored in
-> `libs.versions.toml` (syncForkConfig reads fork.properties first for them, then the catalog).
+> **Source of truth for `appId`: `app-profile/app.yaml#identity.app_id`** — authored there; then
+> `./gradlew syncForkConfig` regenerates `gradle/fork.properties#app.id` from it and writes it into
+> `gradle/libs.versions.toml#appId` (the catalog the build reads via `libs.versions.appId`). Edit
+> `app_id` in app-profile, never fork.properties or the catalog line;
+> `scripts/product-health/checks/appid-consistency.sh` FAILs CI if the catalog + app.id drift. The other
+> build-time keys (`appDisplayName`, `desktopAppName`, `projectName`) resolve the same way — app-profile
+> first (`identity.app_name`, …), then the fork.properties bridge, then the `libs.versions.toml` fallback.
 > `app.display.name` also flows to `cmp-ios/Configuration/Config.xcconfig#APP_NAME` and to per-module
 > `BuildKonfig.APP_DISPLAY_NAME` (e.g. the `feature/settings` About footer). Endpoints / demo creds /
 > log tag (`network.base.url.{demo,prod}` / `demo.username` / `demo.password` / `log.tag`) are read by
@@ -442,7 +445,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 ## Platform-Specific Notes
 
 ### Android
-- **Package (applicationId):** authored in `gradle/fork.properties#app.id` (the single source of truth); `syncForkConfig` writes it into `gradle/libs.versions.toml#appId`, which the build reads. Edit `app.id` there — don't hand-edit the catalog.
+- **Package (applicationId):** authored in `app-profile/app.yaml#identity.app_id` (the single source of truth); `syncForkConfig` regenerates `fork.properties#app.id` from it and writes `gradle/libs.versions.toml#appId`, which the build reads. Edit it in app-profile — don't hand-edit fork.properties or the catalog.
 - **Min SDK:** 24, **Target SDK:** 34
 - **Flavors:** `prod`, `demo`
 - **Build Types:** `debug`, `release`
@@ -450,7 +453,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 - **Firebase:** 2 apps registered (prod + demo), 4 variants in google-services.json
 
 ### iOS
-- **Bundle ID:** authored in `gradle/fork.properties#app.id` (the single source of truth) — same value as the Android applicationId; `syncForkConfig` writes it into `gradle/libs.versions.toml#appId`, which the build reads. Edit `app.id` there — don't hand-edit the catalog.
+- **Bundle ID:** authored in `app-profile/app.yaml#identity.app_id` (the single source of truth) — same value as the Android applicationId; `syncForkConfig` regenerates `fork.properties#app.id` + writes `gradle/libs.versions.toml#appId`, which the build reads. Edit it in app-profile — don't hand-edit fork.properties or the catalog.
 - **Min Version:** iOS 15.0, **Target:** iOS 17.0
 - **Code Signing:** Fastlane Match (adhoc for Firebase, appstore for TestFlight/App Store)
 - **Shared framework integration:** SwiftPM / XCFramework (`cmp-ios/Package.swift` binary target + the `[KMP] Embed and Sign ComposeApp XCFramework` Xcode Run-Script phase). No CocoaPods / Ruby pod toolchain.

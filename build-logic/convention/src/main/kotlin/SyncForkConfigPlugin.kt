@@ -103,6 +103,14 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val appDisplayName = get("app.display.name", "APP_DISPLAY_NAME","appDisplayName")
         val projectName    = get("project.name",     "PROJECT_NAME",    "projectName")
 
+        // Network build-bridge (B4) — SoT is app-profile/app.yaml#network.*; emitted to fork.properties
+        // for KMPFlavorsConventionPlugin. Blank → the plugin's baked-in template default.
+        val networkDemoUrl = get("network.base.url.demo")
+        val networkProdUrl = get("network.base.url.prod")
+        val demoUsername   = get("demo.username")
+        val demoPassword   = get("demo.password")
+        val logTag         = get("log.tag")
+
         // ── 2b. Write app.id BACK into gradle/libs.versions.toml#appId ─────────
         // The whole build reads the bundle id via libs.versions.appId; fork.properties#app.id is the
         // authored SoT. Sync the catalog from it so a fork edits app.id in ONE place. No-op when they
@@ -246,6 +254,8 @@ abstract class SyncForkConfigTask : DefaultTask() {
         if (hasAppProfile) {
             val resolved = linkedMapOf(
                 "app.id" to appId, "app.display.name" to appDisplayName, "project.name" to projectName,
+                "network.base.url.demo" to networkDemoUrl, "network.base.url.prod" to networkProdUrl,
+                "demo.username" to demoUsername, "demo.password" to demoPassword, "log.tag" to logTag,
                 "apple.team.id" to appleTeamId, "apple.match.git.url" to matchGitUrl,
                 "apple.tf.groups" to tfGroups,
                 "firebase.android.prod.app.id" to fbAndroidProd,
@@ -910,6 +920,12 @@ abstract class SyncForkConfigTask : DefaultTask() {
             // ── identity / app ──
             "app.id" to "identity.app_id",
             "app.description" to "store.app_description",
+            // ── network (B4): per-flavor endpoints + demo creds + log tag ──
+            "network.base.url.demo" to "network.demo_base_url",
+            "network.base.url.prod" to "network.prod_base_url",
+            "demo.username" to "network.demo_username",
+            "demo.password" to "network.demo_password",
+            "log.tag" to "network.log_tag",
             // ── org ──
             "org.name" to "org.name",
             "org.email" to "org.email",

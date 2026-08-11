@@ -39,9 +39,10 @@ compose {
     }
 }
 
-// Fork app display name → `kpt.feature.settings.BuildKonfig.APP_DISPLAY_NAME`, read from the fork-owned
-// `gradle/fork.properties` (never synced). SettingsScreen's footer renders this instead of a hardcoded
-// string resource, so a fork rebrands via fork.properties, not 7 locale strings.xml files (S9/T10).
+// Fork app display name → `kpt.feature.settings.BuildKonfig.APP_DISPLAY_NAME`, read from
+// `gradle/fork.properties#app.display.name` — the build-bridge that syncForkConfig generates from the
+// SoT `app-profile/app.yaml#identity.app_name`. SettingsScreen's footer renders this instead of a
+// hardcoded string resource, so a fork rebrands in app-profile, not 7 locale strings.xml files (S9/T10).
 val settingsForkProps = Properties().apply {
     val f = rootProject.file("gradle/fork.properties")
     if (f.exists()) f.inputStream().use { load(it) }

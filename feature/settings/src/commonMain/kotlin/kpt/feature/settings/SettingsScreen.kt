@@ -40,8 +40,8 @@ import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
+import kpt.feature.settings.BuildKonfig
 import kpt.feature.settings.generated.resources.Res
-import kpt.feature.settings.generated.resources.feature_settings_app_name
 import kpt.feature.settings.generated.resources.feature_settings_change_language_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_language_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
@@ -203,10 +203,8 @@ private fun DevMenuDialog(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifier) {
-    // TODO: Replace literal with BuildKonfig-emitted version string once the
-    // BuildKonfig plugin is wired into the consumer module (see core/network
-    // FredApiConfig.kt for the threading pattern). For now we render a static
-    // app-name footer — the long-press hook still works.
+    // App-name footer rendered from BuildKonfig.APP_DISPLAY_NAME (the fork's gradle/fork.properties
+    // app.display.name), not a hardcoded string resource — so a fork rebrands in one place (S9/T10).
     val rowModifier = if (onLongClick != null) {
         modifier
             .fillMaxWidth()
@@ -218,7 +216,7 @@ private fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifi
         modifier.fillMaxWidth()
     }
     Text(
-        text = stringResource(Res.string.feature_settings_app_name),
+        text = BuildKonfig.APP_DISPLAY_NAME,
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,

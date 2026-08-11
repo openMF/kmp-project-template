@@ -331,3 +331,13 @@ windows.partner.center.client.id=YOUR_CLIENT_GUID
 org.copyright=
 app.description=
 mac.app.category=public.app-category.productivity
+
+# ── Network endpoints + demo credentials + log tag (per flavor) ─────────────────
+# Read by KMPFlavorsConventionPlugin (B4) into BuildConfig BASE_URL/DEMO_USERNAME/
+# DEMO_PASSWORD/LOG_TAG. Set your fork's real endpoints; blank falls back to the
+# template default baked into the convention plugin.
+network.base.url.demo=
+network.base.url.prod=
+demo.username=
+demo.password=
+log.tag=

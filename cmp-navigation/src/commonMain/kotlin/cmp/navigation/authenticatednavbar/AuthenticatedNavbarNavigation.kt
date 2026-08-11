@@ -11,6 +11,7 @@
 
 package cmp.navigation.authenticatednavbar
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -26,38 +27,12 @@ internal fun NavController.navigateToAuthenticatedNavBar(navOptions: NavOptions?
 
 internal fun NavGraphBuilder.authenticatedNavbarGraph(
     navigateToSettingsScreen: () -> Unit,
-    // demo:begin
-    navigateToLoans: () -> Unit,
-    navigateToBills: () -> Unit,
-    navigateToRates: () -> Unit,
-    navigateToExchangeRates: () -> Unit,
-    navigateToRateHistory: () -> Unit,
-    navigateToMacro: () -> Unit,
-    navigateToEmi: () -> Unit,
-    navigateToAffordability: () -> Unit,
-    navigateToAmortization: () -> Unit,
-    navigateToLoanComparison: () -> Unit,
-    navigateToLoanCalcWizard: () -> Unit,
-    navigateToCrypto: () -> Unit,
-    // demo:end
+    homeBody: @Composable () -> Unit,
 ) {
     composableWithStayTransitions<AuthenticatedNavbarRoute> {
         AuthenticatedNavbarNavigationScreen(
             navigateToSettingsScreen = navigateToSettingsScreen,
-            // demo:begin
-            navigateToLoans = navigateToLoans,
-            navigateToBills = navigateToBills,
-            navigateToRates = navigateToRates,
-            navigateToExchangeRates = navigateToExchangeRates,
-            navigateToRateHistory = navigateToRateHistory,
-            navigateToMacro = navigateToMacro,
-            navigateToEmi = navigateToEmi,
-            navigateToAffordability = navigateToAffordability,
-            navigateToAmortization = navigateToAmortization,
-            navigateToLoanComparison = navigateToLoanComparison,
-            navigateToLoanCalcWizard = navigateToLoanCalcWizard,
-            navigateToCrypto = navigateToCrypto,
-            // demo:end
+            homeBody = homeBody,
         )
     }
 }

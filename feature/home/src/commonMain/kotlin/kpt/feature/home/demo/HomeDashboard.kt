@@ -124,8 +124,11 @@ import kpt.feature.home.ui.TestTags
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
+// public (not internal): rendered as the default home body by cmp-navigation's fork-owned
+// BackboneRegistry.homeBody seam (epic pure-white-label-store5-network, T7). Lives in the
+// fork-owned `demo/` package; customizer --clean deletes it together with the seam's default.
 @Composable
-internal fun HomeDashboard(
+fun HomeDashboard(
     onNavigateToLoans: () -> Unit,
     onNavigateToBills: () -> Unit,
     onNavigateToRates: () -> Unit,

@@ -153,3 +153,10 @@ check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
     """.trimIndent()
 }
 include(":sync")
+
+// Fork-owned module-include seam (B1/T11 white-label). A fork adds its own `include(":feature:x")`
+// lines in `settings.local.gradle.kts` — never in this template-synced file. Guarded so a `--clean`
+// fork that removed the file still configures.
+if (file("settings.local.gradle.kts").exists()) {
+    apply(from = "settings.local.gradle.kts")
+}

@@ -28,6 +28,11 @@ that whole class of silent loss becomes impossible.
 | `fork` | the fork is the sole author | **never touch** it (branding, demo, the `core/store` seam, generated `Config.xcconfig`, local flavors, icons, store listings, fork identity). |
 | `merge` | both author | **3-way merge**, never a blind copy (`AndroidManifest.xml`, `strings.xml`, `libs.versions.toml`, `settings.gradle.kts`, nav host). |
 
+> The most-edited `owner: fork` files are the **white-label extension seams** — the registries a fork
+> uses to add features, tabs, the home body, and startup hooks without touching template infra. They are
+> documented in
+> [`cmp-navigation/.../registry/README.md`](../../cmp-navigation/src/commonMain/kotlin/cmp/navigation/registry/README.md).
+
 ## Precedence
 
 Rules are ordered **most-specific → most-general**, and the **first matching rule

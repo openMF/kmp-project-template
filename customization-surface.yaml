@@ -57,6 +57,10 @@ rules:
   - glob: "settings.gradle.kts"
     owner: merge
     strategy: include-union
+  # Fork-owned settings-include seam (B1/T11). A fork adds its module includes HERE; the template
+  # settings.gradle.kts applies it via `apply(from = ...)` and stays full-copy / include-union.
+  - glob: "settings.local.gradle.kts"
+    owner: fork
   # Root navigation host: template owns the scaffold; forks wire feature routes in.
   - glob: "cmp-navigation/**/*Navigation*.kt"
     owner: merge
@@ -103,6 +107,11 @@ rules:
   - glob: "cmp-navigation/build.gradle.kts"
     owner: merge
     strategy: kotlin-3way
+  # Fork-owned feature-dependency seam (S7/F4). A fork adds/removes feature-module deps HERE; the
+  # template-owned cmp-navigation/build.gradle.kts applies it via `apply(from = ...)` and stays full-copy.
+  # This closes the S7 gap where a fork had to edit the template build file to add a feature. (E1/T8, 2026-08-11)
+  - glob: "feature-deps.gradle.kts"
+    owner: fork
   # Authenticated bottom-nav ViewModel: template ships the base tab graph; forks add tabs.
   # Merge so a template update never drops fork-added tabs. S6 classification gap — was owner
   # GAP (TabRegistry seam lands in E1). Matches AuthenticatedNavbarNavigationViewModel.kt.
@@ -143,11 +152,14 @@ rules:
     owner: fork
   - glob: "core/store/**/di/StoreModule.kt"
     owner: fork
-  # Feature registry seam — the fork-owned white-label extension point for feature contributions
-  # (Koin modules, nav destinations, workers). The template infra (KoinModules, AuthenticatedNavigation,
-  # WorkerDeclarations) READS this seam; a fork adds/removes features by editing ONLY this file, so the
-  # infra modules stay full-copy `owner: template`. Same seam pattern as the core/store block above. (2026-08-10)
-  - glob: "cmp-navigation/**/registry/FeatureRegistry.kt"
+  # White-label registry seams — the fork-owned extension package (cmp.navigation.registry). The
+  # template infra (KoinModules, AuthenticatedNavigation, the navbar screen, cmp-shared's initKoin,
+  # feature/home's HomeScreen shell) READS these seams; a fork adds/removes features, tabs, the home
+  # body, and startup hooks by editing ONLY files here, so the infra modules stay full-copy
+  # `owner: template`. Covers FeatureRegistry (routes+DI), BackboneRegistry (home body, S5),
+  # TabRegistry (bottom-nav tabs, S6), AppInitializers (startup hooks, S3/S4) + the package README.
+  # The whole package is the seam — same pattern as the core/store block above. (E1/T7, 2026-08-11)
+  - glob: "cmp-navigation/**/registry/**"
     owner: fork
   # Worker seam — the fork-owned @WorkerKmpWorkers site (cmp-shared). The template WorkerDeclarations.kt
   # (base workers) stays owner:template; the KSP processor aggregates both. A fork declares its workers
@@ -180,8 +192,12 @@ rules:
     owner: fork
   - glob: "cmp-desktop/icons/**"
     owner: fork
-  - glob: "cmp-desktop/build.gradle.kts"      # fork desktop packaging (dock name, dmg)
-    owner: fork
+  # Desktop build: template ships the packaging build logic; a fork overrides packaging identity
+  # (dock name, dmg). 3-way merge (symmetry with cmp-android's build.gradle) so template build
+  # improvements reach forks while fork packaging survives — not a blind fork-owned file. (B5/T11)
+  - glob: "cmp-desktop/build.gradle.kts"
+    owner: merge
+    strategy: kotlin-3way
   - glob: "fastlane-config/project_config.rb"
     owner: fork
   # Store-listing text + media are DERIVED from app-profile/ by syncForkConfig — the SoT is
@@ -249,7 +265,14 @@ rules:
     owner: template
   - glob: "gradle/wrapper/**"
     owner: template
-  - glob: "maestro/screen-state/**"
+  # Maestro E2E flow SoT (RULE-TEST-OUTPUT-LAYOUT-001). The template ships its framework screen-state
+  # retention flows here (synced via sync-dirs.sh idea-layer/testers/flows/screen-state); a fork adds its
+  # own feature flows alongside. Run captures (idea-layer/testers/captures/**) are gitignored evidence.
+  - glob: "idea-layer/testers/flows/**"
+    owner: template
+  # In-template feature-authoring guide (E5 consumption contract) — template-authored, synced like
+  # the per-module CONSUMPTION.md docs. (closes a pre-existing E5 classification gap)
+  - glob: "FEATURE_AUTHORING.md"
     owner: template
   - glob: "scripts/**"
     owner: template

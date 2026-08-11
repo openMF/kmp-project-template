@@ -14,6 +14,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.runComposeUiTest
 import kpt.core.designsystem.theme.KptTheme
+import kpt.feature.home.demo.HomeDashboard
 import kpt.feature.home.demo.ui.EmptyBillReminderRepository
 import kpt.feature.home.demo.ui.EmptyLoanRepository
 import kpt.feature.home.demo.ui.FakeDashboardCurrencyRepository
@@ -48,19 +49,25 @@ class HomeScreenUiTest {
             KptTheme {
                 HomeScreen(
                     onSettingsClick = {},
-                    onNavigateToLoans = {},
-                    onNavigateToBills = {},
-                    onNavigateToRates = {},
-                    onNavigateToExchangeRates = {},
-                    onNavigateToRateHistory = {},
-                    onNavigateToMacro = {},
-                    onNavigateToEmi = {},
-                    onNavigateToAffordability = {},
-                    onNavigateToAmortization = {},
-                    onNavigateToLoanComparison = {},
-                    onNavigateToLoanCalcWizard = {},
-                    onNavigateToCrypto = {},
-                    dashboardViewModel = viewModel,
+                    // The fork-owned home body — here the demo dashboard wired to fake repos, mirroring
+                    // production where cmp-navigation's BackboneRegistry.homeBody supplies it.
+                    homeBody = {
+                        HomeDashboard(
+                            onNavigateToLoans = {},
+                            onNavigateToBills = {},
+                            onNavigateToRates = {},
+                            onNavigateToExchangeRates = {},
+                            onNavigateToRateHistory = {},
+                            onNavigateToMacro = {},
+                            onNavigateToEmi = {},
+                            onNavigateToAffordability = {},
+                            onNavigateToAmortization = {},
+                            onNavigateToLoanComparison = {},
+                            onNavigateToLoanCalcWizard = {},
+                            onNavigateToCrypto = {},
+                            viewModel = viewModel,
+                        )
+                    },
                 )
             }
         }

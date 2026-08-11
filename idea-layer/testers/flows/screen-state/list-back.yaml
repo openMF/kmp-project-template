@@ -21,8 +21,8 @@
 # `feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/TestTags.kt`
 # (CU-5 append-only). Any rename lands here in the same commit.
 #
-# Executed on device by /device-test or manually via:
-#   maestro test maestro/screen-state/list-back.yaml
+# Executed on device via /idea-testers-run (pins captures to idea-layer/testers/captures/{run-id})
+# — flow SoT lives at idea-layer/testers/flows/screen-state/list-back.yaml (RULE-TEST-OUTPUT-LAYOUT-001).
 appId: org.mifos.kmp.template
 name: screen-state — list ↔ detail ↔ back retention
 tags:

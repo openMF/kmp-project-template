@@ -5,6 +5,11 @@ modules, from remote/local source all the way to the Compose screen. Pick the **
 your data behaviour (the `store_archetype`), then follow that module chain — each stage links the
 module's own `CONSUMPTION.md`.
 
+> **Registering** the feature (its routes, DI, tab, home body, startup hooks) is a separate, one-file
+> step per surface — see the white-label extension seams in
+> [`cmp-navigation/.../registry/README.md`](cmp-navigation/src/commonMain/kotlin/cmp/navigation/registry/README.md).
+> This document is about a feature's *data flow*; that one is about *wiring it into the app shell*.
+
 > **Source of truth.** The full archetype decision matrix + framework-API taxonomy is
 > `training-layer/instructions/stream-first/latest/CORE_STORE.md` (consumed by `/kmp-implement`).
 > This document is the always-present, syncable in-repo summary of *what to call*. `/kmp-implement`

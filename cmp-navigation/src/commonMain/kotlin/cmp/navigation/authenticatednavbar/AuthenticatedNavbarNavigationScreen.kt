@@ -27,16 +27,16 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
+import cmp.navigation.registry.TabRegistry
 import cmp.navigation.ui.KptRootScaffold
 import cmp.navigation.ui.ScaffoldNavigationData
 import cmp.navigation.ui.logDestinationChanged
 import cmp.navigation.ui.rememberKptNavController
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kpt.core.base.analytics.rememberAnalyticsHelper
 import kpt.core.base.designsystem.theme.motion
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.base.ui.util.RootTransitionProviders
-import kpt.core.ui.NavigationItem
 import kpt.feature.home.HomeDestination
 import kpt.feature.home.homeGraph
 import kpt.feature.home.navigateToHome
@@ -47,20 +47,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 internal fun AuthenticatedNavbarNavigationScreen(
     navigateToSettingsScreen: () -> Unit,
-    // demo:begin
-    navigateToLoans: () -> Unit,
-    navigateToBills: () -> Unit,
-    navigateToRates: () -> Unit,
-    navigateToExchangeRates: () -> Unit,
-    navigateToRateHistory: () -> Unit,
-    navigateToMacro: () -> Unit,
-    navigateToEmi: () -> Unit,
-    navigateToAffordability: () -> Unit,
-    navigateToAmortization: () -> Unit,
-    navigateToLoanComparison: () -> Unit,
-    navigateToLoanCalcWizard: () -> Unit,
-    navigateToCrypto: () -> Unit,
-    // demo:end
+    homeBody: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberKptNavController(
         name = "AuthenticatedNavbarScreen",
@@ -93,20 +80,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
         navController = navController,
         modifier = modifier,
         navigateToSettingsScreen = navigateToSettingsScreen,
-        // demo:begin
-        navigateToLoans = navigateToLoans,
-        navigateToBills = navigateToBills,
-        navigateToRates = navigateToRates,
-        navigateToExchangeRates = navigateToExchangeRates,
-        navigateToRateHistory = navigateToRateHistory,
-        navigateToMacro = navigateToMacro,
-        navigateToEmi = navigateToEmi,
-        navigateToAffordability = navigateToAffordability,
-        navigateToAmortization = navigateToAmortization,
-        navigateToLoanComparison = navigateToLoanComparison,
-        navigateToLoanCalcWizard = navigateToLoanCalcWizard,
-        navigateToCrypto = navigateToCrypto,
-        // demo:end
+        homeBody = homeBody,
         onAction = remember(viewModel) {
             { viewModel.trySendAction(it) }
         },
@@ -117,29 +91,15 @@ internal fun AuthenticatedNavbarNavigationScreen(
 internal fun AuthenticatedNavbarNavigationScreenContent(
     navController: NavHostController,
     navigateToSettingsScreen: () -> Unit,
-    // demo:begin
-    navigateToLoans: () -> Unit,
-    navigateToBills: () -> Unit,
-    navigateToRates: () -> Unit,
-    navigateToExchangeRates: () -> Unit,
-    navigateToRateHistory: () -> Unit,
-    navigateToMacro: () -> Unit,
-    navigateToEmi: () -> Unit,
-    navigateToAffordability: () -> Unit,
-    navigateToAmortization: () -> Unit,
-    navigateToLoanComparison: () -> Unit,
-    navigateToLoanCalcWizard: () -> Unit,
-    navigateToCrypto: () -> Unit,
-    // demo:end
+    homeBody: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onAction: (AuthenticatedNavBarAction) -> Unit,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val navigationItems = persistentListOf<NavigationItem>(
-        AuthenticatedNavBarTabItem.HomeTab,
-        AuthenticatedNavBarTabItem.ProfileTab,
-    )
+    // Tabs from the fork-owned TabRegistry seam (backbone Home/Profile + fork extraTabs) — the
+    // navbar renders the list generically instead of a hardcoded item list (S6 heal, T7).
+    val navigationItems = TabRegistry.tabs.toImmutableList()
 
     KptRootScaffold(
         contentWindowInsets = WindowInsets(0.dp),
@@ -157,6 +117,10 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                     is AuthenticatedNavBarTabItem.ProfileTab -> {
                         onAction(AuthenticatedNavBarAction.SettingsTabClick)
                     }
+
+                    // Fork extraTabs (TabRegistry.extraTabs) own their own navigation; the backbone
+                    // navbar has no built-in action for them.
+                    else -> Unit
                 }
             },
             shouldShowNavigation = navigationItems.any {
@@ -186,20 +150,7 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
             // TOP LEVEL DESTINATIONS
             homeGraph(
                 onSettingsClick = navigateToSettingsScreen,
-                // demo:begin
-                onNavigateToLoans = navigateToLoans,
-                onNavigateToBills = navigateToBills,
-                onNavigateToRates = navigateToRates,
-                onNavigateToExchangeRates = navigateToExchangeRates,
-                onNavigateToRateHistory = navigateToRateHistory,
-                onNavigateToMacro = navigateToMacro,
-                onNavigateToEmi = navigateToEmi,
-                onNavigateToAffordability = navigateToAffordability,
-                onNavigateToAmortization = navigateToAmortization,
-                onNavigateToLoanComparison = navigateToLoanComparison,
-                onNavigateToLoanCalcWizard = navigateToLoanCalcWizard,
-                onNavigateToCrypto = navigateToCrypto,
-                // demo:end
+                homeBody = homeBody,
             )
 
             profileDestination()

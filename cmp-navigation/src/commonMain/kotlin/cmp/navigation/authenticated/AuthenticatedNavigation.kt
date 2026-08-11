@@ -17,22 +17,11 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
+import cmp.navigation.registry.BackboneRegistry
 import cmp.navigation.registry.FeatureRegistry
 import kotlinx.serialization.Serializable
 import kpt.core.base.security.isReleaseBuild
 import kpt.core.base.ui.nav.popBackStackSafely
-import kpt.feature.bills.navigation.navigateToBills
-import kpt.feature.calculators.navigation.navigateToAffordability
-import kpt.feature.calculators.navigation.navigateToAmortization
-import kpt.feature.calculators.navigation.navigateToLoanCalcWizard
-import kpt.feature.calculators.navigation.navigateToLoanComparison
-import kpt.feature.crypto.navigation.navigateToCrypto
-import kpt.feature.currencyrates.navigation.navigateToCurrencyRates
-import kpt.feature.currencyrates.navigation.navigateToRateHistory
-import kpt.feature.emicalculator.navigation.navigateToEmiCalculator
-import kpt.feature.loans.navigation.navigateToLoans
-import kpt.feature.macro.navigation.navigateToMacroGraph
-import kpt.feature.rates.navigation.navigateToRates
 import kpt.feature.settings.navigateToSettings
 import kpt.feature.settings.notificationDestination
 import kpt.feature.settings.settingsDestination
@@ -54,20 +43,9 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
     ) {
         authenticatedNavbarGraph(
             navigateToSettingsScreen = navController::navigateToSettings,
-            // demo:begin
-            navigateToLoans = { navController.navigateToLoans() },
-            navigateToBills = { navController.navigateToBills() },
-            navigateToRates = { navController.navigateToRates() },
-            navigateToExchangeRates = { navController.navigateToCurrencyRates() },
-            navigateToRateHistory = { navController.navigateToRateHistory() },
-            navigateToMacro = { navController.navigateToMacroGraph() },
-            navigateToEmi = { navController.navigateToEmiCalculator() },
-            navigateToAffordability = { navController.navigateToAffordability() },
-            navigateToAmortization = { navController.navigateToAmortization() },
-            navigateToLoanComparison = { navController.navigateToLoanComparison() },
-            navigateToLoanCalcWizard = { navController.navigateToLoanCalcWizard() },
-            navigateToCrypto = { navController.navigateToCrypto() },
-            // demo:end
+            // Home body from the fork-owned BackboneRegistry seam (default: demo dashboard). The
+            // template shell carries zero demo imports — a fork edits BackboneRegistry, not this file.
+            homeBody = { BackboneRegistry.homeBody(navController) },
         )
 
         notificationDestination(onBackClick = { navController.popBackStackSafely() })

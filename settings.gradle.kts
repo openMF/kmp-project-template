@@ -135,6 +135,7 @@ include(":feature:alerts")
 
 include(":core-base:analytics")
 include(":core-base:common")
+include(":core-base:data")
 include(":core-base:database")
 include(":core-base:datastore")
 include(":core-base:designsystem")

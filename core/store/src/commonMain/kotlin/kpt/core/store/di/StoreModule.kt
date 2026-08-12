@@ -23,8 +23,8 @@ import kpt.core.store.demo.economic.impl.provideInterestRateSeriesStore
 import kpt.core.store.demo.economic.impl.provideMacroIndicatorStore
 import kpt.core.store.demo.exchange.impl.provideSpotRateLookupStore
 import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
-import kpt.core.store.infra.StoreCacheManager
-import kpt.core.store.infra.impl.StoreCacheManagerImpl
+import kpt.core.base.store.infra.StoreCacheManager
+import kpt.core.base.store.infra.impl.StoreCacheManagerImpl
 import org.koin.core.module.Module
 import org.koin.dsl.module
 

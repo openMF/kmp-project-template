@@ -32,7 +32,7 @@ object AppUrlTypes {
 
     /**
      * All endpoint types this project exposes. Base URLs for each are declared once in
-     * [AccessPointRegistry]; a fork renames / adds / removes entries here and there in lockstep.
+     * [AppAccessPoints]; a fork renames / adds / removes entries here and there in lockstep.
      */
     val all: List<UrlType> = listOf(MAIN, STAGING, SUPABASE_DATA)
 }

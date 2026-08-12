@@ -9,9 +9,11 @@
  */
 package kpt.core.network.di
 
+import kpt.core.base.network.AccessPointRegistry
 import kpt.core.base.network.MultiUrlConfigProvider
 import kpt.core.base.network.SupabaseConfigClient
 import kpt.core.base.network.SupabaseCredentials
+import kpt.core.network.config.AppAccessPoints
 import kpt.core.network.config.AppMultiUrlConfigProvider
 import org.koin.dsl.module
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
@@ -37,10 +39,14 @@ import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentia
 // wiring a fork already stripped.
 val NetworkModule = module {
 
+    // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
+    // The restApi("<id>") DSL and AppMultiUrlConfigProvider both resolve transports/base-URLs from this.
+    single { AccessPointRegistry(AppAccessPoints.points) }
+
     // Unified access-point provider — resolves every named UrlType to its REST base URL from the
-    // declarative AccessPointRegistry. Clients thread it via
+    // AccessPointRegistry. Clients thread it via
     // setupDefaultHttpClient(multiUrlProvider = get(), urlType = AppUrlTypes.<NAME>).
-    single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider() }
+    single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider(get()) }
 
     // Supabase-backed dynamic config — overridable by forks. The credentials object is generated
     // from secrets/live/supabase/supabaseCredentialsFile.json by SupabaseConfigConventionPlugin (empty when the

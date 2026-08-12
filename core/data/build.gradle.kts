@@ -25,6 +25,13 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.common)
             implementation(projects.core.database)
+            implementation(projects.coreBase.database)
+            implementation(projects.coreBase.datastore)
+            implementation(projects.coreBase.store)
+            // api: re-export the relocated sync/monitor infra (NetworkMonitor, Synchronizer,
+            // SyncManager, TimeZoneMonitor) so existing core/data consumers (features, sync,
+            // cmp-android) keep the transitive visibility they had when it lived in core/data.
+            api(projects.coreBase.data)
             implementation(projects.core.datastore)
             implementation(projects.core.model)
             implementation(projects.core.network)

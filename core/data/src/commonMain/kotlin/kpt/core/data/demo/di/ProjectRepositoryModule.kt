@@ -30,9 +30,9 @@ import kpt.core.data.demo.economic.impl.MacroIndicatorsRepositoryImpl
 import kpt.core.data.demo.watchlist.WatchlistRepository
 import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
 import kpt.core.data.di.OutboxQualifiers
-import kpt.core.data.infra.NetworkMonitor
-import kpt.core.data.infra.impl.RoomBookkeeper
-import kpt.core.data.infra.impl.RoomSubmitOutbox
+import kpt.core.base.data.infra.NetworkMonitor
+import kpt.core.base.store.infra.impl.RoomBookkeeper
+import kpt.core.base.store.infra.impl.RoomSubmitOutbox
 import kpt.core.database.AppDatabase
 import kpt.core.model.demo.alerts.PriceAlert
 import kpt.core.model.demo.banking.BillReminder

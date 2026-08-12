@@ -21,7 +21,7 @@ import kpt.core.data.user.LogoutReason
 import kpt.core.data.user.UserLogoutManager
 import kpt.core.data.util.bufferedMutableSharedFlow
 import kpt.core.datastore.UserPreferencesRepository
-import kpt.core.store.infra.StoreCacheManager
+import kpt.core.base.store.infra.StoreCacheManager
 
 class UserLogoutManagerImpl(
     private val repository: UserPreferencesRepository,

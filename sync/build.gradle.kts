@@ -18,6 +18,7 @@ kotlin {
             implementation(projects.core.common)
             implementation(projects.core.data)
             implementation(projects.core.datastore)
+            implementation(projects.coreBase.datastore)
             implementation(projects.core.model)
 
             // worker-kmp core — CoroutineWorker / WorkerContext / WorkResult / WorkData /

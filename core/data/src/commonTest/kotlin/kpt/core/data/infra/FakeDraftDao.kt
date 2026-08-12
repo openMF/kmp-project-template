@@ -11,8 +11,8 @@ package kpt.core.data.infra
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kpt.core.database.infra.dao.DraftDao
-import kpt.core.database.infra.entity.DraftEntity
+import kpt.core.base.database.infra.dao.DraftDao
+import kpt.core.base.database.infra.entity.DraftEntity
 
 /**
  * In-memory fake of [DraftDao] whose reactive reads are **cold snapshots** — each

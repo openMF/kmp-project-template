@@ -15,8 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kpt.core.base.common.di.CommonModule
 import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.data.infra.NetworkMonitor
-import kpt.core.data.infra.impl.RoomFetchedAtRepository
+import kpt.core.base.data.infra.NetworkMonitor
+import kpt.core.base.store.infra.impl.RoomFetchedAtRepository
 import kpt.core.data.user.UserDataRepository
 import kpt.core.data.user.UserLogoutManager
 import kpt.core.data.user.impl.UserDataRepositoryImpl

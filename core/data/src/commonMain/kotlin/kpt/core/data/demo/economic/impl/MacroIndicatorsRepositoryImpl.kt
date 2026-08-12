@@ -22,8 +22,8 @@ import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.base.store.screen.requireData
 import kpt.core.data.demo.economic.MacroIndicatorsRepository
-import kpt.core.data.infra.Synchronizer
-import kpt.core.data.infra.snapshotSync
+import kpt.core.base.data.infra.Synchronizer
+import kpt.core.base.data.infra.snapshotSync
 import kpt.core.model.demo.economic.IndicatorKind
 import kpt.core.model.demo.economic.MacroIndicator
 import kpt.core.store.demo.economic.impl.MacroIndicatorKey

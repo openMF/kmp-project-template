@@ -40,12 +40,12 @@ import kpt.core.database.demo.economic.InterestRateSeriesDao
 import kpt.core.database.demo.economic.InterestRateSeriesEntity
 import kpt.core.database.demo.watchlist.dao.WatchlistDao
 import kpt.core.database.demo.watchlist.entity.WatchlistEntity
-import kpt.core.database.infra.dao.BookkeeperDao
-import kpt.core.database.infra.dao.DraftDao
-import kpt.core.database.infra.dao.FetchedAtDao
-import kpt.core.database.infra.entity.BookkeeperEntity
-import kpt.core.database.infra.entity.DraftEntity
-import kpt.core.database.infra.entity.FetchedAtEntity
+import kpt.core.base.database.infra.dao.BookkeeperDao
+import kpt.core.base.database.infra.dao.DraftDao
+import kpt.core.base.database.infra.dao.FetchedAtDao
+import kpt.core.base.database.infra.entity.BookkeeperEntity
+import kpt.core.base.database.infra.entity.DraftEntity
+import kpt.core.base.database.infra.entity.FetchedAtEntity
 
 /**
  * KSP-generated constructor bridge for [AppDatabase].

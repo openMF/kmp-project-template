@@ -33,7 +33,7 @@ import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.data.demo.currency.CurrencyRepository
 import kpt.core.data.demo.economic.EconomicRatesRepository
-import kpt.core.data.infra.Synchronizer
+import kpt.core.base.data.infra.Synchronizer
 import kpt.core.model.demo.banking.BillCategory
 import kpt.core.model.demo.banking.BillReminder
 import kpt.core.model.demo.banking.Loan

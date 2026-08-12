@@ -9,6 +9,7 @@
  */
 package kpt.core.network.config
 
+import kpt.core.base.network.AccessPointRegistry
 import kpt.core.base.network.MultiUrlConfigProvider
 import kpt.core.base.network.UrlType
 
@@ -20,11 +21,11 @@ import kpt.core.base.network.UrlType
  * with no per-client wiring. [getBaseUrl] with no argument falls back to the registry's
  * [UrlType.MAIN] entry (the [MultiUrlConfigProvider] default).
  *
- * Registered in Koin as `single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider() }` (see
- * `NetworkModule`).
+ * Registered in Koin as `single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider(get()) }` (see
+ * `NetworkModule`), with the [AccessPointRegistry] resolved from the fork's `AppAccessPoints.points`.
  */
 class AppMultiUrlConfigProvider(
-    private val registry: AccessPointRegistry = AccessPointRegistry,
+    private val registry: AccessPointRegistry,
 ) : MultiUrlConfigProvider {
 
     override fun getBaseUrl(type: UrlType): String =

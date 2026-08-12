@@ -44,7 +44,7 @@ import org.koin.dsl.module
 import org.mobilenativefoundation.store.store5.Bookkeeper
 
 /**
- * DemoRepositoryModule — the FORK-OWNED demo repository/outbox/syncer wiring for the toolkit showcase.
+ * ProjectRepositoryModule — the FORK-OWNED demo repository/outbox/syncer wiring for the toolkit showcase.
  *
  * Relocated out of the infra aggregator [kpt.core.data.di.DataModule] (in `RepositoryModule.kt`)
  * (E1 / C1, epic pure-white-label-store5-network) so that aggregator becomes an infra-only full-copy
@@ -55,14 +55,14 @@ import org.mobilenativefoundation.store.store5.Bookkeeper
  * Dependency resolution is lazy: every `networkMonitor = get()` / `fetchedAtRepository = get()` /
  * `scope = get()` resolves the framework-infra singletons still declared in [kpt.core.data.di.DataModule];
  * every `get(AppStoreRegistry.X)` resolves the Store from `core/store` appStoreModule; the demo DAOs come
- * from [kpt.core.database.demo.di.DemoDatabaseModule]. All of those modules are co-loaded with THIS one
+ * from [kpt.core.database.demo.di.ProjectDatabaseModule]. All of those modules are co-loaded with THIS one
  * whenever the demo showcase is present.
  *
  * Ownership: the `demo/` package is fork-owned in customization-surface.yaml. Installed into the app Koin graph via the
  * fork-owned `cmp-navigation/registry/FeatureRegistry.featureKoinModules` demo block; the customizer
  * `--clean` deletes this whole `demo/` package + empties that registry block together.
  */
-val DemoRepositoryModule = module {
+val ProjectRepositoryModule = module {
     // Personal watchlist — local-only persistence for the SubmitHandler showcase.
     single { get<AppDatabase>().watchlistDao }
     single<WatchlistRepository> {

@@ -26,7 +26,7 @@ import kpt.core.network.demo.economic.config.WorldBankApiConfig
 import org.koin.dsl.module
 
 /**
- * DemoNetworkModule — the FORK-OWNED demo API-client wiring for the toolkit showcase
+ * ProjectNetworkModule — the FORK-OWNED demo API-client wiring for the toolkit showcase
  * (FRED / World Bank / CoinGecko / Frankfurter / JsonPlaceholder).
  *
  * Relocated out of the infra aggregator [kpt.core.network.di.NetworkModule] (E1 / C2, epic
@@ -43,7 +43,7 @@ import org.koin.dsl.module
  * via the fork-owned `cmp-navigation/registry/FeatureRegistry.featureKoinModules` demo block; the
  * customizer `--clean` deletes this whole `demo/` package + empties that registry block together.
  */
-val DemoNetworkModule = module {
+val ProjectNetworkModule = module {
     single<FredApiConfig> {
         FredApiConfig(apiKey = BuildKonfig.FRED_API_KEY.takeIf { it.isNotBlank() })
     }

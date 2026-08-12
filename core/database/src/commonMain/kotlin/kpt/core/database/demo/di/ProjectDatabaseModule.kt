@@ -26,7 +26,7 @@ import org.koin.dsl.module
 private object ChargeTypeConvertersInstalled
 
 /**
- * DemoDatabaseModule — the FORK-OWNED demo DAO/converter wiring for the toolkit showcase.
+ * ProjectDatabaseModule — the FORK-OWNED demo DAO/converter wiring for the toolkit showcase.
  *
  * Relocated out of the infra aggregator [kpt.core.database.di.DatabaseModule] (E1 / C3, epic
  * pure-white-label-store5-network) so that aggregator becomes an infra-only full-copy `owner:
@@ -38,7 +38,7 @@ private object ChargeTypeConvertersInstalled
  * via the fork-owned `cmp-navigation/registry/FeatureRegistry.featureKoinModules` demo block; the
  * customizer `--clean` deletes this whole `demo/` package + empties that registry block together.
  */
-val DemoDatabaseModule = module {
+val ProjectDatabaseModule = module {
     single(createdAtStart = true) {
         ChargeTypeConverters.install(get<FieldEncryptor>())
         ChargeTypeConvertersInstalled

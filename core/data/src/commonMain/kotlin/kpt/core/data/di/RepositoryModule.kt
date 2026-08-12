@@ -34,7 +34,7 @@ import org.koin.dsl.module
  * DataModule — the INFRA-ONLY (framework) data aggregator, `owner: template` (E1 / C1).
  *
  * The demo repositories / outboxes / offline-submit syncers relocated to the fork-owned
- * [kpt.core.data.demo.di.DemoRepositoryModule]; this aggregator now carries ZERO `kpt.core.*.demo.*`
+ * [kpt.core.data.demo.di.ProjectRepositoryModule]; this aggregator now carries ZERO `kpt.core.*.demo.*`
  * imports so a template sync can blind-copy it without re-introducing demo wiring a fork already
  * stripped. The demo module is installed via the fork-owned `FeatureRegistry.featureKoinModules`
  * demo block; both go away together on `customize.sh --clean`.

@@ -36,7 +36,7 @@ import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentia
 //     `dynamicUrlProvider = get()` on any client that should switch base URL at runtime. The
 //     toolkit's own fixed-URL APIs (FRED / World Bank / CoinGecko / Frankfurter) don't use it.
 // INFRA-ONLY, owner: template (E1 / C2). The demo API configs + FintechApiClient + demo API bindings
-// relocated to the fork-owned [kpt.core.network.demo.di.DemoNetworkModule]; this aggregator carries
+// relocated to the fork-owned [kpt.core.network.demo.di.ProjectNetworkModule]; this aggregator carries
 // ZERO `kpt.core.*.demo.*` imports so a template sync can blind-copy it without re-introducing demo
 // wiring a fork already stripped.
 val NetworkModule = module {

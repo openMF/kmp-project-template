@@ -11,35 +11,37 @@ package org.convention
 
 import org.gradle.api.Project
 import java.io.File
+import java.io.StringReader
+import java.util.Properties
 
 /**
- * Resolve a secret's on-disk path by DELEGATING to the ONE resolver — `deployment/scripts/build-secrets`
- * (the bash CLI over `deployment/_shared/lib/build_secrets.rb`, which reads `secrets/LAYOUT.yaml`).
+ * Resolve a secret's on-disk path for the Gradle build by READING the resolver-generated map
+ * `gradle/secrets-paths.properties` — NEVER by shelling out.
  *
- * This is NOT a parallel resolver (RULE-SECRETS-LAYOUT-001 / check-secrets-resolver.sh SR-7/SR-12 forbid
- * those): the Gradle build never reads `secrets/LAYOUT.yaml` itself and never hardcodes a `secrets/live/…`
- * path — it shells out to `build-secrets path <key>`, which composes `roots.{live,sample}` + the secret's
- * `rel:` (live-wins-else-sample). So the whole `secrets/live/<platform>` tree (android / apple / desktop /
- * web / supabase) is re-manageable by editing `secrets/LAYOUT.yaml` alone, and Gradle + Fastlane share ONE
- * resolver. Returns an absolute [File] (the CLI prints a repo-root-relative path).
+ * `deployment/_shared/lib/build_secrets.rb` (the one resolver over `secrets/LAYOUT.yaml`, SoT) stays the
+ * single algorithm; its `export-paths` command emits `key=<repo-relative-path>` for every file-like secret
+ * (`live`-wins-else-`sample`). That map is generated OUTSIDE Gradle — by the CI `pre_fastlane_script` /
+ * Fastlane pre-step / `/secrets pull`, all of which run before the build and have Ruby — and Gradle merely
+ * looks a key up in it. This is deliberate: a config-time subprocess (the old `build-secrets path <key>`
+ * exec) is Windows-shebang-fragile, hostile to the configuration cache, and runs on EVERY build including
+ * the Desktop/Web checks that never sign Android. A file read via [org.gradle.api.provider.ProviderFactory.fileContents]
+ * is cross-platform, config-cache-correct, and free.
+ *
+ * Still NOT a parallel resolver (RULE-SECRETS-LAYOUT-001 / check-secrets-resolver.sh SR-7/SR-12): Gradle
+ * never parses `secrets/LAYOUT.yaml` and never hardcodes a `secrets/live/…` path — it only consumes the
+ * resolver's own output. When the map is absent (e.g. a PR-check build that never materializes secrets) or
+ * lacks the key, it returns an under-`build/` sentinel so configuration of a non-signing build always
+ * succeeds; a real Android release-signing task supplies the keystore via the `KEYSTORE_PATH` env override
+ * (see cmp-android signingConfigs), so it never depends on this fallback. Returns an absolute [File].
  */
 fun Project.resolveSecretPath(key: String): File {
     val repoRoot = rootProject.projectDir
-    val cli = File(repoRoot, "deployment/scripts/build-secrets")
-    // `build-secrets` is a `#!/usr/bin/env bash` CLI. Windows cannot start a shebang script directly
-    // (it is not a .exe/.bat/.cmd) — and this resolver runs at `:cmp-android` configuration time, so a
-    // raw exec breaks EVERY Gradle build on Windows (desktop/web included), not just Android signing.
-    // Launch it through bash (Git Bash is on the GitHub windows-latest PATH) with a forward-slashed
-    // path so it is not mangled; other OSes exec it directly. Both hit the same one resolver.
-    val isWindows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
-    val command = if (isWindows) {
-        listOf("bash", cli.absolutePath.replace('\\', '/'), "path", key)
-    } else {
-        listOf(cli.absolutePath, "path", key)
+    val mapText = providers.fileContents(
+        rootProject.layout.projectDirectory.file("gradle/secrets-paths.properties"),
+    ).asText.orNull
+    if (mapText != null) {
+        val props = Properties().apply { load(StringReader(mapText)) }
+        props.getProperty(key)?.trim()?.takeIf { it.isNotEmpty() }?.let { return File(repoRoot, it) }
     }
-    val rel = providers.exec {
-        workingDir = repoRoot
-        commandLine(command)
-    }.standardOutput.asText.get().trim()
-    return File(repoRoot, rel)
+    return File(repoRoot, "build/secrets-unresolved/$key")
 }

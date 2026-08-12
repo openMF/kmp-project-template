@@ -200,6 +200,33 @@ module BuildSecrets
       end.compact
     end
 
+    # JVM/Gradle consumption surface. Emit `key=<repo-relative-path>` for every secret that resolves to
+    # an on-disk FILE (file/properties/literal kinds + anything with rel/consume_at) via the SAME
+    # `path()` algorithm — so the map is a faithful projection of the resolver, no parallel logic. Gradle
+    # reads this map (a generated `gradle/secrets-paths.properties`) at configuration time instead of
+    # shelling out to this resolver — a config-time subprocess is Windows-fragile + config-cache-hostile
+    # + runs on every build. env_var (env-line) secrets are skipped: Gradle never needs those paths.
+    # Paths are repo-root-relative with forward slashes (Java .properties-safe; the consumer File.joins
+    # them with the Gradle rootProject dir).
+    def export_paths
+      @doc.fetch("secrets").keys.map do |key|
+        s = spec(key)
+        next nil if s["kind"] == "env_var"
+        next nil unless s["rel"] || s["consume_at"]
+        "#{key}=#{path(key)}"
+      end.compact
+    end
+
+    # Persist the JVM path map to gradle/secrets-paths.properties (repo-root-anchored, gitignored).
+    # Called after a materialize (CI / `/secrets pull`) so a subsequent `./gradlew` release build reads
+    # real live paths WITHOUT any subprocess. Returns the written destination.
+    def write_paths_map!
+      dest = File.join(REPO_ROOT, "gradle", "secrets-paths.properties")
+      FileUtils.mkdir_p(File.dirname(dest))
+      File.write(dest, export_paths.join("\n") + "\n")
+      dest
+    end
+
     private
 
     def materialize_dest(key, s)
@@ -268,12 +295,15 @@ if __FILE__ == $PROGRAM_NAME
     warn(dest ? "✓ materialized #{key} → #{dest}" : "· skip #{key} (source empty)")
   when "materialize-all"
     acc.materialize_all!.each { |d| warn "✓ #{d}" }
+    warn "✓ #{acc.write_paths_map!} (gradle path map)"
   when "vault-plan"
     acc.vault_plan.each { |a, e, b| puts "#{a}\t#{e}\t#{b}" }
   when "export-env"
     puts acc.export_env
+  when "export-paths"
+    puts acc.export_paths
   else
-    abort "usage: build-secrets {path|value|application-id|exists|materialize|materialize-all|vault-plan|export-env} " \
+    abort "usage: build-secrets {path|value|application-id|exists|materialize|materialize-all|vault-plan|export-env|export-paths} " \
           "[key] [--flavor f] [--variant v] [--from-env VAR]"
   end
 end

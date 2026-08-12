@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
@@ -189,5 +190,14 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.pickExit(
     else -> fadeThrough
 }
 
+/**
+ * Clear focus when the root destination changes — prevents an Activity leak on Android emulators
+ * where a still-focused view holds a reference across recreation. The multiplatform
+ * [LocalFocusManager] covers every target in one commonMain impl (Compose clears the underlying
+ * platform focus on Android; a no-op where nothing is focused elsewhere), so no per-platform actual
+ * is needed.
+ */
 @Composable
-expect fun ClearFocus()
+fun ClearFocus() {
+    LocalFocusManager.current.clearFocus()
+}

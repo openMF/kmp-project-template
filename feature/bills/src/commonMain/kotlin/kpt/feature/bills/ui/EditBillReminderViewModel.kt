@@ -24,7 +24,7 @@ import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.model.demo.banking.BillCategory
 import kpt.core.model.demo.banking.BillReminder
 import kpt.core.model.demo.banking.Recurrence
-import kpt.core.platform.notification.bill.BillReminderSchedule
+import kpt.feature.bills.notification.BillReminderSchedule
 import kpt.feature.bills.domain.BillReminderRecurrence
 import kpt.feature.bills.notification.BillNotificationGateway
 import kotlin.random.Random

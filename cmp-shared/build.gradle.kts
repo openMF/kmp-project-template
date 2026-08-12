@@ -66,8 +66,9 @@ kotlin {
             // Navigation Modules
             implementation(projects.cmpNavigation)
             implementation(compose.components.resources)
-            implementation(projects.core.platform)
             implementation(projects.core.ui)
+            // core/platform re-exports the core-base/platform surface the app-shell uses.
+            implementation(projects.core.platform)
 
             implementation(libs.coil.kt.compose)
 

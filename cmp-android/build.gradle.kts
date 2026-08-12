@@ -105,11 +105,11 @@ dependencies {
 
     implementation(projects.cmpShared)
     implementation(projects.core.ui)
-    implementation(projects.core.platform)
     implementation(projects.core.analytics)
     implementation(projects.core.model)
     implementation(projects.core.data)
     implementation(projects.core.datastore)
+    implementation(projects.core.platform)
     implementation(projects.sync)
 
     // Compose

@@ -24,6 +24,8 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.core.datastore)
+            // core/platform re-exports core-base/platform (platformModule, GarbageCollectionManager) —
+            // the app-shell reaches those through core/ per G-CORE-BASE-ENCAP.
             implementation(projects.core.platform)
             // core-base/security is the ONE sanctioned app-shell exception: cmp-navigation is the DI
             // aggregator (KoinModules wires SecurityModule) and reads isReleaseBuild; no core/ wrapper

@@ -1,0 +1,34 @@
+/*
+ * Copyright 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package org.convention
+
+import org.gradle.api.Project
+import java.io.File
+
+/**
+ * Resolve a secret's on-disk path by DELEGATING to the ONE resolver — `deployment/scripts/build-secrets`
+ * (the bash CLI over `deployment/_shared/lib/build_secrets.rb`, which reads `secrets/LAYOUT.yaml`).
+ *
+ * This is NOT a parallel resolver (RULE-SECRETS-LAYOUT-001 / check-secrets-resolver.sh SR-7/SR-12 forbid
+ * those): the Gradle build never reads `secrets/LAYOUT.yaml` itself and never hardcodes a `secrets/live/…`
+ * path — it shells out to `build-secrets path <key>`, which composes `roots.{live,sample}` + the secret's
+ * `rel:` (live-wins-else-sample). So the whole `secrets/live/<platform>` tree (android / apple / desktop /
+ * web / supabase) is re-manageable by editing `secrets/LAYOUT.yaml` alone, and Gradle + Fastlane share ONE
+ * resolver. Returns an absolute [File] (the CLI prints a repo-root-relative path).
+ */
+fun Project.resolveSecretPath(key: String): File {
+    val repoRoot = rootProject.projectDir
+    val cli = File(repoRoot, "deployment/scripts/build-secrets")
+    val rel = providers.exec {
+        workingDir = repoRoot
+        commandLine(cli.absolutePath, "path", key)
+    }.standardOutput.asText.get().trim()
+    return File(repoRoot, rel)
+}

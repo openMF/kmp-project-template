@@ -42,7 +42,7 @@ buildkonfig {
     }
 }
 
-// Supabase credentials are sourced dynamically from the gitignored `secrets/supabaseCredentialsFile.json`
+// Supabase credentials are sourced dynamically from the gitignored `secrets/live/supabase/supabaseCredentialsFile.json`
 // (url + anonKey) via the shared SupabaseConfigConventionPlugin — the project's established secrets
 // mechanism — which generates `kpt.core.network.config.SupabaseCredentials`. When the file is absent
 // (the toolkit ships no Supabase project) it generates empty creds, so SupabaseConfigClient stays inert.

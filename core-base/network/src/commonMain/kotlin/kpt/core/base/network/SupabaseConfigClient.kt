@@ -95,7 +95,7 @@ class SupabaseConfigClient(
  * ## Generated Implementation
  *
  * If using the SupabaseConfigConventionPlugin, credentials are
- * automatically generated from `secrets/supabaseCredentialsFile.json`:
+ * automatically generated from `secrets/live/supabase/supabaseCredentialsFile.json`:
  *
  * ```kotlin
  * // Auto-generated SupabaseCredentials object

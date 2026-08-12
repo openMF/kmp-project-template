@@ -24,7 +24,7 @@ import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentia
 // Dynamic server config (consumer-facing, from core-base/network):
 //   - SupabaseConfigClient is registered below so forks can fetch runtime server config from a
 //     Supabase `app_config`-style table. Its credentials are generated from the gitignored
-//     `secrets/supabaseCredentialsFile.json` (SupabaseConfigConventionPlugin); absent that file the
+//     `secrets/live/supabase/supabaseCredentialsFile.json` (SupabaseConfigConventionPlugin); absent that file the
 //     creds are empty, so the client stays inert (isConfigured == false). Forks drop in the file, or
 //     override the `single<SupabaseCredentials>` binding.
 //   - DynamicBaseUrlPlugin is an opt-in of setupDefaultHttpClient(...): a fork implements
@@ -43,7 +43,7 @@ val NetworkModule = module {
     single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider() }
 
     // Supabase-backed dynamic config — overridable by forks. The credentials object is generated
-    // from secrets/supabaseCredentialsFile.json by SupabaseConfigConventionPlugin (empty when the
+    // from secrets/live/supabase/supabaseCredentialsFile.json by SupabaseConfigConventionPlugin (empty when the
     // file is absent, so the client stays inert until a fork provides a project).
     single<SupabaseCredentials> { GeneratedSupabaseCredentials }
     single { SupabaseConfigClient(credentials = get()) }

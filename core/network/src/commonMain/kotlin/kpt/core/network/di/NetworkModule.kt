@@ -16,15 +16,11 @@ import kpt.core.network.config.AppMultiUrlConfigProvider
 import org.koin.dsl.module
 import kpt.core.network.config.SupabaseCredentials as GeneratedSupabaseCredentials
 
-// NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
-// FrankfurterApiConfig, WorldBankApiConfig), each carrying a `baseUrl: String` field that
-// defaults to the public production endpoint. Forks override these `single { ... }` bindings
-// at their app-module level to swap in mocks / mirrors / per-environment endpoints.
-//
-// TODO: If/when BuildKonfig is added to the project for FRED_API_KEY (the canonical Plan 10
-// strategy), thread BuildKonfig.FRED_BASE_URL / FRANKFURTER_BASE_URL / WORLDBANK_BASE_URL
-// through here. Today (no BuildKonfig in-tree), the default-param approach on each config class
-// provides the same fork-customisation surface without the buildscript complexity.
+// NOTE: Backend base URLs are NOT hardcoded here or in config classes anymore — every server is a
+// declared access point in app-profile/app.yaml#network.access_points (→ AccessPointRegistry via
+// syncForkConfig). The demo APIs are wired in ProjectNetworkModule via `restApi("<id>") { … }`, which
+// auto-builds each transport from its access point. Fork-customisation = edit app.yaml + syncForkConfig.
+// FRED's API key remains a per-request @Query param (a vault secret: mifos-x-fred-api-key → BuildKonfig).
 // Dynamic server config (consumer-facing, from core-base/network):
 //   - SupabaseConfigClient is registered below so forks can fetch runtime server config from a
 //     Supabase `app_config`-style table. Its credentials are generated from the gitignored

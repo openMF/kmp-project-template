@@ -97,7 +97,7 @@ class WorldBankApiTest {
             install(ContentNegotiation) { json(json) }
         }
         return Ktorfit.Builder()
-            .baseUrl(WorldBankApi.BASE_URL)
+            .baseUrl("https://api.worldbank.org/") // test-local; production URL comes from the access point
             .httpClient(httpClient)
             .build()
             .createWorldBankApi()

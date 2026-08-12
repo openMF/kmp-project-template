@@ -919,6 +919,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         private val APP_PROFILE_MAP: Map<String, String> = mapOf(
             // ── identity / app ──
             "app.id" to "identity.app_id",
+            "app.display.name" to "identity.app_name",
             "app.description" to "store.app_description",
             // ── network (B4): per-flavor endpoints + demo creds + log tag ──
             "network.base.url.demo" to "network.demo_base_url",

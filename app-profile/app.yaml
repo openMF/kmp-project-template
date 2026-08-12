@@ -9,7 +9,7 @@
 
 identity:
   app_id: org.mifos.kmp.template          # SoT for appId (also mirrored in gradle/libs.versions.toml)
-  app_name: Money Toolkit
+  app_name: Mifos - Money Toolkit         # SoT for appDisplayName (Android app_name, iOS CFBundleDisplayName, settings footer)
   namespace: org.mifos.kmp.template
 
 # Per-flavor network endpoints + demo credentials + log tag. syncForkConfig emits these into

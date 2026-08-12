@@ -17,11 +17,11 @@ import io.github.mobilebytelabs.worker.WorkerContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kpt.core.data.demo.currency.CurrencyRepository
-import kpt.core.data.demo.economic.MacroIndicatorsRepository
 import kpt.core.base.data.infra.Synchronizer
 import kpt.core.base.datastore.infra.ChangeListVersions
 import kpt.core.base.datastore.infra.SyncStatePersister
+import kpt.core.data.demo.currency.CurrencyRepository
+import kpt.core.data.demo.economic.MacroIndicatorsRepository
 
 /**
  * Single data-sync worker. Implements [Synchronizer] so its two [Syncable]

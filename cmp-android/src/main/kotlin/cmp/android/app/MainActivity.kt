@@ -21,14 +21,14 @@ import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.shared.SharedApp
-import io.github.vinceglb.filekit.FileKit
-import io.github.vinceglb.filekit.dialogs.init
 import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
 import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AppLifecycleTracker
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.dialogs.init
+import kpt.core.base.data.infra.NetworkMonitor
 import kpt.core.base.platform.update.AppUpdateManager
 import kpt.core.base.platform.update.AppUpdateManagerImpl
 import kpt.core.base.ui.util.ShareUtils
-import kpt.core.base.data.infra.NetworkMonitor
 import kpt.core.data.user.UserDataRepository
 import org.koin.android.ext.android.inject
 import org.mifos.kmp.template.BuildConfig

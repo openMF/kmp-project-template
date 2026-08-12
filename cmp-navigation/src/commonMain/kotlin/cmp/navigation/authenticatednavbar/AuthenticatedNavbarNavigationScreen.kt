@@ -32,8 +32,8 @@ import cmp.navigation.ui.KptRootScaffold
 import cmp.navigation.ui.ScaffoldNavigationData
 import cmp.navigation.ui.logDestinationChanged
 import cmp.navigation.ui.rememberKptNavController
-import kotlinx.collections.immutable.toImmutableList
 import io.github.mobilebytelabs.kmptoolkit.firebase.compose.rememberAnalyticsHelper
+import kotlinx.collections.immutable.toImmutableList
 import kpt.core.base.designsystem.theme.motion
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.base.ui.util.RootTransitionProviders

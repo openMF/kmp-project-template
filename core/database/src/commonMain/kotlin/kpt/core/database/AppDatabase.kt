@@ -17,6 +17,12 @@ import androidx.room3.DeleteTable
 import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
 import androidx.room3.migration.AutoMigrationSpec
+import kpt.core.base.database.infra.dao.BookkeeperDao
+import kpt.core.base.database.infra.dao.DraftDao
+import kpt.core.base.database.infra.dao.FetchedAtDao
+import kpt.core.base.database.infra.entity.BookkeeperEntity
+import kpt.core.base.database.infra.entity.DraftEntity
+import kpt.core.base.database.infra.entity.FetchedAtEntity
 import kpt.core.database.demo.alerts.AlertDao
 import kpt.core.database.demo.alerts.AlertEntity
 import kpt.core.database.demo.banking.converter.BankingTypeConverters
@@ -40,12 +46,6 @@ import kpt.core.database.demo.economic.InterestRateSeriesDao
 import kpt.core.database.demo.economic.InterestRateSeriesEntity
 import kpt.core.database.demo.watchlist.dao.WatchlistDao
 import kpt.core.database.demo.watchlist.entity.WatchlistEntity
-import kpt.core.base.database.infra.dao.BookkeeperDao
-import kpt.core.base.database.infra.dao.DraftDao
-import kpt.core.base.database.infra.dao.FetchedAtDao
-import kpt.core.base.database.infra.entity.BookkeeperEntity
-import kpt.core.base.database.infra.entity.DraftEntity
-import kpt.core.base.database.infra.entity.FetchedAtEntity
 
 /**
  * KSP-generated constructor bridge for [AppDatabase].

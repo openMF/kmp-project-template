@@ -9,11 +9,10 @@
  */
 package kpt.core.data.infra
 
-import kpt.core.base.data.infra.NetworkMonitorContract
-
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitorProvider
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.runTest
+import kpt.core.base.data.infra.NetworkMonitorContract
 import kotlin.test.AfterTest
 import kotlin.test.Ignore
 import kotlin.test.Test

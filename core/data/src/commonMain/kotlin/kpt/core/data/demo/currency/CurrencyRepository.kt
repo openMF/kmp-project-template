@@ -11,9 +11,9 @@ package kpt.core.data.demo.currency
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kpt.core.base.data.infra.Syncable
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.base.data.infra.Syncable
 import kpt.core.model.demo.currency.ExchangeRates
 import kpt.core.model.demo.currency.RateHistory
 import kpt.core.model.demo.currency.RateHistoryKey

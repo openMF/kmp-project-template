@@ -747,10 +747,14 @@ abstract class SyncForkConfigTask : DefaultTask() {
             val baseUrl = m["base_url"]?.toString().orEmpty()
             val host = m["loggable_host"]?.toString().orEmpty()
             val proxied = m["proxied_host"]?.toString()?.takeIf { it.isNotBlank() }
-            sb.append("        AccessPoint(id = \"${esc(id)}\", kind = AccessPointKind.$kind, ")
-            sb.append("baseUrl = \"${esc(baseUrl)}\", loggableHost = \"${esc(host)}\"")
-            if (proxied != null) sb.append(", proxiedHost = \"${esc(proxied)}\"")
-            sb.append("),\n")
+            // One field per line so the generated block stays under the detekt/ktlint max line length.
+            sb.append("        AccessPoint(\n")
+            sb.append("            id = \"${esc(id)}\",\n")
+            sb.append("            kind = AccessPointKind.$kind,\n")
+            sb.append("            baseUrl = \"${esc(baseUrl)}\",\n")
+            sb.append("            loggableHost = \"${esc(host)}\",\n")
+            if (proxied != null) sb.append("            proxiedHost = \"${esc(proxied)}\",\n")
+            sb.append("        ),\n")
             count++
         }
         sb.append("    )\n")

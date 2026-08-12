@@ -48,6 +48,23 @@ internal expect fun HttpClientConfig<*>.installProxyPlugin(
 )
 
 /**
+ * The auth-credential providers for [setupDefaultHttpClient], grouped so the client builder stays under
+ * the parameter-count limit. All null (the default) installs no `Auth` plugin. When more than one is
+ * supplied, Bearer takes precedence, then Basic, then Digest (mirrors the builder's `when` order).
+ *
+ * @param basic Provider for Basic authentication credentials.
+ * @param digest Provider for Digest authentication credentials.
+ * @param bearer Provider for Bearer token authentication.
+ * @param bearerRefresh Optional refresh logic for Bearer tokens (only used if [bearer] is configured).
+ */
+data class AuthProviders(
+    val basic: (() -> BasicAuthCredentials)? = null,
+    val digest: (() -> DigestAuthCredentials)? = null,
+    val bearer: (() -> BearerTokens)? = null,
+    val bearerRefresh: (() -> BearerTokens)? = null,
+)
+
+/**
  * Provides a default [HttpClientConfig] setup for use with a Ktor-based HTTP client.
  *
  * This function simplifies client configuration by handling common concerns such as:
@@ -73,10 +90,8 @@ internal expect fun HttpClientConfig<*>.installProxyPlugin(
  * @param loggableHosts A list of hostnames for which HTTP logging is enabled.
  * @param sensitiveHeaders List of headers to be hidden in logs (defaults to Authorization).
  * @param jsonConfig Custom [Json] configuration used by `ContentNegotiation`.
- * @param basicCredentialsProvider Provider for Basic authentication credentials.
- * @param digestCredentialsProvider Provider for Digest authentication credentials.
- * @param bearerTokensProvider Provider for Bearer token authentication.
- * @param bearerRefreshProvider Optional refresh logic for Bearer tokens (only used if Bearer auth is configured).
+ * @param authProviders The Basic/Digest/Bearer credential providers (see [AuthProviders]). Default
+ *   installs no auth plugin.
  * @param certificatePinConfig TLS certificate pin configuration. Pins are applied by platform
  *   engines that support it (OkHttp on Android/Desktop). Other platforms ignore this parameter.
  * @param proxiedHosts Hostnames whose requests should be transparently routed through
@@ -118,10 +133,7 @@ fun setupDefaultHttpClient(
         // a `*.UNKNOWN`/default fallback that only works with this flag enabled.
         coerceInputValues = true
     },
-    basicCredentialsProvider: (() -> BasicAuthCredentials)? = null,
-    digestCredentialsProvider: (() -> DigestAuthCredentials)? = null,
-    bearerTokensProvider: (() -> BearerTokens)? = null,
-    bearerRefreshProvider: (() -> BearerTokens)? = null,
+    authProviders: AuthProviders = AuthProviders(),
     certificatePinConfig: CertificatePinConfig = CertificatePinConfig.default(),
     proxiedHosts: List<String> = emptyList(),
     corsProxyBaseUrl: String = "https://corsproxy.io",
@@ -130,6 +142,10 @@ fun setupDefaultHttpClient(
     dynamicUrlProvider: DynamicUrlConfigProvider? = null,
 ): HttpClientConfig<*>.() -> Unit = {
     val refreshMutex = Mutex()
+    val basicCredentialsProvider = authProviders.basic
+    val digestCredentialsProvider = authProviders.digest
+    val bearerTokensProvider = authProviders.bearer
+    val bearerRefreshProvider = authProviders.bearerRefresh
 
     when {
         bearerTokensProvider != null -> {

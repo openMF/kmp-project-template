@@ -9,8 +9,8 @@
  */
 package kpt.core.network.demo.di
 
-import kpt.core.network.BuildKonfig
 import kpt.core.base.network.restApi
+import kpt.core.network.BuildKonfig
 import kpt.core.network.demo.cloudtodo.api.createJsonPlaceholderApi
 import kpt.core.network.demo.crypto.api.createCoinGeckoApi
 import kpt.core.network.demo.currency.api.createFrankfurterApi

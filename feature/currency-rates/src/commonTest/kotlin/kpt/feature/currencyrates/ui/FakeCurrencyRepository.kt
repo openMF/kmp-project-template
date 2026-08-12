@@ -15,13 +15,13 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kpt.core.base.data.infra.Synchronizer
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
 import kpt.core.data.demo.currency.CurrencyRepository
-import kpt.core.base.data.infra.Synchronizer
 import kpt.core.model.demo.currency.ExchangeRates
 import kpt.core.model.demo.currency.RateHistory
 import kpt.core.model.demo.currency.RateHistoryKey

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.network.config
 
@@ -29,14 +29,55 @@ object AppAccessPoints {
     // Edit access points THERE (the SoT) and run `./gradlew syncForkConfig`; do not hand-edit this block.
     // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.
     val points: List<AccessPoint> = listOf(
-        AccessPoint(id = "main", kind = AccessPointKind.REST, baseUrl = "https://api.example.com/", loggableHost = "api.example.com"),
-        AccessPoint(id = "staging", kind = AccessPointKind.REST, baseUrl = "https://staging.example.com/", loggableHost = "staging.example.com"),
-        AccessPoint(id = "supabase_data", kind = AccessPointKind.SUPABASE, baseUrl = "https://project.supabase.co", loggableHost = "project.supabase.co"),
-        AccessPoint(id = "jsonplaceholder", kind = AccessPointKind.REST, baseUrl = "https://jsonplaceholder.typicode.com/", loggableHost = "jsonplaceholder.typicode.com"),
-        AccessPoint(id = "frankfurter", kind = AccessPointKind.REST, baseUrl = "https://api.frankfurter.dev/", loggableHost = "api.frankfurter.dev"),
-        AccessPoint(id = "coingecko", kind = AccessPointKind.REST, baseUrl = "https://api.coingecko.com/", loggableHost = "api.coingecko.com"),
-        AccessPoint(id = "fred", kind = AccessPointKind.REST, baseUrl = "https://api.stlouisfed.org/", loggableHost = "api.stlouisfed.org", proxiedHost = "api.stlouisfed.org"),
-        AccessPoint(id = "worldbank", kind = AccessPointKind.REST, baseUrl = "https://api.worldbank.org/", loggableHost = "api.worldbank.org"),
+        AccessPoint(
+            id = "main",
+            kind = AccessPointKind.REST,
+            baseUrl = "https://api.example.com/",
+            loggableHost = "api.example.com",
+        ),
+        AccessPoint(
+            id = "staging",
+            kind = AccessPointKind.REST,
+            baseUrl = "https://staging.example.com/",
+            loggableHost = "staging.example.com",
+        ),
+        AccessPoint(
+            id = "supabase_data",
+            kind = AccessPointKind.SUPABASE,
+            baseUrl = "https://project.supabase.co",
+            loggableHost = "project.supabase.co",
+        ),
+        AccessPoint(
+            id = "jsonplaceholder",
+            kind = AccessPointKind.REST,
+            baseUrl = "https://jsonplaceholder.typicode.com/",
+            loggableHost = "jsonplaceholder.typicode.com",
+        ),
+        AccessPoint(
+            id = "frankfurter",
+            kind = AccessPointKind.REST,
+            baseUrl = "https://api.frankfurter.dev/",
+            loggableHost = "api.frankfurter.dev",
+        ),
+        AccessPoint(
+            id = "coingecko",
+            kind = AccessPointKind.REST,
+            baseUrl = "https://api.coingecko.com/",
+            loggableHost = "api.coingecko.com",
+        ),
+        AccessPoint(
+            id = "fred",
+            kind = AccessPointKind.REST,
+            baseUrl = "https://api.stlouisfed.org/",
+            loggableHost = "api.stlouisfed.org",
+            proxiedHost = "api.stlouisfed.org",
+        ),
+        AccessPoint(
+            id = "worldbank",
+            kind = AccessPointKind.REST,
+            baseUrl = "https://api.worldbank.org/",
+            loggableHost = "api.worldbank.org",
+        ),
     )
     // syncForkConfig:access-points:end
 }

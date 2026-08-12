@@ -40,7 +40,6 @@ import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
-import kpt.feature.settings.BuildKonfig
 import kpt.feature.settings.generated.resources.Res
 import kpt.feature.settings.generated.resources.feature_settings_change_language_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_language_text

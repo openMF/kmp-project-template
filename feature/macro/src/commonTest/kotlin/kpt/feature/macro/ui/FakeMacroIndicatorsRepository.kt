@@ -12,13 +12,13 @@ package kpt.feature.macro.ui
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kpt.core.base.data.infra.Synchronizer
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
 import kpt.core.data.demo.economic.MacroIndicatorsRepository
-import kpt.core.base.data.infra.Synchronizer
 import kpt.core.model.demo.economic.MacroIndicator
 import kpt.core.store.demo.economic.impl.MacroIndicatorKey
 

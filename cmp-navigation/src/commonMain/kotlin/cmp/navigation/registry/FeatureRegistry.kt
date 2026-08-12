@@ -12,11 +12,9 @@ package cmp.navigation.registry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import kpt.core.base.ui.nav.popBackStackSafely
-// demo:begin — relocated core demo DI aggregators (E1 / C1–C3). customizer --clean strips these imports
 import kpt.core.data.demo.di.ProjectRepositoryModule
 import kpt.core.database.demo.di.ProjectDatabaseModule
 import kpt.core.network.demo.di.ProjectNetworkModule
-// demo:end
 import kpt.feature.addtowatchlist.di.AddToWatchlistModule
 import kpt.feature.alerts.di.AlertsModule
 import kpt.feature.alerts.navigation.alertsGraph

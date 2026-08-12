@@ -57,13 +57,16 @@ class LoanReminderUseCaseTest {
             content: NotificationContent,
             delay: Duration,
             mode: WorkMode,
+            uniqueName: String?,
+            tags: List<String>,
         ): WorkHandle {
             notifications += content to delay
-            return WorkHandle(id = fixedId, uniqueName = null)
+            return WorkHandle(id = fixedId, uniqueName = uniqueName)
         }
 
         override fun observeWork(handle: WorkHandle): Flow<WorkStatus> = flowOf(WorkStatus.Pending)
         override suspend fun cancelWork(handle: WorkHandle) = Unit
+        override suspend fun cancelWorkByTag(tag: String) = Unit
     }
 
     private fun loan(dueDate: LocalDate) = Loan(

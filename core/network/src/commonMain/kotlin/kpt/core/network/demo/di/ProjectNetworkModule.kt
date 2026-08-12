@@ -9,102 +9,43 @@
  */
 package kpt.core.network.demo.di
 
-import de.jensklingenberg.ktorfit.Ktorfit
-import kpt.core.base.network.httpClient
-import kpt.core.base.network.setupDefaultHttpClient
 import kpt.core.network.BuildKonfig
 import kpt.core.network.config.restApi
-import kpt.core.network.demo.FintechApiClient
-import kpt.core.network.demo.cloudtodo.api.JsonPlaceholderApi
 import kpt.core.network.demo.cloudtodo.api.createJsonPlaceholderApi
-import kpt.core.network.demo.crypto.api.CoinGeckoApi
-import kpt.core.network.demo.currency.api.FrankfurterApi
-import kpt.core.network.demo.currency.config.FrankfurterApiConfig
-import kpt.core.network.demo.economic.api.FredApi
-import kpt.core.network.demo.economic.api.WorldBankApi
+import kpt.core.network.demo.crypto.api.createCoinGeckoApi
+import kpt.core.network.demo.currency.api.createFrankfurterApi
+import kpt.core.network.demo.economic.api.createFredApi
+import kpt.core.network.demo.economic.api.createWorldBankApi
 import kpt.core.network.demo.economic.config.FredApiConfig
-import kpt.core.network.demo.economic.config.WorldBankApiConfig
 import org.koin.dsl.module
 
 /**
- * ProjectNetworkModule — the FORK-OWNED demo API-client wiring for the toolkit showcase
- * (FRED / World Bank / CoinGecko / Frankfurter / JsonPlaceholder).
+ * ProjectNetworkModule — the FORK-OWNED API-client wiring. This is where a fork wires its API
+ * interfaces to the app's network **access points**.
  *
- * Relocated out of the infra aggregator [kpt.core.network.di.NetworkModule] (E1 / C2, epic
- * pure-white-label-store5-network) so that aggregator becomes an infra-only full-copy `owner:
- * template` file that carries ZERO `kpt.core.*.demo.*` imports — eliminating the sync-fragility
- * defect class.
+ * Every server the app talks to is declared ONCE in `app-profile/app.yaml#network.access_points`
+ * (→ `AccessPointRegistry` via `syncForkConfig`). This module wires each API in ONE line via
+ * `restApi("<id>") { it.createXApi() }` — `core/network` auto-builds the Ktor client + Ktorfit
+ * (base URL, logging, proxy) from the access point, so there is NO per-API Ktorfit boilerplate and NO
+ * hardcoded URL here. To add an API: declare its endpoint in app.yaml, run `syncForkConfig`, write the
+ * Ktorfit interface + its `createXApi()`, and add one `restApi(...)` line.
  *
- * NOTE: Backend URLs are sourced from Koin-injected config classes (FredApiConfig,
- * FrankfurterApiConfig, WorldBankApiConfig), each carrying a `baseUrl: String` field that
- * defaults to the public production endpoint. Forks override these `single { ... }` bindings
- * at their app-module level to swap in mocks / mirrors / per-environment endpoints.
- *
- * Ownership: the `demo/` package is fork-owned in customization-surface.yaml. Installed into the app Koin graph
- * via the fork-owned `cmp-navigation/registry/FeatureRegistry.featureKoinModules` demo block; the
- * customizer `--clean` deletes this whole `demo/` package + empties that registry block together.
+ * Ownership: fork-owned `demo/` package (customization-surface.yaml); installed via
+ * `FeatureRegistry.featureKoinModules`; the customizer `--clean` strips it. The infra aggregator
+ * [kpt.core.network.di.NetworkModule] stays demo-free `owner: template`.
  */
 val ProjectNetworkModule = module {
+    // FRED's API key is a request-time @Query parameter (not client setup), so its config stays here
+    // (InterestRateSeriesStore injects it); the base URL + proxy come from the "fred" access point.
     single<FredApiConfig> {
         FredApiConfig(apiKey = BuildKonfig.FRED_API_KEY.takeIf { it.isNotBlank() })
     }
-    single<FrankfurterApiConfig> { FrankfurterApiConfig.Default }
-    single<WorldBankApiConfig> { WorldBankApiConfig.Default }
 
-    single {
-        FintechApiClient(
-            frankfurterKtorfit = Ktorfit.Builder()
-                .httpClient(
-                    client = httpClient(
-                        setupDefaultHttpClient(
-                            baseUrl = get<FrankfurterApiConfig>().baseUrl,
-                            loggableHosts = listOf("api.frankfurter.dev"),
-                        ),
-                    ),
-                )
-                .build(),
-            coinGeckoKtorfit = Ktorfit.Builder()
-                .httpClient(
-                    client = httpClient(
-                        setupDefaultHttpClient(
-                            baseUrl = CoinGeckoApi.BASE_URL,
-                            loggableHosts = listOf("api.coingecko.com"),
-                        ),
-                    ),
-                )
-                .build(),
-            fredKtorfit = Ktorfit.Builder()
-                .httpClient(
-                    client = httpClient(
-                        setupDefaultHttpClient(
-                            baseUrl = get<FredApiConfig>().baseUrl,
-                            loggableHosts = listOf("api.stlouisfed.org"),
-                            proxiedHosts = listOf("api.stlouisfed.org"),
-                        ),
-                    ),
-                )
-                .build(),
-            worldBankKtorfit = Ktorfit.Builder()
-                .httpClient(
-                    client = httpClient(
-                        setupDefaultHttpClient(
-                            baseUrl = get<WorldBankApiConfig>().baseUrl,
-                            loggableHosts = listOf("api.worldbank.org"),
-                        ),
-                    ),
-                )
-                .build(),
-        )
-    }
-
-    single<FrankfurterApi> { get<FintechApiClient>().frankfurterApi }
-    single<CoinGeckoApi> { get<FintechApiClient>().coinGeckoApi }
-    single<FredApi> { get<FintechApiClient>().fredApi }
-    single<WorldBankApi> { get<FintechApiClient>().worldBankApi }
-
-    // cloud-todo — jsonplaceholder is the only WRITABLE demo backend (POST/PUT accepted), used to
-    // showcase the Store5 MUTABLE (offline-write) archetype (`provideCloudTodoStore`). Streamlined via
-    // the core/network `restApi` DSL: base URL + loggable host come from the "jsonplaceholder" access
-    // point (AccessPointRegistry ← app-profile network.access_points) — no per-API Ktorfit boilerplate.
+    // Every demo server — base URL + logging (+ FRED's proxy) resolved from its app-profile access point.
+    restApi("frankfurter") { it.createFrankfurterApi() }
+    restApi("coingecko") { it.createCoinGeckoApi() }
+    restApi("fred") { it.createFredApi() }
+    restApi("worldbank") { it.createWorldBankApi() }
+    // jsonplaceholder — the WRITABLE demo backend for the Store5 MUTABLE (offline-write) archetype.
     restApi("jsonplaceholder") { it.createJsonPlaceholderApi() }
 }

@@ -40,6 +40,7 @@ fun ktorfitFor(accessPointId: String): Ktorfit {
                 setupDefaultHttpClient(
                     baseUrl = ap.baseUrl,
                     loggableHosts = listOf(ap.loggableHost),
+                    proxiedHosts = ap.proxiedHost?.let { listOf(it) } ?: emptyList(),
                 ),
             ),
         )

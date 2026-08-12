@@ -35,6 +35,9 @@ data class AccessPoint(
     val kind: AccessPointKind,
     val baseUrl: String,
     val loggableHost: String,
+    /** Host routed through the platform proxy (Ktor's DynamicBaseUrlPlugin) — e.g. an API that blocks
+     *  direct browser/CORS calls. Null = no proxy. */
+    val proxiedHost: String? = null,
     /** UrlType key for dynamic base-URL switching ([kpt.core.base.network.MultiUrlConfigProvider]).
      *  Defaults to the id upper-cased, so a fixed-URL API doesn't need to declare one. */
     val type: UrlType = UrlType(id.uppercase()),
@@ -66,6 +69,10 @@ object AccessPointRegistry {
         AccessPoint(id = "staging", kind = AccessPointKind.REST, baseUrl = "https://staging.example.com/", loggableHost = "staging.example.com"),
         AccessPoint(id = "supabase_data", kind = AccessPointKind.SUPABASE, baseUrl = "https://project.supabase.co", loggableHost = "project.supabase.co"),
         AccessPoint(id = "jsonplaceholder", kind = AccessPointKind.REST, baseUrl = "https://jsonplaceholder.typicode.com/", loggableHost = "jsonplaceholder.typicode.com"),
+        AccessPoint(id = "frankfurter", kind = AccessPointKind.REST, baseUrl = "https://api.frankfurter.dev/", loggableHost = "api.frankfurter.dev"),
+        AccessPoint(id = "coingecko", kind = AccessPointKind.REST, baseUrl = "https://api.coingecko.com/", loggableHost = "api.coingecko.com"),
+        AccessPoint(id = "fred", kind = AccessPointKind.REST, baseUrl = "https://api.stlouisfed.org/", loggableHost = "api.stlouisfed.org", proxiedHost = "api.stlouisfed.org"),
+        AccessPoint(id = "worldbank", kind = AccessPointKind.REST, baseUrl = "https://api.worldbank.org/", loggableHost = "api.worldbank.org"),
     )
     // syncForkConfig:access-points:end
 

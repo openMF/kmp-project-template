@@ -738,8 +738,11 @@ abstract class SyncForkConfigTask : DefaultTask() {
             val kind = if (m["type"]?.toString()?.trim()?.lowercase() == "supabase") "SUPABASE" else "REST"
             val baseUrl = m["base_url"]?.toString().orEmpty()
             val host = m["loggable_host"]?.toString().orEmpty()
+            val proxied = m["proxied_host"]?.toString()?.takeIf { it.isNotBlank() }
             sb.append("        AccessPoint(id = \"${esc(id)}\", kind = AccessPointKind.$kind, ")
-            sb.append("baseUrl = \"${esc(baseUrl)}\", loggableHost = \"${esc(host)}\"),\n")
+            sb.append("baseUrl = \"${esc(baseUrl)}\", loggableHost = \"${esc(host)}\"")
+            if (proxied != null) sb.append(", proxiedHost = \"${esc(proxied)}\"")
+            sb.append("),\n")
             count++
         }
         sb.append("    )\n")

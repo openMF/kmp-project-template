@@ -40,11 +40,31 @@ network:
       type: supabase
       base_url: https://project.supabase.co
       loggable_host: project.supabase.co
-    # demo showcase REST endpoint (jsonplaceholder — WRITABLE, for the Store5 MUTABLE archetype)
-    - id: jsonplaceholder
+    # demo showcase REST endpoints — every server the toolkit actually talks to, wired in
+    # ProjectNetworkModule via restApi("<id>") { it.createXApi() }.
+    - id: jsonplaceholder            # WRITABLE, for the Store5 MUTABLE archetype
       type: rest
       base_url: https://jsonplaceholder.typicode.com/
       loggable_host: jsonplaceholder.typicode.com
+    - id: frankfurter                # FX / currency exchange rates
+      type: rest
+      base_url: https://api.frankfurter.dev/
+      loggable_host: api.frankfurter.dev
+    - id: coingecko                  # crypto market data
+      type: rest
+      base_url: https://api.coingecko.com/
+      loggable_host: api.coingecko.com
+    - id: fred                       # US Federal Reserve economic data
+      type: rest
+      base_url: https://api.stlouisfed.org/
+      loggable_host: api.stlouisfed.org
+      proxied_host: api.stlouisfed.org   # blocks direct CORS calls → route via platform proxy
+      secret_alias: mifos-x-fred-api-key # request-time API key — from the vault (secrets-manifest.yaml),
+                                         # materialized to local.properties → BuildKonfig.FRED_API_KEY
+    - id: worldbank                  # World Bank macro indicators
+      type: rest
+      base_url: https://api.worldbank.org/
+      loggable_host: api.worldbank.org
 
 org:
   name: Mifos Initiative

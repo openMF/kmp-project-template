@@ -23,6 +23,8 @@ kotlin {
             implementation(projects.core.data)
             implementation(projects.core.model)
             implementation(projects.core.ui)
+            // Firebase analytics (AnalyticsHelper + Compose TrackScreenView/rememberAnalyticsHelper) via core/firebase.
+            implementation(projects.core.firebase)
 
             implementation(compose.ui)
             implementation(compose.foundation)

@@ -33,9 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kpt.core.base.analytics.AnalyticsHelper
-import kpt.core.base.analytics.TrackScreenView
-import kpt.core.base.analytics.rememberAnalyticsHelper
+import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
+import io.github.mobilebytelabs.kmptoolkit.firebase.compose.TrackScreenView
+import io.github.mobilebytelabs.kmptoolkit.firebase.compose.rememberAnalyticsHelper
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing

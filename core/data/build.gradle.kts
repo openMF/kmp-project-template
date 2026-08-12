@@ -35,7 +35,7 @@ kotlin {
             implementation(projects.core.datastore)
             implementation(projects.core.model)
             implementation(projects.core.network)
-            implementation(projects.core.analytics)
+            implementation(projects.core.firebase)
 
             implementation(projects.coreBase.common)
             implementation(projects.coreBase.network)

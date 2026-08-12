@@ -101,7 +101,7 @@ include(":cmp-desktop")
 include(":cmp-web")
 include(":cmp-navigation")
 
-include(":core:analytics")
+include(":core:firebase")
 include(":core:common")
 include(":core:data")
 include(":core:database")
@@ -133,7 +133,7 @@ include(":feature:add-to-watchlist")
 include(":feature:alerts")
 // demo:end
 
-include(":core-base:analytics")
+include(":core-base:firebase")
 include(":core-base:common")
 include(":core-base:data")
 include(":core-base:database")

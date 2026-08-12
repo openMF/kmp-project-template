@@ -24,6 +24,8 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.core.datastore)
+            // Firebase analytics (firebaseModule + AnalyticsHelper + Compose helpers) via core/firebase.
+            implementation(projects.core.firebase)
             // core/platform re-exports core-base/platform (platformModule, GarbageCollectionManager) —
             // the app-shell reaches those through core/ per G-CORE-BASE-ENCAP.
             implementation(projects.core.platform)

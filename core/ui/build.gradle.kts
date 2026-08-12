@@ -23,7 +23,7 @@ kotlin {
         }
 
         commonMain.dependencies {
-            implementation(projects.core.analytics)
+            implementation(projects.core.firebase)
             implementation(projects.core.designsystem)
             implementation(projects.core.model)
             implementation(projects.core.common)

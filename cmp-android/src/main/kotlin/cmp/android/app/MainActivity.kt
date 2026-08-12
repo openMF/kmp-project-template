@@ -23,8 +23,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.shared.SharedApp
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
-import kpt.core.base.analytics.AnalyticsHelper
-import kpt.core.base.analytics.lifecycleTracker
+import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
+import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AppLifecycleTracker
 import kpt.core.base.platform.update.AppUpdateManager
 import kpt.core.base.platform.update.AppUpdateManagerImpl
 import kpt.core.base.ui.util.ShareUtils
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private val networkMonitor: NetworkMonitor by inject()
 
     private val analyticsHelper: AnalyticsHelper by inject()
-    private val lifecycleTracker by lazy { analyticsHelper.lifecycleTracker() }
+    private val lifecycleTracker by lazy { AppLifecycleTracker(analyticsHelper) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         var shouldShowSplashScreen = true
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         appUpdateManager.checkForResumeUpdateState()
-        lifecycleTracker.markAppBackground()
+        lifecycleTracker.onEnterBackground()
     }
 
     override fun onStart() {

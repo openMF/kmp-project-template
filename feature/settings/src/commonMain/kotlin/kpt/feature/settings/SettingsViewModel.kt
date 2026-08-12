@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kpt.core.base.analytics.AnalyticsHelper
+import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.user.UserDataRepository
 import kpt.core.model.user.DarkThemeConfig

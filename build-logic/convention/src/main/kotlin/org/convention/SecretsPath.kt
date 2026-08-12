@@ -26,9 +26,20 @@ import java.io.File
 fun Project.resolveSecretPath(key: String): File {
     val repoRoot = rootProject.projectDir
     val cli = File(repoRoot, "deployment/scripts/build-secrets")
+    // `build-secrets` is a `#!/usr/bin/env bash` CLI. Windows cannot start a shebang script directly
+    // (it is not a .exe/.bat/.cmd) — and this resolver runs at `:cmp-android` configuration time, so a
+    // raw exec breaks EVERY Gradle build on Windows (desktop/web included), not just Android signing.
+    // Launch it through bash (Git Bash is on the GitHub windows-latest PATH) with a forward-slashed
+    // path so it is not mangled; other OSes exec it directly. Both hit the same one resolver.
+    val isWindows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
+    val command = if (isWindows) {
+        listOf("bash", cli.absolutePath.replace('\\', '/'), "path", key)
+    } else {
+        listOf(cli.absolutePath, "path", key)
+    }
     val rel = providers.exec {
         workingDir = repoRoot
-        commandLine(cli.absolutePath, "path", key)
+        commandLine(command)
     }.standardOutput.asText.get().trim()
     return File(repoRoot, rel)
 }

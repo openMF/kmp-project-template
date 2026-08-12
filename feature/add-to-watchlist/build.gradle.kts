@@ -17,8 +17,8 @@ kotlin {
             implementation(projects.core.common)
             implementation(projects.core.data)
             implementation(projects.core.model)
-            implementation(projects.coreBase.store)
-            implementation(projects.coreBase.ui)
+            implementation(projects.core.store)
+            implementation(projects.core.ui)
 
             implementation(compose.ui)
             implementation(compose.material3)

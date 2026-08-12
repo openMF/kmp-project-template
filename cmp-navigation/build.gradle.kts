@@ -24,10 +24,11 @@ kotlin {
             implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.core.datastore)
-
-            implementation(projects.core.datastore)
-            implementation(projects.coreBase.common)
-            implementation(projects.coreBase.platform)
+            implementation(projects.core.platform)
+            // core-base/security is the ONE sanctioned app-shell exception: cmp-navigation is the DI
+            // aggregator (KoinModules wires SecurityModule) and reads isReleaseBuild; no core/ wrapper
+            // is warranted for a security module the shell itself assembles. Feature modules NEVER
+            // depend on core-base — enforced by the encapsulation gate (Phase A).
             implementation(projects.coreBase.security)
 
             // Backbone shell features (template-owned) — always present in every fork.

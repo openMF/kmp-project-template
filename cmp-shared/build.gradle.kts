@@ -66,8 +66,8 @@ kotlin {
             // Navigation Modules
             implementation(projects.cmpNavigation)
             implementation(compose.components.resources)
-            implementation(projects.coreBase.platform)
-            implementation(projects.coreBase.ui)
+            implementation(projects.core.platform)
+            implementation(projects.core.ui)
 
             implementation(libs.coil.kt.compose)
 

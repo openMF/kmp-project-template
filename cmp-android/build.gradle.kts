@@ -110,18 +110,12 @@ dependencies {
 
     implementation(projects.cmpShared)
     implementation(projects.core.ui)
-    implementation(projects.coreBase.platform)
-    implementation(projects.coreBase.ui)
-    implementation(projects.coreBase.analytics)
-
-    implementation(projects.core.ui)
+    implementation(projects.core.platform)
+    implementation(projects.core.analytics)
     implementation(projects.core.model)
     implementation(projects.core.data)
     implementation(projects.core.datastore)
     implementation(projects.sync)
-
-    implementation(projects.coreBase.ui)
-    implementation(projects.coreBase.platform)
 
     // Compose
     implementation(libs.androidx.core.ktx)

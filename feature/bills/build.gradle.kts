@@ -20,9 +20,7 @@ kotlin {
             implementation(projects.core.data)
             implementation(projects.core.model)
             implementation(projects.core.platform)
-            implementation(projects.coreBase.store)
-            implementation(projects.coreBase.platform)
-            implementation(projects.coreBase.ui)
+            implementation(projects.core.store)
 
             implementation(compose.ui)
             implementation(compose.material3)

@@ -16,8 +16,8 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.data)
             implementation(projects.core.model)
-            implementation(projects.coreBase.store)
-            implementation(projects.coreBase.ui)
+            implementation(projects.core.store)
+            implementation(projects.core.ui)
             // Hosts the embedded add-to-watchlist star toggle on each CoinMarkets row.
             implementation(projects.feature.addToWatchlist)
 

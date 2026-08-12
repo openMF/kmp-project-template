@@ -49,47 +49,25 @@ data class AccessPoint(
  * so there is exactly one source of truth for "which servers does this app talk to".
  *
  * **SoT: `app-profile/app.yaml#network.access_points`.** A fork declares its N typed endpoints (REST +
- * Supabase) there; the entries below mirror that declaration (keep them in sync — the `syncForkConfig`
- * generation of this list from app-profile is the remaining B3 wiring). Until then, edit BOTH, or treat
- * app.yaml as the authored SoT and this as the generated mirror.
+ * Supabase) there and runs `./gradlew syncForkConfig` — which regenerates the sentinel-bounded [points]
+ * block below from app-profile (do not hand-edit that block). core/network then auto-builds a transport
+ * per access point, so a fork only writes API interfaces + one `restApi("<id>")` line each.
  *
  * The default entries are real `https://` URLs (no `YOUR_` placeholder) so the Supabase point is
  * default-configured, not inert. A fork replaces these with its own.
  */
 object AccessPointRegistry {
     /** Every declared access point — REST and Supabase — for this app. */
+    // syncForkConfig:access-points:begin — GENERATED from app-profile/app.yaml#network.access_points.
+    // Edit access points THERE (the SoT) and run `./gradlew syncForkConfig`; do not hand-edit this block.
+    // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.
     val points: List<AccessPoint> = listOf(
-        AccessPoint(
-            id = "main",
-            type = AppUrlTypes.MAIN,
-            kind = AccessPointKind.REST,
-            baseUrl = "https://api.example.com/",
-            loggableHost = "api.example.com",
-        ),
-        AccessPoint(
-            id = "staging",
-            type = AppUrlTypes.STAGING,
-            kind = AccessPointKind.REST,
-            baseUrl = "https://staging.example.com/",
-            loggableHost = "staging.example.com",
-        ),
-        AccessPoint(
-            id = "supabase_data",
-            type = AppUrlTypes.SUPABASE_DATA,
-            kind = AccessPointKind.SUPABASE,
-            baseUrl = "https://project.supabase.co",
-            loggableHost = "project.supabase.co",
-        ),
-        // demo:begin — the toolkit's showcase REST endpoints, referenced by ProjectNetworkModule via
-        // restApi("<id>") { it.createXApi() }. A fork replaces these with its own access points.
-        AccessPoint(
-            id = "jsonplaceholder",
-            kind = AccessPointKind.REST,
-            baseUrl = "https://jsonplaceholder.typicode.com/",
-            loggableHost = "jsonplaceholder.typicode.com",
-        ),
-        // demo:end
+        AccessPoint(id = "main", kind = AccessPointKind.REST, baseUrl = "https://api.example.com/", loggableHost = "api.example.com"),
+        AccessPoint(id = "staging", kind = AccessPointKind.REST, baseUrl = "https://staging.example.com/", loggableHost = "staging.example.com"),
+        AccessPoint(id = "supabase_data", kind = AccessPointKind.SUPABASE, baseUrl = "https://project.supabase.co", loggableHost = "project.supabase.co"),
+        AccessPoint(id = "jsonplaceholder", kind = AccessPointKind.REST, baseUrl = "https://jsonplaceholder.typicode.com/", loggableHost = "jsonplaceholder.typicode.com"),
     )
+    // syncForkConfig:access-points:end
 
     /** Resolve the access point declared under [id], or `null`. */
     fun byId(id: String): AccessPoint? = points.firstOrNull { it.id == id }

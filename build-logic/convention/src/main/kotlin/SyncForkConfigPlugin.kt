@@ -300,6 +300,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
             forkOut.forEach { (k, v) -> sb.append(k).append('=').append(v).append('\n') }
             File(root, "gradle/fork.properties").writeText(sb.toString())
             logger.lifecycle("syncForkConfig: regenerated fork.properties from app-profile (${forkOut.size} keys)")
+
+            // B3 — regenerate core/network AccessPointRegistry.points from app-profile#network.access_points.
+            regenerateAccessPoints(root, appProfile)
         }
 
         // ── 6. Store metadata files ───────────────────────────────────────────
@@ -706,6 +709,45 @@ abstract class SyncForkConfigTask : DefaultTask() {
     @Suppress("UNCHECKED_CAST")
     private fun Map<*, *>.toStringKeyedMap(): Map<String, Any?> =
         entries.associate { (k, v) -> k.toString() to v }
+
+    // Regenerate core/network AccessPointRegistry.points from app-profile#network.access_points (B3).
+    // In-place sentinel patch (mirrors the libs.versions.toml#appId patch pattern) so the file stays a
+    // committed, compilable Kotlin source while app.yaml remains the SoT. No-op when the section or the
+    // sentinels are absent. `type: rest|supabase` → AccessPointKind; AccessPoint.type (UrlType) defaults.
+    private fun regenerateAccessPoints(root: File, appProfile: Map<String, Any?>) {
+        val network = appProfile["network"] as? Map<*, *> ?: return
+        val aps = network["access_points"] as? List<*> ?: return
+        val file = File(root, "core/network/src/commonMain/kotlin/kpt/core/network/config/AccessPointRegistry.kt")
+        if (!file.isFile) return
+        val begin = "// syncForkConfig:access-points:begin"
+        val end = "// syncForkConfig:access-points:end"
+        val text = file.readText()
+        val beginIdx = text.indexOf(begin)
+        val endIdx = text.indexOf(end)
+        if (beginIdx < 0 || endIdx < 0 || endIdx < beginIdx) return
+        fun esc(s: String) = s.replace("\\", "\\\\").replace("\"", "\\\"")
+        val sb = StringBuilder()
+        sb.append(begin).append(" — GENERATED from app-profile/app.yaml#network.access_points.\n")
+        sb.append("    // Edit access points THERE (the SoT) and run `./gradlew syncForkConfig`; do not hand-edit this block.\n")
+        sb.append("    // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.\n")
+        sb.append("    val points: List<AccessPoint> = listOf(\n")
+        var count = 0
+        for (ap in aps) {
+            val m = ap as? Map<*, *> ?: continue
+            val id = m["id"]?.toString()?.takeIf { it.isNotBlank() } ?: continue
+            val kind = if (m["type"]?.toString()?.trim()?.lowercase() == "supabase") "SUPABASE" else "REST"
+            val baseUrl = m["base_url"]?.toString().orEmpty()
+            val host = m["loggable_host"]?.toString().orEmpty()
+            sb.append("        AccessPoint(id = \"${esc(id)}\", kind = AccessPointKind.$kind, ")
+            sb.append("baseUrl = \"${esc(baseUrl)}\", loggableHost = \"${esc(host)}\"),\n")
+            count++
+        }
+        sb.append("    )\n")
+        sb.append("    ").append(end)
+        val endLineEnd = text.indexOf('\n', endIdx).let { if (it < 0) text.length else it }
+        file.writeText(text.substring(0, beginIdx) + sb.toString() + text.substring(endLineEnd))
+        logger.lifecycle("syncForkConfig: regenerated AccessPointRegistry.points from app-profile ($count access points)")
+    }
 
     private fun deepMerge(a: Map<String, Any?>, b: Map<String, Any?>): Map<String, Any?> {
         val out = LinkedHashMap<String, Any?>(a)

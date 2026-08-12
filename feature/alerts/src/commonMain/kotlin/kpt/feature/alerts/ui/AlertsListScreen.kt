@@ -39,6 +39,7 @@ import kpt.feature.alerts.generated.resources.screens_alerts_delete_cd
 import kpt.feature.alerts.generated.resources.screens_alerts_row_above
 import kpt.feature.alerts.generated.resources.screens_alerts_row_below
 import kpt.feature.alerts.generated.resources.screens_alerts_row_pct_change
+import kpt.feature.alerts.generated.resources.screens_alerts_row_supporting
 import kpt.feature.alerts.generated.resources.screens_alerts_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -110,7 +111,15 @@ private fun AlertRow(
     ListItem(
         modifier = modifier.fillMaxWidth(),
         headlineContent = { Text(alert.coinId) },
-        supportingContent = { Text("$directionLabel ${alert.targetValue}") },
+        supportingContent = {
+            Text(
+                stringResource(
+                    Res.string.screens_alerts_row_supporting,
+                    directionLabel,
+                    alert.targetValue.toString(),
+                ),
+            )
+        },
         trailingContent = {
             IconButton(
                 onClick = onDelete,

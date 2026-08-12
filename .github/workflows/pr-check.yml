@@ -60,4 +60,10 @@ jobs:
         run: ./gradlew :cmp-shared:assembleComposeAppReleaseXCFramework
       - name: fastlane ios build_ios (unsigned)
         # Canonical PR-check lane in fastlane/Fastfile. Same path PR #185 used.
+        env:
+          # `xcodebuild -showBuildSettings` must evaluate the iosApp SwiftPM graph (the native
+          # Firebase SDK added in E6) on a cold runner — Fastlane's default 3s base × 4 retries
+          # times out even though the build itself succeeds. Give the settings probe real headroom.
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: '120'
+          FASTLANE_XCODEBUILD_SETTINGS_RETRIES: '5'
         run: bundle exec fastlane ios build_ios

@@ -13,6 +13,7 @@ import de.jensklingenberg.ktorfit.Ktorfit
 import kpt.core.base.network.httpClient
 import kpt.core.base.network.setupDefaultHttpClient
 import kpt.core.network.BuildKonfig
+import kpt.core.network.config.restApi
 import kpt.core.network.demo.FintechApiClient
 import kpt.core.network.demo.cloudtodo.api.JsonPlaceholderApi
 import kpt.core.network.demo.cloudtodo.api.createJsonPlaceholderApi
@@ -102,18 +103,8 @@ val ProjectNetworkModule = module {
     single<WorldBankApi> { get<FintechApiClient>().worldBankApi }
 
     // cloud-todo — jsonplaceholder is the only WRITABLE demo backend (POST/PUT accepted), used to
-    // showcase the Store5 MUTABLE (offline-write) archetype (`provideCloudTodoStore`).
-    single<JsonPlaceholderApi> {
-        Ktorfit.Builder()
-            .httpClient(
-                client = httpClient(
-                    setupDefaultHttpClient(
-                        baseUrl = "https://jsonplaceholder.typicode.com/",
-                        loggableHosts = listOf("jsonplaceholder.typicode.com"),
-                    ),
-                ),
-            )
-            .build()
-            .createJsonPlaceholderApi()
-    }
+    // showcase the Store5 MUTABLE (offline-write) archetype (`provideCloudTodoStore`). Streamlined via
+    // the core/network `restApi` DSL: base URL + loggable host come from the "jsonplaceholder" access
+    // point (AccessPointRegistry ← app-profile network.access_points) — no per-API Ktorfit boilerplate.
+    restApi("jsonplaceholder") { it.createJsonPlaceholderApi() }
 }

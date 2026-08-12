@@ -30,46 +30,69 @@ enum class AccessPointKind {
  * @param loggableHost the host enabled for HTTP logging on this access point.
  */
 data class AccessPoint(
-    val type: UrlType,
+    /** Stable string id a fork references from `restApi<T>(id)` / `supabaseClientFor(id)`. */
+    val id: String,
     val kind: AccessPointKind,
     val baseUrl: String,
     val loggableHost: String,
+    /** UrlType key for dynamic base-URL switching ([kpt.core.base.network.MultiUrlConfigProvider]).
+     *  Defaults to the id upper-cased, so a fixed-URL API doesn't need to declare one. */
+    val type: UrlType = UrlType(id.uppercase()),
 )
 
 /**
  * The single declarative registry of every network access point this app exposes — REST and
  * Supabase in ONE place.
  *
- * [AppMultiUrlConfigProvider] resolves each REST base URL from here, and the Supabase DI binding
- * reads the [supabasePoint] project URL from here, so there is exactly one source of truth for
- * "which servers does this app talk to". A fork edits ONLY this object to declare its N endpoints —
- * no per-client wiring changes are needed.
+ * [AppMultiUrlConfigProvider] resolves each REST base URL from here, the Supabase DI binding reads the
+ * [supabasePoint] project URL from here, and the `restApi("<id>")` DSL resolves transports by [byId] —
+ * so there is exactly one source of truth for "which servers does this app talk to".
  *
- * The default entries below are real `https://` URLs (no `YOUR_` placeholder) so the Supabase point
- * is default-configured, not inert. A fork replaces these hosts with its own.
+ * **SoT: `app-profile/app.yaml#network.access_points`.** A fork declares its N typed endpoints (REST +
+ * Supabase) there; the entries below mirror that declaration (keep them in sync — the `syncForkConfig`
+ * generation of this list from app-profile is the remaining B3 wiring). Until then, edit BOTH, or treat
+ * app.yaml as the authored SoT and this as the generated mirror.
+ *
+ * The default entries are real `https://` URLs (no `YOUR_` placeholder) so the Supabase point is
+ * default-configured, not inert. A fork replaces these with its own.
  */
 object AccessPointRegistry {
     /** Every declared access point — REST and Supabase — for this app. */
     val points: List<AccessPoint> = listOf(
         AccessPoint(
+            id = "main",
             type = AppUrlTypes.MAIN,
             kind = AccessPointKind.REST,
             baseUrl = "https://api.example.com/",
             loggableHost = "api.example.com",
         ),
         AccessPoint(
+            id = "staging",
             type = AppUrlTypes.STAGING,
             kind = AccessPointKind.REST,
             baseUrl = "https://staging.example.com/",
             loggableHost = "staging.example.com",
         ),
         AccessPoint(
+            id = "supabase_data",
             type = AppUrlTypes.SUPABASE_DATA,
             kind = AccessPointKind.SUPABASE,
             baseUrl = "https://project.supabase.co",
             loggableHost = "project.supabase.co",
         ),
+        // demo:begin — the toolkit's showcase REST endpoints, referenced by ProjectNetworkModule via
+        // restApi("<id>") { it.createXApi() }. A fork replaces these with its own access points.
+        AccessPoint(
+            id = "jsonplaceholder",
+            kind = AccessPointKind.REST,
+            baseUrl = "https://jsonplaceholder.typicode.com/",
+            loggableHost = "jsonplaceholder.typicode.com",
+        ),
+        // demo:end
     )
+
+    /** Resolve the access point declared under [id], or `null`. */
+    fun byId(id: String): AccessPoint? = points.firstOrNull { it.id == id }
 
     /** Resolve the REST base URL registered for [type], or `null` if none is declared. */
     fun restBaseUrl(type: UrlType): String? =

@@ -22,6 +22,29 @@ network:
   demo_username: demo
   demo_password: demo
   log_tag: KMPTemplate
+  # Declarative access-point topology — every REST + Supabase endpoint the app talks to, in ONE place.
+  # This is the SoT for core/network's AccessPointRegistry: a fork declares its N endpoints here
+  # (e.g. 3 REST + 2 Supabase), and ProjectNetworkModule wires each API in one line via
+  # `restApi("<id>") { it.createXApi() }` — core/network auto-builds the transport from the id's
+  # base_url + loggable_host. `type: rest | supabase`. (B3, epic pure-white-label-store5-network)
+  access_points:
+    - id: main
+      type: rest
+      base_url: https://api.example.com/
+      loggable_host: api.example.com
+    - id: staging
+      type: rest
+      base_url: https://staging.example.com/
+      loggable_host: staging.example.com
+    - id: supabase_data
+      type: supabase
+      base_url: https://project.supabase.co
+      loggable_host: project.supabase.co
+    # demo showcase REST endpoint (jsonplaceholder — WRITABLE, for the Store5 MUTABLE archetype)
+    - id: jsonplaceholder
+      type: rest
+      base_url: https://jsonplaceholder.typicode.com/
+      loggable_host: jsonplaceholder.typicode.com
 
 org:
   name: Mifos Initiative

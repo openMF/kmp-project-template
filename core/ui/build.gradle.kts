@@ -23,13 +23,16 @@ kotlin {
         }
 
         commonMain.dependencies {
-            implementation(projects.core.analytics)
+            implementation(projects.core.firebase)
             implementation(projects.core.designsystem)
             implementation(projects.core.model)
             implementation(projects.core.common)
             // For rememberKptPullToRefreshState(pagingStream) bridge — observes
             // ScreenState freshness + calls pagingStream.refresh() on pull.
             implementation(projects.coreBase.store)
+            // Re-export core-base/ui (ScreenContent + Store5 UI wrappers) as core/ui's public API so
+            // feature modules depend on core/ui, never core-base/ui directly (encapsulation, Phase A).
+            api(projects.coreBase.ui)
             implementation(libs.jb.composeViewmodel)
             implementation(libs.jb.lifecycleViewmodel)
             implementation(libs.jb.lifecycleViewmodelSavedState)

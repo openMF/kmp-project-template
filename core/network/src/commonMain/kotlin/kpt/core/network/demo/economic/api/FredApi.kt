@@ -26,10 +26,6 @@ import kpt.core.network.demo.economic.dto.FredObservationsDto
  */
 interface FredApi {
 
-    companion object {
-        const val BASE_URL = "https://api.stlouisfed.org/"
-    }
-
     /**
      * Fetch observations for a single FRED series in the closed date interval
      * `[observationStart, observationEnd]`.

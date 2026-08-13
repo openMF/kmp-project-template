@@ -9,8 +9,8 @@
  */
 package kpt.feature.bills.testing
 
-import kpt.core.platform.notification.bill.BillReminderSchedule
 import kpt.feature.bills.notification.BillNotificationGateway
+import kpt.feature.bills.notification.BillReminderSchedule
 
 /**
  * Recording fake [BillNotificationGateway] for ViewModel unit tests.

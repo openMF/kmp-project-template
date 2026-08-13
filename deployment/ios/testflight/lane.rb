@@ -77,6 +77,12 @@ platform :ios do
     setup_ci_if_needed
     load_api_key(options)
 
+    # E6 — assemble the Kotlin `ComposeApp` XCFramework (SwiftPM/XCFramework; the
+    # CocoaPods-free replacement for the old pod-install step) so the `iosApp.xcodeproj`
+    # archive links the framework the app's Package.swift binary target + embed
+    # Run-Script phase consume. Staging → Release slice.
+    assemble_ios_xcframework(build_ty.to_s)
+
     # Auto-sync + verify App Store Connect store config BEFORE the ~15-min build:
     # fail fast if the app record is missing, and create/update the TestFlight "Test
     # Information" (BetaAppLocalization) from TESTFLIGHT_CONFIG so the external-beta

@@ -15,6 +15,7 @@
     <string name="screens_alerts_delete_cd">Delete alert</string>
     <string name="screens_alerts_row_above">Above</string>
     <string name="screens_alerts_row_below">Below</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
     <string name="screens_alerts_row_pct_change">% change</string>
     <string name="screens_alert_create_title">New Price Alert</string>
     <string name="screens_alert_create_back_cd">Back</string>

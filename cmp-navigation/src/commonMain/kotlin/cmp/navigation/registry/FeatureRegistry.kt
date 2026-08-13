@@ -12,6 +12,9 @@ package cmp.navigation.registry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.core.data.demo.di.ProjectRepositoryModule
+import kpt.core.database.demo.di.ProjectDatabaseModule
+import kpt.core.network.demo.di.ProjectNetworkModule
 import kpt.feature.addtowatchlist.di.AddToWatchlistModule
 import kpt.feature.alerts.di.AlertsModule
 import kpt.feature.alerts.navigation.alertsGraph
@@ -55,7 +58,9 @@ object FeatureRegistry {
      * [cmp.navigation.di.KoinModules] and are always present; this is the fork's own features.
      */
     val featureKoinModules: List<Module> = listOf(
-        // ── default demo feature set (customizer --clean empties this) — replace with your fork's ──
+        // demo:begin — default demo feature set + relocated core demo DI aggregators (E1 / C1–C3, F3).
+        // customizer --clean strips this whole fenced block → an empty listOf() for a clean fork.
+        // ── default demo feature set — replace with your fork's ──
         CurrencyRatesModule,
         EmiCalculatorModule,
         BillsModule,
@@ -68,6 +73,11 @@ object FeatureRegistry {
         AlertsModule,
         WatchlistModule,
         AddToWatchlistModule,
+        // ── relocated core demo DI (were inline fenced blocks in the core aggregators) ──
+        ProjectRepositoryModule,
+        ProjectNetworkModule,
+        ProjectDatabaseModule,
+        // demo:end
     )
 
     /**
@@ -75,7 +85,8 @@ object FeatureRegistry {
      * (settings, notification) stay in [cmp.navigation.authenticated] template; this is the fork's routes.
      */
     val featureDestinations: NavGraphBuilder.(NavController) -> Unit = { navController ->
-        // ── default demo feature routes (customizer --clean empties this) — replace with your fork's ──
+        // demo:begin — default demo feature routes (F3). customizer --clean strips this fenced block →
+        // an empty lambda body for a clean fork; replace with your fork's routes.
         currencyRatesGraph(navController)
         emiCalculatorDestination(onBackClick = { navController.popBackStackSafely() })
         loansGraph(navController)
@@ -86,5 +97,6 @@ object FeatureRegistry {
         cryptoGraph(navController)
         alertsGraph(navController)
         watchlistGraph(navController)
+        // demo:end
     }
 }

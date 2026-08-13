@@ -7,8 +7,14 @@
  *
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.cmp.feature.convention)
+    // Module-local BuildKonfig so the About/version footer can show the fork's app display name
+    // WITHOUT a hardcoded string resource (S9/T10 white-label seam). Same mechanism core/network uses.
+    alias(libs.plugins.buildkonfig)
 }
 
 kotlin {
@@ -16,7 +22,9 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.data)
             implementation(projects.core.model)
-            implementation(projects.coreBase.ui)
+            implementation(projects.core.ui)
+            // Firebase analytics (AnalyticsHelper + Compose TrackScreenView/rememberAnalyticsHelper) via core/firebase.
+            implementation(projects.core.firebase)
 
             implementation(compose.ui)
             implementation(compose.foundation)
@@ -30,5 +38,25 @@ kotlin {
 compose {
     resources {
         packageOfResClass = "kpt.feature.settings.generated.resources"
+    }
+}
+
+// Fork app display name → `kpt.feature.settings.BuildKonfig.APP_DISPLAY_NAME`, read from
+// `gradle/fork.properties#app.display.name` — the build-bridge that syncForkConfig generates from the
+// SoT `app-profile/app.yaml#identity.app_name`. SettingsScreen's footer renders this instead of a
+// hardcoded string resource, so a fork rebrands in app-profile, not 7 locale strings.xml files (S9/T10).
+val settingsForkProps = Properties().apply {
+    val f = rootProject.file("gradle/fork.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
+buildkonfig {
+    packageName = "kpt.feature.settings"
+    defaultConfigs {
+        buildConfigField(
+            STRING,
+            "APP_DISPLAY_NAME",
+            settingsForkProps.getProperty("app.display.name").orEmpty().ifBlank { "App" },
+        )
     }
 }

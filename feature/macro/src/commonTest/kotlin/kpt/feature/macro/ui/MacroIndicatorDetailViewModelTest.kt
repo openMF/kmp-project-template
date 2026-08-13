@@ -20,13 +20,13 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.yield
+import kpt.core.base.data.infra.Synchronizer
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
 import kpt.core.data.demo.economic.MacroIndicatorsRepository
-import kpt.core.data.infra.Synchronizer
 import kpt.core.model.demo.economic.IndicatorKind
 import kpt.core.model.demo.economic.IndicatorObservation
 import kpt.core.model.demo.economic.MacroIndicator

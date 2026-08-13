@@ -13,8 +13,8 @@ import cmp.navigation.AppViewModel
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarNavigationViewModel
 import cmp.navigation.registry.FeatureRegistry
 import cmp.navigation.rootnav.RootNavViewModel
-import kpt.core.base.analytics.di.analyticsModule
 import kpt.core.base.common.di.CommonModule
+import kpt.core.base.firebase.di.firebaseModule
 import kpt.core.base.platform.di.platformModule
 import kpt.core.base.security.di.SecurityModule
 import kpt.core.data.di.DataModule
@@ -57,7 +57,7 @@ object KoinModules {
         dataModule,
         DatabaseModule,
         dispatcherModule,
-        analyticsModule,
+        firebaseModule,
         DatastoreModule,
         featureModule,
         AppModule,

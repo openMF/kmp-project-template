@@ -18,10 +18,6 @@ import kpt.core.network.demo.crypto.dto.CoinMarketDto
 /** CoinGecko public API v3. Base URL: [BASE_URL]. */
 interface CoinGeckoApi {
 
-    companion object {
-        const val BASE_URL = "https://api.coingecko.com/"
-    }
-
     @GET("api/v3/coins/markets")
     suspend fun getMarkets(
         @Query("vs_currency") vsCurrency: String = "usd",

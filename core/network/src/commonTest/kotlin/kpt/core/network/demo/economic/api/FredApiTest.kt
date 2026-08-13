@@ -107,7 +107,7 @@ class FredApiTest {
             install(ContentNegotiation) { json(json) }
         }
         return Ktorfit.Builder()
-            .baseUrl(FredApi.BASE_URL)
+            .baseUrl("https://api.stlouisfed.org/") // test-local; production URL comes from the access point
             .httpClient(httpClient)
             .build()
             .createFredApi()

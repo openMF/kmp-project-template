@@ -9,6 +9,7 @@
  */
 package kpt.feature.home
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -26,22 +27,13 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
     navigate(HomeDestination, navOptions)
 }
 
+/**
+ * The backbone home graph. [homeBody] is the fork-owned home content (default supplied by
+ * `cmp-navigation`'s `BackboneRegistry.homeBody`); this template graph carries zero demo imports.
+ */
 fun NavGraphBuilder.homeGraph(
     onSettingsClick: () -> Unit,
-    // demo:begin
-    onNavigateToLoans: () -> Unit,
-    onNavigateToBills: () -> Unit,
-    onNavigateToRates: () -> Unit,
-    onNavigateToExchangeRates: () -> Unit,
-    onNavigateToRateHistory: () -> Unit,
-    onNavigateToMacro: () -> Unit,
-    onNavigateToEmi: () -> Unit,
-    onNavigateToAffordability: () -> Unit,
-    onNavigateToAmortization: () -> Unit,
-    onNavigateToLoanComparison: () -> Unit,
-    onNavigateToLoanCalcWizard: () -> Unit,
-    onNavigateToCrypto: () -> Unit,
-    // demo:end
+    homeBody: @Composable () -> Unit = {},
 ) {
     navigation<HomeDestination>(
         startDestination = HomeRoute,
@@ -49,20 +41,7 @@ fun NavGraphBuilder.homeGraph(
         composableWithStayTransitions<HomeRoute> {
             HomeScreen(
                 onSettingsClick = onSettingsClick,
-                // demo:begin
-                onNavigateToLoans = onNavigateToLoans,
-                onNavigateToBills = onNavigateToBills,
-                onNavigateToRates = onNavigateToRates,
-                onNavigateToExchangeRates = onNavigateToExchangeRates,
-                onNavigateToRateHistory = onNavigateToRateHistory,
-                onNavigateToMacro = onNavigateToMacro,
-                onNavigateToEmi = onNavigateToEmi,
-                onNavigateToAffordability = onNavigateToAffordability,
-                onNavigateToAmortization = onNavigateToAmortization,
-                onNavigateToLoanComparison = onNavigateToLoanComparison,
-                onNavigateToLoanCalcWizard = onNavigateToLoanCalcWizard,
-                onNavigateToCrypto = onNavigateToCrypto,
-                // demo:end
+                homeBody = homeBody,
             )
         }
     }

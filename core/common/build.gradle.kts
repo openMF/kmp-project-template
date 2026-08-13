@@ -18,6 +18,9 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             api(libs.kermit.logging)
             api(libs.kotlinx.datetime)
+            // Re-export core-base/common (CommonModule DI, base utilities) so app-shell + feature
+            // modules depend on core/common, never core-base/common directly (encapsulation, Phase A).
+            api(projects.coreBase.common)
         }
     }
 }

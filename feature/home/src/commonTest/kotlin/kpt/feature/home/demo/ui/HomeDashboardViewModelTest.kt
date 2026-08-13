@@ -23,6 +23,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kpt.core.base.data.infra.Synchronizer
 import kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
@@ -32,7 +33,6 @@ import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.data.demo.currency.CurrencyRepository
 import kpt.core.data.demo.economic.EconomicRatesRepository
-import kpt.core.data.infra.Synchronizer
 import kpt.core.model.demo.banking.BillReminder
 import kpt.core.model.demo.banking.Loan
 import kpt.core.model.demo.currency.ExchangeRates

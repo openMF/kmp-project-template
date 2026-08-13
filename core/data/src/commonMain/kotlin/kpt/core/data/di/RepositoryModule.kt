@@ -14,31 +14,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kpt.core.base.common.di.CommonModule
+import kpt.core.base.data.infra.NetworkMonitor
 import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.submit.OfflineSubmitSyncer
-import kpt.core.base.store.submit.SubmitOutbox
-import kpt.core.data.demo.alerts.AlertsRepository
-import kpt.core.data.demo.alerts.impl.AlertsRepositoryImpl
-import kpt.core.data.demo.banking.BillReminderRepository
-import kpt.core.data.demo.banking.LoanRepository
-import kpt.core.data.demo.banking.impl.BillReminderRepositoryImpl
-import kpt.core.data.demo.banking.impl.LoanRepositoryImpl
-import kpt.core.data.demo.cloudtodo.CloudTodoRepository
-import kpt.core.data.demo.cloudtodo.impl.CloudTodoRepositoryImpl
-import kpt.core.data.demo.crypto.CryptoRepository
-import kpt.core.data.demo.crypto.impl.CryptoRepositoryImpl
-import kpt.core.data.demo.currency.CurrencyRepository
-import kpt.core.data.demo.currency.impl.CurrencyRepositoryImpl
-import kpt.core.data.demo.economic.EconomicRatesRepository
-import kpt.core.data.demo.economic.MacroIndicatorsRepository
-import kpt.core.data.demo.economic.impl.EconomicRatesRepositoryImpl
-import kpt.core.data.demo.economic.impl.MacroIndicatorsRepositoryImpl
-import kpt.core.data.demo.watchlist.WatchlistRepository
-import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
-import kpt.core.data.infra.NetworkMonitor
-import kpt.core.data.infra.impl.RoomBookkeeper
-import kpt.core.data.infra.impl.RoomFetchedAtRepository
-import kpt.core.data.infra.impl.RoomSubmitOutbox
+import kpt.core.base.store.infra.impl.RoomFetchedAtRepository
 import kpt.core.data.user.UserDataRepository
 import kpt.core.data.user.UserLogoutManager
 import kpt.core.data.user.impl.UserDataRepositoryImpl
@@ -46,19 +24,21 @@ import kpt.core.data.user.impl.UserLogoutManagerImpl
 import kpt.core.database.AppDatabase
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
-import kpt.core.model.demo.alerts.PriceAlert
-import kpt.core.model.demo.banking.BillReminder
-import kpt.core.model.demo.banking.Loan
-import kpt.core.model.demo.banking.LoanCalcScenario
 import kpt.core.network.di.NetworkModule
-import kpt.core.store.AppStoreRegistry
-import kpt.core.store.demo.cloudtodo.impl.CloudTodoKey
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.mobilenativefoundation.store.store5.Bookkeeper
 
+/**
+ * DataModule — the INFRA-ONLY (framework) data aggregator, `owner: template` (E1 / C1).
+ *
+ * The demo repositories / outboxes / offline-submit syncers relocated to the fork-owned
+ * [kpt.core.data.demo.di.ProjectRepositoryModule]; this aggregator now carries ZERO `kpt.core.*.demo.*`
+ * imports so a template sync can blind-copy it without re-introducing demo wiring a fork already
+ * stripped. The demo module is installed via the fork-owned `FeatureRegistry.featureKoinModules`
+ * demo block; both go away together on `customize.sh --clean`.
+ */
 val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
 
@@ -75,196 +55,7 @@ val DataModule = module {
     // App-scoped CoroutineScope for cross-VM long-running coroutines (framework infra).
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
 
-    // demo:begin — customizer --clean strips all demo repositories, outboxes, syncers + their DAOs
-    // Personal watchlist — local-only persistence for the SubmitHandler showcase.
-    single { get<AppDatabase>().watchlistDao }
-    single<WatchlistRepository> {
-        WatchlistRepositoryImpl(
-            watchlistStore = get(AppStoreRegistry.Watchlist),
-            dao = get(),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-
-    // Banking domain — purely local Loan + Bill Reminder persistence.
-    // No remote sync; the DraftSubmitHandler outboxes below give the UX
-    // polish (saving badge, retry on failure) for a local commit "submit".
-    single { get<AppDatabase>().loanDao }
-    single { get<AppDatabase>().billReminderDao }
-    single<LoanRepository> {
-        LoanRepositoryImpl(
-            loansStore = get(AppStoreRegistry.Loans),
-            loanDao = get(),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-    single<BillReminderRepository> {
-        BillReminderRepositoryImpl(
-            billRemindersStore = get(AppStoreRegistry.BillReminders),
-            billReminderDao = get(),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-
-    // Outboxes — each form payload type gets its own RoomSubmitOutbox so
-    // formKey collisions across features are impossible. The "submit" target
-    // for both is the local repository's `upsert`, simulating remote sync.
-    // All four SubmitOutbox bindings MUST declare their qualifier — Koin matches
-    // single<> definitions by raw type (SubmitOutbox::class), not full KType, so
-    // multiple SubmitOutbox<*> bindings collide and the last one wins regardless of
-    // the generic parameter. See `OutboxQualifiers` KDoc for full background.
-    single<SubmitOutbox<Loan>>(qualifier = OutboxQualifiers.Loan) {
-        RoomSubmitOutbox(dao = get(), serializer = Loan.serializer())
-    }
-    single<SubmitOutbox<BillReminder>>(qualifier = OutboxQualifiers.BillReminder) {
-        RoomSubmitOutbox(dao = get(), serializer = BillReminder.serializer())
-    }
-    single<SubmitOutbox<LoanCalcScenario>>(qualifier = OutboxQualifiers.LoanCalcScenario) {
-        RoomSubmitOutbox(dao = get(), serializer = LoanCalcScenario.serializer())
-    }
-
-    // OfflineSubmitSyncer eagerly retries pending drafts when connectivity
-    // returns. For purely-local features (no real network), the submitBlock
-    // commits to the repository directly — `networkStatusFlow` is still
-    // required by the syncer contract.
-    //
-    // We register each syncer behind a unique marker singleton so Koin's
-    // type resolution doesn't collide with other `OfflineSubmitSyncer<*, *>`
-    // bindings (PriceAlert below uses the same pattern by virtue of being
-    // declared as the bare `OfflineSubmitSyncer` type — see note there).
-    single<LoanSubmitSyncer>(createdAtStart = true) {
-        LoanSubmitSyncer(
-            syncer = OfflineSubmitSyncer<Loan, Loan>(
-                scope = get(),
-                outbox = get(qualifier = OutboxQualifiers.Loan),
-                networkStatusFlow = get<NetworkMonitor>().networkStatus,
-                submitBlock = { payload ->
-                    get<LoanRepository>().upsert(payload)
-                    payload
-                },
-            ).also { it.start() },
-        )
-    }
-    single<BillReminderSubmitSyncer>(createdAtStart = true) {
-        BillReminderSubmitSyncer(
-            syncer = OfflineSubmitSyncer<BillReminder, BillReminder>(
-                scope = get(),
-                outbox = get(qualifier = OutboxQualifiers.BillReminder),
-                networkStatusFlow = get<NetworkMonitor>().networkStatus,
-                submitBlock = { payload ->
-                    get<BillReminderRepository>().upsert(payload)
-                    payload
-                },
-            ).also { it.start() },
-        )
-    }
-
-    // demo:end
-
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
-
-    // demo:begin — customizer --clean strips the demo fintech/economic/alerts repositories + syncer
-    // Fintech Repositories
-    single<CurrencyRepository> {
-        CurrencyRepositoryImpl(
-            exchangeRatesStore = get(AppStoreRegistry.ExchangeRates),
-            rateHistoryStore = get(AppStoreRegistry.RateHistory),
-            spotRateStore = get(AppStoreRegistry.SpotRate),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-    single<CryptoRepository> {
-        CryptoRepositoryImpl(
-            coinMarketsStore = get(AppStoreRegistry.CoinMarkets),
-            coinDetailStore = get(AppStoreRegistry.CoinDetail),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-
-    // cloud-todo — MUTABLE (offline-write) archetype. RoomBookkeeper (owned by core/data) records
-    // failed writes for retry-on-reconnect; it's injected into the core/store MutableStore via Koin.
-    single<Bookkeeper<CloudTodoKey>> {
-        RoomBookkeeper(dao = get(), keySerializer = { "cloudTodo:${it.id}" })
-    }
-    single<CloudTodoRepository> {
-        CloudTodoRepositoryImpl(
-            readStore = get(AppStoreRegistry.CloudTodo),
-            writeStore = get(AppStoreRegistry.CloudTodoMutable),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-
-    // Economic Repositories (Banking Utility Toolkit — FRED + World Bank)
-    single<EconomicRatesRepository> {
-        EconomicRatesRepositoryImpl(
-            interestRateSeriesStore = get(AppStoreRegistry.InterestRateSeries),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-    single<MacroIndicatorsRepository> {
-        MacroIndicatorsRepositoryImpl(
-            macroIndicatorStore = get(AppStoreRegistry.MacroIndicator),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-
-    // Price alerts — Store-backed (OFFLINE_LOCAL_ONLY archetype).
-    // AlertsStore is the source of truth; AlertDao is the write target.
-    single { get<AppDatabase>().alertDao }
-    single<AlertsRepository> {
-        AlertsRepositoryImpl(
-            alertsStore = get(AppStoreRegistry.Alerts),
-            alertDao = get(),
-            networkMonitor = get(),
-            fetchedAtRepository = get(),
-        )
-    }
-
-    // Outbox for PriceAlert payloads — RoomSubmitOutbox writes to framework_submit_drafts.
-    single<SubmitOutbox<PriceAlert>>(qualifier = OutboxQualifiers.PriceAlert) {
-        RoomSubmitOutbox(dao = get(), serializer = PriceAlert.serializer())
-    }
-
-    // Eager singleton — starts watching network online events at Koin start; retries
-    // any pending alerts when connectivity returns. For the local-only alerts feature,
-    // the submit block commits directly to the repository (simulating offline resilience).
-    single(createdAtStart = true) {
-        val syncer = OfflineSubmitSyncer<PriceAlert, PriceAlert>(
-            scope = get(),
-            outbox = get(qualifier = OutboxQualifiers.PriceAlert),
-            networkStatusFlow = get<NetworkMonitor>().networkStatus,
-            submitBlock = { payload -> get<AlertsRepository>().submitAlert(payload) },
-        )
-        syncer.start()
-        syncer
-    }
-    // demo:end
 }
 
 expect val platformModule: Module
-
-// demo:begin — marker singletons for the demo submit syncers (stripped with the demo repos)
-/**
- * Marker singleton wrapping the Loan offline submit syncer.
- *
- * Exists so Koin can resolve the binding by a unique type — bare
- * `OfflineSubmitSyncer<*, *>` would erase to the same runtime [kotlin.reflect.KClass]
- * across every payload type and collide with the PriceAlert syncer.
- */
-internal class LoanSubmitSyncer internal constructor(
-    @Suppress("unused") val syncer: OfflineSubmitSyncer<Loan, Loan>,
-)
-
-/** Marker singleton wrapping the BillReminder offline submit syncer. */
-internal class BillReminderSubmitSyncer internal constructor(
-    @Suppress("unused") val syncer: OfflineSubmitSyncer<BillReminder, BillReminder>,
-)
-// demo:end

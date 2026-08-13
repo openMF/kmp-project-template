@@ -26,10 +26,6 @@ import kpt.core.network.demo.economic.dto.WorldBankResponseDto
  */
 interface WorldBankApi {
 
-    companion object {
-        const val BASE_URL = "https://api.worldbank.org/"
-    }
-
     /**
      * Fetch annual observations of a single indicator for a single country.
      *

@@ -31,30 +31,13 @@ package kpt.core.network.demo.economic.config
  */
 data class FredApiConfig(
     val apiKey: String?,
-    /**
-     * Base URL for FRED API requests. Defaults to the public production endpoint
-     * `https://api.stlouisfed.org/`. Forks can override for:
-     *
-     * - **Testing**: point at a MockWebServer / WireMock instance running locally
-     * - **Self-hosted mirrors**: large institutional users may proxy FRED through
-     *   an internal cache
-     * - **Per-environment endpoints**: dev / staging / prod variants
-     *
-     * Override in your Koin DI:
-     * ```kotlin
-     * single { FredApiConfig(apiKey = "...", baseUrl = "https://staging-fred.mybank.internal/") }
-     * ```
-     */
-    val baseUrl: String = DEFAULT_BASE_URL,
+    // Base URL is no longer here — the "fred" access point (app-profile network.access_points) owns it.
 ) {
     /** True when the fork has supplied a non-blank key. */
     val isConfigured: Boolean
         get() = !apiKey.isNullOrBlank()
 
     companion object {
-        /** Default FRED public endpoint. */
-        const val DEFAULT_BASE_URL: String = "https://api.stlouisfed.org/"
-
         /** Sentinel for forks that haven't wired the FRED key yet. */
         val Unconfigured: FredApiConfig = FredApiConfig(apiKey = null)
     }

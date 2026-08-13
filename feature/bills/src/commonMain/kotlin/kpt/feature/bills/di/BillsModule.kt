@@ -10,7 +10,6 @@
 package kpt.feature.bills.di
 
 import kpt.core.data.di.OutboxQualifiers
-import kpt.core.platform.notification.bill.di.notificationModule
 import kpt.feature.bills.notification.BillNotificationGateway
 import kpt.feature.bills.notification.BillNotificationGatewayImpl
 import kpt.feature.bills.ui.BillRemindersListViewModel
@@ -23,18 +22,16 @@ import org.koin.dsl.module
  * Koin module for the Bill Reminders feature.
  *
  * Bindings:
- *  - `BillNotificationGateway` — feature-local seam over the platform scheduler. Resolves
- *    the platform `BillReminderScheduler` from
- *    `kpt.core.platform.notification.bill.di.notificationModule` (pulled in here via
- *    `includes()` rather than the shared `platformModule`, since bill-reminder wiring is
- *    banking-domain-specific and now lives in `core/platform`).
+ *  - `BillNotificationGateway` — feature-local seam that maps bill reminders onto the cross-platform
+ *    `sync` `WorkScheduler` (worker-kmp + KMPNotifier), provided by `SyncModule` at app level. No
+ *    per-platform scheduler module is included here anymore.
  *  - List ViewModel — parameter-less.
  *  - Edit ViewModel — takes the nullable `billId` via Koin's `parameters` channel so
  *    navigation passes the route argument straight through.
  */
 val BillsModule = module {
-    includes(notificationModule)
-
+    // BillNotificationGateway maps bill reminders onto the cross-platform `sync` WorkScheduler
+    // (provided by SyncModule) — no per-platform scheduler module to include here anymore.
     single<BillNotificationGateway> { BillNotificationGatewayImpl(get()) }
 
     viewModel { BillRemindersListViewModel(repository = get(), scheduler = get()) }

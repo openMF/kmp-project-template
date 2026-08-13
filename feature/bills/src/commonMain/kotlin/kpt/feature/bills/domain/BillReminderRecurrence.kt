@@ -33,7 +33,7 @@ import kotlin.time.Clock
  *    [TimeZone].
  *
  * Tests pin both behaviours; the schedule produced here flows into
- * [kpt.core.platform.notification.bill.BillReminderScheduler.schedule].
+ * [kpt.feature.bills.notification.BillNotificationGateway.schedule].
  */
 internal object BillReminderRecurrence {
 

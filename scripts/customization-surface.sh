@@ -14,6 +14,9 @@
 #     scripts/customization-surface.sh report           # owner of every tracked path
 #     scripts/customization-surface.sh verify            # CI: fail if any tracked
 #                                                        # path only matches the default
+#     scripts/customization-surface.sh --verify          # CI: fail if any ownership glob
+#                                                        # matches ZERO real paths (dead-glob
+#                                                        # / contract-rot guard; E0/T2)
 # ─────────────────────────────────────────────────────────────────────────────
 # NOTE: shell options are set only on direct execution (bottom), NOT on source —
 # sourcing must not leak `set -u`/`pipefail` into a caller like scripts/white-label/sync-dirs.sh.
@@ -75,14 +78,69 @@ cs_glob_to_regex() {
 CS_LOADED=0
 cs_load_rules() {
   [ "$CS_LOADED" = 1 ] && return
-  CS_RX=(); CS_OWNER=(); CS_STRAT=(); CS_DEF=()
+  CS_RX=(); CS_OWNER=(); CS_STRAT=(); CS_DEF=(); CS_GLOB=()
   local glob owner strat def
   while IFS='|' read -r glob owner strat def; do
     [ -z "$glob" ] && continue
     CS_RX+=("$(cs_glob_to_regex "$glob")")
-    CS_OWNER+=("$owner"); CS_STRAT+=("$strat"); CS_DEF+=("$def")
+    CS_OWNER+=("$owner"); CS_STRAT+=("$strat"); CS_DEF+=("$def"); CS_GLOB+=("$glob")
   done < <(cs_parse_rules)
   CS_LOADED=1
+}
+
+# ── --verify zero-match-rule guard (pure-white-label-store5-network E0/T2) ────────
+# Every NON-default ownership glob MUST match >=1 real path in the tree — a rule that
+# resolves to zero paths silently mis-owns whatever the author MEANT to cover (exactly
+# how the 4 dead globs `core/store/{economic,banking}/**`, `appStoreModule*.kt`,
+# `core/**/src/**/local/**` survived). This turns contract rot into a hard failure.
+#
+# "Real path" universe = git-tracked files UNION files present on disk (so gitignored-
+# but-materialized fork paths — local.properties, gradle/fork.properties, secrets/live/**,
+# secrets/.sync-meta.json — count as matches, never false-flagged). Heavy build output
+# (build/, .gradle/, .kotlin/, node_modules/, .git/) is pruned.
+#
+# EXEMPT: `owner: generated` rules describe REGENERABLE artifacts (store og-images /
+# screenshots / metadata) that are legitimately absent from a freshly-synced / bare
+# template tree — flagging them would be a false positive by design (a fork regenerates
+# them from app-profile/). The catch-all default `**` rule is skipped too.
+#
+# Returns 0 iff every enforced rule matches >=1 path; 1 (listing the offenders) otherwise.
+cs_build_path_universe() {
+  {
+    git -C "$CS_ROOT" ls-files 2>/dev/null
+    ( cd "$CS_ROOT" 2>/dev/null && \
+      find . \( -path './.git' -o -path '*/build' -o -path '*/.gradle' \
+                -o -path '*/.kotlin' -o -path '*/node_modules' \) -prune \
+             -o -type f -print 2>/dev/null | sed 's#^\./##' )
+  } | sort -u
+}
+
+cs_verify_zero_match() {
+  cs_load_rules
+  local universe rc=0 i n
+  universe="$(mktemp)"
+  cs_build_path_universe > "$universe"
+  if [ ! -s "$universe" ]; then
+    rm -f "$universe"
+    echo "❌ --verify: could not enumerate any real paths under $CS_ROOT" >&2
+    return 1
+  fi
+  for i in "${!CS_RX[@]}"; do
+    [ "${CS_DEF[$i]}" = "1" ] && continue            # catch-all default — matches everything by design
+    [ "${CS_OWNER[$i]}" = "generated" ] && continue  # regenerable artifacts, legitimately absent
+    n="$(grep -cE "${CS_RX[$i]}" "$universe" 2>/dev/null || true)"
+    if [ "${n:-0}" -eq 0 ]; then
+      echo "❌ ZERO-MATCH RULE (owner=${CS_OWNER[$i]}, matches no real path): ${CS_GLOB[$i]}" >&2
+      rc=1
+    fi
+  done
+  rm -f "$universe"
+  if [ "$rc" -eq 0 ]; then
+    echo "✅ --verify: every ownership rule matches >=1 real path (generated carve-outs exempt)"
+  else
+    echo "❌ --verify: one or more ownership rules match ZERO real paths — dead/mis-declared contract rot" >&2
+  fi
+  return "$rc"
 }
 
 # First matching rule → set globals CS_M_OWNER / CS_M_STRAT / CS_M_DEFAULT.
@@ -193,6 +251,10 @@ cs_require_flip_preconditions() {
 cs_main() {
   local cmd="${1:-}"; shift || true
   case "$cmd" in
+    --verify|verify-zero-match)
+      # E0/T2: zero-match-rule guard — exit 1 if ANY enforced glob matches zero real paths.
+      cs_verify_zero_match
+      ;;
     resolve)
       local p="${1:?usage: resolve <path>}"
       cs_match_g "$p"
@@ -235,7 +297,7 @@ cs_main() {
       cs_merge "$@"   # <strategy> <ours> <base> <theirs> [<out>]
       ;;
     *)
-      echo "usage: customization-surface.sh {resolve <path>|report|verify|merge <strategy> <ours> <base> <theirs> [out]}" >&2
+      echo "usage: customization-surface.sh {resolve <path>|report|verify|--verify|merge <strategy> <ours> <base> <theirs> [out]}" >&2
       return 2
       ;;
   esac

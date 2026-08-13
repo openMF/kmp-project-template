@@ -20,34 +20,27 @@ kotlin {
             // Core Modules
             implementation(projects.core.data)
             implementation(projects.core.database)
+            implementation(projects.core.network) // E1: FeatureRegistry wires the relocated DemoNetworkModule (core/network/demo/di)
             implementation(projects.core.model)
             implementation(projects.core.common)
             implementation(projects.core.datastore)
-
-            implementation(projects.core.datastore)
-            implementation(projects.coreBase.common)
-            implementation(projects.coreBase.platform)
+            // Firebase analytics (firebaseModule + AnalyticsHelper + Compose helpers) via core/firebase.
+            implementation(projects.core.firebase)
+            // core/platform re-exports core-base/platform (platformModule, GarbageCollectionManager) —
+            // the app-shell reaches those through core/ per G-CORE-BASE-ENCAP.
+            implementation(projects.core.platform)
+            // core-base/security is the ONE sanctioned app-shell exception: cmp-navigation is the DI
+            // aggregator (KoinModules wires SecurityModule) and reads isReleaseBuild; no core/ wrapper
+            // is warranted for a security module the shell itself assembles. Feature modules NEVER
+            // depend on core-base — enforced by the encapsulation gate (Phase A).
             implementation(projects.coreBase.security)
 
-            // shell (framework) — kept
+            // Backbone shell features (template-owned) — always present in every fork.
             implementation(projects.feature.home)
             implementation(projects.feature.profile)
             implementation(projects.feature.settings)
-            // demo:begin — customizer --clean strips these demo feature dependencies
-            implementation(projects.feature.currencyRates)
-            implementation(projects.feature.emiCalculator)
-            implementation(projects.feature.bills)
-            implementation(projects.feature.loans)
-            implementation(projects.feature.amortization)
-            implementation(projects.feature.rates)
-            implementation(projects.feature.calculators)
-            implementation(projects.feature.macro)
-            implementation(projects.feature.crypto)
-            implementation(projects.feature.showcase)
-            implementation(projects.feature.alerts)
-            implementation(projects.feature.watchlist)
-            implementation(projects.feature.addToWatchlist)
-            // demo:end
+            // Fork feature-module deps come from the fork-owned `feature-deps.gradle.kts` seam
+            // (applied at the bottom of this file, S7/F4). A fork adds a feature there, never here.
             implementation(projects.sync)
 
             // put your multiplatform dependencies here
@@ -84,3 +77,8 @@ compose.resources {
     generateResClass = always
     packageOfResClass = "cmp.navigation.generated.resources"
 }
+
+// Fork-owned feature-module dependencies (S7/F4 white-label seam). Applied AFTER the `kotlin { }` block
+// above so the `commonMainImplementation` configuration it contributes to already exists. A fork edits
+// `feature-deps.gradle.kts`, never this template-owned build file — a template sync full-copies this file.
+apply(from = rootProject.file("feature-deps.gradle.kts"))

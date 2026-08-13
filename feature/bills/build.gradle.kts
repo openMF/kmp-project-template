@@ -19,10 +19,10 @@ kotlin {
             implementation(projects.core.ui)
             implementation(projects.core.data)
             implementation(projects.core.model)
-            implementation(projects.core.platform)
-            implementation(projects.coreBase.store)
-            implementation(projects.coreBase.platform)
-            implementation(projects.coreBase.ui)
+            implementation(projects.core.store)
+            // sync provides WorkScheduler + NotificationContent — the cross-platform (worker-kmp +
+            // KMPNotifier) infra the bill-reminder gateway schedules through.
+            implementation(projects.sync)
 
             implementation(compose.ui)
             implementation(compose.material3)

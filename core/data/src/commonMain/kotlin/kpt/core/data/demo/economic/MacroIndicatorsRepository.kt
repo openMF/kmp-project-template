@@ -11,9 +11,9 @@ package kpt.core.data.demo.economic
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kpt.core.base.data.infra.Syncable
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.data.infra.Syncable
 import kpt.core.model.demo.economic.MacroIndicator
 import kpt.core.store.demo.economic.impl.MacroIndicatorKey
 

@@ -18,13 +18,6 @@ import kpt.core.network.demo.currency.dto.RateHistoryDto
 /** Frankfurter open-source exchange rate API. Base URL: [BASE_URL]. */
 interface FrankfurterApi {
 
-    companion object {
-        // Was api.frankfurter.app — now returns HTTP 301 with a broken redirect target
-        // (https://api.frankfurter.dev/v1/v1/latest?from=USD — note the duplicated /v1/v1/),
-        // so following the redirect doesn't help. Switched to the new canonical host directly.
-        const val BASE_URL = "https://api.frankfurter.dev/"
-    }
-
     @GET("v1/latest")
     suspend fun getLatestRates(@Query("from") from: String): ExchangeRatesDto
 

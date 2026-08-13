@@ -101,7 +101,7 @@ include(":cmp-desktop")
 include(":cmp-web")
 include(":cmp-navigation")
 
-include(":core:analytics")
+include(":core:firebase")
 include(":core:common")
 include(":core:data")
 include(":core:database")
@@ -133,8 +133,9 @@ include(":feature:add-to-watchlist")
 include(":feature:alerts")
 // demo:end
 
-include(":core-base:analytics")
+include(":core-base:firebase")
 include(":core-base:common")
+include(":core-base:data")
 include(":core-base:database")
 include(":core-base:datastore")
 include(":core-base:designsystem")
@@ -153,3 +154,10 @@ check(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_17)) {
     """.trimIndent()
 }
 include(":sync")
+
+// Fork-owned module-include seam (B1/T11 white-label). A fork adds its own `include(":feature:x")`
+// lines in `settings.local.gradle.kts` — never in this template-synced file. Guarded so a `--clean`
+// fork that removed the file still configures.
+if (file("settings.local.gradle.kts").exists()) {
+    apply(from = "settings.local.gradle.kts")
+}

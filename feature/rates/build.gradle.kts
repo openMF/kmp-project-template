@@ -19,7 +19,6 @@ kotlin {
             implementation(projects.core.designsystem)
             implementation(projects.core.model)
             implementation(projects.core.store)
-            implementation(projects.coreBase.store)
 
             implementation(compose.ui)
             implementation(compose.material3)

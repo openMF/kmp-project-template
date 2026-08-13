@@ -29,6 +29,7 @@ kotlin {
             implementation(compose.components.resources)
 
             implementation(projects.core.database)
+            implementation(projects.coreBase.database)
             implementation(projects.core.model)
             implementation(projects.core.network)
             implementation(libs.cmp.network.monitor)

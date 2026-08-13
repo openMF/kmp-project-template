@@ -215,10 +215,9 @@ rules:
   # The ONLY non-template artifacts UNDER deployment/ are the DERIVED store listings above
   # (owner:generated — regenerated from app-profile by syncForkConfig, never hand-edited). All fork DATA
   # was relocated OUT of deployment/: per-target enabled/tier → app-profile/deploy-targets.yaml (owner:
-  # fork, below), and the append-only deploy history → deploy-state/PROMOTION_LOG.yaml (owner: fork,
-  # below). DEPLOYMENT_MANIFEST.yaml is now a pure template target CATALOG that full-copies.
-  - glob: "deploy-state/**"                   # relocated fork deploy runtime-state (PROMOTION_LOG) — E1/D-2
-    owner: fork
+  # fork, below). The append-only deploy history is FRAMEWORK-level (project deployment-layer/deploy-state/,
+  # E1/D-4) — /idea-deploy owns it; community GitHub Actions deploys keep their audit in the Actions run
+  # history, so NOTHING lands in this public source repo. DEPLOYMENT_MANIFEST.yaml is a pure template CATALOG.
   - glob: "secrets/live/**"                   # real secrets (gitignored)
     owner: fork
   - glob: "secrets/**/.sync-meta.json"        # per-fork vault sync state (SV33)

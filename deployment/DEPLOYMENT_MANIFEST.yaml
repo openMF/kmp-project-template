@@ -20,7 +20,8 @@
 # Schema:     core/schemas/deployment-manifest.schema.json
 # Validator:  scripts/deployment-manifest-validate.sh (reads app-profile/deploy-targets.yaml for enabled/tier)
 # Rule:       RULE-DEPLOYMENT-MANIFEST-001 (layers/release/rules/)
-# Promotion:  appends to deploy-state/PROMOTION_LOG.yaml on every deploy (relocated out of deployment/ — E1/D-2)
+# Promotion:  /idea-deploy appends to the framework deployment-layer/deploy-state/PROMOTION_LOG.yaml (E1/D-4);
+#             community GitHub Actions deploys keep their audit trail in the Actions run history.
 #
 # Tier convention:
 #   1 = Tier-1 platforms (Android+iOS+Desktop unsigned+Web GH-Pages) — default ON

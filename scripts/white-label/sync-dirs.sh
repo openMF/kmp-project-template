@@ -50,7 +50,7 @@ SYNC_DIRS=(
     "core-base"
     "core"          # framework infra (incl. core/*/infra) syncs; **/demo/** + core/store seam preserved per-fork by sync_directory's convention block (base-branch re-assert)
     "build-logic"
-    "deployment"     # 18-target deploy infra — FULL-COPY, zero exclusions (fork state relocated to app-profile/deploy-targets.yaml + deploy-state/; E1/D-3)
+    "deployment"     # 18-target deploy infra — FULL-COPY, zero exclusions (fork state → app-profile/deploy-targets.yaml; deploy history is framework-level deployment-layer/deploy-state/; E1/D-4)
     "fastlane"
     "fastlane-config"
     "spotless"       # shared copyright/format config
@@ -109,7 +109,7 @@ declare -A EXCLUSIONS=(
     # Deployment — FULL-COPY, ZERO exclusions (E1 / D-3, epic pure-white-label-store5-network).
     # deployment/** is a pure TEMPLATE-OWNED module now: all fork DATA was relocated OUT —
     #   • per-target enabled/tier state  → app-profile/deploy-targets.yaml   (owner: fork)
-    #   • append-only promotion history  → deploy-state/PROMOTION_LOG.yaml    (owner: fork)
+    #   • append-only promotion history  → framework deployment-layer/deploy-state/ (E1/D-4; /idea-deploy-owned)
     #   • store listings + screenshots   → DERIVED from app-profile/ by `./gradlew syncForkConfig`
     #                                       (template ships placeholders; regenerated post-sync).
     # DEPLOYMENT_MANIFEST.yaml is a pure catalog of available targets (owner: template). With no

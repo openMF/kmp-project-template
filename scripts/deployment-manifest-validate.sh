@@ -13,7 +13,7 @@
 #   V1  every canonical_name in app-profile/deploy-targets.yaml exists in the template catalog
 #       (a fork can't enable a target the template doesn't ship).
 #   V2  every enabled fork target declares a tier ∈ {1,2}.
-#   V3  the promotion log lives at deploy-state/PROMOTION_LOG.yaml (relocated out of deployment/).
+#   V3  the promotion log is FRAMEWORK-level (deployment-layer/deploy-state/) — NOT in this source repo (E1/D-4).
 #
 # Pure bash + grep — no Gradle, no network, no YAML lib (line-oriented reads only).
 # Usage: bash scripts/deployment-manifest-validate.sh   # exit 0 clean, exit 1 on any violation
@@ -56,12 +56,12 @@ while IFS= read -r line; do
   esac
 done < "$TARGETS"
 
-# ── V3: promotion log relocated out of deployment/ ────────────────────────────────────
-if [ ! -f "$LOG" ]; then
-  viol V3-log-location "promotion log not found at $LOG (E1/D-2 — must live outside deployment/)"
+# ── V3: promotion log is FRAMEWORK-level (project deployment-layer/), NOT in this source repo (E1/D-4) ──
+if [ -e "$LOG" ] || [ -d "deploy-state" ]; then
+  viol V3-log-location "$LOG present in the source repo — the promotion log is framework-level now (deployment-layer/deploy-state/, E1/D-4; /idea-deploy owns it via PROMOTION_LOG_PATH)"
 fi
 if [ -f "deployment/PROMOTION_LOG.yaml" ]; then
-  viol V3-log-location "stale deployment/PROMOTION_LOG.yaml present — the log relocated to $LOG (E1/D-2)"
+  viol V3-log-location "stale deployment/PROMOTION_LOG.yaml present — the log is framework-level (E1/D-4)"
 fi
 
 if [ "$violations" -eq 0 ]; then

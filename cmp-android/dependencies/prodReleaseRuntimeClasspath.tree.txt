@@ -3,8 +3,8 @@
 |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0 -> 1.8.22 (c)
 |    +--- org.jetbrains.kotlin:kotlin-stdlib-common:2.4.0 (c)
 |    \--- org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0 -> 1.8.22 (c)
-+--- androidx.databinding:databinding-common:9.2.1
-+--- androidx.databinding:databinding-runtime:9.2.1
++--- androidx.databinding:databinding-common:9.3.1
++--- androidx.databinding:databinding-runtime:9.3.1
 |    +--- androidx.collection:collection:1.0.0 -> 1.5.0
 |    |    \--- androidx.collection:collection-jvm:1.5.0
 |    |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0
@@ -14,8 +14,8 @@
 |    |         +--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.0 (*)
 |    |         +--- androidx.collection:collection-ktx:1.5.0 (c)
 |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.24 -> 2.4.0 (c)
-|    +--- androidx.databinding:databinding-common:9.2.1
-|    +--- androidx.databinding:viewbinding:9.2.1
+|    +--- androidx.databinding:databinding-common:9.3.1
+|    +--- androidx.databinding:viewbinding:9.3.1
 |    |    +--- androidx.annotation:annotation:1.0.0 -> 1.10.0 (*)
 |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.2.10 -> 2.4.0 (*)
 |    +--- androidx.lifecycle:lifecycle-runtime:2.6.1 -> 2.11.0-beta01
@@ -94,12 +94,12 @@
 |    |         +--- androidx.lifecycle:lifecycle-viewmodel-savedstate:2.11.0-beta01 (c)
 |    |         \--- org.jetbrains.androidx.lifecycle:lifecycle-runtime:2.9.5 -> 2.11.0-beta01 (c)
 |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.2.10 -> 2.4.0 (*)
-+--- androidx.databinding:databinding-adapters:9.2.1
-|    +--- androidx.databinding:databinding-runtime:9.2.1 (*)
++--- androidx.databinding:databinding-adapters:9.3.1
+|    +--- androidx.databinding:databinding-runtime:9.3.1 (*)
 |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.10 -> 2.4.0 (*)
-|    \--- androidx.databinding:databinding-common:9.2.1
-+--- androidx.databinding:databinding-ktx:9.2.1
-|    +--- androidx.databinding:databinding-runtime:9.2.1 (*)
+|    \--- androidx.databinding:databinding-common:9.3.1
++--- androidx.databinding:databinding-ktx:9.3.1
+|    +--- androidx.databinding:databinding-runtime:9.3.1 (*)
 |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.10 -> 2.4.0 (*)
 |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1 -> 1.11.0 (*)
 |    +--- androidx.lifecycle:lifecycle-runtime-ktx:2.6.1 -> 2.11.0-beta01

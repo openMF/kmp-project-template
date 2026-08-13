@@ -11,8 +11,8 @@ iosTeamId        = "L432S2FZP5"               # Apple Developer Team ID
 # ─────────────────────────────────────────────────────────────────────────────────────────────────
 # Android
 androidDesugarJdkLibs = "2.1.5"
-androidGradlePlugin = "9.2.1"
-androidTools = "32.2.1"
+androidGradlePlugin = "9.3.1"
+androidTools = "32.3.1"
 compileSdk = "37"
 minSdk = "26"
 targetSdk = "37"
@@ -88,7 +88,7 @@ kotlinxCoroutines = "1.11.0"
 kotlinxDatetime = "0.8.0"
 kotlinxImmutable = "0.5.1"
 kotlinxSerializationJson = "1.11.0"
-ksp = "2.3.9"
+ksp = "2.3.11"
 
 # Ktor & Ktorfit
 ktorVersion = "3.5.1"

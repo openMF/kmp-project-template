@@ -10,6 +10,15 @@
 name: PR Check
 run-name: "🔍 PR Check · #${{ github.event.pull_request.number || github.ref_name }} · ${{ github.event.pull_request.title || github.event.head_commit.message }}"
 
+# Cancel superseded runs: a newer commit on the same PR/branch cancels the older, still-running
+# PR-check instead of letting them pile up and hold scarce macOS runners ~50 min each (the
+# "runs in bunches → grabs many runners and holds them" problem the dev team flagged). This is
+# workflow-level so it covers BOTH the reusable `validate` call AND the local `ios` job —
+# one commit on a branch = at most one live run of this workflow.
+concurrency:
+  group: pr-check-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   pull_request:
     branches: [main, dev]
@@ -53,13 +62,28 @@ jobs:
         with:
           ruby-version: '3.3'
           bundler-cache: true
-      - name: Assemble ComposeApp XCFramework
-        # E6 — SwiftPM/XCFramework (no CocoaPods). Assemble the release XCFramework the
-        # iosApp.xcodeproj archive links against; the `[KMP] Embed and Sign ComposeApp
-        # XCFramework` Run-Script phase re-assembles + embeds it during the build too.
-        run: ./gradlew :cmp-shared:assembleComposeAppReleaseXCFramework
+      # Cache the Kotlin/Native toolchain + platform klibs (~/.konan). A cold iOS K/N compile is the
+      # single biggest cost of this job; setup-gradle caches ~/.gradle but NOT ~/.konan. Keyed on the
+      # version catalog so a Kotlin bump busts it.
+      - name: Cache Kotlin/Native (~/.konan)
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: konan-${{ runner.os }}-
+      # Cache resolved SwiftPM clones (the native Firebase SDK graph, ~14 packages) so xcodebuild's
+      # -resolvePackageDependencies / -showBuildSettings don't re-clone the world every run.
+      - name: Cache SwiftPM packages
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/org.swift.swiftpm
+          key: spm-${{ runner.os }}-${{ hashFiles('cmp-ios/**/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
       - name: fastlane ios build_ios (unsigned)
-        # Canonical PR-check lane in fastlane/Fastfile. Same path PR #185 used.
+        # Canonical PR-check lane in fastlane/Fastfile — it ALREADY assembles the DEBUG ComposeApp
+        # XCFramework (assembleComposeAppDebugXCFramework) and builds the prodDebug scheme unsigned.
+        # We deliberately do NOT pre-assemble a RELEASE XCFramework in a separate step: a debug PR
+        # check never links it, so that was ~1h of Kotlin/Native optimize-compile thrown away.
         env:
           # `xcodebuild -showBuildSettings` must evaluate the iosApp SwiftPM graph (the native
           # Firebase SDK added in E6) on a cold runner — Fastlane's default 3s base × 4 retries

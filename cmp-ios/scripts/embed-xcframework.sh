@@ -42,31 +42,37 @@ if [ ! -x "$GRADLEW" ]; then
   exit 1
 fi
 
-# Hand the KMP embed task the canonical Debug/Release name it recognizes (overriding
-# the custom {flavor}{BuildType} CONFIGURATION), while leaving Xcode's own build
-# environment (SDK_NAME, ARCHS, TARGET_BUILD_DIR, FRAMEWORKS_FOLDER_PATH,
-# EXPANDED_CODE_SIGN_IDENTITY, …) intact so the framework is signed + embedded into
-# the right slice/arch. embedAndSignAppleFrameworkForXcode builds the matching
-# `binaries.framework { baseName = "ComposeApp" }` and copies it into the app bundle.
-CONFIGURATION="$KOTLIN_BUILD_TYPE" \
-  "$GRADLEW" -p "$REPO_ROOT" \
-  ":cmp-shared:embedAndSignAppleFrameworkForXcode"
+# The app consumes ComposeApp as a SwiftPM BINARY TARGET (cmp-ios/Package.swift → the XCFramework at
+# cmp-shared/build/XCFrameworks/<type>/ComposeApp.xcframework). Kotlin REJECTS
+# `embedAndSignAppleFrameworkForXcode` — the direct-integration task — the moment the Xcode project
+# carries SwiftPM dependencies ("error: You have SwiftPM dependencies with embedAndSign integration"),
+# which it now does: the native Firebase SDK + the ComposeApp binary target itself. So we ASSEMBLE the
+# XCFramework the binary target points at; Xcode/SwiftPM embed + sign the binary product automatically
+# when resolving the package. This runs BEFORE Compile Sources so the freshly-built framework is what
+# links. (Debug/Release maps from Xcode's flavored $CONFIGURATION above.)
+"$GRADLEW" -p "$REPO_ROOT" \
+  ":cmp-shared:assembleComposeApp${KOTLIN_BUILD_TYPE}XCFramework"
 
-# Mirror the built framework to the raw `$CONFIGURATION`-named search dir so the
+# Stage the SDK-matching `.framework` slice OUT of the freshly-assembled XCFramework into the
 # project's `FRAMEWORK_SEARCH_PATHS`
-#   $(SRCROOT)/../cmp-shared/build/xcode-frameworks/$(KMPF_VARIANT)/$(SDK_NAME)
-# (KMPF_VARIANT = demoDebug / prodStaging / …, i.e. the raw Xcode CONFIGURATION)
-# resolves at LINK time for every flavor — the embed task writes only to the
-# canonical Debug/Release dir we passed above. No-op when the names already match
-# (the plain Debug/Release configurations).
+#   $(SRCROOT)/../cmp-shared/build/xcode-frameworks/$(CONFIGURATION|KMPF_VARIANT)/$(SDK_NAME)
+# — the app links `ComposeApp` via those search paths (it is NOT a SwiftPM package product; only the
+# Firebase SDK is), so this is what makes `import ComposeApp` resolve at LINK time now that embedAndSign
+# (which used to write that dir) is gone. Assemble-then-stage works for every flavor because $CONFIG is
+# the raw Xcode configuration. (bash 3.2 on the Xcode runner: lowercase via tr, no ${x,,}.)
 SDK="${SDK_NAME:-iphoneos}"
-XCF_ROOT="$REPO_ROOT/cmp-shared/build/xcode-frameworks"
-SRC_DIR="$XCF_ROOT/$KOTLIN_BUILD_TYPE/$SDK"
-DST_DIR="$XCF_ROOT/$CONFIG/$SDK"
-if [ "$SRC_DIR" != "$DST_DIR" ] && [ -d "$SRC_DIR" ]; then
-  echo "note: [KMP] mirroring $KOTLIN_BUILD_TYPE framework → xcode-frameworks/$CONFIG/$SDK for FRAMEWORK_SEARCH_PATHS"
+TYPE_DIR="$(printf '%s' "$KOTLIN_BUILD_TYPE" | tr '[:upper:]' '[:lower:]')"
+XCF="$REPO_ROOT/cmp-shared/build/XCFrameworks/$TYPE_DIR/ComposeApp.xcframework"
+case "$SDK" in
+  *simulator*) SRC_FW="$(ls -d "$XCF"/*simulator*/ComposeApp.framework 2>/dev/null | head -1)" ;;
+  *)           SRC_FW="$(ls -d "$XCF"/ios-arm64/ComposeApp.framework 2>/dev/null | head -1)" ;;
+esac
+DST_DIR="$REPO_ROOT/cmp-shared/build/xcode-frameworks/$CONFIG/$SDK"
+if [ -n "${SRC_FW:-}" ] && [ -d "$SRC_FW" ]; then
+  echo "note: [KMP] staging $(basename "$(dirname "$SRC_FW")") slice → xcode-frameworks/$CONFIG/$SDK for FRAMEWORK_SEARCH_PATHS"
   mkdir -p "$DST_DIR"
-  # -a preserves the .framework bundle; delete stale contents first for a clean mirror.
   rm -rf "${DST_DIR:?}/ComposeApp.framework"
-  cp -a "$SRC_DIR/." "$DST_DIR/"
+  cp -a "$SRC_FW" "$DST_DIR/"
+else
+  echo "warning: [KMP] no ComposeApp slice for SDK=$SDK under $XCF — FRAMEWORK_SEARCH_PATHS may be unset" >&2
 fi

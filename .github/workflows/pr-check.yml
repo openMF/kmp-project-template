@@ -2,11 +2,12 @@
 #
 # Runs Android + iOS + Desktop + Web checks in parallel on every PR + push to main/dev.
 #
-# All platforms (incl. iOS) now go through the actionhub reusable pr-check-v2 @v1.0.22, which fixed the
+# All platforms (incl. iOS) now go through the actionhub reusable pr-check-v2 @v1.0.63, which fixed the
 # KMP/SwiftPM iOS job (macos-26 + Xcode 26, delegates to `fastlane ios build_ios`, konan/SwiftPM caching,
-# cancel-in-progress). The prior LOCAL iOS workaround — needed only while the actionhub iOS step was
-# broken on KMP (it called the ambiguous `:cmp-shared:compileKotlin` on macos-14/Xcode-15.2) — is
-# removed as of this bump.
+# cancel-in-progress) AND added Gradle dependency/build caching to the desktop (3-OS matrix) + web jobs
+# that previously had none (the intermittent Maven/plugin-portal 429 source). The prior LOCAL iOS
+# workaround — needed only while the actionhub iOS step was broken on KMP (it called the ambiguous
+# `:cmp-shared:compileKotlin` on macos-14/Xcode-15.2) — is removed as of this bump.
 name: PR Check
 run-name: "🔍 PR Check · #${{ github.event.pull_request.number || github.ref_name }} · ${{ github.event.pull_request.title || github.event.head_commit.message }}"
 
@@ -25,7 +26,7 @@ on:
 
 jobs:
   validate:
-    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check-v2.yaml@v1.0.22
+    uses: openMF/mifos-x-actionhub/.github/workflows/pr-check-v2.yaml@v1.0.63
     with:
       platforms:            'android,ios,desktop,web'
       android_package_name: cmp-android

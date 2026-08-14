@@ -76,6 +76,19 @@ interface DraftDao {
     @Query("SELECT * FROM framework_submit_drafts WHERE status = 'PENDING'")
     suspend fun getAllPending(): List<DraftEntity>
 
+    /**
+     * Observes ALL non-terminal drafts (PENDING / RETRYING / FAILED) across EVERY formKey,
+     * newest-first. Cross-form data source for the template-level **Sync & Drafts** screen
+     * (Settings) — a live preview of every draft + syncable record the app is holding, so the
+     * user can resume/discard drafts and inspect pending/failed syncs in one place.
+     */
+    @Query(
+        "SELECT * FROM framework_submit_drafts " +
+            "WHERE status IN ('PENDING','RETRYING','FAILED') " +
+            "ORDER BY updatedAtMs DESC",
+    )
+    fun observeAll(): Flow<List<DraftEntity>>
+
     @Query("UPDATE framework_submit_drafts SET status = 'RETRYING', updatedAtMs = :nowMs WHERE id = :id")
     suspend fun markRetrying(id: Long, nowMs: Long)
 

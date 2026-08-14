@@ -76,11 +76,17 @@ rules:
   - glob: "cmp-navigation/**/*TabItem*.kt"
     owner: merge
     strategy: kotlin-3way
-  # Room database registry: template ships the base @Database; forks add their own
-  # entities/DAOs to the SAME AppDatabase.kt. Must merge, never overwrite.
+  # Room database registry: template ships the base @Database; forks add their own entities/DAOs/
+  # migrations ONLY inside the `// fork:begin`/`// fork:end` regions (entities, autoMigrations, DAO
+  # accessors), and bump the version via the fork-owned ForkDatabaseConfig.VERSION_OFFSET — never the
+  # template's TEMPLATE_BASE_VERSION line. Because fork edits live in disjoint regions/file from the
+  # template's demo:begin/end + base-version, the kotlin-3way (git merge-file) merges without conflict.
   - glob: "**/AppDatabase.kt"
     owner: merge
     strategy: kotlin-3way
+  # Fork-owned DB schema offset — the single line a fork edits for its own schema version. PRESERVED.
+  - glob: "**/core/database/**/ForkDatabaseConfig.kt"
+    owner: fork
   # Android FileProvider paths: template ships base <paths>; forks add feature paths
   # (exports/recordings/imports). Blind copy drops them → runtime FileProvider crash.
   - glob: "**/res/xml/provider_paths.xml"

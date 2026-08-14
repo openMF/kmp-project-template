@@ -93,13 +93,13 @@ the per-feature branding, or selectively remove features they don't need.
 | Archetype | Store | ViewModel/Feature | Test |
 |---|---|---|---|
 | OFFLINE_LOCAL_ONLY | `AlertsStore`, `LoansStore`, `BillRemindersStore` | `AmortizationScheduleViewModel` | `AlertsStoreTest`, `LoansStoreTest`, `AmortizationScheduleViewModelTest` |
-| NETWORK_WITH_CACHE | `ExchangeRatesStore`, `InterestRateSeriesStore` | `ExchangeRatesViewModel` | `EconomicMemoryOnlyTest` |
-| NETWORK_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (online) | `SpotRateLookupStoreTest` |
-| CACHE_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (offline) | `CurrencyConverterViewModelTest` |
-| PERIODIC | `ExchangeRatesStore` | `HomeDashboardViewModel` tile | `HomeDashboardViewModelTest` |
-| MEMORY_ONLY | `MacroIndicatorStore` | `MacroIndicatorsViewModel` | `EconomicMemoryOnlyTest` |
+| NETWORK_WITH_CACHE | `ExchangeRatesStore`, `InterestRateSeriesStore` | `CurrencyRatesViewModel`, `InterestRatesViewModel` | `EconomicMemoryOnlyTest` |
+| NETWORK_ONLY | `SpotRateLookupStore` | `CurrencyRatesViewModel` (online) | `SpotRateLookupStoreTest` |
+| CACHE_ONLY | `SpotRateLookupStore` | `CurrencyRatesViewModel` (offline) | `CurrencyConverterViewModelTest` |
+| PERIODIC | `ExchangeRatesStore` | `HomeViewModel` tile | `HomeDashboardViewModelTest` |
+| MEMORY_ONLY | `MacroIndicatorStore` | `CountryMacroViewModel` | `EconomicMemoryOnlyTest` |
 | LOAD_ONCE | `LoansStore` | `LoanDetailViewModel` | `LoanDetailViewModelTest` |
-| MUTABLE | (DraftSubmitHandler) | `BillReminderCreateViewModel` | (existing) |
+| MUTABLE | `CloudTodoStore` (createMutableStore) + `DraftSubmitHandler` | `EditBillReminderViewModel` | `EditBillReminderViewModelTest`, `OfflineSubmitSyncerTest` |
 
 ### Tech Stack
 

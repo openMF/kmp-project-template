@@ -27,6 +27,7 @@ internal fun SettingsScreenContentPreview() {
             onBackClick = {},
             onThemeCardClick = {},
             onLanguageCardClick = {},
+            onSyncAndDraftsClick = {},
         )
     }
 }

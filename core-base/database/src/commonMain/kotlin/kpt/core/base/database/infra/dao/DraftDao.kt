@@ -95,6 +95,19 @@ interface DraftDao {
     @Query("UPDATE framework_submit_drafts SET status = 'SUBMITTED', updatedAtMs = :nowMs WHERE id = :id")
     suspend fun markSubmitted(id: Long, nowMs: Long)
 
+    /**
+     * Re-queues a draft for sync: transitions any state (typically FAILED) back to PENDING and
+     * clears [DraftEntity.errorMessage], so [kpt.core.base.store.submit.OfflineSubmitSyncer] —
+     * which drains PENDING via [getAllPending] (RETRYING is excluded) — re-attempts it on the
+     * next online transition. The MANUAL counterpart to the automatic reconnect retry, surfaced
+     * by the template-level **Sync & Drafts** screen's per-row Retry action.
+     */
+    @Query(
+        "UPDATE framework_submit_drafts SET status = 'PENDING', errorMessage = NULL, " +
+            "updatedAtMs = :nowMs WHERE id = :id",
+    )
+    suspend fun requeue(id: Long, nowMs: Long)
+
     @Query(
         "UPDATE framework_submit_drafts SET status = 'FAILED', " +
             "updatedAtMs = :nowMs, errorMessage = :error WHERE id = :id",
@@ -114,6 +127,14 @@ interface DraftDao {
      */
     @Query("DELETE FROM framework_submit_drafts WHERE formKey = :formKey AND uniqueKey = :uniqueKey")
     suspend fun deleteByUniqueKey(formKey: String, uniqueKey: String)
+
+    /**
+     * Permanently deletes a single draft row by surrogate [id]. Cross-form counterpart to
+     * [deleteByFormKey] / [deleteByUniqueKey] — the template-level **Sync & Drafts** screen's
+     * per-row Discard acts on an [id] it already holds, regardless of formKey/uniqueKey.
+     */
+    @Query("DELETE FROM framework_submit_drafts WHERE id = :id")
+    suspend fun deleteById(id: Long)
 
     @Query("DELETE FROM framework_submit_drafts")
     suspend fun deleteAll()

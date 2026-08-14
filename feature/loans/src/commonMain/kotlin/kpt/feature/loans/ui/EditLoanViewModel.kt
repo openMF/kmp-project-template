@@ -17,7 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kpt.core.base.store.submit.SubmitOutbox
-import kpt.core.base.ui.viewmodel.BaseDraftMutationViewModel
+import kpt.core.base.ui.viewmodel.BaseMutationViewModel
+import kpt.core.base.ui.viewmodel.MutationMode
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.model.demo.banking.Loan
 import kpt.core.model.demo.banking.LoanKind
@@ -25,7 +26,7 @@ import kotlin.random.Random
 import kotlin.time.Clock
 
 /**
- * **The canonical multi-formKey [BaseDraftMutationViewModel] showcase.**
+ * **The canonical multi-formKey [BaseMutationViewModel] (`MutationMode.Draft`) showcase.**
  *
  * Each instance is scoped to a single loan via `uniqueKey = loanId`. The user can edit three
  * loans offline → three independent PENDING drafts coexist in `framework_submit_drafts`. On
@@ -49,11 +50,13 @@ class EditLoanViewModel(
     private val repository: LoanRepository,
     outbox: SubmitOutbox<Loan>,
     val loanId: String?,
-) : BaseDraftMutationViewModel<Loan, Loan>(
-    outbox = outbox,
-    formKey = FORM_KEY,
-    uniqueKey = loanId ?: NEW_LOAN_KEY,
-    autoSaveDraft = true,
+) : BaseMutationViewModel<Loan, Loan>(
+    MutationMode.Draft(
+        outbox = outbox,
+        formKey = FORM_KEY,
+        uniqueKey = loanId ?: NEW_LOAN_KEY,
+        autoSaveDraft = true,
+    ),
 ) {
 
     private val _formState = MutableStateFlow(LoanFormState())
@@ -185,7 +188,7 @@ class EditLoanViewModel(
         const val FORM_KEY: String = "loan"
 
         /**
-         * Sentinel [BaseDraftMutationViewModel.uniqueKey] for the "add new loan" slot when
+         * Sentinel [MutationMode.Draft.uniqueKey] for the "add new loan" slot when
          * no [loanId] is supplied. Per-loan edit drafts use the loan id itself, so they never
          * collide with the add slot.
          */

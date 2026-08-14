@@ -49,11 +49,14 @@ import kpt.feature.settings.generated.resources.feature_settings_dev_close
 import kpt.feature.settings.generated.resources.feature_settings_dev_state_gallery
 import kpt.feature.settings.generated.resources.feature_settings_dev_tools_title
 import kpt.feature.settings.generated.resources.feature_settings_dev_transition_gallery
+import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row
+import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row_description
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 internal fun SettingsScreen(
     onBackClick: () -> Unit,
+    onSyncAndDraftsClick: () -> Unit,
     modifier: Modifier = Modifier,
     onTransitionGalleryClick: (() -> Unit)? = null,
     onStateGalleryClick: (() -> Unit)? = null,
@@ -110,6 +113,7 @@ internal fun SettingsScreen(
             analyticsHelper.logLanguageDialogVisible(true)
             showLanguageDialog = true
         },
+        onSyncAndDraftsClick = onSyncAndDraftsClick,
         onFooterLongClick = onFooterLongClick,
     )
 
@@ -121,6 +125,7 @@ internal fun SettingsScreenContent(
     onBackClick: () -> Unit,
     onThemeCardClick: () -> Unit,
     onLanguageCardClick: () -> Unit,
+    onSyncAndDraftsClick: () -> Unit,
     modifier: Modifier = Modifier,
     onFooterLongClick: (() -> Unit)? = null,
 ) {
@@ -139,10 +144,23 @@ internal fun SettingsScreenContent(
         ) {
             ThemeCard(onClick = onThemeCardClick)
             LanguageCard(onClick = onLanguageCardClick)
+            SyncAndDraftsCard(onClick = onSyncAndDraftsClick)
             Spacer(modifier = Modifier.fillMaxWidth().padding(sp.sm))
             VersionLabel(onLongClick = onFooterLongClick)
         }
     }
+}
+
+@Composable
+internal fun SyncAndDraftsCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    SettingsRowCard(
+        icon = AppIcons.Payment,
+        title = stringResource(Res.string.feature_settings_sync_drafts_row),
+        contentDescription = stringResource(Res.string.feature_settings_sync_drafts_row_description),
+        accentColor = MaterialTheme.colorScheme.secondary,
+        onClick = onClick,
+        modifier = modifier,
+    )
 }
 
 /**

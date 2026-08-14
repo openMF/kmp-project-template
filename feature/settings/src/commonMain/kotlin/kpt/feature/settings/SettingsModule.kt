@@ -14,4 +14,5 @@ import org.koin.dsl.module
 
 val SettingsModule = module {
     viewModelOf(::SettingsViewModel)
+    viewModelOf(::SyncAndDraftsViewModel)
 }

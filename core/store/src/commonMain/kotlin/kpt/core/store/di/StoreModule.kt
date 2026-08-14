@@ -9,7 +9,9 @@
  */
 package kpt.core.store.di
 
+import kpt.core.base.store.infra.DraftInventory
 import kpt.core.base.store.infra.StoreCacheManager
+import kpt.core.base.store.infra.impl.DraftInventoryImpl
 import kpt.core.base.store.infra.impl.StoreCacheManagerImpl
 import kpt.core.store.AppStoreRegistry
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
@@ -50,6 +52,10 @@ val appStoreModule: Module = module {
             draftDao = get(),
         )
     }
+
+    // Cross-form drafts inventory — the live feed + actions behind the template-level
+    // Settings → "Sync & Drafts" screen. Framework infra (not a demo store); survives sync.
+    single<DraftInventory> { DraftInventoryImpl(draftDao = get()) }
 
     // demo:begin — customizer --clean strips all demo stores + their logout registration
     // Fintech Stores (internal — exposed only through repositories)

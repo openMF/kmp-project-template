@@ -23,8 +23,10 @@ import kotlinx.serialization.Serializable
 import kpt.core.base.security.isReleaseBuild
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.settings.navigateToSettings
+import kpt.feature.settings.navigateToSyncAndDrafts
 import kpt.feature.settings.notificationDestination
 import kpt.feature.settings.settingsDestination
+import kpt.feature.settings.syncAndDraftsDestination
 import kpt.feature.showcase.stategallery.StateGalleryRoute
 import kpt.feature.showcase.stategallery.stateGalleryGraph
 import kpt.feature.showcase.transitions.TransitionGalleryRoute
@@ -50,6 +52,10 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
 
         notificationDestination(onBackClick = { navController.popBackStackSafely() })
 
+        // Template-level Sync & Drafts screen (Settings → "Sync & Drafts"). Framework feature —
+        // available in every fork; reads the cross-form DraftInventory seam.
+        syncAndDraftsDestination(onBackClick = { navController.popBackStackSafely() })
+
         // demo:begin
         // Dev-only entry points to the showcase galleries (only wired in non-release builds).
         // Released builds receive null → SettingsScreen hides the dev menu entirely.
@@ -67,6 +73,7 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         // demo:end
         settingsDestination(
             onBackClick = { navController.popBackStackSafely() },
+            onSyncAndDraftsClick = { navController.navigateToSyncAndDrafts() },
             // demo:begin
             onTransitionGalleryClick = onTransitionGalleryClick,
             onStateGalleryClick = onStateGalleryClick,

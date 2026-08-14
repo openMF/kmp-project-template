@@ -27,4 +27,13 @@ object TestTags {
         /** Root scaffold — always rendered regardless of content state. */
         const val SCREEN: String = "notification_screen"
     }
+
+    /** Tags for [SyncAndDraftsScreen]. */
+    object SyncAndDrafts {
+        /** Root scaffold — always rendered regardless of content state. */
+        const val SCREEN: String = "sync_and_drafts_screen"
+
+        /** The manual "Prune expired" button (rendered only when there is content). */
+        const val PRUNE: String = "sync_and_drafts_prune"
+    }
 }

@@ -19,7 +19,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitOutbox
-import kpt.core.base.ui.viewmodel.BaseDraftMutationViewModel
+import kpt.core.base.ui.viewmodel.BaseMutationViewModel
+import kpt.core.base.ui.viewmodel.MutationMode
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.model.demo.banking.BillCategory
 import kpt.core.model.demo.banking.BillReminder
@@ -31,7 +32,7 @@ import kotlin.random.Random
 import kotlin.time.Clock
 
 /**
- * **Second multi-formKey `BaseDraftMutationViewModel` showcase** (after `EditLoanViewModel`).
+ * **Second multi-formKey `BaseMutationViewModel` (`MutationMode.Draft`) showcase** (after `EditLoanViewModel`).
  *
  * Each `EditBillReminderViewModel` instance is scoped to ONE bill — either an existing one
  * (passed `billId`) or a freshly-minted client-side UUID for "new". The `uniqueKey` baked
@@ -53,18 +54,20 @@ class EditBillReminderViewModel(
     outbox: SubmitOutbox<BillReminder>,
     private val clock: Clock = Clock.System,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
-) : BaseDraftMutationViewModel<BillReminder, BillReminder>(
-    outbox = outbox,
-    formKey = FORM_KEY,
-    uniqueKey = billId ?: FORM_KEY_NEW,
-    autoSaveDraft = true,
+) : BaseMutationViewModel<BillReminder, BillReminder>(
+    MutationMode.Draft(
+        outbox = outbox,
+        formKey = FORM_KEY,
+        uniqueKey = billId ?: FORM_KEY_NEW,
+        autoSaveDraft = true,
+    ),
 ) {
 
     private val _formState = MutableStateFlow(initialFormState())
     val formState: StateFlow<BillReminderFormState> = _formState.asStateFlow()
 
     init {
-        // `BaseDraftMutationViewModel<T, R>` couples T as BOTH the screen read-model AND the submit
+        // `BaseMutationViewModel<T, R>` couples T as BOTH the screen read-model AND the submit
         // payload (`SubmitOutbox<T>` / `performSubmit(T)`), so T stays `BillReminder`. The editable
         // body still lives in `_formState`; `mutableScreenState` only gates "form ready" —
         // Loading while an existing bill hydrates (edit), then Content(snapshot); Content(snapshot)
@@ -72,23 +75,33 @@ class EditBillReminderViewModel(
         // (the form renders `_formState`), so the snapshot is a "ready" sentinel, not display data.
         if (billId != null) {
             viewModelScope.launch {
-                repository.getById(billId)?.let { existing ->
-                    _formState.value = BillReminderFormState(
-                        name = existing.name,
-                        amount = existing.amount,
-                        dueDay = existing.dueDay,
-                        recurrence = existing.recurrence,
-                        category = existing.category,
-                        enabled = existing.enabled,
-                        reminderDaysBefore = existing.reminderDaysBefore,
-                    )
-                }
+                repository.getById(billId)?.let { existing -> _formState.value = existing.toFormState() }
                 mutableScreenState.value = ScreenState.Content(formSnapshot())
             }
         } else {
             mutableScreenState.value = ScreenState.Content(formSnapshot())
         }
     }
+
+    /**
+     * Three-case Resume: pre-fill the form from the saved draft surfaced in
+     * [uiState]`.resumableDraft`, then dismiss the prompt (the inherited [onResumeDraft]).
+     * Wired to [kpt.core.base.ui.draft.DraftResolutionPrompt]'s Resume action.
+     */
+    fun onResume() {
+        uiState.value.resumableDraft?.let { draft -> _formState.value = draft.toFormState() }
+        onResumeDraft()
+    }
+
+    private fun BillReminder.toFormState(): BillReminderFormState = BillReminderFormState(
+        name = name,
+        amount = amount,
+        dueDay = dueDay,
+        recurrence = recurrence,
+        category = category,
+        enabled = enabled,
+        reminderDaysBefore = reminderDaysBefore,
+    )
 
     /** A BillReminder snapshot of the current form — the "form ready" sentinel for the screen state. */
     private fun formSnapshot(): BillReminder {

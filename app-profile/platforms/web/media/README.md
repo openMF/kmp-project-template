@@ -44,5 +44,5 @@ shared cross-platform icon set) and is referenced by the web build's
 
 ## Source of truth
 
-Money Toolkit is a 100% offline, no-login personal-finance utility. Generate
+App Toolkit is a 100% offline, no-login personal-finance utility. Generate
 via `/idea-store-assets-generate` rather than manual capture.

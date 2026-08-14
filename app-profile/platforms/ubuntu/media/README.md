@@ -26,5 +26,5 @@ Flathub, `.deb` packaging metadata). `syncForkConfig` /
 
 ## Source of truth
 
-Money Toolkit is a 100% offline, no-login personal-finance utility. Generate
+App Toolkit is a 100% offline, no-login personal-finance utility. Generate
 via `/idea-store-assets-generate` rather than manual capture.

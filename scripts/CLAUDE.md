@@ -362,9 +362,9 @@ scripts/white-label/keystore.sh delete-all [--repo owner/repo]
 Example:
 ```bash
 # Company & Organization
-COMPANY_NAME="Mifos Initiative"
+COMPANY_NAME="Your Company"
 DEPARTMENT="Mobile Development"
-ORGANIZATION="Mifos"
+ORGANIZATION="Your Org"
 CITY="San Francisco"
 STATE="CA"
 COUNTRY="US"

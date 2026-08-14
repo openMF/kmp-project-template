@@ -1,10 +1,10 @@
 # deployment-layer/store-listing/variants/v1/app-content/macos/en-US/age-rating.yaml
 # feeds App Store Connect "App Information" → "Age Rating" for the Mac App Store listing (same
-# 2023 IARC-style questionnaire as iOS — Money Toolkit is one ASC app record spanning iOS + macOS
+# 2023 IARC-style questionnaire as iOS — App Toolkit is one ASC app record spanning iOS + macOS
 # platforms). Folds 1:1 into app-profile/platforms/apple/macos/app-content/age-rating.yaml on
 # `--sync`.
 #
-# Money Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no UGC.
+# App Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no UGC.
 
 content_descriptors:
   cartoon_or_fantasy_violence: NONE

@@ -3,7 +3,7 @@
 # ASC's `AgeRatingDeclaration`). Folds 1:1 into app-profile/platforms/apple/ios/app-content/
 # age-rating.yaml on `--sync`.
 #
-# Money Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no UGC.
+# App Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no UGC.
 
 content_descriptors:
   cartoon_or_fantasy_violence: NONE

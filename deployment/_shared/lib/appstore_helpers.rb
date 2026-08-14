@@ -79,7 +79,7 @@ module AppStoreHelpers
   # A PROMOTE must NEVER change app-level IDENTITY (name / subtitle). App Store names are GLOBALLY
   # unique and set once at registration; re-pushing a taken name aborts the whole submission
   # ("The app name … is already being used on a different account" — e.g. the app-profile brand
-  # 'Money Toolkit' vs the registered, available 'Mifos - Money Toolkit'). Temporarily hide the
+  # name vs a differently-suffixed name already registered on the store). Temporarily hide the
   # app-info files (name/subtitle) around the deliver call so it syncs ONLY version-level content
   # (description / keywords / release-notes / screenshots) and leaves the store's registered name
   # untouched. Restores them after (success OR failure) — the derived metadata stays intact.

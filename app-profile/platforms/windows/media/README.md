@@ -12,7 +12,7 @@ Fork-owned media SoT for the Microsoft Store listing. `syncForkConfig` /
 
 Up to 10 screenshots. Format: PNG or JPEG. Aspect ratio must be consistent
 across all uploaded screenshots for a given listing. Desktop-flavored
-captures of Money Toolkit's screens (Loan Tracker, EMI Calculator, Bill
+captures of App Toolkit's screens (Loan Tracker, EMI Calculator, Bill
 Reminders, Amortization Schedule, Loan Comparison, Interest Rates, Country
 Macro Data, Currency Exchange Rates).
 

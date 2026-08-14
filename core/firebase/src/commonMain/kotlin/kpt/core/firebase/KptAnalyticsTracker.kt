@@ -20,7 +20,7 @@ import io.github.mobilebytelabs.kmptoolkit.firebase.compose.rememberAnalyticsHel
 
 /**
  * Project-specific analytics tracker that provides domain-specific
- * tracking methods for the Mifos application.
+ * tracking methods for the app.
  */
 class KptAnalyticsTracker(
     private val analyticsHelper: AnalyticsHelper,
@@ -114,7 +114,7 @@ class KptAnalyticsTracker(
         analyticsHelper.logEvent(AnalyticsEvent("group_operation", params))
     }
 
-    /** Track center operations (Mifos-specific) */
+    /** Track center operations (app-specific) */
     fun trackCenterOperation(
         // "create", "view", "meeting", "collection"
         operation: String,

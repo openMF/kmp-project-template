@@ -15,7 +15,7 @@ import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
 import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.ParamKeys
 
 /**
- * Extension functions for Mifos-specific analytics operations
+ * Extension functions for app-specific analytics operations
  */
 
 /**
@@ -240,7 +240,7 @@ fun AnalyticsHelper.trackBackupRestore(
 }
 
 /**
- * Convenience function to create Mifos analytics tracker
+ * Convenience function to create the app's analytics tracker
  */
 fun AnalyticsHelper.kptTracker(): KptAnalyticsTracker = KptAnalyticsTracker(this)
 

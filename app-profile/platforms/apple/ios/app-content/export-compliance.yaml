@@ -3,7 +3,7 @@
 # the Info.plist `ITSAppUsesNonExemptEncryption` key. Folds 1:1 into
 # app-profile/platforms/apple/ios/app-content/export-compliance.yaml on `--sync`.
 #
-# Money Toolkit posture: uses only standard OS-provided HTTPS/TLS (URLSession/Ktor over TLS) for
+# App Toolkit posture: uses only standard OS-provided HTTPS/TLS (URLSession/Ktor over TLS) for
 # its three read-only public-data calls (FRED interest rates, World Bank macro data, currency
 # exchange rates). No custom/proprietary cryptography, no cryptography beyond what iOS itself
 # provides for standard networking.

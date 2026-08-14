@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.HeroCard
+import kpt.core.base.ui.AppInfo
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
@@ -69,7 +70,8 @@ internal fun ProfileScreenContent(modifier: Modifier = Modifier) {
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
-                        text = stringResource(Res.string.screens_profile_local_message),
+                        // App display name templated in from the common AppInfo accessor, never hardcoded.
+                        text = stringResource(Res.string.screens_profile_local_message, AppInfo.appDisplayName),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

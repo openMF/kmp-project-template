@@ -15,5 +15,5 @@
          ============================================================ -->
 
     <string name="screens_profile_local_title">Local profile</string>
-    <string name="screens_profile_local_message">Money Toolkit runs entirely on-device. No account required.</string>
+    <string name="screens_profile_local_message">%1$s runs entirely on-device. No account required.</string>
 </resources>

@@ -13,7 +13,7 @@ Fork-owned media SoT for the Play Console store listing. `syncForkConfig` /
 | `wearScreenshots/` | Wear OS | 384×384 px | 1:1 square | 0–8 (only if a Wear OS target ships) |
 | `tvScreenshots/` | Android TV | 1920×1080 px | 16:9 landscape | 0–8 (only if an Android TV target ships) |
 
-File format: PNG or JPEG (24-bit, no alpha). Money Toolkit ships phone-only
+File format: PNG or JPEG (24-bit, no alpha). App Toolkit ships phone-only
 today (no tablet/wear/TV targets) — `sevenInchScreenshots/`,
 `tenInchScreenshots/`, `wearScreenshots/`, `tvScreenshots/` stay empty
 (`.gitkeep` only) until those form factors are targeted.
@@ -28,7 +28,7 @@ today (no tablet/wear/TV targets) — `sevenInchScreenshots/`,
 
 ## Source of truth
 
-Money Toolkit is a 100% offline, no-login personal-finance utility — screens
+App Toolkit is a 100% offline, no-login personal-finance utility — screens
 to capture: Loan Tracker list, EMI Calculator, Bill Reminders, Amortization
 Schedule, Loan Comparison, Interest Rates, Country Macro Data, Currency
 Exchange Rates. Generate via `/idea-store-assets-generate` (renders the

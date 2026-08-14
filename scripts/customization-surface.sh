@@ -293,11 +293,21 @@ cs_main() {
       # mechanism flip WITHOUT the ownership fix HALTs (no clobber).
       cs_require_flip_preconditions
       ;;
+    list-template-owners)
+      # WS4/T7 (pure-white-label-100 phase 5): print every glob whose owner is `template`,
+      # one per line, in contract order. The single SoT the sync-reachability gate
+      # (framework-verify-sync-reachability.sh) consumes so it never hand-rolls YAML parsing.
+      cs_load_rules
+      local i
+      for i in "${!CS_GLOB[@]}"; do
+        [ "${CS_OWNER[$i]}" = "template" ] && printf '%s\n' "${CS_GLOB[$i]}"
+      done
+      ;;
     merge)
       cs_merge "$@"   # <strategy> <ours> <base> <theirs> [<out>]
       ;;
     *)
-      echo "usage: customization-surface.sh {resolve <path>|report|verify|--verify|merge <strategy> <ours> <base> <theirs> [out]}" >&2
+      echo "usage: customization-surface.sh {resolve <path>|report|verify|--verify|list-template-owners|merge <strategy> <ours> <base> <theirs> [out]}" >&2
       return 2
       ;;
   esac

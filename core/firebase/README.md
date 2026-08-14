@@ -1,4 +1,4 @@
-# :core:analytics module
+# :core:firebase module
 
 ## Fork-customisation seam (start here)
 
@@ -69,9 +69,10 @@ bindings — your fork never edits framework files.
 
 ## Overview
 
-This module provides Project-specific analytics tracking functionality built on top of the base
-analytics library (`core-base:analytics`). It offers domain-specific tracking methods, extension
-functions, and Compose utilities tailored for microfinance applications.
+This module provides project-specific analytics tracking functionality built on top of the
+`cmp-firebase` library's `AnalyticsHelper` (bound via `AnalyticsModule`, NoOp mode by default). It
+offers domain-specific tracking methods, extension functions, and Compose utilities tailored for
+microfinance applications.
 
 ## Enhanced Features
 
@@ -118,19 +119,23 @@ functions, and Compose utilities tailored for microfinance applications.
     - `TrackComposableLifecycle()` for component lifecycle tracking
     - `rememberAnalytics()` for easy analytics access
 
-### 🎯 Mifos-Specific Features (`core:analytics`)
+### Domain analytics tracker (`core:firebase`)
 
-#### MifosAnalyticsTracker
+#### KptAnalyticsTracker
 
-A specialized tracker providing domain-specific methods for microfinance operations:
+A specialized tracker providing domain-specific methods for microfinance operations. Construct it
+from an `AnalyticsHelper` via the `kptTracker()` extension:
 
 ```kotlin
-val tracker = analyticsHelper.mifosTracker()
+val tracker = analyticsHelper.kptTracker()
+
+// Track a login
+tracker.trackLogin(method = "password", success = true)
 
 // Track client operations
 tracker.trackClientOperation("create", clientId = "12345", success = true)
 
-// Track loan operations  
+// Track loan operations
 tracker.trackLoanOperation("apply", loanType = "personal", amount = "5000")
 
 // Track savings operations
@@ -144,13 +149,19 @@ tracker.trackPerformance(
 )
 ```
 
-#### Mifos Extension Functions (`MifosAnalyticsExtensions.kt`)
+Other tracker methods: `trackGroupOperation`, `trackCenterOperation`, `trackSurveyOperation`,
+`trackReportGeneration`, `trackSync`, `trackOfflineOperation`.
 
-Convenient extension methods for common Mifos workflows:
+#### Extension functions (`KptAnalyticsExtensions.kt`)
+
+Convenient `AnalyticsHelper` extension methods for common workflows:
 
 ```kotlin
 // Track client creation flow
-analyticsHelper.trackClientCreationFlow("personal_info", success = true)
+analyticsHelper.trackClientCreationFlow("step_2")
+
+// Track loan application flow
+analyticsHelper.trackLoanApplicationFlow("submit")
 
 // Track API performance
 analyticsHelper.trackApiCall("/api/clients", "GET", responseTime = 150, statusCode = 200)
@@ -162,41 +173,41 @@ analyticsHelper.trackNavigation("ClientList", "ClientDetails", "item_click")
 analyticsHelper.trackValidationError("ClientForm", "phoneNumber", "invalid_format")
 ```
 
-#### Compose Analytics Utilities (`MifosComposeAnalytics.kt`)
+More extensions: `trackDataSync`, `trackPreferenceChange`, `trackTutorial`,
+`trackDocumentOperation`, `trackBiometricAuth`, `trackLocationUsage`,
+`trackNotificationInteraction`, `trackAccessibilityUsage`, `trackBackupRestore`,
+`trackMicrofinanceEvent`. The `kptTracker()` extension returns a `KptAnalyticsTracker`.
 
-Seamless integration with Jetpack Compose:
+#### Compose utilities
+
+Seamless integration with Jetpack Compose via `rememberKptAnalyticsTracker()`:
 
 ```kotlin
 @Composable
 fun ClientDetailsScreen(clientId: String) {
-    // Automatic screen tracking with business context
-    TrackMifosScreen("ClientDetails", clientId = clientId)
-
-    // Track business flow progress
-    TrackMifosFlowCompletion("client_onboarding", "step_2", totalSteps = 5)
-
-    // Document operations tracking
-    val documentTracker = rememberMifosDocumentTracker()
+    // Obtain a KptAnalyticsTracker bound to the current AnalyticsHelper
+    val tracker = rememberKptAnalyticsTracker()
 
     Button(
-        modifier = Modifier.trackClientAction("view_documents", clientId),
-        onClick = { documentTracker.trackView("identity_proof") }
+        onClick = {
+            tracker.trackClientOperation("view_documents", clientId = clientId)
+        }
     ) {
         Text("View Documents")
     }
 }
 ```
 
-#### Comprehensive Event Definitions (`MifosAnalyticsEvents.kt`)
+#### Event definitions (`KptAnalyticsEvents.kt`)
 
-Over 50 predefined event types and parameter keys specific to microfinance:
+`object KptEventTypes` defines predefined event-name constants specific to microfinance:
 
 - **Client Management**: `CLIENT_CREATED`, `CLIENT_PROFILE_VIEWED`, etc.
 - **Loan Operations**: `LOAN_APPLICATION_STARTED`, `LOAN_DISBURSED`, `LOAN_REPAYMENT_MADE`
 - **Savings Management**: `SAVINGS_DEPOSIT_MADE`, `SAVINGS_WITHDRAWAL_MADE`
-- **Group Operations**: `GROUP_MEETING_CONDUCTED`, `GROUP_COLLECTION_MADE`
-- **Reporting**: `REPORT_GENERATED`, `DASHBOARD_VIEWED`
-- **Sync Operations**: `DATA_SYNC_COMPLETED`, `OFFLINE_TRANSACTION_SYNCED`
+- **Group Operations**: group meeting / collection events
+- **Reporting**: report + dashboard events
+- **Sync Operations**: data-sync + offline-transaction events
 
 ## Usage Examples
 
@@ -261,21 +272,34 @@ analyticsHelper.trackApiCall(
 
 ### Dependencies
 
-The core analytics module automatically includes the base analytics library:
+The core firebase module depends on the `cmp-firebase` library's `AnalyticsHelper`:
 
 ```kotlin
 // In your module's build.gradle.kts
 dependencies {
-    implementation(projects.core.analytics) // Includes base analytics
+    implementation(projects.core.firebase)
 }
 ```
 
 ### DI Setup
 
+The template binds `AnalyticsHelper` via `AnalyticsModule` — `coreFirebaseModule` installs the
+NoOp mode by default:
+
 ```kotlin
-// In your DI module
-single<AnalyticsHelper> { FirebaseAnalyticsHelper(get()) }
-single<MifosAnalyticsTracker> { MifosAnalyticsTracker(get()) }
+// core/firebase/.../di/AnalyticsModule.kt
+val coreFirebaseModule: Module = module {
+    single<AnalyticsHelper> { AnalyticsModule.analyticsHelper(AnalyticsModule.Mode.NoOp) }
+    // Switch to AnalyticsModule.Mode.Firebase / Mode.Stub, or bind your own provider, to override.
+}
+```
+
+Obtain the domain tracker wherever an `AnalyticsHelper` is available:
+
+```kotlin
+val tracker: KptAnalyticsTracker = analyticsHelper.kptTracker()
+// or, if you prefer explicit construction:
+val tracker = KptAnalyticsTracker(analyticsHelper)
 ```
 
 ### Compose Setup
@@ -326,8 +350,8 @@ tracker.trackClientOperation("create", clientId = "123")
 
 When adding new analytics events:
 
-1. Add event type constants to `MifosEventTypes`
-2. Add parameter keys to `MifosParamKeys`
-3. Consider adding convenience methods to `MifosAnalyticsTracker`
-4. Add Compose utilities if UI-related
+1. Add event-name constants to `KptEventTypes` (`KptAnalyticsEvents.kt`)
+2. Add convenience methods to `KptAnalyticsTracker` if the event needs domain framing
+3. Add `AnalyticsHelper` extension functions to `KptAnalyticsExtensions.kt` for common flows
+4. Add Compose utilities (e.g. via `rememberKptAnalyticsTracker()`) if UI-related
 5. Update this documentation

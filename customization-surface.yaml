@@ -316,7 +316,7 @@ rules:
   - { glob: ".ruby-version",                 owner: template }
   - { glob: ".kover-floor.yml",              owner: template }
   - { glob: ".claudeignore",                 owner: template }
-  - { glob: "customization-surface.yaml",    owner: template }  # this contract self-syncs
+  - { glob: "customization-surface.yaml",    owner: template }  # this contract self-syncs (reached via SYNC_FILES — WS4/T6)
   - { glob: "version.txt",                   owner: template }
   - { glob: "lib-integrate.properties",      owner: template }
   - { glob: "secrets-manifest.yaml",         owner: fork }      # per-fork generated (project id + alias list) — E0/T1

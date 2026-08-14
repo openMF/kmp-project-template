@@ -35,7 +35,7 @@ import java.util.Locale
  * @see SharedApp
  */
 fun main() {
-    val appName = System.getProperty("app.name", "Money Toolkit")
+    val appName = System.getProperty("app.name", "App Toolkit")
     // Must be set before AWT initialises — controls the macOS menu-bar process name.
     System.setProperty("apple.awt.application.name", appName)
     application {

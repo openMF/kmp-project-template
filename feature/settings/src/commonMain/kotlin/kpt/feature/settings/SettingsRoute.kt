@@ -33,15 +33,13 @@ fun NavController.navigateToSyncAndDrafts(navOptions: NavOptions? = null) = navi
 fun NavGraphBuilder.settingsDestination(
     onBackClick: () -> Unit,
     onSyncAndDraftsClick: () -> Unit,
-    onTransitionGalleryClick: (() -> Unit)? = null,
-    onStateGalleryClick: (() -> Unit)? = null,
+    devMenuEntries: List<DevMenuEntry> = emptyList(),
 ) {
     composableWithPushTransitions<SettingsRoute> {
         SettingsScreen(
             onBackClick = onBackClick,
             onSyncAndDraftsClick = onSyncAndDraftsClick,
-            onTransitionGalleryClick = onTransitionGalleryClick,
-            onStateGalleryClick = onStateGalleryClick,
+            devMenuEntries = devMenuEntries,
         )
     }
 }

@@ -11,6 +11,8 @@ package cmp.navigation.registry
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.bills.navigation.navigateToBills
 import kpt.feature.calculators.navigation.navigateToAffordability
 import kpt.feature.calculators.navigation.navigateToAmortization
@@ -24,6 +26,11 @@ import kpt.feature.home.demo.HomeDashboard
 import kpt.feature.loans.navigation.navigateToLoans
 import kpt.feature.macro.navigation.navigateToMacroGraph
 import kpt.feature.rates.navigation.navigateToRates
+import kpt.feature.settings.navigateToSettings
+import kpt.feature.settings.navigateToSyncAndDrafts
+import kpt.feature.settings.notificationDestination
+import kpt.feature.settings.settingsDestination
+import kpt.feature.settings.syncAndDraftsDestination
 
 /**
  * BackboneRegistry — the FORK-OWNED white-label seam for the app **backbone** (the home-tab body and,
@@ -63,5 +70,28 @@ object BackboneRegistry {
             onNavigateToCrypto = { navController.navigateToCrypto() },
         )
         // demo:end
+    }
+
+    /**
+     * Route the authenticated navbar to the Settings backbone. Kept here so the
+     * merge-owned `AuthenticatedNavigation.kt` shell carries no `kpt.feature.*`
+     * imports (mirrors the `homeBody` seam pattern).
+     */
+    val navigateToSettings: (NavController) -> Unit = { it.navigateToSettings() }
+
+    /**
+     * Backbone (framework) nav destinations — settings, notification, sync-and-drafts.
+     * The showcase dev entries hang off the generic `devMenuEntries` slot from
+     * [ShowcaseRegistry.devSettingsEntries]; a `--clean` fork drops to `emptyList()`
+     * and the Settings dev menu hides.
+     */
+    val backboneDestinations: NavGraphBuilder.(NavController) -> Unit = { navController ->
+        notificationDestination(onBackClick = { navController.popBackStackSafely() })
+        syncAndDraftsDestination(onBackClick = { navController.popBackStackSafely() })
+        settingsDestination(
+            onBackClick = { navController.popBackStackSafely() },
+            onSyncAndDraftsClick = { navController.navigateToSyncAndDrafts() },
+            devMenuEntries = ShowcaseRegistry.devSettingsEntries(navController),
+        )
     }
 }

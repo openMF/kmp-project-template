@@ -40,7 +40,6 @@
     <string name="feature_settings_dev_transition_gallery">Transition Gallery</string>
     <string name="feature_settings_dev_state_gallery">State Gallery</string>
     <string name="feature_settings_dev_close">Close</string>
-    <string name="feature_settings_app_name">Money Toolkit</string>
 
     <!-- NotificationScreen — empty state -->
     <string name="feature_settings_notifications_empty_title">No notifications yet</string>

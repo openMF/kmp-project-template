@@ -37,6 +37,7 @@ import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
 import io.github.mobilebytelabs.kmptoolkit.firebase.compose.TrackScreenView
 import io.github.mobilebytelabs.kmptoolkit.firebase.compose.rememberAnalyticsHelper
 import kpt.core.base.designsystem.component.AppCard
+import kpt.core.base.ui.AppInfo
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
@@ -46,9 +47,7 @@ import kpt.feature.settings.generated.resources.feature_settings_change_language
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_text
 import kpt.feature.settings.generated.resources.feature_settings_dev_close
-import kpt.feature.settings.generated.resources.feature_settings_dev_state_gallery
 import kpt.feature.settings.generated.resources.feature_settings_dev_tools_title
-import kpt.feature.settings.generated.resources.feature_settings_dev_transition_gallery
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row_description
 import org.jetbrains.compose.resources.stringResource
@@ -58,8 +57,7 @@ internal fun SettingsScreen(
     onBackClick: () -> Unit,
     onSyncAndDraftsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onTransitionGalleryClick: (() -> Unit)? = null,
-    onStateGalleryClick: (() -> Unit)? = null,
+    devMenuEntries: List<DevMenuEntry> = emptyList(),
 ) {
     val analyticsHelper = rememberAnalyticsHelper()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
@@ -86,14 +84,13 @@ internal fun SettingsScreen(
 
     if (showDevMenu) {
         DevMenuDialog(
-            onTransitionGalleryClick = onTransitionGalleryClick,
-            onStateGalleryClick = onStateGalleryClick,
+            entries = devMenuEntries,
             onDismiss = { showDevMenu = false },
         )
     }
 
-    // Footer long-press surfaces the dev menu when either gallery is available.
-    val hasDevEntries = onTransitionGalleryClick != null || onStateGalleryClick != null
+    // Footer long-press surfaces the dev menu when at least one dev entry is available.
+    val hasDevEntries = devMenuEntries.isNotEmpty()
     val onFooterLongClick: (() -> Unit)? = if (hasDevEntries) {
         { showDevMenu = true }
     } else {
@@ -164,15 +161,14 @@ internal fun SyncAndDraftsCard(onClick: () -> Unit, modifier: Modifier = Modifie
 }
 
 /**
- * Dev-menu dialog surfaced by long-pressing the [VersionLabel] footer. Lists every
- * available debug-only gallery (Transition Gallery, State Gallery, …). Each entry is
- * shown only when its callback is non-null — release-build wiring nulls them all out and
- * the dialog is never reachable.
+ * Dev-menu dialog surfaced by long-pressing the [VersionLabel] footer. Renders one row per
+ * [DevMenuEntry] supplied by the caller (e.g. `cmp-navigation`'s `ShowcaseRegistry`). The
+ * dialog is only reachable when the list is non-empty — release builds / neutralized forks
+ * pass an empty list and the footer long-press handler is `null`.
  */
 @Composable
 private fun DevMenuDialog(
-    onTransitionGalleryClick: (() -> Unit)?,
-    onStateGalleryClick: (() -> Unit)?,
+    entries: List<DevMenuEntry>,
     onDismiss: () -> Unit,
 ) {
     androidx.compose.material3.AlertDialog(
@@ -180,23 +176,14 @@ private fun DevMenuDialog(
         title = { Text(stringResource(Res.string.feature_settings_dev_tools_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
-                if (onTransitionGalleryClick != null) {
+                entries.forEach { entry ->
                     androidx.compose.material3.TextButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = {
                             onDismiss()
-                            onTransitionGalleryClick()
+                            entry.onClick()
                         },
-                    ) { Text(stringResource(Res.string.feature_settings_dev_transition_gallery)) }
-                }
-                if (onStateGalleryClick != null) {
-                    androidx.compose.material3.TextButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            onDismiss()
-                            onStateGalleryClick()
-                        },
-                    ) { Text(stringResource(Res.string.feature_settings_dev_state_gallery)) }
+                    ) { Text(entry.label) }
                 }
             }
         },
@@ -209,19 +196,21 @@ private fun DevMenuDialog(
 }
 
 /**
- * Static version footer label. In debug builds, long-pressing opens the Dev tools menu
- * (Transition Gallery, State Gallery, etc.). In release builds the long-press handler is
- * wired to `null` by the navigation graph builder, so the label behaves as a plain text
- * footer.
+ * Static version footer label. When the caller supplies a non-empty `devMenuEntries`
+ * list, long-pressing opens the Dev tools menu (each entry becomes a row). When the list
+ * is empty (release builds / neutralized forks) the long-press handler is `null`, so the
+ * label behaves as a plain text footer.
  *
- * Wire point: [cmp.navigation.authenticated.authenticatedGraph] passes non-null
- * gallery click handlers only when `!isReleaseBuild()`.
+ * Wire point: `cmp-navigation`'s `BackboneRegistry.backboneDestinations` passes the
+ * `devMenuEntries` from `ShowcaseRegistry.devSettingsEntries(...)`, which is empty on
+ * release builds.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifier) {
-    // App-name footer rendered from BuildKonfig.APP_DISPLAY_NAME (the fork's gradle/fork.properties
-    // app.display.name), not a hardcoded string resource — so a fork rebrands in one place (S9/T10).
+    // App-name footer rendered from the common AppInfo.appDisplayName accessor (BuildKonfig →
+    // gradle/fork.properties#app.display.name), not a hardcoded string resource — so a fork rebrands
+    // in app-profile in one place (S9/T10).
     val rowModifier = if (onLongClick != null) {
         modifier
             .fillMaxWidth()
@@ -233,7 +222,7 @@ private fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifi
         modifier.fillMaxWidth()
     }
     Text(
-        text = BuildKonfig.APP_DISPLAY_NAME,
+        text = AppInfo.appDisplayName,
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,

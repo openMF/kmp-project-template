@@ -17,7 +17,7 @@
          ============================================================ -->
 
     <!-- ===== HomeScreen — TopAppBar ===== -->
-    <string name="screens_home_app_title">Money Toolkit</string>
+    <string name="screens_home_app_title">App Toolkit</string>
     <string name="screens_home_settings_cd">Settings</string>
 
     <!-- ===== HomeScreen — HeroSnapshot ===== -->

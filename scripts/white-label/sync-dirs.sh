@@ -62,6 +62,10 @@ SYNC_DIRS=(
     "docs"           # blueprint documentation — architecture patterns, claude pattern guides, deploy/ios/secrets/setup references; fork-ADDED docs survive (checkout never deletes fork-only files), template docs refresh
     ".github"
     ".run"
+    "feature/home"          # backbone (owner: template) — demo/** + generated/** excluded below (WS4/T5)
+    "feature/profile"       # backbone (owner: template) — demo/** excluded below (WS4/T5)
+    "feature/settings"      # backbone (owner: template) — demo/** excluded below (WS4/T5)
+    "kotlin-js-store"       # JS lockfile tree (owner: template) — full copy (WS4/T5)
 )
 
 SYNC_FILES=(
@@ -91,6 +95,10 @@ SYNC_FILES=(
     #     gradle/fork.properties is gitignored + fork-local — NEVER synced) ---
     "gradle/fork.properties.template"
     "gradle/gradle-daemon-jvm.properties"  # pins the Gradle daemon JVM toolchain (17) + foojay URLs across forks
+    # --- WS4/T6: close the missed-template-update gap for owner:template root paths ---
+    "customization-surface.yaml"    # ownership contract — self-syncs (closes the false "self-syncs" claim in customization-surface.yaml)
+    "build.gradle.kts"              # root Gradle build (owner: template, WS4/T6)
+    "FEATURE_AUTHORING.md"          # in-template feature-authoring guide (owner: template) — was declared "synced" but had no SYNC_FILES vector (WS4/T6)
 )
 
 # Define exclusions for directories and files
@@ -137,6 +145,14 @@ declare -A EXCLUSIONS=(
     # their own flavors / dimensions / overrides on top of the synced base.
     # See docs/architecture/FLAVORS_EXTENSION.md for the pattern.
     ["build-logic"]="convention/src/main/kotlin/local:dir"
+    # Feature backbone (WS4/T5) — home/profile/settings are owner:template and now sync,
+    # but their demo/** showcases (and feature/home's generated/**) stay fork-owned. These
+    # carve-outs preserve the fork's demo customizations when the backbone is widened into
+    # the sync surface (RESEARCH.md Area 4 sync-widening risk: widening SYNC_DIRS must
+    # preserve the demo/fork is_excluded carve-outs).
+    ["feature/home"]="demo:dir generated:dir"
+    ["feature/profile"]="demo:dir"
+    ["feature/settings"]="demo:dir"
 )
 
 # Display help information
@@ -149,6 +165,7 @@ show_help() {
     echo
     echo -e "${BOLD}Options:${NC}"
     echo "  -h, --help      Display this help message and exit"
+    echo "  --list          Print the canonical sync surface (SYNC_DIRS + SYNC_FILES) and exit"
     echo "  --dry-run       Show what would be done without making changes"
     echo "  -f, --force     Skip confirmation prompts and proceed automatically"
     echo "  --only <list>   Restrict the sync to a comma/space-separated subset of the declared"
@@ -735,6 +752,13 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         -h|--help)
             show_help
+            exit 0
+            ;;
+        --list)
+            # Print the canonical sync surface (one entry per line) and exit — read-only,
+            # no git/side-effects. Consumed by framework-verify-sync-reachability (AC11) and
+            # by maintainers auditing what the backbone-widened surface now propagates (WS4).
+            printf '%s\n' "${SYNC_DIRS[@]}" "${SYNC_FILES[@]}"
             exit 0
             ;;
         --dry-run)

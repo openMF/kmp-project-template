@@ -1,42 +1,65 @@
 #!/usr/bin/env bash
-# checks/fork-identity.sh — a fork must not ship the TEMPLATE's (openMF / Mifos) signing + org identity.
+# checks/fork-identity.sh — DIRECTIONAL, placeholder-aware signing + org identity guard.
 #
-# When you fork kmp-project-template it is easy to forget to re-fork the SIGNING + ORG identity in
-# gradle/fork.properties, leaving apple.team.id / apple.match.git.url / org.name at the template's
-# values. Then iOS/macOS signing uses the wrong Apple team + a Match repo that doesn't hold your
-# certs, and Apple rejects the upload (90288 entitlements-mismatch). This check catches it before a
-# broken release. exit 0 PASS / 1 FAIL. Self-skips (PASS) on the upstream template (TEMPLATE_SELF_BUILD=1).
+# A fork must author its OWN signing + org identity (apple.team.id / apple.match.git.url /
+# org.name / appId); the NEUTRAL template must ship those fields as DECLARED placeholders. This
+# check loads the single-source placeholder vocabulary (core/registries/WHITE_LABEL_PLACEHOLDERS.yaml,
+# resolved by lib.sh) and enforces the direction — replacing the old blanket TEMPLATE_SELF_BUILD=1
+# skip (which was a false negative in BOTH directions: it hid a real-brand leak on the template AND
+# an unfilled placeholder on a fork). pure-white-label-100 WS6 — RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001
+# identity/brand-field generalization.
+#
+#   template (TEMPLATE_SELF_BUILD=1) → EVERY field MUST match a declared placeholder (leak → FAIL)
+#   fork     (TEMPLATE_SELF_BUILD unset) → NO field may match a placeholder (unfilled → FAIL)
+#
+# exit 0 PASS / 1 FAIL.
 set -uo pipefail
 # shellcheck source=scripts/product-health/lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
+: "${FORK_PROPERTIES:?fork-identity: FORK_PROPERTIES not set (run via product-health.sh)}"
+: "${HEALTH_ROOT:?fork-identity: HEALTH_ROOT not set (run via product-health.sh)}"
 
-if [ "${TEMPLATE_SELF_BUILD:-}" = "1" ]; then
-  echo "TEMPLATE_SELF_BUILD=1 — this IS the upstream template; identity N/A"; exit 0
-fi
-: "${FORK_PROPERTIES:?fork-identity: FORK_PROPERTIES not set (run via project-health.sh)}"
-: "${HEALTH_ROOT:?fork-identity: HEALTH_ROOT not set (run via project-health.sh)}"
+# Signing/org fields checked, mapped to their WHITE_LABEL_PLACEHOLDERS.yaml category.
+declare -A FIELD_CAT=(
+  [apple.team.id]=apple_team_id
+  [apple.match.git.url]=apple_match_git_url
+  [org.name]=org_name
+)
 
 fail=0
-# Signing/org fields that MUST be re-forked (regex = the template defaults / placeholders / empty).
-declare -A TEMPLATE_DEFAULTS=(
-  [apple.team.id]='L432S2FZP5|^$|CHANGEME'
-  [apple.match.git.url]='openMF/ios-provisioning-profile|^$|CHANGEME'
-  [org.name]='Mifos Initiative|Your Organization Name|^$|CHANGEME'
-)
-for key in "${!TEMPLATE_DEFAULTS[@]}"; do
+is_template="${TEMPLATE_SELF_BUILD:-0}"
+for key in "${!FIELD_CAT[@]}"; do
+  cat="${FIELD_CAT[$key]}"
   val="$(fp_get "$key")"
-  if echo "$val" | grep -qE "${TEMPLATE_DEFAULTS[$key]}"; then
-    echo "❌ '$key=$val' is still the TEMPLATE default — set your fork's value in gradle/fork.properties"
-    fail=1
+  if wl_matches_any "$val" "$cat"; then
+    # value IS a declared placeholder
+    if [ "$is_template" != "1" ]; then
+      echo "❌ '$key=$val' is a template placeholder — a fork must set its own value (see WHITE_LABEL_PLACEHOLDERS.yaml#$cat)"
+      fail=1
+    fi
+  else
+    # value is authored
+    if [ "$is_template" = "1" ]; then
+      echo "❌ '$key=$val' is authored on the NEUTRAL TEMPLATE — a real-brand value leaked in (must be a placeholder from WHITE_LABEL_PLACEHOLDERS.yaml#$cat)"
+      fail=1
+    fi
   fi
 done
 
-# The template bundle id must never survive into a fork's build config (its own SoT: libs.versions.toml).
-if grep -rqE 'org\.mifos\.kmp\.template' "$HEALTH_ROOT/gradle/libs.versions.toml" 2>/dev/null; then
-  echo "❌ appId is still 'org.mifos.kmp.template' in libs.versions.toml — set your fork's appId"
-  fail=1
+# Bundle id in libs.versions.toml — same directional model (WHITE_LABEL_PLACEHOLDERS.yaml#bundle_id).
+lvt="$HEALTH_ROOT/gradle/libs.versions.toml"
+if [ -f "$lvt" ]; then
+  bid="$(grep -E '^[[:space:]]*appId[[:space:]]*=' "$lvt" | head -1 | sed -E 's/.*=[[:space:]]*"?([^"]+)"?.*/\1/')"
+  if wl_matches_any "$bid" bundle_id; then
+    [ "$is_template" != "1" ] && { echo "❌ libs.versions.toml appId '$bid' is a template placeholder — fork must author"; fail=1; }
+  else
+    [ "$is_template" = "1" ] && { echo "❌ libs.versions.toml appId '$bid' is authored on the NEUTRAL TEMPLATE — must be a placeholder"; fail=1; }
+  fi
 fi
 
-[ "$fail" = 0 ] && { echo "gradle/fork.properties carries this fork's own signing + org identity"; exit 0; }
-echo "→ Fix: edit gradle/fork.properties (apple.team.id, apple.match.git.url, org.name) + libs.versions.toml appId."
+if [ "$fail" = 0 ]; then
+  echo "gradle/fork.properties + libs.versions.toml directional identity OK (template-aware via WHITE_LABEL_PLACEHOLDERS.yaml)"
+  exit 0
+fi
+echo "→ Fix: author gradle/fork.properties (apple.team.id, apple.match.git.url, org.name) + libs.versions.toml appId for your fork."
 exit 1

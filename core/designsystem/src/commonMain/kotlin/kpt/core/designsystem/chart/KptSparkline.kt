@@ -9,6 +9,8 @@
  */
 package kpt.core.designsystem.chart
 
+import kpt.core.base.designsystem.chart.SparklineGeometry
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable

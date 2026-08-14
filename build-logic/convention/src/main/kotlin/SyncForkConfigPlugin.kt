@@ -494,8 +494,8 @@ abstract class SyncForkConfigTask : DefaultTask() {
         }
 
         // ── 6c. Tokenize template-owned deployment files (B2 / G6) ────────────
-        // These files carry identity LITERALS (mifos-x-web / MifosInitiative.MoneyToolkit / the
-        // kmp-project-template keystore-alias prefix / …) in the committed template. Derive them from
+        // These files carry identity LITERALS (the Cloudflare Pages project name / MSIX identity / the
+        // project keystore-alias prefix / …) in the committed template. Derive them from
         // app-profile (+ projectName) via targeted substitution — NOT full-file rewrite — so the file
         // structure is preserved and no store-bound literal survives for a fork.
         written += tokenizeDeploymentFiles(
@@ -654,6 +654,26 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 )
                 logger.lifecycle("syncForkConfig: wrote core/database/.../DatabaseConfig.kt (NAME=$dbName, DESKTOP_DIR_NAME=$desktopDir)")
             }
+        }
+
+        // ── 6f. Rewrite cmp-desktop/mac-app-store.entitlements from template ──
+        // The Mac App Store entitlements embed the fully-qualified application id ("$TEAM.$APP_ID")
+        // and the team id — both fork identity. Derive them from the resolved app-profile values via
+        // token substitution against the committed cmp-desktop/mac-app-store.entitlements.template so
+        // the shipped entitlements never carries a hardcoded team/bundle literal. Mirrors the
+        // Config.xcconfig / DatabaseConfig writers above (same shape, no new machinery).
+        val entitlementsTemplate = File(root, "cmp-desktop/mac-app-store.entitlements.template")
+        val entitlementsOut      = File(root, "cmp-desktop/mac-app-store.entitlements")
+        if (entitlementsTemplate.exists()) {
+            val teamId = appleTeamId.ifBlank { "YOUR_TEAM_ID" }
+            val bundleId = appId.ifBlank { "com.example.app" }
+            val body = entitlementsTemplate.readText(Charsets.UTF_8)
+                .replace("{{APPLE_TEAM_ID}}", teamId)
+                .replace("{{APPLE_APP_IDENTIFIER}}", "$teamId.$bundleId")
+            entitlementsOut.writeText(body, Charsets.UTF_8)
+            logger.lifecycle("syncForkConfig: wrote cmp-desktop/mac-app-store.entitlements (team=$teamId, appId=$bundleId)")
+        } else {
+            logger.warn("syncForkConfig: cmp-desktop/mac-app-store.entitlements.template missing — skipping entitlements emit")
         }
 
         // ── 7. Fork icons ─────────────────────────────────────────────────────

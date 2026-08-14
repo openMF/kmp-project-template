@@ -15,20 +15,24 @@
 # keys) must not have drifted from the app-profile key SoT.
 #
 # exit 0 PASS · 1 FAIL (B1/B2/B7/B8 block) · 2 WARN (B3/B4/B5/B6/B9 need attention, non-blocking).
-# Self-skips (PASS) on the upstream template (TEMPLATE_SELF_BUILD=1) — same as fork-identity.sh.
+# DIRECTIONAL, placeholder-aware (pure-white-label-100 WS6): B1 (app_id) + B3 (Firebase / bundle /
+# display placeholders) + B7 (store marker) load the single-source vocabulary
+# (core/registries/WHITE_LABEL_PLACEHOLDERS.yaml, resolved by lib.sh) instead of the old blanket
+# TEMPLATE_SELF_BUILD=1 skip. On the neutral template every placeholder-typed field MUST match a
+# declared placeholder (real-brand leak → FAIL); on a fork NO placeholder-typed field may still match
+# (unfilled placeholder → FAIL). RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001 identity-field generalization.
 set -uo pipefail
 # shellcheck source=scripts/product-health/lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
 
-if [ "${TEMPLATE_SELF_BUILD:-}" = "1" ]; then
-  echo "TEMPLATE_SELF_BUILD=1 — this IS the upstream template; white-label boundary N/A"; exit 0
-fi
 : "${HEALTH_ROOT:?deployment-whitelabel: HEALTH_ROOT not set (run via product-health.sh)}"
+is_template="${TEMPLATE_SELF_BUILD:-0}"
 
 fail=0; warn=0
 APP_YAML="$HEALTH_ROOT/app-profile/app.yaml"
 
-# ── B1 — the fork-owned SoT exists, parses, and carries THIS fork's app id ────
+# ── B1 — the fork-owned SoT exists, parses, and carries a DIRECTIONALLY-correct app id ────
+# (uses WHITE_LABEL_PLACEHOLDERS.yaml#bundle_id: template MUST be a placeholder, fork MUST be authored)
 if [ ! -f "$APP_YAML" ]; then
   echo "❌ B1: app-profile/app.yaml is missing — the fork-owned white-label deployment SoT must exist."
   fail=1
@@ -40,12 +44,10 @@ else
   elif [ -z "$app_id" ]; then
     echo "❌ B1: app-profile/app.yaml identity.app_id is empty — set your fork's app id."
     fail=1
-  elif [ "$app_id" = "org.mifos.kmp.template" ]; then
-    echo "❌ B1: identity.app_id is still the TEMPLATE default 'org.mifos.kmp.template' — set your fork's app id."
-    fail=1
-  elif printf '%s' "$app_id" | grep -qE '^YOUR_|^$'; then
-    echo "❌ B1: identity.app_id '$app_id' is an unfilled placeholder — set your fork's app id."
-    fail=1
+  elif wl_matches_any "$app_id" bundle_id; then
+    [ "$is_template" != "1" ] && { echo "❌ B1: identity.app_id '$app_id' is a template placeholder (WHITE_LABEL_PLACEHOLDERS.yaml#bundle_id) — set your fork's app id."; fail=1; }
+  else
+    [ "$is_template" = "1" ] && { echo "❌ B1: identity.app_id '$app_id' authored on the NEUTRAL TEMPLATE — must remain a placeholder (WHITE_LABEL_PLACEHOLDERS.yaml#bundle_id)."; fail=1; }
   fi
 fi
 
@@ -74,17 +76,25 @@ if [ "${#b2_hits[@]}" -ne 0 ]; then
   fail=1
 fi
 
-# ── B3 — unset distribution placeholders in app-profile (WARN, non-blocking) ──
+# ── B3 — placeholder detection driven by the registry, not hardcoded (directional) ──
+# Load firebase_project_number + bundle_id + app_display_name patterns from
+# WHITE_LABEL_PLACEHOLDERS.yaml and scan app-profile/ for any match. On a fork an unfilled
+# placeholder BLOCKS; on the neutral template the placeholders ARE the intended state (no fail).
 b3=()
-if [ -f "$APP_YAML" ] || [ -d "$HEALTH_ROOT/app-profile" ]; then
-  # Placeholder firebase app ids (all-zero project number) + unfilled windows YOUR_* values.
-  if grep -rqE '1:0{12}:' "$HEALTH_ROOT/app-profile" 2>/dev/null; then b3+=("firebase.* app id is the 1:000000000000:* placeholder"); fi
-  if grep -rqE '\bYOUR_[A-Z_]+' "$HEALTH_ROOT/app-profile" 2>/dev/null; then b3+=("windows.* carries YOUR_* placeholder(s)"); fi
+if [ -d "$HEALTH_ROOT/app-profile" ]; then
+  for cat in firebase_project_number bundle_id app_display_name; do
+    while IFS= read -r pat; do
+      [ -n "$pat" ] || continue
+      if grep -rqE "$pat" "$HEALTH_ROOT/app-profile" 2>/dev/null; then
+        b3+=("app-profile/ carries placeholder pattern from WHITE_LABEL_PLACEHOLDERS.yaml#$cat: $pat")
+      fi
+    done < <(wl_placeholders_load "$cat")
+  done
 fi
-if [ "${#b3[@]}" -ne 0 ]; then
-  echo "⚠️  B3: distribution placeholders still unset in app-profile/ (fill before releasing to that store):"
+if [ "${#b3[@]}" -ne 0 ] && [ "$is_template" != "1" ]; then
+  echo "❌ B3: unfilled placeholders in app-profile/ (fork must author):"
   for w in "${b3[@]}"; do echo "        · $w"; done
-  warn=1
+  fail=1
 fi
 
 # ── B4 — per-platform media dirs present (WARN, non-blocking) ─────────────────
@@ -148,9 +158,12 @@ if [ -f "$APPLE_YAML" ] && grep -q 'trade_representative:' "$APPLE_YAML" 2>/dev/
     echo "❌ B7: apple.yaml#trade_representative.email_address is empty (App Store review contact incomplete)."; fail=1
   fi
 fi
+# Placeholder markers loaded from WHITE_LABEL_PLACEHOLDERS.yaml#store_copy_marker (registry-driven,
+# not hardcoded). Directional: on a fork an unfilled marker blocks; on the template it's expected.
+marker_re="$(wl_placeholders_load store_copy_marker | paste -sd'|' -)"
 # shellcheck disable=SC2086
-if grep -rIlE 'TODO|FIXME|PLACEHOLDER|lorem ipsum' $STORE_YAMLS >/dev/null 2>&1; then
-  echo "❌ B7: placeholder literal (TODO/FIXME/PLACEHOLDER/lorem) in the app-profile store schema — author your copy."; fail=1
+if [ -n "$marker_re" ] && grep -rIlE "$marker_re" $STORE_YAMLS >/dev/null 2>&1; then
+  [ "$is_template" != "1" ] && { echo "❌ B7: placeholder marker (WHITE_LABEL_PLACEHOLDERS.yaml#store_copy_marker) in the app-profile store schema — author your copy."; fail=1; }
 fi
 
 # ── B8 — a fork must not ship the template's default store copy (blocking; template self-skips at top) ──

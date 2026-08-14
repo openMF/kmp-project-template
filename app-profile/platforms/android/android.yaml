@@ -3,13 +3,13 @@
 android:
   category: 'Finance'                          # store.android.category
   short_description: 'Loan tracker, EMI calculator, bill reminders & interest rates. Offline.'  # store.android.short.description
-  changelog: 'First release of Money Toolkit.\n\nTrack loans, calculate EMIs, set bill reminders, compare loan offers, view live interest rates and currency exchange rates.\n\n100% offline — no login, no account, no ads.'  # store.android.changelog
+  changelog: 'YOUR_APP_CHANGELOG — describe what is new in this release.'  # PLACEHOLDER — store.android.changelog
   video_url: ""                              # store.android.video.url (Play Store promo YouTube URL)
   # play_tracks_by_flavor: "prod=internal,demo=internal"   # android.play.tracks.by_flavor (optional override)
   firebase:
-    app_id_prod: 1:728434912738:android:3902eb3363b0938f1a1dbb   # firebase.android.prod.app.id
-    app_id_demo: 1:728434912738:android:4e72c77e967965ce1a1dbb   # firebase.android.demo.app.id
-    groups: mifos-mobile-apps                # firebase.groups (Firebase App Distribution tester group[s], CSV)
+    app_id_prod: 1:000000000000:android:placeholder   # PLACEHOLDER — firebase.android.prod.app.id
+    app_id_demo: 1:000000000000:android:placeholder   # PLACEHOLDER — firebase.android.demo.app.id
+    groups: your-firebase-app-group          # PLACEHOLDER — firebase.groups (Firebase App Distribution tester group[s], CSV)
   play_testers:
     internal_googlegroup: ""                 # play.testers.internal.googlegroup
     closed_googlegroup: ""                   # play.testers.closed.googlegroup

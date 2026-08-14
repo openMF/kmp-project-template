@@ -1,20 +1,20 @@
 # app-profile/platforms/ubuntu/ubuntu.yaml — Linux store packaging (Snap Store / Flathub / .deb).
-# Template default = Money Toolkit; a FORK overrides the package names + maintainer with its own.
+# Template default = a PLACEHOLDER; a FORK overrides the package names + maintainer with its own.
 # Deep-merged under `ubuntu.*` (top-level key), consumed via APP_PROFILE_MAP (ubuntu.* flat keys).
 ubuntu:
   snap:
-    name: money-toolkit                    # ubuntu.snap.name (Snap Store package name, lowercase-hyphen)
+    name: app-toolkit                      # PLACEHOLDER — ubuntu.snap.name (Snap Store package name, lowercase-hyphen)
     grade: stable                          # ubuntu.snap.grade (stable | devel)
     confinement: strict                    # ubuntu.snap.confinement (strict | classic | devmode)
     channel: stable                        # ubuntu.snap.channel (default release channel)
-    summary: 'Offline loan tracker, EMI calculator, and bill reminders. No login required.'   # ubuntu.snap.summary (<=79 chars)
-    description: 'Track your loans, calculate EMIs, set bill reminders, and watch live interest rates — all 100% offline. No login. No account. No internet required.\n\nMoney Toolkit is a free personal finance companion for everyday financial decisions. Every calculation happens on your device. Your data never leaves your machine.\n\nTOOLS INCLUDED\n\n* Loan Tracker — add and manage personal loans; track principal, interest rate, EMI amount, and due date, stored locally.\n* EMI Calculator — enter loan amount, annual interest rate, and tenure to get your monthly payment instantly.\n* Affordability Calculator — enter your income and maximum monthly EMI to see the largest loan you can safely take on.\n* Bill Reminders — recurring reminders for rent, electricity, subscriptions, and loan payments.\n* Amortization Schedule — month-by-month repayment breakdown for any loan.\n* Loan Comparison — compare total cost, monthly payment, and total interest side-by-side.\n* Interest Rates — live US Federal Reserve benchmark rates via the free FRED API.\n* Country Macro Data — GDP growth, inflation (CPI), and unemployment rates from World Bank Open Data.\n* Currency Exchange Rates — live foreign exchange rates for any base currency.\n\nWHY MONEY TOOLKIT\n\nNo login or account. Works offline. No ads, no tracking, no analytics. No subscription — free forever. Open source, MIT licensed.\n\nBuilt by the Mifos Initiative, a nonprofit with 15+ years of experience building financial tools for underserved communities worldwide.\n\nGitHub: https://github.com/openMF/kmp-project-template'   # ubuntu.snap.description (<=4096 chars)
+    summary: 'YOUR_APP_SUMMARY — short one-line summary (<=79 chars).'   # PLACEHOLDER — ubuntu.snap.summary
+    description: 'YOUR_APP_DESCRIPTION — write your Snap Store long description here (<=4096 chars).'   # PLACEHOLDER — ubuntu.snap.description
   flathub:
-    app_id: org.mifos.MoneyToolkit         # ubuntu.flathub.app.id (reverse-DNS Flatpak application id)
-    developer: Mifos Initiative            # ubuntu.flathub.developer
-    name: Money Toolkit                    # ubuntu.flathub.name
-    summary: Offline loan & finance toolkit   # ubuntu.flathub.summary (<=35 chars)
-    description: 'Money Toolkit is a free, 100% offline personal finance companion: track loans, calculate EMIs, set bill reminders, and watch live interest rates. No login, no account, no ads, no tracking. All data stays on your device. Open source and MIT licensed, built by the Mifos Initiative.'   # ubuntu.flathub.description
+    app_id: com.example.app                # PLACEHOLDER — ubuntu.flathub.app.id (reverse-DNS Flatpak application id)
+    developer: Your Organization Name      # PLACEHOLDER — ubuntu.flathub.developer
+    name: App Toolkit                      # PLACEHOLDER — ubuntu.flathub.name
+    summary: YOUR_APP_SUMMARY              # PLACEHOLDER — ubuntu.flathub.summary (<=35 chars)
+    description: 'YOUR_APP_DESCRIPTION — write your Flathub description here.'   # PLACEHOLDER — ubuntu.flathub.description
     categories:                            # ubuntu.flathub.categories (list — unmapped, read direct)
       - Finance
       - Utility
@@ -27,10 +27,10 @@ ubuntu:
       - bills
       - interest
   aur:
-    package_name: money-toolkit-bin        # ubuntu.aur.package.name (MUST end -bin)
+    package_name: app-toolkit-bin          # PLACEHOLDER — ubuntu.aur.package.name (MUST end -bin)
     source_type: binary                    # ubuntu.aur.source.type
   deb:
-    package: money-toolkit                 # ubuntu.deb.package (.deb package name)
+    package: app-toolkit                   # PLACEHOLDER — ubuntu.deb.package (.deb package name)
     section: utils                         # ubuntu.deb.section (Debian archive section)
-    maintainer: Mifos Initiative <team@mifos.org>   # ubuntu.deb.maintainer (Name <email>)
-    homepage: https://github.com/openMF/kmp-project-template  # ubuntu.deb.homepage
+    maintainer: Your Organization Name <you@example.com>   # PLACEHOLDER — ubuntu.deb.maintainer (Name <email>)
+    homepage: https://example.com          # PLACEHOLDER — ubuntu.deb.homepage

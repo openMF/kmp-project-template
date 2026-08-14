@@ -53,7 +53,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
- * Locks the [HomeViewModel] contract for the Money Toolkit pivot:
+ * Locks the [HomeViewModel] contract:
  *
  *  - Initial state has 4 independent Loading slots.
  *  - Loans + Bills are pure-local: empty list → `ScreenState.Empty`; non-empty

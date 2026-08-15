@@ -37,14 +37,21 @@ fi
 # MODULE-FIX-UPSTREAM-001-class generalization). Pure bash + grep + awk — no jq.
 : "${WL_PLACEHOLDERS_YAML:=}"
 if [ -z "$WL_PLACEHOLDERS_YAML" ]; then
-  # Walk up from HEALTH_ROOT looking for the framework's core/registries copy.
-  _d="${HEALTH_ROOT:-$(pwd)}"
-  while [ "$_d" != "/" ] && [ -n "$_d" ]; do
-    if [ -f "$_d/core/registries/WHITE_LABEL_PLACEHOLDERS.yaml" ]; then
-      WL_PLACEHOLDERS_YAML="$_d/core/registries/WHITE_LABEL_PLACEHOLDERS.yaml"; break
-    fi
-    _d="$(dirname "$_d")"
-  done
+  # 1. Template-local vendored copy — next to this lib. This is what a STANDALONE template
+  #    checkout (CI) and every FORK resolve, since neither has the framework monorepo on disk.
+  _self_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [ -f "$_self_dir/WHITE_LABEL_PLACEHOLDERS.yaml" ]; then
+    WL_PLACEHOLDERS_YAML="$_self_dir/WHITE_LABEL_PLACEHOLDERS.yaml"
+  else
+    # 2. Dev fallback: walk up from HEALTH_ROOT to the framework's core/registries copy (monorepo).
+    _d="${HEALTH_ROOT:-$(pwd)}"
+    while [ "$_d" != "/" ] && [ -n "$_d" ]; do
+      if [ -f "$_d/core/registries/WHITE_LABEL_PLACEHOLDERS.yaml" ]; then
+        WL_PLACEHOLDERS_YAML="$_d/core/registries/WHITE_LABEL_PLACEHOLDERS.yaml"; break
+      fi
+      _d="$(dirname "$_d")"
+    done
+  fi
 fi
 export WL_PLACEHOLDERS_YAML
 

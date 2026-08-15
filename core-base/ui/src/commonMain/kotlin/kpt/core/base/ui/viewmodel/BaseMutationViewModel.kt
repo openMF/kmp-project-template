@@ -138,7 +138,11 @@ abstract class BaseMutationViewModel<T, R>(
             MutationAction.DiscardSavedDraft -> {
                 draftMode?.let { m ->
                     viewModelScope.launch {
-                        if (m.uniqueKey != null) m.outbox.deleteByUniqueKey(m.formKey, m.uniqueKey) else m.outbox.deleteByFormKey(m.formKey)
+                        if (m.uniqueKey != null) {
+                            m.outbox.deleteByUniqueKey(m.formKey, m.uniqueKey)
+                        } else {
+                            m.outbox.deleteByFormKey(m.formKey)
+                        }
                     }
                 }
                 resumePromptResolved.value = true

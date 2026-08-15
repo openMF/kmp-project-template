@@ -31,23 +31,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import kpt.core.base.designsystem.theme.KptTheme
 
 /**
- * One selectable draft in the [DraftPickerList] — a **UI value object**, deliberately independent of
- * the store/database types so this framework primitive never leaks `core-base/store` into its public
- * API (consumers map their `DraftRecord` / outbox entry to this).
- *
- * @param id       Stable handle passed back to the picker's callbacks.
- * @param title    Primary line (e.g. the entity being edited — "Rent · ₹1,200").
- * @param subtitle Optional secondary line (e.g. "Saved 2h ago" or the failure reason).
- * @param isFailed When true the row is styled as a failed sync (error accent).
- */
-data class DraftPickerItem(
-    val id: Long,
-    val title: String,
-    val subtitle: String? = null,
-    val isFailed: Boolean = false,
-)
-
-/**
  * Full-screen picker for the **multi-pending** case — a form that can hold N concurrent drafts (one
  * per `uniqueKey`, e.g. per-loan or per-bill). When the user opens such a form and ≥2 drafts exist,
  * show this so they choose which to resume, discard individual ones, or start a brand-new entry.
@@ -119,7 +102,11 @@ private fun DraftPickerRow(
                 Text(
                     text = sub,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (item.isFailed) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (item.isFailed) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )

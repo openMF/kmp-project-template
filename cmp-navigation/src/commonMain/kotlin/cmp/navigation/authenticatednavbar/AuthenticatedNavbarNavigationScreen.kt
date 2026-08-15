@@ -27,6 +27,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
+import cmp.navigation.registry.BackboneRegistry
 import cmp.navigation.registry.TabRegistry
 import cmp.navigation.ui.KptRootScaffold
 import cmp.navigation.ui.ScaffoldNavigationData
@@ -153,7 +154,10 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                 homeBody = homeBody,
             )
 
-            profileDestination()
+            // Profile inner content from the fork-owned BackboneRegistry.profileBody seam (default: demo
+            // body). The template shell forwards this opaque body — a fork edits BackboneRegistry, not this
+            // file. (WS01 base-feature seam, epic AC7 — mirrors the homeBody wiring.)
+            profileDestination(profileBody = { BackboneRegistry.profileBody(navController) })
         }
     }
 }

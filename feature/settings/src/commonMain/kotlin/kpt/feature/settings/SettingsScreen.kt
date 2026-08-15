@@ -24,18 +24,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
-import io.github.mobilebytelabs.kmptoolkit.firebase.compose.TrackScreenView
-import io.github.mobilebytelabs.kmptoolkit.firebase.compose.rememberAnalyticsHelper
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.ui.AppInfo
 import kpt.core.designsystem.icon.AppIcons
@@ -46,77 +38,21 @@ import kpt.feature.settings.generated.resources.feature_settings_change_language
 import kpt.feature.settings.generated.resources.feature_settings_change_language_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_text
-import kpt.feature.settings.generated.resources.feature_settings_dev_close
-import kpt.feature.settings.generated.resources.feature_settings_dev_tools_title
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row_description
 import org.jetbrains.compose.resources.stringResource
 
-@Composable
-internal fun SettingsScreen(
-    onBackClick: () -> Unit,
-    onSyncAndDraftsClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    devMenuEntries: List<DevMenuEntry> = emptyList(),
-) {
-    val analyticsHelper = rememberAnalyticsHelper()
-    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
-    var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
-    var showDevMenu by rememberSaveable { mutableStateOf(false) }
-
-    if (showSettingsDialog) {
-        SettingsDialog(
-            onDismiss = {
-                analyticsHelper.logSettingsDialogVisible(false)
-                showSettingsDialog = false
-            },
-        )
-    }
-
-    if (showLanguageDialog) {
-        LanguageDialog(
-            onDismiss = {
-                analyticsHelper.logLanguageDialogVisible(false)
-                showLanguageDialog = false
-            },
-        )
-    }
-
-    if (showDevMenu) {
-        DevMenuDialog(
-            entries = devMenuEntries,
-            onDismiss = { showDevMenu = false },
-        )
-    }
-
-    // Footer long-press surfaces the dev menu when at least one dev entry is available.
-    val hasDevEntries = devMenuEntries.isNotEmpty()
-    val onFooterLongClick: (() -> Unit)? = if (hasDevEntries) {
-        { showDevMenu = true }
-    } else {
-        null
-    }
-
-    SettingsScreenContent(
-        modifier = modifier
-            .fillMaxSize()
-            .testTag(TestTags.Settings.SCREEN),
-        onBackClick = onBackClick,
-        onThemeCardClick = {
-            analyticsHelper.logSettingsDialogVisible(true)
-            showSettingsDialog = true
-        },
-        onLanguageCardClick = {
-            analyticsHelper.logLanguageDialogVisible(true)
-            showLanguageDialog = true
-        },
-        onSyncAndDraftsClick = onSyncAndDraftsClick,
-        onFooterLongClick = onFooterLongClick,
-    )
-
-    TrackScreenView(screenName = "SettingsScreen")
-}
-
+/**
+ * The settings screen CONTENT — the template-owned Settings [KptScaffold] with the theme / language /
+ * sync-and-drafts cards + version footer. This presentational composable is the reference `@Preview`
+ * render target (see `SettingsScreenPreview.kt` → the desktop Roborazzi golden), so it takes plain
+ * callbacks and no state.
+ *
+ * The stateful shell/seam split (WS01 base-feature seam, epic AC7): the dialog state + dev-menu now live
+ * in the fork-owned [kpt.feature.settings.demo.SettingsDemoBody] (rendered via `cmp-navigation`'s
+ * `BackboneRegistry.settingsBody`), which wires those callbacks to THIS content. A template sync
+ * full-copies this content shell while the fork's `settingsBody` seam survives.
+ */
 @Composable
 internal fun SettingsScreenContent(
     onBackClick: () -> Unit,
@@ -161,49 +97,10 @@ internal fun SyncAndDraftsCard(onClick: () -> Unit, modifier: Modifier = Modifie
 }
 
 /**
- * Dev-menu dialog surfaced by long-pressing the [VersionLabel] footer. Renders one row per
- * [DevMenuEntry] supplied by the caller (e.g. `cmp-navigation`'s `ShowcaseRegistry`). The
- * dialog is only reachable when the list is non-empty — release builds / neutralized forks
- * pass an empty list and the footer long-press handler is `null`.
- */
-@Composable
-private fun DevMenuDialog(
-    entries: List<DevMenuEntry>,
-    onDismiss: () -> Unit,
-) {
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.feature_settings_dev_tools_title)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
-                entries.forEach { entry ->
-                    androidx.compose.material3.TextButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            onDismiss()
-                            entry.onClick()
-                        },
-                    ) { Text(entry.label) }
-                }
-            }
-        },
-        confirmButton = {
-            androidx.compose.material3.TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.feature_settings_dev_close))
-            }
-        },
-    )
-}
-
-/**
- * Static version footer label. When the caller supplies a non-empty `devMenuEntries`
- * list, long-pressing opens the Dev tools menu (each entry becomes a row). When the list
- * is empty (release builds / neutralized forks) the long-press handler is `null`, so the
- * label behaves as a plain text footer.
- *
- * Wire point: `cmp-navigation`'s `BackboneRegistry.backboneDestinations` passes the
- * `devMenuEntries` from `ShowcaseRegistry.devSettingsEntries(...)`, which is empty on
- * release builds.
+ * Static version footer label. When the caller supplies a non-empty dev-menu list (via
+ * [kpt.feature.settings.demo.SettingsDemoBody]), long-pressing opens the Dev tools menu. When the list
+ * is empty (release builds / neutralized forks) the long-press handler is `null`, so the label behaves
+ * as a plain text footer.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -283,18 +180,4 @@ private fun SettingsRowCard(
             }
         }
     }
-}
-
-private fun AnalyticsHelper.logSettingsDialogVisible(visible: Boolean) {
-    logEvent(
-        type = "settings_dialog_visible",
-        params = mapOf("visible" to visible.toString()),
-    )
-}
-
-private fun AnalyticsHelper.logLanguageDialogVisible(visible: Boolean) {
-    logEvent(
-        type = "language_dialog_visible",
-        params = mapOf("visible" to visible.toString()),
-    )
 }

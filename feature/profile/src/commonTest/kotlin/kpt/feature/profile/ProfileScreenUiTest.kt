@@ -14,6 +14,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.runComposeUiTest
 import kpt.core.designsystem.theme.KptTheme
+import kpt.feature.profile.demo.ProfileDemoBody
 import kotlin.test.Test
 
 /**
@@ -31,7 +32,8 @@ class ProfileScreenUiTest {
     fun screenIsDisplayed() = runComposeUiTest {
         setContent {
             KptTheme {
-                ProfileScreen()
+                // In production cmp-navigation's BackboneRegistry.profileBody supplies this body.
+                ProfileScreen(profileBody = { ProfileDemoBody() })
             }
         }
         onNodeWithTag(TestTags.Profile.SCREEN).assertIsDisplayed()

@@ -214,13 +214,143 @@ cs_merge_manifest() {
   return 0
 }
 
+# ── yaml-schema-merge (app-profile deep-merge) ───────────────────────────────
+# PLACEHOLDER classifier — a fork scalar is TEMPLATE-owned (loses on merge) when its
+# value still equals a template default OR its source line carries a `# PLACEHOLDER`
+# marker. Only a NON-placeholder fork value at an AppProfile::MAP identity/org/store
+# key path is allowed to win over the template.
+CS_PLACEHOLDER_RE='(^|[[:space:]])#[[:space:]]*PLACEHOLDER|com\.example\.app|App Toolkit|https?://(demo|api|staging)\.example\.com|YOUR_|Your Organization|you@example\.com'
+
+# yaml-schema-merge — deep-merge <theirs=template> INTO <ours=fork>, key-path by key-path.
+#   template wins: the whole key STRUCTURE + every default + every new demo access-point
+#                  (any key the fork lacks is inherited from the template schema).
+#   fork wins:     any AppProfile::MAP identity/org/store scalar whose fork value is
+#                  NON-placeholder (classified via the MAP key set + CS_PLACEHOLDER_RE);
+#                  plus a fork's own network.access_points[] entries win by `id`, while
+#                  template-only demo access-points are appended (union-by-id).
+# The template is the schema authority (emitted as the base); the fork overlays only its
+# real identity scalars + its real endpoints. `base` (the ancestor) is accepted for
+# dispatcher symmetry but the union is order-preserving and needs no line-diff base.
+#   cs_merge_yaml_schema <ours=fork> <base> <theirs=template> [<out>]
+#   returns 0 merged-clean · 2 error
+cs_merge_yaml_schema() {
+  local ours="$1" base="$2" theirs="$3" out="${4:-$1}"
+  [ -f "$ours" ] && [ -f "$theirs" ] || {
+    echo "cs_merge_yaml_schema: need <ours=fork> <base> <theirs=template>" >&2; return 2; }
+
+  # Load the identity/org/store yaml key paths the fork is allowed to win — the RHS
+  # (dotted yaml path) of every `"flat.key" => "dotted.path"` row in AppProfile::MAP.
+  local cfgrb="$CS_ROOT/deployment/_shared/config.rb"
+  local mapfile; mapfile="$(mktemp)"
+  if [ -f "$cfgrb" ]; then
+    awk -F'=>' '
+      /"[^"]+"[[:space:]]*=>[[:space:]]*"[^"]+"/ {
+        v=$2; sub(/#.*/,"",v); gsub(/[" ,]/,"",v); if (v!="") print v
+      }' "$cfgrb" > "$mapfile"
+  fi
+
+  local tmp; tmp="$(mktemp)"
+  # Two-file awk: FIRST pass indexes the fork (scalar leaves by dotted path + its
+  # access_points block); SECOND pass emits the template as the schema base, overlaying
+  # fork-won scalars and unioning access_points by id.
+  awk -v mapf="$mapfile" -v ph="$CS_PLACEHOLDER_RE" '
+    function spaces(n,   s){ s=""; while(n-->0) s=s" "; return s }
+    function lead(s,   n){ n=0; while(substr(s,n+1,1)==" ") n++; return n }
+    function keyof(s,   t){ t=s; sub(/^[ ]+/,"",t); sub(/:.*/,"",t); return t }
+    function restof(s,   t){ t=s; sub(/^[ ]*[^:]+:/,"",t); sub(/^[ ]+/,"",t); return t }
+    function stripc(v,   t){ t=v; sub(/[ \t]+#.*$/,"",t); sub(/[ \t]+$/,"",t); return t }
+    function pathpush(ind,k,   p,i){
+      while (sp>0 && sind[sp]>=ind) sp--
+      sp++; sind[sp]=ind; skey[sp]=k
+      p=skey[1]; for (i=2;i<=sp;i++) p=p"."skey[i]
+      return p
+    }
+    # flush the currently-buffered TEMPLATE access_point item, emitting it ONLY when its
+    # id is not already provided by the fork (template-only demo access-points win).
+    function ap_flush(   i){
+      if (nib>0) {
+        if (!(curid in forkid)) for (i=1;i<=nib;i++) print ap_itembuf[i]
+        nib=0; curid=""
+      }
+    }
+    BEGIN { while ((getline k < mapf) > 0) if (k!="") forkwins[k]=1 }
+    FNR==1 { sp=0; ap=0 }   # reset the indentation stack + ap-state per input file
+
+    # ── FORK PASS — index scalar leaves + capture the access_points block ──
+    FNR==NR {
+      line=$0
+      if (line ~ /^[ ]*#/ || line ~ /^[ ]*$/) next
+      ind=lead(line); content=line; sub(/^[ ]+/,"",content)
+      if (ap) {
+        if (ind<=ap_ind) { ap=0 }              # dedent → end of fork access_points
+        else {
+          apforkbuf[++nfb]=line                # preserve the fork endpoint verbatim
+          if (content ~ /^-[ ]+id:/)     { idv=content; sub(/^-[ ]+id:[ ]*/,"",idv); forkid[stripc(idv)]=1 }
+          else if (content ~ /^id:/)     { idv=content; sub(/^id:[ ]*/,"",idv);      forkid[stripc(idv)]=1 }
+          next
+        }
+      }
+      if (content ~ /^- /) next
+      if (content ~ /:/) {
+        k=keyof(line); r=restof(line); p=pathpush(ind,k)
+        if (k=="access_points") { ap=1; ap_ind=ind; next }
+        if (r!="" && r !~ /^[|>]/) {           # scalar leaf
+          forkval[p]=stripc(r)
+          forkph[p]=(line ~ ph) ? 1 : 0
+        }
+      }
+      next
+    }
+
+    # ── TEMPLATE PASS — emit schema base, overlay fork identity, union access_points ──
+    {
+      line=$0
+      if (line ~ /^[ ]*#/ || line ~ /^[ ]*$/) { if (ap) next; print line; next }
+      ind=lead(line); content=line; sub(/^[ ]+/,"",content)
+      if (ap) {
+        if (ind<=ap_ind) { ap_flush(); ap=0 }  # end of template access_points → fall through
+        else {
+          if (content ~ /^- /) {
+            ap_flush(); ap_itembuf[++nib]=line
+            if (content ~ /^-[ ]+id:/) { curid=content; sub(/^-[ ]+id:[ ]*/,"",curid); curid=stripc(curid) }
+          } else {
+            ap_itembuf[++nib]=line
+            if (content ~ /^id:/) { curid=content; sub(/^id:[ ]*/,"",curid); curid=stripc(curid) }
+          }
+          next
+        }
+      }
+      if (content ~ /:/) {
+        k=keyof(line); r=restof(line); p=pathpush(ind,k)
+        if (k=="access_points") {
+          print line                            # the access_points: header
+          for (i=1;i<=nfb;i++) print apforkbuf[i]   # fork endpoints preserved (win by id)
+          ap=1; ap_ind=ind; nib=0; curid=""
+          next
+        }
+        if (r!="" && r !~ /^[|>]/ && (p in forkwins) && (p in forkval) && forkph[p]==0) {
+          print spaces(ind) k ": " forkval[p]   # fork identity scalar wins
+          next
+        }
+      }
+      print line
+    }
+    END { if (ap) ap_flush() }
+  ' "$ours" "$theirs" > "$tmp"
+
+  rm -f "$mapfile"
+  mv "$tmp" "$out"
+  return 0
+}
+
 # Strategy dispatcher used by scripts/white-label/sync-dirs.sh for a `merge`-owned file.
 #   cs_merge <strategy> <ours> <base> <theirs> [<out>]
 cs_merge() {
   local strat="$1" ours="$2" base="$3" theirs="$4" out="${5:-$2}"
   case "$strat" in
-    manifest-union) cs_merge_manifest "$ours" "$theirs" "$out" ;;
-    *)              cs_merge_3way "$ours" "$base" "$theirs" "$out" ;;
+    manifest-union)    cs_merge_manifest    "$ours" "$theirs" "$out" ;;
+    yaml-schema-merge) cs_merge_yaml_schema "$ours" "$base" "$theirs" "$out" ;;
+    *)                 cs_merge_3way        "$ours" "$base" "$theirs" "$out" ;;
   esac
 }
 
@@ -259,6 +389,16 @@ cs_main() {
       local p="${1:?usage: resolve <path>}"
       cs_match_g "$p"
       printf '%s\t%s%s\n' "$p" "$CS_M_OWNER" "${CS_M_STRAT:+  (strategy: $CS_M_STRAT)}"
+      ;;
+    resolve-owner)
+      # Print ONLY the resolved owner token (template | fork | merge | generated |
+      # demo-showcase) with no path/strategy decoration — the machine-readable twin of
+      # `resolve`, so a gate can `[ "$(… resolve-owner <p>)" = demo-showcase ]` without
+      # parsing the tab-delimited `resolve` line. (WS01/AC8 — the distinct demo-showcase
+      # ownership class is a first-class owner value the contract now emits.)
+      local p="${1:?usage: resolve-owner <path>}"
+      cs_match_g "$p"
+      printf '%s\n' "$CS_M_OWNER"
       ;;
     report)
       local f; declare -A cnt=()
@@ -307,7 +447,7 @@ cs_main() {
       cs_merge "$@"   # <strategy> <ours> <base> <theirs> [<out>]
       ;;
     *)
-      echo "usage: customization-surface.sh {resolve <path>|report|verify|--verify|list-template-owners|merge <strategy> <ours> <base> <theirs> [out]}" >&2
+      echo "usage: customization-surface.sh {resolve <path>|resolve-owner <path>|report|verify|--verify|list-template-owners|merge <strategy> <ours> <base> <theirs> [out]}" >&2
       return 2
       ;;
   esac

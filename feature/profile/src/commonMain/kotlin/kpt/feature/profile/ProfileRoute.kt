@@ -9,6 +9,7 @@
  */
 package kpt.feature.profile
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -20,8 +21,13 @@ data object ProfileRoute
 
 fun NavController.navigateToProfile(navOptions: NavOptions? = null) = navigate(ProfileRoute, navOptions)
 
-fun NavGraphBuilder.profileDestination() {
+/**
+ * The profile backbone destination. [profileBody] is the fork-owned inner content (default supplied by
+ * `cmp-navigation`'s `BackboneRegistry.profileBody`); this template graph carries zero demo imports and
+ * forwards the opaque body into the [ProfileScreen] shell. (WS01 base-feature seam, epic AC7.)
+ */
+fun NavGraphBuilder.profileDestination(profileBody: @Composable () -> Unit = {}) {
     composableWithStayTransitions<ProfileRoute> {
-        ProfileScreen()
+        ProfileScreen(profileBody = profileBody)
     }
 }

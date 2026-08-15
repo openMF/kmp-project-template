@@ -31,7 +31,6 @@ import kpt.core.base.platform.update.AppUpdateManagerImpl
 import kpt.core.base.ui.util.ShareUtils
 import kpt.core.data.user.UserDataRepository
 import org.koin.android.ext.android.inject
-import org.mifos.kmp.template.BuildConfig
 import java.util.Locale
 
 /**

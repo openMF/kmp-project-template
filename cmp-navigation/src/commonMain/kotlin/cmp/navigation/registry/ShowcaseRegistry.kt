@@ -11,18 +11,16 @@ package cmp.navigation.registry
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import kpt.feature.settings.DevMenuEntry
-// demo:begin
 import kpt.core.base.security.isReleaseBuild
+import kpt.feature.settings.DevMenuEntry
 import kpt.feature.showcase.stategallery.StateGalleryRoute
 import kpt.feature.showcase.stategallery.stateGalleryGraph
 import kpt.feature.showcase.transitions.TransitionGalleryRoute
 import kpt.feature.showcase.transitions.transitionGalleryGraph
-// demo:end
 
 /**
  * ShowcaseRegistry — template-shipped dev-only demo entry points (Transition Gallery,
- * State Gallery). Content is fully fenced `// demo:begin … // demo:end` so
+ * State Gallery). Content is fully fenced with demo begin/end markers so
  * `remove-demo.sh` / `scripts/white-label/customize.sh --clean` reduces the two members
  * to empty stubs (list returns empty, graph body is empty) — the shell still resolves
  * the object; the dev menu simply hides on the neutralized fork.

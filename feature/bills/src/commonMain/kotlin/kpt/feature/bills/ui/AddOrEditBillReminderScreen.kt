@@ -58,11 +58,6 @@ import kpt.feature.bills.generated.resources.screens_bills_addedit_dismiss_butto
 import kpt.feature.bills.generated.resources.screens_bills_addedit_due_day_label
 import kpt.feature.bills.generated.resources.screens_bills_addedit_enabled_label
 import kpt.feature.bills.generated.resources.screens_bills_addedit_name_label
-import kpt.feature.bills.generated.resources.screens_bills_draft_resume_discard
-import kpt.feature.bills.generated.resources.screens_bills_draft_resume_message
-import kpt.feature.bills.generated.resources.screens_bills_draft_resume_resume
-import kpt.feature.bills.generated.resources.screens_bills_draft_resume_start_fresh
-import kpt.feature.bills.generated.resources.screens_bills_draft_resume_title
 import kpt.feature.bills.generated.resources.screens_bills_addedit_recurrence_title
 import kpt.feature.bills.generated.resources.screens_bills_addedit_remind_days_before_label
 import kpt.feature.bills.generated.resources.screens_bills_addedit_retry_button
@@ -73,6 +68,11 @@ import kpt.feature.bills.generated.resources.screens_bills_addedit_status_failed
 import kpt.feature.bills.generated.resources.screens_bills_addedit_status_offline
 import kpt.feature.bills.generated.resources.screens_bills_addedit_status_saved
 import kpt.feature.bills.generated.resources.screens_bills_addedit_status_saving
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_discard
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_message
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_resume
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_start_fresh
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_title
 import kpt.feature.bills.generated.resources.screens_bills_edit_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel

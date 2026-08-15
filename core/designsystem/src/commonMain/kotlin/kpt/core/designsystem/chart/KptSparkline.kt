@@ -9,8 +9,6 @@
  */
 package kpt.core.designsystem.chart
 
-import kpt.core.base.designsystem.chart.SparklineGeometry
-
 import androidx.compose.foundation.Canvas
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -20,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
+import kpt.core.base.designsystem.chart.SparklineGeometry
 
 /**
  * Minimal Canvas-based sparkline — a one-pass connected polyline whose y-axis is

@@ -42,7 +42,6 @@ import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.demo.crypto.CoinDetail
 import kpt.feature.crypto.generated.resources.Res
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_detail_about_label
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_detail_back_cd

@@ -40,3 +40,8 @@ placeholders:
     - '\bFIXME\b'
     - '\bPLACEHOLDER\b'
     - 'lorem ipsum'
+    # Prose placeholders the neutral template ships for store copy (matched case-insensitively):
+    # "Your App Name" / "Your App Tagline Here" / "Your app's one-line promotional pitch…" / "…Your Organization Name".
+    - 'Your App'
+    - "Your app's"
+    - 'Your Organization'

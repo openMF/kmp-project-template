@@ -41,6 +41,11 @@
     <string name="screens_loans_addedit_status_failed_unknown">unknown error</string>
     <string name="screens_loans_addedit_retry_button">Retry</string>
     <string name="screens_loans_addedit_dismiss_button">Dismiss</string>
+    <string name="screens_loans_addedit_draft_resume_title">Resume your loan?</string>
+    <string name="screens_loans_addedit_draft_resume_message">You have an unsaved loan draft. Resume editing it, discard it, or start a new one.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">Resume editing</string>
+    <string name="screens_loans_addedit_draft_resume_discard">Discard draft</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">Start fresh</string>
 
     <!-- ===== LoanDetailScreen ===== -->
     <string name="screens_loans_detail_title">Loan Details</string>

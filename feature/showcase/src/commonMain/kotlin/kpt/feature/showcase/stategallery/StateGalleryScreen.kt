@@ -23,6 +23,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -91,8 +95,18 @@ fun StateGalleryScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
             }
 
             // ── ErrorChip ───────────────────────────────────────────────
+            // Gallery demo: a live tap that increments a local counter and
+            // shows a small acknowledgement, so the chip is genuinely
+            // interactive rather than a dead placeholder.
+            var errorChipTaps by remember { mutableIntStateOf(0) }
             LabelRow("ErrorChip") {
-                ErrorChip(message = "Failed to load", onClick = {})
+                ErrorChip(message = "Failed to load", onClick = { errorChipTaps++ })
+                if (errorChipTaps > 0) {
+                    Text(
+                        text = "tapped ×$errorChipTaps",
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                }
             }
 
             // ── RowLoadingShimmer ───────────────────────────────────────

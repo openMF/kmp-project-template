@@ -24,4 +24,9 @@
     <string name="screens_alert_create_dir_above">Above</string>
     <string name="screens_alert_create_dir_below">Below</string>
     <string name="screens_alert_create_submit">Create alert</string>
+    <string name="screens_alert_create_draft_resume_title">Resume your alert?</string>
+    <string name="screens_alert_create_draft_resume_message">You have an unsaved price alert. Resume editing it, discard it, or start a new one.</string>
+    <string name="screens_alert_create_draft_resume_resume">Resume editing</string>
+    <string name="screens_alert_create_draft_resume_discard">Discard draft</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Start fresh</string>
 </resources>

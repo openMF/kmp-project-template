@@ -37,7 +37,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +49,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.datetime.LocalDate
 import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.base.store.submit.SubmitState
+import kpt.core.base.ui.draft.DraftResolutionPrompt
+import kpt.core.base.ui.submit.MutationScreenContent
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.model.demo.banking.LoanKind
 import kpt.feature.loans.generated.resources.Res
@@ -58,6 +59,11 @@ import kpt.feature.loans.generated.resources.screens_loans_add_title
 import kpt.feature.loans.generated.resources.screens_loans_addedit_annual_rate_label
 import kpt.feature.loans.generated.resources.screens_loans_addedit_back_cd
 import kpt.feature.loans.generated.resources.screens_loans_addedit_dismiss_button
+import kpt.feature.loans.generated.resources.screens_loans_addedit_draft_resume_discard
+import kpt.feature.loans.generated.resources.screens_loans_addedit_draft_resume_message
+import kpt.feature.loans.generated.resources.screens_loans_addedit_draft_resume_resume
+import kpt.feature.loans.generated.resources.screens_loans_addedit_draft_resume_start_fresh
+import kpt.feature.loans.generated.resources.screens_loans_addedit_draft_resume_title
 import kpt.feature.loans.generated.resources.screens_loans_addedit_kind_cd
 import kpt.feature.loans.generated.resources.screens_loans_addedit_kind_label
 import kpt.feature.loans.generated.resources.screens_loans_addedit_monthly_emi_label
@@ -110,10 +116,20 @@ fun AddOrEditLoanScreen(
     val ui by viewModel.uiState.collectAsStateWithLifecycle()
     val submit = ui.submit
 
-    LaunchedEffect(submit) {
-        if (submit is SubmitState.Submitted<*>) {
-            onSaved()
-        }
+    // Three-case resume: on entry, if a saved draft exists for this loan, let the user choose to
+    // resume it, discard it, or start fresh (the draft stays recoverable in Settings → Sync & Drafts).
+    if (ui.hasResumableDraft) {
+        DraftResolutionPrompt(
+            onResume = viewModel::onResume,
+            onDiscard = viewModel::onDiscardSavedDraft,
+            onStartFresh = viewModel::onStartFresh,
+            onDismiss = viewModel::onStartFresh,
+            title = stringResource(Res.string.screens_loans_addedit_draft_resume_title),
+            message = stringResource(Res.string.screens_loans_addedit_draft_resume_message),
+            resumeLabel = stringResource(Res.string.screens_loans_addedit_draft_resume_resume),
+            discardLabel = stringResource(Res.string.screens_loans_addedit_draft_resume_discard),
+            startFreshLabel = stringResource(Res.string.screens_loans_addedit_draft_resume_start_fresh),
+        )
     }
 
     Scaffold(
@@ -142,103 +158,117 @@ fun AddOrEditLoanScreen(
             )
         },
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .imePadding()
-                .navigationBarsPadding()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            OutlinedTextField(
-                value = form.name,
-                onValueChange = viewModel::onNameChange,
-                label = { Text(stringResource(Res.string.screens_loans_addedit_name_label)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = submit !is SubmitState.Submitting,
-            )
-
-            LoanKindDropdown(
-                value = form.kind,
-                onChange = viewModel::onKindChange,
-                enabled = submit !is SubmitState.Submitting,
-            )
-
-            DoubleField(
-                label = stringResource(Res.string.screens_loans_addedit_principal_label),
-                value = form.principal,
-                onChange = viewModel::onPrincipalChange,
-                enabled = submit !is SubmitState.Submitting,
-            )
-            DoubleField(
-                label = stringResource(Res.string.screens_loans_addedit_principal_remaining_label),
-                value = form.principalRemaining,
-                onChange = viewModel::onPrincipalRemainingChange,
-                enabled = submit !is SubmitState.Submitting,
-            )
-            DoubleField(
-                label = stringResource(Res.string.screens_loans_addedit_annual_rate_label),
-                value = form.annualRatePercent,
-                onChange = viewModel::onAnnualRatePercentChange,
-                enabled = submit !is SubmitState.Submitting,
-            )
-            IntField(
-                label = stringResource(Res.string.screens_loans_addedit_tenure_label),
-                value = form.tenureMonths,
-                onChange = viewModel::onTenureMonthsChange,
-                enabled = submit !is SubmitState.Submitting,
-            )
-            IntField(
-                label = stringResource(Res.string.screens_loans_addedit_months_remaining_label),
-                value = form.monthsRemaining,
-                onChange = viewModel::onMonthsRemainingChange,
-                enabled = submit !is SubmitState.Submitting,
-            )
-            DateField(
-                label = stringResource(Res.string.screens_loans_addedit_next_due_date_label),
-                value = form.nextDueDate,
-                onChange = viewModel::onNextDueDateChange,
-                enabled = submit !is SubmitState.Submitting,
-            )
-            DoubleField(
-                label = stringResource(Res.string.screens_loans_addedit_total_paid_label),
-                value = form.totalPaid,
-                onChange = viewModel::onTotalPaidChange,
-                enabled = submit !is SubmitState.Submitting,
-            )
-
-            ComputedPreviewCard(
-                monthlyEmi = form.previewMonthlyEmi,
-                totalInterest = form.previewTotalInterest,
-            )
-
-            Button(
-                onClick = viewModel::onSubmit,
-                modifier = Modifier.fillMaxWidth(),
-                enabled = form.isValid && submit !is SubmitState.Submitting,
-            ) {
-                if (submit is SubmitState.Submitting) {
-                    CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
+        // Framework mutation-screen form: MutationScreenContent owns the read/load gate
+        // (ScreenContent over ui.screen — Loading while an existing loan hydrates), the
+        // Submitting scrim overlay, and the terminal result-handler (onSubmitted → navigate on
+        // success). The persistent inline status line is supplied via the `submitStatus` slot so
+        // the "Saved" / "Failed / retry / offline" affordances render in-place.
+        MutationScreenContent(
+            state = ui,
+            onRetry = viewModel::onRetry,
+            onSubmitted = { onSaved() },
+            modifier = Modifier.padding(padding),
+            submitStatus = { submitState ->
+                Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+                    SubmitStatusLine(
+                        submit = submitState,
+                        onRetry = viewModel::onRetry,
+                        onDismiss = viewModel::onDismissResult,
+                    )
                 }
-                Text(
-                    stringResource(
-                        if (loanId == null) {
-                            Res.string.screens_loans_add_submit
-                        } else {
-                            Res.string.screens_loans_edit_submit
-                        },
-                    ),
+            },
+        ) { _, _ ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
+                    .navigationBarsPadding()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                OutlinedTextField(
+                    value = form.name,
+                    onValueChange = viewModel::onNameChange,
+                    label = { Text(stringResource(Res.string.screens_loans_addedit_name_label)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = submit !is SubmitState.Submitting,
                 )
-            }
 
-            SubmitStatusLine(
-                submit = submit,
-                onRetry = viewModel::onRetry,
-                onDismiss = viewModel::onDismissResult,
-            )
+                LoanKindDropdown(
+                    value = form.kind,
+                    onChange = viewModel::onKindChange,
+                    enabled = submit !is SubmitState.Submitting,
+                )
+
+                DoubleField(
+                    label = stringResource(Res.string.screens_loans_addedit_principal_label),
+                    value = form.principal,
+                    onChange = viewModel::onPrincipalChange,
+                    enabled = submit !is SubmitState.Submitting,
+                )
+                DoubleField(
+                    label = stringResource(Res.string.screens_loans_addedit_principal_remaining_label),
+                    value = form.principalRemaining,
+                    onChange = viewModel::onPrincipalRemainingChange,
+                    enabled = submit !is SubmitState.Submitting,
+                )
+                DoubleField(
+                    label = stringResource(Res.string.screens_loans_addedit_annual_rate_label),
+                    value = form.annualRatePercent,
+                    onChange = viewModel::onAnnualRatePercentChange,
+                    enabled = submit !is SubmitState.Submitting,
+                )
+                IntField(
+                    label = stringResource(Res.string.screens_loans_addedit_tenure_label),
+                    value = form.tenureMonths,
+                    onChange = viewModel::onTenureMonthsChange,
+                    enabled = submit !is SubmitState.Submitting,
+                )
+                IntField(
+                    label = stringResource(Res.string.screens_loans_addedit_months_remaining_label),
+                    value = form.monthsRemaining,
+                    onChange = viewModel::onMonthsRemainingChange,
+                    enabled = submit !is SubmitState.Submitting,
+                )
+                DateField(
+                    label = stringResource(Res.string.screens_loans_addedit_next_due_date_label),
+                    value = form.nextDueDate,
+                    onChange = viewModel::onNextDueDateChange,
+                    enabled = submit !is SubmitState.Submitting,
+                )
+                DoubleField(
+                    label = stringResource(Res.string.screens_loans_addedit_total_paid_label),
+                    value = form.totalPaid,
+                    onChange = viewModel::onTotalPaidChange,
+                    enabled = submit !is SubmitState.Submitting,
+                )
+
+                ComputedPreviewCard(
+                    monthlyEmi = form.previewMonthlyEmi,
+                    totalInterest = form.previewTotalInterest,
+                )
+
+                Button(
+                    onClick = viewModel::onSubmit,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = form.isValid && submit !is SubmitState.Submitting,
+                ) {
+                    if (submit is SubmitState.Submitting) {
+                        CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp))
+                    }
+                    Text(
+                        stringResource(
+                            if (loanId == null) {
+                                Res.string.screens_loans_add_submit
+                            } else {
+                                Res.string.screens_loans_edit_submit
+                            },
+                        ),
+                    )
+                }
+            }
         }
     }
 }

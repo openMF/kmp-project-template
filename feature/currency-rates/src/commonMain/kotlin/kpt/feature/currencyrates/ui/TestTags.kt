@@ -31,6 +31,12 @@ object TestTags {
     object CurrencyRates {
         /** Root [Scaffold] of the currency-rates list screen. */
         const val ROOT: String = "currency_rates_root"
+
+        /**
+         * The currency-converter card — the NETWORK_ONLY/CACHE_ONLY spot-rate
+         * showcase surface (renders `CurrencyRatesViewModel.spotConversionRate`).
+         */
+        const val CONVERTER: String = "currency_rates_converter"
     }
 
     /** Tags for [RateHistoryScreen]. */

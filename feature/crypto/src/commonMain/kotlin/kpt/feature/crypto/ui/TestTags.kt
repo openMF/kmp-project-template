@@ -30,4 +30,10 @@ object TestTags {
 
     /** Individual `CoinMarketRow` in the paging list. */
     const val ROW: String = "coinMarkets.row"
+
+    /**
+     * Root [Scaffold] surface of [CoinDetailScreen] — the drill-down target for
+     * a tapped [ROW]. Stable assertion target regardless of stream state.
+     */
+    const val DETAIL_SCREEN: String = "coinDetail.screen"
 }

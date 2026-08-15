@@ -676,6 +676,48 @@ abstract class SyncForkConfigTask : DefaultTask() {
             logger.warn("syncForkConfig: cmp-desktop/mac-app-store.entitlements.template missing — skipping entitlements emit")
         }
 
+        // ── 6g. Secrets alias-namespace + provisioning-profile URL tokenization (A1) ──
+        // secrets-manifest.yaml + secrets/LAYOUT.yaml carry vault-alias PREFIXES + a match git URL that
+        // are fork identity. Derive them from app-profile so a vault-mode (Path-B) fork rebrands with
+        // ZERO hand-edits, the same way deployment/android/*/secrets-needs.yaml already tokenizes.
+        //   (a) match git URL — the LAYOUT.yaml `match_git_url` literal is DERIVED from
+        //       app-profile#apple.match.git.url (== fork.properties#apple.match.git.url). The neutral
+        //       template value is the YOUR_ORG placeholder; a fork's authored URL flows here. No real
+        //       org literal is ever committed. Fail-soft when blank.
+        //   (b) alias prefix — replace the org (`mifos-x-`) + project (`kmp-project-template-`) alias
+        //       prefixes with the fork's `<aliasNamespace>-`. The project-prefix swap is a natural no-op
+        //       on the upstream template (aliasNamespace == "kmp-project-template"); the org-prefix swap
+        //       is GATED to a real fork (isFork below) so the template's own committed `mifos-x-*`
+        //       aliases stay intact + vault-resolvable — only a genuine fork rewrites them.
+        run {
+            val secretFiles = listOf("secrets-manifest.yaml", "secrets/LAYOUT.yaml")
+            val aliasNamespace = projectName
+            val isFork = aliasNamespace.isNotBlank() && aliasNamespace != "kmp-project-template"
+            for (rel in secretFiles) {
+                val f = File(root, rel)
+                if (!f.isFile) continue
+                val orig = f.readText()
+                var next = orig
+                // (a) provisioning-profile git URL — swap the whole github URL to the app-profile value.
+                if (matchGitUrl.isNotBlank()) {
+                    next = next.replace(
+                        Regex("git@github\\.com:[^\\s\"']+/ios-provisioning-profile\\.git"),
+                        matchGitUrl,
+                    )
+                }
+                // (b) project alias prefix — always safe (no-op on template).
+                if (isFork) {
+                    next = next.replace("kmp-project-template-", "$aliasNamespace-")
+                    // (b) org alias prefix — fork-only, so the template keeps its own `mifos-x-*` aliases.
+                    next = next.replace("mifos-x-", "$aliasNamespace-")
+                }
+                if (next != orig) {
+                    f.writeText(next); written++
+                    logger.lifecycle("syncForkConfig: tokenized $rel (alias prefix=$aliasNamespace, match-url derived)")
+                }
+            }
+        }
+
         // ── 7. Fork icons ─────────────────────────────────────────────────────
         copyForkIcons(root)
     }

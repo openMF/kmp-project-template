@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.base.ui.viewmodel.BaseMutationViewModel
 import kpt.core.base.ui.viewmodel.MutationMode
@@ -63,11 +64,54 @@ class EditLoanViewModel(
     val formState: StateFlow<LoanFormState> = _formState.asStateFlow()
 
     init {
+        // `mutableScreenState` only gates "form ready" — Loading while an existing loan hydrates
+        // (edit), then Content(snapshot); Content(snapshot) immediately for create. Without this the
+        // screen would sit at ScreenState.Loading forever (MutationScreenContent renders the read
+        // gate). The content slot ignores the read payload (the form renders `_formState`), so the
+        // snapshot is a "ready" sentinel, not display data.
         if (loanId != null) {
             viewModelScope.launch {
                 repository.getById(loanId)?.let { hydrateFromExisting(it) }
+                mutableScreenState.value = ScreenState.Content(formSnapshot())
             }
+        } else {
+            mutableScreenState.value = ScreenState.Content(formSnapshot())
         }
+    }
+
+    /**
+     * Three-case Resume: pre-fill the form from the saved draft surfaced in
+     * [uiState]`.resumableDraft`, then dismiss the prompt (the inherited [onResumeDraft]).
+     * Wired to [kpt.core.base.ui.draft.DraftResolutionPrompt]'s Resume action.
+     */
+    fun onResume() {
+        uiState.value.resumableDraft?.let { hydrateFromExisting(it) }
+        onResumeDraft()
+    }
+
+    /** A [Loan] snapshot of the current form — the "form ready" sentinel for the screen state. */
+    private fun formSnapshot(): Loan {
+        val form = _formState.value
+        val now = Clock.System.now().toEpochMilliseconds()
+        return Loan(
+            id = loanId ?: NEW_LOAN_KEY,
+            name = form.name,
+            kind = form.kind,
+            principal = form.principal,
+            principalRemaining = form.principalRemaining,
+            annualRatePercent = form.annualRatePercent,
+            tenureMonths = form.tenureMonths,
+            monthsRemaining = form.monthsRemaining,
+            monthlyPayment = computeMonthlyEmi(
+                principal = form.principal,
+                annualRatePercent = form.annualRatePercent,
+                tenureMonths = form.tenureMonths,
+            ),
+            nextDueDate = form.nextDueDate,
+            totalPaid = form.totalPaid,
+            createdAtMs = now,
+            updatedAtMs = now,
+        )
     }
 
     /** Pre-populate the form with the existing loan's fields. Idempotent. */

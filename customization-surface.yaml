@@ -275,6 +275,12 @@ rules:
   # own feature flows alongside. Run captures (idea-layer/testers/captures/**) are gitignored evidence.
   - glob: "idea-layer/testers/flows/**"
     owner: template
+  # Idea-layer runtime state (agent-awareness / pipeline telemetry, e.g. AGENT_AWARENESS.jsonl) is
+  # per-fork append-only runtime evidence — never a template file to propagate, never clobbered by a
+  # sync. owner:fork = preserve the fork's state. Closes the classification gap so a new state file
+  # cannot silently fall to the blanket default (coverage-verify would flag it).
+  - glob: "idea-layer/state/**"
+    owner: fork
   # In-template feature-authoring guide (E5 consumption contract) — template-authored, synced like
   # the per-module CONSUMPTION.md docs. (closes a pre-existing E5 classification gap)
   - glob: "FEATURE_AUTHORING.md"

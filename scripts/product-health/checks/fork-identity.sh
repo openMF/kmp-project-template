@@ -55,6 +55,23 @@ if [ -f "$lvt" ]; then
   else
     [ "$is_template" = "1" ] && { echo "❌ libs.versions.toml appId '$bid' is authored on the NEUTRAL TEMPLATE — must be a placeholder"; fail=1; }
   fi
+
+  # Apple Team ID in libs.versions.toml — same directional model (WHITE_LABEL_PLACEHOLDERS.yaml#apple_team_id).
+  # A real Apple Team ID literal (e.g. "L432S2FZP5") in the neutral catalog is a signing-identity leak; a
+  # fork must author its own. syncForkConfig resolves iosTeamId app-profile-first, so the catalog is a
+  # fallback that MUST stay a placeholder on the template.
+  # An ABSENT iosTeamId line is neither a leak nor an unfilled placeholder — it means the value is resolved
+  # app-profile-first with no catalog fallback authored — so run the directional check ONLY when the line
+  # is present (an empty match token would otherwise be miscategorized as a "real" value → false leak).
+  tid_line="$(grep -E '^[[:space:]]*iosTeamId[[:space:]]*=' "$lvt" | head -1)"
+  if [ -n "$tid_line" ]; then
+    tid="$(printf '%s' "$tid_line" | sed -E 's/.*=[[:space:]]*"?([^"]+)"?.*/\1/')"
+    if wl_matches_any "$tid" apple_team_id; then
+      [ "$is_template" != "1" ] && { echo "❌ libs.versions.toml iosTeamId '$tid' is a template placeholder — fork must author its own Apple Team ID"; fail=1; }
+    else
+      [ "$is_template" = "1" ] && { echo "❌ libs.versions.toml iosTeamId '$tid' is a REAL Apple Team ID authored on the NEUTRAL TEMPLATE — signing-identity leak (must be the YOUR_TEAM_ID placeholder from WHITE_LABEL_PLACEHOLDERS.yaml#apple_team_id)"; fail=1; }
+    fi
+  fi
 fi
 
 if [ "$fail" = 0 ]; then

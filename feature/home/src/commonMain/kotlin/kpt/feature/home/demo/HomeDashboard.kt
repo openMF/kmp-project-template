@@ -55,6 +55,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.ui.dashboard.DashboardProgressBar
+import kpt.core.base.ui.dashboard.toDashboardProgressState
 import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatDecimal
@@ -162,6 +164,22 @@ fun HomeDashboard(
         verticalArrangement = Arrangement.spacedBy(sp.md),
     ) {
         Spacer(Modifier.height(sp.xs))
+
+        // ── Aggregate load/refresh progress ──────────────────────────────
+        // Same core-base dashboard archetype the Country Macro screen showcases:
+        // fold the four independent per-card ScreenStates (loans / bills / rates /
+        // exchange) into one "X of Y loaded" strip. DashboardProgressBar hides itself
+        // once every card is Content (or on an empty dashboard), so it only surfaces
+        // while cards are still resolving or during a pull-to-refresh fan-out — the
+        // per-card independence + retry below is untouched.
+        DashboardProgressBar(
+            state = listOf(
+                state.loans,
+                state.bills,
+                state.rates,
+                state.exchangeRate,
+            ).toDashboardProgressState(),
+        )
 
         // ── Hero: at-a-glance financial snapshot ─────────────────────────
         HeroSnapshot(state.loans)

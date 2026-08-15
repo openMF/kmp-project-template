@@ -63,6 +63,14 @@ class LoanDetailViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
     /**
+     * Re-fetch the loan detail — wired to the read-side retry affordance surfaced by
+     * [ScreenContent] on an Error/Empty state. Delegates to the repository-built
+     * [kpt.core.base.store.screen.ScreenDataStream.retry], so a transient read failure has a
+     * real recovery path (never an inert lambda — RULE-IMPL-DEAD-CLICKABLE-001).
+     */
+    fun onRetry() = detailStream.retry()
+
+    /**
      * **Archetype: asLoadOnceStream**
      *
      * Stops after the first [ScreenState.Content] emission so background Room updates

@@ -22,6 +22,13 @@
     <string name="screens_currencyrates_list_search_placeholder">Search currency...</string>
     <string name="screens_currencyrates_list_base_label">Base: %1$s • %2$s</string>
 
+    <!-- ===== Currency Converter (NETWORK_ONLY / CACHE_ONLY archetype showcase) ===== -->
+    <string name="screens_currencyrates_converter_title">Currency Converter</string>
+    <string name="screens_currencyrates_converter_amount_label">Amount</string>
+    <string name="screens_currencyrates_converter_target_label">To (e.g. EUR)</string>
+    <string name="screens_currencyrates_converter_result">%1$s %2$s = %3$s %4$s</string>
+    <string name="screens_currencyrates_converter_unavailable">Enter an amount and a supported currency code.</string>
+
     <!-- ===== RateHistoryScreen ===== -->
     <string name="screens_currencyrates_history_title">Rate History</string>
     <string name="screens_currencyrates_history_back_cd">Back</string>

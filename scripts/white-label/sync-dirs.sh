@@ -112,7 +112,11 @@ declare -A EXCLUSIONS=(
     # iOS — consumer-branded asset catalog (app icon, color palette) preserved across syncs.
     ["cmp-ios"]="iosApp/Assets.xcassets:dir Configuration/Config.xcconfig:file"
     ["cmp-web"]="src/jsMain/resources:dir src/wasmJsMain/resources:dir"
-    ["cmp-desktop"]="icons:dir build.gradle.kts:file"
+    # icons:dir stays fork-preserved; build.gradle.kts is REMOVED from the hardcoded exclusion so the
+    # customization-surface.yaml declaration (owner: merge / kotlin-3way) governs — template desktop
+    # build improvements reach forks via the 3-way merge loop while fork packaging identity survives.
+    # (Was clobbering the merge: the restore-excluded block below copied the fork's original back.)
+    ["cmp-desktop"]="icons:dir"
     ["fastlane-config"]="project_config.rb:file extract_config.rb:file"
     # Deployment — FULL-COPY, ZERO exclusions (E1 / D-3, epic pure-white-label-store5-network).
     # deployment/** is a pure TEMPLATE-OWNED module now: all fork DATA was relocated OUT —

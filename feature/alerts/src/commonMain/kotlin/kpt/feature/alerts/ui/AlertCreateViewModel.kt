@@ -58,6 +58,22 @@ class AlertCreateViewModel(
         mutableScreenState.value = ScreenState.Content(draftPayload())
     }
 
+    /**
+     * Three-case Resume: pre-fill the form from the saved draft surfaced in
+     * [uiState]`.resumableDraft`, then dismiss the prompt (the inherited [onResumeDraft]).
+     * Wired to [kpt.core.base.ui.draft.DraftResolutionPrompt]'s Resume action.
+     */
+    fun onResume() {
+        uiState.value.resumableDraft?.let { draft -> _formState.value = draft.toFormState() }
+        onResumeDraft()
+    }
+
+    private fun PriceAlert.toFormState(): AlertFormState = AlertFormState(
+        coinId = coinId,
+        direction = direction,
+        targetValueText = if (targetValue == 0.0) "" else targetValue.toString(),
+    )
+
     override suspend fun performSubmit(payload: PriceAlert): PriceAlert =
         repository.submitAlert(payload)
 

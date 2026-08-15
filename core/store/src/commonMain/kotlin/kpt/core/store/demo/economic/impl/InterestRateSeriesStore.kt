@@ -18,6 +18,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.todayIn
+import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.demo.economic.InterestRateSeriesDao
 import kpt.core.database.demo.economic.InterestRateSeriesEntity
@@ -25,6 +26,7 @@ import kpt.core.model.demo.economic.InterestRateSeries
 import kpt.core.model.demo.economic.RateObservation
 import kpt.core.network.demo.economic.api.FredApi
 import kpt.core.network.demo.economic.config.FredApiConfig
+import kpt.core.store.AppStoreRegistry
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
@@ -47,45 +49,50 @@ fun provideInterestRateSeriesStore(
     config: FredApiConfig,
     networkMonitor: NetworkMonitor,
     dao: InterestRateSeriesDao,
-): Store<InterestRateSeriesKey, InterestRateSeries> = StoreFactory.createStore(
-    fetcher = Fetcher.of { key: InterestRateSeriesKey ->
-        val apiKey = config.apiKey
-            ?: error(
-                "FRED_API_KEY is not configured — supply a key via FredApiConfig " +
-                    "before requesting interest-rate data. See CLAUDE.md " +
-                    "→ \"First-time fork setup\".",
-            )
-        val today = Clock.System.todayIn(TimeZone.UTC)
-        val start = today.minus(key.days, DateTimeUnit.DAY)
-        networkMonitor.executeWithRetry(
-            RetryPolicy { maxAttempts = 1 },
-        ) {
-            api.seriesObservations(
-                seriesId = key.seriesId,
-                apiKey = apiKey,
-                observationStart = start.toString(),
-                observationEnd = today.toString(),
-            ).toDomain(
-                seriesId = key.seriesId,
-                name = key.name,
-                unit = key.unit,
-            )
-        }
-    },
-    sourceOfTruth = SourceOfTruth.of(
-        reader = { key: InterestRateSeriesKey ->
-            dao.observeBySeriesId(key.seriesId).map { entities ->
-                entities.toInterestRateSeries(key)
+): Store<InterestRateSeriesKey, InterestRateSeries> {
+    val validator = DefaultValidator.withTtl<InterestRateSeries>(AppStoreRegistry.Ttl.INTEREST_RATE_SERIES)
+    return StoreFactory.createStore(
+        fetcher = Fetcher.of { key: InterestRateSeriesKey ->
+            val apiKey = config.apiKey
+                ?: error(
+                    "FRED_API_KEY is not configured — supply a key via FredApiConfig " +
+                        "before requesting interest-rate data. See CLAUDE.md " +
+                        "→ \"First-time fork setup\".",
+                )
+            val today = Clock.System.todayIn(TimeZone.UTC)
+            val start = today.minus(key.days, DateTimeUnit.DAY)
+            networkMonitor.executeWithRetry(
+                RetryPolicy { maxAttempts = 1 },
+            ) {
+                api.seriesObservations(
+                    seriesId = key.seriesId,
+                    apiKey = apiKey,
+                    observationStart = start.toString(),
+                    observationEnd = today.toString(),
+                ).toDomain(
+                    seriesId = key.seriesId,
+                    name = key.name,
+                    unit = key.unit,
+                )
             }
         },
-        writer = { _: InterestRateSeriesKey, series: InterestRateSeries ->
-            val now = Clock.System.now().toEpochMilliseconds()
-            dao.upsertAll(series.toEntities(updatedAt = now))
-        },
-        delete = { key: InterestRateSeriesKey -> dao.deleteBySeriesId(key.seriesId) },
-        deleteAll = { dao.deleteAll() },
-    ),
-)
+        sourceOfTruth = SourceOfTruth.of(
+            reader = { key: InterestRateSeriesKey ->
+                dao.observeBySeriesId(key.seriesId).map { entities ->
+                    entities.toInterestRateSeries(key)
+                }
+            },
+            writer = { _: InterestRateSeriesKey, series: InterestRateSeries ->
+                val now = Clock.System.now().toEpochMilliseconds()
+                dao.upsertAll(series.toEntities(updatedAt = now))
+                validator.markFresh()
+            },
+            delete = { key: InterestRateSeriesKey -> dao.deleteBySeriesId(key.seriesId) },
+            deleteAll = { dao.deleteAll() },
+        ),
+        validator = validator,
+    )
+}
 
 // ---------------------------------------------------------------------------
 // Inline mapping helpers — private to this file

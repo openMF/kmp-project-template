@@ -15,9 +15,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.feature.crypto.ui.CoinDetailScreen
 import kpt.feature.crypto.ui.CoinMarketsRoute
 
 /** Root of the crypto feature graph. Navigated to via [navigateToCrypto]. */
@@ -38,30 +40,49 @@ data object CryptoGraphRoute
 @Serializable
 data object CoinMarketsListRoute
 
+/**
+ * Per-coin detail destination — the drill-down target for a tapped CoinMarkets row.
+ *
+ * @property coinId CoinGecko coin id, e.g. `"bitcoin"`.
+ */
+@Serializable
+data class CoinDetailRoute(val coinId: String)
+
 /** Convenience navigator so callers do not construct the route type by hand. */
 fun NavController.navigateToCrypto(navOptions: NavOptions? = null) {
     navigate(route = CryptoGraphRoute, navOptions = navOptions)
 }
 
+fun NavController.navigateToCoinDetail(coinId: String, navOptions: NavOptions? = null) {
+    navigate(route = CoinDetailRoute(coinId = coinId), navOptions = navOptions)
+}
+
 /**
  * Wires the crypto graph into the parent NavHost. Mirrors
- * `LoansNavigation.loansGraph` shape verbatim so future sibling destinations
- * (coin detail, watchlist) can be added inside the same
- * `navigation<CryptoGraphRoute>` block.
+ * `RatesNavigation.ratesGraph` shape: a list destination whose row-tap navigates
+ * to a per-item detail destination inside the same `navigation<CryptoGraphRoute>`
+ * block.
  *
- * `onCoinClick` currently no-ops; the coin-detail destination arrives with the
- * `CoinDetailRoute` sub-plan and re-uses `coinDetailStream` in
- * `CryptoRepositoryImpl` (already wired at HEAD).
+ * The coin-row `onCoinClick(coinId)` now navigates to [CoinDetailRoute], which
+ * renders [CoinDetailScreen] — consuming the `coinDetailStream` / `CoinDetailStore`
+ * read path that was already wired at HEAD (turning the former dead click +
+ * orphan store into a real drill-down).
  */
 fun NavGraphBuilder.cryptoGraph(navController: NavController) {
     navigation<CryptoGraphRoute>(startDestination = CoinMarketsListRoute) {
         composableWithPushTransitions<CoinMarketsListRoute> {
             CoinMarketsRoute(
                 onBackClick = { navController.popBackStackSafely() },
-                onCoinClick = {
-                    // intentional-noop: CoinDetailRoute lands with a future sub-plan;
-                    // the store + repository ScreenDataStream are already wired.
+                onCoinClick = { coinId ->
+                    navController.navigateToCoinDetail(coinId = coinId)
                 },
+            )
+        }
+        composableWithPushTransitions<CoinDetailRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<CoinDetailRoute>()
+            CoinDetailScreen(
+                coinId = route.coinId,
+                onBackClick = { navController.popBackStackSafely() },
             )
         }
     }

@@ -418,7 +418,7 @@ module FastlaneConfig
     TESTFLIGHT_CONFIG = {
       beta_app_review_info: {
         contact_email:         _c._secret("TESTFLIGHT_CONTACT_EMAIL") || _c._fork_prop("org.email")      || "", # E0/T5: no mifos fallback — fork supplies org.email
-        contact_first_name:    _c._secret("TESTFLIGHT_FIRST_NAME")    || _c._fork_prop("org.first.name") || "Mifos",
+        contact_first_name:    _c._secret("TESTFLIGHT_FIRST_NAME")    || _c._fork_prop("org.first.name") || "App",
         contact_last_name:     _c._secret("TESTFLIGHT_LAST_NAME")     || _c._fork_prop("org.last.name")  || "Team",
         contact_phone:         _c._secret("TESTFLIGHT_PHONE")         || _c._fork_prop("org.phone")      || "", # E0/T5: no mifos fallback — fork supplies org.phone
         demo_account_required: false,
@@ -474,7 +474,7 @@ module FastlaneConfig
       # aborts "Export compliance is required to submit". add_id_info_uses_idfa:false ⇒ no IDFA.
       submission_information:             { add_id_info_uses_idfa: false, export_compliance_uses_encryption: false }.freeze,
       app_review_information: {
-        first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || _c._fork_prop("org.first.name") || "Mifos",
+        first_name: _c._secret("APPSTORE_REVIEW_FIRST_NAME") || _c._fork_prop("org.first.name") || "App",
         last_name:  _c._secret("APPSTORE_REVIEW_LAST_NAME")  || _c._fork_prop("org.last.name")  || "Team",
         phone:      _c._secret("APPSTORE_REVIEW_PHONE")      || _c._fork_prop("org.phone")      || "", # E0/T5: no mifos fallback — fork supplies org.phone
         email:      _c._secret("APPSTORE_REVIEW_EMAIL")      || _c._fork_prop("org.email")      || "", # E0/T5: no mifos fallback — fork supplies org.email

@@ -104,14 +104,14 @@ class KMPFlavorsConventionPlugin : Plugin<Project> {
                         desktopWindowTitleSuffix.set(" (Demo)")
                         webTitleSuffix.set(" (Demo)")
                         buildConfigField("Boolean", "IS_DEMO_BUILD", "true")
-                        buildConfigField("String", "BASE_URL", "\"${forkProp("network.base.url.demo", "https://demo.openmf.org")}\"")
+                        buildConfigField("String", "BASE_URL", "\"${forkProp("network.base.url.demo", "https://demo.example.com")}\"")
                         buildConfigField("String", "DEMO_USERNAME", "\"${forkProp("demo.username", "demo")}\"")
                         buildConfigField("String", "DEMO_PASSWORD", "\"${forkProp("demo.password", "demo")}\"")
                     }
                     register("prod") {
                         dimension.set("contentType")
                         buildConfigField("Boolean", "IS_DEMO_BUILD", "false")
-                        buildConfigField("String", "BASE_URL", "\"${forkProp("network.base.url.prod", "https://api.openmf.org")}\"")
+                        buildConfigField("String", "BASE_URL", "\"${forkProp("network.base.url.prod", "https://api.example.com")}\"")
                         buildConfigField("String", "DEMO_USERNAME", "\"\"")
                         buildConfigField("String", "DEMO_PASSWORD", "\"\"")
                     }

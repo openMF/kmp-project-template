@@ -9,7 +9,9 @@
  */
 package kpt.feature.crypto.di
 
+import kpt.feature.crypto.ui.CoinDetailViewModel
 import kpt.feature.crypto.ui.CoinMarketsViewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -22,4 +24,13 @@ import org.koin.dsl.module
  */
 val CryptoFeatureModule = module {
     viewModelOf(::CoinMarketsViewModel)
+
+    // Detail screen — `coinId` comes from the nav route via
+    // koinViewModel { parametersOf(coinId) }.
+    viewModel { params ->
+        CoinDetailViewModel(
+            coinId = params.get(),
+            repository = get(),
+        )
+    }
 }

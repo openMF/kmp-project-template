@@ -107,16 +107,32 @@ class CurrencyRatesViewModel(
 
     override fun handleAction(action: RatesAction) = when (action) {
         is RatesAction.Search -> updateState { copy(searchQuery = action.query) }
+        is RatesAction.ConverterAmount -> updateState { copy(converterAmount = action.amount) }
+        is RatesAction.ConverterTarget -> updateState { copy(converterTarget = action.code) }
         RatesAction.Retry -> stream.retry()
         RatesAction.Refresh -> stream.refresh()
     }
 }
 
-data class RatesLocalState(val searchQuery: String = "")
+/**
+ * @property searchQuery filter applied to the rate list.
+ * @property converterAmount raw amount text typed into the converter card (kept as
+ *   String so the field renders partial/empty input; parsed at render time).
+ * @property converterTarget target currency code the converter converts the base
+ *   ([spotConversionRate]'s USD base) into. Uppercased at lookup time.
+ */
+data class RatesLocalState(
+    val searchQuery: String = "",
+    val converterAmount: String = "1",
+    val converterTarget: String = "EUR",
+)
+
 data class RatesDisplay(val base: String, val date: String, val rates: Map<String, Double>)
 
 sealed interface RatesAction {
     data class Search(val query: String) : RatesAction
+    data class ConverterAmount(val amount: String) : RatesAction
+    data class ConverterTarget(val code: String) : RatesAction
     data object Retry : RatesAction
     data object Refresh : RatesAction
 }

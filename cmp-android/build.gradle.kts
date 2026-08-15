@@ -24,7 +24,11 @@ val appId: String = libs.versions.appId.get()
 val appDisplayName: String = libs.versions.appDisplayName.get()
 
 android {
-    namespace = appId
+    // Namespace is the STABLE code-gen package (BuildConfig / R live here) — deliberately fixed to the
+    // module's own source package, NOT the white-label applicationId. Decoupling the two is what lets a
+    // fork rebrand `applicationId` (market identity) with zero source edits while `BuildConfig` stays at a
+    // stable import path (`cmp.android.app.BuildConfig`, same package as this module's Kotlin).
+    namespace = "cmp.android.app"
 
     defaultConfig {
         applicationId = appId

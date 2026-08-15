@@ -23,6 +23,9 @@ kotlin {
             implementation(projects.core.data)
             implementation(projects.core.model)
             implementation(projects.core.ui)
+            // Sync & Drafts screen consumes the DraftInventory seam. Depend on core/store (the fork
+            // seam), which `api`-re-exposes core-base/store — features never depend on core-base directly.
+            implementation(projects.core.store)
             // Firebase analytics (AnalyticsHelper + Compose TrackScreenView/rememberAnalyticsHelper) via core/firebase.
             implementation(projects.core.firebase)
 

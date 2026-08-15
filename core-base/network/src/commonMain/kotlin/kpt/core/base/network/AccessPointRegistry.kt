@@ -59,9 +59,12 @@ class AccessPointRegistry(val points: List<AccessPoint>) {
     fun restBaseUrl(type: UrlType): String? =
         points.firstOrNull { it.type == type && it.kind == AccessPointKind.REST }?.baseUrl
 
-    /** The first Supabase access point, or `null` if none is declared. */
-    fun supabasePoint(): AccessPoint? =
-        points.firstOrNull { it.kind == AccessPointKind.SUPABASE }
+    /** Every declared Supabase access point, in registry order. Empty if none declared. */
+    fun supabasePoints(): List<AccessPoint> =
+        points.filter { it.kind == AccessPointKind.SUPABASE }
+
+    /** The first Supabase access point, or `null` if none is declared. Prefer [supabasePoints]. */
+    fun supabasePoint(): AccessPoint? = supabasePoints().firstOrNull()
 
     /** Every declared host enabled for HTTP logging, across all access points. */
     fun loggableHosts(): List<String> = points.map { it.loggableHost }

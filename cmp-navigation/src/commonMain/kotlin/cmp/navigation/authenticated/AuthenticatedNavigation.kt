@@ -19,16 +19,10 @@ import cmp.navigation.authenticatednavbar.AuthenticatedNavbarRoute
 import cmp.navigation.authenticatednavbar.authenticatedNavbarGraph
 import cmp.navigation.registry.BackboneRegistry
 import cmp.navigation.registry.FeatureRegistry
+import cmp.navigation.registry.ShowcaseRegistry
 import kotlinx.serialization.Serializable
-import kpt.core.base.security.isReleaseBuild
-import kpt.core.base.ui.nav.popBackStackSafely
-import kpt.feature.settings.navigateToSettings
-import kpt.feature.settings.notificationDestination
-import kpt.feature.settings.settingsDestination
-import kpt.feature.showcase.stategallery.StateGalleryRoute
-import kpt.feature.showcase.stategallery.stateGalleryGraph
-import kpt.feature.showcase.transitions.TransitionGalleryRoute
-import kpt.feature.showcase.transitions.transitionGalleryGraph
+// NOTE: this merge-owned shell carries zero direct feature imports — all backbone, fork-feature,
+// and dev-only destinations flow through the three registry seams imported above.
 
 @Serializable
 internal data object AuthenticatedGraphRoute
@@ -42,49 +36,21 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
         startDestination = AuthenticatedNavbarRoute,
     ) {
         authenticatedNavbarGraph(
-            navigateToSettingsScreen = navController::navigateToSettings,
+            navigateToSettingsScreen = { BackboneRegistry.navigateToSettings(navController) },
             // Home body from the fork-owned BackboneRegistry seam (default: demo dashboard). The
             // template shell carries zero demo imports — a fork edits BackboneRegistry, not this file.
             homeBody = { BackboneRegistry.homeBody(navController) },
         )
 
-        notificationDestination(onBackClick = { navController.popBackStackSafely() })
-
-        // demo:begin
-        // Dev-only entry points to the showcase galleries (only wired in non-release builds).
-        // Released builds receive null → SettingsScreen hides the dev menu entirely.
-        // See feature/showcase for the gallery destinations.
-        val onTransitionGalleryClick: (() -> Unit)? = if (!isReleaseBuild()) {
-            { navController.navigate(TransitionGalleryRoute) }
-        } else {
-            null
-        }
-        val onStateGalleryClick: (() -> Unit)? = if (!isReleaseBuild()) {
-            { navController.navigate(StateGalleryRoute) }
-        } else {
-            null
-        }
-        // demo:end
-        settingsDestination(
-            onBackClick = { navController.popBackStackSafely() },
-            // demo:begin
-            onTransitionGalleryClick = onTransitionGalleryClick,
-            onStateGalleryClick = onStateGalleryClick,
-            // demo:end
-        )
+        // Backbone (framework) destinations — settings, notification, sync-and-drafts.
+        BackboneRegistry.backboneDestinations.invoke(this, navController)
 
         // Fork feature routes — from the fork-owned FeatureRegistry seam (white-label: the template infra
         // never edits this; a fork adds/removes routes in cmp-navigation/registry/FeatureRegistry.kt).
-        // `this` here is the NavGraphBuilder receiver of the enclosing navigation{} block.
         FeatureRegistry.featureDestinations.invoke(this, navController)
 
-        // demo:begin
-
-        // Dev-only transition gallery (Phase 08 Task 14 — Task 12-13 ground work).
-        transitionGalleryGraph(navController)
-
-        // Dev-only state gallery (Phase 02 Task 17 — ScreenState variants + component-scale primitives).
-        stateGalleryGraph(navController)
-        // demo:end
+        // Dev-only showcase destinations — from the template-owned ShowcaseRegistry seam. A `--clean`
+        // fork strips its fenced content, reducing this to a no-op.
+        ShowcaseRegistry.devDestinations.invoke(this, navController)
     }
 }

@@ -304,7 +304,7 @@ This template stores the brand identifier ONCE in `gradle/libs.versions.toml#[ve
 
 ```toml
 [versions]
-appId = "org.mifos.kmp.template"
+appId = "com.example.app"
 ```
 
 And reads it in `KMPFlavorsConventionPlugin`:
@@ -317,7 +317,7 @@ Forking this template to a new brand = changing one TOML line.
 
 ```bash
 grep -E '^appId\s*=' gradle/libs.versions.toml
-# Expected: appId = "org.mifos.kmp.template"
+# Expected: appId = "com.example.app"
 
 grep -E 'libs\.findVersion\("appId"\)' \
   build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt

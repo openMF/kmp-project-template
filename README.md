@@ -2,12 +2,14 @@
 
 <img src="https://github.com/user-attachments/assets/ab2f5bf9-5b88-4fee-90e9-741e3b3f7a26" alt="Project Logo" width="150" style="margin-right: 20px;" />
 
-<h1>Money Toolkit — KMP Financial Utility Template</h1>
+<h1>App Toolkit — Brand-Neutral KMP White-Label Template</h1>
 
-<p>An open-source financial utility template for Kotlin Multiplatform. No login.
-No backend. Ships working personal-finance tools you can use out-of-the-box:
-loan tracking, bill reminders, interest-rate watching, financial calculators,
-country-level macro indicators. Fork to brand and extend.</p>
+<p>An open-source, brand-neutral white-label template for Kotlin Multiplatform. Every
+brand-touching value ships as a placeholder (<code>com.example.app</code> / "App Toolkit"); fill
+<code>app-profile/</code>, run <code>./gradlew syncForkConfig</code>, and it flows to every platform.
+The bundled demo features (loan tracking, bill reminders, interest-rate watching, calculators,
+macro indicators) showcase the 8 Store5 archetypes. See
+<a href="docs/architecture/CONSUMER_APP_MIGRATION_GUIDE.md">the canonical fork loop</a>.</p>
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-7f52ff?style=flat-square&logo=kotlin&logoColor=white)
 ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin%20Multiplatform-4c8d3f?style=flat-square&logo=kotlin&logoColor=white)

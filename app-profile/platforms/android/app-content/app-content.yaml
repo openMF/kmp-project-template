@@ -2,7 +2,7 @@
 # feeds Google Play Console "App content" section (Play Store listing → App content). Folds 1:1
 # into app-profile/platforms/android/app-content/app-content.yaml on `--sync`.
 #
-# Money Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no analytics,
+# App Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no analytics,
 # no data collection or transmission of any kind.
 
 privacy_policy_url: https://raw.githubusercontent.com/openMF/kmp-project-template/main/legal/output/privacy-policy.md
@@ -56,7 +56,7 @@ special_categories:
 financial_features_declaration:
   is_financial_app_requiring_declaration: false
   notes: >
-    Money Toolkit is a personal offline utility (loan tracking, EMI
+    App Toolkit is a personal offline utility (loan tracking, EMI
     calculation) — it does not originate, process, or facilitate loans,
     payments, or any regulated financial transaction, so it does not trigger
     Play's financial-services app declaration requirements.

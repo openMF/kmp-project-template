@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.ui.draft.DraftResolutionPrompt
 import kpt.core.base.ui.submit.MutationScreenContent
 import kpt.core.model.demo.alerts.AlertDirection
 import kpt.feature.alerts.generated.resources.Res
@@ -39,6 +40,11 @@ import kpt.feature.alerts.generated.resources.screens_alert_create_back_cd
 import kpt.feature.alerts.generated.resources.screens_alert_create_coin_label
 import kpt.feature.alerts.generated.resources.screens_alert_create_dir_above
 import kpt.feature.alerts.generated.resources.screens_alert_create_dir_below
+import kpt.feature.alerts.generated.resources.screens_alert_create_draft_resume_discard
+import kpt.feature.alerts.generated.resources.screens_alert_create_draft_resume_message
+import kpt.feature.alerts.generated.resources.screens_alert_create_draft_resume_resume
+import kpt.feature.alerts.generated.resources.screens_alert_create_draft_resume_start_fresh
+import kpt.feature.alerts.generated.resources.screens_alert_create_draft_resume_title
 import kpt.feature.alerts.generated.resources.screens_alert_create_submit
 import kpt.feature.alerts.generated.resources.screens_alert_create_target_label
 import kpt.feature.alerts.generated.resources.screens_alert_create_title
@@ -61,6 +67,22 @@ fun AlertCreateScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val form by viewModel.formState.collectAsStateWithLifecycle()
+
+    // Three-case resume: on entry, if a saved draft exists for this alert, let the user choose to
+    // resume it, discard it, or start fresh (the draft stays recoverable in Settings → Sync & Drafts).
+    if (uiState.hasResumableDraft) {
+        DraftResolutionPrompt(
+            onResume = viewModel::onResume,
+            onDiscard = viewModel::onDiscardSavedDraft,
+            onStartFresh = viewModel::onStartFresh,
+            onDismiss = viewModel::onStartFresh,
+            title = stringResource(Res.string.screens_alert_create_draft_resume_title),
+            message = stringResource(Res.string.screens_alert_create_draft_resume_message),
+            resumeLabel = stringResource(Res.string.screens_alert_create_draft_resume_resume),
+            discardLabel = stringResource(Res.string.screens_alert_create_draft_resume_discard),
+            startFreshLabel = stringResource(Res.string.screens_alert_create_draft_resume_start_fresh),
+        )
+    }
 
     Scaffold(
         modifier = modifier.testTag(TestTags.AlertCreate.SCREEN),

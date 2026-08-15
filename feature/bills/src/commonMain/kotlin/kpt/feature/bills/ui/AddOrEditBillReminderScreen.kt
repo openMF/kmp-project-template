@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.submit.SubmitState
+import kpt.core.base.ui.draft.DraftResolutionPrompt
 import kpt.core.base.ui.submit.MutationScreenContent
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.demo.banking.BillCategory
@@ -67,6 +68,11 @@ import kpt.feature.bills.generated.resources.screens_bills_addedit_status_failed
 import kpt.feature.bills.generated.resources.screens_bills_addedit_status_offline
 import kpt.feature.bills.generated.resources.screens_bills_addedit_status_saved
 import kpt.feature.bills.generated.resources.screens_bills_addedit_status_saving
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_discard
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_message
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_resume
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_start_fresh
+import kpt.feature.bills.generated.resources.screens_bills_draft_resume_title
 import kpt.feature.bills.generated.resources.screens_bills_edit_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -94,6 +100,22 @@ fun AddOrEditBillReminderScreen(
     val form by viewModel.formState.collectAsStateWithLifecycle()
     val ui by viewModel.uiState.collectAsStateWithLifecycle()
     val submit = ui.submit
+
+    // Three-case resume: on entry, if a saved draft exists for this bill, let the user choose to
+    // resume it, discard it, or start fresh (the draft stays recoverable in Settings → Sync & Drafts).
+    if (ui.hasResumableDraft) {
+        DraftResolutionPrompt(
+            onResume = viewModel::onResume,
+            onDiscard = viewModel::onDiscardSavedDraft,
+            onStartFresh = viewModel::onStartFresh,
+            onDismiss = viewModel::onStartFresh,
+            title = stringResource(Res.string.screens_bills_draft_resume_title),
+            message = stringResource(Res.string.screens_bills_draft_resume_message),
+            resumeLabel = stringResource(Res.string.screens_bills_draft_resume_resume),
+            discardLabel = stringResource(Res.string.screens_bills_draft_resume_discard),
+            startFreshLabel = stringResource(Res.string.screens_bills_draft_resume_start_fresh),
+        )
+    }
     val title = stringResource(
         if (billId == null) Res.string.screens_bills_add_title else Res.string.screens_bills_edit_title,
     )

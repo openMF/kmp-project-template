@@ -20,7 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kpt.core.base.store.submit.SubmitOutbox
-import kpt.core.base.ui.viewmodel.BaseDraftMutationViewModel
+import kpt.core.base.ui.viewmodel.BaseMutationViewModel
+import kpt.core.base.ui.viewmodel.MutationMode
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.domain.demo.calc.computeEmi
 import kpt.core.model.demo.banking.Loan
@@ -53,7 +54,7 @@ import kotlin.time.Clock
  * the user was on.
  *
  * The final step ([completeAndSave]) routes through the inherited
- * [BaseDraftMutationViewModel.onSubmit] which calls [performSubmit] →
+ * [BaseMutationViewModel.onSubmit] which calls [performSubmit] →
  * [LoanRepository.upsert]. On success the draft row is automatically marked
  * SUBMITTED.
  */
@@ -61,11 +62,13 @@ class LoanCalcWizardViewModel(
     outbox: SubmitOutbox<LoanCalcScenario>,
     private val repository: LoanRepository,
     private val scenarioIdArg: String?,
-) : BaseDraftMutationViewModel<LoanCalcScenario, Loan>(
-    outbox = outbox,
-    formKey = FORM_KEY,
-    uniqueKey = scenarioIdArg ?: NEW_WIZARD_UNIQUE_KEY,
-    autoSaveDraft = false,
+) : BaseMutationViewModel<LoanCalcScenario, Loan>(
+    MutationMode.Draft(
+        outbox = outbox,
+        formKey = FORM_KEY,
+        uniqueKey = scenarioIdArg ?: NEW_WIZARD_UNIQUE_KEY,
+        autoSaveDraft = false,
+    ),
 ) {
 
     /** Outbox kept as a VM-local handle so we can persist mid-wizard snapshots. */
@@ -167,7 +170,7 @@ class LoanCalcWizardViewModel(
 
     /**
      * Final step — convert the wizard payload to a [Loan] and submit through the
-     * inherited [BaseDraftMutationViewModel.onSubmit]. On success [performSubmit]
+     * inherited [BaseMutationViewModel.onSubmit]. On success [performSubmit]
      * marks the outbox row SUBMITTED automatically.
      */
     fun completeAndSave() {

@@ -2,14 +2,14 @@
 # feeds App Store Connect "App Information" → "Content Rights" declaration. Folds 1:1 into
 # app-profile/platforms/apple/ios/app-content/content-rights.yaml on `--sync`.
 #
-# Money Toolkit posture: fully original app (Mifos Initiative, MIT licensed, source on GitHub).
+# App Toolkit posture: fully original app (Your Organization Name, MIT licensed, source on GitHub).
 # No third-party media, no licensed content, no user-generated content.
 
 contains_third_party_content: false
 declaration: >
   This app does not contain, show, or access third-party content that
   requires additional rights or licenses. All UI, copy, and iconography are
-  original or MIT-licensed open-source assets owned/authored by the Mifos
+  original or MIT-licensed open-source assets owned/authored by the Your Organization
   Initiative. The Interest Rates, Country Macro Data, and Currency Exchange
   Rates screens display factual, non-copyrightable numeric data retrieved
   live from public government/international-institution data APIs (FRED,

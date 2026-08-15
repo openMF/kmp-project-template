@@ -62,7 +62,7 @@ This playbook provides step-by-step deployment procedures for all 5 platforms.
 
 - [ ] **iOS setup complete** - Run `./scripts/ios/verify_ios_deployment.sh`
 - [ ] **Match certificates valid** - Run `bundle exec fastlane match adhoc --readonly`
-- [ ] **CocoaPods updated** - Run `cd cmp-ios && pod install`
+- [ ] **ComposeApp XCFramework assembles** - Run `./gradlew :cmp-shared:assembleComposeAppReleaseXCFramework` (SwiftPM/XCFramework; no CocoaPods)
 - [ ] **App Store Connect access** - Can login to App Store Connect
 - [ ] **Screenshots uploaded** (App Store only) - Check App Store Connect
 - [ ] **Privacy policy URL set** (App Store only) - Check App Information
@@ -346,7 +346,6 @@ gh workflow run multi-platform-build-and-publish.yml \
   -f android_package_name=cmp-android \
   -f ios_package_name=cmp-ios \
   -f distribute_ios_firebase=true \
-  -f use_cocoapods=true \
   -f shared_module=cmp-shared \
   -f desktop_package_name=cmp-desktop \
   -f web_package_name=cmp-web
@@ -404,10 +403,8 @@ Firebase receives: 2026.1.1-beta.0.9 ✅ (pre-release OK)
 # Check Match certificates (appstore profile needed)
 bundle exec fastlane match appstore --readonly
 
-# Check CocoaPods
-cd cmp-ios
-pod install
-cd ..
+# Assemble the ComposeApp XCFramework (SwiftPM/XCFramework; no CocoaPods)
+./gradlew :cmp-shared:assembleComposeAppReleaseXCFramework
 
 # Check version
 ./scripts/ios/check_ios_version.sh
@@ -438,7 +435,6 @@ gh workflow run multi-platform-build-and-publish.yml \
   -f android_package_name=cmp-android \
   -f ios_package_name=cmp-ios \
   -f distribute_ios_testflight=true \
-  -f use_cocoapods=true \
   -f shared_module=cmp-shared \
   -f desktop_package_name=cmp-desktop \
   -f web_package_name=cmp-web
@@ -548,7 +544,6 @@ gh workflow run multi-platform-build-and-publish.yml \
   -f android_package_name=cmp-android \
   -f ios_package_name=cmp-ios \
   -f distribute_ios_appstore=true \
-  -f use_cocoapods=true \
   -f shared_module=cmp-shared \
   -f desktop_package_name=cmp-desktop \
   -f web_package_name=cmp-web

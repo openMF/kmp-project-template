@@ -42,7 +42,7 @@ and is kept for any manually-captured assets not yet sorted into a
 
 ## Source of truth
 
-Money Toolkit is a 100% offline, no-login personal-finance utility — capture
+App Toolkit is a 100% offline, no-login personal-finance utility — capture
 the desktop layout for Loan Tracker, EMI Calculator, Bill Reminders,
 Amortization Schedule, Loan Comparison, Interest Rates, Country Macro Data,
 Currency Exchange Rates. Generate via `/idea-store-assets-generate` rather

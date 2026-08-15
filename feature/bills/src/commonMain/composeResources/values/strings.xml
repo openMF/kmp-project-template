@@ -36,6 +36,12 @@
     <string name="screens_bills_addedit_category_title">Category</string>
     <string name="screens_bills_addedit_remind_days_before_label">Remind days before</string>
     <string name="screens_bills_addedit_enabled_label">Enabled</string>
+    <!-- Three-case draft resume prompt (DraftResolutionPrompt) -->
+    <string name="screens_bills_draft_resume_title">Resume your draft?</string>
+    <string name="screens_bills_draft_resume_message">You have an unsaved bill reminder. Resume where you left off, discard it, or start a new one.</string>
+    <string name="screens_bills_draft_resume_resume">Resume</string>
+    <string name="screens_bills_draft_resume_discard">Discard draft</string>
+    <string name="screens_bills_draft_resume_start_fresh">Start fresh</string>
 
     <!-- ===== BillRemindersListScreen ===== -->
     <string name="screens_bills_list_title">Bill Reminders</string>

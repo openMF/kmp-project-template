@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitOutbox
-import kpt.core.base.ui.viewmodel.BaseDraftMutationViewModel
+import kpt.core.base.ui.viewmodel.BaseMutationViewModel
+import kpt.core.base.ui.viewmodel.MutationMode
 import kpt.core.data.demo.alerts.AlertsRepository
 import kpt.core.model.demo.alerts.AlertDirection
 import kpt.core.model.demo.alerts.PriceAlert
@@ -25,7 +26,7 @@ import kotlin.time.Clock
 /**
  * Create-Price-Alert ViewModel — the toolkit's canonical `submit_offline_write` demo.
  *
- * Offline-first WRITE: the submit is routed through [BaseDraftMutationViewModel]'s
+ * Offline-first WRITE: the submit is routed through [BaseMutationViewModel]'s (`MutationMode.Draft`)
  * `DraftSubmitHandler`, which persists the [PriceAlert] payload to the
  * `framework_submit_drafts` outbox (`SubmitOutbox<PriceAlert>`, DI-qualified
  * `OutboxQualifiers.PriceAlert`) BEFORE hitting the repository. On network failure the
@@ -41,11 +42,13 @@ class AlertCreateViewModel(
     private val repository: AlertsRepository,
     outbox: SubmitOutbox<PriceAlert>,
     private val clock: Clock = Clock.System,
-) : BaseDraftMutationViewModel<PriceAlert, PriceAlert>(
-    outbox = outbox,
-    formKey = FORM_KEY,
-    uniqueKey = FORM_KEY,
-    autoSaveDraft = true,
+) : BaseMutationViewModel<PriceAlert, PriceAlert>(
+    MutationMode.Draft(
+        outbox = outbox,
+        formKey = FORM_KEY,
+        uniqueKey = FORM_KEY,
+        autoSaveDraft = true,
+    ),
 ) {
 
     private val _formState = MutableStateFlow(AlertFormState())
@@ -54,6 +57,22 @@ class AlertCreateViewModel(
     init {
         mutableScreenState.value = ScreenState.Content(draftPayload())
     }
+
+    /**
+     * Three-case Resume: pre-fill the form from the saved draft surfaced in
+     * [uiState]`.resumableDraft`, then dismiss the prompt (the inherited [onResumeDraft]).
+     * Wired to [kpt.core.base.ui.draft.DraftResolutionPrompt]'s Resume action.
+     */
+    fun onResume() {
+        uiState.value.resumableDraft?.let { draft -> _formState.value = draft.toFormState() }
+        onResumeDraft()
+    }
+
+    private fun PriceAlert.toFormState(): AlertFormState = AlertFormState(
+        coinId = coinId,
+        direction = direction,
+        targetValueText = if (targetValue == 0.0) "" else targetValue.toString(),
+    )
 
     override suspend fun performSubmit(payload: PriceAlert): PriceAlert =
         repository.submitAlert(payload)

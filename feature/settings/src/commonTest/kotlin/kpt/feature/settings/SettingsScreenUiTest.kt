@@ -34,6 +34,7 @@ class SettingsScreenUiTest {
             KptTheme {
                 SettingsScreen(
                     onBackClick = {},
+                    onSyncAndDraftsClick = {},
                 )
             }
         }

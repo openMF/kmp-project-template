@@ -76,11 +76,17 @@ rules:
   - glob: "cmp-navigation/**/*TabItem*.kt"
     owner: merge
     strategy: kotlin-3way
-  # Room database registry: template ships the base @Database; forks add their own
-  # entities/DAOs to the SAME AppDatabase.kt. Must merge, never overwrite.
+  # Room database registry: template ships the base @Database; forks add their own entities/DAOs/
+  # migrations ONLY inside the `// fork:begin`/`// fork:end` regions (entities, autoMigrations, DAO
+  # accessors), and bump the version via the fork-owned ForkDatabaseConfig.VERSION_OFFSET — never the
+  # template's TEMPLATE_BASE_VERSION line. Because fork edits live in disjoint regions/file from the
+  # template's demo:begin/end + base-version, the kotlin-3way (git merge-file) merges without conflict.
   - glob: "**/AppDatabase.kt"
     owner: merge
     strategy: kotlin-3way
+  # Fork-owned DB schema offset — the single line a fork edits for its own schema version. PRESERVED.
+  - glob: "**/core/database/**/ForkDatabaseConfig.kt"
+    owner: fork
   # Android FileProvider paths: template ships base <paths>; forks add feature paths
   # (exports/recordings/imports). Blind copy drops them → runtime FileProvider crash.
   - glob: "**/res/xml/provider_paths.xml"
@@ -269,6 +275,12 @@ rules:
   # own feature flows alongside. Run captures (idea-layer/testers/captures/**) are gitignored evidence.
   - glob: "idea-layer/testers/flows/**"
     owner: template
+  # Idea-layer runtime state (agent-awareness / pipeline telemetry, e.g. AGENT_AWARENESS.jsonl) is
+  # per-fork append-only runtime evidence — never a template file to propagate, never clobbered by a
+  # sync. owner:fork = preserve the fork's state. Closes the classification gap so a new state file
+  # cannot silently fall to the blanket default (coverage-verify would flag it).
+  - glob: "idea-layer/state/**"
+    owner: fork
   # In-template feature-authoring guide (E5 consumption contract) — template-authored, synced like
   # the per-module CONSUMPTION.md docs. (closes a pre-existing E5 classification gap)
   - glob: "FEATURE_AUTHORING.md"
@@ -310,7 +322,7 @@ rules:
   - { glob: ".ruby-version",                 owner: template }
   - { glob: ".kover-floor.yml",              owner: template }
   - { glob: ".claudeignore",                 owner: template }
-  - { glob: "customization-surface.yaml",    owner: template }  # this contract self-syncs
+  - { glob: "customization-surface.yaml",    owner: template }  # this contract self-syncs (reached via SYNC_FILES — WS4/T6)
   - { glob: "version.txt",                   owner: template }
   - { glob: "lib-integrate.properties",      owner: template }
   - { glob: "secrets-manifest.yaml",         owner: fork }      # per-fork generated (project id + alias list) — E0/T1

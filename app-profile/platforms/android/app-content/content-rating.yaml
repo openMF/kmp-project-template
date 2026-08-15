@@ -2,7 +2,7 @@
 # feeds Google Play Console "App content" → "Content rating" (IARC) questionnaire. Folds 1:1
 # into app-profile/platforms/android/app-content/content-rating.yaml on `--sync`.
 #
-# Money Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no user-generated
+# App Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no user-generated
 # content. Loan tracker / EMI calculator / bill reminders / interest-rate viewer only.
 
 category: Utility  # IARC "reference category" — Utility, Productivity, or Other (non-game)

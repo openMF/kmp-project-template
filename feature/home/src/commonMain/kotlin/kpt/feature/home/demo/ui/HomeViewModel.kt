@@ -34,7 +34,7 @@ import kpt.core.model.demo.currency.ExchangeRates
 import kpt.core.store.demo.economic.impl.InterestRateSeriesKey
 
 /**
- * **Money Toolkit home dashboard ViewModel.**
+ * **Home dashboard ViewModel.**
  *
  * Composes four independent reactive sources into a single UI state with
  * per-widget loading/empty/error/content slots. Each widget's state evolves
@@ -221,7 +221,7 @@ class HomeViewModel(
 }
 
 /**
- * Aggregate state for the Money Toolkit home dashboard.
+ * Aggregate state for the home dashboard.
  *
  * Each slot is an independent [ScreenState] so the screen can render per-card
  * Loading / Empty / Error / Content states.

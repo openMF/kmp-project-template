@@ -27,8 +27,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import kpt.core.base.ui.AppInfo
 import kpt.feature.home.generated.resources.Res
-import kpt.feature.home.generated.resources.screens_home_app_title
 import kpt.feature.home.generated.resources.screens_home_settings_cd
 import kpt.feature.home.ui.TestTags
 import org.jetbrains.compose.resources.stringResource
@@ -56,7 +56,9 @@ internal fun HomeScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(Res.string.screens_home_app_title),
+                        // App title from the common AppInfo.appDisplayName accessor (BuildKonfig →
+                        // fork.properties#app.display.name), never a hardcoded brand string.
+                        text = AppInfo.appDisplayName,
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.SemiBold,
                         ),

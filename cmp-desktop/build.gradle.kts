@@ -49,7 +49,7 @@ val appVersion: String = libs.versions.desktopPackageVersion.get()
 
 // Fork identity tokens — sourced from gradle/fork.properties (RULE-WORKSPACE-ORG-IDENTITY-001 WOI-3).
 // NEVER hardcode the template's org identity here — a fork that doesn't set org.name/org.copyright
-// in fork.properties must NOT ship "Mifos Initiative". Last-resort default is the fork's OWN appName
+// in fork.properties must NOT ship a brand name. Last-resort default is the fork's OWN appName
 // (libs.versions.desktopAppName, always fork-set) — never the template's org (matches the fastlane
 // lanes' no-mifos-fallback). fork-identity.sh still FAILs CI if org.name is left at the template value.
 val forkProps = Properties().apply {

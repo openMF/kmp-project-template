@@ -3,7 +3,7 @@
 # Fork-owned SoT — syncForkConfig / the release readiness gate reads this file; it does not
 # itself submit to Partner Center.
 #
-# Money Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no UGC.
+# App Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no UGC.
 
 questionnaire:
   violence: NONE

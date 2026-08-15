@@ -26,4 +26,17 @@
     <string name="screens_crypto_coin_markets_load_more_end">You\'re all caught up</string>
     <string name="screens_crypto_coin_markets_row_price_cd">Current price</string>
     <string name="screens_crypto_coin_markets_row_change_cd">24 hour change</string>
+
+    <!-- ===== CoinDetailScreen ===== -->
+    <string name="screens_crypto_coin_detail_back_cd">Back</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">Refresh</string>
+    <string name="screens_crypto_coin_detail_rank_label">Market cap rank</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">Market cap</string>
+    <string name="screens_crypto_coin_detail_high_label">24h high</string>
+    <string name="screens_crypto_coin_detail_low_label">24h low</string>
+    <string name="screens_crypto_coin_detail_circulating_label">Circulating supply</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">Max supply</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">Unlimited</string>
+    <string name="screens_crypto_coin_detail_about_label">About</string>
 </resources>

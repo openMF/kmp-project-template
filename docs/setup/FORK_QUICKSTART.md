@@ -290,7 +290,7 @@ needs:
   `AndroidManifest.xml` and `Info.plist`.
 - **Store listings** — Play Console + App Store Connect metadata, screenshots,
   release notes.
-- **Replace shipped features** — every Money Toolkit feature is a working
+- **Replace shipped features** — every demo feature is a working
   showcase of one framework pattern; remove what you don't want from
   `feature/` and `settings.gradle.kts`. See the
   [toolkit feature showcase table](../CLAUDE.md#toolkit-feature-showcase) for

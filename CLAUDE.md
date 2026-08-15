@@ -1,7 +1,7 @@
-# Claude Code - Money Toolkit (KMP)
+# Claude Code - App Toolkit (KMP white-label template)
 
-**Last Updated:** 2026-05-24
-**Project Type:** Kotlin Multiplatform (KMP) — generic financial utility toolkit
+**Last Updated:** 2026-08-14
+**Project Type:** Kotlin Multiplatform (KMP) — brand-neutral white-label template
 **Platforms:** Android | iOS | macOS | Desktop (Windows/macOS/Linux) | Web
 
 ---
@@ -36,17 +36,22 @@
 
 ## Project Overview
 
-This is the **Money Toolkit** — a generic, open-source financial utility template
-built on Kotlin Multiplatform. It ships working personal-finance tools out of
-the box (loan tracking, bill reminders, interest-rate watching, calculators,
-country-level macro indicators) wired through the same offline-first store
-contract every framework feature uses. No login. No backend. Fork to brand and
-extend.
+This is the **App Toolkit** — a brand-neutral, open-source white-label template
+built on Kotlin Multiplatform. Every brand-touching value ships as a neutral
+placeholder (`com.example.app` / "App Toolkit" / placeholder Firebase); a fork
+fills `app-profile/`, runs `./gradlew syncForkConfig`, and the identity flows to
+every platform surface.
+
+The bundled demo features (loan tracking, bill reminders, interest-rate watching,
+calculators, country-level macro indicators) exist to **showcase the 8 Store5
+archetypes** end-to-end — each demo is the canonical proof of one or more archetypes
+wired through the same offline-first store contract. No login. No backend of its own.
+Keep the demos, swap their branding, or remove the ones you don't need.
 
 The project doubles as a **reference implementation** for every architectural
-pattern in `core-base/store` and `core-base/ui` — each shipped feature is the
-canonical showcase for one or more framework archetypes (see "Toolkit feature
-showcase" below).
+pattern in `core-base/store` and `core-base/ui` — each shipped demo is the
+canonical showcase for one or more framework archetypes (see "Store Archetype
+Showcases" below).
 
 CI/CD infrastructure spans **5 platforms** and **18 deployment targets** (see `deployment/DEPLOYMENT_MANIFEST.yaml`).
 
@@ -88,18 +93,66 @@ the per-feature branding, or selectively remove features they don't need.
 | **Rate History**          | Historical FX charts                                      | Dynamic-key flow + auto-refresh                            |
 | **Amortization Schedule** | Month-by-month payment breakdown for any loan             | OFFLINE_LOCAL_ONLY projection via `ScreenDataStream`       |
 
-## Store Archetype Showcases (kmp-project-template)
+## Store Archetype Showcases
 
-| Archetype | Store | ViewModel/Feature | Test |
-|---|---|---|---|
-| OFFLINE_LOCAL_ONLY | `AlertsStore`, `LoansStore`, `BillRemindersStore` | `AmortizationScheduleViewModel` | `AlertsStoreTest`, `LoansStoreTest`, `AmortizationScheduleViewModelTest` |
-| NETWORK_WITH_CACHE | `ExchangeRatesStore`, `InterestRateSeriesStore` | `ExchangeRatesViewModel` | `EconomicMemoryOnlyTest` |
-| NETWORK_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (online) | `SpotRateLookupStoreTest` |
-| CACHE_ONLY | `SpotRateLookupStore` | `CurrencyConverterViewModel` (offline) | `CurrencyConverterViewModelTest` |
-| PERIODIC | `ExchangeRatesStore` | `HomeDashboardViewModel` tile | `HomeDashboardViewModelTest` |
-| MEMORY_ONLY | `MacroIndicatorStore` | `MacroIndicatorsViewModel` | `EconomicMemoryOnlyTest` |
-| LOAD_ONCE | `LoansStore` | `LoanDetailViewModel` | `LoanDetailViewModelTest` |
-| MUTABLE | (DraftSubmitHandler) | `BillReminderCreateViewModel` | (existing) |
+The generator routes on **`feature_profile.store_archetype`** — the primary key that picks the
+`core/store` factory and the module chain. There are **8 archetypes**; every row below resolves to
+a real demo `*Store.kt` / `*ViewModel.kt` / `*Test.kt`. The decision matrix + module chain is
+`FEATURE_AUTHORING.md` (in-repo summary) and `docs/architecture/STORE_DATA_API.md` (canonical).
+
+| `store_archetype` | Store factory | Store | ViewModel | Test |
+|---|---|---|---|---|
+| OFFLINE_LOCAL_ONLY | `createOfflineStore` | `AlertsStore.kt`, `LoansStore.kt`, `BillRemindersStore.kt` | `AmortizationScheduleViewModel.kt` | `AlertsStoreTest.kt`, `LoansStoreTest.kt`, `AmortizationScheduleViewModelTest.kt` |
+| NETWORK_WITH_CACHE | `createStore` | `ExchangeRatesStore.kt`, `InterestRateSeriesStore.kt` | `CurrencyRatesViewModel.kt`, `InterestRatesViewModel.kt` | `EconomicMemoryOnlyTest.kt` |
+| NETWORK_ONLY | `createStore` + `FetchPolicy.NETWORK_ONLY` | `SpotRateLookupStore.kt` | `CurrencyRatesViewModel.kt` (online) | `SpotRateLookupStoreTest.kt` |
+| CACHE_ONLY | `createStore` + `FetchPolicy.CACHE_ONLY` | `SpotRateLookupStore.kt` | `CurrencyRatesViewModel.kt` (offline) | `CurrencyConverterViewModelTest.kt` |
+| PERIODIC | `createStore` + TTL in `AppStoreRegistry` | `ExchangeRatesStore.kt` | `HomeViewModel.kt` tile | `HomeDashboardViewModelTest.kt` |
+| MEMORY_ONLY | `createMemoryStore` | `MacroIndicatorStore.kt` | `CountryMacroViewModel.kt` | `EconomicMemoryOnlyTest.kt` |
+| LOAD_ONCE | `createStore` + `asLoadOnceStream` | `LoansStore.kt` | `LoanDetailViewModel.kt` | `LoanDetailViewModelTest.kt` |
+| MUTABLE | `createMutableStore` + `Bookkeeper` | `CloudTodoStore.kt` | `EditBillReminderViewModel.kt` | `EditBillReminderViewModelTest.kt`, `OfflineSubmitSyncerTest.kt` |
+
+### Write side — one unified mutation ViewModel
+
+The write path uses a **single** base view-model, `BaseMutationViewModel<T, R>`
+(`core-base/ui/.../viewmodel/BaseMutationViewModel.kt`), parameterized by **`MutationMode`**:
+
+- **`MutationMode.InSession`** — single-shot submit, no persistence.
+- **`MutationMode.Draft`** — offline-resilient draft with 3-case resume (fresh / resume-in-progress /
+  resume-after-crash), persisting the payload across restarts.
+
+An earlier design split these into two separate base view-models; they were collapsed into this one,
+and `MutationMode` now expresses the mode. The **Sync & Drafts** surface
+(`feature/settings/.../SyncAndDraftsViewModel.kt`) lists in-flight drafts from both modes. Wire the
+screen with `MutationScreenContent` + `SubmitHandler` / `DraftSubmitHandler`.
+
+### Customization seams (real registry names)
+
+The app shell reads features + backbone + tabs + stores + network from registries — a fork adds one
+line per surface, never edits the shell:
+
+- **`FeatureRegistry`** (`cmp-navigation/.../registry/FeatureRegistry.kt`) — registers demo/fork
+  features into `AuthenticatedNavigation`.
+- **`BackboneRegistry`** (`cmp-navigation/.../registry/BackboneRegistry.kt`) — home/profile/settings
+  backbone graph.
+- **`TabRegistry`** (`cmp-navigation/.../registry/TabRegistry.kt`) — bottom-nav tab set.
+- **`AppStoreRegistry`** (`core/store/.../AppStoreRegistry.kt`) — feature-tagged Store5 factories.
+- **`AppAccessPoints`** + **`AccessPointRegistry`** (`core-base/network/.../AccessPointRegistry.kt`) —
+  the declared network endpoints (see Network below).
+- **`core/store`** — `AppScreenStateDefaults`, `AppErrorMapper`, `appStoreModule` (branded state
+  visuals + error mapping + DI).
+
+### Network — N REST + N Supabase access points
+
+Every endpoint the app talks to is declared once in
+`app-profile/app.yaml#network.access_points` (`type: rest | supabase`) and generated into
+`AppAccessPoints.points`, which the fork registers as `AccessPointRegistry(AppAccessPoints.points)`
+in its `NetworkModule`. The registry resolves any number of REST **and** Supabase points:
+
+- **REST** — `restApi<T>("<id>")` DSL + `AccessPointRegistry.restBaseUrl(type)`; `core-base/network`
+  owns the transport, so a fork writes only the API interface + one `restApi("<id>")` line.
+- **Supabase** — `AccessPointRegistry.supabasePoints()` returns every declared Supabase point;
+  a per-point `SupabaseConfigClient` factory builds the client (URL from the registry, key from
+  secrets by id). `supabasePoints()` supports N Supabase projects, not a single hardcoded client.
 
 ### Tech Stack
 
@@ -251,7 +304,7 @@ See `.github/CLAUDE.md` for the full rung-ladder + environment-gate model.
 **Via Fastlane (Local/Manual):**
 ```bash
 # Invocation: (cd deployment && bundle exec fastlane <platform> <lane>)
-# --fastlane-dir flag does NOT exist in Fastlane 2.235.0 (doc bug fixed).
+# All lanes live in the canonical deployment/fastlane/ dir — cd into deployment/, no dir flag.
 
 # Android
 (cd deployment && bundle exec fastlane android deployReleaseApkOnFirebase)
@@ -285,9 +338,9 @@ decides every state transition (loading / no-network / captive-portal / empty / 
 content + freshness) so screens never have to. Your fork's only job is to brand the
 visuals via `core/store/AppScreenStateDefaults.kt`.
 
-`MifosTheme` already wires `LocalScreenStateDefaults provides appScreenStateDefaults()`,
-so every screen wrapped by the theme picks up your branded defaults — zero per-screen
-wiring.
+`KptTheme` (`core/designsystem/.../theme/KptTheme.kt`) already wires
+`LocalScreenStateDefaults provides appScreenStateDefaults()`, so every screen wrapped by the theme
+picks up your branded defaults — zero per-screen wiring.
 
 Customize in **`core/store`** (the single discoverable seam):
 
@@ -301,7 +354,7 @@ pattern.
 
 ### User-facing surfaces (extend these in your fork)
 
-The Money Toolkit ships two domain surfaces forks typically brand or extend:
+The demo features ship two domain surfaces forks typically brand or extend:
 
 - **Banking domain** (`core/model/banking/`, `core/data/banking/`,
   `core/database/banking/`) — `Loan` + `BillReminder` entities, repositories,
@@ -406,6 +459,34 @@ Implementation: `build-logic/convention/src/main/kotlin/SyncForkConfigPlugin.kt`
 
 ---
 
+## Canonical consumer walkthrough
+
+The one authoritative loop for standing up a fork — every other doc links here rather than
+re-deriving it:
+
+> **TL;DR:** fork → **`syncForkConfig`** → declare **`store_archetype`** → codegen → build → **`/kmp-project-template-sync`**.
+
+1. **fork** the template into your own repo.
+2. Fill `app-profile/app.yaml` (+ `platforms/**`) and run **`./gradlew syncForkConfig`** — brand flows
+   from `app-profile/` (the SoT) to every tokenized surface: `gradle/fork.properties`, bundle id +
+   display name, `mac-app-store.entitlements`, `fastlane/Appfile`, Firebase config, icons.
+3. Author a feature and **declare its `store_archetype`** (one of the 8) in its `feature_profile`.
+4. Run codegen (`/kmp-implement` → `kmp-store-gen`) — it reads `store_archetype` and emits the matching
+   `core/store` factory (`createStore` / `createMemoryStore` / `createOfflineStore` /
+   `createMutableStore`) + `FetchPolicy`, registered into `AppStoreRegistry`.
+5. **Build / run**, then periodically run **`/kmp-project-template-sync`** to pull future white-label
+   improvements from the upstream template without losing your fork's work.
+
+## Sync — pulling template updates
+
+**`/kmp-project-template-sync`** (engine: `scripts/white-label/sync-dirs.sh`, `SYNC_DIRS` / `SYNC_FILES`)
+pulls upstream template updates without clobbering fork work AND without missing updates. The
+sync-reachable surface now covers `feature/{home,profile,settings}`, `customization-surface.yaml`,
+root `build.gradle.kts`, and `kotlin-js-store`. Anti-clobber is preserved via `is_excluded` carve-outs
+declared in `customization-surface.yaml` — fork-owned paths (e.g. `app-profile/**`) are never rewritten.
+
+---
+
 ## Key Constraints
 
 ### Version Handling
@@ -474,9 +555,9 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 
 ## Emergency Contacts
 
-**Project Owner:** Mifos Initiative
-**CI/CD Infrastructure:** mifos-x-actionhub (openMF/mifos-x-actionhub)
-**Support:** team@mifos.org
+**Project Owner:** set in `app-profile/app.yaml` (fork-owned identity SoT)
+**CI/CD Infrastructure:** the reusable workflows pinned in `.github/workflows/` (see `.github/CLAUDE.md`)
+**Support:** set your fork's support contact in `app-profile/`
 
 ---
 

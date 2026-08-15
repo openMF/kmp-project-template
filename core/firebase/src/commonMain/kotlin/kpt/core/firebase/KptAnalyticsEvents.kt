@@ -10,7 +10,7 @@
 package kpt.core.firebase
 
 /**
- * Mifos-specific analytics event types and parameters
+ * App-specific analytics event types and parameters
  */
 object KptEventTypes {
     // Client Management Events
@@ -108,7 +108,7 @@ object KptEventTypes {
 }
 
 /**
- * Mifos-specific parameter keys
+ * App-specific parameter keys
  */
 object KptParamKeys {
     // Client-specific parameters

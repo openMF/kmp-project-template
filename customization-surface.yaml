@@ -61,6 +61,11 @@ rules:
   # settings.gradle.kts applies it via `apply(from = ...)` and stays full-copy / include-union.
   - glob: "settings.local.gradle.kts"
     owner: fork
+  # Template-sync version marker: records the template commit this fork last synced from. Written by
+  # scripts/white-label/sync-dirs.sh on every sync, so it is FORK-OWNED — a template dir-copy must
+  # never overwrite a fork's own last-synced pointer with the template's.
+  - glob: ".template-version"
+    owner: fork
   # Root navigation host: template owns the scaffold; forks wire feature routes in.
   - glob: "cmp-navigation/**/*Navigation*.kt"
     owner: merge

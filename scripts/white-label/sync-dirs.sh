@@ -1084,6 +1084,28 @@ if [ "$DRY_RUN" = false ]; then
     git branch -D "$TEMP_BRANCH" || handle_error "Failed to delete temporary branch"
     show_progress
 
+    # Record which template commit this sync pulled from. This is the whole point of the
+    # `.template-version` marker: a fork can tell whether it is behind the template (compare
+    # template_sha against the template's latest release) and the NEXT sync can anchor its 3-way
+    # merge base on this exact point instead of git's guessed common ancestor. Written here (before
+    # the commit gate) so a version-only bump still commits; the file is fork-owned
+    # (customization-surface.yaml owner: fork) so a template dir-copy never clobbers it.
+    print_step "Recording template sync version (.template-version)..."
+    _tv_sha="$(git rev-parse "$TEMPLATE_REMOTE/$BASE_BRANCH" 2>/dev/null || echo "")"
+    _tv_tag="$(git describe --tags --exact-match "$_tv_sha" 2>/dev/null || echo "")"
+    {
+        echo "# .template-version — the openMF/kmp-project-template commit this tree last synced from."
+        echo "# Managed by scripts/white-label/sync-dirs.sh — DO NOT hand-edit."
+        echo "# Format: bash-parseable key=value (same convention as gradle/fork.properties)."
+        echo "template_repo=openMF/kmp-project-template"
+        echo "template_ref=$BASE_BRANCH"
+        echo "template_sha=$_tv_sha"
+        echo "template_tag=$_tv_tag"
+        echo "synced_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    } > .template-version
+    git add .template-version 2>/dev/null || true
+    show_progress
+
     # Check for changes
     if ! git diff --quiet --exit-code --cached; then
         print_step "Committing changes..."

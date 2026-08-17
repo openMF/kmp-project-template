@@ -8,9 +8,9 @@
 # Platform-DIFFERENT values live in app-profile/platforms/<platform>/*.yaml — no duplication.
 
 identity:
-  app_id: com.example.app                 # PLACEHOLDER — set your reverse-DNS bundle id (SoT for appId; mirrored to gradle/libs.versions.toml)
+  app_id: org.mifos.kmp.template          # fork bundle id (SoT for appId; mirrored to gradle/libs.versions.toml)
   app_name: App Toolkit                    # PLACEHOLDER — set your app display name (Android app_name, iOS CFBundleDisplayName, settings footer)
-  namespace: com.example.app              # PLACEHOLDER — mirrors app_id
+  namespace: org.mifos.kmp.template       # mirrors app_id
 
 # Per-flavor network endpoints + demo credentials + log tag. syncForkConfig emits these into
 # gradle/fork.properties (network.base.url.{demo,prod} / demo.username / demo.password / log.tag),

@@ -498,6 +498,14 @@ declared in `customization-surface.yaml` — fork-owned paths (e.g. `app-profile
 See [Version Handling Guide](docs/claude/version-handling.md) for details.
 
 ### Secret Management
+- **`cmp-android/google-services.json` IS committed — it is PUBLIC, not a secret.** The Firebase **client**
+  config (project/app IDs + a client API key that ships inside the APK) is protected by Firebase Security
+  Rules + App Check, **not** by secrecy — it is not a private key. It lives at the module root
+  `cmp-android/google-services.json` (the shared config Gradle's Google-Services plugin auto-applies to
+  **every flavor** — no per-flavor copies needed) and is committed to the repo. Do **NOT** treat it as a
+  vault secret, gitignore it, route it through `/secrets`, or ask about it. (The `google-services.json →
+  GOOGLESERVICES` GitHub-secret row below is a legacy CI convenience, not a secrecy requirement.) The
+  same holds for `GoogleService-Info.plist` (iOS Firebase client config).
 - **NEVER commit:** `secrets/`, `keystores/`, `*.keystore`, `*.p8`, `*.p12`, `.env`
 - **Use:** `scripts/white-label/keystore.sh` for all secret operations
 - **GitHub Secrets:** 30+ secrets required for full deployment pipeline

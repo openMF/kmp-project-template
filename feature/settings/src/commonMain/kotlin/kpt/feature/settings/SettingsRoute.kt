@@ -9,6 +9,7 @@
  */
 package kpt.feature.settings
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -30,17 +31,15 @@ fun NavController.navigateToNotification(navOptions: NavOptions? = null) = navig
 
 fun NavController.navigateToSyncAndDrafts(navOptions: NavOptions? = null) = navigate(SyncAndDraftsRoute, navOptions)
 
-fun NavGraphBuilder.settingsDestination(
-    onBackClick: () -> Unit,
-    onSyncAndDraftsClick: () -> Unit,
-    devMenuEntries: List<DevMenuEntry> = emptyList(),
-) {
+/**
+ * The settings backbone destination. [settingsBody] is the fork-owned inner content (default supplied by
+ * `cmp-navigation`'s `BackboneRegistry.settingsBody`, which wires the back / sync-and-drafts / dev-menu
+ * callbacks into the demo body); this template graph forwards the opaque body. (WS01 base-feature seam,
+ * epic AC7 — mirrors the `home` shell/seam split.)
+ */
+fun NavGraphBuilder.settingsDestination(settingsBody: @Composable () -> Unit = {}) {
     composableWithPushTransitions<SettingsRoute> {
-        SettingsScreen(
-            onBackClick = onBackClick,
-            onSyncAndDraftsClick = onSyncAndDraftsClick,
-            devMenuEntries = devMenuEntries,
-        )
+        settingsBody()
     }
 }
 

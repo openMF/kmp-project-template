@@ -25,7 +25,9 @@ import kpt.feature.emicalculator.navigation.navigateToEmiCalculator
 import kpt.feature.home.demo.HomeDashboard
 import kpt.feature.loans.navigation.navigateToLoans
 import kpt.feature.macro.navigation.navigateToMacroGraph
+import kpt.feature.profile.demo.ProfileDemoBody
 import kpt.feature.rates.navigation.navigateToRates
+import kpt.feature.settings.demo.SettingsDemoBody
 import kpt.feature.settings.navigateToSettings
 import kpt.feature.settings.navigateToSyncAndDrafts
 import kpt.feature.settings.notificationDestination
@@ -73,6 +75,35 @@ object BackboneRegistry {
     }
 
     /**
+     * The settings tab's INNER content. The template-owned `SettingsScreen` shell (via
+     * `settingsDestination`) forwards this opaque seam; the fork owns this body. It wires the
+     * back / sync-and-drafts / dev-menu callbacks into the demo [SettingsDemoBody], so the
+     * merge-owned shell carries no `kpt.feature.settings.*` content wiring. `customizer --clean`
+     * strips the fenced block, leaving `{ }` for the fork to fill (mirrors `homeBody`). WS01 / AC7.
+     */
+    val settingsBody: @Composable (NavController) -> Unit = { navController ->
+        // demo:begin — default demo settings body. Replace with your fork's settings content.
+        SettingsDemoBody(
+            onBackClick = { navController.popBackStackSafely() },
+            onSyncAndDraftsClick = { navController.navigateToSyncAndDrafts() },
+            devMenuEntries = ShowcaseRegistry.devSettingsEntries(navController),
+        )
+        // demo:end
+    }
+
+    /**
+     * The profile tab's INNER content. `ProfileScreen` (the template shell) forwards this opaque
+     * seam so the shell carries no `kpt.feature.profile.*` content imports; the fork owns this body.
+     * `customizer --clean` strips the fenced block, leaving `{ }` for the fork to fill (mirrors
+     * `homeBody`). WS01 / AC7.
+     */
+    val profileBody: @Composable (NavController) -> Unit = { _ ->
+        // demo:begin — default demo profile body. Replace with your fork's profile content.
+        ProfileDemoBody()
+        // demo:end
+    }
+
+    /**
      * Route the authenticated navbar to the Settings backbone. Kept here so the
      * merge-owned `AuthenticatedNavigation.kt` shell carries no `kpt.feature.*`
      * imports (mirrors the `homeBody` seam pattern).
@@ -88,10 +119,8 @@ object BackboneRegistry {
     val backboneDestinations: NavGraphBuilder.(NavController) -> Unit = { navController ->
         notificationDestination(onBackClick = { navController.popBackStackSafely() })
         syncAndDraftsDestination(onBackClick = { navController.popBackStackSafely() })
-        settingsDestination(
-            onBackClick = { navController.popBackStackSafely() },
-            onSyncAndDraftsClick = { navController.navigateToSyncAndDrafts() },
-            devMenuEntries = ShowcaseRegistry.devSettingsEntries(navController),
-        )
+        // Settings inner content flows through the fork-owned `settingsBody` seam (WS01 / AC7); the
+        // template `settingsDestination` shell forwards this opaque body, carrying no demo wiring.
+        settingsDestination(settingsBody = { BackboneRegistry.settingsBody(navController) })
     }
 }

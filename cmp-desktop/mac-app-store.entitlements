@@ -2,7 +2,7 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
   Mac App Store entitlements TEMPLATE. syncForkConfig substitutes YOUR_TEAM_ID and
-  YOUR_TEAM_ID.com.example.app from app-profile (apple.team_id + identity.app_id) into the shipped
+  YOUR_TEAM_ID.org.mifos.kmp.template from app-profile (apple.team_id + identity.app_id) into the shipped
   cmp-desktop/mac-app-store.entitlements — do NOT hand-edit the generated .entitlements file.
 -->
 <plist version="1.0">
@@ -18,7 +18,7 @@
     <true/>
     <!-- Application identifier required by TestFlight / Mac App Store provisioning profile -->
     <key>com.apple.application-identifier</key>
-    <string>YOUR_TEAM_ID.com.example.app</string>
+    <string>YOUR_TEAM_ID.org.mifos.kmp.template</string>
     <!-- Team identifier required alongside application-identifier -->
     <key>com.apple.developer.team-identifier</key>
     <string>YOUR_TEAM_ID</string>

@@ -15,5 +15,5 @@ object DatabaseConfig {
     const val NAME = "org_mifos_kmp_template.db"
 
     /** Desktop (JVM) data directory under the OS app-data root (app_name-derived). */
-    const val DESKTOP_DIR_NAME = "AppToolkit"
+    const val DESKTOP_DIR_NAME = "MifosMoneyToolkit"
 }

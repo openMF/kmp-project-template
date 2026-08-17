@@ -8,9 +8,9 @@
 # Platform-DIFFERENT values live in app-profile/platforms/<platform>/*.yaml — no duplication.
 
 identity:
-  app_id: com.example.app                 # PLACEHOLDER — set your reverse-DNS bundle id (SoT for appId; mirrored to gradle/libs.versions.toml)
-  app_name: App Toolkit                    # PLACEHOLDER — set your app display name (Android app_name, iOS CFBundleDisplayName, settings footer)
-  namespace: com.example.app              # PLACEHOLDER — mirrors app_id
+  app_id: org.mifos.kmp.template          # Mifos fork bundle id (SoT for appId; mirrored to gradle/libs.versions.toml)
+  app_name: Mifos Money Toolkit           # app display name (Android app_name, iOS CFBundleDisplayName, settings footer)
+  namespace: org.mifos.kmp.template       # mirrors app_id
 
 # Per-flavor network endpoints + demo credentials + log tag. syncForkConfig emits these into
 # gradle/fork.properties (network.base.url.{demo,prod} / demo.username / demo.password / log.tag),
@@ -21,7 +21,7 @@ network:
   prod_base_url: https://api.example.com     # PLACEHOLDER — fork sets its prod endpoint
   demo_username: demo
   demo_password: demo
-  log_tag: AppToolkit
+  log_tag: MifosMoneyToolkit
   # Declarative access-point topology — every REST + Supabase endpoint the app talks to, in ONE place.
   # This is the SoT for core/network's AccessPointRegistry: a fork declares its N endpoints here
   # (e.g. 3 REST + 2 Supabase), and ProjectNetworkModule wires each API in one line via
@@ -67,21 +67,21 @@ network:
       loggable_host: api.worldbank.org
 
 org:
-  name: Your Organization Name              # PLACEHOLDER — fork sets its legal org name
-  email: you@example.com                     # PLACEHOLDER
-  first_name: Your                           # PLACEHOLDER — App Store review contact first name
-  last_name: Org                             # PLACEHOLDER — App Store review contact last name
-  phone: "+15555550100"                     # PLACEHOLDER
-  copyright: "© 2026 Your Organization Name. All rights reserved."   # PLACEHOLDER — desktop / Mac App Store packaging copyright (org.copyright)
-  marketing_url: https://example.com          # PLACEHOLDER
-  privacy_url: https://example.com/privacy    # PLACEHOLDER
-  support_url: https://example.com/support    # PLACEHOLDER
+  name: Mifos Initiative
+  email: support@mifos.org
+  first_name: Mifos
+  last_name: Initiative                      # App Store review contact (org-level)
+  phone: "+15555550100"                     # PLACEHOLDER — set the fork's review contact phone
+  copyright: "© 2026 Mifos Initiative. All rights reserved."   # desktop / Mac App Store packaging copyright (org.copyright)
+  marketing_url: https://mifos.org
+  privacy_url: https://mifos.org/privacy-policy
+  support_url: https://mifos.org
 
 legal:
-  company_name: Your Organization Name        # PLACEHOLDER
+  company_name: Mifos Initiative
   jurisdiction: United States
   effective_date: June 6, 2026
-  contact_email: you@example.com              # PLACEHOLDER
+  contact_email: support@mifos.org
 
 keystore_dn:
   org_unit: Mobile
@@ -91,22 +91,20 @@ keystore_dn:
 
 store:
   primary_locale: en-US
-  # PLACEHOLDER store listing copy — a fork MUST author these before shipping (product-health
-  # store-listing warns while any YOUR_* / "App Toolkit" placeholder marker remains on a fork).
-  title: 'App Toolkit'                        # PLACEHOLDER — app display name (App Store name / Play title)
-  subtitle: 'YOUR_APP_SUBTITLE'               # PLACEHOLDER — short subtitle (App Store)
-  promotional_text: 'YOUR_APP_PROMO_TEXT'     # PLACEHOLDER — promotional text
-  description: 'YOUR_APP_DESCRIPTION — write your long store description here (App Store / Play full description).'   # PLACEHOLDER
-  release_notes: 'YOUR_APP_RELEASE_NOTES — describe what is new in this release.'   # PLACEHOLDER
-  copyright: '© YOUR_ORGANIZATION_NAME. All rights reserved.'   # PLACEHOLDER
+  title: 'Mifos Money Toolkit'
+  subtitle: 'Loans, bills & rates — offline'
+  promotional_text: 'Your offline-first personal money toolkit.'
+  description: 'Mifos Money Toolkit is an offline-first personal finance app — track loans and EMIs, manage recurring bill reminders, watch interest and exchange rates, and run quick loan calculators. Built on Kotlin Multiplatform by the Mifos Initiative.'
+  release_notes: 'Initial release of Mifos Money Toolkit.'
+  copyright: '© Mifos Initiative. All rights reserved.'
   age_rating: '4+'                            # iOS + macOS App Store age rating (store.ios.age.rating)
   review:
-    notes: 'YOUR_APP_REVIEW_NOTES — notes for the App Store / Play review team (test steps, demo access).'   # PLACEHOLDER
-    first_name: 'Your'                         # PLACEHOLDER — App Store review contact (mirrors org.first_name)
-    last_name: 'Org'                           # PLACEHOLDER — App Store review contact (mirrors org.last_name)
+    notes: 'No login required — the app runs fully offline with demo data. Open the app to explore loans, bills, rates and calculators.'
+    first_name: 'Mifos'                        # App Store review contact (mirrors org.first_name)
+    last_name: 'Initiative'                    # App Store review contact (mirrors org.last_name)
     demo_user: ""                            # store.review.demo.user (blank — no login)
     demo_password: ""                        # store.review.demo.password
-  app_description: App Toolkit                # PLACEHOLDER — desktop packaging description (app.description)
+  app_description: Mifos Money Toolkit         # desktop packaging description (app.description)
 
 media:
   root: media

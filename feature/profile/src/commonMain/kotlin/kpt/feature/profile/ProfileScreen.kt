@@ -24,8 +24,8 @@ import kpt.core.ui.scaffold.KptScaffold
  */
 @Composable
 internal fun ProfileScreen(
-    profileBody: @Composable () -> Unit = {},
     modifier: Modifier = Modifier,
+    profileBody: @Composable () -> Unit = {},
 ) {
     KptScaffold(
         modifier = modifier

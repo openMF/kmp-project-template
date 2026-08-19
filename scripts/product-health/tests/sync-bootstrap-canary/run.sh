@@ -70,7 +70,8 @@ mkdir -p "$tpl"; ( cd "$tpl"; git init -qb dev; git config user.email t@t; git c
   { echo '#!/bin/bash'; echo "$BLK"; echo 'echo "ENGINE=v2 guard=${SYNC_DIRS_SELF_UPDATED:-0}"'; } > engine.sh
   git add -A; git commit -qm v2 )
 git clone -q "$tpl" "$fork"
-out="$( cd "$fork"; git remote rename origin template >/dev/null 2>&1; git checkout -qb work
+out="$( cd "$fork"; git config user.email t@t; git config user.name t   # CI has no global git identity
+        git remote rename origin template >/dev/null 2>&1; git checkout -qb work
         sed 's/ENGINE=v2/ENGINE=v1/' "$tpl/engine.sh" > engine.sh; git add -A; git commit -qm v1 >/dev/null 2>&1
         bash engine.sh 2>&1 )"
 if echo "$out" | grep -q 'ENGINE=v2' && echo "$out" | grep -q 'guard=1'; then

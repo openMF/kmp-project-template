@@ -46,16 +46,23 @@ for key in "${KEYS[@]}"; do
 done
 
 if [ "$is_template" = "1" ]; then
-  # template: the store copy IS the committed Mifos "Money Toolkit" example (authored prose — some keys
-  # carry the brand, others are brand-free descriptive text like the subtitle). It must be COMPLETE:
-  # the only failure is an UNFILLED placeholder marker. Authored example copy is the intended state.
-  if [ "${#leaked[@]}" -ne 0 ]; then
-    echo "❌ store copy on the TEMPLATE still carries UNFILLED placeholder marker(s) — the Mifos example listing must be complete (WHITE_LABEL_PLACEHOLDERS.yaml#store_copy_marker):"
-    for k in "${leaked[@]}"; do echo "     · $k"; done
-    exit 1
+  # The template presents store copy in one of TWO valid shapes, and store-listing reads it via fp_get
+  # (gradle/fork.properties → falls back to fork.properties.template):
+  #   • CI checkout: no generated fork.properties → the neutral fork.properties.template PLACEHOLDERS.
+  #   • local post-syncForkConfig: the committed Mifos "Money Toolkit" example copy (brand keys carry
+  #     the reference; descriptive keys like the subtitle are brand-free prose).
+  # Both are legitimate. PASS if there is ANY template signal — the Mifos reference appears anywhere
+  # (→ example copy; brand-free descriptive keys are fine) OR any key is a placeholder marker (→ neutral
+  # fallback; not every key carries a marker, e.g. the .template's store.description is plain prose). FAIL
+  # ONLY when the copy is WHOLESALE foreign — no reference and no placeholder marker anywhere (a real
+  # rebrand leak). Structured identity leaks are caught by fork-identity + deployment-whitelabel B1/B8.
+  if [ "${#reference[@]}" -gt 0 ] || [ "${#leaked[@]}" -gt 0 ]; then
+    echo "template store copy OK (Mifos reference example or neutral placeholders — directional PASS)"
+    exit 0
   fi
-  echo "template store copy is the authored Mifos reference listing (no unfilled placeholders — directional PASS)"
-  exit 0
+  echo "❌ store copy on the TEMPLATE is WHOLESALE foreign — no Mifos reference and no placeholder marker present (a real-brand leak):"
+  for k in "${authored[@]}"; do echo "     · $k"; done
+  exit 1
 fi
 
 # fork: NO key may still be a placeholder marker OR the Mifos reference copy; WARN (exit 2), since prose is human-authored.

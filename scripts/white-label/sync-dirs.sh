@@ -986,8 +986,8 @@ fi
 # preserves fork edits (e.g. AndroidManifest permissions). The mechanical sync
 # below is UNCHANGED — the contract is the declared source of truth the merge
 # engine adopts next. Fully guarded so it can never abort a sync.
-CS_READER="$(dirname "$0")/scripts/customization-surface.sh"
-if [ -f "$CS_READER" ] && [ -f "$(dirname "$0")/customization-surface.yaml" ]; then
+CS_READER="$SCRIPT_DIR/../customization-surface.sh"
+if [ -f "$CS_READER" ] && [ -f "$SCRIPT_DIR/../../customization-surface.yaml" ]; then
     # shellcheck source=/dev/null
     source "$CS_READER" 2>/dev/null || true
     if declare -F cs_match_g >/dev/null 2>&1; then

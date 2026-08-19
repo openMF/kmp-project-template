@@ -27,33 +27,41 @@ MARKER_RE="$(
     wl_placeholders_load store_copy_marker
   } | paste -sd'|' -
 )"
+# The Mifos REFERENCE store copy the template ships (example_identity.store_copy_reference).
+REF_RE="$(wl_example_load store_copy_reference | paste -sd'|' -)"
 KEYS=(store.title store.subtitle store.description store.promotional.text app.description store.copyright)
 
-leaked=(); authored=()
+leaked=(); reference=(); authored=()
 for key in "${KEYS[@]}"; do
   val="$(fp_get "$key")"
-  if [ -n "$MARKER_RE" ] && echo "$val" | grep -qiE "$MARKER_RE"; then
+  # printf (NOT echo): store copy carries literal '\n' paragraph breaks — echo would interpret them
+  # into real newlines, and the empty-value marker '^$' would then false-match a blank paragraph line.
+  if [ -n "$MARKER_RE" ] && printf '%s' "$val" | grep -qiE "$MARKER_RE"; then
     leaked+=("$key")
+  elif [ -n "$REF_RE" ] && printf '%s' "$val" | grep -qiE "$REF_RE"; then
+    reference+=("$key")
   else
     authored+=("$key")
   fi
 done
 
 if [ "$is_template" = "1" ]; then
-  # template: every key MUST match a placeholder marker; an authored value = real-brand leak = FAIL.
-  if [ "${#authored[@]}" -ne 0 ]; then
-    echo "❌ store copy on NEUTRAL TEMPLATE has AUTHORED value(s) — must remain placeholder(s) per WHITE_LABEL_PLACEHOLDERS.yaml:"
-    for k in "${authored[@]}"; do echo "     · $k"; done
+  # template: the store copy IS the committed Mifos "Money Toolkit" example (authored prose — some keys
+  # carry the brand, others are brand-free descriptive text like the subtitle). It must be COMPLETE:
+  # the only failure is an UNFILLED placeholder marker. Authored example copy is the intended state.
+  if [ "${#leaked[@]}" -ne 0 ]; then
+    echo "❌ store copy on the TEMPLATE still carries UNFILLED placeholder marker(s) — the Mifos example listing must be complete (WHITE_LABEL_PLACEHOLDERS.yaml#store_copy_marker):"
+    for k in "${leaked[@]}"; do echo "     · $k"; done
     exit 1
   fi
-  echo "template store copy is all placeholder markers (WHITE_LABEL_PLACEHOLDERS.yaml directional PASS)"
+  echo "template store copy is the authored Mifos reference listing (no unfilled placeholders — directional PASS)"
   exit 0
 fi
 
-# fork: NO key may match a placeholder marker; WARN (exit 2), since prose is human-authored.
-if [ "${#leaked[@]}" -ne 0 ]; then
-  echo "⚠️  store copy still carries template placeholder(s) — author for your app in gradle/fork.properties (WHITE_LABEL_PLACEHOLDERS.yaml):"
-  for k in "${leaked[@]}"; do echo "     · $k"; done
+# fork: NO key may still be a placeholder marker OR the Mifos reference copy; WARN (exit 2), since prose is human-authored.
+if [ "${#leaked[@]}" -ne 0 ] || [ "${#reference[@]}" -ne 0 ]; then
+  echo "⚠️  store copy still carries template placeholder(s) or the Mifos reference copy — author for your app in gradle/fork.properties (WHITE_LABEL_PLACEHOLDERS.yaml):"
+  for k in "${leaked[@]}" "${reference[@]}"; do echo "     · $k"; done
   echo "   (non-blocking: the listing ships to App Store / Play — write your own before you release.)"
   exit 2
 fi

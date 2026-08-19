@@ -228,9 +228,13 @@ CS_PLACEHOLDER_RE='(^|[[:space:]])#[[:space:]]*PLACEHOLDER|com\.example\.app|App
 #                  NON-placeholder (classified via the MAP key set + CS_PLACEHOLDER_RE);
 #                  plus a fork's own network.access_points[] entries win by `id`, while
 #                  template-only demo access-points are appended (union-by-id).
-# The template is the schema authority (emitted as the base); the fork overlays only its
-# real identity scalars + its real endpoints. `base` (the ancestor) is accepted for
-# dispatcher symmetry but the union is order-preserving and needs no line-diff base.
+# TRUE 3-WAY (diff3): the template supplies the schema/keys/defaults (THEIRS, emitted as the
+# structure), and the fork WINS every leaf it changed from the BASE — the template state the fork
+# LAST SYNCED FROM (.template-version#template_sha). That is: identity scalars (MAP) win as before,
+# AND any other key the fork customized (OURS[path] != BASE[path]) is PRESERVED, while keys the fork
+# left at the template default follow the template. So a fork's NON-identity customization survives a
+# sync (the 2-way overlay used to revert it to the new template default). `base` absent → falls back
+# to the identity-only 2-way (a never-synced fork has no ancestor). access_points union-by-id unchanged.
 #   cs_merge_yaml_schema <ours=fork> <base> <theirs=template> [<out>]
 #   returns 0 merged-clean · 2 error
 cs_merge_yaml_schema() {
@@ -247,6 +251,30 @@ cs_merge_yaml_schema() {
       /"[^"]+"[[:space:]]*=>[[:space:]]*"[^"]+"/ {
         v=$2; sub(/#.*/,"",v); gsub(/[" ,]/,"",v); if (v!="") print v
       }' "$cfgrb" > "$mapfile"
+  fi
+
+  # ── 3-WAY: a fork also WINS any leaf it CHANGED from the BASE (template @ last-synced sha), not just
+  # the MAP identity scalars — so a fork's non-identity customization survives. Append those dotted
+  # paths to the forkwins set (mapfile). Base absent (never-synced fork) → skip → identity-only 2-way.
+  if [ -f "$base" ]; then
+    awk '
+      function lead(s,   n){ n=0; while(substr(s,n+1,1)==" ") n++; return n }
+      function keyof(s,   t){ t=s; sub(/^[ ]+/,"",t); sub(/:.*/,"",t); return t }
+      function restof(s,   t){ t=s; sub(/^[ ]*[^:]+:/,"",t); sub(/^[ ]+/,"",t); sub(/[ \t]+#.*$/,"",t); sub(/[ \t]+$/,"",t); return t }
+      function pathpush(ind,k,   p,i){ while(sp>0 && sind[sp]>=ind) sp--; sp++; sind[sp]=ind; skey[sp]=k; p=skey[1]; for(i=2;i<=sp;i++) p=p"."skey[i]; return p }
+      FNR==1 { sp=0 }
+      FNR==NR {                                   # BASE pass — index scalar leaves by dotted path
+        if ($0 ~ /^[ ]*#/ || $0 ~ /^[ ]*$/) next; ind=lead($0); c=$0; sub(/^[ ]+/,"",c)
+        if (c ~ /^- /) next
+        if (c ~ /:/) { k=keyof($0); r=restof($0); p=pathpush(ind,k); if (r!="" && r !~ /^[|>]/) baseval[p]=r }
+        next
+      }
+      {                                           # OURS pass — emit paths the fork changed from base
+        if ($0 ~ /^[ ]*#/ || $0 ~ /^[ ]*$/) next; ind=lead($0); c=$0; sub(/^[ ]+/,"",c)
+        if (c ~ /^- /) next
+        if (c ~ /:/) { k=keyof($0); r=restof($0); p=pathpush(ind,k); if (r!="" && r !~ /^[|>]/ && (p in baseval) && baseval[p]!=r) print p }
+      }
+    ' "$base" "$ours" >> "$mapfile"
   fi
 
   local tmp; tmp="$(mktemp)"

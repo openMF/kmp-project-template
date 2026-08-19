@@ -126,9 +126,24 @@ abstract class SyncForkConfigTask : DefaultTask() {
         if (appDisplayName.isNotBlank()) {
             patchTomlVersion(File(root, "gradle/libs.versions.toml"), "appDisplayName", appDisplayName)
         }
+        // desktopAppName (JVM/dock) + projectName (rootProject.name) ALSO live in the catalog and resolve
+        // app-profile-first (identity.app_name / project name) per this repo's CLAUDE.md, but a catalog-3way
+        // merge during /kmp-project-template-sync reverts them to the template placeholder ("App Toolkit" /
+        // "kmp-project-template"). Writing only appId+appDisplayName left them stale (mbs/healld-health
+        // 2026-08-19: catalog carried template identity after a clean sync). Derive + write ALL identity
+        // lines so the catalog fully follows the app-profile SoT after any sync.
+        if (appDisplayName.isNotBlank()) {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "desktopAppName", appDisplayName)
+        }
+        if (projectName.isNotBlank()) {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "projectName", projectName)
+        }
 
         // Apple
         val appleTeamId   = get("apple.team.id",     "APPLE_TEAM_ID",   "iosTeamId")
+        if (appleTeamId.isNotBlank() && appleTeamId != "YOUR_TEAM_ID") {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "iosTeamId", appleTeamId)
+        }
         val matchGitUrl   = get("apple.match.git.url","MATCH_GIT_URL")
         val tfGroups      = get("apple.tf.groups",    "TESTFLIGHT_GROUPS")
 

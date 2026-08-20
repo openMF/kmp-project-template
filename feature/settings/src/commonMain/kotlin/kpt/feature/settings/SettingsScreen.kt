@@ -35,6 +35,8 @@ import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.settings.generated.resources.Res
 import kpt.feature.settings.generated.resources.feature_settings_change_language_placeholder_text
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_empty_title
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_title
 import kpt.feature.settings.generated.resources.feature_settings_change_language_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_text
@@ -59,6 +61,7 @@ internal fun SettingsScreenContent(
     onThemeCardClick: () -> Unit,
     onLanguageCardClick: () -> Unit,
     onSyncAndDraftsClick: () -> Unit,
+    onConflictsClick: () -> Unit,
     modifier: Modifier = Modifier,
     onFooterLongClick: (() -> Unit)? = null,
 ) {
@@ -78,6 +81,7 @@ internal fun SettingsScreenContent(
             ThemeCard(onClick = onThemeCardClick)
             LanguageCard(onClick = onLanguageCardClick)
             SyncAndDraftsCard(onClick = onSyncAndDraftsClick)
+            ConflictsCard(onClick = onConflictsClick)
             Spacer(modifier = Modifier.fillMaxWidth().padding(sp.sm))
             VersionLabel(onLongClick = onFooterLongClick)
         }
@@ -91,6 +95,18 @@ internal fun SyncAndDraftsCard(onClick: () -> Unit, modifier: Modifier = Modifie
         title = stringResource(Res.string.feature_settings_sync_drafts_row),
         contentDescription = stringResource(Res.string.feature_settings_sync_drafts_row_description),
         accentColor = MaterialTheme.colorScheme.secondary,
+        onClick = onClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun ConflictsCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    SettingsRowCard(
+        icon = AppIcons.Payment,
+        title = stringResource(Res.string.feature_settings_conflicts_title),
+        contentDescription = stringResource(Res.string.feature_settings_conflicts_empty_title),
+        accentColor = MaterialTheme.colorScheme.error,
         onClick = onClick,
         modifier = modifier,
     )

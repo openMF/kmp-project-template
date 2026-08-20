@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.stringResource
 fun SettingsDemoBody(
     onBackClick: () -> Unit,
     onSyncAndDraftsClick: () -> Unit,
+    onConflictsClick: () -> Unit,
     modifier: Modifier = Modifier,
     devMenuEntries: List<DevMenuEntry> = emptyList(),
 ) {
@@ -105,6 +106,7 @@ fun SettingsDemoBody(
             showLanguageDialog = true
         },
         onSyncAndDraftsClick = onSyncAndDraftsClick,
+        onConflictsClick = onConflictsClick,
         onFooterLongClick = onFooterLongClick,
     )
 

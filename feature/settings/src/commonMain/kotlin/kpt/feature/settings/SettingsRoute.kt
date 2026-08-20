@@ -25,11 +25,16 @@ data object NotificationRoute
 @Serializable
 data object SyncAndDraftsRoute
 
+@Serializable
+data object ConflictsRoute
+
 fun NavController.navigateToSettings(navOptions: NavOptions? = null) = navigate(SettingsRoute, navOptions)
 
 fun NavController.navigateToNotification(navOptions: NavOptions? = null) = navigate(NotificationRoute, navOptions)
 
 fun NavController.navigateToSyncAndDrafts(navOptions: NavOptions? = null) = navigate(SyncAndDraftsRoute, navOptions)
+
+fun NavController.navigateToConflicts(navOptions: NavOptions? = null) = navigate(ConflictsRoute, navOptions)
 
 /**
  * The settings backbone destination. [settingsBody] is the fork-owned inner content (default supplied by
@@ -54,6 +59,14 @@ fun NavGraphBuilder.notificationDestination(onBackClick: () -> Unit) {
 fun NavGraphBuilder.syncAndDraftsDestination(onBackClick: () -> Unit) {
     composableWithPushTransitions<SyncAndDraftsRoute> {
         SyncAndDraftsScreen(
+            onBackClick = onBackClick,
+        )
+    }
+}
+
+fun NavGraphBuilder.conflictsDestination(onBackClick: () -> Unit) {
+    composableWithPushTransitions<ConflictsRoute> {
+        ConflictResolutionScreen(
             onBackClick = onBackClick,
         )
     }

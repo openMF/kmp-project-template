@@ -278,6 +278,14 @@ is_excluded() {
         core/store/*AppErrorMapper.kt)         return 0 ;;
         core/store/*AppStoreRegistry.kt)       return 0 ;;
         core/store/*StoreModule.kt)            return 0 ;;
+        */schemas/*)                    return 0 ;;  # Room schema-export snapshots (per-fork
+            # migration/version history — every fork's AppDatabase.VERSION + entity set diverges
+            # from the template's own demo schema from v1, so these can never be template-owned or
+            # merged; blind-preserved same as media/icons/store-content. Without this, a whole-dir
+            # sync of `core` overwrites the fork's REAL schemas/N.json with the template's demo
+            # schema (extra template-only versions incl. a phantom `samples` table), corrupting
+            # Room's AutoMigration diff and breaking the next `kspAndroidMain` with an
+            # "AutoMigration Failure: declare @RenameTable/@DeleteTable" error.
     esac
 
     # ── Contract-driven preservation (white-label-template-completion E0/T3, LD-2 operative flip) ──
@@ -548,6 +556,45 @@ merge_contract_root_files() {
 }
 
 # Function to sync directory with exclusions
+# Propagate the template's OWN deletions into a fork that inherited the now-removed file from
+# a previous sync (the `core/platform/notification/bill/**` class: the template consolidated its
+# bill-reminder scheduler into worker-kmp and deleted the old per-platform WorkManager scheduler,
+# but `git checkout $temp_branch -- $dir` only ever OVERWRITES files present in $temp_branch — it
+# never deletes files the fork's tree has that $temp_branch doesn't, so the dead files sat in every
+# fork's tree indefinitely, silently breaking the next dependency-surface change that touched them).
+#
+# Conservative by design — this NEVER deletes anything the fork customized:
+#   1. Find files under $dir the template HAD at PREV_TEMPLATE_SHA but no longer has at $temp_branch
+#      (a real template-side deletion since the fork's last sync).
+#   2. Skip anything is_excluded() already treats as fork-owned/convention (demo/**, schemas/**, the
+#      core/store seam, customization-surface.yaml owner:fork paths) — deletion-propagation only
+#      ever applies to owner:template surfaces.
+#   3. Skip anything the fork already doesn't have (nothing to do) or already customized — i.e. the
+#      fork's current content differs from what PREV_TEMPLATE_SHA shipped. A diverged file is NEVER
+#      auto-deleted; it's surfaced as a warning for a human to review.
+#   4. Only auto-delete when the fork's copy is BYTE-IDENTICAL to the old template content — proof
+#      the fork never touched it, so dropping it just mirrors the template's own completed migration.
+propagate_template_deletions() {
+    local dir=$1
+    local temp_branch=$2
+
+    [ -n "$PREV_TEMPLATE_SHA" ] || return 0
+
+    local deleted_f
+    while IFS= read -r deleted_f; do
+        [ -z "$deleted_f" ] && continue
+        [ -e "$deleted_f" ] || continue                                   # fork doesn't have it either
+        is_excluded "$dir" "$deleted_f" "file" && continue                # fork-owned/convention path
+
+        if git diff --quiet "$PREV_TEMPLATE_SHA" -- "$deleted_f" 2>/dev/null; then
+            git rm -rf --quiet "$deleted_f" 2>/dev/null || rm -f "$deleted_f"
+            print_step "Dropped template-removed ${BOLD}$deleted_f${NC} (unmodified since last sync)"
+        else
+            print_warning "Template removed ${BOLD}$deleted_f${NC} but your fork customized it — review manually (kept)."
+        fi
+    done < <(git diff --name-only --diff-filter=D "$PREV_TEMPLATE_SHA" "$temp_branch" -- "$dir" 2>/dev/null)
+}
+
 sync_directory() {
     local dir=$1
     local temp_branch=$2
@@ -611,6 +658,9 @@ sync_directory() {
                     fi
                 fi
             done < <(git diff --name-only "$BASE_BRANCH" -- "$dir" 2>/dev/null)
+
+            # ── Deletion propagation (template-side removals the fork inherited) ──
+            propagate_template_deletions "$dir" "$temp_branch"
 
             # ── 3-way merge for merge-owned files (customization-surface contract) ──
             # Replaces a blind upstream clobber with a real merge so fork edits (e.g.
@@ -972,6 +1022,21 @@ if [ "$DRY_RUN" = false ]; then
 
     # Preserve root-level excluded files
     preserve_root_files
+
+    # ── Capture the PRIOR synced template commit (deletion-propagation anchor) ──
+    # Read BEFORE any dir sync touches the tree — `.template-version` is fork-owned
+    # (never clobbered by a dir sync) and still holds the sha from the LAST sync at this
+    # point. Used by propagate_template_deletions() below to detect files the template
+    # deleted since we last synced. Empty on a fork's first-ever sync (nothing to diff
+    # against) — that's fine, deletion-propagation just no-ops.
+    PREV_TEMPLATE_SHA=""
+    if [ -f .template-version ]; then
+        PREV_TEMPLATE_SHA="$(grep '^template_sha=' .template-version 2>/dev/null | cut -d= -f2)"
+        if [ -n "$PREV_TEMPLATE_SHA" ] && ! git cat-file -e "$PREV_TEMPLATE_SHA" 2>/dev/null; then
+            print_warning "recorded template_sha ($PREV_TEMPLATE_SHA) is not reachable locally — skipping deletion-propagation this run (fetch more template history to re-enable)."
+            PREV_TEMPLATE_SHA=""
+        fi
+    fi
 
     # ── STEP 0 BOOTSTRAP — the merge-protection contract MUST be on disk before ANY dir syncs ──
     # is_excluded()'s fork-ownership check AND the 3-way merge engine (cs_merge) both silently

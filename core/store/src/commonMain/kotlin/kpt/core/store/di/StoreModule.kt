@@ -9,6 +9,7 @@
  */
 package kpt.core.store.di
 
+import kpt.core.base.store.di.StoreModule as CoreBaseStoreModule
 import kpt.core.base.store.infra.DraftInventory
 import kpt.core.base.store.infra.StoreCacheManager
 import kpt.core.base.store.infra.impl.DraftInventoryImpl
@@ -45,6 +46,12 @@ import org.koin.dsl.module
  * ```
  */
 val appStoreModule: Module = module {
+    // Framework write-SoT: the base-store module provides the single write door (MutationGateway)
+    // + its Room-backed ConflictInbox. Every repo migrated onto `gateway.*` resolves `get()` here,
+    // so a fork wiring `appStoreModule` gets the gateway for free (needs ConflictDao from
+    // DatabaseModule + NetworkMonitor on the graph — both present in KoinModules.allModules).
+    includes(CoreBaseStoreModule)
+
     // Store cache manager — clears all registered caches on logout (registration-based)
     single<StoreCacheManager> {
         StoreCacheManagerImpl(

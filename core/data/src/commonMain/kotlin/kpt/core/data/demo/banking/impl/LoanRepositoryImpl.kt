@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.database.demo.banking.dao.LoanDao
@@ -43,6 +43,7 @@ import org.mobilenativefoundation.store.store5.StoreReadResponse
 internal class LoanRepositoryImpl(
     private val loansStore: Store<Unit, List<Loan>>,
     private val loanDao: LoanDao,
+    private val gateway: MutationGateway,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
 ) : LoanRepository {
@@ -81,13 +82,13 @@ internal class LoanRepositoryImpl(
     override suspend fun getById(id: String): Loan? = loanDao.getById(id)?.toDomain()
 
     override suspend fun upsert(loan: Loan) {
-        notifyingWrite(LOANS_TABLE) {
+        gateway.localMutation(LOANS_TABLE) {
             loanDao.upsert(loan.toEntity())
         }
     }
 
     override suspend fun delete(id: String) {
-        notifyingWrite(LOANS_TABLE) {
+        gateway.localMutation(LOANS_TABLE) {
             loanDao.deleteById(id)
         }
     }

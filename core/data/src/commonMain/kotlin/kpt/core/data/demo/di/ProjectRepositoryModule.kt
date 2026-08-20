@@ -84,6 +84,7 @@ val ProjectRepositoryModule = module {
         LoanRepositoryImpl(
             loansStore = get(AppStoreRegistry.Loans),
             loanDao = get(),
+            gateway = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
@@ -92,6 +93,7 @@ val ProjectRepositoryModule = module {
         BillReminderRepositoryImpl(
             billRemindersStore = get(AppStoreRegistry.BillReminders),
             billReminderDao = get(),
+            gateway = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
@@ -207,6 +209,7 @@ val ProjectRepositoryModule = module {
         AlertsRepositoryImpl(
             alertsStore = get(AppStoreRegistry.Alerts),
             alertDao = get(),
+            gateway = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

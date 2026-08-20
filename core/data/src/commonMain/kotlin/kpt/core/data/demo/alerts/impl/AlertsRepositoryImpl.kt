@@ -11,10 +11,10 @@ package kpt.core.data.demo.alerts.impl
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
-import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.alerts.AlertsRepository
 import kpt.core.database.demo.alerts.AlertDao
@@ -25,6 +25,7 @@ import org.mobilenativefoundation.store.store5.Store
 internal class AlertsRepositoryImpl(
     private val alertsStore: Store<Unit, List<PriceAlert>>,
     private val alertDao: AlertDao,
+    private val gateway: MutationGateway,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
 ) : AlertsRepository {
@@ -43,14 +44,14 @@ internal class AlertsRepositoryImpl(
         )
 
     override suspend fun submitAlert(alert: PriceAlert): PriceAlert {
-        notifyingWrite(ALERTS_TABLE) {
+        gateway.localMutation(ALERTS_TABLE) {
             alertDao.upsert(alert.toAlertEntity())
         }
         return alert
     }
 
     override suspend fun deleteAlert(id: String) {
-        notifyingWrite(ALERTS_TABLE) {
+        gateway.localMutation(ALERTS_TABLE) {
             alertDao.deleteById(id)
         }
     }

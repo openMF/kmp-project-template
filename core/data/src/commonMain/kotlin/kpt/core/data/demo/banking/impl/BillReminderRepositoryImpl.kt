@@ -19,10 +19,10 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.database.demo.banking.dao.BillReminderDao
@@ -48,6 +48,7 @@ import kotlin.time.Clock
 internal class BillReminderRepositoryImpl(
     private val billRemindersStore: Store<Unit, List<BillReminder>>,
     private val billReminderDao: BillReminderDao,
+    private val gateway: MutationGateway,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
     private val clock: Clock = Clock.System,
@@ -90,13 +91,13 @@ internal class BillReminderRepositoryImpl(
     override suspend fun getById(id: String): BillReminder? = billReminderDao.getById(id)?.toDomain()
 
     override suspend fun upsert(bill: BillReminder) {
-        notifyingWrite(BILL_REMINDERS_TABLE) {
+        gateway.localMutation(BILL_REMINDERS_TABLE) {
             billReminderDao.upsert(bill.toEntity())
         }
     }
 
     override suspend fun delete(id: String) {
-        notifyingWrite(BILL_REMINDERS_TABLE) {
+        gateway.localMutation(BILL_REMINDERS_TABLE) {
             billReminderDao.deleteById(id)
         }
     }

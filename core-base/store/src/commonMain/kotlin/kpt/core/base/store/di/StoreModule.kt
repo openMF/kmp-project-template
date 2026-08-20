@@ -9,17 +9,34 @@
  */
 package kpt.core.base.store.di
 
+import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
+import kotlin.time.Clock
+import kpt.core.base.store.mutation.DefaultMutationGateway
+import kpt.core.base.store.mutation.MutationGateway
+import kpt.core.base.store.mutation.conflict.ConflictInbox
+import kpt.core.base.store.mutation.conflict.impl.RoomConflictInbox
 import org.koin.dsl.module
 
 /**
  * Koin module providing base Store infrastructure.
  *
  * Consumer apps should include this module and add their own store bindings
- * in their `core/data` DI module using [StoreFactory] to create store instances.
+ * in their `core/data` DI module using `StoreFactory` to create store instances.
+ *
+ * Also provides the framework write-SoT: the [MutationGateway] (the single write door every repo
+ * routes mutations through) and its Room-backed [ConflictInbox]. Requires a `NetworkMonitor` (from
+ * `cmp-network-monitor`) and the framework `ConflictDao` (from `DatabaseModule`) on the graph.
  */
 val StoreModule = module {
-    // Base store module — intentionally minimal.
-    // StoreFactory is an object and doesn't need DI.
-    // Consumer apps wire their own Store<Key, Output> instances
-    // using their specific DAOs, API services, and converters.
+    // Room-backed conflict inbox surfaced in Settings.
+    single<ConflictInbox> {
+        RoomConflictInbox(dao = get(), now = { Clock.System.now().toEpochMilliseconds() })
+    }
+    // The single write door — composes MutableStore.write + the conflict inbox + connectivity.
+    single<MutationGateway> {
+        DefaultMutationGateway(
+            isOnline = { get<NetworkMonitor>().isOnline.value },
+            conflictInbox = get(),
+        )
+    }
 }

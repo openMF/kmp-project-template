@@ -19,9 +19,11 @@ import androidx.room3.RoomDatabaseConstructor
 import androidx.room3.migration.AutoMigrationSpec
 import kpt.core.base.database.infra.dao.BookkeeperDao
 import kpt.core.base.database.infra.dao.DraftDao
+import kpt.core.base.database.infra.dao.ConflictDao
 import kpt.core.base.database.infra.dao.FetchedAtDao
 import kpt.core.base.database.infra.entity.BookkeeperEntity
 import kpt.core.base.database.infra.entity.DraftEntity
+import kpt.core.base.database.infra.entity.ConflictEntity
 import kpt.core.base.database.infra.entity.FetchedAtEntity
 import kpt.core.database.demo.alerts.AlertDao
 import kpt.core.database.demo.alerts.AlertEntity
@@ -95,6 +97,7 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         BookkeeperEntity::class,
         FetchedAtEntity::class,
         DraftEntity::class,
+        ConflictEntity::class,
         // demo:begin
         ExchangeRatesEntity::class,
         CoinMarketEntity::class,
@@ -138,6 +141,10 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         // generates CREATE TABLE for the two new tables; the explicit @DeleteTable spec
         // handles the DROP of `samples`.
         AutoMigration(from = 8, to = 10, spec = AppDatabase.MigrationSpec8to10::class),
+        // v11 → v12: purely additive — creates `framework_write_conflicts` for the write-conflict
+        // inbox (MutationGateway server-wins conflicts surfaced in Settings). Room auto-generates
+        // `CREATE TABLE IF NOT EXISTS …`; no existing schema is modified.
+        AutoMigration(from = 11, to = 12),
         // demo:end
         // fork:begin — a fork adds its own AutoMigration(...) entries here, one per schema-changing
         // fork entity (from = previous effective version, to = new). PRESERVED across sync.
@@ -158,6 +165,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val bookkeeperDao: BookkeeperDao
     abstract val fetchedAtDao: FetchedAtDao
     abstract val draftDao: DraftDao
+    abstract val conflictDao: ConflictDao
 
     // demo:begin
     abstract val exchangeRatesDao: ExchangeRatesDao
@@ -193,7 +201,7 @@ abstract class AppDatabase : RoomDatabase() {
         // NOTE: `customizer --clean` resets TEMPLATE_BASE_VERSION to 1 (fresh-fork baseline) via a
         // targeted sed, since the migration history above is stripped with the demo block.
         /** Template-owned base schema version — the TEMPLATE bumps this on its own schema changes. */
-        const val TEMPLATE_BASE_VERSION = 11
+        const val TEMPLATE_BASE_VERSION = 12
 
         /**
          * Effective DB schema version = template base + the fork's offset ([ForkDatabaseConfig],

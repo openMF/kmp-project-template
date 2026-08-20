@@ -14,6 +14,9 @@ import kotlinx.coroutines.CoroutineScope
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
+import kpt.core.base.store.mutation.MutationGateway
+import kpt.core.base.store.mutation.MutationPolicy
+import kpt.core.base.store.mutation.MutationResult
 import kpt.core.data.demo.cloudtodo.CloudTodoRepository
 import kpt.core.model.demo.cloudtodo.CloudTodo
 import kpt.core.store.demo.cloudtodo.impl.CloudTodoKey
@@ -29,6 +32,7 @@ import org.mobilenativefoundation.store.store5.StoreWriteRequest
 class CloudTodoRepositoryImpl(
     private val readStore: Store<CloudTodoKey, CloudTodo>,
     private val writeStore: MutableStore<CloudTodoKey, CloudTodo>,
+    private val gateway: MutationGateway,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
 ) : CloudTodoRepository {
@@ -54,4 +58,15 @@ class CloudTodoRepositoryImpl(
             ),
         )
     }
+
+    override suspend fun completeOnline(todo: CloudTodo): MutationResult<CloudTodo> =
+        // OnlineRequired: the gateway awaits the network PUT (via writeStore's Updater) and ingests the
+        // server record; offline it returns Blocked WITHOUT writing locally — no unconfirmed optimistic
+        // state, unlike toggleCompleted. The single write door owns the connectivity + ingest decision.
+        gateway.upsert(
+            store = writeStore,
+            key = CloudTodoKey(todo.id),
+            value = todo.copy(completed = true),
+            policy = MutationPolicy.OnlineRequired,
+        )
 }

@@ -178,6 +178,7 @@ val ProjectRepositoryModule = module {
         CloudTodoRepositoryImpl(
             readStore = get(AppStoreRegistry.CloudTodo),
             writeStore = get(AppStoreRegistry.CloudTodoMutable),
+            gateway = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

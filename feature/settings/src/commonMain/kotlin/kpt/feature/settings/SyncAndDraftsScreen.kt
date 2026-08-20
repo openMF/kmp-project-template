@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.infra.DraftRecord
+import kpt.core.base.store.mutation.conflict.ConflictEntry
 import kpt.core.base.store.submit.SubmitOutboxStatus
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
@@ -59,6 +60,10 @@ import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_sec
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_status_failed
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_status_pending
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_status_retrying
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_accept_server
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_retry_local
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_row_label
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_title
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_title
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -74,14 +79,20 @@ internal fun SyncAndDraftsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SyncAndDraftsViewModel = koinViewModel(),
+    conflictViewModel: ConflictInboxViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
+    val conflictState by conflictViewModel.stateFlow.collectAsStateWithLifecycle()
+    val conflicts = (conflictState as? ConflictInboxUiState.Success)?.conflicts ?: emptyList()
     SyncAndDraftsScreenContent(
         uiState = uiState,
+        conflicts = conflicts,
         onBackClick = onBackClick,
         onRetry = viewModel::retry,
         onDiscard = viewModel::discard,
         onPrune = viewModel::pruneExpired,
+        onAcceptServer = conflictViewModel::acceptServer,
+        onRetryLocal = conflictViewModel::retryLocal,
         modifier = modifier.testTag(TestTags.SyncAndDrafts.SCREEN),
     )
 }
@@ -94,6 +105,9 @@ internal fun SyncAndDraftsScreenContent(
     onDiscard: (Long) -> Unit,
     onPrune: () -> Unit,
     modifier: Modifier = Modifier,
+    conflicts: List<ConflictEntry> = emptyList(),
+    onAcceptServer: (String) -> Unit = {},
+    onRetryLocal: (String) -> Unit = {},
 ) {
     val sp = MaterialTheme.spacing
 
@@ -125,7 +139,7 @@ internal fun SyncAndDraftsScreenContent(
     ) {
         when (uiState) {
             SyncAndDraftsUiState.Loading -> LoadingState()
-            is SyncAndDraftsUiState.Success -> if (uiState.isEmpty) {
+            is SyncAndDraftsUiState.Success -> if (uiState.isEmpty && conflicts.isEmpty()) {
                 EmptyState()
             } else {
                 LazyColumn(
@@ -133,6 +147,11 @@ internal fun SyncAndDraftsScreenContent(
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(sp.lg),
                     verticalArrangement = Arrangement.spacedBy(sp.sm),
                 ) {
+                    conflictSection(
+                        conflicts = conflicts,
+                        onAcceptServer = onAcceptServer,
+                        onRetryLocal = onRetryLocal,
+                    )
                     draftSection(
                         titleRes = Res.string.feature_settings_sync_drafts_section_failed,
                         rows = uiState.failed,
@@ -313,3 +332,58 @@ private fun EmptyState() {
  */
 private fun DraftRecord.formTitle(): String =
     if (uniqueKey.isNullOrBlank()) formKey else "$formKey · $uniqueKey"
+
+/**
+ * Sync conflicts section — surfaced INSIDE Sync & Drafts because a conflict is a sync failure the
+ * user must resolve (keep the server's version, or retry theirs). Data comes from the framework
+ * [ConflictInboxViewModel]; empty conflicts render nothing (the draft sections carry the screen).
+ */
+private fun androidx.compose.foundation.lazy.LazyListScope.conflictSection(
+    conflicts: List<ConflictEntry>,
+    onAcceptServer: (String) -> Unit,
+    onRetryLocal: (String) -> Unit,
+) {
+    if (conflicts.isEmpty()) return
+    item(key = "header_conflicts") {
+        Text(
+            text = "${stringResource(Res.string.feature_settings_conflicts_title)} · ${conflicts.size}",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(vertical = MaterialTheme.spacing.sm),
+        )
+    }
+    items(conflicts, key = { it.id }) { conflict ->
+        ConflictRowCard(conflict, onAcceptServer, onRetryLocal)
+    }
+}
+
+@Composable
+private fun ConflictRowCard(
+    conflict: ConflictEntry,
+    onAcceptServer: (String) -> Unit,
+    onRetryLocal: (String) -> Unit,
+) {
+    val sp = MaterialTheme.spacing
+    AppCard(modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(sp.md), verticalArrangement = Arrangement.spacedBy(sp.xs)) {
+            Text(
+                text = stringResource(Res.string.feature_settings_conflicts_row_label) + " · " + conflict.entity,
+                style = MaterialTheme.typography.titleSmall,
+            )
+            Text(text = conflict.key, style = MaterialTheme.typography.bodySmall)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = sp.xs),
+                horizontalArrangement = Arrangement.spacedBy(sp.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                OutlinedButton(onClick = { onAcceptServer(conflict.id) }) {
+                    Text(stringResource(Res.string.feature_settings_conflicts_accept_server))
+                }
+                TextButton(onClick = { onRetryLocal(conflict.id) }) {
+                    Text(stringResource(Res.string.feature_settings_conflicts_retry_local))
+                }
+            }
+        }
+    }
+}

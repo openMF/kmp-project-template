@@ -37,7 +37,6 @@ class SettingsScreenUiTest {
                 SettingsDemoBody(
                     onBackClick = {},
                     onSyncAndDraftsClick = {},
-                    onConflictsClick = {},
                 )
             }
         }

@@ -30,11 +30,9 @@ import kpt.feature.rates.navigation.navigateToRates
 import kpt.feature.settings.demo.SettingsDemoBody
 import kpt.feature.settings.navigateToSettings
 import kpt.feature.settings.navigateToSyncAndDrafts
-import kpt.feature.settings.navigateToConflicts
 import kpt.feature.settings.notificationDestination
 import kpt.feature.settings.settingsDestination
 import kpt.feature.settings.syncAndDraftsDestination
-import kpt.feature.settings.conflictsDestination
 
 /**
  * BackboneRegistry — the FORK-OWNED white-label seam for the app **backbone** (the home-tab body and,
@@ -88,7 +86,6 @@ object BackboneRegistry {
         SettingsDemoBody(
             onBackClick = { navController.popBackStackSafely() },
             onSyncAndDraftsClick = { navController.navigateToSyncAndDrafts() },
-            onConflictsClick = { navController.navigateToConflicts() },
             devMenuEntries = ShowcaseRegistry.devSettingsEntries(navController),
         )
         // demo:end
@@ -122,7 +119,6 @@ object BackboneRegistry {
     val backboneDestinations: NavGraphBuilder.(NavController) -> Unit = { navController ->
         notificationDestination(onBackClick = { navController.popBackStackSafely() })
         syncAndDraftsDestination(onBackClick = { navController.popBackStackSafely() })
-        conflictsDestination(onBackClick = { navController.popBackStackSafely() })
         // Settings inner content flows through the fork-owned `settingsBody` seam (WS01 / AC7); the
         // template `settingsDestination` shell forwards this opaque body, carrying no demo wiring.
         settingsDestination(settingsBody = { BackboneRegistry.settingsBody(navController) })

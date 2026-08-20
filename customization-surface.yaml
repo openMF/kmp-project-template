@@ -380,7 +380,10 @@ rules:
   - { glob: "version.txt",                   owner: template }
   - { glob: "lib-integrate.properties",      owner: template }
   - { glob: "secrets-manifest.yaml",         owner: fork }      # per-fork generated (project id + alias list) — E0/T1
-  - { glob: "gradle.properties",             owner: fork }      # holds fork.project.name (SyncForkConfigPlugin) — E0/T1
+  # MIXED file: fork values (fork.project.name) + template infra (JVM args, gradle/kotlin flags, memory,
+  # toggles). owner:fork froze the template infra out; 3-way merge brings template infra in while
+  # preserving the fork's changed keys (BASE = template@last-synced sha, per FT-5b). E0/T1.
+  - { glob: "gradle.properties",             owner: merge, strategy: properties-3way }
   - { glob: "build.gradle.kts",              owner: template }
   - { glob: "kotlin-js-store/**",            owner: template }
   - { glob: "legal/**",                      owner: template }

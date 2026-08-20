@@ -3,3 +3,5 @@
 {"ts":"2026-08-15T14:58:28Z","command":"superpowers:brainstorming","actor":"claude","dispatched_by":"standalone","verified_by_parent":false,"verdict":null}
 {"ts":"2026-08-16T13:46:46Z","command":"kmp-implement-template","actor":"claude","dispatched_by":"standalone","verified_by_parent":false,"verdict":null}
 {"ts":"2026-08-19T12:18:34Z","command":"idea-ci-pr","actor":"claude","dispatched_by":"standalone","verified_by_parent":false,"verdict":null}
+{"ts":"2026-08-20T10:59:58Z","command":"superpowers:brainstorming","actor":"claude","dispatched_by":"standalone","verified_by_parent":false,"verdict":null}
+{"ts":"2026-08-20T11:15:17Z","command":"goal-research","actor":"claude","dispatched_by":"standalone","verified_by_parent":false,"verdict":null}

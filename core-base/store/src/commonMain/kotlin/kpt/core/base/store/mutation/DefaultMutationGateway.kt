@@ -9,6 +9,7 @@
  */
 package kpt.core.base.store.mutation
 
+import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.mutation.conflict.ConflictInbox
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
@@ -103,4 +104,12 @@ class DefaultMutationGateway(
             MutationResult.Failed(cause = t, rolledBack = rolledBack)
         }
     }
+
+    override suspend fun localMutation(table: String, mutate: suspend () -> Unit): MutationResult<Unit> =
+        try {
+            notifyingWrite(table) { mutate() }
+            MutationResult.Applied(value = Unit, synced = true)
+        } catch (t: Throwable) {
+            MutationResult.Failed(cause = t, rolledBack = false)
+        }
 }

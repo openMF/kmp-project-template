@@ -13,9 +13,9 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
+import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.watchlist.WatchlistRepository
@@ -37,6 +37,7 @@ import kotlin.time.Clock
 internal class WatchlistRepositoryImpl(
     private val watchlistStore: Store<Unit, List<WatchlistItem>>,
     private val dao: WatchlistDao,
+    private val gateway: MutationGateway,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
 ) : WatchlistRepository {
@@ -55,13 +56,15 @@ internal class WatchlistRepositoryImpl(
     override fun contains(coinId: String): Flow<Boolean> = daoFlow(WATCHLIST_TABLE) { dao.observeContains(coinId) }
 
     override suspend fun add(coinId: String) {
-        notifyingWrite(WATCHLIST_TABLE) {
+        // Single write door: the DAO write is handed to the gateway (local-only Optimistic), which runs
+        // it inside notifyingWrite(WATCHLIST_TABLE) so wasmJs collectors re-emit. No direct dao write here.
+        gateway.localMutation(WATCHLIST_TABLE) {
             dao.insert(WatchlistEntity(coinId = coinId, addedAtMs = Clock.System.now().toEpochMilliseconds()))
         }
     }
 
     override suspend fun remove(coinId: String) {
-        notifyingWrite(WATCHLIST_TABLE) {
+        gateway.localMutation(WATCHLIST_TABLE) {
             dao.delete(coinId)
         }
     }

@@ -69,6 +69,7 @@ val ProjectRepositoryModule = module {
         WatchlistRepositoryImpl(
             watchlistStore = get(AppStoreRegistry.Watchlist),
             dao = get(),
+            gateway = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

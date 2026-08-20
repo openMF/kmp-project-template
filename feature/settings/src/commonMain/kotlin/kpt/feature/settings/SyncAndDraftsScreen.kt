@@ -46,6 +46,10 @@ import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.core.ui.scaffold.KptScaffold
 import kpt.feature.settings.generated.resources.Res
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_accept_server
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_retry_local
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_row_label
+import kpt.feature.settings.generated.resources.feature_settings_conflicts_title
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_discard
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_discard_confirm_cancel
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_discard_confirm_message
@@ -60,10 +64,6 @@ import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_sec
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_status_failed
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_status_pending
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_status_retrying
-import kpt.feature.settings.generated.resources.feature_settings_conflicts_accept_server
-import kpt.feature.settings.generated.resources.feature_settings_conflicts_retry_local
-import kpt.feature.settings.generated.resources.feature_settings_conflicts_row_label
-import kpt.feature.settings.generated.resources.feature_settings_conflicts_title
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_title
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource

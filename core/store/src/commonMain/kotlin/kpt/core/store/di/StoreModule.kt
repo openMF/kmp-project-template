@@ -9,7 +9,6 @@
  */
 package kpt.core.store.di
 
-import kpt.core.base.store.di.StoreModule as CoreBaseStoreModule
 import kpt.core.base.store.infra.DraftInventory
 import kpt.core.base.store.infra.StoreCacheManager
 import kpt.core.base.store.infra.impl.DraftInventoryImpl
@@ -30,6 +29,7 @@ import kpt.core.store.demo.exchange.impl.provideSpotRateLookupStore
 import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import kpt.core.base.store.di.StoreModule as CoreBaseStoreModule
 
 /**
  * Koin module for app-level Store wiring.

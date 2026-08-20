@@ -14,8 +14,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.mutation.MutationGateway
+import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.watchlist.WatchlistRepository

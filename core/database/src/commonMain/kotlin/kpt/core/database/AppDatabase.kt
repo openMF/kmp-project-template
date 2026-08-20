@@ -18,12 +18,12 @@ import androidx.room3.RoomDatabase
 import androidx.room3.RoomDatabaseConstructor
 import androidx.room3.migration.AutoMigrationSpec
 import kpt.core.base.database.infra.dao.BookkeeperDao
-import kpt.core.base.database.infra.dao.DraftDao
 import kpt.core.base.database.infra.dao.ConflictDao
+import kpt.core.base.database.infra.dao.DraftDao
 import kpt.core.base.database.infra.dao.FetchedAtDao
 import kpt.core.base.database.infra.entity.BookkeeperEntity
-import kpt.core.base.database.infra.entity.DraftEntity
 import kpt.core.base.database.infra.entity.ConflictEntity
+import kpt.core.base.database.infra.entity.DraftEntity
 import kpt.core.base.database.infra.entity.FetchedAtEntity
 import kpt.core.database.demo.alerts.AlertDao
 import kpt.core.database.demo.alerts.AlertEntity

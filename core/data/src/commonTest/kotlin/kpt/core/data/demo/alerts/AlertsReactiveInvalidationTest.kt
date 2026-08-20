@@ -17,6 +17,7 @@ import kpt.core.base.store.screen.ScreenState
 import kpt.core.data.demo.alerts.impl.AlertsRepositoryImpl
 import kpt.core.data.infra.InMemoryFetchedAtRepository
 import kpt.core.data.infra.onlineNetworkMonitor
+import kpt.core.data.infra.testMutationGateway
 import kpt.core.model.demo.alerts.AlertDirection
 import kpt.core.model.demo.alerts.PriceAlert
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
@@ -45,6 +46,7 @@ class AlertsReactiveInvalidationTest {
     private val repo: AlertsRepository = AlertsRepositoryImpl(
         alertsStore = provideAlertsStore(dao),
         alertDao = dao,
+        gateway = testMutationGateway(),
         networkMonitor = onlineNetworkMonitor(),
         fetchedAtRepository = InMemoryFetchedAtRepository(),
     )

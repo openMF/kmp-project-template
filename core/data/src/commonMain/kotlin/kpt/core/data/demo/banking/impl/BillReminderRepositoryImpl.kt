@@ -20,9 +20,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.FetchedAtRepository
+import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.database.demo.banking.dao.BillReminderDao

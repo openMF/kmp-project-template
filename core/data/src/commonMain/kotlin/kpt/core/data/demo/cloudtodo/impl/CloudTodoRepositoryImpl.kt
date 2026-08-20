@@ -12,11 +12,11 @@ package kpt.core.data.demo.cloudtodo.impl
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.base.store.screen.asScreenStream
 import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.mutation.MutationPolicy
 import kpt.core.base.store.mutation.MutationResult
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.cloudtodo.CloudTodoRepository
 import kpt.core.model.demo.cloudtodo.CloudTodo
 import kpt.core.store.demo.cloudtodo.impl.CloudTodoKey

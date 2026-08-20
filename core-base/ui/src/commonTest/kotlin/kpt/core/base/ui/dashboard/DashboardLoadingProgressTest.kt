@@ -135,7 +135,7 @@ class DashboardLoadingProgressTest {
         assertEquals(
             older,
             states.toDashboardProgressState().oldestFetchedAt,
-            "oldestFetchedAt must be the minimum (stalest) Content fetchedAt — the dashboard is as stale as its stalest card.",
+            "oldestFetchedAt is the stalest (min) Content fetchedAt across cards.",
         )
     }
 

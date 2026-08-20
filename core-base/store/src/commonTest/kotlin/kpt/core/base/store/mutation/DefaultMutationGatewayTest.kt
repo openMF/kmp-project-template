@@ -24,7 +24,13 @@ import kotlin.test.assertTrue
 
 private class FakeConflictInbox : ConflictInbox {
     val recorded = mutableListOf<ConflictReport>()
-    override suspend fun record(entity: String, key: String, localPayloadJson: String, serverPayloadJson: String, formRoute: String?): String {
+    override suspend fun record(
+        entity: String,
+        key: String,
+        localPayloadJson: String,
+        serverPayloadJson: String,
+        formRoute: String?,
+    ): String {
         recorded += ConflictReport(entity, key, localPayloadJson, serverPayloadJson, formRoute)
         return "c${recorded.size}"
     }
@@ -34,7 +40,7 @@ private class FakeConflictInbox : ConflictInbox {
 
 /**
  * Tests the [DefaultMutationGateway] command-path decision logic (SP-1/T2) — the arm that carries the
- * policy + conflict + rollback semantics without needing a fake Store5 [org.mobilenativefoundation.store.store5.MutableStore].
+ * policy + conflict + rollback semantics without needing a fake Store5 MutableStore.
  */
 class DefaultMutationGatewayTest {
 

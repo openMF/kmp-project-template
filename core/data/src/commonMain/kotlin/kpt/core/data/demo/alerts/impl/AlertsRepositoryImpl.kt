@@ -12,9 +12,9 @@ package kpt.core.data.demo.alerts.impl
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kpt.core.base.store.infra.FetchedAtRepository
+import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.alerts.AlertsRepository
 import kpt.core.database.demo.alerts.AlertDao

@@ -17,6 +17,7 @@ import kpt.core.base.store.screen.ScreenState
 import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
 import kpt.core.data.infra.InMemoryFetchedAtRepository
 import kpt.core.data.infra.onlineNetworkMonitor
+import kpt.core.data.infra.testMutationGateway
 import kpt.core.model.demo.watchlist.WatchlistItem
 import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
 import kotlin.test.Test
@@ -37,6 +38,7 @@ class WatchlistReactiveInvalidationTest {
     private val repo: WatchlistRepository = WatchlistRepositoryImpl(
         watchlistStore = provideWatchlistStore(dao),
         dao = dao,
+        gateway = testMutationGateway(),
         networkMonitor = onlineNetworkMonitor(),
         fetchedAtRepository = InMemoryFetchedAtRepository(),
     )

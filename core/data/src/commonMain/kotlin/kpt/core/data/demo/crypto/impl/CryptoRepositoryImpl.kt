@@ -18,6 +18,7 @@ import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.crypto.CryptoRepository
 import kpt.core.model.demo.crypto.CoinDetail
 import kpt.core.model.demo.crypto.CoinMarket
+import kpt.core.store.AppCacheKeys
 import org.mobilenativefoundation.store.store5.Store
 
 class CryptoRepositoryImpl(
@@ -27,7 +28,7 @@ class CryptoRepositoryImpl(
 
     override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
         coinMarketsStore.asPagingScreenStream(
-            cacheKey = "crypto:coinMarkets",
+            cacheKey = AppCacheKeys.COIN_MARKETS,
             scope = scope,
             pageSize = pageSize,
         )
@@ -35,7 +36,7 @@ class CryptoRepositoryImpl(
     override fun coinDetailStream(coinId: String, scope: CoroutineScope): ScreenDataStream<CoinDetail> =
         coinDetailStore.asScreenStream(
             key = coinId,
-            cacheKey = "crypto:coinDetail:$coinId",
+            cacheKey = AppCacheKeys.coinDetail(coinId),
             scope = scope,
         )
 }

@@ -18,6 +18,7 @@ import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.watchlist.WatchlistRepository
 import kpt.core.database.demo.watchlist.dao.WatchlistDao
 import kpt.core.model.demo.watchlist.WatchlistItem
+import kpt.core.store.AppCacheKeys
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
@@ -44,7 +45,7 @@ internal class WatchlistRepositoryImpl(
     override fun watchlistStream(scope: CoroutineScope): ScreenDataStream<List<WatchlistItem>> =
         watchlistStore.asScreenStream(
             key = Unit,
-            cacheKey = "watchlist",
+            cacheKey = AppCacheKeys.WATCHLIST,
             scope = scope,
             fetchPolicy = FetchPolicy.CACHE_ONLY,
             isEmpty = { it.isEmpty() },

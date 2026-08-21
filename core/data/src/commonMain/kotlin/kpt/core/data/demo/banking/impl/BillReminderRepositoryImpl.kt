@@ -24,6 +24,7 @@ import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.database.demo.banking.dao.BillReminderDao
 import kpt.core.model.demo.banking.BillReminder
+import kpt.core.store.AppCacheKeys
 import kpt.core.store.demo.banking.impl.toDomain
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
@@ -35,13 +36,12 @@ import kotlin.time.Clock
 /**
  * Local-only impl of [BillReminderRepository].
  *
- * Read-path contract: [billRemindersStream] builds the offline-local [ScreenDataStream] (CACHE_ONLY)
- * over the domain-emitting [kpt.core.store.demo.banking.impl.provideBillRemindersStore]; read screens
- * consume `.state`. The "upcoming" window math runs in the repository; [Clock] + [TimeZone] are
- * injected so tests can fix "today". Direct-DAO `Flow` reads (`observeUpcoming`, `observeById`, the
- * dashboard aggregates) are wrapped with [daoFlow] and writes with [notifyingWrite] so the wasmJs
- * target's long-lived collectors re-emit after writes even when Room 3 alpha05's async
- * InvalidationTracker fails to fan out (no-op on Android/Desktop/iOS).
+ * Writes flow through the single write door [billRemindersWriteStore] (`store.write` / `store.clear`);
+ * the read `Store` re-projects via [billRemindersStream]'s `asScreenStream`. Aggregate / filter /
+ * one-shot READS stay DAO-backed reactive methods (`daoFlow { billReminderDao.… }`) — Store5's
+ * cache-oriented read API serves stale one-shot reads and its `MutableStore` is not a `Store`, so a
+ * direct `daoFlow` read of the SAME Room SoT is the coherent path (Room is the single SoT). [Clock] +
+ * [TimeZone] are injected so the "upcoming" window math is deterministic under test.
  */
 internal class BillReminderRepositoryImpl(
     private val billRemindersStore: Store<Unit, List<BillReminder>>,
@@ -59,7 +59,7 @@ internal class BillReminderRepositoryImpl(
     override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
         billRemindersStore.asScreenStream(
             key = Unit,
-            cacheKey = "billReminders",
+            cacheKey = AppCacheKeys.BILL_REMINDERS,
             scope = scope,
             fetchPolicy = FetchPolicy.CACHE_ONLY,
             isEmpty = { it.isEmpty() },

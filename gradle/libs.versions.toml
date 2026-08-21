@@ -140,10 +140,10 @@ aboutLibraries = "15.0.3"
 desktopPackageVersion = "1.0.0"
 
 # Store 5
-store = "5.1.0-alpha08"
+store = "5.1.0-alpha10"
 
 #Room 3
-room = "3.0.0"
+room = "3.0.1"
 sqliteBundled = "2.7.0"
 sqliteWeb = "2.7.0"
 

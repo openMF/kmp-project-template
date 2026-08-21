@@ -25,6 +25,7 @@ import kpt.core.data.demo.currency.CurrencyRepository
 import kpt.core.model.demo.currency.ExchangeRates
 import kpt.core.model.demo.currency.RateHistory
 import kpt.core.model.demo.currency.RateHistoryKey
+import kpt.core.store.AppCacheKeys
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
@@ -48,7 +49,7 @@ class CurrencyRepositoryImpl(
         fetchPolicy: FetchPolicy,
     ): ScreenDataStream<ExchangeRates> = exchangeRatesStore.asScreenStream(
         key = baseCurrency,
-        cacheKey = "currency:exchangeRates:$baseCurrency",
+        cacheKey = AppCacheKeys.exchangeRates(baseCurrency),
         scope = scope,
         fetchPolicy = fetchPolicy,
     )
@@ -59,7 +60,7 @@ class CurrencyRepositoryImpl(
         scope: CoroutineScope,
     ): ScreenDataStream<ExchangeRates> = spotRateStore.asScreenStream(
         key = baseCurrency,
-        cacheKey = "currency:spotRate:$baseCurrency",
+        cacheKey = AppCacheKeys.spotRate(baseCurrency),
         scope = scope,
         fetchPolicy = if (online) FetchPolicy.NETWORK_ONLY else FetchPolicy.CACHE_ONLY,
     )
@@ -69,7 +70,7 @@ class CurrencyRepositoryImpl(
         scope: CoroutineScope,
     ): ScreenDataStream<RateHistory> = rateHistoryStore.asScreenStream(
         keyFlow = keyFlow,
-        cacheKeyFor = { key -> "currency:rateHistory:${key.from}-${key.to}-${key.days}d" },
+        cacheKeyFor = { key -> AppCacheKeys.rateHistory(key.from, key.to, key.days) },
         scope = scope,
     )
 

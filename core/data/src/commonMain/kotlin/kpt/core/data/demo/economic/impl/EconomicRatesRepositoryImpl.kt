@@ -15,6 +15,7 @@ import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.economic.EconomicRatesRepository
 import kpt.core.model.demo.economic.InterestRateSeries
+import kpt.core.store.AppCacheKeys
 import kpt.core.store.demo.economic.impl.InterestRateSeriesKey
 import org.mobilenativefoundation.store.store5.Store
 
@@ -27,7 +28,7 @@ class EconomicRatesRepositoryImpl(
         scope: CoroutineScope,
     ): ScreenDataStream<InterestRateSeries> = interestRateSeriesStore.asScreenStream(
         key = key,
-        cacheKey = "economic:rates:${key.seriesId}:${key.days}d",
+        cacheKey = AppCacheKeys.interestRateSeries(key.seriesId, key.days),
         scope = scope,
     )
 

@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -25,10 +24,11 @@ import kpt.core.database.demo.banking.dao.LoanDao
 import kpt.core.model.demo.banking.Loan
 import kpt.core.store.demo.banking.impl.provideLoanDetailStore
 import kpt.core.store.demo.banking.impl.toDomain
-import kpt.core.store.demo.banking.impl.toEntity
+import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
+import org.mobilenativefoundation.store.store5.StoreWriteRequest
 
 /**
  * Local-only impl of [LoanRepository].
@@ -42,8 +42,8 @@ import org.mobilenativefoundation.store.store5.StoreReadResponse
  */
 internal class LoanRepositoryImpl(
     private val loansStore: Store<Unit, List<Loan>>,
+    private val loansWriteStore: MutableStore<String, Loan>,
     private val loanDao: LoanDao,
-    private val gateway: MutationGateway,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
 ) : LoanRepository {
@@ -82,15 +82,15 @@ internal class LoanRepositoryImpl(
     override suspend fun getById(id: String): Loan? = loanDao.getById(id)?.toDomain()
 
     override suspend fun upsert(loan: Loan) {
-        gateway.localMutation(LOANS_TABLE) {
-            loanDao.upsert(loan.toEntity())
-        }
+        // Write through the store — persists to the Room SoT (via the SoT writer); the read store re-emits.
+        loansWriteStore.write(
+            StoreWriteRequest.of<String, Loan, Any>(key = loan.id, value = loan),
+        )
     }
 
     override suspend fun delete(id: String) {
-        gateway.localMutation(LOANS_TABLE) {
-            loanDao.deleteById(id)
-        }
+        // Clear through the store — removes the row from the Room SoT (via the SoT delete).
+        loansWriteStore.clear(id)
     }
 
     override fun observeTotalMonthlyEmi(): Flow<Double> = daoFlow(LOANS_TABLE) { loanDao.observeAll() }.map { rows ->

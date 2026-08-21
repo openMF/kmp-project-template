@@ -68,8 +68,8 @@ val ProjectRepositoryModule = module {
     single<WatchlistRepository> {
         WatchlistRepositoryImpl(
             watchlistStore = get(AppStoreRegistry.Watchlist),
+            watchlistWriteStore = get(AppStoreRegistry.WatchlistMutable),
             dao = get(),
-            gateway = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
@@ -83,8 +83,8 @@ val ProjectRepositoryModule = module {
     single<LoanRepository> {
         LoanRepositoryImpl(
             loansStore = get(AppStoreRegistry.Loans),
+            loansWriteStore = get(AppStoreRegistry.LoansMutable),
             loanDao = get(),
-            gateway = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
@@ -92,8 +92,8 @@ val ProjectRepositoryModule = module {
     single<BillReminderRepository> {
         BillReminderRepositoryImpl(
             billRemindersStore = get(AppStoreRegistry.BillReminders),
+            billRemindersWriteStore = get(AppStoreRegistry.BillRemindersMutable),
             billReminderDao = get(),
-            gateway = get(),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )
@@ -208,8 +208,7 @@ val ProjectRepositoryModule = module {
     single<AlertsRepository> {
         AlertsRepositoryImpl(
             alertsStore = get(AppStoreRegistry.Alerts),
-            alertDao = get(),
-            gateway = get(),
+            alertsWriteStore = get(AppStoreRegistry.AlertsMutable),
             networkMonitor = get(),
             fetchedAtRepository = get(),
         )

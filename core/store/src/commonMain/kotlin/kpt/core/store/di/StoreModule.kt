@@ -15,8 +15,11 @@ import kpt.core.base.store.infra.impl.DraftInventoryImpl
 import kpt.core.base.store.infra.impl.StoreCacheManagerImpl
 import kpt.core.store.AppStoreRegistry
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
+import kpt.core.store.demo.alerts.impl.provideAlertsWriteStore
 import kpt.core.store.demo.banking.impl.provideBillRemindersStore
+import kpt.core.store.demo.banking.impl.provideBillRemindersWriteStore
 import kpt.core.store.demo.banking.impl.provideLoansStore
+import kpt.core.store.demo.banking.impl.provideLoansWriteStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoReadStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoStore
 import kpt.core.store.demo.crypto.impl.provideCoinDetailStore
@@ -27,6 +30,7 @@ import kpt.core.store.demo.economic.impl.provideInterestRateSeriesStore
 import kpt.core.store.demo.economic.impl.provideMacroIndicatorStore
 import kpt.core.store.demo.exchange.impl.provideSpotRateLookupStore
 import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
+import kpt.core.store.demo.watchlist.impl.provideWatchlistWriteStore
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import kpt.core.base.store.di.StoreModule as CoreBaseStoreModule
@@ -86,14 +90,26 @@ val appStoreModule: Module = module {
     single(AppStoreRegistry.Alerts) {
         provideAlertsStore(dao = get())
     }
+    single(AppStoreRegistry.AlertsMutable) {
+        provideAlertsWriteStore(dao = get())
+    }
     single(AppStoreRegistry.Watchlist) {
         provideWatchlistStore(dao = get())
+    }
+    single(AppStoreRegistry.WatchlistMutable) {
+        provideWatchlistWriteStore(dao = get())
     }
     single(AppStoreRegistry.Loans) {
         provideLoansStore(dao = get())
     }
+    single(AppStoreRegistry.LoansMutable) {
+        provideLoansWriteStore(dao = get())
+    }
     single(AppStoreRegistry.BillReminders) {
         provideBillRemindersStore(dao = get())
+    }
+    single(AppStoreRegistry.BillRemindersMutable) {
+        provideBillRemindersWriteStore(dao = get())
     }
 
     // Banking Utility Toolkit — spot exchange-rate lookup (NETWORK_ONLY callsite archetype)

@@ -14,30 +14,33 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.infra.FetchedAtRepository
-import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.watchlist.WatchlistRepository
 import kpt.core.database.demo.watchlist.dao.WatchlistDao
-import kpt.core.database.demo.watchlist.entity.WatchlistEntity
 import kpt.core.model.demo.watchlist.WatchlistItem
+import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
+import org.mobilenativefoundation.store.store5.StoreWriteRequest
 import kotlin.time.Clock
 
 /**
  * Local-only impl of [WatchlistRepository].
  *
- * Read-path contract: the repository builds the [ScreenDataStream] over the offline-local
- * [kpt.core.store.demo.watchlist.impl.provideWatchlistStore] (CACHE_ONLY); the ViewModel consumes
- * `.state`. Writes go direct-to-DAO via [notifyingWrite] so wasmJs collectors re-emit after
- * add/remove even when Room 3 alpha05's async InvalidationTracker fails to fan out (no-op on
- * Android/Desktop/iOS). See `core-base/database/.../invalidation/README.md`.
+ * Store5 single-source-of-truth: every write flows through the [watchlistWriteStore] — `store.write`
+ * (add) / `store.clear` (remove). The repository never touches the DAO for writes; the write store's
+ * `SourceOfTruth` writer/delete are the only DAO write callers, so Room stays the durable SoT and the
+ * paired read store ([watchlistStore]) re-projects reactively (same `personal_watchlist` table). The
+ * SoT writer/delete fire [notifyingWrite] so wasmJs collectors re-emit after add/remove even when
+ * Room 3 alpha05's async InvalidationTracker fails to fan out (no-op on Android/Desktop/iOS). See
+ * `core-base/database/.../invalidation/README.md`. The [dao] is retained only for the reactive
+ * [contains] membership read.
  */
 internal class WatchlistRepositoryImpl(
     private val watchlistStore: Store<Unit, List<WatchlistItem>>,
+    private val watchlistWriteStore: MutableStore<String, WatchlistItem>,
     private val dao: WatchlistDao,
-    private val gateway: MutationGateway,
     private val networkMonitor: NetworkMonitor,
     private val fetchedAtRepository: FetchedAtRepository,
 ) : WatchlistRepository {
@@ -56,17 +59,18 @@ internal class WatchlistRepositoryImpl(
     override fun contains(coinId: String): Flow<Boolean> = daoFlow(WATCHLIST_TABLE) { dao.observeContains(coinId) }
 
     override suspend fun add(coinId: String) {
-        // Single write door: the DAO write is handed to the gateway (local-only Optimistic), which runs
-        // it inside notifyingWrite(WATCHLIST_TABLE) so wasmJs collectors re-emit. No direct dao write here.
-        gateway.localMutation(WATCHLIST_TABLE) {
-            dao.insert(WatchlistEntity(coinId = coinId, addedAtMs = Clock.System.now().toEpochMilliseconds()))
-        }
+        // Write through the store — persists to the Room SoT (via the SoT writer); the read store re-emits.
+        watchlistWriteStore.write(
+            StoreWriteRequest.of<String, WatchlistItem, Any>(
+                key = coinId,
+                value = WatchlistItem(coinId = coinId, addedAtMs = Clock.System.now().toEpochMilliseconds()),
+            ),
+        )
     }
 
     override suspend fun remove(coinId: String) {
-        gateway.localMutation(WATCHLIST_TABLE) {
-            dao.delete(coinId)
-        }
+        // Clear through the store — removes the row from the Room SoT (via the SoT delete).
+        watchlistWriteStore.clear(coinId)
     }
 
     private companion object {

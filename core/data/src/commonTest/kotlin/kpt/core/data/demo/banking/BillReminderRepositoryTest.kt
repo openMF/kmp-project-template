@@ -16,11 +16,11 @@ import kotlinx.datetime.TimeZone
 import kpt.core.data.demo.banking.impl.BillReminderRepositoryImpl
 import kpt.core.data.infra.InMemoryFetchedAtRepository
 import kpt.core.data.infra.onlineNetworkMonitor
-import kpt.core.data.infra.testMutationGateway
 import kpt.core.model.demo.banking.BillCategory
 import kpt.core.model.demo.banking.BillReminder
 import kpt.core.model.demo.banking.Recurrence
 import kpt.core.store.demo.banking.impl.provideBillRemindersStore
+import kpt.core.store.demo.banking.impl.provideBillRemindersWriteStore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -53,8 +53,8 @@ class BillReminderRepositoryTest {
     private val repo: BillReminderRepository =
         BillReminderRepositoryImpl(
             billRemindersStore = provideBillRemindersStore(dao),
+            billRemindersWriteStore = provideBillRemindersWriteStore(dao),
             billReminderDao = dao,
-            gateway = testMutationGateway(),
             networkMonitor = onlineNetworkMonitor(),
             fetchedAtRepository = InMemoryFetchedAtRepository(),
             clock = fixedClock,

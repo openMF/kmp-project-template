@@ -11,9 +11,7 @@ package kpt.core.data.demo.currency
 
 import kotlinx.coroutines.test.runTest
 import kpt.core.data.demo.currency.impl.CurrencyRepositoryImpl
-import kpt.core.data.infra.InMemoryFetchedAtRepository
 import kpt.core.data.infra.RecordingSynchronizer
-import kpt.core.data.infra.onlineNetworkMonitor
 import kpt.core.model.demo.currency.ExchangeRates
 import kpt.core.model.demo.currency.RateHistory
 import kpt.core.model.demo.currency.RateHistoryKey
@@ -61,8 +59,6 @@ class CurrencyRepositorySyncWithTest {
             exchangeRatesStore = exchangeRatesStore,
             rateHistoryStore = rateHistoryStore,
             spotRateStore = spotRateStore,
-            networkMonitor = onlineNetworkMonitor(),
-            fetchedAtRepository = InMemoryFetchedAtRepository(),
         )
         val synchronizer = RecordingSynchronizer()
 

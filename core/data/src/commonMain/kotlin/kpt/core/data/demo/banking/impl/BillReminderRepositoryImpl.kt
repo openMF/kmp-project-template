@@ -9,7 +9,6 @@
  */
 package kpt.core.data.demo.banking.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -19,7 +18,6 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -49,8 +47,6 @@ internal class BillReminderRepositoryImpl(
     private val billRemindersStore: Store<Unit, List<BillReminder>>,
     private val billRemindersWriteStore: MutableStore<String, BillReminder>,
     private val billReminderDao: BillReminderDao,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
     private val clock: Clock = Clock.System,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BillReminderRepository {
@@ -63,8 +59,6 @@ internal class BillReminderRepositoryImpl(
     override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
         billRemindersStore.asScreenStream(
             key = Unit,
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = fetchedAtRepository,
             cacheKey = "billReminders",
             scope = scope,
             fetchPolicy = FetchPolicy.CACHE_ONLY,

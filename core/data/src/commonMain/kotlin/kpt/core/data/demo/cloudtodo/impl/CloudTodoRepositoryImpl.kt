@@ -9,9 +9,7 @@
  */
 package kpt.core.data.demo.cloudtodo.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.mutation.MutationPolicy
 import kpt.core.base.store.mutation.MutationResult
@@ -33,15 +31,11 @@ class CloudTodoRepositoryImpl(
     private val readStore: Store<CloudTodoKey, CloudTodo>,
     private val writeStore: MutableStore<CloudTodoKey, CloudTodo>,
     private val gateway: MutationGateway,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
 ) : CloudTodoRepository {
 
     override fun todoStream(id: Int, scope: CoroutineScope): ScreenDataStream<CloudTodo> =
         readStore.asScreenStream(
             key = CloudTodoKey(id),
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = fetchedAtRepository,
             cacheKey = "cloudTodo:$id",
             scope = scope,
         )

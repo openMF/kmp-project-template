@@ -9,7 +9,6 @@
  */
 package kpt.core.data.demo.economic.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kpt.core.base.data.infra.Synchronizer
 import kpt.core.base.data.infra.snapshotSync
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -43,8 +41,6 @@ private val PINNED_MACRO_KEYS = listOf(
 
 class MacroIndicatorsRepositoryImpl(
     private val macroIndicatorStore: Store<MacroIndicatorKey, MacroIndicator>,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
 ) : MacroIndicatorsRepository {
 
     override fun macroIndicatorStream(
@@ -53,8 +49,6 @@ class MacroIndicatorsRepositoryImpl(
         fetchPolicy: FetchPolicy,
     ): ScreenDataStream<MacroIndicator> = macroIndicatorStore.asScreenStream(
         key = key,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
         cacheKey = "economic:macro:${key.countryCode}:${key.indicator.name}:${key.years}y",
         scope = scope,
         fetchPolicy = fetchPolicy,
@@ -65,8 +59,6 @@ class MacroIndicatorsRepositoryImpl(
         scope: CoroutineScope,
     ): ScreenDataStream<MacroIndicator> = macroIndicatorStore.asScreenStream(
         keyFlow = keyFlow,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
         cacheKeyFor = { key ->
             "economic:macro:${key.countryCode}:${key.indicator.name}:${key.years}y"
         },

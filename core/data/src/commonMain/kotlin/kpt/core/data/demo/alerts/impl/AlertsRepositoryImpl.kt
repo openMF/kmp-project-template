@@ -9,9 +9,7 @@
  */
 package kpt.core.data.demo.alerts.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -31,8 +29,6 @@ import org.mobilenativefoundation.store.store5.StoreWriteRequest
 internal class AlertsRepositoryImpl(
     private val alertsStore: Store<Unit, List<PriceAlert>>,
     private val alertsWriteStore: MutableStore<String, PriceAlert>,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
 ) : AlertsRepository {
 
     // Read-path contract: the repository builds the ScreenDataStream (offline-local → CACHE_ONLY);
@@ -40,8 +36,6 @@ internal class AlertsRepositoryImpl(
     override fun alertsStream(scope: CoroutineScope): ScreenDataStream<List<PriceAlert>> =
         alertsStore.asScreenStream(
             key = Unit,
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = fetchedAtRepository,
             cacheKey = "alerts",
             scope = scope,
             fetchPolicy = FetchPolicy.CACHE_ONLY,

@@ -9,13 +9,11 @@
  */
 package kpt.core.data.demo.banking.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -44,8 +42,6 @@ internal class LoanRepositoryImpl(
     private val loansStore: Store<Unit, List<Loan>>,
     private val loansWriteStore: MutableStore<String, Loan>,
     private val loanDao: LoanDao,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
 ) : LoanRepository {
 
     override fun observeAll(): Flow<List<Loan>> = loansStore.stream(StoreReadRequest.cached(Unit, refresh = false))
@@ -55,8 +51,6 @@ internal class LoanRepositoryImpl(
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         loansStore.asScreenStream(
             key = Unit,
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = fetchedAtRepository,
             cacheKey = "loans",
             scope = scope,
             fetchPolicy = FetchPolicy.CACHE_ONLY,
@@ -69,8 +63,6 @@ internal class LoanRepositoryImpl(
     override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
         loanDetailStore.asScreenStream(
             key = id,
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = fetchedAtRepository,
             cacheKey = "loan:$id",
             scope = scope,
             fetchPolicy = FetchPolicy.CACHE_ONLY,

@@ -9,10 +9,8 @@
  */
 package kpt.core.data.demo.economic.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.economic.EconomicRatesRepository
@@ -22,8 +20,6 @@ import org.mobilenativefoundation.store.store5.Store
 
 class EconomicRatesRepositoryImpl(
     private val interestRateSeriesStore: Store<InterestRateSeriesKey, InterestRateSeries>,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
 ) : EconomicRatesRepository {
 
     override fun interestRateSeriesStream(
@@ -31,8 +27,6 @@ class EconomicRatesRepositoryImpl(
         scope: CoroutineScope,
     ): ScreenDataStream<InterestRateSeries> = interestRateSeriesStore.asScreenStream(
         key = key,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
         cacheKey = "economic:rates:${key.seriesId}:${key.days}d",
         scope = scope,
     )
@@ -42,8 +36,6 @@ class EconomicRatesRepositoryImpl(
         scope: CoroutineScope,
     ): ScreenDataStream<InterestRateSeries> = interestRateSeriesStore.asScreenStream(
         keyFlow = keyFlow,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
         cacheKeyFor = { key -> "economic:rates:${key.seriesId}:${key.days}d" },
         scope = scope,
     )

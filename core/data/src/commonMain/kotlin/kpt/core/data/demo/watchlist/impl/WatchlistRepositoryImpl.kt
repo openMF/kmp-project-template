@@ -9,11 +9,9 @@
  */
 package kpt.core.data.demo.watchlist.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -41,15 +39,11 @@ internal class WatchlistRepositoryImpl(
     private val watchlistStore: Store<Unit, List<WatchlistItem>>,
     private val watchlistWriteStore: MutableStore<String, WatchlistItem>,
     private val dao: WatchlistDao,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
 ) : WatchlistRepository {
 
     override fun watchlistStream(scope: CoroutineScope): ScreenDataStream<List<WatchlistItem>> =
         watchlistStore.asScreenStream(
             key = Unit,
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = fetchedAtRepository,
             cacheKey = "watchlist",
             scope = scope,
             fetchPolicy = FetchPolicy.CACHE_ONLY,

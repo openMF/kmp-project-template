@@ -15,6 +15,7 @@ import kpt.core.base.store.mutation.DefaultMutationGateway
 import kpt.core.base.store.mutation.MutationGateway
 import kpt.core.base.store.mutation.conflict.ConflictInbox
 import kpt.core.base.store.mutation.conflict.impl.RoomConflictInbox
+import kpt.core.base.store.screen.ScreenStreamContext
 import org.koin.dsl.module
 
 /**
@@ -39,4 +40,7 @@ val StoreModule = module {
             conflictInbox = get(),
         )
     }
+    // The read-path infra bundle every repository's `store.asScreenStream(...)` needs — resolved by
+    // `asScreenStream` itself (Koin default), so it is NOT threaded through repository constructors.
+    single { ScreenStreamContext(networkMonitor = get(), fetchedAtRepository = get()) }
 }

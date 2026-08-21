@@ -14,8 +14,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kpt.core.data.demo.banking.impl.BillReminderRepositoryImpl
-import kpt.core.data.infra.InMemoryFetchedAtRepository
-import kpt.core.data.infra.onlineNetworkMonitor
 import kpt.core.model.demo.banking.BillCategory
 import kpt.core.model.demo.banking.BillReminder
 import kpt.core.model.demo.banking.Recurrence
@@ -55,8 +53,6 @@ class BillReminderRepositoryTest {
             billRemindersStore = provideBillRemindersStore(dao),
             billRemindersWriteStore = provideBillRemindersWriteStore(dao),
             billReminderDao = dao,
-            networkMonitor = onlineNetworkMonitor(),
-            fetchedAtRepository = InMemoryFetchedAtRepository(),
             clock = fixedClock,
             timeZone = timeZone,
         )

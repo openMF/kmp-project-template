@@ -2373,6 +2373,7 @@
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-reflect:2.3.21
 |    |    |    |    |    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
 |    |    |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.0 (*)
+|    |    |    |    |    |    +--- io.github.jan-tennert.supabase:auth-kt:3.6.0 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)

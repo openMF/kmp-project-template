@@ -293,6 +293,41 @@ rules:
   - glob: "CLAUDE.md"                          # fork project instructions
     owner: fork
 
+  # ── fork brand / build-deps / legal-content surface ───────────────────────────
+  # Declared BEFORE the broad template module globs (first-match-wins) so a fork's brand + build +
+  # legal customizations survive a sync full-copy. Without these carve-outs each falls through to
+  # `owner: template` and a blind copy clobbers it (the exact loss class this contract exists to close).
+  #
+  # Brand theme — a fork fully replaces the reference palette + type ramp; owner:fork (blind preserve).
+  # The SHARED design primitives live in core-base/designsystem (stays template-owned).
+  - glob: "**/core/designsystem/**/theme/**"
+    owner: fork
+  # Brand icons — a fork adds glyphs to the shared AppIcons object; 3-way so template icon additions
+  # AND fork icons both survive.
+  - glob: "**/core/designsystem/**/icon/**"
+    owner: merge
+    strategy: kotlin-3way
+  # App scaffold — the template ships KptScaffold; a fork overrides its top-bar/FAB/branding. 3-way so a
+  # template scaffold update never drops the fork's overrides.
+  - glob: "**/core/ui/**/scaffold/**"
+    owner: merge
+    strategy: kotlin-3way
+  # Root scaffold + nav controller — a fork tweaks root theming (dark-mode-aware colors) + analytics
+  # wiring; 3-way-merged against template updates.
+  - glob: "cmp-navigation/**/ui/*.kt"
+    owner: merge
+    strategy: kotlin-3way
+  # Core-module build deps — a fork adds module dependencies its own code compiles against; 3-way
+  # (symmetry with cmp-android/build.gradle.kts) so a template plugin/version bump merges without
+  # dropping fork deps. Single-segment `core` only — does NOT match core-base/**.
+  - glob: "**/core/**/build.gradle.kts"
+    owner: merge
+    strategy: kotlin-3way
+  # Legal content — the privacy-policy/terms CONTENT templates are the fork's real legal documents;
+  # the generator (legal/generate.sh) + rendered legal/output/** stay template/generated below.
+  - glob: "legal/*/template.md"
+    owner: fork
+
   # ── template-owned (the broad sync surface — lowest precedence, declared LAST) ──
   - glob: "build-logic/**"
     owner: template

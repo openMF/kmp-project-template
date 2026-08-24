@@ -87,6 +87,12 @@ def sync_play_listing_if_changed(options = {})
     track:           "internal",   # listing fields are app-level in Play; any track's edit updates them
     skip_upload_apk: true,
     skip_upload_aab: true,
+    # Changelogs (release notes) are RELEASE-scoped — supply attaches them to a specific versionCode.
+    # A listing-only sync uploads no binary and passes no version_code, so leaving changelog upload ON
+    # makes supply fail with "Cannot find changelog because no version code given". Changelogs are
+    # pushed at release-upload time (deployInternal) instead. Skipping them here fixes every promotion
+    # lane (promoteToBeta / promoteToClosed / promote_to_production) that calls this sync first.
+    skip_upload_changelogs: true,
     json_key:        File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for.path(:play_service_account)),
     package_name:    FastlaneConfig::ProjectConfig.android_package_name,
     metadata_path:   md,

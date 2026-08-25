@@ -562,7 +562,13 @@ module FastlaneConfig
     base = {
       serviceCredsFile: ENV["FIREBASE_SERVICE_ACCOUNT_PATH"] ||
                         File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for(flavor: flavor).path(:firebase_service_account)),
-      groups: ENV["FIREBASE_GROUPS"] || nil,
+      # Priority: ENV (CI) → fork.properties key (local) → nil. Mirrors the iOS app-id resolution
+      # below (and the TestFlight groups line) so a fork's tester group (gradle/fork.properties
+      # `firebase.groups`) is applied automatically. Without this, `firebase_app_distribution`
+      # silently logs "No testers or groups passed in. Skipping this step." on every local deploy —
+      # the build uploads but reaches ZERO testers — unless FIREBASE_GROUPS is exported per-deploy
+      # (the long-standing "Firebase groups parameter ignored" known issue).
+      groups: ENV["FIREBASE_GROUPS"] || _fork_prop("firebase.groups") || nil,
     }
     case platform
     when :ios

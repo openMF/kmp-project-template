@@ -949,13 +949,18 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
       # some Spaceship model versions expose no instance #update, so fall back to leaving
       # the existing (still-valid) values in place rather than failing the release.
       begin
-        Spaceship::ConnectAPI.patch_beta_app_localization(localization_id: existing.id, attributes: attrs)
+        # Spaceship's ConnectAPI tunes client exposes the PLURAL client-level methods
+        # (post_beta_app_localizations / patch_beta_app_localizations) — NOT a singular
+        # #patch_beta_app_localization nor a model-level BetaAppLocalization.create (those
+        # raise NoMethodError on spaceship 2.235, which was silently swallowing Test-Information
+        # sync and blocking external beta review with "Beta App Description is missing").
+        Spaceship::ConnectAPI.patch_beta_app_localizations(localization_id: existing.id, attributes: attrs)
         UI.success("🔄 Synced TestFlight Test Information (#{locale}) for #{app_identifier}.")
       rescue NoMethodError, NameError, ArgumentError
         UI.success("✅ TestFlight Test Information already present (#{locale}) for #{app_identifier} — external beta review unblocked.")
       end
     else
-      Spaceship::ConnectAPI::BetaAppLocalization.create(app_id: app.id, attributes: attrs.merge(locale: locale))
+      Spaceship::ConnectAPI.post_beta_app_localizations(app_id: app.id, attributes: attrs.merge(locale: locale))
       UI.success("🆕 Created TestFlight Test Information (#{locale}) for #{app_identifier} — external beta review is now unblocked.")
     end
   rescue => e

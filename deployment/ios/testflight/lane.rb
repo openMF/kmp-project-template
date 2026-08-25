@@ -224,6 +224,7 @@ platform :ios do
     pilot(
       api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
       app_identifier:                       ios_config[:app_identifier],
+      app_platform:                         "ios",   # distribute_only has no upload to infer platform from → pilot prompts interactively without this (crashes in non-interactive/CI)
       build_number:                         build_number,
       distribute_only:                      true,
       distribute_external:                  true,

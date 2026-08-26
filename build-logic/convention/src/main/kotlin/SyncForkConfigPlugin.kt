@@ -230,7 +230,13 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 "// then re-run ./gradlew syncForkConfig\n" +
                 "APP_BUNDLE_ID = $appId\n" +
                 "APP_NAME = $appDisplayName\n" +
-                "TEAM_ID = $appleTeamId\n"
+                "TEAM_ID = $appleTeamId\n" +
+                "\n" +
+                "// Keychain Sharing entitlement — REQUIRED by core-base/datastore's KeychainSettings\n" +
+                "// (service \"kpt.secure\"). Without it iOS keychain access fails -34018 at launch and\n" +
+                "// crashes the Koin graph (UserPreferencesRepositoryImpl -> AppViewModel). Applies to\n" +
+                "// every flavor (project-level base config). Path relative to cmp-ios/ (SRCROOT).\n" +
+                "CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements\n"
             )
             logger.lifecycle("syncForkConfig: wrote cmp-ios/Configuration/Config.xcconfig")
         }

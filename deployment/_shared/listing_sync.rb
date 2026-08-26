@@ -100,3 +100,53 @@ def sync_play_listing_if_changed(options = {})
   record_store_listing_synced("android", md)
   UI.success("✅ Play Store listing synced from app-profile")
 end
+# ── iOS App Store listing OVERRIDE from the app-profile SoT (deployment/ derived by before_all's
+#    syncForkConfig). Mirror of sync_play_listing_if_changed for iOS. TEXT via deliver (metadata-scoped);
+#    SCREENSHOTS via the vendored reliable clear-and-replace uploader — deliver's screenshot upload
+#    half-fills display sets and cannot guarantee a full replace. Drift-gated. Requires load_api_key first.
+#    RULE-DEPLOY-STORE-SYNC-ON-DEPLOY-001.
+def sync_ios_listing_if_changed(options = {})
+  return if options[:skip_listing_sync]
+  md = File.join(DEPLOYMENT_REPO_ROOT, "deployment/ios/appstore/metadata")
+  unless File.directory?(md)
+    UI.important("⏭️  No iOS App Store metadata at #{md} — skipping listing sync")
+    return
+  end
+  unless options[:force_listing_sync] || store_listing_needs_sync?("ios", md)
+    UI.message("✓ App Store listing unchanged since last push — skipping listing sync")
+    return
+  end
+  UI.message("🔄 App Store listing changed (or never pushed) — OVERRIDE app-profile → App Store (text + screenshots)…")
+  deliver(
+    api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
+    metadata_path:                        md,
+    skip_binary_upload:                   true,
+    skip_screenshots:                     true,
+    submit_for_review:                    false,
+    skip_app_version_update:              true,
+    ignore_language_directory_validation: true,
+    run_precheck_before_submit:           false,
+    force:                                true,
+  )
+  override_ios_screenshots_from_sot
+  record_store_listing_synced("ios", md)
+  UI.success("✅ App Store listing overridden from app-profile (text + screenshots)")
+end
+
+# iOS screenshots: reliable CLEAR-and-REPLACE per locale via the vendored uploader (self-contained under
+# deployment/_shared/scripts, so a fork's CI needs no framework checkout). Requires load_api_key context.
+def override_ios_screenshots_from_sot
+  cfg     = FastlaneConfig::IosConfig::BUILD_CONFIG
+  dep     = File.join(DEPLOYMENT_REPO_ROOT, "deployment")
+  ss_root = File.join(dep, "ios/appstore/metadata/screenshots")
+  script  = File.join(dep, "_shared/scripts/asc-upload-screenshots.rb")
+  return unless File.directory?(ss_root) && File.exist?(script)
+  Dir.entries(ss_root).select { |e| !e.start_with?(".") && File.directory?(File.join(ss_root, e)) }.sort.each do |loc|
+    Dir.chdir(dep) do
+      sh("bundle", "exec", "ruby", script,
+         "--bundle-id", cfg[:app_identifier].to_s, "--key-id", cfg[:key_id].to_s,
+         "--issuer", cfg[:issuer_id].to_s, "--p8", cfg[:key_filepath].to_s,
+         "--screenshots-dir", "ios/appstore/metadata/screenshots/#{loc}", "--locale", loc)
+    end
+  end
+end

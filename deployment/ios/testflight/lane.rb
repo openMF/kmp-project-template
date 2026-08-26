@@ -164,9 +164,16 @@ platform :ios do
     # this explicit distribution + review submission. External beta review REQUIRES a valid
     # beta_app_review_info.contact_phone (org SoT deploy_contact.phone) — Apple rejects an empty one.
     testers   = FastlaneConfig::IosConfig::TESTERS[:ios]
-    tf_groups = [testers[:internal_group], testers[:external_group]]
+    # ONLY external groups go to pilot's `groups:`. An INTERNAL group has
+    # has_access_to_all_builds=true and receives every build AUTOMATICALLY — it CANNOT be
+    # explicitly assigned: pilot's add_beta_groups then POSTs both group ids in ONE request,
+    # Apple rejects the whole request with "Cannot add internal group to a build", and the
+    # exception ABORTS distribute — killing the external group assignment AND the beta-review
+    # submission along with it. Internal testers already have the build via all-builds access,
+    # so dropping the internal group here loses nothing and lets the external distribute succeed.
+    tf_groups = [testers[:external_group]]
                   .map { |g| g.to_s.strip }.reject(&:empty?).uniq
-    UI.important("👥 Distributing to TestFlight groups: #{tf_groups.join(', ')} — and submitting for beta review")
+    UI.important("👥 Distributing to TestFlight external group(s): #{tf_groups.join(', ')} — internal testers auto-receive via all-builds; submitting for beta review")
 
     pilot(
       api_key:                           Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],

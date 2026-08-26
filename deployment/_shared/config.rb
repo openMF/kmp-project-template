@@ -432,7 +432,7 @@ module FastlaneConfig
       skip_submission:                   false,
       skip_waiting_for_build_processing: true,
       submit_beta_review:                true,
-      expire_previous_builds:            true,
+      expire_previous_builds:            false, # NEVER auto-expire: a later run that expires the prior build then FAILS to upload a new one leaves the app with zero live builds (all EXPIRED) → no internal/external distribution possible + un-expiry is impossible. Apple keeps builds 90d; testers always get the latest anyway.
       reject_build_waiting_for_review:   true,
       wait_processing_interval:          30,
       wait_processing_timeout_duration:  900,
@@ -968,6 +968,34 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
     UI.important("⚠️  Could not sync TestFlight Test Information for #{app_identifier}: " \
                  "#{e.message.to_s.lines.first&.strip}. Internal upload continues; " \
                  "external promotion may need it set on App Store Connect.")
+  end
+
+  # ── 3. Sync the app-level BetaAppReviewDetail (contact info) from config ──
+  # External beta review REQUIRES this SEPARATE app-level object (contact name/email/phone +
+  # demo account) — it is DISTINCT from the BetaAppLocalization synced above. pilot passes
+  # beta_app_review_info only at submit time, so on an expired/failed build the review detail
+  # is never created and external review stays blocked with no obvious cause. Create/patch it
+  # here, independent of any build, so external promotion always has it. The betaAppReviewDetail
+  # resource id EQUALS the app id (1:1), so patch(app_id: app.id) is the create-or-update. Phone
+  # must be non-empty — Apple rejects an empty contact_phone on external submission. Best-effort.
+  begin
+    ri = (config[:beta_app_review_info] || {})
+    brd_attrs = {
+      contactFirstName:    ri[:contact_first_name].to_s,
+      contactLastName:     ri[:contact_last_name].to_s,
+      contactEmail:        ri[:contact_email].to_s,
+      contactPhone:        ri[:contact_phone].to_s,
+      demoAccountRequired: !!ri[:demo_account_required],
+    }
+    unless brd_attrs[:contactEmail].empty? || brd_attrs[:contactPhone].empty?
+      Spaceship::ConnectAPI.patch_beta_app_review_detail(app_id: app.id, attributes: brd_attrs)
+      UI.success("🔄 Synced TestFlight Beta App Review contact info for #{app_identifier} — external beta review unblocked.")
+    else
+      UI.important("⚠️  Skipped Beta App Review contact sync for #{app_identifier}: contact_email/contact_phone empty in TESTFLIGHT_CONFIG[:beta_app_review_info] (org.email / org.phone). External review will reject an empty contact.")
+    end
+  rescue => e
+    UI.important("⚠️  Could not sync Beta App Review contact info for #{app_identifier}: " \
+                 "#{e.message.to_s.lines.first&.strip}. External promotion may need it set on App Store Connect.")
   end
 end
 

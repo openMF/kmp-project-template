@@ -44,6 +44,10 @@ kotlin {
             implementation(projects.sync)
 
             // put your multiplatform dependencies here
+            // Deep links (home-screen widgets + external app:// URIs) — cmp-deep-link (KmpToolkit,
+            // commonMain). Android capture is auto-init (ContentProvider); RootNavScreen collects
+            // DeepLinkHandler.lastReceived and dispatches through the fork-owned DeepLinkRegistry seam.
+            implementation(libs.cmp.deep.link)
             implementation(compose.material3)
             implementation(compose.materialIconsExtended)
             implementation(compose.foundation)

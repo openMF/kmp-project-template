@@ -30,8 +30,10 @@ OptionParser.new do |o|
 end.parse!
 %i[bundle_id key_id issuer p8 dir].each { |k| abort "❌ --#{k.to_s.tr('_','-')} required" unless opts[k] }
 
+# NOTE: no 'iphone-6.3' — APP_IPHONE_63 is NOT a valid ASC screenshotDisplayType (ASC 409s on it);
+# the iPhone 6.3" (16 Pro) shares the 6.1" bucket (APP_IPHONE_61), already covered by 'iphone-6.1'.
 MAP = { 'iphone-6.9' => 'APP_IPHONE_67', 'iphone-6.7' => 'APP_IPHONE_67', 'iphone-6.5' => 'APP_IPHONE_65',
-        'iphone-6.3' => 'APP_IPHONE_63', 'iphone-6.1' => 'APP_IPHONE_61', 'iphone-5.5' => 'APP_IPHONE_55',
+        'iphone-6.1' => 'APP_IPHONE_61', 'iphone-5.5' => 'APP_IPHONE_55',
         'ipad-13' => 'APP_IPAD_PRO_3GEN_129', 'ipad-11' => 'APP_IPAD_PRO_3GEN_11' }
 
 TOK = Spaceship::ConnectAPI::Token.create(key_id: opts[:key_id], issuer_id: opts[:issuer], key: File.read(opts[:p8]))
@@ -60,13 +62,18 @@ _, locs = api(:get, "/v1/appStoreVersions/#{V.id}/appStoreVersionLocalizations?l
 loc = (locs['data'] || []).find { |l| l.dig('attributes', 'locale') == opts[:locale] } or abort "❌ no localization #{opts[:locale]}"
 LOCID = loc['id']
 
-Dir.children(opts[:dir]).sort.each do |folder|
-  dt = MAP[folder]; next unless dt
+MAP.each do |device, dt|
   next if opts[:only] && !opts[:only].include?(dt)
-  files = Dir.glob(File.join(opts[:dir], folder, '*.{png,jpg,jpeg}')).sort
+  # Support BOTH screenshot layouts (media-not-synced fix, 2026-08-27): flat device-PREFIXED files
+  # (`ipad-13-01.png` — the fastlane deliver / syncForkConfig convention under deployment/**/metadata)
+  # AND device SUBDIRECTORIES (`ipad-13/01.png` — the app-profile media convention). The prior loop
+  # only globbed subdirs, so pointing it at the flat deck silently uploaded NOTHING (empty iteration,
+  # "sync complete") → required display types ended up missing. Flat first, then subdir fallback.
+  files = Dir.glob(File.join(opts[:dir], "#{device}-*.{png,jpg,jpeg}")).sort
+  files = Dir.glob(File.join(opts[:dir], device, '*.{png,jpg,jpeg}')).sort if files.empty?
   next if files.empty?
   files = files.first(10) # Apple caps at 10 per size
-  puts "▸ #{folder} → #{dt}: #{files.size} local"
+  puts "▸ #{device} → #{dt}: #{files.size} local"
   # find or create the screenshot set
   _, sets = api(:get, "/v1/appStoreVersionLocalizations/#{LOCID}/appScreenshotSets?limit=50")
   set = (sets['data'] || []).find { |s| s.dig('attributes', 'screenshotDisplayType') == dt }

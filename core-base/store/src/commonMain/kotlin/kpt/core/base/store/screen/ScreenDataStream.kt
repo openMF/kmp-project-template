@@ -441,7 +441,11 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         DecisionEngine.decide(storeData, status, fetchPolicy)
     }.onStart {
         val current = networkStatusFlow.value
-        if (current !is NetworkStatus.Available) {
+        // Pre-emit NoNetwork so an offline screen shows it instead of a Loading flash — EXCEPT for the
+        // offline-first [FetchPolicy.CACHE_FIRST_SWR], which lets the DecisionEngine decide from the
+        // first storeFlow emission (Content for cached data, Empty for genuinely-no-data) so it never
+        // flashes the blocking NoNetwork state offline. Matches the DecisionEngine offline-empty rule.
+        if (current !is NetworkStatus.Available && fetchPolicy != FetchPolicy.CACHE_FIRST_SWR) {
             emit(ScreenState.NoNetwork(isCaptivePortal = current is NetworkStatus.CaptivePortal))
         }
     }
@@ -647,7 +651,11 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         DecisionEngine.decide(storeData, status, fetchPolicy)
     }.onStart {
         val current = networkStatusFlow.value
-        if (current !is NetworkStatus.Available) {
+        // Pre-emit NoNetwork so an offline screen shows it instead of a Loading flash — EXCEPT for the
+        // offline-first [FetchPolicy.CACHE_FIRST_SWR], which lets the DecisionEngine decide from the
+        // first storeFlow emission (Content for cached data, Empty for genuinely-no-data) so it never
+        // flashes the blocking NoNetwork state offline. Matches the DecisionEngine offline-empty rule.
+        if (current !is NetworkStatus.Available && fetchPolicy != FetchPolicy.CACHE_FIRST_SWR) {
             emit(ScreenState.NoNetwork(isCaptivePortal = current is NetworkStatus.CaptivePortal))
         }
     }

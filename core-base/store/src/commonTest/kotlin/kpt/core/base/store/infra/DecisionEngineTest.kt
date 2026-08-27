@@ -14,6 +14,7 @@ import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.DataOrigin
+import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.StoreData
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
@@ -50,6 +51,16 @@ class DecisionEngineTest {
         val result = DecisionEngine.decide(emptyStoreData(), unavailable)
         assertIs<ScreenState.NoNetwork>(result)
         assertEquals(false, result.isCaptivePortal)
+    }
+
+    @Test
+    fun `no data + Unavailable + no error + CACHE_FIRST_SWR = Empty (offline-first)`() {
+        // Offline-first policy: a cache-first screen with no cached data offline surfaces the screen's
+        // own Empty state, NOT a blocking NoNetwork (every other policy keeps NoNetwork — see the test
+        // above, which uses the NETWORK_WITH_CACHE default). Regression guard for the DecisionEngine
+        // offline-empty rule so a brand-new user offline never sees a full-screen No-internet error.
+        val result = DecisionEngine.decide(emptyStoreData(), unavailable, FetchPolicy.CACHE_FIRST_SWR)
+        assertIs<ScreenState.Empty>(result)
     }
 
     @Test

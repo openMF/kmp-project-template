@@ -70,6 +70,15 @@ object DecisionEngine {
                 // keep decide() within the ReturnCount limit; behaviour identical to a guard clause).
                 fetchPolicy == FetchPolicy.CACHE_ONLY && error == null -> ScreenState.Empty
                 isCaptivePortal -> ScreenState.NoNetwork(isCaptivePortal = true)
+                // OFFLINE-FIRST — generalises the CACHE_ONLY rule above to the explicit offline-first
+                // policy [FetchPolicy.CACHE_FIRST_SWR] (which is also asScreenStream's default). A
+                // cache-first screen with no cached data offline and no error has genuinely "nothing
+                // yet", so it surfaces the screen's own Empty state instead of a blocking full-screen
+                // NoNetwork — no caller opt-in, no ViewModel remap; the decision is made here. The other
+                // policies are deliberately UNCHANGED: NETWORK_WITH_CACHE / NETWORK_ONLY still show
+                // NoNetwork offline (the framework's tested "tell the user they're offline" behaviour).
+                // The reconnect trigger re-runs this decision once connectivity returns.
+                !isOnline && fetchPolicy == FetchPolicy.CACHE_FIRST_SWR && error == null -> ScreenState.Empty
                 !isOnline -> ScreenState.NoNetwork()
                 error != null -> when (categorize(error)) {
                     ErrorCategory.Network, ErrorCategory.Timeout.Connect, ErrorCategory.Timeout.Read ->

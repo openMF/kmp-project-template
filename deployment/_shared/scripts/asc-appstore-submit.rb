@@ -34,6 +34,10 @@ OptionParser.new do |o|
   o.on('--issuer V')    { |v| opts[:issuer] = v }
   o.on('--p8 V')        { |v| opts[:p8] = v }
   o.on('--version V')   { |v| opts[:version] = v }
+  # PROACTIVE "reply": App Review notes given to the reviewer UP FRONT (demo/guest access, how to test)
+  # so they never have to ask — the API can set this even though replying to a review MESSAGE cannot
+  # (Resolution Center is UI-only, probe-verified 404). Default path is the fastlane review_information note.
+  o.on('--review-notes-file V') { |v| opts[:review_notes_file] = v }
 end.parse!
 %i[bundle_id key_id issuer p8].each { |k| abort "❌ --#{k.to_s.tr('_', '-')} required" unless opts[k] }
 
@@ -97,6 +101,27 @@ ver = if opts[:version]
 abort "❌ no editable iOS App Store version found (states: #{versions.map { |v| v.dig('attributes', 'versionString') + ':' + v.dig('attributes', 'appStoreState').to_s }.join(', ')})" unless ver
 vid = ver['id']
 puts "→ version #{ver.dig('attributes', 'versionString')} (#{ver.dig('attributes', 'appStoreState')}) id=#{vid}"
+
+# ── PROACTIVE review notes — hand the reviewer demo/guest access instructions up front so they never
+#    have to ask (the ONLY reliable "auto-reply": posting a Resolution Center message has NO API). ────
+notes_file = opts[:review_notes_file]
+notes_file ||= 'ios/appstore/metadata/review_information/notes.txt' if File.exist?('ios/appstore/metadata/review_information/notes.txt')
+if notes_file && File.exist?(notes_file)
+  notes = File.read(notes_file).strip
+  unless notes.empty?
+    dc, db = api(:get, "appStoreVersions/#{vid}/appStoreReviewDetail")
+    if dc == 200 && db.dig('data', 'id')
+      rid = db['data']['id']
+      api(:patch, "appStoreReviewDetails/#{rid}", { 'data' => { 'type' => 'appStoreReviewDetails', 'id' => rid,
+        'attributes' => { 'notes' => notes } } })
+    else
+      api(:post, 'appStoreReviewDetails', { 'data' => { 'type' => 'appStoreReviewDetails',
+        'attributes' => { 'notes' => notes },
+        'relationships' => { 'appStoreVersion' => { 'data' => { 'type' => 'appStoreVersions', 'id' => vid } } } } })
+    end
+    puts "→ proactive review notes set (reviewer sees demo/guest access up front)"
+  end
+end
 
 # ── reuse an existing draft reviewSubmission or create one ─────────────────────────────────────────
 _, rb = api(:get, "reviewSubmissions?filter[app]=#{app_id}&limit=20")

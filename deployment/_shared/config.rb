@@ -449,6 +449,20 @@ module FastlaneConfig
         internal_group:       _nz.call(_c._fork_prop("apple.testers.internal.group")) || "Internal Testers",
         external_group:       _nz.call(_c._fork_prop("apple.testers.external.group")) || _nz.call(_c._fork_prop("apple.tf.groups")) || "External Beta",
         external_public_link: (_nz.call(_c._fork_prop("apple.testers.external.public.link")) || "true").to_s.downcase == "true",
+        # External TestFlight tester roster (emails — PUBLIC identifiers, not secrets). App-profile is the
+        # runtime SoT (apple.testers.external_emails), materialized from _org/company.yaml. Comma-separated
+        # fork.properties `apple.tf.testers` is the fallback when app-profile is absent (older forks).
+        external_emails:      (lambda {
+                                f = File.join(DEPLOYMENT_REPO_ROOT, "app-profile/platforms/apple/apple.yaml")
+                                raw = nil
+                                if File.exist?(f)
+                                  y = (YAML.load_file(f) rescue nil) || {}
+                                  raw = y.dig("apple", "testers", "external_emails")
+                                end
+                                raw ||= _nz.call(_c._fork_prop("apple.tf.testers"))
+                                list = raw.is_a?(Array) ? raw : raw.to_s.split(",")
+                                list.map { |e| e.to_s.strip.downcase }.reject(&:empty?).uniq
+                              }).call,
       },
       play: {
         internal_googlegroup: _nz.call(_c._fork_prop("play.testers.internal.googlegroup")),
@@ -1050,6 +1064,29 @@ def sync_testflight_testers(app_identifier:, config: nil)
       if !gs[:internal] && gs[:public]
         link = (grp.respond_to?(:public_link) && grp.public_link) || nil
         UI.success("🔗 Public TestFlight join link for '#{gs[:name]}': #{link}") if link
+      end
+
+      # Add the org-shared external tester roster (emails) to the EXTERNAL group so named testers
+      # receive an invite, not only public-link self-joiners. Idempotent + best-effort per email —
+      # a tester that already exists (globally or in the group) is a no-op, never an error. Roster
+      # SoT: app-profile apple.testers.external_emails ← _org/company.yaml. Internal group is team-
+      # only (members must be added by Apple-ID in App Store Connect), so we never push emails there.
+      if !gs[:internal]
+        (cfg[:external_emails] || []).each do |em|
+          begin
+            fn = em.split("@").first.to_s.gsub(/[^A-Za-z0-9]/, " ").strip[0, 30]
+            fn = "Tester" if fn.empty?
+            Spaceship::ConnectAPI.create_beta_tester(group_id: grp.id, email: em, first_name: fn, last_name: "MBS")
+            UI.success("   ➕ external tester added to '#{gs[:name]}': #{em}")
+          rescue => e
+            msg = e.message.to_s.lines.first&.strip
+            if msg.to_s =~ /already|exist|taken|duplicate/i
+              UI.message("   ✓ external tester already in '#{gs[:name]}': #{em}")
+            else
+              UI.important("   ⚠️  could not add external tester #{em}: #{msg}")
+            end
+          end
+        end
       end
     rescue => e
       UI.important("⚠️  ASC group '#{gs[:name]}' sync hiccuped: #{e.message.to_s.lines.first&.strip}. " \

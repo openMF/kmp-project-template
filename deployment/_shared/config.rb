@@ -460,7 +460,13 @@ module FastlaneConfig
     }.freeze
 
     APPSTORE_CONFIG = {
-      submit_for_review:                  true,
+      # SUBMIT is done by _shared/scripts/asc-appstore-submit.rb (the reliable direct-API path), NOT by
+      # deliver — deliver's submit_for_review races on reviewSubmission state, chokes on stale empty
+      # drafts (one open reviewSubmission max), and can't surface the Part XX ITA human gate. The
+      # `release` lane builds/uploads/syncs the listing; the deploy runtime runs the submit script after
+      # (RULE-DEPLOY-APPSTORE-AUTOSUBMIT-001). automatic_release stays true → auto-release to production
+      # on Apple approval.
+      submit_for_review:                  false,
       automatic_release:                  true,
       phased_release:                     false,
       skip_app_version_update:            false,

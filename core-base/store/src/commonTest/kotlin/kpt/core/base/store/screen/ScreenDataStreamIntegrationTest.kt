@@ -71,10 +71,15 @@ class ScreenDataStreamIntegrationTest {
         }
     }
 
-    // ─── T2: offline, no cache → NoNetwork ───────────────────────────────────
+    // ─── T2: offline, no cache, CACHE_FIRST_SWR default → Empty (offline-first) ──
 
     @Test
-    fun offline_with_empty_store_emits_NoNetwork() = runTest {
+    fun offline_with_empty_store_emits_Empty_offlineFirst() = runTest {
+        // asScreenStream's default policy is CACHE_FIRST_SWR (offline-first): offline with no cached
+        // data and no error surfaces the screen's own Empty state, NOT a blocking full-screen NoNetwork
+        // (DecisionEngine offline-first-empty rule; asserted in DecisionEngineTest "…CACHE_FIRST_SWR =
+        // Empty"). Offline CACHE_FIRST_SWR skips the network leg, so the throwing fetcher is never
+        // invoked and error stays null. Every other policy still shows NoNetwork offline.
         val store = StoreBuilder
             .from<String, String>(fetcher = Fetcher.of { _ -> throw RuntimeException("no network") })
             .build()
@@ -91,7 +96,7 @@ class ScreenDataStreamIntegrationTest {
             // Drain until we see a non-Loading state
             var state: ScreenState<String> = awaitItem()
             while (state is ScreenState.Loading) { state = awaitItem() }
-            assertIs<ScreenState.NoNetwork>(state)
+            assertIs<ScreenState.Empty>(state)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -156,10 +161,12 @@ class ScreenDataStreamIntegrationTest {
         )
 
         stream.state.test {
-            // Wait until we see NoNetwork (or Error) for the offline state
+            // Offline-first (CACHE_FIRST_SWR default): offline + empty + no error surfaces Empty, not
+            // a blocking NoNetwork (see T2 + DecisionEngineTest). The reconnect below re-runs the
+            // decision and fetches, moving the screen to Content.
             var state: ScreenState<String> = awaitItem()
             while (state is ScreenState.Loading) { state = awaitItem() }
-            assertIs<ScreenState.NoNetwork>(state)
+            assertIs<ScreenState.Empty>(state)
 
             // Simulate reconnect
             network.setStatus(NetworkStatus.Available(onlineInfo))

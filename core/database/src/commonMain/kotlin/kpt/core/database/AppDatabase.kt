@@ -141,6 +141,10 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         // generates CREATE TABLE for the two new tables; the explicit @DeleteTable spec
         // handles the DROP of `samples`.
         AutoMigration(from = 8, to = 10, spec = AppDatabase.MigrationSpec8to10::class),
+        // v10 → v11: purely additive — creates `cloud_todos` (the MUTABLE-archetype demo added the
+        // entity + bumped to v11 in #274 but omitted this hop, so an in-place v10→v11 upgrade had no
+        // path). Room auto-generates `CREATE TABLE IF NOT EXISTS …`; no existing schema is modified.
+        AutoMigration(from = 10, to = 11),
         // v11 → v12: purely additive — creates `framework_write_conflicts` for the write-conflict
         // inbox (MutationGateway server-wins conflicts surfaced in Settings). Room auto-generates
         // `CREATE TABLE IF NOT EXISTS …`; no existing schema is modified.

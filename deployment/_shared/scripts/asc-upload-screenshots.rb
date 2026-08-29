@@ -2,8 +2,8 @@
 # asc-upload-screenshots.rb — RELIABLE App Store screenshot sync via the direct ASC API
 # (reserve → upload → commit → poll-COMPLETE), bypassing fastlane `deliver`'s finicky
 # screenshot handling (device-folder mapping gaps, config-path errors, upload races that
-# leave sets half-full — all seen on awaazly 2026-08-06 where APP_IPHONE_67 ended up with 1
-# of 10 screenshots). Idempotent per display type: clears the set, then uploads the full
+# leave sets half-full — e.g. a display type ending up with 1 of 10 screenshots). Idempotent
+# per display type: clears the set, then uploads the full
 # local mockup set in filename order, and waits until every image is COMPLETE.
 #
 # Usage:

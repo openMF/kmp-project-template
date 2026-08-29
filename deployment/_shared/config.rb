@@ -1076,7 +1076,9 @@ def sync_testflight_testers(app_identifier:, config: nil)
           begin
             fn = em.split("@").first.to_s.gsub(/[^A-Za-z0-9]/, " ").strip[0, 30]
             fn = "Tester" if fn.empty?
-            Spaceship::ConnectAPI.create_beta_tester(group_id: grp.id, email: em, first_name: fn, last_name: "MBS")
+            # last_name is a required ASC field but carries no product meaning — keep it brand-neutral
+            # (never a fork's initials) so a synced fork doesn't stamp its testers with another org's name.
+            Spaceship::ConnectAPI.create_beta_tester(group_id: grp.id, email: em, first_name: fn, last_name: "Tester")
             UI.success("   ➕ external tester added to '#{gs[:name]}': #{em}")
           rescue => e
             msg = e.message.to_s.lines.first&.strip

@@ -129,8 +129,8 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // desktopAppName (JVM/dock) + projectName (rootProject.name) ALSO live in the catalog and resolve
         // app-profile-first (identity.app_name / project name) per this repo's CLAUDE.md, but a catalog-3way
         // merge during /kmp-project-template-sync reverts them to the template placeholder ("App Toolkit" /
-        // "kmp-project-template"). Writing only appId+appDisplayName left them stale (mbs/healld-health
-        // 2026-08-19: catalog carried template identity after a clean sync). Derive + write ALL identity
+        // "kmp-project-template"). Writing only appId+appDisplayName left them stale (a fork's catalog
+        // could carry template identity after a clean sync). Derive + write ALL identity
         // lines so the catalog fully follows the app-profile SoT after any sync.
         if (appDisplayName.isNotBlank()) {
             patchTomlVersion(File(root, "gradle/libs.versions.toml"), "desktopAppName", appDisplayName)
@@ -908,7 +908,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 logger.lifecycle("syncForkConfig: tokenized wrangler.toml name=$cloudflareProject")
             }
             // config.yaml + workflow-snippet.yml — `--project-name=…` in the runner/CI command string.
-            // (workflow-snippet.yml was missed initially — surfaced by the awaazly fork proof 2026-08-07.)
+            // (workflow-snippet.yml was missed initially — surfaced by a downstream fork proof.)
             for (rel in listOf(
                 "deployment/web/cloudflare-pages/config.yaml",
                 "deployment/web/cloudflare-pages/workflow-snippet.yml",

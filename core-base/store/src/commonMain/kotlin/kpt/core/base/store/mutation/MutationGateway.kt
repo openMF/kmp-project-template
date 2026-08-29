@@ -10,6 +10,7 @@
 package kpt.core.base.store.mutation
 
 import kpt.core.base.store.mutation.conflict.ConflictReport
+import org.mobilenativefoundation.store.store5.Bookkeeper
 import org.mobilenativefoundation.store.store5.MutableStore
 
 /**
@@ -32,8 +33,10 @@ interface MutationGateway {
      * Upsert [value] under [key] through [store].
      *
      * - [MutationPolicy.Optimistic]: the local write lands first (UI updates instantly); the network
-     *   sync is queued via the store's `Bookkeeper` and retried on reconnect. On a differing server
-     *   record the gateway ingests the server value (server-wins) and records a conflict.
+     *   sync is queued via the store's `Updater` + `Bookkeeper` and retried on reconnect. Server-wins
+     *   reconciliation is applied when the read store next fetches. A keyed optimistic write cannot be
+     *   rolled back or conflict-recorded synchronously here (its network leg is async) — route a
+     *   mutation that must await the server and record a conflict / roll back through [command].
      * - [MutationPolicy.OnlineRequired]: the network call is awaited first; on success the real server
      *   record is ingested by its server key. Offline → [MutationResult.Blocked].
      */
@@ -48,13 +51,17 @@ interface MutationGateway {
      * Delete the entity for [key] through [store], syncing the delete to the network via [deleteEndpoint].
      *
      * Store5's `MutableStore` has no network-DELETE path (its `Updater` is write-only), so the caller
-     * supplies [deleteEndpoint] — the suspend network DELETE. Optimistic offline delete clears the local
-     * row immediately and retries [deleteEndpoint] on reconnect; online delete awaits it.
+     * supplies [deleteEndpoint] — the suspend network DELETE — and the store's [bookkeeper], into which
+     * an Optimistic offline/failed delete records a pending-delete tombstone (retried on reconnect by
+     * the feature's `SyncOrchestrator`). Optimistic delete clears the local row immediately; an
+     * OnlineRequired delete awaits the network first and clears local only on success (offline →
+     * [MutationResult.Blocked], never tombstoned).
      */
     suspend fun <K : Any, V : Any> delete(
         store: MutableStore<K, V>,
         key: K,
         deleteEndpoint: suspend (K) -> Unit,
+        bookkeeper: Bookkeeper<K>,
         policy: MutationPolicy = MutationPolicy.Optimistic,
     ): MutationResult<Unit>
 

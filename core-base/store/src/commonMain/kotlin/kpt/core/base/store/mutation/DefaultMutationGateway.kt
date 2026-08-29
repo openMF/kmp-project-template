@@ -11,8 +11,11 @@ package kpt.core.base.store.mutation
 
 import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.mutation.conflict.ConflictInbox
+import kpt.core.base.store.mutation.delete.DeleteSync
+import org.mobilenativefoundation.store.store5.Bookkeeper
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
+import kotlin.time.Clock
 
 /**
  * The default [MutationGateway] — composes the existing Store5 write machinery.
@@ -26,10 +29,12 @@ import org.mobilenativefoundation.store.store5.StoreWriteRequest
  * @param isOnline connectivity probe (DI wires it to the app's `NetworkMonitor`); kept as a lambda so the
  *   gateway is decoupled from the network API and trivially testable.
  * @param conflictInbox durable sink for write conflicts surfaced in Settings.
+ * @param now monotonic-millis provider for pending-delete tombstones (injectable for deterministic tests).
  */
 class DefaultMutationGateway(
     private val isOnline: suspend () -> Boolean,
     private val conflictInbox: ConflictInbox,
+    private val now: () -> Long = { Clock.System.now().toEpochMilliseconds() },
 ) : MutationGateway {
 
     override suspend fun <K : Any, V : Any> upsert(
@@ -55,18 +60,34 @@ class DefaultMutationGateway(
         store: MutableStore<K, V>,
         key: K,
         deleteEndpoint: suspend (K) -> Unit,
+        bookkeeper: Bookkeeper<K>,
         policy: MutationPolicy,
     ): MutationResult<Unit> {
-        if (policy is MutationPolicy.OnlineRequired && !isOnline()) {
-            return MutationResult.Blocked(BlockReason.OFFLINE)
+        if (policy is MutationPolicy.OnlineRequired) {
+            if (!isOnline()) return MutationResult.Blocked(BlockReason.OFFLINE)
+            // Network-first: confirm the server DELETE before touching local state; never tombstone.
+            return try {
+                deleteEndpoint(key)
+                store.clear(key)
+                MutationResult.Applied(value = Unit, synced = true)
+            } catch (t: Throwable) {
+                MutationResult.Failed(cause = t, rolledBack = false)
+            }
         }
+        // Optimistic: clear the local row now (it disappears from every read), sync the network DELETE,
+        // and — offline or on failure — record a pending-delete tombstone in the [bookkeeper] so the
+        // feature's SyncOrchestrator retries it on reconnect. Composes the DeleteSync primitive
+        // (behaviour unit-tested in DeleteSyncTest); clearing the row is the only op that can throw here.
         return try {
-            // Clear the local row immediately (optimistic — it disappears from reads), then sync the
-            // network DELETE. On an optimistic offline delete the row stays cleared and the caller's
-            // SyncOrchestrator retries [deleteEndpoint] on reconnect.
-            store.clear(key)
-            if (isOnline()) deleteEndpoint(key)
-            MutationResult.Applied(value = Unit, synced = isOnline())
+            val deleteSync = DeleteSync(
+                clearLocal = { store.clear(it) },
+                deleteEndpoint = deleteEndpoint,
+                bookkeeper = bookkeeper,
+                isOnline = isOnline,
+                now = now,
+            )
+            val synced = deleteSync.delete(key)
+            MutationResult.Applied(value = Unit, synced = synced)
         } catch (t: Throwable) {
             MutationResult.Failed(cause = t, rolledBack = false)
         }

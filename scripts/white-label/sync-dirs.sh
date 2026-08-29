@@ -59,7 +59,6 @@ SYNC_DIRS=(
     "fastlane-config"
     "spotless"       # shared copyright/format config
     "gradle/wrapper" # Gradle wrapper (properties + jar) — pins the version across forks; NOT gradle/ root (libs.versions.toml is consumer-local + auto-healed)
-    "idea-layer/testers/flows/screen-state" # framework E2E — core-base/ui screen-state retention flows (list-back, paging-restore, scroll-appkill, tab-switch) at the canonical Maestro-flow SoT (RULE-TEST-OUTPUT-LAYOUT-001); consumer feature flows live elsewhere under idea-layer/testers/flows + are preserved
     "scripts"
     "config"
     "secrets"        # secrets SCAFFOLD only — secrets/sample/** placeholder tree + LAYOUT.yaml sync; real secrets/live/** is gitignored + fork-local + excluded below (never synced)

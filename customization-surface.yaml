@@ -92,6 +92,12 @@ rules:
   # Fork-owned DB schema offset — the single line a fork edits for its own schema version. PRESERVED.
   - glob: "**/core/database/**/ForkDatabaseConfig.kt"
     owner: fork
+  # Room exported schema JSONs (core/database/schemas/**/N.json) evolve per-fork: a fork adds entities
+  # + bumps the version via VERSION_OFFSET, producing its OWN schema files at higher versions. sync-dirs.sh
+  # blind-preserves `*/schemas/*`; this rule makes the ownership contract agree (owner:fork), so a synced
+  # template never clobbers a fork's schema history.
+  - glob: "**/schemas/**"
+    owner: fork
   # Android FileProvider paths: template ships base <paths>; forks add feature paths
   # (exports/recordings/imports). Blind copy drops them → runtime FileProvider crash.
   - glob: "**/res/xml/provider_paths.xml"
@@ -359,17 +365,9 @@ rules:
     owner: template
   - glob: "gradle/wrapper/**"
     owner: template
-  # Maestro E2E flow SoT (RULE-TEST-OUTPUT-LAYOUT-001). The template ships its framework screen-state
-  # retention flows here (synced via sync-dirs.sh idea-layer/testers/flows/screen-state); a fork adds its
-  # own feature flows alongside. Run captures (idea-layer/testers/captures/**) are gitignored evidence.
-  - glob: "idea-layer/testers/flows/**"
-    owner: template
-  # Idea-layer runtime state (agent-awareness / pipeline telemetry, e.g. AGENT_AWARENESS.jsonl) is
-  # per-fork append-only runtime evidence — never a template file to propagate, never clobbered by a
-  # sync. owner:fork = preserve the fork's state. Closes the classification gap so a new state file
-  # cannot silently fall to the blanket default (coverage-verify would flag it).
-  - glob: "idea-layer/state/**"
-    owner: fork
+  # NOTE: idea-layer/** is framework tooling (the claude-product-cycle project layer), NOT shipped
+  # white-label app code, and the template tracks zero idea-layer paths — so it carries no ownership
+  # rule here. A fork's idea-layer lives in its framework tree, never in the template source repo.
   # In-template feature-authoring guide (E5 consumption contract) — template-authored, synced like
   # the per-module CONSUMPTION.md docs. (closes a pre-existing E5 classification gap)
   - glob: "FEATURE_AUTHORING.md"

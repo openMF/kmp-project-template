@@ -61,8 +61,9 @@ class AppDatabaseTest {
         // Bumped to 12 in the v11→v12 change that added the `framework_write_conflicts` table
         // (MutationGateway conflict inbox) with a matching AutoMigration(11→12) + 12.json export.
         // Update this constant when bumping AppDatabase.VERSION so the guardrail stays meaningful.
-        // NOTE: #274 added the `cloud_todos` entity + v11 but omitted the AutoMigration(10→11) — a
-        // fresh install is fine, but an in-place v10→v11 upgrade still needs that migration in a follow-up.
+        // The full in-place upgrade chain is now closed: AutoMigration hops exist for every step up to
+        // 12 (incl. the 10→11 `cloud_todos` add that #274 originally omitted), so a v10 device upgrades
+        // cleanly to v12.
         assertEquals(12, AppDatabase.VERSION)
     }
 

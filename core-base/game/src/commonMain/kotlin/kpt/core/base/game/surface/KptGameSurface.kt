@@ -25,8 +25,8 @@ import kpt.core.base.game.loop.rememberGameLoop
  */
 @Composable
 fun KptGameSurface(
-    modifier: Modifier = Modifier,
     update: (dt: Float, t: Float) -> Unit,
+    modifier: Modifier = Modifier,
     draw: DrawScope.() -> Unit,
 ) {
     val frame = rememberGameLoop(onFrame = update)

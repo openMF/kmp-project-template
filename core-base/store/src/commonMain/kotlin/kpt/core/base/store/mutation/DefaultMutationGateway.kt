@@ -63,31 +63,31 @@ class DefaultMutationGateway(
         bookkeeper: Bookkeeper<K>,
         policy: MutationPolicy,
     ): MutationResult<Unit> {
-        if (policy is MutationPolicy.OnlineRequired) {
-            if (!isOnline()) return MutationResult.Blocked(BlockReason.OFFLINE)
-            // Network-first: confirm the server DELETE before touching local state; never tombstone.
-            return try {
+        // OnlineRequired offline → nothing is written or tombstoned.
+        if (policy is MutationPolicy.OnlineRequired && !isOnline()) {
+            return MutationResult.Blocked(BlockReason.OFFLINE)
+        }
+        return try {
+            if (policy is MutationPolicy.OnlineRequired) {
+                // Network-first: confirm the server DELETE before touching local state; never tombstone.
                 deleteEndpoint(key)
                 store.clear(key)
                 MutationResult.Applied(value = Unit, synced = true)
-            } catch (t: Throwable) {
-                MutationResult.Failed(cause = t, rolledBack = false)
+            } else {
+                // Optimistic: clear the local row now (it disappears from every read), sync the network
+                // DELETE, and — offline or on failure — record a pending-delete tombstone in the
+                // [bookkeeper] so the feature's SyncOrchestrator retries it on reconnect. Composes the
+                // DeleteSync primitive (behaviour unit-tested in DeleteSyncTest); clearing the row is the
+                // only op that can throw here.
+                val deleteSync = DeleteSync(
+                    clearLocal = { store.clear(it) },
+                    deleteEndpoint = deleteEndpoint,
+                    bookkeeper = bookkeeper,
+                    isOnline = isOnline,
+                    now = now,
+                )
+                MutationResult.Applied(value = Unit, synced = deleteSync.delete(key))
             }
-        }
-        // Optimistic: clear the local row now (it disappears from every read), sync the network DELETE,
-        // and — offline or on failure — record a pending-delete tombstone in the [bookkeeper] so the
-        // feature's SyncOrchestrator retries it on reconnect. Composes the DeleteSync primitive
-        // (behaviour unit-tested in DeleteSyncTest); clearing the row is the only op that can throw here.
-        return try {
-            val deleteSync = DeleteSync(
-                clearLocal = { store.clear(it) },
-                deleteEndpoint = deleteEndpoint,
-                bookkeeper = bookkeeper,
-                isOnline = isOnline,
-                now = now,
-            )
-            val synced = deleteSync.delete(key)
-            MutationResult.Applied(value = Unit, synced = synced)
         } catch (t: Throwable) {
             MutationResult.Failed(cause = t, rolledBack = false)
         }

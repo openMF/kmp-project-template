@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.data.demo.cloudtodo
 
@@ -76,9 +76,15 @@ private class FakeCloudTodoDao : CloudTodoDao {
     private val rows = mutableMapOf<Int, CloudTodoEntity>()
     override fun observeById(id: Int): Flow<CloudTodoEntity?> = flow { emit(rows[id]) }
     override suspend fun getById(id: Int): CloudTodoEntity? = rows[id]
-    override suspend fun upsert(entity: CloudTodoEntity) { rows[entity.id] = entity }
-    override suspend fun deleteById(id: Int) { rows.remove(id) }
-    override suspend fun deleteAll() { rows.clear() }
+    override suspend fun upsert(entity: CloudTodoEntity) {
+        rows[entity.id] = entity
+    }
+    override suspend fun deleteById(id: Int) {
+        rows.remove(id)
+    }
+    override suspend fun deleteAll() {
+        rows.clear()
+    }
 }
 
 private class FakeJsonPlaceholderApi : JsonPlaceholderApi {

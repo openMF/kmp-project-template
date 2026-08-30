@@ -2911,6 +2911,14 @@
 |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
+|    |    +--- io.github.mobilebytelabs:cmp-deep-link:3.5.11
+|    |    |    \--- io.github.mobilebytelabs:cmp-deep-link-android:3.5.11
+|    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 (*)
+|    |    |         +--- androidx.activity:activity-compose:1.12.2 -> 1.13.0 (*)
+|    |    |         +--- androidx.lifecycle:lifecycle-process:2.8.7 -> 2.11.0-beta01 (*)
+|    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
+|    |    |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
+|    |    |         \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    +--- org.jetbrains.compose.foundation:foundation:1.11.1 (*)

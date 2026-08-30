@@ -386,6 +386,8 @@ io.github.mirzemehdi:kmpnotifier-core-android:2.0.0
 io.github.mirzemehdi:kmpnotifier-core:2.0.0
 io.github.mirzemehdi:kmpnotifier-local-android:2.0.0
 io.github.mirzemehdi:kmpnotifier-local:2.0.0
+io.github.mobilebytelabs:cmp-deep-link-android:3.5.11
+io.github.mobilebytelabs:cmp-deep-link:3.5.11
 io.github.mobilebytelabs:cmp-firebase-android:3.5.11
 io.github.mobilebytelabs:cmp-firebase-compose-android:3.5.11
 io.github.mobilebytelabs:cmp-firebase-compose:3.5.11

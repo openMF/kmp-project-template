@@ -112,6 +112,25 @@ platform :ios do
       profile_name:          "match AppStore #{ios_config[:app_identifier]}",
     )
 
+    # EVERY app-extension target needs its OWN profile (its bundle id is a distinct App ID).
+    # Discovered from the .xcodeproj — extension names are fork-specific, never hardcoded.
+    # Without this the archive fails late with
+    #   `"<Ext>" requires a provisioning profile with the <capability> feature`.
+    ios_extension_targets(
+      ios_config[:project_path], ios_config[:app_identifier], build_ty.to_s.capitalize
+    ).each do |ext|
+      UI.message("🔏 signing app-extension target #{ext[:name]} → #{ext[:bundle_id]}")
+      update_code_signing_settings(
+        use_automatic_signing: false,
+        path:                  ios_config[:project_path],
+        team_id:               ios_config[:team_id],
+        code_sign_identity:    "Apple Distribution",
+        targets:               [ext[:name]],
+        bundle_identifier:     ext[:bundle_id],
+        profile_name:          "match AppStore #{ext[:bundle_id]}",
+      )
+    end
+
     gradle_version = get_version_from_gradle(sanitize_for_appstore: true)
 
     latest_build_number = latest_tf_build_number_resilient(

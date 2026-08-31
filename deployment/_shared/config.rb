@@ -801,6 +801,41 @@ def suppress_codesign_keychain_prompt
 end
 
 # Run Fastlane Match to fetch/refresh certificates and provisioning profiles.
+# ── App-extension signing discovery (RULE-IOS-SIGNING-001; added 2026-09-01) ──
+# A fork may ship app extensions (widgets, share, notification-service). EVERY such target
+# needs its OWN provisioning profile — the extension bundle id is a DISTINCT App ID, so a
+# profile for the app alone does NOT cover it. Xcode fails the archive with
+# `"<Ext>" requires a provisioning profile with the <capability> feature` when the extension
+# target is left unsigned — a failure that lands AFTER the full Kotlin/Native link (~40 min).
+#
+# Extension target names are FORK-SPECIFIC (CappyWidgets, FooShareExtension, …) and therefore
+# can NOT be hardcoded here — they are DISCOVERED from the .xcodeproj, and their bundle ids
+# resolved by substituting the `$(APP_BUNDLE_ID)` xcconfig var the template already owns.
+# Returns [{name:, bundle_id:}]; [] (with a warning) if discovery fails — never raises.
+def ios_extension_targets(project_path, app_identifier, configuration = "Release")
+  require "xcodeproj"
+  Xcodeproj::Project.open(project_path).native_targets.select { |t|
+    t.product_type.to_s.include?("app-extension")
+  }.map { |t|
+    cfg = t.build_configurations.find { |c| c.name == configuration } || t.build_configurations.first
+    raw = cfg&.build_settings&.dig("PRODUCT_BUNDLE_IDENTIFIER").to_s
+    bid = raw.gsub("$(APP_BUNDLE_ID)", app_identifier.to_s)
+    bid = "" if bid.include?("$(")            # unresolved var → fall back below
+    bid = "#{app_identifier}.#{t.name.downcase}" if bid.empty?
+    { name: t.name, bundle_id: bid }
+  }
+rescue StandardError => e
+  UI.important("⚠️ app-extension discovery failed (#{e.message}) — signing the app target only")
+  []
+end
+
+# Every bundle id needing a provisioning profile: the app + each app extension.
+def ios_signing_identifiers(app_identifier, configuration = "Release")
+  cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
+  exts = ios_extension_targets(cfg[:project_path], app_identifier, configuration)
+  [app_identifier] + exts.map { |e| e[:bundle_id] }
+end
+
 def fetch_certificates_with_match(options = {})
   cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
   ssh_key = File.join(DEPLOYMENT_REPO_ROOT, cfg[:match_ssh_key_path])
@@ -816,7 +851,9 @@ def fetch_certificates_with_match(options = {})
 
   base = {
     type:                     options[:match_type]       || cfg[:match_type],
-    app_identifier:           options[:app_identifier]   || cfg[:app_identifier],
+    # App + EVERY app-extension bundle id — match's app_identifier accepts an Array. Fetching
+    # only the app leaves the extension profile uninstalled → archive hunts and fails.
+    app_identifier:           ios_signing_identifiers(options[:app_identifier] || cfg[:app_identifier]),
     git_url:                  options[:match_git_url]    || cfg[:match_git_url],
     git_branch:               options[:match_git_branch] || cfg[:match_git_branch],
     git_private_key:          File.exist?(ssh_key) ? ssh_key : nil,

@@ -11,6 +11,7 @@ package kpt.feature.settings
 
 import androidx.compose.runtime.Composable
 import kpt.core.base.store.infra.DraftRecord
+import kpt.core.base.store.mutation.conflict.ConflictEntry
 import kpt.core.base.store.submit.SubmitOutboxStatus
 import kpt.core.base.ui.draft.DraftPickerItem
 import kpt.core.base.ui.draft.DraftPickerList
@@ -62,6 +63,33 @@ internal fun SyncAndDraftsEmptyPreview() {
             onRetry = {},
             onDiscard = {},
             onPrune = {},
+        )
+    }
+}
+
+/** Sync & Drafts — with unresolved sync conflicts surfaced above the drafts (Keep server / Retry mine). */
+@Preview
+@Composable
+internal fun SyncAndDraftsWithConflictsPreview() {
+    KptTheme {
+        SyncAndDraftsScreenContent(
+            uiState = SyncAndDraftsUiState.Success(
+                drafts = emptyList(),
+                syncing = emptyList(),
+                failed = listOf(
+                    DraftRecord(1, "bill", "rent", SubmitOutboxStatus.FAILED, 0, 0, "Network timeout — will retry"),
+                ),
+            ),
+            onBackClick = {},
+            onRetry = {},
+            onDiscard = {},
+            onPrune = {},
+            conflicts = listOf(
+                ConflictEntry("c1", "BillReminder", "rent-2026-08", "{}", "{}", null, 0),
+                ConflictEntry("c2", "Loan", "home-loan", "{}", "{}", null, 0),
+            ),
+            onAcceptServer = {},
+            onRetryLocal = {},
         )
     }
 }

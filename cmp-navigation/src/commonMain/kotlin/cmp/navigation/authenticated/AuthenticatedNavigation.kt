@@ -40,6 +40,10 @@ internal fun NavGraphBuilder.authenticatedGraph(navController: NavController) {
             // Home body from the fork-owned BackboneRegistry seam (default: demo dashboard). The
             // template shell carries zero demo imports — a fork edits BackboneRegistry, not this file.
             homeBody = { BackboneRegistry.homeBody(navController) },
+            // The outer graph's controller — the navbar uses it to push full-screen fork tabs above the
+            // scaffold and to hand inline fork tabs a controller for their drill-downs. This IS the same
+            // graph the fork tabs' destinations register on (FeatureRegistry.featureDestinations below).
+            outerNavController = navController,
         )
 
         // Backbone (framework) destinations — settings, notification, sync-and-drafts.

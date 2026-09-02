@@ -14,6 +14,10 @@ apple:
     internal_group: Internal Testers         # apple.testers.internal.group
     external_group: your-firebase-app-group  # PLACEHOLDER — apple.testers.external.group
     external_public_link: "true"             # apple.testers.external.public.link
+    # External TestFlight tester roster (emails — PUBLIC identifiers, not secrets). deployment/_shared/config.rb
+    # #sync_testflight_testers reads this list and adds each as an external beta tester on the group.
+    # For an org-shared roster, materialize this from your org SoT. Leave empty for public-link-only.
+    external_emails: []                      # apple.testers.external.emails — e.g. [alice@example.com, bob@example.com]
   keywords: 'EMI calculator,debt,bill reminder,interest rate,amortization,budget,currency,mortgage'  # store.ios.keywords
   category: 'FINANCE'                          # store.ios.category
   # App Store trade-representative contact (App Review → App Information). iOS + macOS App Store.

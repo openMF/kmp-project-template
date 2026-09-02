@@ -62,8 +62,9 @@ internal class InterestRateDetailViewModel(
         trySendAction(DetailAction.Refresh)
     }
 
+    // CACHE_FIRST_SWR default (see InterestRatesViewModel) — a user refresh must reach the network.
     override fun handleAction(action: DetailAction) = when (action) {
-        DetailAction.Retry, DetailAction.Refresh -> series.refresh()
+        DetailAction.Retry, DetailAction.Refresh -> series.refresh(forceFresh = true)
     }
 }
 

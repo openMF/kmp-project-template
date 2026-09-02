@@ -50,4 +50,17 @@ interface NavigationItem {
      * The test tag of the tab.
      */
     val testTag: String
+
+    /**
+     * Whether this tab renders INLINE inside the navbar scaffold — its content swaps within the inner
+     * NavHost so the bottom bar stays visible and the tab keeps its own back stack (exactly like the
+     * backbone Home/Profile tabs) — versus a FULL-SCREEN destination pushed on the outer authenticated
+     * graph (the bottom bar is hidden; e.g. an immersive focus-timer that declares
+     * `bottom_navigation_visible: false`). Default `true` (inline). A full-screen tab overrides to `false`.
+     *
+     * An inline extra tab (beyond Home/Profile) MUST also register its start destination via
+     * `TabRegistry.extraInlineTabDestinations` so the inner NavHost can host it; otherwise the tab has
+     * nothing to render inline.
+     */
+    val inlineTab: Boolean get() = true
 }

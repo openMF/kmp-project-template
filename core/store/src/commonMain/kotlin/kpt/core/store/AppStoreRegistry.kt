@@ -51,11 +51,19 @@ object AppStoreRegistry : StoreRegistry() {
     val CoinMarkets = store("coinMarkets")
     val CoinDetail = store("coinDetail")
 
-    // Banking Utility Toolkit — offline-local stores (OFFLINE_LOCAL_ONLY archetype)
+    // Banking Utility Toolkit — offline-local READ stores (OFFLINE_LOCAL_ONLY archetype)
     val Alerts = store("alerts")
     val Watchlist = store("watchlist")
     val Loans = store("loans")
     val BillReminders = store("billReminders")
+
+    // Per-item WRITE stores for the offline-local entities — every mutation flows through
+    // `store.write`/`store.clear` (single write door, no repo-level DAO writes). Local-only:
+    // createOfflineMutableStore (no-op Updater), paired with the READ stores above over the same table.
+    val AlertsMutable = store("alertsMutable")
+    val WatchlistMutable = store("watchlistMutable")
+    val LoansMutable = store("loansMutable")
+    val BillRemindersMutable = store("billRemindersMutable")
 
     // Banking Utility Toolkit — economic data (NETWORK_WITH_CACHE archetype)
     val InterestRateSeries = store("interestRateSeries")

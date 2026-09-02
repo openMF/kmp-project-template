@@ -168,10 +168,10 @@ fun HomeDashboard(
         // ── Aggregate load/refresh progress ──────────────────────────────
         // Same core-base dashboard archetype the Country Macro screen showcases:
         // fold the four independent per-card ScreenStates (loans / bills / rates /
-        // exchange) into one "X of Y loaded" strip. DashboardProgressBar hides itself
-        // once every card is Content (or on an empty dashboard), so it only surfaces
-        // while cards are still resolving or during a pull-to-refresh fan-out — the
-        // per-card independence + retry below is untouched.
+        // exchange) into one "Updated X ago" freshness line — the age of the stalest
+        // card, so the user can trust how current the numbers are (NOT a load count).
+        // It shows a subtle "Loading…" bar until the first card has data and hides once
+        // there is nothing to surface — the per-card independence + retry below is untouched.
         DashboardProgressBar(
             state = listOf(
                 state.loans,

@@ -11,9 +11,12 @@ package kpt.core.store.demo.watchlist.impl
 
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
+import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.demo.watchlist.dao.WatchlistDao
+import kpt.core.database.demo.watchlist.entity.WatchlistEntity
 import kpt.core.model.demo.watchlist.WatchlistItem
+import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
@@ -40,6 +43,30 @@ fun provideWatchlistStore(dao: WatchlistDao): Store<Unit, List<WatchlistItem>> =
         deleteAll = { dao.deleteAll() },
     ),
 )
+
+/**
+ * Per-item WRITE store for the watchlist (keyed by coin id). Every mutation flows through
+ * `store.write` (add) / `store.clear` (remove), so `WatchlistRepositoryImpl` never touches the DAO for
+ * writes — the SoT writer/delete are the single DAO callers. Local-only
+ * ([StoreFactory.createOfflineMutableStore] — no-op Updater); the writer/delete fire [notifyingWrite]
+ * so the paired [provideWatchlistStore] read collectors re-emit on wasmJs (same `personal_watchlist` table).
+ */
+fun provideWatchlistWriteStore(dao: WatchlistDao): MutableStore<String, WatchlistItem> =
+    StoreFactory.createOfflineMutableStore(
+        sourceOfTruth = SourceOfTruth.of(
+            reader = { coinId: String ->
+                daoFlow(WATCHLIST_TABLE) { dao.observeById(coinId) }
+                    .map { it?.let { row -> WatchlistItem(coinId = row.coinId, addedAtMs = row.addedAtMs) } }
+            },
+            writer = { _: String, item: WatchlistItem ->
+                notifyingWrite(WATCHLIST_TABLE) {
+                    dao.insert(WatchlistEntity(coinId = item.coinId, addedAtMs = item.addedAtMs))
+                }
+            },
+            delete = { coinId: String -> notifyingWrite(WATCHLIST_TABLE) { dao.delete(coinId) } },
+            deleteAll = { notifyingWrite(WATCHLIST_TABLE) { dao.deleteAll() } },
+        ),
+    )
 
 /** Room `@Entity(tableName = …)` for the watchlist table. */
 private const val WATCHLIST_TABLE = "personal_watchlist"

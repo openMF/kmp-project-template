@@ -4,9 +4,10 @@
 > `StoreFactory` (from `core-base/store`) and registered here. This module owns the app's
 > store factories (`provide*Store`), the `AppStoreRegistry` qualifier catalogue, and `StoreModule` DI.
 >
-> The archetype decision matrix + full API taxonomy is the SoT in
-> `training-layer/instructions/stream-first/latest/CORE_STORE.md` — this contract is the streamlined
-> "what to call" summary.
+> The archetype → factory → FetchPolicy catalogue and the write path are in
+> [`docs/architecture/STORE_ARCHITECTURE.md`](../../docs/architecture/STORE_ARCHITECTURE.md) — this
+> contract is the streamlined "what to call" summary. (Generator-side training guides live in the
+> framework repo, not in this repository.)
 
 ## Call sequence
 

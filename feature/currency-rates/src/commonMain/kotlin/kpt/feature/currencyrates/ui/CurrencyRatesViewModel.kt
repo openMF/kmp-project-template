@@ -109,6 +109,8 @@ class CurrencyRatesViewModel(
         is RatesAction.Search -> updateState { copy(searchQuery = action.query) }
         is RatesAction.ConverterAmount -> updateState { copy(converterAmount = action.amount) }
         is RatesAction.ConverterTarget -> updateState { copy(converterTarget = action.code) }
+        // This stream reads at NETWORK_WITH_CACHE (the CurrencyRepository default), which already
+        // refetches on every refresh — no force needed. retry() forces fresh on its own.
         RatesAction.Retry -> stream.retry()
         RatesAction.Refresh -> stream.refresh()
     }

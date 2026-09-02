@@ -14,11 +14,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kpt.core.data.demo.banking.impl.LoanRepositoryImpl
-import kpt.core.data.infra.InMemoryFetchedAtRepository
-import kpt.core.data.infra.onlineNetworkMonitor
 import kpt.core.model.demo.banking.Loan
 import kpt.core.model.demo.banking.LoanKind
 import kpt.core.store.demo.banking.impl.provideLoansStore
+import kpt.core.store.demo.banking.impl.provideLoansWriteStore
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -36,9 +35,8 @@ class LoanRepositoryTest {
     private val dao = FakeLoanDao()
     private val repo: LoanRepository = LoanRepositoryImpl(
         loansStore = provideLoansStore(dao),
+        loansWriteStore = provideLoansWriteStore(dao),
         loanDao = dao,
-        networkMonitor = onlineNetworkMonitor(),
-        fetchedAtRepository = InMemoryFetchedAtRepository(),
     )
 
     @Test

@@ -23,4 +23,12 @@ interface CloudTodoRepository {
 
     /** Flips `completed` and writes back through the MutableStore (Updater → server; Bookkeeper on failure). */
     suspend fun toggleCompleted(todo: CloudTodo)
+
+    /**
+     * Mark [todo] complete with the `OnlineRequired` policy — the network PUT is awaited first and the
+     * server record ingested; when offline the mutation is [kpt.core.base.store.mutation.MutationResult.Blocked]
+     * and nothing is written locally (unlike the optimistic [toggleCompleted]). The demo reference for
+     * network-first mutations that must not show an unconfirmed local state (payments, approvals).
+     */
+    suspend fun completeOnline(todo: CloudTodo): kpt.core.base.store.mutation.MutationResult<CloudTodo>
 }

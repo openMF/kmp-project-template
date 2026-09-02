@@ -63,4 +63,10 @@
     <string name="feature_settings_sync_drafts_discard_confirm_title">Discard draft?</string>
     <string name="feature_settings_sync_drafts_discard_confirm_message">This permanently deletes the saved draft. This can\'t be undone.</string>
     <string name="feature_settings_sync_drafts_discard_confirm_cancel">Cancel</string>
+    <string name="feature_settings_conflicts_title">Sync conflicts</string>
+    <string name="feature_settings_conflicts_empty_title">No conflicts</string>
+    <string name="feature_settings_conflicts_empty_message">When a change you made conflicts with a newer version on the server, it shows up here so you can keep the server\'s version or retry yours.</string>
+    <string name="feature_settings_conflicts_row_label">Conflict</string>
+    <string name="feature_settings_conflicts_accept_server">Keep server</string>
+    <string name="feature_settings_conflicts_retry_local">Retry mine</string>
 </resources>

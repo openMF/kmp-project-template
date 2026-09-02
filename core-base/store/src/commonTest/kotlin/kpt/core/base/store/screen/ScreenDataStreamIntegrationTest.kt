@@ -22,6 +22,7 @@ import kpt.core.base.store.infra.FakeFetchedAtRepository
 import kotlin.test.Test
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * End-to-end integration tests for [asScreenStream].
@@ -33,6 +34,14 @@ import kotlin.test.assertTrue
 class ScreenDataStreamIntegrationTest {
 
     private val onlineInfo = NetworkInfo(type = NetworkType.WiFi, isMetered = false)
+
+    // Real-time budget for every Turbine block below. These tests drive a REAL in-memory Store5
+    // whose internal coroutines are not fully virtual-time-bound, so a heavily-loaded CI runner can
+    // exceed Turbine's 3s default while the logic under test is perfectly correct — the
+    // 2026-09-02 `offline_with_empty_store_emits_Empty_offlineFirst` failure on a runner executing
+    // 3054 Gradle tasks, green on four prior runs of the identical code. Widening the wait budget
+    // removes the scheduling flake WITHOUT relaxing a single assertion.
+    private val turbineTimeout = 30.seconds
 
     // ─── T1: online → Content(FRESH) ─────────────────────────────────────────
 
@@ -50,7 +59,7 @@ class ScreenDataStreamIntegrationTest {
             scope = backgroundScope,
         )
 
-        stream.state.test {
+        stream.state.test(timeout = turbineTimeout) {
             // May emit Loading first (depends on Store5 in-memory-only path)
             val first = awaitItem()
             val content = if (first is ScreenState.Content) first else awaitItem()
@@ -71,10 +80,15 @@ class ScreenDataStreamIntegrationTest {
         }
     }
 
-    // ─── T2: offline, no cache → NoNetwork ───────────────────────────────────
+    // ─── T2: offline, no cache, CACHE_FIRST_SWR default → Empty (offline-first) ──
 
     @Test
-    fun offline_with_empty_store_emits_NoNetwork() = runTest {
+    fun offline_with_empty_store_emits_Empty_offlineFirst() = runTest {
+        // asScreenStream's default policy is CACHE_FIRST_SWR (offline-first): offline with no cached
+        // data and no error surfaces the screen's own Empty state, NOT a blocking full-screen NoNetwork
+        // (DecisionEngine offline-first-empty rule; asserted in DecisionEngineTest "…CACHE_FIRST_SWR =
+        // Empty"). Offline CACHE_FIRST_SWR skips the network leg, so the throwing fetcher is never
+        // invoked and error stays null. Every other policy still shows NoNetwork offline.
         val store = StoreBuilder
             .from<String, String>(fetcher = Fetcher.of { _ -> throw RuntimeException("no network") })
             .build()
@@ -87,11 +101,13 @@ class ScreenDataStreamIntegrationTest {
             scope = backgroundScope,
         )
 
-        stream.state.test {
+        stream.state.test(timeout = turbineTimeout) {
+            // Settle the debounced NetworkStatus + Store5 round-trip before deciding.
+            advanceUntilIdle()
             // Drain until we see a non-Loading state
             var state: ScreenState<String> = awaitItem()
             while (state is ScreenState.Loading) { state = awaitItem() }
-            assertIs<ScreenState.NoNetwork>(state)
+            assertIs<ScreenState.Empty>(state)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -111,7 +127,7 @@ class ScreenDataStreamIntegrationTest {
         val network = FakeNetworkMonitor(NetworkStatus.Available(onlineInfo))
 
         // Prime the in-memory cache via a normal read first
-        store.streamData("k3").test {
+        store.streamData("k3").test(timeout = turbineTimeout) {
             awaitItem() // consume
             cancelAndIgnoreRemainingEvents()
         }
@@ -126,7 +142,7 @@ class ScreenDataStreamIntegrationTest {
             fetchPolicy = FetchPolicy.CACHE_ONLY,
         )
 
-        stream.state.test {
+        stream.state.test(timeout = turbineTimeout) {
             var state: ScreenState<String> = awaitItem()
             while (state is ScreenState.Loading) { state = awaitItem() }
             // CACHE_ONLY must not trigger new network fetches
@@ -155,11 +171,13 @@ class ScreenDataStreamIntegrationTest {
             scope = backgroundScope,
         )
 
-        stream.state.test {
-            // Wait until we see NoNetwork (or Error) for the offline state
+        stream.state.test(timeout = turbineTimeout) {
+            // Offline-first (CACHE_FIRST_SWR default): offline + empty + no error surfaces Empty, not
+            // a blocking NoNetwork (see T2 + DecisionEngineTest). The reconnect below re-runs the
+            // decision and fetches, moving the screen to Content.
             var state: ScreenState<String> = awaitItem()
             while (state is ScreenState.Loading) { state = awaitItem() }
-            assertIs<ScreenState.NoNetwork>(state)
+            assertIs<ScreenState.Empty>(state)
 
             // Simulate reconnect
             network.setStatus(NetworkStatus.Available(onlineInfo))

@@ -13,6 +13,7 @@
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		BF7FA1D79F34816E320C8EDA /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 450586FEB2DE420D9722E79B /* FirebaseAnalytics */; };
 		D93DFD3AD365436F195168D6 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 7EF40345BBFE68C34625D3D0 /* FirebaseCore */; };
+		A1B2C3D4E5F600000000F001 /* KotlinMultiplatformLinkedPackage in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F600000000F002 /* KotlinMultiplatformLinkedPackage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 			files = (
 				BF7FA1D79F34816E320C8EDA /* FirebaseAnalytics in Frameworks */,
 				D93DFD3AD365436F195168D6 /* FirebaseCore in Frameworks */,
+				A1B2C3D4E5F600000000F001 /* KotlinMultiplatformLinkedPackage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +118,7 @@
 				7555FF77242A565900829871 /* Sources */,
 				B92378962B6B1156000C7307 /* Frameworks */,
 				7555FF79242A565900829871 /* Resources */,
+				A1B2C3D4E5F600000000E002 /* [KMP] Copy Compose Resources */,
 			);
 			buildRules = (
 			);
@@ -125,6 +128,7 @@
 			packageProductDependencies = (
 				450586FEB2DE420D9722E79B /* FirebaseAnalytics */,
 				7EF40345BBFE68C34625D3D0 /* FirebaseCore */,
+				A1B2C3D4E5F600000000F002 /* KotlinMultiplatformLinkedPackage */,
 			);
 			productName = iosApp;
 			productReference = 7555FF7B242A565900829871 /* iosApp.app */;
@@ -157,6 +161,7 @@
 			mainGroup = 7555FF72242A565900829871;
 			packageReferences = (
 				118A06A4848A7CD9FF70BABD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				A1B2C3D4E5F600000000F003 /* XCLocalSwiftPackageReference "KotlinMultiplatformLinkedPackage" */,
 			);
 			productRefGroup = 7555FF7C242A565900829871 /* Products */;
 			projectDirPath = "";
@@ -197,6 +202,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"$SRCROOT/scripts/embed-xcframework.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A1B2C3D4E5F600000000E002 /* [KMP] Copy Compose Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[KMP] Copy Compose Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/scripts/copy-compose-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -378,7 +402,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 54;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = L432S2FZP5;
+				DEVELOPMENT_TEAM = "$(TEAM_ID)";
 				ENABLE_PREVIEWS = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1007,13 +1031,20 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		A1B2C3D4E5F600000000F003 /* XCLocalSwiftPackageReference "KotlinMultiplatformLinkedPackage" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = KotlinMultiplatformLinkedPackage;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		118A06A4848A7CD9FF70BABD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 11.0.0;
+				minimumVersion = 12.17.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1028,6 +1059,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 118A06A4848A7CD9FF70BABD /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
+		};
+		A1B2C3D4E5F600000000F002 /* KotlinMultiplatformLinkedPackage */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KotlinMultiplatformLinkedPackage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

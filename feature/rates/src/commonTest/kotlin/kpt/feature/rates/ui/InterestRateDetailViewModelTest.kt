@@ -37,7 +37,8 @@ import kotlin.test.assertTrue
  *    so the detail screen still renders something rather than crashing.
  *  - Initial state is Loading.
  *  - Content emissions surface as [ScreenState.Content].
- *  - `onRetry()` and `onRefresh()` both refresh the underlying stream.
+ *  - `onRetry()` and `onRefresh()` both refresh the underlying stream (forcing a fresh fetch —
+ *    see RateStreamFactory / ScreenDataStream.refresh(forceFresh)).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class InterestRateDetailViewModelTest {

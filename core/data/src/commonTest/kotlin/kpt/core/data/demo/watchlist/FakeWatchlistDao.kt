@@ -39,6 +39,9 @@ internal class FakeWatchlistDao : WatchlistDao {
     override fun observeContains(coinId: String): Flow<Boolean> =
         flow { emit(rows.any { it.coinId == coinId }) }
 
+    override fun observeById(coinId: String): Flow<WatchlistEntity?> =
+        flow { emit(rows.firstOrNull { it.coinId == coinId }) }
+
     override suspend fun insert(entry: WatchlistEntity) {
         rows.removeAll { it.coinId == entry.coinId }
         rows.add(entry)

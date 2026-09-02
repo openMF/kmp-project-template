@@ -58,12 +58,13 @@ class AppDatabaseTest {
 
     @Test
     fun databaseVersionIsCurrent() {
-        // Bumped to 11 in the v10→v11 change that added the `cloud_todos` table (#274).
-        // Update this constant when bumping AppDatabase.VERSION so the guardrail
-        // stays meaningful. NOTE: #274 added the entity + version but omitted the
-        // AutoMigration(10→11) + 11.json schema export — a fresh install is fine, but an
-        // in-place v10→v11 upgrade needs that migration completed in a follow-up.
-        assertEquals(11, AppDatabase.VERSION)
+        // Bumped to 12 in the v11→v12 change that added the `framework_write_conflicts` table
+        // (MutationGateway conflict inbox) with a matching AutoMigration(11→12) + 12.json export.
+        // Update this constant when bumping AppDatabase.VERSION so the guardrail stays meaningful.
+        // The full in-place upgrade chain is now closed: AutoMigration hops exist for every step up to
+        // 12 (incl. the 10→11 `cloud_todos` add that #274 originally omitted), so a v10 device upgrades
+        // cleanly to v12.
+        assertEquals(12, AppDatabase.VERSION)
     }
 
     @Test

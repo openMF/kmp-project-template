@@ -25,6 +25,8 @@ import kpt.core.base.store.error.OfflineException
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.infra.DecisionEngine
 import kpt.core.base.store.infra.FetchedAtRepository
+import kpt.core.base.store.screen.ScreenStreamContext
+import org.koin.mp.KoinPlatform
 import kpt.core.base.store.screen.DataOrigin
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.StoreData
@@ -296,3 +298,25 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
         fetchPolicy = fetchPolicy,
     ).also { it.loadInitialPage() }
 }
+
+/**
+ * [asPagingScreenStream] overload taking a bundled [ScreenStreamContext] instead of the two infra
+ * deps — so a paginated repository reads `store.asPagingScreenStream(screen, cacheKey, scope, …)`
+ * with `screen` its one injected [ScreenStreamContext]. Delegates to the primary overload.
+ */
+fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
+    context: ScreenStreamContext = KoinPlatform.getKoin().get(),
+    cacheKey: String,
+    scope: CoroutineScope,
+    pageSize: Int = PageKey.DEFAULT_PAGE_SIZE,
+    query: String? = null,
+    fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
+): PagingScreenStream<Value> = asPagingScreenStream(
+    networkMonitor = context.networkMonitor,
+    fetchedAtRepository = context.fetchedAtRepository,
+    cacheKey = cacheKey,
+    scope = scope,
+    pageSize = pageSize,
+    query = query,
+    fetchPolicy = fetchPolicy,
+)

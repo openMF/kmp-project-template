@@ -9,7 +9,6 @@
  */
 package kpt.core.data.demo.currency.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kpt.core.base.data.infra.Synchronizer
 import kpt.core.base.data.infra.snapshotSync
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -27,6 +25,7 @@ import kpt.core.data.demo.currency.CurrencyRepository
 import kpt.core.model.demo.currency.ExchangeRates
 import kpt.core.model.demo.currency.RateHistory
 import kpt.core.model.demo.currency.RateHistoryKey
+import kpt.core.store.AppCacheKeys
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
@@ -42,8 +41,6 @@ class CurrencyRepositoryImpl(
     private val exchangeRatesStore: Store<String, ExchangeRates>,
     private val rateHistoryStore: Store<RateHistoryKey, RateHistory>,
     private val spotRateStore: Store<String, ExchangeRates>,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
 ) : CurrencyRepository {
 
     override fun exchangeRatesStream(
@@ -52,9 +49,7 @@ class CurrencyRepositoryImpl(
         fetchPolicy: FetchPolicy,
     ): ScreenDataStream<ExchangeRates> = exchangeRatesStore.asScreenStream(
         key = baseCurrency,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
-        cacheKey = "currency:exchangeRates:$baseCurrency",
+        cacheKey = AppCacheKeys.exchangeRates(baseCurrency),
         scope = scope,
         fetchPolicy = fetchPolicy,
     )
@@ -65,9 +60,7 @@ class CurrencyRepositoryImpl(
         scope: CoroutineScope,
     ): ScreenDataStream<ExchangeRates> = spotRateStore.asScreenStream(
         key = baseCurrency,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
-        cacheKey = "currency:spotRate:$baseCurrency",
+        cacheKey = AppCacheKeys.spotRate(baseCurrency),
         scope = scope,
         fetchPolicy = if (online) FetchPolicy.NETWORK_ONLY else FetchPolicy.CACHE_ONLY,
     )
@@ -77,9 +70,7 @@ class CurrencyRepositoryImpl(
         scope: CoroutineScope,
     ): ScreenDataStream<RateHistory> = rateHistoryStore.asScreenStream(
         keyFlow = keyFlow,
-        networkMonitor = networkMonitor,
-        fetchedAtRepository = fetchedAtRepository,
-        cacheKeyFor = { key -> "currency:rateHistory:${key.from}-${key.to}-${key.days}d" },
+        cacheKeyFor = { key -> AppCacheKeys.rateHistory(key.from, key.to, key.days) },
         scope = scope,
     )
 

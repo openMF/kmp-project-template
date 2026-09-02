@@ -11,10 +11,12 @@ package kpt.core.store.demo.alerts.impl
 
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
+import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.demo.alerts.AlertDao
 import kpt.core.database.demo.alerts.AlertEntity
 import kpt.core.model.demo.alerts.PriceAlert
+import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
@@ -47,6 +49,27 @@ fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFact
         deleteAll = { dao.deleteAll() },
     ),
 )
+
+/**
+ * Per-item WRITE store for price alerts (keyed by alert id). Every mutation flows through
+ * `store.write` / `store.clear` via [kpt.core.base.store.mutation.MutationGateway], so the
+ * repository never touches the DAO — the SoT writer/delete are the single DAO callers. Local-only
+ * ([StoreFactory.createOfflineMutableStore] — no-op Updater); the writer/delete fire
+ * [notifyingWrite] so the paired [provideAlertsStore] read collectors re-emit on wasmJs.
+ */
+fun provideAlertsWriteStore(dao: AlertDao): MutableStore<String, PriceAlert> =
+    StoreFactory.createOfflineMutableStore(
+        sourceOfTruth = SourceOfTruth.of(
+            reader = { id: String ->
+                daoFlow(ALERTS_TABLE) { dao.observeById(id) }.map { it?.toPriceAlert() }
+            },
+            writer = { _: String, alert: PriceAlert ->
+                notifyingWrite(ALERTS_TABLE) { dao.upsert(alert.toAlertEntity()) }
+            },
+            delete = { id: String -> notifyingWrite(ALERTS_TABLE) { dao.deleteById(id) } },
+            deleteAll = { notifyingWrite(ALERTS_TABLE) { dao.deleteAll() } },
+        ),
+    )
 
 /** Room `@Entity(tableName = …)` for [AlertEntity]. Shared with the repository's writes. */
 private const val ALERTS_TABLE = "alerts"

@@ -52,6 +52,11 @@ platform :ios do
     ios_listing_changed = store_listing_needs_sync?("ios", ios_config[:metadata_path])
     UI.message(ios_listing_changed ? "🔄 App Store listing changed — will upload metadata + screenshots" : "✓ App Store listing unchanged — skipping metadata re-upload")
 
+    # SCREENSHOTS — reliable CLEAR-and-REPLACE via the vendored uploader BEFORE the deliver/submit, so the
+    # version carries the full deck. deliver's screenshot upload half-fills display sets and cannot
+    # guarantee a replace (RULE-DEPLOY-STORE-SYNC-ON-DEPLOY-001); deliver below is TEXT-only.
+    override_ios_screenshots_from_sot if ios_listing_changed
+
     # HEAL 2 — a promote NEVER changes app-level identity (name/subtitle). Hide those files around
     # deliver so it syncs ONLY version-level listing and never aborts on the globally-unique app-name
     # conflict ("app name already used on a different account"). Restored after (success OR failure).
@@ -63,12 +68,10 @@ platform :ios do
         build_number:                         build_number,
         # No binary — use the build already on TestFlight
         skip_binary_upload:                   true,
-        # Metadata + screenshots (keeps listing in sync) — gated on drift
+        # TEXT metadata gated on drift; SCREENSHOTS never via deliver (reliable uploader ran above).
         skip_metadata:                        !ios_listing_changed,
-        skip_screenshots:                     !ios_listing_changed,
+        skip_screenshots:                     true,
         metadata_path:                        ios_config[:metadata_path],
-        screenshots_path:                     ios_config[:screenshots_path],
-        overwrite_screenshots:                true,
         ignore_language_directory_validation: true,
         skip_app_version_update:              true,
         # Review + release settings
@@ -215,15 +218,18 @@ platform :ios do
       FileUtils.mkdir_p(File.dirname(release_notes_path))
       File.write(release_notes_path, releaseNotes)
 
+      # SCREENSHOTS — reliable CLEAR-and-REPLACE via the vendored uploader BEFORE deliver, so the version
+      # carries the full deck. deliver below is TEXT-only — its screenshot upload half-fills display sets
+      # (RULE-DEPLOY-STORE-SYNC-ON-DEPLOY-001). Skip only when the caller explicitly skipped screenshots.
+      override_ios_screenshots_from_sot unless options[:skip_screenshots]
+
       deliver(
         api_key: Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
         copyright: "#{Time.now.year} #{FastlaneConfig::ProjectConfig::ORGANIZATION_NAME}",
         metadata_path: ios_config[:metadata_path],
-        screenshots_path: ios_config[:screenshots_path],
         skip_metadata: false,
-        skip_screenshots: options.key?(:skip_screenshots) ? options[:skip_screenshots] : false,
+        skip_screenshots: true,   # screenshots overridden reliably above (deliver half-fills sets)
         skip_binary_upload: options[:skip_binary_upload] || false,
-        overwrite_screenshots: true,
         ignore_language_directory_validation: true,
         app_review_information: appstore_config[:app_review_information].dup,
         submit_for_review: options[:submit_for_review] || appstore_config[:submit_for_review],
@@ -235,7 +241,8 @@ platform :ios do
         precheck_include_in_app_purchases: appstore_config[:precheck_include_in_app_purchases],
         run_precheck_before_submit: appstore_config[:run_precheck_before_submit],
         submission_information: appstore_config[:submission_information],
-        app_rating_config_path: ios_config[:app_rating_config_path],
+        # NO app_rating_config_path — Age Rating is a one-time app-level declaration (deliver rejects the
+        # config's versioned `v1_0` shape on the current ASC API). Set it in ASC / the release flow, not here.
       )
 
       UI.success("✅ Successfully deployed to App Store!")

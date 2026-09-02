@@ -14,12 +14,19 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.ScreenStreamContext
 import kpt.core.data.demo.alerts.impl.AlertsRepositoryImpl
 import kpt.core.data.infra.InMemoryFetchedAtRepository
 import kpt.core.data.infra.onlineNetworkMonitor
 import kpt.core.model.demo.alerts.AlertDirection
 import kpt.core.model.demo.alerts.PriceAlert
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
+import kpt.core.store.demo.alerts.impl.provideAlertsWriteStore
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -44,10 +51,24 @@ class AlertsReactiveInvalidationTest {
     private val dao = FakeAlertDao()
     private val repo: AlertsRepository = AlertsRepositoryImpl(
         alertsStore = provideAlertsStore(dao),
-        alertDao = dao,
-        networkMonitor = onlineNetworkMonitor(),
-        fetchedAtRepository = InMemoryFetchedAtRepository(),
+        alertsWriteStore = provideAlertsWriteStore(dao),
     )
+
+    // asScreenStream self-resolves its ScreenStreamContext from Koin, so a test that collects the
+    // stream registers the read-path infra bundle for the duration of the test.
+    @BeforeTest
+    fun startKoinForScreenStream() {
+        startKoin {
+            modules(
+                module {
+                    single { ScreenStreamContext(onlineNetworkMonitor(), InMemoryFetchedAtRepository()) }
+                },
+            )
+        }
+    }
+
+    @AfterTest
+    fun stopKoinAfterTest() = stopKoin()
 
     @Test
     fun alertsStreamReEmitsAcrossSubmitAndDelete() = runTest {

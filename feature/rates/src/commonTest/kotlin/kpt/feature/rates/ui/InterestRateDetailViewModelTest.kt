@@ -37,8 +37,8 @@ import kotlin.test.assertTrue
  *    so the detail screen still renders something rather than crashing.
  *  - Initial state is Loading.
  *  - Content emissions surface as [ScreenState.Content].
- *  - `onRetry()` and `onRefresh()` both force a FRESH refresh of the underlying stream
- *    (user-initiated intent — see RateStreamFactory / ScreenDataStream.refresh(forceFresh)).
+ *  - `onRetry()` and `onRefresh()` both refresh the underlying stream (forcing a fresh fetch —
+ *    see RateStreamFactory / ScreenDataStream.refresh(forceFresh)).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class InterestRateDetailViewModelTest {
@@ -110,9 +110,7 @@ class InterestRateDetailViewModelTest {
         val vm = InterestRateDetailViewModel(seriesId = "DFF", repository = repo)
         dispatcher.scheduler.advanceUntilIdle()
 
-        // onRetry()/onRefresh() are user-initiated, so they force a fresh fetch — the
-        // emission lands on forceFreshTrigger, not the policy-driven refreshTrigger.
-        repo.forceFreshTrigger.test {
+        repo.refreshTrigger.test {
             vm.onRetry()
             dispatcher.scheduler.advanceUntilIdle()
             awaitItem()
@@ -126,9 +124,7 @@ class InterestRateDetailViewModelTest {
         val vm = InterestRateDetailViewModel(seriesId = "DFF", repository = repo)
         dispatcher.scheduler.advanceUntilIdle()
 
-        // onRetry()/onRefresh() are user-initiated, so they force a fresh fetch — the
-        // emission lands on forceFreshTrigger, not the policy-driven refreshTrigger.
-        repo.forceFreshTrigger.test {
+        repo.refreshTrigger.test {
             vm.onRefresh()
             dispatcher.scheduler.advanceUntilIdle()
             awaitItem()

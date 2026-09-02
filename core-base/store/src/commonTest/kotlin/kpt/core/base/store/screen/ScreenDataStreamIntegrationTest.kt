@@ -175,7 +175,6 @@ class ScreenDataStreamIntegrationTest {
             // Offline-first (CACHE_FIRST_SWR default): offline + empty + no error surfaces Empty, not
             // a blocking NoNetwork (see T2 + DecisionEngineTest). The reconnect below re-runs the
             // decision and fetches, moving the screen to Content.
-            advanceUntilIdle()
             var state: ScreenState<String> = awaitItem()
             while (state is ScreenState.Loading) { state = awaitItem() }
             assertIs<ScreenState.Empty>(state)

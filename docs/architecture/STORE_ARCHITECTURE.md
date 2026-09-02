@@ -158,13 +158,18 @@ are separate, explicit `refresh = true` paths:
 `CACHE_FIRST_SWR` default a plain `refresh()` only re-serves cache while revalidation stays band-gated,
 so on a `Fresh` band the user's pull-to-refresh does **nothing**.
 
-**How the force is threaded.** `ScreenDataStream` holds two channels: `refreshTrigger` (policy-driven —
-user refresh, reconnect listener, `PERIODIC` ticker) and `forceFreshTrigger` (forced). `asScreenStream`
-merges them into one ordered stream carrying a `Boolean`, which reaches
-`streamDataForPolicy(..., forceFresh = …)` and short-circuits to `StoreReadRequest.fresh(...)` ahead of
-the policy `when`. Two channels rather than one widened flow so the opt-in
-`screenDataStreamForTesting(...)` factory keeps its `MutableSharedFlow<Unit>` signature —
-`forceFreshTrigger` is an optional parameter, so existing callers compile unchanged.
+**How the force is threaded.** Every refresh — policy-driven or forced — emits on the single
+`refreshTrigger`. Intent rides alongside it in a `ForceFreshLatch`: set immediately before the emit,
+read-and-reset by `storeFlow`'s `flatMapLatest`, and passed as
+`streamDataForPolicy(..., forceFresh = …)`, which short-circuits to `StoreReadRequest.fresh(...)` ahead
+of the policy `when`. `forceFreshTrigger` exists only as an optional observation channel for tests.
+
+**Why a latch and not a second flow.** Merging a `forceFreshTrigger` into the read pipeline adds an
+async subscription hop before the underlying `SharedFlow`s are collected — and `refreshTrigger` has
+`replay = 0`, so a reconnect `tryEmit` landing inside that widened window is **silently dropped** and
+the screen never refreshes on reconnect. The latch leaves the collector's subscription topology exactly
+as it was before force-fresh existed. Keeping `refreshTrigger` a `MutableSharedFlow<Unit>` also means
+the opt-in `screenDataStreamForTesting(...)` factory keeps its original signature.
 
 **`CACHE_ONLY` is exempt.** An offline-only screen must never reach the network, so `streamDataForPolicy`
 ignores `forceFresh` for that policy. The guard lives there, not at the call site, so no consumer can

@@ -15,8 +15,11 @@ import kpt.core.base.store.infra.impl.DraftInventoryImpl
 import kpt.core.base.store.infra.impl.StoreCacheManagerImpl
 import kpt.core.store.AppStoreRegistry
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
+import kpt.core.store.demo.alerts.impl.provideAlertsWriteStore
 import kpt.core.store.demo.banking.impl.provideBillRemindersStore
+import kpt.core.store.demo.banking.impl.provideBillRemindersWriteStore
 import kpt.core.store.demo.banking.impl.provideLoansStore
+import kpt.core.store.demo.banking.impl.provideLoansWriteStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoReadStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoStore
 import kpt.core.store.demo.crypto.impl.provideCoinDetailStore
@@ -27,8 +30,10 @@ import kpt.core.store.demo.economic.impl.provideInterestRateSeriesStore
 import kpt.core.store.demo.economic.impl.provideMacroIndicatorStore
 import kpt.core.store.demo.exchange.impl.provideSpotRateLookupStore
 import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
+import kpt.core.store.demo.watchlist.impl.provideWatchlistWriteStore
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import kpt.core.base.store.di.StoreModule as CoreBaseStoreModule
 
 /**
  * Koin module for app-level Store wiring.
@@ -45,6 +50,12 @@ import org.koin.dsl.module
  * ```
  */
 val appStoreModule: Module = module {
+    // Framework write-SoT: the base-store module provides the single write door (MutationGateway)
+    // + its Room-backed ConflictInbox. Every repo migrated onto `gateway.*` resolves `get()` here,
+    // so a fork wiring `appStoreModule` gets the gateway for free (needs ConflictDao from
+    // DatabaseModule + NetworkMonitor on the graph — both present in KoinModules.allModules).
+    includes(CoreBaseStoreModule)
+
     // Store cache manager — clears all registered caches on logout (registration-based)
     single<StoreCacheManager> {
         StoreCacheManagerImpl(
@@ -79,14 +90,26 @@ val appStoreModule: Module = module {
     single(AppStoreRegistry.Alerts) {
         provideAlertsStore(dao = get())
     }
+    single(AppStoreRegistry.AlertsMutable) {
+        provideAlertsWriteStore(dao = get())
+    }
     single(AppStoreRegistry.Watchlist) {
         provideWatchlistStore(dao = get())
+    }
+    single(AppStoreRegistry.WatchlistMutable) {
+        provideWatchlistWriteStore(dao = get())
     }
     single(AppStoreRegistry.Loans) {
         provideLoansStore(dao = get())
     }
+    single(AppStoreRegistry.LoansMutable) {
+        provideLoansWriteStore(dao = get())
+    }
     single(AppStoreRegistry.BillReminders) {
         provideBillRemindersStore(dao = get())
+    }
+    single(AppStoreRegistry.BillRemindersMutable) {
+        provideBillRemindersWriteStore(dao = get())
     }
 
     // Banking Utility Toolkit — spot exchange-rate lookup (NETWORK_ONLY callsite archetype)

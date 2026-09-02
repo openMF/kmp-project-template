@@ -32,6 +32,10 @@ interface WatchlistDao {
     @Query("SELECT EXISTS(SELECT 1 FROM personal_watchlist WHERE coinId = :coinId)")
     fun observeContains(coinId: String): Flow<Boolean>
 
+    /** Observe a single watchlist row by coin id — the per-item write store's SourceOfTruth reader. */
+    @Query("SELECT * FROM personal_watchlist WHERE coinId = :coinId")
+    fun observeById(coinId: String): Flow<WatchlistEntity?>
+
     /** Add a coin to the watchlist. If already present, replaces the row (no-op effectively). */
     @Insert(entity = WatchlistEntity::class, onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: WatchlistEntity)

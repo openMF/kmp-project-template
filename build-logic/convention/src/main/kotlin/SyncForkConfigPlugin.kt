@@ -126,9 +126,24 @@ abstract class SyncForkConfigTask : DefaultTask() {
         if (appDisplayName.isNotBlank()) {
             patchTomlVersion(File(root, "gradle/libs.versions.toml"), "appDisplayName", appDisplayName)
         }
+        // desktopAppName (JVM/dock) + projectName (rootProject.name) ALSO live in the catalog and resolve
+        // app-profile-first (identity.app_name / project name) per this repo's CLAUDE.md, but a catalog-3way
+        // merge during /kmp-project-template-sync reverts them to the template placeholder ("App Toolkit" /
+        // "kmp-project-template"). Writing only appId+appDisplayName left them stale (a fork's catalog
+        // could carry template identity after a clean sync). Derive + write ALL identity
+        // lines so the catalog fully follows the app-profile SoT after any sync.
+        if (appDisplayName.isNotBlank()) {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "desktopAppName", appDisplayName)
+        }
+        if (projectName.isNotBlank()) {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "projectName", projectName)
+        }
 
         // Apple
         val appleTeamId   = get("apple.team.id",     "APPLE_TEAM_ID",   "iosTeamId")
+        if (appleTeamId.isNotBlank() && appleTeamId != "YOUR_TEAM_ID") {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "iosTeamId", appleTeamId)
+        }
         val matchGitUrl   = get("apple.match.git.url","MATCH_GIT_URL")
         val tfGroups      = get("apple.tf.groups",    "TESTFLIGHT_GROUPS")
 
@@ -215,7 +230,13 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 "// then re-run ./gradlew syncForkConfig\n" +
                 "APP_BUNDLE_ID = $appId\n" +
                 "APP_NAME = $appDisplayName\n" +
-                "TEAM_ID = $appleTeamId\n"
+                "TEAM_ID = $appleTeamId\n" +
+                "\n" +
+                "// Keychain Sharing entitlement — REQUIRED by core-base/datastore's KeychainSettings\n" +
+                "// (service \"kpt.secure\"). Without it iOS keychain access fails -34018 at launch and\n" +
+                "// crashes the Koin graph (UserPreferencesRepositoryImpl -> AppViewModel). Applies to\n" +
+                "// every flavor (project-level base config). Path relative to cmp-ios/ (SRCROOT).\n" +
+                "CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements\n"
             )
             logger.lifecycle("syncForkConfig: wrote cmp-ios/Configuration/Config.xcconfig")
         }
@@ -887,7 +908,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 logger.lifecycle("syncForkConfig: tokenized wrangler.toml name=$cloudflareProject")
             }
             // config.yaml + workflow-snippet.yml — `--project-name=…` in the runner/CI command string.
-            // (workflow-snippet.yml was missed initially — surfaced by the awaazly fork proof 2026-08-07.)
+            // (workflow-snippet.yml was missed initially — surfaced by a downstream fork proof.)
             for (rel in listOf(
                 "deployment/web/cloudflare-pages/config.yaml",
                 "deployment/web/cloudflare-pages/workflow-snippet.yml",

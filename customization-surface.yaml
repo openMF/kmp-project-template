@@ -92,6 +92,12 @@ rules:
   # Fork-owned DB schema offset — the single line a fork edits for its own schema version. PRESERVED.
   - glob: "**/core/database/**/ForkDatabaseConfig.kt"
     owner: fork
+  # Room exported schema JSONs (core/database/schemas/**/N.json) evolve per-fork: a fork adds entities
+  # + bumps the version via VERSION_OFFSET, producing its OWN schema files at higher versions. sync-dirs.sh
+  # blind-preserves `*/schemas/*`; this rule makes the ownership contract agree (owner:fork), so a synced
+  # template never clobbers a fork's schema history.
+  - glob: "**/schemas/**"
+    owner: fork
   # Android FileProvider paths: template ships base <paths>; forks add feature paths
   # (exports/recordings/imports). Blind copy drops them → runtime FileProvider crash.
   - glob: "**/res/xml/provider_paths.xml"
@@ -293,6 +299,41 @@ rules:
   - glob: "CLAUDE.md"                          # fork project instructions
     owner: fork
 
+  # ── fork brand / build-deps / legal-content surface ───────────────────────────
+  # Declared BEFORE the broad template module globs (first-match-wins) so a fork's brand + build +
+  # legal customizations survive a sync full-copy. Without these carve-outs each falls through to
+  # `owner: template` and a blind copy clobbers it (the exact loss class this contract exists to close).
+  #
+  # Brand theme — a fork fully replaces the reference palette + type ramp; owner:fork (blind preserve).
+  # The SHARED design primitives live in core-base/designsystem (stays template-owned).
+  - glob: "**/core/designsystem/**/theme/**"
+    owner: fork
+  # Brand icons — a fork adds glyphs to the shared AppIcons object; 3-way so template icon additions
+  # AND fork icons both survive.
+  - glob: "**/core/designsystem/**/icon/**"
+    owner: merge
+    strategy: kotlin-3way
+  # App scaffold — the template ships KptScaffold; a fork overrides its top-bar/FAB/branding. 3-way so a
+  # template scaffold update never drops the fork's overrides.
+  - glob: "**/core/ui/**/scaffold/**"
+    owner: merge
+    strategy: kotlin-3way
+  # Root scaffold + nav controller — a fork tweaks root theming (dark-mode-aware colors) + analytics
+  # wiring; 3-way-merged against template updates.
+  - glob: "cmp-navigation/**/ui/*.kt"
+    owner: merge
+    strategy: kotlin-3way
+  # Core-module build deps — a fork adds module dependencies its own code compiles against; 3-way
+  # (symmetry with cmp-android/build.gradle.kts) so a template plugin/version bump merges without
+  # dropping fork deps. Single-segment `core` only — does NOT match core-base/**.
+  - glob: "**/core/**/build.gradle.kts"
+    owner: merge
+    strategy: kotlin-3way
+  # Legal content — the privacy-policy/terms CONTENT templates are the fork's real legal documents;
+  # the generator (legal/generate.sh) + rendered legal/output/** stay template/generated below.
+  - glob: "legal/*/template.md"
+    owner: fork
+
   # ── template-owned (the broad sync surface — lowest precedence, declared LAST) ──
   - glob: "build-logic/**"
     owner: template
@@ -324,17 +365,9 @@ rules:
     owner: template
   - glob: "gradle/wrapper/**"
     owner: template
-  # Maestro E2E flow SoT (RULE-TEST-OUTPUT-LAYOUT-001). The template ships its framework screen-state
-  # retention flows here (synced via sync-dirs.sh idea-layer/testers/flows/screen-state); a fork adds its
-  # own feature flows alongside. Run captures (idea-layer/testers/captures/**) are gitignored evidence.
-  - glob: "idea-layer/testers/flows/**"
-    owner: template
-  # Idea-layer runtime state (agent-awareness / pipeline telemetry, e.g. AGENT_AWARENESS.jsonl) is
-  # per-fork append-only runtime evidence — never a template file to propagate, never clobbered by a
-  # sync. owner:fork = preserve the fork's state. Closes the classification gap so a new state file
-  # cannot silently fall to the blanket default (coverage-verify would flag it).
-  - glob: "idea-layer/state/**"
-    owner: fork
+  # NOTE: idea-layer/** is framework tooling (the claude-product-cycle project layer), NOT shipped
+  # white-label app code, and the template tracks zero idea-layer paths — so it carries no ownership
+  # rule here. A fork's idea-layer lives in its framework tree, never in the template source repo.
   # In-template feature-authoring guide (E5 consumption contract) — template-authored, synced like
   # the per-module CONSUMPTION.md docs. (closes a pre-existing E5 classification gap)
   - glob: "FEATURE_AUTHORING.md"
@@ -380,7 +413,10 @@ rules:
   - { glob: "version.txt",                   owner: template }
   - { glob: "lib-integrate.properties",      owner: template }
   - { glob: "secrets-manifest.yaml",         owner: fork }      # per-fork generated (project id + alias list) — E0/T1
-  - { glob: "gradle.properties",             owner: fork }      # holds fork.project.name (SyncForkConfigPlugin) — E0/T1
+  # MIXED file: fork values (fork.project.name) + template infra (JVM args, gradle/kotlin flags, memory,
+  # toggles). owner:fork froze the template infra out; 3-way merge brings template infra in while
+  # preserving the fork's changed keys (BASE = template@last-synced sha, per FT-5b). E0/T1.
+  - { glob: "gradle.properties",             owner: merge, strategy: properties-3way }
   - { glob: "build.gradle.kts",              owner: template }
   - { glob: "kotlin-js-store/**",            owner: template }
   - { glob: "legal/**",                      owner: template }

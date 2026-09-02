@@ -31,6 +31,9 @@ internal class FakeAlertDao : AlertDao {
     override fun observeAll(): Flow<List<AlertEntity>> =
         flow { emit(rows.sortedByDescending { it.createdAt }) }
 
+    override fun observeById(id: String): Flow<AlertEntity?> =
+        flow { emit(rows.firstOrNull { it.id == id }) }
+
     override suspend fun upsert(alert: AlertEntity) {
         rows.removeAll { it.id == alert.id }
         rows.add(alert)

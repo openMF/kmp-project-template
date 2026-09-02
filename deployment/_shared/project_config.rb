@@ -239,7 +239,8 @@ module FastlaneConfig
           demo_password: ENV["APPSTORE_DEMO_PASSWORD"] || "",
           notes:         "Thank you for reviewing our app!",
         },
-        submit_for_review:                 true,
+        # SUBMIT via _shared/scripts/asc-appstore-submit.rb, not deliver (RULE-DEPLOY-APPSTORE-AUTOSUBMIT-001).
+        submit_for_review:                 false,
         automatic_release:                 true,
         phased_release:                    false,
         skip_app_version_update:           false,

@@ -51,6 +51,9 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asLoadOnceStream(
 ): ScreenDataStream<Output> {
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
+    // Load-once captures the first Content and stops, so it wires no forceFreshTrigger — a forced
+    // fresh fetch is meaningless once the stream has terminated. ScreenDataStream defaults that
+    // parameter, so refreshFresh() on a load-once stream is simply inert.
     val stateFlow = refreshTrigger
         .onStart { emit(Unit) }
         .flatMapLatest {

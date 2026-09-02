@@ -30,15 +30,18 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
 import cmp.navigation.authenticated.AuthenticatedGraphRoute
 import cmp.navigation.authenticated.authenticatedGraph
 import cmp.navigation.authenticated.navigateToAuthenticatedGraph
+import cmp.navigation.registry.DeepLinkRegistry
 import cmp.navigation.splash.SplashRoute
 import cmp.navigation.splash.navigateToSplash
 import cmp.navigation.splash.splashDestination
 import cmp.navigation.ui.rememberKptNavController
 import cmp.navigation.utils.toObjectNavigationRoute
+import com.mobilebytelabs.kmptoolkit.deeplink.DeepLinkHandler
 import kpt.core.base.designsystem.theme.motion
 import kpt.core.base.ui.KptConnectivityBanner
 import kpt.core.base.ui.util.NonNullEnterTransitionProvider
@@ -102,6 +105,26 @@ fun RootNavScreen(
                 authenticatedGraph(navController)
 //            userUnlockDestination()
             }
+        }
+    }
+
+    // Deep-link routing (fork-provided via DeepLinkRegistry — the template ships no links). Inbound URIs are
+    // captured by cmp-deep-link (KmpToolkit): Android auto-init reads the launch / onNewIntent Intent.data
+    // with NO Activity wiring, parsed onto DeepLinkHandler. We read the retained lastReceived (a StateFlow
+    // that survives the Splash → graph handoff, so a cold-start widget tap isn't dropped) and dispatch it
+    // through the fork's DeepLinkRegistry ONLY once the user is authenticated AND the authenticated graph is
+    // on-screen — otherwise the root-state navigation below (which pops to the graph start) would discard the
+    // destination. Held (not cleared) until then, so a first-run link resolves after Splash / onboarding.
+    val pendingDeepLink by DeepLinkHandler.lastReceived.collectAsStateWithLifecycle()
+    val deepLinkBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(pendingDeepLink, deepLinkBackStackEntry, state) {
+        val link = pendingDeepLink ?: return@LaunchedEffect
+        val atAuthenticatedRoot = deepLinkBackStackEntry?.destination?.rootLevelRoute() ==
+            AuthenticatedGraphRoute.toObjectNavigationRoute()
+        if (state is RootNavState.UserUnlocked && atAuthenticatedRoot &&
+            DeepLinkRegistry.route(link, navController)
+        ) {
+            DeepLinkHandler.clear()
         }
     }
 

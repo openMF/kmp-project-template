@@ -11,6 +11,7 @@ package kpt.core.store.demo.alerts
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kpt.core.database.demo.alerts.AlertDao
 import kpt.core.database.demo.alerts.AlertEntity
 import kpt.core.store.demo.alerts.impl.provideAlertsStore
@@ -41,6 +42,9 @@ private class FakeAlertDao : AlertDao {
     private val alerts = MutableStateFlow<List<AlertEntity>>(emptyList())
 
     override fun observeAll(): Flow<List<AlertEntity>> = alerts
+
+    override fun observeById(id: String): Flow<AlertEntity?> =
+        alerts.map { rows -> rows.firstOrNull { it.id == id } }
 
     override suspend fun upsert(alert: AlertEntity) {
         alerts.value = alerts.value

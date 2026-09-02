@@ -15,4 +15,7 @@ import org.koin.dsl.module
 val SettingsModule = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SyncAndDraftsViewModel)
+    // Sync conflicts screen — a live window over the framework ConflictInbox (provided by
+    // core-base StoreModule, included via appStoreModule).
+    viewModelOf(::ConflictInboxViewModel)
 }

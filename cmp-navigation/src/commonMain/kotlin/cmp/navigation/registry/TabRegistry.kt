@@ -9,6 +9,9 @@
  */
 package cmp.navigation.registry
 
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import cmp.navigation.authenticatednavbar.AuthenticatedNavBarTabItem
 import kpt.core.ui.NavigationItem
 
@@ -24,6 +27,30 @@ import kpt.core.ui.NavigationItem
 object TabRegistry {
     /** Fork tabs appended after the backbone Home/Profile tabs. Template default = none. */
     val extraTabs: List<NavigationItem> = emptyList()
+
+    /**
+     * Fork registration of INLINE extra-tab TOP destinations into the navbar's INNER NavHost.
+     *
+     * Any extra tab whose [NavigationItem.inlineTab] is `true` (the default) MUST register its start
+     * destination here, so that tapping the tab swaps content WITHIN the scaffold — the bottom bar stays
+     * visible and the tab keeps its own back stack, exactly like the backbone Home/Profile tabs. Without
+     * an inline registration an `inlineTab = true` tab would have nothing to render inline.
+     *
+     * The lambda runs with a [NavGraphBuilder] receiver (register destinations here) and receives:
+     *  - `innerNav`  — the navbar's inner [NavHostController]; use it for tab-local navigation such as
+     *                  returning to the Home tab (`innerNav.navigate(HomeRoute) { … }`).
+     *  - `outerNav`  — the OUTER authenticated-graph [NavController]; use it for DRILL-DOWN navigation to
+     *                  full-screen feature routes (`outerNav.navigateToItemDetail(id)`), which correctly
+     *                  push above the scaffold and hide the bar — the standard drill-down affordance.
+     *
+     * Registering a tab's top screen here does NOT conflict with also registering it (or its drill-downs)
+     * on the outer graph via `FeatureRegistry.featureDestinations` — the two NavHosts are independent, so
+     * a screen reachable both as a tab (inline) and as a push from another feature (full-screen) is fine.
+     *
+     * Template default = no-op (the template ships no inline extra tabs). `owner: fork`.
+     */
+    val extraInlineTabDestinations: NavGraphBuilder.(innerNav: NavHostController, outerNav: NavController) -> Unit =
+        { _, _ -> }
 
     /** The full ordered tab list the navbar renders: backbone shell tabs + [extraTabs]. */
     val tabs: List<NavigationItem> = buildList {

@@ -290,12 +290,18 @@ class CacheFirstSwrTest {
 
     @Test
     fun refreshFreshBypassesBandGate() = runTest {
-        // Verifies both surfaces of the S5-5 fresh-fetch pair:
-        //   1. `ScreenDataStream.refreshFresh()` re-triggers the underlying
-        //      Store5 flow — observable as a repeat Content emission on
-        //      `stream.state`.
+        // Verifies both surfaces of the S5-5 fresh-fetch pair BY FETCHER INVOCATION:
+        //   1. `ScreenDataStream.refreshFresh()` emits force-fresh intent through refreshTrigger,
+        //      routing streamDataForPolicy to StoreReadRequest.fresh(...) instead of
+        //      CACHE_FIRST_SWR's cached(refresh = false) — so the FETCHER RUNS.
         //   2. `Store<K,O>.refreshFresh(key)` extension delegates to the
         //      existing `freshData(key)` path and drives the fetcher.
+        //
+        // REGRESSION GUARD: this assertion used to accept "at least one more emission", which a
+        // re-emission of CACHED data satisfies. That let the real defect through — refreshTrigger
+        // was MutableSharedFlow<Unit>, carried no intent, and under the CACHE_FIRST_SWR default
+        // refreshFresh() re-subscribed to cached(refresh = false) and issued NO request at all.
+        // Assert the fetch, never the emission.
         var fetchCount = 0
         val store = StoreBuilder
             .from<String, String>(
@@ -324,21 +330,17 @@ class CacheFirstSwrTest {
             ttl = 24.hours,
         )
 
+        // The class-side surface is asserted at the ROUTING layer instead — see
+        // forceFreshRoutesToFreshRequestUnderSwr. Driving it through stream.state and draining to
+        // Content proves nothing: `fresh(fallBackToSourceOfTruth = true)` may emit the CACHED value
+        // before the network one, so a Content emission is not evidence the fetcher ran, and on a
+        // SoT-less store the drain can block until runTest times out. (That unsound shape is exactly
+        // what let the original refreshFresh defect ship green.) Dispatch from the ViewModel layer is
+        // covered by InterestRateDetailViewModelTest.
         stream.state.test {
             var state: ScreenState<String> = awaitItem()
             while (state is ScreenState.Loading) state = awaitItem()
             assertIs<ScreenState.Content<String>>(state)
-
-            // Trigger the class-side sibling — bypasses user-tap debounce.
-            stream.refreshFresh()
-            // After refreshFresh(), flatMapLatest re-runs and re-emits — the
-            // exact ScreenState transition depends on Store5 internals, but at
-            // least one more emission must be observable.
-            val next = awaitItem()
-            assertTrue(
-                next is ScreenState.Content<String> || next is ScreenState.Loading,
-                "refreshFresh() must produce a follow-up emission; got $next",
-            )
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -356,5 +358,48 @@ class CacheFirstSwrTest {
         // Sanity: the extension actually did *something* beyond the priming
         // + follow-up refresh from the state-flow branch above.
         assertTrue(fetchCount >= fetchesAfterPrime, "fetch count must be monotonically non-decreasing")
+    }
+
+    // ─── forceFresh routing (streamDataForPolicy) ─────────────────────────────
+    //
+    // Asserted at the routing layer, NOT through ScreenDataStream + Turbine: a
+    // `fresh(fallBackToSourceOfTruth = true)` read can emit the cached value before the network one,
+    // so "drain to Content" never proved a fetch happened and could block until runTest timed out.
+
+    @Test
+    fun forceFreshRoutesToFreshRequestUnderSwr() = runTest {
+        var fetchCount = 0
+        val store = StoreBuilder
+            .from<String, String>(fetcher = Fetcher.of { key -> fetchCount++; "fresh:$key" })
+            .build()
+        store.streamData("k4").test { awaitItem(); cancelAndIgnoreRemainingEvents() }
+
+        val before = fetchCount
+        store.streamDataForPolicy("k4", FetchPolicy.CACHE_FIRST_SWR, forceFresh = true)
+            .first { !it.isEmpty }
+        assertTrue(
+            fetchCount > before,
+            "forceFresh must route to StoreReadRequest.fresh and drive the fetcher even under " +
+                "CACHE_FIRST_SWR (whose normal read is cached(refresh = false)); " +
+                "before=$before after=$fetchCount",
+        )
+    }
+
+    @Test
+    fun cacheOnlyIgnoresForceFresh() = runTest {
+        // An offline-only screen must NEVER reach the network, even when a caller forces a refresh.
+        var fetchCount = 0
+        val store = StoreBuilder
+            .from<String, String>(fetcher = Fetcher.of { key -> fetchCount++; "fresh:$key" })
+            .build()
+        store.streamData("k5").test { awaitItem(); cancelAndIgnoreRemainingEvents() }
+
+        val before = fetchCount
+        store.streamDataForPolicy("k5", FetchPolicy.CACHE_ONLY, forceFresh = true).first()
+        assertEquals(
+            before,
+            fetchCount,
+            "CACHE_ONLY must ignore forceFresh and stay local; fetchCount moved $before -> $fetchCount",
+        )
     }
 }

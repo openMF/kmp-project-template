@@ -432,7 +432,7 @@ module FastlaneConfig
       skip_submission:                   false,
       skip_waiting_for_build_processing: true,
       submit_beta_review:                true,
-      expire_previous_builds:            true,
+      expire_previous_builds:            false, # NEVER auto-expire: a later run that expires the prior build then FAILS to upload a new one leaves the app with zero live builds (all EXPIRED) → no internal/external distribution possible + un-expiry is impossible. Apple keeps builds 90d; testers always get the latest anyway.
       reject_build_waiting_for_review:   true,
       wait_processing_interval:          30,
       wait_processing_timeout_duration:  900,
@@ -449,6 +449,20 @@ module FastlaneConfig
         internal_group:       _nz.call(_c._fork_prop("apple.testers.internal.group")) || "Internal Testers",
         external_group:       _nz.call(_c._fork_prop("apple.testers.external.group")) || _nz.call(_c._fork_prop("apple.tf.groups")) || "External Beta",
         external_public_link: (_nz.call(_c._fork_prop("apple.testers.external.public.link")) || "true").to_s.downcase == "true",
+        # External TestFlight tester roster (emails — PUBLIC identifiers, not secrets). App-profile is the
+        # runtime SoT (apple.testers.external_emails), materialized from _org/company.yaml. Comma-separated
+        # fork.properties `apple.tf.testers` is the fallback when app-profile is absent (older forks).
+        external_emails:      (lambda {
+                                f = File.join(DEPLOYMENT_REPO_ROOT, "app-profile/platforms/apple/apple.yaml")
+                                raw = nil
+                                if File.exist?(f)
+                                  y = (YAML.load_file(f) rescue nil) || {}
+                                  raw = y.dig("apple", "testers", "external_emails")
+                                end
+                                raw ||= _nz.call(_c._fork_prop("apple.tf.testers"))
+                                list = raw.is_a?(Array) ? raw : raw.to_s.split(",")
+                                list.map { |e| e.to_s.strip.downcase }.reject(&:empty?).uniq
+                              }).call,
       },
       play: {
         internal_googlegroup: _nz.call(_c._fork_prop("play.testers.internal.googlegroup")),
@@ -460,7 +474,13 @@ module FastlaneConfig
     }.freeze
 
     APPSTORE_CONFIG = {
-      submit_for_review:                  true,
+      # SUBMIT is done by _shared/scripts/asc-appstore-submit.rb (the reliable direct-API path), NOT by
+      # deliver — deliver's submit_for_review races on reviewSubmission state, chokes on stale empty
+      # drafts (one open reviewSubmission max), and can't surface the Part XX ITA human gate. The
+      # `release` lane builds/uploads/syncs the listing; the deploy runtime runs the submit script after
+      # (RULE-DEPLOY-APPSTORE-AUTOSUBMIT-001). automatic_release stays true → auto-release to production
+      # on Apple approval.
+      submit_for_review:                  false,
       automatic_release:                  true,
       phased_release:                     false,
       skip_app_version_update:            false,
@@ -562,7 +582,13 @@ module FastlaneConfig
     base = {
       serviceCredsFile: ENV["FIREBASE_SERVICE_ACCOUNT_PATH"] ||
                         File.join(DEPLOYMENT_REPO_ROOT, BuildSecrets.for(flavor: flavor).path(:firebase_service_account)),
-      groups: ENV["FIREBASE_GROUPS"] || nil,
+      # Priority: ENV (CI) → fork.properties key (local) → nil. Mirrors the iOS app-id resolution
+      # below (and the TestFlight groups line) so a fork's tester group (gradle/fork.properties
+      # `firebase.groups`) is applied automatically. Without this, `firebase_app_distribution`
+      # silently logs "No testers or groups passed in. Skipping this step." on every local deploy —
+      # the build uploads but reaches ZERO testers — unless FIREBASE_GROUPS is exported per-deploy
+      # (the long-standing "Firebase groups parameter ignored" known issue).
+      groups: ENV["FIREBASE_GROUPS"] || _fork_prop("firebase.groups") || nil,
     }
     case platform
     when :ios
@@ -775,6 +801,41 @@ def suppress_codesign_keychain_prompt
 end
 
 # Run Fastlane Match to fetch/refresh certificates and provisioning profiles.
+# ── App-extension signing discovery (RULE-IOS-SIGNING-001; added 2026-09-01) ──
+# A fork may ship app extensions (widgets, share, notification-service). EVERY such target
+# needs its OWN provisioning profile — the extension bundle id is a DISTINCT App ID, so a
+# profile for the app alone does NOT cover it. Xcode fails the archive with
+# `"<Ext>" requires a provisioning profile with the <capability> feature` when the extension
+# target is left unsigned — a failure that lands AFTER the full Kotlin/Native link (~40 min).
+#
+# Extension target names are FORK-SPECIFIC (CappyWidgets, FooShareExtension, …) and therefore
+# can NOT be hardcoded here — they are DISCOVERED from the .xcodeproj, and their bundle ids
+# resolved by substituting the `$(APP_BUNDLE_ID)` xcconfig var the template already owns.
+# Returns [{name:, bundle_id:}]; [] (with a warning) if discovery fails — never raises.
+def ios_extension_targets(project_path, app_identifier, configuration = "Release")
+  require "xcodeproj"
+  Xcodeproj::Project.open(project_path).native_targets.select { |t|
+    t.product_type.to_s.include?("app-extension")
+  }.map { |t|
+    cfg = t.build_configurations.find { |c| c.name == configuration } || t.build_configurations.first
+    raw = cfg&.build_settings&.dig("PRODUCT_BUNDLE_IDENTIFIER").to_s
+    bid = raw.gsub("$(APP_BUNDLE_ID)", app_identifier.to_s)
+    bid = "" if bid.include?("$(")            # unresolved var → fall back below
+    bid = "#{app_identifier}.#{t.name.downcase}" if bid.empty?
+    { name: t.name, bundle_id: bid }
+  }
+rescue StandardError => e
+  UI.important("⚠️ app-extension discovery failed (#{e.message}) — signing the app target only")
+  []
+end
+
+# Every bundle id needing a provisioning profile: the app + each app extension.
+def ios_signing_identifiers(app_identifier, configuration = "Release")
+  cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
+  exts = ios_extension_targets(cfg[:project_path], app_identifier, configuration)
+  [app_identifier] + exts.map { |e| e[:bundle_id] }
+end
+
 def fetch_certificates_with_match(options = {})
   cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
   ssh_key = File.join(DEPLOYMENT_REPO_ROOT, cfg[:match_ssh_key_path])
@@ -790,7 +851,9 @@ def fetch_certificates_with_match(options = {})
 
   base = {
     type:                     options[:match_type]       || cfg[:match_type],
-    app_identifier:           options[:app_identifier]   || cfg[:app_identifier],
+    # App + EVERY app-extension bundle id — match's app_identifier accepts an Array. Fetching
+    # only the app leaves the extension profile uninstalled → archive hunts and fails.
+    app_identifier:           ios_signing_identifiers(options[:app_identifier] || cfg[:app_identifier]),
     git_url:                  options[:match_git_url]    || cfg[:match_git_url],
     git_branch:               options[:match_git_branch] || cfg[:match_git_branch],
     git_private_key:          File.exist?(ssh_key) ? ssh_key : nil,
@@ -943,13 +1006,18 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
       # some Spaceship model versions expose no instance #update, so fall back to leaving
       # the existing (still-valid) values in place rather than failing the release.
       begin
-        Spaceship::ConnectAPI.patch_beta_app_localization(localization_id: existing.id, attributes: attrs)
+        # Spaceship's ConnectAPI tunes client exposes the PLURAL client-level methods
+        # (post_beta_app_localizations / patch_beta_app_localizations) — NOT a singular
+        # #patch_beta_app_localization nor a model-level BetaAppLocalization.create (those
+        # raise NoMethodError on spaceship 2.235, which was silently swallowing Test-Information
+        # sync and blocking external beta review with "Beta App Description is missing").
+        Spaceship::ConnectAPI.patch_beta_app_localizations(localization_id: existing.id, attributes: attrs)
         UI.success("🔄 Synced TestFlight Test Information (#{locale}) for #{app_identifier}.")
       rescue NoMethodError, NameError, ArgumentError
         UI.success("✅ TestFlight Test Information already present (#{locale}) for #{app_identifier} — external beta review unblocked.")
       end
     else
-      Spaceship::ConnectAPI::BetaAppLocalization.create(app_id: app.id, attributes: attrs.merge(locale: locale))
+      Spaceship::ConnectAPI.post_beta_app_localizations(app_id: app.id, attributes: attrs.merge(locale: locale))
       UI.success("🆕 Created TestFlight Test Information (#{locale}) for #{app_identifier} — external beta review is now unblocked.")
     end
   rescue => e
@@ -957,6 +1025,34 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
     UI.important("⚠️  Could not sync TestFlight Test Information for #{app_identifier}: " \
                  "#{e.message.to_s.lines.first&.strip}. Internal upload continues; " \
                  "external promotion may need it set on App Store Connect.")
+  end
+
+  # ── 3. Sync the app-level BetaAppReviewDetail (contact info) from config ──
+  # External beta review REQUIRES this SEPARATE app-level object (contact name/email/phone +
+  # demo account) — it is DISTINCT from the BetaAppLocalization synced above. pilot passes
+  # beta_app_review_info only at submit time, so on an expired/failed build the review detail
+  # is never created and external review stays blocked with no obvious cause. Create/patch it
+  # here, independent of any build, so external promotion always has it. The betaAppReviewDetail
+  # resource id EQUALS the app id (1:1), so patch(app_id: app.id) is the create-or-update. Phone
+  # must be non-empty — Apple rejects an empty contact_phone on external submission. Best-effort.
+  begin
+    ri = (config[:beta_app_review_info] || {})
+    brd_attrs = {
+      contactFirstName:    ri[:contact_first_name].to_s,
+      contactLastName:     ri[:contact_last_name].to_s,
+      contactEmail:        ri[:contact_email].to_s,
+      contactPhone:        ri[:contact_phone].to_s,
+      demoAccountRequired: !!ri[:demo_account_required],
+    }
+    unless brd_attrs[:contactEmail].empty? || brd_attrs[:contactPhone].empty?
+      Spaceship::ConnectAPI.patch_beta_app_review_detail(app_id: app.id, attributes: brd_attrs)
+      UI.success("🔄 Synced TestFlight Beta App Review contact info for #{app_identifier} — external beta review unblocked.")
+    else
+      UI.important("⚠️  Skipped Beta App Review contact sync for #{app_identifier}: contact_email/contact_phone empty in TESTFLIGHT_CONFIG[:beta_app_review_info] (org.email / org.phone). External review will reject an empty contact.")
+    end
+  rescue => e
+    UI.important("⚠️  Could not sync Beta App Review contact info for #{app_identifier}: " \
+                 "#{e.message.to_s.lines.first&.strip}. External promotion may need it set on App Store Connect.")
   end
 end
 
@@ -1005,6 +1101,31 @@ def sync_testflight_testers(app_identifier:, config: nil)
       if !gs[:internal] && gs[:public]
         link = (grp.respond_to?(:public_link) && grp.public_link) || nil
         UI.success("🔗 Public TestFlight join link for '#{gs[:name]}': #{link}") if link
+      end
+
+      # Add the org-shared external tester roster (emails) to the EXTERNAL group so named testers
+      # receive an invite, not only public-link self-joiners. Idempotent + best-effort per email —
+      # a tester that already exists (globally or in the group) is a no-op, never an error. Roster
+      # SoT: app-profile apple.testers.external_emails ← _org/company.yaml. Internal group is team-
+      # only (members must be added by Apple-ID in App Store Connect), so we never push emails there.
+      if !gs[:internal]
+        (cfg[:external_emails] || []).each do |em|
+          begin
+            fn = em.split("@").first.to_s.gsub(/[^A-Za-z0-9]/, " ").strip[0, 30]
+            fn = "Tester" if fn.empty?
+            # last_name is a required ASC field but carries no product meaning — keep it brand-neutral
+            # (never a fork's initials) so a synced fork doesn't stamp its testers with another org's name.
+            Spaceship::ConnectAPI.create_beta_tester(group_id: grp.id, email: em, first_name: fn, last_name: "Tester")
+            UI.success("   ➕ external tester added to '#{gs[:name]}': #{em}")
+          rescue => e
+            msg = e.message.to_s.lines.first&.strip
+            if msg.to_s =~ /already|exist|taken|duplicate/i
+              UI.message("   ✓ external tester already in '#{gs[:name]}': #{em}")
+            else
+              UI.important("   ⚠️  could not add external tester #{em}: #{msg}")
+            end
+          end
+        end
       end
     rescue => e
       UI.important("⚠️  ASC group '#{gs[:name]}' sync hiccuped: #{e.message.to_s.lines.first&.strip}. " \

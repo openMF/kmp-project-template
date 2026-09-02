@@ -11,10 +11,12 @@ package kpt.core.store.demo.banking.impl
 
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
+import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.demo.banking.dao.LoanDao
 import kpt.core.database.demo.banking.entity.LoanEntity
 import kpt.core.model.demo.banking.Loan
+import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
@@ -59,6 +61,26 @@ fun provideLoanDetailStore(dao: LoanDao): Store<String, Loan> = StoreFactory.cre
         deleteAll = { dao.deleteAll() },
     ),
 )
+
+/**
+ * Per-item WRITE store for loans (keyed by loan id). Every mutation flows through `store.write` /
+ * `store.clear`, so the repository never touches the DAO — the SoT writer/delete are the single DAO
+ * callers. Local-only ([StoreFactory.createOfflineMutableStore] — no-op Updater); the writer/delete
+ * fire [notifyingWrite] so the paired [provideLoansStore] read collectors re-emit on wasmJs.
+ */
+fun provideLoansWriteStore(dao: LoanDao): MutableStore<String, Loan> =
+    StoreFactory.createOfflineMutableStore(
+        sourceOfTruth = SourceOfTruth.of(
+            reader = { id: String ->
+                daoFlow(LOANS_TABLE) { dao.observeById(id) }.map { it?.toDomain() }
+            },
+            writer = { _: String, loan: Loan ->
+                notifyingWrite(LOANS_TABLE) { dao.upsert(loan.toEntity()) }
+            },
+            delete = { id: String -> notifyingWrite(LOANS_TABLE) { dao.deleteById(id) } },
+            deleteAll = { notifyingWrite(LOANS_TABLE) { dao.deleteAll() } },
+        ),
+    )
 
 /** Room `@Entity(tableName = …)` for [LoanEntity]. Shared with the repository's writes. */
 private const val LOANS_TABLE = "banking_loans"

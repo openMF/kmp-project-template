@@ -1492,7 +1492,7 @@ generate_keystore() {
             -sigalg SHA256withRSA \
               -validity $((validity*365)) \
             -storepass "$keystore_password" \
-            -keypass "$keystore_password" \  # PKCS12: key pw == store pw
+            -keypass "$keystore_password" \
             -dname "$DN"
     else
         # gradle/fork.properties not present — fall back to interactive DN entry

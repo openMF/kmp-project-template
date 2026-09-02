@@ -69,6 +69,24 @@
                 tools:replace="android:resource" />
         </provider>
 
+        <!--
+            worker-kmp initializes WorkManager on-demand (WorkerKmpHost.initialize +
+            androidWorkManagerFactory, wired from cmp-shared initKoin → WorkerKmpAuto.install()).
+            Disable androidx.startup's default WorkManagerInitializer so the two don't both
+            initialize WorkManager — otherwise the first lazy WorkScheduler resolve (e.g. opening
+            Bills → notification gateway) throws IllegalStateException "WorkManager is already
+            initialized". This is the canonical on-demand-initialization recipe.
+        -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                tools:node="remove" />
+        </provider>
+
         <!-- Disable collection of AD_ID for all build variants -->
         <meta-data
             android:name="google_analytics_adid_collection_enabled"

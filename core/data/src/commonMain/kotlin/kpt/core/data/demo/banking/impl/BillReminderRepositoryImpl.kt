@@ -9,7 +9,6 @@
  */
 package kpt.core.data.demo.banking.impl
 
-import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -19,37 +18,35 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.database.invalidation.notifyingWrite
-import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.database.demo.banking.dao.BillReminderDao
 import kpt.core.model.demo.banking.BillReminder
+import kpt.core.store.AppCacheKeys
 import kpt.core.store.demo.banking.impl.toDomain
-import kpt.core.store.demo.banking.impl.toEntity
+import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
+import org.mobilenativefoundation.store.store5.StoreWriteRequest
 import kotlin.time.Clock
 
 /**
  * Local-only impl of [BillReminderRepository].
  *
- * Read-path contract: [billRemindersStream] builds the offline-local [ScreenDataStream] (CACHE_ONLY)
- * over the domain-emitting [kpt.core.store.demo.banking.impl.provideBillRemindersStore]; read screens
- * consume `.state`. The "upcoming" window math runs in the repository; [Clock] + [TimeZone] are
- * injected so tests can fix "today". Direct-DAO `Flow` reads (`observeUpcoming`, `observeById`, the
- * dashboard aggregates) are wrapped with [daoFlow] and writes with [notifyingWrite] so the wasmJs
- * target's long-lived collectors re-emit after writes even when Room 3 alpha05's async
- * InvalidationTracker fails to fan out (no-op on Android/Desktop/iOS).
+ * Writes flow through the single write door [billRemindersWriteStore] (`store.write` / `store.clear`);
+ * the read `Store` re-projects via [billRemindersStream]'s `asScreenStream`. Aggregate / filter /
+ * one-shot READS stay DAO-backed reactive methods (`daoFlow { billReminderDao.… }`) — Store5's
+ * cache-oriented read API serves stale one-shot reads and its `MutableStore` is not a `Store`, so a
+ * direct `daoFlow` read of the SAME Room SoT is the coherent path (Room is the single SoT). [Clock] +
+ * [TimeZone] are injected so the "upcoming" window math is deterministic under test.
  */
 internal class BillReminderRepositoryImpl(
     private val billRemindersStore: Store<Unit, List<BillReminder>>,
+    private val billRemindersWriteStore: MutableStore<String, BillReminder>,
     private val billReminderDao: BillReminderDao,
-    private val networkMonitor: NetworkMonitor,
-    private val fetchedAtRepository: FetchedAtRepository,
     private val clock: Clock = Clock.System,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ) : BillReminderRepository {
@@ -62,9 +59,7 @@ internal class BillReminderRepositoryImpl(
     override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
         billRemindersStore.asScreenStream(
             key = Unit,
-            networkMonitor = networkMonitor,
-            fetchedAtRepository = fetchedAtRepository,
-            cacheKey = "billReminders",
+            cacheKey = AppCacheKeys.BILL_REMINDERS,
             scope = scope,
             fetchPolicy = FetchPolicy.CACHE_ONLY,
             isEmpty = { it.isEmpty() },
@@ -90,15 +85,15 @@ internal class BillReminderRepositoryImpl(
     override suspend fun getById(id: String): BillReminder? = billReminderDao.getById(id)?.toDomain()
 
     override suspend fun upsert(bill: BillReminder) {
-        notifyingWrite(BILL_REMINDERS_TABLE) {
-            billReminderDao.upsert(bill.toEntity())
-        }
+        // Write through the store — persists to the Room SoT (via the SoT writer); readers re-emit.
+        billRemindersWriteStore.write(
+            StoreWriteRequest.of<String, BillReminder, Any>(key = bill.id, value = bill),
+        )
     }
 
     override suspend fun delete(id: String) {
-        notifyingWrite(BILL_REMINDERS_TABLE) {
-            billReminderDao.deleteById(id)
-        }
+        // Clear through the store — removes the row from the Room SoT (via the SoT delete).
+        billRemindersWriteStore.clear(id)
     }
 
     override fun observeCount(): Flow<Int> = daoFlow(BILL_REMINDERS_TABLE) { billReminderDao.count() }

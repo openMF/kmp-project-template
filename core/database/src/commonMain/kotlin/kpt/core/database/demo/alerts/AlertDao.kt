@@ -28,6 +28,10 @@ interface AlertDao {
     @Query("SELECT * FROM alerts ORDER BY createdAt DESC")
     fun observeAll(): Flow<List<AlertEntity>>
 
+    /** Observe a single alert by id — the per-item write store's SourceOfTruth reader. */
+    @Query("SELECT * FROM alerts WHERE id = :id")
+    fun observeById(id: String): Flow<AlertEntity?>
+
     /** Insert or replace a single alert. */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(alert: AlertEntity)

@@ -1,7 +1,19 @@
 # `core-base/store` — Framework-Shared State Infrastructure
 
-> See training-layer/instructions/stream-first/latest/CORE_BASE_STORE.md
+**End-to-end guide: [`docs/architecture/STORE_ARCHITECTURE.md`](../../docs/architecture/STORE_ARCHITECTURE.md)**
 
-The single unified build guide (StoreFactory APIs, read/write patterns, FetchPolicy, reach-for-what)
-is the sole source of truth. This README is a redirect stub (white-label E2/T3). Framework-shared —
-do not edit; push fork pressure to `core/store`.
+Framework-shared — do not edit in a fork. Push fork pressure to `core/store`; a genuine fix here goes
+upstream to `openMF/kmp-project-template`.
+
+## What lives here
+
+| Area | Symbols |
+|---|---|
+| Store construction | `StoreFactory` — `createStore`, `createMemoryStore`, `createOfflineStore`, `createOfflineMutableStore`, `createMutableStore`, `createScreenWithMutation` |
+| Read path | `asScreenStream`, `ScreenStreamContext`, `asLoadOnceStream`, `PagingScreenStream`, `FetchPolicy`, `DecisionEngine` |
+| Write path | `MutationGateway`, `MutationPolicy`, `MutationResult`, `CommandSpec`, `ConflictInbox`, `DeleteSync` |
+| Room-backed defaults | `RoomBookkeeper`, `RoomFetchedAtRepository`, `RoomConflictInbox`, `StoreCacheManagerImpl` |
+
+Call sequence + which primitive backs which archetype: [`CONSUMPTION.md`](./CONSUMPTION.md).
+Read-path internals (`StoreData<T>`, paging, submit outbox):
+[`docs/architecture/STORE_DATA_API.md`](../../docs/architecture/STORE_DATA_API.md).

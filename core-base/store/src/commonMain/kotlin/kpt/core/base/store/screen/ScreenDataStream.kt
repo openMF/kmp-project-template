@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -108,6 +109,13 @@ class ScreenDataStream<T> internal constructor(
      */
     val freshness: Flow<FreshnessSignal> = emptyFlow(),
     private val refreshTrigger: MutableSharedFlow<Unit>,
+    /**
+     * Separate channel for [refreshFresh]'s force-fresh intent, merged with [refreshTrigger] into one
+     * ordered trigger stream. Kept DISTINCT from [refreshTrigger] (rather than widening that flow's
+     * element type) so the public test-only factory stays source-compatible: a `MutableSharedFlow<Unit>`
+     * a caller already had keeps working, and this parameter is optional.
+     */
+    private val forceFreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
     private val userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
     private val timeSource: kotlin.time.TimeSource = kotlin.time.TimeSource.Monotonic,
 ) {
@@ -120,8 +128,17 @@ class ScreenDataStream<T> internal constructor(
      * the network layer from accidental thrashing when a user mashes pull-to-refresh.
      * The first tap fires immediately; subsequent taps inside the window are dropped
      * silently. Pass `userRefreshDebounceMs = 0L` on the builder to disable.
+     *
+     * Pass [forceFresh] `= true` for a USER-INITIATED refresh (pull-to-refresh, retry button): the
+     * user asserted intent to burn a request, so the read bypasses the policy's cache-first shape and
+     * issues `StoreReadRequest.fresh(...)`. Without it, a refresh under the [FetchPolicy.CACHE_FIRST_SWR]
+     * default merely re-serves cache while revalidation stays band-gated — so on a `Fresh` band the
+     * user's pull-to-refresh does nothing. [FetchPolicy.CACHE_ONLY] ignores the force and stays local.
+     *
+     * Debouncing applies either way — unlike [refreshFresh], which is the undebounced variant for
+     * post-mutation invalidate.
      */
-    fun refresh() {
+    fun refresh(forceFresh: Boolean = false) {
         if (userRefreshDebounceMs > 0L) {
             val mark = lastRefreshMark
             if (mark != null) {
@@ -132,17 +149,24 @@ class ScreenDataStream<T> internal constructor(
             }
             lastRefreshMark = timeSource.markNow()
         }
-        refreshTrigger.tryEmit(Unit)
+        if (forceFresh) forceFreshTrigger.tryEmit(Unit) else refreshTrigger.tryEmit(Unit)
     }
 
-    /** Retry loading (semantic alias for refresh — used on error/no-network screens). */
-    fun retry() = refresh()
+    /**
+     * Retry loading (semantic alias for refresh — used on error/no-network screens). Forces a fresh
+     * fetch: a retry after an error must reach the network, not re-serve the cache that failed.
+     */
+    fun retry() = refresh(forceFresh = true)
 
     /**
-     * Force a fresh network fetch that bypasses the SWR band gate wired around
-     * [FetchPolicy.CACHE_FIRST_SWR] — used by pull-to-refresh and post-mutation
-     * invalidate paths where the caller has already asserted intent to burn a
-     * request. Distinct from [refresh] because it does NOT honor the
+     * Force a fresh network fetch that bypasses BOTH the read policy's own cache-first shape and
+     * the SWR band gate wired around [FetchPolicy.CACHE_FIRST_SWR] — used by pull-to-refresh and
+     * post-mutation invalidate paths where the caller has already asserted intent to burn a
+     * request. Emits through [forceFreshTrigger], which routes `streamDataForPolicy` to
+     * `StoreReadRequest.fresh(fallBackToSourceOfTruth = true)` instead of the policy's normal
+     * request. (Before this was wired the trigger carried no intent, so under the
+     * `CACHE_FIRST_SWR` default this method re-subscribed to `cached(refresh = false)` and issued
+     * no request at all.) Distinct from [refresh] because it does NOT honor the
      * `userRefreshDebounceMs` window; the caller is responsible for its own
      * debouncing. Emits through the same [refreshTrigger] so `lastContent`
      * preservation, the freshness banner, and captive-portal detection all
@@ -152,7 +176,7 @@ class ScreenDataStream<T> internal constructor(
      * layer.
      */
     fun refreshFresh() {
-        refreshTrigger.tryEmit(Unit)
+        forceFreshTrigger.tryEmit(Unit)
     }
 }
 
@@ -190,6 +214,7 @@ annotation class ExperimentalScreenDataStreamTestingApi
 fun <T> screenDataStreamForTesting(
     state: Flow<ScreenState<T>>,
     refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
+    forceFreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
     userRefreshDebounceMs: Long = 0L, // tests don't want debounce by default
     timeSource: kotlin.time.TimeSource = kotlin.time.TimeSource.Monotonic,
     freshness: Flow<FreshnessSignal> = emptyFlow(),
@@ -197,6 +222,7 @@ fun <T> screenDataStreamForTesting(
     state = state,
     freshness = freshness,
     refreshTrigger = refreshTrigger,
+    forceFreshTrigger = forceFreshTrigger,
     userRefreshDebounceMs = userRefreshDebounceMs,
     timeSource = timeSource,
 )
@@ -263,6 +289,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     }
 
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val forceFreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     // Auto-refresh when network reconnects. Uses the same debounced status flow so a brief
     // handoff that doesn't reach Unavailable→Available never triggers a spurious fetch.
@@ -301,10 +328,16 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     // Track last known content to preserve during refresh
     var lastContent: StoreData<Output>? = null
 
-    val storeFlow: Flow<StoreData<Output>> = refreshTrigger
-        .onStart { emit(Unit) } // Initial load on subscription
-        .flatMapLatest {
-            streamDataForPolicy(key = key, policy = fetchPolicy, isEmpty = isEmpty)
+    // Policy-driven refreshes (user tap, reconnect, PERIODIC ticker) carry `false`; refreshFresh()
+    // carries `true`. Merging keeps ONE ordered trigger stream while leaving refreshTrigger's public
+    // `MutableSharedFlow<Unit>` shape untouched.
+    val storeFlow: Flow<StoreData<Output>> = merge(
+        refreshTrigger.map { false },
+        forceFreshTrigger.map { true },
+    )
+        .onStart { emit(false) } // Initial load on subscription (policy-driven, not forced)
+        .flatMapLatest { forceFresh ->
+            streamDataForPolicy(key = key, policy = fetchPolicy, isEmpty = isEmpty, forceFresh = forceFresh)
         }
         .map { storeData ->
             // Persistence: when Store5 hands us NETWORK-origin data with a fresh
@@ -463,6 +496,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         state = screenStateFlow,
         freshness = freshnessFlow,
         refreshTrigger = refreshTrigger,
+        forceFreshTrigger = forceFreshTrigger,
         userRefreshDebounceMs = userRefreshDebounceMs,
     )
 }
@@ -497,6 +531,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     }
 
     val refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val forceFreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
     if (fetchPolicy != FetchPolicy.CACHE_ONLY && reconnectDebounceMs > 0L) {
         scope.launch {
@@ -529,9 +564,10 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
 
     val storeFlow: Flow<StoreData<Output>> = combine(
         keyFlow,
-        refreshTrigger.onStart { emit(Unit) },
-    ) { key, _ -> key }
-        .flatMapLatest { key ->
+        merge(refreshTrigger.map { false }, forceFreshTrigger.map { true })
+            .onStart { emit(false) },
+    ) { key, forceFresh -> key to forceFresh }
+        .flatMapLatest { (key, forceFresh) ->
             // NOTE: do NOT null `lastContent` on key change — carry previous content forward
             // as a stale fallback so input-type stores (Rate History period/currency picker)
             // keep showing data while the new key's fetch is in-flight or fails. The
@@ -543,7 +579,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             lastObservedKey = key
             // Re-seed persistedFetchedAt for the new key.
             persistedFetchedAt = fetchedAtRepository.read(currentCacheKey)
-            streamDataForPolicy(key = key, policy = fetchPolicy, isEmpty = isEmpty)
+            streamDataForPolicy(key = key, policy = fetchPolicy, isEmpty = isEmpty, forceFresh = forceFresh)
         }
         .map { storeData ->
             val key = currentCacheKey ?: return@map storeData
@@ -672,6 +708,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
         state = screenStateFlow,
         freshness = freshnessFlow,
         refreshTrigger = refreshTrigger,
+        forceFreshTrigger = forceFreshTrigger,
         userRefreshDebounceMs = userRefreshDebounceMs,
     )
 }

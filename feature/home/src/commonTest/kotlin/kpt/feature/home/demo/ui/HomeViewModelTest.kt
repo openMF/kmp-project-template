@@ -454,7 +454,12 @@ private class FakeEconomicRatesRepository(
         trigger
             .onEach { refreshes[key.seriesId] = (refreshes[key.seriesId] ?: 0) + 1 }
             .launchIn(scope)
-        return screenDataStreamForTesting(state = source, refreshTrigger = trigger)
+        return screenDataStreamForTesting(
+            state = source,
+            refreshTrigger = trigger,
+            // retry()/refresh(forceFresh) land here; alias so the fake sees either.
+            forceFreshTrigger = trigger,
+        )
     }
 
     override fun interestRateSeriesStream(
@@ -487,7 +492,12 @@ private class FakeCurrencyRepository : CurrencyRepository {
         lastFetchPolicy = fetchPolicy
         val trigger = MutableSharedFlow<Unit>(extraBufferCapacity = 64)
         trigger.onEach { refreshCount += 1 }.launchIn(scope)
-        return screenDataStreamForTesting(state = source, refreshTrigger = trigger)
+        return screenDataStreamForTesting(
+            state = source,
+            refreshTrigger = trigger,
+            // retry()/refresh(forceFresh) land here; alias so the fake sees either.
+            forceFreshTrigger = trigger,
+        )
     }
 
     override fun spotRateStream(baseCurrency: String, online: Boolean, scope: CoroutineScope): ScreenDataStream<ExchangeRates> =

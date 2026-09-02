@@ -290,12 +290,18 @@ class CacheFirstSwrTest {
 
     @Test
     fun refreshFreshBypassesBandGate() = runTest {
-        // Verifies both surfaces of the S5-5 fresh-fetch pair:
-        //   1. `ScreenDataStream.refreshFresh()` re-triggers the underlying
-        //      Store5 flow — observable as a repeat Content emission on
-        //      `stream.state`.
+        // Verifies both surfaces of the S5-5 fresh-fetch pair BY FETCHER INVOCATION:
+        //   1. `ScreenDataStream.refreshFresh()` emits force-fresh intent through refreshTrigger,
+        //      routing streamDataForPolicy to StoreReadRequest.fresh(...) instead of
+        //      CACHE_FIRST_SWR's cached(refresh = false) — so the FETCHER RUNS.
         //   2. `Store<K,O>.refreshFresh(key)` extension delegates to the
         //      existing `freshData(key)` path and drives the fetcher.
+        //
+        // REGRESSION GUARD: this assertion used to accept "at least one more emission", which a
+        // re-emission of CACHED data satisfies. That let the real defect through — refreshTrigger
+        // was MutableSharedFlow<Unit>, carried no intent, and under the CACHE_FIRST_SWR default
+        // refreshFresh() re-subscribed to cached(refresh = false) and issued NO request at all.
+        // Assert the fetch, never the emission.
         var fetchCount = 0
         val store = StoreBuilder
             .from<String, String>(
@@ -330,14 +336,18 @@ class CacheFirstSwrTest {
             assertIs<ScreenState.Content<String>>(state)
 
             // Trigger the class-side sibling — bypasses user-tap debounce.
+            // ttl = 24h and the cache was just primed, so the band is Fresh and the SWR band gate
+            // will NOT fire: any fetch observed below is attributable to refreshFresh() alone.
+            val fetchesBeforeRefreshFresh = fetchCount
             stream.refreshFresh()
-            // After refreshFresh(), flatMapLatest re-runs and re-emits — the
-            // exact ScreenState transition depends on Store5 internals, but at
-            // least one more emission must be observable.
-            val next = awaitItem()
+
+            var next: ScreenState<String> = awaitItem()
+            while (next is ScreenState.Loading) next = awaitItem()
+            assertIs<ScreenState.Content<String>>(next)
             assertTrue(
-                next is ScreenState.Content<String> || next is ScreenState.Loading,
-                "refreshFresh() must produce a follow-up emission; got $next",
+                fetchCount > fetchesBeforeRefreshFresh,
+                "refreshFresh() must DRIVE THE FETCHER (StoreReadRequest.fresh), not merely re-emit " +
+                    "cached data; before=$fetchesBeforeRefreshFresh after=$fetchCount",
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -356,5 +366,80 @@ class CacheFirstSwrTest {
         // Sanity: the extension actually did *something* beyond the priming
         // + follow-up refresh from the state-flow branch above.
         assertTrue(fetchCount >= fetchesAfterPrime, "fetch count must be monotonically non-decreasing")
+    }
+
+    // ─── refresh(forceFresh = true) — the debounced user-initiated variant ────
+
+    @Test
+    fun refreshForceFreshDrivesFetcherUnderSwr() = runTest {
+        var fetchCount = 0
+        val store = StoreBuilder
+            .from<String, String>(fetcher = Fetcher.of { key -> fetchCount++; "fresh:$key" })
+            .build()
+        store.streamData("k4").test { awaitItem(); cancelAndIgnoreRemainingEvents() }
+
+        val stream = store.asScreenStream(
+            key = "k4",
+            networkMonitor = FakeNetworkMonitor(online),
+            fetchedAtRepository = FakeFetchedAtRepository(),
+            cacheKey = "test:force-fresh",
+            scope = backgroundScope,
+            fetchPolicy = FetchPolicy.CACHE_FIRST_SWR,
+            userRefreshDebounceMs = 0L,
+            ttl = 24.hours,
+        )
+
+        stream.state.test {
+            var state: ScreenState<String> = awaitItem()
+            while (state is ScreenState.Loading) state = awaitItem()
+            assertIs<ScreenState.Content<String>>(state)
+
+            val before = fetchCount
+            stream.refresh(forceFresh = true)
+            var next: ScreenState<String> = awaitItem()
+            while (next is ScreenState.Loading) next = awaitItem()
+            assertTrue(
+                fetchCount > before,
+                "refresh(forceFresh = true) must drive the fetcher under CACHE_FIRST_SWR; " +
+                    "before=$before after=$fetchCount",
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun cacheOnlyIgnoresForceFresh() = runTest {
+        // An offline-only screen must NEVER reach the network, even when a caller forces a refresh.
+        var fetchCount = 0
+        val store = StoreBuilder
+            .from<String, String>(fetcher = Fetcher.of { key -> fetchCount++; "fresh:$key" })
+            .build()
+        store.streamData("k5").test { awaitItem(); cancelAndIgnoreRemainingEvents() }
+
+        val stream = store.asScreenStream(
+            key = "k5",
+            networkMonitor = FakeNetworkMonitor(online),
+            fetchedAtRepository = FakeFetchedAtRepository(),
+            cacheKey = "test:cache-only-force",
+            scope = backgroundScope,
+            fetchPolicy = FetchPolicy.CACHE_ONLY,
+            userRefreshDebounceMs = 0L,
+            ttl = 24.hours,
+        )
+
+        stream.state.test {
+            var state: ScreenState<String> = awaitItem()
+            while (state is ScreenState.Loading) state = awaitItem()
+            val before = fetchCount
+            stream.refresh(forceFresh = true)
+            stream.refreshFresh()
+            awaitItem()
+            assertEquals(
+                before,
+                fetchCount,
+                "CACHE_ONLY must ignore forceFresh and stay local; fetchCount moved $before -> $fetchCount",
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

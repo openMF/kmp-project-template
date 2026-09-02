@@ -60,7 +60,10 @@ internal class FakeCurrencyRepository : CurrencyRepository {
         lastExchangeRatesBase = baseCurrency
         return screenDataStreamForTesting(
             state = exchangeRatesState,
+            // Fakes observe ONE channel: the class only emits on these (the merge lives in
+            // asScreenStream), so aliasing both params keeps forced + policy refreshes visible here.
             refreshTrigger = exchangeRatesRefresh,
+            forceFreshTrigger = exchangeRatesRefresh,
         )
     }
 
@@ -72,7 +75,10 @@ internal class FakeCurrencyRepository : CurrencyRepository {
         keyFlow.onEach { rateHistoryKeys += it }.launchIn(scope)
         return screenDataStreamForTesting(
             state = rateHistoryState,
+            // Fakes observe ONE channel: the class only emits on these (the merge lives in
+            // asScreenStream), so aliasing both params keeps forced + policy refreshes visible here.
             refreshTrigger = rateHistoryRefresh,
+            forceFreshTrigger = rateHistoryRefresh,
         )
     }
 

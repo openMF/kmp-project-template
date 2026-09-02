@@ -32,6 +32,13 @@ internal class FakeEconomicRatesRepository : EconomicRatesRepository {
         MutableStateFlow(ScreenState.Loading)
     val refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 8)
 
+    /**
+     * Where a FORCED refresh lands — `refresh(forceFresh = true)` / `retry()` / `refreshFresh()`.
+     * Kept separate from [refreshTrigger] exactly as production does, so a test can tell a
+     * policy-driven refresh apart from a user-asserted fresh fetch.
+     */
+    val forceFreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 8)
+
     /** Keys that the ViewModel opened the stream with. */
     val openedKeys: MutableList<InterestRateSeriesKey> = mutableListOf()
 
@@ -40,11 +47,19 @@ internal class FakeEconomicRatesRepository : EconomicRatesRepository {
         scope: CoroutineScope,
     ): ScreenDataStream<InterestRateSeries> {
         openedKeys += key
-        return screenDataStreamForTesting(state = state, refreshTrigger = refreshTrigger)
+        return screenDataStreamForTesting(
+            state = state,
+            refreshTrigger = refreshTrigger,
+            forceFreshTrigger = forceFreshTrigger,
+        )
     }
 
     override fun interestRateSeriesStream(
         keyFlow: Flow<InterestRateSeriesKey>,
         scope: CoroutineScope,
-    ): ScreenDataStream<InterestRateSeries> = screenDataStreamForTesting(state = state, refreshTrigger = refreshTrigger)
+    ): ScreenDataStream<InterestRateSeries> = screenDataStreamForTesting(
+        state = state,
+        refreshTrigger = refreshTrigger,
+        forceFreshTrigger = forceFreshTrigger,
+    )
 }

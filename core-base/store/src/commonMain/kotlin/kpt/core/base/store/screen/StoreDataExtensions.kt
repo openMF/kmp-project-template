@@ -154,39 +154,54 @@ internal fun <Key : Any, Output : Any> Store<Key, Output>.streamDataForPolicy(
     key: Key,
     policy: FetchPolicy,
     isEmpty: (Output) -> Boolean = { false },
-): Flow<StoreData<Output>> = when (policy) {
-    FetchPolicy.NETWORK_WITH_CACHE -> streamDataNoFallback(key, isEmpty = isEmpty)
-    FetchPolicy.NETWORK_ONLY ->
-        stream(StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true))
-            .mapToStoreDataNoFallback(isEmpty)
-    FetchPolicy.CACHE_ONLY ->
-        stream(StoreReadRequest.localOnly(key))
-            .mapToStoreDataNoFallback(isEmpty)
-    // Cache-first SWR: emit cached value with refresh=false so no network hits
-    // on the read path itself. `StoreReadRequest.cached(key, refresh = false)`
-    // in Store5 5.1.0-alpha08 keeps the subscription open on the store's
-    // [org.mobilenativefoundation.store.store5.SourceOfTruth] (when present)
-    // and re-emits on every SoT write — proven by
-    // `RoomChangeBusSwrTest.notifyingWriteTriggersDaoFlowReEmissionUnderSwr`.
-    // This is the mechanism SWR revalidation depends on: `asScreenStream`'s
-    // band gate launches an independent `stream(StoreReadRequest.fresh(...))`
-    // side-fetch whose network response writes SoT, and the SoT write
-    // re-fans-out through THIS subscription as a fresh-value emission that
-    // reaches the consumer without any explicit re-subscription.
+    forceFresh: Boolean = false,
+): Flow<StoreData<Output>> = if (forceFresh && policy != FetchPolicy.CACHE_ONLY) {
+    // S5-5 explicit fresh-fetch (pull-to-refresh / post-mutation invalidate). The caller has already
+    // asserted intent to burn a request, so bypass the policy's own read shape — critically
+    // [FetchPolicy.CACHE_FIRST_SWR], whose `cached(refresh = false)` issues NO network request at all,
+    // and whose band gate deliberately will not fire for a Fresh band. Without this branch a
+    // pull-to-refresh on a fresh screen was a no-op that merely re-emitted the cached value.
     //
-    // For memory-only stores (no SoT), `cached(refresh = false)` serves the
-    // memory cache once; the SWR swap-in is a no-op there (memory cache does
-    // not re-emit on write) but the read stays correct.
-    //
-    // The sibling [Store.refreshFresh] extension + [ScreenDataStream.refreshFresh]
-    // method together cover the S5-5 explicit fresh-fetch path required for
-    // pull-to-refresh and post-mutation invalidate — those are distinct from
-    // the band-gated SWR revalidation and stay untouched.
-    FetchPolicy.CACHE_FIRST_SWR ->
-        stream(StoreReadRequest.cached(key, refresh = false))
-            .mapToStoreDataNoFallback(isEmpty)
-    // PERIODIC's read semantic is network-with-cache — the periodic refresh
-    // is layered on top by ScreenDataStream via a ticker that fires through
-    // the same refresh-trigger pipeline as the reconnect/user-tap refresh.
-    is FetchPolicy.PERIODIC -> streamDataNoFallback(key, isEmpty = isEmpty)
+    // [FetchPolicy.CACHE_ONLY] is EXEMPT: an offline-only screen must never reach the network, so a
+    // forced refresh there stays a local re-read. The guard lives here rather than at the call site
+    // so no consumer can violate the policy by passing forceFresh.
+    stream(StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true))
+        .mapToStoreDataNoFallback(isEmpty)
+} else {
+    when (policy) {
+        FetchPolicy.NETWORK_WITH_CACHE -> streamDataNoFallback(key, isEmpty = isEmpty)
+        FetchPolicy.NETWORK_ONLY ->
+            stream(StoreReadRequest.fresh(key, fallBackToSourceOfTruth = true))
+                .mapToStoreDataNoFallback(isEmpty)
+        FetchPolicy.CACHE_ONLY ->
+            stream(StoreReadRequest.localOnly(key))
+                .mapToStoreDataNoFallback(isEmpty)
+        // Cache-first SWR: emit cached value with refresh=false so no network hits
+        // on the read path itself. `StoreReadRequest.cached(key, refresh = false)`
+        // in Store5 5.1.0-alpha08 keeps the subscription open on the store's
+        // [org.mobilenativefoundation.store.store5.SourceOfTruth] (when present)
+        // and re-emits on every SoT write — proven by
+        // `RoomChangeBusSwrTest.notifyingWriteTriggersDaoFlowReEmissionUnderSwr`.
+        // This is the mechanism SWR revalidation depends on: `asScreenStream`'s
+        // band gate launches an independent `stream(StoreReadRequest.fresh(...))`
+        // side-fetch whose network response writes SoT, and the SoT write
+        // re-fans-out through THIS subscription as a fresh-value emission that
+        // reaches the consumer without any explicit re-subscription.
+        //
+        // For memory-only stores (no SoT), `cached(refresh = false)` serves the
+        // memory cache once; the SWR swap-in is a no-op there (memory cache does
+        // not re-emit on write) but the read stays correct.
+        //
+        // The sibling [Store.refreshFresh] extension + [ScreenDataStream.refreshFresh]
+        // method together cover the S5-5 explicit fresh-fetch path required for
+        // pull-to-refresh and post-mutation invalidate — those are distinct from
+        // the band-gated SWR revalidation and stay untouched.
+        FetchPolicy.CACHE_FIRST_SWR ->
+            stream(StoreReadRequest.cached(key, refresh = false))
+                .mapToStoreDataNoFallback(isEmpty)
+        // PERIODIC's read semantic is network-with-cache — the periodic refresh
+        // is layered on top by ScreenDataStream via a ticker that fires through
+        // the same refresh-trigger pipeline as the reconnect/user-tap refresh.
+        is FetchPolicy.PERIODIC -> streamDataNoFallback(key, isEmpty = isEmpty)
+    }
 }

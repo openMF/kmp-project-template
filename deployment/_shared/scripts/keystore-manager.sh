@@ -1309,7 +1309,41 @@ EOL
 }
 
 # Function to update cmp-android/build.gradle.kts with keystore information
+#
+# DISABLED — this wrote PLAINTEXT PASSWORDS into a TRACKED SOURCE FILE.
+#
+# It rewrote the `?:` fallbacks in cmp-android/build.gradle.kts:
+#
+#     storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "<real password inlined here>"
+#
+# so every generated password landed in a git-tracked build script — one `git add` away from
+# being committed and pushed, and printed by any routine `git diff` or code review.
+#
+# It also produced malformed Kotlin: the awk replacement does not escape the value, so a
+# password containing `"`, `$` or `\` breaks the string literal and the module stops compiling.
+# Since strong generated passwords routinely contain those characters, this failed exactly when
+# the password was good.
+#
+# The inlining was never necessary. cmp-android/build.gradle.kts already resolves all four
+# values from the environment via System.getenv(); CI and local release builds export them
+# before invoking Gradle, and the checked-in `?:` fallbacks are deliberately non-secret
+# template defaults. Credentials belong in the environment and in 0600 files under
+# secrets/live/ — never in tracked source.
+#
+# Kept as a no-op stub (rather than deleted) so existing callers keep working.
 update_gradle_config() {
+    local keystore_name=$1
+    local key_alias=$3   # $2/$4 are the passwords — deliberately unused
+    echo -e "${BLUE}Skipping Gradle build-file mutation (credentials stay out of tracked source).${NC}"
+    echo -e "${BLUE}  keystore: ${keystore_name}   alias: ${key_alias}${NC}"
+    echo -e "${BLUE}  Passwords resolve at build time from KEYSTORE_PASSWORD /${NC}"
+    echo -e "${BLUE}  KEYSTORE_ALIAS_PASSWORD in the environment.${NC}"
+    return 0
+}
+
+# Original implementation retained under a disabled name for reference only.
+# Do not re-enable: it writes secrets into cmp-android/build.gradle.kts.
+_update_gradle_config_DISABLED_writes_plaintext_to_source() {
     local keystore_name=$1
     local keystore_password=$2
     local key_alias=$3
@@ -1377,9 +1411,34 @@ _read_keystore_secret() {
     local secret_file="secrets/live/android/keystores/${secret_name}"
     if [[ -f "$secret_file" ]]; then
         cat "$secret_file" | tr -d '\n\r'
-    else
-        echo ""
+        return
     fi
+    # FALLBACK: the KEY=VALUE properties layout.
+    #
+    # This reader originally knew only the one-file-per-value layout
+    # (secrets/live/android/keystores/keystore_password, .../keystore_alias, ...). Projects that
+    # keep all three values in a single properties file — the common shape, and the one Gradle
+    # itself can load directly — got "" from every lookup here. Generation then silently fell
+    # back to the placeholder defaults below ("Keystore_password" / "Keystore_Alias"), producing
+    # a keystore whose passwords match nothing the project actually holds. The failure is
+    # invisible until an upload is rejected at signing time.
+    #
+    # Serve both layouts instead of requiring projects to restructure to suit this reader.
+    local props="secrets/live/android/keystores/upload_keystore.properties"
+    if [[ -f "$props" ]]; then
+        local key=""
+        case "$secret_name" in
+            keystore_password)       key="KEYSTORE_PASSWORD" ;;
+            keystore_alias)          key="KEYSTORE_ALIAS" ;;
+            keystore_alias_password) key="KEYSTORE_ALIAS_PASSWORD" ;;
+        esac
+        if [[ -n "$key" ]]; then
+            # First match only; strip the KEY= prefix and any trailing CR/LF.
+            grep -m1 "^${key}=" "$props" 2>/dev/null | sed "s/^${key}=//" | tr -d '\n\r'
+            return
+        fi
+    fi
+    echo ""
 }
 
 # Function to generate keystore

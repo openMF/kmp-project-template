@@ -62,7 +62,14 @@ class CurrencyRepositoryImpl(
         key = baseCurrency,
         cacheKey = AppCacheKeys.spotRate(baseCurrency),
         scope = scope,
-        fetchPolicy = if (online) FetchPolicy.NETWORK_ONLY else FetchPolicy.CACHE_ONLY,
+        // Cache-first in BOTH branches. Online was NETWORK_ONLY, which routes to
+        // `fresh(fallBackToSourceOfTruth = true)` — network FIRST, cache only as a failure fallback —
+        // so the screen sat on Loading even though SpotRateLookupStore has a full Room SourceOfTruth
+        // holding the previous rate. CACHE_FIRST_SWR serves that rate immediately and revalidates only
+        // when the freshness band goes Stale/VeryStale; the staleness banner (FreshnessSignal) tells
+        // the user the quote's age, which is the honest way to show a possibly-old FX rate rather than
+        // showing nothing at all. Offline stays CACHE_ONLY — nothing to revalidate against.
+        fetchPolicy = if (online) FetchPolicy.CACHE_FIRST_SWR else FetchPolicy.CACHE_ONLY,
     )
 
     override fun rateHistoryStream(

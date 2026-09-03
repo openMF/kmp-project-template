@@ -54,17 +54,19 @@ class AppDatabaseTest {
             .build()
 
         assertNotNull(database!!.interestRateSeriesDao)
+        assertNotNull(database!!.macroIndicatorDao)
     }
 
     @Test
     fun databaseVersionIsCurrent() {
-        // Bumped to 12 in the v11→v12 change that added the `framework_write_conflicts` table
-        // (MutationGateway conflict inbox) with a matching AutoMigration(11→12) + 12.json export.
-        // Update this constant when bumping AppDatabase.VERSION so the guardrail stays meaningful.
-        // The full in-place upgrade chain is now closed: AutoMigration hops exist for every step up to
-        // 12 (incl. the 10→11 `cloud_todos` add that #274 originally omitted), so a v10 device upgrades
-        // cleanly to v12.
-        assertEquals(12, AppDatabase.VERSION)
+        // Bumped to 13 in the v12→v13 change that added the `macro_indicator` table, giving the World
+        // Bank macro store a durable SourceOfTruth (it was the one demo network store built with
+        // createMemoryStore, so its cache died with the process). Matching AutoMigration(12→13) +
+        // 13.json export. Update this constant when bumping AppDatabase.VERSION so the guardrail stays
+        // meaningful. The full in-place upgrade chain is closed: AutoMigration hops exist for every
+        // step up to 13 (incl. the 10→11 `cloud_todos` add that #274 originally omitted), so a v10
+        // device upgrades cleanly to v13.
+        assertEquals(13, AppDatabase.VERSION)
     }
 
     @Test

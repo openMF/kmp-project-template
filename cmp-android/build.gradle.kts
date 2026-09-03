@@ -36,14 +36,15 @@ val signingProps = Properties().apply {
 }
 val ksFile = System.getenv("KEYSTORE_PATH")?.let { file(it) }
     ?: project.resolveSecretPath("upload_keystore")
-// ONE name per credential, whichever transport it arrives on. The properties file written by
-// `/secrets pull` uses the SAME keys as the CI env vars (KEYSTORE_PASSWORD / KEYSTORE_ALIAS /
-// KEYSTORE_ALIAS_PASSWORD). Reading camelCase keys here meant that on any project using the
-// declared properties layout all three resolved to null, releaseSigningReady flipped false, and
-// release signing was SILENTLY skipped — a build that looks fine and ships unsigned.
-val ksStorePass = System.getenv("KEYSTORE_PASSWORD") ?: signingProps.getProperty("KEYSTORE_PASSWORD")
-val ksKeyAlias = System.getenv("KEYSTORE_ALIAS") ?: signingProps.getProperty("KEYSTORE_ALIAS")
-val ksKeyPass = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: signingProps.getProperty("KEYSTORE_ALIAS_PASSWORD")
+// The two transports use DIFFERENT names, by design: env vars are KEYSTORE_* (CI), while the
+// properties file uses the `name:` fields secrets/LAYOUT.yaml declares (storePassword / keyAlias /
+// keyPassword). In LAYOUT, `source_env:` is only where the VALUE comes from — NOT the key it is
+// written under. (An earlier revision changed these reads to KEYSTORE_* after observing a fork whose
+// properties file had those keys; that fork was simply missing secrets/LAYOUT.yaml, so its file had
+// been written by the manifest/env path instead of the LAYOUT pass. Reverted 2026-09-03.)
+val ksStorePass = System.getenv("KEYSTORE_PASSWORD") ?: signingProps.getProperty("storePassword")
+val ksKeyAlias = System.getenv("KEYSTORE_ALIAS") ?: signingProps.getProperty("keyAlias")
+val ksKeyPass = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: signingProps.getProperty("keyPassword")
 val releaseSigningReady = ksFile.exists() && !ksStorePass.isNullOrBlank() &&
     !ksKeyAlias.isNullOrBlank() && !ksKeyPass.isNullOrBlank()
 

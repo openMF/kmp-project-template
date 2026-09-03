@@ -83,7 +83,7 @@ val appStoreModule: Module = module {
         provideInterestRateSeriesStore(get(), get(), get(), get())
     }
     single(AppStoreRegistry.MacroIndicator) {
-        provideMacroIndicatorStore(get(), get(), get())
+        provideMacroIndicatorStore(get(), get())
     }
 
     // Banking Utility Toolkit — offline-local stores (OFFLINE_LOCAL_ONLY archetype)

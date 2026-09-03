@@ -38,5 +38,6 @@ dependencies {
     "commonMainImplementation"(project(":feature:alerts"))
     "commonMainImplementation"(project(":feature:watchlist"))
     "commonMainImplementation"(project(":feature:add-to-watchlist"))
+    "commonMainImplementation"(project(":feature:cloudtodo"))
     // demo:end
 }

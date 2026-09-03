@@ -120,6 +120,8 @@ data class SubmitOutboxEntry<out P>(
     val uniqueKey: String? = null,
     val errorMessage: String? = null,
     val idempotencyKey: String? = null,
+    /** Submit attempts made so far (0 = never attempted). Drives [RetryPolicy] backoff + cap. */
+    val attemptCount: Int = 0,
 )
 
 /**

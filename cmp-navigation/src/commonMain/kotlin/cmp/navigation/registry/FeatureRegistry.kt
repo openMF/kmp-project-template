@@ -23,6 +23,7 @@ import kpt.feature.bills.di.BillsModule
 import kpt.feature.bills.navigation.billsGraph
 import kpt.feature.calculators.di.CalculatorsModule
 import kpt.feature.calculators.navigation.calculatorsGraph
+import kpt.feature.cloudtodo.di.CloudTodoModule
 import kpt.feature.crypto.di.CryptoFeatureModule
 import kpt.feature.crypto.navigation.cryptoGraph
 import kpt.feature.currencyrates.di.CurrencyRatesModule
@@ -73,6 +74,7 @@ object FeatureRegistry {
         AlertsModule,
         WatchlistModule,
         AddToWatchlistModule,
+        CloudTodoModule,
         // ── relocated core demo DI (were inline fenced blocks in the core aggregators) ──
         ProjectRepositoryModule,
         ProjectNetworkModule,

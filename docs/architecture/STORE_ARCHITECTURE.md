@@ -134,7 +134,7 @@ fresh emission — no re-subscription. Pinned by `RoomChangeBusSwrTest.notifying
 | Store type | SourceOfTruth | Fetcher | Consequence |
 |---|---|---|---|
 | `createStore` | Room | ✅ | the full cache-then-network shape |
-| `createMemoryStore` | **none** (in-memory) | ✅ | no SoT, so the SWR swap-in is a **no-op** — a memory cache does not re-emit on write, and the cache dies with the process (no cache-first on cold start). No store in this template uses it: `macroIndicator` was the last one and moved to Room in v13 |
+| `createMemoryStore` | **none** (in-memory) | ✅ | no SoT, so the SWR swap-in is a **no-op** — a memory cache does not re-emit on write, and the cache dies with the process. This is the **MEMORY_ONLY archetype showcase** (`macroIndicator`), deliberately non-cache-first — see `core/store/STORE_ARCHETYPES.yaml` |
 | `createOfflineStore` | Room | **none** | **no network leg at all** — nothing to revalidate |
 | `createOfflineMutableStore` | Room | **none** | local-only reads and writes |
 
@@ -154,12 +154,15 @@ are separate, explicit `refresh = true` paths:
 | `ScreenDataStream.refreshFresh()` | screen | ✗ caller debounces | ✅ — undebounced, for post-mutation invalidate |
 | `Store<K,O>.refreshFresh(key)` | repository | ✗ | ✅ |
 
-**Cache-first is the invariant.** Every read path in this template serves cache first: the
-`asScreenStream` default (`CACHE_FIRST_SWR`), `NETWORK_WITH_CACHE`, `PERIODIC` and `CACHE_ONLY` all do,
-and every store has a Room `SourceOfTruth`. `NETWORK_ONLY` is the one policy that does **not** — it
-routes to `fresh(fallBackToSourceOfTruth = true)`, i.e. network first with cache only as a failure
-fallback — so reach for it only where a stale value would be actively harmful, and prefer
-`CACHE_FIRST_SWR` plus the staleness banner, which shows the old value *and* its age.
+**Cache-first is the default, not a universal invariant.** `CACHE_FIRST_SWR` (the `asScreenStream`
+default), `NETWORK_WITH_CACHE`, `PERIODIC` and `CACHE_ONLY` all serve cache first. Two archetypes
+deliberately do **not**, and are declared as such in `core/store/STORE_ARCHETYPES.yaml#cache_first`:
+`NETWORK_ONLY` (routes to `fresh(fallBackToSourceOfTruth = true)` — network first, cache only as a
+failure fallback) and `MEMORY_ONLY` (no SourceOfTruth, so nothing survives process death).
+
+Before flagging a non-cache-first read as a defect, **check that registry** — it distinguishes a real
+gap from an archetype demo. For a genuinely new read path, prefer `CACHE_FIRST_SWR` plus the staleness
+banner, which shows the old value *and* its age.
 
 **Use `forceFresh = true` for anything user-initiated** (pull-to-refresh, retry button). Under the
 `CACHE_FIRST_SWR` default a plain `refresh()` only re-serves cache while revalidation stays band-gated,

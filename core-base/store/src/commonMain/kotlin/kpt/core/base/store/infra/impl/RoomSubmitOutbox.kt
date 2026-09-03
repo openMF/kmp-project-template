@@ -127,6 +127,7 @@ class RoomSubmitOutbox<P>(
             createdAtMs = createdAtMs,
             uniqueKey = uniqueKey,
             errorMessage = errorMessage,
+            attemptCount = attemptCount,
         )
     }.getOrNull()
 }

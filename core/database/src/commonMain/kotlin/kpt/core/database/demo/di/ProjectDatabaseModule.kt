@@ -52,5 +52,4 @@ val ProjectDatabaseModule = module {
     single { get<AppDatabase>().billReminderDao }
     single { get<AppDatabase>().alertDao }
     single { get<AppDatabase>().interestRateSeriesDao }
-    single { get<AppDatabase>().macroIndicatorDao }
 }

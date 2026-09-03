@@ -46,8 +46,6 @@ import kpt.core.database.demo.currency.entity.ExchangeRatesEntity
 import kpt.core.database.demo.currency.entity.RateHistoryEntity
 import kpt.core.database.demo.economic.InterestRateSeriesDao
 import kpt.core.database.demo.economic.InterestRateSeriesEntity
-import kpt.core.database.demo.economic.MacroIndicatorDao
-import kpt.core.database.demo.economic.MacroIndicatorEntity
 import kpt.core.database.demo.watchlist.dao.WatchlistDao
 import kpt.core.database.demo.watchlist.entity.WatchlistEntity
 
@@ -110,7 +108,6 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         BillReminderEntity::class,
         AlertEntity::class,
         InterestRateSeriesEntity::class,
-        MacroIndicatorEntity::class,
         CloudTodoEntity::class,
         // demo:end
         // fork:begin — a fork adds its OWN @Entity classes here. This block is PRESERVED across
@@ -152,12 +149,12 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         // inbox (MutationGateway server-wins conflicts surfaced in Settings). Room auto-generates
         // `CREATE TABLE IF NOT EXISTS …`; no existing schema is modified.
         AutoMigration(from = 11, to = 12),
-        // v12 → v13: purely additive — creates `macro_indicator`, giving the World Bank macro
-        // store a durable SourceOfTruth. It was the ONE demo network store built with
-        // createMemoryStore, so its cache died with the process and every cold start refetched.
-        // Room auto-generates `CREATE TABLE IF NOT EXISTS …`; no existing schema is modified.
-        AutoMigration(from = 12, to = 13),
         // demo:end
+        // v12 → v13: purely additive — adds `attemptCount` to `framework_submit_drafts` so
+        // OfflineSubmitSyncer can apply RetryPolicy backoff AND enforce maxAttempts across process
+        // restarts (the policy was previously accepted and ignored). Non-null with a default, so
+        // Room auto-generates `ALTER TABLE … ADD COLUMN … DEFAULT 0`; existing rows read as 0.
+        AutoMigration(from = 12, to = 13),
         // fork:begin — a fork adds its own AutoMigration(...) entries here, one per schema-changing
         // fork entity (from = previous effective version, to = new). PRESERVED across sync.
         // fork:end
@@ -190,8 +187,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract val billReminderDao: BillReminderDao
     abstract val alertDao: AlertDao
     abstract val interestRateSeriesDao: InterestRateSeriesDao
-
-    abstract val macroIndicatorDao: MacroIndicatorDao
     // demo:end
 
     // fork:begin — a fork adds its own `abstract val fooDao: FooDao` accessors here. PRESERVED

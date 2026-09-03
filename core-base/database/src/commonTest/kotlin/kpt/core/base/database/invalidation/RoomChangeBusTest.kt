@@ -194,7 +194,9 @@ class RoomChangeBusTest {
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
-        assertTrue(true) // explicit completion sentinel
+        // vacuous-ok: completion sentinel — the real assertion is expectNoEvents() above;
+        // this only proves the turbine block returned rather than hanging.
+        assertTrue(true)
     }
 }
 

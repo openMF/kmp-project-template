@@ -54,6 +54,13 @@ class AppViewModel(
         settingsRepository
             .observeLanguage
             .distinctUntilChanged()
+            // Mirror the active locale into STATE as well as emitting the platform event.
+            // The event drives the per-platform locale switch (setApplicationLocales on Android,
+            // Locale.setDefault elsewhere); the state drives Compose's LayoutDirection at the app
+            // root. Both are needed: Locale.setDefault does NOT set LayoutDirection, so without
+            // this an RTL language renders translated strings inside a left-to-right layout on
+            // desktop / iOS / web. Android is already correct via setApplicationLocales.
+            .onEach { language -> mutableStateFlow.update { it.copy(localeName = language.localeName) } }
             .map { AppEvent.UpdateAppLocale(it.localeName) }
             .onEach(::sendEvent)
             .launchIn(viewModelScope)
@@ -115,6 +122,10 @@ data class AppState(
     val isAndroidTheme: Boolean,
     val isDynamicColorsEnabled: Boolean,
     val isScreenCaptureAllowed: Boolean,
+    /** Active app locale as a BCP-47 tag (null = follow the system). Drives Compose's
+     *  LayoutDirection at the app root so RTL languages mirror on desktop / iOS / web,
+     *  where Locale.setDefault alone does not. */
+    val localeName: String? = null,
 )
 
 sealed interface AppEvent {

@@ -10,9 +10,12 @@
 package cmp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cmp.navigation.rootnav.RootNavScreen
 import kpt.core.base.ui.effects.EventsEffect
@@ -50,14 +53,43 @@ fun ComposeApp(
     // saved-instance-state Bundle. No app-root SaveableStateRegistry override — the
     // platform default is used, so Navigation's Bundle-typed back-stack state is
     // never rejected. Feature modules carry zero retention code.
-    KptTheme(
-        darkTheme = uiState.darkTheme,
-        androidTheme = uiState.isAndroidTheme,
-        useDynamicColor = uiState.isDynamicColorsEnabled,
-    ) {
-        RootNavScreen(
-            modifier = modifier,
-            onSplashScreenRemoved = onSplashScreenRemoved,
-        )
+    // RTL layout direction.
+    //
+    // `handleAppLocale` above switches the platform locale — on Android via
+    // AppCompatDelegate.setApplicationLocales, which (with manifest supportsRtl="true") makes the
+    // platform mirror the layout for us. On desktop / iOS / web it calls Locale.setDefault, and
+    // that does NOT set Compose's LayoutDirection: an Arabic, Hebrew, Urdu or Persian user would
+    // get correctly translated strings inside a left-to-right layout — back arrows pointing the
+    // wrong way, every `padding(start=)` on the wrong edge. Providing it here, from the SAME
+    // locale the rest of the app uses, makes every target agree. Android is unaffected.
+    val layoutDirection = if (isRtlLanguage(uiState.localeName)) {
+        LayoutDirection.Rtl
+    } else {
+        LayoutDirection.Ltr
+    }
+
+    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        KptTheme(
+            darkTheme = uiState.darkTheme,
+            androidTheme = uiState.isAndroidTheme,
+            useDynamicColor = uiState.isDynamicColorsEnabled,
+        ) {
+            RootNavScreen(
+                modifier = modifier,
+                onSplashScreenRemoved = onSplashScreenRemoved,
+            )
+        }
     }
 }
+
+/** BCP-47 language subtags written right-to-left. */
+private val RTL_LANGUAGES = setOf("ar", "he", "iw", "fa", "ur", "ps", "sd", "ckb", "yi", "dv")
+
+/**
+ * True when [languageTag] (e.g. "ar", "ar-EG") is a right-to-left language.
+ * A null tag means "follow the system", which the platform resolves itself — treated as LTR here
+ * because on Android the platform has already mirrored, and on other targets there is no app
+ * override to honour.
+ */
+private fun isRtlLanguage(languageTag: String?): Boolean =
+    languageTag != null && RTL_LANGUAGES.contains(languageTag.substringBefore('-').lowercase())

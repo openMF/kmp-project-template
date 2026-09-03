@@ -29,6 +29,7 @@
 :feature:amortization
 :feature:bills
 :feature:calculators
+:feature:cloudtodo
 :feature:crypto
 :feature:currency-rates
 :feature:emi-calculator

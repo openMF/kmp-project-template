@@ -36,9 +36,14 @@ val signingProps = Properties().apply {
 }
 val ksFile = System.getenv("KEYSTORE_PATH")?.let { file(it) }
     ?: project.resolveSecretPath("upload_keystore")
-val ksStorePass = System.getenv("KEYSTORE_PASSWORD") ?: signingProps.getProperty("storePassword")
-val ksKeyAlias = System.getenv("KEYSTORE_ALIAS") ?: signingProps.getProperty("keyAlias")
-val ksKeyPass = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: signingProps.getProperty("keyPassword")
+// ONE name per credential, whichever transport it arrives on. The properties file written by
+// `/secrets pull` uses the SAME keys as the CI env vars (KEYSTORE_PASSWORD / KEYSTORE_ALIAS /
+// KEYSTORE_ALIAS_PASSWORD). Reading camelCase keys here meant that on any project using the
+// declared properties layout all three resolved to null, releaseSigningReady flipped false, and
+// release signing was SILENTLY skipped — a build that looks fine and ships unsigned.
+val ksStorePass = System.getenv("KEYSTORE_PASSWORD") ?: signingProps.getProperty("KEYSTORE_PASSWORD")
+val ksKeyAlias = System.getenv("KEYSTORE_ALIAS") ?: signingProps.getProperty("KEYSTORE_ALIAS")
+val ksKeyPass = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: signingProps.getProperty("KEYSTORE_ALIAS_PASSWORD")
 val releaseSigningReady = ksFile.exists() && !ksStorePass.isNullOrBlank() &&
     !ksKeyAlias.isNullOrBlank() && !ksKeyPass.isNullOrBlank()
 

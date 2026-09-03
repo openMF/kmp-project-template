@@ -1199,9 +1199,9 @@ update_secrets_env() {
 # Use <<EOF and EOF to denote multiline values
 # Run this command to format these secrets: dos2unix $ENV_FILE
 
-UPLOAD_KEYSTORE_FILE_PASSWORD=${UPLOAD_KEYSTORE_FILE_PASSWORD:-Keystore_password}
-UPLOAD_KEYSTORE_ALIAS=${UPLOAD_KEYSTORE_ALIAS:-Keystore_Alias}
-UPLOAD_KEYSTORE_ALIAS_PASSWORD=${UPLOAD_KEYSTORE_ALIAS_PASSWORD:-Alias_password}
+UPLOAD_KEYSTORE_FILE_PASSWORD=${UPLOAD_KEYSTORE_FILE_PASSWORD}
+UPLOAD_KEYSTORE_ALIAS=${UPLOAD_KEYSTORE_ALIAS}
+UPLOAD_KEYSTORE_ALIAS_PASSWORD=${UPLOAD_KEYSTORE_ALIAS_PASSWORD}
 UPLOAD_KEYSTORE_FILE<<EOF
 $upload_b64
 EOF
@@ -1341,59 +1341,6 @@ update_gradle_config() {
     return 0
 }
 
-# Original implementation retained under a disabled name for reference only.
-# Do not re-enable: it writes secrets into cmp-android/build.gradle.kts.
-_update_gradle_config_DISABLED_writes_plaintext_to_source() {
-    local keystore_name=$1
-    local keystore_password=$2
-    local key_alias=$3
-    local key_password=$4
-
-    # Path to the Gradle build file
-    local gradle_file="cmp-android/build.gradle.kts"
-
-    echo -e "${BLUE}Updating Gradle build file with keystore information...${NC}"
-
-    # Check if the file exists
-    if [ -f "$gradle_file" ]; then
-        echo -e "${BLUE}Updating existing $gradle_file${NC}"
-
-        # Create a temporary file for the updated content
-        local temp_file=$(mktemp)
-
-        # Use awk for cross-platform compatibility (works on both macOS and Linux)
-        awk -v ks_name="$keystore_name" -v ks_pass="$keystore_password" -v k_alias="$key_alias" -v k_pass="$key_password" '
-        /storeFile = file\(System.getenv\("KEYSTORE_PATH"\)/ {
-            gsub(/\?\: "[^"]*"/, "?: \"../keystores/" ks_name "\"")
-            print
-            next
-        }
-        /storePassword = System.getenv\("KEYSTORE_PASSWORD"\)/ {
-            gsub(/\?\: "[^"]*"/, "?: \"" ks_pass "\"")
-            print
-            next
-        }
-        /keyAlias = System.getenv\("KEYSTORE_ALIAS"\)/ {
-            gsub(/\?\: "[^"]*"/, "?: \"" k_alias "\"")
-            print
-            next
-        }
-        /keyPassword = System.getenv\("KEYSTORE_ALIAS_PASSWORD"\)/ {
-            gsub(/\?\: "[^"]*"/, "?: \"" k_pass "\"")
-            print
-            next
-        }
-        { print }
-        ' "$gradle_file" > "$temp_file"
-
-        # Replace the original file with the updated one
-        mv "$temp_file" "$gradle_file"
-        echo -e "${GREEN}Gradle build file updated successfully${NC}"
-    else
-        echo -e "${YELLOW}Gradle file not found: $gradle_file${NC}"
-        echo -e "${YELLOW}Skipping Gradle build file update${NC}"
-    fi
-}
 
 # Read a single key from a Java-style properties file (key=value format).
 # Usage: _read_fork_prop "gradle/fork.properties" "keystore.dn.city"
@@ -1407,39 +1354,34 @@ _read_fork_prop() {
 # Returns empty string (not an error) when the file is absent so the caller
 # can fall back to a default.
 _read_keystore_secret() {
-    local secret_name="$1"   # e.g. keystore_password
-    local secret_file="secrets/live/android/keystores/${secret_name}"
-    if [[ -f "$secret_file" ]]; then
-        cat "$secret_file" | tr -d '\n\r'
-        return
-    fi
-    # FALLBACK: the KEY=VALUE properties layout.
+    local secret_name="$1"   # keystore_password | keystore_alias | keystore_alias_password
+
+    # ONE layout: the KEY=VALUE properties file. This is the only keystore-credential layout the
+    # project declares (secrets/LAYOUT.yaml), the one Gradle can load directly, and the one the
+    # signing config reads via System.getenv() after it is exported.
     #
-    # This reader originally knew only the one-file-per-value layout
-    # (secrets/live/android/keystores/keystore_password, .../keystore_alias, ...). Projects that
-    # keep all three values in a single properties file — the common shape, and the one Gradle
-    # itself can load directly — got "" from every lookup here. Generation then silently fell
-    # back to the placeholder defaults below ("Keystore_password" / "Keystore_Alias"), producing
-    # a keystore whose passwords match nothing the project actually holds. The failure is
-    # invisible until an upload is rejected at signing time.
-    #
-    # Serve both layouts instead of requiring projects to restructure to suit this reader.
+    # An earlier revision of this reader looked for one file per value
+    # (secrets/live/android/keystores/keystore_password, .../keystore_alias, ...). That layout was
+    # never declared anywhere, so on a real project every lookup returned "" and generation
+    # silently fell back to the placeholder defaults below ("Keystore_password" / "Keystore_Alias")
+    # — producing a keystore whose passwords match nothing the project holds, a failure invisible
+    # until an upload is rejected at signing time. Supporting both shapes only moved the confusion
+    # around, so the undeclared one is gone: one layout, one place to look.
     local props="secrets/live/android/keystores/upload_keystore.properties"
-    if [[ -f "$props" ]]; then
-        local key=""
-        case "$secret_name" in
-            keystore_password)       key="KEYSTORE_PASSWORD" ;;
-            keystore_alias)          key="KEYSTORE_ALIAS" ;;
-            keystore_alias_password) key="KEYSTORE_ALIAS_PASSWORD" ;;
-        esac
-        if [[ -n "$key" ]]; then
-            # First match only; strip the KEY= prefix and any trailing CR/LF.
-            grep -m1 "^${key}=" "$props" 2>/dev/null | sed "s/^${key}=//" | tr -d '\n\r'
-            return
-        fi
-    fi
-    echo ""
+    [[ -f "$props" ]] || { echo ""; return; }
+
+    local key=""
+    case "$secret_name" in
+        keystore_password)       key="KEYSTORE_PASSWORD" ;;
+        keystore_alias)          key="KEYSTORE_ALIAS" ;;
+        keystore_alias_password) key="KEYSTORE_ALIAS_PASSWORD" ;;
+        *)                       echo ""; return ;;
+    esac
+
+    # First match only; strip the KEY= prefix and any trailing CR/LF. Never echoed by callers.
+    grep -m1 "^${key}=" "$props" 2>/dev/null | sed "s/^${key}=//" | tr -d '\n\r'
 }
+
 
 # Function to generate keystore
 # Reads:
@@ -1611,15 +1553,27 @@ generate_keystores() {
     # can complete; the caller is expected to populate the files before CI use.
     local UPLOAD_KEYSTORE_FILE_PASSWORD
     UPLOAD_KEYSTORE_FILE_PASSWORD=$(_read_keystore_secret "keystore_password")
-    UPLOAD_KEYSTORE_FILE_PASSWORD="${UPLOAD_KEYSTORE_FILE_PASSWORD:-Keystore_password}"
 
     local UPLOAD_KEYSTORE_ALIAS
     UPLOAD_KEYSTORE_ALIAS=$(_read_keystore_secret "keystore_alias")
-    UPLOAD_KEYSTORE_ALIAS="${UPLOAD_KEYSTORE_ALIAS:-Keystore_Alias}"
 
     local UPLOAD_KEYSTORE_ALIAS_PASSWORD
     UPLOAD_KEYSTORE_ALIAS_PASSWORD=$(_read_keystore_secret "keystore_alias_password")
-    UPLOAD_KEYSTORE_ALIAS_PASSWORD="${UPLOAD_KEYSTORE_ALIAS_PASSWORD:-Alias_password}"
+
+    # No placeholder fallback. These used to default to "Keystore_password" / "Keystore_Alias" /
+    # "Alias_password" when the properties file was absent or unreadable — which generated a REAL
+    # keystore protected by a well-known literal, recorded nowhere, matching nothing in the vault.
+    # Nothing failed at generation time; the app signed locally and the mismatch only surfaced when
+    # Play rejected the upload, by which point the keystore may already be the app's identity.
+    # The credential source is the single source of truth: if it is not there, stop.
+    if [[ -z "$UPLOAD_KEYSTORE_FILE_PASSWORD" || -z "$UPLOAD_KEYSTORE_ALIAS" || -z "$UPLOAD_KEYSTORE_ALIAS_PASSWORD" ]]; then
+        echo -e "${RED}Keystore credentials not available.${NC}" >&2
+        echo -e "${RED}  expected: secrets/live/android/keystores/upload_keystore.properties${NC}" >&2
+        echo -e "${RED}  with keys: KEYSTORE_PASSWORD, KEYSTORE_ALIAS, KEYSTORE_ALIAS_PASSWORD${NC}" >&2
+        echo -e "${RED}Materialize them from your secrets store first, then re-run.${NC}" >&2
+        echo -e "${RED}Refusing to generate a keystore with placeholder credentials.${NC}" >&2
+        return 1
+    fi
 
     echo -e "${BLUE}🔑 Play App Signing mode: generating UPLOAD keystore${NC}"
     print_info "Password source: secrets/live/android/keystores/ (new model)"
@@ -1665,8 +1619,8 @@ generate_keystores() {
 
     if [ $UPLOAD_RESULT -eq 0 ]; then
         echo -e "${GREEN}Keystore written to: keystores/$UPLOAD_KEYSTORE_NAME${NC}"
-        echo -e "${GREEN}fastlane-config/project_config.rb updated${NC}"
-        echo -e "${GREEN}cmp-android/build.gradle.kts updated${NC}"
+        echo -e "${BLUE}Build files NOT modified — signing config reads the credentials at${NC}"
+        echo -e "${BLUE}build time from KEYSTORE_* (env, or the properties file).${NC}"
         echo -e "${CYAN}Next step: run 'scripts/secrets/sync-secrets-to-github.sh' to push secrets to GitHub${NC}"
         return 0
     else

@@ -641,7 +641,14 @@ module FastlaneConfig
 
     # Read storeFile dynamically so forks can rename the keystore without
     # touching config.rb (storeFile key in upload_keystore.properties is canonical).
-    default_jks = "#{ks_dir}/#{props.fetch("storeFile", "upload_keystore.keystore")}"
+    # `fetch` only falls back when the key is ABSENT. secrets/LAYOUT.yaml can emit a `storeFile`
+    # key whose vault alias is unresolvable ("not resolvable from vault → skip"), leaving the key
+    # PRESENT but EMPTY — fetch then returns "" and this collapses to the bare directory:
+    #   Keystore file '.../secrets/live/android/keystores' not found for signing config 'release'
+    # which surfaces only after a full release build. Treat empty as absent (2026-09-04).
+    store_file_name = props["storeFile"].to_s.strip
+    store_file_name = "upload_keystore.keystore" if store_file_name.empty?
+    default_jks = "#{ks_dir}/#{store_file_name}"
 
     {
       keystore_path:     options[:keystore_path]     ||

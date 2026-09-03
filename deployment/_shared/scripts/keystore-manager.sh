@@ -1370,7 +1370,9 @@ _read_keystore_secret() {
     # Path from secrets/LAYOUT.yaml via build_secrets — the SoT every consumer reads.
     local props
     props="$(ruby deployment/_shared/lib/build_secrets.rb path upload_keystore_properties 2>/dev/null || true)"
-    [[ -n "$props" ]] || props="secrets/live/android/keystores/upload_keystore.properties"
+    # NO FALLBACK — same reason as the keystore path above. A hardcoded default here would silently
+    # diverge from LAYOUT the moment LAYOUT changed.
+    [[ -n "$props" ]] || { echo "" ; return; }
     [[ -f "$props" ]] || { echo ""; return; }
 
     # LAYOUT-declared property NAMES. secrets/LAYOUT.yaml#upload_keystore_properties.keys[].name is
@@ -1430,8 +1432,14 @@ generate_keystore() {
     local keystore_path
     keystore_path="$(ruby deployment/_shared/lib/build_secrets.rb path upload_keystore 2>/dev/null || true)"
     if [ -z "$keystore_path" ]; then
-        keystore_path="keystores/$keystore_name"
-        echo -e "${YELLOW}⚠️  LAYOUT could not resolve upload_keystore — falling back to $keystore_path${NC}"
+        # NO FALLBACK. The old hardcoded `keystores/` is precisely the defect this replaced: it wrote
+        # where no consumer looks, so a freshly generated keystore appeared not to exist and the old
+        # one kept being used. Falling back to it would recreate that silently. If LAYOUT cannot
+        # resolve the path there is no correct place to write, so stop and say why.
+        echo -e "${RED}✖ secrets/LAYOUT.yaml could not resolve 'upload_keystore'.${NC}" >&2
+        echo -e "${RED}  LAYOUT is the single source of truth for where the keystore lives; without it${NC}" >&2
+        echo -e "${RED}  there is no path every consumer agrees on. Fix the LAYOUT entry, then re-run.${NC}" >&2
+        return 1
     fi
     KEYSTORE_OUT_DIR="$(dirname "$keystore_path")"
     mkdir -p "$KEYSTORE_OUT_DIR"

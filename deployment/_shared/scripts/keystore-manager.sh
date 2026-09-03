@@ -1367,14 +1367,22 @@ _read_keystore_secret() {
     # — producing a keystore whose passwords match nothing the project holds, a failure invisible
     # until an upload is rejected at signing time. Supporting both shapes only moved the confusion
     # around, so the undeclared one is gone: one layout, one place to look.
-    local props="secrets/live/android/keystores/upload_keystore.properties"
+    # Path from secrets/LAYOUT.yaml via build_secrets — the SoT every consumer reads.
+    local props
+    props="$(ruby deployment/_shared/lib/build_secrets.rb path upload_keystore_properties 2>/dev/null || true)"
+    [[ -n "$props" ]] || props="secrets/live/android/keystores/upload_keystore.properties"
     [[ -f "$props" ]] || { echo ""; return; }
 
+    # LAYOUT-declared property NAMES. secrets/LAYOUT.yaml#upload_keystore_properties.keys[].name is
+    # the key the file is written under (storePassword / keyAlias / keyPassword); `source_env:` is
+    # only where the VALUE is sourced from. Reading KEYSTORE_* here returns empty once the LAYOUT
+    # pass owns the file, and generation then silently falls back to the placeholder defaults —
+    # producing a keystore whose passwords match nothing in the vault.
     local key=""
     case "$secret_name" in
-        keystore_password)       key="KEYSTORE_PASSWORD" ;;
-        keystore_alias)          key="KEYSTORE_ALIAS" ;;
-        keystore_alias_password) key="KEYSTORE_ALIAS_PASSWORD" ;;
+        keystore_password)       key="storePassword" ;;
+        keystore_alias)          key="keyAlias" ;;
+        keystore_alias_password) key="keyPassword" ;;
         *)                       echo ""; return ;;
     esac
 
@@ -1398,13 +1406,35 @@ generate_keystore() {
     local key_password=$5
 
     # Hard-coded generation constants (not per-fork config)
+    # PKCS12 (keytool's default store type) has ONE password: the store password also protects the
+    # key. `-keypass` is accepted and silently ignored when it differs, producing a keystore whose
+    # key no consumer can open ("Get Key failed: Given final block not properly padded") — a failure
+    # that reads like corruption and hides three layers from its cause. secrets/LAYOUT.yaml resolves
+    # BOTH storePassword and keyPassword from the SAME vault alias, so they cannot diverge upstream;
+    # this keeps the invariant local too.
+    key_password="$keystore_password"
+
     local validity=1000  # ~1000 years — upload key must outlive the app
     local keyalg="RSA"
     local keysize=4096
-    local overwrite=false
+    # Honour an explicit request. Hardcoded `false` with no flag meant the ONLY way to regenerate was
+    # to delete the file first — and the skip path returned 0, so `generate` printed SUCCESS while
+    # leaving the OLD keystore in place, byte-identical (caught only by hashing).
+    local overwrite="${KEYSTORE_OVERWRITE:-false}"
 
     # Path to save the keystore
-    local keystore_path="keystores/$keystore_name"
+    # Output path from secrets/LAYOUT.yaml via build_secrets, NOT a hardcoded dir. Hardcoding
+    # `keystores/` wrote where no consumer looks — cmp-android/build.gradle.kts and the fastlane
+    # lanes both resolve secrets/live/android/keystores/ — so a freshly generated keystore appeared
+    # not to exist and the old one kept being used.
+    local keystore_path
+    keystore_path="$(ruby deployment/_shared/lib/build_secrets.rb path upload_keystore 2>/dev/null || true)"
+    if [ -z "$keystore_path" ]; then
+        keystore_path="keystores/$keystore_name"
+        echo -e "${YELLOW}⚠️  LAYOUT could not resolve upload_keystore — falling back to $keystore_path${NC}"
+    fi
+    KEYSTORE_OUT_DIR="$(dirname "$keystore_path")"
+    mkdir -p "$KEYSTORE_OUT_DIR"
 
     echo -e "${BLUE}==================================================================${NC}"
     echo -e "${BLUE}Generating $env keystore${NC}"
@@ -1421,11 +1451,17 @@ generate_keystore() {
     # Check if the keystore file already exists
     if [ -f "$keystore_path" ]; then
         if [ "$overwrite" = "true" ]; then
-            echo -e "${BLUE}Overwriting existing keystore file '$keystore_path'.${NC}"
+            # ACTUALLY remove it. Printing "Overwriting" without deleting made keytool fail with
+            # `Key pair not generated, alias <...> already exists` (keytool ADDS to an existing
+            # keystore, it never truncates), leaving the OLD keystore while the log claimed success.
+            echo -e "${BLUE}Overwriting existing keystore file '$keystore_path' (removing it first).${NC}"
+            rm -f "$keystore_path"
         else
-            echo -e "${BLUE}Keystore file '$keystore_path' already exists and OVERWRITE is not set to 'true'.${NC}"
-            echo -e "${BLUE}Using existing keystore.${NC}"
-            return 0
+            echo -e "${YELLOW}⏭  SKIPPED — '$keystore_path' already exists; NOTHING was generated.${NC}"
+            echo -e "${YELLOW}    To replace it deliberately:  KEYSTORE_OVERWRITE=true ./keystore-manager.sh generate${NC}"
+            echo -e "${YELLOW}    (Play permanently binds the signing key on FIRST upload — replacing a"
+            echo -e "     keystore after publication makes every future update unpublishable.)${NC}"
+            return 9   # distinct from 0: the caller must not report SUCCESS for a skip
         fi
     fi
 
@@ -1607,7 +1643,11 @@ generate_keystores() {
     echo -e "${BLUE}==================================================================${NC}"
 
     if [ $UPLOAD_RESULT -eq 0 ]; then
-        echo -e "${GREEN}UPLOAD keystore: SUCCESS - $(realpath "keystores/$UPLOAD_KEYSTORE_NAME")${NC}"
+        echo -e "${GREEN}UPLOAD keystore: SUCCESS - $(realpath "$KEYSTORE_OUT_DIR/$UPLOAD_KEYSTORE_NAME")${NC}"
+    elif [ $UPLOAD_RESULT -eq 9 ]; then
+        # A skip is NOT success. Reporting it as success once produced a "regenerated" keystore that
+        # was byte-identical to the old one; the failure only surfaced later, at signing.
+        echo -e "${YELLOW}UPLOAD keystore: SKIPPED (already exists — nothing generated)${NC}"
     else
         echo -e "${RED}UPLOAD keystore: FAILED${NC}"
     fi

@@ -650,13 +650,16 @@ module FastlaneConfig
     store_file_name = "upload_keystore.keystore" if store_file_name.empty?
     default_jks = "#{ks_dir}/#{store_file_name}"
 
+    # Resolved once, because the key password falls back to it (see below).
+    store_password = options[:keystore_password] ||
+                     ENV["KEYSTORE_PASSWORD"]    ||
+                     props["storePassword"]      || ""
+
     {
       keystore_path:     options[:keystore_path]     ||
                          ENV["KEYSTORE_PATH"]        ||
                          default_jks,
-      keystore_password: options[:keystore_password] ||
-                         ENV["KEYSTORE_PASSWORD"]    ||
-                         props["storePassword"]      || "",
+      keystore_password: store_password,
       # Honor BOTH env conventions: KEY_ALIAS (CI pre_fastlane_script) AND KEYSTORE_ALIAS
       # (build.gradle.kts + buildAndSignApp / vault materialization). props (upload_keystore.properties)
       # is the file source. The literal "release" is a LAST-RESORT default — it is WRONG for keystores
@@ -666,10 +669,17 @@ module FastlaneConfig
                          ENV["KEY_ALIAS"]            ||
                          ENV["KEYSTORE_ALIAS"]       ||
                          props["keyAlias"]           || "release",
+      # Falls back to the STORE password, never to "". A PKCS12 keystore has no separate
+      # key password — keytool discards `-keypass` at creation — so the store password IS
+      # the key password. Measured with jarsigner against a real PKCS12 keystore: signing
+      # succeeds when the key password is absent or equal to the store password, and FAILS
+      # ("key associated with <alias> not a private key") when it is empty or different.
+      # An empty default is therefore not a graceful degradation, it is one of the two
+      # failure values — and it fails only in CI, after the local build has gone green.
       key_password:      options[:key_password]      ||
                          ENV["KEY_PASSWORD"]         ||
                          ENV["KEYSTORE_ALIAS_PASSWORD"] ||
-                         props["keyPassword"]        || "",
+                         props["keyPassword"]        || store_password,
     }
   end
 end
@@ -1458,7 +1468,9 @@ def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
   ENV["KEYSTORE_PATH"]           = keystore_abs
   ENV["KEYSTORE_PASSWORD"]       = signing_config[:keystore_password] || ENV["KEYSTORE_PASSWORD"] || ""
   ENV["KEYSTORE_ALIAS"]          = signing_config[:key_alias]         || ENV["KEYSTORE_ALIAS"] || "release"
-  ENV["KEYSTORE_ALIAS_PASSWORD"] = signing_config[:key_password]      || ENV["KEYSTORE_ALIAS_PASSWORD"] || ""
+  # Never "" — an empty key password is a measured signing FAILURE, not an unset value.
+  # PKCS12 has no separate key password, so the store password is the correct last resort.
+  ENV["KEYSTORE_ALIAS_PASSWORD"] = signing_config[:key_password]      || ENV["KEYSTORE_ALIAS_PASSWORD"] || ENV["KEYSTORE_PASSWORD"]
 
   # -p tells Gradle to use repo root as project dir, overriding whatever cwd
   # Fastlane sets (deployment/fastlane/) when running the lane. NO signing on the command line.

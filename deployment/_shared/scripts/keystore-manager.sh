@@ -1601,8 +1601,15 @@ generate_keystores() {
     local UPLOAD_KEYSTORE_ALIAS
     UPLOAD_KEYSTORE_ALIAS=$(_read_keystore_secret "keystore_alias")
 
+    # The key password is NOT an independent credential. A PKCS12 keystore has no separate
+    # key password — keytool discards `-keypass` at creation ("Different store and key
+    # passwords not supported for PKCS12 KeyStores") — so it always equals the store
+    # password. Read it if present (older forks still carry the key), otherwise derive it.
+    # Requiring it as its own value is what made this refuse to run against a correctly
+    # provisioned single-password keystore.
     local UPLOAD_KEYSTORE_ALIAS_PASSWORD
     UPLOAD_KEYSTORE_ALIAS_PASSWORD=$(_read_keystore_secret "keystore_alias_password")
+    [[ -z "$UPLOAD_KEYSTORE_ALIAS_PASSWORD" ]] && UPLOAD_KEYSTORE_ALIAS_PASSWORD="$UPLOAD_KEYSTORE_FILE_PASSWORD"
 
     # No placeholder fallback. These used to default to "Keystore_password" / "Keystore_Alias" /
     # "Alias_password" when the properties file was absent or unreadable — which generated a REAL
@@ -1610,10 +1617,11 @@ generate_keystores() {
     # Nothing failed at generation time; the app signed locally and the mismatch only surfaced when
     # Play rejected the upload, by which point the keystore may already be the app's identity.
     # The credential source is the single source of truth: if it is not there, stop.
-    if [[ -z "$UPLOAD_KEYSTORE_FILE_PASSWORD" || -z "$UPLOAD_KEYSTORE_ALIAS" || -z "$UPLOAD_KEYSTORE_ALIAS_PASSWORD" ]]; then
+    # (The key password is excluded from this check — it is derived above, never independent.)
+    if [[ -z "$UPLOAD_KEYSTORE_FILE_PASSWORD" || -z "$UPLOAD_KEYSTORE_ALIAS" ]]; then
         echo -e "${RED}Keystore credentials not available.${NC}" >&2
         echo -e "${RED}  expected: secrets/live/android/keystores/upload_keystore.properties${NC}" >&2
-        echo -e "${RED}  with keys: KEYSTORE_PASSWORD, KEYSTORE_ALIAS, KEYSTORE_ALIAS_PASSWORD${NC}" >&2
+        echo -e "${RED}  with keys: KEYSTORE_PASSWORD, KEYSTORE_ALIAS${NC}" >&2
         echo -e "${RED}Materialize them from your secrets store first, then re-run.${NC}" >&2
         echo -e "${RED}Refusing to generate a keystore with placeholder credentials.${NC}" >&2
         return 1

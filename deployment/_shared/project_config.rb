@@ -131,7 +131,10 @@ module FastlaneConfig
         file:         ENV["ANDROID_STORE_FILE"]    || "upload_keystore.keystore",
         password:     ENV["ANDROID_STORE_PASSWORD"] || "",
         key_alias:    ENV["ANDROID_KEY_ALIAS"]     || "release-key",
-        key_password: ENV["ANDROID_KEY_PASSWORD"]  || "",
+        # PKCS12 has no separate key password (keytool discards `-keypass` at creation), so
+        # this falls back to the STORE password rather than "". Empty is not "unset" — it is
+        # a measured signing failure ("key associated with <alias> not a private key").
+        key_password: ENV["ANDROID_KEY_PASSWORD"]  || ENV["ANDROID_STORE_PASSWORD"] || "",
       },
       firebase: {
         # ENV overrides: FIREBASE_ANDROID_PROD_APP_ID / FIREBASE_ANDROID_DEMO_APP_ID / FIREBASE_GROUPS

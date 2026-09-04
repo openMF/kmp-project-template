@@ -131,6 +131,7 @@ include(":feature:crypto")
 include(":feature:watchlist")
 include(":feature:add-to-watchlist")
 include(":feature:alerts")
+include(":feature:cloudtodo")
 // demo:end
 
 include(":core-base:firebase")

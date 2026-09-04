@@ -100,14 +100,25 @@ The generator routes on **`feature_profile.store_archetype`** — the primary ke
 a real demo `*Store.kt` / `*ViewModel.kt` / `*Test.kt`. The decision matrix + module chain is
 `FEATURE_AUTHORING.md` (in-repo summary) and `docs/architecture/STORE_DATA_API.md` (canonical).
 
+> **The archetype ↔ showcase contract is enforced, not just documented.**
+> `core/store/STORE_ARCHETYPES.yaml` is the machine-readable source of truth; the table below is a
+> human projection of it. `scripts/product-health/checks/store-archetype-coverage.sh` fails the build
+> if any archetype loses its last showcase, or if a showcase stops calling its declared factory.
+>
+> That registry also declares **`cache_first`** per archetype. Two are non-cache-first *by
+> definition* — **MEMORY_ONLY** (no SourceOfTruth, so the cache dies with the process) and
+> **NETWORK_ONLY** (network-first, cache only as a failure fallback). Do not "fix" them to be
+> cache-first: that deletes the archetype demo. This is not hypothetical — it happened, the two
+> guarding tests were `assertTrue(true, …)` and passed, and the gates above exist because of it.
+
 | `store_archetype` | Store factory | Store | ViewModel | Test |
 |---|---|---|---|---|
 | OFFLINE_LOCAL_ONLY | `createOfflineStore` | `AlertsStore.kt`, `LoansStore.kt`, `BillRemindersStore.kt` | `AmortizationScheduleViewModel.kt` | `AlertsStoreTest.kt`, `LoansStoreTest.kt`, `AmortizationScheduleViewModelTest.kt` |
-| NETWORK_WITH_CACHE | `createStore` | `ExchangeRatesStore.kt`, `InterestRateSeriesStore.kt` | `CurrencyRatesViewModel.kt`, `InterestRatesViewModel.kt` | `EconomicMemoryOnlyTest.kt` |
+| NETWORK_WITH_CACHE | `createStore` | `ExchangeRatesStore.kt`, `InterestRateSeriesStore.kt` | `CurrencyRatesViewModel.kt`, `InterestRatesViewModel.kt` | `store-archetype-coverage.sh` (AC-3) |
 | NETWORK_ONLY | `createStore` + `FetchPolicy.NETWORK_ONLY` | `SpotRateLookupStore.kt` | `CurrencyRatesViewModel.kt` (online) | `SpotRateLookupStoreTest.kt` |
 | CACHE_ONLY | `createStore` + `FetchPolicy.CACHE_ONLY` | `SpotRateLookupStore.kt` | `CurrencyRatesViewModel.kt` (offline) | `CurrencyConverterViewModelTest.kt` |
 | PERIODIC | `createStore` + TTL in `AppStoreRegistry` | `ExchangeRatesStore.kt` | `HomeViewModel.kt` tile | `HomeDashboardViewModelTest.kt` |
-| MEMORY_ONLY | `createMemoryStore` | `MacroIndicatorStore.kt` | `CountryMacroViewModel.kt` | `EconomicMemoryOnlyTest.kt` |
+| MEMORY_ONLY | `createMemoryStore` | `MacroIndicatorStore.kt` | `CountryMacroViewModel.kt` | `store-archetype-coverage.sh` (AC-3) |
 | LOAD_ONCE | `createStore` + `asLoadOnceStream` | `LoansStore.kt` | `LoanDetailViewModel.kt` | `LoanDetailViewModelTest.kt` |
 | MUTABLE | `createMutableStore` + `Bookkeeper` | `CloudTodoStore.kt` | `EditBillReminderViewModel.kt` | `EditBillReminderViewModelTest.kt`, `OfflineSubmitSyncerTest.kt` |
 

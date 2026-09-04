@@ -10,7 +10,6 @@
 package kpt.core.base.store.submit
 
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
 
 /**
  * Orchestrator for submitting a list of payloads via a single per-payload [submitBlock].
@@ -35,12 +34,9 @@ import kotlinx.coroutines.CoroutineScope
  * the key — see [IdempotencyKey] for the storage caveat.
  *
  * @param P Per-payload type.
- * @param scope Held for future use by retry/parallelism extensions; unused in the
- *   sequential implementation. Kept on the constructor to avoid an API break later.
  * @param mode Default failure-handling mode; overridable per [submitBatch] call.
  */
 class BatchSubmitHandler<P>(
-    @Suppress("unused") private val scope: CoroutineScope,
     private val mode: BatchSubmitMode = BatchSubmitMode.AllOrNothing,
 ) {
 

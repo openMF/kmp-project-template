@@ -11,6 +11,7 @@ package kpt.core.base.store.submit
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -58,15 +59,13 @@ class OfflineSubmitSyncer<P, R>(
     private val retryOnStatus: RetryOnNetworkStatus = RetryOnNetworkStatus.OnlineOnly,
     private val crashReporter: CrashReporter? = null,
     /**
-     * Per-attempt retry-backoff policy. **Held but not yet applied** — the per-entry
-     * `attemptCount` and `nextRetryAt` columns required to schedule backoff between
-     * the connectivity-triggered retry cycles are pending a Room schema migration
-     * (see `docs/claude/retry-policy.md` for the deferred work). Until then,
-     * `retryAll()` continues to fire every PENDING entry once per reconnect with
-     * no inter-entry delay — same behavior as before this parameter existed.
-     * Defaults to [RetryPolicy] defaults (3 attempts, 1s/2s/4s backoff, ±25% jitter).
+     * Per-attempt retry-backoff policy — APPLIED (v14+). Each entry carries a persisted
+     * `attemptCount`; [retryAll] waits [RetryPolicy.delayFor] before re-submitting and stops
+     * retrying an entry once its attempts reach [RetryPolicy.maxAttempts], marking it permanently
+     * FAILED. Persisting the count means the cap survives process death — a crash-looping payload
+     * cannot retry forever across restarts. Defaults to [RetryPolicy] defaults (3 attempts,
+     * 1s/2s/4s backoff, ±25% jitter).
      */
-    @Suppress("unused")
     private val retryPolicy: RetryPolicy = RetryPolicy(),
 ) {
 
@@ -89,6 +88,20 @@ class OfflineSubmitSyncer<P, R>(
     private suspend fun retryAll() {
         val pending = outbox.getAllPending()
         for (entry in pending) {
+            // Cap: an entry that has already burned its attempts is terminally FAILED, not retried
+            // again on the next reconnect. attemptCount is persisted, so this holds across restarts.
+            if (entry.attemptCount >= retryPolicy.maxAttempts) {
+                outbox.markFailed(
+                    entry.id,
+                    "retry limit reached (${entry.attemptCount}/${retryPolicy.maxAttempts})",
+                )
+                continue
+            }
+            // Backoff BEFORE the attempt: attemptCount is the number already made, so
+            // delayFor(0) == 0 leaves the first attempt immediate and later ones spaced 1s/2s/4s
+            // (±25% jitter) so reconnecting clients don't thundering-herd a recovering server.
+            val backoffMs = retryPolicy.delayFor(entry.attemptCount)
+            if (backoffMs > 0L) delay(backoffMs)
             outbox.markRetrying(entry.id)
             try {
                 submitBlock(entry.payload)

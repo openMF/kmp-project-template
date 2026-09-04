@@ -97,6 +97,8 @@ fun provideCloudTodoStore(
         converter = converter,
         updater = updater,
         bookkeeper = bookkeeper,
-        conflictStrategy = conflictStrategy,
+        // conflictStrategy is NOT passed to the factory — it is applied inside `updater` above,
+        // the only place both the server echo and the client value exist. The factory used to
+        // accept it as an ignored parameter; that decoration is gone.
     )
 }

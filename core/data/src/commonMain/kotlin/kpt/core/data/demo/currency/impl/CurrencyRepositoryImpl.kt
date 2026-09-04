@@ -62,6 +62,10 @@ class CurrencyRepositoryImpl(
         key = baseCurrency,
         cacheKey = AppCacheKeys.spotRate(baseCurrency),
         scope = scope,
+        // NETWORK_ONLY is DELIBERATE — this is the template's NETWORK_ONLY archetype showcase
+        // (see STORE_ARCHETYPES.yaml + CLAUDE.md). A spot FX rate is the canonical case where stale
+        // data misleads, so the read goes network-first with cache only as a failure fallback.
+        // Do NOT "fix" this to CACHE_FIRST_SWR: it would delete the archetype demo.
         fetchPolicy = if (online) FetchPolicy.NETWORK_ONLY else FetchPolicy.CACHE_ONLY,
     )
 

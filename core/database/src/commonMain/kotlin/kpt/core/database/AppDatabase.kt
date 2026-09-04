@@ -150,6 +150,11 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
         // `CREATE TABLE IF NOT EXISTS …`; no existing schema is modified.
         AutoMigration(from = 11, to = 12),
         // demo:end
+        // v12 → v13: purely additive — adds `attemptCount` to `framework_submit_drafts` so
+        // OfflineSubmitSyncer can apply RetryPolicy backoff AND enforce maxAttempts across process
+        // restarts (the policy was previously accepted and ignored). Non-null with a default, so
+        // Room auto-generates `ALTER TABLE … ADD COLUMN … DEFAULT 0`; existing rows read as 0.
+        AutoMigration(from = 12, to = 13),
         // fork:begin — a fork adds its own AutoMigration(...) entries here, one per schema-changing
         // fork entity (from = previous effective version, to = new). PRESERVED across sync.
         // fork:end
@@ -205,7 +210,7 @@ abstract class AppDatabase : RoomDatabase() {
         // NOTE: `customizer --clean` resets TEMPLATE_BASE_VERSION to 1 (fresh-fork baseline) via a
         // targeted sed, since the migration history above is stripped with the demo block.
         /** Template-owned base schema version — the TEMPLATE bumps this on its own schema changes. */
-        const val TEMPLATE_BASE_VERSION = 12
+        const val TEMPLATE_BASE_VERSION = 13
 
         /**
          * Effective DB schema version = template base + the fork's offset ([ForkDatabaseConfig],

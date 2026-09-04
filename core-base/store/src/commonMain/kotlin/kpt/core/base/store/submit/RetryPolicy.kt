@@ -30,10 +30,8 @@ import kotlin.math.pow
  * - [jitterFraction] = 0.25 — ±25% randomisation.
  * - [maxDelayMs] = 60s — hard ceiling to keep retries snappy.
  *
- * **Wire-in note:** [OfflineSubmitSyncer] holds this policy as a constructor
- * param but the per-attempt backoff is not yet applied — see the syncer's KDoc
- * for the deferred follow-up (needs Room schema migration to store
- * `attemptCount` + `nextRetryAt` per outbox entry).
+ * **Wire-in:** [OfflineSubmitSyncer] APPLIES this policy (v14+) — it waits [delayFor] before each
+ * re-submit and stops retrying an entry once its persisted `attemptCount` reaches [maxAttempts].
  *
  * @property maxAttempts Total attempts including the first one. Must be ≥ 1.
  * @property initialDelayMs Delay before attempt 2 (i.e. the first retry). Must be > 0.

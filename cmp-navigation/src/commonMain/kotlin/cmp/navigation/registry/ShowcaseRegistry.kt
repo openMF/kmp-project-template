@@ -12,7 +12,10 @@ package cmp.navigation.registry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import kpt.core.base.security.isReleaseBuild
+import kpt.feature.cloudtodo.navigation.CloudTodoRoute
+import kpt.feature.cloudtodo.navigation.cloudTodoGraph
 import kpt.feature.settings.DevMenuEntry
+import kpt.feature.settings.navigateToSyncAndDrafts
 import kpt.feature.showcase.stategallery.StateGalleryRoute
 import kpt.feature.showcase.stategallery.stateGalleryGraph
 import kpt.feature.showcase.transitions.TransitionGalleryRoute
@@ -39,6 +42,7 @@ object ShowcaseRegistry {
             return listOf(
                 DevMenuEntry("Transition Gallery") { navController.navigate(TransitionGalleryRoute) },
                 DevMenuEntry("State Gallery") { navController.navigate(StateGalleryRoute) },
+                DevMenuEntry("Cloud Todo (write path)") { navController.navigate(CloudTodoRoute) },
             )
         }
         // demo:end
@@ -50,6 +54,13 @@ object ShowcaseRegistry {
         // demo:begin
         transitionGalleryGraph(navController)
         stateGalleryGraph(navController)
+        // The registry supplies the conflict hand-off, so feature/cloudtodo never depends on
+        // feature/settings — a Conflicted outcome opens the SHIPPED Sync & Drafts screen rather
+        // than this demo growing a duplicate conflict surface.
+        cloudTodoGraph(
+            navController = navController,
+            onResolveConflict = { navController.navigateToSyncAndDrafts() },
+        )
         // demo:end
     }
 }

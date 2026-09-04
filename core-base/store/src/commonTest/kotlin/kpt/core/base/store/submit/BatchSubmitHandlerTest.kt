@@ -10,7 +10,6 @@
 package kpt.core.base.store.submit
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -30,7 +29,7 @@ class BatchSubmitHandlerTest {
 
     @Test
     fun `AllOrNothing all payloads succeed produces full success result`() = runTest {
-        val handler = BatchSubmitHandler<Int>(TestScope(testScheduler), BatchSubmitMode.AllOrNothing)
+        val handler = BatchSubmitHandler<Int>(BatchSubmitMode.AllOrNothing)
         val attempted = mutableListOf<Int>()
 
         val result = handler.submitBatch(listOf(1, 2, 3)) { _, payload, _ ->
@@ -50,7 +49,7 @@ class BatchSubmitHandlerTest {
 
     @Test
     fun `AllOrNothing first failure aborts remaining payloads`() = runTest {
-        val handler = BatchSubmitHandler<Int>(TestScope(testScheduler), BatchSubmitMode.AllOrNothing)
+        val handler = BatchSubmitHandler<Int>(BatchSubmitMode.AllOrNothing)
         val attempted = mutableListOf<Int>()
 
         val result = handler.submitBatch(listOf(1, 2, 3, 4)) { index, payload, _ ->
@@ -72,7 +71,7 @@ class BatchSubmitHandlerTest {
 
     @Test
     fun `Independent all payloads succeed produces full success result`() = runTest {
-        val handler = BatchSubmitHandler<String>(TestScope(testScheduler), BatchSubmitMode.Independent)
+        val handler = BatchSubmitHandler<String>(BatchSubmitMode.Independent)
         val attempted = mutableListOf<String>()
 
         val result = handler.submitBatch(listOf("a", "b", "c")) { _, payload, _ ->
@@ -90,7 +89,7 @@ class BatchSubmitHandlerTest {
 
     @Test
     fun `Independent attempts every payload and reports per-index failures`() = runTest {
-        val handler = BatchSubmitHandler<Int>(TestScope(testScheduler), BatchSubmitMode.Independent)
+        val handler = BatchSubmitHandler<Int>(BatchSubmitMode.Independent)
         val attempted = mutableListOf<Int>()
 
         val result = handler.submitBatch(listOf(10, 20, 30, 40)) { index, payload, _ ->
@@ -111,7 +110,7 @@ class BatchSubmitHandlerTest {
 
     @Test
     fun `Independent every payload fails returns isFullFailure`() = runTest {
-        val handler = BatchSubmitHandler<Int>(TestScope(testScheduler), BatchSubmitMode.Independent)
+        val handler = BatchSubmitHandler<Int>(BatchSubmitMode.Independent)
 
         val result = handler.submitBatch(listOf(1, 2, 3)) { _, _, _ ->
             throw RuntimeException("always-fail")
@@ -128,7 +127,7 @@ class BatchSubmitHandlerTest {
 
     @Test
     fun `empty batch returns zero counts with full success flag`() = runTest {
-        val handler = BatchSubmitHandler<Int>(TestScope(testScheduler))
+        val handler = BatchSubmitHandler<Int>()
 
         val result = handler.submitBatch(emptyList<Int>()) { _, _, _ ->
             error("submitBlock must not be called for an empty batch")
@@ -147,7 +146,7 @@ class BatchSubmitHandlerTest {
 
     @Test
     fun `submitBlock receives the same idempotency key for every payload in the batch`() = runTest {
-        val handler = BatchSubmitHandler<Int>(TestScope(testScheduler))
+        val handler = BatchSubmitHandler<Int>()
         val keysSeen = mutableSetOf<String>()
 
         val provided = "test-key-12345"
@@ -160,7 +159,7 @@ class BatchSubmitHandlerTest {
 
     @Test
     fun `default idempotency key is auto-generated UUID-shaped string`() = runTest {
-        val handler = BatchSubmitHandler<Int>(TestScope(testScheduler))
+        val handler = BatchSubmitHandler<Int>()
         var observed: String? = null
 
         handler.submitBatch(listOf(1)) { _, _, key -> observed = key }

@@ -20,6 +20,7 @@ import org.mobilenativefoundation.store.store5.StoreBuilder
 import kpt.core.base.store.fixtures.FakeNetworkMonitor
 import kpt.core.base.store.infra.FakeFetchedAtRepository
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
@@ -69,13 +70,12 @@ class ScreenDataStreamIntegrationTest {
             // computed by decideFreshness() sibling. For a live in-memory store with
             // network, either isRefreshing=true (request in-flight) or false (FRESH).
             // Both are valid initial emissions; either way the Content path is healthy.
-            val signal = content.freshnessSignal
-            // Any signal state is acceptable here — band defaults to Initial/Fresh
-            // and isRefreshing reflects request lifecycle.
-            assertTrue(
-                true,
-                "Content emitted via in-memory + live network path: signal=$signal",
-            )
+            // Assert the value actually reaches the screen. The original assertion here was
+            // `assertTrue(true, "…signal=$signal")` — it could not fail, and merely interpolated the
+            // signal into a message that nothing read. Freshness band / isRefreshing are genuinely
+            // timing-dependent against a live in-memory store, which is why they are pinned in
+            // DecisionEngineTest against a deterministic clock rather than asserted here.
+            assertEquals("hello", content.data, "the fetched value must reach the screen")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -183,19 +183,25 @@ class ScreenDataStreamIntegrationTest {
             network.setStatus(NetworkStatus.Available(onlineInfo))
             advanceUntilIdle()
 
-            // After reconnect + debounce window, a refresh is triggered
-            // Drain until we get Content or timeout
-            var found = false
-            run drainLoop@{
-                repeat(5) {
-                    val next = awaitItem()
-                    if (next is ScreenState.Content) {
-                        found = true
-                        return@drainLoop
-                    }
-                }
+            // After reconnect + debounce window, a refresh is triggered.
+            //
+            // Drain until Content, bounded by turbine's `timeout` (30s) — NOT by an iteration
+            // count. The previous `repeat(5)` contradicted this comment's own stated intent: how
+            // many intermediate states (Loading / Refreshing / freshness re-emissions) precede
+            // Content is timing-dependent, so a slower or more contended runner can legitimately
+            // emit more than five before the fetch lands and exhaust the budget while the stream
+            // is still healthy. That made this a CI-only failure — it passes on a fast dev machine.
+            // If Content genuinely never arrives, awaitItem() now fails on the turbine timeout
+            // with a real "no more events" diagnostic instead of a bare AssertionError.
+            var next: ScreenState<String> = awaitItem()
+            while (next !is ScreenState.Content) {
+                next = awaitItem()
             }
-            assertTrue(found, "Expected Content after reconnect, but state never reached Content")
+            assertEquals(
+                "refreshed",
+                next.data,
+                "reconnect must refresh from the network, not resurface stale cache",
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }

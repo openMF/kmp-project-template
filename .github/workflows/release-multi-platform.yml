@@ -324,8 +324,14 @@ jobs:
         if [ -n "${KEYSTORE_ALIAS:-}" ]; then
           echo "KEY_ALIAS=$KEYSTORE_ALIAS" >> "$GITHUB_ENV"
         fi
+        # Falls back to the STORE password. A PKCS12 keystore has no separate key password
+        # (keytool discards -keypass at creation), so the two are the same value — but an
+        # EMPTY key password is not "unset", it is a signing failure ("key associated with
+        # <alias> not a private key"). Never export an empty KEY_PASSWORD.
         if [ -n "${KEYSTORE_ALIAS_PASSWORD:-}" ]; then
           echo "KEY_PASSWORD=$KEYSTORE_ALIAS_PASSWORD" >> "$GITHUB_ENV"
+        elif [ -n "${KEYSTORE_PASSWORD:-}" ]; then
+          echo "KEY_PASSWORD=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
         fi
         if [ -n "${KEYSTORE_PASSWORD:-}" ]; then
           # IMPORTANT: pass RELATIVE path (relative to DEPLOYMENT_REPO_ROOT = repo root).
@@ -357,7 +363,11 @@ jobs:
       upload_keystore:              ${{ secrets.UPLOAD_KEYSTORE }}
       keystore_password:            ${{ secrets.KEYSTORE_PASSWORD }}
       keystore_alias:               ${{ secrets.KEYSTORE_ALIAS }}
-      keystore_alias_password:      ${{ secrets.KEYSTORE_ALIAS_PASSWORD }}
+      # `||` falls through when the secret is unset or empty. PKCS12 has no separate key
+      # password, so this is the SAME credential as keystore_password; a fork that has not
+      # re-synced its CI secrets would otherwise pass an empty value cross-org to the
+      # orchestrator, and an empty key password fails signing rather than being ignored.
+      keystore_alias_password:      ${{ secrets.KEYSTORE_ALIAS_PASSWORD || secrets.KEYSTORE_PASSWORD }}
       firebase_android_app_id:      ${{ secrets.FIREBASE_ANDROID_APP_ID }}
       firebase_android_demo_app_id: ${{ secrets.FIREBASE_ANDROID_DEMO_APP_ID }}
       appstore_key_id:              ${{ secrets.APPSTORE_KEY_ID }}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ko · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_star_add_cd">관심 목록에 추가</string>
+    <string name="screens_watchlist_star_remove_cd">관심 목록에서 제거</string>
+</resources>

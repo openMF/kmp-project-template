@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: pt-rBR · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Lista de acompanhamento</string>
+    <string name="screens_watchlist_back_cd">Voltar</string>
+    <string name="screens_watchlist_remove_cd">Remover da lista de acompanhamento</string>
+    <string name="screens_watchlist_empty">Sua lista de acompanhamento está vazia</string>
+</resources>

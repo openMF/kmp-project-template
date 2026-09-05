@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: es · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">Atrás</string>
+    <string name="screens_rates_list_title">Tipos de interés</string>
+    <string name="screens_rates_refresh_all_cd">Actualizar todo</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">Actualizar</string>
+    <string name="screens_rates_detail_current_label">Actual</string>
+    <string name="screens_rates_detail_source_label">Fuente: %1$s</string>
+    <string name="screens_rates_detail_observations_label">Observaciones</string>
+</resources>

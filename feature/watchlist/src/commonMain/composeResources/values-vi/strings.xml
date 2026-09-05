@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: vi · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Danh sách theo dõi</string>
+    <string name="screens_watchlist_back_cd">Quay lại</string>
+    <string name="screens_watchlist_remove_cd">Xóa khỏi danh sách theo dõi</string>
+    <string name="screens_watchlist_empty">Danh sách theo dõi của bạn trống</string>
+</resources>

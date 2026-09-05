@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: pl · translated by /idea-locale -->
+<resources>
+    <string name="screens_emicalculator_title">Kalkulator raty</string>
+    <string name="screens_emicalculator_back_cd">Wstecz</string>
+    <string name="screens_emicalculator_principal_label">Kwota kapitału</string>
+    <string name="screens_emicalculator_rate_label">Stopa roczna (%)</string>
+    <string name="screens_emicalculator_tenure_label">Okres (miesiące)</string>
+    <string name="screens_emicalculator_monthly_emi_label">Rata miesięczna</string>
+    <string name="screens_emicalculator_total_payment_label">Łączna spłata</string>
+    <string name="screens_emicalculator_total_interest_label">Łączne odsetki</string>
+</resources>

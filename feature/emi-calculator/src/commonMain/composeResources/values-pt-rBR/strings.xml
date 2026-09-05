@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: pt-rBR · translated by /idea-locale -->
+<resources>
+    <string name="screens_emicalculator_title">Calculadora de parcelas</string>
+    <string name="screens_emicalculator_back_cd">Voltar</string>
+    <string name="screens_emicalculator_principal_label">Valor principal</string>
+    <string name="screens_emicalculator_rate_label">Taxa anual (%)</string>
+    <string name="screens_emicalculator_tenure_label">Prazo (meses)</string>
+    <string name="screens_emicalculator_monthly_emi_label">Parcela mensal</string>
+    <string name="screens_emicalculator_total_payment_label">Pagamento total</string>
+    <string name="screens_emicalculator_total_interest_label">Juros totais</string>
+</resources>

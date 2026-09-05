@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: pl · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">Harmonogram spłat</string>
+    <string name="screens_amortization_schedule_back_cd">Wstecz</string>
+    <string name="screens_amortization_schedule_header_month">Nr</string>
+    <string name="screens_amortization_schedule_header_principal">Kapitał</string>
+    <string name="screens_amortization_schedule_header_interest">Odsetki</string>
+    <string name="screens_amortization_schedule_header_balance">Saldo</string>
+    <string name="screens_amortization_schedule_summary_title">Podsumowanie</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Łączne płatności</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Łączny kapitał</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Łączne odsetki</string>
+</resources>

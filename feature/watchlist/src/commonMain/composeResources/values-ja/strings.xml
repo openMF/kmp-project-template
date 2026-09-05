@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ja · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">ウォッチリスト</string>
+    <string name="screens_watchlist_back_cd">戻る</string>
+    <string name="screens_watchlist_remove_cd">ウォッチリストから削除</string>
+    <string name="screens_watchlist_empty">ウォッチリストは空です</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: uk · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">Графік платежів</string>
+    <string name="screens_amortization_schedule_back_cd">Назад</string>
+    <string name="screens_amortization_schedule_header_month">№</string>
+    <string name="screens_amortization_schedule_header_principal">Основна сума</string>
+    <string name="screens_amortization_schedule_header_interest">Відсотки</string>
+    <string name="screens_amortization_schedule_header_balance">Залишок</string>
+    <string name="screens_amortization_schedule_summary_title">Підсумок</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Усього платежів</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Усього основної суми</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Усього відсотків</string>
+</resources>

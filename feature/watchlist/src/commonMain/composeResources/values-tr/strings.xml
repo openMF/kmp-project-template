@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: tr · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">İzleme listesi</string>
+    <string name="screens_watchlist_back_cd">Geri</string>
+    <string name="screens_watchlist_remove_cd">İzleme listesinden çıkar</string>
+    <string name="screens_watchlist_empty">İzleme listeniz boş</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rTW · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">還款計畫</string>
+    <string name="screens_amortization_schedule_back_cd">返回</string>
+    <string name="screens_amortization_schedule_header_month">#</string>
+    <string name="screens_amortization_schedule_header_principal">本金</string>
+    <string name="screens_amortization_schedule_header_interest">利息</string>
+    <string name="screens_amortization_schedule_header_balance">餘額</string>
+    <string name="screens_amortization_schedule_summary_title">摘要</string>
+    <string name="screens_amortization_schedule_summary_total_payments">還款總額</string>
+    <string name="screens_amortization_schedule_summary_total_principal">本金總額</string>
+    <string name="screens_amortization_schedule_summary_total_interest">利息總額</string>
+</resources>

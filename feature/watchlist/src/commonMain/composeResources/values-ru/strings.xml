@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ru · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Список отслеживания</string>
+    <string name="screens_watchlist_back_cd">Назад</string>
+    <string name="screens_watchlist_remove_cd">Удалить из списка отслеживания</string>
+    <string name="screens_watchlist_empty">Ваш список отслеживания пуст</string>
+</resources>

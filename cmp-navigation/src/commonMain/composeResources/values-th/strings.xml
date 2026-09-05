@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: th · seeded by /idea-locale · values carry SOURCE text until translated -->
+<resources>
+    <string name="app_name" translate="pending">KPT Design</string>
+    <string name="home" translate="pending">Home</string>
+    <string name="profile" translate="pending">Profile</string>
+    <string name="settings" translate="pending">Settings</string>
+    <string name="not_connected" translate="pending">⚠️ You aren’t connected to the internet</string>
+    <string name="screenstate_empty_title" translate="pending">Nothing here yet</string>
+    <string name="screenstate_empty_message" translate="pending">When you have data, it'll show up here.</string>
+    <string name="screenstate_error_title" translate="pending">Something went wrong</string>
+    <string name="screenstate_error_retry" translate="pending">Try again</string>
+    <string name="screenstate_nonet_title" translate="pending">You're offline</string>
+    <string name="screenstate_nonet_message" translate="pending">We'll retry when you reconnect.</string>
+    <string name="screenstate_nonet_retry" translate="pending">Retry now</string>
+    <string name="screenstate_captive_title" translate="pending">Sign in to WiFi</string>
+    <string name="screenstate_captive_message" translate="pending">Your network needs you to sign in before connecting.</string>
+    <string name="screenstate_captive_action" translate="pending">Open sign-in page</string>
+    <string name="error_category_network" translate="pending">Can't reach the server. Check your connection.</string>
+    <string name="error_category_auth" translate="pending">Your session expired. Please sign in again.</string>
+    <string name="error_category_ratelimit" translate="pending">Too many requests. Please wait and try again.</string>
+    <string name="error_category_server" translate="pending">Our servers are having a moment. Try again in a bit.</string>
+    <string name="error_category_generic" translate="pending">Something went wrong</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rCN · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">本地资料</string>
+    <string name="screens_profile_local_message">%1$s 完全在设备上运行，无需账户。</string>
+</resources>

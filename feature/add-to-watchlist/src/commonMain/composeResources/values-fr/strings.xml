@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: fr · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_star_add_cd">Ajouter à la liste de suivi</string>
+    <string name="screens_watchlist_star_remove_cd">Retirer de la liste de suivi</string>
+</resources>

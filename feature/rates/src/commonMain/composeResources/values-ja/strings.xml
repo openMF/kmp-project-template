@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ja · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">戻る</string>
+    <string name="screens_rates_list_title">金利</string>
+    <string name="screens_rates_refresh_all_cd">すべて更新</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">更新</string>
+    <string name="screens_rates_detail_current_label">現在</string>
+    <string name="screens_rates_detail_source_label">出典: %1$s</string>
+    <string name="screens_rates_detail_observations_label">観測値</string>
+</resources>

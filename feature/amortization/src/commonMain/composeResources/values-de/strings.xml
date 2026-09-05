@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: de · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">Tilgungsplan</string>
+    <string name="screens_amortization_schedule_back_cd">Zurück</string>
+    <string name="screens_amortization_schedule_header_month">Nr.</string>
+    <string name="screens_amortization_schedule_header_principal">Tilgung</string>
+    <string name="screens_amortization_schedule_header_interest">Zinsen</string>
+    <string name="screens_amortization_schedule_header_balance">Restschuld</string>
+    <string name="screens_amortization_schedule_summary_title">Zusammenfassung</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Zahlungen gesamt</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Tilgung gesamt</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Zinsen gesamt</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rTW · translated by /idea-locale
+     NB: Loading / Empty / Error / NoNetwork / Content are ScreenState VARIANT NAMES (Kotlin
+     identifiers) that this dev-only gallery exists to exhibit — deliberately not translated. -->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">對 core/designsystem 提供的每個 ScreenState 變體和每個元件層級狀態原語進行視覺冒煙測試。</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty （預設值：標題 + 訊息）</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error 全螢幕</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — 強制入口網站 CTA</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — 一般離線</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">已點擊 ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">點按每個圖磚，使用該轉場推入示範頁面。目標頁面 2 秒後自動返回。請注意是否閃爍。</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n（2 秒後自動返回）</string>
+</resources>

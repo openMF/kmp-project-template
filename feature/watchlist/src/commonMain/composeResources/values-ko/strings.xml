@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ko · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">관심 목록</string>
+    <string name="screens_watchlist_back_cd">뒤로</string>
+    <string name="screens_watchlist_remove_cd">관심 목록에서 제거</string>
+    <string name="screens_watchlist_empty">관심 목록이 비어 있습니다</string>
+</resources>

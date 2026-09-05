@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: id · translated by /idea-locale -->
+<resources>
+    <string name="screens_macro_back_cd">Kembali</string>
+    <string name="screens_macro_country_title">Makro negara</string>
+    <string name="screens_macro_refresh_all_cd">Segarkan semua</string>
+    <string name="screens_macro_stale_chip">USANG — menampilkan data cache</string>
+    <string name="screens_macro_picker_title">Pilih negara</string>
+    <string name="screens_macro_picker_search_placeholder">Cari negara atau kode ISO</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Sumber: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Tahun demi tahun</string>
+    <string name="screens_macro_card_empty">Tidak ada data yang dipublikasikan untuk indikator ini.</string>
+    <string name="screens_macro_card_captive_portal">Di balik captive portal — masuk untuk melanjutkan.</string>
+    <string name="screens_macro_card_offline">Offline — sambungkan untuk mengambil indikator ini.</string>
+    <string name="screens_macro_card_generic_error">Tidak dapat memuat indikator ini.</string>
+    <string name="screens_macro_card_auth_required">Perlu autentikasi.</string>
+    <string name="screens_macro_card_latest_year">Terbaru: %1$s</string>
+    <string name="screens_macro_card_loading">Memuat…</string>
+    <string name="screens_macro_card_retry">Coba lagi</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

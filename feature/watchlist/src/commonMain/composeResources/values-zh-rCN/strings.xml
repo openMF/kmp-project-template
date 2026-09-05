@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rCN · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">自选</string>
+    <string name="screens_watchlist_back_cd">返回</string>
+    <string name="screens_watchlist_remove_cd">从自选中移除</string>
+    <string name="screens_watchlist_empty">您的自选列表为空</string>
+</resources>

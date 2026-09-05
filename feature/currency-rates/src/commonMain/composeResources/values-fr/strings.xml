@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: fr · translated by /idea-locale -->
+<resources>
+    <string name="screens_currencyrates_list_title">Taux de change</string>
+    <string name="screens_currencyrates_list_back_cd">Retour</string>
+    <string name="screens_currencyrates_list_search_placeholder">Rechercher une devise…</string>
+    <string name="screens_currencyrates_list_base_label">Base: %1$s • %2$s</string>
+    <string name="screens_currencyrates_converter_title">Convertisseur de devises</string>
+    <string name="screens_currencyrates_converter_amount_label">Montant</string>
+    <string name="screens_currencyrates_converter_target_label">Vers (ex. EUR)</string>
+    <string name="screens_currencyrates_converter_result">%1$s %2$s = %3$s %4$s</string>
+    <string name="screens_currencyrates_converter_unavailable">Saisissez un montant et un code de devise pris en charge.</string>
+    <string name="screens_currencyrates_history_title">Historique des taux</string>
+    <string name="screens_currencyrates_history_back_cd">Retour</string>
+    <string name="screens_currencyrates_history_currency_label">Devise</string>
+    <string name="screens_currencyrates_history_period_label">Période</string>
+    <string name="screens_currencyrates_history_period_days">%1$d j</string>
+    <string name="screens_currencyrates_history_usd_label">USD</string>
+    <string name="screens_currencyrates_history_to_label">%1$s (du %2$s au %3$s)</string>
+</resources>

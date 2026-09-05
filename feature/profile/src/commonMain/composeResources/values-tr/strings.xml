@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: tr · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">Yerel profil</string>
+    <string name="screens_profile_local_message">%1$s tamamen cihaz üzerinde çalışır. Hesap gerekmez.</string>
+</resources>

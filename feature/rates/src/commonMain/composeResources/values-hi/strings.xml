@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: hi · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">वापस</string>
+    <string name="screens_rates_list_title">ब्याज दरें</string>
+    <string name="screens_rates_refresh_all_cd">सभी रीफ़्रेश करें</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">रीफ़्रेश करें</string>
+    <string name="screens_rates_detail_current_label">वर्तमान</string>
+    <string name="screens_rates_detail_source_label">स्रोत: %1$s</string>
+    <string name="screens_rates_detail_observations_label">प्रेक्षण</string>
+</resources>

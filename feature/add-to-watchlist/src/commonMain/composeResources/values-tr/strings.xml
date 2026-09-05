@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: tr · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_star_add_cd">İzleme listesine ekle</string>
+    <string name="screens_watchlist_star_remove_cd">İzleme listesinden çıkar</string>
+</resources>

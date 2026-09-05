@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: hi · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_star_add_cd">वॉचलिस्ट में जोड़ें</string>
+    <string name="screens_watchlist_star_remove_cd">वॉचलिस्ट से हटाएँ</string>
+</resources>

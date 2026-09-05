@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: th · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_star_add_cd">เพิ่มในรายการติดตาม</string>
+    <string name="screens_watchlist_star_remove_cd">นำออกจากรายการติดตาม</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: pt-rBR · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">Perfil local</string>
+    <string name="screens_profile_local_message">O %1$s funciona inteiramente no dispositivo. Nenhuma conta necessária.</string>
+</resources>

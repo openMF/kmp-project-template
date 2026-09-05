@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: tr · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">Ödeme planı</string>
+    <string name="screens_amortization_schedule_back_cd">Geri</string>
+    <string name="screens_amortization_schedule_header_month">#</string>
+    <string name="screens_amortization_schedule_header_principal">Anapara</string>
+    <string name="screens_amortization_schedule_header_interest">Faiz</string>
+    <string name="screens_amortization_schedule_header_balance">Bakiye</string>
+    <string name="screens_amortization_schedule_summary_title">Özet</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Toplam ödemeler</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Toplam anapara</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Toplam faiz</string>
+</resources>

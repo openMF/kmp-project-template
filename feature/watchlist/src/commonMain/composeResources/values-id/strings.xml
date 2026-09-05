@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: id · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Daftar pantau</string>
+    <string name="screens_watchlist_back_cd">Kembali</string>
+    <string name="screens_watchlist_remove_cd">Hapus dari daftar pantau</string>
+    <string name="screens_watchlist_empty">Daftar pantau Anda kosong</string>
+</resources>

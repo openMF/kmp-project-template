@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: it · translated by /idea-locale -->
+<resources>
+    <string name="screens_macro_back_cd">Indietro</string>
+    <string name="screens_macro_country_title">Macro per paese</string>
+    <string name="screens_macro_refresh_all_cd">Aggiorna tutto</string>
+    <string name="screens_macro_stale_chip">OBSOLETO — dati dalla cache</string>
+    <string name="screens_macro_picker_title">Seleziona paese</string>
+    <string name="screens_macro_picker_search_placeholder">Cerca paese o codice ISO</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Fonte: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Anno per anno</string>
+    <string name="screens_macro_card_empty">Nessun dato pubblicato per questo indicatore.</string>
+    <string name="screens_macro_card_captive_portal">Dietro un captive portal — accedi per continuare.</string>
+    <string name="screens_macro_card_offline">Offline — connettiti per recuperare questo indicatore.</string>
+    <string name="screens_macro_card_generic_error">Impossibile caricare questo indicatore.</string>
+    <string name="screens_macro_card_auth_required">Autenticazione richiesta.</string>
+    <string name="screens_macro_card_latest_year">Ultimo: %1$s</string>
+    <string name="screens_macro_card_loading">Caricamento…</string>
+    <string name="screens_macro_card_retry">Riprova</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: uk · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_star_add_cd">Додати до списку стеження</string>
+    <string name="screens_watchlist_star_remove_cd">Видалити зі списку стеження</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rCN · translated by /idea-locale
+     NB: Loading / Empty / Error / NoNetwork / Content are ScreenState VARIANT NAMES (Kotlin
+     identifiers) that this dev-only gallery exists to exhibit — deliberately not translated. -->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">对 core/designsystem 提供的每个 ScreenState 变体和每个组件级状态原语进行可视化冒烟测试。</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty （默认值：标题 + 消息）</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error 全屏</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — 强制门户 CTA</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — 普通离线</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">已点击 ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">点按每个磁贴，使用该转场推入演示页面。目标页面 2 秒后自动返回。注意是否闪烁。</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n（2 秒后自动返回）</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rCN · translated by /idea-locale -->
+<resources>
+    <string name="screens_macro_back_cd">返回</string>
+    <string name="screens_macro_country_title">国家宏观数据</string>
+    <string name="screens_macro_refresh_all_cd">全部刷新</string>
+    <string name="screens_macro_stale_chip">已过期 — 显示缓存数据</string>
+    <string name="screens_macro_picker_title">选择国家</string>
+    <string name="screens_macro_picker_search_placeholder">搜索国家或 ISO 代码</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">来源：%1$s</string>
+    <string name="screens_macro_detail_year_by_year">逐年</string>
+    <string name="screens_macro_card_empty">该指标暂无发布数据。</string>
+    <string name="screens_macro_card_captive_portal">处于强制门户后 — 请登录后继续。</string>
+    <string name="screens_macro_card_offline">离线 — 请联网以获取该指标。</string>
+    <string name="screens_macro_card_generic_error">无法加载该指标。</string>
+    <string name="screens_macro_card_auth_required">需要身份验证。</string>
+    <string name="screens_macro_card_latest_year">最新：%1$s</string>
+    <string name="screens_macro_card_loading">加载中…</string>
+    <string name="screens_macro_card_retry">重试</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: th · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">ตารางการชำระเงิน</string>
+    <string name="screens_amortization_schedule_back_cd">ย้อนกลับ</string>
+    <string name="screens_amortization_schedule_header_month">#</string>
+    <string name="screens_amortization_schedule_header_principal">เงินต้น</string>
+    <string name="screens_amortization_schedule_header_interest">ดอกเบี้ย</string>
+    <string name="screens_amortization_schedule_header_balance">ยอดคงเหลือ</string>
+    <string name="screens_amortization_schedule_summary_title">สรุป</string>
+    <string name="screens_amortization_schedule_summary_total_payments">ยอดชำระรวม</string>
+    <string name="screens_amortization_schedule_summary_total_principal">เงินต้นรวม</string>
+    <string name="screens_amortization_schedule_summary_total_interest">ดอกเบี้ยรวม</string>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: hi · translated by /idea-locale
+     NB: Loading / Empty / Error / NoNetwork / Content are ScreenState VARIANT NAMES (Kotlin
+     identifiers) that this dev-only gallery exists to exhibit — deliberately not translated. -->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">core/designsystem द्वारा दिए गए हर ScreenState वैरिएंट और हर कंपोनेंट-स्तरीय स्टेट प्रिमिटिव के लिए विज़ुअल स्मोक टेस्ट।</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (डिफ़ॉल्ट — शीर्षक + संदेश)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error पूर्ण-स्क्रीन</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — कैप्टिव पोर्टल CTA</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — सामान्य ऑफ़लाइन</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">टैप ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">उस ट्रांज़िशन से डेमो स्क्रीन खोलने के लिए हर टाइल पर टैप करें। गंतव्य 2 सेकंड बाद अपने आप बंद हो जाता है। ब्लिंक पर ध्यान दें।</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(2 सेकंड में अपने आप बंद)</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rTW · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">返回</string>
+    <string name="screens_rates_list_title">利率</string>
+    <string name="screens_rates_refresh_all_cd">全部重新整理</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">重新整理</string>
+    <string name="screens_rates_detail_current_label">目前</string>
+    <string name="screens_rates_detail_source_label">來源：%1$s</string>
+    <string name="screens_rates_detail_observations_label">觀測值</string>
+</resources>

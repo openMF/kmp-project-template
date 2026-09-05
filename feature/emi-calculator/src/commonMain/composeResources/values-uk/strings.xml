@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: uk · translated by /idea-locale -->
+<resources>
+    <string name="screens_emicalculator_title">Калькулятор платежу</string>
+    <string name="screens_emicalculator_back_cd">Назад</string>
+    <string name="screens_emicalculator_principal_label">Сума основного боргу</string>
+    <string name="screens_emicalculator_rate_label">Річна ставка (%)</string>
+    <string name="screens_emicalculator_tenure_label">Строк (місяців)</string>
+    <string name="screens_emicalculator_monthly_emi_label">Щомісячний платіж</string>
+    <string name="screens_emicalculator_total_payment_label">Загальна сума виплат</string>
+    <string name="screens_emicalculator_total_interest_label">Усього відсотків</string>
+</resources>

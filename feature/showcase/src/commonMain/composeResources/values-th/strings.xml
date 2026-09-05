@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: th · translated by /idea-locale
+     NB: Loading / Empty / Error / NoNetwork / Content are ScreenState VARIANT NAMES (Kotlin
+     identifiers) that this dev-only gallery exists to exhibit — deliberately not translated. -->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">การทดสอบภาพเบื้องต้นสำหรับทุกรูปแบบของ ScreenState และทุกสถานะระดับคอมโพเนนต์ที่ core/designsystem มีให้</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (ค่าเริ่มต้น — ชื่อเรื่อง + ข้อความ)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error เต็มหน้าจอ</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — CTA แบบ captive portal</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — ออฟไลน์ธรรมดา</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">แตะ ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">แตะแต่ละไทล์เพื่อเปิดหน้าจอสาธิตด้วยทรานซิชันนั้น ปลายทางจะปิดเองใน 2 วินาที สังเกตการกะพริบ</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(ปิดเองใน 2 วินาที)</string>
+</resources>

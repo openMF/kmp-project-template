@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: uk · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">Локальний профіль</string>
+    <string name="screens_profile_local_message">%1$s працює повністю на пристрої. Обліковий запис не потрібен.</string>
+</resources>

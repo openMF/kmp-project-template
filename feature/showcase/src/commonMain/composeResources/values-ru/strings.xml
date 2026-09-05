@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ru · translated by /idea-locale
+     NB: Loading / Empty / Error / NoNetwork / Content are ScreenState VARIANT NAMES (Kotlin
+     identifiers) that this dev-only gallery exists to exhibit — deliberately not translated. -->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">Визуальный дымовой тест для каждого варианта ScreenState и каждого примитива состояния уровня компонента из core/designsystem.</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (по умолчанию — заголовок + сообщение)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error во весь экран</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — CTA перехватывающего портала</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — обычный офлайн</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">нажато ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">Нажмите на плитку, чтобы открыть демоэкран с этим переходом. Экран закроется сам через 2 с. Следите за миганием.</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(закроется через 2 с)</string>
+</resources>

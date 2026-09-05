@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ru · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">Локальный профиль</string>
+    <string name="screens_profile_local_message">%1$s работает полностью на устройстве. Учётная запись не требуется.</string>
+</resources>

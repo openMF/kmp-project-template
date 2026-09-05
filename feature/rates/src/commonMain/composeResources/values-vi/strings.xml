@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: vi · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">Quay lại</string>
+    <string name="screens_rates_list_title">Lãi suất</string>
+    <string name="screens_rates_refresh_all_cd">Làm mới tất cả</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">Làm mới</string>
+    <string name="screens_rates_detail_current_label">Hiện tại</string>
+    <string name="screens_rates_detail_source_label">Nguồn: %1$s</string>
+    <string name="screens_rates_detail_observations_label">Quan sát</string>
+</resources>

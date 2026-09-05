@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: de · translated by /idea-locale -->
+<resources>
+    <string name="screens_macro_back_cd">Zurück</string>
+    <string name="screens_macro_country_title">Länder-Makrodaten</string>
+    <string name="screens_macro_refresh_all_cd">Alle aktualisieren</string>
+    <string name="screens_macro_stale_chip">VERALTET – zwischengespeicherte Daten</string>
+    <string name="screens_macro_picker_title">Land auswählen</string>
+    <string name="screens_macro_picker_search_placeholder">Land oder ISO-Code suchen</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Quelle: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Jahr für Jahr</string>
+    <string name="screens_macro_card_empty">Für diesen Indikator wurden keine Daten veröffentlicht.</string>
+    <string name="screens_macro_card_captive_portal">Hinter einem Captive Portal – zum Fortfahren anmelden.</string>
+    <string name="screens_macro_card_offline">Offline – verbinde dich, um diesen Indikator zu laden.</string>
+    <string name="screens_macro_card_generic_error">Dieser Indikator konnte nicht geladen werden.</string>
+    <string name="screens_macro_card_auth_required">Authentifizierung erforderlich.</string>
+    <string name="screens_macro_card_latest_year">Zuletzt: %1$s</string>
+    <string name="screens_macro_card_loading">Wird geladen…</string>
+    <string name="screens_macro_card_retry">Wiederholen</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: id · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">Profil lokal</string>
+    <string name="screens_profile_local_message">%1$s berjalan sepenuhnya di perangkat. Tidak perlu akun.</string>
+</resources>

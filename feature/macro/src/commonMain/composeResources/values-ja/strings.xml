@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ja · translated by /idea-locale -->
+<resources>
+    <string name="screens_macro_back_cd">戻る</string>
+    <string name="screens_macro_country_title">国別マクロ指標</string>
+    <string name="screens_macro_refresh_all_cd">すべて更新</string>
+    <string name="screens_macro_stale_chip">古い情報 — キャッシュを表示中</string>
+    <string name="screens_macro_picker_title">国を選択</string>
+    <string name="screens_macro_picker_search_placeholder">国名または ISO コードで検索</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">出典: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">年ごと</string>
+    <string name="screens_macro_card_empty">この指標のデータは公開されていません。</string>
+    <string name="screens_macro_card_captive_portal">キャプティブポータルの内側です — 続けるにはサインインしてください。</string>
+    <string name="screens_macro_card_offline">オフラインです — この指標を取得するには接続してください。</string>
+    <string name="screens_macro_card_generic_error">この指標を読み込めませんでした。</string>
+    <string name="screens_macro_card_auth_required">認証が必要です。</string>
+    <string name="screens_macro_card_latest_year">最新: %1$s</string>
+    <string name="screens_macro_card_loading">読み込み中…</string>
+    <string name="screens_macro_card_retry">再試行</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

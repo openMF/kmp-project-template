@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: vi · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">Hồ sơ cục bộ</string>
+    <string name="screens_profile_local_message">%1$s chạy hoàn toàn trên thiết bị. Không cần tài khoản.</string>
+</resources>

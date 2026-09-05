@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ar · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">قائمة المتابعة</string>
+    <string name="screens_watchlist_back_cd">رجوع</string>
+    <string name="screens_watchlist_remove_cd">إزالة من قائمة المتابعة</string>
+    <string name="screens_watchlist_empty">قائمة المتابعة فارغة</string>
+</resources>

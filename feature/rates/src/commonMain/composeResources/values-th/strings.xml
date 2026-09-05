@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: th · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">ย้อนกลับ</string>
+    <string name="screens_rates_list_title">อัตราดอกเบี้ย</string>
+    <string name="screens_rates_refresh_all_cd">รีเฟรชทั้งหมด</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">รีเฟรช</string>
+    <string name="screens_rates_detail_current_label">ปัจจุบัน</string>
+    <string name="screens_rates_detail_source_label">แหล่งที่มา: %1$s</string>
+    <string name="screens_rates_detail_observations_label">ค่าที่สังเกตได้</string>
+</resources>

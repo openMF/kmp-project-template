@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rTW · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">本機個人資料</string>
+    <string name="screens_profile_local_message">%1$s 完全在裝置上執行，無需帳戶。</string>
+</resources>

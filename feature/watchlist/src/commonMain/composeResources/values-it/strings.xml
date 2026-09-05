@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: it · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Watchlist</string>
+    <string name="screens_watchlist_back_cd">Indietro</string>
+    <string name="screens_watchlist_remove_cd">Rimuovi dalla watchlist</string>
+    <string name="screens_watchlist_empty">La tua watchlist è vuota</string>
+</resources>

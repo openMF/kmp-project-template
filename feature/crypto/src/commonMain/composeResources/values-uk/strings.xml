@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: uk · seeded by /idea-locale · values carry SOURCE text until translated -->
+<resources>
+    <string name="screens_crypto_coin_markets_title" translate="pending">Coin Markets</string>
+    <string name="screens_crypto_coin_markets_back_cd" translate="pending">Back</string>
+    <string name="screens_crypto_coin_markets_empty" translate="pending">No coins to show yet.</string>
+    <string name="screens_crypto_coin_markets_error_retry" translate="pending">Retry</string>
+    <string name="screens_crypto_coin_markets_load_more_loading" translate="pending">Loading more…</string>
+    <string name="screens_crypto_coin_markets_load_more_end" translate="pending">You\'re all caught up</string>
+    <string name="screens_crypto_coin_markets_row_price_cd" translate="pending">Current price</string>
+    <string name="screens_crypto_coin_markets_row_change_cd" translate="pending">24 hour change</string>
+    <string name="screens_crypto_coin_detail_back_cd" translate="pending">Back</string>
+    <string name="screens_crypto_coin_detail_refresh_cd" translate="pending">Refresh</string>
+    <string name="screens_crypto_coin_detail_rank_label" translate="pending">Market cap rank</string>
+    <string name="screens_crypto_coin_detail_rank_value" translate="pending">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label" translate="pending">Market cap</string>
+    <string name="screens_crypto_coin_detail_high_label" translate="pending">24h high</string>
+    <string name="screens_crypto_coin_detail_low_label" translate="pending">24h low</string>
+    <string name="screens_crypto_coin_detail_circulating_label" translate="pending">Circulating supply</string>
+    <string name="screens_crypto_coin_detail_max_supply_label" translate="pending">Max supply</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited" translate="pending">Unlimited</string>
+    <string name="screens_crypto_coin_detail_about_label" translate="pending">About</string>
+</resources>

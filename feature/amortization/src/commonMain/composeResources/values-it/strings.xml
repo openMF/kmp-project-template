@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: it · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">Piano di ammortamento</string>
+    <string name="screens_amortization_schedule_back_cd">Indietro</string>
+    <string name="screens_amortization_schedule_header_month">N.</string>
+    <string name="screens_amortization_schedule_header_principal">Capitale</string>
+    <string name="screens_amortization_schedule_header_interest">Interessi</string>
+    <string name="screens_amortization_schedule_header_balance">Saldo</string>
+    <string name="screens_amortization_schedule_summary_title">Riepilogo</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Pagamenti totali</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Capitale totale</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Interessi totali</string>
+</resources>

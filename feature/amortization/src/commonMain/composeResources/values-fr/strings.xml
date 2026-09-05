@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: fr · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">Échéancier</string>
+    <string name="screens_amortization_schedule_back_cd">Retour</string>
+    <string name="screens_amortization_schedule_header_month">N°</string>
+    <string name="screens_amortization_schedule_header_principal">Capital</string>
+    <string name="screens_amortization_schedule_header_interest">Intérêts</string>
+    <string name="screens_amortization_schedule_header_balance">Solde</string>
+    <string name="screens_amortization_schedule_summary_title">Résumé</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Total des paiements</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Capital total</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Intérêts totaux</string>
+</resources>

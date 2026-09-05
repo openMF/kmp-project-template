@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: id · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">Jadwal pembayaran</string>
+    <string name="screens_amortization_schedule_back_cd">Kembali</string>
+    <string name="screens_amortization_schedule_header_month">#</string>
+    <string name="screens_amortization_schedule_header_principal">Pokok</string>
+    <string name="screens_amortization_schedule_header_interest">Bunga</string>
+    <string name="screens_amortization_schedule_header_balance">Saldo</string>
+    <string name="screens_amortization_schedule_summary_title">Ringkasan</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Total pembayaran</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Total pokok</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Total bunga</string>
+</resources>

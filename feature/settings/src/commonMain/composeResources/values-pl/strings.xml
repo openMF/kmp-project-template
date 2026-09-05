@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: pl · seeded by /idea-locale · values carry SOURCE text until translated -->
+<resources>
+    <string name="feature_settings_top_app_bar_action_icon_description" translate="pending">Settings</string>
+    <string name="feature_settings_top_app_bar_navigation_icon_description" translate="pending">Search</string>
+    <string name="feature_settings_title" translate="pending">Settings</string>
+    <string name="feature_settings_loading" translate="pending">Loading…</string>
+    <string name="feature_settings_privacy_policy" translate="pending">Privacy policy</string>
+    <string name="feature_settings_licenses" translate="pending">Licenses</string>
+    <string name="feature_settings_brand_guidelines" translate="pending">Brand Guidelines</string>
+    <string name="feature_settings_feedback" translate="pending">Feedback</string>
+    <string name="feature_settings_theme" translate="pending">Theme</string>
+    <string name="feature_settings_brand_default" translate="pending">Default</string>
+    <string name="feature_settings_brand_android" translate="pending">Android</string>
+    <string name="feature_settings_dark_mode_preference" translate="pending">Dark mode preference</string>
+    <string name="feature_settings_dark_mode_config_system_default" translate="pending">System default</string>
+    <string name="feature_settings_dark_mode_config_light" translate="pending">Light</string>
+    <string name="feature_settings_dark_mode_config_dark" translate="pending">Dark</string>
+    <string name="feature_settings_dynamic_color_preference" translate="pending">Use Dynamic Color</string>
+    <string name="feature_settings_dynamic_color_yes" translate="pending">Yes</string>
+    <string name="feature_settings_dynamic_color_no" translate="pending">No</string>
+    <string name="feature_settings_dismiss_dialog_button_text" translate="pending">OK</string>
+    <string name="feature_settings_change_theme_text" translate="pending">Change Theme</string>
+    <string name="feature_settings_change_theme_placeholder_text" translate="pending">Change Theme</string>
+    <string name="feature_settings_change_language_text" translate="pending">Change Language</string>
+    <string name="feature_settings_change_language_placeholder_text" translate="pending">Change Language</string>
+    <string name="feature_settings_language_preference" translate="pending">Language</string>
+    <string name="feature_settings_dev_tools_title" translate="pending">Dev tools</string>
+    <string name="feature_settings_dev_transition_gallery" translate="pending">Transition Gallery</string>
+    <string name="feature_settings_dev_state_gallery" translate="pending">State Gallery</string>
+    <string name="feature_settings_dev_close" translate="pending">Close</string>
+    <string name="feature_settings_notifications_empty_title" translate="pending">No notifications yet</string>
+    <string name="feature_settings_notifications_empty_message" translate="pending">You\'ll see bill reminders and rate alerts here.</string>
+    <string name="feature_settings_sync_drafts_row" translate="pending">Sync &amp; Drafts</string>
+    <string name="feature_settings_sync_drafts_row_description" translate="pending">View and manage drafts and pending syncs</string>
+    <string name="feature_settings_sync_drafts_title" translate="pending">Sync &amp; Drafts</string>
+    <string name="feature_settings_sync_drafts_empty_title" translate="pending">Nothing to sync</string>
+    <string name="feature_settings_sync_drafts_empty_message" translate="pending">Drafts you save offline and records waiting to sync will appear here.</string>
+    <string name="feature_settings_sync_drafts_section_drafts" translate="pending">Drafts</string>
+    <string name="feature_settings_sync_drafts_section_syncing" translate="pending">Syncing</string>
+    <string name="feature_settings_sync_drafts_section_failed" translate="pending">Failed</string>
+    <string name="feature_settings_sync_drafts_status_pending" translate="pending">Pending</string>
+    <string name="feature_settings_sync_drafts_status_retrying" translate="pending">Retrying</string>
+    <string name="feature_settings_sync_drafts_status_failed" translate="pending">Failed</string>
+    <string name="feature_settings_sync_drafts_retry" translate="pending">Retry</string>
+    <string name="feature_settings_sync_drafts_discard" translate="pending">Discard</string>
+    <string name="feature_settings_sync_drafts_prune" translate="pending">Prune expired</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_title" translate="pending">Discard draft?</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_message" translate="pending">This permanently deletes the saved draft. This can\'t be undone.</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_cancel" translate="pending">Cancel</string>
+    <string name="feature_settings_conflicts_title" translate="pending">Sync conflicts</string>
+    <string name="feature_settings_conflicts_empty_title" translate="pending">No conflicts</string>
+    <string name="feature_settings_conflicts_empty_message" translate="pending">When a change you made conflicts with a newer version on the server, it shows up here so you can keep the server\'s version or retry yours.</string>
+    <string name="feature_settings_conflicts_row_label" translate="pending">Conflict</string>
+    <string name="feature_settings_conflicts_accept_server" translate="pending">Keep server</string>
+    <string name="feature_settings_conflicts_retry_local" translate="pending">Retry mine</string>
+</resources>

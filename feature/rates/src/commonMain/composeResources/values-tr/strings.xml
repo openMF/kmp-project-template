@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: tr · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">Geri</string>
+    <string name="screens_rates_list_title">Faiz oranları</string>
+    <string name="screens_rates_refresh_all_cd">Tümünü yenile</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">Yenile</string>
+    <string name="screens_rates_detail_current_label">Güncel</string>
+    <string name="screens_rates_detail_source_label">Kaynak: %1$s</string>
+    <string name="screens_rates_detail_observations_label">Gözlemler</string>
+</resources>

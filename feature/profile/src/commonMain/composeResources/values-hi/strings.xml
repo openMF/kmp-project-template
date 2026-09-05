@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: hi · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">स्थानीय प्रोफ़ाइल</string>
+    <string name="screens_profile_local_message">%1$s पूरी तरह डिवाइस पर चलता है। किसी खाते की आवश्यकता नहीं।</string>
+</resources>

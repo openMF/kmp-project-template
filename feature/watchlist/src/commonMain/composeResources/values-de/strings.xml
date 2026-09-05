@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: de · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Merkliste</string>
+    <string name="screens_watchlist_back_cd">Zurück</string>
+    <string name="screens_watchlist_remove_cd">Von Merkliste entfernen</string>
+    <string name="screens_watchlist_empty">Deine Merkliste ist leer</string>
+</resources>

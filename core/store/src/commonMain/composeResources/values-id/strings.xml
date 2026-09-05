@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: id · translated by /idea-locale -->
+<resources>
+    <string name="screenstate_empty_title">Belum ada apa-apa di sini</string>
+    <string name="screenstate_empty_message">Saat Anda punya data, data akan muncul di sini.</string>
+    <string name="screenstate_error_title">Terjadi kesalahan</string>
+    <string name="screenstate_error_retry">Coba lagi</string>
+    <string name="screenstate_nonet_title">Anda sedang offline</string>
+    <string name="screenstate_nonet_message">Kami akan mencoba lagi saat Anda tersambung kembali.</string>
+    <string name="screenstate_nonet_retry">Coba sekarang</string>
+    <string name="screenstate_captive_title">Masuk ke Wi-Fi</string>
+    <string name="screenstate_captive_message">Jaringan Anda mengharuskan Anda masuk sebelum tersambung.</string>
+    <string name="screenstate_captive_action">Buka halaman masuk</string>
+    <string name="error_category_network">Tidak dapat menjangkau server. Periksa koneksi Anda.</string>
+    <string name="error_category_auth">Sesi Anda berakhir. Silakan masuk lagi.</string>
+    <string name="error_category_ratelimit">Terlalu banyak permintaan. Harap tunggu dan coba lagi.</string>
+    <string name="error_category_server">Server kami sedang bermasalah. Coba lagi sebentar lagi.</string>
+    <string name="error_category_generic">Terjadi kesalahan</string>
+</resources>

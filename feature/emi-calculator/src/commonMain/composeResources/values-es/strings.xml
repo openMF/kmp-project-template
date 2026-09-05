@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: es · translated by /idea-locale -->
+<resources>
+    <string name="screens_emicalculator_title">Calculadora de cuotas</string>
+    <string name="screens_emicalculator_back_cd">Atrás</string>
+    <string name="screens_emicalculator_principal_label">Importe del capital</string>
+    <string name="screens_emicalculator_rate_label">Tasa anual (%)</string>
+    <string name="screens_emicalculator_tenure_label">Plazo (meses)</string>
+    <string name="screens_emicalculator_monthly_emi_label">Cuota mensual</string>
+    <string name="screens_emicalculator_total_payment_label">Pago total</string>
+    <string name="screens_emicalculator_total_interest_label">Intereses totales</string>
+</resources>

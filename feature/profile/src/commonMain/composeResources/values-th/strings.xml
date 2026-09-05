@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: th · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">โปรไฟล์ในเครื่อง</string>
+    <string name="screens_profile_local_message">%1$s ทำงานบนอุปกรณ์ทั้งหมด ไม่ต้องใช้บัญชี</string>
+</resources>

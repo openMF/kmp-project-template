@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: ar · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">الملف الشخصي المحلي</string>
+    <string name="screens_profile_local_message">يعمل %1$s بالكامل على الجهاز. لا حاجة إلى حساب.</string>
+</resources>

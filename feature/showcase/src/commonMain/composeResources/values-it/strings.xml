@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: it · translated by /idea-locale
+     NB: Loading / Empty / Error / NoNetwork / Content are ScreenState VARIANT NAMES (Kotlin
+     identifiers) that this dev-only gallery exists to exhibit — deliberately not translated. -->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">Test visivo di fumo per ogni variante di ScreenState e ogni primitiva di stato a livello di componente fornita da core/designsystem.</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (valori predefiniti — titolo + messaggio)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error a schermo intero</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — CTA del captive portal</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — offline semplice</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">toccato ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">Tocca ogni riquadro per aprire una schermata demo con quella transizione. La destinazione si chiude da sola dopo 2 s. Osserva eventuali sfarfallii.</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(si chiude tra 2 s)</string>
+</resources>

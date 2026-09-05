@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: pl · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Obserwowane</string>
+    <string name="screens_watchlist_back_cd">Wstecz</string>
+    <string name="screens_watchlist_remove_cd">Usuń z obserwowanych</string>
+    <string name="screens_watchlist_empty">Twoja lista obserwowanych jest pusta</string>
+</resources>

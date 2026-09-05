@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: fr · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Liste de suivi</string>
+    <string name="screens_watchlist_back_cd">Retour</string>
+    <string name="screens_watchlist_remove_cd">Retirer de la liste de suivi</string>
+    <string name="screens_watchlist_empty">Votre liste de suivi est vide</string>
+</resources>

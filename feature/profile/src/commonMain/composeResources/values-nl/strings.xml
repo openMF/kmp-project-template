@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: nl · translated by /idea-locale -->
+<resources>
+    <string name="screens_profile_local_title">Lokaal profiel</string>
+    <string name="screens_profile_local_message">%1$s draait volledig op het apparaat. Geen account nodig.</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: es · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">Calendario de pagos</string>
+    <string name="screens_amortization_schedule_back_cd">Atrás</string>
+    <string name="screens_amortization_schedule_header_month">N.º</string>
+    <string name="screens_amortization_schedule_header_principal">Capital</string>
+    <string name="screens_amortization_schedule_header_interest">Intereses</string>
+    <string name="screens_amortization_schedule_header_balance">Saldo</string>
+    <string name="screens_amortization_schedule_summary_title">Resumen</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Pagos totales</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Capital total</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Intereses totales</string>
+</resources>

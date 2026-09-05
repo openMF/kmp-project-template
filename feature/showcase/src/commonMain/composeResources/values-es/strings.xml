@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: es · translated by /idea-locale
+     NB: Loading / Empty / Error / NoNetwork / Content are ScreenState VARIANT NAMES (Kotlin
+     identifiers) that this dev-only gallery exists to exhibit — deliberately not translated. -->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">Prueba visual de humo para cada variante de ScreenState y cada primitiva de estado a escala de componente que incluye core/designsystem.</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (valores por defecto: título + mensaje)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error a pantalla completa</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — CTA de portal cautivo</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — sin conexión simple</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">pulsado ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">Toca cada mosaico para abrir una pantalla de demostración con esa transición. El destino se cierra solo tras 2 s. Fíjate en los parpadeos.</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(se cierra en 2 s)</string>
+</resources>

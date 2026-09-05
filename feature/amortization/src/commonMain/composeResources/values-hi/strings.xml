@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: hi · translated by /idea-locale -->
+<resources>
+    <string name="screens_amortization_schedule_title">भुगतान अनुसूची</string>
+    <string name="screens_amortization_schedule_back_cd">वापस</string>
+    <string name="screens_amortization_schedule_header_month">#</string>
+    <string name="screens_amortization_schedule_header_principal">मूलधन</string>
+    <string name="screens_amortization_schedule_header_interest">ब्याज</string>
+    <string name="screens_amortization_schedule_header_balance">शेष</string>
+    <string name="screens_amortization_schedule_summary_title">सारांश</string>
+    <string name="screens_amortization_schedule_summary_total_payments">कुल भुगतान</string>
+    <string name="screens_amortization_schedule_summary_total_principal">कुल मूलधन</string>
+    <string name="screens_amortization_schedule_summary_total_interest">कुल ब्याज</string>
+</resources>

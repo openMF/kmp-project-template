@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: nl · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">Volglijst</string>
+    <string name="screens_watchlist_back_cd">Terug</string>
+    <string name="screens_watchlist_remove_cd">Verwijderen uit volglijst</string>
+    <string name="screens_watchlist_empty">Je volglijst is leeg</string>
+</resources>

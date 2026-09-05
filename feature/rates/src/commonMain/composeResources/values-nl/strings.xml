@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: nl · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">Terug</string>
+    <string name="screens_rates_list_title">Rentetarieven</string>
+    <string name="screens_rates_refresh_all_cd">Alles vernieuwen</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">Vernieuwen</string>
+    <string name="screens_rates_detail_current_label">Huidig</string>
+    <string name="screens_rates_detail_source_label">Bron: %1$s</string>
+    <string name="screens_rates_detail_observations_label">Waarnemingen</string>
+</resources>

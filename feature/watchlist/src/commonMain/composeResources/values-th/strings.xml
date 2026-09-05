@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: th · translated by /idea-locale -->
+<resources>
+    <string name="screens_watchlist_title">รายการติดตาม</string>
+    <string name="screens_watchlist_back_cd">ย้อนกลับ</string>
+    <string name="screens_watchlist_remove_cd">นำออกจากรายการติดตาม</string>
+    <string name="screens_watchlist_empty">รายการติดตามของคุณว่างเปล่า</string>
+</resources>

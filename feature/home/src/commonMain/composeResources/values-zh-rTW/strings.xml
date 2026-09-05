@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: zh-rTW · seeded by /idea-locale · values carry SOURCE text until translated -->
+<resources>
+    <string name="screens_home_app_title" translate="pending">App Toolkit</string>
+    <string name="screens_home_settings_cd" translate="pending">Settings</string>
+    <string name="screens_home_outstanding_label" translate="pending">Outstanding balance</string>
+    <string name="screens_home_no_loans_message" translate="pending">No active loans — start by adding one.</string>
+    <string name="screens_home_total_outstanding_label" translate="pending">Total outstanding</string>
+    <string name="screens_home_active_loans_singular" translate="pending">%1$d active loan</string>
+    <string name="screens_home_active_loans_plural" translate="pending">%1$d active loans</string>
+    <string name="screens_home_monthly_emi_label" translate="pending">Monthly EMI</string>
+    <string name="screens_home_loans_label" translate="pending">Loans</string>
+    <string name="screens_home_loans_carousel_title" translate="pending">Your loans · %1$d</string>
+    <string name="screens_home_remaining_label" translate="pending">Remaining</string>
+    <string name="screens_home_money_value" translate="pending">$%1$s</string>
+    <string name="screens_home_loan_tile_footer" translate="pending">EMI $%1$s · %2$d%% paid</string>
+    <string name="screens_home_section_this_week" translate="pending">This week</string>
+    <string name="screens_home_section_tools" translate="pending">Tools</string>
+    <string name="screens_home_section_tools_subtitle" translate="pending">Calculators, comparisons, macro indicators</string>
+    <string name="screens_home_bills_card_title" translate="pending">Upcoming Bills</string>
+    <string name="screens_home_bills_total_label" translate="pending">Total due (next 7d)</string>
+    <string name="screens_home_bills_day_value" translate="pending">Day %1$d</string>
+    <string name="screens_home_bills_empty" translate="pending">No bills due in the next 7 days.</string>
+    <string name="screens_home_rates_card_title" translate="pending">Today\'s Rates</string>
+    <string name="screens_home_rates_fed_funds_label" translate="pending">Federal Funds</string>
+    <string name="screens_home_rates_mortgage_30y_label" translate="pending">30Y Mortgage</string>
+    <string name="screens_home_rates_value_format" translate="pending">%1$s%%</string>
+    <string name="screens_home_rates_delta_flat" translate="pending">—</string>
+    <string name="screens_home_rates_delta_mortgage" translate="pending">+0.05</string>
+    <string name="screens_home_exchange_card_title" translate="pending">USD Exchange</string>
+    <string name="screens_home_usd_label" translate="pending">USD</string>
+    <string name="screens_home_see_all" translate="pending">See all</string>
+    <string name="screens_home_tool_emi_title" translate="pending">EMI Calculator</string>
+    <string name="screens_home_tool_emi_subtitle" translate="pending">Monthly payment for any loan</string>
+    <string name="screens_home_tool_affordability_title" translate="pending">Affordability</string>
+    <string name="screens_home_tool_affordability_subtitle" translate="pending">How much can I borrow safely?</string>
+    <string name="screens_home_tool_amortization_title" translate="pending">Amortization</string>
+    <string name="screens_home_tool_amortization_subtitle" translate="pending">Full payment schedule</string>
+    <string name="screens_home_tool_compare_title" translate="pending">Compare Loans</string>
+    <string name="screens_home_tool_compare_subtitle" translate="pending">Side-by-side total cost</string>
+    <string name="screens_home_tool_wizard_title" translate="pending">Loan Wizard</string>
+    <string name="screens_home_tool_wizard_subtitle" translate="pending">Step-by-step planner</string>
+    <string name="screens_home_tool_currency_title" translate="pending">Currency Rates</string>
+    <string name="screens_home_tool_currency_subtitle" translate="pending">Live exchange rates</string>
+    <string name="screens_home_tool_history_title" translate="pending">Rate History</string>
+    <string name="screens_home_tool_history_subtitle" translate="pending">Historical FX charts</string>
+    <string name="screens_home_tool_macro_title" translate="pending">Country Macro</string>
+    <string name="screens_home_tool_macro_subtitle" translate="pending">GDP, CPI, unemployment</string>
+    <string name="screens_home_tool_crypto_title" translate="pending">Coin Markets</string>
+    <string name="screens_home_tool_crypto_subtitle" translate="pending">Live crypto prices + watchlist</string>
+    <string name="screens_home_money_zero" translate="pending">$0.00</string>
+</resources>

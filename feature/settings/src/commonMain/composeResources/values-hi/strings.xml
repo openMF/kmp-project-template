@@ -33,4 +33,33 @@
     <string name="feature_settings_change_language_text">भाषा बदलें</string>
     <string name="feature_settings_change_language_placeholder_text">भाषा बदलें</string>
     <string name="feature_settings_language_preference">भाषा</string>
+    <string name="feature_settings_dev_tools_title" translate="pending">Dev tools</string>
+    <string name="feature_settings_dev_transition_gallery" translate="pending">Transition Gallery</string>
+    <string name="feature_settings_dev_state_gallery" translate="pending">State Gallery</string>
+    <string name="feature_settings_dev_close" translate="pending">Close</string>
+    <string name="feature_settings_notifications_empty_title" translate="pending">No notifications yet</string>
+    <string name="feature_settings_notifications_empty_message" translate="pending">You\'ll see bill reminders and rate alerts here.</string>
+    <string name="feature_settings_sync_drafts_row" translate="pending">Sync &amp; Drafts</string>
+    <string name="feature_settings_sync_drafts_row_description" translate="pending">View and manage drafts and pending syncs</string>
+    <string name="feature_settings_sync_drafts_title" translate="pending">Sync &amp; Drafts</string>
+    <string name="feature_settings_sync_drafts_empty_title" translate="pending">Nothing to sync</string>
+    <string name="feature_settings_sync_drafts_empty_message" translate="pending">Drafts you save offline and records waiting to sync will appear here.</string>
+    <string name="feature_settings_sync_drafts_section_drafts" translate="pending">Drafts</string>
+    <string name="feature_settings_sync_drafts_section_syncing" translate="pending">Syncing</string>
+    <string name="feature_settings_sync_drafts_section_failed" translate="pending">Failed</string>
+    <string name="feature_settings_sync_drafts_status_pending" translate="pending">Pending</string>
+    <string name="feature_settings_sync_drafts_status_retrying" translate="pending">Retrying</string>
+    <string name="feature_settings_sync_drafts_status_failed" translate="pending">Failed</string>
+    <string name="feature_settings_sync_drafts_retry" translate="pending">Retry</string>
+    <string name="feature_settings_sync_drafts_discard" translate="pending">Discard</string>
+    <string name="feature_settings_sync_drafts_prune" translate="pending">Prune expired</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_title" translate="pending">Discard draft?</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_message" translate="pending">This permanently deletes the saved draft. This can\'t be undone.</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_cancel" translate="pending">Cancel</string>
+    <string name="feature_settings_conflicts_title" translate="pending">Sync conflicts</string>
+    <string name="feature_settings_conflicts_empty_title" translate="pending">No conflicts</string>
+    <string name="feature_settings_conflicts_empty_message" translate="pending">When a change you made conflicts with a newer version on the server, it shows up here so you can keep the server\'s version or retry yours.</string>
+    <string name="feature_settings_conflicts_row_label" translate="pending">Conflict</string>
+    <string name="feature_settings_conflicts_accept_server" translate="pending">Keep server</string>
+    <string name="feature_settings_conflicts_retry_local" translate="pending">Retry mine</string>
 </resources>

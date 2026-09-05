@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: id · translated by /idea-locale -->
+<resources>
+    <string name="screens_emicalculator_title">Kalkulator angsuran</string>
+    <string name="screens_emicalculator_back_cd">Kembali</string>
+    <string name="screens_emicalculator_principal_label">Jumlah pokok</string>
+    <string name="screens_emicalculator_rate_label">Suku bunga tahunan (%)</string>
+    <string name="screens_emicalculator_tenure_label">Tenor (bulan)</string>
+    <string name="screens_emicalculator_monthly_emi_label">Angsuran bulanan</string>
+    <string name="screens_emicalculator_total_payment_label">Total pembayaran</string>
+    <string name="screens_emicalculator_total_interest_label">Total bunga</string>
+</resources>

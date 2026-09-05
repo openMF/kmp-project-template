@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- locale: pt-rBR · translated by /idea-locale -->
+<resources>
+    <string name="screens_rates_back_cd">Voltar</string>
+    <string name="screens_rates_list_title">Taxas de juros</string>
+    <string name="screens_rates_refresh_all_cd">Atualizar tudo</string>
+    <string name="screens_rates_value_with_unit">%1$s%2$s</string>
+    <string name="screens_rates_detail_refresh_cd">Atualizar</string>
+    <string name="screens_rates_detail_current_label">Atual</string>
+    <string name="screens_rates_detail_source_label">Fonte: %1$s</string>
+    <string name="screens_rates_detail_observations_label">Observações</string>
+</resources>

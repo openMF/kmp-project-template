@@ -24,8 +24,8 @@ import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.banking.LoanRepository
-import kpt.core.model.demo.banking.Loan
 import kpt.core.data.demo.calc.AmortizationCalcRepository
+import kpt.core.model.demo.banking.Loan
 import kpt.core.model.demo.calc.AmortizationBreakdown
 import kpt.core.store.demo.calc.impl.AmortizationCalcParams
 

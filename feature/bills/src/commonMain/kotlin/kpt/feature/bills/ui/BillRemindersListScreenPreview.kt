@@ -27,8 +27,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 
 internal fun previewBill(
-    id: String = "bill-1", // i18n:skip
-    name: String = "Electricity", // i18n:skip
+    id: String = "bill-1",
+    name: String = "Electricity",
     dueDay: Int = 15,
     category: BillCategory = BillCategory.UTILITIES,
     enabled: Boolean = true,
@@ -80,7 +80,7 @@ internal fun BillReminderRowOverdueAndDisabledPreview() {
         Column {
             BillReminderRow(bill = previewBill(dueDay = 3), today = 20, onMarkPaid = {}, onClick = {})
             BillReminderRow(
-                bill = previewBill(id = "bill-2", name = "Gym", enabled = false), // i18n:skip
+                bill = previewBill(id = "bill-2", name = "Gym", enabled = false),
                 today = 10,
                 onMarkPaid = {},
                 onClick = {},

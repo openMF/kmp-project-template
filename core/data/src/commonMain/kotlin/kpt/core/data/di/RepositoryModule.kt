@@ -29,8 +29,6 @@ import kpt.core.network.di.NetworkModule
 import kpt.core.store.AppStoreRegistry
 import kpt.core.store.prefs.impl.UserDataSource
 import org.koin.core.module.Module
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.bind
 import org.koin.dsl.module
 
 /**

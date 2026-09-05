@@ -16,8 +16,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /*
  * @Preview siblings for the device-free CMP render tier — see CoinDetailScreenPreview.kt for the
- * full rationale, including why the literals below carry `// i18n:skip` (preview fixture data,
- * never reachable from the running app).
+ * full rationale, including why the fixture literals below are not translated (preview fixture
+ * data, never reachable from the running app).
  *
  * `CoinMarketsScreen` is not previewed directly: it resolves its ViewModel through Koin AND owns a
  * `PagingScreenStream`, neither of which exists outside a running graph.
@@ -26,10 +26,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 private fun sampleCoin(
     priceChangePercent24h: Double,
 ) = CoinMarket(
-    id = "bitcoin", // i18n:skip
-    symbol = "btc", // i18n:skip
-    name = "Bitcoin", // i18n:skip
-    imageUrl = "", // i18n:skip
+    id = "bitcoin",
+    symbol = "btc",
+    name = "Bitcoin",
+    imageUrl = "",
     currentPrice = 50_000.0,
     marketCap = 1_284_000_000_000L,
     marketCapRank = 1,

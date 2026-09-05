@@ -33,9 +33,9 @@ internal fun LoanFormFieldsEnabledPreview() {
     KptTheme {
         Column {
             LoanKindDropdown(value = LoanKind.AUTO, onChange = {}, enabled = true)
-            DoubleField(label = "Principal", value = 100_000.0, onChange = {}, enabled = true) // i18n:skip
-            IntField(label = "Tenure (months)", value = 60, onChange = {}, enabled = true) // i18n:skip
-            DateField(label = "First due date", value = LocalDate(2026, 10, 5), onChange = {}, enabled = true) // i18n:skip
+            DoubleField(label = "Principal", value = 100_000.0, onChange = {}, enabled = true)
+            IntField(label = "Tenure (months)", value = 60, onChange = {}, enabled = true)
+            DateField(label = "First due date", value = LocalDate(2026, 10, 5), onChange = {}, enabled = true)
         }
     }
 }
@@ -48,9 +48,9 @@ internal fun LoanFormFieldsDisabledPreview() {
     KptTheme {
         Column {
             LoanKindDropdown(value = LoanKind.MORTGAGE, onChange = {}, enabled = false)
-            DoubleField(label = "Principal", value = 100_000.0, onChange = {}, enabled = false) // i18n:skip
-            IntField(label = "Tenure (months)", value = 60, onChange = {}, enabled = false) // i18n:skip
-            DateField(label = "First due date", value = LocalDate(2026, 10, 5), onChange = {}, enabled = false) // i18n:skip
+            DoubleField(label = "Principal", value = 100_000.0, onChange = {}, enabled = false)
+            IntField(label = "Tenure (months)", value = 60, onChange = {}, enabled = false)
+            DateField(label = "First due date", value = LocalDate(2026, 10, 5), onChange = {}, enabled = false)
         }
     }
 }
@@ -79,7 +79,7 @@ internal fun SubmitStatusLineFailedPreview() {
     KptTheme {
         SubmitStatusLine(
             submit = SubmitState.Failed(
-                error = IllegalStateException("no connection"), // i18n:skip
+                error = IllegalStateException("no connection"),
                 category = ErrorCategory.Network,
             ),
             onRetry = {},

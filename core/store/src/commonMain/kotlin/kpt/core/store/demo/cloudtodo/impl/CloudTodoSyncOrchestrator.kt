@@ -90,36 +90,48 @@ class CloudTodoSyncOrchestrator(
      * @return the number of keys successfully replayed.
      */
     suspend fun retryPending(): Int {
-        var replayed = 0
-        var attempt = 0
+        // Resolve the replayable keys FIRST. A key that belongs to another store, or whose failure
+        // a concurrent successful write already cleared, never enters the replay loop — so that
+        // loop has exactly one job and one exit instead of four interleaved jumps.
+        val replayable = mutableListOf<CloudTodoKey>()
         for (raw in bookkeeperDao.pendingKeys()) {
             val key = raw.toCloudTodoKeyOrNull() ?: continue // another store's key — not ours
-
             // Re-check through the Bookkeeper itself: pendingKeys() is a snapshot, and a
             // concurrent successful write may have cleared this key since we read it.
-            if (bookkeeper.getLastFailedSync(key) == null) continue
+            if (bookkeeper.getLastFailedSync(key) != null) replayable += key
+        }
 
-            // Space the attempts (1s/2s/4s ±jitter) so a reconnect with a large backlog
-            // doesn't burst the whole queue at the server in one tick.
-            attempt++
-            if (attempt > retryPolicy.maxAttempts) break
-            delay(retryPolicy.delayFor(attempt - 1))
-
-            try {
-                val local = loadLocal(key)
-                if (local == null) {
-                    bookkeeper.clear(key) // nothing left to send
-                    continue
-                }
-                writeBlock(local)
-                bookkeeper.clear(key)
-                replayed++
-            } catch (t: Throwable) {
-                // Keep the bookkeeper entry so the next online edge retries it.
-                onReplayError(t)
-            }
+        var replayed = 0
+        // Space the attempts (1s/2s/4s ±jitter) so a reconnect with a large backlog doesn't burst
+        // the whole queue at the server in one tick. Capped at maxAttempts per online edge; the
+        // remainder keeps its bookkeeper entry and drains on the next reconnect.
+        replayable.take(retryPolicy.maxAttempts).forEachIndexed { index, key ->
+            delay(retryPolicy.delayFor(index))
+            if (replayOne(key)) replayed++
         }
         return replayed
+    }
+
+    /**
+     * Replay a single key.
+     *
+     * @return true when the write landed. A row that has vanished (deleted while offline) clears
+     *   its bookkeeper entry and returns false — nothing is owed, but nothing was replayed either.
+     *   A throwing write KEEPS its entry so the next online edge picks it up.
+     */
+    private suspend fun replayOne(key: CloudTodoKey): Boolean = try {
+        val local = loadLocal(key)
+        if (local == null) {
+            bookkeeper.clear(key) // nothing left to send
+            false
+        } else {
+            writeBlock(local)
+            bookkeeper.clear(key)
+            true
+        }
+    } catch (t: Throwable) {
+        onReplayError(t)
+        false
     }
 }
 

@@ -49,9 +49,15 @@ class SyncAndDraftsViewModelTest {
             private set
 
         override fun observeAll(): Flow<List<DraftRecord>> = rows
-        override suspend fun discard(id: Long) { discarded += id }
-        override suspend fun retry(id: Long) { retried += id }
-        override suspend fun pruneExpired() { pruneCount++ }
+        override suspend fun discard(id: Long) {
+            discarded += id
+        }
+        override suspend fun retry(id: Long) {
+            retried += id
+        }
+        override suspend fun pruneExpired() {
+            pruneCount++
+        }
     }
 
     private fun draft(id: Long, status: SubmitOutboxStatus) = DraftRecord(

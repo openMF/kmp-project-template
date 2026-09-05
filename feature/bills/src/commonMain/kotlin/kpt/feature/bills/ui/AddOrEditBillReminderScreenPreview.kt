@@ -33,7 +33,7 @@ internal fun BasicInfoSectionPreview() {
     KptTheme {
         BasicInfoSection(
             form = BillReminderFormState(
-                name = "Electricity", // i18n:skip
+                name = "Electricity",
                 amount = 128.40,
                 dueDay = 15,
             ),
@@ -50,7 +50,7 @@ internal fun BasicInfoSectionPreview() {
 internal fun BasicInfoSectionSubmittingPreview() {
     KptTheme {
         BasicInfoSection(
-            form = BillReminderFormState(name = "Electricity", amount = 128.40, dueDay = 15), // i18n:skip
+            form = BillReminderFormState(name = "Electricity", amount = 128.40, dueDay = 15),
             isSubmitting = true,
             onNameChange = {},
             onAmountChange = {},
@@ -139,7 +139,7 @@ internal fun BillSubmitStatusLineFailedPreview() {
     KptTheme {
         SubmitStatusLine(
             submit = SubmitState.Failed(
-                error = IllegalStateException("no connection"), // i18n:skip
+                error = IllegalStateException("no connection"),
                 category = ErrorCategory.Network,
                 draftSaved = true,
             ),

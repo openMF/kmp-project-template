@@ -36,7 +36,7 @@ internal fun ProfileScreenShellPreview() {
         ProfileScreen(
             profileBody = {
                 Box(Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
-                    Text("Profile details render here") // i18n:skip
+                    Text("Profile details render here")
                 }
             },
         )

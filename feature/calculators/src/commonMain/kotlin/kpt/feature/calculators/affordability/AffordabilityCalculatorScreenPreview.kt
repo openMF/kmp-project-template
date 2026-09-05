@@ -22,7 +22,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  * `AffordabilityCalculatorScreen` is the stateful wrapper (it resolves its ViewModel through Koin);
  * `AffordabilityCalculatorScreenContent` is the stateless body rendered here.
  *
- * Literals are PREVIEW FIXTURE DATA — never reachable from the running app — hence `// i18n:skip`.
+ * Literals are PREVIEW FIXTURE DATA — never reachable from the running app; G-SOURCE-I18N
+ * excludes `*Preview.kt` from its scan.
  */
 
 @Preview
@@ -34,7 +35,7 @@ internal fun AffordabilityCalculatorScreenContentPreview() {
             result = AffordabilityResult(
                 maxEmi = 1_500.0,
                 maxPrincipal = 193_500.0,
-                rationale = "40% of $5,000 income minus $500 obligations", // i18n:skip
+                rationale = "40% of $5,000 income minus $500 obligations",
             ),
             onBackClick = {},
             onIncomeChange = {},
@@ -57,7 +58,7 @@ internal fun AffordabilityCalculatorScreenContentNothingAffordablePreview() {
             result = AffordabilityResult(
                 maxEmi = 0.0,
                 maxPrincipal = 0.0,
-                rationale = "Existing obligations already exceed the debt-to-income allowance", // i18n:skip
+                rationale = "Existing obligations already exceed the debt-to-income allowance",
             ),
             onBackClick = {},
             onIncomeChange = {},

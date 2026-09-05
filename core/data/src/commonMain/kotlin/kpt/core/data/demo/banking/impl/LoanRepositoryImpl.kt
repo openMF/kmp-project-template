@@ -10,8 +10,6 @@
 package kpt.core.data.demo.banking.impl
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
@@ -21,7 +19,6 @@ import kpt.core.database.demo.banking.dao.LoanDao
 import kpt.core.model.demo.banking.Loan
 import kpt.core.store.AppCacheKeys
 import kpt.core.store.demo.banking.impl.provideLoanDetailStore
-import kpt.core.store.demo.banking.impl.toDomain
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
@@ -62,8 +59,6 @@ internal class LoanRepositoryImpl(
             fetchPolicy = FetchPolicy.CACHE_ONLY,
         )
 
-
-
     override suspend fun upsert(loan: Loan) {
         // Write through the store — persists to the Room SoT (via the SoT writer); the read store re-emits.
         loansWriteStore.write(
@@ -75,7 +70,6 @@ internal class LoanRepositoryImpl(
         // Clear through the store — removes the row from the Room SoT (via the SoT delete).
         loansWriteStore.clear(id)
     }
-
 
     private companion object {
         /** Room `@Entity(tableName = …)` for [kpt.core.database.demo.banking.entity.LoanEntity]. */

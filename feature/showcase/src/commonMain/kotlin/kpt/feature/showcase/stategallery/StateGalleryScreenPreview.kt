@@ -45,9 +45,9 @@ internal fun StateGalleryLayoutPrimitivesPreview() {
     // section/label/box spacing rhythm is actually visible.
     KptTheme {
         Column {
-            SectionHeader(text = "Content states") // i18n:skip
-            LabelRow(label = "Loading") { Text("spinner goes here") } // i18n:skip
-            PreviewBox(label = "Empty") { Text("nothing to show") } // i18n:skip
+            SectionHeader(text = "Content states")
+            LabelRow(label = "Loading") { Text("spinner goes here") }
+            PreviewBox(label = "Empty") { Text("nothing to show") }
         }
     }
 }

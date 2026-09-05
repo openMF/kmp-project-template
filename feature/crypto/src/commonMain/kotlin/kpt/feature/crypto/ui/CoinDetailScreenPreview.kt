@@ -24,14 +24,15 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  *
  * The literals here are PREVIEW FIXTURE DATA, not shipped copy — they exist only to give the
  * renderer something to lay out and are never reachable from the running app, so they carry
- * `// i18n:skip` rather than being translated into every locale (RULE-IMPL-NO-HARDCODED-STRING-001).
+ * not translated into every locale — G-SOURCE-I18N excludes `*Preview.kt` from its scan
+ * (RULE-IMPL-NO-HARDCODED-STRING-001).
  */
 
 @Preview
 @Composable
 internal fun StatRowPreview() {
     KptTheme {
-        StatRow(label = "Market cap rank", value = "#1") // i18n:skip
+        StatRow(label = "Market cap rank", value = "#1")
     }
 }
 
@@ -42,10 +43,10 @@ internal fun StatRowGroupPreview() {
     // where label/value column balance breaks, and a single row never shows that.
     KptTheme {
         Column {
-            StatRow(label = "Market cap", value = "$1,284,000,000,000") // i18n:skip
-            StatRow(label = "24h high", value = "$51,000.00") // i18n:skip
-            StatRow(label = "24h low", value = "$49,000.00") // i18n:skip
-            StatRow(label = "Circulating supply", value = "19,000,000 BTC") // i18n:skip
+            StatRow(label = "Market cap", value = "$1,284,000,000,000")
+            StatRow(label = "24h high", value = "$51,000.00")
+            StatRow(label = "24h low", value = "$49,000.00")
+            StatRow(label = "Circulating supply", value = "19,000,000 BTC")
         }
     }
 }

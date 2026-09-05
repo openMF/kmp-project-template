@@ -7,7 +7,6 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-
 package kpt.core.model.user
 
 /**

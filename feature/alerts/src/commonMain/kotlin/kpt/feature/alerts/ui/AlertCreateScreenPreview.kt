@@ -20,7 +20,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /*
  * @Preview siblings for the device-free CMP render tier — see AlertsListScreenPreview.kt for the
- * full rationale, including why fixture literals carry `// i18n:skip`.
+ * full rationale, including why fixture literals are not translated.
  *
  * `AlertCreateScreen` is the stateful wrapper (it resolves its ViewModel through Koin);
  * `AlertCreateScreenContent` is the stateless body rendered here.
@@ -31,8 +31,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 
 @Composable
-private fun previewContent(
-    form: AlertFormState = AlertFormState(coinId = "bitcoin", targetValueText = "50000"), // i18n:skip
+private fun PreviewContent(
+    form: AlertFormState = AlertFormState(coinId = "bitcoin", targetValueText = "50000"),
     submitState: SubmitState<PriceAlert> = SubmitState.Idle,
     hasResumableDraft: Boolean = false,
 ) {
@@ -59,7 +59,7 @@ private fun previewContent(
 @Preview
 @Composable
 internal fun AlertCreateScreenContentPreview() {
-    previewContent()
+    PreviewContent()
 }
 
 @Preview
@@ -67,7 +67,7 @@ internal fun AlertCreateScreenContentPreview() {
 internal fun AlertCreateScreenContentEmptyFormPreview() {
     // A blank form is the first-open state, and `canSubmit` is false — so this is the only render
     // that shows the submit button in its disabled treatment.
-    previewContent(form = AlertFormState())
+    PreviewContent(form = AlertFormState())
 }
 
 @Preview
@@ -75,11 +75,11 @@ internal fun AlertCreateScreenContentEmptyFormPreview() {
 internal fun AlertCreateScreenContentBelowDirectionPreview() {
     // The direction chips are a two-way selection; rendering BELOW proves the highlight tracks the
     // form rather than always sitting on ABOVE.
-    previewContent(
+    PreviewContent(
         form = AlertFormState(
-            coinId = "ethereum", // i18n:skip
+            coinId = "ethereum",
             direction = AlertDirection.BELOW,
-            targetValueText = "1500", // i18n:skip
+            targetValueText = "1500",
         ),
     )
 }
@@ -87,7 +87,7 @@ internal fun AlertCreateScreenContentBelowDirectionPreview() {
 @Preview
 @Composable
 internal fun AlertCreateScreenContentSubmittingPreview() {
-    previewContent(submitState = SubmitState.Submitting())
+    PreviewContent(submitState = SubmitState.Submitting())
 }
 
 @Preview
@@ -95,9 +95,9 @@ internal fun AlertCreateScreenContentSubmittingPreview() {
 internal fun AlertCreateScreenContentOfflineFailurePreview() {
     // The offline-write payoff: the failure strip must read as "saved, will retry" rather than
     // "lost", because the draft IS still in the outbox awaiting reconnect.
-    previewContent(
+    PreviewContent(
         submitState = SubmitState.Failed(
-            error = IllegalStateException("no connection"), // i18n:skip
+            error = IllegalStateException("no connection"),
             category = ErrorCategory.Network,
             draftSaved = true,
         ),
@@ -109,5 +109,5 @@ internal fun AlertCreateScreenContentOfflineFailurePreview() {
 internal fun AlertCreateScreenContentResumePromptPreview() {
     // Case 3 of the three-case resume — the prompt that appears over the form when a saved draft
     // is found on entry.
-    previewContent(hasResumableDraft = true)
+    PreviewContent(hasResumableDraft = true)
 }

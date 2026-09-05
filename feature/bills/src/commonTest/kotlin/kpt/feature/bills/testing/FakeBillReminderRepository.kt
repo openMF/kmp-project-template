@@ -59,11 +59,11 @@ internal class FakeBillReminderRepository : BillReminderRepository {
         if (maxDays < 0) emptyList() else rows.filter { it.enabled }
     }
 
-     fun observeById(id: String): Flow<BillReminder?> = state.map { rows ->
+    fun observeById(id: String): Flow<BillReminder?> = state.map { rows ->
         rows.firstOrNull { it.id == id }
     }
 
-     suspend fun getById(id: String): BillReminder? = state.value.firstOrNull { it.id == id }
+    suspend fun getById(id: String): BillReminder? = state.value.firstOrNull { it.id == id }
 
     override suspend fun upsert(bill: BillReminder) {
         state.value = state.value.filterNot { it.id == bill.id } + bill
@@ -77,7 +77,7 @@ internal class FakeBillReminderRepository : BillReminderRepository {
         if (maxDays < 0) 0.0 else rows.filter { it.enabled }.sumOf { it.amount }
     }
 
-     fun observeCount(): Flow<Int> = state.map { it.size }
+    fun observeCount(): Flow<Int> = state.map { it.size }
 }
 
 /**

@@ -24,15 +24,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.base.ui.screen.ScreenContent
-import kpt.core.model.demo.profile.ProfileInfo
-import kpt.feature.profile.demo.ui.ProfileViewModel
-import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
+import kpt.core.model.demo.profile.ProfileInfo
+import kpt.feature.profile.demo.ui.ProfileViewModel
 import kpt.feature.profile.generated.resources.Res
 import kpt.feature.profile.generated.resources.screens_profile_local_message
 import kpt.feature.profile.generated.resources.screens_profile_local_title
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
 /**
  * The profile tab's fork-owned INNER content (the default demo body). `ProfileScreen` (the

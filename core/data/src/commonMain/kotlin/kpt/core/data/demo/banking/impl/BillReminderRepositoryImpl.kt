@@ -121,7 +121,6 @@ internal class BillReminderRepositoryImpl(
         billRemindersWriteStore.clear(id)
     }
 
-
     /**
      * Returns the set of day-of-month integers covered by `[today, today + maxDays]`,
      * wrapping across month boundaries. Returned values are clamped to 1..31; the
@@ -142,7 +141,6 @@ internal class BillReminderRepositoryImpl(
             }
         }
     }
-
 }
 
 /** Cheap +1 day without dragging in DatePeriod arithmetic. */

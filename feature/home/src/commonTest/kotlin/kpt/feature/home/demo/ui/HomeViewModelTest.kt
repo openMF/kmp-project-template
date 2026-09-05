@@ -390,17 +390,17 @@ private class FakeLoanRepository(initial: List<Loan> = emptyList()) : LoanReposi
         screenDataStreamForTesting(rows.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
     override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
         screenDataStreamForTesting(rows.map { r -> r.firstOrNull { it.id == id }?.let { ScreenState.Content(it) } ?: ScreenState.Empty })
-     fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
-     suspend fun getById(id: String): Loan? = throw UnsupportedOperationException()
+    fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
+    suspend fun getById(id: String): Loan? = throw UnsupportedOperationException()
     override suspend fun upsert(loan: Loan) {
         rows.value = rows.value.filterNot { it.id == loan.id } + loan
     }
     override suspend fun delete(id: String) {
         rows.value = rows.value.filterNot { it.id == id }
     }
-     fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
-     fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
-     fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
+    fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
+    fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
+    fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
@@ -431,12 +431,12 @@ private class FakeBillReminderRepository : BillReminderRepository {
         lastRequestedWindow = maxDays
         return upcoming
     }
-     fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
-     suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
+    fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
+    suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
     override suspend fun upsert(bill: BillReminder) = throw UnsupportedOperationException()
     override suspend fun delete(id: String) = throw UnsupportedOperationException()
     override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> = throw UnsupportedOperationException()
-     fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
+    fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)

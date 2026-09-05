@@ -29,7 +29,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 internal fun WatchlistRowPreview() {
     KptTheme {
         WatchlistRow(
-            item = WatchlistItem(coinId = "bitcoin", addedAtMs = 1_700_000_000_000L), // i18n:skip
+            item = WatchlistItem(coinId = "bitcoin", addedAtMs = 1_700_000_000_000L),
             onRemove = {},
         )
     }
@@ -42,8 +42,8 @@ internal fun WatchlistRowListPreview() {
     // id/remove-affordance alignment breaks first.
     KptTheme {
         Column {
-            WatchlistRow(WatchlistItem("btc", 1_700_000_000_000L), onRemove = {}) // i18n:skip
-            WatchlistRow(WatchlistItem("ethereum-classic", 1_700_000_000_000L), onRemove = {}) // i18n:skip
+            WatchlistRow(WatchlistItem("btc", 1_700_000_000_000L), onRemove = {})
+            WatchlistRow(WatchlistItem("ethereum-classic", 1_700_000_000_000L), onRemove = {})
         }
     }
 }

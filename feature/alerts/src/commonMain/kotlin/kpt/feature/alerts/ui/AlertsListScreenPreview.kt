@@ -23,16 +23,16 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  *
  * The `*Screen` entry composables are not previewed: they resolve their ViewModel through Koin.
  * Literals below are PREVIEW FIXTURE DATA — never reachable from the running app — hence
- * `// i18n:skip` rather than a translated string resource.
+ * G-SOURCE-I18N excludes `*Preview.kt` from its scan rather than asking for them to be translated.
  */
 
 internal fun previewAlert(
-    id: String = "alert-1", // i18n:skip
+    id: String = "alert-1",
     direction: AlertDirection = AlertDirection.ABOVE,
     targetValue: Double = 50_000.0,
 ) = PriceAlert(
     id = id,
-    coinId = "bitcoin", // i18n:skip
+    coinId = "bitcoin",
     direction = direction,
     targetValue = targetValue,
     enabled = true,
@@ -54,10 +54,10 @@ internal fun AlertRowEveryDirectionPreview() {
     // leave two thirds of that branch — including the PCT_CHANGE wording — unseen.
     KptTheme {
         Column {
-            AlertRow(previewAlert(id = "a1", direction = AlertDirection.ABOVE), onDelete = {}) // i18n:skip
-            AlertRow(previewAlert(id = "a2", direction = AlertDirection.BELOW), onDelete = {}) // i18n:skip
+            AlertRow(previewAlert(id = "a1", direction = AlertDirection.ABOVE), onDelete = {})
+            AlertRow(previewAlert(id = "a2", direction = AlertDirection.BELOW), onDelete = {})
             AlertRow(
-                previewAlert(id = "a3", direction = AlertDirection.PCT_CHANGE, targetValue = 5.0), // i18n:skip
+                previewAlert(id = "a3", direction = AlertDirection.PCT_CHANGE, targetValue = 5.0),
                 onDelete = {},
             )
         }

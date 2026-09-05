@@ -20,21 +20,21 @@ import kpt.core.store.demo.banking.impl.provideBillRemindersStore
 import kpt.core.store.demo.banking.impl.provideBillRemindersWriteStore
 import kpt.core.store.demo.banking.impl.provideLoansStore
 import kpt.core.store.demo.banking.impl.provideLoansWriteStore
+import kpt.core.store.demo.calc.impl.provideAmortizationCalcStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoReadStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoStore
 import kpt.core.store.demo.crypto.impl.provideCoinDetailStore
-import kpt.core.store.demo.calc.impl.provideAmortizationCalcStore
-import kpt.core.store.demo.emi.impl.provideEmiStore
-import kpt.core.store.demo.profile.impl.provideProfileStore
-import kpt.core.store.prefs.impl.provideUserDataStore
 import kpt.core.store.demo.crypto.impl.provideCoinMarketsStore
 import kpt.core.store.demo.currency.impl.provideExchangeRatesStore
 import kpt.core.store.demo.currency.impl.provideRateHistoryStore
 import kpt.core.store.demo.economic.impl.provideInterestRateSeriesStore
 import kpt.core.store.demo.economic.impl.provideMacroIndicatorStore
+import kpt.core.store.demo.emi.impl.provideEmiStore
 import kpt.core.store.demo.exchange.impl.provideSpotRateLookupStore
+import kpt.core.store.demo.profile.impl.provideProfileStore
 import kpt.core.store.demo.watchlist.impl.provideWatchlistStore
 import kpt.core.store.demo.watchlist.impl.provideWatchlistWriteStore
+import kpt.core.store.prefs.impl.provideUserDataStore
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import kpt.core.base.store.di.StoreModule as CoreBaseStoreModule
@@ -138,6 +138,14 @@ val appStoreModule: Module = module {
         mgr.register(get(AppStoreRegistry.CoinMarkets))
         mgr.register(get(AppStoreRegistry.CloudTodo))
         mgr.register(get(AppStoreRegistry.CoinDetail))
+        // MEMORY_ONLY compute + profile + preference caches. They hold no rows of their own, but
+        // their in-memory entries are keyed on the SIGNED-IN user's inputs and preferences — leaving
+        // them registered-but-unpurged is what shows one user's figures to the next on a shared
+        // device (LP-1).
+        mgr.register(get(AppStoreRegistry.Emi))
+        mgr.register(get(AppStoreRegistry.AmortizationCalc))
+        mgr.register(get(AppStoreRegistry.Profile))
+        mgr.register(get(AppStoreRegistry.UserData))
         mgr.register(get(AppStoreRegistry.InterestRateSeries))
         mgr.register(get(AppStoreRegistry.MacroIndicator))
         mgr.register(get(AppStoreRegistry.Alerts))

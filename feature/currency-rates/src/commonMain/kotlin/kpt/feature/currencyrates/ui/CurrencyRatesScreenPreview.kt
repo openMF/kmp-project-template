@@ -26,13 +26,13 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 
 internal fun previewRates() = ExchangeRates(
-    base = "USD", // i18n:skip
-    date = "2026-01-01", // i18n:skip
+    base = "USD",
+    date = "2026-01-01",
     rates = mapOf(
-        "EUR" to 0.92, // i18n:skip
-        "GBP" to 0.79, // i18n:skip
-        "INR" to 83.12, // i18n:skip
-        "JPY" to 147.85, // i18n:skip
+        "EUR" to 0.92,
+        "GBP" to 0.79,
+        "INR" to 83.12,
+        "JPY" to 147.85,
     ),
 )
 
@@ -41,8 +41,8 @@ internal fun previewRates() = ExchangeRates(
 internal fun CurrencyConverterCardContentPreview() {
     KptTheme {
         CurrencyConverterCard(
-            amount = "100", // i18n:skip
-            targetCode = "EUR", // i18n:skip
+            amount = "100",
+            targetCode = "EUR",
             spotState = ScreenState.Content(previewRates()),
             onAmountChange = {},
             onTargetChange = {},
@@ -59,9 +59,9 @@ internal fun CurrencyConverterCardOfflinePreview() {
     // as if it were live.
     KptTheme {
         CurrencyConverterCard(
-            amount = "100", // i18n:skip
-            targetCode = "EUR", // i18n:skip
-            spotState = ScreenState.Error(IllegalStateException("offline"), isNetworkError = true), // i18n:skip
+            amount = "100",
+            targetCode = "EUR",
+            spotState = ScreenState.Error(IllegalStateException("offline"), isNetworkError = true),
             onAmountChange = {},
             onTargetChange = {},
             onRetry = {},
@@ -74,8 +74,8 @@ internal fun CurrencyConverterCardOfflinePreview() {
 internal fun RateItemPreview() {
     KptTheme {
         Column {
-            RateItem(code = "EUR", rate = 0.92) // i18n:skip
-            RateItem(code = "JPY", rate = 147.85) // i18n:skip
+            RateItem(code = "EUR", rate = 0.92)
+            RateItem(code = "JPY", rate = 147.85)
         }
     }
 }

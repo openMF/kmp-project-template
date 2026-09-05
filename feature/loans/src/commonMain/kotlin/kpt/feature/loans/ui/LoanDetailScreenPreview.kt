@@ -27,8 +27,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 
 internal fun previewLoan(
-    id: String = "loan-1", // i18n:skip
-    name: String = "Car loan", // i18n:skip
+    id: String = "loan-1",
+    name: String = "Car loan",
     kind: LoanKind = LoanKind.AUTO,
     principalRemaining: Double = 62_500.0,
     monthsRemaining: Int = 38,
@@ -81,8 +81,8 @@ internal fun LoanDetailContentFullyRepaidPreview() {
 internal fun MetricRowPreview() {
     KptTheme {
         Column {
-            MetricRow(label = "Interest rate", value = "9.00%") // i18n:skip
-            MetricRow(label = "Next due", value = "5 Oct 2026") // i18n:skip
+            MetricRow(label = "Interest rate", value = "9.00%")
+            MetricRow(label = "Next due", value = "5 Oct 2026")
         }
     }
 }

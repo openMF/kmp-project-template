@@ -24,17 +24,17 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  *
  * The `*Screen` entry composable is never previewed: it resolves its ViewModel through Koin.
  * Literals below are PREVIEW FIXTURE DATA, never reachable from the running app — hence
- * `// i18n:skip` rather than a translated string resource.
+ * G-SOURCE-I18N excludes `*Preview.kt` from its scan rather than asking for them to be translated.
  */
 
 internal fun previewRateSeries(
     current: Double = 5.33,
     values: List<Double> = listOf(5.10, 5.18, 5.25, 5.33),
 ) = InterestRateSeries(
-    seriesId = "FEDFUNDS", // i18n:skip
-    name = "Federal Funds Effective Rate", // i18n:skip
+    seriesId = "FEDFUNDS",
+    name = "Federal Funds Effective Rate",
     current = current,
-    unit = "%", // i18n:skip
+    unit = "%",
     observations = values.mapIndexed { i, v ->
         RateObservation(date = LocalDate(2026, 1, i + 1), value = v)
     },
@@ -60,7 +60,7 @@ internal fun RateRowCardErrorPreview() {
     // error. That per-card treatment only shows up in this state.
     KptTheme {
         RateRowCard(
-            state = ScreenState.Error(IllegalStateException("FRED unavailable")), // i18n:skip
+            state = ScreenState.Error(IllegalStateException("FRED unavailable")),
             onRetry = {},
             onSeriesClick = {},
         )

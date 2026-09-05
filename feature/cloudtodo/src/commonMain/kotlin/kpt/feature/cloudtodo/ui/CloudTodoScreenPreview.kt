@@ -31,7 +31,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private fun previewTodo(completed: Boolean = false) = CloudTodo(
     id = 1,
-    title = "Ship the offline-write demo", // i18n:skip
+    title = "Ship the offline-write demo",
     completed = completed,
 )
 
@@ -78,7 +78,7 @@ internal fun OutcomeCardConflictedPreview() {
     // renders like the others the user has no way to reach their conflicted write.
     KptTheme {
         OutcomeCard(
-            outcome = MutationOutcome.Conflicted(conflictId = "c-1"), // i18n:skip
+            outcome = MutationOutcome.Conflicted(conflictId = "c-1"),
             onDismiss = {},
             onResolveConflict = {},
         )
@@ -90,7 +90,7 @@ internal fun OutcomeCardConflictedPreview() {
 internal fun OutcomeCardFailedRolledBackPreview() {
     KptTheme {
         OutcomeCard(
-            outcome = MutationOutcome.Failed(message = "Server rejected the write", rolledBack = true), // i18n:skip
+            outcome = MutationOutcome.Failed(message = "Server rejected the write", rolledBack = true),
             onDismiss = {},
             onResolveConflict = {},
         )

@@ -31,12 +31,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 private fun draft(id: Long, status: SubmitOutboxStatus) = DraftRecord(
     id = id,
-    formKey = "bill-reminder-create", // i18n:skip
-    uniqueKey = "bill-$id", // i18n:skip
+    formKey = "bill-reminder-create",
+    uniqueKey = "bill-$id",
     status = status,
     createdAtMs = 1_700_000_000_000L,
     updatedAtMs = 1_700_000_000_000L,
-    errorMessage = if (status == SubmitOutboxStatus.FAILED) "Server rejected the write" else null, // i18n:skip
+    errorMessage = if (status == SubmitOutboxStatus.FAILED) "Server rejected the write" else null,
 )
 
 @Preview
@@ -142,11 +142,11 @@ internal fun ConflictRowCardPreview() {
     KptTheme {
         ConflictRowCard(
             conflict = ConflictEntry(
-                id = "c-1", // i18n:skip
-                entity = "CloudTodo", // i18n:skip
-                key = "1", // i18n:skip
-                localPayloadJson = """{"completed":true}""", // i18n:skip
-                serverPayloadJson = """{"completed":false}""", // i18n:skip
+                id = "c-1",
+                entity = "CloudTodo",
+                key = "1",
+                localPayloadJson = """{"completed":true}""",
+                serverPayloadJson = """{"completed":false}""",
                 formRoute = null,
                 recordedAtMs = 1_700_000_000_000L,
             ),

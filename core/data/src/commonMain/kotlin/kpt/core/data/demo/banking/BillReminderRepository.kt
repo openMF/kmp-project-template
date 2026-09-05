@@ -42,8 +42,6 @@ interface BillReminderRepository {
      */
     fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-
-
     /** Insert-or-replace. Idempotent. */
     suspend fun upsert(bill: BillReminder)
 
@@ -56,5 +54,4 @@ interface BillReminderRepository {
      * "Due in next X days" tile.
      */
     fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double>
-
 }

@@ -22,7 +22,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  *
  * The `*Screen` entry composable is never previewed: it resolves its ViewModel through Koin, so it
  * cannot render outside a running graph. Literals below are PREVIEW FIXTURE DATA — never reachable
- * from the running app — hence `// i18n:skip` rather than a translated resource.
+ * from the running app, so G-SOURCE-I18N excludes `*Preview.kt` from its scan.
  */
 
 @Preview
@@ -30,7 +30,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 internal fun CountryRowPreview() {
     KptTheme {
         CountryRow(
-            country = Country(code = "US", name = "United States", flagEmoji = "🇺🇸"), // i18n:skip
+            country = Country(code = "US", name = "United States", flagEmoji = "🇺🇸"),
             onClick = {},
         )
     }
@@ -42,9 +42,9 @@ internal fun CountryRowListPreview() {
     // A long name beside a short one is where the row's name/flag alignment actually breaks.
     KptTheme {
         Column {
-            CountryRow(Country("US", "United States", "🇺🇸"), onClick = {}) // i18n:skip
-            CountryRow(Country("IN", "India", "🇮🇳"), onClick = {}) // i18n:skip
-            CountryRow(Country("CD", "Democratic Republic of the Congo", "🇨🇩"), onClick = {}) // i18n:skip
+            CountryRow(Country("US", "United States", "🇺🇸"), onClick = {})
+            CountryRow(Country("IN", "India", "🇮🇳"), onClick = {})
+            CountryRow(Country("CD", "Democratic Republic of the Congo", "🇨🇩"), onClick = {})
         }
     }
 }

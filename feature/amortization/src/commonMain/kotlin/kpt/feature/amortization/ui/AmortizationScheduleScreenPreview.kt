@@ -82,8 +82,8 @@ internal fun ScheduleTotalRowPreview() {
 internal fun SummaryLinePreview() {
     KptTheme {
         Column {
-            SummaryLine(label = "Total principal", value = "$100,000.00") // i18n:skip
-            SummaryLine(label = "Total interest", value = "$18,420.51") // i18n:skip
+            SummaryLine(label = "Total principal", value = "$100,000.00")
+            SummaryLine(label = "Total interest", value = "$18,420.51")
         }
     }
 }

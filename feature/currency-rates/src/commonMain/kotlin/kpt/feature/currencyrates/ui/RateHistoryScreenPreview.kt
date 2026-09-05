@@ -24,9 +24,9 @@ import kotlin.time.Instant
 internal fun RateHistoryControlsPreview() {
     KptTheme {
         RateHistoryControls(
-            currencies = listOf("EUR", "GBP", "INR", "JPY"), // i18n:skip
+            currencies = listOf("EUR", "GBP", "INR", "JPY"),
             periods = listOf(7, 30, 90),
-            selectedCurrency = "EUR", // i18n:skip
+            selectedCurrency = "EUR",
             selectedPeriod = 30,
             onSelectCurrency = {},
             onSelectPeriod = {},
@@ -41,9 +41,9 @@ internal fun RateHistoryControlsLongestPeriodPreview() {
     // what shows the selected-chip treatment actually tracks both inputs rather than the first.
     KptTheme {
         RateHistoryControls(
-            currencies = listOf("EUR", "GBP", "INR", "JPY"), // i18n:skip
+            currencies = listOf("EUR", "GBP", "INR", "JPY"),
             periods = listOf(7, 30, 90),
-            selectedCurrency = "JPY", // i18n:skip
+            selectedCurrency = "JPY",
             selectedPeriod = 90,
             onSelectCurrency = {},
             onSelectPeriod = {},

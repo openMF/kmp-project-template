@@ -30,12 +30,9 @@ interface LoanRepository {
     /** Observe a single loan as a [ScreenDataStream] (absent id → Empty) for detail/projection screens. */
     fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan>
 
-
-
     /** Insert-or-replace by [Loan.id]. Idempotent. */
     suspend fun upsert(loan: Loan)
 
     /** Delete by id. No-op if absent. */
     suspend fun delete(id: String)
-
 }

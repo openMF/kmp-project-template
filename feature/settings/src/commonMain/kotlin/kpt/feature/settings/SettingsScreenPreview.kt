@@ -23,8 +23,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  * `kmp-screen-gen` emits these per screen; this is the template's demonstrator.
  *
  * `SettingsScreen` itself is not previewed: it resolves its ViewModel through Koin. Literals below
- * are PREVIEW FIXTURE DATA — never reachable from the running app — hence `// i18n:skip` rather
- * than a translated string resource.
+ * are PREVIEW FIXTURE DATA — never reachable from the running app, so G-SOURCE-I18N excludes
+ * `*Preview.kt` from its scan rather than asking for them to be translated.
  */
 
 @Preview
@@ -84,8 +84,8 @@ internal fun SettingsRowCardLongTitlePreview() {
     KptTheme {
         SettingsRowCard(
             icon = AppIcons.Language,
-            title = "Change the application display language and region format", // i18n:skip
-            contentDescription = "Opens the language picker", // i18n:skip
+            title = "Change the application display language and region format",
+            contentDescription = "Opens the language picker",
             accentColor = MaterialTheme.colorScheme.tertiary,
             onClick = {},
         )

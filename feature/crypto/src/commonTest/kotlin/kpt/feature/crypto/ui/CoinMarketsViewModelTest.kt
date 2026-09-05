@@ -11,12 +11,8 @@ package kpt.feature.crypto.ui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runCurrent
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlin.test.AfterTest
@@ -70,18 +66,4 @@ class CoinMarketsViewModelTest {
     // fails on timing. The refresh semantics are covered deterministically in core-base/store
     // (`PagingScreenStreamOfflineTest`, `StorePagingSourceTest`); what belongs to THIS ViewModel is
     // the delegation above and the page size below.
-}
-
-/**
- * Drains BOTH the `runTest` job tree and the scopes that live outside it — `viewModelScope` and
- * `backgroundScope`. `advanceUntilIdle()` alone does not start those, so a collector stays
- * unsubscribed and a replay-0 `tryEmit` is dropped with nothing to show for it; `runCurrent()`
- * does. Interleaving both, a few rounds, covers work that re-schedules itself.
- */
-@OptIn(ExperimentalCoroutinesApi::class)
-private fun TestScope.drain() {
-    repeat(3) {
-        runCurrent()
-        advanceUntilIdle()
-    }
 }

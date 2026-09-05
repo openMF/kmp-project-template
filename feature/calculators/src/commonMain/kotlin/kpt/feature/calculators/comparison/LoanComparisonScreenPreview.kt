@@ -106,6 +106,6 @@ internal fun ResultStripPlainPreview() {
 @Composable
 internal fun ResultCellPreview() {
     KptTheme {
-        ResultCell(label = "Total payable", value = "$118,000.00") // i18n:skip
+        ResultCell(label = "Total payable", value = "$118,000.00")
     }
 }

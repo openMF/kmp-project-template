@@ -31,8 +31,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 
 private fun indicator(kind: IndicatorKind, value: Double) = MacroIndicator(
-    countryCode = "US", // i18n:skip
-    countryName = "United States", // i18n:skip
+    countryCode = "US",
+    countryName = "United States",
     indicator = kind,
     observations = listOf(
         IndicatorObservation(year = 2024, value = value),
@@ -46,7 +46,7 @@ internal fun CountryMacroScreenContentPreview() {
     KptTheme {
         CountryMacroScreenContent(
             uiState = MacroUiState(
-                countryCode = "US", // i18n:skip
+                countryCode = "US",
                 gdp = ScreenState.Content(indicator(IndicatorKind.GDP, 27_360_000_000_000.0)),
                 inflation = ScreenState.Content(indicator(IndicatorKind.INFLATION_CPI, 3.1)),
                 unemployment = ScreenState.Content(indicator(IndicatorKind.UNEMPLOYMENT, 3.9)),
@@ -69,10 +69,10 @@ internal fun CountryMacroScreenContentMixedCardStatesPreview() {
     KptTheme {
         CountryMacroScreenContent(
             uiState = MacroUiState(
-                countryCode = "US", // i18n:skip
+                countryCode = "US",
                 gdp = ScreenState.Content(indicator(IndicatorKind.GDP, 27_360_000_000_000.0)),
                 inflation = ScreenState.Loading,
-                unemployment = ScreenState.Error(IllegalStateException("World Bank unavailable")), // i18n:skip
+                unemployment = ScreenState.Error(IllegalStateException("World Bank unavailable")),
             ),
             onBackClick = {},
             onPickCountry = {},
@@ -89,7 +89,7 @@ internal fun CountryMacroScreenContentAllLoadingPreview() {
     // Cold start: nothing resolved yet, so DashboardProgressBar reads "0 of 3 loaded".
     KptTheme {
         CountryMacroScreenContent(
-            uiState = MacroUiState(countryCode = "US"), // i18n:skip
+            uiState = MacroUiState(countryCode = "US"),
             onBackClick = {},
             onPickCountry = {},
             onOpenIndicator = {},

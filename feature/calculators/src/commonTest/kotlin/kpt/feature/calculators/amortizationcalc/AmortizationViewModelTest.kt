@@ -21,8 +21,8 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.model.demo.banking.Loan
-import kpt.core.model.demo.calc.AmortizationBreakdown
 import kpt.core.model.demo.banking.LoanKind
+import kpt.core.model.demo.calc.AmortizationBreakdown
 import kpt.feature.calculators.wizard.FakeLoanRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -48,7 +48,11 @@ class AmortizationViewModelTest {
     @Test
     fun inlineModePopulatesScheduleFromUserInputs() = runTest {
         val repo = FakeLoanRepository()
-        val vm = AmortizationViewModel(repository = repo, calcRepository = FakeAmortizationCalcRepository(), loanId = null)
+        val vm = AmortizationViewModel(
+            repository = repo,
+            calcRepository = FakeAmortizationCalcRepository(),
+            loanId = null,
+        )
         vm.trySendAction(AmortizationAction.UpdatePrincipal(10_000.0))
         vm.trySendAction(AmortizationAction.UpdateRate(12.0))
         vm.trySendAction(AmortizationAction.UpdateTenure(6))
@@ -81,7 +85,11 @@ class AmortizationViewModelTest {
         )
         repo.upsert(loan)
 
-        val vm = AmortizationViewModel(repository = repo, calcRepository = FakeAmortizationCalcRepository(), loanId = "L42")
+        val vm = AmortizationViewModel(
+            repository = repo,
+            calcRepository = FakeAmortizationCalcRepository(),
+            loanId = "L42",
+        )
         vm.stateFlow.test {
             // Skip the default; wait for the loan-backed update to arrive.
             val state = awaitItem().let { initial ->
@@ -98,7 +106,11 @@ class AmortizationViewModelTest {
     @Test
     fun summaryReflectsCurrentInputs() = runTest {
         val repo = FakeLoanRepository()
-        val vm = AmortizationViewModel(repository = repo, calcRepository = FakeAmortizationCalcRepository(), loanId = null)
+        val vm = AmortizationViewModel(
+            repository = repo,
+            calcRepository = FakeAmortizationCalcRepository(),
+            loanId = null,
+        )
         vm.trySendAction(AmortizationAction.UpdatePrincipal(50_000.0))
         vm.trySendAction(AmortizationAction.UpdateRate(7.0))
         vm.trySendAction(AmortizationAction.UpdateTenure(60))

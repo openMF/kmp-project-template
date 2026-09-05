@@ -35,6 +35,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.model.user.DarkThemeConfig
 import kpt.core.model.user.ThemeBrand
 import kpt.feature.settings.generated.resources.Res
@@ -52,8 +54,6 @@ import kpt.feature.settings.generated.resources.feature_settings_loading
 import kpt.feature.settings.generated.resources.feature_settings_theme
 import kpt.feature.settings.generated.resources.feature_settings_title
 import org.jetbrains.compose.resources.stringResource
-import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.ui.screen.ScreenContent
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable

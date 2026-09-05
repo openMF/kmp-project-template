@@ -27,7 +27,7 @@ internal fun SummaryHeroPreview() {
             ui = LoansListUiState(
                 loans = listOf(
                     previewLoan(),
-                    previewLoan(id = "loan-2", name = "Home loan", kind = LoanKind.MORTGAGE), // i18n:skip
+                    previewLoan(id = "loan-2", name = "Home loan", kind = LoanKind.MORTGAGE),
                 ),
                 totalMonthlyEmi = 4_152.0,
                 totalPrincipalRemaining = 125_000.0,

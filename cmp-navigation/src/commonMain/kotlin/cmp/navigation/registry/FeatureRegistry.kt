@@ -29,12 +29,12 @@ import kpt.feature.crypto.navigation.cryptoGraph
 import kpt.feature.currencyrates.di.CurrencyRatesModule
 import kpt.feature.currencyrates.navigation.currencyRatesGraph
 import kpt.feature.emicalculator.di.EmiCalculatorModule
-import kpt.feature.profile.di.ProfileModule
 import kpt.feature.emicalculator.navigation.emiCalculatorDestination
 import kpt.feature.loans.di.LoansModule
 import kpt.feature.loans.navigation.loansGraph
 import kpt.feature.macro.di.MacroModule
 import kpt.feature.macro.navigation.macroGraph
+import kpt.feature.profile.di.ProfileModule
 import kpt.feature.rates.di.RatesModule
 import kpt.feature.rates.navigation.ratesGraph
 import kpt.feature.watchlist.di.WatchlistModule

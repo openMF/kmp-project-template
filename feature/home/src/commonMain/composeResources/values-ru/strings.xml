@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: ru · translated by /idea-locale
-     app_title / money formats / USD / delta values are brand or format tokens — untranslated. -->
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
 <resources>
     <string name="screens_home_app_title">App Toolkit</string>
     <string name="screens_home_settings_cd">Настройки</string>

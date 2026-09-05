@@ -41,7 +41,7 @@ internal fun HomeScreenShellPreview() {
             onSettingsClick = {},
             homeBody = {
                 Box(Modifier.fillMaxSize().padding(16.dp), contentAlignment = Alignment.Center) {
-                    Text("Dashboard cards render here") // i18n:skip
+                    Text("Dashboard cards render here")
                 }
             },
         )

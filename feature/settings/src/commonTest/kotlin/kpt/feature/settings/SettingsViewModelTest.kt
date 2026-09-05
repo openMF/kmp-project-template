@@ -94,10 +94,18 @@ class SettingsViewModelTest {
                 forceFreshTrigger = refreshTrigger,
             )
 
-        override suspend fun setThemeBrand(themeBrand: ThemeBrand) { brandWrites += themeBrand }
-        override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) { darkWrites += darkThemeConfig }
-        override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) { dynamicColorWrites += useDynamicColor }
-        override suspend fun setLanguage(language: LanguageConfig) { languageWrites += language }
+        override suspend fun setThemeBrand(themeBrand: ThemeBrand) {
+            brandWrites += themeBrand
+        }
+        override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
+            darkWrites += darkThemeConfig
+        }
+        override suspend fun setDynamicColorPreference(useDynamicColor: Boolean) {
+            dynamicColorWrites += useDynamicColor
+        }
+        override suspend fun setLanguage(language: LanguageConfig) {
+            languageWrites += language
+        }
 
         override val authToken: String? get() = unused()
         override val passcode: String get() = unused()

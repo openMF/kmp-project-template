@@ -32,10 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kpt.core.base.ui.draft.DraftResolutionPrompt
-import kpt.core.base.ui.submit.MutationScreenContent
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitState
+import kpt.core.base.ui.draft.DraftResolutionPrompt
+import kpt.core.base.ui.submit.MutationScreenContent
 import kpt.core.model.demo.alerts.AlertDirection
 import kpt.core.model.demo.alerts.PriceAlert
 import kpt.feature.alerts.generated.resources.Res

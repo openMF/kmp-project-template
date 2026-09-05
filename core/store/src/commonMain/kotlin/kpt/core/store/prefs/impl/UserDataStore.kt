@@ -7,6 +7,8 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+@file:Suppress("MatchingDeclarationName")
+
 package kpt.core.store.prefs.impl
 
 import kotlinx.coroutines.flow.Flow

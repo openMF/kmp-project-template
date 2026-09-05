@@ -29,10 +29,10 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  */
 
 private fun previewForm(
-    name: String = "Car loan", // i18n:skip
+    name: String = "Car loan",
     currentStep: Int = 1,
 ) = LoanCalcScenario(
-    scenarioId = "scenario-1", // i18n:skip
+    scenarioId = "scenario-1",
     name = name,
     principal = 100_000.0,
     ratePercent = 7.5,
@@ -79,7 +79,7 @@ internal fun StepReviewPreview() {
 @Composable
 internal fun ReviewMetricRowPreview() {
     KptTheme {
-        ReviewMetricRow(label = "Monthly EMI", value = "$2,003.79") // i18n:skip
+        ReviewMetricRow(label = "Monthly EMI", value = "$2,003.79")
     }
 }
 

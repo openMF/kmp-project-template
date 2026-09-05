@@ -41,7 +41,17 @@ internal class FakeBillReminderRepository : BillReminderRepository {
     override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
         screenDataStreamForTesting(state.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
 
-    override fun observeAll(): Flow<List<BillReminder>> = state.map { rows ->
+    override fun billReminderDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<BillReminder> =
+        screenDataStreamForTesting(
+            state.map { rows ->
+                rows.firstOrNull { it.id == id }?.let { ScreenState.Content(it) } ?: ScreenState.Empty
+            },
+        )
+
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<BillReminder>> = state.map { rows ->
         rows.sortedBy { it.dueDay }
     }
 
@@ -49,11 +59,11 @@ internal class FakeBillReminderRepository : BillReminderRepository {
         if (maxDays < 0) emptyList() else rows.filter { it.enabled }
     }
 
-    override fun observeById(id: String): Flow<BillReminder?> = state.map { rows ->
+    fun observeById(id: String): Flow<BillReminder?> = state.map { rows ->
         rows.firstOrNull { it.id == id }
     }
 
-    override suspend fun getById(id: String): BillReminder? = state.value.firstOrNull { it.id == id }
+    suspend fun getById(id: String): BillReminder? = state.value.firstOrNull { it.id == id }
 
     override suspend fun upsert(bill: BillReminder) {
         state.value = state.value.filterNot { it.id == bill.id } + bill
@@ -67,7 +77,7 @@ internal class FakeBillReminderRepository : BillReminderRepository {
         if (maxDays < 0) 0.0 else rows.filter { it.enabled }.sumOf { it.amount }
     }
 
-    override fun observeCount(): Flow<Int> = state.map { it.size }
+    fun observeCount(): Flow<Int> = state.map { it.size }
 }
 
 /**

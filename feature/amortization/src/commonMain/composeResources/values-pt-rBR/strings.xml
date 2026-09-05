@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_amortization_schedule_title">Cronograma de pagamentos</string>
+    <string name="screens_amortization_schedule_back_cd">Voltar</string>
+    <string name="screens_amortization_schedule_header_month">Nº</string>
+    <string name="screens_amortization_schedule_header_principal">Principal</string>
+    <string name="screens_amortization_schedule_header_interest">Juros</string>
+    <string name="screens_amortization_schedule_header_balance">Saldo</string>
+    <string name="screens_amortization_schedule_summary_title">Resumo</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Total de pagamentos</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Principal total</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Juros totais</string>
+</resources>

@@ -10,6 +10,7 @@
 package kpt.core.data.demo.di
 
 import kpt.core.base.data.infra.NetworkMonitor
+import kpt.core.base.observability.CrashReporter
 import kpt.core.base.store.infra.impl.RoomBookkeeper
 import kpt.core.base.store.infra.impl.RoomSubmitOutbox
 import kpt.core.base.store.submit.OfflineSubmitSyncer
@@ -20,6 +21,8 @@ import kpt.core.data.demo.banking.BillReminderRepository
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.data.demo.banking.impl.BillReminderRepositoryImpl
 import kpt.core.data.demo.banking.impl.LoanRepositoryImpl
+import kpt.core.data.demo.calc.AmortizationCalcRepository
+import kpt.core.data.demo.calc.impl.AmortizationCalcRepositoryImpl
 import kpt.core.data.demo.cloudtodo.CloudTodoRepository
 import kpt.core.data.demo.cloudtodo.impl.CloudTodoRepositoryImpl
 import kpt.core.data.demo.crypto.CryptoRepository
@@ -30,16 +33,24 @@ import kpt.core.data.demo.economic.EconomicRatesRepository
 import kpt.core.data.demo.economic.MacroIndicatorsRepository
 import kpt.core.data.demo.economic.impl.EconomicRatesRepositoryImpl
 import kpt.core.data.demo.economic.impl.MacroIndicatorsRepositoryImpl
+import kpt.core.data.demo.emi.EmiCalculatorRepository
+import kpt.core.data.demo.emi.impl.EmiCalculatorRepositoryImpl
+import kpt.core.data.demo.profile.ProfileRepository
+import kpt.core.data.demo.profile.impl.ProfileRepositoryImpl
 import kpt.core.data.demo.watchlist.WatchlistRepository
 import kpt.core.data.demo.watchlist.impl.WatchlistRepositoryImpl
 import kpt.core.data.di.OutboxQualifiers
 import kpt.core.database.AppDatabase
+import kpt.core.database.demo.cloudtodo.CloudTodoDao
+import kpt.core.database.demo.cloudtodo.toDomain
 import kpt.core.model.demo.alerts.PriceAlert
 import kpt.core.model.demo.banking.BillReminder
 import kpt.core.model.demo.banking.Loan
 import kpt.core.model.demo.banking.LoanCalcScenario
 import kpt.core.store.AppStoreRegistry
+import kpt.core.store.demo.cloudtodo.impl.CLOUD_TODO_KEY_PREFIX
 import kpt.core.store.demo.cloudtodo.impl.CloudTodoKey
+import kpt.core.store.demo.cloudtodo.impl.CloudTodoSyncOrchestrator
 import org.koin.dsl.module
 import org.mobilenativefoundation.store.store5.Bookkeeper
 
@@ -164,14 +175,45 @@ val ProjectRepositoryModule = module {
     // cloud-todo — MUTABLE (offline-write) archetype. RoomBookkeeper (owned by core/data) records
     // failed writes for retry-on-reconnect; it's injected into the core/store MutableStore via Koin.
     single<Bookkeeper<CloudTodoKey>> {
-        RoomBookkeeper(dao = get(), keySerializer = { "cloudTodo:${it.id}" })
+        RoomBookkeeper(dao = get(), keySerializer = { "$CLOUD_TODO_KEY_PREFIX${it.id}" })
     }
+    single<AmortizationCalcRepository> {
+        AmortizationCalcRepositoryImpl(store = get(AppStoreRegistry.AmortizationCalc))
+    }
+
+    single<ProfileRepository> {
+        ProfileRepositoryImpl(profileStore = get(AppStoreRegistry.Profile))
+    }
+
+    single<EmiCalculatorRepository> {
+        EmiCalculatorRepositoryImpl(emiStore = get(AppStoreRegistry.Emi))
+    }
+
     single<CloudTodoRepository> {
         CloudTodoRepositoryImpl(
             readStore = get(AppStoreRegistry.CloudTodo),
             writeStore = get(AppStoreRegistry.CloudTodoMutable),
             gateway = get(),
         )
+    }
+
+    // Eager singleton — drains the cloud-todo write backlog on the offline → online edge.
+    // The sibling features drain a SubmitOutbox of payloads via OfflineSubmitSyncer; the
+    // MutableStore path records KEYS in the bookkeeper instead, so it needs the store-side
+    // counterpart. Without this the bookkeeper recorded every failed offline write and
+    // nothing ever retried them (S5-SYNC).
+    single(createdAtStart = true) {
+        val orchestrator = CloudTodoSyncOrchestrator(
+            scope = get(),
+            networkMonitor = get(),
+            bookkeeperDao = get(),
+            bookkeeper = get<Bookkeeper<CloudTodoKey>>(),
+            loadLocal = { key -> get<CloudTodoDao>().getById(key.id)?.toDomain() },
+            writeBlock = { todo -> get<CloudTodoRepository>().toggleCompleted(todo) },
+            onReplayError = { t -> getOrNull<CrashReporter>()?.recordException(t) },
+        )
+        orchestrator.start()
+        orchestrator
     }
 
     // Economic Repositories (Banking Utility Toolkit — FRED + World Bank)

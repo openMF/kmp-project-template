@@ -69,7 +69,13 @@ import org.koin.core.parameter.parametersOf
  * - A STALE badge (when [MacroUiState.overallBand] is Stale/VeryStale) so users
  *   know they're looking at cached data without per-card inspection
  */
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Stateful entry point — resolves the ViewModel and hands its state to [CountryMacroScreenContent].
+ *
+ * The split follows the template's house pattern (see `SettingsScreen`): everything visual lives in
+ * the stateless content composable so it can be rendered by `@Preview` off `desktopTest` without a
+ * Koin graph, which is what the device-free CMP render tier needs.
+ */
 @Composable
 fun CountryMacroScreen(
     countryCode: String,
@@ -80,6 +86,41 @@ fun CountryMacroScreen(
     viewModel: CountryMacroViewModel = koinViewModel { parametersOf(countryCode) },
 ) {
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
+
+    CountryMacroScreenContent(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        onPickCountry = onPickCountry,
+        onOpenIndicator = onOpenIndicator,
+        onRefreshAll = { viewModel.trySendAction(MacroAction.RefreshAll) },
+        onRetryIndicator = { index -> viewModel.trySendAction(MACRO_RETRY_ACTIONS[index]) },
+        modifier = modifier,
+    )
+}
+
+/**
+ * Per-card retry actions, indexed to match the card order in [CountryMacroScreenContent]
+ * (GDP, inflation, unemployment). Hoisted to file scope so the stateless body can address a card by
+ * INDEX while the stateful wrapper owns the action dispatch.
+ */
+private val MACRO_RETRY_ACTIONS = listOf(
+    MacroAction.RetryGdp,
+    MacroAction.RetryInflation,
+    MacroAction.RetryUnemployment,
+)
+
+/** Stateless body — every visual decision lives here, so `@Preview` can render it directly. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun CountryMacroScreenContent(
+    uiState: MacroUiState,
+    onBackClick: () -> Unit,
+    onPickCountry: () -> Unit,
+    onOpenIndicator: (IndicatorKind) -> Unit,
+    onRefreshAll: () -> Unit,
+    onRetryIndicator: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val country = SupportedCountries.findByCode(uiState.countryCode)
 
     val sp = MaterialTheme.spacing
@@ -109,7 +150,7 @@ fun CountryMacroScreen(
                             .padding(end = sp.sm)
                             .clickable(onClick = onPickCountry),
                     )
-                    IconButton(onClick = { viewModel.trySendAction(MacroAction.RefreshAll) }) {
+                    IconButton(onClick = onRefreshAll) {
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = stringResource(Res.string.screens_macro_refresh_all_cd),
@@ -142,7 +183,6 @@ fun CountryMacroScreen(
             // the compact per-card slots keep the dense look. DashboardProgressBar shows "X of Y loaded".
             val macroStates = listOf(uiState.gdp, uiState.inflation, uiState.unemployment)
             val macroKinds = listOf(IndicatorKind.GDP, IndicatorKind.INFLATION_CPI, IndicatorKind.UNEMPLOYMENT)
-            val macroRetries = listOf(MacroAction.RetryGdp, MacroAction.RetryInflation, MacroAction.RetryUnemployment)
 
             DashboardProgressBar(
                 state = macroStates.toDashboardProgressState(),
@@ -151,7 +191,7 @@ fun CountryMacroScreen(
 
             IndependentCardLayout(
                 states = macroStates,
-                onRetry = { index -> viewModel.trySendAction(macroRetries[index]) },
+                onRetry = onRetryIndicator,
                 cardChrome = { index, card ->
                     MacroIndicatorCardChrome(
                         indicatorKind = macroKinds[index],
@@ -162,7 +202,7 @@ fun CountryMacroScreen(
                 empty = { index ->
                     MacroInlineMessage(
                         text = stringResource(Res.string.screens_macro_card_empty),
-                        onRetry = { viewModel.trySendAction(macroRetries[index]) },
+                        onRetry = { onRetryIndicator(index) },
                     )
                 },
                 noNetwork = { index, isCaptivePortal ->
@@ -172,13 +212,13 @@ fun CountryMacroScreen(
                         } else {
                             stringResource(Res.string.screens_macro_card_offline)
                         },
-                        onRetry = { viewModel.trySendAction(macroRetries[index]) },
+                        onRetry = { onRetryIndicator(index) },
                     )
                 },
                 error = { index, throwable ->
                     MacroInlineMessage(
                         text = throwable.message ?: stringResource(Res.string.screens_macro_card_generic_error),
-                        onRetry = { viewModel.trySendAction(macroRetries[index]) },
+                        onRetry = { onRetryIndicator(index) },
                     )
                 },
             ) { _, data, _ ->

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_watchlist_title">관심 목록</string>
+    <string name="screens_watchlist_back_cd">뒤로</string>
+    <string name="screens_watchlist_remove_cd">관심 목록에서 제거</string>
+    <string name="screens_watchlist_empty">관심 목록이 비어 있습니다</string>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">币种行情</string>
+    <string name="screens_crypto_coin_markets_back_cd">返回</string>
+    <string name="screens_crypto_coin_markets_empty">暂无可显示的币种。</string>
+    <string name="screens_crypto_coin_markets_error_retry">重试</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">正在加载更多…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">已全部加载</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">当前价格</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">24 小时涨跌</string>
+    <string name="screens_crypto_coin_detail_back_cd">返回</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">刷新</string>
+    <string name="screens_crypto_coin_detail_rank_label">市值排名</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">市值</string>
+    <string name="screens_crypto_coin_detail_high_label">24 小时最高</string>
+    <string name="screens_crypto_coin_detail_low_label">24 小时最低</string>
+    <string name="screens_crypto_coin_detail_circulating_label">流通量</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">最大供应量</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">无上限</string>
+    <string name="screens_crypto_coin_detail_about_label">关于</string>
+</resources>

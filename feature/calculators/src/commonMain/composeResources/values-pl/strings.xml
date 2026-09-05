@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">Zdolność kredytowa</string>
+    <string name="screens_calc_affordability_back_cd">Wstecz</string>
+    <string name="screens_calc_affordability_income_label">Miesięczny dochód</string>
+    <string name="screens_calc_affordability_obligations_label">Istniejące zobowiązania miesięczne</string>
+    <string name="screens_calc_affordability_dti_label">Limit wskaźnika DTI (%)</string>
+    <string name="screens_calc_affordability_rate_label">Stopa roczna (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Okres (miesiące)</string>
+    <string name="screens_calc_affordability_max_principal_label">Maksymalny kapitał kredytu</string>
+    <string name="screens_calc_affordability_max_emi_label">Maksymalna rata</string>
+    <string name="screens_calc_amortization_title">Amortyzacja</string>
+    <string name="screens_calc_amortization_title_with_source">Amortyzacja · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Wstecz</string>
+    <string name="screens_calc_amortization_principal_label">Kapitał</string>
+    <string name="screens_calc_amortization_rate_label">Stopa roczna (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Okres (miesiące)</string>
+    <string name="screens_calc_amortization_emi_label">Rata miesięczna</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Odsetki %1$s · Razem %2$s</string>
+    <string name="screens_calc_amortization_header_month">Nr</string>
+    <string name="screens_calc_amortization_header_principal">Kapitał</string>
+    <string name="screens_calc_amortization_header_interest">Odsetki</string>
+    <string name="screens_calc_amortization_header_balance">Saldo</string>
+    <string name="screens_calc_compare_title">Porównaj kredyty</string>
+    <string name="screens_calc_compare_back_cd">Wstecz</string>
+    <string name="screens_calc_compare_best_emi_label">Najlepsza rata · Wariant %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/mies.</string>
+    <string name="screens_calc_compare_savings_text">Oszczędza łącznie %1$s w porównaniu z najdroższym</string>
+    <string name="screens_calc_compare_helper_text">Zmień dowolny wariant poniżej, aby zobaczyć aktualizację porównania na żywo.</string>
+    <string name="screens_calc_compare_scenario_label">Wariant %1$d</string>
+    <string name="screens_calc_compare_best_badge">Najlepszy</string>
+    <string name="screens_calc_compare_principal_label">Kapitał</string>
+    <string name="screens_calc_compare_rate_label">Stopa (%)</string>
+    <string name="screens_calc_compare_tenure_label">Okres (miesiące)</string>
+    <string name="screens_calc_compare_result_emi">Rata</string>
+    <string name="screens_calc_compare_result_interest">Odsetki</string>
+    <string name="screens_calc_compare_result_total">Razem</string>
+    <string name="screens_calc_wizard_resume_title">Wznowić nieukończonego kreatora?</string>
+    <string name="screens_calc_wizard_resume_message">Masz kreator obliczeń kredytu na kroku %1$d. Kontynuować od miejsca przerwania czy odrzucić?</string>
+    <string name="screens_calc_wizard_resume_continue">Kontynuuj</string>
+    <string name="screens_calc_wizard_resume_discard">Odrzuć</string>
+    <string name="screens_calc_wizard_title">Nowy kredyt · Krok %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Wstecz</string>
+    <string name="screens_calc_wizard_step_principal_question">Ile chcesz pożyczyć?</string>
+    <string name="screens_calc_wizard_step_principal_label">Kwota kapitału</string>
+    <string name="screens_calc_wizard_step_tenure_question">Na ile miesięcy?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Okres (miesiące)</string>
+    <string name="screens_calc_wizard_step_rate_question">Przy jakiej stopie rocznej?</string>
+    <string name="screens_calc_wizard_step_rate_label">Stopa roczna (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Rata miesięczna</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Łącznie do zapłaty: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Kapitał</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Okres</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d mies.</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Stopa</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Łączne odsetki</string>
+    <string name="screens_calc_wizard_step_name_message">Nazwij ten wariant, aby później odnaleźć go wśród swoich kredytów.</string>
+    <string name="screens_calc_wizard_step_name_label">Nazwa wariantu</string>
+    <string name="screens_calc_wizard_step_name_required">Wymagane — wpisz nazwę, aby włączyć Zapisz.</string>
+    <string name="screens_calc_wizard_button_back">Wstecz</string>
+    <string name="screens_calc_wizard_button_next">Dalej</string>
+    <string name="screens_calc_wizard_button_save">Zapisz jako kredyt</string>
+</resources>

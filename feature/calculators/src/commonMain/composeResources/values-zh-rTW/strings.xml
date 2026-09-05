@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">可負擔額度</string>
+    <string name="screens_calc_affordability_back_cd">返回</string>
+    <string name="screens_calc_affordability_income_label">月收入</string>
+    <string name="screens_calc_affordability_obligations_label">現有每月負債</string>
+    <string name="screens_calc_affordability_dti_label">負債收入比上限 (%)</string>
+    <string name="screens_calc_affordability_rate_label">年利率 (%)</string>
+    <string name="screens_calc_affordability_tenure_label">期限（月）</string>
+    <string name="screens_calc_affordability_max_principal_label">最高貸款本金</string>
+    <string name="screens_calc_affordability_max_emi_label">最高月付</string>
+    <string name="screens_calc_amortization_title">攤還計畫</string>
+    <string name="screens_calc_amortization_title_with_source">攤還計畫 · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">返回</string>
+    <string name="screens_calc_amortization_principal_label">本金</string>
+    <string name="screens_calc_amortization_rate_label">年利率 (%)</string>
+    <string name="screens_calc_amortization_tenure_label">期限（月）</string>
+    <string name="screens_calc_amortization_emi_label">每月還款額</string>
+    <string name="screens_calc_amortization_interest_total_supporting">利息 %1$s · 總計 %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">本金</string>
+    <string name="screens_calc_amortization_header_interest">利息</string>
+    <string name="screens_calc_amortization_header_balance">餘額</string>
+    <string name="screens_calc_compare_title">貸款比較</string>
+    <string name="screens_calc_compare_back_cd">返回</string>
+    <string name="screens_calc_compare_best_emi_label">最佳月付 · 方案 %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/月</string>
+    <string name="screens_calc_compare_savings_text">比最貴方案總共節省 %1$s</string>
+    <string name="screens_calc_compare_helper_text">編輯下方任一方案，比較結果會即時更新。</string>
+    <string name="screens_calc_compare_scenario_label">方案 %1$d</string>
+    <string name="screens_calc_compare_best_badge">最佳</string>
+    <string name="screens_calc_compare_principal_label">本金</string>
+    <string name="screens_calc_compare_rate_label">利率 (%)</string>
+    <string name="screens_calc_compare_tenure_label">期限（月）</string>
+    <string name="screens_calc_compare_result_emi">月付</string>
+    <string name="screens_calc_compare_result_interest">利息</string>
+    <string name="screens_calc_compare_result_total">總計</string>
+    <string name="screens_calc_wizard_resume_title">要繼續未完成的精靈嗎？</string>
+    <string name="screens_calc_wizard_resume_message">您有一個進行到第 %1$d 步的貸款計算精靈。要繼續還是捨棄？</string>
+    <string name="screens_calc_wizard_resume_continue">繼續</string>
+    <string name="screens_calc_wizard_resume_discard">捨棄</string>
+    <string name="screens_calc_wizard_title">新增貸款 · 第 %1$d/%2$d 步</string>
+    <string name="screens_calc_wizard_back_cd">返回</string>
+    <string name="screens_calc_wizard_step_principal_question">您想借多少？</string>
+    <string name="screens_calc_wizard_step_principal_label">本金金額</string>
+    <string name="screens_calc_wizard_step_tenure_question">分多少個月？</string>
+    <string name="screens_calc_wizard_step_tenure_label">期限（月）</string>
+    <string name="screens_calc_wizard_step_rate_question">年利率是多少？</string>
+    <string name="screens_calc_wizard_step_rate_label">年利率 (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">每月還款額</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">應付總額：%1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">本金</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">期限</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d 個月</string>
+    <string name="screens_calc_wizard_step_review_rate_label">利率</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">利息總額</string>
+    <string name="screens_calc_wizard_step_name_message">為這個方案命名，方便日後在貸款中找到它。</string>
+    <string name="screens_calc_wizard_step_name_label">方案名稱</string>
+    <string name="screens_calc_wizard_step_name_required">必填 — 輸入名稱後才能儲存。</string>
+    <string name="screens_calc_wizard_button_back">上一步</string>
+    <string name="screens_calc_wizard_button_next">下一步</string>
+    <string name="screens_calc_wizard_button_save">儲存為貸款</string>
+</resources>

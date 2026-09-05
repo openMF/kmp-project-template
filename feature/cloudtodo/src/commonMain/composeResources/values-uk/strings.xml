@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">Хмарне завдання</string>
+    <string name="screens_cloudtodo_detail_intro">Єдиний споживач createMutableStore + MutationGateway. Вимкніть мережу, щоб побачити офлайн-гілки.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Перемкнути (оптимістично)</string>
+    <string name="screens_cloudtodo_complete_online_text">Завершити (потрібна мережа)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Розвʼязати конфлікт</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Закрити</string>
+    <string name="screens_cloudtodo_status_completed">Виконано</string>
+    <string name="screens_cloudtodo_status_not_completed">Не виконано</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">Застосовано локально</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Спершу запис у Room. Мережеву синхронізацію поставлено в чергу, її буде повторено після відновлення зʼєднання.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Застосовано · синхронізовано</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">Сервер підтвердив запис.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Застосовано · у черзі</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Записано локально; синхронізація в черзі й повториться, коли зʼявиться зʼєднання.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Заблоковано</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Офлайн — запис, що потребує мережі, відхиляється замість локального запису. Нічого не записано.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">Немає автентифікації для цієї операції. Нічого не записано.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">Передумову на сервері не виконано до запису. Нічого не записано.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Конфлікт зафіксовано</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">Сервер також змінив цей запис. Його версію застосовано, а вашу збережено — виберіть, яка переможе.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Помилка</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — оптимістичний локальний запис скасовано.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — локальний стан збережено.</string>
+    <string name="screens_cloudtodo_conflicts_title">Конфлікти синхронізації</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">Немає нерозвʼязаних конфліктів.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Зберегти версію сервера</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Повторити мою версію</string>
+</resources>

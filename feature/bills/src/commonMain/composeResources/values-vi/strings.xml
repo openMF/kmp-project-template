@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_bills_add_title">Nhắc hóa đơn mới</string>
+    <string name="screens_bills_edit_title">Sửa nhắc hóa đơn</string>
+    <string name="screens_bills_addedit_back_cd">Quay lại</string>
+    <string name="screens_bills_addedit_save_button">Lưu</string>
+    <string name="screens_bills_addedit_status_saving">Đang lưu…</string>
+    <string name="screens_bills_addedit_status_saved">Đã lưu ✓</string>
+    <string name="screens_bills_addedit_status_add_another">Thêm cái khác</string>
+    <string name="screens_bills_addedit_status_offline">Đã lưu ngoại tuyến — sẽ đồng bộ khi có mạng.</string>
+    <string name="screens_bills_addedit_status_failed">Lưu thất bại: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">lỗi không xác định</string>
+    <string name="screens_bills_addedit_retry_button">Thử lại</string>
+    <string name="screens_bills_addedit_dismiss_button">Bỏ qua</string>
+    <string name="screens_bills_addedit_name_label">Tên (vd. Tiền điện)</string>
+    <string name="screens_bills_addedit_amount_label">Số tiền</string>
+    <string name="screens_bills_addedit_due_day_label">Ngày đến hạn trong tháng (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">Lặp lại</string>
+    <string name="screens_bills_addedit_category_title">Danh mục</string>
+    <string name="screens_bills_addedit_remind_days_before_label">Nhắc trước bao nhiêu ngày</string>
+    <string name="screens_bills_addedit_enabled_label">Đang bật</string>
+    <string name="screens_bills_draft_resume_title">Tiếp tục bản nháp?</string>
+    <string name="screens_bills_draft_resume_message">Bạn có một nhắc hóa đơn chưa lưu. Hãy tiếp tục từ chỗ đang dở, bỏ đi, hoặc tạo cái mới.</string>
+    <string name="screens_bills_draft_resume_resume">Tiếp tục</string>
+    <string name="screens_bills_draft_resume_discard">Bỏ bản nháp</string>
+    <string name="screens_bills_draft_resume_start_fresh">Bắt đầu lại</string>
+    <string name="screens_bills_list_title">Nhắc hóa đơn</string>
+    <string name="screens_bills_list_back_cd">Quay lại</string>
+    <string name="screens_bills_list_new_fab_text">Hóa đơn mới</string>
+    <string name="screens_bills_list_summary_label">Sắp đến hạn tháng này</string>
+    <string name="screens_bills_list_summary_due_single">Có %1$d hóa đơn đến hạn trong 7 ngày tới</string>
+    <string name="screens_bills_list_summary_due_plural">Có %1$d hóa đơn đến hạn trong 7 ngày tới</string>
+    <string name="screens_bills_list_mark_paid_cd">Đánh dấu đã trả</string>
+    <string name="screens_bills_list_paid_button">Đã trả</string>
+    <string name="screens_bills_list_reminders_disabled">Đã tắt nhắc</string>
+</resources>

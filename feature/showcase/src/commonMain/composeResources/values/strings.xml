@@ -30,6 +30,8 @@
     <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — captive portal CTA</string>
     <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — plain offline</string>
 
+    <string name="screens_showcase_state_gallery_error_chip_tapped">tapped ×%1$d</string>
+
     <!-- ===== TransitionGalleryScreen ===== -->
     <string name="screens_showcase_transition_gallery_intro">Tap each tile to push a demo screen using that transition. The destination auto-pops after 2s. Watch for blinks.</string>
 

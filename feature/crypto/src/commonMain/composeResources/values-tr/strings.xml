@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">Coin piyasaları</string>
+    <string name="screens_crypto_coin_markets_back_cd">Geri</string>
+    <string name="screens_crypto_coin_markets_empty">Gösterilecek coin henüz yok.</string>
+    <string name="screens_crypto_coin_markets_error_retry">Yeniden dene</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">Daha fazla yükleniyor…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">Her şeyi gördünüz</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">Güncel fiyat</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">24 saatlik değişim</string>
+    <string name="screens_crypto_coin_detail_back_cd">Geri</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">Yenile</string>
+    <string name="screens_crypto_coin_detail_rank_label">Piyasa değeri sıralaması</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">Piyasa değeri</string>
+    <string name="screens_crypto_coin_detail_high_label">24s en yüksek</string>
+    <string name="screens_crypto_coin_detail_low_label">24s en düşük</string>
+    <string name="screens_crypto_coin_detail_circulating_label">Dolaşımdaki arz</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">Maksimum arz</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">Sınırsız</string>
+    <string name="screens_crypto_coin_detail_about_label">Hakkında</string>
+</resources>

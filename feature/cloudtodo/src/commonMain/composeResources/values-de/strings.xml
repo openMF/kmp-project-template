@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">Cloud-Aufgabe</string>
+    <string name="screens_cloudtodo_detail_intro">Der einzige Consumer von createMutableStore + MutationGateway. Schalte das Netzwerk ab, um die Offline-Zweige zu sehen.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Umschalten (optimistisch)</string>
+    <string name="screens_cloudtodo_complete_online_text">Abschließen (Online erforderlich)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Konflikt lösen</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Verwerfen</string>
+    <string name="screens_cloudtodo_status_completed">Erledigt</string>
+    <string name="screens_cloudtodo_status_not_completed">Nicht erledigt</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">Lokal angewendet</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Room-First-Schreibvorgang. Die Netzwerksynchronisierung ist eingereiht und wird bei erneuter Verbindung wiederholt.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Angewendet · synchronisiert</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">Der Server hat den Schreibvorgang bestätigt.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Angewendet · eingereiht</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Lokal geschrieben; die Synchronisierung ist eingereiht und wird bei wiederhergestellter Verbindung wiederholt.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Blockiert</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Offline – ein Schreibvorgang mit Online-Pflicht wird abgelehnt statt lokal geschrieben. Es wurde nichts geschrieben.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">Für diesen Vorgang nicht authentifiziert. Es wurde nichts geschrieben.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">Eine Server-Vorbedingung schlug vor dem Schreiben fehl. Es wurde nichts geschrieben.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Konflikt erfasst</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">Der Server hat diesen Datensatz ebenfalls geändert. Seine Version wurde angewendet und deine bewahrt – wähle, welche gilt.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Fehlgeschlagen</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s – der optimistische lokale Schreibvorgang wurde zurückgenommen.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s – lokaler Zustand beibehalten.</string>
+    <string name="screens_cloudtodo_conflicts_title">Synchronisierungskonflikte</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">Keine offenen Konflikte.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Serverversion behalten</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Meine Version erneut versuchen</string>
+</resources>

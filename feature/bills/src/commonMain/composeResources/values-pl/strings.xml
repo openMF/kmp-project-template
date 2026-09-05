@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_bills_add_title">Nowe przypomnienie o rachunku</string>
+    <string name="screens_bills_edit_title">Edytuj przypomnienie</string>
+    <string name="screens_bills_addedit_back_cd">Wstecz</string>
+    <string name="screens_bills_addedit_save_button">Zapisz</string>
+    <string name="screens_bills_addedit_status_saving">Zapisywanie…</string>
+    <string name="screens_bills_addedit_status_saved">Zapisano ✓</string>
+    <string name="screens_bills_addedit_status_add_another">Dodaj kolejne</string>
+    <string name="screens_bills_addedit_status_offline">Zapisano offline — zsynchronizuje się po połączeniu.</string>
+    <string name="screens_bills_addedit_status_failed">Nie udało się zapisać: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">nieznany błąd</string>
+    <string name="screens_bills_addedit_retry_button">Ponów</string>
+    <string name="screens_bills_addedit_dismiss_button">Odrzuć</string>
+    <string name="screens_bills_addedit_name_label">Nazwa (np. Prąd)</string>
+    <string name="screens_bills_addedit_amount_label">Kwota</string>
+    <string name="screens_bills_addedit_due_day_label">Dzień płatności w miesiącu (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">Powtarzanie</string>
+    <string name="screens_bills_addedit_category_title">Kategoria</string>
+    <string name="screens_bills_addedit_remind_days_before_label">Przypomnij dni wcześniej</string>
+    <string name="screens_bills_addedit_enabled_label">Włączone</string>
+    <string name="screens_bills_draft_resume_title">Wznowić wersję roboczą?</string>
+    <string name="screens_bills_draft_resume_message">Masz niezapisane przypomnienie o rachunku. Wznów w miejscu przerwania, odrzuć je lub utwórz nowe.</string>
+    <string name="screens_bills_draft_resume_resume">Wznów</string>
+    <string name="screens_bills_draft_resume_discard">Odrzuć wersję roboczą</string>
+    <string name="screens_bills_draft_resume_start_fresh">Zacznij od nowa</string>
+    <string name="screens_bills_list_title">Przypomnienia o rachunkach</string>
+    <string name="screens_bills_list_back_cd">Wstecz</string>
+    <string name="screens_bills_list_new_fab_text">Nowy rachunek</string>
+    <string name="screens_bills_list_summary_label">Zbliżające się w tym miesiącu</string>
+    <string name="screens_bills_list_summary_due_single">W ciągu 7 dni przypada %1$d rachunek</string>
+    <string name="screens_bills_list_summary_due_plural">W ciągu 7 dni przypada %1$d rachunków</string>
+    <string name="screens_bills_list_mark_paid_cd">Oznacz jako opłacony</string>
+    <string name="screens_bills_list_paid_button">Opłacony</string>
+    <string name="screens_bills_list_reminders_disabled">Przypomnienia wyłączone</string>
+</resources>

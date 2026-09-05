@@ -29,7 +29,10 @@ internal class FakeLoanRepository : LoanRepository {
         state.value = loans.toList()
     }
 
-    override fun observeAll(): Flow<List<Loan>> = state
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<Loan>> = state
 
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         screenDataStreamForTesting(state.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
@@ -41,9 +44,9 @@ internal class FakeLoanRepository : LoanRepository {
             },
         )
 
-    override fun observeById(id: String): Flow<Loan?> = state.map { rows -> rows.firstOrNull { it.id == id } }
+    fun observeById(id: String): Flow<Loan?> = state.map { rows -> rows.firstOrNull { it.id == id } }
 
-    override suspend fun getById(id: String): Loan? = state.value.firstOrNull { it.id == id }
+    suspend fun getById(id: String): Loan? = state.value.firstOrNull { it.id == id }
 
     override suspend fun upsert(loan: Loan) {
         state.value = state.value.filterNot { it.id == loan.id } + loan
@@ -53,10 +56,10 @@ internal class FakeLoanRepository : LoanRepository {
         state.value = state.value.filterNot { it.id == id }
     }
 
-    override fun observeTotalMonthlyEmi(): Flow<Double> = state.map { rows -> rows.sumOf { it.monthlyPayment } }
+    fun observeTotalMonthlyEmi(): Flow<Double> = state.map { rows -> rows.sumOf { it.monthlyPayment } }
 
-    override fun observeTotalPrincipalRemaining(): Flow<Double> =
+    fun observeTotalPrincipalRemaining(): Flow<Double> =
         state.map { rows -> rows.sumOf { it.principalRemaining } }
 
-    override fun observeCount(): Flow<Int> = state.map { it.size }
+    fun observeCount(): Flow<Int> = state.map { it.size }
 }

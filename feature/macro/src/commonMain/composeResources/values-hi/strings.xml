@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">वापस</string>
+    <string name="screens_macro_country_title">देश मैक्रो</string>
+    <string name="screens_macro_refresh_all_cd">सभी रीफ़्रेश करें</string>
+    <string name="screens_macro_stale_chip">पुराना — कैश्ड डेटा दिखाया जा रहा है</string>
+    <string name="screens_macro_picker_title">देश चुनें</string>
+    <string name="screens_macro_picker_search_placeholder">देश या ISO कोड खोजें</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">स्रोत: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">वर्ष-दर-वर्ष</string>
+    <string name="screens_macro_card_empty">इस संकेतक के लिए कोई डेटा प्रकाशित नहीं है।</string>
+    <string name="screens_macro_card_captive_portal">कैप्टिव पोर्टल के पीछे — जारी रखने के लिए साइन इन करें।</string>
+    <string name="screens_macro_card_offline">ऑफ़लाइन — यह संकेतक लाने के लिए कनेक्ट करें।</string>
+    <string name="screens_macro_card_generic_error">यह संकेतक लोड नहीं हो सका।</string>
+    <string name="screens_macro_card_auth_required">प्रमाणीकरण आवश्यक है।</string>
+    <string name="screens_macro_card_latest_year">नवीनतम: %1$s</string>
+    <string name="screens_macro_card_loading">लोड हो रहा है…</string>
+    <string name="screens_macro_card_retry">पुनः प्रयास करें</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

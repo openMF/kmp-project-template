@@ -9,8 +9,10 @@
  */
 package kpt.core.data.user
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.model.user.DarkThemeConfig
 import kpt.core.model.user.LanguageConfig
 import kpt.core.model.user.ThemeBrand
@@ -26,6 +28,15 @@ import kpt.core.model.user.UserData
 interface UserDataRepository {
 
     val userData: StateFlow<UserData>
+
+    /**
+     * Store5-backed read of the same preferences, as a [ScreenDataStream].
+     *
+     * [userData] stays for the many call sites that just want the current value (auth, theme
+     * bootstrap). Screens consume THIS instead, so preferences render through `ScreenContent`
+     * with real Loading / Content / Error states like every other read surface.
+     */
+    fun userDataStream(scope: CoroutineScope): ScreenDataStream<UserData>
 
     val authToken: String?
 

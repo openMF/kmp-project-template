@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">ローンを追加</string>
+    <string name="screens_loans_edit_title">ローンを編集</string>
+    <string name="screens_loans_addedit_back_cd">戻る</string>
+    <string name="screens_loans_addedit_name_label">ローン名</string>
+    <string name="screens_loans_addedit_kind_label">種類</string>
+    <string name="screens_loans_addedit_kind_cd">ローンの種類を選択</string>
+    <string name="screens_loans_addedit_principal_label">当初元金</string>
+    <string name="screens_loans_addedit_principal_remaining_label">元金残高</string>
+    <string name="screens_loans_addedit_annual_rate_label">年利 (%)</string>
+    <string name="screens_loans_addedit_tenure_label">期間（月）</string>
+    <string name="screens_loans_addedit_months_remaining_label">残り月数</string>
+    <string name="screens_loans_addedit_next_due_date_label">次回返済日（YYYY-MM-DD）</string>
+    <string name="screens_loans_addedit_total_paid_label">これまでの返済総額</string>
+    <string name="screens_loans_addedit_monthly_emi_label">月々の返済額</string>
+    <string name="screens_loans_addedit_total_interest_preview">利息合計: %1$s</string>
+    <string name="screens_loans_add_submit">ローンを保存</string>
+    <string name="screens_loans_edit_submit">ローンを更新</string>
+    <string name="screens_loans_addedit_status_saving">保存中…</string>
+    <string name="screens_loans_addedit_status_saved">保存しました ✓</string>
+    <string name="screens_loans_addedit_status_offline">オフラインで保存しました — オンラインになると同期します。</string>
+    <string name="screens_loans_addedit_status_failed">保存に失敗しました: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">不明なエラー</string>
+    <string name="screens_loans_addedit_retry_button">再試行</string>
+    <string name="screens_loans_addedit_dismiss_button">閉じる</string>
+    <string name="screens_loans_addedit_draft_resume_title">ローンの入力を再開しますか？</string>
+    <string name="screens_loans_addedit_draft_resume_message">保存されていないローンの下書きがあります。編集を再開するか、破棄するか、新規作成してください。</string>
+    <string name="screens_loans_addedit_draft_resume_resume">編集を再開</string>
+    <string name="screens_loans_addedit_draft_resume_discard">下書きを破棄</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">新規作成</string>
+    <string name="screens_loans_detail_title">ローンの詳細</string>
+    <string name="screens_loans_detail_back_cd">戻る</string>
+    <string name="screens_loans_detail_delete_dialog_title">ローンを削除しますか？</string>
+    <string name="screens_loans_detail_delete_dialog_message">このローンと追跡履歴が削除されます。</string>
+    <string name="screens_loans_detail_delete_confirm">削除</string>
+    <string name="screens_loans_detail_delete_cancel">キャンセル</string>
+    <string name="screens_loans_detail_principal_remaining_label">元金残高</string>
+    <string name="screens_loans_detail_months_remaining_value">残り %1$d か月</string>
+    <string name="screens_loans_detail_original_principal_label">当初元金</string>
+    <string name="screens_loans_detail_monthly_payment_label">月々の返済額</string>
+    <string name="screens_loans_detail_total_paid_label">これまでの返済総額</string>
+    <string name="screens_loans_detail_annual_rate_label">年利</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">次回返済日</string>
+    <string name="screens_loans_detail_tenure_label">期間</string>
+    <string name="screens_loans_detail_tenure_value">%1$d か月</string>
+    <string name="screens_loans_detail_tenure_progress_label">返済期間の進捗</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% 完了</string>
+    <string name="screens_loans_detail_edit_button">編集</string>
+    <string name="screens_loans_detail_schedule_button">返済計画</string>
+    <string name="screens_loans_detail_delete_button">削除</string>
+    <string name="screens_loans_list_title">個人ローン</string>
+    <string name="screens_loans_list_back_cd">戻る</string>
+    <string name="screens_loans_list_new_fab_text">新しいローン</string>
+    <string name="screens_loans_list_delete_dialog_title">ローンを削除しますか？</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' が削除されます。元に戻せません。</string>
+    <string name="screens_loans_list_delete_confirm">削除</string>
+    <string name="screens_loans_list_delete_cancel">キャンセル</string>
+    <string name="screens_loans_list_total_outstanding_label">未返済合計</string>
+    <string name="screens_loans_list_active_count_single">アクティブなローン %1$d 件</string>
+    <string name="screens_loans_list_active_count_plural">アクティブなローン %1$d 件</string>
+    <string name="screens_loans_list_monthly_emi_label">月々の返済額</string>
+    <string name="screens_loans_row_remaining_label">残り</string>
+    <string name="screens_loans_row_monthly_emi_label">月々の返済額</string>
+    <string name="screens_loans_row_progress_value">%1$d%% 返済済み</string>
+    <string name="screens_loans_row_next_due_value">次回: %1$s</string>
+</resources>

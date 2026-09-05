@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_currencyrates_list_title">मुद्रा दरें</string>
+    <string name="screens_currencyrates_list_back_cd">वापस</string>
+    <string name="screens_currencyrates_list_search_placeholder">मुद्रा खोजें…</string>
+    <string name="screens_currencyrates_list_base_label">Base: %1$s • %2$s</string>
+    <string name="screens_currencyrates_converter_title">मुद्रा परिवर्तक</string>
+    <string name="screens_currencyrates_converter_amount_label">राशि</string>
+    <string name="screens_currencyrates_converter_target_label">में (जैसे EUR)</string>
+    <string name="screens_currencyrates_converter_result">%1$s %2$s = %3$s %4$s</string>
+    <string name="screens_currencyrates_converter_unavailable">एक राशि और समर्थित मुद्रा कोड दर्ज करें।</string>
+    <string name="screens_currencyrates_history_title">दर इतिहास</string>
+    <string name="screens_currencyrates_history_back_cd">वापस</string>
+    <string name="screens_currencyrates_history_currency_label">मुद्रा</string>
+    <string name="screens_currencyrates_history_period_label">अवधि</string>
+    <string name="screens_currencyrates_history_period_days">%1$d दिन</string>
+    <string name="screens_currencyrates_history_usd_label">USD</string>
+    <string name="screens_currencyrates_history_to_label">%1$s (%2$s से %3$s)</string>
+</resources>

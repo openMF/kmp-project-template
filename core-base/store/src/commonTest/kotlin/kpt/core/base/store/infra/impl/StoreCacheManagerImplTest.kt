@@ -26,6 +26,8 @@ private class ClearCountingBookkeeperDao : BookkeeperDao {
     val rows = mutableMapOf<String, Long>()
     var deleteAllCount = 0
     override suspend fun getLastFailedSync(key: String): Long? = rows[key]
+    override suspend fun pendingKeys(): List<String> =
+        rows.entries.sortedBy { it.value }.map { it.key }
     override suspend fun upsert(entity: BookkeeperEntity) {
         rows[entity.key] = entity.lastFailedSync
     }

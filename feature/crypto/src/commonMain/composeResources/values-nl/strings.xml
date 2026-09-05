@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">Coinmarkten</string>
+    <string name="screens_crypto_coin_markets_back_cd">Terug</string>
+    <string name="screens_crypto_coin_markets_empty">Nog geen coins om te tonen.</string>
+    <string name="screens_crypto_coin_markets_error_retry">Opnieuw</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">Meer laden…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">Je bent helemaal bij</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">Huidige prijs</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">Verandering 24 uur</string>
+    <string name="screens_crypto_coin_detail_back_cd">Terug</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">Vernieuwen</string>
+    <string name="screens_crypto_coin_detail_rank_label">Marktkapitalisatie-rang</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">Marktkapitalisatie</string>
+    <string name="screens_crypto_coin_detail_high_label">24u hoogste</string>
+    <string name="screens_crypto_coin_detail_low_label">24u laagste</string>
+    <string name="screens_crypto_coin_detail_circulating_label">Circulerend aanbod</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">Maximaal aanbod</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">Onbeperkt</string>
+    <string name="screens_crypto_coin_detail_about_label">Over</string>
+</resources>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">Ajouter un prêt</string>
+    <string name="screens_loans_edit_title">Modifier le prêt</string>
+    <string name="screens_loans_addedit_back_cd">Retour</string>
+    <string name="screens_loans_addedit_name_label">Nom du prêt</string>
+    <string name="screens_loans_addedit_kind_label">Type</string>
+    <string name="screens_loans_addedit_kind_cd">Choisir le type de prêt</string>
+    <string name="screens_loans_addedit_principal_label">Capital initial</string>
+    <string name="screens_loans_addedit_principal_remaining_label">Capital restant dû</string>
+    <string name="screens_loans_addedit_annual_rate_label">Taux d\'intérêt annuel (%)</string>
+    <string name="screens_loans_addedit_tenure_label">Durée (mois)</string>
+    <string name="screens_loans_addedit_months_remaining_label">Mois restants</string>
+    <string name="screens_loans_addedit_next_due_date_label">Prochaine échéance (AAAA-MM-JJ)</string>
+    <string name="screens_loans_addedit_total_paid_label">Total payé à ce jour</string>
+    <string name="screens_loans_addedit_monthly_emi_label">Mensualité</string>
+    <string name="screens_loans_addedit_total_interest_preview">Intérêts totaux : %1$s</string>
+    <string name="screens_loans_add_submit">Enregistrer le prêt</string>
+    <string name="screens_loans_edit_submit">Mettre à jour le prêt</string>
+    <string name="screens_loans_addedit_status_saving">Enregistrement…</string>
+    <string name="screens_loans_addedit_status_saved">Enregistré ✓</string>
+    <string name="screens_loans_addedit_status_offline">Enregistré hors ligne – synchronisation dès le retour en ligne.</string>
+    <string name="screens_loans_addedit_status_failed">Échec de l\'enregistrement : %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">erreur inconnue</string>
+    <string name="screens_loans_addedit_retry_button">Réessayer</string>
+    <string name="screens_loans_addedit_dismiss_button">Ignorer</string>
+    <string name="screens_loans_addedit_draft_resume_title">Reprendre votre prêt ?</string>
+    <string name="screens_loans_addedit_draft_resume_message">Vous avez un brouillon de prêt non enregistré. Reprenez la modification, supprimez-le ou créez-en un nouveau.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">Reprendre la modification</string>
+    <string name="screens_loans_addedit_draft_resume_discard">Supprimer le brouillon</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">Recommencer</string>
+    <string name="screens_loans_detail_title">Détails du prêt</string>
+    <string name="screens_loans_detail_back_cd">Retour</string>
+    <string name="screens_loans_detail_delete_dialog_title">Supprimer le prêt ?</string>
+    <string name="screens_loans_detail_delete_dialog_message">Ce prêt et son historique de suivi seront supprimés.</string>
+    <string name="screens_loans_detail_delete_confirm">Supprimer</string>
+    <string name="screens_loans_detail_delete_cancel">Annuler</string>
+    <string name="screens_loans_detail_principal_remaining_label">Capital restant dû</string>
+    <string name="screens_loans_detail_months_remaining_value">%1$d mois restants</string>
+    <string name="screens_loans_detail_original_principal_label">Capital initial</string>
+    <string name="screens_loans_detail_monthly_payment_label">Paiement mensuel (mensualité)</string>
+    <string name="screens_loans_detail_total_paid_label">Total payé à ce jour</string>
+    <string name="screens_loans_detail_annual_rate_label">Taux annuel</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">Prochaine échéance</string>
+    <string name="screens_loans_detail_tenure_label">Durée</string>
+    <string name="screens_loans_detail_tenure_value">%1$d mois</string>
+    <string name="screens_loans_detail_tenure_progress_label">Progression de la durée</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% effectué</string>
+    <string name="screens_loans_detail_edit_button">Modifier</string>
+    <string name="screens_loans_detail_schedule_button">Échéancier</string>
+    <string name="screens_loans_detail_delete_button">Supprimer</string>
+    <string name="screens_loans_list_title">Prêts personnels</string>
+    <string name="screens_loans_list_back_cd">Retour</string>
+    <string name="screens_loans_list_new_fab_text">Nouveau prêt</string>
+    <string name="screens_loans_list_delete_dialog_title">Supprimer le prêt ?</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' sera supprimé. Cette action est irréversible.</string>
+    <string name="screens_loans_list_delete_confirm">Supprimer</string>
+    <string name="screens_loans_list_delete_cancel">Annuler</string>
+    <string name="screens_loans_list_total_outstanding_label">Total restant dû</string>
+    <string name="screens_loans_list_active_count_single">%1$d prêt actif</string>
+    <string name="screens_loans_list_active_count_plural">%1$d prêts actifs</string>
+    <string name="screens_loans_list_monthly_emi_label">Mensualité</string>
+    <string name="screens_loans_row_remaining_label">Restant</string>
+    <string name="screens_loans_row_monthly_emi_label">Mensualité</string>
+    <string name="screens_loans_row_progress_value">%1$d%% remboursé</string>
+    <string name="screens_loans_row_next_due_value">Prochaine : %1$s</string>
+</resources>

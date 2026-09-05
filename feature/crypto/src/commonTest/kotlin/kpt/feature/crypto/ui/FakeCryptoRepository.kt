@@ -14,12 +14,15 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.infra.FetchedAtRepository
 import kpt.core.base.store.paging.PageKey
 import kpt.core.base.store.paging.PagingScreenStream
@@ -37,22 +40,56 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 /**
- * Minimal [CryptoRepository] for Compose UI tests.
+ * Minimal [CryptoRepository] for Compose UI tests AND ViewModel tests.
  *
  * Returns an always-empty paging stream via an in-memory Store so
  * [CoinMarketsViewModel] can be constructed without Koin, without a
  * real network, and without Room.
+ *
+ * It also RECORDS what each ViewModel asked for ([lastPageSize], [lastCoinId], [fetchCount]).
+ * Those are what let a ViewModel test assert the request contract rather than only the render:
+ * a detail screen that streams the wrong `coinId`, or a list that silently drops to a 1-row page
+ * size, produces a perfectly valid-looking screen and is invisible to a render-only assertion.
  */
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
-internal class FakeCryptoRepository : CryptoRepository {
+internal class FakeCryptoRepository(
+    /** Detail state served by [coinDetailStream]; Loading by default (UI tests want no targets). */
+    private val detailState: MutableStateFlow<ScreenState<CoinDetail>> =
+        MutableStateFlow(ScreenState.Loading),
+    /** Refresh trigger handed to the detail stream, so a test can observe `refresh()` dispatch. */
+    val detailRefreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
+    /** Freshness fed to the detail stream, so a test can assert the ViewModel's projection. */
+    private val detailFreshness: Flow<FreshnessSignal> = emptyFlow(),
+) : CryptoRepository {
+
+    /** Page size the last [coinMarketsStream] caller requested. */
+    var lastPageSize: Int? = null
+        private set
+
+    /** The stream instance last handed out — lets a test assert the ViewModel passes it through. */
+    var lastMarketsStream: PagingScreenStream<CoinMarket>? = null
+        private set
+
+    /** Coin id the last [coinDetailStream] caller requested. */
+    var lastCoinId: String? = null
+        private set
+
+    private val fetches = MutableStateFlow(0)
+
+    /** How many times the paging store's fetcher ran — a refresh must increment this. */
+    val fetchCount: Int get() = fetches.value
 
     override fun coinMarketsStream(
         scope: CoroutineScope,
         pageSize: Int,
     ): PagingScreenStream<CoinMarket> {
+        lastPageSize = pageSize
         val store = StoreBuilder
             .from<PageKey, List<CoinMarket>>(
-                fetcher = Fetcher.of { emptyList() },
+                fetcher = Fetcher.of {
+                    fetches.value += 1
+                    emptyList()
+                },
             )
             .build()
         return store.asPagingScreenStream(
@@ -61,21 +98,24 @@ internal class FakeCryptoRepository : CryptoRepository {
             cacheKey = "crypto:coinMarkets:test",
             scope = scope,
             pageSize = pageSize,
-        )
+        ).also { lastMarketsStream = it }
     }
 
     /**
-     * Not exercised by [CoinMarketsScreen] — only used by the coin-detail
-     * route. Stays permanently in [ScreenState.Loading] so no assertion targets
-     * appear; sufficient for UI-test construction.
+     * Serves [detailState]. Defaults to permanently [ScreenState.Loading] so the Compose UI tests
+     * that construct this fake with no arguments see no assertion targets, exactly as before.
      */
     override fun coinDetailStream(
         coinId: String,
         scope: CoroutineScope,
-    ): ScreenDataStream<CoinDetail> = screenDataStreamForTesting(
-        state = MutableStateFlow(ScreenState.Loading),
-        refreshTrigger = MutableSharedFlow(),
-    )
+    ): ScreenDataStream<CoinDetail> {
+        lastCoinId = coinId
+        return screenDataStreamForTesting(
+            state = detailState,
+            refreshTrigger = detailRefreshTrigger,
+            freshness = detailFreshness,
+        )
+    }
 }
 
 /**

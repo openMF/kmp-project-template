@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">Назад</string>
+    <string name="screens_macro_country_title">Макропоказатели страны</string>
+    <string name="screens_macro_refresh_all_cd">Обновить все</string>
+    <string name="screens_macro_stale_chip">УСТАРЕЛО — показаны кэшированные данные</string>
+    <string name="screens_macro_picker_title">Выберите страну</string>
+    <string name="screens_macro_picker_search_placeholder">Поиск страны или кода ISO</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Источник: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">По годам</string>
+    <string name="screens_macro_card_empty">Для этого показателя нет опубликованных данных.</string>
+    <string name="screens_macro_card_captive_portal">За перехватывающим порталом — войдите, чтобы продолжить.</string>
+    <string name="screens_macro_card_offline">Офлайн — подключитесь, чтобы получить этот показатель.</string>
+    <string name="screens_macro_card_generic_error">Не удалось загрузить этот показатель.</string>
+    <string name="screens_macro_card_auth_required">Требуется аутентификация.</string>
+    <string name="screens_macro_card_latest_year">Последнее: %1$s</string>
+    <string name="screens_macro_card_loading">Загрузка…</string>
+    <string name="screens_macro_card_retry">Повторить</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

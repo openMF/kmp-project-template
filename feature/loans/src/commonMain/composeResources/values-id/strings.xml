@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">Tambah pinjaman</string>
+    <string name="screens_loans_edit_title">Edit pinjaman</string>
+    <string name="screens_loans_addedit_back_cd">Kembali</string>
+    <string name="screens_loans_addedit_name_label">Nama pinjaman</string>
+    <string name="screens_loans_addedit_kind_label">Jenis</string>
+    <string name="screens_loans_addedit_kind_cd">Pilih jenis pinjaman</string>
+    <string name="screens_loans_addedit_principal_label">Pokok awal</string>
+    <string name="screens_loans_addedit_principal_remaining_label">Sisa pokok</string>
+    <string name="screens_loans_addedit_annual_rate_label">Suku bunga tahunan (%)</string>
+    <string name="screens_loans_addedit_tenure_label">Tenor (bulan)</string>
+    <string name="screens_loans_addedit_months_remaining_label">Sisa bulan</string>
+    <string name="screens_loans_addedit_next_due_date_label">Jatuh tempo berikutnya (TTTT-BB-HH)</string>
+    <string name="screens_loans_addedit_total_paid_label">Total dibayar sampai kini</string>
+    <string name="screens_loans_addedit_monthly_emi_label">Angsuran bulanan</string>
+    <string name="screens_loans_addedit_total_interest_preview">Total bunga: %1$s</string>
+    <string name="screens_loans_add_submit">Simpan pinjaman</string>
+    <string name="screens_loans_edit_submit">Perbarui pinjaman</string>
+    <string name="screens_loans_addedit_status_saving">Menyimpan…</string>
+    <string name="screens_loans_addedit_status_saved">Tersimpan ✓</string>
+    <string name="screens_loans_addedit_status_offline">Disimpan offline — akan disinkronkan saat online.</string>
+    <string name="screens_loans_addedit_status_failed">Gagal menyimpan: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">kesalahan tidak diketahui</string>
+    <string name="screens_loans_addedit_retry_button">Coba lagi</string>
+    <string name="screens_loans_addedit_dismiss_button">Tutup</string>
+    <string name="screens_loans_addedit_draft_resume_title">Lanjutkan pinjaman Anda?</string>
+    <string name="screens_loans_addedit_draft_resume_message">Anda punya draf pinjaman yang belum disimpan. Lanjutkan mengedit, buang, atau buat yang baru.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">Lanjutkan mengedit</string>
+    <string name="screens_loans_addedit_draft_resume_discard">Buang draf</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">Mulai baru</string>
+    <string name="screens_loans_detail_title">Detail pinjaman</string>
+    <string name="screens_loans_detail_back_cd">Kembali</string>
+    <string name="screens_loans_detail_delete_dialog_title">Hapus pinjaman?</string>
+    <string name="screens_loans_detail_delete_dialog_message">Pinjaman ini dan riwayat pelacakannya akan dihapus.</string>
+    <string name="screens_loans_detail_delete_confirm">Hapus</string>
+    <string name="screens_loans_detail_delete_cancel">Batal</string>
+    <string name="screens_loans_detail_principal_remaining_label">Sisa pokok</string>
+    <string name="screens_loans_detail_months_remaining_value">%1$d bulan tersisa</string>
+    <string name="screens_loans_detail_original_principal_label">Pokok awal</string>
+    <string name="screens_loans_detail_monthly_payment_label">Pembayaran bulanan (angsuran)</string>
+    <string name="screens_loans_detail_total_paid_label">Total dibayar sampai kini</string>
+    <string name="screens_loans_detail_annual_rate_label">Suku bunga tahunan</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">Jatuh tempo berikutnya</string>
+    <string name="screens_loans_detail_tenure_label">Tenor</string>
+    <string name="screens_loans_detail_tenure_value">%1$d bulan</string>
+    <string name="screens_loans_detail_tenure_progress_label">Kemajuan tenor</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% selesai</string>
+    <string name="screens_loans_detail_edit_button">Edit</string>
+    <string name="screens_loans_detail_schedule_button">Jadwal</string>
+    <string name="screens_loans_detail_delete_button">Hapus</string>
+    <string name="screens_loans_list_title">Pinjaman pribadi</string>
+    <string name="screens_loans_list_back_cd">Kembali</string>
+    <string name="screens_loans_list_new_fab_text">Pinjaman baru</string>
+    <string name="screens_loans_list_delete_dialog_title">Hapus pinjaman?</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' akan dihapus. Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="screens_loans_list_delete_confirm">Hapus</string>
+    <string name="screens_loans_list_delete_cancel">Batal</string>
+    <string name="screens_loans_list_total_outstanding_label">Total sisa</string>
+    <string name="screens_loans_list_active_count_single">%1$d pinjaman aktif</string>
+    <string name="screens_loans_list_active_count_plural">%1$d pinjaman aktif</string>
+    <string name="screens_loans_list_monthly_emi_label">Angsuran bulanan</string>
+    <string name="screens_loans_row_remaining_label">Sisa</string>
+    <string name="screens_loans_row_monthly_emi_label">Angsuran bulanan</string>
+    <string name="screens_loans_row_progress_value">%1$d%% lunas</string>
+    <string name="screens_loans_row_next_due_value">Berikutnya: %1$s</string>
+</resources>

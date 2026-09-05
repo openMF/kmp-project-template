@@ -13,7 +13,7 @@ import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.PUT
 import de.jensklingenberg.ktorfit.http.Path
-import kpt.core.network.demo.cloudtodo.dto.TodoDto
+import kpt.core.network.demo.cloudtodo.dto.CloudTodoDto
 
 /**
  * jsonplaceholder `/todos` — a free WRITABLE demo REST API (POST/PUT accepted, echoed back).
@@ -23,9 +23,9 @@ import kpt.core.network.demo.cloudtodo.dto.TodoDto
  */
 interface JsonPlaceholderApi {
     @GET("todos/{id}")
-    suspend fun getTodo(@Path("id") id: Int): TodoDto
+    suspend fun getTodo(@Path("id") id: Int): CloudTodoDto
 
     /** Write-back (`PUT /todos/{id}`) — jsonplaceholder echoes the body as if persisted. */
     @PUT("todos/{id}")
-    suspend fun updateTodo(@Path("id") id: Int, @Body todo: TodoDto): TodoDto
+    suspend fun updateTodo(@Path("id") id: Int, @Body todo: CloudTodoDto): CloudTodoDto
 }

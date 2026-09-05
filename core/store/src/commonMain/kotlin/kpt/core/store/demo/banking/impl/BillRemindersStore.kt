@@ -53,6 +53,27 @@ fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillRemind
     )
 
 /**
+ * Per-item READ store for one bill reminder (keyed by bill id) — the offline-local detail read.
+ *
+ * Mirrors [kpt.core.store.demo.banking.impl.provideLoanDetailStore]. Repository-internal (not
+ * DI-registered): it exists so an edit form can hydrate THROUGH the store instead of calling
+ * `repository.getById(...)` straight onto the DAO. That raw read was the
+ * S5-2 / S5-10 read-path bypass — the write path already went through a store while the read
+ * beside it did not.
+ */
+fun provideBillReminderDetailStore(dao: BillReminderDao): Store<String, BillReminder> =
+    StoreFactory.createOfflineStore(
+        sourceOfTruth = SourceOfTruth.of(
+            reader = { id: String ->
+                daoFlow(BILL_REMINDERS_TABLE) { dao.observeById(id) }.map { it?.toDomain() }
+            },
+            writer = { _: String, _: BillReminder -> Unit },
+            delete = { id: String -> dao.deleteById(id) },
+            deleteAll = { dao.deleteAll() },
+        ),
+    )
+
+/**
  * Per-item WRITE store for bill reminders (keyed by bill id). Every mutation flows through
  * `store.write` / `store.clear`, so the repository never touches the DAO for writes — the SoT
  * writer/delete are the single DAO callers. Local-only ([StoreFactory.createOfflineMutableStore] —

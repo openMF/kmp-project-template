@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">Alerty cenowe</string>
+    <string name="screens_alerts_back_cd">Wstecz</string>
+    <string name="screens_alerts_create_cd">Utwórz alert</string>
+    <string name="screens_alerts_delete_cd">Usuń alert</string>
+    <string name="screens_alerts_row_above">Powyżej</string>
+    <string name="screens_alerts_row_below">Poniżej</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% zmiany</string>
+    <string name="screens_alert_create_title">Nowy alert cenowy</string>
+    <string name="screens_alert_create_back_cd">Wstecz</string>
+    <string name="screens_alert_create_coin_label">Moneta</string>
+    <string name="screens_alert_create_target_label">Cena docelowa</string>
+    <string name="screens_alert_create_dir_above">Powyżej</string>
+    <string name="screens_alert_create_dir_below">Poniżej</string>
+    <string name="screens_alert_create_submit">Utwórz alert</string>
+    <string name="screens_alert_create_draft_resume_title">Wznowić alert?</string>
+    <string name="screens_alert_create_draft_resume_message">Masz niezapisany alert cenowy. Wznów edycję, odrzuć go lub utwórz nowy.</string>
+    <string name="screens_alert_create_draft_resume_resume">Wznów edycję</string>
+    <string name="screens_alert_create_draft_resume_discard">Odrzuć wersję roboczą</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Zacznij od nowa</string>
+</resources>

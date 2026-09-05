@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">core/designsystem이 제공하는 모든 ScreenState 변형과 컴포넌트 단위 상태 프리미티브에 대한 시각적 스모크 테스트입니다.</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (기본값 — 제목 + 메시지)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error 전체 화면</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — 캡티브 포털 CTA</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — 일반 오프라인</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">탭 ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">각 타일을 탭하면 해당 전환으로 데모 화면이 열립니다. 대상 화면은 2초 후 자동으로 닫힙니다. 깜박임을 확인하세요.</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(2초 후 자동 닫힘)</string>
+</resources>

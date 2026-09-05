@@ -38,10 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
+import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
-import kpt.core.domain.demo.calc.AmortizationRow
+import kpt.core.model.demo.banking.AmortizationRow
 import kpt.feature.calculators.TestTags
 import kpt.feature.calculators.generated.resources.Res
 import kpt.feature.calculators.generated.resources.screens_calc_amortization_back_cd
@@ -69,8 +70,7 @@ fun AmortizationScreen(
     viewModel: AmortizationViewModel = koinViewModel { parametersOf(loanId) },
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    val schedule by viewModel.schedule.collectAsStateWithLifecycle()
-    val summary by viewModel.summary.collectAsStateWithLifecycle()
+    val breakdownState by viewModel.breakdownState.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier.testTag(TestTags.Amortization.SCREEN),
@@ -144,28 +144,37 @@ fun AmortizationScreen(
                 }
             }
 
-            HeroCard {
-                AmountDisplay(
-                    amountText = summary.emi.formatGrouped(2),
-                    label = stringResource(Res.string.screens_calc_amortization_emi_label),
-                    supporting = {
-                        Text(
-                            text = stringResource(
-                                Res.string.screens_calc_amortization_interest_total_supporting,
-                                summary.totalInterest.formatGrouped(2),
-                                summary.totalPayment.formatGrouped(2),
-                            ),
-                            style = MaterialTheme.typography.bodyMedium,
+            // Store5 read surface: schedule + summary arrive as ONE ScreenState, rendered
+            // through the same ScreenContent wrapper as every other read screen.
+            ScreenContent(
+                state = breakdownState,
+                onRetry = viewModel::onRetry,
+            ) { breakdown, _ ->
+                Column(verticalArrangement = Arrangement.spacedBy(sp.md)) {
+                    HeroCard {
+                        AmountDisplay(
+                            amountText = breakdown.summary.emi.formatGrouped(2),
+                            label = stringResource(Res.string.screens_calc_amortization_emi_label),
+                            supporting = {
+                                Text(
+                                    text = stringResource(
+                                        Res.string.screens_calc_amortization_interest_total_supporting,
+                                        breakdown.summary.totalInterest.formatGrouped(2),
+                                        breakdown.summary.totalPayment.formatGrouped(2),
+                                    ),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            },
                         )
-                    },
-                )
-            }
+                    }
 
-            AmortizationHeader()
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(schedule, key = { it.installmentNumber }) { row ->
-                    AmortizationRowItem(row)
-                    HorizontalDivider()
+                    AmortizationHeader()
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items(breakdown.rows, key = { it.month }) { row ->
+                            AmortizationRowItem(row)
+                            HorizontalDivider()
+                        }
+                    }
                 }
             }
         }
@@ -173,7 +182,7 @@ fun AmortizationScreen(
 }
 
 @Composable
-private fun AmortizationHeader() {
+internal fun AmortizationHeader() {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -198,14 +207,14 @@ private fun AmortizationHeader() {
 }
 
 @Composable
-private fun AmortizationRowItem(row: AmortizationRow) {
+internal fun AmortizationRowItem(row: AmortizationRow) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(row.installmentNumber.toString())
-        Text(row.principalPaid.formatGrouped(2))
-        Text(row.interestPaid.formatGrouped(2))
-        Text(row.balanceRemaining.coerceAtLeast(0.0).formatGrouped(2))
+        Text(row.month.toString())
+        Text(row.principal.formatGrouped(2))
+        Text(row.interest.formatGrouped(2))
+        Text(row.balance.coerceAtLeast(0.0).formatGrouped(2))
     }
 }

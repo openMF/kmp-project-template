@@ -31,6 +31,9 @@ object AppCacheKeys {
     // Per-key streams — typed builders own the format string; the call site passes only the values.
     fun loan(id: String): String = "loan:$id"
 
+    /** Cache key for one bill reminder's store-backed detail read. */
+    fun billReminder(id: String): String = "billReminder:$id"
+
     fun coinDetail(coinId: String): String = "crypto:coinDetail:$coinId"
 
     fun cloudTodo(id: Int): String = "cloudTodo:$id"

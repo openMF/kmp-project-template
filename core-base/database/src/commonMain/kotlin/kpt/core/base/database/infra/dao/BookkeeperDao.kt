@@ -32,4 +32,17 @@ interface BookkeeperDao {
 
     @Query("DELETE FROM store_bookkeeper")
     suspend fun deleteAll()
+
+    /**
+     * Every key with a recorded sync failure, oldest failure first.
+     *
+     * A [org.mobilenativefoundation.store.store5.Bookkeeper] can only answer "did THIS key
+     * fail?" — `getLastFailedSync(key)` needs the key you are already holding. That is enough
+     * to gate a re-read, but it makes the recorded failures undrainable: nothing can enumerate
+     * what is outstanding, so a write that failed while offline stays recorded forever and is
+     * never retried. This query is the enumeration a sync orchestrator needs to drain the
+     * backlog when connectivity returns.
+     */
+    @Query("SELECT `key` FROM store_bookkeeper ORDER BY lastFailedSync ASC")
+    suspend fun pendingKeys(): List<String>
 }

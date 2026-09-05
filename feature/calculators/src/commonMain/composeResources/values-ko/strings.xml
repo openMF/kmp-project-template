@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">대출 여력</string>
+    <string name="screens_calc_affordability_back_cd">뒤로</string>
+    <string name="screens_calc_affordability_income_label">월 소득</string>
+    <string name="screens_calc_affordability_obligations_label">기존 월 부채</string>
+    <string name="screens_calc_affordability_dti_label">DTI 상한 (%)</string>
+    <string name="screens_calc_affordability_rate_label">연이율 (%)</string>
+    <string name="screens_calc_affordability_tenure_label">기간(개월)</string>
+    <string name="screens_calc_affordability_max_principal_label">최대 대출 원금</string>
+    <string name="screens_calc_affordability_max_emi_label">최대 월 상환금</string>
+    <string name="screens_calc_amortization_title">상환 계획</string>
+    <string name="screens_calc_amortization_title_with_source">상환 계획 · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">뒤로</string>
+    <string name="screens_calc_amortization_principal_label">원금</string>
+    <string name="screens_calc_amortization_rate_label">연이율 (%)</string>
+    <string name="screens_calc_amortization_tenure_label">기간(개월)</string>
+    <string name="screens_calc_amortization_emi_label">월 상환금</string>
+    <string name="screens_calc_amortization_interest_total_supporting">이자 %1$s · 합계 %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">원금</string>
+    <string name="screens_calc_amortization_header_interest">이자</string>
+    <string name="screens_calc_amortization_header_balance">잔액</string>
+    <string name="screens_calc_compare_title">대출 비교</string>
+    <string name="screens_calc_compare_back_cd">뒤로</string>
+    <string name="screens_calc_compare_best_emi_label">최적 상환금 · 시나리오 %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/월</string>
+    <string name="screens_calc_compare_savings_text">가장 비싼 안보다 총 %1$s 절약</string>
+    <string name="screens_calc_compare_helper_text">아래 시나리오를 편집하면 비교가 실시간으로 갱신됩니다.</string>
+    <string name="screens_calc_compare_scenario_label">시나리오 %1$d</string>
+    <string name="screens_calc_compare_best_badge">최적</string>
+    <string name="screens_calc_compare_principal_label">원금</string>
+    <string name="screens_calc_compare_rate_label">이율 (%)</string>
+    <string name="screens_calc_compare_tenure_label">기간(개월)</string>
+    <string name="screens_calc_compare_result_emi">상환금</string>
+    <string name="screens_calc_compare_result_interest">이자</string>
+    <string name="screens_calc_compare_result_total">합계</string>
+    <string name="screens_calc_wizard_resume_title">완료되지 않은 마법사를 이어서 할까요?</string>
+    <string name="screens_calc_wizard_resume_message">%1$d단계까지 진행한 대출 계산 마법사가 있습니다. 이어서 하시겠어요, 아니면 삭제할까요?</string>
+    <string name="screens_calc_wizard_resume_continue">계속</string>
+    <string name="screens_calc_wizard_resume_discard">삭제</string>
+    <string name="screens_calc_wizard_title">새 대출 · %1$d/%2$d단계</string>
+    <string name="screens_calc_wizard_back_cd">뒤로</string>
+    <string name="screens_calc_wizard_step_principal_question">얼마를 빌리시겠어요?</string>
+    <string name="screens_calc_wizard_step_principal_label">원금</string>
+    <string name="screens_calc_wizard_step_tenure_question">몇 개월에 걸쳐서요?</string>
+    <string name="screens_calc_wizard_step_tenure_label">기간(개월)</string>
+    <string name="screens_calc_wizard_step_rate_question">연이율은 몇 %인가요?</string>
+    <string name="screens_calc_wizard_step_rate_label">연이율 (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">월 상환금</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">총 상환액: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">원금</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">기간</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d개월</string>
+    <string name="screens_calc_wizard_step_review_rate_label">이율</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">총 이자</string>
+    <string name="screens_calc_wizard_step_name_message">나중에 대출 목록에서 찾을 수 있도록 이 시나리오에 이름을 지정하세요.</string>
+    <string name="screens_calc_wizard_step_name_label">시나리오 이름</string>
+    <string name="screens_calc_wizard_step_name_required">필수 — 이름을 입력해야 저장할 수 있습니다.</string>
+    <string name="screens_calc_wizard_button_back">이전</string>
+    <string name="screens_calc_wizard_button_next">다음</string>
+    <string name="screens_calc_wizard_button_save">대출로 저장</string>
+</resources>

@@ -147,7 +147,7 @@ fun LoanComparisonScreen(
 }
 
 @Composable
-private fun ComparisonHero(analysis: LoanComparisonAnalysis) {
+internal fun ComparisonHero(analysis: LoanComparisonAnalysis) {
     val sp = MaterialTheme.spacing
     val cheapest = analysis.results.getOrNull(analysis.cheapestIndex)
     val mostExpensive = analysis.results.maxByOrNull { it.totalPayment }
@@ -187,7 +187,7 @@ private fun ComparisonHero(analysis: LoanComparisonAnalysis) {
 }
 
 @Composable
-private fun ScenarioCard(
+internal fun ScenarioCard(
     index: Int,
     scenario: LoanScenario,
     result: EmiResult?,
@@ -272,7 +272,7 @@ private fun ScenarioCard(
 }
 
 @Composable
-private fun ResultStrip(result: EmiResult, highlight: Boolean) {
+internal fun ResultStrip(result: EmiResult, highlight: Boolean) {
     val sp = MaterialTheme.spacing
     val container = if (highlight) {
         MaterialTheme.colorScheme.secondaryContainer
@@ -313,7 +313,7 @@ private fun ResultStrip(result: EmiResult, highlight: Boolean) {
 }
 
 @Composable
-private fun ResultCell(label: String, value: String) {
+internal fun ResultCell(label: String, value: String) {
     Column(horizontalAlignment = Alignment.Start) {
         Text(
             text = label,

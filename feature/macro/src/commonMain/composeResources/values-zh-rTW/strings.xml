@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">返回</string>
+    <string name="screens_macro_country_title">國家總體數據</string>
+    <string name="screens_macro_refresh_all_cd">全部重新整理</string>
+    <string name="screens_macro_stale_chip">已過期 — 顯示快取資料</string>
+    <string name="screens_macro_picker_title">選擇國家</string>
+    <string name="screens_macro_picker_search_placeholder">搜尋國家或 ISO 代碼</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">來源：%1$s</string>
+    <string name="screens_macro_detail_year_by_year">逐年</string>
+    <string name="screens_macro_card_empty">此指標尚無發布資料。</string>
+    <string name="screens_macro_card_captive_portal">位於強制入口網站後 — 請登入後繼續。</string>
+    <string name="screens_macro_card_offline">離線 — 請連線以取得此指標。</string>
+    <string name="screens_macro_card_generic_error">無法載入此指標。</string>
+    <string name="screens_macro_card_auth_required">需要驗證。</string>
+    <string name="screens_macro_card_latest_year">最新：%1$s</string>
+    <string name="screens_macro_card_loading">載入中…</string>
+    <string name="screens_macro_card_retry">重試</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

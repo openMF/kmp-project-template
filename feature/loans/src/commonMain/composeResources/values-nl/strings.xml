@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">Lening toevoegen</string>
+    <string name="screens_loans_edit_title">Lening bewerken</string>
+    <string name="screens_loans_addedit_back_cd">Terug</string>
+    <string name="screens_loans_addedit_name_label">Naam van de lening</string>
+    <string name="screens_loans_addedit_kind_label">Soort</string>
+    <string name="screens_loans_addedit_kind_cd">Kies het soort lening</string>
+    <string name="screens_loans_addedit_principal_label">Oorspronkelijke hoofdsom</string>
+    <string name="screens_loans_addedit_principal_remaining_label">Resterende hoofdsom</string>
+    <string name="screens_loans_addedit_annual_rate_label">Jaarlijkse rente (%)</string>
+    <string name="screens_loans_addedit_tenure_label">Looptijd (maanden)</string>
+    <string name="screens_loans_addedit_months_remaining_label">Resterende maanden</string>
+    <string name="screens_loans_addedit_next_due_date_label">Volgende vervaldatum (JJJJ-MM-DD)</string>
+    <string name="screens_loans_addedit_total_paid_label">Tot nu toe betaald</string>
+    <string name="screens_loans_addedit_monthly_emi_label">Maandlast</string>
+    <string name="screens_loans_addedit_total_interest_preview">Totale rente: %1$s</string>
+    <string name="screens_loans_add_submit">Lening opslaan</string>
+    <string name="screens_loans_edit_submit">Lening bijwerken</string>
+    <string name="screens_loans_addedit_status_saving">Opslaan…</string>
+    <string name="screens_loans_addedit_status_saved">Opgeslagen ✓</string>
+    <string name="screens_loans_addedit_status_offline">Offline opgeslagen — wordt gesynchroniseerd zodra je online bent.</string>
+    <string name="screens_loans_addedit_status_failed">Opslaan mislukt: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">onbekende fout</string>
+    <string name="screens_loans_addedit_retry_button">Opnieuw</string>
+    <string name="screens_loans_addedit_dismiss_button">Sluiten</string>
+    <string name="screens_loans_addedit_draft_resume_title">Lening hervatten?</string>
+    <string name="screens_loans_addedit_draft_resume_message">Je hebt een niet-opgeslagen concept van een lening. Hervat het bewerken, verwijder het of maak een nieuwe.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">Bewerken hervatten</string>
+    <string name="screens_loans_addedit_draft_resume_discard">Concept verwijderen</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">Opnieuw beginnen</string>
+    <string name="screens_loans_detail_title">Leninggegevens</string>
+    <string name="screens_loans_detail_back_cd">Terug</string>
+    <string name="screens_loans_detail_delete_dialog_title">Lening verwijderen?</string>
+    <string name="screens_loans_detail_delete_dialog_message">Deze lening en de bijbehorende geschiedenis worden verwijderd.</string>
+    <string name="screens_loans_detail_delete_confirm">Verwijderen</string>
+    <string name="screens_loans_detail_delete_cancel">Annuleren</string>
+    <string name="screens_loans_detail_principal_remaining_label">Resterende hoofdsom</string>
+    <string name="screens_loans_detail_months_remaining_value">Nog %1$d maanden</string>
+    <string name="screens_loans_detail_original_principal_label">Oorspronkelijke hoofdsom</string>
+    <string name="screens_loans_detail_monthly_payment_label">Maandelijkse betaling (maandlast)</string>
+    <string name="screens_loans_detail_total_paid_label">Tot nu toe betaald</string>
+    <string name="screens_loans_detail_annual_rate_label">Jaarrente</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">Volgende vervaldatum</string>
+    <string name="screens_loans_detail_tenure_label">Looptijd</string>
+    <string name="screens_loans_detail_tenure_value">%1$d maanden</string>
+    <string name="screens_loans_detail_tenure_progress_label">Voortgang looptijd</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% voltooid</string>
+    <string name="screens_loans_detail_edit_button">Bewerken</string>
+    <string name="screens_loans_detail_schedule_button">Schema</string>
+    <string name="screens_loans_detail_delete_button">Verwijderen</string>
+    <string name="screens_loans_list_title">Persoonlijke leningen</string>
+    <string name="screens_loans_list_back_cd">Terug</string>
+    <string name="screens_loans_list_new_fab_text">Nieuwe lening</string>
+    <string name="screens_loans_list_delete_dialog_title">Lening verwijderen?</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' wordt verwijderd. Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="screens_loans_list_delete_confirm">Verwijderen</string>
+    <string name="screens_loans_list_delete_cancel">Annuleren</string>
+    <string name="screens_loans_list_total_outstanding_label">Totaal openstaand</string>
+    <string name="screens_loans_list_active_count_single">%1$d actieve lening</string>
+    <string name="screens_loans_list_active_count_plural">%1$d actieve leningen</string>
+    <string name="screens_loans_list_monthly_emi_label">Maandlast</string>
+    <string name="screens_loans_row_remaining_label">Resterend</string>
+    <string name="screens_loans_row_monthly_emi_label">Maandlast</string>
+    <string name="screens_loans_row_progress_value">%1$d%% afgelost</string>
+    <string name="screens_loans_row_next_due_value">Volgende: %1$s</string>
+</resources>

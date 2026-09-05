@@ -10,23 +10,57 @@
 package kpt.feature.emicalculator.ui
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.domain.demo.emi.calculateEmi
+import kpt.core.data.demo.emi.EmiCalculatorRepository
 import kpt.core.model.demo.emi.EmiResult
+import kpt.core.store.demo.emi.impl.EmiParams
 
-class EmiCalculatorViewModel : BaseViewModel<EmiState, Nothing, EmiAction>(EmiState()) {
+/**
+ * EMI calculator — the `calculator_pure` combo on the DYNAMIC-KEY read shape.
+ *
+ * The form inputs ARE the Store key, so each distinct parameter set is its own cache entry and
+ * `flatMapLatest` re-streams on every change. The result reaches the screen as a `ScreenState`
+ * like every other read surface, which is what lets the screen render through `ScreenContent`
+ * instead of a bespoke nullable `StateFlow` with a hand-rolled `?.let` in the composable.
+ */
+class EmiCalculatorViewModel(
+    private val repository: EmiCalculatorRepository,
+) : BaseViewModel<EmiState, Nothing, EmiAction>(EmiState()) {
 
-    val emiResult: StateFlow<EmiResult?> = stateFlow.map { state ->
-        if (state.principal > 0 && state.ratePercent > 0 && state.tenureMonths > 0) {
-            calculateEmi(state.principal, state.ratePercent, state.tenureMonths)
-        } else {
-            null
+    /** The stream backing the CURRENT key — retained so [onRetry] re-runs the live one. */
+    private var currentStream: ScreenDataStream<EmiResult>? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val emiState: StateFlow<ScreenState<EmiResult>> = stateFlow
+        .map { EmiParams(it.principal, it.ratePercent, it.tenureMonths) }
+        .distinctUntilChanged()
+        .flatMapLatest { params ->
+            if (params.isComputable) {
+                repository.emiStream(params, viewModelScope)
+                    .also { currentStream = it }
+                    .state
+            } else {
+                // Incomplete inputs are Empty, not Error — the user simply hasn't finished
+                // typing. Emitting Error here would render a failure for a valid in-progress form.
+                currentStream = null
+                flowOf(ScreenState.Empty)
+            }
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
+
+    fun onRetry() {
+        currentStream?.retry()
+    }
 
     override fun handleAction(action: EmiAction) = when (action) {
         is EmiAction.UpdatePrincipal -> updateState { copy(principal = action.value) }

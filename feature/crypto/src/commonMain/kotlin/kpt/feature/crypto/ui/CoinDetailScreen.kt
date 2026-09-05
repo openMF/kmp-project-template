@@ -205,7 +205,7 @@ internal fun CoinDetailScreen(
 }
 
 @Composable
-private fun StatRow(label: String, value: String, modifier: Modifier = Modifier) {
+internal fun StatRow(label: String, value: String, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,

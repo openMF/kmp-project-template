@@ -23,7 +23,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * End-to-end integration tests for [asScreenStream].
@@ -42,12 +42,25 @@ class ScreenDataStreamIntegrationTest {
     // 2026-09-02 `offline_with_empty_store_emits_Empty_offlineFirst` failure on a runner executing
     // 3054 Gradle tasks, green on four prior runs of the identical code. Widening the wait budget
     // removes the scheduling flake WITHOUT relaxing a single assertion.
-    private val turbineTimeout = 30.seconds
+    //
+    // Raised again 2026-09-05: 30s was still not enough under the Kover job, where coverage
+    // INSTRUMENTATION multiplies the cost of every Store5 coroutine hop
+    // (`reconnect_triggers_refresh_after_offline`, 3119 tasks). The tell was that the identical
+    // commit passed `desktopTest` on all three Desktop runners and failed only under Kover.
+    //
+    // This budget exists to bound a genuine HANG, not to assert performance: a healthy run
+    // satisfies it in milliseconds, so a generous ceiling costs nothing on success and still fails
+    // loudly — with a real "no more events" diagnostic — if a state never arrives. [runTestTimeout]
+    // sits above it so Turbine's diagnostic wins the race against runTest's bare timeout.
+    private val turbineTimeout = 4.minutes
+
+    /** Must exceed [turbineTimeout] so Turbine reports WHICH state never arrived. */
+    private val runTestTimeout = 5.minutes
 
     // ─── T1: online → Content(FRESH) ─────────────────────────────────────────
 
     @Test
-    fun online_emits_Content_FRESH_after_successful_fetch() = runTest {
+    fun online_emits_Content_FRESH_after_successful_fetch() = runTest(timeout = runTestTimeout) {
         val store = StoreBuilder
             .from<String, String>(fetcher = Fetcher.of { _ -> "hello" })
             .build()
@@ -83,7 +96,7 @@ class ScreenDataStreamIntegrationTest {
     // ─── T2: offline, no cache, CACHE_FIRST_SWR default → Empty (offline-first) ──
 
     @Test
-    fun offline_with_empty_store_emits_Empty_offlineFirst() = runTest {
+    fun offline_with_empty_store_emits_Empty_offlineFirst() = runTest(timeout = runTestTimeout) {
         // asScreenStream's default policy is CACHE_FIRST_SWR (offline-first): offline with no cached
         // data and no error surfaces the screen's own Empty state, NOT a blocking full-screen NoNetwork
         // (DecisionEngine offline-first-empty rule; asserted in DecisionEngineTest "…CACHE_FIRST_SWR =
@@ -115,7 +128,7 @@ class ScreenDataStreamIntegrationTest {
     // ─── T3: CACHE_ONLY skips network even when online ────────────────────────
 
     @Test
-    fun cacheOnly_online_store_emits_without_network_call() = runTest {
+    fun cacheOnly_online_store_emits_without_network_call() = runTest(timeout = runTestTimeout) {
         var fetchCallCount = 0
         val store = StoreBuilder
             .from<String, String>(fetcher = Fetcher.of { _ ->
@@ -157,7 +170,7 @@ class ScreenDataStreamIntegrationTest {
     // ─── T4: reconnect triggers state refresh ────────────────────────────────
 
     @Test
-    fun reconnect_triggers_refresh_after_offline() = runTest {
+    fun reconnect_triggers_refresh_after_offline() = runTest(timeout = runTestTimeout) {
         val store = StoreBuilder
             .from<String, String>(fetcher = Fetcher.of { _ -> "refreshed" })
             .build()

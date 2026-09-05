@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">Alertas de precio</string>
+    <string name="screens_alerts_back_cd">Atrás</string>
+    <string name="screens_alerts_create_cd">Crear alerta</string>
+    <string name="screens_alerts_delete_cd">Eliminar alerta</string>
+    <string name="screens_alerts_row_above">Por encima</string>
+    <string name="screens_alerts_row_below">Por debajo</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% de cambio</string>
+    <string name="screens_alert_create_title">Nueva alerta de precio</string>
+    <string name="screens_alert_create_back_cd">Atrás</string>
+    <string name="screens_alert_create_coin_label">Moneda</string>
+    <string name="screens_alert_create_target_label">Precio objetivo</string>
+    <string name="screens_alert_create_dir_above">Por encima</string>
+    <string name="screens_alert_create_dir_below">Por debajo</string>
+    <string name="screens_alert_create_submit">Crear alerta</string>
+    <string name="screens_alert_create_draft_resume_title">¿Reanudar tu alerta?</string>
+    <string name="screens_alert_create_draft_resume_message">Tienes una alerta de precio sin guardar. Reanuda la edición, descártala o crea una nueva.</string>
+    <string name="screens_alert_create_draft_resume_resume">Reanudar edición</string>
+    <string name="screens_alert_create_draft_resume_discard">Descartar borrador</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Empezar de nuevo</string>
+</resources>

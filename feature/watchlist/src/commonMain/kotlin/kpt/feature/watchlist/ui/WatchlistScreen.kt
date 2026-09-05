@@ -82,7 +82,7 @@ fun WatchlistScreen(
 }
 
 @Composable
-private fun WatchlistRow(
+internal fun WatchlistRow(
     item: WatchlistItem,
     onRemove: () -> Unit,
     modifier: Modifier = Modifier,

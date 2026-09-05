@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">Cloudtaak</string>
+    <string name="screens_cloudtodo_detail_intro">De enige consumer van createMutableStore + MutationGateway. Zet het netwerk uit om de offline-takken te zien.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Wisselen (optimistisch)</string>
+    <string name="screens_cloudtodo_complete_online_text">Voltooien (online vereist)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Conflict oplossen</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Sluiten</string>
+    <string name="screens_cloudtodo_status_completed">Voltooid</string>
+    <string name="screens_cloudtodo_status_not_completed">Niet voltooid</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">Lokaal toegepast</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Eerst naar Room geschreven. De netwerksynchronisatie staat in de wachtrij en wordt bij herverbinding opnieuw geprobeerd.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Toegepast · gesynchroniseerd</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">De server heeft de schrijfactie bevestigd.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Toegepast · in wachtrij</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Lokaal geschreven; de synchronisatie staat in de wachtrij en wordt opnieuw geprobeerd zodra er verbinding is.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Geblokkeerd</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Offline — een schrijfactie die verbinding vereist wordt geweigerd in plaats van lokaal geschreven. Er is niets geschreven.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">Niet geverifieerd voor deze bewerking. Er is niets geschreven.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">Een servervoorwaarde mislukte vóór het schrijven. Er is niets geschreven.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Conflict vastgelegd</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">De server heeft dit record ook gewijzigd. Zijn versie is toegepast en die van jou is bewaard — kies welke wint.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Mislukt</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — de optimistische lokale schrijfactie is teruggedraaid.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — lokale status behouden.</string>
+    <string name="screens_cloudtodo_conflicts_title">Synchronisatieconflicten</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">Geen onopgeloste conflicten.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Serverversie behouden</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Mijn versie opnieuw proberen</string>
+</resources>

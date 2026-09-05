@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_amortization_schedule_title">返済スケジュール</string>
+    <string name="screens_amortization_schedule_back_cd">戻る</string>
+    <string name="screens_amortization_schedule_header_month">#</string>
+    <string name="screens_amortization_schedule_header_principal">元金</string>
+    <string name="screens_amortization_schedule_header_interest">利息</string>
+    <string name="screens_amortization_schedule_header_balance">残高</string>
+    <string name="screens_amortization_schedule_summary_title">概要</string>
+    <string name="screens_amortization_schedule_summary_total_payments">支払総額</string>
+    <string name="screens_amortization_schedule_summary_total_principal">元金合計</string>
+    <string name="screens_amortization_schedule_summary_total_interest">利息合計</string>
+</resources>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">إضافة قرض</string>
+    <string name="screens_loans_edit_title">تعديل القرض</string>
+    <string name="screens_loans_addedit_back_cd">رجوع</string>
+    <string name="screens_loans_addedit_name_label">اسم القرض</string>
+    <string name="screens_loans_addedit_kind_label">النوع</string>
+    <string name="screens_loans_addedit_kind_cd">اختر نوع القرض</string>
+    <string name="screens_loans_addedit_principal_label">أصل المبلغ الأصلي</string>
+    <string name="screens_loans_addedit_principal_remaining_label">أصل المبلغ المتبقي</string>
+    <string name="screens_loans_addedit_annual_rate_label">معدل الفائدة السنوي (%)</string>
+    <string name="screens_loans_addedit_tenure_label">المدة (بالأشهر)</string>
+    <string name="screens_loans_addedit_months_remaining_label">الأشهر المتبقية</string>
+    <string name="screens_loans_addedit_next_due_date_label">تاريخ الاستحقاق التالي (YYYY-MM-DD)</string>
+    <string name="screens_loans_addedit_total_paid_label">إجمالي المسدّد حتى الآن</string>
+    <string name="screens_loans_addedit_monthly_emi_label">القسط الشهري</string>
+    <string name="screens_loans_addedit_total_interest_preview">إجمالي الفائدة: %1$s</string>
+    <string name="screens_loans_add_submit">حفظ القرض</string>
+    <string name="screens_loans_edit_submit">تحديث القرض</string>
+    <string name="screens_loans_addedit_status_saving">جارٍ الحفظ…</string>
+    <string name="screens_loans_addedit_status_saved">تم الحفظ ✓</string>
+    <string name="screens_loans_addedit_status_offline">تم الحفظ دون اتصال — ستتم المزامنة عند الاتصال.</string>
+    <string name="screens_loans_addedit_status_failed">فشل الحفظ: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">خطأ غير معروف</string>
+    <string name="screens_loans_addedit_retry_button">أعد المحاولة</string>
+    <string name="screens_loans_addedit_dismiss_button">تجاهل</string>
+    <string name="screens_loans_addedit_draft_resume_title">هل تريد استئناف قرضك؟</string>
+    <string name="screens_loans_addedit_draft_resume_message">لديك مسودة قرض غير محفوظة. تابع تحريرها أو تجاهلها أو ابدأ واحدة جديدة.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">متابعة التحرير</string>
+    <string name="screens_loans_addedit_draft_resume_discard">تجاهل المسودة</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">ابدأ من جديد</string>
+    <string name="screens_loans_detail_title">تفاصيل القرض</string>
+    <string name="screens_loans_detail_back_cd">رجوع</string>
+    <string name="screens_loans_detail_delete_dialog_title">حذف القرض؟</string>
+    <string name="screens_loans_detail_delete_dialog_message">سيُحذف هذا القرض وسجل تتبّعه.</string>
+    <string name="screens_loans_detail_delete_confirm">حذف</string>
+    <string name="screens_loans_detail_delete_cancel">إلغاء</string>
+    <string name="screens_loans_detail_principal_remaining_label">أصل المبلغ المتبقي</string>
+    <string name="screens_loans_detail_months_remaining_value">%1$d شهرًا متبقيًا</string>
+    <string name="screens_loans_detail_original_principal_label">أصل المبلغ الأصلي</string>
+    <string name="screens_loans_detail_monthly_payment_label">الدفعة الشهرية (القسط)</string>
+    <string name="screens_loans_detail_total_paid_label">إجمالي المسدّد حتى الآن</string>
+    <string name="screens_loans_detail_annual_rate_label">المعدل السنوي</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">تاريخ الاستحقاق التالي</string>
+    <string name="screens_loans_detail_tenure_label">المدة</string>
+    <string name="screens_loans_detail_tenure_value">%1$d شهرًا</string>
+    <string name="screens_loans_detail_tenure_progress_label">تقدّم المدة</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% مكتمل</string>
+    <string name="screens_loans_detail_edit_button">تعديل</string>
+    <string name="screens_loans_detail_schedule_button">الجدول</string>
+    <string name="screens_loans_detail_delete_button">حذف</string>
+    <string name="screens_loans_list_title">القروض الشخصية</string>
+    <string name="screens_loans_list_back_cd">رجوع</string>
+    <string name="screens_loans_list_new_fab_text">قرض جديد</string>
+    <string name="screens_loans_list_delete_dialog_title">حذف القرض؟</string>
+    <string name="screens_loans_list_delete_dialog_message">سيُحذف \'%1$s\'. لا يمكن التراجع عن ذلك.</string>
+    <string name="screens_loans_list_delete_confirm">حذف</string>
+    <string name="screens_loans_list_delete_cancel">إلغاء</string>
+    <string name="screens_loans_list_total_outstanding_label">إجمالي المستحق</string>
+    <string name="screens_loans_list_active_count_single">قرض نشط واحد (%1$d)</string>
+    <string name="screens_loans_list_active_count_plural">%1$d قروض نشطة</string>
+    <string name="screens_loans_list_monthly_emi_label">القسط الشهري</string>
+    <string name="screens_loans_row_remaining_label">المتبقي</string>
+    <string name="screens_loans_row_monthly_emi_label">القسط الشهري</string>
+    <string name="screens_loans_row_progress_value">تم سداد %1$d%%</string>
+    <string name="screens_loans_row_next_due_value">التالي: %1$s</string>
+</resources>

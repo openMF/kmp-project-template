@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">Quay lại</string>
+    <string name="screens_macro_country_title">Vĩ mô theo quốc gia</string>
+    <string name="screens_macro_refresh_all_cd">Làm mới tất cả</string>
+    <string name="screens_macro_stale_chip">CŨ — đang hiển thị dữ liệu bộ nhớ đệm</string>
+    <string name="screens_macro_picker_title">Chọn quốc gia</string>
+    <string name="screens_macro_picker_search_placeholder">Tìm quốc gia hoặc mã ISO</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Nguồn: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Theo từng năm</string>
+    <string name="screens_macro_card_empty">Chưa có dữ liệu công bố cho chỉ số này.</string>
+    <string name="screens_macro_card_captive_portal">Đang sau cổng bắt buộc — hãy đăng nhập để tiếp tục.</string>
+    <string name="screens_macro_card_offline">Ngoại tuyến — hãy kết nối để tải chỉ số này.</string>
+    <string name="screens_macro_card_generic_error">Không thể tải chỉ số này.</string>
+    <string name="screens_macro_card_auth_required">Cần xác thực.</string>
+    <string name="screens_macro_card_latest_year">Mới nhất: %1$s</string>
+    <string name="screens_macro_card_loading">Đang tải…</string>
+    <string name="screens_macro_card_retry">Thử lại</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

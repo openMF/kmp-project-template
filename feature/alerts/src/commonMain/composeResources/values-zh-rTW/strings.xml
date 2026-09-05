@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">價格提醒</string>
+    <string name="screens_alerts_back_cd">返回</string>
+    <string name="screens_alerts_create_cd">建立提醒</string>
+    <string name="screens_alerts_delete_cd">刪除提醒</string>
+    <string name="screens_alerts_row_above">高於</string>
+    <string name="screens_alerts_row_below">低於</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% 變動</string>
+    <string name="screens_alert_create_title">新增價格提醒</string>
+    <string name="screens_alert_create_back_cd">返回</string>
+    <string name="screens_alert_create_coin_label">幣種</string>
+    <string name="screens_alert_create_target_label">目標價格</string>
+    <string name="screens_alert_create_dir_above">高於</string>
+    <string name="screens_alert_create_dir_below">低於</string>
+    <string name="screens_alert_create_submit">建立提醒</string>
+    <string name="screens_alert_create_draft_resume_title">要恢復您的提醒嗎？</string>
+    <string name="screens_alert_create_draft_resume_message">您有一則未儲存的價格提醒。可以繼續編輯、捨棄，或建立新的。</string>
+    <string name="screens_alert_create_draft_resume_resume">繼續編輯</string>
+    <string name="screens_alert_create_draft_resume_discard">捨棄草稿</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">重新開始</string>
+</resources>

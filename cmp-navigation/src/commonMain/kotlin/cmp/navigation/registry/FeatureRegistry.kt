@@ -34,6 +34,7 @@ import kpt.feature.loans.di.LoansModule
 import kpt.feature.loans.navigation.loansGraph
 import kpt.feature.macro.di.MacroModule
 import kpt.feature.macro.navigation.macroGraph
+import kpt.feature.profile.di.ProfileModule
 import kpt.feature.rates.di.RatesModule
 import kpt.feature.rates.navigation.ratesGraph
 import kpt.feature.watchlist.di.WatchlistModule
@@ -75,6 +76,7 @@ object FeatureRegistry {
         WatchlistModule,
         AddToWatchlistModule,
         CloudTodoModule,
+        ProfileModule,
         // ── relocated core demo DI (were inline fenced blocks in the core aggregators) ──
         ProjectRepositoryModule,
         ProjectNetworkModule,

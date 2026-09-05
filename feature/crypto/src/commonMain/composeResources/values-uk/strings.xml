@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">Ринки монет</string>
+    <string name="screens_crypto_coin_markets_back_cd">Назад</string>
+    <string name="screens_crypto_coin_markets_empty">Поки немає монет для показу.</string>
+    <string name="screens_crypto_coin_markets_error_retry">Повторити</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">Завантаження ще…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">Ви переглянули все</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">Поточна ціна</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">Зміна за 24 год</string>
+    <string name="screens_crypto_coin_detail_back_cd">Назад</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">Оновити</string>
+    <string name="screens_crypto_coin_detail_rank_label">Місце за капіталізацією</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">Ринкова капіталізація</string>
+    <string name="screens_crypto_coin_detail_high_label">Максимум за 24 год</string>
+    <string name="screens_crypto_coin_detail_low_label">Мінімум за 24 год</string>
+    <string name="screens_crypto_coin_detail_circulating_label">Обіговий обсяг</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">Максимальний обсяг</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">Без обмежень</string>
+    <string name="screens_crypto_coin_detail_about_label">Про монету</string>
+</resources>

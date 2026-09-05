@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_emicalculator_title">等额本息计算器</string>
+    <string name="screens_emicalculator_back_cd">返回</string>
+    <string name="screens_emicalculator_principal_label">本金金额</string>
+    <string name="screens_emicalculator_rate_label">年利率 (%)</string>
+    <string name="screens_emicalculator_tenure_label">期限（月）</string>
+    <string name="screens_emicalculator_monthly_emi_label">每月还款额</string>
+    <string name="screens_emicalculator_total_payment_label">还款总额</string>
+    <string name="screens_emicalculator_total_interest_label">利息总额</string>
+</resources>

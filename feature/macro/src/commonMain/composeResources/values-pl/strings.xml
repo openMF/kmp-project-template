@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">Wstecz</string>
+    <string name="screens_macro_country_title">Makro kraju</string>
+    <string name="screens_macro_refresh_all_cd">Odśwież wszystko</string>
+    <string name="screens_macro_stale_chip">NIEAKTUALNE — dane z pamięci podręcznej</string>
+    <string name="screens_macro_picker_title">Wybierz kraj</string>
+    <string name="screens_macro_picker_search_placeholder">Szukaj kraju lub kodu ISO</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Źródło: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Rok po roku</string>
+    <string name="screens_macro_card_empty">Brak opublikowanych danych dla tego wskaźnika.</string>
+    <string name="screens_macro_card_captive_portal">Za portalem przechwytującym — zaloguj się, aby kontynuować.</string>
+    <string name="screens_macro_card_offline">Offline — połącz się, aby pobrać ten wskaźnik.</string>
+    <string name="screens_macro_card_generic_error">Nie udało się wczytać tego wskaźnika.</string>
+    <string name="screens_macro_card_auth_required">Wymagane uwierzytelnienie.</string>
+    <string name="screens_macro_card_latest_year">Ostatnie: %1$s</string>
+    <string name="screens_macro_card_loading">Ładowanie…</string>
+    <string name="screens_macro_card_retry">Ponów</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

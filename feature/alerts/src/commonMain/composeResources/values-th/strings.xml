@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">การแจ้งเตือนราคา</string>
+    <string name="screens_alerts_back_cd">ย้อนกลับ</string>
+    <string name="screens_alerts_create_cd">สร้างการแจ้งเตือน</string>
+    <string name="screens_alerts_delete_cd">ลบการแจ้งเตือน</string>
+    <string name="screens_alerts_row_above">สูงกว่า</string>
+    <string name="screens_alerts_row_below">ต่ำกว่า</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% การเปลี่ยนแปลง</string>
+    <string name="screens_alert_create_title">การแจ้งเตือนราคาใหม่</string>
+    <string name="screens_alert_create_back_cd">ย้อนกลับ</string>
+    <string name="screens_alert_create_coin_label">เหรียญ</string>
+    <string name="screens_alert_create_target_label">ราคาเป้าหมาย</string>
+    <string name="screens_alert_create_dir_above">สูงกว่า</string>
+    <string name="screens_alert_create_dir_below">ต่ำกว่า</string>
+    <string name="screens_alert_create_submit">สร้างการแจ้งเตือน</string>
+    <string name="screens_alert_create_draft_resume_title">ดำเนินการแจ้งเตือนต่อไหม</string>
+    <string name="screens_alert_create_draft_resume_message">คุณมีการแจ้งเตือนราคาที่ยังไม่ได้บันทึก แก้ไขต่อ ทิ้งไป หรือสร้างใหม่</string>
+    <string name="screens_alert_create_draft_resume_resume">แก้ไขต่อ</string>
+    <string name="screens_alert_create_draft_resume_discard">ทิ้งฉบับร่าง</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">เริ่มใหม่</string>
+</resources>

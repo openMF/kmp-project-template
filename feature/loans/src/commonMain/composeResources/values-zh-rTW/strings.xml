@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">新增貸款</string>
+    <string name="screens_loans_edit_title">編輯貸款</string>
+    <string name="screens_loans_addedit_back_cd">返回</string>
+    <string name="screens_loans_addedit_name_label">貸款名稱</string>
+    <string name="screens_loans_addedit_kind_label">類型</string>
+    <string name="screens_loans_addedit_kind_cd">選擇貸款類型</string>
+    <string name="screens_loans_addedit_principal_label">原始本金</string>
+    <string name="screens_loans_addedit_principal_remaining_label">剩餘本金</string>
+    <string name="screens_loans_addedit_annual_rate_label">年利率 (%)</string>
+    <string name="screens_loans_addedit_tenure_label">期限（月）</string>
+    <string name="screens_loans_addedit_months_remaining_label">剩餘月數</string>
+    <string name="screens_loans_addedit_next_due_date_label">下次還款日（YYYY-MM-DD）</string>
+    <string name="screens_loans_addedit_total_paid_label">累計已還</string>
+    <string name="screens_loans_addedit_monthly_emi_label">每月還款額</string>
+    <string name="screens_loans_addedit_total_interest_preview">利息總額：%1$s</string>
+    <string name="screens_loans_add_submit">儲存貸款</string>
+    <string name="screens_loans_edit_submit">更新貸款</string>
+    <string name="screens_loans_addedit_status_saving">正在儲存…</string>
+    <string name="screens_loans_addedit_status_saved">已儲存 ✓</string>
+    <string name="screens_loans_addedit_status_offline">已離線儲存 — 連線後會同步。</string>
+    <string name="screens_loans_addedit_status_failed">儲存失敗：%1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">未知錯誤</string>
+    <string name="screens_loans_addedit_retry_button">重試</string>
+    <string name="screens_loans_addedit_dismiss_button">忽略</string>
+    <string name="screens_loans_addedit_draft_resume_title">要恢復您的貸款嗎？</string>
+    <string name="screens_loans_addedit_draft_resume_message">您有一份未儲存的貸款草稿。可以繼續編輯、捨棄，或新增一份。</string>
+    <string name="screens_loans_addedit_draft_resume_resume">繼續編輯</string>
+    <string name="screens_loans_addedit_draft_resume_discard">捨棄草稿</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">重新開始</string>
+    <string name="screens_loans_detail_title">貸款詳情</string>
+    <string name="screens_loans_detail_back_cd">返回</string>
+    <string name="screens_loans_detail_delete_dialog_title">刪除貸款？</string>
+    <string name="screens_loans_detail_delete_dialog_message">將刪除此貸款及其追蹤紀錄。</string>
+    <string name="screens_loans_detail_delete_confirm">刪除</string>
+    <string name="screens_loans_detail_delete_cancel">取消</string>
+    <string name="screens_loans_detail_principal_remaining_label">剩餘本金</string>
+    <string name="screens_loans_detail_months_remaining_value">剩餘 %1$d 個月</string>
+    <string name="screens_loans_detail_original_principal_label">原始本金</string>
+    <string name="screens_loans_detail_monthly_payment_label">每月還款額</string>
+    <string name="screens_loans_detail_total_paid_label">累計已還</string>
+    <string name="screens_loans_detail_annual_rate_label">年利率</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">下次還款日</string>
+    <string name="screens_loans_detail_tenure_label">期限</string>
+    <string name="screens_loans_detail_tenure_value">%1$d 個月</string>
+    <string name="screens_loans_detail_tenure_progress_label">期限進度</string>
+    <string name="screens_loans_detail_tenure_progress_value">已完成 %1$d%%</string>
+    <string name="screens_loans_detail_edit_button">編輯</string>
+    <string name="screens_loans_detail_schedule_button">還款計畫</string>
+    <string name="screens_loans_detail_delete_button">刪除</string>
+    <string name="screens_loans_list_title">個人貸款</string>
+    <string name="screens_loans_list_back_cd">返回</string>
+    <string name="screens_loans_list_new_fab_text">新增貸款</string>
+    <string name="screens_loans_list_delete_dialog_title">刪除貸款？</string>
+    <string name="screens_loans_list_delete_dialog_message">將刪除\'%1$s\'。此操作無法復原。</string>
+    <string name="screens_loans_list_delete_confirm">刪除</string>
+    <string name="screens_loans_list_delete_cancel">取消</string>
+    <string name="screens_loans_list_total_outstanding_label">未還總額</string>
+    <string name="screens_loans_list_active_count_single">%1$d 筆進行中的貸款</string>
+    <string name="screens_loans_list_active_count_plural">%1$d 筆進行中的貸款</string>
+    <string name="screens_loans_list_monthly_emi_label">每月還款額</string>
+    <string name="screens_loans_row_remaining_label">剩餘</string>
+    <string name="screens_loans_row_monthly_emi_label">每月還款額</string>
+    <string name="screens_loans_row_progress_value">已還 %1$d%%</string>
+    <string name="screens_loans_row_next_due_value">下次：%1$s</string>
+</resources>

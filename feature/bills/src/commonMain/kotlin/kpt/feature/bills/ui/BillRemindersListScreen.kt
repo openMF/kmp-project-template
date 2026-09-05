@@ -158,7 +158,7 @@ fun BillRemindersListScreen(
 }
 
 @Composable
-private fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
+internal fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
     HeroCard {
         AmountDisplay(
             amountText = formatCurrency(totalAmount),
@@ -178,7 +178,7 @@ private fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
 }
 
 @Composable
-private fun BillReminderRow(bill: BillReminder, today: Int, onMarkPaid: () -> Unit, onClick: () -> Unit) {
+internal fun BillReminderRow(bill: BillReminder, today: Int, onMarkPaid: () -> Unit, onClick: () -> Unit) {
     val sp = MaterialTheme.spacing
     val diff = bill.dueDay - today
     val urgency = when {

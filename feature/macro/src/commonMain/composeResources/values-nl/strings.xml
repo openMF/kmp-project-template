@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">Terug</string>
+    <string name="screens_macro_country_title">Land-macrodata</string>
+    <string name="screens_macro_refresh_all_cd">Alles vernieuwen</string>
+    <string name="screens_macro_stale_chip">VEROUDERD — gecachte gegevens</string>
+    <string name="screens_macro_picker_title">Land selecteren</string>
+    <string name="screens_macro_picker_search_placeholder">Zoek land of ISO-code</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Bron: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Jaar per jaar</string>
+    <string name="screens_macro_card_empty">Geen gegevens gepubliceerd voor deze indicator.</string>
+    <string name="screens_macro_card_captive_portal">Achter een captive portal — meld je aan om door te gaan.</string>
+    <string name="screens_macro_card_offline">Offline — maak verbinding om deze indicator op te halen.</string>
+    <string name="screens_macro_card_generic_error">Kan deze indicator niet laden.</string>
+    <string name="screens_macro_card_auth_required">Verificatie vereist.</string>
+    <string name="screens_macro_card_latest_year">Laatste: %1$s</string>
+    <string name="screens_macro_card_loading">Laden…</string>
+    <string name="screens_macro_card_retry">Opnieuw</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">借入可能額</string>
+    <string name="screens_calc_affordability_back_cd">戻る</string>
+    <string name="screens_calc_affordability_income_label">月収</string>
+    <string name="screens_calc_affordability_obligations_label">既存の月々の返済</string>
+    <string name="screens_calc_affordability_dti_label">返済比率の上限 (%)</string>
+    <string name="screens_calc_affordability_rate_label">年利 (%)</string>
+    <string name="screens_calc_affordability_tenure_label">期間（月）</string>
+    <string name="screens_calc_affordability_max_principal_label">最大借入元金</string>
+    <string name="screens_calc_affordability_max_emi_label">最大月々返済額</string>
+    <string name="screens_calc_amortization_title">返済計画</string>
+    <string name="screens_calc_amortization_title_with_source">返済計画 · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">戻る</string>
+    <string name="screens_calc_amortization_principal_label">元金</string>
+    <string name="screens_calc_amortization_rate_label">年利 (%)</string>
+    <string name="screens_calc_amortization_tenure_label">期間（月）</string>
+    <string name="screens_calc_amortization_emi_label">月々の返済額</string>
+    <string name="screens_calc_amortization_interest_total_supporting">利息 %1$s · 合計 %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">元金</string>
+    <string name="screens_calc_amortization_header_interest">利息</string>
+    <string name="screens_calc_amortization_header_balance">残高</string>
+    <string name="screens_calc_compare_title">ローン比較</string>
+    <string name="screens_calc_compare_back_cd">戻る</string>
+    <string name="screens_calc_compare_best_emi_label">最良の返済額 · シナリオ %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/月</string>
+    <string name="screens_calc_compare_savings_text">最も高い案と比べて合計 %1$s の節約</string>
+    <string name="screens_calc_compare_helper_text">下のシナリオを編集すると、比較がリアルタイムで更新されます。</string>
+    <string name="screens_calc_compare_scenario_label">シナリオ %1$d</string>
+    <string name="screens_calc_compare_best_badge">最良</string>
+    <string name="screens_calc_compare_principal_label">元金</string>
+    <string name="screens_calc_compare_rate_label">金利 (%)</string>
+    <string name="screens_calc_compare_tenure_label">期間（月）</string>
+    <string name="screens_calc_compare_result_emi">返済額</string>
+    <string name="screens_calc_compare_result_interest">利息</string>
+    <string name="screens_calc_compare_result_total">合計</string>
+    <string name="screens_calc_wizard_resume_title">未完了のウィザードを再開しますか？</string>
+    <string name="screens_calc_wizard_resume_message">ステップ %1$d まで進んだローン計算ウィザードがあります。続きから再開しますか、破棄しますか？</string>
+    <string name="screens_calc_wizard_resume_continue">続ける</string>
+    <string name="screens_calc_wizard_resume_discard">破棄</string>
+    <string name="screens_calc_wizard_title">新規ローン · ステップ %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">戻る</string>
+    <string name="screens_calc_wizard_step_principal_question">いくら借りますか？</string>
+    <string name="screens_calc_wizard_step_principal_label">元金</string>
+    <string name="screens_calc_wizard_step_tenure_question">何か月で返済しますか？</string>
+    <string name="screens_calc_wizard_step_tenure_label">期間（月）</string>
+    <string name="screens_calc_wizard_step_rate_question">年利は何％ですか？</string>
+    <string name="screens_calc_wizard_step_rate_label">年利 (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">月々の返済額</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">支払総額: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">元金</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">期間</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d か月</string>
+    <string name="screens_calc_wizard_step_review_rate_label">金利</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">利息合計</string>
+    <string name="screens_calc_wizard_step_name_message">後でローン一覧から見つけられるよう、このシナリオに名前を付けてください。</string>
+    <string name="screens_calc_wizard_step_name_label">シナリオ名</string>
+    <string name="screens_calc_wizard_step_name_required">必須 — 名前を入力すると保存できます。</string>
+    <string name="screens_calc_wizard_button_back">戻る</string>
+    <string name="screens_calc_wizard_button_next">次へ</string>
+    <string name="screens_calc_wizard_button_save">ローンとして保存</string>
+</resources>

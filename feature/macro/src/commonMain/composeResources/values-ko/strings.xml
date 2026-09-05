@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">뒤로</string>
+    <string name="screens_macro_country_title">국가 거시지표</string>
+    <string name="screens_macro_refresh_all_cd">모두 새로 고침</string>
+    <string name="screens_macro_stale_chip">오래됨 — 캐시된 데이터 표시 중</string>
+    <string name="screens_macro_picker_title">국가 선택</string>
+    <string name="screens_macro_picker_search_placeholder">국가 또는 ISO 코드 검색</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">출처: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">연도별</string>
+    <string name="screens_macro_card_empty">이 지표에 게시된 데이터가 없습니다.</string>
+    <string name="screens_macro_card_captive_portal">캡티브 포털 뒤에 있습니다 — 계속하려면 로그인하세요.</string>
+    <string name="screens_macro_card_offline">오프라인 — 이 지표를 가져오려면 연결하세요.</string>
+    <string name="screens_macro_card_generic_error">이 지표를 불러오지 못했습니다.</string>
+    <string name="screens_macro_card_auth_required">인증이 필요합니다.</string>
+    <string name="screens_macro_card_latest_year">최신: %1$s</string>
+    <string name="screens_macro_card_loading">불러오는 중…</string>
+    <string name="screens_macro_card_retry">다시 시도</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

@@ -274,7 +274,7 @@ fun AddOrEditLoanScreen(
 }
 
 @Composable
-private fun LoanKindDropdown(value: LoanKind, onChange: (LoanKind) -> Unit, enabled: Boolean) {
+internal fun LoanKindDropdown(value: LoanKind, onChange: (LoanKind) -> Unit, enabled: Boolean) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
@@ -308,7 +308,7 @@ private fun LoanKindDropdown(value: LoanKind, onChange: (LoanKind) -> Unit, enab
 }
 
 @Composable
-private fun DoubleField(label: String, value: Double, onChange: (Double) -> Unit, enabled: Boolean) {
+internal fun DoubleField(label: String, value: Double, onChange: (Double) -> Unit, enabled: Boolean) {
     OutlinedTextField(
         value = if (value == 0.0) "" else value.toString(),
         onValueChange = { input -> onChange(input.toDoubleOrNull() ?: 0.0) },
@@ -321,7 +321,7 @@ private fun DoubleField(label: String, value: Double, onChange: (Double) -> Unit
 }
 
 @Composable
-private fun IntField(label: String, value: Int, onChange: (Int) -> Unit, enabled: Boolean) {
+internal fun IntField(label: String, value: Int, onChange: (Int) -> Unit, enabled: Boolean) {
     OutlinedTextField(
         value = if (value == 0) "" else value.toString(),
         onValueChange = { input -> onChange(input.toIntOrNull() ?: 0) },
@@ -334,7 +334,7 @@ private fun IntField(label: String, value: Int, onChange: (Int) -> Unit, enabled
 }
 
 @Composable
-private fun DateField(label: String, value: LocalDate, onChange: (LocalDate) -> Unit, enabled: Boolean) {
+internal fun DateField(label: String, value: LocalDate, onChange: (LocalDate) -> Unit, enabled: Boolean) {
     // Simple ISO date input — keeps the screen cross-platform without bikeshedding the date
     // picker per the plan's Risks table. Forks can swap in a Material date picker later.
     OutlinedTextField(
@@ -350,7 +350,7 @@ private fun DateField(label: String, value: LocalDate, onChange: (LocalDate) -> 
 }
 
 @Composable
-private fun ComputedPreviewCard(monthlyEmi: Double, totalInterest: Double) {
+internal fun ComputedPreviewCard(monthlyEmi: Double, totalInterest: Double) {
     HeroCard {
         AmountDisplay(
             amountText = formatMoney(monthlyEmi),
@@ -369,7 +369,7 @@ private fun ComputedPreviewCard(monthlyEmi: Double, totalInterest: Double) {
 }
 
 @Composable
-private fun SubmitStatusLine(submit: SubmitState<*>, onRetry: () -> Unit, onDismiss: () -> Unit) {
+internal fun SubmitStatusLine(submit: SubmitState<*>, onRetry: () -> Unit, onDismiss: () -> Unit) {
     when (submit) {
         is SubmitState.Idle -> Unit
         is SubmitState.Submitting -> Text(

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">Coin-Märkte</string>
+    <string name="screens_crypto_coin_markets_back_cd">Zurück</string>
+    <string name="screens_crypto_coin_markets_empty">Noch keine Coins vorhanden.</string>
+    <string name="screens_crypto_coin_markets_error_retry">Wiederholen</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">Mehr wird geladen…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">Du bist auf dem neuesten Stand</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">Aktueller Preis</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">24-Stunden-Änderung</string>
+    <string name="screens_crypto_coin_detail_back_cd">Zurück</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">Aktualisieren</string>
+    <string name="screens_crypto_coin_detail_rank_label">Marktkapitalisierungs-Rang</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">Marktkapitalisierung</string>
+    <string name="screens_crypto_coin_detail_high_label">24-Std-Hoch</string>
+    <string name="screens_crypto_coin_detail_low_label">24-Std-Tief</string>
+    <string name="screens_crypto_coin_detail_circulating_label">Umlaufmenge</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">Maximale Menge</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">Unbegrenzt</string>
+    <string name="screens_crypto_coin_detail_about_label">Info</string>
+</resources>

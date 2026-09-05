@@ -150,11 +150,11 @@ fun LoanCalcWizardScreen(
 
             Box(modifier = Modifier.weight(1f)) {
                 when (form.currentStep) {
-                    1 -> StepPrincipal(form, viewModel)
-                    2 -> StepTenure(form, viewModel)
-                    3 -> StepRate(form, viewModel)
+                    1 -> StepPrincipal(form, viewModel::onUpdatePrincipal)
+                    2 -> StepTenure(form, viewModel::onUpdateTenure)
+                    3 -> StepRate(form, viewModel::onUpdateRate)
                     4 -> StepReview(form, preview)
-                    else -> StepNameAndSave(form, viewModel)
+                    else -> StepNameAndSave(form, viewModel::onUpdateName)
                 }
             }
 
@@ -173,7 +173,7 @@ fun LoanCalcWizardScreen(
 }
 
 @Composable
-private fun StepPrincipal(form: LoanCalcScenario, viewModel: LoanCalcWizardViewModel) {
+internal fun StepPrincipal(form: LoanCalcScenario, onPrincipalChange: (Double) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(Res.string.screens_calc_wizard_step_principal_question),
@@ -181,7 +181,7 @@ private fun StepPrincipal(form: LoanCalcScenario, viewModel: LoanCalcWizardViewM
         )
         OutlinedTextField(
             value = form.principal.toLong().toString(),
-            onValueChange = { it.toDoubleOrNull()?.let(viewModel::onUpdatePrincipal) },
+            onValueChange = { it.toDoubleOrNull()?.let(onPrincipalChange) },
             label = { Text(stringResource(Res.string.screens_calc_wizard_step_principal_label)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
@@ -190,7 +190,7 @@ private fun StepPrincipal(form: LoanCalcScenario, viewModel: LoanCalcWizardViewM
 }
 
 @Composable
-private fun StepTenure(form: LoanCalcScenario, viewModel: LoanCalcWizardViewModel) {
+internal fun StepTenure(form: LoanCalcScenario, onTenureChange: (Int) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(Res.string.screens_calc_wizard_step_tenure_question),
@@ -198,7 +198,7 @@ private fun StepTenure(form: LoanCalcScenario, viewModel: LoanCalcWizardViewMode
         )
         OutlinedTextField(
             value = form.tenureMonths.toString(),
-            onValueChange = { it.toIntOrNull()?.let(viewModel::onUpdateTenure) },
+            onValueChange = { it.toIntOrNull()?.let(onTenureChange) },
             label = { Text(stringResource(Res.string.screens_calc_wizard_step_tenure_label)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
@@ -207,7 +207,7 @@ private fun StepTenure(form: LoanCalcScenario, viewModel: LoanCalcWizardViewMode
 }
 
 @Composable
-private fun StepRate(form: LoanCalcScenario, viewModel: LoanCalcWizardViewModel) {
+internal fun StepRate(form: LoanCalcScenario, onRateChange: (Double) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(Res.string.screens_calc_wizard_step_rate_question),
@@ -215,7 +215,7 @@ private fun StepRate(form: LoanCalcScenario, viewModel: LoanCalcWizardViewModel)
         )
         OutlinedTextField(
             value = form.ratePercent.toString(),
-            onValueChange = { it.toDoubleOrNull()?.let(viewModel::onUpdateRate) },
+            onValueChange = { it.toDoubleOrNull()?.let(onRateChange) },
             label = { Text(stringResource(Res.string.screens_calc_wizard_step_rate_label)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             modifier = Modifier.fillMaxWidth(),
@@ -224,7 +224,7 @@ private fun StepRate(form: LoanCalcScenario, viewModel: LoanCalcWizardViewModel)
 }
 
 @Composable
-private fun StepReview(form: LoanCalcScenario, preview: kpt.core.model.demo.emi.EmiResult) {
+internal fun StepReview(form: LoanCalcScenario, preview: kpt.core.model.demo.emi.EmiResult) {
     val sp = MaterialTheme.spacing
     Column(verticalArrangement = Arrangement.spacedBy(sp.md)) {
         HeroCard {
@@ -277,7 +277,7 @@ private fun StepReview(form: LoanCalcScenario, preview: kpt.core.model.demo.emi.
 }
 
 @Composable
-private fun ReviewMetricRow(label: String, value: String) {
+internal fun ReviewMetricRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -292,7 +292,7 @@ private fun ReviewMetricRow(label: String, value: String) {
 }
 
 @Composable
-private fun StepNameAndSave(form: LoanCalcScenario, viewModel: LoanCalcWizardViewModel) {
+internal fun StepNameAndSave(form: LoanCalcScenario, onNameChange: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(Res.string.screens_calc_wizard_step_name_message),
@@ -300,7 +300,7 @@ private fun StepNameAndSave(form: LoanCalcScenario, viewModel: LoanCalcWizardVie
         )
         OutlinedTextField(
             value = form.name,
-            onValueChange = viewModel::onUpdateName,
+            onValueChange = onNameChange,
             label = { Text(stringResource(Res.string.screens_calc_wizard_step_name_label)) },
             singleLine = true,
             isError = form.name.isBlank(),
@@ -318,7 +318,7 @@ private fun StepNameAndSave(form: LoanCalcScenario, viewModel: LoanCalcWizardVie
 }
 
 @Composable
-private fun WizardButtons(
+internal fun WizardButtons(
     currentStep: Int,
     canSave: Boolean,
     onBack: () -> Unit,

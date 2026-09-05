@@ -15,7 +15,7 @@ import kpt.core.model.demo.cloudtodo.CloudTodo
 
 /** Wire shape for jsonplaceholder `/todos`. */
 @Serializable
-data class TodoDto(
+data class CloudTodoDto(
     @SerialName("id") val id: Int,
     @SerialName("title") val title: String,
     @SerialName("completed") val completed: Boolean,
@@ -24,7 +24,7 @@ data class TodoDto(
     fun toDomain(): CloudTodo = CloudTodo(id = id, title = title, completed = completed)
 
     companion object {
-        fun fromDomain(todo: CloudTodo): TodoDto =
-            TodoDto(id = todo.id, title = todo.title, completed = todo.completed)
+        fun fromDomain(todo: CloudTodo): CloudTodoDto =
+            CloudTodoDto(id = todo.id, title = todo.title, completed = todo.completed)
     }
 }

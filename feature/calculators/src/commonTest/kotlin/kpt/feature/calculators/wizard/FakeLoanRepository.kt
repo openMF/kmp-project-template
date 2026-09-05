@@ -33,8 +33,6 @@ internal class FakeLoanRepository : LoanRepository {
     var lastUpserted: Loan? = null
         private set
 
-    override fun observeAll(): Flow<List<Loan>> = state.map { it.values.toList() }
-
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         screenDataStreamForTesting(
             state.map { it.values.toList() }.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) },
@@ -43,9 +41,9 @@ internal class FakeLoanRepository : LoanRepository {
     override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
         screenDataStreamForTesting(state.map { it[id]?.let { loan -> ScreenState.Content(loan) } ?: ScreenState.Empty })
 
-    override fun observeById(id: String): Flow<Loan?> = state.map { it[id] }
+    fun observeById(id: String): Flow<Loan?> = state.map { it[id] }
 
-    override suspend fun getById(id: String): Loan? = state.value[id]
+    suspend fun getById(id: String): Loan? = state.value[id]
 
     override suspend fun upsert(loan: Loan) {
         state.value = state.value + (loan.id to loan)
@@ -56,10 +54,10 @@ internal class FakeLoanRepository : LoanRepository {
         state.value = state.value - id
     }
 
-    override fun observeTotalMonthlyEmi(): Flow<Double> = state.map { rows -> rows.values.sumOf { it.monthlyPayment } }
+    fun observeTotalMonthlyEmi(): Flow<Double> = state.map { rows -> rows.values.sumOf { it.monthlyPayment } }
 
-    override fun observeTotalPrincipalRemaining(): Flow<Double> =
+    fun observeTotalPrincipalRemaining(): Flow<Double> =
         state.map { rows -> rows.values.sumOf { it.principalRemaining } }
 
-    override fun observeCount(): Flow<Int> = state.map { it.size }
+    fun observeCount(): Flow<Int> = state.map { it.size }
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_bills_add_title">Neue Rechnungserinnerung</string>
+    <string name="screens_bills_edit_title">Rechnungserinnerung bearbeiten</string>
+    <string name="screens_bills_addedit_back_cd">Zurück</string>
+    <string name="screens_bills_addedit_save_button">Speichern</string>
+    <string name="screens_bills_addedit_status_saving">Wird gespeichert…</string>
+    <string name="screens_bills_addedit_status_saved">Gespeichert ✓</string>
+    <string name="screens_bills_addedit_status_add_another">Weitere hinzufügen</string>
+    <string name="screens_bills_addedit_status_offline">Offline gespeichert – wird synchronisiert, sobald du online bist.</string>
+    <string name="screens_bills_addedit_status_failed">Speichern fehlgeschlagen: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">unbekannter Fehler</string>
+    <string name="screens_bills_addedit_retry_button">Wiederholen</string>
+    <string name="screens_bills_addedit_dismiss_button">Verwerfen</string>
+    <string name="screens_bills_addedit_name_label">Name (z. B. Strom)</string>
+    <string name="screens_bills_addedit_amount_label">Betrag</string>
+    <string name="screens_bills_addedit_due_day_label">Fälligkeitstag im Monat (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">Wiederholung</string>
+    <string name="screens_bills_addedit_category_title">Kategorie</string>
+    <string name="screens_bills_addedit_remind_days_before_label">Tage vorher erinnern</string>
+    <string name="screens_bills_addedit_enabled_label">Aktiviert</string>
+    <string name="screens_bills_draft_resume_title">Entwurf fortsetzen?</string>
+    <string name="screens_bills_draft_resume_message">Du hast eine ungespeicherte Rechnungserinnerung. Mach dort weiter, wo du aufgehört hast, verwirf sie oder beginne neu.</string>
+    <string name="screens_bills_draft_resume_resume">Fortsetzen</string>
+    <string name="screens_bills_draft_resume_discard">Entwurf verwerfen</string>
+    <string name="screens_bills_draft_resume_start_fresh">Neu beginnen</string>
+    <string name="screens_bills_list_title">Rechnungserinnerungen</string>
+    <string name="screens_bills_list_back_cd">Zurück</string>
+    <string name="screens_bills_list_new_fab_text">Neue Rechnung</string>
+    <string name="screens_bills_list_summary_label">Diesen Monat fällig</string>
+    <string name="screens_bills_list_summary_due_single">In den nächsten 7 Tagen ist %1$d Rechnung fällig</string>
+    <string name="screens_bills_list_summary_due_plural">In den nächsten 7 Tagen sind %1$d Rechnungen fällig</string>
+    <string name="screens_bills_list_mark_paid_cd">Als bezahlt markieren</string>
+    <string name="screens_bills_list_paid_button">Bezahlt</string>
+    <string name="screens_bills_list_reminders_disabled">Erinnerungen deaktiviert</string>
+</resources>

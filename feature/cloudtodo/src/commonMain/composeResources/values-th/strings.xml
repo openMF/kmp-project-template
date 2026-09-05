@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">งานบนคลาวด์</string>
+    <string name="screens_cloudtodo_detail_intro">เป็นที่เดียวที่ใช้ createMutableStore + MutationGateway ปิดเครือข่ายเพื่อดูเส้นทางออฟไลน์</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">สลับ (มองโลกในแง่ดี)</string>
+    <string name="screens_cloudtodo_complete_online_text">ทำให้เสร็จ (ต้องออนไลน์)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">แก้ไขข้อขัดแย้ง</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">ปิด</string>
+    <string name="screens_cloudtodo_status_completed">เสร็จแล้ว</string>
+    <string name="screens_cloudtodo_status_not_completed">ยังไม่เสร็จ</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">ใช้กับเครื่องแล้ว</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">เขียนลง Room ก่อน การซิงค์ผ่านเครือข่ายอยู่ในคิวและจะลองใหม่เมื่อเชื่อมต่ออีกครั้ง</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">ใช้แล้ว · ซิงค์แล้ว</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">เซิร์ฟเวอร์ยืนยันการเขียนแล้ว</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">ใช้แล้ว · อยู่ในคิว</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">เขียนในเครื่องแล้ว การซิงค์อยู่ในคิวและจะลองใหม่เมื่อกลับมาเชื่อมต่อ</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">ถูกบล็อก</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">ออฟไลน์ — การเขียนที่ต้องออนไลน์จะถูกปฏิเสธแทนที่จะเขียนในเครื่อง ไม่มีการเขียนใด ๆ</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">ไม่ได้ยืนยันตัวตนสำหรับการดำเนินการนี้ ไม่มีการเขียนใด ๆ</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">เงื่อนไขเบื้องต้นของเซิร์ฟเวอร์ล้มเหลวก่อนการเขียน ไม่มีการเขียนใด ๆ</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">บันทึกข้อขัดแย้งแล้ว</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">เซิร์ฟเวอร์ก็แก้ไขระเบียนนี้ด้วย เวอร์ชันของเซิร์ฟเวอร์ถูกใช้และเวอร์ชันของคุณถูกเก็บไว้ — เลือกว่าจะใช้อันไหน</string>
+    <string name="screens_cloudtodo_outcome_failed_title">ล้มเหลว</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — ย้อนกลับการเขียนในเครื่องแบบมองโลกในแง่ดีแล้ว</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — คงสถานะในเครื่องไว้</string>
+    <string name="screens_cloudtodo_conflicts_title">ข้อขัดแย้งการซิงค์</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">ไม่มีข้อขัดแย้งที่ยังไม่ได้แก้ไข</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">เก็บเวอร์ชันของเซิร์ฟเวอร์</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">ลองเวอร์ชันของฉันอีกครั้ง</string>
+</resources>

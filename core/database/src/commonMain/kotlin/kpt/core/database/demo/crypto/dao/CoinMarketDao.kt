@@ -11,6 +11,7 @@ package kpt.core.database.demo.crypto.dao
 
 import androidx.room3.Dao
 import androidx.room3.Query
+import androidx.room3.Transaction
 import androidx.room3.Upsert
 import kotlinx.coroutines.flow.Flow
 import kpt.core.database.demo.crypto.entity.CoinMarketEntity
@@ -35,4 +36,20 @@ interface CoinMarketDao {
 
     @Query("SELECT COUNT(*) FROM coin_markets")
     suspend fun count(): Int
+
+    /**
+     * Atomically swap the rows of one page (S5-3 PAGINATION_RACE).
+     *
+     * A Store `writer` that calls [deleteByPage] and then [upsertAll] as two separate
+     * suspending statements leaves a window in which `getPage(...)` observes the page
+     * with the old rows gone and the new rows not yet inserted — the reader emits an
+     * empty page and `PagingScreenStream` renders a flash of Empty mid-refresh. Running
+     * both statements inside one `@Transaction` closes that window: subscribers re-query
+     * post-commit and never see the intermediate state.
+     */
+    @Transaction
+    suspend fun replacePage(page: Int, entities: List<CoinMarketEntity>) {
+        deleteByPage(page)
+        upsertAll(entities)
+    }
 }

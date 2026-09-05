@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_bills_add_title">新增帳單提醒</string>
+    <string name="screens_bills_edit_title">編輯帳單提醒</string>
+    <string name="screens_bills_addedit_back_cd">返回</string>
+    <string name="screens_bills_addedit_save_button">儲存</string>
+    <string name="screens_bills_addedit_status_saving">正在儲存…</string>
+    <string name="screens_bills_addedit_status_saved">已儲存 ✓</string>
+    <string name="screens_bills_addedit_status_add_another">再新增一個</string>
+    <string name="screens_bills_addedit_status_offline">已離線儲存 — 連線後會同步。</string>
+    <string name="screens_bills_addedit_status_failed">儲存失敗：%1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">未知錯誤</string>
+    <string name="screens_bills_addedit_retry_button">重試</string>
+    <string name="screens_bills_addedit_dismiss_button">忽略</string>
+    <string name="screens_bills_addedit_name_label">名稱（例如 電費）</string>
+    <string name="screens_bills_addedit_amount_label">金額</string>
+    <string name="screens_bills_addedit_due_day_label">每月到期日（1-31）</string>
+    <string name="screens_bills_addedit_recurrence_title">重複週期</string>
+    <string name="screens_bills_addedit_category_title">類別</string>
+    <string name="screens_bills_addedit_remind_days_before_label">提前提醒天數</string>
+    <string name="screens_bills_addedit_enabled_label">已啟用</string>
+    <string name="screens_bills_draft_resume_title">要恢復您的草稿嗎？</string>
+    <string name="screens_bills_draft_resume_message">您有一則未儲存的帳單提醒。可以從上次的位置繼續、捨棄，或新增一則。</string>
+    <string name="screens_bills_draft_resume_resume">繼續</string>
+    <string name="screens_bills_draft_resume_discard">捨棄草稿</string>
+    <string name="screens_bills_draft_resume_start_fresh">重新開始</string>
+    <string name="screens_bills_list_title">帳單提醒</string>
+    <string name="screens_bills_list_back_cd">返回</string>
+    <string name="screens_bills_list_new_fab_text">新增帳單</string>
+    <string name="screens_bills_list_summary_label">本月即將到期</string>
+    <string name="screens_bills_list_summary_due_single">未來 7 天內有 %1$d 筆帳單到期</string>
+    <string name="screens_bills_list_summary_due_plural">未來 7 天內有 %1$d 筆帳單到期</string>
+    <string name="screens_bills_list_mark_paid_cd">標記為已付</string>
+    <string name="screens_bills_list_paid_button">已付</string>
+    <string name="screens_bills_list_reminders_disabled">提醒已關閉</string>
+</resources>

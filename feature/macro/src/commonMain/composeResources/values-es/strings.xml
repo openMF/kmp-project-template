@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">Atrás</string>
+    <string name="screens_macro_country_title">Macro por país</string>
+    <string name="screens_macro_refresh_all_cd">Actualizar todo</string>
+    <string name="screens_macro_stale_chip">OBSOLETO — mostrando datos en caché</string>
+    <string name="screens_macro_picker_title">Seleccionar país</string>
+    <string name="screens_macro_picker_search_placeholder">Buscar país o código ISO</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Fuente: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Año por año</string>
+    <string name="screens_macro_card_empty">No hay datos publicados para este indicador.</string>
+    <string name="screens_macro_card_captive_portal">Detrás de un portal cautivo: inicia sesión para continuar.</string>
+    <string name="screens_macro_card_offline">Sin conexión: conéctate para obtener este indicador.</string>
+    <string name="screens_macro_card_generic_error">No se pudo cargar este indicador.</string>
+    <string name="screens_macro_card_auth_required">Se requiere autenticación.</string>
+    <string name="screens_macro_card_latest_year">Último: %1$s</string>
+    <string name="screens_macro_card_loading">Cargando…</string>
+    <string name="screens_macro_card_retry">Reintentar</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

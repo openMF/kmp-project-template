@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">Leencapaciteit</string>
+    <string name="screens_calc_affordability_back_cd">Terug</string>
+    <string name="screens_calc_affordability_income_label">Maandinkomen</string>
+    <string name="screens_calc_affordability_obligations_label">Bestaande maandelijkse schulden</string>
+    <string name="screens_calc_affordability_dti_label">Maximale schuldquote (%)</string>
+    <string name="screens_calc_affordability_rate_label">Jaarrente (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Looptijd (maanden)</string>
+    <string name="screens_calc_affordability_max_principal_label">Maximale hoofdsom</string>
+    <string name="screens_calc_affordability_max_emi_label">Maximale maandlast</string>
+    <string name="screens_calc_amortization_title">Aflossing</string>
+    <string name="screens_calc_amortization_title_with_source">Aflossing · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Terug</string>
+    <string name="screens_calc_amortization_principal_label">Hoofdsom</string>
+    <string name="screens_calc_amortization_rate_label">Jaarrente (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Looptijd (maanden)</string>
+    <string name="screens_calc_amortization_emi_label">Maandlast</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Rente %1$s · Totaal %2$s</string>
+    <string name="screens_calc_amortization_header_month">Nr.</string>
+    <string name="screens_calc_amortization_header_principal">Hoofdsom</string>
+    <string name="screens_calc_amortization_header_interest">Rente</string>
+    <string name="screens_calc_amortization_header_balance">Saldo</string>
+    <string name="screens_calc_compare_title">Leningen vergelijken</string>
+    <string name="screens_calc_compare_back_cd">Terug</string>
+    <string name="screens_calc_compare_best_emi_label">Beste maandlast · Scenario %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/mnd</string>
+    <string name="screens_calc_compare_savings_text">Bespaart in totaal %1$s ten opzichte van de duurste</string>
+    <string name="screens_calc_compare_helper_text">Pas hieronder een scenario aan om de vergelijking live te zien bijwerken.</string>
+    <string name="screens_calc_compare_scenario_label">Scenario %1$d</string>
+    <string name="screens_calc_compare_best_badge">Beste</string>
+    <string name="screens_calc_compare_principal_label">Hoofdsom</string>
+    <string name="screens_calc_compare_rate_label">Rente (%)</string>
+    <string name="screens_calc_compare_tenure_label">Looptijd (maanden)</string>
+    <string name="screens_calc_compare_result_emi">Maandlast</string>
+    <string name="screens_calc_compare_result_interest">Rente</string>
+    <string name="screens_calc_compare_result_total">Totaal</string>
+    <string name="screens_calc_wizard_resume_title">Onafgeronde wizard hervatten?</string>
+    <string name="screens_calc_wizard_resume_message">Je hebt een leningberekening-wizard bij stap %1$d. Verdergaan waar je gebleven was of verwijderen?</string>
+    <string name="screens_calc_wizard_resume_continue">Doorgaan</string>
+    <string name="screens_calc_wizard_resume_discard">Verwijderen</string>
+    <string name="screens_calc_wizard_title">Nieuwe lening · Stap %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Terug</string>
+    <string name="screens_calc_wizard_step_principal_question">Hoeveel wil je lenen?</string>
+    <string name="screens_calc_wizard_step_principal_label">Hoofdsom</string>
+    <string name="screens_calc_wizard_step_tenure_question">Over hoeveel maanden?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Looptijd (maanden)</string>
+    <string name="screens_calc_wizard_step_rate_question">Tegen welke jaarrente?</string>
+    <string name="screens_calc_wizard_step_rate_label">Jaarrente (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Maandlast</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Totaal te betalen: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Hoofdsom</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Looptijd</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d maanden</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Rente</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Totale rente</string>
+    <string name="screens_calc_wizard_step_name_message">Geef dit scenario een naam zodat je het later terugvindt bij je leningen.</string>
+    <string name="screens_calc_wizard_step_name_label">Scenarionaam</string>
+    <string name="screens_calc_wizard_step_name_required">Verplicht — typ een naam om Opslaan in te schakelen.</string>
+    <string name="screens_calc_wizard_button_back">Terug</string>
+    <string name="screens_calc_wizard_button_next">Volgende</string>
+    <string name="screens_calc_wizard_button_save">Opslaan als lening</string>
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">Kemampuan bayar</string>
+    <string name="screens_calc_affordability_back_cd">Kembali</string>
+    <string name="screens_calc_affordability_income_label">Penghasilan bulanan</string>
+    <string name="screens_calc_affordability_obligations_label">Utang bulanan yang ada</string>
+    <string name="screens_calc_affordability_dti_label">Batas rasio utang terhadap penghasilan (%)</string>
+    <string name="screens_calc_affordability_rate_label">Suku bunga tahunan (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Tenor (bulan)</string>
+    <string name="screens_calc_affordability_max_principal_label">Pokok pinjaman maksimum</string>
+    <string name="screens_calc_affordability_max_emi_label">Angsuran maksimum</string>
+    <string name="screens_calc_amortization_title">Amortisasi</string>
+    <string name="screens_calc_amortization_title_with_source">Amortisasi · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Kembali</string>
+    <string name="screens_calc_amortization_principal_label">Pokok</string>
+    <string name="screens_calc_amortization_rate_label">Suku bunga tahunan (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Tenor (bulan)</string>
+    <string name="screens_calc_amortization_emi_label">Angsuran bulanan</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Bunga %1$s · Total %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">Pokok</string>
+    <string name="screens_calc_amortization_header_interest">Bunga</string>
+    <string name="screens_calc_amortization_header_balance">Saldo</string>
+    <string name="screens_calc_compare_title">Bandingkan pinjaman</string>
+    <string name="screens_calc_compare_back_cd">Kembali</string>
+    <string name="screens_calc_compare_best_emi_label">Angsuran terbaik · Skenario %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/bln</string>
+    <string name="screens_calc_compare_savings_text">Menghemat %1$s total dibanding yang termahal</string>
+    <string name="screens_calc_compare_helper_text">Ubah skenario mana pun di bawah untuk melihat perbandingan diperbarui langsung.</string>
+    <string name="screens_calc_compare_scenario_label">Skenario %1$d</string>
+    <string name="screens_calc_compare_best_badge">Terbaik</string>
+    <string name="screens_calc_compare_principal_label">Pokok</string>
+    <string name="screens_calc_compare_rate_label">Suku bunga (%)</string>
+    <string name="screens_calc_compare_tenure_label">Tenor (bulan)</string>
+    <string name="screens_calc_compare_result_emi">Angsuran</string>
+    <string name="screens_calc_compare_result_interest">Bunga</string>
+    <string name="screens_calc_compare_result_total">Total</string>
+    <string name="screens_calc_wizard_resume_title">Lanjutkan wizard yang belum selesai?</string>
+    <string name="screens_calc_wizard_resume_message">Anda punya wizard hitung pinjaman di langkah %1$d. Lanjutkan dari tempat terakhir atau buang?</string>
+    <string name="screens_calc_wizard_resume_continue">Lanjutkan</string>
+    <string name="screens_calc_wizard_resume_discard">Buang</string>
+    <string name="screens_calc_wizard_title">Pinjaman baru · Langkah %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Kembali</string>
+    <string name="screens_calc_wizard_step_principal_question">Berapa yang ingin Anda pinjam?</string>
+    <string name="screens_calc_wizard_step_principal_label">Jumlah pokok</string>
+    <string name="screens_calc_wizard_step_tenure_question">Selama berapa bulan?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Tenor (bulan)</string>
+    <string name="screens_calc_wizard_step_rate_question">Dengan suku bunga tahunan berapa?</string>
+    <string name="screens_calc_wizard_step_rate_label">Suku bunga tahunan (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Angsuran bulanan</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Total yang harus dibayar: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Pokok</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Tenor</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d bulan</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Suku bunga</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Total bunga</string>
+    <string name="screens_calc_wizard_step_name_message">Beri nama skenario ini agar mudah ditemukan lagi di daftar pinjaman Anda.</string>
+    <string name="screens_calc_wizard_step_name_label">Nama skenario</string>
+    <string name="screens_calc_wizard_step_name_required">Wajib — ketik nama untuk mengaktifkan Simpan.</string>
+    <string name="screens_calc_wizard_button_back">Kembali</string>
+    <string name="screens_calc_wizard_button_next">Berikutnya</string>
+    <string name="screens_calc_wizard_button_save">Simpan sebagai pinjaman</string>
+</resources>

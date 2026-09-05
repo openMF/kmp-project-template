@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">ตลาดเหรียญ</string>
+    <string name="screens_crypto_coin_markets_back_cd">ย้อนกลับ</string>
+    <string name="screens_crypto_coin_markets_empty">ยังไม่มีเหรียญให้แสดง</string>
+    <string name="screens_crypto_coin_markets_error_retry">ลองใหม่</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">กำลังโหลดเพิ่ม…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">คุณดูครบแล้ว</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">ราคาปัจจุบัน</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">การเปลี่ยนแปลง 24 ชม.</string>
+    <string name="screens_crypto_coin_detail_back_cd">ย้อนกลับ</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">รีเฟรช</string>
+    <string name="screens_crypto_coin_detail_rank_label">อันดับมูลค่าตลาด</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">มูลค่าตลาด</string>
+    <string name="screens_crypto_coin_detail_high_label">สูงสุด 24 ชม.</string>
+    <string name="screens_crypto_coin_detail_low_label">ต่ำสุด 24 ชม.</string>
+    <string name="screens_crypto_coin_detail_circulating_label">อุปทานหมุนเวียน</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">อุปทานสูงสุด</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">ไม่จำกัด</string>
+    <string name="screens_crypto_coin_detail_about_label">เกี่ยวกับ</string>
+</resources>

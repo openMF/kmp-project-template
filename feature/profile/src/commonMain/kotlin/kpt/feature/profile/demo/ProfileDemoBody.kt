@@ -23,13 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.HeroCard
-import kpt.core.base.ui.AppInfo
+import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
+import kpt.core.model.demo.profile.ProfileInfo
+import kpt.feature.profile.demo.ui.ProfileViewModel
 import kpt.feature.profile.generated.resources.Res
 import kpt.feature.profile.generated.resources.screens_profile_local_message
 import kpt.feature.profile.generated.resources.screens_profile_local_title
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
 /**
  * The profile tab's fork-owned INNER content (the default demo body). `ProfileScreen` (the
@@ -39,7 +42,30 @@ import org.jetbrains.compose.resources.stringResource
  * fenced block, leaving an empty body for the fork to fill — the shell chrome survives unchanged.
  */
 @Composable
-fun ProfileDemoBody(modifier: Modifier = Modifier) {
+fun ProfileDemoBody(
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = retainedKoinViewModel(),
+) {
+    // Store5 read surface: the body consumes the repository-built STREAM directly, the same way
+    // feature/watchlist and feature/macro's detail screen do — `ScreenContent(stream = …)` collects
+    // with lifecycle awareness and wires `onRetry = stream::retry` itself, so there is no
+    // collectAsStateWithLifecycle here and no re-exposed StateFlow on the ViewModel. Today the
+    // store serves a local placeholder, so it settles on Content immediately — but a fork that
+    // swaps the fetcher for a signed-in user gets Loading / Error / retry for free instead of
+    // restructuring this composable.
+    ScreenContent(
+        stream = viewModel.profile,
+        modifier = modifier,
+    ) { profile, _ ->
+        ProfileDemoContent(profile = profile)
+    }
+}
+
+@Composable
+private fun ProfileDemoContent(
+    profile: ProfileInfo,
+    modifier: Modifier = Modifier,
+) {
     val sp = MaterialTheme.spacing
     Column(
         modifier = modifier
@@ -66,7 +92,7 @@ fun ProfileDemoBody(modifier: Modifier = Modifier) {
                 )
                 Text(
                     // App display name templated in from the common AppInfo accessor, never hardcoded.
-                    text = stringResource(Res.string.screens_profile_local_message, AppInfo.appDisplayName),
+                    text = stringResource(Res.string.screens_profile_local_message, profile.appDisplayName),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

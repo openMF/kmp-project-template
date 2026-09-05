@@ -104,7 +104,7 @@ internal fun SyncAndDraftsCard(onClick: () -> Unit, modifier: Modifier = Modifie
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifier) {
+internal fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifier) {
     // App-name footer rendered from the common AppInfo.appDisplayName accessor (BuildKonfig →
     // gradle/fork.properties#app.display.name), not a hardcoded string resource — so a fork rebrands
     // in app-profile in one place (S9/T10).
@@ -152,7 +152,7 @@ internal fun LanguageCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SettingsRowCard(
+internal fun SettingsRowCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     contentDescription: String,

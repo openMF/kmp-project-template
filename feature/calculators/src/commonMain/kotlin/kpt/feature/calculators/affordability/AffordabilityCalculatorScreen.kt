@@ -41,6 +41,7 @@ import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.common.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
+import kpt.core.domain.demo.calc.AffordabilityResult
 import kpt.feature.calculators.TestTags
 import kpt.feature.calculators.generated.resources.Res
 import kpt.feature.calculators.generated.resources.screens_calc_affordability_back_cd
@@ -55,7 +56,14 @@ import kpt.feature.calculators.generated.resources.screens_calc_affordability_ti
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Stateful entry point — resolves the ViewModel and hands its state to
+ * [AffordabilityCalculatorScreenContent].
+ *
+ * The split follows the template's house pattern (see `SettingsScreen`): everything visual lives in
+ * the stateless content composable so it can be rendered by `@Preview` off `desktopTest` without a
+ * Koin graph, which is what the device-free CMP render tier needs.
+ */
 @Composable
 fun AffordabilityCalculatorScreen(
     onBackClick: () -> Unit,
@@ -65,6 +73,33 @@ fun AffordabilityCalculatorScreen(
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val result by viewModel.affordability.collectAsStateWithLifecycle()
 
+    AffordabilityCalculatorScreenContent(
+        state = state,
+        result = result,
+        onBackClick = onBackClick,
+        onIncomeChange = { viewModel.trySendAction(AffordabilityAction.UpdateIncome(it)) },
+        onObligationsChange = { viewModel.trySendAction(AffordabilityAction.UpdateObligations(it)) },
+        onDtiPercentChange = { viewModel.trySendAction(AffordabilityAction.UpdateDti(it / 100.0)) },
+        onRateChange = { viewModel.trySendAction(AffordabilityAction.UpdateRate(it)) },
+        onTenureChange = { viewModel.trySendAction(AffordabilityAction.UpdateTenure(it)) },
+        modifier = modifier,
+    )
+}
+
+/** Stateless body — every visual decision lives here, so `@Preview` can render it directly. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun AffordabilityCalculatorScreenContent(
+    state: AffordabilityState,
+    result: AffordabilityResult,
+    onBackClick: () -> Unit,
+    onIncomeChange: (Double) -> Unit,
+    onObligationsChange: (Double) -> Unit,
+    onDtiPercentChange: (Int) -> Unit,
+    onRateChange: (Double) -> Unit,
+    onTenureChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier.testTag(TestTags.Affordability.SCREEN),
         topBar = {
@@ -101,55 +136,35 @@ fun AffordabilityCalculatorScreen(
                 ) {
                     OutlinedTextField(
                         value = state.monthlyIncome.toLong().toString(),
-                        onValueChange = {
-                            it.toDoubleOrNull()?.let { v ->
-                                viewModel.trySendAction(AffordabilityAction.UpdateIncome(v))
-                            }
-                        },
+                        onValueChange = { it.toDoubleOrNull()?.let(onIncomeChange) },
                         label = { Text(stringResource(Res.string.screens_calc_affordability_income_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = state.monthlyObligations.toLong().toString(),
-                        onValueChange = {
-                            it.toDoubleOrNull()?.let { v ->
-                                viewModel.trySendAction(AffordabilityAction.UpdateObligations(v))
-                            }
-                        },
+                        onValueChange = { it.toDoubleOrNull()?.let(onObligationsChange) },
                         label = { Text(stringResource(Res.string.screens_calc_affordability_obligations_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = ((state.dtiRatio * 100).toInt()).toString(),
-                        onValueChange = {
-                            it.toIntOrNull()?.let { v ->
-                                viewModel.trySendAction(AffordabilityAction.UpdateDti(v / 100.0))
-                            }
-                        },
+                        onValueChange = { it.toIntOrNull()?.let(onDtiPercentChange) },
                         label = { Text(stringResource(Res.string.screens_calc_affordability_dti_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = state.ratePercent.toString(),
-                        onValueChange = {
-                            it.toDoubleOrNull()?.let { v ->
-                                viewModel.trySendAction(AffordabilityAction.UpdateRate(v))
-                            }
-                        },
+                        onValueChange = { it.toDoubleOrNull()?.let(onRateChange) },
                         label = { Text(stringResource(Res.string.screens_calc_affordability_rate_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
                     )
                     OutlinedTextField(
                         value = state.tenureMonths.toString(),
-                        onValueChange = {
-                            it.toIntOrNull()?.let { v ->
-                                viewModel.trySendAction(AffordabilityAction.UpdateTenure(v))
-                            }
-                        },
+                        onValueChange = { it.toIntOrNull()?.let(onTenureChange) },
                         label = { Text(stringResource(Res.string.screens_calc_affordability_tenure_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),

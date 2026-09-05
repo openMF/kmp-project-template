@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">Avvisi di prezzo</string>
+    <string name="screens_alerts_back_cd">Indietro</string>
+    <string name="screens_alerts_create_cd">Crea avviso</string>
+    <string name="screens_alerts_delete_cd">Elimina avviso</string>
+    <string name="screens_alerts_row_above">Sopra</string>
+    <string name="screens_alerts_row_below">Sotto</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% di variazione</string>
+    <string name="screens_alert_create_title">Nuovo avviso di prezzo</string>
+    <string name="screens_alert_create_back_cd">Indietro</string>
+    <string name="screens_alert_create_coin_label">Moneta</string>
+    <string name="screens_alert_create_target_label">Prezzo obiettivo</string>
+    <string name="screens_alert_create_dir_above">Sopra</string>
+    <string name="screens_alert_create_dir_below">Sotto</string>
+    <string name="screens_alert_create_submit">Crea avviso</string>
+    <string name="screens_alert_create_draft_resume_title">Riprendere l\'avviso?</string>
+    <string name="screens_alert_create_draft_resume_message">Hai un avviso di prezzo non salvato. Riprendi la modifica, eliminalo o creane uno nuovo.</string>
+    <string name="screens_alert_create_draft_resume_resume">Riprendi modifica</string>
+    <string name="screens_alert_create_draft_resume_discard">Elimina bozza</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Ricomincia</string>
+</resources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">Thị trường tiền mã hóa</string>
+    <string name="screens_crypto_coin_markets_back_cd">Quay lại</string>
+    <string name="screens_crypto_coin_markets_empty">Chưa có đồng nào để hiển thị.</string>
+    <string name="screens_crypto_coin_markets_error_retry">Thử lại</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">Đang tải thêm…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">Bạn đã xem hết</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">Giá hiện tại</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">Thay đổi 24 giờ</string>
+    <string name="screens_crypto_coin_detail_back_cd">Quay lại</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">Làm mới</string>
+    <string name="screens_crypto_coin_detail_rank_label">Xếp hạng vốn hóa</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">Vốn hóa thị trường</string>
+    <string name="screens_crypto_coin_detail_high_label">Cao nhất 24h</string>
+    <string name="screens_crypto_coin_detail_low_label">Thấp nhất 24h</string>
+    <string name="screens_crypto_coin_detail_circulating_label">Nguồn cung lưu hành</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">Nguồn cung tối đa</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">Không giới hạn</string>
+    <string name="screens_crypto_coin_detail_about_label">Giới thiệu</string>
+</resources>

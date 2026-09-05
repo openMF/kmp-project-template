@@ -192,33 +192,44 @@ internal class FakeDashboardCurrencyRepository : CurrencyRepository {
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
 internal object EmptyLoanRepository : LoanRepository {
     private val empty = MutableStateFlow<List<Loan>>(emptyList())
-    override fun observeAll(): Flow<List<Loan>> = empty
+
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<Loan>> = empty
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         screenDataStreamForTesting(empty.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
     override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
         screenDataStreamForTesting(empty.map { ScreenState.Empty })
-    override fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
-    override suspend fun getById(id: String): Loan? = null
+    fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
+    suspend fun getById(id: String): Loan? = null
     override suspend fun upsert(loan: Loan) = Unit
     override suspend fun delete(id: String) = Unit
-    override fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
+    fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
+    fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
+    fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
 internal object EmptyBillReminderRepository : BillReminderRepository {
     private val empty = MutableStateFlow<List<BillReminder>>(emptyList())
-    override fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
+
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
     override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
         screenDataStreamForTesting(empty.map { ScreenState.Empty })
+
+    override fun billReminderDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<BillReminder> =
+        screenDataStreamForTesting(empty.map { ScreenState.Empty })
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> = empty
-    override fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
-    override suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
+    fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
+    suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
     override suspend fun upsert(bill: BillReminder) = throw UnsupportedOperationException()
     override suspend fun delete(id: String) = throw UnsupportedOperationException()
     override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
+    fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)

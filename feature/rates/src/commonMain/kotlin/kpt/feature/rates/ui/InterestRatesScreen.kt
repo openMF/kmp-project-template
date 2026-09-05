@@ -149,7 +149,7 @@ internal fun InterestRatesScreen(
 }
 
 @Composable
-private fun RateRowCard(
+internal fun RateRowCard(
     state: ScreenState<InterestRateSeries>,
     onRetry: () -> Unit,
     onSeriesClick: (seriesId: String) -> Unit,
@@ -184,7 +184,7 @@ private fun RateRowCard(
 }
 
 @Composable
-private fun RateRowContent(series: InterestRateSeries, onClick: () -> Unit) {
+internal fun RateRowContent(series: InterestRateSeries, onClick: () -> Unit) {
     val sp = MaterialTheme.spacing
     val delta = computeOneDayDelta(series)
     Row(

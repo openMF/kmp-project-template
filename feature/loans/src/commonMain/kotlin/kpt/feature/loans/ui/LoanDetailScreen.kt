@@ -143,7 +143,7 @@ fun LoanDetailScreen(
 }
 
 @Composable
-private fun LoanDetailContent(
+internal fun LoanDetailContent(
     loan: Loan,
     onEditClick: () -> Unit,
     onAmortizationClick: () -> Unit,
@@ -270,7 +270,7 @@ private fun LoanDetailContent(
 }
 
 @Composable
-private fun MetricRow(label: String, value: String) {
+internal fun MetricRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,

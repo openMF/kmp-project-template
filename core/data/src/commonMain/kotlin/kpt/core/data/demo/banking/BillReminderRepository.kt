@@ -23,11 +23,14 @@ import kpt.core.model.demo.banking.BillReminder
  */
 interface BillReminderRepository {
 
-    /** Observe every bill reminder (enabled and disabled), day-of-month order. */
-    fun observeAll(): Flow<List<BillReminder>>
-
     /** Observe all reminders as a Store5-backed [ScreenDataStream] (offline-local) for read screens. */
     fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>>
+
+    /**
+     * Store-backed detail read for ONE reminder — the read path an edit form hydrates from.
+     * Mirrors [kpt.core.data.demo.banking.LoanRepository.loanDetailStream]; absent id → Empty.
+     */
+    fun billReminderDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<BillReminder>
 
     /**
      * Observe enabled bill reminders whose `dueDay` falls within the next
@@ -38,12 +41,6 @@ interface BillReminderRepository {
      * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
      */
     fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
-
-    /** Observe a single bill reminder. Emits `null` after deletion. */
-    fun observeById(id: String): Flow<BillReminder?>
-
-    /** One-shot read. */
-    suspend fun getById(id: String): BillReminder?
 
     /** Insert-or-replace. Idempotent. */
     suspend fun upsert(bill: BillReminder)
@@ -57,7 +54,4 @@ interface BillReminderRepository {
      * "Due in next X days" tile.
      */
     fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double>
-
-    /** Reactive row count — used by the dashboard badge. */
-    fun observeCount(): Flow<Int>
 }

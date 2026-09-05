@@ -98,7 +98,7 @@ fun AlertsListScreen(
 }
 
 @Composable
-private fun AlertRow(
+internal fun AlertRow(
     alert: PriceAlert,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,

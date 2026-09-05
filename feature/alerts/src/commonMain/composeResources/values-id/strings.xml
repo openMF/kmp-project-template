@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">Peringatan harga</string>
+    <string name="screens_alerts_back_cd">Kembali</string>
+    <string name="screens_alerts_create_cd">Buat peringatan</string>
+    <string name="screens_alerts_delete_cd">Hapus peringatan</string>
+    <string name="screens_alerts_row_above">Di atas</string>
+    <string name="screens_alerts_row_below">Di bawah</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% perubahan</string>
+    <string name="screens_alert_create_title">Peringatan harga baru</string>
+    <string name="screens_alert_create_back_cd">Kembali</string>
+    <string name="screens_alert_create_coin_label">Koin</string>
+    <string name="screens_alert_create_target_label">Harga target</string>
+    <string name="screens_alert_create_dir_above">Di atas</string>
+    <string name="screens_alert_create_dir_below">Di bawah</string>
+    <string name="screens_alert_create_submit">Buat peringatan</string>
+    <string name="screens_alert_create_draft_resume_title">Lanjutkan peringatan Anda?</string>
+    <string name="screens_alert_create_draft_resume_message">Anda punya peringatan harga yang belum disimpan. Lanjutkan mengedit, buang, atau buat yang baru.</string>
+    <string name="screens_alert_create_draft_resume_resume">Lanjutkan mengedit</string>
+    <string name="screens_alert_create_draft_resume_discard">Buang draf</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Mulai baru</string>
+</resources>

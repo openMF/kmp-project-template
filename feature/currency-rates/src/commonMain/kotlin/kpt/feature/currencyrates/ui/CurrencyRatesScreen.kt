@@ -176,7 +176,7 @@ fun CurrencyRatesScreen(
  * is bounded so the card wraps its content inside the scrolling screen.
  */
 @Composable
-private fun CurrencyConverterCard(
+internal fun CurrencyConverterCard(
     amount: String,
     targetCode: String,
     spotState: ScreenState<ExchangeRates>,
@@ -251,7 +251,7 @@ private fun CurrencyConverterCard(
 }
 
 @Composable
-private fun RateItem(code: String, rate: Double) {
+internal fun RateItem(code: String, rate: Double) {
     val sp = MaterialTheme.spacing
     Row(
         modifier = Modifier

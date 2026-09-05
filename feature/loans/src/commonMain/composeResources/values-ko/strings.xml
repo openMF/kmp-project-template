@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">대출 추가</string>
+    <string name="screens_loans_edit_title">대출 편집</string>
+    <string name="screens_loans_addedit_back_cd">뒤로</string>
+    <string name="screens_loans_addedit_name_label">대출 이름</string>
+    <string name="screens_loans_addedit_kind_label">종류</string>
+    <string name="screens_loans_addedit_kind_cd">대출 종류 선택</string>
+    <string name="screens_loans_addedit_principal_label">최초 원금</string>
+    <string name="screens_loans_addedit_principal_remaining_label">잔여 원금</string>
+    <string name="screens_loans_addedit_annual_rate_label">연이자율 (%)</string>
+    <string name="screens_loans_addedit_tenure_label">기간(개월)</string>
+    <string name="screens_loans_addedit_months_remaining_label">남은 개월 수</string>
+    <string name="screens_loans_addedit_next_due_date_label">다음 상환일 (YYYY-MM-DD)</string>
+    <string name="screens_loans_addedit_total_paid_label">지금까지 상환 총액</string>
+    <string name="screens_loans_addedit_monthly_emi_label">월 상환금</string>
+    <string name="screens_loans_addedit_total_interest_preview">총 이자: %1$s</string>
+    <string name="screens_loans_add_submit">대출 저장</string>
+    <string name="screens_loans_edit_submit">대출 업데이트</string>
+    <string name="screens_loans_addedit_status_saving">저장 중…</string>
+    <string name="screens_loans_addedit_status_saved">저장됨 ✓</string>
+    <string name="screens_loans_addedit_status_offline">오프라인으로 저장됨 — 온라인이 되면 동기화됩니다.</string>
+    <string name="screens_loans_addedit_status_failed">저장 실패: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">알 수 없는 오류</string>
+    <string name="screens_loans_addedit_retry_button">다시 시도</string>
+    <string name="screens_loans_addedit_dismiss_button">닫기</string>
+    <string name="screens_loans_addedit_draft_resume_title">대출 작성을 이어서 할까요?</string>
+    <string name="screens_loans_addedit_draft_resume_message">저장하지 않은 대출 임시 저장이 있습니다. 편집을 이어가거나 삭제하거나 새로 만드세요.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">편집 이어가기</string>
+    <string name="screens_loans_addedit_draft_resume_discard">임시 저장 삭제</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">새로 시작</string>
+    <string name="screens_loans_detail_title">대출 상세</string>
+    <string name="screens_loans_detail_back_cd">뒤로</string>
+    <string name="screens_loans_detail_delete_dialog_title">대출을 삭제할까요?</string>
+    <string name="screens_loans_detail_delete_dialog_message">이 대출과 추적 기록이 삭제됩니다.</string>
+    <string name="screens_loans_detail_delete_confirm">삭제</string>
+    <string name="screens_loans_detail_delete_cancel">취소</string>
+    <string name="screens_loans_detail_principal_remaining_label">잔여 원금</string>
+    <string name="screens_loans_detail_months_remaining_value">%1$d개월 남음</string>
+    <string name="screens_loans_detail_original_principal_label">최초 원금</string>
+    <string name="screens_loans_detail_monthly_payment_label">월 납입금(상환금)</string>
+    <string name="screens_loans_detail_total_paid_label">지금까지 상환 총액</string>
+    <string name="screens_loans_detail_annual_rate_label">연이율</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">다음 상환일</string>
+    <string name="screens_loans_detail_tenure_label">기간</string>
+    <string name="screens_loans_detail_tenure_value">%1$d개월</string>
+    <string name="screens_loans_detail_tenure_progress_label">기간 진행률</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% 완료</string>
+    <string name="screens_loans_detail_edit_button">편집</string>
+    <string name="screens_loans_detail_schedule_button">상환 일정</string>
+    <string name="screens_loans_detail_delete_button">삭제</string>
+    <string name="screens_loans_list_title">개인 대출</string>
+    <string name="screens_loans_list_back_cd">뒤로</string>
+    <string name="screens_loans_list_new_fab_text">새 대출</string>
+    <string name="screens_loans_list_delete_dialog_title">대출을 삭제할까요?</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\'이(가) 삭제됩니다. 되돌릴 수 없습니다.</string>
+    <string name="screens_loans_list_delete_confirm">삭제</string>
+    <string name="screens_loans_list_delete_cancel">취소</string>
+    <string name="screens_loans_list_total_outstanding_label">총 미상환액</string>
+    <string name="screens_loans_list_active_count_single">진행 중인 대출 %1$d건</string>
+    <string name="screens_loans_list_active_count_plural">진행 중인 대출 %1$d건</string>
+    <string name="screens_loans_list_monthly_emi_label">월 상환금</string>
+    <string name="screens_loans_row_remaining_label">남음</string>
+    <string name="screens_loans_row_monthly_emi_label">월 상환금</string>
+    <string name="screens_loans_row_progress_value">%1$d%% 상환</string>
+    <string name="screens_loans_row_next_due_value">다음: %1$s</string>
+</resources>

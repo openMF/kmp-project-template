@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">Кредитоспособность</string>
+    <string name="screens_calc_affordability_back_cd">Назад</string>
+    <string name="screens_calc_affordability_income_label">Ежемесячный доход</string>
+    <string name="screens_calc_affordability_obligations_label">Текущие ежемесячные обязательства</string>
+    <string name="screens_calc_affordability_dti_label">Предел долговой нагрузки (%)</string>
+    <string name="screens_calc_affordability_rate_label">Годовая ставка (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Срок (месяцев)</string>
+    <string name="screens_calc_affordability_max_principal_label">Максимальная сумма кредита</string>
+    <string name="screens_calc_affordability_max_emi_label">Максимальный платёж</string>
+    <string name="screens_calc_amortization_title">Амортизация</string>
+    <string name="screens_calc_amortization_title_with_source">Амортизация · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Назад</string>
+    <string name="screens_calc_amortization_principal_label">Основной долг</string>
+    <string name="screens_calc_amortization_rate_label">Годовая ставка (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Срок (месяцев)</string>
+    <string name="screens_calc_amortization_emi_label">Ежемесячный платёж</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Проценты %1$s · Итого %2$s</string>
+    <string name="screens_calc_amortization_header_month">№</string>
+    <string name="screens_calc_amortization_header_principal">Основной долг</string>
+    <string name="screens_calc_amortization_header_interest">Проценты</string>
+    <string name="screens_calc_amortization_header_balance">Остаток</string>
+    <string name="screens_calc_compare_title">Сравнение кредитов</string>
+    <string name="screens_calc_compare_back_cd">Назад</string>
+    <string name="screens_calc_compare_best_emi_label">Лучший платёж · Сценарий %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/мес</string>
+    <string name="screens_calc_compare_savings_text">Экономия %1$s по сравнению с самым дорогим</string>
+    <string name="screens_calc_compare_helper_text">Измените любой сценарий ниже — сравнение обновится сразу.</string>
+    <string name="screens_calc_compare_scenario_label">Сценарий %1$d</string>
+    <string name="screens_calc_compare_best_badge">Лучший</string>
+    <string name="screens_calc_compare_principal_label">Основной долг</string>
+    <string name="screens_calc_compare_rate_label">Ставка (%)</string>
+    <string name="screens_calc_compare_tenure_label">Срок (месяцев)</string>
+    <string name="screens_calc_compare_result_emi">Платёж</string>
+    <string name="screens_calc_compare_result_interest">Проценты</string>
+    <string name="screens_calc_compare_result_total">Итого</string>
+    <string name="screens_calc_wizard_resume_title">Продолжить незавершённый мастер?</string>
+    <string name="screens_calc_wizard_resume_message">У вас есть мастер расчёта кредита на шаге %1$d. Продолжить с места остановки или удалить?</string>
+    <string name="screens_calc_wizard_resume_continue">Продолжить</string>
+    <string name="screens_calc_wizard_resume_discard">Удалить</string>
+    <string name="screens_calc_wizard_title">Новый кредит · Шаг %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Назад</string>
+    <string name="screens_calc_wizard_step_principal_question">Сколько вы хотите занять?</string>
+    <string name="screens_calc_wizard_step_principal_label">Сумма основного долга</string>
+    <string name="screens_calc_wizard_step_tenure_question">На сколько месяцев?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Срок (месяцев)</string>
+    <string name="screens_calc_wizard_step_rate_question">По какой годовой ставке?</string>
+    <string name="screens_calc_wizard_step_rate_label">Годовая ставка (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Ежемесячный платёж</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Всего к выплате: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Основной долг</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Срок</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d мес.</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Ставка</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Всего процентов</string>
+    <string name="screens_calc_wizard_step_name_message">Назовите этот сценарий, чтобы позже найти его в своих кредитах.</string>
+    <string name="screens_calc_wizard_step_name_label">Название сценария</string>
+    <string name="screens_calc_wizard_step_name_required">Обязательно — введите название, чтобы включить сохранение.</string>
+    <string name="screens_calc_wizard_button_back">Назад</string>
+    <string name="screens_calc_wizard_button_next">Далее</string>
+    <string name="screens_calc_wizard_button_save">Сохранить как кредит</string>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">Wizualny test dymny dla każdego wariantu ScreenState i każdego prymitywu stanu na poziomie komponentu z core/designsystem.</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (domyślne — tytuł + komunikat)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error pełnoekranowy</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — CTA portalu przechwytującego</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — zwykły offline</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">dotknięto ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">Dotknij każdego kafelka, aby otworzyć ekran demo z tym przejściem. Cel zamknie się sam po 2 s. Zwróć uwagę na migotanie.</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(zamknie się za 2 s)</string>
+</resources>

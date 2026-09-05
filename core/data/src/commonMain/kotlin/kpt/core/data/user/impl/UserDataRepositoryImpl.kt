@@ -9,20 +9,34 @@
  */
 package kpt.core.data.user.impl
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kpt.core.base.store.screen.FetchPolicy
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.user.UserDataRepository
 import kpt.core.datastore.UserPreferencesRepository
 import kpt.core.model.user.DarkThemeConfig
 import kpt.core.model.user.LanguageConfig
 import kpt.core.model.user.ThemeBrand
 import kpt.core.model.user.UserData
+import org.mobilenativefoundation.store.store5.Store
 
 class UserDataRepositoryImpl(
     private val preferencesRepository: UserPreferencesRepository,
+    private val userDataStore: Store<Unit, UserData>,
 ) : UserDataRepository {
     override val userData: StateFlow<UserData>
         get() = preferencesRepository.userData
+
+    override fun userDataStream(scope: CoroutineScope): ScreenDataStream<UserData> =
+        userDataStore.asScreenStream(
+            key = Unit,
+            cacheKey = "userData",
+            scope = scope,
+            fetchPolicy = FetchPolicy.CACHE_ONLY,
+        )
 
     override val authToken: String?
         get() = preferencesRepository.authToken

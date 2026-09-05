@@ -175,7 +175,7 @@ internal fun InterestRateDetailScreen(
 }
 
 @Composable
-private fun ChartCard(series: InterestRateSeries) {
+internal fun ChartCard(series: InterestRateSeries) {
     val sp = MaterialTheme.spacing
     AppCard {
         Box(modifier = Modifier.fillMaxWidth().height(220.dp).padding(sp.sm)) {

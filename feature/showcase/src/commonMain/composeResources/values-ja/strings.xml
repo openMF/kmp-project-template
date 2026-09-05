@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">core/designsystem が提供するすべての ScreenState バリアントとコンポーネント単位の状態プリミティブのビジュアルスモークテスト。</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty （デフォルト — タイトル + メッセージ）</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error 全画面</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork — キャプティブポータルの CTA</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork — 通常のオフライン</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">タップ ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">各タイルをタップすると、そのトランジションでデモ画面を表示します。遷移先は 2 秒後に自動で戻ります。ちらつきに注意してください。</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n（2 秒後に自動で戻ります）</string>
+</resources>

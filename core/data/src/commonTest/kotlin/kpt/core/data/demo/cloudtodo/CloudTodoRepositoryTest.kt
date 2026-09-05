@@ -20,7 +20,7 @@ import kpt.core.database.demo.cloudtodo.CloudTodoDao
 import kpt.core.database.demo.cloudtodo.CloudTodoEntity
 import kpt.core.model.demo.cloudtodo.CloudTodo
 import kpt.core.network.demo.cloudtodo.api.JsonPlaceholderApi
-import kpt.core.network.demo.cloudtodo.dto.TodoDto
+import kpt.core.network.demo.cloudtodo.dto.CloudTodoDto
 import kpt.core.store.demo.cloudtodo.impl.CloudTodoKey
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoReadStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoStore
@@ -89,9 +89,9 @@ private class FakeCloudTodoDao : CloudTodoDao {
 
 private class FakeJsonPlaceholderApi : JsonPlaceholderApi {
     var updateCalled = false
-    override suspend fun getTodo(id: Int): TodoDto =
-        TodoDto(id = id, title = "todo-$id", completed = false)
-    override suspend fun updateTodo(id: Int, todo: TodoDto): TodoDto {
+    override suspend fun getTodo(id: Int): CloudTodoDto =
+        CloudTodoDto(id = id, title = "todo-$id", completed = false)
+    override suspend fun updateTodo(id: Int, todo: CloudTodoDto): CloudTodoDto {
         updateCalled = true
         return todo // the server echoes the write back
     }

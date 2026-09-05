@@ -34,6 +34,7 @@ class AmortizationScreenUiTest {
     fun screenIsDisplayed() = runComposeUiTest {
         val viewModel = AmortizationViewModel(
             repository = FakeLoanRepository(),
+            calcRepository = FakeAmortizationCalcRepository(),
             loanId = null,
         )
         setContent {

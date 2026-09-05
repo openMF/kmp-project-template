@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">Cảnh báo giá</string>
+    <string name="screens_alerts_back_cd">Quay lại</string>
+    <string name="screens_alerts_create_cd">Tạo cảnh báo</string>
+    <string name="screens_alerts_delete_cd">Xóa cảnh báo</string>
+    <string name="screens_alerts_row_above">Trên</string>
+    <string name="screens_alerts_row_below">Dưới</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% thay đổi</string>
+    <string name="screens_alert_create_title">Cảnh báo giá mới</string>
+    <string name="screens_alert_create_back_cd">Quay lại</string>
+    <string name="screens_alert_create_coin_label">Đồng tiền</string>
+    <string name="screens_alert_create_target_label">Giá mục tiêu</string>
+    <string name="screens_alert_create_dir_above">Trên</string>
+    <string name="screens_alert_create_dir_below">Dưới</string>
+    <string name="screens_alert_create_submit">Tạo cảnh báo</string>
+    <string name="screens_alert_create_draft_resume_title">Tiếp tục cảnh báo của bạn?</string>
+    <string name="screens_alert_create_draft_resume_message">Bạn có một cảnh báo giá chưa lưu. Hãy tiếp tục chỉnh sửa, bỏ đi, hoặc tạo cái mới.</string>
+    <string name="screens_alert_create_draft_resume_resume">Tiếp tục chỉnh sửa</string>
+    <string name="screens_alert_create_draft_resume_discard">Bỏ bản nháp</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Bắt đầu lại</string>
+</resources>

@@ -96,7 +96,7 @@ fun AmortizationScheduleScreen(
 }
 
 @Composable
-private fun AmortizationTable(rows: List<AmortizationRow>, modifier: Modifier = Modifier) {
+internal fun AmortizationTable(rows: List<AmortizationRow>, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         item { ScheduleTableHeader() }
         item { HorizontalDivider(thickness = 1.5.dp) }
@@ -114,7 +114,7 @@ private fun AmortizationTable(rows: List<AmortizationRow>, modifier: Modifier = 
 }
 
 @Composable
-private fun ScheduleTableHeader(modifier: Modifier = Modifier) {
+internal fun ScheduleTableHeader(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -130,7 +130,7 @@ private fun ScheduleTableHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ScheduleRow(row: AmortizationRow, isEven: Boolean, modifier: Modifier = Modifier) {
+internal fun ScheduleRow(row: AmortizationRow, isEven: Boolean, modifier: Modifier = Modifier) {
     val bg = if (isEven) {
         MaterialTheme.colorScheme.surface
     } else {
@@ -156,7 +156,7 @@ private fun ScheduleRow(row: AmortizationRow, isEven: Boolean, modifier: Modifie
 }
 
 @Composable
-private fun ScheduleTotalRow(rows: List<AmortizationRow>, modifier: Modifier = Modifier) {
+internal fun ScheduleTotalRow(rows: List<AmortizationRow>, modifier: Modifier = Modifier) {
     val totalPrincipal = rows.sumOf { it.principal }
     val totalInterest = rows.sumOf { it.interest }
     val totalPayment = rows.sumOf { it.payment }
@@ -191,7 +191,7 @@ private fun ScheduleTotalRow(rows: List<AmortizationRow>, modifier: Modifier = M
 }
 
 @Composable
-private fun SummaryLine(
+internal fun SummaryLine(
     label: String,
     value: String,
     modifier: Modifier = Modifier,

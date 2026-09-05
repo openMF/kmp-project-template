@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: ja · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: ja · translated by /idea-locale
+     createMutableStore / MutationGateway are Kotlin API names — deliberately untranslated. -->
 <resources>
-    <string name="screens_cloudtodo_detail_title" translate="pending">Cloud Todo</string>
-    <string name="screens_cloudtodo_detail_intro" translate="pending">Drives the only createMutableStore + MutationGateway consumer. Turn the network off to see the offline arms.</string>
-    <string name="screens_cloudtodo_toggle_optimistic_text" translate="pending">Toggle (optimistic)</string>
-    <string name="screens_cloudtodo_complete_online_text" translate="pending">Complete (online-required)</string>
-    <string name="screens_cloudtodo_outcome_resolve_text" translate="pending">Resolve conflict</string>
-    <string name="screens_cloudtodo_outcome_dismiss_text" translate="pending">Dismiss</string>
-    <string name="screens_cloudtodo_status_completed" translate="pending">Completed</string>
-    <string name="screens_cloudtodo_status_not_completed" translate="pending">Not completed</string>
-    <string name="screens_cloudtodo_outcome_applied_local_title" translate="pending">Applied locally</string>
-    <string name="screens_cloudtodo_outcome_applied_local_body" translate="pending">Room-first write. The network sync is queued and retries on reconnect.</string>
-    <string name="screens_cloudtodo_outcome_applied_synced_title" translate="pending">Applied · synced</string>
-    <string name="screens_cloudtodo_outcome_applied_synced_body" translate="pending">The server confirmed the write.</string>
-    <string name="screens_cloudtodo_outcome_applied_queued_title" translate="pending">Applied · queued</string>
-    <string name="screens_cloudtodo_outcome_applied_queued_body" translate="pending">Written locally; the sync is queued and will retry when connectivity returns.</string>
-    <string name="screens_cloudtodo_outcome_blocked_title" translate="pending">Blocked</string>
-    <string name="screens_cloudtodo_outcome_blocked_offline" translate="pending">Offline — an online-required write refuses rather than writing locally. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_blocked_unauthenticated" translate="pending">Not authenticated for this operation. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_blocked_precondition" translate="pending">A server precondition failed before any write. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_conflicted_title" translate="pending">Conflict recorded</string>
-    <string name="screens_cloudtodo_outcome_conflicted_body" translate="pending">The server changed this record too. Its version was applied and yours was preserved — choose which one wins.</string>
-    <string name="screens_cloudtodo_outcome_failed_title" translate="pending">Failed</string>
-    <string name="screens_cloudtodo_outcome_failed_rolled_back" translate="pending">%1$s — the optimistic local write was rolled back.</string>
-    <string name="screens_cloudtodo_outcome_failed_kept" translate="pending">%1$s — local state kept.</string>
-    <string name="screens_cloudtodo_conflicts_title" translate="pending">Sync conflicts</string>
-    <string name="screens_cloudtodo_conflicts_empty_text" translate="pending">No unresolved conflicts.</string>
-    <string name="screens_cloudtodo_conflict_accept_server_text" translate="pending">Keep server version</string>
-    <string name="screens_cloudtodo_conflict_retry_local_text" translate="pending">Retry my version</string>
+    <string name="screens_cloudtodo_detail_title">クラウドToDo</string>
+    <string name="screens_cloudtodo_detail_intro">createMutableStore + MutationGateway の唯一の利用箇所です。ネットワークをオフにするとオフライン分岐を確認できます。</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">切り替え（楽観的）</string>
+    <string name="screens_cloudtodo_complete_online_text">完了（オンライン必須）</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">競合を解決</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">閉じる</string>
+    <string name="screens_cloudtodo_status_completed">完了</string>
+    <string name="screens_cloudtodo_status_not_completed">未完了</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">ローカルに適用</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Room を先に書き込みます。ネットワーク同期はキューに入り、再接続時に再試行します。</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">適用 · 同期済み</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">サーバーが書き込みを確認しました。</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">適用 · キュー待ち</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">ローカルに書き込みました。同期はキューにあり、接続が戻ると再試行します。</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">ブロック</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">オフライン — オンライン必須の書き込みはローカルに書かず拒否します。何も書き込まれていません。</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">この操作の認証がありません。何も書き込まれていません。</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">書き込み前にサーバーの事前条件が失敗しました。何も書き込まれていません。</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">競合を記録しました</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">サーバーもこのレコードを変更しました。サーバー版が適用され、あなたの版は保持されています — どちらを採用するか選択してください。</string>
+    <string name="screens_cloudtodo_outcome_failed_title">失敗</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — 楽観的なローカル書き込みをロールバックしました。</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — ローカルの状態を保持しました。</string>
+    <string name="screens_cloudtodo_conflicts_title">同期の競合</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">未解決の競合はありません。</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">サーバー版を保持</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">自分の版で再試行</string>
 </resources>

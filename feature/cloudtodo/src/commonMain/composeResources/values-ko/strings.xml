@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: ko · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: ko · translated by /idea-locale
+     createMutableStore / MutationGateway are Kotlin API names — deliberately untranslated. -->
 <resources>
-    <string name="screens_cloudtodo_detail_title" translate="pending">Cloud Todo</string>
-    <string name="screens_cloudtodo_detail_intro" translate="pending">Drives the only createMutableStore + MutationGateway consumer. Turn the network off to see the offline arms.</string>
-    <string name="screens_cloudtodo_toggle_optimistic_text" translate="pending">Toggle (optimistic)</string>
-    <string name="screens_cloudtodo_complete_online_text" translate="pending">Complete (online-required)</string>
-    <string name="screens_cloudtodo_outcome_resolve_text" translate="pending">Resolve conflict</string>
-    <string name="screens_cloudtodo_outcome_dismiss_text" translate="pending">Dismiss</string>
-    <string name="screens_cloudtodo_status_completed" translate="pending">Completed</string>
-    <string name="screens_cloudtodo_status_not_completed" translate="pending">Not completed</string>
-    <string name="screens_cloudtodo_outcome_applied_local_title" translate="pending">Applied locally</string>
-    <string name="screens_cloudtodo_outcome_applied_local_body" translate="pending">Room-first write. The network sync is queued and retries on reconnect.</string>
-    <string name="screens_cloudtodo_outcome_applied_synced_title" translate="pending">Applied · synced</string>
-    <string name="screens_cloudtodo_outcome_applied_synced_body" translate="pending">The server confirmed the write.</string>
-    <string name="screens_cloudtodo_outcome_applied_queued_title" translate="pending">Applied · queued</string>
-    <string name="screens_cloudtodo_outcome_applied_queued_body" translate="pending">Written locally; the sync is queued and will retry when connectivity returns.</string>
-    <string name="screens_cloudtodo_outcome_blocked_title" translate="pending">Blocked</string>
-    <string name="screens_cloudtodo_outcome_blocked_offline" translate="pending">Offline — an online-required write refuses rather than writing locally. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_blocked_unauthenticated" translate="pending">Not authenticated for this operation. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_blocked_precondition" translate="pending">A server precondition failed before any write. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_conflicted_title" translate="pending">Conflict recorded</string>
-    <string name="screens_cloudtodo_outcome_conflicted_body" translate="pending">The server changed this record too. Its version was applied and yours was preserved — choose which one wins.</string>
-    <string name="screens_cloudtodo_outcome_failed_title" translate="pending">Failed</string>
-    <string name="screens_cloudtodo_outcome_failed_rolled_back" translate="pending">%1$s — the optimistic local write was rolled back.</string>
-    <string name="screens_cloudtodo_outcome_failed_kept" translate="pending">%1$s — local state kept.</string>
-    <string name="screens_cloudtodo_conflicts_title" translate="pending">Sync conflicts</string>
-    <string name="screens_cloudtodo_conflicts_empty_text" translate="pending">No unresolved conflicts.</string>
-    <string name="screens_cloudtodo_conflict_accept_server_text" translate="pending">Keep server version</string>
-    <string name="screens_cloudtodo_conflict_retry_local_text" translate="pending">Retry my version</string>
+    <string name="screens_cloudtodo_detail_title">클라우드 할 일</string>
+    <string name="screens_cloudtodo_detail_intro">createMutableStore + MutationGateway를 사용하는 유일한 화면입니다. 네트워크를 끄면 오프라인 분기를 확인할 수 있습니다.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">전환(낙관적)</string>
+    <string name="screens_cloudtodo_complete_online_text">완료(온라인 필요)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">충돌 해결</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">닫기</string>
+    <string name="screens_cloudtodo_status_completed">완료됨</string>
+    <string name="screens_cloudtodo_status_not_completed">완료되지 않음</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">로컬에 적용됨</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Room 우선 쓰기입니다. 네트워크 동기화는 대기열에 있으며 재연결 시 다시 시도합니다.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">적용됨 · 동기화됨</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">서버가 쓰기를 확인했습니다.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">적용됨 · 대기 중</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">로컬에 기록했습니다. 동기화는 대기열에 있으며 연결이 복구되면 다시 시도합니다.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">차단됨</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">오프라인 — 온라인이 필요한 쓰기는 로컬에 기록하지 않고 거부합니다. 아무것도 기록되지 않았습니다.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">이 작업에 대한 인증이 없습니다. 아무것도 기록되지 않았습니다.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">쓰기 전에 서버 사전 조건이 실패했습니다. 아무것도 기록되지 않았습니다.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">충돌이 기록됨</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">서버도 이 레코드를 변경했습니다. 서버 버전이 적용되고 사용자의 버전은 보존되었습니다 — 어느 쪽을 적용할지 선택하세요.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">실패</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — 낙관적 로컬 쓰기가 롤백되었습니다.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — 로컬 상태가 유지되었습니다.</string>
+    <string name="screens_cloudtodo_conflicts_title">동기화 충돌</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">해결되지 않은 충돌이 없습니다.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">서버 버전 유지</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">내 버전으로 다시 시도</string>
 </resources>

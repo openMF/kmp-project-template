@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: ar · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: ar · translated by /idea-locale
+     screenstate_* / error_category_* mirror core/store verbatim — same strings, same wording. -->
 <resources>
-    <string name="app_name" translate="pending">KPT Design</string>
-    <string name="home" translate="pending">Home</string>
-    <string name="profile" translate="pending">Profile</string>
-    <string name="settings" translate="pending">Settings</string>
-    <string name="not_connected" translate="pending">⚠️ You aren’t connected to the internet</string>
-    <string name="screenstate_empty_title" translate="pending">Nothing here yet</string>
-    <string name="screenstate_empty_message" translate="pending">When you have data, it'll show up here.</string>
-    <string name="screenstate_error_title" translate="pending">Something went wrong</string>
-    <string name="screenstate_error_retry" translate="pending">Try again</string>
-    <string name="screenstate_nonet_title" translate="pending">You're offline</string>
-    <string name="screenstate_nonet_message" translate="pending">We'll retry when you reconnect.</string>
-    <string name="screenstate_nonet_retry" translate="pending">Retry now</string>
-    <string name="screenstate_captive_title" translate="pending">Sign in to WiFi</string>
-    <string name="screenstate_captive_message" translate="pending">Your network needs you to sign in before connecting.</string>
-    <string name="screenstate_captive_action" translate="pending">Open sign-in page</string>
-    <string name="error_category_network" translate="pending">Can't reach the server. Check your connection.</string>
-    <string name="error_category_auth" translate="pending">Your session expired. Please sign in again.</string>
-    <string name="error_category_ratelimit" translate="pending">Too many requests. Please wait and try again.</string>
-    <string name="error_category_server" translate="pending">Our servers are having a moment. Try again in a bit.</string>
-    <string name="error_category_generic" translate="pending">Something went wrong</string>
+    <string name="app_name">KPT Design</string>
+    <string name="home">الرئيسية</string>
+    <string name="profile">الملف الشخصي</string>
+    <string name="settings">الإعدادات</string>
+    <string name="not_connected">⚠️ لست متصلاً بالإنترنت</string>
+    <string name="screenstate_empty_title">لا يوجد شيء هنا بعد</string>
+    <string name="screenstate_empty_message">عندما تتوفر بيانات، ستظهر هنا.</string>
+    <string name="screenstate_error_title">حدث خطأ ما</string>
+    <string name="screenstate_error_retry">أعد المحاولة</string>
+    <string name="screenstate_nonet_title">أنت غير متصل</string>
+    <string name="screenstate_nonet_message">سنعيد المحاولة عند إعادة الاتصال.</string>
+    <string name="screenstate_nonet_retry">أعد المحاولة الآن</string>
+    <string name="screenstate_captive_title">سجّل الدخول إلى Wi-Fi</string>
+    <string name="screenstate_captive_message">تتطلب شبكتك تسجيل الدخول قبل الاتصال.</string>
+    <string name="screenstate_captive_action">افتح صفحة تسجيل الدخول</string>
+    <string name="error_category_network">تعذّر الوصول إلى الخادم. تحقّق من اتصالك.</string>
+    <string name="error_category_auth">انتهت جلستك. يُرجى تسجيل الدخول مرة أخرى.</string>
+    <string name="error_category_ratelimit">طلبات كثيرة جدًا. يُرجى الانتظار ثم المحاولة.</string>
+    <string name="error_category_server">خوادمنا تواجه مشكلة مؤقتة. حاول بعد قليل.</string>
+    <string name="error_category_generic">حدث خطأ ما</string>
 </resources>

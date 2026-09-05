@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: ko · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: ko · translated by /idea-locale -->
 <resources>
-    <string name="screens_alerts_title" translate="pending">Price Alerts</string>
-    <string name="screens_alerts_back_cd" translate="pending">Back</string>
-    <string name="screens_alerts_create_cd" translate="pending">Create alert</string>
-    <string name="screens_alerts_delete_cd" translate="pending">Delete alert</string>
-    <string name="screens_alerts_row_above" translate="pending">Above</string>
-    <string name="screens_alerts_row_below" translate="pending">Below</string>
-    <string name="screens_alerts_row_supporting" translate="pending">%1$s %2$s</string>
-    <string name="screens_alerts_row_pct_change" translate="pending">% change</string>
-    <string name="screens_alert_create_title" translate="pending">New Price Alert</string>
-    <string name="screens_alert_create_back_cd" translate="pending">Back</string>
-    <string name="screens_alert_create_coin_label" translate="pending">Coin</string>
-    <string name="screens_alert_create_target_label" translate="pending">Target price</string>
-    <string name="screens_alert_create_dir_above" translate="pending">Above</string>
-    <string name="screens_alert_create_dir_below" translate="pending">Below</string>
-    <string name="screens_alert_create_submit" translate="pending">Create alert</string>
-    <string name="screens_alert_create_draft_resume_title" translate="pending">Resume your alert?</string>
-    <string name="screens_alert_create_draft_resume_message" translate="pending">You have an unsaved price alert. Resume editing it, discard it, or start a new one.</string>
-    <string name="screens_alert_create_draft_resume_resume" translate="pending">Resume editing</string>
-    <string name="screens_alert_create_draft_resume_discard" translate="pending">Discard draft</string>
-    <string name="screens_alert_create_draft_resume_start_fresh" translate="pending">Start fresh</string>
+    <string name="screens_alerts_title">가격 알림</string>
+    <string name="screens_alerts_back_cd">뒤로</string>
+    <string name="screens_alerts_create_cd">알림 만들기</string>
+    <string name="screens_alerts_delete_cd">알림 삭제</string>
+    <string name="screens_alerts_row_above">이상</string>
+    <string name="screens_alerts_row_below">이하</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% 변동</string>
+    <string name="screens_alert_create_title">새 가격 알림</string>
+    <string name="screens_alert_create_back_cd">뒤로</string>
+    <string name="screens_alert_create_coin_label">코인</string>
+    <string name="screens_alert_create_target_label">목표 가격</string>
+    <string name="screens_alert_create_dir_above">이상</string>
+    <string name="screens_alert_create_dir_below">이하</string>
+    <string name="screens_alert_create_submit">알림 만들기</string>
+    <string name="screens_alert_create_draft_resume_title">알림을 이어서 작성할까요?</string>
+    <string name="screens_alert_create_draft_resume_message">저장하지 않은 가격 알림이 있습니다. 편집을 이어가거나 삭제하거나 새로 만드세요.</string>
+    <string name="screens_alert_create_draft_resume_resume">편집 이어가기</string>
+    <string name="screens_alert_create_draft_resume_discard">임시 저장 삭제</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">새로 시작</string>
 </resources>

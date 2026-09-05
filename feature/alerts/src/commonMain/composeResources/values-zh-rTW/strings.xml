@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: zh-rTW · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: zh-rTW · translated by /idea-locale -->
 <resources>
-    <string name="screens_alerts_title" translate="pending">Price Alerts</string>
-    <string name="screens_alerts_back_cd" translate="pending">Back</string>
-    <string name="screens_alerts_create_cd" translate="pending">Create alert</string>
-    <string name="screens_alerts_delete_cd" translate="pending">Delete alert</string>
-    <string name="screens_alerts_row_above" translate="pending">Above</string>
-    <string name="screens_alerts_row_below" translate="pending">Below</string>
-    <string name="screens_alerts_row_supporting" translate="pending">%1$s %2$s</string>
-    <string name="screens_alerts_row_pct_change" translate="pending">% change</string>
-    <string name="screens_alert_create_title" translate="pending">New Price Alert</string>
-    <string name="screens_alert_create_back_cd" translate="pending">Back</string>
-    <string name="screens_alert_create_coin_label" translate="pending">Coin</string>
-    <string name="screens_alert_create_target_label" translate="pending">Target price</string>
-    <string name="screens_alert_create_dir_above" translate="pending">Above</string>
-    <string name="screens_alert_create_dir_below" translate="pending">Below</string>
-    <string name="screens_alert_create_submit" translate="pending">Create alert</string>
-    <string name="screens_alert_create_draft_resume_title" translate="pending">Resume your alert?</string>
-    <string name="screens_alert_create_draft_resume_message" translate="pending">You have an unsaved price alert. Resume editing it, discard it, or start a new one.</string>
-    <string name="screens_alert_create_draft_resume_resume" translate="pending">Resume editing</string>
-    <string name="screens_alert_create_draft_resume_discard" translate="pending">Discard draft</string>
-    <string name="screens_alert_create_draft_resume_start_fresh" translate="pending">Start fresh</string>
+    <string name="screens_alerts_title">價格提醒</string>
+    <string name="screens_alerts_back_cd">返回</string>
+    <string name="screens_alerts_create_cd">建立提醒</string>
+    <string name="screens_alerts_delete_cd">刪除提醒</string>
+    <string name="screens_alerts_row_above">高於</string>
+    <string name="screens_alerts_row_below">低於</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% 變動</string>
+    <string name="screens_alert_create_title">新增價格提醒</string>
+    <string name="screens_alert_create_back_cd">返回</string>
+    <string name="screens_alert_create_coin_label">幣種</string>
+    <string name="screens_alert_create_target_label">目標價格</string>
+    <string name="screens_alert_create_dir_above">高於</string>
+    <string name="screens_alert_create_dir_below">低於</string>
+    <string name="screens_alert_create_submit">建立提醒</string>
+    <string name="screens_alert_create_draft_resume_title">要恢復您的提醒嗎？</string>
+    <string name="screens_alert_create_draft_resume_message">您有一則未儲存的價格提醒。可以繼續編輯、捨棄，或建立新的。</string>
+    <string name="screens_alert_create_draft_resume_resume">繼續編輯</string>
+    <string name="screens_alert_create_draft_resume_discard">捨棄草稿</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">重新開始</string>
 </resources>

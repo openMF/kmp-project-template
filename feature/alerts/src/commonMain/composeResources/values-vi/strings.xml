@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: vi · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: vi · translated by /idea-locale -->
 <resources>
-    <string name="screens_alerts_title" translate="pending">Price Alerts</string>
-    <string name="screens_alerts_back_cd" translate="pending">Back</string>
-    <string name="screens_alerts_create_cd" translate="pending">Create alert</string>
-    <string name="screens_alerts_delete_cd" translate="pending">Delete alert</string>
-    <string name="screens_alerts_row_above" translate="pending">Above</string>
-    <string name="screens_alerts_row_below" translate="pending">Below</string>
-    <string name="screens_alerts_row_supporting" translate="pending">%1$s %2$s</string>
-    <string name="screens_alerts_row_pct_change" translate="pending">% change</string>
-    <string name="screens_alert_create_title" translate="pending">New Price Alert</string>
-    <string name="screens_alert_create_back_cd" translate="pending">Back</string>
-    <string name="screens_alert_create_coin_label" translate="pending">Coin</string>
-    <string name="screens_alert_create_target_label" translate="pending">Target price</string>
-    <string name="screens_alert_create_dir_above" translate="pending">Above</string>
-    <string name="screens_alert_create_dir_below" translate="pending">Below</string>
-    <string name="screens_alert_create_submit" translate="pending">Create alert</string>
-    <string name="screens_alert_create_draft_resume_title" translate="pending">Resume your alert?</string>
-    <string name="screens_alert_create_draft_resume_message" translate="pending">You have an unsaved price alert. Resume editing it, discard it, or start a new one.</string>
-    <string name="screens_alert_create_draft_resume_resume" translate="pending">Resume editing</string>
-    <string name="screens_alert_create_draft_resume_discard" translate="pending">Discard draft</string>
-    <string name="screens_alert_create_draft_resume_start_fresh" translate="pending">Start fresh</string>
+    <string name="screens_alerts_title">Cảnh báo giá</string>
+    <string name="screens_alerts_back_cd">Quay lại</string>
+    <string name="screens_alerts_create_cd">Tạo cảnh báo</string>
+    <string name="screens_alerts_delete_cd">Xóa cảnh báo</string>
+    <string name="screens_alerts_row_above">Trên</string>
+    <string name="screens_alerts_row_below">Dưới</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% thay đổi</string>
+    <string name="screens_alert_create_title">Cảnh báo giá mới</string>
+    <string name="screens_alert_create_back_cd">Quay lại</string>
+    <string name="screens_alert_create_coin_label">Đồng tiền</string>
+    <string name="screens_alert_create_target_label">Giá mục tiêu</string>
+    <string name="screens_alert_create_dir_above">Trên</string>
+    <string name="screens_alert_create_dir_below">Dưới</string>
+    <string name="screens_alert_create_submit">Tạo cảnh báo</string>
+    <string name="screens_alert_create_draft_resume_title">Tiếp tục cảnh báo của bạn?</string>
+    <string name="screens_alert_create_draft_resume_message">Bạn có một cảnh báo giá chưa lưu. Hãy tiếp tục chỉnh sửa, bỏ đi, hoặc tạo cái mới.</string>
+    <string name="screens_alert_create_draft_resume_resume">Tiếp tục chỉnh sửa</string>
+    <string name="screens_alert_create_draft_resume_discard">Bỏ bản nháp</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Bắt đầu lại</string>
 </resources>

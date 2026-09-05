@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: hi · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: hi · translated by /idea-locale
+     createMutableStore / MutationGateway are Kotlin API names — deliberately untranslated. -->
 <resources>
-    <string name="screens_cloudtodo_detail_title" translate="pending">Cloud Todo</string>
-    <string name="screens_cloudtodo_detail_intro" translate="pending">Drives the only createMutableStore + MutationGateway consumer. Turn the network off to see the offline arms.</string>
-    <string name="screens_cloudtodo_toggle_optimistic_text" translate="pending">Toggle (optimistic)</string>
-    <string name="screens_cloudtodo_complete_online_text" translate="pending">Complete (online-required)</string>
-    <string name="screens_cloudtodo_outcome_resolve_text" translate="pending">Resolve conflict</string>
-    <string name="screens_cloudtodo_outcome_dismiss_text" translate="pending">Dismiss</string>
-    <string name="screens_cloudtodo_status_completed" translate="pending">Completed</string>
-    <string name="screens_cloudtodo_status_not_completed" translate="pending">Not completed</string>
-    <string name="screens_cloudtodo_outcome_applied_local_title" translate="pending">Applied locally</string>
-    <string name="screens_cloudtodo_outcome_applied_local_body" translate="pending">Room-first write. The network sync is queued and retries on reconnect.</string>
-    <string name="screens_cloudtodo_outcome_applied_synced_title" translate="pending">Applied · synced</string>
-    <string name="screens_cloudtodo_outcome_applied_synced_body" translate="pending">The server confirmed the write.</string>
-    <string name="screens_cloudtodo_outcome_applied_queued_title" translate="pending">Applied · queued</string>
-    <string name="screens_cloudtodo_outcome_applied_queued_body" translate="pending">Written locally; the sync is queued and will retry when connectivity returns.</string>
-    <string name="screens_cloudtodo_outcome_blocked_title" translate="pending">Blocked</string>
-    <string name="screens_cloudtodo_outcome_blocked_offline" translate="pending">Offline — an online-required write refuses rather than writing locally. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_blocked_unauthenticated" translate="pending">Not authenticated for this operation. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_blocked_precondition" translate="pending">A server precondition failed before any write. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_conflicted_title" translate="pending">Conflict recorded</string>
-    <string name="screens_cloudtodo_outcome_conflicted_body" translate="pending">The server changed this record too. Its version was applied and yours was preserved — choose which one wins.</string>
-    <string name="screens_cloudtodo_outcome_failed_title" translate="pending">Failed</string>
-    <string name="screens_cloudtodo_outcome_failed_rolled_back" translate="pending">%1$s — the optimistic local write was rolled back.</string>
-    <string name="screens_cloudtodo_outcome_failed_kept" translate="pending">%1$s — local state kept.</string>
-    <string name="screens_cloudtodo_conflicts_title" translate="pending">Sync conflicts</string>
-    <string name="screens_cloudtodo_conflicts_empty_text" translate="pending">No unresolved conflicts.</string>
-    <string name="screens_cloudtodo_conflict_accept_server_text" translate="pending">Keep server version</string>
-    <string name="screens_cloudtodo_conflict_retry_local_text" translate="pending">Retry my version</string>
+    <string name="screens_cloudtodo_detail_title">क्लाउड टूडू</string>
+    <string name="screens_cloudtodo_detail_intro">यह createMutableStore + MutationGateway का एकमात्र उपभोक्ता है। ऑफ़लाइन शाखाएँ देखने के लिए नेटवर्क बंद करें।</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">टॉगल करें (आशावादी)</string>
+    <string name="screens_cloudtodo_complete_online_text">पूर्ण करें (ऑनलाइन आवश्यक)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">विरोध हल करें</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">खारिज करें</string>
+    <string name="screens_cloudtodo_status_completed">पूर्ण</string>
+    <string name="screens_cloudtodo_status_not_completed">अपूर्ण</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">स्थानीय रूप से लागू</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">पहले Room में लिखा गया। नेटवर्क सिंक कतार में है और दोबारा कनेक्ट होने पर पुनः प्रयास करेगा।</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">लागू · सिंक किया गया</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">सर्वर ने लेखन की पुष्टि की।</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">लागू · कतार में</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">स्थानीय रूप से लिखा गया; सिंक कतार में है और कनेक्टिविटी लौटने पर पुनः प्रयास करेगा।</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">अवरुद्ध</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">ऑफ़लाइन — ऑनलाइन-आवश्यक लेखन स्थानीय रूप से लिखने के बजाय अस्वीकार कर देता है। कुछ नहीं लिखा गया।</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">इस कार्रवाई के लिए प्रमाणीकरण नहीं है। कुछ नहीं लिखा गया।</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">किसी भी लेखन से पहले सर्वर की पूर्वशर्त विफल रही। कुछ नहीं लिखा गया।</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">विरोध दर्ज किया गया</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">सर्वर ने भी यह रिकॉर्ड बदला है। उसका संस्करण लागू हुआ और आपका सुरक्षित रखा गया — चुनें कि कौन-सा मान्य होगा।</string>
+    <string name="screens_cloudtodo_outcome_failed_title">विफल</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — आशावादी स्थानीय लेखन वापस ले लिया गया।</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — स्थानीय स्थिति बनी रही।</string>
+    <string name="screens_cloudtodo_conflicts_title">सिंक विरोध</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">कोई अनसुलझा विरोध नहीं।</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">सर्वर संस्करण रखें</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">मेरा संस्करण पुनः आज़माएँ</string>
 </resources>

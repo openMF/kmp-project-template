@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: zh-rTW · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: zh-rTW · translated by /idea-locale -->
 <resources>
-    <string name="screens_crypto_coin_markets_title" translate="pending">Coin Markets</string>
-    <string name="screens_crypto_coin_markets_back_cd" translate="pending">Back</string>
-    <string name="screens_crypto_coin_markets_empty" translate="pending">No coins to show yet.</string>
-    <string name="screens_crypto_coin_markets_error_retry" translate="pending">Retry</string>
-    <string name="screens_crypto_coin_markets_load_more_loading" translate="pending">Loading more…</string>
-    <string name="screens_crypto_coin_markets_load_more_end" translate="pending">You\'re all caught up</string>
-    <string name="screens_crypto_coin_markets_row_price_cd" translate="pending">Current price</string>
-    <string name="screens_crypto_coin_markets_row_change_cd" translate="pending">24 hour change</string>
-    <string name="screens_crypto_coin_detail_back_cd" translate="pending">Back</string>
-    <string name="screens_crypto_coin_detail_refresh_cd" translate="pending">Refresh</string>
-    <string name="screens_crypto_coin_detail_rank_label" translate="pending">Market cap rank</string>
-    <string name="screens_crypto_coin_detail_rank_value" translate="pending">#%1$d</string>
-    <string name="screens_crypto_coin_detail_market_cap_label" translate="pending">Market cap</string>
-    <string name="screens_crypto_coin_detail_high_label" translate="pending">24h high</string>
-    <string name="screens_crypto_coin_detail_low_label" translate="pending">24h low</string>
-    <string name="screens_crypto_coin_detail_circulating_label" translate="pending">Circulating supply</string>
-    <string name="screens_crypto_coin_detail_max_supply_label" translate="pending">Max supply</string>
-    <string name="screens_crypto_coin_detail_max_supply_unlimited" translate="pending">Unlimited</string>
-    <string name="screens_crypto_coin_detail_about_label" translate="pending">About</string>
+    <string name="screens_crypto_coin_markets_title">幣種行情</string>
+    <string name="screens_crypto_coin_markets_back_cd">返回</string>
+    <string name="screens_crypto_coin_markets_empty">尚無可顯示的幣種。</string>
+    <string name="screens_crypto_coin_markets_error_retry">重試</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">正在載入更多…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">已全部載入</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">目前價格</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">24 小時漲跌</string>
+    <string name="screens_crypto_coin_detail_back_cd">返回</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">重新整理</string>
+    <string name="screens_crypto_coin_detail_rank_label">市值排名</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">市值</string>
+    <string name="screens_crypto_coin_detail_high_label">24 小時最高</string>
+    <string name="screens_crypto_coin_detail_low_label">24 小時最低</string>
+    <string name="screens_crypto_coin_detail_circulating_label">流通量</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">最大供應量</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">無上限</string>
+    <string name="screens_crypto_coin_detail_about_label">關於</string>
 </resources>

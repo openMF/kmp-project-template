@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: pt-rBR · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: pt-rBR · translated by /idea-locale
+     createMutableStore / MutationGateway are Kotlin API names — deliberately untranslated. -->
 <resources>
-    <string name="screens_cloudtodo_detail_title" translate="pending">Cloud Todo</string>
-    <string name="screens_cloudtodo_detail_intro" translate="pending">Drives the only createMutableStore + MutationGateway consumer. Turn the network off to see the offline arms.</string>
-    <string name="screens_cloudtodo_toggle_optimistic_text" translate="pending">Toggle (optimistic)</string>
-    <string name="screens_cloudtodo_complete_online_text" translate="pending">Complete (online-required)</string>
-    <string name="screens_cloudtodo_outcome_resolve_text" translate="pending">Resolve conflict</string>
-    <string name="screens_cloudtodo_outcome_dismiss_text" translate="pending">Dismiss</string>
-    <string name="screens_cloudtodo_status_completed" translate="pending">Completed</string>
-    <string name="screens_cloudtodo_status_not_completed" translate="pending">Not completed</string>
-    <string name="screens_cloudtodo_outcome_applied_local_title" translate="pending">Applied locally</string>
-    <string name="screens_cloudtodo_outcome_applied_local_body" translate="pending">Room-first write. The network sync is queued and retries on reconnect.</string>
-    <string name="screens_cloudtodo_outcome_applied_synced_title" translate="pending">Applied · synced</string>
-    <string name="screens_cloudtodo_outcome_applied_synced_body" translate="pending">The server confirmed the write.</string>
-    <string name="screens_cloudtodo_outcome_applied_queued_title" translate="pending">Applied · queued</string>
-    <string name="screens_cloudtodo_outcome_applied_queued_body" translate="pending">Written locally; the sync is queued and will retry when connectivity returns.</string>
-    <string name="screens_cloudtodo_outcome_blocked_title" translate="pending">Blocked</string>
-    <string name="screens_cloudtodo_outcome_blocked_offline" translate="pending">Offline — an online-required write refuses rather than writing locally. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_blocked_unauthenticated" translate="pending">Not authenticated for this operation. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_blocked_precondition" translate="pending">A server precondition failed before any write. Nothing was written.</string>
-    <string name="screens_cloudtodo_outcome_conflicted_title" translate="pending">Conflict recorded</string>
-    <string name="screens_cloudtodo_outcome_conflicted_body" translate="pending">The server changed this record too. Its version was applied and yours was preserved — choose which one wins.</string>
-    <string name="screens_cloudtodo_outcome_failed_title" translate="pending">Failed</string>
-    <string name="screens_cloudtodo_outcome_failed_rolled_back" translate="pending">%1$s — the optimistic local write was rolled back.</string>
-    <string name="screens_cloudtodo_outcome_failed_kept" translate="pending">%1$s — local state kept.</string>
-    <string name="screens_cloudtodo_conflicts_title" translate="pending">Sync conflicts</string>
-    <string name="screens_cloudtodo_conflicts_empty_text" translate="pending">No unresolved conflicts.</string>
-    <string name="screens_cloudtodo_conflict_accept_server_text" translate="pending">Keep server version</string>
-    <string name="screens_cloudtodo_conflict_retry_local_text" translate="pending">Retry my version</string>
+    <string name="screens_cloudtodo_detail_title">Tarefa na nuvem</string>
+    <string name="screens_cloudtodo_detail_intro">É o único consumidor de createMutableStore + MutationGateway. Desligue a rede para ver os caminhos offline.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Alternar (otimista)</string>
+    <string name="screens_cloudtodo_complete_online_text">Concluir (exige conexão)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Resolver conflito</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Dispensar</string>
+    <string name="screens_cloudtodo_status_completed">Concluída</string>
+    <string name="screens_cloudtodo_status_not_completed">Não concluída</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">Aplicado localmente</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Gravação primeiro no Room. A sincronização fica na fila e tenta de novo ao reconectar.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Aplicado · sincronizado</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">O servidor confirmou a gravação.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Aplicado · na fila</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Gravado localmente; a sincronização está na fila e tentará de novo quando a conexão voltar.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Bloqueado</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Offline — uma gravação que exige conexão é recusada em vez de gravar localmente. Nada foi gravado.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">Sem autenticação para esta operação. Nada foi gravado.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">Uma pré-condição do servidor falhou antes de qualquer gravação. Nada foi gravado.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Conflito registrado</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">O servidor também alterou este registro. A versão dele foi aplicada e a sua foi preservada — escolha qual prevalece.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Falhou</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — a gravação local otimista foi revertida.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — o estado local foi mantido.</string>
+    <string name="screens_cloudtodo_conflicts_title">Conflitos de sincronização</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">Nenhum conflito pendente.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Manter versão do servidor</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Tentar minha versão</string>
 </resources>

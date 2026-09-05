@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: fr · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: fr · translated by /idea-locale -->
 <resources>
-    <string name="screens_alerts_title" translate="pending">Price Alerts</string>
-    <string name="screens_alerts_back_cd" translate="pending">Back</string>
-    <string name="screens_alerts_create_cd" translate="pending">Create alert</string>
-    <string name="screens_alerts_delete_cd" translate="pending">Delete alert</string>
-    <string name="screens_alerts_row_above" translate="pending">Above</string>
-    <string name="screens_alerts_row_below" translate="pending">Below</string>
-    <string name="screens_alerts_row_supporting" translate="pending">%1$s %2$s</string>
-    <string name="screens_alerts_row_pct_change" translate="pending">% change</string>
-    <string name="screens_alert_create_title" translate="pending">New Price Alert</string>
-    <string name="screens_alert_create_back_cd" translate="pending">Back</string>
-    <string name="screens_alert_create_coin_label" translate="pending">Coin</string>
-    <string name="screens_alert_create_target_label" translate="pending">Target price</string>
-    <string name="screens_alert_create_dir_above" translate="pending">Above</string>
-    <string name="screens_alert_create_dir_below" translate="pending">Below</string>
-    <string name="screens_alert_create_submit" translate="pending">Create alert</string>
-    <string name="screens_alert_create_draft_resume_title" translate="pending">Resume your alert?</string>
-    <string name="screens_alert_create_draft_resume_message" translate="pending">You have an unsaved price alert. Resume editing it, discard it, or start a new one.</string>
-    <string name="screens_alert_create_draft_resume_resume" translate="pending">Resume editing</string>
-    <string name="screens_alert_create_draft_resume_discard" translate="pending">Discard draft</string>
-    <string name="screens_alert_create_draft_resume_start_fresh" translate="pending">Start fresh</string>
+    <string name="screens_alerts_title">Alertes de prix</string>
+    <string name="screens_alerts_back_cd">Retour</string>
+    <string name="screens_alerts_create_cd">Créer une alerte</string>
+    <string name="screens_alerts_delete_cd">Supprimer l\'alerte</string>
+    <string name="screens_alerts_row_above">Au-dessus</string>
+    <string name="screens_alerts_row_below">En dessous</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% de variation</string>
+    <string name="screens_alert_create_title">Nouvelle alerte de prix</string>
+    <string name="screens_alert_create_back_cd">Retour</string>
+    <string name="screens_alert_create_coin_label">Crypto</string>
+    <string name="screens_alert_create_target_label">Prix cible</string>
+    <string name="screens_alert_create_dir_above">Au-dessus</string>
+    <string name="screens_alert_create_dir_below">En dessous</string>
+    <string name="screens_alert_create_submit">Créer une alerte</string>
+    <string name="screens_alert_create_draft_resume_title">Reprendre votre alerte ?</string>
+    <string name="screens_alert_create_draft_resume_message">Vous avez une alerte de prix non enregistrée. Reprenez la modification, supprimez-la ou créez-en une nouvelle.</string>
+    <string name="screens_alert_create_draft_resume_resume">Reprendre la modification</string>
+    <string name="screens_alert_create_draft_resume_discard">Supprimer le brouillon</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Recommencer</string>
 </resources>

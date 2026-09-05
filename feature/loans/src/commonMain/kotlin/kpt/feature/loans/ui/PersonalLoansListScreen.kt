@@ -177,7 +177,7 @@ fun PersonalLoansListScreen(
 }
 
 @Composable
-private fun SummaryHero(ui: LoansListUiState) {
+internal fun SummaryHero(ui: LoansListUiState) {
     HeroCard {
         Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.md)) {
             AmountDisplay(

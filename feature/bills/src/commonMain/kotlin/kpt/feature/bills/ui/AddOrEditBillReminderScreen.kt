@@ -213,7 +213,7 @@ fun AddOrEditBillReminderScreen(
 }
 
 @Composable
-private fun SubmitStatusLine(
+internal fun SubmitStatusLine(
     submit: SubmitState<*>,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
@@ -271,7 +271,7 @@ private fun SubmitStatusLine(
 }
 
 @Composable
-private fun BasicInfoSection(
+internal fun BasicInfoSection(
     form: BillReminderFormState,
     isSubmitting: Boolean,
     onNameChange: (String) -> Unit,
@@ -315,7 +315,7 @@ private fun BasicInfoSection(
 }
 
 @Composable
-private fun RecurrenceSection(selected: Recurrence, isSubmitting: Boolean, onChange: (Recurrence) -> Unit) {
+internal fun RecurrenceSection(selected: Recurrence, isSubmitting: Boolean, onChange: (Recurrence) -> Unit) {
     val sp = MaterialTheme.spacing
     AppCard {
         Column(
@@ -354,7 +354,7 @@ private fun RecurrenceSection(selected: Recurrence, isSubmitting: Boolean, onCha
 
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun CategorySection(selected: BillCategory, isSubmitting: Boolean, onChange: (BillCategory) -> Unit) {
+internal fun CategorySection(selected: BillCategory, isSubmitting: Boolean, onChange: (BillCategory) -> Unit) {
     val sp = MaterialTheme.spacing
     AppCard {
         Column(
@@ -391,7 +391,7 @@ private fun CategorySection(selected: BillCategory, isSubmitting: Boolean, onCha
 }
 
 @Composable
-private fun ReminderSettingsSection(
+internal fun ReminderSettingsSection(
     reminderDaysBefore: Int,
     enabled: Boolean,
     isSubmitting: Boolean,

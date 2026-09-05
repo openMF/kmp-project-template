@@ -132,7 +132,7 @@ fun CloudTodoScreen(
 }
 
 @Composable
-private fun TodoActions(
+internal fun TodoActions(
     todo: CloudTodo,
     onToggleOptimistic: (CloudTodo) -> Unit,
     onCompleteOnline: (CloudTodo) -> Unit,
@@ -177,7 +177,7 @@ private fun TodoActions(
 }
 
 @Composable
-private fun OutcomeCard(
+internal fun OutcomeCard(
     outcome: MutationOutcome,
     onDismiss: () -> Unit,
     onResolveConflict: () -> Unit,

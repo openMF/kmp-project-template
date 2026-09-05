@@ -152,7 +152,7 @@ internal fun LanguageCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SettingsRowCard(
+internal fun SettingsRowCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     contentDescription: String,

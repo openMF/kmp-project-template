@@ -105,7 +105,7 @@ fun CountryPickerScreen(
 }
 
 @Composable
-private fun CountryRow(country: Country, onClick: () -> Unit) {
+internal fun CountryRow(country: Country, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

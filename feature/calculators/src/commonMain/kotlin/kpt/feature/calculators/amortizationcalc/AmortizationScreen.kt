@@ -182,7 +182,7 @@ fun AmortizationScreen(
 }
 
 @Composable
-private fun AmortizationHeader() {
+internal fun AmortizationHeader() {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -207,7 +207,7 @@ private fun AmortizationHeader() {
 }
 
 @Composable
-private fun AmortizationRowItem(row: AmortizationRow) {
+internal fun AmortizationRowItem(row: AmortizationRow) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,

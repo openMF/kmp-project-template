@@ -37,6 +37,16 @@ class CMPFeatureConventionPlugin : Plugin<Project> {
             val composeVersion = libs.findVersion("compose-plugin").get().requiredVersion
 
             dependencies {
+                // The @Preview annotation itself, in commonMain. This is what makes the device-free
+                // render tier automatic per the block above: a feature declares `@Preview` siblings
+                // and CommonComposablePreviewScanner picks them up with zero per-module wiring.
+                // MUST be the org.jetbrains artifact — the androidx `ui-tooling-preview` annotation
+                // is Android-only and is rejected by G-COMPOSE-PREVIEW (CP-3).
+                add(
+                    "commonMainImplementation",
+                    "org.jetbrains.compose.components:components-ui-tooling-preview:$composeVersion",
+                )
+
                 add("commonTestImplementation", "org.jetbrains.compose.ui:ui-test:$composeVersion")
                 add(
                     "desktopTestImplementation",

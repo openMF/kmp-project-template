@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: es · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: es · translated by /idea-locale -->
 <resources>
-    <string name="screens_bills_add_title" translate="pending">New bill reminder</string>
-    <string name="screens_bills_edit_title" translate="pending">Edit bill reminder</string>
-    <string name="screens_bills_addedit_back_cd" translate="pending">Back</string>
-    <string name="screens_bills_addedit_save_button" translate="pending">Save</string>
-    <string name="screens_bills_addedit_status_saving" translate="pending">Saving…</string>
-    <string name="screens_bills_addedit_status_saved" translate="pending">Saved ✓</string>
-    <string name="screens_bills_addedit_status_add_another" translate="pending">Add another</string>
-    <string name="screens_bills_addedit_status_offline" translate="pending">Saved offline — will sync when online.</string>
-    <string name="screens_bills_addedit_status_failed" translate="pending">Save failed: %1$s</string>
-    <string name="screens_bills_addedit_status_failed_unknown" translate="pending">unknown error</string>
-    <string name="screens_bills_addedit_retry_button" translate="pending">Retry</string>
-    <string name="screens_bills_addedit_dismiss_button" translate="pending">Dismiss</string>
-    <string name="screens_bills_addedit_name_label" translate="pending">Name (e.g. Electricity)</string>
-    <string name="screens_bills_addedit_amount_label" translate="pending">Amount</string>
-    <string name="screens_bills_addedit_due_day_label" translate="pending">Due day of month (1-31)</string>
-    <string name="screens_bills_addedit_recurrence_title" translate="pending">Recurrence</string>
-    <string name="screens_bills_addedit_category_title" translate="pending">Category</string>
-    <string name="screens_bills_addedit_remind_days_before_label" translate="pending">Remind days before</string>
-    <string name="screens_bills_addedit_enabled_label" translate="pending">Enabled</string>
-    <string name="screens_bills_draft_resume_title" translate="pending">Resume your draft?</string>
-    <string name="screens_bills_draft_resume_message" translate="pending">You have an unsaved bill reminder. Resume where you left off, discard it, or start a new one.</string>
-    <string name="screens_bills_draft_resume_resume" translate="pending">Resume</string>
-    <string name="screens_bills_draft_resume_discard" translate="pending">Discard draft</string>
-    <string name="screens_bills_draft_resume_start_fresh" translate="pending">Start fresh</string>
-    <string name="screens_bills_list_title" translate="pending">Bill Reminders</string>
-    <string name="screens_bills_list_back_cd" translate="pending">Back</string>
-    <string name="screens_bills_list_new_fab_text" translate="pending">New bill</string>
-    <string name="screens_bills_list_summary_label" translate="pending">Upcoming this month</string>
-    <string name="screens_bills_list_summary_due_single" translate="pending">%1$d bill due in next 7 days</string>
-    <string name="screens_bills_list_summary_due_plural" translate="pending">%1$d bills due in next 7 days</string>
-    <string name="screens_bills_list_mark_paid_cd" translate="pending">Mark paid</string>
-    <string name="screens_bills_list_paid_button" translate="pending">Paid</string>
-    <string name="screens_bills_list_reminders_disabled" translate="pending">Reminders disabled</string>
+    <string name="screens_bills_add_title">Nuevo recordatorio de factura</string>
+    <string name="screens_bills_edit_title">Editar recordatorio</string>
+    <string name="screens_bills_addedit_back_cd">Atrás</string>
+    <string name="screens_bills_addedit_save_button">Guardar</string>
+    <string name="screens_bills_addedit_status_saving">Guardando…</string>
+    <string name="screens_bills_addedit_status_saved">Guardado ✓</string>
+    <string name="screens_bills_addedit_status_add_another">Añadir otro</string>
+    <string name="screens_bills_addedit_status_offline">Guardado sin conexión: se sincronizará al reconectar.</string>
+    <string name="screens_bills_addedit_status_failed">Error al guardar: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">error desconocido</string>
+    <string name="screens_bills_addedit_retry_button">Reintentar</string>
+    <string name="screens_bills_addedit_dismiss_button">Descartar</string>
+    <string name="screens_bills_addedit_name_label">Nombre (p. ej. Electricidad)</string>
+    <string name="screens_bills_addedit_amount_label">Importe</string>
+    <string name="screens_bills_addedit_due_day_label">Día de vencimiento (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">Periodicidad</string>
+    <string name="screens_bills_addedit_category_title">Categoría</string>
+    <string name="screens_bills_addedit_remind_days_before_label">Avisar días antes</string>
+    <string name="screens_bills_addedit_enabled_label">Activado</string>
+    <string name="screens_bills_draft_resume_title">¿Reanudar tu borrador?</string>
+    <string name="screens_bills_draft_resume_message">Tienes un recordatorio de factura sin guardar. Continúa donde lo dejaste, descártalo o crea uno nuevo.</string>
+    <string name="screens_bills_draft_resume_resume">Reanudar</string>
+    <string name="screens_bills_draft_resume_discard">Descartar borrador</string>
+    <string name="screens_bills_draft_resume_start_fresh">Empezar de nuevo</string>
+    <string name="screens_bills_list_title">Recordatorios de facturas</string>
+    <string name="screens_bills_list_back_cd">Atrás</string>
+    <string name="screens_bills_list_new_fab_text">Nueva factura</string>
+    <string name="screens_bills_list_summary_label">Próximas este mes</string>
+    <string name="screens_bills_list_summary_due_single">%1$d factura vence en los próximos 7 días</string>
+    <string name="screens_bills_list_summary_due_plural">%1$d facturas vencen en los próximos 7 días</string>
+    <string name="screens_bills_list_mark_paid_cd">Marcar como pagada</string>
+    <string name="screens_bills_list_paid_button">Pagada</string>
+    <string name="screens_bills_list_reminders_disabled">Recordatorios desactivados</string>
 </resources>

@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: ja · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: ja · translated by /idea-locale -->
 <resources>
-    <string name="screens_bills_add_title" translate="pending">New bill reminder</string>
-    <string name="screens_bills_edit_title" translate="pending">Edit bill reminder</string>
-    <string name="screens_bills_addedit_back_cd" translate="pending">Back</string>
-    <string name="screens_bills_addedit_save_button" translate="pending">Save</string>
-    <string name="screens_bills_addedit_status_saving" translate="pending">Saving…</string>
-    <string name="screens_bills_addedit_status_saved" translate="pending">Saved ✓</string>
-    <string name="screens_bills_addedit_status_add_another" translate="pending">Add another</string>
-    <string name="screens_bills_addedit_status_offline" translate="pending">Saved offline — will sync when online.</string>
-    <string name="screens_bills_addedit_status_failed" translate="pending">Save failed: %1$s</string>
-    <string name="screens_bills_addedit_status_failed_unknown" translate="pending">unknown error</string>
-    <string name="screens_bills_addedit_retry_button" translate="pending">Retry</string>
-    <string name="screens_bills_addedit_dismiss_button" translate="pending">Dismiss</string>
-    <string name="screens_bills_addedit_name_label" translate="pending">Name (e.g. Electricity)</string>
-    <string name="screens_bills_addedit_amount_label" translate="pending">Amount</string>
-    <string name="screens_bills_addedit_due_day_label" translate="pending">Due day of month (1-31)</string>
-    <string name="screens_bills_addedit_recurrence_title" translate="pending">Recurrence</string>
-    <string name="screens_bills_addedit_category_title" translate="pending">Category</string>
-    <string name="screens_bills_addedit_remind_days_before_label" translate="pending">Remind days before</string>
-    <string name="screens_bills_addedit_enabled_label" translate="pending">Enabled</string>
-    <string name="screens_bills_draft_resume_title" translate="pending">Resume your draft?</string>
-    <string name="screens_bills_draft_resume_message" translate="pending">You have an unsaved bill reminder. Resume where you left off, discard it, or start a new one.</string>
-    <string name="screens_bills_draft_resume_resume" translate="pending">Resume</string>
-    <string name="screens_bills_draft_resume_discard" translate="pending">Discard draft</string>
-    <string name="screens_bills_draft_resume_start_fresh" translate="pending">Start fresh</string>
-    <string name="screens_bills_list_title" translate="pending">Bill Reminders</string>
-    <string name="screens_bills_list_back_cd" translate="pending">Back</string>
-    <string name="screens_bills_list_new_fab_text" translate="pending">New bill</string>
-    <string name="screens_bills_list_summary_label" translate="pending">Upcoming this month</string>
-    <string name="screens_bills_list_summary_due_single" translate="pending">%1$d bill due in next 7 days</string>
-    <string name="screens_bills_list_summary_due_plural" translate="pending">%1$d bills due in next 7 days</string>
-    <string name="screens_bills_list_mark_paid_cd" translate="pending">Mark paid</string>
-    <string name="screens_bills_list_paid_button" translate="pending">Paid</string>
-    <string name="screens_bills_list_reminders_disabled" translate="pending">Reminders disabled</string>
+    <string name="screens_bills_add_title">新しい請求リマインダー</string>
+    <string name="screens_bills_edit_title">請求リマインダーを編集</string>
+    <string name="screens_bills_addedit_back_cd">戻る</string>
+    <string name="screens_bills_addedit_save_button">保存</string>
+    <string name="screens_bills_addedit_status_saving">保存中…</string>
+    <string name="screens_bills_addedit_status_saved">保存しました ✓</string>
+    <string name="screens_bills_addedit_status_add_another">続けて追加</string>
+    <string name="screens_bills_addedit_status_offline">オフラインで保存しました — オンラインになると同期します。</string>
+    <string name="screens_bills_addedit_status_failed">保存に失敗しました: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">不明なエラー</string>
+    <string name="screens_bills_addedit_retry_button">再試行</string>
+    <string name="screens_bills_addedit_dismiss_button">閉じる</string>
+    <string name="screens_bills_addedit_name_label">名称（例: 電気代）</string>
+    <string name="screens_bills_addedit_amount_label">金額</string>
+    <string name="screens_bills_addedit_due_day_label">毎月の支払日（1〜31）</string>
+    <string name="screens_bills_addedit_recurrence_title">繰り返し</string>
+    <string name="screens_bills_addedit_category_title">カテゴリ</string>
+    <string name="screens_bills_addedit_remind_days_before_label">何日前に通知するか</string>
+    <string name="screens_bills_addedit_enabled_label">有効</string>
+    <string name="screens_bills_draft_resume_title">下書きを再開しますか？</string>
+    <string name="screens_bills_draft_resume_message">保存されていない請求リマインダーがあります。続きから再開するか、破棄するか、新規作成してください。</string>
+    <string name="screens_bills_draft_resume_resume">再開</string>
+    <string name="screens_bills_draft_resume_discard">下書きを破棄</string>
+    <string name="screens_bills_draft_resume_start_fresh">新規作成</string>
+    <string name="screens_bills_list_title">請求リマインダー</string>
+    <string name="screens_bills_list_back_cd">戻る</string>
+    <string name="screens_bills_list_new_fab_text">新しい請求</string>
+    <string name="screens_bills_list_summary_label">今月の予定</string>
+    <string name="screens_bills_list_summary_due_single">今後7日間に %1$d 件の支払期日</string>
+    <string name="screens_bills_list_summary_due_plural">今後7日間に %1$d 件の支払期日</string>
+    <string name="screens_bills_list_mark_paid_cd">支払済みにする</string>
+    <string name="screens_bills_list_paid_button">支払済み</string>
+    <string name="screens_bills_list_reminders_disabled">リマインダー無効</string>
 </resources>

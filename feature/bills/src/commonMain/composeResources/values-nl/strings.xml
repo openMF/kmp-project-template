@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- locale: nl · seeded by /idea-locale · values carry SOURCE text until translated -->
+<!-- locale: nl · translated by /idea-locale -->
 <resources>
-    <string name="screens_bills_add_title" translate="pending">New bill reminder</string>
-    <string name="screens_bills_edit_title" translate="pending">Edit bill reminder</string>
-    <string name="screens_bills_addedit_back_cd" translate="pending">Back</string>
-    <string name="screens_bills_addedit_save_button" translate="pending">Save</string>
-    <string name="screens_bills_addedit_status_saving" translate="pending">Saving…</string>
-    <string name="screens_bills_addedit_status_saved" translate="pending">Saved ✓</string>
-    <string name="screens_bills_addedit_status_add_another" translate="pending">Add another</string>
-    <string name="screens_bills_addedit_status_offline" translate="pending">Saved offline — will sync when online.</string>
-    <string name="screens_bills_addedit_status_failed" translate="pending">Save failed: %1$s</string>
-    <string name="screens_bills_addedit_status_failed_unknown" translate="pending">unknown error</string>
-    <string name="screens_bills_addedit_retry_button" translate="pending">Retry</string>
-    <string name="screens_bills_addedit_dismiss_button" translate="pending">Dismiss</string>
-    <string name="screens_bills_addedit_name_label" translate="pending">Name (e.g. Electricity)</string>
-    <string name="screens_bills_addedit_amount_label" translate="pending">Amount</string>
-    <string name="screens_bills_addedit_due_day_label" translate="pending">Due day of month (1-31)</string>
-    <string name="screens_bills_addedit_recurrence_title" translate="pending">Recurrence</string>
-    <string name="screens_bills_addedit_category_title" translate="pending">Category</string>
-    <string name="screens_bills_addedit_remind_days_before_label" translate="pending">Remind days before</string>
-    <string name="screens_bills_addedit_enabled_label" translate="pending">Enabled</string>
-    <string name="screens_bills_draft_resume_title" translate="pending">Resume your draft?</string>
-    <string name="screens_bills_draft_resume_message" translate="pending">You have an unsaved bill reminder. Resume where you left off, discard it, or start a new one.</string>
-    <string name="screens_bills_draft_resume_resume" translate="pending">Resume</string>
-    <string name="screens_bills_draft_resume_discard" translate="pending">Discard draft</string>
-    <string name="screens_bills_draft_resume_start_fresh" translate="pending">Start fresh</string>
-    <string name="screens_bills_list_title" translate="pending">Bill Reminders</string>
-    <string name="screens_bills_list_back_cd" translate="pending">Back</string>
-    <string name="screens_bills_list_new_fab_text" translate="pending">New bill</string>
-    <string name="screens_bills_list_summary_label" translate="pending">Upcoming this month</string>
-    <string name="screens_bills_list_summary_due_single" translate="pending">%1$d bill due in next 7 days</string>
-    <string name="screens_bills_list_summary_due_plural" translate="pending">%1$d bills due in next 7 days</string>
-    <string name="screens_bills_list_mark_paid_cd" translate="pending">Mark paid</string>
-    <string name="screens_bills_list_paid_button" translate="pending">Paid</string>
-    <string name="screens_bills_list_reminders_disabled" translate="pending">Reminders disabled</string>
+    <string name="screens_bills_add_title">Nieuwe rekeningherinnering</string>
+    <string name="screens_bills_edit_title">Rekeningherinnering bewerken</string>
+    <string name="screens_bills_addedit_back_cd">Terug</string>
+    <string name="screens_bills_addedit_save_button">Opslaan</string>
+    <string name="screens_bills_addedit_status_saving">Opslaan…</string>
+    <string name="screens_bills_addedit_status_saved">Opgeslagen ✓</string>
+    <string name="screens_bills_addedit_status_add_another">Nog een toevoegen</string>
+    <string name="screens_bills_addedit_status_offline">Offline opgeslagen — wordt gesynchroniseerd zodra je online bent.</string>
+    <string name="screens_bills_addedit_status_failed">Opslaan mislukt: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">onbekende fout</string>
+    <string name="screens_bills_addedit_retry_button">Opnieuw</string>
+    <string name="screens_bills_addedit_dismiss_button">Sluiten</string>
+    <string name="screens_bills_addedit_name_label">Naam (bijv. Elektriciteit)</string>
+    <string name="screens_bills_addedit_amount_label">Bedrag</string>
+    <string name="screens_bills_addedit_due_day_label">Vervaldag van de maand (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">Herhaling</string>
+    <string name="screens_bills_addedit_category_title">Categorie</string>
+    <string name="screens_bills_addedit_remind_days_before_label">Dagen vooraf herinneren</string>
+    <string name="screens_bills_addedit_enabled_label">Ingeschakeld</string>
+    <string name="screens_bills_draft_resume_title">Concept hervatten?</string>
+    <string name="screens_bills_draft_resume_message">Je hebt een niet-opgeslagen rekeningherinnering. Ga verder waar je gebleven was, verwijder hem of maak een nieuwe.</string>
+    <string name="screens_bills_draft_resume_resume">Hervatten</string>
+    <string name="screens_bills_draft_resume_discard">Concept verwijderen</string>
+    <string name="screens_bills_draft_resume_start_fresh">Opnieuw beginnen</string>
+    <string name="screens_bills_list_title">Rekeningherinneringen</string>
+    <string name="screens_bills_list_back_cd">Terug</string>
+    <string name="screens_bills_list_new_fab_text">Nieuwe rekening</string>
+    <string name="screens_bills_list_summary_label">Deze maand te betalen</string>
+    <string name="screens_bills_list_summary_due_single">Over 7 dagen vervalt %1$d rekening</string>
+    <string name="screens_bills_list_summary_due_plural">Over 7 dagen vervallen %1$d rekeningen</string>
+    <string name="screens_bills_list_mark_paid_cd">Markeren als betaald</string>
+    <string name="screens_bills_list_paid_button">Betaald</string>
+    <string name="screens_bills_list_reminders_disabled">Herinneringen uitgeschakeld</string>
 </resources>

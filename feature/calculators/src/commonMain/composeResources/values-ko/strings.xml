@@ -1,65 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- locale: ko · seeded by /idea-locale · values carry SOURCE text until translated -->
 <resources>
-    <string name="screens_calc_affordability_title" translate="pending">Affordability</string>
-    <string name="screens_calc_affordability_back_cd" translate="pending">Back</string>
-    <string name="screens_calc_affordability_income_label" translate="pending">Monthly Income</string>
-    <string name="screens_calc_affordability_obligations_label" translate="pending">Existing Monthly Debt</string>
-    <string name="screens_calc_affordability_dti_label" translate="pending">DTI Ceiling (%)</string>
-    <string name="screens_calc_affordability_rate_label" translate="pending">Annual Rate (%)</string>
-    <string name="screens_calc_affordability_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_calc_affordability_max_principal_label" translate="pending">Max loan principal</string>
-    <string name="screens_calc_affordability_max_emi_label" translate="pending">Max EMI</string>
-    <string name="screens_calc_amortization_title" translate="pending">Amortization</string>
-    <string name="screens_calc_amortization_title_with_source" translate="pending">Amortization · %1$s</string>
-    <string name="screens_calc_amortization_back_cd" translate="pending">Back</string>
-    <string name="screens_calc_amortization_principal_label" translate="pending">Principal</string>
-    <string name="screens_calc_amortization_rate_label" translate="pending">Annual Rate (%)</string>
-    <string name="screens_calc_amortization_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_calc_amortization_emi_label" translate="pending">Monthly EMI</string>
-    <string name="screens_calc_amortization_interest_total_supporting" translate="pending">Interest %1$s · Total %2$s</string>
-    <string name="screens_calc_amortization_header_month" translate="pending">#</string>
-    <string name="screens_calc_amortization_header_principal" translate="pending">Principal</string>
-    <string name="screens_calc_amortization_header_interest" translate="pending">Interest</string>
-    <string name="screens_calc_amortization_header_balance" translate="pending">Balance</string>
-    <string name="screens_calc_compare_title" translate="pending">Compare Loans</string>
-    <string name="screens_calc_compare_back_cd" translate="pending">Back</string>
-    <string name="screens_calc_compare_best_emi_label" translate="pending">Best EMI · Scenario %1$d</string>
-    <string name="screens_calc_compare_best_emi_value" translate="pending">%1$s/mo</string>
-    <string name="screens_calc_compare_savings_text" translate="pending">Saves %1$s total vs. costliest</string>
-    <string name="screens_calc_compare_helper_text" translate="pending">Edit any scenario below to see the comparison update live.</string>
-    <string name="screens_calc_compare_scenario_label" translate="pending">Scenario %1$d</string>
-    <string name="screens_calc_compare_best_badge" translate="pending">Best</string>
-    <string name="screens_calc_compare_principal_label" translate="pending">Principal</string>
-    <string name="screens_calc_compare_rate_label" translate="pending">Rate (%)</string>
-    <string name="screens_calc_compare_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_calc_compare_result_emi" translate="pending">EMI</string>
-    <string name="screens_calc_compare_result_interest" translate="pending">Interest</string>
-    <string name="screens_calc_compare_result_total" translate="pending">Total</string>
-    <string name="screens_calc_wizard_resume_title" translate="pending">Resume unfinished wizard?</string>
-    <string name="screens_calc_wizard_resume_message" translate="pending">You have an in-progress loan-calc wizard at step %1$d. Continue where you left off, or discard?</string>
-    <string name="screens_calc_wizard_resume_continue" translate="pending">Continue</string>
-    <string name="screens_calc_wizard_resume_discard" translate="pending">Discard</string>
-    <string name="screens_calc_wizard_title" translate="pending">New Loan · Step %1$d/%2$d</string>
-    <string name="screens_calc_wizard_back_cd" translate="pending">Back</string>
-    <string name="screens_calc_wizard_step_principal_question" translate="pending">How much do you want to borrow?</string>
-    <string name="screens_calc_wizard_step_principal_label" translate="pending">Principal Amount</string>
-    <string name="screens_calc_wizard_step_tenure_question" translate="pending">Over how many months?</string>
-    <string name="screens_calc_wizard_step_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_calc_wizard_step_rate_question" translate="pending">At what annual rate?</string>
-    <string name="screens_calc_wizard_step_rate_label" translate="pending">Annual Rate (%)</string>
-    <string name="screens_calc_wizard_step_review_emi_label" translate="pending">Monthly EMI</string>
-    <string name="screens_calc_wizard_step_review_total_supporting" translate="pending">Total payable: %1$s</string>
-    <string name="screens_calc_wizard_step_review_principal_label" translate="pending">Principal</string>
-    <string name="screens_calc_wizard_step_review_tenure_label" translate="pending">Tenure</string>
-    <string name="screens_calc_wizard_step_review_tenure_value" translate="pending">%1$d months</string>
-    <string name="screens_calc_wizard_step_review_rate_label" translate="pending">Rate</string>
-    <string name="screens_calc_wizard_step_review_rate_value" translate="pending">%1$s%%</string>
-    <string name="screens_calc_wizard_step_review_total_interest_label" translate="pending">Total interest</string>
-    <string name="screens_calc_wizard_step_name_message" translate="pending">Name this scenario so you can find it again in your loans.</string>
-    <string name="screens_calc_wizard_step_name_label" translate="pending">Scenario Name</string>
-    <string name="screens_calc_wizard_step_name_required" translate="pending">Required — type a name to enable Save.</string>
-    <string name="screens_calc_wizard_button_back" translate="pending">Back</string>
-    <string name="screens_calc_wizard_button_next" translate="pending">Next</string>
-    <string name="screens_calc_wizard_button_save" translate="pending">Save as Loan</string>
+    <string name="screens_calc_affordability_title">대출 여력</string>
+    <string name="screens_calc_affordability_back_cd">뒤로</string>
+    <string name="screens_calc_affordability_income_label">월 소득</string>
+    <string name="screens_calc_affordability_obligations_label">기존 월 부채</string>
+    <string name="screens_calc_affordability_dti_label">DTI 상한 (%)</string>
+    <string name="screens_calc_affordability_rate_label">연이율 (%)</string>
+    <string name="screens_calc_affordability_tenure_label">기간(개월)</string>
+    <string name="screens_calc_affordability_max_principal_label">최대 대출 원금</string>
+    <string name="screens_calc_affordability_max_emi_label">최대 월 상환금</string>
+    <string name="screens_calc_amortization_title">상환 계획</string>
+    <string name="screens_calc_amortization_title_with_source">상환 계획 · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">뒤로</string>
+    <string name="screens_calc_amortization_principal_label">원금</string>
+    <string name="screens_calc_amortization_rate_label">연이율 (%)</string>
+    <string name="screens_calc_amortization_tenure_label">기간(개월)</string>
+    <string name="screens_calc_amortization_emi_label">월 상환금</string>
+    <string name="screens_calc_amortization_interest_total_supporting">이자 %1$s · 합계 %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">원금</string>
+    <string name="screens_calc_amortization_header_interest">이자</string>
+    <string name="screens_calc_amortization_header_balance">잔액</string>
+    <string name="screens_calc_compare_title">대출 비교</string>
+    <string name="screens_calc_compare_back_cd">뒤로</string>
+    <string name="screens_calc_compare_best_emi_label">최적 상환금 · 시나리오 %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/월</string>
+    <string name="screens_calc_compare_savings_text">가장 비싼 안보다 총 %1$s 절약</string>
+    <string name="screens_calc_compare_helper_text">아래 시나리오를 편집하면 비교가 실시간으로 갱신됩니다.</string>
+    <string name="screens_calc_compare_scenario_label">시나리오 %1$d</string>
+    <string name="screens_calc_compare_best_badge">최적</string>
+    <string name="screens_calc_compare_principal_label">원금</string>
+    <string name="screens_calc_compare_rate_label">이율 (%)</string>
+    <string name="screens_calc_compare_tenure_label">기간(개월)</string>
+    <string name="screens_calc_compare_result_emi">상환금</string>
+    <string name="screens_calc_compare_result_interest">이자</string>
+    <string name="screens_calc_compare_result_total">합계</string>
+    <string name="screens_calc_wizard_resume_title">완료되지 않은 마법사를 이어서 할까요?</string>
+    <string name="screens_calc_wizard_resume_message">%1$d단계까지 진행한 대출 계산 마법사가 있습니다. 이어서 하시겠어요, 아니면 삭제할까요?</string>
+    <string name="screens_calc_wizard_resume_continue">계속</string>
+    <string name="screens_calc_wizard_resume_discard">삭제</string>
+    <string name="screens_calc_wizard_title">새 대출 · %1$d/%2$d단계</string>
+    <string name="screens_calc_wizard_back_cd">뒤로</string>
+    <string name="screens_calc_wizard_step_principal_question">얼마를 빌리시겠어요?</string>
+    <string name="screens_calc_wizard_step_principal_label">원금</string>
+    <string name="screens_calc_wizard_step_tenure_question">몇 개월에 걸쳐서요?</string>
+    <string name="screens_calc_wizard_step_tenure_label">기간(개월)</string>
+    <string name="screens_calc_wizard_step_rate_question">연이율은 몇 %인가요?</string>
+    <string name="screens_calc_wizard_step_rate_label">연이율 (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">월 상환금</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">총 상환액: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">원금</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">기간</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d개월</string>
+    <string name="screens_calc_wizard_step_review_rate_label">이율</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">총 이자</string>
+    <string name="screens_calc_wizard_step_name_message">나중에 대출 목록에서 찾을 수 있도록 이 시나리오에 이름을 지정하세요.</string>
+    <string name="screens_calc_wizard_step_name_label">시나리오 이름</string>
+    <string name="screens_calc_wizard_step_name_required">필수 — 이름을 입력해야 저장할 수 있습니다.</string>
+    <string name="screens_calc_wizard_button_back">이전</string>
+    <string name="screens_calc_wizard_button_next">다음</string>
+    <string name="screens_calc_wizard_button_save">대출로 저장</string>
 </resources>

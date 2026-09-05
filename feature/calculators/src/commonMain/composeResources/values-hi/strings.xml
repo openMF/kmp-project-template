@@ -1,65 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- locale: hi · seeded by /idea-locale · values carry SOURCE text until translated -->
 <resources>
-    <string name="screens_calc_affordability_title" translate="pending">Affordability</string>
-    <string name="screens_calc_affordability_back_cd" translate="pending">Back</string>
-    <string name="screens_calc_affordability_income_label" translate="pending">Monthly Income</string>
-    <string name="screens_calc_affordability_obligations_label" translate="pending">Existing Monthly Debt</string>
-    <string name="screens_calc_affordability_dti_label" translate="pending">DTI Ceiling (%)</string>
-    <string name="screens_calc_affordability_rate_label" translate="pending">Annual Rate (%)</string>
-    <string name="screens_calc_affordability_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_calc_affordability_max_principal_label" translate="pending">Max loan principal</string>
-    <string name="screens_calc_affordability_max_emi_label" translate="pending">Max EMI</string>
-    <string name="screens_calc_amortization_title" translate="pending">Amortization</string>
-    <string name="screens_calc_amortization_title_with_source" translate="pending">Amortization · %1$s</string>
-    <string name="screens_calc_amortization_back_cd" translate="pending">Back</string>
-    <string name="screens_calc_amortization_principal_label" translate="pending">Principal</string>
-    <string name="screens_calc_amortization_rate_label" translate="pending">Annual Rate (%)</string>
-    <string name="screens_calc_amortization_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_calc_amortization_emi_label" translate="pending">Monthly EMI</string>
-    <string name="screens_calc_amortization_interest_total_supporting" translate="pending">Interest %1$s · Total %2$s</string>
-    <string name="screens_calc_amortization_header_month" translate="pending">#</string>
-    <string name="screens_calc_amortization_header_principal" translate="pending">Principal</string>
-    <string name="screens_calc_amortization_header_interest" translate="pending">Interest</string>
-    <string name="screens_calc_amortization_header_balance" translate="pending">Balance</string>
-    <string name="screens_calc_compare_title" translate="pending">Compare Loans</string>
-    <string name="screens_calc_compare_back_cd" translate="pending">Back</string>
-    <string name="screens_calc_compare_best_emi_label" translate="pending">Best EMI · Scenario %1$d</string>
-    <string name="screens_calc_compare_best_emi_value" translate="pending">%1$s/mo</string>
-    <string name="screens_calc_compare_savings_text" translate="pending">Saves %1$s total vs. costliest</string>
-    <string name="screens_calc_compare_helper_text" translate="pending">Edit any scenario below to see the comparison update live.</string>
-    <string name="screens_calc_compare_scenario_label" translate="pending">Scenario %1$d</string>
-    <string name="screens_calc_compare_best_badge" translate="pending">Best</string>
-    <string name="screens_calc_compare_principal_label" translate="pending">Principal</string>
-    <string name="screens_calc_compare_rate_label" translate="pending">Rate (%)</string>
-    <string name="screens_calc_compare_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_calc_compare_result_emi" translate="pending">EMI</string>
-    <string name="screens_calc_compare_result_interest" translate="pending">Interest</string>
-    <string name="screens_calc_compare_result_total" translate="pending">Total</string>
-    <string name="screens_calc_wizard_resume_title" translate="pending">Resume unfinished wizard?</string>
-    <string name="screens_calc_wizard_resume_message" translate="pending">You have an in-progress loan-calc wizard at step %1$d. Continue where you left off, or discard?</string>
-    <string name="screens_calc_wizard_resume_continue" translate="pending">Continue</string>
-    <string name="screens_calc_wizard_resume_discard" translate="pending">Discard</string>
-    <string name="screens_calc_wizard_title" translate="pending">New Loan · Step %1$d/%2$d</string>
-    <string name="screens_calc_wizard_back_cd" translate="pending">Back</string>
-    <string name="screens_calc_wizard_step_principal_question" translate="pending">How much do you want to borrow?</string>
-    <string name="screens_calc_wizard_step_principal_label" translate="pending">Principal Amount</string>
-    <string name="screens_calc_wizard_step_tenure_question" translate="pending">Over how many months?</string>
-    <string name="screens_calc_wizard_step_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_calc_wizard_step_rate_question" translate="pending">At what annual rate?</string>
-    <string name="screens_calc_wizard_step_rate_label" translate="pending">Annual Rate (%)</string>
-    <string name="screens_calc_wizard_step_review_emi_label" translate="pending">Monthly EMI</string>
-    <string name="screens_calc_wizard_step_review_total_supporting" translate="pending">Total payable: %1$s</string>
-    <string name="screens_calc_wizard_step_review_principal_label" translate="pending">Principal</string>
-    <string name="screens_calc_wizard_step_review_tenure_label" translate="pending">Tenure</string>
-    <string name="screens_calc_wizard_step_review_tenure_value" translate="pending">%1$d months</string>
-    <string name="screens_calc_wizard_step_review_rate_label" translate="pending">Rate</string>
-    <string name="screens_calc_wizard_step_review_rate_value" translate="pending">%1$s%%</string>
-    <string name="screens_calc_wizard_step_review_total_interest_label" translate="pending">Total interest</string>
-    <string name="screens_calc_wizard_step_name_message" translate="pending">Name this scenario so you can find it again in your loans.</string>
-    <string name="screens_calc_wizard_step_name_label" translate="pending">Scenario Name</string>
-    <string name="screens_calc_wizard_step_name_required" translate="pending">Required — type a name to enable Save.</string>
-    <string name="screens_calc_wizard_button_back" translate="pending">Back</string>
-    <string name="screens_calc_wizard_button_next" translate="pending">Next</string>
-    <string name="screens_calc_wizard_button_save" translate="pending">Save as Loan</string>
+    <string name="screens_calc_affordability_title">वहनीयता</string>
+    <string name="screens_calc_affordability_back_cd">वापस</string>
+    <string name="screens_calc_affordability_income_label">मासिक आय</string>
+    <string name="screens_calc_affordability_obligations_label">मौजूदा मासिक ऋण</string>
+    <string name="screens_calc_affordability_dti_label">डीटीआई सीमा (%)</string>
+    <string name="screens_calc_affordability_rate_label">वार्षिक दर (%)</string>
+    <string name="screens_calc_affordability_tenure_label">अवधि (महीने)</string>
+    <string name="screens_calc_affordability_max_principal_label">अधिकतम ऋण मूलधन</string>
+    <string name="screens_calc_affordability_max_emi_label">अधिकतम ईएमआई</string>
+    <string name="screens_calc_amortization_title">परिशोधन</string>
+    <string name="screens_calc_amortization_title_with_source">परिशोधन · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">वापस</string>
+    <string name="screens_calc_amortization_principal_label">मूलधन</string>
+    <string name="screens_calc_amortization_rate_label">वार्षिक दर (%)</string>
+    <string name="screens_calc_amortization_tenure_label">अवधि (महीने)</string>
+    <string name="screens_calc_amortization_emi_label">मासिक ईएमआई</string>
+    <string name="screens_calc_amortization_interest_total_supporting">ब्याज %1$s · कुल %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">मूलधन</string>
+    <string name="screens_calc_amortization_header_interest">ब्याज</string>
+    <string name="screens_calc_amortization_header_balance">शेष</string>
+    <string name="screens_calc_compare_title">ऋण तुलना</string>
+    <string name="screens_calc_compare_back_cd">वापस</string>
+    <string name="screens_calc_compare_best_emi_label">सर्वोत्तम ईएमआई · परिदृश्य %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/माह</string>
+    <string name="screens_calc_compare_savings_text">सबसे महँगे की तुलना में कुल %1$s की बचत</string>
+    <string name="screens_calc_compare_helper_text">नीचे किसी भी परिदृश्य को बदलें और तुलना लाइव अपडेट होते देखें।</string>
+    <string name="screens_calc_compare_scenario_label">परिदृश्य %1$d</string>
+    <string name="screens_calc_compare_best_badge">सर्वोत्तम</string>
+    <string name="screens_calc_compare_principal_label">मूलधन</string>
+    <string name="screens_calc_compare_rate_label">दर (%)</string>
+    <string name="screens_calc_compare_tenure_label">अवधि (महीने)</string>
+    <string name="screens_calc_compare_result_emi">ईएमआई</string>
+    <string name="screens_calc_compare_result_interest">ब्याज</string>
+    <string name="screens_calc_compare_result_total">कुल</string>
+    <string name="screens_calc_wizard_resume_title">अधूरा विज़ार्ड फिर से शुरू करें?</string>
+    <string name="screens_calc_wizard_resume_message">आपका ऋण-गणना विज़ार्ड चरण %1$d पर है। जहाँ छोड़ा था वहीं से जारी रखें या हटा दें?</string>
+    <string name="screens_calc_wizard_resume_continue">जारी रखें</string>
+    <string name="screens_calc_wizard_resume_discard">हटाएँ</string>
+    <string name="screens_calc_wizard_title">नया ऋण · चरण %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">वापस</string>
+    <string name="screens_calc_wizard_step_principal_question">आप कितना उधार लेना चाहते हैं?</string>
+    <string name="screens_calc_wizard_step_principal_label">मूलधन राशि</string>
+    <string name="screens_calc_wizard_step_tenure_question">कितने महीनों में?</string>
+    <string name="screens_calc_wizard_step_tenure_label">अवधि (महीने)</string>
+    <string name="screens_calc_wizard_step_rate_question">वार्षिक दर क्या है?</string>
+    <string name="screens_calc_wizard_step_rate_label">वार्षिक दर (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">मासिक ईएमआई</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">कुल देय: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">मूलधन</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">अवधि</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d महीने</string>
+    <string name="screens_calc_wizard_step_review_rate_label">दर</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">कुल ब्याज</string>
+    <string name="screens_calc_wizard_step_name_message">इस परिदृश्य को नाम दें ताकि आप इसे अपने ऋणों में फिर से पा सकें।</string>
+    <string name="screens_calc_wizard_step_name_label">परिदृश्य का नाम</string>
+    <string name="screens_calc_wizard_step_name_required">आवश्यक — सहेजें सक्षम करने के लिए नाम लिखें।</string>
+    <string name="screens_calc_wizard_button_back">पीछे</string>
+    <string name="screens_calc_wizard_button_next">आगे</string>
+    <string name="screens_calc_wizard_button_save">ऋण के रूप में सहेजें</string>
 </resources>

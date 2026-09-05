@@ -7,10 +7,23 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+
 package kpt.core.model.user
 
 /**
- * Represents the languages supported by the app.
+ * Every language the app can be switched to, in the user's OWN language.
+ *
+ * GENERATED from core/registries/LOCALE_REGISTRY.yaml by
+ * `core/scripts/language-picker-sync.sh --write` — DO NOT HAND-EDIT. The selectable set is
+ * held EQUAL to the shipped locale set by LC-14 (RULE-IMPL-LOCALE-COVERAGE-001): a locale
+ * that has translated strings but no picker entry is unreachable, and a picker entry with
+ * no strings shows English. Add or remove languages in the registry, then re-run the sync.
+ *
+ * Enabled for mifos-x/kmp-project-template: tiers [1]  (20 languages + system default)
+ *
+ * @property localeName platform locale tag (BCP-47) passed to the platform locale switcher;
+ *   `null` means "follow the system".
+ * @property text the language endonym — a picker must name a language in that language.
  */
 enum class LanguageConfig(
     val localeName: String?,
@@ -20,164 +33,84 @@ enum class LanguageConfig(
         localeName = null,
         text = "System Default",
     ),
-    AFRIKAANS(
-        localeName = "af",
-        text = "Afrikaans",
-    ),
-    BELARUSIAN(
-        localeName = "be",
-        text = "Беларуская",
-    ),
-    BULGARIAN(
-        localeName = "bg",
-        text = "български",
-    ),
-    CATALAN(
-        localeName = "ca",
-        text = "català",
-    ),
-    CZECH(
-        localeName = "cs",
-        text = "čeština",
-    ),
-    DANISH(
-        localeName = "da",
-        text = "Dansk",
-    ),
-    GERMAN(
-        localeName = "de",
-        text = "Deutsch",
-    ),
-    GREEK(
-        localeName = "el",
-        text = "Ελληνικά",
-    ),
     ENGLISH(
         localeName = "en",
         text = "English",
-    ),
-    ENGLISH_BRITISH(
-        localeName = "en-GB",
-        text = "English (British)",
     ),
     SPANISH(
         localeName = "es",
         text = "Español",
     ),
-    ESTONIAN(
-        localeName = "et",
-        text = "eesti",
+    CHINESE_SIMPLIFIED(
+        localeName = "zh-CN",
+        text = "简体中文",
     ),
-    PERSIAN(
-        localeName = "fa",
-        text = "فارسی",
-    ),
-    FINNISH(
-        localeName = "fi",
-        text = "suomi",
-    ),
-    FRENCH(
-        localeName = "fr",
-        text = "Français",
+    CHINESE_TRADITIONAL(
+        localeName = "zh-TW",
+        text = "繁體中文",
     ),
     HINDI(
         localeName = "hi",
         text = "हिन्दी",
     ),
-    CROATIAN(
-        localeName = "hr",
-        text = "hrvatski",
+    ARABIC(
+        localeName = "ar",
+        text = "العربية",
     ),
-    HUNGARIAN(
-        localeName = "hu",
-        text = "magyar",
+    PORTUGUESE_BRAZIL(
+        localeName = "pt-BR",
+        text = "Português (Brasil)",
     ),
-    INDONESIAN(
-        localeName = "in",
-        text = "Bahasa Indonesia",
-    ),
-    ITALIAN(
-        localeName = "it",
-        text = "Italiano",
-    ),
-    HEBREW(
-        localeName = "iw",
-        text = "עברית",
+    RUSSIAN(
+        localeName = "ru",
+        text = "Русский",
     ),
     JAPANESE(
         localeName = "ja",
         text = "日本語",
     ),
+    GERMAN(
+        localeName = "de",
+        text = "Deutsch",
+    ),
+    FRENCH(
+        localeName = "fr",
+        text = "Français",
+    ),
     KOREAN(
         localeName = "ko",
         text = "한국어",
     ),
-    LATVIAN(
-        localeName = "lv",
-        text = "Latvietis",
-    ),
-    MALAYALAM(
-        localeName = "ml",
-        text = "മലയാളം",
-    ),
-    NORWEGIAN(
-        localeName = "nb",
-        text = "norsk (bokmål)",
-    ),
-    DUTCH(
-        localeName = "nl",
-        text = "Nederlands",
-    ),
-    POLISH(
-        localeName = "pl",
-        text = "Polski",
-    ),
-    PORTUGUESE_BRAZILIAN(
-        localeName = "pt-BR",
-        text = "Português do Brasil",
-    ),
-    PORTUGUESE(
-        localeName = "pt-PT",
-        text = "Português",
-    ),
-    ROMANIAN(
-        localeName = "ro",
-        text = "română",
-    ),
-    RUSSIAN(
-        localeName = "ru",
-        text = "русский",
-    ),
-    SLOVAK(
-        localeName = "sk",
-        text = "slovenčina",
-    ),
-    SWEDISH(
-        localeName = "sv",
-        text = "svenska",
-    ),
-    THAI(
-        localeName = "th",
-        text = "ไทย",
+    ITALIAN(
+        localeName = "it",
+        text = "Italiano",
     ),
     TURKISH(
         localeName = "tr",
         text = "Türkçe",
     ),
-    UKRAINIAN(
-        localeName = "uk",
-        text = "українська",
+    INDONESIAN(
+        localeName = "in",
+        text = "Bahasa Indonesia",
     ),
     VIETNAMESE(
         localeName = "vi",
         text = "Tiếng Việt",
     ),
-    CHINESE_SIMPLIFIED(
-        localeName = "zh-CN",
-        text = "中文（中国大陆）",
+    THAI(
+        localeName = "th",
+        text = "ไทย",
     ),
-    CHINESE_TRADITIONAL(
-        localeName = "zh-TW",
-        text = "中文（台灣）",
+    POLISH(
+        localeName = "pl",
+        text = "Polski",
+    ),
+    DUTCH(
+        localeName = "nl",
+        text = "Nederlands",
+    ),
+    UKRAINIAN(
+        localeName = "uk",
+        text = "Українська",
     ),
 }

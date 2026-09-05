@@ -33,8 +33,6 @@ internal class FakeLoanRepository : LoanRepository {
     var lastUpserted: Loan? = null
         private set
 
-    override fun observeAll(): Flow<List<Loan>> = state.map { it.values.toList() }
-
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         screenDataStreamForTesting(
             state.map { it.values.toList() }.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) },

@@ -11,7 +11,6 @@ package kpt.core.data.demo.banking.impl
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.screen.FetchPolicy
@@ -25,8 +24,6 @@ import kpt.core.store.demo.banking.impl.provideLoanDetailStore
 import kpt.core.store.demo.banking.impl.toDomain
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
-import org.mobilenativefoundation.store.store5.StoreReadRequest
-import org.mobilenativefoundation.store.store5.StoreReadResponse
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
 
 /**
@@ -44,10 +41,6 @@ internal class LoanRepositoryImpl(
     private val loansWriteStore: MutableStore<String, Loan>,
     private val loanDao: LoanDao,
 ) : LoanRepository {
-
-    override fun observeAll(): Flow<List<Loan>> = loansStore.stream(StoreReadRequest.cached(Unit, refresh = false))
-        .filterIsInstance<StoreReadResponse.Data<List<Loan>>>()
-        .map { response -> response.value }
 
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         loansStore.asScreenStream(

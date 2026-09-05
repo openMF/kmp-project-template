@@ -23,9 +23,6 @@ import kpt.core.model.demo.banking.BillReminder
  */
 interface BillReminderRepository {
 
-    /** Observe every bill reminder (enabled and disabled), day-of-month order. */
-    fun observeAll(): Flow<List<BillReminder>>
-
     /** Observe all reminders as a Store5-backed [ScreenDataStream] (offline-local) for read screens. */
     fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>>
 

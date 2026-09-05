@@ -34,7 +34,9 @@ internal class FakeLoanRepository : LoanRepository {
     /** Snapshot accessor for tests. */
     val current: List<Loan> get() = state.value
 
-    override fun observeAll(): Flow<List<Loan>> = state.map { rows ->
+    // NOT an interface member any more: LoanRepository dropped observeAll() (it duplicated
+    // the store-backed loansStream read path). Kept as a plain test helper.
+    fun observeAll(): Flow<List<Loan>> = state.map { rows ->
         rows.sortedWith(compareBy({ it.nextDueDate }, { it.createdAtMs }))
     }
 

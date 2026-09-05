@@ -41,7 +41,10 @@ internal class FakeBillReminderRepository : BillReminderRepository {
     override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
         screenDataStreamForTesting(state.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
 
-    override fun observeAll(): Flow<List<BillReminder>> = state.map { rows ->
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<BillReminder>> = state.map { rows ->
         rows.sortedBy { it.dueDay }
     }
 

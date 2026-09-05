@@ -11,13 +11,23 @@ package kpt.core.data.demo.banking
 
 import app.cash.turbine.test
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.ScreenStreamContext
 import kpt.core.data.demo.banking.impl.LoanRepositoryImpl
+import kpt.core.data.infra.InMemoryFetchedAtRepository
+import kpt.core.data.infra.onlineNetworkMonitor
 import kpt.core.model.demo.banking.Loan
 import kpt.core.model.demo.banking.LoanKind
 import kpt.core.store.demo.banking.impl.provideLoansStore
 import kpt.core.store.demo.banking.impl.provideLoansWriteStore
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -39,20 +49,41 @@ class LoanRepositoryTest {
         loanDao = dao,
     )
 
+    // asScreenStream self-resolves its ScreenStreamContext from Koin, so a test that collects
+    // the repository's ScreenDataStream registers the read-path infra bundle for its duration.
+    @BeforeTest
+    fun startKoinForScreenStream() {
+        startKoin {
+            modules(
+                module {
+                    single { ScreenStreamContext(onlineNetworkMonitor(), InMemoryFetchedAtRepository()) }
+                },
+            )
+        }
+    }
+
+    @AfterTest
+    fun stopKoinAfterTest() = stopKoin()
+
     @Test
-    fun upsertThenObserveAllRoundTripsTheDomainObject() = runTest {
+    fun upsertThenLoansStreamRoundTripsTheDomainObject() = runTest {
         val loan = sampleLoan(id = "L1")
         repo.upsert(loan)
-        assertEquals(listOf(loan), repo.observeAll().first())
+        val loans = repo.loansStream(backgroundScope).state
+            .mapNotNull { it.loansOrNull() }
+            .first { it.isNotEmpty() }
+        assertEquals(listOf(loan), loans)
     }
 
     @Test
-    fun observeAllSortsBySoonestDueFirst() = runTest {
+    fun loansStreamSortsBySoonestDueFirst() = runTest {
         repo.upsert(sampleLoan(id = "late", nextDueDate = LocalDate(2026, 12, 1)))
         repo.upsert(sampleLoan(id = "early", nextDueDate = LocalDate(2026, 1, 1)))
         repo.upsert(sampleLoan(id = "mid", nextDueDate = LocalDate(2026, 6, 1)))
 
-        val ids = repo.observeAll().first().map { it.id }
+        val ids = repo.loansStream(backgroundScope).state
+            .mapNotNull { state -> state.loansOrNull()?.map { it.id } }
+            .first { it.size == 3 }
         assertEquals(listOf("early", "mid", "late"), ids)
     }
 
@@ -156,4 +187,11 @@ class LoanRepositoryTest {
         createdAtMs = 1_700_000_000_000L,
         updatedAtMs = 1_700_000_000_000L,
     )
+}
+
+/** Domain list out of a `ScreenState` (Content → rows, Empty → ∅, Loading/Error → null-skip). */
+private fun ScreenState<List<Loan>>.loansOrNull(): List<Loan>? = when (this) {
+    is ScreenState.Content -> data
+    ScreenState.Empty -> emptyList()
+    else -> null
 }

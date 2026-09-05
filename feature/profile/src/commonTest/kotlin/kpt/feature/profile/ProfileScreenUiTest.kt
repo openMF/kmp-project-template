@@ -9,21 +9,21 @@
  */
 package kpt.feature.profile
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.runComposeUiTest
 import kpt.core.designsystem.theme.KptTheme
-import kpt.feature.profile.demo.ProfileDemoBody
 import kotlin.test.Test
 
 /**
- * Compose Multiplatform UI test for [ProfileScreen].
+ * Compose Multiplatform UI test for [ProfileScreen] — the opaque SHELL.
  *
- * ProfileScreen is a pure-UI screen with no ViewModel — it renders a static
- * placeholder hero-card. The test renders it directly inside [KptTheme] and
- * asserts the always-present root scaffold node identified by
- * [TestTags.Profile.SCREEN].
+ * `ProfileScreen` renders whatever `BackboneRegistry.profileBody` supplies (the WS01
+ * shell/seam split), so the shell is tested with a trivial body: the assertion is that the
+ * scaffold root exists regardless of what the fork plugs in. The default demo body is
+ * store-backed and covered separately by [ProfileDemoBodyUiTest], which needs a Koin graph.
  */
 @OptIn(ExperimentalTestApi::class)
 class ProfileScreenUiTest {
@@ -32,8 +32,8 @@ class ProfileScreenUiTest {
     fun screenIsDisplayed() = runComposeUiTest {
         setContent {
             KptTheme {
-                // In production cmp-navigation's BackboneRegistry.profileBody supplies this body.
-                ProfileScreen(profileBody = { ProfileDemoBody() })
+                // A fork's body is opaque to the shell — an empty Box is a faithful stand-in.
+                ProfileScreen(profileBody = { Box(androidx.compose.ui.Modifier) })
             }
         }
         onNodeWithTag(TestTags.Profile.SCREEN).assertIsDisplayed()

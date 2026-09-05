@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.common.formatGrouped
@@ -61,7 +62,7 @@ fun EmiCalculatorScreen(
     viewModel: EmiCalculatorViewModel = koinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    val emiResult by viewModel.emiResult.collectAsStateWithLifecycle()
+    val emiState by viewModel.emiState.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier.testTag(TestTags.EmiCalculator.SCREEN),
@@ -135,7 +136,13 @@ fun EmiCalculatorScreen(
                 }
             }
 
-            emiResult?.let { result ->
+            // Store5 read surface: the calculator renders through the SAME ScreenContent
+            // wrapper as every other read screen — Loading / Content / Empty (inputs not
+            // yet complete) / Error are the store's states, not hand-rolled null checks.
+            ScreenContent(
+                state = emiState,
+                onRetry = viewModel::onRetry,
+            ) { result, _ ->
                 HeroCard {
                     AmountDisplay(
                         amountText = result.emi.formatGrouped(2),

@@ -23,7 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.HeroCard
-import kpt.core.base.ui.AppInfo
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.ui.screen.ScreenContent
+import kpt.core.model.demo.profile.ProfileInfo
+import kpt.feature.profile.demo.ui.ProfileViewModel
+import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.spacing
 import kpt.feature.profile.generated.resources.Res
@@ -39,7 +44,29 @@ import org.jetbrains.compose.resources.stringResource
  * fenced block, leaving an empty body for the fork to fill — the shell chrome survives unchanged.
  */
 @Composable
-fun ProfileDemoBody(modifier: Modifier = Modifier) {
+fun ProfileDemoBody(
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = retainedKoinViewModel(),
+) {
+    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+    // Store5 read surface: the profile body renders through the SAME ScreenContent wrapper as
+    // every other read screen. Today the store serves a local placeholder, so this settles on
+    // Content immediately — but a fork that swaps the fetcher for a signed-in user gets
+    // Loading / Error / retry for free instead of restructuring this composable.
+    ScreenContent(
+        state = screenState,
+        onRetry = viewModel::onRetry,
+        modifier = modifier,
+    ) { profile, _ ->
+        ProfileDemoContent(profile = profile)
+    }
+}
+
+@Composable
+private fun ProfileDemoContent(
+    profile: ProfileInfo,
+    modifier: Modifier = Modifier,
+) {
     val sp = MaterialTheme.spacing
     Column(
         modifier = modifier
@@ -66,7 +93,7 @@ fun ProfileDemoBody(modifier: Modifier = Modifier) {
                 )
                 Text(
                     // App display name templated in from the common AppInfo accessor, never hardcoded.
-                    text = stringResource(Res.string.screens_profile_local_message, AppInfo.appDisplayName),
+                    text = stringResource(Res.string.screens_profile_local_message, profile.appDisplayName),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

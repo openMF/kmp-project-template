@@ -10,18 +10,23 @@
 package kpt.feature.calculators.amortizationcalc
 
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.banking.LoanRepository
-import kpt.core.domain.demo.calc.AmortizationRow
-import kpt.core.domain.demo.calc.amortizationSchedule
-import kpt.core.domain.demo.calc.computeEmi
-import kpt.core.model.demo.emi.EmiResult
+import kpt.core.data.demo.calc.AmortizationCalcRepository
+import kpt.core.model.demo.calc.AmortizationBreakdown
+import kpt.core.store.demo.calc.impl.AmortizationCalcParams
 
 /**
  * VM for B3 Amortization Schedule.
@@ -34,25 +39,46 @@ import kpt.core.model.demo.emi.EmiResult
  * - **Inline** — when [loanId] is `null`, the user enters principal / rate /
  *   tenure from scratch.
  *
- * The amortization schedule is derived from the current input state via
- * [amortizationSchedule] — no async work, no Store.
+ * The schedule + summary come from the MEMORY_ONLY Store5 store keyed on the inputs
+ * ([AmortizationCalcParams]), consumed as a `ScreenState` like every other read surface.
  */
 class AmortizationViewModel(
     private val repository: LoanRepository,
+    private val calcRepository: AmortizationCalcRepository,
     private val loanId: String? = null,
 ) : BaseViewModel<AmortizationState, Nothing, AmortizationAction>(AmortizationState()) {
 
-    val schedule: StateFlow<List<AmortizationRow>> = stateFlow
-        .map { s -> amortizationSchedule(s.principal, s.ratePercent, s.tenureMonths) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    /** The stream backing the CURRENT key — retained so [onRetry] re-runs the live one. */
+    private var currentStream: ScreenDataStream<AmortizationBreakdown>? = null
 
-    val summary: StateFlow<EmiResult> = stateFlow
-        .map { s -> computeEmi(s.principal, s.ratePercent, s.tenureMonths) }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            EmiResult(0.0, 0.0, 0.0),
-        )
+    /**
+     * Schedule AND summary as ONE Store-backed `ScreenState`.
+     *
+     * They were two independently-derived `StateFlow`s off the form state; both come from the
+     * same inputs, so they are one Store value now — the screen can never show a schedule from
+     * one parameter set beside a summary from another, and a 240-row schedule is no longer
+     * rebuilt from scratch on every keystroke that returns to a previous value.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val breakdownState: StateFlow<ScreenState<AmortizationBreakdown>> = stateFlow
+        .map { AmortizationCalcParams(it.principal, it.ratePercent, it.tenureMonths) }
+        .distinctUntilChanged()
+        .flatMapLatest { params ->
+            if (params.isComputable) {
+                calcRepository.breakdownStream(params, viewModelScope)
+                    .also { currentStream = it }
+                    .state
+            } else {
+                // Incomplete inputs are Empty, not Error — the user hasn't finished typing.
+                currentStream = null
+                flowOf(ScreenState.Empty)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
+
+    fun onRetry() {
+        currentStream?.retry()
+    }
 
     init {
         if (loanId != null) {

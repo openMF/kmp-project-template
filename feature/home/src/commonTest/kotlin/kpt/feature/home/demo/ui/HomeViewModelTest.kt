@@ -382,7 +382,10 @@ class HomeViewModelTest {
 private class FakeLoanRepository(initial: List<Loan> = emptyList()) : LoanRepository {
     private val rows = MutableStateFlow(initial)
 
-    override fun observeAll(): Flow<List<Loan>> = rows
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<Loan>> = rows
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         screenDataStreamForTesting(rows.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
     override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
@@ -411,7 +414,10 @@ private class FakeBillReminderRepository : BillReminderRepository {
         upcoming.value = values
     }
 
-    override fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
     override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
         screenDataStreamForTesting(upcoming.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> {

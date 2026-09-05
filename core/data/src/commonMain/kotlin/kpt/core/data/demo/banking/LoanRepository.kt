@@ -24,9 +24,6 @@ import kpt.core.model.demo.banking.Loan
  */
 interface LoanRepository {
 
-    /** Observe all loans, soonest-due first. */
-    fun observeAll(): Flow<List<Loan>>
-
     /** Observe all loans as a Store5-backed [ScreenDataStream] (offline-local) for read screens. */
     fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>>
 

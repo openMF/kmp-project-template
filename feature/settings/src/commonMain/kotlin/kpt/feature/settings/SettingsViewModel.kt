@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.user.UserDataRepository
 import kpt.core.model.user.DarkThemeConfig
@@ -35,18 +36,31 @@ class SettingsViewModel(
     /** Backward-compat alias for the inherited [stateFlow] — the dialogs read this. */
     val settingsUiState: StateFlow<SettingsUiState> get() = stateFlow
 
+    /** The store-backed preferences read — retained so [onRetry] re-runs it. */
+    private val stream = settingsRepository.userDataStream(viewModelScope)
+
+    /** Re-run the preferences read (wired for ScreenContent's retry affordance). */
+    fun onRetry() = stream.retry()
+
     init {
-        settingsRepository.userData
-            .onEach { userData ->
-                updateState {
-                    SettingsUiState.Success(
-                        settings = UserEditableSettings(
-                            brand = userData.themeBrand,
-                            useDynamicColor = userData.useDynamicColor,
-                            darkThemeConfig = userData.darkThemeConfig,
-                            language = userData.appLanguage,
-                        ),
-                    )
+        // Read-path contract: consume the repository's ScreenDataStream rather than the raw
+        // preferences StateFlow, so Loading / Content / Error come from the store instead of
+        // being hand-rolled here. `SettingsUiState.Loading` stays as the VM's own projection
+        // for the dialogs that already read it.
+        stream.state
+            .onEach { screenState ->
+                if (screenState is ScreenState.Content) {
+                    val userData = screenState.data
+                    updateState {
+                        SettingsUiState.Success(
+                            settings = UserEditableSettings(
+                                brand = userData.themeBrand,
+                                useDynamicColor = userData.useDynamicColor,
+                                darkThemeConfig = userData.darkThemeConfig,
+                                language = userData.appLanguage,
+                            ),
+                        )
+                    }
                 }
             }
             .launchIn(viewModelScope)

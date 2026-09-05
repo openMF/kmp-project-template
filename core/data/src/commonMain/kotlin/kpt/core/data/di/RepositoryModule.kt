@@ -23,8 +23,11 @@ import kpt.core.data.user.impl.UserDataRepositoryImpl
 import kpt.core.data.user.impl.UserLogoutManagerImpl
 import kpt.core.database.AppDatabase
 import kpt.core.database.di.DatabaseModule
+import kpt.core.datastore.UserPreferencesRepository
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.network.di.NetworkModule
+import kpt.core.store.AppStoreRegistry
+import kpt.core.store.prefs.impl.UserDataSource
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -43,7 +46,16 @@ val DataModule = module {
     includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
 
     single<NetworkMonitor> { NetworkMonitorProvider.install() }
-    singleOf(::UserDataRepositoryImpl) bind UserDataRepository::class
+    // Binds the read PORT declared by core/store — core/store cannot depend on core/datastore,
+    // so this module (which owns UserPreferencesRepository) supplies the preferences flow.
+    single<UserDataSource> { UserDataSource { get<UserPreferencesRepository>().userData } }
+
+    single<UserDataRepository> {
+        UserDataRepositoryImpl(
+            preferencesRepository = get(),
+            userDataStore = get(AppStoreRegistry.UserData),
+        )
+    }
 
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).

@@ -39,6 +39,10 @@ kotlin {
 
             implementation(projects.coreBase.common)
             implementation(projects.coreBase.network)
+            // CrashReporter — the sync orchestrators report a failed replay rather than
+            // swallowing it. core-base/store declares observability as `implementation`,
+            // so it is not transitively visible here.
+            implementation(project(":core-base:observability"))
             api(projects.core.store)
 
             implementation(libs.kotlinx.coroutines.core)

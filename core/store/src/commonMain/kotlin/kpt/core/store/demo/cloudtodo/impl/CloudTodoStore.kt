@@ -60,16 +60,17 @@ fun provideCloudTodoReadStore(
  *
  * Conflict handling: Store5's `Updater` does NOT auto-consume a [ConflictStrategy] (see
  * `StoreFactory.createMutableStore` KDoc), so the strategy is applied HERE inside the [Updater] —
- * we resolve the server echo against the client value via `conflictStrategy.resolve(server, client)`
- * and write the resolved value back. [ConflictStrategy.ClientWins] keeps the user's offline toggle
- * authoritative (offline-first).
+ * we resolve the server echo against the client value via [CloudTodoConflictResolver] and write the
+ * resolved value back. Its default [ConflictStrategy.ClientWins] keeps the user's offline toggle
+ * authoritative (offline-first); the resolver also reports whether the two sides genuinely
+ * diverged, which is what a `MutationResult.Conflicted` outcome is derived from.
  */
 fun provideCloudTodoStore(
     api: JsonPlaceholderApi,
     dao: CloudTodoDao,
     bookkeeper: Bookkeeper<CloudTodoKey>,
 ): MutableStore<CloudTodoKey, CloudTodo> {
-    val conflictStrategy: ConflictStrategy<CloudTodo> = ConflictStrategy.ClientWins()
+    val conflictResolver = CloudTodoConflictResolver()
 
     val converter = Converter.Builder<TodoDto, CloudTodoEntity, CloudTodo>()
         // fetch -> SoT: network DTO mapped through domain to the Room entity.
@@ -81,8 +82,8 @@ fun provideCloudTodoStore(
     val updater = Updater.by<CloudTodoKey, CloudTodo, TodoDto>(
         post = { key: CloudTodoKey, value: CloudTodo ->
             val serverEcho = api.updateTodo(key.id, TodoDto.fromDomain(value)).toDomain()
-            val resolved = conflictStrategy.resolve(server = serverEcho, client = value)
-            UpdaterResult.Success.Typed(TodoDto.fromDomain(resolved))
+            val resolution = conflictResolver.resolve(server = serverEcho, client = value)
+            UpdaterResult.Success.Typed(TodoDto.fromDomain(resolution.value))
         },
     )
 

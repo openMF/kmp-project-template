@@ -10,15 +10,25 @@
 package kpt.core.data.demo.banking
 
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.ScreenStreamContext
 import kpt.core.data.demo.banking.impl.BillReminderRepositoryImpl
+import kpt.core.data.infra.InMemoryFetchedAtRepository
+import kpt.core.data.infra.onlineNetworkMonitor
 import kpt.core.model.demo.banking.BillCategory
 import kpt.core.model.demo.banking.BillReminder
 import kpt.core.model.demo.banking.Recurrence
 import kpt.core.store.demo.banking.impl.provideBillRemindersStore
 import kpt.core.store.demo.banking.impl.provideBillRemindersWriteStore
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -57,6 +67,22 @@ class BillReminderRepositoryTest {
             timeZone = timeZone,
         )
 
+    // asScreenStream self-resolves its ScreenStreamContext from Koin, so a test that collects
+    // the repository's ScreenDataStream registers the read-path infra bundle for its duration.
+    @BeforeTest
+    fun startKoinForScreenStream() {
+        startKoin {
+            modules(
+                module {
+                    single { ScreenStreamContext(onlineNetworkMonitor(), InMemoryFetchedAtRepository()) }
+                },
+            )
+        }
+    }
+
+    @AfterTest
+    fun stopKoinAfterTest() = stopKoin()
+
     @Test
     fun fixedClockResolvesToExpectedDate() {
         // Sanity check — if this assertion ever fails, every other test in
@@ -68,19 +94,24 @@ class BillReminderRepositoryTest {
     }
 
     @Test
-    fun upsertThenObserveAllRoundTripsTheDomainObject() = runTest {
+    fun upsertThenBillRemindersStreamRoundTripsTheDomainObject() = runTest {
         val bill = sampleBill(id = "B1", dueDay = 15)
         repo.upsert(bill)
-        assertEquals(listOf(bill), repo.observeAll().first())
+        val bills = repo.billRemindersStream(backgroundScope).state
+            .mapNotNull { it.billsOrNull() }
+            .first { it.isNotEmpty() }
+        assertEquals(listOf(bill), bills)
     }
 
     @Test
-    fun observeAllSortsByDueDayAscending() = runTest {
+    fun billRemindersStreamSortsByDueDayAscending() = runTest {
         repo.upsert(sampleBill(id = "late", dueDay = 28))
         repo.upsert(sampleBill(id = "early", dueDay = 1))
         repo.upsert(sampleBill(id = "mid", dueDay = 15))
 
-        val ids = repo.observeAll().first().map { it.id }
+        val ids = repo.billRemindersStream(backgroundScope).state
+            .mapNotNull { state -> state.billsOrNull()?.map { it.id } }
+            .first { it.size == 3 }
         assertEquals(listOf("early", "mid", "late"), ids)
     }
 
@@ -193,4 +224,11 @@ class BillReminderRepositoryTest {
         createdAtMs = 1_700_000_000_000L,
         updatedAtMs = 1_700_000_000_000L,
     )
+}
+
+/** Domain list out of a `ScreenState` (Content → rows, Empty → ∅, Loading/Error → null-skip). */
+private fun ScreenState<List<BillReminder>>.billsOrNull(): List<BillReminder>? = when (this) {
+    is ScreenState.Content -> data
+    ScreenState.Empty -> emptyList()
+    else -> null
 }

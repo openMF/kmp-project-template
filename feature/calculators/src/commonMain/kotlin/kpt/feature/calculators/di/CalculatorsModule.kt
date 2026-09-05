@@ -10,6 +10,11 @@
 package kpt.feature.calculators.di
 
 import kpt.core.data.di.OutboxQualifiers
+import kpt.core.domain.demo.calc.amortizationSchedule
+import kpt.core.domain.demo.calc.computeEmi
+import kpt.core.model.demo.banking.AmortizationRow
+import kpt.core.model.demo.calc.AmortizationBreakdown
+import kpt.core.store.demo.calc.impl.AmortizationCompute
 import kpt.feature.calculators.affordability.AffordabilityCalculatorViewModel
 import kpt.feature.calculators.amortizationcalc.AmortizationViewModel
 import kpt.feature.calculators.comparison.LoanComparisonViewModel
@@ -41,8 +46,33 @@ val CalculatorsModule = module {
 
     viewModelOf(::AffordabilityCalculatorViewModel)
     viewModelOf(::LoanComparisonViewModel)
+    // Binds the compute PORT declared by core/store. core/store cannot import core/domain
+    // (store → domain → data → store would be a cycle), so the feature — which sees both —
+    // supplies the implementation and maps the domain's row shape onto core/model's
+    // AmortizationRow, the same type feature/amortization renders. See AmortizationCalcStore.kt.
+    single<AmortizationCompute> {
+        AmortizationCompute { params ->
+            AmortizationBreakdown(
+                rows = amortizationSchedule(
+                    params.principal,
+                    params.ratePercent,
+                    params.tenureMonths,
+                ).map { row ->
+                    AmortizationRow(
+                        month = row.installmentNumber,
+                        payment = row.principalPaid + row.interestPaid,
+                        principal = row.principalPaid,
+                        interest = row.interestPaid,
+                        balance = row.balanceRemaining,
+                    )
+                },
+                summary = computeEmi(params.principal, params.ratePercent, params.tenureMonths),
+            )
+        }
+    }
+
     viewModel { (loanId: String?) ->
-        AmortizationViewModel(repository = get(), loanId = loanId)
+        AmortizationViewModel(repository = get(), calcRepository = get(), loanId = loanId)
     }
     viewModel { (scenarioId: String?) ->
         LoanCalcWizardViewModel(

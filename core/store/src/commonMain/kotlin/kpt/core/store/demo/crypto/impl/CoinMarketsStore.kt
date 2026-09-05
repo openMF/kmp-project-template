@@ -50,8 +50,9 @@ fun provideCoinMarketsStore(
                     .map { entities -> entities.map { it.toDomain() }.ifEmpty { null } }
             },
             writer = { key, markets ->
-                dao.deleteByPage(key.page)
-                dao.upsertAll(markets.map { it.toEntity(key.page) })
+                // S5-3: one atomic swap, not delete-then-upsert — a reader must never
+                // observe the page with the old rows dropped and the new ones not yet in.
+                dao.replacePage(key.page, markets.map { it.toEntity(key.page) })
                 validator.markFresh()
             },
             delete = { key -> dao.deleteByPage(key.page) },

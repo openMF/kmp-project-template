@@ -29,7 +29,10 @@ internal class FakeLoanRepository : LoanRepository {
         state.value = loans.toList()
     }
 
-    override fun observeAll(): Flow<List<Loan>> = state
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<Loan>> = state
 
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         screenDataStreamForTesting(state.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })

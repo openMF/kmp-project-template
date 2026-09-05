@@ -74,6 +74,17 @@ object AppStoreRegistry : StoreRegistry() {
     val CloudTodo = store("cloudTodo")
     val CloudTodoMutable = store("cloudTodoMutable")
 
+    // Pure-compute stores (MEMORY_ONLY archetype) — the "fetcher" is a local calculation, so
+    // the Store contributes an in-memory cache keyed on the inputs and a ScreenState-shaped
+    // read path, letting calculators render through the same wrappers as every other screen.
+    val Emi = store("emi")
+    val Profile = store("profile")
+    val AmortizationCalc = store("amortizationCalc")
+
+    // User preferences (OFFLINE_LOCAL_ONLY) — puts the settings screen on the same
+    // ScreenState read path as every other screen.
+    val UserData = store("userData")
+
     /** TTL durations — financial data has different freshness requirements. */
     object Ttl {
         val EXCHANGE_RATES = 5.minutes

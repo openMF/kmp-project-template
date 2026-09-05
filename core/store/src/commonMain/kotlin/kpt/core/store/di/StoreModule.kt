@@ -23,6 +23,10 @@ import kpt.core.store.demo.banking.impl.provideLoansWriteStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoReadStore
 import kpt.core.store.demo.cloudtodo.impl.provideCloudTodoStore
 import kpt.core.store.demo.crypto.impl.provideCoinDetailStore
+import kpt.core.store.demo.calc.impl.provideAmortizationCalcStore
+import kpt.core.store.demo.emi.impl.provideEmiStore
+import kpt.core.store.demo.profile.impl.provideProfileStore
+import kpt.core.store.prefs.impl.provideUserDataStore
 import kpt.core.store.demo.crypto.impl.provideCoinMarketsStore
 import kpt.core.store.demo.currency.impl.provideExchangeRatesStore
 import kpt.core.store.demo.currency.impl.provideRateHistoryStore
@@ -76,6 +80,15 @@ val appStoreModule: Module = module {
     single(AppStoreRegistry.CloudTodo) { provideCloudTodoReadStore(get(), get()) }
     single(AppStoreRegistry.CloudTodoMutable) { provideCloudTodoStore(api = get(), dao = get(), bookkeeper = get()) }
     single(AppStoreRegistry.CoinDetail) { provideCoinDetailStore(get(), get(), get()) }
+    // EmiCompute is bound by the emi-calculator FEATURE module — core/store cannot import
+    // core/domain without closing a store → domain → data → store cycle, so the port is
+    // resolved through Koin at runtime instead. See EmiStore.kt.
+    single(AppStoreRegistry.Emi) { provideEmiStore(compute = get()) }
+    // ProfileInfoSource is bound by the profile FEATURE module (AppInfo lives in core-base/ui).
+    single(AppStoreRegistry.Profile) { provideProfileStore(source = get()) }
+    single(AppStoreRegistry.AmortizationCalc) { provideAmortizationCalcStore(compute = get()) }
+    // UserDataSource is bound in core/data (it owns UserPreferencesRepository).
+    single(AppStoreRegistry.UserData) { provideUserDataStore(source = get()) }
 
     // Economic Stores (Banking Utility Toolkit — FRED + World Bank)
     single(AppStoreRegistry.InterestRateSeries) {

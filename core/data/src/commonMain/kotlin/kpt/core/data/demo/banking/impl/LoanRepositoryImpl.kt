@@ -62,10 +62,7 @@ internal class LoanRepositoryImpl(
             fetchPolicy = FetchPolicy.CACHE_ONLY,
         )
 
-    override fun observeById(id: String): Flow<Loan?> =
-        daoFlow(LOANS_TABLE) { loanDao.observeById(id) }.map { it?.toDomain() }
 
-    override suspend fun getById(id: String): Loan? = loanDao.getById(id)?.toDomain()
 
     override suspend fun upsert(loan: Loan) {
         // Write through the store — persists to the Room SoT (via the SoT writer); the read store re-emits.
@@ -79,16 +76,6 @@ internal class LoanRepositoryImpl(
         loansWriteStore.clear(id)
     }
 
-    override fun observeTotalMonthlyEmi(): Flow<Double> = daoFlow(LOANS_TABLE) { loanDao.observeAll() }.map { rows ->
-        rows.sumOf { it.monthlyPayment }
-    }
-
-    override fun observeTotalPrincipalRemaining(): Flow<Double> =
-        daoFlow(LOANS_TABLE) { loanDao.observeAll() }.map { rows ->
-            rows.sumOf { it.principalRemaining }
-        }
-
-    override fun observeCount(): Flow<Int> = daoFlow(LOANS_TABLE) { loanDao.count() }
 
     private companion object {
         /** Room `@Entity(tableName = …)` for [kpt.core.database.demo.banking.entity.LoanEntity]. */

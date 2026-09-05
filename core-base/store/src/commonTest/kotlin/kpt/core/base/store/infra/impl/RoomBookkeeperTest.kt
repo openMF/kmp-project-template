@@ -21,6 +21,8 @@ import kotlin.test.assertTrue
 private class FakeBookkeeperDao : BookkeeperDao {
     val rows = mutableMapOf<String, Long>()
     override suspend fun getLastFailedSync(key: String): Long? = rows[key]
+    override suspend fun pendingKeys(): List<String> =
+        rows.entries.sortedBy { it.value }.map { it.key }
     override suspend fun upsert(entity: BookkeeperEntity) {
         rows[entity.key] = entity.lastFailedSync
     }

@@ -12,11 +12,10 @@ package kpt.feature.loans.ui
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.base.store.screen.combineContent
+import kpt.core.base.store.screen.mapContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.banking.LoanRepository
 import kpt.core.model.demo.banking.Loan
@@ -36,17 +35,17 @@ class PersonalLoansListViewModel(
 
     private val stream = repository.loansStream(viewModelScope)
 
-    private val totals = combine(
-        repository.observeTotalMonthlyEmi(),
-        repository.observeTotalPrincipalRemaining(),
-    ) { emi, remaining -> emi to remaining }
-
+    // Portfolio totals are DERIVED from the store's own list — they were two extra
+    // `daoFlow { loanDao.observeAll() }` queries summing the SAME rows this stream already
+    // carries, i.e. a second read path over identical data (the S5-2 split-read defect) and
+    // three concurrent collectors on one table. Deriving here means one read, one source of
+    // truth, and totals that can never disagree with the list rendered beside them.
     val screenState: StateFlow<ScreenState<LoansListUiState>> = stream.state
-        .combineContent(totals) { loans, (totalEmi, totalRemaining), _ ->
+        .mapContent { loans, _ ->
             LoansListUiState(
                 loans = loans,
-                totalMonthlyEmi = totalEmi,
-                totalPrincipalRemaining = totalRemaining,
+                totalMonthlyEmi = loans.sumOf { it.monthlyPayment },
+                totalPrincipalRemaining = loans.sumOf { it.principalRemaining },
             )
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)

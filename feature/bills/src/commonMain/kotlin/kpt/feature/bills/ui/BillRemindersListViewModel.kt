@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kpt.core.base.store.screen.ScreenState
@@ -92,8 +93,20 @@ class BillRemindersListViewModel(
      * notification scheduler re-registers a fresh request — pinning the contract even
      * before per-row "lastPaidAtMs" lands.
      */
+    /**
+     * One-shot read of ONE reminder THROUGH the store — the read half of a read-modify-write.
+     * Was `repository.getById(...)`, which went straight to the DAO and bypassed the store read
+     * path while the paired `upsert` went through the write store (the S5-2 split-read defect).
+     */
+    private suspend fun loadOne(billId: String): BillReminder? =
+        (
+            repository.billReminderDetailStream(billId, viewModelScope).state
+                .firstOrNull { it is ScreenState.Content<BillReminder> || it is ScreenState.Empty }
+                as? ScreenState.Content<BillReminder>
+            )?.data
+
     private suspend fun markPaid(billId: String) {
-        val existing = repository.getById(billId) ?: return
+        val existing = loadOne(billId) ?: return
         repository.upsert(existing.copy(updatedAtMs = clock.now().toEpochMilliseconds()))
         // Re-scheduling is the responsibility of [EditBillReminderViewModel] on the
         // happy path; here we just cancel-and-let-the-next-edit-or-app-launch reschedule.
@@ -106,7 +119,7 @@ class BillRemindersListViewModel(
     }
 
     private suspend fun toggle(billId: String) {
-        val existing = repository.getById(billId) ?: return
+        val existing = loadOne(billId) ?: return
         val flipped = existing.copy(
             enabled = !existing.enabled,
             updatedAtMs = clock.now().toEpochMilliseconds(),

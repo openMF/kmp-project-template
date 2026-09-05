@@ -24,6 +24,7 @@ import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.demo.banking.LoanRepository
+import kpt.core.model.demo.banking.Loan
 import kpt.core.data.demo.calc.AmortizationCalcRepository
 import kpt.core.model.demo.calc.AmortizationBreakdown
 import kpt.core.store.demo.calc.impl.AmortizationCalcParams
@@ -82,9 +83,14 @@ class AmortizationViewModel(
 
     init {
         if (loanId != null) {
-            repository.observeById(loanId)
-                .onEach { loan ->
-                    loan?.let {
+            // Read the source loan THROUGH the store-backed detail stream, not a raw
+            // `repository.observeById`. The store path already existed
+            // (`provideLoanDetailStore` → `loanDetailStream`) and was simply not used here.
+            // Only Content prefills; Loading/Empty/Error leave the user's own inputs
+            // untouched — same behaviour as the previous null-guarded observeById.
+            repository.loanDetailStream(loanId, viewModelScope).state
+                .onEach { screenState ->
+                    (screenState as? ScreenState.Content<Loan>)?.data?.let {
                         updateState {
                             copy(
                                 principal = it.principal,

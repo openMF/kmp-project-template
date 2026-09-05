@@ -44,9 +44,9 @@ internal class FakeLoanRepository : LoanRepository {
             },
         )
 
-    override fun observeById(id: String): Flow<Loan?> = state.map { rows -> rows.firstOrNull { it.id == id } }
+     fun observeById(id: String): Flow<Loan?> = state.map { rows -> rows.firstOrNull { it.id == id } }
 
-    override suspend fun getById(id: String): Loan? = state.value.firstOrNull { it.id == id }
+     suspend fun getById(id: String): Loan? = state.value.firstOrNull { it.id == id }
 
     override suspend fun upsert(loan: Loan) {
         state.value = state.value.filterNot { it.id == loan.id } + loan
@@ -56,10 +56,10 @@ internal class FakeLoanRepository : LoanRepository {
         state.value = state.value.filterNot { it.id == id }
     }
 
-    override fun observeTotalMonthlyEmi(): Flow<Double> = state.map { rows -> rows.sumOf { it.monthlyPayment } }
+     fun observeTotalMonthlyEmi(): Flow<Double> = state.map { rows -> rows.sumOf { it.monthlyPayment } }
 
-    override fun observeTotalPrincipalRemaining(): Flow<Double> =
+     fun observeTotalPrincipalRemaining(): Flow<Double> =
         state.map { rows -> rows.sumOf { it.principalRemaining } }
 
-    override fun observeCount(): Flow<Int> = state.map { it.size }
+     fun observeCount(): Flow<Int> = state.map { it.size }
 }

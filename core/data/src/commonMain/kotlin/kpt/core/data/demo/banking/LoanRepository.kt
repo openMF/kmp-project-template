@@ -30,11 +30,7 @@ interface LoanRepository {
     /** Observe a single loan as a [ScreenDataStream] (absent id → Empty) for detail/projection screens. */
     fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan>
 
-    /** Observe a single loan. Emits `null` after deletion. */
-    fun observeById(id: String): Flow<Loan?>
 
-    /** One-shot read. `null` if the loan was never saved or has been deleted. */
-    suspend fun getById(id: String): Loan?
 
     /** Insert-or-replace by [Loan.id]. Idempotent. */
     suspend fun upsert(loan: Loan)
@@ -42,18 +38,4 @@ interface LoanRepository {
     /** Delete by id. No-op if absent. */
     suspend fun delete(id: String)
 
-    /**
-     * Sum of every loan's [Loan.monthlyPayment]. Useful for the dashboard
-     * "Total Monthly EMI" tile. Emits whenever any loan changes.
-     */
-    fun observeTotalMonthlyEmi(): Flow<Double>
-
-    /**
-     * Sum of every loan's [Loan.principalRemaining]. Useful for the dashboard
-     * "Total Outstanding" tile. Emits whenever any loan changes.
-     */
-    fun observeTotalPrincipalRemaining(): Flow<Double>
-
-    /** Reactive row count — used by the dashboard badge. */
-    fun observeCount(): Flow<Int>
 }

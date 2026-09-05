@@ -27,6 +27,12 @@ interface BillReminderRepository {
     fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>>
 
     /**
+     * Store-backed detail read for ONE reminder — the read path an edit form hydrates from.
+     * Mirrors [kpt.core.data.demo.banking.LoanRepository.loanDetailStream]; absent id → Empty.
+     */
+    fun billReminderDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<BillReminder>
+
+    /**
      * Observe enabled bill reminders whose `dueDay` falls within the next
      * [maxDays] starting from today. The window wraps across the month boundary —
      * a reminder on day 3 *is* "upcoming" when today is day 30 and
@@ -36,11 +42,7 @@ interface BillReminderRepository {
      */
     fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    /** Observe a single bill reminder. Emits `null` after deletion. */
-    fun observeById(id: String): Flow<BillReminder?>
 
-    /** One-shot read. */
-    suspend fun getById(id: String): BillReminder?
 
     /** Insert-or-replace. Idempotent. */
     suspend fun upsert(bill: BillReminder)
@@ -55,6 +57,4 @@ interface BillReminderRepository {
      */
     fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double>
 
-    /** Reactive row count — used by the dashboard badge. */
-    fun observeCount(): Flow<Int>
 }

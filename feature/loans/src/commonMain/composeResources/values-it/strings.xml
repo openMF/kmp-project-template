@@ -1,69 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- locale: it · seeded by /idea-locale · values carry SOURCE text until translated -->
 <resources>
-    <string name="screens_loans_add_title" translate="pending">Add Loan</string>
-    <string name="screens_loans_edit_title" translate="pending">Edit Loan</string>
-    <string name="screens_loans_addedit_back_cd" translate="pending">Back</string>
-    <string name="screens_loans_addedit_name_label" translate="pending">Loan name</string>
-    <string name="screens_loans_addedit_kind_label" translate="pending">Kind</string>
-    <string name="screens_loans_addedit_kind_cd" translate="pending">Choose loan kind</string>
-    <string name="screens_loans_addedit_principal_label" translate="pending">Original principal</string>
-    <string name="screens_loans_addedit_principal_remaining_label" translate="pending">Principal remaining</string>
-    <string name="screens_loans_addedit_annual_rate_label" translate="pending">Annual interest rate (%)</string>
-    <string name="screens_loans_addedit_tenure_label" translate="pending">Tenure (months)</string>
-    <string name="screens_loans_addedit_months_remaining_label" translate="pending">Months remaining</string>
-    <string name="screens_loans_addedit_next_due_date_label" translate="pending">Next due date (YYYY-MM-DD)</string>
-    <string name="screens_loans_addedit_total_paid_label" translate="pending">Total paid to date</string>
-    <string name="screens_loans_addedit_monthly_emi_label" translate="pending">Monthly EMI</string>
-    <string name="screens_loans_addedit_total_interest_preview" translate="pending">Total interest: %1$s</string>
-    <string name="screens_loans_add_submit" translate="pending">Save Loan</string>
-    <string name="screens_loans_edit_submit" translate="pending">Update Loan</string>
-    <string name="screens_loans_addedit_status_saving" translate="pending">Saving…</string>
-    <string name="screens_loans_addedit_status_saved" translate="pending">Saved ✓</string>
-    <string name="screens_loans_addedit_status_offline" translate="pending">Saved offline — will sync when online.</string>
-    <string name="screens_loans_addedit_status_failed" translate="pending">Save failed: %1$s</string>
-    <string name="screens_loans_addedit_status_failed_unknown" translate="pending">unknown error</string>
-    <string name="screens_loans_addedit_retry_button" translate="pending">Retry</string>
-    <string name="screens_loans_addedit_dismiss_button" translate="pending">Dismiss</string>
-    <string name="screens_loans_addedit_draft_resume_title" translate="pending">Resume your loan?</string>
-    <string name="screens_loans_addedit_draft_resume_message" translate="pending">You have an unsaved loan draft. Resume editing it, discard it, or start a new one.</string>
-    <string name="screens_loans_addedit_draft_resume_resume" translate="pending">Resume editing</string>
-    <string name="screens_loans_addedit_draft_resume_discard" translate="pending">Discard draft</string>
-    <string name="screens_loans_addedit_draft_resume_start_fresh" translate="pending">Start fresh</string>
-    <string name="screens_loans_detail_title" translate="pending">Loan Details</string>
-    <string name="screens_loans_detail_back_cd" translate="pending">Back</string>
-    <string name="screens_loans_detail_delete_dialog_title" translate="pending">Delete loan?</string>
-    <string name="screens_loans_detail_delete_dialog_message" translate="pending">This loan and its tracking history will be removed.</string>
-    <string name="screens_loans_detail_delete_confirm" translate="pending">Delete</string>
-    <string name="screens_loans_detail_delete_cancel" translate="pending">Cancel</string>
-    <string name="screens_loans_detail_principal_remaining_label" translate="pending">Principal remaining</string>
-    <string name="screens_loans_detail_months_remaining_value" translate="pending">%1$d months remaining</string>
-    <string name="screens_loans_detail_original_principal_label" translate="pending">Original principal</string>
-    <string name="screens_loans_detail_monthly_payment_label" translate="pending">Monthly payment (EMI)</string>
-    <string name="screens_loans_detail_total_paid_label" translate="pending">Total paid to date</string>
-    <string name="screens_loans_detail_annual_rate_label" translate="pending">Annual rate</string>
-    <string name="screens_loans_detail_annual_rate_value" translate="pending">%1$s%%</string>
-    <string name="screens_loans_detail_next_due_label" translate="pending">Next due date</string>
-    <string name="screens_loans_detail_tenure_label" translate="pending">Tenure</string>
-    <string name="screens_loans_detail_tenure_value" translate="pending">%1$d months</string>
-    <string name="screens_loans_detail_tenure_progress_label" translate="pending">Tenure progress</string>
-    <string name="screens_loans_detail_tenure_progress_value" translate="pending">%1$d%% complete</string>
-    <string name="screens_loans_detail_edit_button" translate="pending">Edit</string>
-    <string name="screens_loans_detail_schedule_button" translate="pending">Schedule</string>
-    <string name="screens_loans_detail_delete_button" translate="pending">Delete</string>
-    <string name="screens_loans_list_title" translate="pending">Personal Loans</string>
-    <string name="screens_loans_list_back_cd" translate="pending">Back</string>
-    <string name="screens_loans_list_new_fab_text" translate="pending">New loan</string>
-    <string name="screens_loans_list_delete_dialog_title" translate="pending">Delete loan?</string>
-    <string name="screens_loans_list_delete_dialog_message" translate="pending">\'%1$s\' will be removed. This cannot be undone.</string>
-    <string name="screens_loans_list_delete_confirm" translate="pending">Delete</string>
-    <string name="screens_loans_list_delete_cancel" translate="pending">Cancel</string>
-    <string name="screens_loans_list_total_outstanding_label" translate="pending">Total outstanding</string>
-    <string name="screens_loans_list_active_count_single" translate="pending">%1$d active loan</string>
-    <string name="screens_loans_list_active_count_plural" translate="pending">%1$d active loans</string>
-    <string name="screens_loans_list_monthly_emi_label" translate="pending">Monthly EMI</string>
-    <string name="screens_loans_row_remaining_label" translate="pending">Remaining</string>
-    <string name="screens_loans_row_monthly_emi_label" translate="pending">Monthly EMI</string>
-    <string name="screens_loans_row_progress_value" translate="pending">%1$d%% paid</string>
-    <string name="screens_loans_row_next_due_value" translate="pending">Next: %1$s</string>
+    <string name="screens_loans_add_title">Aggiungi prestito</string>
+    <string name="screens_loans_edit_title">Modifica prestito</string>
+    <string name="screens_loans_addedit_back_cd">Indietro</string>
+    <string name="screens_loans_addedit_name_label">Nome del prestito</string>
+    <string name="screens_loans_addedit_kind_label">Tipo</string>
+    <string name="screens_loans_addedit_kind_cd">Scegli il tipo di prestito</string>
+    <string name="screens_loans_addedit_principal_label">Capitale iniziale</string>
+    <string name="screens_loans_addedit_principal_remaining_label">Capitale residuo</string>
+    <string name="screens_loans_addedit_annual_rate_label">Tasso di interesse annuo (%)</string>
+    <string name="screens_loans_addedit_tenure_label">Durata (mesi)</string>
+    <string name="screens_loans_addedit_months_remaining_label">Mesi rimanenti</string>
+    <string name="screens_loans_addedit_next_due_date_label">Prossima scadenza (AAAA-MM-GG)</string>
+    <string name="screens_loans_addedit_total_paid_label">Totale pagato a oggi</string>
+    <string name="screens_loans_addedit_monthly_emi_label">Rata mensile</string>
+    <string name="screens_loans_addedit_total_interest_preview">Interessi totali: %1$s</string>
+    <string name="screens_loans_add_submit">Salva prestito</string>
+    <string name="screens_loans_edit_submit">Aggiorna prestito</string>
+    <string name="screens_loans_addedit_status_saving">Salvataggio…</string>
+    <string name="screens_loans_addedit_status_saved">Salvato ✓</string>
+    <string name="screens_loans_addedit_status_offline">Salvato offline — verrà sincronizzato quando torni online.</string>
+    <string name="screens_loans_addedit_status_failed">Salvataggio non riuscito: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">errore sconosciuto</string>
+    <string name="screens_loans_addedit_retry_button">Riprova</string>
+    <string name="screens_loans_addedit_dismiss_button">Ignora</string>
+    <string name="screens_loans_addedit_draft_resume_title">Riprendere il prestito?</string>
+    <string name="screens_loans_addedit_draft_resume_message">Hai una bozza di prestito non salvata. Riprendi la modifica, eliminala o creane una nuova.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">Riprendi modifica</string>
+    <string name="screens_loans_addedit_draft_resume_discard">Elimina bozza</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">Ricomincia</string>
+    <string name="screens_loans_detail_title">Dettagli del prestito</string>
+    <string name="screens_loans_detail_back_cd">Indietro</string>
+    <string name="screens_loans_detail_delete_dialog_title">Eliminare il prestito?</string>
+    <string name="screens_loans_detail_delete_dialog_message">Questo prestito e la sua cronologia verranno rimossi.</string>
+    <string name="screens_loans_detail_delete_confirm">Elimina</string>
+    <string name="screens_loans_detail_delete_cancel">Annulla</string>
+    <string name="screens_loans_detail_principal_remaining_label">Capitale residuo</string>
+    <string name="screens_loans_detail_months_remaining_value">%1$d mesi rimanenti</string>
+    <string name="screens_loans_detail_original_principal_label">Capitale iniziale</string>
+    <string name="screens_loans_detail_monthly_payment_label">Pagamento mensile (rata)</string>
+    <string name="screens_loans_detail_total_paid_label">Totale pagato a oggi</string>
+    <string name="screens_loans_detail_annual_rate_label">Tasso annuo</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">Prossima scadenza</string>
+    <string name="screens_loans_detail_tenure_label">Durata</string>
+    <string name="screens_loans_detail_tenure_value">%1$d mesi</string>
+    <string name="screens_loans_detail_tenure_progress_label">Avanzamento durata</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% completato</string>
+    <string name="screens_loans_detail_edit_button">Modifica</string>
+    <string name="screens_loans_detail_schedule_button">Piano</string>
+    <string name="screens_loans_detail_delete_button">Elimina</string>
+    <string name="screens_loans_list_title">Prestiti personali</string>
+    <string name="screens_loans_list_back_cd">Indietro</string>
+    <string name="screens_loans_list_new_fab_text">Nuovo prestito</string>
+    <string name="screens_loans_list_delete_dialog_title">Eliminare il prestito?</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' verrà rimosso. Non è possibile annullare.</string>
+    <string name="screens_loans_list_delete_confirm">Elimina</string>
+    <string name="screens_loans_list_delete_cancel">Annulla</string>
+    <string name="screens_loans_list_total_outstanding_label">Totale residuo</string>
+    <string name="screens_loans_list_active_count_single">%1$d prestito attivo</string>
+    <string name="screens_loans_list_active_count_plural">%1$d prestiti attivi</string>
+    <string name="screens_loans_list_monthly_emi_label">Rata mensile</string>
+    <string name="screens_loans_row_remaining_label">Residuo</string>
+    <string name="screens_loans_row_monthly_emi_label">Rata mensile</string>
+    <string name="screens_loans_row_progress_value">%1$d%% pagato</string>
+    <string name="screens_loans_row_next_due_value">Prossima: %1$s</string>
 </resources>

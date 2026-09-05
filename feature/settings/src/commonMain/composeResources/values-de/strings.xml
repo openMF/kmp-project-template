@@ -33,33 +33,33 @@
     <string name="feature_settings_change_language_text">Sprache ändern</string>
     <string name="feature_settings_change_language_placeholder_text">Sprache ändern</string>
     <string name="feature_settings_language_preference">Sprache</string>
-    <string name="feature_settings_dev_tools_title" translate="pending">Dev tools</string>
-    <string name="feature_settings_dev_transition_gallery" translate="pending">Transition Gallery</string>
-    <string name="feature_settings_dev_state_gallery" translate="pending">State Gallery</string>
-    <string name="feature_settings_dev_close" translate="pending">Close</string>
-    <string name="feature_settings_notifications_empty_title" translate="pending">No notifications yet</string>
-    <string name="feature_settings_notifications_empty_message" translate="pending">You\'ll see bill reminders and rate alerts here.</string>
-    <string name="feature_settings_sync_drafts_row" translate="pending">Sync &amp; Drafts</string>
-    <string name="feature_settings_sync_drafts_row_description" translate="pending">View and manage drafts and pending syncs</string>
-    <string name="feature_settings_sync_drafts_title" translate="pending">Sync &amp; Drafts</string>
-    <string name="feature_settings_sync_drafts_empty_title" translate="pending">Nothing to sync</string>
-    <string name="feature_settings_sync_drafts_empty_message" translate="pending">Drafts you save offline and records waiting to sync will appear here.</string>
-    <string name="feature_settings_sync_drafts_section_drafts" translate="pending">Drafts</string>
-    <string name="feature_settings_sync_drafts_section_syncing" translate="pending">Syncing</string>
-    <string name="feature_settings_sync_drafts_section_failed" translate="pending">Failed</string>
-    <string name="feature_settings_sync_drafts_status_pending" translate="pending">Pending</string>
-    <string name="feature_settings_sync_drafts_status_retrying" translate="pending">Retrying</string>
-    <string name="feature_settings_sync_drafts_status_failed" translate="pending">Failed</string>
-    <string name="feature_settings_sync_drafts_retry" translate="pending">Retry</string>
-    <string name="feature_settings_sync_drafts_discard" translate="pending">Discard</string>
-    <string name="feature_settings_sync_drafts_prune" translate="pending">Prune expired</string>
-    <string name="feature_settings_sync_drafts_discard_confirm_title" translate="pending">Discard draft?</string>
-    <string name="feature_settings_sync_drafts_discard_confirm_message" translate="pending">This permanently deletes the saved draft. This can\'t be undone.</string>
-    <string name="feature_settings_sync_drafts_discard_confirm_cancel" translate="pending">Cancel</string>
-    <string name="feature_settings_conflicts_title" translate="pending">Sync conflicts</string>
-    <string name="feature_settings_conflicts_empty_title" translate="pending">No conflicts</string>
-    <string name="feature_settings_conflicts_empty_message" translate="pending">When a change you made conflicts with a newer version on the server, it shows up here so you can keep the server\'s version or retry yours.</string>
-    <string name="feature_settings_conflicts_row_label" translate="pending">Conflict</string>
-    <string name="feature_settings_conflicts_accept_server" translate="pending">Keep server</string>
-    <string name="feature_settings_conflicts_retry_local" translate="pending">Retry mine</string>
+    <string name="feature_settings_dev_tools_title">Entwicklertools</string>
+    <string name="feature_settings_dev_transition_gallery">Übergangsgalerie</string>
+    <string name="feature_settings_dev_state_gallery">Zustandsgalerie</string>
+    <string name="feature_settings_dev_close">Schließen</string>
+    <string name="feature_settings_notifications_empty_title">Noch keine Benachrichtigungen</string>
+    <string name="feature_settings_notifications_empty_message">Hier siehst du Rechnungserinnerungen und Zinswarnungen.</string>
+    <string name="feature_settings_sync_drafts_row">Synchronisierung &amp; Entwürfe</string>
+    <string name="feature_settings_sync_drafts_row_description">Entwürfe und ausstehende Synchronisierungen ansehen und verwalten</string>
+    <string name="feature_settings_sync_drafts_title">Synchronisierung &amp; Entwürfe</string>
+    <string name="feature_settings_sync_drafts_empty_title">Nichts zu synchronisieren</string>
+    <string name="feature_settings_sync_drafts_empty_message">Offline gespeicherte Entwürfe und Datensätze, die auf Synchronisierung warten, erscheinen hier.</string>
+    <string name="feature_settings_sync_drafts_section_drafts">Entwürfe</string>
+    <string name="feature_settings_sync_drafts_section_syncing">Wird synchronisiert</string>
+    <string name="feature_settings_sync_drafts_section_failed">Fehlgeschlagen</string>
+    <string name="feature_settings_sync_drafts_status_pending">Ausstehend</string>
+    <string name="feature_settings_sync_drafts_status_retrying">Wird wiederholt</string>
+    <string name="feature_settings_sync_drafts_status_failed">Fehlgeschlagen</string>
+    <string name="feature_settings_sync_drafts_retry">Wiederholen</string>
+    <string name="feature_settings_sync_drafts_discard">Verwerfen</string>
+    <string name="feature_settings_sync_drafts_prune">Abgelaufene entfernen</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_title">Entwurf verwerfen?</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_message">Dadurch wird der gespeicherte Entwurf endgültig gelöscht. Das lässt sich nicht rückgängig machen.</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_cancel">Abbrechen</string>
+    <string name="feature_settings_conflicts_title">Synchronisierungskonflikte</string>
+    <string name="feature_settings_conflicts_empty_title">Keine Konflikte</string>
+    <string name="feature_settings_conflicts_empty_message">Wenn eine deiner Änderungen mit einer neueren Version auf dem Server kollidiert, erscheint sie hier, damit du die Serverversion behalten oder deine erneut versuchen kannst.</string>
+    <string name="feature_settings_conflicts_row_label">Konflikt</string>
+    <string name="feature_settings_conflicts_accept_server">Server behalten</string>
+    <string name="feature_settings_conflicts_retry_local">Meine wiederholen</string>
 </resources>

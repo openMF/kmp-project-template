@@ -33,33 +33,33 @@
     <string name="feature_settings_change_language_text">更改语言</string>
     <string name="feature_settings_change_language_placeholder_text">更改语言</string>
     <string name="feature_settings_language_preference">语言</string>
-    <string name="feature_settings_dev_tools_title" translate="pending">Dev tools</string>
-    <string name="feature_settings_dev_transition_gallery" translate="pending">Transition Gallery</string>
-    <string name="feature_settings_dev_state_gallery" translate="pending">State Gallery</string>
-    <string name="feature_settings_dev_close" translate="pending">Close</string>
-    <string name="feature_settings_notifications_empty_title" translate="pending">No notifications yet</string>
-    <string name="feature_settings_notifications_empty_message" translate="pending">You\'ll see bill reminders and rate alerts here.</string>
-    <string name="feature_settings_sync_drafts_row" translate="pending">Sync &amp; Drafts</string>
-    <string name="feature_settings_sync_drafts_row_description" translate="pending">View and manage drafts and pending syncs</string>
-    <string name="feature_settings_sync_drafts_title" translate="pending">Sync &amp; Drafts</string>
-    <string name="feature_settings_sync_drafts_empty_title" translate="pending">Nothing to sync</string>
-    <string name="feature_settings_sync_drafts_empty_message" translate="pending">Drafts you save offline and records waiting to sync will appear here.</string>
-    <string name="feature_settings_sync_drafts_section_drafts" translate="pending">Drafts</string>
-    <string name="feature_settings_sync_drafts_section_syncing" translate="pending">Syncing</string>
-    <string name="feature_settings_sync_drafts_section_failed" translate="pending">Failed</string>
-    <string name="feature_settings_sync_drafts_status_pending" translate="pending">Pending</string>
-    <string name="feature_settings_sync_drafts_status_retrying" translate="pending">Retrying</string>
-    <string name="feature_settings_sync_drafts_status_failed" translate="pending">Failed</string>
-    <string name="feature_settings_sync_drafts_retry" translate="pending">Retry</string>
-    <string name="feature_settings_sync_drafts_discard" translate="pending">Discard</string>
-    <string name="feature_settings_sync_drafts_prune" translate="pending">Prune expired</string>
-    <string name="feature_settings_sync_drafts_discard_confirm_title" translate="pending">Discard draft?</string>
-    <string name="feature_settings_sync_drafts_discard_confirm_message" translate="pending">This permanently deletes the saved draft. This can\'t be undone.</string>
-    <string name="feature_settings_sync_drafts_discard_confirm_cancel" translate="pending">Cancel</string>
-    <string name="feature_settings_conflicts_title" translate="pending">Sync conflicts</string>
-    <string name="feature_settings_conflicts_empty_title" translate="pending">No conflicts</string>
-    <string name="feature_settings_conflicts_empty_message" translate="pending">When a change you made conflicts with a newer version on the server, it shows up here so you can keep the server\'s version or retry yours.</string>
-    <string name="feature_settings_conflicts_row_label" translate="pending">Conflict</string>
-    <string name="feature_settings_conflicts_accept_server" translate="pending">Keep server</string>
-    <string name="feature_settings_conflicts_retry_local" translate="pending">Retry mine</string>
+    <string name="feature_settings_dev_tools_title">开发者工具</string>
+    <string name="feature_settings_dev_transition_gallery">转场画廊</string>
+    <string name="feature_settings_dev_state_gallery">状态画廊</string>
+    <string name="feature_settings_dev_close">关闭</string>
+    <string name="feature_settings_notifications_empty_title">暂无通知</string>
+    <string name="feature_settings_notifications_empty_message">账单提醒和利率提醒会显示在这里。</string>
+    <string name="feature_settings_sync_drafts_row">同步与草稿</string>
+    <string name="feature_settings_sync_drafts_row_description">查看并管理草稿和待同步项</string>
+    <string name="feature_settings_sync_drafts_title">同步与草稿</string>
+    <string name="feature_settings_sync_drafts_empty_title">没有需要同步的内容</string>
+    <string name="feature_settings_sync_drafts_empty_message">你离线保存的草稿和等待同步的记录会显示在这里。</string>
+    <string name="feature_settings_sync_drafts_section_drafts">草稿</string>
+    <string name="feature_settings_sync_drafts_section_syncing">同步中</string>
+    <string name="feature_settings_sync_drafts_section_failed">失败</string>
+    <string name="feature_settings_sync_drafts_status_pending">待处理</string>
+    <string name="feature_settings_sync_drafts_status_retrying">重试中</string>
+    <string name="feature_settings_sync_drafts_status_failed">失败</string>
+    <string name="feature_settings_sync_drafts_retry">重试</string>
+    <string name="feature_settings_sync_drafts_discard">丢弃</string>
+    <string name="feature_settings_sync_drafts_prune">清理过期项</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_title">丢弃草稿？</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_message">这将永久删除已保存的草稿，且无法撤销。</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_cancel">取消</string>
+    <string name="feature_settings_conflicts_title">同步冲突</string>
+    <string name="feature_settings_conflicts_empty_title">没有冲突</string>
+    <string name="feature_settings_conflicts_empty_message">当你的更改与服务器上更新的版本冲突时，会显示在这里，你可以保留服务器版本或重试自己的版本。</string>
+    <string name="feature_settings_conflicts_row_label">冲突</string>
+    <string name="feature_settings_conflicts_accept_server">保留服务器</string>
+    <string name="feature_settings_conflicts_retry_local">重试我的</string>
 </resources>

@@ -56,6 +56,28 @@ internal fun SettingsRowsPreview() {
 
 @Preview
 @Composable
+internal fun ThemeCardPreview() {
+    KptTheme {
+        ThemeCard(onClick = {})
+    }
+}
+
+@Preview
+@Composable
+internal fun VersionLabelPreview() {
+    // The footer renders the fork's app display name from BuildKonfig, not a string resource, so a
+    // rebrand shows up here. Both variants matter: the long-press affordance (the hidden dev-menu
+    // entry point) is only wired when `onLongClick` is non-null.
+    KptTheme {
+        Column {
+            VersionLabel(onLongClick = null)
+            VersionLabel(onLongClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
 internal fun SettingsRowCardLongTitlePreview() {
     // The row primitive on its own, with a title long enough to wrap — the case the two shipped
     // rows (both short) never exercise, and where icon/title/chevron alignment breaks first.

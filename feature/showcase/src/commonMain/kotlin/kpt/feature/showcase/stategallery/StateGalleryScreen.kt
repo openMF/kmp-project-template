@@ -207,7 +207,7 @@ fun StateGalleryScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SectionHeader(text: String) {
+internal fun SectionHeader(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,
@@ -216,7 +216,7 @@ private fun SectionHeader(text: String) {
 }
 
 @Composable
-private fun LabelRow(label: String, content: @Composable () -> Unit) {
+internal fun LabelRow(label: String, content: @Composable () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -233,7 +233,7 @@ private fun LabelRow(label: String, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun PreviewBox(label: String, content: @Composable () -> Unit) {
+internal fun PreviewBox(label: String, content: @Composable () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text = label,

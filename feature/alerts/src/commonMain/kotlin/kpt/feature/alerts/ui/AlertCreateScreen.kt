@@ -34,7 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.draft.DraftResolutionPrompt
 import kpt.core.base.ui.submit.MutationScreenContent
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.submit.SubmitState
 import kpt.core.model.demo.alerts.AlertDirection
+import kpt.core.model.demo.alerts.PriceAlert
 import kpt.feature.alerts.generated.resources.Res
 import kpt.feature.alerts.generated.resources.screens_alert_create_back_cd
 import kpt.feature.alerts.generated.resources.screens_alert_create_coin_label
@@ -57,7 +60,6 @@ import org.koin.compose.viewmodel.koinViewModel
  * [MutationScreenContent] renders the persistent Saving / Saved / Failed-with-retry strip and
  * calls [onSubmitted] on success so the screen pops back to the list.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertCreateScreen(
     onBackClick: () -> Unit,
@@ -68,14 +70,57 @@ fun AlertCreateScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val form by viewModel.formState.collectAsStateWithLifecycle()
 
+    AlertCreateScreenContent(
+        form = form,
+        screenState = uiState.screen,
+        submitState = uiState.submit,
+        hasResumableDraft = uiState.hasResumableDraft,
+        onBackClick = onBackClick,
+        onSubmitted = onSubmitted,
+        onCoinIdChange = viewModel::onCoinIdChange,
+        onDirectionChange = viewModel::onDirectionChange,
+        onTargetValueChange = viewModel::onTargetValueChange,
+        onSubmit = viewModel::submitForm,
+        onRetry = viewModel::onRetry,
+        onResume = viewModel::onResume,
+        onDiscardSavedDraft = viewModel::onDiscardSavedDraft,
+        onStartFresh = viewModel::onStartFresh,
+        modifier = modifier,
+    )
+}
+
+/**
+ * Stateless body — every visual decision lives here, so `@Preview` can render it directly without a
+ * Koin graph (the device-free CMP render tier). Follows the template's house pattern; see
+ * `SettingsScreen`.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun AlertCreateScreenContent(
+    form: AlertFormState,
+    screenState: ScreenState<PriceAlert>,
+    submitState: SubmitState<PriceAlert>,
+    hasResumableDraft: Boolean,
+    onBackClick: () -> Unit,
+    onSubmitted: () -> Unit,
+    onCoinIdChange: (String) -> Unit,
+    onDirectionChange: (AlertDirection) -> Unit,
+    onTargetValueChange: (String) -> Unit,
+    onSubmit: () -> Unit,
+    onRetry: () -> Unit,
+    onResume: () -> Unit,
+    onDiscardSavedDraft: () -> Unit,
+    onStartFresh: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     // Three-case resume: on entry, if a saved draft exists for this alert, let the user choose to
     // resume it, discard it, or start fresh (the draft stays recoverable in Settings → Sync & Drafts).
-    if (uiState.hasResumableDraft) {
+    if (hasResumableDraft) {
         DraftResolutionPrompt(
-            onResume = viewModel::onResume,
-            onDiscard = viewModel::onDiscardSavedDraft,
-            onStartFresh = viewModel::onStartFresh,
-            onDismiss = viewModel::onStartFresh,
+            onResume = onResume,
+            onDiscard = onDiscardSavedDraft,
+            onStartFresh = onStartFresh,
+            onDismiss = onStartFresh,
             title = stringResource(Res.string.screens_alert_create_draft_resume_title),
             message = stringResource(Res.string.screens_alert_create_draft_resume_message),
             resumeLabel = stringResource(Res.string.screens_alert_create_draft_resume_resume),
@@ -101,9 +146,9 @@ fun AlertCreateScreen(
         },
     ) { padding ->
         MutationScreenContent(
-            screenState = uiState.screen,
-            submitState = uiState.submit,
-            onRetry = viewModel::onRetry,
+            screenState = screenState,
+            submitState = submitState,
+            onRetry = onRetry,
             onSubmitted = { onSubmitted() },
             modifier = Modifier.fillMaxSize().padding(padding),
         ) { _, _ ->
@@ -113,7 +158,7 @@ fun AlertCreateScreen(
             ) {
                 OutlinedTextField(
                     value = form.coinId,
-                    onValueChange = viewModel::onCoinIdChange,
+                    onValueChange = onCoinIdChange,
                     label = { Text(stringResource(Res.string.screens_alert_create_coin_label)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().testTag(TestTags.AlertCreate.COIN_FIELD),
@@ -123,24 +168,24 @@ fun AlertCreateScreen(
                 ) {
                     FilterChip(
                         selected = form.direction == AlertDirection.ABOVE,
-                        onClick = { viewModel.onDirectionChange(AlertDirection.ABOVE) },
+                        onClick = { onDirectionChange(AlertDirection.ABOVE) },
                         label = { Text(stringResource(Res.string.screens_alert_create_dir_above)) },
                     )
                     FilterChip(
                         selected = form.direction == AlertDirection.BELOW,
-                        onClick = { viewModel.onDirectionChange(AlertDirection.BELOW) },
+                        onClick = { onDirectionChange(AlertDirection.BELOW) },
                         label = { Text(stringResource(Res.string.screens_alert_create_dir_below)) },
                     )
                 }
                 OutlinedTextField(
                     value = form.targetValueText,
-                    onValueChange = viewModel::onTargetValueChange,
+                    onValueChange = onTargetValueChange,
                     label = { Text(stringResource(Res.string.screens_alert_create_target_label)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth().testTag(TestTags.AlertCreate.TARGET_FIELD),
                 )
                 Button(
-                    onClick = viewModel::submitForm,
+                    onClick = onSubmit,
                     enabled = form.canSubmit,
                     modifier = Modifier.fillMaxWidth().testTag(TestTags.AlertCreate.SUBMIT),
                 ) {

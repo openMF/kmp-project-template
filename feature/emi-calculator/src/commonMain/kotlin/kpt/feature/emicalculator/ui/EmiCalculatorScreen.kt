@@ -36,10 +36,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
 import kpt.core.common.formatGrouped
+import kpt.core.model.demo.emi.EmiResult
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.theme.spacing
 import kpt.feature.emicalculator.generated.resources.Res
@@ -54,7 +56,14 @@ import kpt.feature.emicalculator.generated.resources.screens_emicalculator_total
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Stateful entry point — resolves the ViewModel and hands its state to
+ * [EmiCalculatorScreenContent].
+ *
+ * The split follows the template's house pattern (see `SettingsScreen`): everything visual lives in
+ * the stateless content composable so it can be rendered by `@Preview` off `desktopTest` without a
+ * Koin graph, which is what the device-free CMP render tier needs.
+ */
 @Composable
 fun EmiCalculatorScreen(
     onBackClick: () -> Unit,
@@ -64,6 +73,31 @@ fun EmiCalculatorScreen(
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val emiState by viewModel.emiState.collectAsStateWithLifecycle()
 
+    EmiCalculatorScreenContent(
+        state = state,
+        emiState = emiState,
+        onBackClick = onBackClick,
+        onPrincipalChange = { viewModel.trySendAction(EmiAction.UpdatePrincipal(it)) },
+        onRateChange = { viewModel.trySendAction(EmiAction.UpdateRate(it)) },
+        onTenureChange = { viewModel.trySendAction(EmiAction.UpdateTenure(it)) },
+        onRetry = viewModel::onRetry,
+        modifier = modifier,
+    )
+}
+
+/** Stateless body — every visual decision lives here, so `@Preview` can render it directly. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun EmiCalculatorScreenContent(
+    state: EmiState,
+    emiState: ScreenState<EmiResult>,
+    onBackClick: () -> Unit,
+    onPrincipalChange: (Double) -> Unit,
+    onRateChange: (Double) -> Unit,
+    onTenureChange: (Int) -> Unit,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier.testTag(TestTags.EmiCalculator.SCREEN),
         topBar = {
@@ -100,11 +134,7 @@ fun EmiCalculatorScreen(
                 ) {
                     OutlinedTextField(
                         value = state.principal.toLong().toString(),
-                        onValueChange = {
-                            it.toDoubleOrNull()?.let { v ->
-                                viewModel.trySendAction(EmiAction.UpdatePrincipal(v))
-                            }
-                        },
+                        onValueChange = { it.toDoubleOrNull()?.let(onPrincipalChange) },
                         label = { Text(stringResource(Res.string.screens_emicalculator_principal_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
@@ -112,11 +142,7 @@ fun EmiCalculatorScreen(
 
                     OutlinedTextField(
                         value = state.ratePercent.toString(),
-                        onValueChange = {
-                            it.toDoubleOrNull()?.let { v ->
-                                viewModel.trySendAction(EmiAction.UpdateRate(v))
-                            }
-                        },
+                        onValueChange = { it.toDoubleOrNull()?.let(onRateChange) },
                         label = { Text(stringResource(Res.string.screens_emicalculator_rate_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         modifier = Modifier.fillMaxWidth(),
@@ -124,11 +150,7 @@ fun EmiCalculatorScreen(
 
                     OutlinedTextField(
                         value = state.tenureMonths.toString(),
-                        onValueChange = {
-                            it.toIntOrNull()?.let { v ->
-                                viewModel.trySendAction(EmiAction.UpdateTenure(v))
-                            }
-                        },
+                        onValueChange = { it.toIntOrNull()?.let(onTenureChange) },
                         label = { Text(stringResource(Res.string.screens_emicalculator_tenure_label)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
@@ -141,7 +163,7 @@ fun EmiCalculatorScreen(
             // yet complete) / Error are the store's states, not hand-rolled null checks.
             ScreenContent(
                 state = emiState,
-                onRetry = viewModel::onRetry,
+                onRetry = onRetry,
             ) { result, _ ->
                 HeroCard {
                     AmountDisplay(

@@ -47,6 +47,7 @@ import kpt.feature.showcase.generated.resources.Res
 import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_content
 import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_empty
 import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_error
+import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_error_chip_tapped
 import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_intro
 import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_loading
 import kpt.feature.showcase.generated.resources.screens_showcase_state_gallery_nonet
@@ -103,7 +104,10 @@ fun StateGalleryScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
                 ErrorChip(message = "Failed to load", onClick = { errorChipTaps++ })
                 if (errorChipTaps > 0) {
                     Text(
-                        text = "tapped ×$errorChipTaps",
+                        text = stringResource(
+                            Res.string.screens_showcase_state_gallery_error_chip_tapped,
+                            errorChipTaps,
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }

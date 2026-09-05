@@ -52,14 +52,17 @@ import kpt.feature.settings.generated.resources.feature_settings_loading
 import kpt.feature.settings.generated.resources.feature_settings_theme
 import kpt.feature.settings.generated.resources.feature_settings_title
 import org.jetbrains.compose.resources.stringResource
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.ui.screen.ScreenContent
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SettingsDialog(onDismiss: () -> Unit, viewModel: SettingsViewModel = koinViewModel()) {
-    val settingsUiState by viewModel.settingsUiState.collectAsStateWithLifecycle()
+    val settingsState by viewModel.settingsState.collectAsStateWithLifecycle()
     SettingsDialog(
         onDismiss = onDismiss,
-        settingsUiState = settingsUiState,
+        settingsState = settingsState,
+        onRetry = viewModel::onRetry,
         onChangeThemeBrand = viewModel::updateThemeBrand,
         onChangeDynamicColorPreference = viewModel::updateDynamicColorPreference,
         onChangeDarkThemeConfig = viewModel::updateDarkThemeConfig,
@@ -68,8 +71,9 @@ fun SettingsDialog(onDismiss: () -> Unit, viewModel: SettingsViewModel = koinVie
 
 @Composable
 fun SettingsDialog(
-    settingsUiState: SettingsUiState,
+    settingsState: ScreenState<UserEditableSettings>,
     onDismiss: () -> Unit,
+    onRetry: () -> Unit,
     onChangeThemeBrand: (themeBrand: ThemeBrand) -> Unit,
     onChangeDynamicColorPreference: (useDynamicColor: Boolean) -> Unit,
     onChangeDarkThemeConfig: (darkThemeConfig: DarkThemeConfig) -> Unit,
@@ -89,23 +93,29 @@ fun SettingsDialog(
         text = {
             HorizontalDivider()
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                when (settingsUiState) {
-                    SettingsUiState.Loading -> {
+                // Store5 read surface: the same ScreenContent wrapper every other read screen
+                // uses. The previous hand-rolled `Loading | Success` pair had NO error arm, so a
+                // failed preferences read left this dialog on "Loading…" forever with nothing to
+                // retry; ScreenContent renders Error/NoNetwork with a retry wired to the store.
+                // `loading` keeps the dialog's own compact copy rather than the full-screen
+                // spinner, which would be wrong inside an AlertDialog.
+                ScreenContent(
+                    state = settingsState,
+                    onRetry = onRetry,
+                    loading = {
                         Text(
                             text = stringResource(resource = Res.string.feature_settings_loading),
                             modifier = Modifier.padding(vertical = 16.dp),
                         )
-                    }
-
-                    is SettingsUiState.Success -> {
-                        SettingsPanel(
-                            settings = settingsUiState.settings,
-                            supportDynamicColor = supportDynamicColor,
-                            onChangeThemeBrand = onChangeThemeBrand,
-                            onChangeDynamicColorPreference = onChangeDynamicColorPreference,
-                            onChangeDarkThemeConfig = onChangeDarkThemeConfig,
-                        )
-                    }
+                    },
+                ) { settings, _ ->
+                    SettingsPanel(
+                        settings = settings,
+                        supportDynamicColor = supportDynamicColor,
+                        onChangeThemeBrand = onChangeThemeBrand,
+                        onChangeDynamicColorPreference = onChangeDynamicColorPreference,
+                        onChangeDarkThemeConfig = onChangeDarkThemeConfig,
+                    )
                 }
             }
         },

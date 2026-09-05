@@ -23,8 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.HeroCard
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.model.demo.profile.ProfileInfo
 import kpt.feature.profile.demo.ui.ProfileViewModel
@@ -48,14 +46,15 @@ fun ProfileDemoBody(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = retainedKoinViewModel(),
 ) {
-    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
-    // Store5 read surface: the profile body renders through the SAME ScreenContent wrapper as
-    // every other read screen. Today the store serves a local placeholder, so this settles on
-    // Content immediately — but a fork that swaps the fetcher for a signed-in user gets
-    // Loading / Error / retry for free instead of restructuring this composable.
+    // Store5 read surface: the body consumes the repository-built STREAM directly, the same way
+    // feature/watchlist and feature/macro's detail screen do — `ScreenContent(stream = …)` collects
+    // with lifecycle awareness and wires `onRetry = stream::retry` itself, so there is no
+    // collectAsStateWithLifecycle here and no re-exposed StateFlow on the ViewModel. Today the
+    // store serves a local placeholder, so it settles on Content immediately — but a fork that
+    // swaps the fetcher for a signed-in user gets Loading / Error / retry for free instead of
+    // restructuring this composable.
     ScreenContent(
-        state = screenState,
-        onRetry = viewModel::onRetry,
+        stream = viewModel.profile,
         modifier = modifier,
     ) { profile, _ ->
         ProfileDemoContent(profile = profile)

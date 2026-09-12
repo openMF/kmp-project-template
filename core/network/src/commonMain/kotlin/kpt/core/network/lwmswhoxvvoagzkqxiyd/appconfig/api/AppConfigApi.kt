@@ -7,9 +7,9 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.api
+package kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.api
 
-import kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.dto.RemoteAppConfigDto
+import kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.dto.RemoteAppConfigDto
 
 /**
  * The `app_config` table's API — the CONTRACT, with no Supabase types in sight.
@@ -20,7 +20,7 @@ import kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.dto.RemoteAppConfigDto
  * the interface; supabase-kt has no interface-generation step, so the implementation is hand-written
  * — but the SEAM is identical, and callers should never see the difference.
  *
- * One interface per TABLE. The package path `project/app_config/` is `{supabase-project}/{table}`,
+ * One interface per TABLE. The package path `project/appconfig/` is `{supabase-project}/{table}`,
  * so a project with five tables has five of these rather than one class that grows without bound.
  */
 interface AppConfigApi {

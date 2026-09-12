@@ -3,17 +3,44 @@
 SCAFFOLDED by `./gradlew syncForkConfig` from the `project` access point in
 `app-profile/app.yaml#network.access_points`. One package per endpoint.
 
-## Layout: `{supabase-project}/{table}/{api,dto}`
+## Layout: `{supabase-project}/{table}/api` + `api/impl`
 
 ```
-project/                      ← the access-point id == the Supabase project ref
-  app_config/                 ← one package per TABLE
+lwmswhoxvvoagzkqxiyd/           ← the access-point id == the Supabase project ref
+  appconfig/                   ← one package per TABLE
     api/
-      AppConfigApi.kt         ← interface — the contract, no Supabase types
-      AppConfigApiImpl.kt     ← @ApiBinding("lwmswhoxvvoagzkqxiyd") — the postgrest facade
+      AppConfigApi.kt           ← interface — the contract, no Supabase types
+      impl/
+        AppConfigApiImpl.kt     ← @ApiBinding(...) — the postgrest facade
     dto/
-      RemoteAppConfigDto.kt   ← the wire types for THIS table
+      RemoteAppConfigDto.kt     ← the wire types for THIS table
 ```
+
+**Why the interface and the implementation are separated into two packages**, rather than sharing a
+file the way a small API tempts you to:
+
+- **Tests.** A consumer injects `AppConfigApi` and a test fakes it with a plain object — no
+  `SupabaseConfigClient`, no network, no Koin. That is only possible while the contract is a type in
+  its own right.
+- **File-naming conflicts.** Detekt's `MatchingDeclarationName` (and ktlint's `standard:filename`)
+  require a file with one top-level classlike to be named after it. Put `AppConfigApi` and
+  `AppConfigApiImpl` in one file and the file can only be named for one of them — the other trips the
+  rule. Two files in two packages sidesteps it instead of suppressing it.
+- **The binding names the interface.** `network-ksp` resolves the impl's single supertype and emits
+  `supabaseApi<AppConfigApi>("<id>") { AppConfigApiImpl(it) }`, so `get<AppConfigApi>()` resolves and
+  nothing outside `api/impl/` ever names the implementation.
+
+**`api/impl/` holds HAND-WRITTEN implementations only.** That is the whole rule, and it is why the REST
+access points in this module (`coingecko`, `fineract`, `frankfurter`, `fred`, `jsonplaceholder`,
+`worldbank`) have an `api/` with no `impl/` beside it: their API type is a Ktorfit interface and
+Ktorfit GENERATES the implementation into `build/generated`, which the binding reaches as
+`restApi("<id>") { it.create<Simple>() }`. There is no hand-written file to place, the interface is
+already alone in its file so the naming rule is satisfied, and a test already fakes the interface — so
+a delegating wrapper would add a layer to maintain and buy none of the three reasons above.
+
+Supabase is the asymmetric case: supabase-kt has no interface-generation step, so the implementation
+is written by hand — and that is exactly what belongs in `api/impl/`. The SEAM is identical on both
+sides; only the AUTHOR of the implementation differs.
 
 **`project` is a placeholder the fork renames.** The template cannot ship a real Supabase project, so
 the access point id, the `base_url` host and this package are all the neutral word `project`. A fork

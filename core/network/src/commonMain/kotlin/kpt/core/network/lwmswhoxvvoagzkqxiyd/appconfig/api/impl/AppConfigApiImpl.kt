@@ -7,11 +7,12 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.api
+package kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.api.impl
 
 import kpt.core.base.network.SupabaseConfigClient
+import kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.api.AppConfigApi
 import kpt.core.base.network.annotation.ApiBinding
-import kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.dto.RemoteAppConfigDto
+import kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.dto.RemoteAppConfigDto
 
 /**
  * Supabase implementation of [AppConfigApi] — a typed facade over `client.postgrest`.

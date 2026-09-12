@@ -15,8 +15,8 @@ import kpt.core.base.network.AccessPointRegistry
 import kpt.core.base.network.SupabaseClientFactory
 import kpt.core.network.config.AppAccessPoints
 import kpt.core.network.config.AppSupabaseAnonKeys
-import kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.api.AppConfigApi
-import kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.api.AppConfigApiImpl
+import kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.api.AppConfigApi
+import kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.api.impl.AppConfigApiImpl
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse

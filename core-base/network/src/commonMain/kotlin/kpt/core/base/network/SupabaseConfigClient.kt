@@ -12,6 +12,7 @@ package kpt.core.base.network
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.logging.LogLevel
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 
@@ -45,6 +46,18 @@ import io.github.jan.supabase.postgrest.postgrest
 class SupabaseConfigClient(
     private val credentials: SupabaseCredentials,
     private val logLevel: LogLevel = LogLevel.INFO,
+    /**
+     * Fork seam for the modules this exposer does not install.
+     *
+     * Postgrest is always installed; Auth / ComposeAuth / Realtime / Storage are opt-in. Before this
+     * seam existed a fork that needed Auth had to build its OWN `createSupabaseClient` — and then the
+     * client the generated `supabaseApi(...)` binding hands to an `@ApiBinding` type was a DIFFERENT
+     * instance from the one the fork signed in on, so every RLS-gated call resolved no `auth.uid()`.
+     * The only way out was to stop using `@ApiBinding` and hand-wire the singles, which is the drift
+     * NAP-7 refuses. With the seam there is ONE client per access point: sign-in and every table API
+     * share it, and the annotation keeps working.
+     */
+    private val installExtras: SupabaseClientBuilder.() -> Unit = {},
 ) {
     /**
      * Lazily initialized Supabase client.
@@ -57,6 +70,7 @@ class SupabaseConfigClient(
         ) {
             defaultLogLevel = logLevel
             install(Postgrest)
+            installExtras()
         }
     }
 

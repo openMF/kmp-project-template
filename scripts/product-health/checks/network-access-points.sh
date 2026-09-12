@@ -179,7 +179,12 @@ if bind_src.nil?
   # enforced by the compiler: a binding for a class that does not exist does not build.
   puts "   ℹ️  NAP-4 GeneratedApiBindings not built — annotation/declaration agreement checked, binding shapes deferred to the compiler"
 else
-  bound = bind_src.scan(/(?:restApi|supabaseApi)\("([^"]+)"\)/).flatten
+  # `<Iface>` is OPTIONAL: a supabase point whose API is split into interface + impl generates
+  # `supabaseApi<AppConfigApi>("project") { AppConfigApiImpl(it) }` so Koin binds the INTERFACE
+  # (`single<T>` infers T from the factory lambda, so without the explicit type argument every
+  # `get<Interface>()` would miss). Matching only the bare form reported that correct binding as
+  # MISSING and then as "does not use supabaseApi(...)" — two failures for working code.
+  bound = bind_src.scan(/(?:restApi|supabaseApi)(?:<[^>]+>)?\("([^"]+)"\)/).flatten
   missing = want_bind.map { |p| p["id"].to_s } - bound
   extra   = bound - points.map { |p| p["id"].to_s }
   fail = bad("❌ NAP-4 @ApiBinding declared but no generated binding: #{missing.join(', ')}\n     → rebuild core/network") if missing.any?
@@ -188,7 +193,9 @@ else
     id     = p["id"].to_s
     simple = annotated_simple[p["id"].to_s]
     dsl    = p["type"].to_s.strip.downcase == "supabase" ? "supabaseApi" : "restApi"
-    unless bind_src.include?(%Q{#{dsl}("#{id}")})
+    # Regex, not include? — the DSL call may carry an explicit type argument
+    # (`supabaseApi<AppConfigApi>("project")`) when the API is split interface + impl.
+    unless bind_src =~ /#{Regexp.escape(dsl)}(?:<[^>]+>)?\(#{Regexp.escape(%Q{"#{id}"})}\)/
       fail = bad("❌ NAP-4 '#{id}' is #{p['type']} but its binding does not use #{dsl}(...)")
       next
     end
@@ -353,7 +360,7 @@ Dir.glob(File.join(net_dir, "**/*.kt")).sort.each do |f|
   next if f.end_with?("GeneratedApiBindings.kt")
   src = File.read(f)
   src = src.gsub(%r{/\*.*?\*/}m, "").gsub(%r{//[^\n]*}, "")
-  hits = src.scan(/^\s*(restApi|supabaseApi)\("([^"]+)"\)/)
+  hits = src.scan(/^\s*(restApi|supabaseApi)(?:<[^>]+>)?\("([^"]+)"\)/)
   hits.each do |dsl, id|
     fail = bad("❌ NAP-7 hand-wired #{dsl}(\"#{id}\") in #{f.sub(net_dir + '/', '')}\n     → annotate the API type `@ApiBinding(\"#{id}\")`; the binding is generated")
   end

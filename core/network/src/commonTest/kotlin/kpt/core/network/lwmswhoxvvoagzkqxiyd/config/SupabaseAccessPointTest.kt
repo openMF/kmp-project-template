@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.network.project.config
+package kpt.core.network.lwmswhoxvvoagzkqxiyd.config
 
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.network.AccessPointKind
@@ -15,7 +15,8 @@ import kpt.core.base.network.AccessPointRegistry
 import kpt.core.base.network.SupabaseClientFactory
 import kpt.core.network.config.AppAccessPoints
 import kpt.core.network.config.AppSupabaseAnonKeys
-import kpt.core.network.project.api.AppConfigApi
+import kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.api.AppConfigApi
+import kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.api.AppConfigApiImpl
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
@@ -25,7 +26,7 @@ import kotlin.test.assertTrue
 /**
  * The Supabase access-point path, end to end on the NEUTRAL template.
  *
- * Lives under the ENDPOINT's own package (`kpt.core.network.project`), not `config`, because it
+ * Lives under the ENDPOINT's own package (`kpt.core.network.lwmswhoxvvoagzkqxiyd`), not `config`, because it
  * depends on that endpoint's API facade: `remove-demo.sh` deletes an `owner: template` access point's
  * package, and a test sitting outside it would survive holding an import of a class that no longer
  * exists — an unresolved reference in :core:network:commonTest for every cleaned fork.
@@ -85,7 +86,10 @@ class SupabaseAccessPointTest {
     @Test
     fun `the generated AppConfigApi returns empty instead of failing when unconfigured`() = runTest {
         val point = AccessPointRegistry(AppAccessPoints.points).supabasePoints().first()
-        val api = AppConfigApi(factory().requireClientFor(point.id))
+        // Typed as the INTERFACE, constructed as the IMPL — the same shape the generated binding
+        // uses (`supabaseApi<AppConfigApi>("project") { AppConfigApiImpl(it) }`), so this asserts
+        // against the contract a consumer injects rather than against the implementation.
+        val api: AppConfigApi = AppConfigApiImpl(factory().requireClientFor(point.id))
         assertFalse(api.isConfigured)
         // The guard matters: without it this would reach `client`, build a Supabase client on an empty
         // URL, and fail at app start-up on every unconfigured fork.

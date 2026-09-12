@@ -14,6 +14,7 @@ import kpt.core.base.network.DefaultHeaderProvider
 import kpt.core.base.network.MultiUrlConfigProvider
 import kpt.core.base.network.RuntimeHeaderStore
 import kpt.core.base.network.SupabaseClientFactory
+import kpt.core.base.network.SupabaseExtrasProvider
 import kpt.core.base.network.SupabaseConfigClient
 import kpt.core.network.config.AppAccessPoints
 import kpt.core.network.config.AppMultiUrlConfigProvider
@@ -77,6 +78,18 @@ val NetworkModule = module {
         SupabaseClientFactory(
             registry = get(),
             anonKeyFor = AppSupabaseAnonKeys::forId,
+            // THE LINK THAT MAKES THE SEAM REAL. SupabaseConfigClient and SupabaseClientFactory both
+            // accept the extras hook, but if nothing passes it here the default `{ {} }` wins and a
+            // fork's `single<SupabaseExtrasProvider>` is never called — Auth is silently not installed,
+            // sign-in and the table APIs stop sharing an authenticated client, and every RLS-gated call
+            // resolves no `auth.uid()`. It compiles, and NAP-7 passes, which is what makes the gap so
+            // easy to ship: each layer is individually correct.
+            //
+            // `getOrNull` because the binding is OPTIONAL — a fork needing only Postgrest binds nothing
+            // and gets the no-op, which is the neutral template's own behaviour.
+            installExtrasFor = { id ->
+                getOrNull<SupabaseExtrasProvider>()?.forId(id) ?: {}
+            },
         )
     }
 

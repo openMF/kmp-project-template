@@ -9,6 +9,7 @@
  */
 package kpt.core.base.network
 
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.logging.LogLevel
 
 /**
@@ -25,6 +26,13 @@ class SupabaseClientFactory(
     private val registry: AccessPointRegistry,
     private val anonKeyFor: (id: String) -> String,
     private val logLevel: LogLevel = LogLevel.INFO,
+    /**
+     * Per-access-point fork seam: extra supabase-kt modules to install on that point's client
+     * (Auth, ComposeAuth, Realtime, Storage). Defaults to none, which is the neutral template.
+     *
+     * Keyed by id because a fork may run several projects and want Auth on only one of them.
+     */
+    private val installExtrasFor: (id: String) -> SupabaseClientBuilder.() -> Unit = { {} },
 ) {
     private val cache: MutableMap<String, SupabaseConfigClient> = mutableMapOf()
 
@@ -38,6 +46,7 @@ class SupabaseClientFactory(
                     override val anonKey: String = anonKeyFor(id)
                 },
                 logLevel = logLevel,
+                installExtras = installExtrasFor(id),
             )
         }
     }

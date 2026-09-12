@@ -64,7 +64,10 @@ demo:
 template:
   - { id: config,  status: exists }         # AppAccessPoints / AppUrlTypes / AppSupabaseAnonKeys (generated)
   - { id: di,      status: exists }         # NetworkModule + the ProjectNetworkModule fork seam
-  - { id: project, status: exists }         # the Supabase access point every fork gets by default
+  # Named for the Supabase project REF — the access-point id, the package, and the @ApiBinding
+  # argument are the same string, and all three come from app-profile/app.yaml. Rename them
+  # together or network-ksp rejects the annotation against the declared ids.
+  - { id: lwmswhoxvvoagzkqxiyd, status: exists }   # the Supabase access point every fork gets by default
 
 # The fork's own. Listed for documentation only — undeclared packages are fork too.
 fork:

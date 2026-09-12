@@ -618,7 +618,7 @@ rules:
     owner: demo-showcase
   - glob: "core/network/**/kpt/core/network/worldbank/**"
     owner: demo-showcase
-  - glob: "core/network/**/kpt/core/network/project/**"
+  - glob: "core/network/**/kpt/core/network/lwmswhoxvvoagzkqxiyd/**"
     owner: template
   - glob: "core/network/**/kpt/core/network/config/**"
     owner: template

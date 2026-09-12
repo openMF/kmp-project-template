@@ -17,6 +17,7 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 
 /**
@@ -73,7 +74,40 @@ class ApiBindingProcessor(
                 return@mapNotNull null
             }
             val fqn = decl.qualifiedName?.asString() ?: return@mapNotNull null
-            Triple(id, fqn, kind)
+
+            // SUPABASE: bind the INTERFACE, not the concrete class.
+            //
+            // `supabaseApi<T>` is `single<T> { … }` with T inferred from the factory lambda, so
+            // `{ AppConfigApiImpl(it) }` would register the IMPL type and `get<AppConfigApi>()` would
+            // fail at runtime — after compiling cleanly, which is the worst place to find it. The
+            // annotation stays on the impl (that is what gets constructed); the processor resolves
+            // its single directly-implemented interface and binds that instead.
+            //
+            // Exactly one supertype interface is required: zero means there is no seam to bind
+            // against (the old one-concrete-class shape — still valid, bind the class itself), and
+            // more than one is ambiguous, which is an author error rather than something to guess at.
+            val bound = if (kind == "supabase") {
+                val ifaces = decl.superTypes
+                    .mapNotNull { it.resolve().declaration as? KSClassDeclaration }
+                    .filter { it.classKind == ClassKind.INTERFACE }
+                    .mapNotNull { it.qualifiedName?.asString() }
+                    .toList()
+                when (ifaces.size) {
+                    0 -> fqn
+                    1 -> ifaces.single()
+                    else -> {
+                        logger.error(
+                            "network-ksp: @ApiBinding(\"$id\") on ${decl.simpleName.asString()} implements " +
+                                "${ifaces.size} interfaces (${ifaces.joinToString()}) — cannot decide which to " +
+                                "bind. Give the API type exactly one interface.",
+                        )
+                        return@mapNotNull null
+                    }
+                }
+            } else {
+                fqn
+            }
+            Triple(id, "$fqn|$bound", kind)
         }
 
         // Two classes on one point would emit two `single` of different types for the same id: the
@@ -95,13 +129,24 @@ class ApiBindingProcessor(
         val lines = StringBuilder()
         var rest = 0
         var supa = 0
-        bindings.forEach { (id, fqn, kind) ->
-            val pkg = fqn.substringBeforeLast('.')
-            val simple = fqn.substringAfterLast('.')
+        bindings.forEach { (id, packed, kind) ->
+            val implFqn = packed.substringBefore('|')
+            val boundFqn = packed.substringAfter('|')
+            val fqn = implFqn
+            val pkg = implFqn.substringBeforeLast('.')
+            val simple = implFqn.substringAfterLast('.')
             if (kind == "supabase") {
-                imports += fqn
+                imports += implFqn
                 imports += "kpt.core.base.network.supabaseApi"
-                lines.append("    supabaseApi(\"$id\") { $simple(it) }\n")
+                if (boundFqn != implFqn) {
+                    // Explicit type argument — without it `single<T>` infers the impl and every
+                    // `get<Interface>()` misses.
+                    imports += boundFqn
+                    val boundSimple = boundFqn.substringAfterLast('.')
+                    lines.append("    supabaseApi<$boundSimple>(\"$id\") { $simple(it) }\n")
+                } else {
+                    lines.append("    supabaseApi(\"$id\") { $simple(it) }\n")
+                }
                 supa++
             } else {
                 // Ktorfit emits `create<Simple>()` as a top-level extension beside the interface.

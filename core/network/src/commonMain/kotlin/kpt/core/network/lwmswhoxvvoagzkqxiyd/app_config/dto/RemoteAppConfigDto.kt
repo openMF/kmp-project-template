@@ -7,7 +7,7 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.core.network.project.dto
+package kpt.core.network.lwmswhoxvvoagzkqxiyd.app_config.dto
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

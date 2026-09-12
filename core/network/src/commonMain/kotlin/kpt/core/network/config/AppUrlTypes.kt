@@ -38,8 +38,8 @@ object AppUrlTypes {
     /** `staging` — REST access point. */
     val STAGING: UrlType = UrlType("STAGING")
 
-    /** `project` — Supabase access point. */
-    val PROJECT: UrlType = UrlType("PROJECT")
+    /** `lwmswhoxvvoagzkqxiyd` — Supabase access point. */
+    val LWMSWHOXVVOAGZKQXIYD: UrlType = UrlType("LWMSWHOXVVOAGZKQXIYD")
 
     /** `jsonplaceholder` — REST access point. */
     val JSONPLACEHOLDER: UrlType = UrlType("JSONPLACEHOLDER")
@@ -63,7 +63,7 @@ object AppUrlTypes {
     val all: List<UrlType> = listOf(
         MAIN,
         STAGING,
-        PROJECT,
+        LWMSWHOXVVOAGZKQXIYD,
         JSONPLACEHOLDER,
         FRANKFURTER,
         COINGECKO,

@@ -10,8 +10,8 @@
 package kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.api.impl
 
 import kpt.core.base.network.SupabaseConfigClient
-import kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.api.AppConfigApi
 import kpt.core.base.network.annotation.ApiBinding
+import kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.api.AppConfigApi
 import kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.dto.RemoteAppConfigDto
 
 /**

@@ -55,18 +55,26 @@ echo ""
 # check slower. PH_JOBS overrides; --serial restores the old one-at-a-time behaviour for debugging a
 # check that misbehaves under concurrency.
 PH_SERIAL=0
+# Fail-fast is the DEFAULT for an interactive run and OFF in CI. A developer wants the first failure
+# now; CI wants the complete picture in one pass, because a run that stops at the first failure hides
+# the other four and turns one red build into five sequential ones. PH_FAILFAST=0/1 overrides either.
+PH_FAILFAST="${PH_FAILFAST:-$([ -n "${CI:-}" ] && echo 0 || echo 1)}"
 for a in "$@"; do
   case "$a" in
-    --serial) PH_SERIAL=1 ;;
-    --jobs=*) PH_JOBS="${a#--jobs=}" ;;
+    --serial)     PH_SERIAL=1 ;;
+    --jobs=*)     PH_JOBS="${a#--jobs=}" ;;
+    --fail-fast)  PH_FAILFAST=1 ;;
+    --no-fail-fast|--all) PH_FAILFAST=0 ;;
   esac
 done
+PH_FAILFAST_NOTE=""
+[ "$PH_FAILFAST" -eq 1 ] && PH_FAILFAST_NOTE="  — stopping early (--all to run everything)"
 if [ -z "${PH_JOBS:-}" ]; then
   PH_JOBS="$( (sysctl -n hw.ncpu 2>/dev/null || nproc 2>/dev/null || echo 4) | head -1 )"
   case "$PH_JOBS" in (''|*[!0-9]*) PH_JOBS=4 ;; esac
 fi
 
-fail=0; warn=0; pass=0
+fail=0; warn=0; pass=0; skip=0
 PH_TMP="$(mktemp -d)"
 trap 'rm -rf "$PH_TMP"' EXIT
 
@@ -76,8 +84,25 @@ if [ "$PH_SERIAL" -eq 0 ]; then
   for chk in "$HEALTH_DIR"/checks/*.sh; do
     [ -f "$chk" ] || continue
     name="$(basename "$chk" .sh)"
-    while [ "$(jobs -r 2>/dev/null | wc -l | tr -d ' ')" -ge "$PH_JOBS" ]; do sleep 0.05; done
-    ( bash "$chk" >"$PH_TMP/$name.out" 2>&1; printf '%s' "$?" >"$PH_TMP/$name.rc" ) &
+    # FAIL FAST: stop launching the moment something has already failed. Parallel made the suite
+    # faster; it did NOT make it fail faster, because the report only prints once every check is in.
+    # A failure found at second 2 was invisible until second 34, which is the opposite of what a
+    # pre-commit harness is for.
+    if [ "$PH_FAILFAST" -eq 1 ] && [ -e "$PH_TMP/.failed" ]; then break; fi
+    while [ "$(jobs -r 2>/dev/null | wc -l | tr -d ' ')" -ge "$PH_JOBS" ]; do
+      if [ "$PH_FAILFAST" -eq 1 ] && [ -e "$PH_TMP/.failed" ]; then break; fi
+      sleep 0.05
+    done
+    (
+      bash "$chk" >"$PH_TMP/$name.out" 2>&1; _rc=$?
+      printf '%s' "$_rc" >"$PH_TMP/$name.rc"
+      # Announce a failure THE MOMENT it happens, out of order and clearly marked. The ordered report
+      # below is still the record; this is the early warning, so `^C` is a real option on a long run.
+      if [ "$_rc" -ne 0 ] && [ "$_rc" -ne 2 ]; then
+        : > "$PH_TMP/.failed"
+        printf '  %s✗ FAILED%s  %s%s\n' "$C_RED" "$C_RST" "$name" "${PH_FAILFAST_NOTE}" >&2
+      fi
+    ) &
   done
   wait
 fi
@@ -88,6 +113,12 @@ for chk in "$HEALTH_DIR"/checks/*.sh; do
   if [ "$PH_SERIAL" -eq 1 ]; then
     out="$(bash "$chk" 2>&1)"; rc=$?
   else
+    # Never launched (fail-fast broke the loop) → SKIPPED, not PASS. Counting an unrun check as a
+    # pass is how a fail-fast harness silently shrinks its own coverage.
+    if [ ! -e "$PH_TMP/$name.rc" ] && [ ! -e "$PH_TMP/$name.out" ]; then
+      skip=$((skip+1)); printf '  %s⊘ SKIP%s   %s %s(not run — earlier failure)%s\n' "$C_DIM" "$C_RST" "$name" "$C_DIM" "$C_RST"
+      continue
+    fi
     out="$(cat "$PH_TMP/$name.out" 2>/dev/null)"
     rc="$(cat "$PH_TMP/$name.rc" 2>/dev/null)"
     # A missing .rc means the subshell died without recording one (OOM-killed, or the check exec'd
@@ -106,7 +137,12 @@ for chk in "$HEALTH_DIR"/checks/*.sh; do
 done
 
 echo ""
-echo "── ${pass} passed · ${warn} warn · ${fail} failed ──"
+if [ "${skip:-0}" -gt 0 ]; then
+  echo "── ${pass} passed · ${warn} warn · ${fail} failed · ${skip} not run ──"
+  echo "   ${C_DIM}stopped at the first failure; run with --all for the full picture${C_RST}"
+else
+  echo "── ${pass} passed · ${warn} warn · ${fail} failed ──"
+fi
 [ "$warn" -gt 0 ] && [ "$fail" = 0 ] && echo "   ${C_DIM}(warnings don't block — but resolve them before releasing)${C_RST}"
 
 # ── Local-run hint: fork mode is the SAFE DEFAULT, so say why, don't infer around it ─────────

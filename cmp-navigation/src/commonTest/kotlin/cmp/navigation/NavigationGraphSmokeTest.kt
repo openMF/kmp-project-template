@@ -83,19 +83,17 @@ class NavigationGraphSmokeTest {
         CountryPickerRoute,
     )
 
-    @Test
-    fun everyParameterlessRouteIsReferenceableAndNonNull() {
-        parameterlessRoutes.forEach { route ->
-            assertNotNull(route, "Route ${route::class.simpleName} should be non-null")
-        }
-        // Sanity: no duplicate route types in the list (catches copy-paste mistakes).
-        val classes = parameterlessRoutes.map { it::class }
-        assertEquals(
-            classes.size,
-            classes.toSet().size,
-            "Parameterless route list has duplicates: $classes",
-        )
-    }
+    // REMOVED: `everyParameterlessRouteIsReferenceableAndNonNull`.
+    //
+    // It looped `parameterlessRoutes` asserting `assertNotNull(route)`. The list is `List<Any>`, so
+    // every element is non-null BY TYPE and the assertion could not fail. Its companion duplicate
+    // check compared the hand-written list against itself, so a route MISSING from the list was
+    // never noticed either.
+    //
+    // The list itself stays: `everyRouteIsKotlinxSerializable` and
+    // `routeCountMatchesExpectedFeatureSurface` both use the same routes, and those DO fail —
+    // `serializer<T>()` stops resolving the moment a route loses `@Serializable` or a feature module
+    // drops the serialization plugin.
 
     @Test
     fun parameterisedRoutesInstantiateWithDefaults() {

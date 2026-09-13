@@ -46,7 +46,11 @@ object KoinModules {
 
     private val featureModule = module {
         // Framework SHELL modules — always present.
-        includes(HomeModule, SettingsModule)
+        // HomeModule is NOT listed: it lives at feature/home/di and so arrives via
+        // GeneratedFeatureKoinBindings. SettingsModule does not — it is declared at
+        // kpt.feature.settings.SettingsModule, outside a `di/` package, so the generator cannot
+        // see it and it stays hand-listed here.
+        includes(SettingsModule)
         // Fork features — from the fork-owned FeatureRegistry seam (white-label: the template infra
         // NEVER edits this; a fork adds/removes features by editing cmp-navigation/registry/FeatureRegistry.kt).
         includes(FeatureRegistry.featureKoinModules)

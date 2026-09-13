@@ -16,29 +16,15 @@ import kpt.core.data.di.ProjectRepositoryModule
 import kpt.core.database.di.ProjectDatabaseModule
 import kpt.core.datastore.di.ProjectDatastoreModule
 import kpt.core.network.di.ProjectNetworkModule
-import kpt.feature.addtowatchlist.di.AddToWatchlistModule
-import kpt.feature.alerts.di.AlertsModule
 import kpt.feature.alerts.navigation.alertsGraph
-import kpt.feature.amortization.di.AmortizationModule
-import kpt.feature.bills.di.BillsModule
 import kpt.feature.bills.navigation.billsGraph
-import kpt.feature.calculators.di.CalculatorsModule
 import kpt.feature.calculators.navigation.calculatorsGraph
-import kpt.feature.cloudtodo.di.CloudTodoModule
-import kpt.feature.crypto.di.CryptoFeatureModule
 import kpt.feature.crypto.navigation.cryptoGraph
-import kpt.feature.currencyrates.di.CurrencyRatesModule
 import kpt.feature.currencyrates.navigation.currencyRatesGraph
-import kpt.feature.emicalculator.di.EmiCalculatorModule
 import kpt.feature.emicalculator.navigation.emiCalculatorDestination
-import kpt.feature.loans.di.LoansModule
 import kpt.feature.loans.navigation.loansGraph
-import kpt.feature.macro.di.MacroModule
 import kpt.feature.macro.navigation.macroGraph
-import kpt.feature.profile.di.ProfileModule
-import kpt.feature.rates.di.RatesModule
 import kpt.feature.rates.navigation.ratesGraph
-import kpt.feature.watchlist.di.WatchlistModule
 import kpt.feature.watchlist.navigation.watchlistGraph
 import org.koin.core.module.Module
 
@@ -60,34 +46,24 @@ object FeatureRegistry {
      * Feature Koin modules the app installs. The framework SHELL modules (Home, Settings) live in
      * [cmp.navigation.di.KoinModules] and are always present; this is the fork's own features.
      */
+    /**
+     * The four per-layer fork seams, plus every `feature/<f>/di` Koin module.
+     *
+     * The feature half is DERIVED — `:cmp-navigation:generateFeatureKoinBindings` reads each
+     * feature module's `di` package and emits [GeneratedFeatureKoinBindings]. Adding a
+     * feature no longer means editing this file: previously it took an import AND a list entry
+     * here, and forgetting either compiled cleanly while the feature's ViewModels failed to
+     * resolve at runtime.
+     *
+     * The `Project*Module` seams stay listed BY HAND on purpose — they are core-layer fork seams,
+     * not features, and nothing under `feature/` declares them.
+     */
     val featureKoinModules: List<Module> = listOf(
-        // ── the FORK's own per-layer DI seams — OUTSIDE the fence, so `--clean` keeps them ──
-        // Empty on the template; a fork fills them. They are listed here rather than inside the demo
-        // block because a cleaned fork must still HAVE somewhere to register DI: the whole list used
-        // to be fenced, so `remove-demo.sh` reduced it to `listOf()` and left no seam at all.
         ProjectRepositoryModule,
         ProjectNetworkModule,
         ProjectDatabaseModule,
         ProjectDatastoreModule,
-        // demo:begin — default demo feature set + the demo DI aggregators.
-        // customizer --clean strips this fenced block; the four Project* seams above survive.
-        // ── default demo feature set — replace with your fork's ──
-        CurrencyRatesModule,
-        EmiCalculatorModule,
-        BillsModule,
-        LoansModule,
-        AmortizationModule,
-        RatesModule,
-        CalculatorsModule,
-        MacroModule,
-        CryptoFeatureModule,
-        AlertsModule,
-        WatchlistModule,
-        AddToWatchlistModule,
-        CloudTodoModule,
-        ProfileModule,
-        // ── demo DI aggregators (were inline fenced blocks in the core aggregators) ──
-        // demo:end
+        GeneratedFeatureKoinBindings,
     )
 
     /**

@@ -39,7 +39,18 @@ class CoinMarketsViewModelTest {
     fun setUp() = Dispatchers.setMain(dispatcher)
 
     @AfterTest
-    fun tearDown() = Dispatchers.resetMain()
+    fun tearDown() {
+        // Drain viewModelScope BEFORE releasing Main.
+        //
+        // `CoinMarketsViewModel(repo)` launches collection on Dispatchers.Main and nothing cancels
+        // it — the tests never hold the instance. So `resetMain()` could run while those coroutines
+        // were still live, and the NEXT test's `setMain()` then threw
+        // "Dispatchers.Main is used concurrently with setting it". It is a scheduling race, not a
+        // logic difference: green on a warm local run, red in CI, and reproducible locally with
+        // `--rerun-tasks`.
+        dispatcher.scheduler.advanceUntilIdle()
+        Dispatchers.resetMain()
+    }
 
     @Test
     fun requestsAWholePageNotASingleRow() = runTest(dispatcher) {

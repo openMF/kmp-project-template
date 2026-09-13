@@ -48,7 +48,8 @@ import kotlin.time.Clock
 @RepositoryBinding(binds = BillReminderRepository::class)
 internal class BillReminderRepositoryImpl(
     @FromStore(AppStoreIds.BillReminders) private val billRemindersStore: Store<Unit, List<BillReminder>>,
-    @FromStore(AppStoreIds.BillRemindersMutable) private val billRemindersWriteStore: MutableStore<String, BillReminder>,
+    @FromStore(AppStoreIds.BillRemindersMutable)
+    private val billRemindersWriteStore: MutableStore<String, BillReminder>,
     private val billReminderDao: BillReminderDao,
     private val clock: Clock = Clock.System,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),

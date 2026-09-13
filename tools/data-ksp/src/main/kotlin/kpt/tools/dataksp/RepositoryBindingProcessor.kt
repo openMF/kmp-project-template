@@ -133,6 +133,16 @@ class RepositoryBindingProcessor(
         // Defaulted parameters are the fork's to leave unset; an unnamed one cannot be emitted.
         val name = param.name?.asString()
         if (param.hasDefault || name == null) return null
+        return resolvedDependency(param, name)
+    }
+
+    /**
+     * The body of [dependency] once the parameter is known to be nameable and non-defaulted.
+     *
+     * Split out only to keep each half within detekt's `ReturnCount` limit — the unresolvable-id guard
+     * below needs an early return of its own, which pushed the single function to three.
+     */
+    private fun resolvedDependency(param: KSValueParameter, name: String): Pair<String, String>? {
         // PRESENT-BUT-UNRESOLVABLE is the dangerous case, not ABSENT.
         //
         // `@FromStore("alerts")` with a typo'd literal emits `get(AppStoreRegistry.Alertz)` — generated

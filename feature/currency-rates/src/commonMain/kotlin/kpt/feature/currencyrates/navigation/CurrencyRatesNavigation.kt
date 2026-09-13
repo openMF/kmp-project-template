@@ -14,6 +14,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.currencyrates.ui.CurrencyRatesScreen
@@ -32,6 +33,7 @@ fun NavController.navigateToCurrencyRates(navOptions: NavOptions? = null) {
     navigate(route = CurrencyRatesGraphRoute, navOptions = navOptions)
 }
 
+@FeatureDestination
 fun NavGraphBuilder.currencyRatesGraph(navController: NavController) {
     navigation<CurrencyRatesGraphRoute>(startDestination = CurrencyRatesRoute) {
         composableWithPushTransitions<CurrencyRatesRoute> {

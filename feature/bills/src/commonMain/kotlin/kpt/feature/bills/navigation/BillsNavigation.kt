@@ -17,6 +17,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.bills.ui.AddOrEditBillReminderScreen
@@ -45,6 +46,7 @@ fun NavController.navigateToBills(navOptions: NavOptions? = null) {
  * Wires the bills graph into a parent [NavGraphBuilder]. Mirrors `alertsGraph` —
  * push-transition routes, back-pop navigation, type-safe arg passing.
  */
+@FeatureDestination
 fun NavGraphBuilder.billsGraph(navController: NavController) {
     navigation<BillsGraphRoute>(startDestination = BillRemindersListRoute) {
         composableWithPushTransitions<BillRemindersListRoute> {

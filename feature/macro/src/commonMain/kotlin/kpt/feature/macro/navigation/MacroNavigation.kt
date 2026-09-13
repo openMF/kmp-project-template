@@ -15,6 +15,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.core.model.economic.IndicatorKind
@@ -61,6 +62,7 @@ fun NavController.navigateToMacroGraph(navOptions: NavOptions? = null) {
  * calling [macroGraph] inside its own `NavHost { ... }` builder once this
  * feature is enabled.
  */
+@FeatureDestination
 fun NavGraphBuilder.macroGraph(navController: NavController) {
     navigation<MacroGraphRoute>(startDestination = CountryMacroRoute()) {
         composableWithPushTransitions<CountryMacroRoute> { entry ->

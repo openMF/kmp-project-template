@@ -11,21 +11,10 @@ package cmp.navigation.registry
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.core.data.di.ProjectRepositoryModule
 import kpt.core.database.di.ProjectDatabaseModule
 import kpt.core.datastore.di.ProjectDatastoreModule
 import kpt.core.network.di.ProjectNetworkModule
-import kpt.feature.alerts.navigation.alertsGraph
-import kpt.feature.bills.navigation.billsGraph
-import kpt.feature.calculators.navigation.calculatorsGraph
-import kpt.feature.crypto.navigation.cryptoGraph
-import kpt.feature.currencyrates.navigation.currencyRatesGraph
-import kpt.feature.emicalculator.navigation.emiCalculatorDestination
-import kpt.feature.loans.navigation.loansGraph
-import kpt.feature.macro.navigation.macroGraph
-import kpt.feature.rates.navigation.ratesGraph
-import kpt.feature.watchlist.navigation.watchlistGraph
 import org.koin.core.module.Module
 
 /**
@@ -70,19 +59,17 @@ object FeatureRegistry {
      * Feature nav destinations — registered into the authenticated graph. The shell destinations
      * (settings, notification) stay in [cmp.navigation.authenticated] template; this is the fork's routes.
      */
-    val featureDestinations: NavGraphBuilder.(NavController) -> Unit = { navController ->
-        // demo:begin — default demo feature routes (F3). customizer --clean strips this fenced block →
-        // an empty lambda body for a clean fork; replace with your fork's routes.
-        currencyRatesGraph(navController)
-        emiCalculatorDestination(onBackClick = { navController.popBackStackSafely() })
-        loansGraph(navController)
-        billsGraph(navController)
-        calculatorsGraph(navController)
-        ratesGraph(navController)
-        macroGraph(navController)
-        cryptoGraph(navController)
-        alertsGraph(navController)
-        watchlistGraph(navController)
-        // demo:end
-    }
+    /**
+     * Every top-level feature destination, DERIVED from `@FeatureDestination`.
+     *
+     * `:cmp-navigation:generateFeatureDestinations` scans each feature's `navigation` package and
+     * emits [GeneratedFeatureDestinations]. Adding a screen to the app graph is now a matter of
+     * annotating it where it is declared, rather than editing this file — which previously took an
+     * import AND a call, and where a missed call meant a route that silently did not exist.
+     *
+     * Nested and non-feature-graph entries are left unannotated on purpose:
+     * `amortizationScheduleDestination` is registered inside `loansGraph`, and `cloudTodoGraph`
+     * belongs to ShowcaseRegistry.
+     */
+    val featureDestinations: NavGraphBuilder.(NavController) -> Unit = GeneratedFeatureDestinations
 }

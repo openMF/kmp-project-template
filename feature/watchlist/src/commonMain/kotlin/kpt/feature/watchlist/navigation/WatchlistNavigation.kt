@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.watchlist.ui.WatchlistScreen
@@ -32,6 +33,7 @@ fun NavController.navigateToWatchlist(navOptions: NavOptions? = null) {
  * the top-level RootNavGraph by calling [watchlistGraph] inside its own
  * `NavHost { ... }` builder once this feature is enabled.
  */
+@FeatureDestination
 fun NavGraphBuilder.watchlistGraph(navController: NavController) {
     composableWithPushTransitions<WatchlistRoute> {
         WatchlistScreen(

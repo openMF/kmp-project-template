@@ -15,6 +15,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.rates.ui.InterestRateDetailScreen
@@ -49,6 +50,7 @@ fun NavController.navigateToRateDetail(seriesId: String, navOptions: NavOptions?
  *
  * Host apps wire this from their root navigation by calling `ratesGraph(navController)`.
  */
+@FeatureDestination
 fun NavGraphBuilder.ratesGraph(navController: NavController) {
     navigation<RatesGraphRoute>(startDestination = RatesListRoute) {
         composableWithPushTransitions<RatesListRoute> {

@@ -112,6 +112,12 @@ class NavigationGraphSmokeTest {
         assertNotNull(RateDetailRoute(seriesId = "DFF"))
     }
 
+    // vacuous-ok: every assertion below is `assertNotNull(serializer<T>())`, and `serializer<T>()`
+    // returns a non-null KSerializer by signature — so none of them can fail at RUNTIME. They are
+    // kept because the guarantee is at COMPILE time: `serializer<T>()` stops resolving the moment a
+    // route loses `@Serializable`, or its feature module drops the kotlinx-serialization plugin.
+    // That is the bug this test exists to catch, and it is caught by the file compiling at all.
+    // The asserts remain so the intent is legible in the test report rather than implicit.
     @Test
     fun everyRouteIsKotlinxSerializable() {
         // serializer<T>() resolves at compile time iff T is @Serializable AND the

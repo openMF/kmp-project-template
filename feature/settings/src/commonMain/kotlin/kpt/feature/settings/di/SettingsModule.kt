@@ -7,8 +7,11 @@
  *
  * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-package kpt.feature.settings
+package kpt.feature.settings.di
 
+import kpt.feature.settings.ConflictInboxViewModel
+import kpt.feature.settings.SettingsViewModel
+import kpt.feature.settings.SyncAndDraftsViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 

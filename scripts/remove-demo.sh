@@ -56,7 +56,7 @@ DEMO_FEATURES=$(awk '/demo:begin/{s=1;next} /demo:end/{s=0} s' settings.gradle.k
 #     positional and could not express `supabase_data` — its point sat OUTSIDE the fence while its
 #     `api:` sat inside, so the facade survived the strip and needed a second, separate parser. One
 #     declared field per entry replaces both parsers and cannot drift from what it describes.
-TEMPLATE_POINTS=$(awk '
+DEMO_POINTS=$(awk '
   /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { id=$0; sub(/.*id:[[:space:]]*/,"",id); sub(/[[:space:]].*$/,"",id); owner="" ; next }
   /^[[:space:]]*owner:[[:space:]]*/ { o=$0; sub(/.*owner:[[:space:]]*/,"",o); sub(/[[:space:]].*$/,"",o); if (id != "" && o == "demo") { print id; id="" } }
 ' app-profile/app.yaml 2>/dev/null || true)
@@ -78,14 +78,14 @@ MARKED_FILES=$(grep -rl 'demo:begin' --include='*.kt' --include='*.kts' --includ
   | grep -v '/module-packages\.yaml$' || true)
 
 echo "remove-demo ($MODE): demo features = ${DEMO_FEATURES//$'\n'/ }"
-echo "remove-demo ($MODE): template access points = ${TEMPLATE_POINTS//$'\n'/ }"
+echo "remove-demo ($MODE): demo access points = ${DEMO_POINTS//$'\n'/ }"
 
 # ── 2b. Per-module package + file declarations — READ BEFORE THE FENCE STRIP ───────────
 #     These live inside `# demo:begin … # demo:end` fences in app-profile, and step 3 below deletes
 #     fenced blocks. Reading them afterwards therefore finds NOTHING: in --apply the module-package
 #     sweep silently deleted zero packages while still printing its heading, so a "clean" fork kept
 #     every demo store and entity. (Dry-run looked correct precisely because it mutates nothing.)
-#     `TEMPLATE_POINTS` above already had to be captured early for the same reason; these now are too.
+#     `DEMO_POINTS` above already had to be captured early for the same reason; these now are too.
 # Each module declares its own packages in `core/<module>/module-packages.yaml` (three-value
 # vocabulary: demo | template | fork). ONLY `owner: demo` is deleted — `template` is framework code a
 # clean fork keeps, and `fork` is the fork's own. The two-value scheme this replaced used
@@ -217,7 +217,7 @@ while IFS= read -r f; do
   [ "$APPLY" -eq 1 ] && rm -f "$f"
 done <<< "$TEMPLATE_MODULE_FILES"
 
-# ── 4c. Delete the per-access-point packages of the TEMPLATE-owned endpoints ──────────
+# ── 4c. Delete the per-access-point packages of the DEMO-owned endpoints ──────────────
 #     Endpoint code lives in a package named for its access point (`kpt/core/network/<id>/`), not
 #     under `demo/`, so step 4's sweep does not reach it.
 echo "delete template access-point packages:"
@@ -231,28 +231,39 @@ while IFS= read -r ap; do
   [ -z "$pkg" ] && continue
   for d in "$NET_PKG_ROOT/$pkg" "$NET_TEST_ROOT/$pkg"; do
     [ -d "$d" ] || continue
-    say "rm -rf $d  (access point '$ap', owner: template)"
+    say "rm -rf $d  (access point '$ap', owner: demo)"
     [ "$APPLY" -eq 1 ] && rm -rf "$d"
   done
-done <<< "$TEMPLATE_POINTS"
+done <<< "$DEMO_POINTS"
 
 # ── 4d. Drop those entries from app-profile itself ────────────────────────────────────
 #     Block-shaped delete: an access point is a `- id:` block, so buffer each block and drop the ones
-#     whose body declares `owner: template`. Comment-preserving, unlike a YAML round-trip.
-echo "drop template access points from app-profile:"
-say "remove $(echo "$TEMPLATE_POINTS" | grep -c . || echo 0) template access point(s) from app-profile/app.yaml"
+#     whose body declares `owner: demo`. Comment-preserving, unlike a YAML round-trip.
+#
+#     THIS USED TO DROP `owner: template`, which is the exact inverse of the contract app.yaml
+#     states: template points are "shipped to EVERY fork and KEPT by the customizer", demo points are
+#     the showcase the strip deletes. The variable feeding step 4c was even named TEMPLATE_POINTS
+#     while collecting `o == "demo"`, so 4c deleted the right packages under the wrong label and 4d
+#     then edited a DIFFERENT set. A strip left the six demo endpoints declared in app.yaml with
+#     their code gone (syncForkConfig regenerates AppAccessPoints for endpoints that no longer
+#     exist), and deleted the one template endpoint from app.yaml while its package stayed — an
+#     @ApiBinding naming an id app-profile no longer declares, which is precisely NAP-4.
+echo "drop demo access points from app-profile:"
+say "remove $(echo "$DEMO_POINTS" | grep -c . || echo 0) demo access point(s) from app-profile/app.yaml"
 if [ "$APPLY" -eq 1 ]; then
   awk '
     function flush() { if (n > 0) { if (!drop) for (i = 1; i <= n; i++) print buf[i]; n = 0; drop = 0 } }
     /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { flush(); inblk = 1; n = 1; buf[1] = $0; drop = 0; next }
-    inblk && /^[[:space:]]*owner:[[:space:]]*template[[:space:]]*$/ { drop = 1; buf[++n] = $0; next }
+    inblk && /^[[:space:]]*owner:[[:space:]]*demo[[:space:]]*$/ { drop = 1; buf[++n] = $0; next }
     inblk && /^[[:space:]]{6,}/ { buf[++n] = $0; next }
     inblk && /^[[:space:]]*#/ { buf[++n] = $0; next }
     { flush(); inblk = 0; print }
     END { flush() }
   ' app-profile/app.yaml > app-profile/app.yaml.tmp && mv app-profile/app.yaml.tmp app-profile/app.yaml
-  left=$(awk '/^[[:space:]]*owner:[[:space:]]*template/{c++} END{print c+0}' app-profile/app.yaml)
-  [ "$left" = "0" ] || { echo "remove-demo: FAILED to drop template access points ($left left)" >&2; exit 1; }
+  # Anchored at line start so the `#   owner: demo …` prose in app.yaml's own contract comment is
+  # not counted — an unanchored match would make this assertion unsatisfiable.
+  left=$(awk '/^[[:space:]]*owner:[[:space:]]*demo/{c++} END{print c+0}' app-profile/app.yaml)
+  [ "$left" = "0" ] || { echo "remove-demo: FAILED to drop demo access points ($left left)" >&2; exit 1; }
 fi
 
 # ── 5. Delete demo feature modules ────────────────────────────────────────────────────

@@ -98,6 +98,10 @@ module FastlaneConfig
     _privacy_url   = ENV["APP_PRIVACY_URL"]      || FORK["org.privacy.url"]
 
     _team_id          = ENV["APPLE_TEAM_ID"]    || FORK["apple.team.id"]
+    # App Store NUMERIC id. `ios_config[:apple_id]` was READ by the TestFlight lane but never
+    # DEFINED here, so its `|| "6744892773"` fallback was not a fallback — it was the value,
+    # on every fork. SoT is app-profile/platforms/apple/apple.yaml#apple.app_store_id.
+    _apple_id         = ENV["APPLE_APP_STORE_ID"] || FORK["apple.app.store.id"]
     _match_git_url    = ENV["MATCH_GIT_URL"]    || FORK["apple.match.git.url"]
     _match_git_branch = ENV["MATCH_GIT_BRANCH"] || "master"
 
@@ -169,6 +173,8 @@ module FastlaneConfig
     IOS_SHARED = {
       # ENV override: APPLE_TEAM_ID
       team_id:    _team_id,
+      # ENV override: APPLE_APP_STORE_ID
+      apple_id:   _apple_id,
       ci_provider: "circleci",
       app_store_connect: {
         # ENV overrides: APPSTORE_KEY_ID / APPSTORE_ISSUER_ID / APPSTORE_KEY_PATH

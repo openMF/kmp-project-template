@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Pengingat tagihan dan peringatan suku bunga akan muncul di sini.</string>
     <string name="feature_settings_sync_drafts_row">Sinkronisasi &amp; draf</string>
     <string name="feature_settings_sync_drafts_row_description">Lihat dan kelola draf serta sinkronisasi yang tertunda</string>
+    <string name="feature_settings_rate_app_row">Beri rating aplikasi ini</string>
+    <string name="feature_settings_rate_app_row_description">Buka halaman toko untuk memberi rating aplikasi ini</string>
     <string name="feature_settings_sync_drafts_title">Sinkronisasi &amp; draf</string>
     <string name="feature_settings_sync_drafts_empty_title">Tidak ada yang perlu disinkronkan</string>
     <string name="feature_settings_sync_drafts_empty_message">Draf yang Anda simpan offline dan catatan yang menunggu sinkronisasi akan muncul di sini.</string>

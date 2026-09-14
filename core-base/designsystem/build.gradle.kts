@@ -26,6 +26,12 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(compose.materialIconsExtended)
 
+            // Backs KptToastHost. The DI binding lives in core-base/platform (platformModule),
+            // which already owns the manager singles and has Koin; this module only renders.
+            // `api` because KptToastHost's own signature takes a ToastHostState and a
+            // `@Composable (ToastData) -> Unit` slot — a caller must be able to name both.
+            api(libs.cmp.toast)
+
             api(compose.material3AdaptiveNavigationSuite)
             api(libs.jetbrains.compose.material3.adaptive)
             api(libs.jetbrains.compose.material3.adaptive.layout)

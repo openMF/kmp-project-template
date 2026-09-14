@@ -42,14 +42,33 @@ internal fun SettingsScreenContentPreview() {
 
 @Preview
 @Composable
+internal fun SettingsScreenContentWithRateAppPreview() {
+    // The same screen with review REACHABLE. `onRateAppClick` is null in the preview above, which is
+    // the honest default (a target with no native review flow and no configured store listing hides
+    // the row) — but it means the shipped row renders in no golden at all unless a second preview
+    // passes it. Both states are real, so both are captured.
+    KptTheme {
+        SettingsScreenContent(
+            onBackClick = {},
+            onThemeCardClick = {},
+            onLanguageCardClick = {},
+            onSyncAndDraftsClick = {},
+            onRateAppClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
 internal fun SettingsRowsPreview() {
-    // The two shipped rows side by side. Each passes its own accent colour into the shared
+    // The three shipped rows side by side. Each passes its own accent colour into the shared
     // `SettingsRowCard`, so rendering them together is what shows the accents actually differ
-    // rather than both falling back to one theme colour.
+    // rather than all falling back to one theme colour.
     KptTheme {
         Column {
             LanguageCard(onClick = {})
             SyncAndDraftsCard(onClick = {})
+            RateAppCard(onClick = {})
         }
     }
 }

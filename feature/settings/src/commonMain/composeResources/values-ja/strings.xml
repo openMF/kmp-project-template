@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">請求リマインダーや金利アラートがここに表示されます。</string>
     <string name="feature_settings_sync_drafts_row">同期と下書き</string>
     <string name="feature_settings_sync_drafts_row_description">下書きと保留中の同期を確認・管理します</string>
+    <string name="feature_settings_rate_app_row">このアプリを評価</string>
+    <string name="feature_settings_rate_app_row_description">ストアのページを開いてこのアプリを評価します</string>
     <string name="feature_settings_sync_drafts_title">同期と下書き</string>
     <string name="feature_settings_sync_drafts_empty_title">同期するものはありません</string>
     <string name="feature_settings_sync_drafts_empty_message">オフラインで保存した下書きと同期待ちのレコードがここに表示されます。</string>

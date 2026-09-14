@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Тут зʼявлятимуться нагадування про рахунки та сповіщення про ставки.</string>
     <string name="feature_settings_sync_drafts_row">Синхронізація та чернетки</string>
     <string name="feature_settings_sync_drafts_row_description">Переглядайте чернетки й очікувані синхронізації та керуйте ними</string>
+    <string name="feature_settings_rate_app_row">Оцінити застосунок</string>
+    <string name="feature_settings_rate_app_row_description">Відкрити сторінку в магазині, щоб оцінити застосунок</string>
     <string name="feature_settings_sync_drafts_title">Синхронізація та чернетки</string>
     <string name="feature_settings_sync_drafts_empty_title">Немає що синхронізувати</string>
     <string name="feature_settings_sync_drafts_empty_message">Тут зʼявляться чернетки, збережені офлайн, і записи, що очікують на синхронізацію.</string>

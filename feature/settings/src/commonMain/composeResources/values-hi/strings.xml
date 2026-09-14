@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">यहाँ आपको बिल रिमाइंडर और दर अलर्ट दिखेंगे।</string>
     <string name="feature_settings_sync_drafts_row">सिंक और ड्राफ़्ट</string>
     <string name="feature_settings_sync_drafts_row_description">ड्राफ़्ट और लंबित सिंक देखें और प्रबंधित करें</string>
+    <string name="feature_settings_rate_app_row">इस ऐप को रेट करें</string>
+    <string name="feature_settings_rate_app_row_description">इस ऐप को रेट करने के लिए स्टोर लिस्टिंग खोलें</string>
     <string name="feature_settings_sync_drafts_title">सिंक और ड्राफ़्ट</string>
     <string name="feature_settings_sync_drafts_empty_title">सिंक करने के लिए कुछ नहीं</string>
     <string name="feature_settings_sync_drafts_empty_message">ऑफ़लाइन सहेजे गए ड्राफ़्ट और सिंक की प्रतीक्षा कर रहे रिकॉर्ड यहाँ दिखेंगे।</string>

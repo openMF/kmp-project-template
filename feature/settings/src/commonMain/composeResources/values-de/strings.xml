@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Hier siehst du Rechnungserinnerungen und Zinswarnungen.</string>
     <string name="feature_settings_sync_drafts_row">Synchronisierung &amp; Entwürfe</string>
     <string name="feature_settings_sync_drafts_row_description">Entwürfe und ausstehende Synchronisierungen ansehen und verwalten</string>
+    <string name="feature_settings_rate_app_row">Diese App bewerten</string>
+    <string name="feature_settings_rate_app_row_description">Store-Eintrag öffnen, um diese App zu bewerten</string>
     <string name="feature_settings_sync_drafts_title">Synchronisierung &amp; Entwürfe</string>
     <string name="feature_settings_sync_drafts_empty_title">Nichts zu synchronisieren</string>
     <string name="feature_settings_sync_drafts_empty_message">Offline gespeicherte Entwürfe und Datensätze, die auf Synchronisierung warten, erscheinen hier.</string>

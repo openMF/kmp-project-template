@@ -53,6 +53,7 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material.icons.outlined.Wallet
@@ -135,4 +136,7 @@ object AppIcons {
 
 //    val Theme = Icons.Filled.WbSunny
     val Sun = Icons.Outlined.WbSunny
+
+    /** "Rate this app" affordance (settings). */
+    val Star = Icons.Outlined.StarOutline
 }

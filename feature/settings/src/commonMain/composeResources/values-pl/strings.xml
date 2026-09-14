@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Zobaczysz tu przypomnienia o rachunkach i alerty o stopach.</string>
     <string name="feature_settings_sync_drafts_row">Synchronizacja i wersje robocze</string>
     <string name="feature_settings_sync_drafts_row_description">Przeglądaj wersje robocze i oczekujące synchronizacje oraz zarządzaj nimi</string>
+    <string name="feature_settings_rate_app_row">Oceń tę aplikację</string>
+    <string name="feature_settings_rate_app_row_description">Otwórz stronę sklepu, aby ocenić tę aplikację</string>
     <string name="feature_settings_sync_drafts_title">Synchronizacja i wersje robocze</string>
     <string name="feature_settings_sync_drafts_empty_title">Nie ma nic do zsynchronizowania</string>
     <string name="feature_settings_sync_drafts_empty_message">Wersje robocze zapisane offline i rekordy oczekujące na synchronizację pojawią się tutaj.</string>

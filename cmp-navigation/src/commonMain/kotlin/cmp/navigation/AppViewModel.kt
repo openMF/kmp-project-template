@@ -12,6 +12,7 @@ package cmp.navigation
 import androidx.lifecycle.viewModelScope
 import cmp.navigation.AppAction.Internal.DynamicColorsUpdate
 import cmp.navigation.AppAction.Internal.ScreenCaptureUpdate
+import com.mobilebytelabs.kmptoolkit.appreview.AppReview
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -19,14 +20,17 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kpt.core.base.platform.garbage.GarbageCollectionManager
+import kpt.core.base.platform.update.AppUpdateManager
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.user.UserDataRepository
 import kpt.core.model.user.DarkThemeConfig
 import kpt.core.model.user.LanguageConfig
+import kpt.core.platform.config.AppReviewConfig
 
 class AppViewModel(
     private val settingsRepository: UserDataRepository,
     private val garbageCollectionManager: GarbageCollectionManager,
+    private val appUpdateManager: AppUpdateManager,
 ) : BaseViewModel<AppState, AppEvent, AppAction>(
     initialState = AppState(
         darkTheme = false,
@@ -36,6 +40,26 @@ class AppViewModel(
     ),
 ) {
     init {
+        // Configure the store listing ONCE, before anything can ask for a review.
+        //
+        // `AppReviewManagerImpl`'s KDoc names this as the fork step and nothing performed it, so
+        // `canRequestReview` was permanently false on desktop and web (the two targets with no
+        // native review flow) while Android/iOS/macOS masked the gap behind theirs. It lives here
+        // rather than in each platform entry point because the ids are commonMain data and the
+        // toolkit resolves the target itself — an androidMain/iosMain pair would be four copies of
+        // one call, three of which a fork would forget on the next platform it adds.
+        AppReview.configure(AppReviewConfig.storeListing)
+
+        // App-update check moved off MainActivity so every platform gets it.
+        //
+        // It ran only on Android, inside `setContent`, keyed on connectivity — so desktop and iOS
+        // never checked at all. `checkForAppUpdate()` already returns `UpdateOutcome.NotSupported`
+        // where there is no update mechanism, which is the honest answer and costs one call. The
+        // Android copy was REMOVED rather than left in place: two checks per launch on one platform
+        // is not a safety net, it is a second thing to keep in sync. MainActivity keeps only
+        // `checkForResumeUpdateState()` in onResume, which is a real Android lifecycle concern.
+        viewModelScope.launch { appUpdateManager.checkForAppUpdate() }
+
         settingsRepository
             .observeDarkThemeConfig
             .onEach { trySendAction(AppAction.Internal.ThemeUpdate(it)) }

@@ -28,6 +28,9 @@ kotlin {
             implementation(projects.core.store)
             // Firebase analytics (AnalyticsHelper + Compose TrackScreenView/rememberAnalyticsHelper) via core/firebase.
             implementation(projects.core.firebase)
+            // AppReviewManager + the generated AppReviewConfig for the "Rate this app" row. Same rule
+            // as core/store above: depend on core/platform, which `api`-re-exposes core-base/platform.
+            implementation(projects.core.platform)
 
             implementation(compose.ui)
             implementation(compose.foundation)

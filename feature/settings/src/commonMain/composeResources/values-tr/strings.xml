@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Fatura hatırlatıcıları ve oran uyarıları burada görünecek.</string>
     <string name="feature_settings_sync_drafts_row">Senkronizasyon ve taslaklar</string>
     <string name="feature_settings_sync_drafts_row_description">Taslakları ve bekleyen senkronizasyonları görüntüleyip yönetin</string>
+    <string name="feature_settings_rate_app_row">Bu uygulamayı değerlendir</string>
+    <string name="feature_settings_rate_app_row_description">Bu uygulamayı değerlendirmek için mağaza sayfasını aç</string>
     <string name="feature_settings_sync_drafts_title">Senkronizasyon ve taslaklar</string>
     <string name="feature_settings_sync_drafts_empty_title">Senkronize edilecek bir şey yok</string>
     <string name="feature_settings_sync_drafts_empty_message">Çevrimdışı kaydettiğiniz taslaklar ve senkronizasyon bekleyen kayıtlar burada görünecek.</string>

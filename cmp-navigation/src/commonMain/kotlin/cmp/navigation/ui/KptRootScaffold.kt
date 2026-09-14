@@ -45,11 +45,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import kpt.core.base.designsystem.component.KptToastHost
 import kpt.core.base.designsystem.theme.KptTheme
 import kpt.core.ui.bottombar.KptBottomBar
 import kpt.core.ui.bottombar.KptNavigationRail
 import kpt.core.ui.scaffold.KptPullToRefreshState
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongMethod")
@@ -59,7 +61,12 @@ fun KptRootScaffold(
     topBar: @Composable () -> Unit = { },
     utilityBar: @Composable () -> Unit = { },
     overlay: @Composable () -> Unit = { },
-    snackbarHost: @Composable () -> Unit = { },
+    // Defaults to the app-wide toast host rather than `{ }`. An empty default is why the template
+    // had no working transient-message surface: `toastModule` makes ToastDispatcher injectable, so a
+    // ViewModel could raise a toast that nothing rendered — it would queue and never appear. The
+    // ToastHostState comes from Koin, which is the same instance bound as ToastDispatcher, so what a
+    // ViewModel raises is what this renders. Pass your own to override.
+    snackbarHost: @Composable () -> Unit = { KptToastHost(hostState = koinInject()) },
     floatingActionButton: @Composable () -> Unit = { },
     floatingActionButtonPosition: FabPosition = FabPosition.End,
     navigationData: ScaffoldNavigationData? = null,

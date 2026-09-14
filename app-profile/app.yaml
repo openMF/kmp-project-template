@@ -255,6 +255,23 @@ store:
     demo_password: ""                        # store.review.demo.password
   app_description: Money Toolkit desktop     # desktop packaging description (app.description)
 
+# In-app review prompting — NOT the `store.review` block above.
+#
+# `store.review` is the App STORE review TEAM's contact + demo notes, read at submission time.
+# This is the running app asking a user to rate it. The names sit one word apart and the meanings do
+# not overlap at all, so they are deliberately separate top-level keys rather than nested siblings.
+#
+# `syncForkConfig` projects this into the generated `core/platform/config/AppReviewConfig`, which
+# `AppViewModel` reads. Store identity is NOT duplicated here — it resolves from
+# `platforms/apple/apple.yaml#apple.app_store_id` (iOS) and `identity.app_id` (Android).
+in_app_review:
+  enabled: true
+  # These guard the CUSTOM path. The native prompt is rate-limited by the OS itself, but
+  # `promptForCustomReview()` deep-links to the store and would otherwise fire whenever asked.
+  min_launches: 5                            # never on first launch — before the app has earned it
+  min_days_since_install: 3
+  cooldown_days: 90                          # after a prompt, do not ask again inside this window
+
 media:
   root: media
 

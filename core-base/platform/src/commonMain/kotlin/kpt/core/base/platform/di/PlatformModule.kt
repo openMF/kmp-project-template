@@ -18,6 +18,8 @@ import kpt.core.base.platform.garbage.GarbageCollectionManagerImpl
 import com.mobilebytelabs.kmptoolkit.appintents.di.appIntentsModule
 import com.mobilebytelabs.kmptoolkit.bubble.di.bubbleModule
 import com.mobilebytelabs.kmptoolkit.clipboard.di.clipboardModule
+import com.mobilebytelabs.kmptoolkit.intentlauncher.di.intentLauncherModule
+import com.mobilebytelabs.kmptoolkit.share.di.shareModule
 import com.mobilebytelabs.kmptoolkit.pdfgenerator.di.pdfModule
 import kpt.core.base.platform.intent.IntentManager
 import kpt.core.base.platform.intent.IntentManagerImpl
@@ -80,6 +82,17 @@ val platformModule = module {
     // (FakeClipboard, FakeAppIntentsManager, FakeBubble, FakePdfManager, FakeAppReviewManager), so
     // substitution in tests never needed a template-owned type, and insulation was already gone
     // once these types appeared in this module's public API.
+    // shareModule binds the TOOLKIT's ShareManager. The template's ShareManager (a wrapper adding
+    // MimeType + ImageBitmap encoding) stays the one this module's own local exposes; this exists so
+    // the toolkit's LocalShareManager can be provided from DI rather than defaulting to a second
+    // instance. Both delegate to the same global `Share` engine, so they cannot disagree.
+    includes(shareModule)
+    // Binds the TOOLKIT's IntentManager. On Android this instance has no IntentLauncher (one is
+    // Activity-scoped), so its pickers report unsupported and `rememberIntentCapabilities` says so —
+    // that is the library's documented, honest degradation, not a fault. A fork wanting pickers
+    // calls `rememberIntentManagerFromLauncher()` inside its ComponentActivity's setContent and
+    // wraps the app in `ProvideIntentManager(manager)`, which overrides the local below.
+    includes(intentLauncherModule)
     includes(clipboardModule())
     includes(bubbleModule())
     includes(appIntentsModule)

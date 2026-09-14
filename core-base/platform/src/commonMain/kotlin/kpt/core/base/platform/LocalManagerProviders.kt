@@ -14,6 +14,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import com.mobilebytelabs.kmptoolkit.appintents.AppIntentsManager
+import com.mobilebytelabs.kmptoolkit.appintents.compose.LocalAppIntentsManager
+import com.mobilebytelabs.kmptoolkit.intentlauncher.IntentManager as ToolkitIntentManager
+import com.mobilebytelabs.kmptoolkit.intentlauncher.compose.LocalIntentManager as ToolkitLocalIntentManager
+import com.mobilebytelabs.kmptoolkit.share.compose.LocalShareManager as ToolkitLocalShareManager
+import com.mobilebytelabs.kmptoolkit.share.ShareManager as ToolkitShareManager
 import com.mobilebytelabs.kmptoolkit.bubble.Bubble
 import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
 import com.mobilebytelabs.kmptoolkit.pdfgenerator.PdfManager
@@ -58,15 +63,54 @@ fun LocalManagerProvider(
         LocalShareManager provides koinInject(),
         LocalAppUpdateManager provides koinInject(),
         LocalClipboardManager provides koinInject(),
-        LocalAppIntentsManager provides koinInject(),
         LocalBubbleManager provides koinInject(),
         LocalPdfManager provides koinInject(),
+        // The toolkit's own locals, provided from the SAME graph. They default to constructing a
+        // separate impl rather than throwing, so leaving them unprovided would make a wrong import
+        // silently use a second object instead of failing. cmp-share-compose's composables
+        // (ShareButton, ShareSheet) call the global `Share` engine directly and do not need this —
+        // it exists so `rememberShareManager()` and `rememberAppIntentsManager()` resolve to the
+        // app's managers.
+        ToolkitLocalShareManager provides koinInject<ToolkitShareManager>(),
+        ToolkitLocalIntentManager provides koinInject<ToolkitIntentManager>(),
+        LocalAppIntentsManager provides koinInject(),
     ) {
         content()
     }
 }
 
-/**
+/*
+ * Name collision with the toolkit's -compose modules — read before adding an import.
+ *
+ * cmp-share-compose, cmp-intent-launcher-compose and cmp-app-intents-compose each export their own
+ * `LocalShareManager` / `LocalIntentManager` / `LocalAppIntentsManager`, the same simple names used
+ * here.
+ *
+ * None of them throws when unprovided. Each defaults to `staticCompositionLocalOf { SomeImpl() }`,
+ * so a wrong import compiles, runs, and quietly uses a SECOND manager — no error to notice. That is
+ * why `LocalManagerProvider` above provides all three too, from the same Koin graph: whichever name
+ * is imported now resolves to the app's instance.
+ *
+ * Share and intent-launcher are the real duplicates, because the template's managers are wrappers —
+ * `ShareManager` adds MimeType handling and ImageBitmap encoding; `IntentManager` exposes only the
+ * SystemIntents-backed operations (openAppSettings, createDocument) that need no Activity. The
+ * toolkit's own types carry the full operation sets. Both sides delegate to the same engines, so
+ * they cannot disagree; pick the template's for the extras, the toolkit's for the full surface.
+ *
+ * App-intents had no such difference — both names meant the identical type — so the template's
+ * duplicate was removed and the toolkit's is the single one.
+ *
+ * ## Android + intent pickers
+ * The toolkit's `IntentManager` bound in `platformModule` has no `IntentLauncher` on Android,
+ * because one is Activity-scoped. That is documented, honest degradation: the pickers report
+ * unsupported and `rememberIntentCapabilities()` says so, while openAppSettings/createDocument still
+ * work. A fork that wants pickers builds one from its Activity and overrides the local:
+ *
+ * ```kotlin
+ * // inside setContent { } of a ComponentActivity
+ * ProvideIntentManager(rememberIntentManagerFromLauncher()) { App() }
+ * ```
+ *//**
  * Builds a manager [ProvidableCompositionLocal] that throws, rather than defaulting, when read
  * without a provider above it.
  *
@@ -121,10 +165,6 @@ val LocalAppUpdateManager: ProvidableCompositionLocal<AppUpdateManager> =
  */
 val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager> =
     managerCompositionLocal("LocalClipboardManager")
-
-/** Registers Siri Shortcuts / Assistant intents. Provided by [LocalManagerProvider]. */
-val LocalAppIntentsManager: ProvidableCompositionLocal<AppIntentsManager> =
-    managerCompositionLocal("LocalAppIntentsManager")
 
 /** Shows floating bubbles, overlays and heads-up UI. Provided by [LocalManagerProvider]. */
 val LocalBubbleManager: ProvidableCompositionLocal<Bubble> =

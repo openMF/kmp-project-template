@@ -412,6 +412,19 @@ cmp-app-intents = { module = "io.github.mobilebytelabs:cmp-app-intents", version
 cmp-bubble = { module = "io.github.mobilebytelabs:cmp-bubble", version.ref = "kmptoolkit" }
 cmp-pdf-generator = { module = "io.github.mobilebytelabs:cmp-pdf-generator", version.ref = "kmptoolkit" }
 cmp-toast = { module = "io.github.mobilebytelabs:cmp-toast", version.ref = "kmptoolkit" }
+# Compose surfaces for cores already integrated above. Added to core-base/ui as `api`, which the
+# feature convention plugin already gives every feature. Taken for their COMPOSABLES — ShareButton /
+# ShareSheet / AppIntentsRegistry / rememberSupportsIntent — which call the libraries' global entry
+# points directly and do not depend on the CompositionLocals these modules also export.
+#
+# Their exported locals (LocalShareManager, LocalIntentManager, LocalAppIntentsManager) carry the
+# SAME simple names as the template's own in kpt.core.base.platform, and none of them throws when
+# unprovided — each falls back to constructing its own impl. All three are therefore PROVIDED by
+# LocalManagerProvider from the same DI instances, so either import resolves to the app's manager
+# rather than a private second one. See the note in LocalManagerProviders.kt.
+cmp-share-compose = { module = "io.github.mobilebytelabs:cmp-share-compose", version.ref = "kmptoolkit" }
+cmp-intent-launcher-compose = { module = "io.github.mobilebytelabs:cmp-intent-launcher-compose", version.ref = "kmptoolkit" }
+cmp-app-intents-compose = { module = "io.github.mobilebytelabs:cmp-app-intents-compose", version.ref = "kmptoolkit" }
 
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }

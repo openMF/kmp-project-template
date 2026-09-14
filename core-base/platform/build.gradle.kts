@@ -45,6 +45,13 @@ kotlin {
             // KptToastHost rendering the state share one queue. The composable lives in
             // core-base/designsystem.
             implementation(libs.cmp.toast)
+            // Needed to PROVIDE these libraries' own CompositionLocals from LocalManagerProvider.
+            // They default to constructing a separate impl when unprovided, so a fork importing the
+            // toolkit's LocalShareManager instead of the template's would get a second object with
+            // no error. Providing them here points both names at the same DI-bound instance.
+            implementation(libs.cmp.share.compose)
+            implementation(libs.cmp.intent.launcher.compose)
+            implementation(libs.cmp.app.intents.compose)
             // The CompositionLocals read their managers OUT of Koin rather than constructing a
             // second copy — platformModule is the single owner. Same pattern as core-base/security.
             implementation(libs.koin.compose)

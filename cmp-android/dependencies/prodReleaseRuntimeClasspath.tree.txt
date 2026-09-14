@@ -1549,6 +1549,115 @@
 |    |    +--- project ':core-base:ui'
 |    |    |    +--- androidx.metrics:metrics-performance:1.0.0 (*)
 |    |    |    +--- androidx.compose.runtime:runtime -> 1.12.0 (*)
+|    |    |    +--- io.github.mobilebytelabs:cmp-share-compose:3.5.28
+|    |    |    |    \--- io.github.mobilebytelabs:cmp-share-compose-android:3.5.28
+|    |    |    |         +--- io.github.mobilebytelabs:cmp-share:3.5.28
+|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-share-android:3.5.28
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28
+|    |    |    |         |         |    \--- io.github.mobilebytelabs:cmp-observe-android:3.5.28
+|    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |         |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
+|    |    |    |         +--- org.jetbrains.compose.ui:ui:1.12.0 (*)
+|    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0
+|    |    |    |         |    +--- androidx.compose.material3:material3:1.4.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.animation:animation-core:1.9.1 -> 1.12.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.annotation-internal:annotation:1.9.1
+|    |    |    |         |    |    \--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.collection-internal:collection:1.9.1
+|    |    |    |         |    |    \--- androidx.collection:collection:1.5.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.foundation:foundation:1.9.1 -> 1.12.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.foundation:foundation-layout:1.9.1 -> 1.12.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.material:material-ripple:1.9.1 -> 1.12.0
+|    |    |    |         |    |    \--- org.jetbrains.compose.material:material-ripple-android:1.12.0
+|    |    |    |         |    |         +--- androidx.collection:collection:1.5.0 (*)
+|    |    |    |         |    |         +--- androidx.compose.material:material-ripple:1.12.0 (*)
+|    |    |    |         |    |         +--- org.jetbrains.compose.animation:animation:1.12.0 (*)
+|    |    |    |         |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
+|    |    |    |         |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
+|    |    |    |         |    |         \--- org.jetbrains.compose.ui:ui-util:1.12.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.runtime:runtime:1.9.1 -> 1.12.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.ui:ui-backhandler:1.9.1 -> 1.12.0
+|    |    |    |         |    |    \--- org.jetbrains.compose.ui:ui-backhandler-android:1.12.0
+|    |    |    |         |    |         +--- androidx.activity:activity-compose:1.8.0 -> 1.13.0 (*)
+|    |    |    |         |    |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
+|    |    |    |         |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-util:1.12.0 (*)
+|    |    |    |         |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.4.20 (*)
+|    |    |    |         |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0 -> 1.11.0 (*)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui:1.12.0 (c)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-geometry:1.12.0 (c)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-graphics:1.12.0 (c)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-text:1.12.0 (c)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-tooling:1.12.0 (c)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-tooling-data:1.12.0 (c)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-tooling-preview:1.12.0 (c)
+|    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-unit:1.12.0 (c)
+|    |    |    |         |    |         \--- org.jetbrains.compose.ui:ui-util:1.12.0 (c)
+|    |    |    |         |    +--- org.jetbrains.compose.ui:ui-graphics:1.9.1 -> 1.12.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.ui:ui-text:1.9.1 -> 1.12.0 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.ui:ui-util:1.9.1 -> 1.12.0 (*)
+|    |    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.20 (*)
+|    |    |    |         +--- org.jetbrains.compose.material:material-icons-extended:1.7.3
+|    |    |    |         |    +--- androidx.compose.material:material-icons-extended:1.7.6 -> 1.7.8
+|    |    |    |         |    |    \--- androidx.compose.material:material-icons-extended-android:1.7.8
+|    |    |    |         |    |         +--- androidx.compose.material:material-icons-core:1.7.8
+|    |    |    |         |    |         |    \--- androidx.compose.material:material-icons-core-android:1.7.8
+|    |    |    |         |    |         |         +--- androidx.compose.ui:ui:1.6.0 -> 1.12.0 (*)
+|    |    |    |         |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.4.20 (*)
+|    |    |    |         |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.8.22 -> 2.4.20
+|    |    |    |         |    |         |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.8.22 -> 2.4.20 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.material:material-icons-core:1.7.3
+|    |    |    |         |    |    +--- androidx.compose.material:material-icons-core:1.7.6 -> 1.7.8 (*)
+|    |    |    |         |    |    +--- org.jetbrains.compose.ui:ui:1.7.3 -> 1.12.0 (*)
+|    |    |    |         |    |    +--- org.jetbrains.compose.ui:ui-graphics:1.7.3 -> 1.12.0 (*)
+|    |    |    |         |    |    +--- org.jetbrains.compose.ui:ui-unit:1.7.3 -> 1.12.0 (*)
+|    |    |    |         |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.24 -> 2.4.20 (*)
+|    |    |    |         |    +--- org.jetbrains.compose.ui:ui:1.7.3 -> 1.12.0 (*)
+|    |    |    |         |    \--- org.jetbrains.compose.ui:ui-graphics:1.7.3 -> 1.12.0 (*)
+|    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher-compose:3.5.28
+|    |    |    |    \--- io.github.mobilebytelabs:cmp-intent-launcher-compose-android:3.5.28
+|    |    |    |         +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.28
+|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-intent-launcher-android:3.5.28
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
+|    |    |    |         |         +--- androidx.activity:activity:1.10.1 -> 1.13.0 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |         |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
+|    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         +--- androidx.activity:activity-compose:1.13.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    +--- io.github.mobilebytelabs:cmp-app-intents-compose:3.5.28
+|    |    |    |    \--- io.github.mobilebytelabs:cmp-app-intents-compose-android:3.5.28
+|    |    |    |         +--- io.github.mobilebytelabs:cmp-app-intents:3.5.28
+|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-app-intents-android:3.5.28
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
+|    |    |    |         |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
+|    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
+|    |    |    |         +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
+|    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    +--- io.github.alexzhirkevich:compottie:2.2.4
 |    |    |    |    \--- io.github.alexzhirkevich:compottie-android:2.2.4
 |    |    |    |         +--- io.github.alexzhirkevich:compottie-core:2.2.4
@@ -1634,9 +1743,7 @@
 |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28
 |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-network-monitor-android:3.5.28
 |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28
-|    |    |    |    |         |    \--- io.github.mobilebytelabs:cmp-observe-android:3.5.28
-|    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
 |    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
@@ -1722,45 +1829,7 @@
 |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
 |    |    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
 |    |    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
-|    |    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0
-|    |    |    |    |         |    +--- androidx.compose.material3:material3:1.4.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.animation:animation-core:1.9.1 -> 1.12.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.annotation-internal:annotation:1.9.1
-|    |    |    |    |         |    |    \--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.collection-internal:collection:1.9.1
-|    |    |    |    |         |    |    \--- androidx.collection:collection:1.5.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.foundation:foundation:1.9.1 -> 1.12.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.foundation:foundation-layout:1.9.1 -> 1.12.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.material:material-ripple:1.9.1 -> 1.12.0
-|    |    |    |    |         |    |    \--- org.jetbrains.compose.material:material-ripple-android:1.12.0
-|    |    |    |    |         |    |         +--- androidx.collection:collection:1.5.0 (*)
-|    |    |    |    |         |    |         +--- androidx.compose.material:material-ripple:1.12.0 (*)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.animation:animation:1.12.0 (*)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
-|    |    |    |    |         |    |         \--- org.jetbrains.compose.ui:ui-util:1.12.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.runtime:runtime:1.9.1 -> 1.12.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.ui:ui-backhandler:1.9.1 -> 1.12.0
-|    |    |    |    |         |    |    \--- org.jetbrains.compose.ui:ui-backhandler-android:1.12.0
-|    |    |    |    |         |    |         +--- androidx.activity:activity-compose:1.8.0 -> 1.13.0 (*)
-|    |    |    |    |         |    |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-util:1.12.0 (*)
-|    |    |    |    |         |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.20 -> 2.4.20 (*)
-|    |    |    |    |         |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0 -> 1.11.0 (*)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui:1.12.0 (c)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-geometry:1.12.0 (c)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-graphics:1.12.0 (c)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-text:1.12.0 (c)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-tooling:1.12.0 (c)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-tooling-data:1.12.0 (c)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-tooling-preview:1.12.0 (c)
-|    |    |    |    |         |    |         +--- org.jetbrains.compose.ui:ui-unit:1.12.0 (c)
-|    |    |    |    |         |    |         \--- org.jetbrains.compose.ui:ui-util:1.12.0 (c)
-|    |    |    |    |         |    +--- org.jetbrains.compose.ui:ui-graphics:1.9.1 -> 1.12.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.ui:ui-text:1.9.1 -> 1.12.0 (*)
-|    |    |    |    |         |    +--- org.jetbrains.compose.ui:ui-util:1.9.1 -> 1.12.0 (*)
-|    |    |    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.20 (*)
+|    |    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    |    |         +--- org.jetbrains.compose.animation:animation:1.12.0 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
@@ -1858,24 +1927,7 @@
 |    |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
 |    |    |    |    +--- org.jetbrains.compose.components:components-resources:1.12.0 (*)
 |    |    |    |    +--- org.jetbrains.compose.components:components-ui-tooling-preview:1.12.0 (*)
-|    |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3
-|    |    |    |    |    +--- androidx.compose.material:material-icons-extended:1.7.6 -> 1.7.8
-|    |    |    |    |    |    \--- androidx.compose.material:material-icons-extended-android:1.7.8
-|    |    |    |    |    |         +--- androidx.compose.material:material-icons-core:1.7.8
-|    |    |    |    |    |         |    \--- androidx.compose.material:material-icons-core-android:1.7.8
-|    |    |    |    |    |         |         +--- androidx.compose.ui:ui:1.6.0 -> 1.12.0 (*)
-|    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:1.8.22 -> 2.4.20 (*)
-|    |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.8.22 -> 2.4.20
-|    |    |    |    |    |         |              \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.8.22 -> 2.4.20 (*)
-|    |    |    |    |    +--- org.jetbrains.compose.material:material-icons-core:1.7.3
-|    |    |    |    |    |    +--- androidx.compose.material:material-icons-core:1.7.6 -> 1.7.8 (*)
-|    |    |    |    |    |    +--- org.jetbrains.compose.ui:ui:1.7.3 -> 1.12.0 (*)
-|    |    |    |    |    |    +--- org.jetbrains.compose.ui:ui-graphics:1.7.3 -> 1.12.0 (*)
-|    |    |    |    |    |    +--- org.jetbrains.compose.ui:ui-unit:1.7.3 -> 1.12.0 (*)
-|    |    |    |    |    |    \--- org.jetbrains.kotlin:kotlin-stdlib-common:1.9.24 -> 2.4.20 (*)
-|    |    |    |    |    +--- org.jetbrains.compose.ui:ui:1.7.3 -> 1.12.0 (*)
-|    |    |    |    |    \--- org.jetbrains.compose.ui:ui-graphics:1.7.3 -> 1.12.0 (*)
+|    |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.11.0-beta01 (*)
 |    |    |    |    \--- org.jetbrains.compose.ui:ui-backhandler:1.11.1 -> 1.12.0 (*)
 |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor-compose:3.5.28
@@ -1887,15 +1939,7 @@
 |    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    |         +--- org.jetbrains.compose.animation:animation:1.12.0 (*)
 |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.28
-|    |    |    |    \--- io.github.mobilebytelabs:cmp-intent-launcher-android:3.5.28
-|    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
-|    |    |    |         +--- androidx.activity:activity:1.10.1 -> 1.13.0 (*)
-|    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
-|    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
-|    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
+|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.28 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.12.0 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
@@ -2306,15 +2350,7 @@
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-intents:3.5.28
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-app-intents-android:3.5.28
-|    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |    |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
-|    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
-|    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
-|    |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-intents:3.5.28 (*)
 |    |    |    |    |    +--- io.github.mobilebytelabs:cmp-bubble:3.5.28
 |    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-bubble-android:3.5.28
 |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
@@ -2392,14 +2428,7 @@
 |    |    |    |    |    |         |         +--- com.mohamedrejeb.calf:calf-permissions-core:0.12.0 (*)
 |    |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.20 (*)
 |    |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.20 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-share:3.5.28
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-share-android:3.5.28
-|    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |    |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
-|    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
-|    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-share:3.5.28 (*)
 |    |    |    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.28 (*)
 |    |    |    |    |    +--- io.github.mobilebytelabs:cmp-open-url:3.5.28 (*)
 |    |    |    |    |    +--- io.github.mobilebytelabs:cmp-in-app-update:3.5.28
@@ -2423,6 +2452,9 @@
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
 |    |    |    |    |    +--- io.github.mobilebytelabs:cmp-toast:3.5.28 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-share-compose:3.5.28 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher-compose:3.5.28 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-intents-compose:3.5.28 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-compose:4.2.2 (*)
 |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
@@ -2934,6 +2966,7 @@
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1 (*)
 |    |    |    +--- project ':core:model' (*)
 |    |    |    +--- project ':core:store' (*)
+|    |    |    +--- project ':core:platform' (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.12.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)

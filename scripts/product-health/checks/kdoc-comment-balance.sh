@@ -35,7 +35,12 @@ pass() { printf '  ✓ %s\n' "$1"; }
 fail() { printf '  ✗ %s\n' "$1"; FAILED=1; }
 FAILED=0
 
-FILES="$(git ls-files '*.kt' 2>/dev/null)"
+# product-health/tests/** is excluded for the same reason shell-portability.sh excludes it: a RED
+# canary fixture is DELIBERATELY broken, and it only proves the gate can fail if the gate still fails
+# on it. Scanning the fixtures would make this check report its own test data as a defect — and,
+# because the fixtures are tracked, would fail the repo the moment the canary was committed. That is
+# exactly what happened: the canary landed, CI went red, and the "defect" was the proof of correctness.
+FILES="$(git ls-files '*.kt' 2>/dev/null | grep -v '^scripts/product-health/tests/' || true)"
 if [ -z "$FILES" ]; then
     echo "  ✗ CB-0 found 0 tracked .kt files — refusing a vacuous pass"
     exit 1

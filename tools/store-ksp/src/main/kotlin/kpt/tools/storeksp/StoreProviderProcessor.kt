@@ -24,7 +24,7 @@ private const val PROVIDER = "kpt.core.base.store.annotation.StoreProvider"
 private const val BINDINGS_PKG = "kpt.core.store.di"
 private const val CONFIG_PKG = "kpt.core.store.config"
 private val TTL_RE = Regex("^(\\d+)(m|h|d)$")
-private val PLACEHOLDER_RE = Regex("\\{([A-Za-z0-9_]+)}")
+private val PLACEHOLDER_RE = Regex("\\{([A-Za-z0-9_]+)\\}")
 
 private data class KeySpec(val name: String, val fn: String, val key: String, val params: List<Pair<String, String>>)
 

@@ -20,9 +20,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kpt.core.base.platform.garbage.GarbageCollectionManager
+import kpt.core.base.platform.review.AppReviewManager
 import kpt.core.base.platform.update.AppUpdateManager
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.user.UserDataRepository
+import kpt.core.datastore.prefs.AppReviewPromptStore
 import kpt.core.model.user.DarkThemeConfig
 import kpt.core.model.user.LanguageConfig
 import kpt.core.platform.config.AppReviewConfig
@@ -31,6 +33,8 @@ class AppViewModel(
     private val settingsRepository: UserDataRepository,
     private val garbageCollectionManager: GarbageCollectionManager,
     private val appUpdateManager: AppUpdateManager,
+    private val appReviewManager: AppReviewManager,
+    private val appReviewPromptStore: AppReviewPromptStore,
 ) : BaseViewModel<AppState, AppEvent, AppAction>(
     initialState = AppState(
         darkTheme = false,
@@ -60,6 +64,20 @@ class AppViewModel(
         // `checkForResumeUpdateState()` in onResume, which is a real Android lifecycle concern.
         viewModelScope.launch { appUpdateManager.checkForAppUpdate() }
 
+        // Review prompt, on the same automatic footing as the update check.
+        //
+        // Template-level on purpose: a fork inherits both by existing, with nothing to call. That is
+        // the whole point — the previous arrangement configured the store listing here but left the
+        // only prompt behind a settings row, so a fork that removed or never rendered that row
+        // shipped a review capability that could not fire.
+        //
+        // Three gates, in widening order of cost to evaluate: the fork's own `enabled` flag and the
+        // thresholds (generated from app-profile), then whether this target can reach a review at
+        // all, and finally the OS, which rate-limits the native flow independently of anything here.
+        // `recordLaunch()` runs regardless, because the counters must advance on launches that do
+        // NOT prompt — otherwise `min_launches` could never be reached.
+        viewModelScope.launch { maybePromptForReview() }
+
         settingsRepository
             .observeDarkThemeConfig
             .onEach { trySendAction(AppAction.Internal.ThemeUpdate(it)) }
@@ -88,6 +106,29 @@ class AppViewModel(
             .map { AppEvent.UpdateAppLocale(it.localeName) }
             .onEach(::sendEvent)
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * Ask for a review if this launch is the one the policy has been waiting for.
+     *
+     * Silent by design when it declines: every branch here is a legitimate "not now", and a user who
+     * is not being asked has nothing to be told.
+     */
+    private suspend fun maybePromptForReview() {
+        val state = appReviewPromptStore.recordLaunch()
+
+        val due = AppReviewConfig.shouldPromptForReview(
+            launchCount = state.launchCount,
+            daysSinceInstall = state.daysSinceInstall,
+            daysSinceLastPrompt = state.daysSinceLastPrompt,
+        )
+        if (!due || !appReviewManager.canRequestReview) return
+
+        appReviewManager.promptForReview()
+        // Stamped even though the native flow may have decided to show nothing. We asked; the
+        // cooldown starts. Stamping only on a confirmed display is not an option — neither store
+        // reports it — and treating "not shown" as "not asked" would retry on every launch.
+        appReviewPromptStore.recordPromptShown()
     }
 
     override fun handleAction(action: AppAction) {

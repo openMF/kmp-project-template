@@ -60,8 +60,14 @@ REPORT="$(printf '%s\n' "$FILES" | while IFS= read -r f; do
         # Keep only comment-decoration lines; everything else may contain string literals.
         if (line !~ /^[ \t]*(\/\*|\*)/) next
         body = line
-        sub(/^[ \t]*\/\*\*?/, "", body)   # strip a leading /** or /*
-        sub(/^[ \t]*\*/, "", body)          # strip a leading continuation *
+        sub(/^[ \t]+/, "", body)
+        # A LEADING closer, before the continuation-star strip below. `*//**` — one comment ending
+        # where the next begins, which Kotlin accepts — otherwise lost its `*` to that strip and the
+        # remaining `//**` read as an opener with no close. That is a balanced line, and flagging it
+        # sent a reader hunting for a nesting bug in a file the compiler was perfectly happy with.
+        sub(/^\*\//, "", body)
+        sub(/^\/\*\*?/, "", body)          # strip a leading /** or /*
+        sub(/^\*/, "", body)                # strip a leading continuation *
         # …and the comment CLOSER. A one-line `/** … */` carries both; leaving the trailing `*/`
         # counted made every single-line KDoc look like it closed a comment it never opened.
         sub(/\*\/[ \t]*$/, "", body)

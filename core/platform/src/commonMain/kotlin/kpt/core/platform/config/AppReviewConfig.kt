@@ -30,10 +30,11 @@ import com.mobilebytelabs.kmptoolkit.appreview.StoreListing
  * against, the Partner Center Store ID. A second hand-typed copy is the drift this projection removes.
  *
  * ## Policy vs. the native prompt
- * [enabled] and the three thresholds gate the CUSTOM path only. `promptForReview()` reaches a native
- * flow that the OS itself rate-limits (Play and StoreKit both silently no-op when they judge it too
- * soon); `promptForCustomReview()` opens the store listing directly and would fire every time it is
- * asked. Counting launches and days is the caller's job — this object only carries the thresholds.
+ * [enabled] and the three thresholds gate the AUTOMATIC prompt the app shell raises at launch
+ * (`AppViewModel`). They are the app's own restraint, layered on top of the OS's: `promptForReview()`
+ * reaches a native flow that Play and StoreKit each rate-limit independently, silently showing
+ * nothing when they judge it too soon. Neither layer replaces the other — the OS limit is invisible
+ * and unconfigurable, so a fork that wants "not before day 3" has to say so here.
  */
 object AppReviewConfig {
     // syncForkConfig:app-review:begin — GENERATED from app-profile. Do not hand-edit.
@@ -65,11 +66,10 @@ object AppReviewConfig {
     /**
      * Whether an AUTOMATIC review prompt is due, given counters the caller keeps.
      *
-     * The counters are deliberately parameters rather than state owned here. Persisting them would
-     * mean choosing a storage scope, and the obvious one is wrong: review eligibility is per-DEVICE
-     * and must survive sign-out, whereas `UserPreferencesRepository.clearUserData()` exists to wipe
-     * per-user state. A fork that already tracks sessions passes what it has; one that does not is
-     * not forced into a schema it did not ask for.
+     * The counters are parameters rather than state owned here, so this stays a pure function of the
+     * generated thresholds. `AppReviewPromptStore` keeps them — deliberately outside
+     * `UserPreferencesRepository`, because review eligibility is per-DEVICE and must survive
+     * sign-out while `clearUserData()` exists to wipe per-user state.
      *
      * This is for a prompt the APP decides to show. A user who taps "Rate this app" has asked
      * already — do not route that through here, call `promptForReview()` directly.

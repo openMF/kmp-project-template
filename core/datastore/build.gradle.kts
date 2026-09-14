@@ -34,6 +34,13 @@ kotlin {
             implementation(libs.multiplatform.settings.serialization)
             implementation(libs.multiplatform.settings.coroutines)
         }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            // MapSettings — an in-memory Settings, so the review-counter tests exercise the real
+            // read/write path rather than a hand-rolled fake that could drift from it.
+            implementation(libs.multiplatform.settings.test)
+        }
     }
 }
 

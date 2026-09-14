@@ -16,6 +16,7 @@ import androidx.navigation.NavGraphBuilder
 import kotlinx.coroutines.launch
 import kpt.core.base.platform.review.AppReviewManager
 import kpt.core.base.ui.nav.popBackStackSafely
+import kpt.core.datastore.prefs.AppReviewPromptStore
 import kpt.core.platform.config.AppReviewConfig
 import kpt.feature.bills.navigation.navigateToBills
 import kpt.feature.calculators.navigation.navigateToAffordability
@@ -89,6 +90,7 @@ object BackboneRegistry {
     val settingsBody: @Composable (NavController) -> Unit = { navController ->
         // demo:begin — default demo settings body. Replace with your fork's settings content.
         val reviewManager = koinInject<AppReviewManager>()
+        val promptStore = koinInject<AppReviewPromptStore>()
         val scope = rememberCoroutineScope()
         SettingsDemoBody(
             onBackClick = { navController.popBackStackSafely() },
@@ -103,7 +105,16 @@ object BackboneRegistry {
             // tapping, and refusing it because they are a day short of `min_days_since_install`
             // would be exactly that dead button. The native flow is OS-throttled either way.
             onRateAppClick = if (AppReviewConfig.ENABLED && reviewManager.canRequestReview) {
-                { scope.launch { reviewManager.promptForReview() } }
+                {
+                    scope.launch {
+                        reviewManager.promptForReview()
+                        // Starts the cooldown for the AUTOMATIC prompt too. Without this the two
+                        // paths do not know about each other: someone who rates from here could be
+                        // asked again unprompted on the next launch — the exact repetition the
+                        // cooldown exists to prevent.
+                        promptStore.recordPromptShown()
+                    }
+                }
             } else {
                 null
             },

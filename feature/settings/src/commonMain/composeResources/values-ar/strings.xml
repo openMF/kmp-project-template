@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">سترى هنا تذكيرات الفواتير وتنبيهات الأسعار.</string>
     <string name="feature_settings_sync_drafts_row">المزامنة والمسودات</string>
     <string name="feature_settings_sync_drafts_row_description">عرض المسودات وعمليات المزامنة المعلّقة وإدارتها</string>
+    <string name="feature_settings_rate_app_row">قيّم هذا التطبيق</string>
+    <string name="feature_settings_rate_app_row_description">افتح صفحة المتجر لتقييم هذا التطبيق</string>
     <string name="feature_settings_sync_drafts_title">المزامنة والمسودات</string>
     <string name="feature_settings_sync_drafts_empty_title">لا شيء للمزامنة</string>
     <string name="feature_settings_sync_drafts_empty_message">ستظهر هنا المسودات التي تحفظها دون اتصال والسجلات التي تنتظر المزامنة.</string>

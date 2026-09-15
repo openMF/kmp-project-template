@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Você verá aqui lembretes de contas e alertas de taxas.</string>
     <string name="feature_settings_sync_drafts_row">Sincronização e rascunhos</string>
     <string name="feature_settings_sync_drafts_row_description">Ver e gerenciar rascunhos e sincronizações pendentes</string>
+    <string name="feature_settings_rate_app_row">Avaliar este app</string>
+    <string name="feature_settings_rate_app_row_description">Abrir a página da loja para avaliar este app</string>
     <string name="feature_settings_sync_drafts_title">Sincronização e rascunhos</string>
     <string name="feature_settings_sync_drafts_empty_title">Nada para sincronizar</string>
     <string name="feature_settings_sync_drafts_empty_message">Rascunhos salvos offline e registros aguardando sincronização aparecerão aqui.</string>

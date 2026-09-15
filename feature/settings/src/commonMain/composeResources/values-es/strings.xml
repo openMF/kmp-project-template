@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Aquí verás recordatorios de facturas y alertas de tipos.</string>
     <string name="feature_settings_sync_drafts_row">Sincronización y borradores</string>
     <string name="feature_settings_sync_drafts_row_description">Ver y gestionar borradores y sincronizaciones pendientes</string>
+    <string name="feature_settings_rate_app_row">Valorar esta aplicación</string>
+    <string name="feature_settings_rate_app_row_description">Abrir la ficha de la tienda para valorar esta aplicación</string>
     <string name="feature_settings_sync_drafts_title">Sincronización y borradores</string>
     <string name="feature_settings_sync_drafts_empty_title">Nada que sincronizar</string>
     <string name="feature_settings_sync_drafts_empty_message">Aquí aparecerán los borradores que guardes sin conexión y los registros pendientes de sincronizar.</string>

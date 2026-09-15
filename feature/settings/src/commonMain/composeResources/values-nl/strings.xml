@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Hier zie je rekeningherinneringen en rentemeldingen.</string>
     <string name="feature_settings_sync_drafts_row">Synchronisatie &amp; concepten</string>
     <string name="feature_settings_sync_drafts_row_description">Concepten en openstaande synchronisaties bekijken en beheren</string>
+    <string name="feature_settings_rate_app_row">Deze app beoordelen</string>
+    <string name="feature_settings_rate_app_row_description">Open de winkelpagina om deze app te beoordelen</string>
     <string name="feature_settings_sync_drafts_title">Synchronisatie &amp; concepten</string>
     <string name="feature_settings_sync_drafts_empty_title">Niets te synchroniseren</string>
     <string name="feature_settings_sync_drafts_empty_message">Offline opgeslagen concepten en records die wachten op synchronisatie verschijnen hier.</string>

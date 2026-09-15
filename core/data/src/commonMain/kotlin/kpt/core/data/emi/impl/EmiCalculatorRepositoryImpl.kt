@@ -18,6 +18,7 @@ import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.emi.EmiCalculatorRepository
 import kpt.core.model.emi.EmiResult
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import kpt.core.store.emi.impl.EmiParams
 import org.mobilenativefoundation.store.store5.Store
 
@@ -30,7 +31,7 @@ import org.mobilenativefoundation.store.store5.Store
  */
 @RepositoryBinding(binds = EmiCalculatorRepository::class)
 internal class EmiCalculatorRepositoryImpl(
-    @FromStore("emi") private val emiStore: Store<EmiParams, EmiResult>,
+    @FromStore(AppStoreIds.Emi) private val emiStore: Store<EmiParams, EmiResult>,
 ) : EmiCalculatorRepository {
 
     override fun emiStream(params: EmiParams, scope: CoroutineScope): ScreenDataStream<EmiResult> =

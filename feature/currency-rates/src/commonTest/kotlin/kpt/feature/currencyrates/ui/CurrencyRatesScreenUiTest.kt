@@ -12,7 +12,7 @@ package kpt.feature.currencyrates.ui
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor

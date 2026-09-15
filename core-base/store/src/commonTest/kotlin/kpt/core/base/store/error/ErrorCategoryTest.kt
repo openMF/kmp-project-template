@@ -85,6 +85,27 @@ class ErrorCategoryTest {
     }
 
     @Test
+    fun categorize_ktorJsEngineFailure_returnsNetwork() {
+        // Ktor's JS and wasmJs engines wrap EVERY JavaScript-side failure in
+        //   class JsError(origin: dynamic) : Throwable("Error from javascript[...]")
+        // including a rejected fetch and a rejected ReadableStreamDefaultReader.read(). Verified
+        // against ktor main: ktor-client-core/js/.../JsClientEngine.kt and
+        // ktor-client-core/wasmJs/.../browser/BrowserFetch.kt. (The engine moved out of
+        // ktor-client-js into ktor-client-core, which is why looking for a cached ktor-client-js
+        // artifact found nothing.)
+        //
+        // The name carries NO transport word — not IOException, not Connect, not Socket — so before
+        // this case web was the last platform still falling through to a blocking NoNetwork on an
+        // empty offline cache, the same bug the Darwin case fixed for iOS. The browser's own cause
+        // ("TypeError: Failed to fetch") hangs off `origin`, not `cause`, so the chain never sees it.
+        class JsError : RuntimeException()
+        assertEquals(
+            ErrorCategory.Network,
+            categorize(JsError()),
+        )
+    }
+
+    @Test
     fun categorize_serverResponseException_staysNonNetwork() {
         // Guard on the widening: Ktor reports HTTP STATUS failures as ResponseException subclasses,
         // which must NOT become Network — a 500 is real signal from a reachable server, and calling

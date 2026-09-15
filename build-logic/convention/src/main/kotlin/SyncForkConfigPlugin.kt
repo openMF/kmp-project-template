@@ -342,6 +342,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
             regenerateAccessPoints(root, appProfile)
             regenerateUrlTypes(root, appProfile)
             regenerateSupabaseAnonKeys(root, appProfile)
+            regenerateAppReviewConfig(root, appProfile)
             reconcileMigrationLedger(root, appProfile)
             regenerateBuildKonfigFields(root, appProfile)
             scaffoldAccessPointPackages(root, appProfile)
@@ -1037,6 +1038,79 @@ abstract class SyncForkConfigTask : DefaultTask() {
 
 
     /**
+     * Regenerate `AppReviewConfig` — store identity + prompt policy for the in-app review flow.
+     *
+     * Every id here already exists in app-profile for the DEPLOY side (the Android applicationId, the
+     * App Store numeric id the TestFlight lane uploads against, the Partner Center Store ID). The
+     * running app could not read any of them, so `AppReviewManagerImpl`'s documented fork step —
+     * `AppReview.configure(StoreListing(...))` — had no source to draw from and was never performed.
+     * Projecting rather than re-declaring keeps one SoT per id.
+     *
+     * Absent policy keys fall back to conservative defaults (disabled, no prompting) rather than to
+     * an enabled-with-zero-thresholds state, which would prompt on first launch.
+     */
+    private fun regenerateAppReviewConfig(root: File, appProfile: Map<String, Any?>) {
+        if (appProfile.isEmpty()) return
+        val file = File(
+            root,
+            "core/platform/src/commonMain/kotlin/kpt/core/platform/config/AppReviewConfig.kt",
+        )
+
+        // PLACEHOLDER ids are treated as absent, matching resolve-deploy-config.sh's `pick`. A
+        // literal "YOUR_TEAM_ID"-class value in a StoreListing produces a store URL that 404s —
+        // worse than an empty listing, which at least reports canRequestReview == false honestly.
+        fun id(key: String): String =
+            appProfileGet(appProfile, key)?.trim().orEmpty()
+                .takeUnless { it.isEmpty() || it.startsWith("YOUR_") || it.contains("example.com") }
+                .orEmpty()
+
+        val review = appProfile["in_app_review"] as? Map<*, *>
+        fun policy(k: String): String? = review?.get(k)?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+        val enabled = policy("enabled")?.lowercase() == "true"
+        val minLaunches = policy("min_launches")?.toIntOrNull() ?: 0
+        val minDays = policy("min_days_since_install")?.toIntOrNull() ?: 0
+        val cooldown = policy("cooldown_days")?.toIntOrNull() ?: 0
+
+        val play = id("app.id")
+        val appStore = id("apple.app.store.id")
+        val microsoft = id("windows.store.id")
+        val web = id("org.marketing.url")
+
+        val sb = StringBuilder()
+        sb.append("// syncForkConfig:app-review:begin — GENERATED from app-profile. Do not hand-edit.\n")
+        sb.append("    /** Play Store package — `identity.app_id`. */\n")
+        sb.append("    const val PLAY_STORE_PACKAGE: String = \"").append(play).append("\"\n\n")
+        sb.append("    /** App Store numeric id — `platforms/apple/apple.yaml#apple.app_store_id`. */\n")
+        sb.append("    const val APP_STORE_ID: String = \"").append(appStore).append("\"\n\n")
+        sb.append("    /** Microsoft Store product id — `platforms/windows/windows.yaml#windows.store_id`. */\n")
+        sb.append("    const val MICROSOFT_STORE_PRODUCT_ID: String = \"").append(microsoft).append("\"\n\n")
+        sb.append("    /** Open-web fallback for targets with no store — `org.marketing_url`. */\n")
+        sb.append("    const val WEB_URL: String = \"").append(web).append("\"\n\n")
+        sb.append("    /** `in_app_review.enabled` — false disables the custom prompt entirely. */\n")
+        sb.append("    const val ENABLED: Boolean = ").append(enabled).append("\n\n")
+        sb.append("    /** `in_app_review.min_launches`. */\n")
+        sb.append("    const val MIN_LAUNCHES: Int = ").append(minLaunches).append("\n\n")
+        sb.append("    /** `in_app_review.min_days_since_install`. */\n")
+        sb.append("    const val MIN_DAYS_SINCE_INSTALL: Int = ").append(minDays).append("\n\n")
+        sb.append("    /** `in_app_review.cooldown_days`. */\n")
+        sb.append("    const val COOLDOWN_DAYS: Int = ").append(cooldown).append("\n")
+        sb.append("    // syncForkConfig:app-review:end")
+
+        if (patchSentinel(
+                file,
+                "// syncForkConfig:app-review:begin",
+                "// syncForkConfig:app-review:end",
+                sb.toString(),
+            )
+        ) {
+            val ids = listOf(play, appStore, microsoft, web).count { it.isNotEmpty() }
+            logger.lifecycle(
+                "syncForkConfig: regenerated AppReviewConfig ($ids/4 store ids, enabled=$enabled)",
+            )
+        }
+    }
+
+    /**
      * Refill `AppDatabase.kt`'s four `fork-*` regions from `app-profile/app.yaml#database`.
      *
      * This is what lets `core/database/**/AppDatabase.kt` be `owner: template` (FULL-COPY on a
@@ -1556,6 +1630,10 @@ abstract class SyncForkConfigTask : DefaultTask() {
             "play.testers.closed.googlegroup" to "android.play_testers.closed_googlegroup",
             // ── apple (shared iOS + macOS) ──
             "apple.team.id" to "apple.team_id",
+            // The App Store NUMERIC id. Two consumers that previously each had their own copy:
+            // the TestFlight/App Store lanes (hardcoded) and AppReviewConfig (which had none, so
+            // promptForCustomReview could not reach the listing on iOS).
+            "apple.app.store.id" to "apple.app_store_id",
             "apple.match.git.url" to "apple.match.git.url",
             "apple.match.git.branch" to "apple.match.git.branch",
             "firebase.ios.prod.app.id" to "apple.firebase.ios_app_id_prod",

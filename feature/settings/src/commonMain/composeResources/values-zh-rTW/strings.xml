@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">帳單提醒和利率提醒會顯示在這裡。</string>
     <string name="feature_settings_sync_drafts_row">同步與草稿</string>
     <string name="feature_settings_sync_drafts_row_description">檢視並管理草稿和待同步項目</string>
+    <string name="feature_settings_rate_app_row">為此應用程式評分</string>
+    <string name="feature_settings_rate_app_row_description">開啟商店頁面為此應用程式評分</string>
     <string name="feature_settings_sync_drafts_title">同步與草稿</string>
     <string name="feature_settings_sync_drafts_empty_title">沒有需要同步的項目</string>
     <string name="feature_settings_sync_drafts_empty_message">你離線儲存的草稿和等待同步的記錄會顯示在這裡。</string>

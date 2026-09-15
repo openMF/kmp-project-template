@@ -19,6 +19,7 @@ import kpt.core.data.calc.AmortizationCalcRepository
 import kpt.core.model.calc.AmortizationBreakdown
 import kpt.core.store.calc.impl.AmortizationCalcParams
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.Store
 
 /**
@@ -29,7 +30,7 @@ import org.mobilenativefoundation.store.store5.Store
  */
 @RepositoryBinding(binds = AmortizationCalcRepository::class)
 internal class AmortizationCalcRepositoryImpl(
-    @FromStore("amortizationCalc") private val store: Store<AmortizationCalcParams, AmortizationBreakdown>,
+    @FromStore(AppStoreIds.AmortizationCalc) private val store: Store<AmortizationCalcParams, AmortizationBreakdown>,
 ) : AmortizationCalcRepository {
 
     override fun breakdownStream(

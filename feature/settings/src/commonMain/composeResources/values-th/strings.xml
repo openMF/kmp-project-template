@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">การเตือนบิลและการแจ้งเตือนอัตราจะแสดงที่นี่</string>
     <string name="feature_settings_sync_drafts_row">การซิงค์และฉบับร่าง</string>
     <string name="feature_settings_sync_drafts_row_description">ดูและจัดการฉบับร่างและรายการที่รอซิงค์</string>
+    <string name="feature_settings_rate_app_row">ให้คะแนนแอปนี้</string>
+    <string name="feature_settings_rate_app_row_description">เปิดหน้าร้านค้าเพื่อให้คะแนนแอปนี้</string>
     <string name="feature_settings_sync_drafts_title">การซิงค์และฉบับร่าง</string>
     <string name="feature_settings_sync_drafts_empty_title">ไม่มีอะไรต้องซิงค์</string>
     <string name="feature_settings_sync_drafts_empty_message">ฉบับร่างที่คุณบันทึกแบบออฟไลน์และระเบียนที่รอซิงค์จะแสดงที่นี่</string>

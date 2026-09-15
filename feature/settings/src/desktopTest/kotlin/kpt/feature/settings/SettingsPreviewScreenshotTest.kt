@@ -15,6 +15,7 @@ import androidx.compose.ui.test.runDesktopComposeUiTest
 import io.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Test
 import sergio.sastre.composable.preview.scanner.common.CommonComposablePreviewScanner
+import kotlin.test.assertTrue
 
 /**
  * Device-free CMP render tier (SCREENSHOT_TEST.md CMP-PRIMARY). Auto-discovers every commonMain
@@ -36,18 +37,36 @@ class SettingsPreviewScreenshotTest {
 
     @Test
     fun captureAllPreviews() {
-        CommonComposablePreviewScanner()
+        val previews = CommonComposablePreviewScanner()
             .scanPackageTrees("kpt.feature.settings")
             .getPreviews()
-            .forEachIndexed { index, preview ->
-                runDesktopComposeUiTest {
-                    setContent { preview() }
-                    // Golden under src/desktopTest/resources (committed) so CI `verifyRoborazziDesktop`
-                    // has a baseline to compare a fresh render against — not a throwaway build/ dir.
-                    onRoot().captureRoboImage(
-                        "src/desktopTest/resources/screenshots/settings/preview_$index.png",
-                    )
-                }
+
+        // Names must be unique BEFORE anything is written. Two previews resolving to one file would
+        // otherwise have the second silently overwrite the first: the golden count stays plausible,
+        // `verifyRoborazziDesktop` stays green (it re-renders the same winner), and one preview is
+        // simply no longer covered. Fail loudly and make the author rename.
+        val names = previews.map { it.methodName }
+        val duplicates = names.groupingBy { it }.eachCount().filterValues { it > 1 }.keys
+        assertTrue(
+            duplicates.isEmpty(),
+            "Preview function names must be unique across this feature — goldens are keyed by name. " +
+                "Duplicated: $duplicates",
+        )
+
+        previews.forEach { preview ->
+            runDesktopComposeUiTest {
+                setContent { preview() }
+                // Golden under src/desktopTest/resources (committed) so CI `verifyRoborazziDesktop`
+                // has a baseline to compare a fresh render against — not a throwaway build/ dir.
+                //
+                // Keyed by the preview FUNCTION NAME, not its scan index. Index keying made every
+                // golden positional: adding one @Preview shifted all later previews down a slot, so
+                // a one-preview change rewrote 19 files and the diff said nothing about what
+                // actually changed. A rename here renames one file; a new preview adds one file.
+                onRoot().captureRoboImage(
+                    "src/desktopTest/resources/screenshots/settings/${preview.methodName}.png",
+                )
             }
+        }
     }
 }

@@ -21,6 +21,7 @@ import kpt.core.database.banking.dao.LoanDao
 import kpt.core.model.banking.Loan
 import kpt.core.store.banking.impl.provideLoanDetailStore
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
@@ -37,8 +38,8 @@ import org.mobilenativefoundation.store.store5.StoreWriteRequest
  */
 @RepositoryBinding(binds = LoanRepository::class)
 internal class LoanRepositoryImpl(
-    @FromStore("loans") private val loansStore: Store<Unit, List<Loan>>,
-    @FromStore("loansMutable") private val loansWriteStore: MutableStore<String, Loan>,
+    @FromStore(AppStoreIds.Loans) private val loansStore: Store<Unit, List<Loan>>,
+    @FromStore(AppStoreIds.LoansMutable) private val loansWriteStore: MutableStore<String, Loan>,
     private val loanDao: LoanDao,
 ) : LoanRepository {
 

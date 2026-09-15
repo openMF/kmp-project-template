@@ -15,7 +15,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
+import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.emicalculator.ui.EmiCalculatorScreen
 
 @Serializable
@@ -25,8 +27,12 @@ fun NavController.navigateToEmiCalculator(navOptions: NavOptions? = null) {
     navigate(route = EmiCalculatorRoute, navOptions = navOptions)
 }
 
-fun NavGraphBuilder.emiCalculatorDestination(onBackClick: () -> Unit) {
+@FeatureDestination
+fun NavGraphBuilder.emiCalculatorDestination(navController: NavController) {
     composableWithPushTransitions<EmiCalculatorRoute> {
-        EmiCalculatorScreen(onBackClick = onBackClick)
+        // Takes the NavController like every other top-level destination, rather than an
+        // `onBackClick` lambda: the aggregate invokes one uniform shape, and a bespoke signature
+        // is exactly what kept this entry hand-wired in FeatureRegistry.
+        EmiCalculatorScreen(onBackClick = { navController.popBackStackSafely() })
     }
 }

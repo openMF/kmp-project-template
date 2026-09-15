@@ -27,6 +27,7 @@ import kpt.core.data.economic.MacroIndicatorsRepository
 import kpt.core.model.economic.IndicatorKind
 import kpt.core.model.economic.MacroIndicator
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import kpt.core.store.economic.impl.MacroIndicatorKey
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
@@ -44,7 +45,7 @@ private val PINNED_MACRO_KEYS = listOf(
 
 @RepositoryBinding(binds = MacroIndicatorsRepository::class)
 class MacroIndicatorsRepositoryImpl(
-    @FromStore("macroIndicator") private val macroIndicatorStore: Store<MacroIndicatorKey, MacroIndicator>,
+    @FromStore(AppStoreIds.MacroIndicator) private val macroIndicatorStore: Store<MacroIndicatorKey, MacroIndicator>,
 ) : MacroIndicatorsRepository {
 
     override fun macroIndicatorStream(

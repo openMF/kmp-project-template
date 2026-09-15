@@ -14,6 +14,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.alerts.ui.AlertCreateScreen
@@ -39,6 +40,7 @@ fun NavController.navigateToAlertsGraph(navOptions: NavOptions? = null) {
  * Alerts feature's navigation graph — list → create. The host (cmp-navigation) wires this
  * into the top-level RootNavGraph by calling [alertsGraph] inside its own `NavHost { ... }`.
  */
+@FeatureDestination
 fun NavGraphBuilder.alertsGraph(navController: NavController) {
     navigation<AlertsGraphRoute>(startDestination = AlertsListRoute) {
         composableWithPushTransitions<AlertsListRoute> {

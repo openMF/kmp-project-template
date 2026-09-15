@@ -18,6 +18,7 @@ import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.alerts.AlertsRepository
 import kpt.core.model.alerts.PriceAlert
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
@@ -31,8 +32,8 @@ import org.mobilenativefoundation.store.store5.StoreWriteRequest
  */
 @RepositoryBinding(binds = AlertsRepository::class)
 internal class AlertsRepositoryImpl(
-    @FromStore("alerts") private val alertsStore: Store<Unit, List<PriceAlert>>,
-    @FromStore("alertsMutable") private val alertsWriteStore: MutableStore<String, PriceAlert>,
+    @FromStore(AppStoreIds.Alerts) private val alertsStore: Store<Unit, List<PriceAlert>>,
+    @FromStore(AppStoreIds.AlertsMutable) private val alertsWriteStore: MutableStore<String, PriceAlert>,
 ) : AlertsRepository {
 
     // Read-path contract: the repository builds the ScreenDataStream (offline-local → CACHE_ONLY);

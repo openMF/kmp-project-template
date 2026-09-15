@@ -43,9 +43,41 @@ class RepositoryBindingProcessor(
 ) : SymbolProcessor {
     private var emitted = false
 
+    /** `@StoreProvider` id → the Koin qualifier symbol store-ksp generates for it. */
+    private var storeQualifiers: Map<String, String> = emptyMap()
+
+    /**
+     * The registry symbol for a `@FromStore` id. Falls back to the id-derived name when no
+     * `@StoreProvider` declares it — the store may live in a module this round cannot see, and a
+     * genuinely wrong id still surfaces as an unresolved reference rather than a silent miss.
+     */
+    private fun registrySymbol(storeId: String): String =
+        storeQualifiers[storeId] ?: storeId.replaceFirstChar { it.uppercaseChar() }
+
     override fun process(resolver: Resolver): List<KSAnnotated> {
         if (emitted) return emptyList()
         emitted = true
+
+        // `@FromStore("x")` has to resolve to the SAME Koin qualifier store-ksp generated for the
+        // store whose `@StoreProvider(id = "x")` declared it. store-ksp derives that symbol as
+        // `qualifier.ifEmpty { id.replaceFirstChar(uppercase) }` — so an explicit `qualifier = "Y"`
+        // makes the symbol `AppStoreRegistry.Y`, while this processor used to emit
+        // `AppStoreRegistry.X` unconditionally. The two agreed only while no store set `qualifier`.
+        //
+        // The divergence fails the build (unresolved reference in generated code) rather than
+        // corrupting anything, but it fails pointing at a file nobody wrote, describing a symbol
+        // nobody typed. Reading the same annotation store-ksp reads removes the disagreement at the
+        // source instead of documenting it.
+        storeQualifiers = resolver.getSymbolsWithAnnotation(ANN_STORE_PROVIDER)
+            .filterIsInstance<KSFunctionDeclaration>()
+            .mapNotNull { fn ->
+                val a = fn.annotations.firstOrNull { it.shortName.asString() == "StoreProvider" }
+                    ?: return@mapNotNull null
+                fun arg(n: String) = a.arguments.firstOrNull { it.name?.asString() == n }?.value as? String
+                val id = arg("id")?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                id to (arg("qualifier")?.takeIf { it.isNotBlank() } ?: id.replaceFirstChar { it.uppercaseChar() })
+            }
+            .toMap()
 
         val impls = resolver.getSymbolsWithAnnotation(ANN_BINDING)
             .filterIsInstance<KSClassDeclaration>()
@@ -101,15 +133,48 @@ class RepositoryBindingProcessor(
         // Defaulted parameters are the fork's to leave unset; an unnamed one cannot be emitted.
         val name = param.name?.asString()
         if (param.hasDefault || name == null) return null
-        val storeId = param.annotations.firstOrNull { it.shortName.asString() == "FromStore" }
+        return resolvedDependency(param, name)
+    }
+
+    /**
+     * The body of [dependency] once the parameter is known to be nameable and non-defaulted.
+     *
+     * Split out only to keep each half within detekt's `ReturnCount` limit — the unresolvable-id guard
+     * below needs an early return of its own, which pushed the single function to three.
+     */
+    private fun resolvedDependency(param: KSValueParameter, name: String): Pair<String, String>? {
+        // PRESENT-BUT-UNRESOLVABLE is the dangerous case, not ABSENT.
+        //
+        // `@FromStore("alerts")` with a typo'd literal emits `get(AppStoreRegistry.Alertz)` — generated
+        // code that fails to compile, loudly, pointing at a missing symbol. But once the id is written
+        // as a CONSTANT (`@FromStore(AppStoreIds.Alerts)`, which is what makes the two sides
+        // compiler-linked), an unresolvable reference makes KSP hand us `null` instead — and the old
+        // `when` fell straight through to a bare `get()`. That silently drops the qualifier: Koin then
+        // resolves whichever unqualified Store matches the type, so the repository is wired to the
+        // WRONG STORE with a clean build. Measured 2026-09-13: a one-letter typo produced
+        // `alertsStore = get()` and BUILD SUCCESSFUL.
+        //
+        // So the annotation's PRESENCE is the contract. If it is there, its id must resolve.
+        val fromStoreAnn = param.annotations.firstOrNull { it.shortName.asString() == "FromStore" }
+        val storeId = fromStoreAnn
             ?.arguments?.firstOrNull { it.name?.asString() == "id" }?.value as? String
+        if (fromStoreAnn != null && storeId.isNullOrBlank()) {
+            logger.error(
+                "data-ksp: @FromStore on parameter '$name' has an id that does not resolve to a " +
+                    "compile-time String. If it names a constant, check the spelling and that the " +
+                    "declaring module is on the compile classpath — falling back to an unqualified " +
+                    "get() would bind the wrong store.",
+                param,
+            )
+            return null
+        }
         val named = param.annotations.firstOrNull { it.shortName.asString() == "FromQualifier" }
             ?.arguments?.firstOrNull { it.name?.asString() == "name" }?.value as? String
         // A nullable dependency is OPTIONAL — resolving it with get() would fail the graph for a
         // fork that never installed it.
         val nullable = param.type.resolve().isMarkedNullable
         val resolve = when {
-            !storeId.isNullOrBlank() -> "get($REGISTRY.${storeId.replaceFirstChar { it.uppercaseChar() }})"
+            !storeId.isNullOrBlank() -> "get($REGISTRY.${registrySymbol(storeId)})"
             !named.isNullOrBlank() -> "get(named(\"$named\"))"
             nullable -> "getOrNull()"
             else -> "get()"
@@ -213,15 +278,31 @@ class RepositoryBindingProcessor(
             // `get()` for it would ask Koin for a type nothing binds and fail at construction.
             if (param.hasDefault) return@mapNotNull null
             val name = param.name?.asString() ?: return@mapNotNull null
-            val storeId = param.annotations
+            // PRESENT-BUT-UNRESOLVABLE is the dangerous case — see the note in dependency().
+            // A typo'd CONSTANT (`@FromStore(AppStoreIds.Alertz)`) makes KSP hand us null, and
+            // falling through to a bare `get()` silently drops the qualifier: Koin resolves whichever
+            // unqualified Store matches the type, wiring the repository to the WRONG STORE with a
+            // clean build. Measured 2026-09-13 — `alertsStore = get()` and BUILD SUCCESSFUL.
+            val fromStoreAnn = param.annotations
                 .firstOrNull { it.shortName.asString() == "FromStore" }
+            val storeId = fromStoreAnn
                 ?.arguments?.firstOrNull { it.name?.asString() == "id" }
                 ?.value as? String
+            if (fromStoreAnn != null && storeId.isNullOrBlank()) {
+                logger.error(
+                    "data-ksp: @FromStore on parameter '$name' has an id that does not resolve to a " +
+                        "compile-time String. If it names a constant, check the spelling and that the " +
+                        "declaring module is on the compile classpath — falling back to an " +
+                        "unqualified get() would bind the wrong store.",
+                    param,
+                )
+                return@mapNotNull null
+            }
             val resolve = if (storeId.isNullOrBlank()) {
                 "get()"
             } else {
                 // Same id -> member rule store-ksp uses, so the two generated files agree by construction.
-                "get($REGISTRY.${storeId.replaceFirstChar { it.uppercaseChar() }})"
+                "get($REGISTRY.${registrySymbol(storeId)})"
             }
             name to resolve
         }
@@ -305,6 +386,7 @@ class RepositoryBindingProcessor(
         const val REGISTRY_FQN = "kpt.core.store.config.AppStoreRegistry"
         const val CONFIG_PKG = "kpt.core.data.config"
         const val ANN_PROVIDER = "kpt.core.base.data.annotation.DataProvider"
+        const val ANN_STORE_PROVIDER = "kpt.core.base.store.annotation.StoreProvider"
 
         val LICENSE = """
             |/*

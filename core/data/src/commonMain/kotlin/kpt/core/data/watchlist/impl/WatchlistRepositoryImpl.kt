@@ -21,6 +21,7 @@ import kpt.core.data.watchlist.WatchlistRepository
 import kpt.core.database.watchlist.dao.WatchlistDao
 import kpt.core.model.watchlist.WatchlistItem
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
@@ -40,8 +41,8 @@ import kotlin.time.Clock
  */
 @RepositoryBinding(binds = WatchlistRepository::class)
 internal class WatchlistRepositoryImpl(
-    @FromStore("watchlist") private val watchlistStore: Store<Unit, List<WatchlistItem>>,
-    @FromStore("watchlistMutable") private val watchlistWriteStore: MutableStore<String, WatchlistItem>,
+    @FromStore(AppStoreIds.Watchlist) private val watchlistStore: Store<Unit, List<WatchlistItem>>,
+    @FromStore(AppStoreIds.WatchlistMutable) private val watchlistWriteStore: MutableStore<String, WatchlistItem>,
     private val dao: WatchlistDao,
 ) : WatchlistRepository {
 

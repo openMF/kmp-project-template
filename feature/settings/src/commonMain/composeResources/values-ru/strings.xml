@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Здесь появятся напоминания о счетах и оповещения о ставках.</string>
     <string name="feature_settings_sync_drafts_row">Синхронизация и черновики</string>
     <string name="feature_settings_sync_drafts_row_description">Просмотр и управление черновиками и ожидающими синхронизациями</string>
+    <string name="feature_settings_rate_app_row">Оценить приложение</string>
+    <string name="feature_settings_rate_app_row_description">Открыть страницу в магазине, чтобы оценить приложение</string>
     <string name="feature_settings_sync_drafts_title">Синхронизация и черновики</string>
     <string name="feature_settings_sync_drafts_empty_title">Нечего синхронизировать</string>
     <string name="feature_settings_sync_drafts_empty_message">Здесь появятся черновики, сохранённые офлайн, и записи, ожидающие синхронизации.</string>

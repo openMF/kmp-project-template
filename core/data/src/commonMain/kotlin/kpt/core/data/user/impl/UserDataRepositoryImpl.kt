@@ -24,12 +24,13 @@ import kpt.core.model.user.LanguageConfig
 import kpt.core.model.user.ThemeBrand
 import kpt.core.model.user.UserData
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.Store
 
 @RepositoryBinding(binds = UserDataRepository::class)
 class UserDataRepositoryImpl(
     private val preferencesRepository: UserPreferencesRepository,
-    @FromStore("userData") private val userDataStore: Store<Unit, UserData>,
+    @FromStore(AppStoreIds.UserData) private val userDataStore: Store<Unit, UserData>,
 ) : UserDataRepository {
     override val userData: StateFlow<UserData>
         get() = preferencesRepository.userData

@@ -28,6 +28,7 @@ import kpt.core.model.currency.ExchangeRates
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RateHistoryKey
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
@@ -41,9 +42,9 @@ private val PINNED_BASE_CURRENCIES = listOf("USD", "EUR", "INR")
 
 @RepositoryBinding(binds = CurrencyRepository::class)
 class CurrencyRepositoryImpl(
-    @FromStore("exchangeRates") private val exchangeRatesStore: Store<String, ExchangeRates>,
-    @FromStore("rateHistory") private val rateHistoryStore: Store<RateHistoryKey, RateHistory>,
-    @FromStore("spotRate") private val spotRateStore: Store<String, ExchangeRates>,
+    @FromStore(AppStoreIds.ExchangeRates) private val exchangeRatesStore: Store<String, ExchangeRates>,
+    @FromStore(AppStoreIds.RateHistory) private val rateHistoryStore: Store<RateHistoryKey, RateHistory>,
+    @FromStore(AppStoreIds.SpotRate) private val spotRateStore: Store<String, ExchangeRates>,
 ) : CurrencyRepository {
 
     override fun exchangeRatesStream(

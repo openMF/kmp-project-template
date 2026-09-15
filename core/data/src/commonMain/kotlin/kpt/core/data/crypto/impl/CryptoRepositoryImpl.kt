@@ -21,12 +21,13 @@ import kpt.core.data.crypto.CryptoRepository
 import kpt.core.model.crypto.CoinDetail
 import kpt.core.model.crypto.CoinMarket
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.Store
 
 @RepositoryBinding(binds = CryptoRepository::class)
 class CryptoRepositoryImpl(
-    @FromStore("coinMarkets") private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    @FromStore("coinDetail") private val coinDetailStore: Store<String, CoinDetail>,
+    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
+    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
 ) : CryptoRepository {
 
     override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =

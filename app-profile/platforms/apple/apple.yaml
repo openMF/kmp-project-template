@@ -2,6 +2,15 @@
 # Only values that DIFFER from the common app.yaml live here.
 apple:
   team_id: YOUR_TEAM_ID                      # PLACEHOLDER — apple.team.id (fork sets its Apple Developer team id)
+  # The App Store NUMERIC id (not the bundle id). Deploy lanes already needed it; the APP needs it too,
+  # because `AppReviewManager.promptForCustomReview()` deep-links to the store listing and iOS has no
+  # bundle-id-based store URL. It lived in `deployment-layer/DEPLOYMENT_PROJECT_CONFIG.yaml` and
+  # hardcoded in `deployment/ios/testflight/lane.rb` — neither of which the running app can read.
+  #
+  # This is the PROJECT-scope SoT. `resolve-deploy-config.sh` keeps the three scopes in order for
+  # deploy time (deployment-layer override → here → _org/company.yaml), and `syncForkConfig` projects
+  # THIS value into the generated `core/platform/config/AppReviewConfig` for runtime.
+  app_store_id: ""                           # PLACEHOLDER — apple.app.store.id (numeric, e.g. 6744892773)
   match:
     git:
       url: git@github.com:YOUR_ORG/ios-provisioning-profile.git   # PLACEHOLDER — apple.match.git.url

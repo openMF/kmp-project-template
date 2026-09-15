@@ -63,7 +63,6 @@ bouncycastle = "1.84"
 dependencyGuard = "0.5.0"
 googleOss = "17.5.1"
 googleOssPlugin = "0.12.0"
-review = "2.0.2"
 appUpdate = "2.1.0"
 integrity = "1.6.0"
 
@@ -103,12 +102,18 @@ koinAnnotationsVersion = "4.2.2"
 
 
 # KMP Toolkit Libraries
+# 3.5.28: adds cmp-app-review, cmp-clipboard, cmp-app-intents, cmp-bubble, cmp-pdf-generator and
+#         cmp-toast to this template. Also drops nine transitive artifacts (firebase-perf,
+#         firebase-config, firebase-abt, protobuf-javalite, dagger and friends): cmp-observe no
+#         longer bundles the Firebase hooks — they moved to cmp-observe-firebase, which this
+#         template does not depend on and never registered. Add that artifact explicitly if a fork
+#         wants FirebaseCrashlyticsAttributionHook / FirebaseAnalyticsHealthHook / Performance.
 # 3.5.21: cmp-firebase on GitLive 3.0.0-alpha02 (Firebase BoM 34.18.0) — wasmJs PROMOTED from the
 #         Measurement-Protocol tier to the native Firebase tier, so wasmJs now reads FirebaseConfig.web
 #         (the same `web` entry as js) and needs applicationId/apiKey/projectId/authDomain populated.
 #         Also: cmp-share direct-to-app share (ShareOptions.targetPackage) + file:// → FileProvider
 #         content:// resolution; cmp-remote-config min/max app-version gate.
-kmptoolkit = "3.5.21"
+kmptoolkit = "3.5.28"
 
 # CMP Libraries
 compose-plugin = "1.12.0"
@@ -249,8 +254,6 @@ app-update = { module = "com.google.android.play:app-update", version.ref = "app
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
 integrity = { module = "com.google.android.play:integrity", version.ref = "integrity" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
-review = { module = "com.google.android.play:review", version.ref = "review" }
-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "review" }
 
 # jb Compose
 jb-kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
@@ -390,6 +393,38 @@ cmp-deep-link = { module = "io.github.mobilebytelabs:cmp-deep-link", version.ref
 # cmp-firebase — unified Firebase (Analytics + Crashlytics) engine + Compose companion.
 cmp-firebase = { module = "io.github.mobilebytelabs:cmp-firebase", version.ref = "kmptoolkit" }
 cmp-firebase-compose = { module = "io.github.mobilebytelabs:cmp-firebase-compose", version.ref = "kmptoolkit" }
+# Platform capabilities wired into core-base/platform (+ cmp-toast into core-base/designsystem).
+# All 21-target headless libraries except cmp-toast, which is Compose-only at 7.
+#
+# Bound in platformModule as the TOOLKIT types, not behind template-owned wrappers: a wrapper would
+# either mirror each library or hide most of it, and neither insulation nor testability justified
+# the cost — every one of these ships a public Fake* in its main artifact. cmp-app-review is the
+# exception, kept behind kpt.core.base.platform.review.AppReviewManager because that interface
+# already existed and reshapes rather than forwards.
+#
+# cmp-app-review replaces the hand-rolled AppReviewManagerImpl pair whose nonAndroidMain twin was an
+# empty `promptForReview() {}` + TODO — every non-Android fork shipped a review prompt that silently
+# did nothing. cmp-toast replaces KptSnackbarHost so ViewModels depend on an injectable
+# ToastDispatcher instead of a Compose SnackbarHostState.
+cmp-app-review = { module = "io.github.mobilebytelabs:cmp-app-review", version.ref = "kmptoolkit" }
+cmp-clipboard = { module = "io.github.mobilebytelabs:cmp-clipboard", version.ref = "kmptoolkit" }
+cmp-app-intents = { module = "io.github.mobilebytelabs:cmp-app-intents", version.ref = "kmptoolkit" }
+cmp-bubble = { module = "io.github.mobilebytelabs:cmp-bubble", version.ref = "kmptoolkit" }
+cmp-pdf-generator = { module = "io.github.mobilebytelabs:cmp-pdf-generator", version.ref = "kmptoolkit" }
+cmp-toast = { module = "io.github.mobilebytelabs:cmp-toast", version.ref = "kmptoolkit" }
+# Compose surfaces for cores already integrated above. Added to core-base/ui as `api`, which the
+# feature convention plugin already gives every feature. Taken for their COMPOSABLES — ShareButton /
+# ShareSheet / AppIntentsRegistry / rememberSupportsIntent — which call the libraries' global entry
+# points directly and do not depend on the CompositionLocals these modules also export.
+#
+# Their exported locals (LocalShareManager, LocalIntentManager, LocalAppIntentsManager) carry the
+# SAME simple names as the template's own in kpt.core.base.platform, and none of them throws when
+# unprovided — each falls back to constructing its own impl. All three are therefore PROVIDED by
+# LocalManagerProvider from the same DI instances, so either import resolves to the app's manager
+# rather than a private second one. See the note in LocalManagerProviders.kt.
+cmp-share-compose = { module = "io.github.mobilebytelabs:cmp-share-compose", version.ref = "kmptoolkit" }
+cmp-intent-launcher-compose = { module = "io.github.mobilebytelabs:cmp-intent-launcher-compose", version.ref = "kmptoolkit" }
+cmp-app-intents-compose = { module = "io.github.mobilebytelabs:cmp-app-intents-compose", version.ref = "kmptoolkit" }
 
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }

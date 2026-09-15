@@ -154,6 +154,7 @@ module AppProfile
     "play.testers.closed.googlegroup"    => "android.play_testers.closed_googlegroup",
     # ── apple (shared iOS + macOS) ──
     "apple.team.id"                      => "apple.team_id",
+    "apple.app.store.id"                 => "apple.app_store_id",
     "apple.match.git.url"                => "apple.match.git.url",
     "apple.match.git.branch"             => "apple.match.git.branch",
     "firebase.ios.prod.app.id"           => "apple.firebase.ios_app_id_prod",

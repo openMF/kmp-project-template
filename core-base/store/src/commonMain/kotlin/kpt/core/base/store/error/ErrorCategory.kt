@@ -141,6 +141,17 @@ private fun Throwable.messageChain(): Sequence<String> = sequence {
  *    that, and "SocketException" contains none of the original six patterns. A dropped connection
  *    on JVM/Android categorized Generic while its sibling `SocketTimeoutException` matched via
  *    "Timeout" — an inconsistency nothing in the API surface hinted at.
+ *  - `JsError` — the JS and wasmJs engines wrap EVERY JavaScript-side failure in
+ *    `JsError(origin: dynamic) : Throwable("Error from javascript[...]")`, including a rejected
+ *    `fetch` and a rejected `ReadableStreamDefaultReader.read()`. Verified against ktor `main`:
+ *    `ktor-client-core/js/.../JsClientEngine.kt` and
+ *    `ktor-client-core/wasmJs/.../browser/BrowserFetch.kt` — the engine moved OUT of
+ *    `ktor-client-js` into `ktor-client-core`, which is why hunting for a cached `ktor-client-js`
+ *    artifact turned up nothing. The name carries no transport word at all — not IOException, not
+ *    Connect, not Socket — so until this entry, web was the last platform still falling through to
+ *    a blocking NoNetwork on an empty offline cache: the same bug the Darwin entry fixed for iOS.
+ *    The browser's own cause (`TypeError: Failed to fetch`) hangs off `origin`, not `cause`, so the
+ *    chain never sees it either.
  *
  * Each entry above is pinned by a case in ErrorCategoryTest, including a negative one asserting
  * `ServerResponseException` does NOT become Network.
@@ -153,7 +164,8 @@ private fun String.matchesNetworkClassName(): Boolean =
         contains("SSLException", ignoreCase = true) ||
         contains("Offline", ignoreCase = true) ||
         contains("HttpRequestException", ignoreCase = true) ||
-        contains("Socket", ignoreCase = true)
+        contains("Socket", ignoreCase = true) ||
+        contains("JsError", ignoreCase = true)
 
 /**
  * Matches any 3-digit HTTP status code in a message, optionally preceded by `HTTP `.

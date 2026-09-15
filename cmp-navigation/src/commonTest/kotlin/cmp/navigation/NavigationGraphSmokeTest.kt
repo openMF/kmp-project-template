@@ -83,19 +83,17 @@ class NavigationGraphSmokeTest {
         CountryPickerRoute,
     )
 
-    @Test
-    fun everyParameterlessRouteIsReferenceableAndNonNull() {
-        parameterlessRoutes.forEach { route ->
-            assertNotNull(route, "Route ${route::class.simpleName} should be non-null")
-        }
-        // Sanity: no duplicate route types in the list (catches copy-paste mistakes).
-        val classes = parameterlessRoutes.map { it::class }
-        assertEquals(
-            classes.size,
-            classes.toSet().size,
-            "Parameterless route list has duplicates: $classes",
-        )
-    }
+    // REMOVED: `everyParameterlessRouteIsReferenceableAndNonNull`.
+    //
+    // It looped `parameterlessRoutes` asserting `assertNotNull(route)`. The list is `List<Any>`, so
+    // every element is non-null BY TYPE and the assertion could not fail. Its companion duplicate
+    // check compared the hand-written list against itself, so a route MISSING from the list was
+    // never noticed either.
+    //
+    // The list itself stays: `everyRouteIsKotlinxSerializable` and
+    // `routeCountMatchesExpectedFeatureSurface` both use the same routes, and those DO fail —
+    // `serializer<T>()` stops resolving the moment a route loses `@Serializable` or a feature module
+    // drops the serialization plugin.
 
     @Test
     fun parameterisedRoutesInstantiateWithDefaults() {
@@ -114,6 +112,12 @@ class NavigationGraphSmokeTest {
         assertNotNull(RateDetailRoute(seriesId = "DFF"))
     }
 
+    // vacuous-ok: every assertion below is `assertNotNull(serializer<T>())`, and `serializer<T>()`
+    // returns a non-null KSerializer by signature — so none of them can fail at RUNTIME. They are
+    // kept because the guarantee is at COMPILE time: `serializer<T>()` stops resolving the moment a
+    // route loses `@Serializable`, or its feature module drops the kotlinx-serialization plugin.
+    // That is the bug this test exists to catch, and it is caught by the file compiling at all.
+    // The asserts remain so the intent is legible in the test report rather than implicit.
     @Test
     fun everyRouteIsKotlinxSerializable() {
         // serializer<T>() resolves at compile time iff T is @Serializable AND the

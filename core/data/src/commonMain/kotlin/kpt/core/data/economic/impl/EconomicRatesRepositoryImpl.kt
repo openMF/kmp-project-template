@@ -18,12 +18,13 @@ import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.economic.EconomicRatesRepository
 import kpt.core.model.economic.InterestRateSeries
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import kpt.core.store.economic.impl.InterestRateSeriesKey
 import org.mobilenativefoundation.store.store5.Store
 
 @RepositoryBinding(binds = EconomicRatesRepository::class)
 class EconomicRatesRepositoryImpl(
-    @FromStore("interestRateSeries")
+    @FromStore(AppStoreIds.InterestRateSeries)
     private val interestRateSeriesStore: Store<InterestRateSeriesKey, InterestRateSeries>,
 ) : EconomicRatesRepository {
 

@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Vous verrez ici les rappels de factures et les alertes de taux.</string>
     <string name="feature_settings_sync_drafts_row">Synchronisation &amp; brouillons</string>
     <string name="feature_settings_sync_drafts_row_description">Consulter et gérer les brouillons et les synchronisations en attente</string>
+    <string name="feature_settings_rate_app_row">Noter cette application</string>
+    <string name="feature_settings_rate_app_row_description">Ouvrir la fiche du magasin pour noter cette application</string>
     <string name="feature_settings_sync_drafts_title">Synchronisation &amp; brouillons</string>
     <string name="feature_settings_sync_drafts_empty_title">Rien à synchroniser</string>
     <string name="feature_settings_sync_drafts_empty_message">Les brouillons enregistrés hors ligne et les enregistrements en attente de synchronisation apparaîtront ici.</string>

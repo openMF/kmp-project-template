@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Qui vedrai i promemoria delle bollette e gli avvisi sui tassi.</string>
     <string name="feature_settings_sync_drafts_row">Sincronizzazione e bozze</string>
     <string name="feature_settings_sync_drafts_row_description">Visualizza e gestisci bozze e sincronizzazioni in sospeso</string>
+    <string name="feature_settings_rate_app_row">Valuta questa app</string>
+    <string name="feature_settings_rate_app_row_description">Apri la scheda dello store per valutare questa app</string>
     <string name="feature_settings_sync_drafts_title">Sincronizzazione e bozze</string>
     <string name="feature_settings_sync_drafts_empty_title">Niente da sincronizzare</string>
     <string name="feature_settings_sync_drafts_empty_message">Le bozze salvate offline e i record in attesa di sincronizzazione appariranno qui.</string>

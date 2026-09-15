@@ -18,6 +18,7 @@ import kpt.core.base.store.screen.asScreenStream
 import kpt.core.data.profile.ProfileRepository
 import kpt.core.model.profile.ProfileInfo
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.Store
 
 /**
@@ -28,7 +29,7 @@ import org.mobilenativefoundation.store.store5.Store
  */
 @RepositoryBinding(binds = ProfileRepository::class)
 internal class ProfileRepositoryImpl(
-    @FromStore("profile") private val profileStore: Store<Unit, ProfileInfo>,
+    @FromStore(AppStoreIds.Profile) private val profileStore: Store<Unit, ProfileInfo>,
 ) : ProfileRepository {
 
     override fun profileStream(scope: CoroutineScope): ScreenDataStream<ProfileInfo> =

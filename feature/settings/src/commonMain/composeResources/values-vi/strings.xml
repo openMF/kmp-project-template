@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">Nhắc hóa đơn và cảnh báo lãi suất sẽ hiển thị ở đây.</string>
     <string name="feature_settings_sync_drafts_row">Đồng bộ &amp; bản nháp</string>
     <string name="feature_settings_sync_drafts_row_description">Xem và quản lý bản nháp cùng các mục chờ đồng bộ</string>
+    <string name="feature_settings_rate_app_row">Đánh giá ứng dụng này</string>
+    <string name="feature_settings_rate_app_row_description">Mở trang cửa hàng để đánh giá ứng dụng này</string>
     <string name="feature_settings_sync_drafts_title">Đồng bộ &amp; bản nháp</string>
     <string name="feature_settings_sync_drafts_empty_title">Không có gì để đồng bộ</string>
     <string name="feature_settings_sync_drafts_empty_message">Bản nháp bạn lưu khi ngoại tuyến và các bản ghi đang chờ đồng bộ sẽ hiển thị ở đây.</string>

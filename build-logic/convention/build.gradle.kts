@@ -74,6 +74,11 @@ gradlePlugin {
             implementationClass = "AndroidApplicationConventionPlugin"
         }
 
+        register("featureAggregate") {
+            id = "org.convention.feature.aggregate"
+            implementationClass = "FeatureAggregateConventionPlugin"
+        }
+
         register("kmpFlavors") {
             id = "org.convention.kmp.flavors"
             implementationClass = "KMPFlavorsConventionPlugin"

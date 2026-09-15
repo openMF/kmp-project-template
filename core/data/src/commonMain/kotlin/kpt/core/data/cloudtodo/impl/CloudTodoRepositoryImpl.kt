@@ -21,6 +21,7 @@ import kpt.core.data.cloudtodo.CloudTodoRepository
 import kpt.core.model.cloudtodo.CloudTodo
 import kpt.core.store.cloudtodo.impl.CloudTodoKey
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
@@ -32,8 +33,8 @@ import org.mobilenativefoundation.store.store5.StoreWriteRequest
  */
 @RepositoryBinding(binds = CloudTodoRepository::class)
 class CloudTodoRepositoryImpl(
-    @FromStore("cloudTodo") private val readStore: Store<CloudTodoKey, CloudTodo>,
-    @FromStore("cloudTodoMutable") private val writeStore: MutableStore<CloudTodoKey, CloudTodo>,
+    @FromStore(AppStoreIds.CloudTodo) private val readStore: Store<CloudTodoKey, CloudTodo>,
+    @FromStore(AppStoreIds.CloudTodoMutable) private val writeStore: MutableStore<CloudTodoKey, CloudTodo>,
     private val gateway: MutationGateway,
 ) : CloudTodoRepository {
 

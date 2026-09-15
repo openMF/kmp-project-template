@@ -43,6 +43,20 @@ kotlin {
             implementation(libs.cmp.network.monitor.compose)
             implementation(libs.cmp.intent.launcher)
 
+            // Compose surfaces for the cores wired in core-base/platform. `api`, not
+            // `implementation`: these exist to be CALLED from feature screens, and the feature
+            // convention plugin already gives every feature core-base:ui — so exposing them here is
+            // what makes ShareButton / ShareSheet / AppIntentsRegistry / rememberSupportsIntent
+            // reachable without each feature declaring anything.
+            //
+            // Their composables call the libraries' global entry points (Share.share, AppIntents…)
+            // rather than the CompositionLocals these modules also export, so nothing here needs the
+            // toolkit locals provided. The template's own locals in kpt.core.base.platform stay
+            // canonical — see the note in LocalManagerProviders.kt about the name collision.
+            api(libs.cmp.share.compose)
+            api(libs.cmp.intent.launcher.compose)
+            api(libs.cmp.app.intents.compose)
+
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(compose.foundation)

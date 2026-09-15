@@ -41,6 +41,8 @@
     <string name="feature_settings_notifications_empty_message">청구 알림과 금리 알림이 여기에 표시됩니다.</string>
     <string name="feature_settings_sync_drafts_row">동기화 및 임시 저장</string>
     <string name="feature_settings_sync_drafts_row_description">임시 저장과 대기 중인 동기화를 보고 관리합니다</string>
+    <string name="feature_settings_rate_app_row">이 앱 평가하기</string>
+    <string name="feature_settings_rate_app_row_description">스토어 페이지를 열어 이 앱을 평가합니다</string>
     <string name="feature_settings_sync_drafts_title">동기화 및 임시 저장</string>
     <string name="feature_settings_sync_drafts_empty_title">동기화할 항목 없음</string>
     <string name="feature_settings_sync_drafts_empty_message">오프라인에서 저장한 임시 항목과 동기화를 기다리는 레코드가 여기에 표시됩니다.</string>

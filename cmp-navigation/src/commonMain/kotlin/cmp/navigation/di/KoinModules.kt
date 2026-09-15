@@ -21,8 +21,6 @@ import kpt.core.data.di.DataModule
 import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.store.di.appStoreModule
-import kpt.feature.home.di.HomeModule
-import kpt.feature.settings.SettingsModule
 import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -45,10 +43,9 @@ object KoinModules {
     }
 
     private val featureModule = module {
-        // Framework SHELL modules — always present.
-        includes(HomeModule, SettingsModule)
-        // Fork features — from the fork-owned FeatureRegistry seam (white-label: the template infra
-        // NEVER edits this; a fork adds/removes features by editing cmp-navigation/registry/FeatureRegistry.kt).
+        // No feature module is listed here any more. Every one — including the backbone's
+        // HomeModule and SettingsModule — is picked up by GeneratedFeatureKoinBindings and reaches
+        // Koin through FeatureRegistry.featureKoinModules.
         includes(FeatureRegistry.featureKoinModules)
     }
 

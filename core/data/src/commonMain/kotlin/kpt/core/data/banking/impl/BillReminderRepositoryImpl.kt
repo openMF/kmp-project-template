@@ -28,6 +28,7 @@ import kpt.core.database.banking.dao.BillReminderDao
 import kpt.core.model.banking.BillReminder
 import kpt.core.store.banking.impl.provideBillReminderDetailStore
 import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreReadRequest
@@ -46,8 +47,9 @@ import kotlin.time.Clock
  */
 @RepositoryBinding(binds = BillReminderRepository::class)
 internal class BillReminderRepositoryImpl(
-    @FromStore("billReminders") private val billRemindersStore: Store<Unit, List<BillReminder>>,
-    @FromStore("billRemindersMutable") private val billRemindersWriteStore: MutableStore<String, BillReminder>,
+    @FromStore(AppStoreIds.BillReminders) private val billRemindersStore: Store<Unit, List<BillReminder>>,
+    @FromStore(AppStoreIds.BillRemindersMutable)
+    private val billRemindersWriteStore: MutableStore<String, BillReminder>,
     private val billReminderDao: BillReminderDao,
     private val clock: Clock = Clock.System,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault(),

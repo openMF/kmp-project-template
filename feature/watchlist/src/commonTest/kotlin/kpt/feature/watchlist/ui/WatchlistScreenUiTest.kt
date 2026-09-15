@@ -15,7 +15,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import kpt.feature.watchlist.testing.FakeWatchlistRepository
 import kpt.feature.watchlist.testing.item
 import kotlin.test.Test

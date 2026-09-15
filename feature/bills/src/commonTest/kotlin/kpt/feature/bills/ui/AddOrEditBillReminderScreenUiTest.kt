@@ -11,7 +11,7 @@ package kpt.feature.bills.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import kpt.core.designsystem.theme.KptTheme
 import kpt.core.model.banking.BillReminder
 import kpt.feature.bills.testing.FakeBillReminderRepository

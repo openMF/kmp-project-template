@@ -192,7 +192,7 @@ declare -A EXCLUSIONS=(
     # mifos-x-group-banking, mifos-x-open-banking, reels-downloader-new, ...) may
     # create build-logic/convention/src/main/kotlin/local/LocalFlavors.kt to add
     # their own flavors / dimensions / overrides on top of the synced base.
-    # See docs/architecture/FLAVORS_EXTENSION.md for the pattern.
+    # See docs/architecture/cross-cutting/flavors-extension.md for the pattern.
     ["build-logic"]="convention/src/main/kotlin/local:dir"
     # Feature backbone (WS4/T5) — home/profile/settings are owner:template and now sync,
     # but their demo/** showcases (and feature/home's generated/**) stay fork-owned. These

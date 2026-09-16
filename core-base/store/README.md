@@ -1,6 +1,6 @@
 # `core-base/store` — Framework-Shared State Infrastructure
 
-**End-to-end guide: [`docs/architecture/STORE_ARCHITECTURE.md`](../../docs/architecture/STORE_ARCHITECTURE.md)**
+**End-to-end guide: [`docs/architecture/cross-cutting/store-architecture.md`](../../docs/architecture/cross-cutting/store-architecture.md)**
 
 Framework-shared — do not edit in a fork. Push fork pressure to `core/store`; a genuine fix here goes
 upstream to `openMF/kmp-project-template`.
@@ -16,4 +16,4 @@ upstream to `openMF/kmp-project-template`.
 
 Call sequence + which primitive backs which archetype: [`CONSUMPTION.md`](./CONSUMPTION.md).
 Read-path internals (`StoreData<T>`, paging, submit outbox):
-[`docs/architecture/STORE_DATA_API.md`](../../docs/architecture/STORE_DATA_API.md).
+[`docs/architecture/cross-cutting/store-data-api.md`](../../docs/architecture/cross-cutting/store-data-api.md).

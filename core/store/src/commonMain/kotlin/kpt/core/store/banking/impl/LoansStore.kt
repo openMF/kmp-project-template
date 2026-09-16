@@ -58,6 +58,7 @@ fun provideLoansStore(dao: LoanDao): Store<Unit, List<Loan>> = StoreFactory.crea
  * screens (e.g. the amortization schedule) consume a `ScreenDataStream` instead of hand-folding a
  * `Flow<Loan?>`. Repository-internal (not DI-registered) — reads the same DAO the list store clears.
  */
+// store-binding: internal — repository-internal; LoanRepository calls it directly and clears via the list store's table
 fun provideLoanDetailStore(dao: LoanDao): Store<String, Loan> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
         reader = { id: String -> daoFlow(LOANS_TABLE) { dao.observeById(id) }.map { it?.toDomain() } },

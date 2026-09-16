@@ -791,7 +791,7 @@ class ClientViewModel(
 }
 ```
 
-For full Store 5 API reference, see [`docs/architecture/STORE_DATA_API.md`](../architecture/STORE_DATA_API.md).
+For full Store 5 API reference, see [`docs/architecture/cross-cutting/store-data-api.md`](store-data-api.md).
 
 ---
 

@@ -66,6 +66,7 @@ fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillRemind
  * S5-2 / S5-10 read-path bypass — the write path already went through a store while the read
  * beside it did not.
  */
+// store-binding: internal — repository-internal; see the KDoc above for the S5-2/S5-10 rationale
 fun provideBillReminderDetailStore(dao: BillReminderDao): Store<String, BillReminder> =
     StoreFactory.createOfflineStore(
         sourceOfTruth = SourceOfTruth.of(

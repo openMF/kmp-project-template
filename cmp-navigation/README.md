@@ -37,4 +37,4 @@ at the bottom of `build.gradle.kts`) + the `FeatureRegistry` seam — never as a
 here.
 
 See also: [`FEATURE_AUTHORING.md`](../FEATURE_AUTHORING.md),
-[`docs/architecture/CUSTOMIZATION_SURFACE.md`](../docs/architecture/CUSTOMIZATION_SURFACE.md).
+[`docs/architecture/cross-cutting/customization-surface.md`](../docs/architecture/cross-cutting/customization-surface.md).

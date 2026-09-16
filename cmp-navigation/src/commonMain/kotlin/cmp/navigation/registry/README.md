@@ -9,7 +9,7 @@ untouched.
 
 Everything here is **commonMain**. A fork wires its app once, here, and every platform
 (Android / iOS / Desktop / Web) picks it up — there is no per-platform app-class to edit. See the
-[ownership contract](../../../../../../../docs/architecture/CUSTOMIZATION_SURFACE.md) for how these
+[ownership contract](../../../../../../../docs/architecture/cross-cutting/customization-surface.md) for how these
 files are classified `owner: fork`.
 
 ## The four seams

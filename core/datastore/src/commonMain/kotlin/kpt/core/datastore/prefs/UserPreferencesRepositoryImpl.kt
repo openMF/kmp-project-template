@@ -182,10 +182,40 @@ class UserPreferencesRepositoryImpl(
     override suspend fun setScreenCapturePreference(isScreenCaptureEnabled: Boolean) =
         updatePreference { it.copy(enableScreenCapture = isScreenCaptureEnabled) }
 
+    /**
+     * Discards everything belonging to the signed-in PERSON, and nothing belonging to the DEVICE.
+     *
+     * The boundary is not invented here — it is the one [loadCombinedUserData] already uses when it
+     * prefers the secure store: `activeUserId`, `passcode`, `isAuthenticated`, `isUnlocked` are
+     * user/session state; theme, language, onboarding, screen-capture and biometric toggles are
+     * device preferences a person expects to survive signing out.
+     *
+     * This previously flipped `isAuthenticated` alone, which left `activeUserId` and `passcode`
+     * readable on disk — in BOTH stores, because [putUserPreference] writes the whole blob to the
+     * plain store as well (the migration keeps the full record there "for UI fields"). On a shared
+     * device the next person inherited them. The auth token is removed too; it lives under its own
+     * key and no `UserData` write touches it.
+     *
+     * Device-scoped counters (e.g. `AppReviewPromptStore`) are deliberately NOT part of `UserData`
+     * and are unaffected — see RULE-KMP-DATASTORE-SCOPE-001.
+     */
     override suspend fun clearUserData() {
-        setIsAuthenticated(false)
-        // TODO:: Uncomment this line when Unlocked Screen is Present
-        // setIsUnlocked(false)
+        withContext(dispatcher.io) {
+            val cleared = loadCombinedUserData().copy(
+                activeUserId = UserData.DEFAULT.activeUserId,
+                passcode = UserData.DEFAULT.passcode,
+                // NOT UserData.DEFAULT for these two: the default describes a FRESH INSTALL, where
+                // both are `true`. Signing out must leave the app locked and unauthenticated, so the
+                // sign-out value is stated explicitly rather than inherited.
+                isAuthenticated = false,
+                isUnlocked = false,
+            )
+            plainSettings.putUserPreference(cleared)
+            secureSettings.putSecurePreference(cleared)
+            secureSettings.remove(AUTH_TOKEN_KEY)
+            _authToken.value = null
+            _userData.value = cleared
+        }
     }
 }
 

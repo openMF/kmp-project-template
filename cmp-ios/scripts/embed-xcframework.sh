@@ -77,14 +77,27 @@ if [ "$KOTLIN_BUILD_TYPE" = "Debug" ] && [ "${KMP_FORCE_XCFRAMEWORK:-0}" != "1" 
   # a raw build for exactly this reason, but an Xcode Run Script phase never passes through that
   # guard — so the exclusions have to be here, matching what /idea-build-kmp runs.
   "$GRADLEW" -p "$REPO_ROOT" ":cmp-shared:link${KOTLIN_BUILD_TYPE}Framework${KMP_ARCH_TARGET}" \
-    -x :cmp-shared:workerKmpAppCodegenAndroid -x :cmp-shared:workerKmpAppCodegenAutoShim \
-    -x :sync:workerKmpAppCodegenAndroid -x :sync:workerKmpAppCodegenAutoShim
+    # Exclude the WHOLE workerKmpAppCodegen family, never a subset. Each of these captures
+    # `Project`, so ONE unexcluded variant discards the configuration cache for the entire build.
+    # This list named only Android+AutoShim, leaving Ios/Desktop/Web in — so every iOS build
+    # reconfigured from cold (measured 9m28s vs 2m08s once Ios was added) while reporting nothing
+    # but "Configuration cache entry discarded because incompatible task was found".
+    -x :cmp-shared:workerKmpAppCodegenAll -x :cmp-shared:workerKmpAppCodegenAndroid \
+    -x :cmp-shared:workerKmpAppCodegenAutoShim -x :cmp-shared:workerKmpAppCodegenDesktop \
+    -x :cmp-shared:workerKmpAppCodegenIos -x :cmp-shared:workerKmpAppCodegenWeb \
+    -x :sync:workerKmpAppCodegenAll -x :sync:workerKmpAppCodegenAndroid \
+    -x :sync:workerKmpAppCodegenAutoShim -x :sync:workerKmpAppCodegenDesktop \
+    -x :sync:workerKmpAppCodegenIos -x :sync:workerKmpAppCodegenWeb
   FAST_SINGLE_ARCH=1
 else
   "$GRADLEW" -p "$REPO_ROOT" \
     ":cmp-shared:assembleComposeApp${KOTLIN_BUILD_TYPE}XCFramework" \
-    -x :cmp-shared:workerKmpAppCodegenAndroid -x :cmp-shared:workerKmpAppCodegenAutoShim \
-    -x :sync:workerKmpAppCodegenAndroid -x :sync:workerKmpAppCodegenAutoShim
+    -x :cmp-shared:workerKmpAppCodegenAll -x :cmp-shared:workerKmpAppCodegenAndroid \
+    -x :cmp-shared:workerKmpAppCodegenAutoShim -x :cmp-shared:workerKmpAppCodegenDesktop \
+    -x :cmp-shared:workerKmpAppCodegenIos -x :cmp-shared:workerKmpAppCodegenWeb \
+    -x :sync:workerKmpAppCodegenAll -x :sync:workerKmpAppCodegenAndroid \
+    -x :sync:workerKmpAppCodegenAutoShim -x :sync:workerKmpAppCodegenDesktop \
+    -x :sync:workerKmpAppCodegenIos -x :sync:workerKmpAppCodegenWeb
 fi
 
 # Stage the SDK-matching `.framework` slice OUT of the freshly-assembled XCFramework into the

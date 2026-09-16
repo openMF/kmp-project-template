@@ -11,14 +11,22 @@
 #   bash scripts/white-label/fork-init.sh com.mybank.app MyBankApp "My Bank" ABCDE12345 --keep-demo
 #
 # What this does (identity mode):
-#   1. Writes app.id into gradle/fork.properties (its single source of truth) + mirrors the
-#      remaining build-time identity (appDisplayName/projectName/iosTeamId) into
-#      gradle/libs.versions.toml. syncForkConfig keeps libs.versions.toml#appId synced from app.id.
-#   2. Runs ./gradlew syncForkConfig to propagate to iOS Config.xcconfig,
-#      local.properties (Fastlane), and gradle.properties (rootProject.name)
+#   1. Brands `app-profile/app.yaml` — THE source of truth. identity.app_id / app_name / namespace,
+#      plus the `org:` block (vendor, copyright) when --org= is given.
+#   2. Runs ./gradlew syncForkConfig, which DERIVES gradle/fork.properties, libs.versions.toml,
+#      iOS Config.xcconfig, local.properties (Fastlane) and gradle.properties FROM app-profile.
 #   3. Removes the demo showcase (scripts/remove-demo.sh) so the fork starts from a
 #      clean, branded framework shell — this is the DEFAULT. Pass --keep-demo to retain
 #      the Money-Toolkit demo (for exploring the framework's reference features).
+#
+# SCOPE: app-profile only — app.yaml (identity + org block) and platforms/apple/apple.yaml's
+# ORG-scope signing identity (team id, Match git url/branch), inherited from the workspace's
+# _org/company.yaml via --org=. Per-app deployment values that are NOT org-wide — Firebase app ids,
+# store metadata, per-target config — stay DEPLOYMENT-LAYER scope and arrive via promote.
+#
+# fork.properties and libs.versions.toml are NOT written here at all — syncForkConfig derives both
+# from app-profile. Branding them directly is a no-op that reports success; see the note at the
+# derived-files section below.
 #
 # No source file scanning, no package renaming, no sync-dirs conflicts. The convention plugin
 # derives all module namespaces from the framework-owned BASE_MODULE_NAMESPACE constant (kpt) —
@@ -55,6 +63,73 @@ if [[ "${1:-}" == "--clean" ]]; then
   exit $?
 fi
 
+# ── --verify: is this fork still fully initialised? ──────────────────────────
+# Read-only. Answers the question you cannot answer by eye once a fork is months old and has taken
+# template syncs: did every identity value actually land, and does the DERIVED layer still agree
+# with the SoT?
+#
+# The agreement check is the point. Each layer is internally consistent even when branding failed —
+# that is exactly how this script once reported success while leaving the template's identity in
+# place — so checking app-profile alone, or the catalog alone, proves nothing. FV-2/FV-3 compare
+# them, which is the only way a silent revert shows up.
+if [[ "${1:-}" == "--verify" ]]; then
+  fv_fail=0
+  fv_ok()   { echo -e "${GREEN}  ✓ $1${NC}"; }
+  fv_bad()  { echo -e "${RED}  ✗ $1${NC}"; fv_fail=1; }
+  yval()    { grep -E "^[[:space:]]*$2:" "$1" 2>/dev/null | head -1 | cut -d: -f2- \
+                | sed -e 's/[[:space:]]*#.*$//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//'; }
+  tval()    { grep -E "^$2[[:space:]]*=" "$1" 2>/dev/null | head -1 | cut -d'"' -f2; }
+
+  echo -e "${BOLD}fork-init --verify${NC}"
+  AY="app-profile/app.yaml"; LT="gradle/libs.versions.toml"
+  FP="gradle/fork.properties"; AP="app-profile/platforms/apple/apple.yaml"
+
+  # FV-1 — the SoT is branded, not still the template's reference identity.
+  a_id="$(yval "$AY" app_id)"; a_nm="$(yval "$AY" app_name)"
+  if [[ -z "$a_id" ]]; then                       fv_bad "FV-1 $AY has no identity.app_id"
+  elif [[ "$a_id" == "org.mifos.kmp.template" ]]; then
+    fv_bad "FV-1 app_id is still the template's reference identity ($a_id) — fork-init never branded this tree"
+  else                                            fv_ok  "FV-1 app-profile app_id=$a_id app_name=$a_nm"; fi
+
+  # FV-2 / FV-3 — the DERIVED layer agrees with the SoT (a mismatch means a write was reverted).
+  l_id="$(tval "$LT" appId)"
+  [[ "$l_id" == "$a_id" ]] && fv_ok "FV-2 libs.versions.toml appId agrees with app-profile" \
+    || fv_bad "FV-2 appId disagrees — app-profile='$a_id' catalog='$l_id'. Run ./gradlew syncForkConfig."
+  if [[ -f "$FP" ]]; then
+    f_id="$(grep -E '^app\.id=' "$FP" 2>/dev/null | head -1 | cut -d= -f2-)"
+    [[ "$f_id" == "$a_id" ]] && fv_ok "FV-3 fork.properties app.id agrees with app-profile" \
+      || fv_bad "FV-3 app.id disagrees — app-profile='$a_id' bridge='$f_id'. Run ./gradlew syncForkConfig."
+  fi
+
+  # FV-4 — projectName reached the catalog (its own SoT, so nothing else can prove it).
+  p_nm="$(tval "$LT" projectName)"
+  [[ -n "$p_nm" && "$p_nm" != "kmp-project-template" ]] \
+    && fv_ok  "FV-4 projectName=$p_nm" \
+    || fv_bad "FV-4 projectName is still '$p_nm' — the fork builds under the template's name"
+
+  # FV-5 — ORG signing identity was inherited, not left as a placeholder.
+  if [[ -f "$AP" ]]; then
+    t_id="$(yval "$AP" team_id)"; m_url="$(grep -E '^[[:space:]]*url:' "$AP" | head -1 | sed -e 's/^[[:space:]]*url:[[:space:]]*//' -e 's/[[:space:]]*#.*$//')"
+    [[ -n "$t_id" && "$t_id" != "YOUR_TEAM_ID" ]] && fv_ok "FV-5 apple team_id=$t_id" \
+      || fv_bad "FV-5 apple team_id is a placeholder ($t_id) — pass --org=<ws>/_org/company.yaml"
+    case "$m_url" in
+      *YOUR_ORG*|"") fv_bad "FV-5 Match git url is a placeholder ($m_url)" ;;
+      git.com:*)     fv_bad "FV-5 Match git url is CORRUPT ($m_url) — the '@host' was eaten by shell interpolation" ;;
+      *)             fv_ok  "FV-5 Match git url set" ;;
+    esac
+  fi
+
+  # FV-6 — the demo is gone (a fork that still ships it has features that are not its own).
+  d_mod=0; [[ -d feature ]] && d_mod="$(ls feature 2>/dev/null | grep -cE '^(showcase|loans|crypto|bills|alerts|watchlist|cloudtodo|macro|rates|amortization|calculators|currency-rates|emi-calculator|add-to-watchlist)$' || true)"
+  d_fence="$(grep -rl 'demo:begin' . --include='*.kt' --include='*.kts' --include='*.yaml' 2>/dev/null | grep -v '/build/' | grep -vc '/.git/' || true)"
+  if [[ "$d_mod" -eq 0 ]]; then fv_ok "FV-6 no demo feature modules remain"
+  else fv_bad "FV-6 $d_mod demo feature module(s) still present — run fork-init --clean --apply"; fi
+
+  echo
+  [[ "$fv_fail" -eq 0 ]] && { echo -e "${GREEN}${BOLD}fork identity intact (FV-1..FV-6)${NC}"; exit 0; }
+  echo -e "${RED}${BOLD}fork identity INCOMPLETE — see failures above${NC}"; exit 1
+fi
+
 # ── Flags (extracted before positional parsing so they can appear anywhere) ──
 # Identity mode removes the demo showcase BY DEFAULT (the point of the separation:
 # forking = starting clean). --keep-demo retains it; --no-format forwards to the strip.
@@ -67,8 +142,9 @@ STRIP_FORMAT_FLAG=""
 # below. Passing them in IS the contract, not a convenience.
 #
 # ORG scope lives in `workspaces/<ws>/_org/company.yaml` — ordinary org config, bash-readable.
-# --org= resolves apple team id, vendor, copyright, match git and tester groups from there so a
-# fork never restates an org-wide value per project.
+# --org= merges every org-wide value a fork must not restate: vendor + copyright into app.yaml's
+# `org:` block, and the signing identity (apple team id, Match git url/branch) into
+# platforms/apple/apple.yaml. Per-app deployment values that are not org-wide stay with promote.
 ORG_YAML=""
 SECRETS_MANIFEST=""
 POSITIONAL=()
@@ -115,33 +191,20 @@ echo
 print_info "Package ID:       $PACKAGE"
 print_info "Project name:     $PROJECT_NAME"
 print_info "Display name:     $APPNAME"
-print_info "iOS Team ID:      $TEAM_ID"
+print_info "iOS Team ID:      $TEAM_ID (arg; --org= overrides when unset)"
 echo
 
-# ── Update libs.versions.toml ────────────────────────────────────────────────
-print_info "Updating $LIBS_TOML..."
-
-sed -i.bak "s|appId[[:space:]]*=.*|appId            = \"$PACKAGE\"|"             "$LIBS_TOML"
-sed -i.bak "s|appDisplayName[[:space:]]*=.*|appDisplayName   = \"$APPNAME\"|"    "$LIBS_TOML"
-sed -i.bak "s|projectName[[:space:]]*=.*|projectName      = \"$PROJECT_NAME\"|"  "$LIBS_TOML"
-sed -i.bak "s|iosTeamId[[:space:]]*=.*|iosTeamId        = \"$TEAM_ID\"|"         "$LIBS_TOML"
-find . -name "*.bak" -not -path "*/build/*" -delete
-
-print_success "libs.versions.toml updated"
-
-# ── Author app.id into gradle/fork.properties (its single source of truth) ────
-# app.id is authored in fork.properties; syncForkConfig writes it back into libs.versions.toml.
-# We set BOTH here so there is never a drift window even if syncForkConfig is skipped.
-FORK_PROPS="gradle/fork.properties"
-[[ -f "$FORK_PROPS" ]] || { cp gradle/fork.properties.template "$FORK_PROPS" 2>/dev/null && print_info "Created $FORK_PROPS from template"; }
-if [[ -f "$FORK_PROPS" ]]; then
-  if grep -qE '^app\.id=' "$FORK_PROPS"; then
-    sed -i.bak "s|^app\.id=.*|app.id=$PACKAGE|" "$FORK_PROPS" && rm -f "$FORK_PROPS.bak"
-  else
-    printf '\napp.id=%s\n' "$PACKAGE" >> "$FORK_PROPS"
-  fi
-  print_success "fork.properties app.id=$PACKAGE (source of truth)"
-fi
+# ── gradle/fork.properties + gradle/libs.versions.toml are NOT written here ──
+# Both are DERIVED: `syncForkConfig` regenerates them from app-profile on every run, and
+# fork.properties carries that in its own header — "DERIVED from app-profile by syncForkConfig.
+# DO NOT EDIT. Edit app-profile/app.yaml … instead."
+#
+# An earlier revision wrote both directly, before calling syncForkConfig. Every write was reverted
+# moments later by the very next step, so the script printed
+#   ✅ libs.versions.toml updated
+#   ✅ fork.properties app.id=com.acme.app
+# and finished with the TEMPLATE's identity still in place. Branding the derived layer is not a
+# redundant safety net; it is a no-op that reports success. The SoT write is below.
 
 # ── ORG scope — merge workspaces/<ws>/_org/company.yaml into app-profile ─────
 # Org-wide values belong in ONE place. Restating apple_team_id or the Match git URL per project is
@@ -151,6 +214,8 @@ fi
 # HARD, not best-effort: --org= naming a file that does not exist is an ERROR. A silent skip here is
 # precisely the failure this whole step exists to remove — a fork that looks branded and carries the
 # template's signing identity.
+APP_YAML="app-profile/app.yaml"   # defined BEFORE the ORG block, which writes into it
+
 orgval() {  # $1 = key under org_identity:
   [[ -f "$ORG_YAML" ]] || return 1
   grep -E "^[[:space:]]+$1:" "$ORG_YAML" | head -1 \
@@ -167,21 +232,86 @@ if [[ -n "$ORG_YAML" ]]; then
   ORG_MATCH_BRANCH="$(orgval apple_match_git_branch)"
   ORG_VENDOR="$(orgval vendor)"
   ORG_COPYRIGHT="$(orgval copyright)"
-  APPLE_YAML="app-profile/platforms/apple/apple.yaml"
 
-  # iOS team id: an explicitly-passed arg wins (per-project override); otherwise inherit the org's.
-  # `XXXXXXXXXX` is the arg default, i.e. "caller did not supply one".
-  if [[ ( -z "${TEAM_ID:-}" || "$TEAM_ID" == "XXXXXXXXXX" ) && -n "$ORG_TEAM" ]]; then
-    TEAM_ID="$ORG_TEAM"
-    print_success "apple team id ← org ($ORG_TEAM)"
+  # SCOPE: this script writes app-profile/app.yaml ONLY.
+  #
+  # platforms/**/*.yaml (apple team id, Match git URL, Firebase app ids, store metadata) are
+  # DEPLOYMENT-LAYER driven and reach app-profile through deployment-layer promote — not from here.
+  # An earlier revision wrote apple.yaml's team_id and Match URL directly; that put a second writer
+  # on files the promote flow owns, which is the same two-writers-one-artifact split that produced
+  # two competing secrets-manifests. fork-init brands the app; it does not provision signing.
+  #
+  # So the ORG merge lands in app.yaml's own `org:` block, and nowhere else.
+  ORG_NAME="$(orgval name)"
+  if [[ -n "$ORG_VENDOR" ]]; then
+    FI_V="$ORG_VENDOR" perl -pi -e 's{^(\s*vendor:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1$ENV{FI_V}$3$4}' "$APP_YAML" 2>/dev/null \
+      && print_success "org.vendor ← org ($ORG_VENDOR)"
   fi
-  if [[ -f "$APPLE_YAML" && -n "$ORG_MATCH_URL" ]]; then
-    perl -0pi -e "s{(url:\\s*)\\S+}{\${1}$ORG_MATCH_URL}" "$APPLE_YAML" 2>/dev/null \
-      && print_success "match git url ← org"
+  if [[ -n "$ORG_COPYRIGHT" ]]; then
+    FI_C="$ORG_COPYRIGHT" perl -pi -e 's{^(\s*copyright:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1"$ENV{FI_C}"$3$4}' "$APP_YAML" 2>/dev/null \
+      && print_success "org.copyright ← org"
   fi
-  [[ -n "$ORG_VENDOR"    ]] && print_success "vendor ← org ($ORG_VENDOR)"
-  [[ -n "$ORG_COPYRIGHT" ]] && print_success "copyright ← org"
+  # platforms/apple/apple.yaml — ORG-scope signing identity, filled from the WORKSPACE's org file.
+  #
+  # These are org-wide facts (one Apple team, one Match repo per workspace), so they belong in
+  # _org/company.yaml and are inherited here rather than hand-typed per project. Leaving them as
+  # `YOUR_TEAM_ID` / `YOUR_ORG` is the failure this step removes: a fork that looks branded, builds,
+  # and then cannot sign — discovered at release time rather than at init.
+  #
+  # Every value reaches perl through the ENVIRONMENT. A Match URL is `git@github.com:org/repo.git`,
+  # and inside a double-quoted `-e` program perl reads `@github` as an array, interpolating it to
+  # nothing and silently producing `git.com:org/repo.git` — a URL that looks plausible and cannot
+  # clone. $ENV{} is not stylistic here; it is the difference between working and subtly broken.
+  APPLE_YAML="app-profile/platforms/apple/apple.yaml"
+  if [[ -f "$APPLE_YAML" ]]; then
+    if [[ -n "$ORG_TEAM" ]]; then
+      FI_TEAM="$ORG_TEAM" perl -pi -e 's{^(\s*team_id:\s*)(\S+)}{$1$ENV{FI_TEAM}}' "$APPLE_YAML" \
+        && print_success "apple.team_id ← org ($ORG_TEAM)"
+    fi
+    if [[ -n "$ORG_MATCH_URL" ]]; then
+      FI_URL="$ORG_MATCH_URL" perl -pi -e 's{^(\s*url:\s*)(\S+)}{$1$ENV{FI_URL}}' "$APPLE_YAML" \
+        && print_success "apple.match.git.url ← org"
+    fi
+    if [[ -n "$ORG_MATCH_BRANCH" ]]; then
+      FI_BR="$ORG_MATCH_BRANCH" perl -pi -e 's{^(\s*branch:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1$ENV{FI_BR}$3$4}' "$APPLE_YAML" \
+        && print_success "apple.match.git.branch ← org ($ORG_MATCH_BRANCH)"
+    fi
+  fi
 fi
+
+# ── Brand app-profile — THE SoT. Everything else is derived from it. ─────────
+# This must happen BEFORE syncForkConfig, and it is the only write that actually sticks.
+#
+# This is the ONLY identity write in the script. syncForkConfig (next step) derives
+# gradle/fork.properties, gradle/libs.versions.toml, Config.xcconfig, local.properties and
+# gradle.properties from what is written here.
+if [[ -f "$APP_YAML" ]]; then
+  print_info "Branding $APP_YAML (the SoT)…"
+  # Value-only substitution that preserves each line's trailing `# comment`. PACKAGE/APPNAME reach
+  # perl through the ENVIRONMENT, never interpolated into the -e program: an app id or display name
+  # containing @ or $ would otherwise be mangled by perl's own interpolation.
+  FI_PKG="$PACKAGE" perl -pi -e 's{^(\s*app_id:\s*)\S+}{$1$ENV{FI_PKG}}'        "$APP_YAML"
+  FI_PKG="$PACKAGE" perl -pi -e 's{^(\s*namespace:\s*)\S+}{$1$ENV{FI_PKG}}'     "$APP_YAML"
+  FI_APP="$APPNAME" perl -pi -e 's{^(\s*app_name:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1$ENV{FI_APP}$3$4}' "$APP_YAML"
+  print_success "app-profile app_id=$PACKAGE app_name=$APPNAME"
+else
+  print_warning "$APP_YAML not found — identity will not survive syncForkConfig"
+fi
+
+# ── projectName — the ONE identity value whose SoT is the catalog, not app-profile ──
+# Everything else here is written to app-profile and derived outward. `projectName` is the documented
+# exception: `fork-props-manifest-parity.sh` lists it under NOT_APP_PROFILE — "SoT is
+# gradle/libs.versions.toml#projectName (TRACKED); syncForkConfig mirrors it into the bridge as a
+# convenience". Giving it an app-profile home would hand derive.rb a second resolution order, which
+# is the two-opinions failure that gate exists to prevent — so it is written HERE, directly.
+#
+# Without this the positional <project_name> never reaches anything: syncForkConfig reads the key
+# from the catalog, so a fork initialised as "acme-app" still built as "kmp-project-template".
+FI_PROJ="$PROJECT_NAME" perl -pi -e 's{^(projectName\s*=\s*)"[^"]*"}{$1"$ENV{FI_PROJ}"}' "$LIBS_TOML" \
+  && print_success "libs.versions.toml projectName=$PROJECT_NAME (its declared SoT)"
+
+# platforms/**/*.yaml is deliberately NOT written here — see the ORG-scope note above.
+# Signing identity, Firebase ids and store metadata arrive via deployment-layer promote.
 
 # ── Regenerate all platform config files ─────────────────────────────────────
 print_info "Running ./gradlew syncForkConfig..."
@@ -209,13 +339,13 @@ fi
 
 echo
 # ── Project health — surface anything still template-default ──────────────────
-# fork.properties is the project-level source of truth; run the sanity harness so the fork
+# app-profile is the project-level source of truth; run the sanity harness so the fork
 # immediately sees what customization left un-forked (signing/org identity, store copy).
 # Non-fatal here — CI's quality-gate is the hard gate; this is guidance right after forking.
 if [[ -f "$(dirname "$0")/../product-health/product-health.sh" ]]; then
-  print_info "Running product health check (gradle/fork.properties sanity)…"
+  print_info "Running product health check (fork identity sanity)…"
   bash "$(dirname "$0")/../product-health/product-health.sh" \
-    || print_warning "Project health flagged items above — set them in gradle/fork.properties before releasing."
+    || print_warning "Project health flagged items above — set them in app-profile/ before releasing."
   echo
 fi
 
@@ -227,4 +357,4 @@ echo "  2. Update fastlane-config/project_config.rb Firebase App IDs"
 echo "  3. Replace cmp-ios/iosApp/Assets.xcassets with your app icon"
 echo "  4. Run ./gradlew build to verify everything compiles"
 echo
-echo -e "  To update identity later: edit ${BOLD}gradle/fork.properties${NC} → run ${BOLD}./gradlew syncForkConfig${NC}"
+echo -e "  To update identity later: edit ${BOLD}app-profile/app.yaml${NC} → run ${BOLD}./gradlew syncForkConfig${NC}"

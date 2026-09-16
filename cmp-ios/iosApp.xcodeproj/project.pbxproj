@@ -189,13 +189,16 @@
 			files = (
 			);
 			inputFileListPaths = (
+				"$(SRCROOT)/kotlin-sources.xcfilelist",
 			);
 			inputPaths = (
+				"$(SRCROOT)/scripts/embed-xcframework.sh",
 			);
 			name = "[KMP] Embed and Sign ComposeApp XCFramework";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(SRCROOT)/../cmp-shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)/ComposeApp.framework/ComposeApp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -210,11 +213,14 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/scripts/copy-compose-resources.sh",
+				"$(SRCROOT)/../cmp-shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)/ComposeApp.framework/composeResources",
 			);
 			name = "[KMP] Copy Compose Resources";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(WRAPPER_NAME)/compose-resources",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

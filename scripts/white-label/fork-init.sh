@@ -48,6 +48,75 @@ print_info()    { echo -e "${BLUE}⚙️  $1${NC}"; }
 print_warning() { echo -e "${YELLOW}⚠️  $1${NC}"; }
 print_error()   { echo -e "${RED}✘ $1${NC}"; exit 1; }
 
+
+# yaml_value <file> <key> — first matching key's value, comment + surrounding quotes stripped.
+# `cut -d: -f2-` rejoins on ':' so a value that contains one (a Match git URL) survives intact.
+yaml_value() {
+  grep -m1 -E "^[[:space:]]*$2:" "$1" 2>/dev/null \
+    | cut -d: -f2- | sed -e 's/[[:space:]]*#.*$//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
+                         -e 's/^"//' -e 's/"$//'
+}
+
+# brand_assert_toml <file> <key> <expected> <label> — brand_assert for a `key = "value"` catalog line.
+brand_assert_toml() {
+  local file="$1" key="$2" want="$3" label="$4" got
+  got="$(grep -m1 -E "^[[:space:]]*$key[[:space:]]*=" "$file" 2>/dev/null \
+         | sed -e 's/^[^=]*=[[:space:]]*//' -e 's/[[:space:]]*#.*$//' -e 's/^"//' -e 's/"[[:space:]]*$//')"
+  if [[ "$got" == "$want" ]]; then
+    print_success "$label"
+  else
+    print_warning "$label — NOT written: $file has no '$key =' carrying that value (found: '${got:-<key absent>}')"
+  fi
+}
+
+# brand_assert <file> <key> <expected> <label>
+# Report what is TRUE of the file, not that a command exited 0.
+#
+# `perl -pi -e 's{...}{...}'` exits 0 whether it rewrote every line or matched nothing at all, so
+# `perl … && print_success` prints a green tick for a write that never happened. That is not
+# hypothetical: this script claimed `org.vendor ← org (The Mifos Initiative)` on every run while
+# app-profile has no `vendor:` key anywhere — a success message for a permanent no-op. Assert the
+# value is in the file afterwards (RULE-MEASUREMENT-INTEGRITY-001 MI-4/MI-5); a key that is not
+# there is a WARNING naming it, never a tick.
+brand_assert() {
+  local file="$1" key="$2" want="$3" label="$4" got
+  got="$(yaml_value "$file" "$key")"
+  if [[ "$got" == "$want" ]]; then
+    print_success "$label"
+  else
+    print_warning "$label — NOT written: $file has no '$key:' carrying that value (found: '${got:-<key absent>}')"
+  fi
+}
+# clear_stale_note <file> <key>
+# Strip an authoring note that stops being true the moment the line is branded.
+#
+# Two markers mean "this value is not yours yet":
+#   `# PLACEHOLDER — …`  the value is unset; fill it in
+#   `# REFERENCE …`      the value is the template's own example
+# Every substitution in this script preserves the trailing comment, so a branded fork ends up
+# asserting `team_id: L432S2FZP5   # PLACEHOLDER — …` and `app_id: org.mifos.acme   # REFERENCE
+# example identity — the template ships as … (a fork re-brands via customize / app-profile)` — both
+# of which deny exactly what just happened, and the second still names `customize`, a script this
+# file replaced. Clear the marker on keys we actually brand; keep the durable half of the comment
+# (what the field feeds), and leave untouched keys marked, so what stays marked is what is still unset.
+clear_stale_note() {
+  local file="$1" key="$2"
+  [[ -f "$file" ]] || return 0
+  FI_K="$key" perl -pi -e '
+    my $k = $ENV{FI_K};
+    if (/^(\s*)\Q$k\E(:\s*)(\S[^#\n]*?)(\s*)#(.*)$/) {
+      my ($ind, $sep, $val, $gap, $c) = ($1, $2, $3, $4, $5);
+      if ($c =~ /^\s*PLACEHOLDER\b/) {
+        $_ = "$ind$k$sep$val\n";                     # the whole note was the marker
+      } elsif ($c =~ /^\s*REFERENCE\b/) {
+        $c =~ s/^\s*REFERENCE\s+//;                  # drop the marker word
+        $c =~ s/^example identity[^.]*\.\s*//;       # and "…the template ships as … ."
+        $_ = ($c =~ /\S/) ? "$ind$k$sep$val$gap# $c\n" : "$ind$k$sep$val\n";
+      }
+    }
+  ' "$file" 2>/dev/null || true
+}
+
 # ── Verify bash version ──────────────────────────────────────────────────────
 if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
   print_error "Bash 4+ required. macOS ships with Bash 3 — run: brew install bash"
@@ -121,9 +190,19 @@ if [[ "${1:-}" == "--verify" ]]; then
 
   # FV-6 — the demo is gone (a fork that still ships it has features that are not its own).
   d_mod=0; [[ -d feature ]] && d_mod="$(ls feature 2>/dev/null | grep -cE '^(showcase|loans|crypto|bills|alerts|watchlist|cloudtodo|macro|rates|amortization|calculators|currency-rates|emi-calculator|add-to-watchlist)$' || true)"
-  d_fence="$(grep -rl 'demo:begin' . --include='*.kt' --include='*.kts' --include='*.yaml' 2>/dev/null | grep -v '/build/' | grep -vc '/.git/' || true)"
+  # Fences are checked SEPARATELY from modules: a strip interrupted partway (or run with an older
+  # remove-demo) can delete every demo module and still leave `// demo:begin` blocks behind in
+  # settings.gradle.kts, the registries and feature-deps — a tree that looks clean by module count
+  # and does not configure. Counting only modules missed exactly that state.
+  #
+  # product-health/tests/** is excluded: those fixtures carry demo markers DELIBERATELY as canary
+  # input for the DI-seam and access-point gates. Stripping them would break the gates they prove.
+  d_fence="$(grep -rl 'demo:begin' . --include='*.kt' --include='*.kts' --include='*.yaml' 2>/dev/null \
+               | grep -v '/build/' | grep -v '/.git/' | grep -vc '/product-health/tests/' || true)"
   if [[ "$d_mod" -eq 0 ]]; then fv_ok "FV-6 no demo feature modules remain"
   else fv_bad "FV-6 $d_mod demo feature module(s) still present — run fork-init --clean --apply"; fi
+  if [[ "${d_fence:-0}" -eq 0 ]]; then fv_ok "FV-6 no demo:begin fences remain"
+  else fv_bad "FV-6 $d_fence file(s) still carry a demo:begin fence — the strip did not complete; re-run fork-init --clean --apply"; fi
 
   echo
   [[ "$fv_fail" -eq 0 ]] && { echo -e "${GREEN}${BOLD}fork identity intact (FV-1..FV-6)${NC}"; exit 0; }
@@ -241,40 +320,46 @@ if [[ -n "$ORG_YAML" ]]; then
   # on files the promote flow owns, which is the same two-writers-one-artifact split that produced
   # two competing secrets-manifests. fork-init brands the app; it does not provision signing.
   #
+
   # So the ORG merge lands in app.yaml's own `org:` block, and nowhere else.
+  #
+  # The target key is `name:`, which is what the block actually has. An earlier revision wrote
+  # `vendor:` — a key that exists in _org/company.yaml but NOWHERE in app-profile — so the
+  # substitution matched nothing on every run and still printed a green tick, because perl exits 0
+  # when it matches nothing. `name:` is also why the write must be scoped to the `org:` block:
+  # app.yaml carries many unrelated `name:` keys, and an unscoped substitution would rewrite them all.
   ORG_NAME="$(orgval name)"
-  if [[ -n "$ORG_VENDOR" ]]; then
-    FI_V="$ORG_VENDOR" perl -pi -e 's{^(\s*vendor:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1$ENV{FI_V}$3$4}' "$APP_YAML" 2>/dev/null \
-      && print_success "org.vendor ← org ($ORG_VENDOR)"
+  [[ -z "$ORG_NAME" ]] && ORG_NAME="$ORG_VENDOR"
+  if [[ -n "$ORG_NAME" ]]; then
+    FI_N="$ORG_NAME" perl -pi -e '
+      if (/^org:/)   { $in = 1 }
+      elsif (/^\S/) { $in = 0 }
+      if ($in) { s{^(\s*name:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1$ENV{FI_N}$3$4} }
+    ' "$APP_YAML" 2>/dev/null
+    clear_stale_note "$APP_YAML" name
+    brand_assert "$APP_YAML" name "$ORG_NAME" "org.name ← org ($ORG_NAME)"
   fi
   if [[ -n "$ORG_COPYRIGHT" ]]; then
-    FI_C="$ORG_COPYRIGHT" perl -pi -e 's{^(\s*copyright:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1"$ENV{FI_C}"$3$4}' "$APP_YAML" 2>/dev/null \
-      && print_success "org.copyright ← org"
+    FI_C="$ORG_COPYRIGHT" perl -pi -e 's{^(\s*copyright:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1"$ENV{FI_C}"$3$4}' "$APP_YAML" 2>/dev/null
+    clear_stale_note "$APP_YAML" copyright
+    brand_assert "$APP_YAML" copyright "$ORG_COPYRIGHT" "org.copyright ← org"
   fi
-  # platforms/apple/apple.yaml — ORG-scope signing identity, filled from the WORKSPACE's org file.
-  #
-  # These are org-wide facts (one Apple team, one Match repo per workspace), so they belong in
-  # _org/company.yaml and are inherited here rather than hand-typed per project. Leaving them as
-  # `YOUR_TEAM_ID` / `YOUR_ORG` is the failure this step removes: a fork that looks branded, builds,
-  # and then cannot sign — discovered at release time rather than at init.
-  #
-  # Every value reaches perl through the ENVIRONMENT. A Match URL is `git@github.com:org/repo.git`,
-  # and inside a double-quoted `-e` program perl reads `@github` as an array, interpolating it to
-  # nothing and silently producing `git.com:org/repo.git` — a URL that looks plausible and cannot
-  # clone. $ENV{} is not stylistic here; it is the difference between working and subtly broken.
   APPLE_YAML="app-profile/platforms/apple/apple.yaml"
   if [[ -f "$APPLE_YAML" ]]; then
     if [[ -n "$ORG_TEAM" ]]; then
-      FI_TEAM="$ORG_TEAM" perl -pi -e 's{^(\s*team_id:\s*)(\S+)}{$1$ENV{FI_TEAM}}' "$APPLE_YAML" \
-        && print_success "apple.team_id ← org ($ORG_TEAM)"
+      FI_TEAM="$ORG_TEAM" perl -pi -e 's{^(\s*team_id:\s*)(\S+)}{$1$ENV{FI_TEAM}}' "$APPLE_YAML" 2>/dev/null
+      clear_stale_note "$APPLE_YAML" team_id
+      brand_assert "$APPLE_YAML" team_id "$ORG_TEAM" "apple.team_id ← org ($ORG_TEAM)"
     fi
     if [[ -n "$ORG_MATCH_URL" ]]; then
-      FI_URL="$ORG_MATCH_URL" perl -pi -e 's{^(\s*url:\s*)(\S+)}{$1$ENV{FI_URL}}' "$APPLE_YAML" \
-        && print_success "apple.match.git.url ← org"
+      FI_URL="$ORG_MATCH_URL" perl -pi -e 's{^(\s*url:\s*)(\S+)}{$1$ENV{FI_URL}}' "$APPLE_YAML" 2>/dev/null
+      clear_stale_note "$APPLE_YAML" url
+      brand_assert "$APPLE_YAML" url "$ORG_MATCH_URL" "apple.match.git.url ← org"
     fi
     if [[ -n "$ORG_MATCH_BRANCH" ]]; then
-      FI_BR="$ORG_MATCH_BRANCH" perl -pi -e 's{^(\s*branch:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1$ENV{FI_BR}$3$4}' "$APPLE_YAML" \
-        && print_success "apple.match.git.branch ← org ($ORG_MATCH_BRANCH)"
+      FI_BR="$ORG_MATCH_BRANCH" perl -pi -e 's{^(\s*branch:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1$ENV{FI_BR}$3$4}' "$APPLE_YAML" 2>/dev/null
+      clear_stale_note "$APPLE_YAML" branch
+      brand_assert "$APPLE_YAML" branch "$ORG_MATCH_BRANCH" "apple.match.git.branch ← org ($ORG_MATCH_BRANCH)"
     fi
   fi
 fi
@@ -293,6 +378,7 @@ if [[ -f "$APP_YAML" ]]; then
   FI_PKG="$PACKAGE" perl -pi -e 's{^(\s*app_id:\s*)\S+}{$1$ENV{FI_PKG}}'        "$APP_YAML"
   FI_PKG="$PACKAGE" perl -pi -e 's{^(\s*namespace:\s*)\S+}{$1$ENV{FI_PKG}}'     "$APP_YAML"
   FI_APP="$APPNAME" perl -pi -e 's{^(\s*app_name:\s*)([^#\n]*?)(\s*)(#.*)?$}{$1$ENV{FI_APP}$3$4}' "$APP_YAML"
+  for k in app_id namespace app_name; do clear_stale_note "$APP_YAML" "$k"; done
   print_success "app-profile app_id=$PACKAGE app_name=$APPNAME"
 else
   print_warning "$APP_YAML not found — identity will not survive syncForkConfig"
@@ -307,8 +393,9 @@ fi
 #
 # Without this the positional <project_name> never reaches anything: syncForkConfig reads the key
 # from the catalog, so a fork initialised as "acme-app" still built as "kmp-project-template".
-FI_PROJ="$PROJECT_NAME" perl -pi -e 's{^(projectName\s*=\s*)"[^"]*"}{$1"$ENV{FI_PROJ}"}' "$LIBS_TOML" \
-  && print_success "libs.versions.toml projectName=$PROJECT_NAME (its declared SoT)"
+FI_PROJ="$PROJECT_NAME" perl -pi -e 's{^(projectName\s*=\s*)"[^"]*"}{$1"$ENV{FI_PROJ}"}' "$LIBS_TOML" 2>/dev/null
+  brand_assert_toml "$LIBS_TOML" projectName "$PROJECT_NAME" \
+    "libs.versions.toml projectName=$PROJECT_NAME (its declared SoT)"
 
 # platforms/**/*.yaml is deliberately NOT written here — see the ORG-scope note above.
 # Signing identity, Firebase ids and store metadata arrive via deployment-layer promote.

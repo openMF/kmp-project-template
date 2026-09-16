@@ -4,7 +4,7 @@
 # (epic showcase-framework-separation). Fails (exit 1) on any convention drift so the
 # `customizer --clean` removal + `sync-dirs` sync guarantees stay sound.
 #
-# The template ships a demo showcase that a fork removes with `scripts/white-label/customize.sh --clean`.
+# The template ships a demo showcase that a fork removes with `scripts/white-label/fork-init.sh --clean`.
 # That removal is line-based (strips `// demo:begin … // demo:end` blocks + deletes
 # `**/demo/**` packages + the demo feature modules), so the convention MUST hold or the
 # strip corrupts source. This gate enforces it. Pure bash + grep + find — no Gradle, no

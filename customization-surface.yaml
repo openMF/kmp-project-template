@@ -5,7 +5,7 @@
 # A fork of this template runs `scripts/white-label/sync-dirs.sh` to pull template updates while
 # keeping its own branding + features. This file is the SINGLE declared source of
 # truth for "who owns this path?" — replacing the ownership knowledge previously
-# scattered across scripts/white-label/sync-dirs.sh (SYNC_DIRS + EXCLUSIONS), scripts/white-label/customize.sh, and the
+# scattered across scripts/white-label/sync-dirs.sh (SYNC_DIRS + EXCLUSIONS), scripts/white-label/fork-init.sh, and the
 # syncForkConfig copy map.
 #
 # Every path resolves to exactly one owner:
@@ -910,7 +910,7 @@ rules:
   - { glob: "gradlew.bat",                   owner: template }
   - { glob: "compose_compiler_config.conf",  owner: template }
   - { glob: "scripts/white-label/sync-dirs.sh",                  owner: template }
-  - { glob: "scripts/white-label/customize.sh",                 owner: template }
+  - { glob: "scripts/white-label/fork-init.sh",                 owner: template }
   - { glob: "setup-project.sh",              owner: template }
   - { glob: "scripts/white-label/keystore.sh",           owner: template }
   - { glob: "scripts/white-label/firebase.sh",             owner: template }

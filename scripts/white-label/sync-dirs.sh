@@ -132,7 +132,7 @@ SYNC_FILES=(
     ".claudeignore"                 # Claude tooling ignore baseline
     # --- blueprint setup / customization scripts (root-level, not under scripts/) ---
     "setup-project.sh"              # master fork setup script
-    "scripts/white-label/customize.sh"                 # fork customization driver
+    "scripts/white-label/fork-init.sh"                 # fork customization driver
     "scripts/white-label/keystore.sh"           # keystore generate/encode/add operations
     "scripts/white-label/firebase.sh"             # Firebase project configuration
     "generateModuleGraphs.sh"       # module dependency-graph generator

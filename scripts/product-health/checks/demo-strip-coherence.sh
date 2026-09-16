@@ -2,7 +2,7 @@
 # checks/demo-strip-coherence.sh — the POST-`--clean` tree must be coherent, not just the template's.
 #
 # Every other gate in this repo audits the tree as the TEMPLATE ships it. None of them audits the
-# tree a fork actually gets, which is the tree AFTER `scripts/remove-demo.sh --apply` (customize.sh
+# tree a fork actually gets, which is the tree AFTER `scripts/remove-demo.sh --apply` (fork-init.sh
 # strips the demo BY DEFAULT — "forking = starting clean"). That blind spot is not theoretical: the
 # E1/C7 relocation moved AppDatabase's demo entities/DAOs/migrations out of `demo:`-fenced blocks and
 # into app-profile-driven `gen-*` codegen regions, which left a cleaned fork holding entities that
@@ -22,7 +22,7 @@
 #          would have broken :core:network:commonTest on every cleaned fork.
 #   DSC-5  every syncForkConfig-generated surface agrees with the STRIPPED app-profile — the strip
 #          removes DECLARATIONS, and the generated output is committed source that must be re-derived
-#          from what survives. customize.sh runs syncForkConfig BEFORE remove-demo (wrong side), so a
+#          from what survives. fork-init.sh runs syncForkConfig BEFORE remove-demo (wrong side), so a
 #          cleaned fork shipped AppAccessPoints/AppUrlTypes listing 5 endpoints app.yaml no longer had.
 #
 # Static only — no Gradle. A dangling reference to a deleted class is an unresolved-reference compile
@@ -152,7 +152,7 @@ if grep -q 'syncForkConfig' "$SB/scripts/remove-demo.sh"; then
   ok "DSC-5 the strip re-derives generated surfaces from the stripped app-profile"
 else
   bad "DSC-5 the strip never re-derives generated surfaces — AppAccessPoints/AppUrlTypes will keep"
-  echo "        demo endpoints app.yaml no longer declares (customize.sh runs syncForkConfig BEFORE"
+  echo "        demo endpoints app.yaml no longer declares (fork-init.sh runs syncForkConfig BEFORE"
   echo "        the strip, which is the wrong side of it)"
 fi
 

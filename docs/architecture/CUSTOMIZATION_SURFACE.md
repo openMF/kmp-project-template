@@ -3,7 +3,7 @@
 `customization-surface.yaml` (repo root) is the **single declared source of truth
 for who owns each path** when a fork syncs template updates. It replaces ownership
 knowledge that was previously implicit and scattered across `scripts/white-label/sync-dirs.sh`
-(`SYNC_DIRS` + `EXCLUSIONS`), `scripts/white-label/customize.sh`, and the `syncForkConfig` copy map.
+(`SYNC_DIRS` + `EXCLUSIONS`), `scripts/white-label/fork-init.sh`, and the `syncForkConfig` copy map.
 
 ## Why it exists
 

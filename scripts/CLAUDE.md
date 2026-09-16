@@ -10,8 +10,8 @@
 > (`deploy_firebase.sh`, `deploy_testflight.sh`, `deploy_appstore.sh`, `check_environment.sh`,
 > `check_file_env_keys.sh`, `check-commit-signing.sh`, `ensure_base64.sh`,
 > `fix-detekt-permissions.sh`), 22 that do exist were never mentioned, and every path was written
-> flat (`customize.sh`) when the scripts had long since moved into subdirectories
-> (`scripts/white-label/customize.sh`). A doc that names a script which is not there costs more than
+> flat (`fork-init.sh`) when the scripts had long since moved into subdirectories
+> (`scripts/white-label/fork-init.sh`). A doc that names a script which is not there costs more than
 > no doc — it sends a reader looking for something that was deliberately removed.
 >
 > The deploy scripts are gone on purpose: deployment runs through **Fastlane lanes**, not shell
@@ -85,7 +85,7 @@ that still needs the shell fixed.
 |---|---|
 | `doctor.sh` | **the ONE entry**: setup + verify + sync (RULE-WHITE-LABEL-DOCTOR-001) |
 | `derive.rb` | `app-profile/` → `gradle/fork.properties` (the single SoT projection) |
-| `customize.sh` | package-name / namespace customization |
+| `fork-init.sh` | package-name / namespace customization |
 | `firebase.sh` | Firebase project + app registration |
 | `keystore.sh` | keystore generation and secrets management |
 | `sync-dirs.sh` | the template sync engine (`owner: template`, self-propagating) |

@@ -95,6 +95,22 @@ before_all do
     repo_root = parent
   end
 
+  # iOS: the "[KMP] Embed and Sign ComposeApp XCFramework" Run Script phase declares
+  # cmp-ios/kotlin-sources.xcfilelist as an input. Xcode resolves inputFileListPaths at
+  # GRAPH-CONSTRUCTION time, before any phase runs, so the list cannot self-heal during a build —
+  # a MISSING list is a hard "Unable to load contents of file list" failure, and a STALE one lets
+  # Xcode skip the phase after a Kotlin edit and ship stale code. Ensure it before gym/xcodebuild.
+  # The generator is write-only-if-changed, so an in-sync run costs nothing and does NOT invalidate
+  # the phase (rewriting it unconditionally would re-trigger the ~8-11 min Gradle path every build).
+  filelist_gen = File.join(repo_root, "cmp-ios", "scripts", "gen-kotlin-filelist.sh")
+  if File.exist?(filelist_gen)
+    begin
+      Dir.chdir(repo_root) { sh("bash", filelist_gen) }
+    rescue => e
+      UI.important("gen-kotlin-filelist.sh failed (#{e.message}) — iOS build may re-run Gradle or use a stale list")
+    end
+  end
+
   if ENV["SYNC_FORK_DONE"].nil? && File.exist?(File.join(repo_root, "app-profile", "app.yaml"))
     UI.message("app-profile → deployment/**/metadata: materializing store listing via ./gradlew syncForkConfig…")
     begin

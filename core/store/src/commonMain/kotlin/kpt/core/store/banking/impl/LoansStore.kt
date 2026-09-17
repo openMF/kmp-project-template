@@ -86,6 +86,3 @@ fun provideLoansWriteStore(dao: LoanDao): MutableStore<String, Loan> =
             deleteAll = { dao.deleteAll() },
         ),
     )
-
-/** Room `@Entity(tableName = …)` for [LoanEntity]. Shared with the repository's writes. */
-private const val LOANS_TABLE = "banking_loans"

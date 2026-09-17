@@ -55,6 +55,3 @@ class DraftInventoryImpl(
 }
 
 private fun currentTimeMillis(): Long = kotlin.time.Clock.System.now().toEpochMilliseconds()
-
-/** Room `@Entity(tableName = …)` for [DraftEntity] — drives the wasmJs invalidation bridge. */
-private const val DRAFTS_TABLE = "framework_submit_drafts"

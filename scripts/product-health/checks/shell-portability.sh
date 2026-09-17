@@ -16,6 +16,10 @@
 #         next argument as the suffix — so it is rejected too.)
 #   SP-2  no bare `readlink -f` / `stat -f` / `md5` without a GNU fallback on the same line.
 #         These are the other three BSD/GNU splits this repo's scripts actually reach for.
+#   SP-3  no comment line spliced into a `\` line continuation. A trailing backslash joins the next
+#         line onto the command, so a `# …` line there ENDS the command: every argument below it is
+#         silently dropped, and the first orphaned line runs as a command of its own. Put the
+#         explanation ABOVE the command.
 #
 # Scope: TRACKED *.sh only (git ls-files), comment lines stripped (a commented-out form never
 # runs). Two exclusions: product-health/tests/** (canary fixtures deliberately contain the
@@ -80,6 +84,37 @@ for probe in 'readlink -f' 'stat -f ' 'md5 '; do
     fail=1
   fi
 done
+
+# ── SP-3 — a comment inside a `\` continuation silently truncates the command ──────────────────
+#
+# Hit 2026-09-17 in cmp-ios/scripts/embed-xcframework.sh. The Xcode Run Script phase read:
+#
+#     "$GRADLEW" -p "$REPO_ROOT" ":cmp-shared:linkDebugFrameworkIosArm64" \
+#       # Exclude the WHOLE workerKmpAppCodegen family, never a subset.
+#       -x :cmp-shared:workerKmpAppCodegenAll ... \
+#       -x :sync:workerKmpAppCodegenWeb
+#
+# The backslash splices the comment onto the command line, so the command ENDS at the `#`. All
+# twelve `-x` exclusions vanished — discarding the configuration cache those very lines existed to
+# preserve — and the orphaned `-x …` block then ran as a command: "-x: command not found", exit 127.
+# Under `set -e` that failed the build phase AFTER a 7-minute link, with no Gradle error to show.
+# `bash -n` does not catch it: both spellings parse. Only reading the argv does.
+cont_comment="$(printf '%s\n' "$scripts" | while IFS= read -r f; do
+  awk 'BEGIN { prev = -1 }
+       # A comment line: report it when a REAL command line armed the rule on the line above.
+       # It never arms the rule itself — a usage block wrapping its example across `\`-terminated
+       # comment lines is prose, not a truncated command.
+       /^[[:space:]]*#/ { if (prev == NR-1) printf "%d:%s\n", NR, $0; prev = -1; next }
+       /\\$/            { prev = NR; next }
+                        { prev = -1 }' "$f" 2>/dev/null | sed "s|^|${f}:|"
+done)"
+if [ -n "$cont_comment" ]; then
+  echo "${C_RED}✗ SP-3${C_RST}: comment line spliced into a \`\\\` continuation — the command ENDS here and"
+  echo "       every argument below it is silently dropped (then runs as its own command):"
+  printf '%s\n' "$cont_comment" | sed 's/^/       /'
+  echo "       Move the comment ABOVE the command."
+  fail=1
+fi
 
 [ "$fail" -eq 0 ] && echo "shell portable ($(printf '%s\n' "$scripts" | wc -l | tr -d ' ') tracked scripts; runs on macOS + Linux runners)"
 exit "$fail"

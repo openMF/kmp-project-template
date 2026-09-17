@@ -72,7 +72,12 @@ while IFS= read -r f; do
         printf '        %s\n' "$(printf '%s' "$h" | cut -d: -f2- | sed 's/^[[:space:]]*//' | cut -c1-96)"
         FAILED=1
     done <<< "$hits"
-done < <(cd "$ROOT" && git ls-files '*Test.kt' 2>/dev/null)
+# product-health/tests/** is excluded for the same reason kdoc-comment-balance.sh excludes it: a RED
+# canary fixture is DELIBERATELY broken, and it only proves the gate can fail if the gate still fails
+# on it. Scanning the fixtures from the repo-wide walk would fail the repo the moment the canary was
+# committed — which is exactly what happened here. The canary stages each fixture in its own throwaway
+# git repo (run.sh), so the fixture paths it scans are never under this prefix.
+done < <(cd "$ROOT" && git ls-files '*Test.kt' 2>/dev/null | grep -v '^scripts/product-health/tests/')
 
 if [ "$FAILED" = "0" ]; then
     echo "  ✓ web-compiled database tests wait in real time (no turbine/virtual-time waits)"

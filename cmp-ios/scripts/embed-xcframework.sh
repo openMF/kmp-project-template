@@ -76,12 +76,18 @@ if [ "$KOTLIN_BUILD_TYPE" = "Debug" ] && [ "${KMP_FORCE_XCFRAMEWORK:-0}" != "1" 
   # capture `Project`, which discards the configuration cache. `gradle-fast-build-guard.sh` refuses
   # a raw build for exactly this reason, but an Xcode Run Script phase never passes through that
   # guard — so the exclusions have to be here, matching what /idea-build-kmp runs.
+  # Exclude the WHOLE workerKmpAppCodegen family, never a subset. Each of these captures
+  # `Project`, so ONE unexcluded variant discards the configuration cache for the entire build.
+  # This list named only Android+AutoShim, leaving Ios/Desktop/Web in — so every iOS build
+  # reconfigured from cold (measured 9m28s vs 2m08s once Ios was added) while reporting nothing
+  # but "Configuration cache entry discarded because incompatible task was found".
+  #
+  # These comments sit ABOVE the command, never inside its `\` continuation. A comment line spliced
+  # in by a trailing backslash ENDS the command — bash silently dropped every `-x` below it, then ran
+  # the leftover `-x …` line as a command ("-x: command not found", exit 127). Under `set -e` that
+  # failed the Xcode Run Script phase AFTER a full 7-minute link, with no Gradle error to show for it,
+  # while ALSO discarding the very configuration cache these lines exist to preserve.
   "$GRADLEW" -p "$REPO_ROOT" ":cmp-shared:link${KOTLIN_BUILD_TYPE}Framework${KMP_ARCH_TARGET}" \
-    # Exclude the WHOLE workerKmpAppCodegen family, never a subset. Each of these captures
-    # `Project`, so ONE unexcluded variant discards the configuration cache for the entire build.
-    # This list named only Android+AutoShim, leaving Ios/Desktop/Web in — so every iOS build
-    # reconfigured from cold (measured 9m28s vs 2m08s once Ios was added) while reporting nothing
-    # but "Configuration cache entry discarded because incompatible task was found".
     -x :cmp-shared:workerKmpAppCodegenAll -x :cmp-shared:workerKmpAppCodegenAndroid \
     -x :cmp-shared:workerKmpAppCodegenAutoShim -x :cmp-shared:workerKmpAppCodegenDesktop \
     -x :cmp-shared:workerKmpAppCodegenIos -x :cmp-shared:workerKmpAppCodegenWeb \

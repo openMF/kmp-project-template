@@ -98,6 +98,3 @@ fun provideBillRemindersWriteStore(dao: BillReminderDao): MutableStore<String, B
             deleteAll = { dao.deleteAll() },
         ),
     )
-
-/** Room `@Entity(tableName = …)` for [BillReminderEntity]. Shared with the repository's writes. */
-private const val BILL_REMINDERS_TABLE = "banking_bill_reminders"

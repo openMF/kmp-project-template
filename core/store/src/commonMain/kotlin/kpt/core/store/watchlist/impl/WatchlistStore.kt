@@ -63,12 +63,8 @@ fun provideWatchlistWriteStore(dao: WatchlistDao): MutableStore<String, Watchlis
             },
             writer = { _: String, item: WatchlistItem ->
                 dao.insert(WatchlistEntity(coinId = item.coinId, addedAtMs = item.addedAtMs))
-                
             },
             delete = { coinId: String -> dao.delete(coinId) },
             deleteAll = { dao.deleteAll() },
         ),
     )
-
-/** Room `@Entity(tableName = …)` for the watchlist table. */
-private const val WATCHLIST_TABLE = "personal_watchlist"

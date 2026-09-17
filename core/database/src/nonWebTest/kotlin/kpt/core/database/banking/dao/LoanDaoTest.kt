@@ -10,17 +10,16 @@
 package kpt.core.database.banking.dao
 
 import app.cash.turbine.test
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kpt.core.database.AppDatabase
+import kpt.core.database.banking.entity.LoanEntity
 import kpt.core.database.di.testPlatformModule
+import kpt.core.model.banking.LoanKind
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.mp.KoinPlatform
-import kpt.core.database.banking.entity.LoanEntity
-import kpt.core.model.banking.LoanKind
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

@@ -9,7 +9,6 @@
  */
 package kpt.core.database.config
 
-import kotlinx.coroutines.Dispatchers
 import kpt.core.database.AppDatabase
 import kpt.core.database.di.testPlatformModule
 import org.koin.core.context.startKoin

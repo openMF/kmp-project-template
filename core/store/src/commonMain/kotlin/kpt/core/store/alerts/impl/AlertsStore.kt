@@ -73,6 +73,3 @@ fun provideAlertsWriteStore(dao: AlertDao): MutableStore<String, PriceAlert> =
             deleteAll = { dao.deleteAll() },
         ),
     )
-
-/** Room `@Entity(tableName = …)` for [AlertEntity]. Shared with the repository's writes. */
-private const val ALERTS_TABLE = "alerts"

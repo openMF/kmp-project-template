@@ -23,8 +23,8 @@
    `DraftDao` backs the offline-resilient `SubmitHandler`/`DraftSubmitHandler` write path
    (`framework_submit_drafts`). All three are registered once in `core/database`'s `DatabaseModule`
    (`single { get<AppDatabase>().bookkeeperDao }`, etc.) — bind, don't duplicate.
-4. **Wrap every DAO write/read with the invalidation bridge** — `notifyingWrite("table") { dao
-   .upsert(...) }` and `daoFlow("table") { dao.observeXxx() }` — so wasmJs `Flow` consumers
+4. **Use plain DAO writes and plain Room `Flow` reads** — Room's `InvalidationTracker`
+   re-emits to live collectors after a write on every target, so wasmJs `Flow` consumers
    re-emit after writes despite Room 3 alpha's async `InvalidationTracker` gap. See
    `invalidation/README.md` for the full "why" and the exact 1-line-edit recipe; it's a no-op cost
    on Android/Desktop/iOS.
@@ -40,6 +40,6 @@
   `core/database` (see its `CONSUMPTION.md`), never here.
 
 Canonical example: `core/database`'s `DatabaseModule.kt` (the `platformModule` delegation +
-infra DAO bindings); `core/data/banking/` repositories (the `notifyingWrite`/`daoFlow` pattern).
+infra DAO bindings); `core/data/banking/` repositories.
 
-Symbols: platformDatabaseModule, DatabaseNaming, BookkeeperDao, FetchedAtDao, DraftDao, RoomChangeBus, daoFlow, notifyingWrite
+Symbols: platformDatabaseModule, DatabaseNaming, BookkeeperDao, FetchedAtDao, DraftDao

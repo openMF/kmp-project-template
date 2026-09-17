@@ -10,48 +10,46 @@
 package kpt.core.data.watchlist
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kpt.core.database.watchlist.dao.WatchlistDao
 import kpt.core.database.watchlist.entity.WatchlistEntity
 
 /**
- * In-memory fake of [WatchlistDao] whose reactive reads are **cold snapshots** — each
- * subscription emits the current rows exactly once, then completes.
+ * In-memory fake of [WatchlistDao] whose reactive reads are backed by a [MutableStateFlow], so a
+ * live collector re-emits after every write.
  *
- * This deliberately models the wasmJs failure mode the invalidation bridge exists to
- * absorb: Room 3 alpha05's `InvalidationTracker` does NOT fan out to a live collector
- * after a write on the single-threaded JS event loop, so the DAO `Flow` never re-emits
- * on its own. A correct repository therefore MUST re-emit via `daoFlow { }` re-subscribing
- * on the `RoomChangeBus` signal published by `notifyingWrite { }`.
- *
- * Contrast with [kpt.core.data.banking.FakeLoanDao], which uses a hot
- * `MutableStateFlow` — that self-emits and RACES the `daoFlow` re-collect, which is why
- * the banking reactive tests are `@Ignore`d. A cold snapshot has exactly one re-emit
- * source (the bridge), so the assertion is deterministic.
+ * That is what a real Room DAO `Flow` does: `InvalidationTracker` fans a write out to existing
+ * collectors. Until 2026-09-17 these reads were deliberately COLD (one emission per subscription)
+ * to model a wasmJs invalidation gap, which made re-emission the exclusive job of a
+ * `RoomChangeBus`/`daoFlow`/`notifyingWrite` bridge. That bridge has been removed — Room
+ * 3.1.0-alpha01 was measured re-emitting correctly on js and wasmJs (see
+ * `core/database/src/{js,wasmJs}Test/.../WebInvalidationProbeTest.kt`) — so a cold fake now models
+ * nothing real and would assert the absence of a mechanism the app relies on.
  */
 internal class FakeWatchlistDao : WatchlistDao {
 
-    private val rows = mutableListOf<WatchlistEntity>()
+    private val rows = MutableStateFlow<List<WatchlistEntity>>(emptyList())
 
     override fun observeAll(): Flow<List<WatchlistEntity>> =
-        flow { emit(rows.sortedByDescending { it.addedAtMs }) }
+        rows.map { list -> list.sortedByDescending { it.addedAtMs } }
 
     override fun observeContains(coinId: String): Flow<Boolean> =
-        flow { emit(rows.any { it.coinId == coinId }) }
+        rows.map { list -> list.any { it.coinId == coinId } }
 
     override fun observeById(coinId: String): Flow<WatchlistEntity?> =
-        flow { emit(rows.firstOrNull { it.coinId == coinId }) }
+        rows.map { list -> list.firstOrNull { it.coinId == coinId } }
 
     override suspend fun insert(entry: WatchlistEntity) {
-        rows.removeAll { it.coinId == entry.coinId }
-        rows.add(entry)
+        rows.update { list -> list.filterNot { it.coinId == entry.coinId } + entry }
     }
 
     override suspend fun delete(coinId: String) {
-        rows.removeAll { it.coinId == coinId }
+        rows.update { list -> list.filterNot { it.coinId == coinId } }
     }
 
     override suspend fun deleteAll() {
-        rows.clear()
+        rows.update { emptyList() }
     }
 }

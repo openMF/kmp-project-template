@@ -127,7 +127,7 @@ if (isOnline && isStale && !wasStale) { /* launch fresh(...) side-fetch */ }
 
 The swap-in is **indirect**: the side-fetch writes the SourceOfTruth, and because `cached(refresh = false)`
 keeps the subscription open on the SoT, that write re-fans-out through the *original* subscription as a
-fresh emission — no re-subscription. Pinned by `RoomChangeBusSwrTest.notifyingWriteTriggersDaoFlowReEmissionUnderSwr`.
+fresh emission — no re-subscription. Pinned by `SourceOfTruthReEmissionSwrTest.sourceOfTruthReEmissionRefreshesSwrStream`.
 
 ### Not every store has Room, or a network leg
 

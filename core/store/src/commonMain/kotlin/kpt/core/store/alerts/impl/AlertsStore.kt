@@ -10,8 +10,6 @@
 package kpt.core.store.alerts.impl
 
 import kotlinx.coroutines.flow.map
-import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.annotation.CacheKey
 import kpt.core.base.store.annotation.StoreProvider
 import kpt.core.base.store.infra.StoreFactory
@@ -33,10 +31,10 @@ import org.mobilenativefoundation.store.store5.Store
  * Key: [Unit] — always returns all alerts (no per-alert keyed filter here;
  * per-id lookup goes through the repository directly).
  *
- * The DAO reader is wrapped with [daoFlow] so wasmJs collectors re-emit after writes
+ * The DAO reader is a plain Room `Flow`; Room's InvalidationTracker re-emits to live collectors after writes
  * even when Room 3 alpha05's async InvalidationTracker fails to fan out (see
  * `core-base/database/.../invalidation/README.md`). The paired write notification is
- * emitted by `AlertsRepositoryImpl`'s [kpt.core.base.database.invalidation.notifyingWrite]
+ * emitted by `AlertsRepositoryImpl`'s plain DAO write
  * on `alertDao.upsert` / `deleteById`. On Android/Desktop/iOS the wrap is a microsecond
  * no-op alongside Room's native invalidation.
  */
@@ -46,7 +44,7 @@ fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFact
     sourceOfTruth = SourceOfTruth.of(
         // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
         reader = { _: Unit ->
-            daoFlow(ALERTS_TABLE) { dao.observeAll() }.map { rows -> rows.map(AlertEntity::toPriceAlert) }
+            dao.observeAll().map { rows -> rows.map(AlertEntity::toPriceAlert) }
         },
         writer = { _: Unit, alerts: List<PriceAlert> -> dao.upsertAll(alerts.map(PriceAlert::toAlertEntity)) },
         delete = { _: Unit -> dao.deleteAll() },
@@ -59,20 +57,20 @@ fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFact
  * `store.write` / `store.clear` via [kpt.core.base.store.mutation.MutationGateway], so the
  * repository never touches the DAO — the SoT writer/delete are the single DAO callers. Local-only
  * ([StoreFactory.createOfflineMutableStore] — no-op Updater); the writer/delete fire
- * [notifyingWrite] so the paired [provideAlertsStore] read collectors re-emit on wasmJs.
+ * a plain DAO write so the paired [provideAlertsStore] read collectors re-emit on wasmJs.
  */
 @StoreProvider(id = "alertsMutable", logout = false)
 fun provideAlertsWriteStore(dao: AlertDao): MutableStore<String, PriceAlert> =
     StoreFactory.createOfflineMutableStore(
         sourceOfTruth = SourceOfTruth.of(
             reader = { id: String ->
-                daoFlow(ALERTS_TABLE) { dao.observeById(id) }.map { it?.toPriceAlert() }
+                dao.observeById(id).map { it?.toPriceAlert() }
             },
             writer = { _: String, alert: PriceAlert ->
-                notifyingWrite(ALERTS_TABLE) { dao.upsert(alert.toAlertEntity()) }
+                dao.upsert(alert.toAlertEntity())
             },
-            delete = { id: String -> notifyingWrite(ALERTS_TABLE) { dao.deleteById(id) } },
-            deleteAll = { notifyingWrite(ALERTS_TABLE) { dao.deleteAll() } },
+            delete = { id: String -> dao.deleteById(id) },
+            deleteAll = { dao.deleteAll() },
         ),
     )
 

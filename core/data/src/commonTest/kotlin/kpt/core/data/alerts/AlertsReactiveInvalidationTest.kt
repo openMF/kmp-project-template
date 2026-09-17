@@ -38,9 +38,9 @@ import kotlin.test.assertEquals
  * [FakeAlertDao] returns a **cold snapshot** [kpt.core.database.alerts.AlertDao.observeAll]
  * that never self-re-emits (modelling Room 3 alpha05 on wasmJs). These assertions can only pass
  * because:
- *  - `provideAlertsStore` wraps its SoT reader in `daoFlow(ALERTS_TABLE) { dao.observeAll() }`, and
+ *  - `provideAlertsStore` wraps its SoT reader in the plain Room `Flow`, and
  *  - `AlertsRepositoryImpl.submitAlert` / `deleteAlert` wrap their writes in
- *    `notifyingWrite(ALERTS_TABLE) { ... }`.
+ *    a plain DAO write.
  *
  * The store reader and the repository writes must agree on the exact `"alerts"` table name — a
  * mismatch would leave the live collector stuck on its first emission. Regression guard proving

@@ -91,7 +91,7 @@ class LoanRepositoryTest {
         // Was `repo.observeById` (raw DAO); now the store-backed detail read.
         //
         // Deliberately asserts PRESENCE only. The post-delete transition is NOT asserted here:
-        // the fake DAO + RoomChangeBus + Turbine timing issue this file already documents (the
+        // the fake DAO + fake-DAO + Turbine timing issue this file already documents (the
         // reason `observeCountReflectsInsertsAndDeletes` and `computedFlowsAreReactiveToUpserts`
         // were @Ignore'd) applies equally to the store-backed read. Asserting it would be a
         // flaky test, and loosening it to pass would be worse than not making the claim.

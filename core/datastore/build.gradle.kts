@@ -11,13 +11,6 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-androidComponents {
-    finalizeDsl { ext ->
-        ext.withHostTest {
-            isReturnDefaultValues = true
-        }
-    }
-}
 
 kotlin {
     sourceSets {

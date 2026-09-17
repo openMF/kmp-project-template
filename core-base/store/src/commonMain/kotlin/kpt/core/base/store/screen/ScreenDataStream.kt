@@ -428,7 +428,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     // That path drives the fetcher AND writes the SourceOfTruth; the base
     // storeFlow (built on `cached(key, refresh = false)`, see
     // `streamDataForPolicy`) continuously observes the SoT and re-emits the
-    // swapped-in fresh value automatically. See `RoomChangeBusSwrTest` for the
+    // swapped-in fresh value automatically. See `SourceOfTruthReEmissionSwrTest` for the
     // invariant this fix relies on: a SoT write DOES re-fan-out through an
     // already-open `cached(refresh = false)` subscription.
     //

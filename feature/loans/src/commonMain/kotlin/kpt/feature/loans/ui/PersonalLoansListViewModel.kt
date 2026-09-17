@@ -36,7 +36,7 @@ class PersonalLoansListViewModel(
     private val stream = repository.loansStream(viewModelScope)
 
     // Portfolio totals are DERIVED from the store's own list — they were two extra
-    // `daoFlow { loanDao.observeAll() }` queries summing the SAME rows this stream already
+    // `loanDao.observeAll()` queries summing the SAME rows this stream already
     // carries, i.e. a second read path over identical data (the S5-2 split-read defect) and
     // three concurrent collectors on one table. Deriving here means one read, one source of
     // truth, and totals that can never disagree with the list rendered beside them.

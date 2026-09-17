@@ -10,8 +10,6 @@
 package kpt.core.store.banking.impl
 
 import kotlinx.coroutines.flow.map
-import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.annotation.CacheKey
 import kpt.core.base.store.annotation.StoreProvider
 import kpt.core.base.store.infra.StoreFactory
@@ -33,7 +31,7 @@ import org.mobilenativefoundation.store.store5.Store
  * Key: [Unit] — returns all reminders. Filtered reads (e.g., upcoming within N days)
  * are handled in the repository via [BillReminderDao.observeUpcoming].
  *
- * The DAO reader is wrapped with [daoFlow] so wasmJs collectors re-emit after writes
+ * The DAO reader is a plain Room `Flow`; Room's InvalidationTracker re-emits to live collectors after writes
  * even when Room 3 alpha05's async InvalidationTracker fails to fan out (see
  * `core-base/database/.../invalidation/README.md`). On Android/Desktop/iOS the wrap
  * is a microsecond no-op alongside Room's native invalidation.
@@ -46,7 +44,7 @@ fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillRemind
         sourceOfTruth = SourceOfTruth.of(
             // Emit the DOMAIN model — entity→domain map lives in the SourceOfTruth (read-path contract).
             reader = { _: Unit ->
-                daoFlow(BILL_REMINDERS_TABLE) { dao.observeAll() }
+                dao.observeAll()
                     .map { rows -> rows.map(BillReminderEntity::toDomain) }
             },
             writer = { _: Unit, reminders: List<BillReminder> ->
@@ -71,7 +69,7 @@ fun provideBillReminderDetailStore(dao: BillReminderDao): Store<String, BillRemi
     StoreFactory.createOfflineStore(
         sourceOfTruth = SourceOfTruth.of(
             reader = { id: String ->
-                daoFlow(BILL_REMINDERS_TABLE) { dao.observeById(id) }.map { it?.toDomain() }
+                dao.observeById(id).map { it?.toDomain() }
             },
             writer = { _: String, _: BillReminder -> Unit },
             delete = { id: String -> dao.deleteById(id) },
@@ -83,21 +81,21 @@ fun provideBillReminderDetailStore(dao: BillReminderDao): Store<String, BillRemi
  * Per-item WRITE store for bill reminders (keyed by bill id). Every mutation flows through
  * `store.write` / `store.clear`, so the repository never touches the DAO for writes — the SoT
  * writer/delete are the single DAO callers. Local-only ([StoreFactory.createOfflineMutableStore] —
- * no-op Updater); the writer/delete fire [notifyingWrite] so the paired [provideBillRemindersStore]
- * read collectors (and the repository's DAO-direct `daoFlow` reads) re-emit on wasmJs.
+ * no-op Updater); the writer/delete are plain DAO writes so the paired [provideBillRemindersStore]
+ * read collectors (and the repository's DAO-direct the Room `Flow` reads) re-emit on wasmJs.
  */
 @StoreProvider(id = "billRemindersMutable", logout = false)
 fun provideBillRemindersWriteStore(dao: BillReminderDao): MutableStore<String, BillReminder> =
     StoreFactory.createOfflineMutableStore(
         sourceOfTruth = SourceOfTruth.of(
             reader = { id: String ->
-                daoFlow(BILL_REMINDERS_TABLE) { dao.observeById(id) }.map { it?.toDomain() }
+                dao.observeById(id).map { it?.toDomain() }
             },
             writer = { _: String, reminder: BillReminder ->
-                notifyingWrite(BILL_REMINDERS_TABLE) { dao.upsert(reminder.toEntity()) }
+                dao.upsert(reminder.toEntity())
             },
-            delete = { id: String -> notifyingWrite(BILL_REMINDERS_TABLE) { dao.deleteById(id) } },
-            deleteAll = { notifyingWrite(BILL_REMINDERS_TABLE) { dao.deleteAll() } },
+            delete = { id: String -> dao.deleteById(id) },
+            deleteAll = { dao.deleteAll() },
         ),
     )
 

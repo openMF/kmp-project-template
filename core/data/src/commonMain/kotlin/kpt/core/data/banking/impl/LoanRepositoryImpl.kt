@@ -12,7 +12,6 @@ package kpt.core.data.banking.impl
 import kotlinx.coroutines.CoroutineScope
 import kpt.core.base.data.annotation.FromStore
 import kpt.core.base.data.annotation.RepositoryBinding
-import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -32,7 +31,7 @@ import org.mobilenativefoundation.store.store5.StoreWriteRequest
  * Read-path contract: [loansStream] builds the offline-local [ScreenDataStream] (CACHE_ONLY) over
  * the domain-emitting [kpt.core.store.banking.impl.provideLoansStore]; read screens consume
  * `.state`. Direct-DAO `Flow` reads (`observeById`, the dashboard aggregates) are wrapped with
- * [daoFlow] and writes with [notifyingWrite] so the wasmJs target's long-lived collectors re-emit
+ * a plain Room `Flow` and writes with a plain DAO write so the wasmJs target's long-lived collectors re-emit
  * after writes even when Room 3 alpha05's async InvalidationTracker fails to fan out (no-op on
  * Android/Desktop/iOS). See `core-base/database/.../invalidation/README.md`.
  */

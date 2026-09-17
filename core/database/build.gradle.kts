@@ -37,6 +37,33 @@ kotlin {
             implementation(libs.turbine)
             implementation(libs.koin.test)
         }
+
+        // ── nonWebTest — every target where Room can actually OPEN a database ───────────────
+        // js/wasmJs get the web-worker SQLite driver, which needs a browser `Worker`; under
+        // jsNodeTest/wasmJsNodeTest there is none, so a DAO test cannot construct a database
+        // there at all. Everywhere else (jvm, android, native) it can.
+        //
+        // Before this existed, every DAO test in this module sat in `desktopTest` — so the schema
+        // was exercised on ONE target and android/native/ios never ran a single DAO test. This
+        // source set is the honest middle: share them across all four, keep them out of the two
+        // that physically cannot run them, and do it without an `expect`/`actual` per test.
+        val nonWebTest by creating { dependsOn(commonTest.get()) }
+        desktopTest.get().dependsOn(nonWebTest)
+        // `androidHostTest` is created by the AGP KMP-library plugin (withHostTest, called from
+        // the convention's finalizeDsl) — which runs AFTER this script's kotlin{} block, so the
+        // set does not exist yet and neither a typed accessor nor getByName() can see it.
+        // matching{}.configureEach{} is lazy: it fires when AGP creates the set.
+        matching { it.name == "androidHostTest" }.configureEach {
+            dependsOn(nonWebTest)
+            dependencies {
+                // An android host test runs on the HOST JVM, so it resolves the *android*
+                // variant of sqlite-bundled — whose native library is built for device ABIs
+                // and cannot load here (UnsatisfiedLinkError: no sqliteJni in
+                // java.library.path). The jvm variant carries the host-native library.
+                implementation("androidx.sqlite:sqlite-bundled-jvm:${libs.versions.sqliteBundled.get()}")
+            }
+        }
+        nativeTest.get().dependsOn(nonWebTest)
     }
 }
 
@@ -55,7 +82,7 @@ project.file("module-deps.gradle.kts").takeIf { it.exists() }?.let { apply(from 
 
 /*
  * This module's tests are desktop-only (Room + SQLite). Its `jsTest` / `wasmJsTest` / `nativeTest` /
- * `androidUnitTest` sources contain ONLY the `actual val testPlatformModule` counterparts that let
+ * `androidHostTest` sources contain ONLY the `actual val testPlatformModule` counterparts that let
  * `commonTest` compile on those targets - there is not a single `@Test` among them.
  *
  * Gradle 9 fails a test task that has sources but discovers no tests, so every one of those targets
@@ -148,3 +175,46 @@ val kspCommonMetadata = "kspCommonMainKotlinMetadata"
 tasks.matching {
     (it.name.startsWith("compileKotlin") || it.name.startsWith("ksp")) && it.name != kspCommonMetadata
 }.configureEach { dependsOn(kspCommonMetadata) }
+
+// ── android host tests: the @Upsert CONFLICT path cannot run here ──────────────────────────
+// On android, `androidx.sqlite.SQLiteException` is an `actual typealias` for
+// `android.database.SQLException`. A host (JVM) unit test links against the android.jar STUB of
+// that class, whose constructor discards the message. Room's EntityUpsertAdapter recognises a
+// uniqueness violation by READING that message (`ex.message ?: throw ex`) before falling back
+// from INSERT to UPDATE — so with a null message it rethrows and the upsert-over-existing-row
+// case fails. The DAO, the schema and the driver are all correct; only the stub is lossy.
+//
+// Scope is exactly the conflict path: `upsertThenGetByIdReturnsTheRow` and
+// `upsertThenReadReturnsTimestamp` insert into an empty table, hit no constraint, and PASS on
+// android. The three below are the only tests that depend on the message surviving.
+//
+// The upsert SEMANTICS stay covered — these same shared `nonWebTest` sources run them on
+// desktop, iOS and native. Closing the android hole properly needs an instrumented (device)
+// test, where the real android.database classes are present. Tracked as a device-verify gap.
+tasks.withType<Test>().matching { it.name == "testAndroidHostTest" }.configureEach {
+    filter {
+        excludeTestsMatching("kpt.core.database.banking.dao.BillReminderDaoTest.upsertReplacesExistingRow")
+        excludeTestsMatching("kpt.core.database.banking.dao.LoanDaoTest.upsertReplacesExistingRow")
+        excludeTestsMatching("kpt.core.database.infra.dao.FetchedAtDaoTest.upsertOverwritesPreviousValue")
+    }
+}
+
+// ── web tests: browser ON, and the Worker-dependent ones kept OFF under node ───────────────
+// This module is the one place where the web SQLite driver is actually exercised, and that
+// driver needs a browser `Worker`. The convention leaves `jsBrowserTest`/`wasmJsBrowserTest` off
+// for non-Compose modules because they are usually a slower duplicate of the node run — here they
+// are not a duplicate, they are the ONLY environment where a database can be opened on web.
+// Verified 2026-09-17: this module pulls no skiko, so the browser run works (ChromeHeadless 153).
+afterEvaluate {
+    tasks.matching { it.name == "jsBrowserTest" || it.name == "wasmJsBrowserTest" }
+        .configureEach { enabled = true }
+
+    // The same `jsTest`/`wasmJsTest` sources feed BOTH the node and browser runs, and under node
+    // there is no `Worker` — so these two would fail there for an environmental reason, not a
+    // real defect. Excluded by name rather than moved, because no source set distinguishes
+    // "web, browser-only" from "web".
+    tasks.withType<org.gradle.api.tasks.testing.AbstractTestTask>()
+        .matching { it.name == "jsNodeTest" || it.name == "wasmJsNodeTest" }
+        .configureEach { filter.excludeTestsMatching("*WebInvalidationProbeTest*") }
+}
+

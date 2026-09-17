@@ -14,6 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import kpt.core.base.database.infra.entity.DraftEntity
 import kpt.core.database.AppDatabase
 import kpt.core.database.banking.entity.BillReminderEntity
 import kpt.core.database.di.testPlatformModule
@@ -162,10 +163,51 @@ class WebInvalidationProbeTest {
         updatedAtMs = 1_000L,
     )
 
+    /**
+     * The drafts-outbox path the bill-reminder probes above do NOT cover, on two axes at once: a
+     * **filtered** query whose row must LEAVE the result set, driven by an **UPDATE** rather than an
+     * insert. Everything above inserts rows into an unfiltered `count()`.
+     *
+     * `observeAllByFormKey` selects `status IN ('PENDING','RETRYING','FAILED')` and backs the
+     * Sync & Drafts screen; `markSubmitted` is a bare `UPDATE … SET status = 'SUBMITTED'`. If Room's
+     * tracker re-emitted only on insert, a submitted draft would sit in the picker forever. The
+     * bridge used to force that refresh with `notifyingWrite(DRAFTS_TABLE)` — removed with the rest
+     * of the bridge — so the behaviour is MEASURED here rather than inherited from the probes above.
+     */
+    @Test
+    fun draftsFlowDropsARowOnWebWhenAnUpdateMovesItOutOfTheFilter() = runTest {
+        val dao = database.draftDao
+        val seen = mutableListOf<Int>()
+        val job = launch(Dispatchers.Default) {
+            dao.observeAllByFormKey(DRAFT_FORM_KEY).collect { seen += it.size }
+        }
+        withContext(Dispatchers.Default) {
+            settle()
+            val id = dao.insert(draft())
+            assertEquals(1, awaitLast(seen) { it == 1 }, "draft insert never re-emitted: $seen")
+            dao.markSubmitted(id, 2_000L)
+            assertEquals(
+                0,
+                awaitLast(seen) { it == 0 },
+                "UPDATE moving the row out of the filter never re-emitted; observed=$seen",
+            )
+        }
+        job.cancel()
+    }
+
+    private fun draft(): DraftEntity = DraftEntity(
+        formKey = DRAFT_FORM_KEY,
+        payloadJson = "{}",
+        status = "PENDING",
+        createdAtMs = 1_000L,
+        updatedAtMs = 1_000L,
+    )
+
     private companion object {
         const val SETTLE_MS = 400L
         const val POLL_MS = 50L
         const val AWAIT_TIMEOUT_MS = 5_000L
         const val BURST = 20
+        const val DRAFT_FORM_KEY = "probe-drafts"
     }
 }

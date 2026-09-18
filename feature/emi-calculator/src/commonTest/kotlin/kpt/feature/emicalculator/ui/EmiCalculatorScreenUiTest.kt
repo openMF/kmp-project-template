@@ -12,14 +12,14 @@ package kpt.feature.emicalculator.ui
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import kpt.core.designsystem.theme.KptTheme
 import kotlin.test.Test
 
 /**
  * Compose Multiplatform UI test for [EmiCalculatorScreen] — a pure-local-state
- * (no Store, no repository) calculator screen. Builds the real [EmiCalculatorViewModel]
- * with its no-arg constructor (EMI math is pure Kotlin — no fakes needed), wraps in
+ * Store5-backed (MEMORY_ONLY) calculator screen. Builds the real [EmiCalculatorViewModel]
+ * over [FakeEmiCalculatorRepository] (the real EMI math, faked Store plumbing), wraps in
  * [KptTheme], and asserts the always-rendered scaffold root — stable regardless of
  * which input values are set.
  */
@@ -28,7 +28,7 @@ class EmiCalculatorScreenUiTest {
 
     @Test
     fun screenIsDisplayed() = runComposeUiTest {
-        val viewModel = EmiCalculatorViewModel()
+        val viewModel = EmiCalculatorViewModel(FakeEmiCalculatorRepository())
         setContent {
             KptTheme {
                 EmiCalculatorScreen(

@@ -28,9 +28,19 @@ val Project.libs
 
 /**
  * Get the dynamic version of the project.
+ *
+ * `version.txt` at the repo root is the version SOURCE OF TRUTH — written by the release pipeline and
+ * round-tripped by the gradle `versionFile` task. Prefer it over reckon's `project.version`, which
+ * infers from git tags and can fall back to a default when the release tag format isn't recognized.
+ * Falls back to reckon only when `version.txt` is absent/blank (e.g. a fresh clone before any release).
  */
 val Project.dynamicVersion
-    get() = project.version.toString().split('+')[0]
+    get(): String {
+        val fromFile = runCatching {
+            rootProject.file("version.txt").takeIf { it.exists() }?.readText()?.trim()
+        }.getOrNull()?.takeIf { it.isNotBlank() && it != "unspecified" && it != "0.0.0" }
+        return (fromFile ?: project.version.toString()).split('+')[0]
+    }
 
 /**
  * Configures the `detekt` plugin with the [configure] lambda.

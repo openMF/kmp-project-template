@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <!-- cloud-todo-detail -->
+    <string name="screens_cloudtodo_detail_title">Cloud Todo</string>
+    <string name="screens_cloudtodo_detail_intro">Drives the only createMutableStore + MutationGateway consumer. Turn the network off to see the offline arms.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Toggle (optimistic)</string>
+    <string name="screens_cloudtodo_complete_online_text">Complete (online-required)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Resolve conflict</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Dismiss</string>
+    <string name="screens_cloudtodo_status_completed">Completed</string>
+    <string name="screens_cloudtodo_status_not_completed">Not completed</string>
+
+    <!-- MutationResult arms — one string per arm so every outcome is legible on device -->
+    <string name="screens_cloudtodo_outcome_applied_local_title">Applied locally</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Room-first write. The network sync is queued and retries on reconnect.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Applied · synced</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">The server confirmed the write.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Applied · queued</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Written locally; the sync is queued and will retry when connectivity returns.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Blocked</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Offline — an online-required write refuses rather than writing locally. Nothing was written.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">Not authenticated for this operation. Nothing was written.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">A server precondition failed before any write. Nothing was written.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Conflict recorded</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">The server changed this record too. Its version was applied and yours was preserved — choose which one wins.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Failed</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — the optimistic local write was rolled back.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — local state kept.</string>
+
+    <!-- conflict-inbox -->
+    <string name="screens_cloudtodo_conflicts_title">Sync conflicts</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">No unresolved conflicts.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Keep server version</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Retry my version</string>
+</resources>

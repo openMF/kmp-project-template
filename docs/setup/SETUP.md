@@ -22,7 +22,7 @@ Before you begin, ensure your development environment meets the following requir
 - **macOS 13.0+**: Required for iOS development
 - **Xcode 14.1+**: Apple's IDE for iOS development (resolves SwiftPM packages)
 - **Ruby 2.7+**: Required for Fastlane
-- No CocoaPods — iOS links the Kotlin `ComposeApp` framework as an XCFramework via SwiftPM (`cmp-ios/Package.swift`)
+- iOS links the Kotlin `ComposeApp` framework as an XCFramework via SwiftPM (`cmp-ios/Package.swift`)
 
 #### Desktop Development
 - **IntelliJ IDEA 2022.3+**: Recommended IDE for desktop development (Community Edition is sufficient)
@@ -52,7 +52,7 @@ cd kmp-project-template
 The project includes a customization script that will update package names, application IDs, and other project identifiers to match your organization's naming conventions.
 
 ```bash
-scripts/white-label/customize.sh org.example.myapp MyKMPProject
+scripts/white-label/fork-init.sh org.example.myapp MyKMPProject
 ```
 
 Parameters:
@@ -75,7 +75,7 @@ The project uses Gradle's dependency management, so no additional steps are requ
 #### iOS
 
 iOS integrates the Kotlin `ComposeApp` framework as an XCFramework (SwiftPM binary
-target, `cmp-ios/Package.swift`) — there is no CocoaPods step. Assemble the framework,
+target, `cmp-ios/Package.swift`) — there is no dependency-install step. Assemble the framework,
 then open the project in Xcode; its `[KMP] Embed and Sign ComposeApp XCFramework`
 Run-Script phase assembles + embeds it on every build:
 
@@ -121,7 +121,8 @@ This will:
 
 ### Xcode (for iOS)
 
-1. Open the `cmp-ios/KmpProject.xcworkspace` file in Xcode
+1. Open the `cmp-ios/iosApp.xcodeproj` file in Xcode (a plain project — there is no
+   generated `.xcworkspace` since the SwiftPM/XCFramework migration)
 2. Select your development team in the project settings
 3. Configure an iOS simulator or device for testing
 
@@ -152,13 +153,14 @@ Or use Android Studio's run button with a configured AVD (Android Virtual Device
 
 #### iOS
 
-Open the Xcode workspace and run the project on a simulator or device.
+Open `cmp-ios/iosApp.xcodeproj` in Xcode, pick a flavor scheme (`demoDebug`, `prodRelease`, …),
+and run on a simulator or device.
 
 Alternatively, use the command line:
 
 ```bash
-cd cmp-ios
-xcodebuild -workspace KmpProject.xcworkspace -scheme KmpProject -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 14,OS=latest'
+xcodebuild -project cmp-ios/iosApp.xcodeproj -scheme demoDebug -configuration demoDebug \
+  -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest'
 ```
 
 #### Desktop
@@ -199,7 +201,7 @@ sdk.dir=/path/to/your/Android/sdk
 
 ### iOS Build Issues
 
-1. Make sure the Kotlin `ComposeApp` XCFramework is assembled and up-to-date (SwiftPM/XCFramework; no CocoaPods):
+1. Make sure the Kotlin `ComposeApp` XCFramework is assembled and up-to-date (SwiftPM/XCFramework):
 
 ```bash
 ./gradlew :cmp-shared:assembleComposeAppXCFramework

@@ -260,7 +260,6 @@ bash scripts/configure-release-environments.sh \
 **Inputs:**
 - `ios_package_name` (required): iOS module name (e.g., `cmp-ios`)
 - `build_type` (required): `Debug` or `Release`
-- `use_cocoapods` (default: `false`): Install CocoaPods dependencies
 - `shared_module` (required): Shared module path
 - For Release builds:
   - `appstore_key_id`, `appstore_issuer_id` (App Store Connect API)
@@ -294,7 +293,6 @@ bash scripts/configure-release-environments.sh \
 
 **Inputs:**
 - `ios_package_name` (required)
-- `use_cocoapods` (default: `false`)
 - `shared_module` (required)
 - App Store Connect API parameters (same as build-ios-app)
 - `firebase_creds` (required): Base64-encoded service account JSON

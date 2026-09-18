@@ -4,7 +4,7 @@
 # It DRIVES and VERIFIES every stage of adopting the white-label template — and re-audits ALL stages on
 # every run, so a fork is never silently half-set-up or drifted from the template. app-profile/
 # {app.yaml, platforms/**} is the ONE fork source of truth; everything else is DERIVED. This one command
-# replaces the scattered surface (scripts/white-label/customize.sh + scripts/white-label/firebase.sh + scripts/white-label/keystore.sh +
+# replaces the scattered surface (scripts/white-label/fork-init.sh + scripts/white-label/firebase.sh + scripts/white-label/keystore.sh +
 # setup_ios_complete.sh + scripts/white-label/sync-dirs.sh + syncForkConfig + secrets pull).
 #
 # Stages (each is DRIVEN when incomplete, and VERIFIED every run):
@@ -56,15 +56,20 @@ esac
 
 [ -f "$REPO_ROOT/app-profile/app.yaml" ] || { err "app-profile/app.yaml missing — not a white-label fork of kmp-project-template"; exit 3; }
 
-# ── Ruby runner: prefer the framework toolchain manager (install-once), else the deployment bundle,
-#    else system ruby. Keeps the derive reproducible without assuming a global gem state. ──────────────
+# ── Ruby runner — delegates to the ONE resolver (scripts/ruby-exec.sh). ─────────────────────────
+# This used to inline its own fallback, with two defects that only bite on a machine nobody tests on:
+#   * the framework helper was found by a fixed five-level `../` climb, so it resolved ONLY at
+#     workspaces/{ws}/{proj}/source/{proj}/ and silently missed for a standalone clone — the shape an
+#     OSS fork actually has. ruby-exec.sh searches upward instead.
+#   * `RBENV_VERSION="${RBENV_VERSION:-3.3.6}"` hardcoded the pin, so bumping .ruby-version would
+#     leave this asking for a stale interpreter. ruby-exec.sh reads .ruby-version, the SoT RT-1 guards.
+. "$REPO_ROOT/scripts/ruby-exec.sh"
 run_ruby() {  # run_ruby <abs-script> [args...]
-  local fw="$REPO_ROOT/../../../../../core/scripts/ruby-toolchain-ensure.sh"  # framework, if present
-  if [ -x "$fw" ] && [ -d "$REPO_ROOT/deployment" ]; then
-    RBENV_VERSION="${RBENV_VERSION:-3.3.6}" bash "$fw" "$REPO_ROOT/deployment" -- bundle exec ruby "$@" 2>&1 | grep -avE 'ruby toolchain ready|exec under ruby'
+  if [ -d "$REPO_ROOT/deployment" ]; then
+    ruby_bundle "$REPO_ROOT/deployment" -- exec ruby "$@" 2>&1 | grep -avE 'ruby toolchain ready|exec under ruby'
     return "${PIPESTATUS[0]}"
   fi
-  ( cd "$REPO_ROOT/deployment" 2>/dev/null && bundle exec ruby "$@" ) 2>/dev/null || ruby "$@"
+  ruby_exec "$@"
 }
 
 DERIVE="$REPO_ROOT/scripts/white-label/derive.rb"

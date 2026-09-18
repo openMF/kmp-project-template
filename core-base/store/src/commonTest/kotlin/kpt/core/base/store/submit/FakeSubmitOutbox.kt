@@ -108,7 +108,25 @@ class FakeSubmitOutbox<P> : SubmitOutbox<P> {
     override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> =
         _entries.value.filter { it.status == SubmitOutboxStatus.PENDING }
 
-    override suspend fun markRetrying(id: Long) = updateStatus(id, SubmitOutboxStatus.RETRYING)
+    // Mirrors production: RoomSubmitOutbox's DAO does
+    // `SET status = 'RETRYING', attemptCount = attemptCount + 1`. The fake must increment too, or
+    // OfflineSubmitSyncer's RetryPolicy cap can never be exercised in tests.
+    override suspend fun markRetrying(id: Long) {
+        _entries.value = _entries.value.map {
+            if (it.id == id) {
+                it.copy(status = SubmitOutboxStatus.RETRYING, attemptCount = it.attemptCount + 1)
+            } else {
+                it
+            }
+        }
+    }
+
+    /** Test seam — force an entry's attemptCount to simulate prior failed cycles. */
+    fun seedAttemptCount(id: Long, attempts: Int) {
+        _entries.value = _entries.value.map {
+            if (it.id == id) it.copy(attemptCount = attempts) else it
+        }
+    }
 
     override suspend fun markSubmitted(id: Long) = updateStatus(id, SubmitOutboxStatus.SUBMITTED)
 

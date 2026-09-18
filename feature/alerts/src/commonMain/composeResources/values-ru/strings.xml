@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">Ценовые оповещения</string>
+    <string name="screens_alerts_back_cd">Назад</string>
+    <string name="screens_alerts_create_cd">Создать оповещение</string>
+    <string name="screens_alerts_delete_cd">Удалить оповещение</string>
+    <string name="screens_alerts_row_above">Выше</string>
+    <string name="screens_alerts_row_below">Ниже</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% изменения</string>
+    <string name="screens_alert_create_title">Новое ценовое оповещение</string>
+    <string name="screens_alert_create_back_cd">Назад</string>
+    <string name="screens_alert_create_coin_label">Монета</string>
+    <string name="screens_alert_create_target_label">Целевая цена</string>
+    <string name="screens_alert_create_dir_above">Выше</string>
+    <string name="screens_alert_create_dir_below">Ниже</string>
+    <string name="screens_alert_create_submit">Создать оповещение</string>
+    <string name="screens_alert_create_draft_resume_title">Продолжить оповещение?</string>
+    <string name="screens_alert_create_draft_resume_message">У вас есть несохранённое ценовое оповещение. Продолжите редактирование, удалите его или создайте новое.</string>
+    <string name="screens_alert_create_draft_resume_resume">Продолжить редактирование</string>
+    <string name="screens_alert_create_draft_resume_discard">Удалить черновик</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Начать заново</string>
+</resources>

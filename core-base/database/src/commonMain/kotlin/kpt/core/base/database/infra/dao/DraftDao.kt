@@ -89,7 +89,10 @@ interface DraftDao {
     )
     fun observeAll(): Flow<List<DraftEntity>>
 
-    @Query("UPDATE framework_submit_drafts SET status = 'RETRYING', updatedAtMs = :nowMs WHERE id = :id")
+    @Query(
+        "UPDATE framework_submit_drafts SET status = 'RETRYING', updatedAtMs = :nowMs, " +
+            "attemptCount = attemptCount + 1 WHERE id = :id",
+    )
     suspend fun markRetrying(id: Long, nowMs: Long)
 
     @Query("UPDATE framework_submit_drafts SET status = 'SUBMITTED', updatedAtMs = :nowMs WHERE id = :id")

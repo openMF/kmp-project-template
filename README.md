@@ -9,7 +9,7 @@ brand-touching value ships as a placeholder (<code>com.example.app</code> / "App
 <code>app-profile/</code>, run <code>./gradlew syncForkConfig</code>, and it flows to every platform.
 The bundled demo features (loan tracking, bill reminders, interest-rate watching, calculators,
 macro indicators) showcase the 8 Store5 archetypes. See
-<a href="docs/architecture/CONSUMER_APP_MIGRATION_GUIDE.md">the canonical fork loop</a>.</p>
+<a href="docs/architecture/cross-cutting/consumer-app-migration-guide.md">the canonical fork loop</a>.</p>
 
 ![Kotlin](https://img.shields.io/badge/Kotlin-7f52ff?style=flat-square&logo=kotlin&logoColor=white)
 ![Kotlin Multiplatform](https://img.shields.io/badge/Kotlin%20Multiplatform-4c8d3f?style=flat-square&logo=kotlin&logoColor=white)
@@ -210,8 +210,8 @@ architecture:
   environment
 - [ ] [Architecture Overview](docs/architecture/ARCHITECTURE.md) - Explanation of the project's structure and
   design patterns
-- [ ] [Code Style Guide](docs/architecture/STYLE_GUIDE.md) - Coding conventions and best practices
-- [ ] [Source Set Hierarchy](docs/architecture/SOURCE_SET_HIERARCHY.md) - Guide to the Kotlin Multiplatform code
+- [ ] [Code Style Guide](docs/architecture/cross-cutting/style-guide.md) - Coding conventions and best practices
+- [ ] [Source Set Hierarchy](docs/architecture/cross-cutting/source-set-hierarchy.md) - Guide to the Kotlin Multiplatform code
   sharing structure
 - [ ] [Sync Script](docs/setup/SYNC_SCRIPT.md) - Information about keeping in sync with upstream changes
 - [ ] [Secrets Manager](docs/secrets/SECRETS_MANAGER.md) - Documentation for the keystore and secrets

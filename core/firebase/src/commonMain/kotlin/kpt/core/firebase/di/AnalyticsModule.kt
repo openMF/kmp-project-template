@@ -26,8 +26,9 @@ import org.koin.dsl.module
  * - **Debug logging** — `single<AnalyticsHelper> { AnalyticsModule.analyticsHelper(AnalyticsModule.Mode.Stub) }`.
  * - **Your own provider** — `single<AnalyticsHelper> { MixpanelAnalyticsHelper(...) }`.
  *
- * The app-owned domain event catalog ([kpt.core.firebase.KptAnalyticsEvents] /
- * [kpt.core.firebase.KptAnalyticsTracker]) lives in this project layer, separate from the generic library.
+ * The app-owned cross-cutting catalog lives in `config/analytics/` + `config/crashlytics/` in this
+ * project layer, separate from the generic library. A feature's own vocabulary lives outside
+ * `config/`, in `kpt/core/firebase/<feature>/` — see `loans/`.
  */
 val coreFirebaseModule: Module = module {
     single<AnalyticsHelper> { AnalyticsModule.analyticsHelper(AnalyticsModule.Mode.NoOp) }

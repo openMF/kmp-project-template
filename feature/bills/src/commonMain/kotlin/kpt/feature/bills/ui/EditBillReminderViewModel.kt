@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
@@ -21,10 +22,10 @@ import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.base.ui.viewmodel.BaseMutationViewModel
 import kpt.core.base.ui.viewmodel.MutationMode
-import kpt.core.data.demo.banking.BillReminderRepository
-import kpt.core.model.demo.banking.BillCategory
-import kpt.core.model.demo.banking.BillReminder
-import kpt.core.model.demo.banking.Recurrence
+import kpt.core.data.banking.BillReminderRepository
+import kpt.core.model.banking.BillCategory
+import kpt.core.model.banking.BillReminder
+import kpt.core.model.banking.Recurrence
 import kpt.feature.bills.domain.BillReminderRecurrence
 import kpt.feature.bills.notification.BillNotificationGateway
 import kpt.feature.bills.notification.BillReminderSchedule
@@ -75,7 +76,14 @@ class EditBillReminderViewModel(
         // (the form renders `_formState`), so the snapshot is a "ready" sentinel, not display data.
         if (billId != null) {
             viewModelScope.launch {
-                repository.getById(billId)?.let { existing -> _formState.value = existing.toFormState() }
+                // One-shot hydrate THROUGH the store — first SETTLED value off the store-backed
+                // detail stream, not a raw `repository.getById`. One-shot semantics are preserved
+                // (a live stream would clobber the user's in-progress edits), but the read now
+                // goes through Store5: same SoT, cache and error path as every other read.
+                val settled = repository.billReminderDetailStream(billId, viewModelScope).state
+                    .firstOrNull { it is ScreenState.Content<BillReminder> || it is ScreenState.Empty }
+                (settled as? ScreenState.Content<BillReminder>)?.data
+                    ?.let { existing -> _formState.value = existing.toFormState() }
                 mutableScreenState.value = ScreenState.Content(formSnapshot())
             }
         } else {

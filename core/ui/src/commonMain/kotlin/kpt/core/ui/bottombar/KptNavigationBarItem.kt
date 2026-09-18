@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.Composable
@@ -42,7 +43,12 @@ fun RowScope.KptNavigationBarItem(
             Icon(
                 imageVector = if (isSelected) selectedIcon else unselectedIcon,
                 contentDescription = stringResource(contentDescriptionRes),
-                tint = Color.Unspecified,
+                // Inherit LocalContentColor, which NavigationBarItem drives from the
+                // selected/unselected icon colors set below (KptTheme.colorScheme.primary), so the
+                // monochrome tab icons follow the theme in BOTH light and dark. `Color.Unspecified`
+                // forced the vector's baked-in black, which vanished on the dark navigation bar and
+                // made the selected/unselectedIconColor config below dead.
+                tint = LocalContentColor.current,
             )
         },
         label = {

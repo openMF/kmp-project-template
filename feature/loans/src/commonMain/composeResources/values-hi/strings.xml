@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">ऋण जोड़ें</string>
+    <string name="screens_loans_edit_title">ऋण संपादित करें</string>
+    <string name="screens_loans_addedit_back_cd">वापस</string>
+    <string name="screens_loans_addedit_name_label">ऋण का नाम</string>
+    <string name="screens_loans_addedit_kind_label">प्रकार</string>
+    <string name="screens_loans_addedit_kind_cd">ऋण का प्रकार चुनें</string>
+    <string name="screens_loans_addedit_principal_label">मूल मूलधन</string>
+    <string name="screens_loans_addedit_principal_remaining_label">शेष मूलधन</string>
+    <string name="screens_loans_addedit_annual_rate_label">वार्षिक ब्याज दर (%)</string>
+    <string name="screens_loans_addedit_tenure_label">अवधि (महीने)</string>
+    <string name="screens_loans_addedit_months_remaining_label">शेष महीने</string>
+    <string name="screens_loans_addedit_next_due_date_label">अगली देय तिथि (YYYY-MM-DD)</string>
+    <string name="screens_loans_addedit_total_paid_label">अब तक कुल भुगतान</string>
+    <string name="screens_loans_addedit_monthly_emi_label">मासिक ईएमआई</string>
+    <string name="screens_loans_addedit_total_interest_preview">कुल ब्याज: %1$s</string>
+    <string name="screens_loans_add_submit">ऋण सहेजें</string>
+    <string name="screens_loans_edit_submit">ऋण अपडेट करें</string>
+    <string name="screens_loans_addedit_status_saving">सहेजा जा रहा है…</string>
+    <string name="screens_loans_addedit_status_saved">सहेजा गया ✓</string>
+    <string name="screens_loans_addedit_status_offline">ऑफ़लाइन सहेजा गया — ऑनलाइन होने पर सिंक होगा।</string>
+    <string name="screens_loans_addedit_status_failed">सहेजना विफल: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">अज्ञात त्रुटि</string>
+    <string name="screens_loans_addedit_retry_button">पुनः प्रयास करें</string>
+    <string name="screens_loans_addedit_dismiss_button">खारिज करें</string>
+    <string name="screens_loans_addedit_draft_resume_title">अपना ऋण फिर से शुरू करें?</string>
+    <string name="screens_loans_addedit_draft_resume_message">आपके पास एक असहेजा ऋण ड्राफ़्ट है। संपादन जारी रखें, उसे हटाएँ, या नया बनाएँ।</string>
+    <string name="screens_loans_addedit_draft_resume_resume">संपादन जारी रखें</string>
+    <string name="screens_loans_addedit_draft_resume_discard">ड्राफ़्ट हटाएँ</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">नया शुरू करें</string>
+    <string name="screens_loans_detail_title">ऋण विवरण</string>
+    <string name="screens_loans_detail_back_cd">वापस</string>
+    <string name="screens_loans_detail_delete_dialog_title">ऋण हटाएँ?</string>
+    <string name="screens_loans_detail_delete_dialog_message">यह ऋण और इसका ट्रैकिंग इतिहास हटा दिया जाएगा।</string>
+    <string name="screens_loans_detail_delete_confirm">हटाएँ</string>
+    <string name="screens_loans_detail_delete_cancel">रद्द करें</string>
+    <string name="screens_loans_detail_principal_remaining_label">शेष मूलधन</string>
+    <string name="screens_loans_detail_months_remaining_value">%1$d महीने शेष</string>
+    <string name="screens_loans_detail_original_principal_label">मूल मूलधन</string>
+    <string name="screens_loans_detail_monthly_payment_label">मासिक भुगतान (ईएमआई)</string>
+    <string name="screens_loans_detail_total_paid_label">अब तक कुल भुगतान</string>
+    <string name="screens_loans_detail_annual_rate_label">वार्षिक दर</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">अगली देय तिथि</string>
+    <string name="screens_loans_detail_tenure_label">अवधि</string>
+    <string name="screens_loans_detail_tenure_value">%1$d महीने</string>
+    <string name="screens_loans_detail_tenure_progress_label">अवधि की प्रगति</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% पूर्ण</string>
+    <string name="screens_loans_detail_edit_button">संपादित करें</string>
+    <string name="screens_loans_detail_schedule_button">अनुसूची</string>
+    <string name="screens_loans_detail_delete_button">हटाएँ</string>
+    <string name="screens_loans_list_title">व्यक्तिगत ऋण</string>
+    <string name="screens_loans_list_back_cd">वापस</string>
+    <string name="screens_loans_list_new_fab_text">नया ऋण</string>
+    <string name="screens_loans_list_delete_dialog_title">ऋण हटाएँ?</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' हटा दिया जाएगा। इसे पूर्ववत नहीं किया जा सकता।</string>
+    <string name="screens_loans_list_delete_confirm">हटाएँ</string>
+    <string name="screens_loans_list_delete_cancel">रद्द करें</string>
+    <string name="screens_loans_list_total_outstanding_label">कुल बकाया</string>
+    <string name="screens_loans_list_active_count_single">%1$d सक्रिय ऋण</string>
+    <string name="screens_loans_list_active_count_plural">%1$d सक्रिय ऋण</string>
+    <string name="screens_loans_list_monthly_emi_label">मासिक ईएमआई</string>
+    <string name="screens_loans_row_remaining_label">शेष</string>
+    <string name="screens_loans_row_monthly_emi_label">मासिक ईएमआई</string>
+    <string name="screens_loans_row_progress_value">%1$d%% चुकाया</string>
+    <string name="screens_loans_row_next_due_value">अगला: %1$s</string>
+</resources>

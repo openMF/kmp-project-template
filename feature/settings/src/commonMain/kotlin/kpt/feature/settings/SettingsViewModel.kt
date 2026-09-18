@@ -11,10 +11,12 @@ package kpt.feature.settings
 
 import androidx.lifecycle.viewModelScope
 import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.store.screen.mapContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
 import kpt.core.data.user.UserDataRepository
 import kpt.core.model.user.DarkThemeConfig
@@ -23,34 +25,43 @@ import kpt.core.model.user.ThemeBrand
 
 /**
  * Settings ViewModel — the toolkit's `local_only_prefs` demo, on the MVI `BaseViewModel`
- * idiom (state + typed actions), consistent with every other feature. Reads the reactive
- * [UserDataRepository.userData] into [SettingsUiState]; each preference change is a typed
- * [SettingsAction] handled in [handleAction], persisted to the repository, and logged.
+ * idiom (typed actions) with a Store5 read path. Preferences are read through
+ * [UserDataRepository.userDataStream] (a `createOfflineStore` over the preferences SoT) and
+ * PROJECTED to [UserEditableSettings] via `.mapContent { }` — the same shape
+ * `feature/amortization` uses, so the dialogs render it with `ScreenContent(state = …)`.
+ *
+ * There is deliberately NO bespoke `SettingsUiState` envelope any more: a hand-rolled
+ * `Loading | Success` pair is a reimplementation of `ScreenState`, and it silently had no error
+ * arm — a failed preferences read left the dialog stuck on "Loading…" forever with nothing to
+ * retry. `ScreenState` carries Loading / Content / Empty / Error / NoNetwork and [onRetry] is
+ * wired to the store, so that state is now representable and recoverable.
+ *
+ * WRITES stay on the repository's typed setters (`setThemeBrand`, `setLanguage`, …): routing
+ * them through `store.write` would funnel every individual preference through one whole-`UserData`
+ * blob write, losing the per-setting API for no benefit.
  */
 class SettingsViewModel(
     private val settingsRepository: UserDataRepository,
     private val analyticsHelper: AnalyticsHelper,
-) : BaseViewModel<SettingsUiState, Nothing, SettingsAction>(SettingsUiState.Loading) {
+) : BaseViewModel<Unit, Nothing, SettingsAction>(Unit) {
 
-    /** Backward-compat alias for the inherited [stateFlow] — the dialogs read this. */
-    val settingsUiState: StateFlow<SettingsUiState> get() = stateFlow
+    /** The store-backed preferences read — retained so [onRetry] re-runs it. */
+    private val stream = settingsRepository.userDataStream(viewModelScope)
 
-    init {
-        settingsRepository.userData
-            .onEach { userData ->
-                updateState {
-                    SettingsUiState.Success(
-                        settings = UserEditableSettings(
-                            brand = userData.themeBrand,
-                            useDynamicColor = userData.useDynamicColor,
-                            darkThemeConfig = userData.darkThemeConfig,
-                            language = userData.appLanguage,
-                        ),
-                    )
-                }
-            }
-            .launchIn(viewModelScope)
-    }
+    /** Projected preferences as the framework state model — the dialogs render this. */
+    val settingsState: StateFlow<ScreenState<UserEditableSettings>> = stream.state
+        .mapContent { userData, _ ->
+            UserEditableSettings(
+                brand = userData.themeBrand,
+                useDynamicColor = userData.useDynamicColor,
+                darkThemeConfig = userData.darkThemeConfig,
+                language = userData.appLanguage,
+            )
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
+
+    /** Re-run the preferences read (wired to ScreenContent's retry affordance). */
+    fun onRetry() = stream.retry()
 
     override fun handleAction(action: SettingsAction) {
         when (action) {
@@ -109,11 +120,6 @@ data class UserEditableSettings(
     val darkThemeConfig: DarkThemeConfig,
     val language: LanguageConfig,
 )
-
-sealed interface SettingsUiState {
-    data object Loading : SettingsUiState
-    data class Success(val settings: UserEditableSettings) : SettingsUiState
-}
 
 private fun AnalyticsHelper.logThemeBrandChanged(themeBrand: ThemeBrand) {
     logEvent(

@@ -14,6 +14,7 @@ import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.DataOrigin
+import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.StoreData
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
@@ -50,6 +51,50 @@ class DecisionEngineTest {
         val result = DecisionEngine.decide(emptyStoreData(), unavailable)
         assertIs<ScreenState.NoNetwork>(result)
         assertEquals(false, result.isCaptivePortal)
+    }
+
+    @Test
+    fun `no data + Unavailable + no error + CACHE_FIRST_SWR = Empty — offline-first`() {
+        // Offline-first policy: a cache-first screen with no cached data offline surfaces the screen's
+        // own Empty state, NOT a blocking NoNetwork (every other policy keeps NoNetwork — see the test
+        // above, which uses the NETWORK_WITH_CACHE default). Regression guard for the DecisionEngine
+        // offline-empty rule so a brand-new user offline never sees a full-screen No-internet error.
+        val result = DecisionEngine.decide(emptyStoreData(), unavailable, FetchPolicy.CACHE_FIRST_SWR)
+        assertIs<ScreenState.Empty>(result)
+    }
+
+    @Test
+    fun `no data + Unavailable + NETWORK error + CACHE_FIRST_SWR = Empty — doomed fetch ignored`() {
+        // The offline-first rule must survive the network error that offline reliably PRODUCES.
+        //
+        // Store5's `cached(key, refresh = false)` invokes the fetcher when nothing is cached
+        // (`refresh = false` means "don't refetch when data exists", not "never fetch"), so a
+        // cold-start offline screen always attempts a doomed request and always gets a connection
+        // failure. The rule used to require `error == null`, which meant the screen showed Empty or
+        // a blocking NoNetwork depending purely on whether the empty emission or the failure won the
+        // race — Empty on a fast machine, NoNetwork on a loaded CI runner.
+        //
+        // Offline, a transport failure is the expected outcome and says nothing about the data, so
+        // it must not change the verdict.
+        val result = DecisionEngine.decide(
+            emptyStoreData(error = FakeIOException("connection refused")),
+            unavailable,
+            FetchPolicy.CACHE_FIRST_SWR,
+        )
+        assertIs<ScreenState.Empty>(result)
+    }
+
+    @Test
+    fun `no data + Unavailable + NON-network error + CACHE_FIRST_SWR = not Empty — real signal kept`() {
+        // The complement, and the reason the guard is category-scoped rather than dropped outright:
+        // an auth failure cannot legitimately originate from an offline device, so if one appears it
+        // is real signal and must still surface rather than be swallowed as "expected offline".
+        val result = DecisionEngine.decide(
+            emptyStoreData(error = RuntimeException("HTTP 401 Unauthorized")),
+            unavailable,
+            FetchPolicy.CACHE_FIRST_SWR,
+        )
+        assertFalse(result is ScreenState.Empty, "a non-transport error offline must not read as Empty")
     }
 
     @Test
@@ -120,7 +165,7 @@ class DecisionEngineTest {
     // in-flight refresh) — never network state, never error.
 
     @Test
-    fun `has data + Unavailable = Content FRESH (network state in ConnectivityBanner, not DataFreshness)`() {
+    fun `has data + Unavailable = Content FRESH — network state belongs in ConnectivityBanner not DataFreshness`() {
         val data = dataStoreData("cached")
         val result = DecisionEngine.decide(data, unavailable)
         assertIs<ScreenState.Content<String>>(result)
@@ -128,7 +173,7 @@ class DecisionEngineTest {
     }
 
     @Test
-    fun `has data + CaptivePortal = Content FRESH (network state in ConnectivityBanner, not DataFreshness)`() {
+    fun `has data + CaptivePortal = Content FRESH — network state belongs in ConnectivityBanner not DataFreshness`() {
         val data = dataStoreData("cached")
         val result = DecisionEngine.decide(data, captivePortal)
         assertIs<ScreenState.Content<String>>(result)
@@ -136,7 +181,7 @@ class DecisionEngineTest {
     }
 
     @Test
-    fun `has data + refreshing = Content UPDATING (request-state, legitimate)`() {
+    fun `has data + refreshing = Content UPDATING — request-state is legitimate`() {
         val data = dataStoreData("old", isRefreshing = true)
         val result = DecisionEngine.decide(data, available)
         assertIs<ScreenState.Content<String>>(result)
@@ -152,7 +197,7 @@ class DecisionEngineTest {
     }
 
     @Test
-    fun `has data + refreshing + Unavailable = Content UPDATING (refreshing wins - network state ignored)`() {
+    fun `has data + refreshing + Unavailable = Content UPDATING — refreshing wins over network state`() {
         val data = dataStoreData("old", isRefreshing = true)
         val result = DecisionEngine.decide(data, unavailable)
         assertIs<ScreenState.Content<String>>(result)
@@ -233,7 +278,7 @@ class DecisionEngineTest {
 
     @OptIn(ExperimentalTime::class)
     @Test
-    fun `decideFreshness - has data + offline + fresh = Fresh band (network ignored)`() {
+    fun `decideFreshness - has data + offline + fresh = Fresh band — network ignored`() {
         // freshness is pure time + error; network connectivity is NEVER read.
         val now = Clock.System.now()
         val data = dataStoreData("cached", fetchedAtInstant = now - 2.minutes)

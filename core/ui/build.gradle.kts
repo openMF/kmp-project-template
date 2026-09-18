@@ -56,3 +56,15 @@ compose.resources {
     generateResClass = always
     packageOfResClass = "kpt.core.ui.generated.resources"
 }
+// ── Fork-owned dependency seam (white-label, mirrors `feature-deps.gradle.kts`) ────────────────
+// A fork adds its OWN dependencies for this module in `core/ui/module-deps.gradle.kts` — never in
+// this file. That is what lets THIS build file be `owner: template` and FULL-COPY on a template
+// sync: the fork's deps live in a file the sync never touches, so a template plugin/version bump
+// can no longer drop them and no 3-way merge is needed.
+//
+// String `"commonMainImplementation"(...)` notation is used in the seam, not the type-safe
+// `libs.`/`projects.` accessors: those are NOT generated for `apply(from = ...)` script plugins.
+//
+// Guarded like feature-deps: a fork that adopted the template BEFORE this seam existed may not have
+// the file yet, and an unconditional apply would fail the whole configuration.
+project.file("module-deps.gradle.kts").takeIf { it.exists() }?.let { apply(from = it) }

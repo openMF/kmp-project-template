@@ -1,3 +1,4 @@
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -7,7 +8,6 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.register
 import org.gradle.work.DisableCachingByDefault
 import org.yaml.snakeyaml.Yaml
-import java.io.File
 
 /**
  * Registers the `syncForkConfig` task on whichever project applies this plugin.
@@ -126,9 +126,24 @@ abstract class SyncForkConfigTask : DefaultTask() {
         if (appDisplayName.isNotBlank()) {
             patchTomlVersion(File(root, "gradle/libs.versions.toml"), "appDisplayName", appDisplayName)
         }
+        // desktopAppName (JVM/dock) + projectName (rootProject.name) ALSO live in the catalog and resolve
+        // app-profile-first (identity.app_name / project name) per this repo's CLAUDE.md, but a catalog-3way
+        // merge during /kmp-project-template-sync reverts them to the template placeholder ("App Toolkit" /
+        // "kmp-project-template"). Writing only appId+appDisplayName left them stale (a fork's catalog
+        // could carry template identity after a clean sync). Derive + write ALL identity
+        // lines so the catalog fully follows the app-profile SoT after any sync.
+        if (appDisplayName.isNotBlank()) {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "desktopAppName", appDisplayName)
+        }
+        if (projectName.isNotBlank()) {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "projectName", projectName)
+        }
 
         // Apple
         val appleTeamId   = get("apple.team.id",     "APPLE_TEAM_ID",   "iosTeamId")
+        if (appleTeamId.isNotBlank() && appleTeamId != "YOUR_TEAM_ID") {
+            patchTomlVersion(File(root, "gradle/libs.versions.toml"), "iosTeamId", appleTeamId)
+        }
         val matchGitUrl   = get("apple.match.git.url","MATCH_GIT_URL")
         val tfGroups      = get("apple.tf.groups",    "TESTFLIGHT_GROUPS")
 
@@ -215,7 +230,13 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 "// then re-run ./gradlew syncForkConfig\n" +
                 "APP_BUNDLE_ID = $appId\n" +
                 "APP_NAME = $appDisplayName\n" +
-                "TEAM_ID = $appleTeamId\n"
+                "TEAM_ID = $appleTeamId\n" +
+                "\n" +
+                "// Keychain Sharing entitlement — REQUIRED by core-base/datastore's KeychainSettings\n" +
+                "// (service \"kpt.secure\"). Without it iOS keychain access fails -34018 at launch and\n" +
+                "// crashes the Koin graph (UserPreferencesRepositoryImpl -> AppViewModel). Applies to\n" +
+                "// every flavor (project-level base config). Path relative to cmp-ios/ (SRCROOT).\n" +
+                "CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements\n"
             )
             logger.lifecycle("syncForkConfig: wrote cmp-ios/Configuration/Config.xcconfig")
         }
@@ -302,7 +323,12 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 if (!forkOut.containsKey(ks) && vs.isNotBlank() && !vs.contains('\n')) forkOut[ks] = vs
             }
             val sb = StringBuilder()
-                .append("# GENERATED from app-profile/app.yaml by syncForkConfig — do not hand-edit\n")
+                // The "DERIVED from app-profile" phrase is a CONTRACT, not prose: white-label-derived.sh
+                // greps head -3 for it to tell a generated bridge from a hand-authored one. derive.rb
+                // stamps the same phrase. They disagreed until 2026-09-06 — this writer said "GENERATED
+                // from app-profile/app.yaml" — so a syncForkConfig-written bridge was reported
+                // hand-authored, and the health verdict depended on which of the two writers ran last.
+                .append("# gradle/fork.properties — DERIVED from app-profile by syncForkConfig. DO NOT EDIT.\n")
                 .append("# Edit app-profile/app.yaml or app-profile/platforms/**/*.yaml instead;\n")
                 .append("# fork.properties is the derived build-bridge (config.rb fallback + inline reads).\n")
             forkOut.forEach { (k, v) -> sb.append(k).append('=').append(v).append('\n') }
@@ -310,7 +336,16 @@ abstract class SyncForkConfigTask : DefaultTask() {
             logger.lifecycle("syncForkConfig: regenerated fork.properties from app-profile (${forkOut.size} keys)")
 
             // B3 — regenerate core/network AccessPointRegistry.points from app-profile#network.access_points.
+            // The four passes share one SoT (network.access_points), so a declared endpoint reaches the
+            // registry, the UrlType vocabulary, the anon-key map AND its Koin binding in one run — the
+            // reason a fork only writes the API type.
             regenerateAccessPoints(root, appProfile)
+            regenerateUrlTypes(root, appProfile)
+            regenerateSupabaseAnonKeys(root, appProfile)
+            regenerateAppReviewConfig(root, appProfile)
+            reconcileMigrationLedger(root, appProfile)
+            regenerateBuildKonfigFields(root, appProfile)
+            scaffoldAccessPointPackages(root, appProfile)
         }
 
         // ── 6. Store metadata files ───────────────────────────────────────────
@@ -639,7 +674,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
             // blank. Per-fork + collision-free so two template-derived desktop apps never share a dir.
             val desktopDir = appDisplayName.replace(Regex("[^A-Za-z0-9]"), "")
                 .ifBlank { appId.split(".").joinToString("") { seg -> seg.replaceFirstChar { it.uppercase() } } }
-            val dbConfig = File(root, "core/database/src/commonMain/kotlin/kpt/core/database/DatabaseConfig.kt")
+            val dbConfig = File(root, "core/database/src/commonMain/kotlin/kpt/core/database/config/DatabaseConfig.kt")
             if (dbConfig.parentFile.exists()) {
                 dbConfig.writeText(
                     "/*\n" +
@@ -651,7 +686,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
                         " *\n" +
                         " * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE\n" +
                         " */\n" +
-                        "package kpt.core.database\n\n" +
+                        "package kpt.core.database.config\n\n" +
                         "/** Fork-unique database naming — generated by syncForkConfig from app-profile/app.yaml. */\n" +
                         "object DatabaseConfig {\n" +
                         "    /** On-disk SQLite file name (appId-derived). */\n" +
@@ -742,10 +777,21 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // (\b guards against appId matching a longer key), so appDisplayName is never touched.
         val re = Regex("^(\\s*" + Regex.escape(key) + "\\s*=\\s*)\"[^\"]*\"(.*)$")
         var hit = false
+        // A `(PLACEHOLDER — …)` note on the trailing comment describes the OLD unset value. Carrying
+        // it through verbatim leaves the catalog asserting something false the moment a fork is
+        // branded: `iosTeamId = "L432S2FZP5"   # … (PLACEHOLDER — set in app-profile/…)`. A reader
+        // then cannot tell a real value from an unfilled one, which is exactly what the marker is
+        // for. Drop the parenthetical when the value written is real; keep the descriptive half.
+        val valueIsReal = value.isNotBlank() &&
+            !value.startsWith("YOUR_") &&
+            !value.contains("example.com") &&
+            value != "XXXXXXXXXX"
+        val placeholderNote = Regex("\\s*\\((?:PLACEHOLDER|placeholder)\\b[^)]*\\)")
         val out = lines.map { line ->
             val m = re.find(line) ?: return@map line
             hit = true
-            "${m.groupValues[1]}\"$value\"${m.groupValues[2]}"
+            val rest = if (valueIsReal) placeholderNote.replace(m.groupValues[2], "") else m.groupValues[2]
+            "${m.groupValues[1]}\"$value\"$rest"
         }
         if (hit && out != lines) {
             toml.writeText(out.joinToString("\n") + "\n")
@@ -815,6 +861,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
             val id = m["id"]?.toString()?.takeIf { it.isNotBlank() } ?: continue
             val kind = if (m["type"]?.toString()?.trim()?.lowercase() == "supabase") "SUPABASE" else "REST"
             val baseUrl = m["base_url"]?.toString().orEmpty()
+            val basePath = m["base_path"]?.toString()?.trim()?.takeIf { it.isNotBlank() }
             val host = m["loggable_host"]?.toString().orEmpty()
             val proxied = m["proxied_host"]?.toString()?.takeIf { it.isNotBlank() }
             // One field per line so the generated block stays under the detekt/ktlint max line length.
@@ -822,8 +869,51 @@ abstract class SyncForkConfigTask : DefaultTask() {
             sb.append("            id = \"${esc(id)}\",\n")
             sb.append("            kind = AccessPointKind.$kind,\n")
             sb.append("            baseUrl = \"${esc(baseUrl)}\",\n")
+            if (basePath != null) sb.append("            basePath = \"${esc(basePath)}\",\n")
             sb.append("            loggableHost = \"${esc(host)}\",\n")
             if (proxied != null) sb.append("            proxiedHost = \"${esc(proxied)}\",\n")
+            // Declared headers. A `value:` is baked in; a `runtime:` emits the KEY only — the value
+            // is written to RuntimeHeaderStore at login and read again on every request, because a
+            // credential captured when this singleton client was built could never become a token
+            // obtained after sign-in.
+            val authRaw = m["auth"]?.toString()?.trim()?.lowercase()
+            val authScheme = when (authRaw) {
+                "basic" -> "BASIC"
+                "bearer" -> "BEARER"
+                "oauth" -> "OAUTH"
+                else -> "NONE"
+            }
+            val hdrs = (m["headers"] as? List<*>).orEmpty().mapNotNull { h ->
+                val hm = h as? Map<*, *> ?: return@mapNotNull null
+                val hname = hm["name"]?.toString()?.trim().orEmpty()
+                if (hname.isEmpty()) return@mapNotNull null
+                val hvalue = hm["value"]?.toString()
+                val hruntime = hm["runtime"]?.toString()?.trim()
+                when {
+                    hruntime != null && hruntime.isNotEmpty() ->
+                        "HeaderSpec(name = \"${esc(hname)}\", runtimeKey = \"${esc(hruntime)}\")"
+                    hvalue != null ->
+                        "HeaderSpec(name = \"${esc(hname)}\", value = \"${esc(hvalue)}\")"
+                    // Neither set is a malformed row: emitting it would fail HeaderSpec's own
+                    // require() at construction, i.e. at app start. Skip, and let NAP report it.
+                    else -> null
+                }
+            }
+            // A declared `auth:` emits its own Authorization spec, so no one writes that row by hand
+            // (and no one gets the `Basic `/`Bearer ` prefix wrong). An EXPLICIT Authorization row
+            // still wins — a fork with a non-standard scheme keeps full control.
+            val hasExplicitAuthHeader = hdrs.any { it.contains("name = \"Authorization\"") }
+            val allHdrs = if (authScheme != "NONE" && !hasExplicitAuthHeader) {
+                hdrs + "HeaderSpec(name = \"Authorization\", runtimeKey = \"${esc(id)}.auth\")"
+            } else {
+                hdrs
+            }
+            if (authScheme != "NONE") sb.append("            auth = AuthScheme.$authScheme,\n")
+            if (allHdrs.isNotEmpty()) {
+                sb.append("            headers = listOf(\n")
+                allHdrs.forEach { sb.append("                ").append(it).append(",\n") }
+                sb.append("            ),\n")
+            }
             sb.append("        ),\n")
             count++
         }
@@ -832,6 +922,458 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val endLineEnd = text.indexOf('\n', endIdx).let { if (it < 0) text.length else it }
         file.writeText(text.substring(0, beginIdx) + sb.toString() + text.substring(endLineEnd))
         logger.lifecycle("syncForkConfig: regenerated AppAccessPoints.points from app-profile ($count access points)")
+    }
+
+    /** The `network.access_points` list, normalized to maps with a non-blank `id`. Empty when absent. */
+    private fun accessPoints(appProfile: Map<String, Any?>): List<Map<*, *>> {
+        val network = appProfile["network"] as? Map<*, *> ?: return emptyList()
+        val aps = network["access_points"] as? List<*> ?: return emptyList()
+        return aps.mapNotNull { it as? Map<*, *> }
+            .filter { it["id"]?.toString()?.isNotBlank() == true }
+    }
+
+    private fun isSupabase(m: Map<*, *>): Boolean =
+        m["type"]?.toString()?.trim()?.lowercase() == "supabase"
+
+    /**
+     * Replace the text between [begin] and [end] sentinels in [file] with [body].
+     *
+     * No-op when the file or either sentinel is absent — a fork that stripped the demo wiring (or
+     * removed the block) is not an error, it is a fork that opted out. Returns true when it wrote.
+     */
+    private fun patchSentinel(file: File, begin: String, end: String, body: String): Boolean {
+        if (!file.isFile) return false
+        val text = file.readText()
+        val b = text.indexOf(begin)
+        val e = text.indexOf(end)
+        if (b < 0 || e < 0 || e < b) return false
+        val endLineEnd = text.indexOf('\n', e).let { if (it < 0) text.length else it }
+        file.writeText(text.substring(0, b) + body + text.substring(endLineEnd))
+        return true
+    }
+
+    /**
+     * Regenerate `AppUrlTypes` from the declared access points.
+     *
+     * [AccessPoint.type] defaults to `UrlType(id.uppercase())`, so the vocabulary is a pure projection
+     * of the id list — yet it was hand-maintained and had drifted to 3 constants against 8 declared
+     * points. That drift is silent AND wrong-answering: `AppMultiUrlConfigProvider.getBaseUrl` falls
+     * back to `UrlType.MAIN` for an unknown type, so a lookup for an undeclared id returned the MAIN
+     * base URL instead of failing. Generating it removes the class of bug rather than the instance.
+     */
+    private fun regenerateUrlTypes(root: File, appProfile: Map<String, Any?>) {
+        val points = accessPoints(appProfile)
+        if (points.isEmpty()) return
+        val file = File(root, "core/network/src/commonMain/kotlin/kpt/core/network/config/AppUrlTypes.kt")
+        val sb = StringBuilder()
+        sb.append("// syncForkConfig:url-types:begin — GENERATED from app-profile/app.yaml#network.access_points.\n")
+        sb.append("    // One constant per declared access point (UrlType(id.uppercase()), matching\n")
+        sb.append("    // AccessPoint.type's default). Edit the access points THERE; do not hand-edit this block.\n")
+        val names = mutableListOf<String>()
+        for (m in points) {
+            val id = m["id"].toString()
+            // The KEY must be exactly `id.uppercase()` — that is what AccessPoint.type defaults to, and
+            // UrlType equality is what AccessPointRegistry.restBaseUrl matches on. Only the Kotlin
+            // IDENTIFIER is sanitized (an id may contain characters an identifier cannot). Sanitizing
+            // the key too would silently break every hyphenated id: `pay-gw` would declare
+            // UrlType("PAY_GW") while its access point carries UrlType("PAY-GW"), so restBaseUrl would
+            // miss and getBaseUrl would fall back to MAIN's URL — the exact bug this codegen removes.
+            val key = id.uppercase()
+            val name = key.replace(Regex("[^A-Z0-9]"), "_")
+            names += name
+            val kindDoc = if (isSupabase(m)) "Supabase" else "REST"
+            sb.append("\n    /** `$id` — $kindDoc access point. */\n")
+            if (key == "MAIN") {
+                sb.append("    val MAIN: UrlType = UrlType.MAIN\n")
+            } else {
+                sb.append("    val $name: UrlType = UrlType(\"$key\")\n")
+            }
+        }
+        // One entry per line: a fork with many endpoints would otherwise generate a single line past
+        // any sane max-line-length, and the formatter cannot reflow generated output for us.
+        sb.append("\n    /** Every declared endpoint type, in app-profile order. */\n")
+        sb.append("    val all: List<UrlType> = listOf(\n")
+        names.forEach { sb.append("        ").append(it).append(",\n") }
+        sb.append("    )\n")
+        sb.append("    // syncForkConfig:url-types:end")
+        if (patchSentinel(file, "// syncForkConfig:url-types:begin", "// syncForkConfig:url-types:end", sb.toString())) {
+            logger.lifecycle("syncForkConfig: regenerated AppUrlTypes (${names.size} types)")
+        }
+    }
+
+    /**
+     * Regenerate `AppSupabaseAnonKeys` — one row per declared SUPABASE access point.
+     *
+     * A point declaring `anon_key_env: X` emits `BuildKonfig.X` (build-time read of env /
+     * local.properties, the same sanctioned path as FRED_API_KEY), so no key is ever written to a
+     * tracked file. A point WITHOUT it emits `""`, which leaves the client inert
+     * (`isConfigured == false`) rather than half-configured with a fake key.
+     */
+    private fun regenerateSupabaseAnonKeys(root: File, appProfile: Map<String, Any?>) {
+        val points = accessPoints(appProfile).filter { isSupabase(it) }
+        val file = File(
+            root,
+            "core/network/src/commonMain/kotlin/kpt/core/network/config/AppSupabaseAnonKeys.kt",
+        )
+        val sb = StringBuilder()
+        sb.append("// syncForkConfig:supabase-anon-keys:begin — GENERATED from app-profile/app.yaml.\n")
+        sb.append("    // One row per SUPABASE access point. `anon_key_env: X` on the point emits BuildKonfig.X\n")
+        sb.append("    // (build-time env / local.properties read, referenced by FQN so no import is needed\n")
+        sb.append("    // outside this block); no key is committed. Absent -> \"\" so the client stays inert.\n")
+        sb.append("    private val byId: Map<String, String> = mapOf(\n")
+        var withKey = 0
+        for (m in points) {
+            val id = m["id"].toString()
+            val env = m["anon_key_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+            if (env != null) {
+                sb.append("        \"$id\" to kpt.core.network.BuildKonfig.$env,\n")
+                withKey++
+            } else {
+                sb.append("        \"$id\" to \"\",\n")
+            }
+        }
+        sb.append("    )\n")
+        sb.append("    // syncForkConfig:supabase-anon-keys:end")
+        if (patchSentinel(
+                file,
+                "// syncForkConfig:supabase-anon-keys:begin",
+                "// syncForkConfig:supabase-anon-keys:end",
+                sb.toString(),
+            )
+        ) {
+            logger.lifecycle(
+                "syncForkConfig: regenerated AppSupabaseAnonKeys (${points.size} points, $withKey keyed)",
+            )
+        }
+    }
+
+
+    /**
+     * Regenerate `AppReviewConfig` — store identity + prompt policy for the in-app review flow.
+     *
+     * Every id here already exists in app-profile for the DEPLOY side (the Android applicationId, the
+     * App Store numeric id the TestFlight lane uploads against, the Partner Center Store ID). The
+     * running app could not read any of them, so `AppReviewManagerImpl`'s documented fork step —
+     * `AppReview.configure(StoreListing(...))` — had no source to draw from and was never performed.
+     * Projecting rather than re-declaring keeps one SoT per id.
+     *
+     * Absent policy keys fall back to conservative defaults (disabled, no prompting) rather than to
+     * an enabled-with-zero-thresholds state, which would prompt on first launch.
+     */
+    private fun regenerateAppReviewConfig(root: File, appProfile: Map<String, Any?>) {
+        if (appProfile.isEmpty()) return
+        val file = File(
+            root,
+            "core/platform/src/commonMain/kotlin/kpt/core/platform/config/AppReviewConfig.kt",
+        )
+
+        // PLACEHOLDER ids are treated as absent, matching resolve-deploy-config.sh's `pick`. A
+        // literal "YOUR_TEAM_ID"-class value in a StoreListing produces a store URL that 404s —
+        // worse than an empty listing, which at least reports canRequestReview == false honestly.
+        fun id(key: String): String =
+            appProfileGet(appProfile, key)?.trim().orEmpty()
+                .takeUnless { it.isEmpty() || it.startsWith("YOUR_") || it.contains("example.com") }
+                .orEmpty()
+
+        val review = appProfile["in_app_review"] as? Map<*, *>
+        fun policy(k: String): String? = review?.get(k)?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+        val enabled = policy("enabled")?.lowercase() == "true"
+        val minLaunches = policy("min_launches")?.toIntOrNull() ?: 0
+        val minDays = policy("min_days_since_install")?.toIntOrNull() ?: 0
+        val cooldown = policy("cooldown_days")?.toIntOrNull() ?: 0
+
+        val play = id("app.id")
+        val appStore = id("apple.app.store.id")
+        val microsoft = id("windows.store.id")
+        val web = id("org.marketing.url")
+
+        val sb = StringBuilder()
+        sb.append("// syncForkConfig:app-review:begin — GENERATED from app-profile. Do not hand-edit.\n")
+        sb.append("    /** Play Store package — `identity.app_id`. */\n")
+        sb.append("    const val PLAY_STORE_PACKAGE: String = \"").append(play).append("\"\n\n")
+        sb.append("    /** App Store numeric id — `platforms/apple/apple.yaml#apple.app_store_id`. */\n")
+        sb.append("    const val APP_STORE_ID: String = \"").append(appStore).append("\"\n\n")
+        sb.append("    /** Microsoft Store product id — `platforms/windows/windows.yaml#windows.store_id`. */\n")
+        sb.append("    const val MICROSOFT_STORE_PRODUCT_ID: String = \"").append(microsoft).append("\"\n\n")
+        sb.append("    /** Open-web fallback for targets with no store — `org.marketing_url`. */\n")
+        sb.append("    const val WEB_URL: String = \"").append(web).append("\"\n\n")
+        sb.append("    /** `in_app_review.enabled` — false disables the custom prompt entirely. */\n")
+        sb.append("    const val ENABLED: Boolean = ").append(enabled).append("\n\n")
+        sb.append("    /** `in_app_review.min_launches`. */\n")
+        sb.append("    const val MIN_LAUNCHES: Int = ").append(minLaunches).append("\n\n")
+        sb.append("    /** `in_app_review.min_days_since_install`. */\n")
+        sb.append("    const val MIN_DAYS_SINCE_INSTALL: Int = ").append(minDays).append("\n\n")
+        sb.append("    /** `in_app_review.cooldown_days`. */\n")
+        sb.append("    const val COOLDOWN_DAYS: Int = ").append(cooldown).append("\n")
+        sb.append("    // syncForkConfig:app-review:end")
+
+        if (patchSentinel(
+                file,
+                "// syncForkConfig:app-review:begin",
+                "// syncForkConfig:app-review:end",
+                sb.toString(),
+            )
+        ) {
+            val ids = listOf(play, appStore, microsoft, web).count { it.isNotEmpty() }
+            logger.lifecycle(
+                "syncForkConfig: regenerated AppReviewConfig ($ids/4 store ids, enabled=$enabled)",
+            )
+        }
+    }
+
+    /**
+     * Refill `AppDatabase.kt`'s four `fork-*` regions from `app-profile/app.yaml#database`.
+     *
+     * This is what lets `core/database/**/AppDatabase.kt` be `owner: template` (FULL-COPY on a
+     * template sync) instead of a permanent 3-way merge: Room needs one compile-time
+     * `entities = [...]` array literal, so a fork's tables cannot live in a separate file — but they
+     * CAN be re-derived into the copied file afterwards. A sync full-copies the template's
+     * AppDatabase (fork regions empty), then the mandatory post-sync `syncForkConfig` projects the
+     * fork's declared schema back in. Same shape as the deployment metadata/screenshot regeneration.
+     *
+     * Hand-editing a `fork-*` region is pointless — this overwrites it. Declare in app-profile.
+     */
+    /**
+     * Give every declared access point its OWN package under `core/network`:
+     * `kpt/core/network/<id>/{api,dto}`.
+     *
+     * Endpoint code used to live in DOMAIN packages under `demo/` (`demo/economic` held BOTH the fred
+     * and worldbank APIs), which tied it to the demo lifecycle: `remove-demo.sh` deletes every
+     * a `demo` package, so a fork's endpoint code could not live beside the template's, and a
+     * cleaned fork had nowhere structural to put an API at all. Naming the package for the ACCESS
+     * POINT makes the layout a pure projection of app-profile — declare an endpoint, get a package,
+     * write the interface in it — and lets the strip delete exactly the endpoints it removed.
+     *
+     * Scaffolds only; never overwrites. Each new package gets a README so git tracks the directory
+     * and the next person knows what belongs there.
+     */
+    private fun declaredStores(appProfile: Map<String, Any?>): List<Map<*, *>> {
+        val block = (appProfile["core_store"] as? Map<*, *>).orEmpty()
+        return ((block["stores"] as? List<*>) ?: emptyList<Any?>()).mapNotNull { it as? Map<*, *> }
+    }
+
+    private fun storeStr(row: Map<*, *>, key: String): String =
+        row[key]?.toString()?.trim().orEmpty()
+
+    /** `interestRateSeries` -> `INTEREST_RATE_SERIES`, matching the hand-written Ttl constants. */
+    private fun screamingSnake(id: String): String =
+        id.replace(Regex("([a-z0-9])([A-Z])"), "$1_$2").uppercase()
+
+    /** `5m` / `1h` / `7d` -> a kotlin.time expression. Anything else is rejected loudly. */
+    private fun ttlExpression(raw: String): String {
+        val m = Regex("^(\\d+)(m|h|d)$").find(raw.trim())
+            ?: error("core_store.stores[].ttl must look like 5m / 1h / 7d, got '$raw'")
+        val n = m.groupValues[1]
+        return when (m.groupValues[2]) {
+            "m" -> "$n.minutes"
+            "h" -> "$n.hours"
+            else -> "$n.days"
+        }
+    }
+
+    private fun licenseHeader(sb: StringBuilder) {
+        sb.append("/*\n")
+        sb.append(" * Copyright 2026 Mifos Initiative\n")
+        sb.append(" *\n")
+        sb.append(" * This Source Code Form is subject to the terms of the Mozilla Public\n")
+        sb.append(" * License, v. 2.0. If a copy of the MPL was not distributed with this\n")
+        sb.append(" * file, You can obtain one at https://mozilla.org/MPL/2.0/.\n")
+        sb.append(" *\n")
+        sb.append(" * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE\n")
+        sb.append(" */\n")
+    }
+
+    private fun scaffoldAccessPointPackages(root: File, appProfile: Map<String, Any?>) {
+        val base = File(root, "core/network/src/commonMain/kotlin/kpt/core/network")
+        if (!base.isDirectory) return
+        var made = 0
+        for (m in accessPoints(appProfile)) {
+            val id = m["id"]?.toString()?.trim().orEmpty()
+            // Package segments are lowercase alphanumerics: `my_api` -> `myapi`.
+            val pkg = id.lowercase().filter { it.isLetterOrDigit() }
+            if (pkg.isEmpty() || !pkg.first().isLetter()) continue
+            val dir = File(base, pkg)
+            val readme = File(dir, "README.md")
+            if (readme.isFile) continue
+            File(dir, "api").mkdirs()
+            File(dir, "dto").mkdirs()
+            val type = m["type"]?.toString()?.trim()?.lowercase() ?: "rest"
+            val simple = pkg.replaceFirstChar { it.uppercase() }
+            readme.writeText(
+                buildString {
+                    append("# `$id` — access point package\n\n")
+                    append("SCAFFOLDED by `./gradlew syncForkConfig` from the `$id` access point in\n")
+                    append("`app-profile/app.yaml#network.access_points`. One package per endpoint.\n\n")
+                    append("- `api/` — the Ktorfit interface for this endpoint. Annotate it\n")
+                    append("  `@ApiBinding(\"$id\")` and its Koin binding is GENERATED into\n")
+                    append("  `di/GeneratedApiBindings.kt`; there is no wiring step.\n")
+                    append("- `dto/` — the wire types this endpoint returns.\n\n")
+                    if (type == "supabase") {
+                        append("`type: supabase` — the binding is `supabaseApi(\"$id\") { ${'$'}{simple}Api(it) }`, so the\n")
+                        append("interface takes a single `SupabaseConfigClient` constructor argument.\n")
+                    } else {
+                        append("`type: rest` — the binding is `restApi(\"$id\") { it.create${'$'}{simple}Api() }`, so Ktorfit\n")
+                        append("generates the `create…Api()` factory from the interface.\n")
+                    }
+                    append("\nDelete this package by removing its access point from app-profile.\n")
+                },
+            )
+            made++
+        }
+        if (made > 0) logger.lifecycle("syncForkConfig: scaffolded $made access-point package(s) under core/network")
+    }
+
+    /**
+     * Refill the `syncForkConfig:buildkonfig` region of `core/network/build.gradle.kts` — one
+     * `buildConfigField` per key a fork declares in app-profile.
+     *
+     * Closes the half of the endpoint contract that was missing: `syncForkConfig` generated the
+     * REFERENCE (`AppSupabaseAnonKeys` emits `BuildKonfig.<anon_key_env>`) while the DECLARATION had
+     * to be hand-added to this template-owned build file. A fork that declared `anon_key_env: X` got
+     * `Unresolved reference: X` and no seam to fix it in. Now the declaration is derived from the same
+     * SoT as the reference, so the two cannot drift.
+     *
+     * Sources: every access point's `anon_key_env:` / `api_key_env:`, plus `network.build_config_fields`
+     * for keys not tied to an endpoint. Names already declared OUTSIDE the region (the demo
+     * `FRED_API_KEY`) are skipped — a duplicate `buildConfigField` fails the buildkonfig plugin.
+     */
+    private fun regenerateBuildKonfigFields(root: File, appProfile: Map<String, Any?>) {
+        val file = File(root, "core/network/build.gradle.kts")
+        if (!file.isFile) return
+        val begin = "        // syncForkConfig:buildkonfig:begin"
+        val end = "        // syncForkConfig:buildkonfig:end"
+        val text = file.readText()
+        if (!text.contains(begin) || !text.contains(end)) return
+
+        // A BuildKonfig constant is a Kotlin identifier reached as `BuildKonfig.NAME`; anything else
+        // would emit uncompilable source. Skip rather than emit (the api-binding generator did the same,
+        // before @ApiBinding replaced it).
+        val valid = Regex("^[A-Z][A-Z0-9_]*$")
+
+        // (name -> env). LinkedHashMap keeps declaration order stable so the region does not churn.
+        val fields = LinkedHashMap<String, String>()
+        for (m in accessPoints(appProfile)) {
+            for (key in listOf("anon_key_env", "api_key_env")) {
+                val env = m[key]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
+                if (valid.matches(env)) fields.putIfAbsent(env, env)
+            }
+        }
+        val network = (appProfile["network"] as? Map<*, *>).orEmpty()
+        for (row in (network["build_config_fields"] as? List<*>) ?: emptyList<Any?>()) {
+            val m = row as? Map<*, *> ?: continue
+            val name = m["name"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
+            if (!valid.matches(name)) continue
+            val env = m["from_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: name
+            if (valid.matches(env)) fields.putIfAbsent(name, env)
+        }
+
+        // Anything already declared outside the region wins — re-emitting it would be a duplicate.
+        val outside = text.substringBefore(begin) + text.substringAfter(end)
+        val existing = Regex("""buildConfigField\(\s*STRING,\s*"([A-Z0-9_]+)"""")
+            .findAll(outside).map { it.groupValues[1] }.toSet()
+
+        val body = buildString {
+            append(begin).append(" — GENERATED from `app-profile/app.yaml`: one field per\n")
+            append("        // access point declaring `anon_key_env:`/`api_key_env:`, plus every `network.build_config_fields`\n")
+            append("        // entry. DO NOT HAND-EDIT — declare the key in app-profile and re-run `./gradlew syncForkConfig`.\n")
+            append("        // Values are read at BUILD time from the env var or local.properties, so no secret is committed.\n")
+            for ((name, env) in fields) {
+                if (name in existing) continue
+                append("        buildConfigField(\n")
+                append("            STRING, \"").append(name).append("\",\n")
+                append("            System.getenv(\"").append(env).append("\") ?: localProps.getProperty(\"")
+                    .append(env).append("\", \"\"),\n")
+                append("        )\n")
+            }
+            append(end)
+        }
+        val before = file.readText()
+        patchSentinel(file, begin, end, body)
+        if (file.readText() != before) {
+            val emitted = fields.keys.count { it !in existing }
+            logger.lifecycle("syncForkConfig: regenerated core/network buildkonfig fields ($emitted field(s))")
+        }
+    }
+
+    /**
+     * Append any template migration unit this fork has not applied yet, at the fork's next free
+     * version. APPEND-ONLY — an existing row is never renumbered.
+     *
+     * Room's version is one monotonic integer and migrations are edges between consecutive values,
+     * so template and fork cannot share the counter. The previous `TEMPLATE_BASE_VERSION +
+     * VERSION_OFFSET` did not separate them, it relabelled it: a fork at base 13 + offset 1 ships
+     * v14, the template bumps base to 14, the fork computes 15, and devices sitting at 14 have no
+     * 14 -> 15 edge. Here the fork owns the sequence outright and the template ships units with a
+     * stable id and NO version, so the same unit can land at v14 in one fork and v27 in another.
+     *
+     * Renumbering is the one forbidden move: a shipped from/to edge is a contract with every
+     * installed device, and rewriting it strands them.
+     */
+    /** Parse `app-profile/migration-ledger.yaml` -> ordered (from, to, specFqn?) rows. */
+    private fun readLedgerVersion(root: File): Int? {
+        val ledger = File(root, "app-profile/migration-ledger.yaml")
+        if (!ledger.isFile) return null
+        return ledger.readLines().firstNotNullOfOrNull { raw ->
+            Regex("""^version:\s*(\d+)""").find(raw.substringBefore('#'))?.groupValues?.get(1)?.toInt()
+        }
+    }
+
+    private fun reconcileMigrationLedger(root: File, appProfile: Map<String, Any?>) {
+        val ledger = File(root, "app-profile/migration-ledger.yaml")
+        if (!ledger.isFile) return
+        // Units live in their OWN template-owned file, not app.yaml: app.yaml is owner:merge and
+        // holds both sides' declarations, so a template edit beside a fork edit is a 3-way merge.
+        // migration-units.yaml is template-only and full-copies; the ledger is fork-only and is never
+        // copied. Neither side writes the other's file.
+        val unitsFile = File(root, "core/database/migration-units.yaml")
+        val units = if (unitsFile.isFile) {
+            unitsFile.readLines().mapNotNull { raw ->
+                val line = raw.substringBefore('#')
+                if (!line.trimStart().startsWith("-")) return@mapNotNull null
+                Regex("""id:\s*([A-Za-z0-9_-]+)""").find(line)?.groupValues?.get(1)
+            }
+        } else {
+            emptyList()
+        }
+        if (units.isEmpty()) return
+
+        // Line-oriented read/write: the ledger is fork-authored and comment-heavy, and a YAML
+        // round-trip would reformat it and drop every comment explaining why a row exists.
+        val lines = ledger.readLines().toMutableList()
+        val applied = mutableSetOf<String>()
+        var version = 0
+        var baselineIdx = -1
+        var lastMigrationIdx = -1
+        val unitRe = Regex("""unit:\s*([A-Za-z0-9_-]+)""")
+        lines.forEachIndexed { i, raw ->
+            val line = raw.substringBefore('#')
+            Regex("""^version:\s*(\d+)""").find(line)?.let { version = it.groupValues[1].toInt() }
+            if (Regex("""^baseline_units:""").containsMatchIn(line)) baselineIdx = i
+            if (baselineIdx >= 0 && i == baselineIdx) {
+                Regex("""\[(.*)\]""").find(line)?.groupValues?.get(1)
+                    ?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }?.forEach { applied += it }
+            }
+            unitRe.find(line)?.let { applied += it.groupValues[1] }
+            if (Regex("""^\s*-\s*\{.*from:""").containsMatchIn(line)) lastMigrationIdx = i
+        }
+        if (version <= 0 || lastMigrationIdx < 0) return
+
+        val missing = units.filterNot { it in applied }
+        if (missing.isEmpty()) return
+
+        val additions = missing.map { id ->
+            val from = version
+            version += 1
+            "  - { from: $from, to: $version, unit: $id }   # appended by syncForkConfig"
+        }
+        lines.addAll(lastMigrationIdx + 1, additions)
+        val vIdx = lines.indexOfFirst { Regex("""^version:\s*\d+""").containsMatchIn(it.substringBefore('#')) }
+        if (vIdx >= 0) lines[vIdx] = Regex("""^version:\s*\d+""").replace(lines[vIdx], "version: $version")
+        ledger.writeText(lines.joinToString("\n") + "\n")
+        logger.lifecycle(
+            "syncForkConfig: appended ${missing.size} migration unit(s) to the ledger " +
+                "(${missing.joinToString(", ")}) -> version $version",
+        )
     }
 
     private fun deepMerge(a: Map<String, Any?>, b: Map<String, Any?>): Map<String, Any?> {
@@ -887,7 +1429,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 logger.lifecycle("syncForkConfig: tokenized wrangler.toml name=$cloudflareProject")
             }
             // config.yaml + workflow-snippet.yml — `--project-name=…` in the runner/CI command string.
-            // (workflow-snippet.yml was missed initially — surfaced by the awaazly fork proof 2026-08-07.)
+            // (workflow-snippet.yml was missed initially — surfaced by a downstream fork proof.)
             for (rel in listOf(
                 "deployment/web/cloudflare-pages/config.yaml",
                 "deployment/web/cloudflare-pages/workflow-snippet.yml",
@@ -1099,6 +1641,10 @@ abstract class SyncForkConfigTask : DefaultTask() {
             "play.testers.closed.googlegroup" to "android.play_testers.closed_googlegroup",
             // ── apple (shared iOS + macOS) ──
             "apple.team.id" to "apple.team_id",
+            // The App Store NUMERIC id. Two consumers that previously each had their own copy:
+            // the TestFlight/App Store lanes (hardcoded) and AppReviewConfig (which had none, so
+            // promptForCustomReview could not reach the listing on iOS).
+            "apple.app.store.id" to "apple.app_store_id",
             "apple.match.git.url" to "apple.match.git.url",
             "apple.match.git.branch" to "apple.match.git.branch",
             "firebase.ios.prod.app.id" to "apple.firebase.ios_app_id_prod",

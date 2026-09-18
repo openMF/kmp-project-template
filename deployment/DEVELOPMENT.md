@@ -75,7 +75,7 @@ vault access (`gha_secret_var` names the matching plain GitHub Actions secret).
 - **`before_all.rb`** — regenerates `deployment/**/metadata` (DERIVED, gitignored) from
   `app-profile/` via `./gradlew syncForkConfig` before any lane runs; also restores the small
   allow-list of tracked files (`cmp-ios/iosApp.xcodeproj/project.pbxproj`,
-  `cmp-ios/iosApp/Info.plist`, `cmp-shared/cmp_shared.podspec`) that Fastlane's `match`/`gym`/
+  `cmp-ios/iosApp/Info.plist`) that Fastlane's `match`/`gym`/
   version steps mutate during a build, so a deploy never leaves dirty tracked source behind for
   `git-session-commit` to sweep in.
 - **`listing_sync.rb`** — drift-checked store-listing sync every store-deploy lane calls

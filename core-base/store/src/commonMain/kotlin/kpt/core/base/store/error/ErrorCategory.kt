@@ -120,13 +120,52 @@ private fun Throwable.messageChain(): Sequence<String> = sequence {
     }
 }
 
+/**
+ * Transport-failure class names, matched on the class-name chain.
+ *
+ * The list is NAME-based because this is commonMain — there is no shared supertype to test against
+ * (`java.io.IOException` does not exist on iOS or Web). That makes coverage a question of evidence,
+ * not intuition: an engine whose exception happens not to contain one of these substrings silently
+ * categorizes Generic, and `DecisionEngine.isExpectedWhenOffline()` then refuses the offline-first
+ * rule and shows a blocking NoNetwork on a screen that should have shown its own Empty.
+ *
+ * Two such holes were measured rather than guessed:
+ *
+ *  - `HttpRequestException` — Ktor's Darwin engine (iOS/macOS) raises `DarwinHttpRequestException`
+ *    (and the deprecated `IosHttpRequestException`) for a transport failure, wrapping the NSError.
+ *    Confirmed against the cached `ktor-client-darwin` 3.2.1 klib. The NSError is a PROPERTY, not a
+ *    `cause`, so the chain never reaches its "offline" text. Matching the `HttpRequestException`
+ *    suffix is deliberately narrow: Ktor reports HTTP STATUS failures as `ClientRequestException` /
+ *    `ServerResponseException`, neither of which contains it, so a 500 stays real signal.
+ *  - `Socket` — `java.net.SocketException` IS an IOException subclass, but a name match cannot see
+ *    that, and "SocketException" contains none of the original six patterns. A dropped connection
+ *    on JVM/Android categorized Generic while its sibling `SocketTimeoutException` matched via
+ *    "Timeout" — an inconsistency nothing in the API surface hinted at.
+ *  - `JsError` — the JS and wasmJs engines wrap EVERY JavaScript-side failure in
+ *    `JsError(origin: dynamic) : Throwable("Error from javascript[...]")`, including a rejected
+ *    `fetch` and a rejected `ReadableStreamDefaultReader.read()`. Verified against ktor `main`:
+ *    `ktor-client-core/js/.../JsClientEngine.kt` and
+ *    `ktor-client-core/wasmJs/.../browser/BrowserFetch.kt` — the engine moved OUT of
+ *    `ktor-client-js` into `ktor-client-core`, which is why hunting for a cached `ktor-client-js`
+ *    artifact turned up nothing. The name carries no transport word at all — not IOException, not
+ *    Connect, not Socket — so until this entry, web was the last platform still falling through to
+ *    a blocking NoNetwork on an empty offline cache: the same bug the Darwin entry fixed for iOS.
+ *    The browser's own cause (`TypeError: Failed to fetch`) hangs off `origin`, not `cause`, so the
+ *    chain never sees it either.
+ *
+ * Each entry above is pinned by a case in ErrorCategoryTest, including a negative one asserting
+ * `ServerResponseException` does NOT become Network.
+ */
 private fun String.matchesNetworkClassName(): Boolean =
     contains("IOException", ignoreCase = true) ||
         contains("Connect", ignoreCase = true) ||
         contains("Timeout", ignoreCase = true) ||
         contains("UnknownHost", ignoreCase = true) ||
         contains("SSLException", ignoreCase = true) ||
-        contains("Offline", ignoreCase = true)
+        contains("Offline", ignoreCase = true) ||
+        contains("HttpRequestException", ignoreCase = true) ||
+        contains("Socket", ignoreCase = true) ||
+        contains("JsError", ignoreCase = true)
 
 /**
  * Matches any 3-digit HTTP status code in a message, optionally preceded by `HTTP `.

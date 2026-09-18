@@ -17,12 +17,12 @@
    `core-base/database`. It persists sync-failure timestamps across process restarts so a
    `MutableStore` can retry offline writes on reconnect.
 3. `core/store` registers the built `Store` / `MutableStore` in Koin under a qualifier from its own
-   `AppStoreRegistry`, which extends this module's `StoreRegistry` (`protected fun store(name) =
+   the generated `<Store>Keys` objects, which extend this module's `StoreRegistry` (`protected fun store(name) =
    named(name)`) — `core-base` supplies only the qualifier-naming mechanism; the qualifiers themselves
    are fork-owned.
 4. This module's own `StoreModule` Koin module is intentionally near-empty — `StoreFactory` is a plain
    `object` with nothing to bind. The real per-feature bindings live in `core/store`'s own DI module
-   (`appStoreModule`).
+   (`appStoreModule`, which includes the generated bindings).
 5. The read side turns any `Store<Key, Output>` into a `ScreenDataStream<Output>` via
    `Store<Key, Output>.asScreenStream(key, networkMonitor, fetchedAtRepository, cacheKey, scope,
    fetchPolicy = ...)` — `core/data` repositories call this, not the feature layer.
@@ -36,7 +36,7 @@
   most screens compose the read stream and `SubmitHandler` separately instead.
 - Framework-owned: `StoreFactory`, `DecisionEngine`, and the `infra/impl` Room-backed defaults
   (`RoomBookkeeper`, `RoomFetchedAtRepository`, `StoreCacheManagerImpl`). Fork pressure goes to
-  `core/store`'s `provide*Store` functions and `AppStoreRegistry`, never here — see the
+  `core/store`'s `provide*Store` functions annotated `@StoreProvider`, never here — see the
   "framework-shared, don't modify" note in the root `CLAUDE.md`.
 
 Canonical example: `core/store/CONSUMPTION.md` is the feature-facing contract this module backs.

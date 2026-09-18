@@ -17,6 +17,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.crypto.ui.CoinDetailScreen
@@ -68,6 +69,7 @@ fun NavController.navigateToCoinDetail(coinId: String, navOptions: NavOptions? =
  * read path that was already wired at HEAD (turning the former dead click +
  * orphan store into a real drill-down).
  */
+@FeatureDestination
 fun NavGraphBuilder.cryptoGraph(navController: NavController) {
     navigation<CryptoGraphRoute>(startDestination = CoinMarketsListRoute) {
         composableWithPushTransitions<CoinMarketsListRoute> {

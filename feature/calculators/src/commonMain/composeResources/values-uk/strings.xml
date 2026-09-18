@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">Кредитоспроможність</string>
+    <string name="screens_calc_affordability_back_cd">Назад</string>
+    <string name="screens_calc_affordability_income_label">Щомісячний дохід</string>
+    <string name="screens_calc_affordability_obligations_label">Наявні щомісячні зобовʼязання</string>
+    <string name="screens_calc_affordability_dti_label">Межа боргового навантаження (%)</string>
+    <string name="screens_calc_affordability_rate_label">Річна ставка (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Строк (місяців)</string>
+    <string name="screens_calc_affordability_max_principal_label">Максимальна сума кредиту</string>
+    <string name="screens_calc_affordability_max_emi_label">Максимальний платіж</string>
+    <string name="screens_calc_amortization_title">Амортизація</string>
+    <string name="screens_calc_amortization_title_with_source">Амортизація · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Назад</string>
+    <string name="screens_calc_amortization_principal_label">Основна сума</string>
+    <string name="screens_calc_amortization_rate_label">Річна ставка (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Строк (місяців)</string>
+    <string name="screens_calc_amortization_emi_label">Щомісячний платіж</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Відсотки %1$s · Разом %2$s</string>
+    <string name="screens_calc_amortization_header_month">№</string>
+    <string name="screens_calc_amortization_header_principal">Основна сума</string>
+    <string name="screens_calc_amortization_header_interest">Відсотки</string>
+    <string name="screens_calc_amortization_header_balance">Залишок</string>
+    <string name="screens_calc_compare_title">Порівняти кредити</string>
+    <string name="screens_calc_compare_back_cd">Назад</string>
+    <string name="screens_calc_compare_best_emi_label">Найкращий платіж · Сценарій %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/міс</string>
+    <string name="screens_calc_compare_savings_text">Заощаджує %1$s загалом порівняно з найдорожчим</string>
+    <string name="screens_calc_compare_helper_text">Змініть будь-який сценарій нижче — порівняння оновиться миттєво.</string>
+    <string name="screens_calc_compare_scenario_label">Сценарій %1$d</string>
+    <string name="screens_calc_compare_best_badge">Найкращий</string>
+    <string name="screens_calc_compare_principal_label">Основна сума</string>
+    <string name="screens_calc_compare_rate_label">Ставка (%)</string>
+    <string name="screens_calc_compare_tenure_label">Строк (місяців)</string>
+    <string name="screens_calc_compare_result_emi">Платіж</string>
+    <string name="screens_calc_compare_result_interest">Відсотки</string>
+    <string name="screens_calc_compare_result_total">Разом</string>
+    <string name="screens_calc_wizard_resume_title">Продовжити незавершений майстер?</string>
+    <string name="screens_calc_wizard_resume_message">У вас є майстер розрахунку кредиту на кроці %1$d. Продовжити з місця зупинки чи відхилити?</string>
+    <string name="screens_calc_wizard_resume_continue">Продовжити</string>
+    <string name="screens_calc_wizard_resume_discard">Відхилити</string>
+    <string name="screens_calc_wizard_title">Новий кредит · Крок %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Назад</string>
+    <string name="screens_calc_wizard_step_principal_question">Скільки ви хочете позичити?</string>
+    <string name="screens_calc_wizard_step_principal_label">Сума основного боргу</string>
+    <string name="screens_calc_wizard_step_tenure_question">На скільки місяців?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Строк (місяців)</string>
+    <string name="screens_calc_wizard_step_rate_question">За якою річною ставкою?</string>
+    <string name="screens_calc_wizard_step_rate_label">Річна ставка (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Щомісячний платіж</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Усього до сплати: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Основна сума</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Строк</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d місяців</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Ставка</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Усього відсотків</string>
+    <string name="screens_calc_wizard_step_name_message">Назвіть цей сценарій, щоб згодом знайти його серед своїх кредитів.</string>
+    <string name="screens_calc_wizard_step_name_label">Назва сценарію</string>
+    <string name="screens_calc_wizard_step_name_required">Обовʼязково — введіть назву, щоб активувати Зберегти.</string>
+    <string name="screens_calc_wizard_button_back">Назад</string>
+    <string name="screens_calc_wizard_button_next">Далі</string>
+    <string name="screens_calc_wizard_button_save">Зберегти як кредит</string>
+</resources>

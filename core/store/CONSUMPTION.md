@@ -2,11 +2,12 @@
 
 > The Store5 keystone. Every read/write of app data goes through a `Store` built by
 > `StoreFactory` (from `core-base/store`) and registered here. This module owns the app's
-> store factories (`provide*Store`), the `AppStoreRegistry` qualifier catalogue, and `StoreModule` DI.
+> store factories (`provide*Store`) annotated with `@StoreProvider`; qualifiers, cache keys and DI are generated.
 >
-> The archetype decision matrix + full API taxonomy is the SoT in
-> `training-layer/instructions/stream-first/latest/CORE_STORE.md` — this contract is the streamlined
-> "what to call" summary.
+> The archetype → factory → FetchPolicy catalogue and the write path are in
+> [`docs/architecture/cross-cutting/store-architecture.md`](../../docs/architecture/cross-cutting/store-architecture.md) — this
+> contract is the streamlined "what to call" summary. (Generator-side training guides live in the
+> framework repo, not in this repository.)
 
 ## Call sequence
 
@@ -22,17 +23,17 @@
      (canonical: `provideMacroIndicatorStore`).
 2. **Author `provide<Name>Store(...)`** returning `Store<Key, DomainOut>`. The entity→domain map
    lives INSIDE the `SourceOfTruth.reader` (the read-path contract) — the store emits the DOMAIN model.
-3. **Register the qualifier** in `AppStoreRegistry` (`val YourStore = store("yourStore")`) and the
-   `single<Store<...>>(qualifier = AppStoreRegistry.YourStore) { provideYourStore(get()) }` in `StoreModule`.
+3. **Annotate the provider** — `@StoreProvider(id = "yourStore")`. The qualifier, the Koin binding and
+   the logout purge are generated; there is nothing to register by hand.
    Also register in the logout-clear list so sign-out purges it.
 4. **`core/data` consumes the store**, not the feature — the repository turns it into a
    `ScreenDataStream` via `store.asScreenStream(...)` (see core/data/CONSUMPTION.md).
 
 ## Notes
 
-- `StoreCacheManager` centralises TTL / invalidation; TTLs live next to the qualifier in `AppStoreRegistry`.
+- `StoreCacheManager` centralises TTL / invalidation; a store's TTL is `@StoreProvider(ttl = "5m")`.
 - `AppErrorMapper` + `AppScreenStateDefaults` map Store5 errors → the `ScreenState` a screen renders.
 
 Canonical example: feature/crypto (createStore), feature/loans (createOfflineStore), the cloud-todo showcase (createMutableStore).
 
-Symbols: AppStoreRegistry, StoreModule, provideCoinMarketsStore, provideExchangeRatesStore, provideLoansStore, provideCloudTodoStore, provideMacroIndicatorStore, StoreCacheManager, AppErrorMapper, AppScreenStateDefaults
+Symbols: StoreProvider, CacheKey, StoreModule, provideCoinMarketsStore, provideExchangeRatesStore, provideLoansStore, provideCloudTodoStore, provideMacroIndicatorStore, StoreCacheManager, AppErrorMapper, AppScreenStateDefaults

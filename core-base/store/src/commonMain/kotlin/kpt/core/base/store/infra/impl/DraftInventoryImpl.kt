@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kpt.core.base.database.infra.dao.DraftDao
 import kpt.core.base.database.infra.entity.DraftEntity
-import kpt.core.base.database.invalidation.daoFlow
-import kpt.core.base.database.invalidation.notifyingWrite
 import kpt.core.base.store.infra.DraftInventory
 import kpt.core.base.store.infra.DraftRecord
 import kpt.core.base.store.infra.StoreCacheManager
@@ -24,25 +22,23 @@ import kpt.core.base.store.submit.SubmitOutboxStatus
  * Room-backed [DraftInventory]. A thin, framework-owned read/action facade over [DraftDao] that
  * exposes the cross-form draft feed the Sync & Drafts screen renders.
  *
- * Reuses the same wasmJs invalidation bridge every other draft consumer uses ([daoFlow] /
- * [notifyingWrite]) so the live list re-emits after a discard/retry on every platform.
+ * Reuses the same wasmJs invalidation bridge every other draft consumer uses (a plain Room `Flow` /
+ * a plain DAO write) so the live list re-emits after a discard/retry on every platform.
  */
 class DraftInventoryImpl(
     private val draftDao: DraftDao,
 ) : DraftInventory {
 
     override fun observeAll(): Flow<List<DraftRecord>> =
-        daoFlow(DRAFTS_TABLE) { draftDao.observeAll() }.map { rows -> rows.map { it.toRecord() } }
+        draftDao.observeAll().map { rows -> rows.map { it.toRecord() } }
 
-    override suspend fun discard(id: Long) = notifyingWrite(DRAFTS_TABLE) {
-        draftDao.deleteById(id)
-    }
+    override suspend fun discard(id: Long) = draftDao.deleteById(id)
+    
 
-    override suspend fun retry(id: Long) = notifyingWrite(DRAFTS_TABLE) {
-        draftDao.requeue(id, currentTimeMillis())
-    }
+    override suspend fun retry(id: Long) = draftDao.requeue(id, currentTimeMillis())
+    
 
-    override suspend fun pruneExpired() = notifyingWrite(DRAFTS_TABLE) {
+    override suspend fun pruneExpired() = run {
         val thresholdMs = currentTimeMillis() - StoreCacheManager.DEFAULT_DRAFT_TTL_MS
         draftDao.deleteOlderThan(thresholdMs)
     }
@@ -59,6 +55,3 @@ class DraftInventoryImpl(
 }
 
 private fun currentTimeMillis(): Long = kotlin.time.Clock.System.now().toEpochMilliseconds()
-
-/** Room `@Entity(tableName = …)` for [DraftEntity] — drives the wasmJs invalidation bridge. */
-private const val DRAFTS_TABLE = "framework_submit_drafts"

@@ -16,7 +16,7 @@ import org.koin.dsl.module
 /**
  * Koin module for the Watchlist feature (`read_local_list` demo).
  * [WatchlistViewModel] takes no parameters — it reads reactively from the
- * DI-provided [kpt.core.data.demo.watchlist.WatchlistRepository].
+ * DI-provided [kpt.core.data.watchlist.WatchlistRepository].
  */
 val WatchlistModule = module {
     viewModel { WatchlistViewModel(repository = get()) }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">Zadanie w chmurze</string>
+    <string name="screens_cloudtodo_detail_intro">Jedyny konsument createMutableStore + MutationGateway. Wyłącz sieć, aby zobaczyć gałęzie offline.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Przełącz (optymistycznie)</string>
+    <string name="screens_cloudtodo_complete_online_text">Zakończ (wymaga połączenia)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Rozwiąż konflikt</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Odrzuć</string>
+    <string name="screens_cloudtodo_status_completed">Ukończone</string>
+    <string name="screens_cloudtodo_status_not_completed">Nieukończone</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">Zastosowano lokalnie</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Zapis najpierw do Room. Synchronizacja sieciowa jest w kolejce i zostanie ponowiona po ponownym połączeniu.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Zastosowano · zsynchronizowano</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">Serwer potwierdził zapis.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Zastosowano · w kolejce</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Zapisano lokalnie; synchronizacja jest w kolejce i zostanie ponowiona po powrocie łączności.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Zablokowano</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Offline — zapis wymagający połączenia jest odrzucany zamiast zapisu lokalnego. Nic nie zapisano.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">Brak uwierzytelnienia dla tej operacji. Nic nie zapisano.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">Warunek wstępny serwera nie powiódł się przed zapisem. Nic nie zapisano.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Zarejestrowano konflikt</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">Serwer również zmienił ten rekord. Zastosowano jego wersję, a Twoja została zachowana — wybierz, która ma obowiązywać.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Niepowodzenie</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — optymistyczny zapis lokalny został wycofany.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — zachowano stan lokalny.</string>
+    <string name="screens_cloudtodo_conflicts_title">Konflikty synchronizacji</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">Brak nierozwiązanych konfliktów.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Zachowaj wersję serwera</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Ponów moją wersję</string>
+</resources>

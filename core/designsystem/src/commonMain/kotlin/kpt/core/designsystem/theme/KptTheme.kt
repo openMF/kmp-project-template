@@ -23,7 +23,7 @@ import kpt.core.base.designsystem.theme.Motion
 import kpt.core.base.designsystem.toKptColorScheme
 import kpt.core.base.designsystem.toKptTypography
 import kpt.core.base.ui.screen.LocalScreenStateDefaults
-import kpt.core.store.appScreenStateDefaults
+import kpt.core.store.config.appScreenStateDefaults
 
 val lightScheme = lightColorScheme(
     primary = primaryLight,

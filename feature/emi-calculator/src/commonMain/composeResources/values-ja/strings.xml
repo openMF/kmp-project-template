@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_emicalculator_title">月々の返済額計算</string>
+    <string name="screens_emicalculator_back_cd">戻る</string>
+    <string name="screens_emicalculator_principal_label">元金</string>
+    <string name="screens_emicalculator_rate_label">年利 (%)</string>
+    <string name="screens_emicalculator_tenure_label">期間（月）</string>
+    <string name="screens_emicalculator_monthly_emi_label">月々の返済額</string>
+    <string name="screens_emicalculator_total_payment_label">支払総額</string>
+    <string name="screens_emicalculator_total_interest_label">利息合計</string>
+</resources>

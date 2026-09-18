@@ -13,7 +13,7 @@
    - Plain `Flow<...>` accessors for derived totals (e.g. `observeTotalMonthlyEmi()`).
    Mirror `LoanRepository` (offline) or `CryptoRepository` (network+cache, paging via `PagingScreenStream`).
 2. **Implement it** (`impl/<Name>RepositoryImpl`): inject the `Store` from `core/store`
-   (`Store<Key, Domain>` via its `AppStoreRegistry` qualifier) and build the read stream with
+   (`Store<Key, Domain>` via its generated `<Store>Keys.Qualifier`) and build the read stream with
    `store.asScreenStream(scope, key)` / `store.asPagingScreenStream(...)`. Writes call
    `store.write(...)` (mutable) or the DAO's `upsert` (offline-local).
 3. **Bind in `RepositoryModule`** (`single<YourRepository> { YourRepositoryImpl(get(), ...) }`).

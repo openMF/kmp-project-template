@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">Fiyat uyarıları</string>
+    <string name="screens_alerts_back_cd">Geri</string>
+    <string name="screens_alerts_create_cd">Uyarı oluştur</string>
+    <string name="screens_alerts_delete_cd">Uyarıyı sil</string>
+    <string name="screens_alerts_row_above">Üstünde</string>
+    <string name="screens_alerts_row_below">Altında</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% değişim</string>
+    <string name="screens_alert_create_title">Yeni fiyat uyarısı</string>
+    <string name="screens_alert_create_back_cd">Geri</string>
+    <string name="screens_alert_create_coin_label">Coin</string>
+    <string name="screens_alert_create_target_label">Hedef fiyat</string>
+    <string name="screens_alert_create_dir_above">Üstünde</string>
+    <string name="screens_alert_create_dir_below">Altında</string>
+    <string name="screens_alert_create_submit">Uyarı oluştur</string>
+    <string name="screens_alert_create_draft_resume_title">Uyarınıza devam edilsin mi?</string>
+    <string name="screens_alert_create_draft_resume_message">Kaydedilmemiş bir fiyat uyarınız var. Düzenlemeye devam edin, silin veya yeni bir tane oluşturun.</string>
+    <string name="screens_alert_create_draft_resume_resume">Düzenlemeye devam et</string>
+    <string name="screens_alert_create_draft_resume_discard">Taslağı sil</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Yeniden başla</string>
+</resources>

@@ -36,13 +36,20 @@ class AndroidApplicationFirebaseConventionPlugin : Plugin<Project> {
                 "implementation"(libs.findLibrary("firebase.crashlytics").get())
             }
 
+            // The Crashlytics mapping-file upload runs at release-build time and returns 400 (failing
+            // the WHOLE build) when the fork's Firebase app has no Crashlytics provisioned. Gate it on a
+            // gradle property — default true (backward-compatible for configured forks); an unconfigured
+            // fork sets `firebase.crashlytics.mappingUploadEnabled=false` in gradle.properties to skip it.
+            // (Was hardcoded `true`, which contradicted the comment's own "only if configured" intent.)
+            val crashlyticsMappingUpload = providers
+                .gradleProperty("firebase.crashlytics.mappingUploadEnabled")
+                .orNull?.toBooleanStrictOrNull() ?: true
             extensions.configure<ApplicationExtension> {
                 buildTypes.configureEach {
-                    // Disable the Crashlytics mapping file upload. This feature should only be
-                    // enabled if a Firebase backend is available and configured in
-                    // google-services.json.
+                    // Mapping-file upload only when a Firebase backend is available + configured in
+                    // google-services.json — governed by the gate above.
                     configure<CrashlyticsExtension> {
-                        mappingFileUploadEnabled = true
+                        mappingFileUploadEnabled = crashlyticsMappingUpload
                     }
                 }
             }

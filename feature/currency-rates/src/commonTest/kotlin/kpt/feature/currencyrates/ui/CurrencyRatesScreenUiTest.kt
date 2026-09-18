@@ -12,7 +12,7 @@ package kpt.feature.currencyrates.ui
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkChangeEvent
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kpt.core.designsystem.theme.KptTheme
-import kpt.core.model.demo.currency.ExchangeRates
+import kpt.core.model.currency.ExchangeRates
 import org.mobilenativefoundation.store.store5.StoreBuilder
 import kotlin.test.Test
 

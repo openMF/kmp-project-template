@@ -42,12 +42,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.designsystem.component.HeroCard
-import kpt.core.common.formatGrouped
+import kpt.core.common.format.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.component.StatusChip
 import kpt.core.designsystem.component.StatusChipIntent
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.demo.emi.EmiResult
+import kpt.core.model.emi.EmiResult
 import kpt.feature.calculators.TestTags
 import kpt.feature.calculators.generated.resources.Res
 import kpt.feature.calculators.generated.resources.screens_calc_compare_back_cd
@@ -147,7 +147,7 @@ fun LoanComparisonScreen(
 }
 
 @Composable
-private fun ComparisonHero(analysis: LoanComparisonAnalysis) {
+internal fun ComparisonHero(analysis: LoanComparisonAnalysis) {
     val sp = MaterialTheme.spacing
     val cheapest = analysis.results.getOrNull(analysis.cheapestIndex)
     val mostExpensive = analysis.results.maxByOrNull { it.totalPayment }
@@ -187,7 +187,7 @@ private fun ComparisonHero(analysis: LoanComparisonAnalysis) {
 }
 
 @Composable
-private fun ScenarioCard(
+internal fun ScenarioCard(
     index: Int,
     scenario: LoanScenario,
     result: EmiResult?,
@@ -272,7 +272,7 @@ private fun ScenarioCard(
 }
 
 @Composable
-private fun ResultStrip(result: EmiResult, highlight: Boolean) {
+internal fun ResultStrip(result: EmiResult, highlight: Boolean) {
     val sp = MaterialTheme.spacing
     val container = if (highlight) {
         MaterialTheme.colorScheme.secondaryContainer
@@ -313,7 +313,7 @@ private fun ResultStrip(result: EmiResult, highlight: Boolean) {
 }
 
 @Composable
-private fun ResultCell(label: String, value: String) {
+internal fun ResultCell(label: String, value: String) {
     Column(horizontalAlignment = Alignment.Start) {
         Text(
             text = label,

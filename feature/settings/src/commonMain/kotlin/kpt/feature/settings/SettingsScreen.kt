@@ -38,6 +38,8 @@ import kpt.feature.settings.generated.resources.feature_settings_change_language
 import kpt.feature.settings.generated.resources.feature_settings_change_language_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_text
+import kpt.feature.settings.generated.resources.feature_settings_rate_app_row
+import kpt.feature.settings.generated.resources.feature_settings_rate_app_row_description
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row_description
 import org.jetbrains.compose.resources.stringResource
@@ -61,6 +63,7 @@ internal fun SettingsScreenContent(
     onSyncAndDraftsClick: () -> Unit,
     modifier: Modifier = Modifier,
     onFooterLongClick: (() -> Unit)? = null,
+    onRateAppClick: (() -> Unit)? = null,
 ) {
     val sp = MaterialTheme.spacing
     KptScaffold(
@@ -78,6 +81,10 @@ internal fun SettingsScreenContent(
             ThemeCard(onClick = onThemeCardClick)
             LanguageCard(onClick = onLanguageCardClick)
             SyncAndDraftsCard(onClick = onSyncAndDraftsClick)
+            // Absent, not disabled, when review is unreachable. `canRequestReview` is false on a
+            // target with neither a native review flow nor a configured store listing, and a
+            // greyed-out row there would advertise a capability the build genuinely does not have.
+            onRateAppClick?.let { RateAppCard(onClick = it) }
             Spacer(modifier = Modifier.fillMaxWidth().padding(sp.sm))
             VersionLabel(onLongClick = onFooterLongClick)
         }
@@ -97,6 +104,22 @@ internal fun SyncAndDraftsCard(onClick: () -> Unit, modifier: Modifier = Modifie
 }
 
 /**
+ * "Rate this app" row. Rendered only when the caller resolved that a review can actually be
+ * requested — see [kpt.feature.settings.demo.SettingsDemoBody].
+ */
+@Composable
+internal fun RateAppCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    SettingsRowCard(
+        icon = AppIcons.Star,
+        title = stringResource(Res.string.feature_settings_rate_app_row),
+        contentDescription = stringResource(Res.string.feature_settings_rate_app_row_description),
+        accentColor = MaterialTheme.colorScheme.primary,
+        onClick = onClick,
+        modifier = modifier,
+    )
+}
+
+/**
  * Static version footer label. When the caller supplies a non-empty dev-menu list (via
  * [kpt.feature.settings.demo.SettingsDemoBody]), long-pressing opens the Dev tools menu. When the list
  * is empty (release builds / neutralized forks) the long-press handler is `null`, so the label behaves
@@ -104,7 +127,7 @@ internal fun SyncAndDraftsCard(onClick: () -> Unit, modifier: Modifier = Modifie
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifier) {
+internal fun VersionLabel(onLongClick: (() -> Unit)?, modifier: Modifier = Modifier) {
     // App-name footer rendered from the common AppInfo.appDisplayName accessor (BuildKonfig →
     // gradle/fork.properties#app.display.name), not a hardcoded string resource — so a fork rebrands
     // in app-profile in one place (S9/T10).
@@ -152,7 +175,7 @@ internal fun LanguageCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun SettingsRowCard(
+internal fun SettingsRowCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     contentDescription: String,

@@ -10,6 +10,8 @@
 package kpt.core.base.ui.dashboard
 
 import androidx.compose.runtime.Immutable
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Aggregate progress snapshot for a multi-card dashboard. Computed from a list of
@@ -35,6 +37,7 @@ import androidx.compose.runtime.Immutable
  * The shape is intentionally simple: a single value class consumed by both UI and
  * telemetry. For per-card retry, route through the card's own `onRetry`.
  */
+@OptIn(ExperimentalTime::class)
 @Immutable
 data class DashboardProgressState(
     val loaded: Int,
@@ -42,4 +45,11 @@ data class DashboardProgressState(
     val isAnyLoading: Boolean,
     val hasAnyError: Boolean,
     val hasAnyEmpty: Boolean,
+    /**
+     * Oldest `fetchedAt` across the `Content` cards — the dashboard is only as fresh as its stalest
+     * card, so [DashboardProgressBar] renders "Updated {humanizeDuration(now − oldestFetchedAt)}"
+     * (staleness), NOT a load count. Null until at least one card carries a fetch timestamp, which
+     * drives the "Loading…" fallback while the first data is still arriving.
+     */
+    val oldestFetchedAt: Instant? = null,
 )

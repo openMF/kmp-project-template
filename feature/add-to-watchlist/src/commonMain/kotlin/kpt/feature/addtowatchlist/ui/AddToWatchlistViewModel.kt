@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.stateIn
 import kpt.core.base.store.submit.SubmitState
 import kpt.core.base.store.submit.submitHandler
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.data.demo.watchlist.WatchlistRepository
+import kpt.core.data.watchlist.WatchlistRepository
 
 /**
  * The WRITE side of the Personal Crypto Watchlist — the canonical `submit_offline_write`
@@ -29,7 +29,7 @@ import kpt.core.data.demo.watchlist.WatchlistRepository
  * Two orthogonal streams the star renders from:
  * - [isTracked] — read side: `repository.contains(coinId)` (reactive `Flow<Boolean>`), drives
  *   filled (tracked) vs outline (not tracked). Re-emits instantly after a toggle because both
- *   DAO writes are wrapped in the core-base `notifyingWrite {}` invalidation bridge.
+ *   DAO writes are wrapped in the core-base a plain DAO write invalidation bridge.
  * - [submitState] — write side: the [SubmitHandler] state (Idle / Submitting / Submitted / Failed).
  *   The local Room commit effectively never fails on-device; the Failed arm is the framework showcase.
  *
@@ -59,7 +59,7 @@ class AddToWatchlistViewModel(
 
     /**
      * Toggle membership. Reads the CURRENT tracked value and routes to the opposite write —
-     * both direct-DAO commits are wrapped in `notifyingWrite {}` so `contains()` re-emits and
+     * both direct-DAO commits are wrapped in a plain DAO write so `contains()` re-emits and
      * the star flips. Idempotent both ways.
      */
     fun onToggle() {

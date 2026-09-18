@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.data.demo.economic.EconomicRatesRepository
-import kpt.core.model.demo.economic.InterestRateSeries
-import kpt.core.store.demo.economic.impl.InterestRateSeriesKey
+import kpt.core.data.economic.EconomicRatesRepository
+import kpt.core.model.economic.InterestRateSeries
+import kpt.core.store.economic.impl.InterestRateSeriesKey
 
 /**
  * Per-series stream + refresh seam used by [InterestRatesViewModel].
@@ -65,7 +65,13 @@ internal class DefaultRateStreamFactory(
         return object : RateStream {
             override val state: Flow<ScreenState<InterestRateSeries>> = stream.state
             override val freshness: Flow<FreshnessSignal> = stream.freshness
-            override fun refresh() = stream.refresh()
+
+            // RateStream.refresh() is the USER-INITIATED entry point (pull-to-refresh / row-retry),
+            // so it forces a fresh fetch. EconomicRatesRepositoryImpl passes no fetchPolicy, i.e. the
+            // asScreenStream CACHE_FIRST_SWR default — a plain refresh() there only re-serves cache
+            // while revalidation stays band-gated, so on a Fresh band the user's pull-to-refresh
+            // would do nothing at all. Debouncing still applies inside ScreenDataStream.
+            override fun refresh() = stream.refresh(forceFresh = true)
         }
     }
 }

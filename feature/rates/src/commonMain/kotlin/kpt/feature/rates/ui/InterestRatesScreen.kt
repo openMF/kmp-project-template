@@ -44,13 +44,13 @@ import kpt.core.base.designsystem.component.AppCard
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
-import kpt.core.common.formatDecimal
+import kpt.core.common.format.formatDecimal
 import kpt.core.designsystem.chart.KptSparkline
 import kpt.core.designsystem.component.RateBadge
 import kpt.core.designsystem.component.RateDirection
 import kpt.core.designsystem.theme.finance
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.demo.economic.InterestRateSeries
+import kpt.core.model.economic.InterestRateSeries
 import kpt.feature.rates.generated.resources.Res
 import kpt.feature.rates.generated.resources.screens_rates_back_cd
 import kpt.feature.rates.generated.resources.screens_rates_list_title
@@ -149,7 +149,7 @@ internal fun InterestRatesScreen(
 }
 
 @Composable
-private fun RateRowCard(
+internal fun RateRowCard(
     state: ScreenState<InterestRateSeries>,
     onRetry: () -> Unit,
     onSeriesClick: (seriesId: String) -> Unit,
@@ -184,7 +184,7 @@ private fun RateRowCard(
 }
 
 @Composable
-private fun RateRowContent(series: InterestRateSeries, onClick: () -> Unit) {
+internal fun RateRowContent(series: InterestRateSeries, onClick: () -> Unit) {
     val sp = MaterialTheme.spacing
     val delta = computeOneDayDelta(series)
     Row(

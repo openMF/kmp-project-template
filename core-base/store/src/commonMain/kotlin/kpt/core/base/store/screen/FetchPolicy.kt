@@ -13,15 +13,24 @@ package kpt.core.base.store.screen
  * Controls whether a screen stream reads from cache, hits the network, or both.
  *
  * Pass to [ScreenDataStream.asScreenStream], [LoadOnceStream.asLoadOnceStream], or
- * [PagingScreenStream] to override the default network-with-cache behaviour.
+ * [PagingScreenStream] to override that entry point's default.
+ *
+ * **Defaults differ per entry point — there is no single global default:**
+ * | Entry point                                             | Default              |
+ * |---------------------------------------------------------|----------------------|
+ * | `asScreenStream` (all overloads)                        | [CACHE_FIRST_SWR]    |
+ * | `asLoadOnceStream`                                      | [NETWORK_WITH_CACHE] |
+ * | [PagingScreenStream] / `asPagingScreenStream`           | [NETWORK_WITH_CACHE] |
+ * | `StoreFactory.createScreenWithMutation`                 | [NETWORK_WITH_CACHE] |
  *
  * **Choosing a policy:**
- * | Scenario                                                                    | Policy                         |
- * |-----------------------------------------------------------------------------|--------------------------------|
- * | Normal screen — show cached data immediately, refresh in background         | [NETWORK_WITH_CACHE] (default) |
- * | Always-fresh data required (e.g. payment confirmation)                      | [NETWORK_ONLY]                 |
- * | Offline-only view or explicit "load from cache"                             | [CACHE_ONLY]                   |
- * | Ambient surface that silently re-fetches on a cadence (FX rates, tickers)  | [PERIODIC]                     |
+ * | Scenario                                                                    | Policy                |
+ * |-----------------------------------------------------------------------------|-----------------------|
+ * | Offline-first screen — cached value now, revalidate only when stale         | [CACHE_FIRST_SWR]     |
+ * | Show cached data immediately, always refresh in background                  | [NETWORK_WITH_CACHE]  |
+ * | Always-fresh data required (e.g. payment confirmation)                      | [NETWORK_ONLY]        |
+ * | Offline-only view or explicit "load from cache"                             | [CACHE_ONLY]          |
+ * | Ambient surface that silently re-fetches on a cadence (FX rates, tickers)  | [PERIODIC]            |
  *
  * Modelled as a sealed interface so the vocabulary is open to additional variants
  * without breaking the source-compatible `FetchPolicy.NETWORK_WITH_CACHE`-style
@@ -33,8 +42,11 @@ sealed interface FetchPolicy {
      * Emit cached data immediately (if present), then trigger a background network fetch
      * and emit refreshed data when it arrives.
      *
-     * This is the default and works well for most screens. The user sees content quickly
-     * while the data is silently refreshed in the background. The staleness banner from
+     * The default for `asLoadOnceStream`, [PagingScreenStream] and
+     * `StoreFactory.createScreenWithMutation` — but NOT for `asScreenStream`, which defaults
+     * to [CACHE_FIRST_SWR]. The user sees content quickly while the data is silently refreshed
+     * in the background. Unlike [CACHE_FIRST_SWR] this refetches on EVERY subscription, not
+     * only when the freshness band is stale. The staleness banner from
      * [DataFreshnessIndicator] is shown when the data is older than the configured TTL.
      */
     data object NETWORK_WITH_CACHE : FetchPolicy
@@ -109,8 +121,14 @@ sealed interface FetchPolicy {
      * fresh-fetch path (pull-to-refresh, post-mutation) — the pair together
      * satisfies Store5 S5-5 (single source of truth for freshness).
      *
-     * The [ScreenDataStream] global default is still [NETWORK_WITH_CACHE]; opt
-     * in per call site via `asScreenStream(fetchPolicy = CACHE_FIRST_SWR)`.
+     * This is the `asScreenStream` DEFAULT (ScreenDataStream + ScreenStreamContext overloads)
+     * — no per-call-site opt-in needed. Opt OUT explicitly when a screen must refetch on every
+     * subscription: `asScreenStream(fetchPolicy = NETWORK_WITH_CACHE)`.
+     *
+     * Being the default is what makes an offline screen with an empty store render the screen's
+     * own [ScreenState.Empty] rather than a blocking [ScreenState.NoNetwork]: the `.onStart`
+     * NoNetwork pre-emit in [ScreenDataStream] is deliberately skipped for this policy, so the
+     * DecisionEngine decides from the first store emission instead.
      */
     data object CACHE_FIRST_SWR : FetchPolicy
 }

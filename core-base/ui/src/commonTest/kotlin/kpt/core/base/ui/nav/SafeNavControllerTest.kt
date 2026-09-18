@@ -31,7 +31,7 @@ class SafeNavControllerTest {
     }
 
     @Test
-    fun `lifecycle guard — STARTED blocks pop (mid-exit transition)`() {
+    fun `lifecycle guard — STARTED blocks pop during a mid-exit transition`() {
         assertFalse(shouldAllowPop(Lifecycle.State.STARTED))
     }
 

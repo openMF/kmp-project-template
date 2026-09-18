@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">코인 시장</string>
+    <string name="screens_crypto_coin_markets_back_cd">뒤로</string>
+    <string name="screens_crypto_coin_markets_empty">아직 표시할 코인이 없습니다.</string>
+    <string name="screens_crypto_coin_markets_error_retry">다시 시도</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">더 불러오는 중…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">모두 확인했습니다</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">현재 가격</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">24시간 변동</string>
+    <string name="screens_crypto_coin_detail_back_cd">뒤로</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">새로 고침</string>
+    <string name="screens_crypto_coin_detail_rank_label">시가총액 순위</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">시가총액</string>
+    <string name="screens_crypto_coin_detail_high_label">24시간 고가</string>
+    <string name="screens_crypto_coin_detail_low_label">24시간 저가</string>
+    <string name="screens_crypto_coin_detail_circulating_label">유통 공급량</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">최대 공급량</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">무제한</string>
+    <string name="screens_crypto_coin_detail_about_label">정보</string>
+</resources>

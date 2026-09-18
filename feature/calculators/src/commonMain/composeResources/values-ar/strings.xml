@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">القدرة على الاقتراض</string>
+    <string name="screens_calc_affordability_back_cd">رجوع</string>
+    <string name="screens_calc_affordability_income_label">الدخل الشهري</string>
+    <string name="screens_calc_affordability_obligations_label">الالتزامات الشهرية الحالية</string>
+    <string name="screens_calc_affordability_dti_label">سقف نسبة الدين إلى الدخل (%)</string>
+    <string name="screens_calc_affordability_rate_label">المعدل السنوي (%)</string>
+    <string name="screens_calc_affordability_tenure_label">المدة (بالأشهر)</string>
+    <string name="screens_calc_affordability_max_principal_label">أقصى أصل للقرض</string>
+    <string name="screens_calc_affordability_max_emi_label">أقصى قسط شهري</string>
+    <string name="screens_calc_amortization_title">الإطفاء</string>
+    <string name="screens_calc_amortization_title_with_source">الإطفاء · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">رجوع</string>
+    <string name="screens_calc_amortization_principal_label">أصل المبلغ</string>
+    <string name="screens_calc_amortization_rate_label">المعدل السنوي (%)</string>
+    <string name="screens_calc_amortization_tenure_label">المدة (بالأشهر)</string>
+    <string name="screens_calc_amortization_emi_label">القسط الشهري</string>
+    <string name="screens_calc_amortization_interest_total_supporting">الفائدة %1$s · الإجمالي %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">أصل المبلغ</string>
+    <string name="screens_calc_amortization_header_interest">الفائدة</string>
+    <string name="screens_calc_amortization_header_balance">الرصيد</string>
+    <string name="screens_calc_compare_title">مقارنة القروض</string>
+    <string name="screens_calc_compare_back_cd">رجوع</string>
+    <string name="screens_calc_compare_best_emi_label">أفضل قسط · السيناريو %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/شهر</string>
+    <string name="screens_calc_compare_savings_text">يوفّر %1$s إجمالاً مقارنةً بالأغلى</string>
+    <string name="screens_calc_compare_helper_text">عدّل أي سيناريو أدناه لترى المقارنة تتحدّث مباشرةً.</string>
+    <string name="screens_calc_compare_scenario_label">السيناريو %1$d</string>
+    <string name="screens_calc_compare_best_badge">الأفضل</string>
+    <string name="screens_calc_compare_principal_label">أصل المبلغ</string>
+    <string name="screens_calc_compare_rate_label">المعدل (%)</string>
+    <string name="screens_calc_compare_tenure_label">المدة (بالأشهر)</string>
+    <string name="screens_calc_compare_result_emi">القسط</string>
+    <string name="screens_calc_compare_result_interest">الفائدة</string>
+    <string name="screens_calc_compare_result_total">الإجمالي</string>
+    <string name="screens_calc_wizard_resume_title">هل تريد استئناف المعالج غير المكتمل؟</string>
+    <string name="screens_calc_wizard_resume_message">لديك معالج حساب قرض عند الخطوة %1$d. هل تتابع من حيث توقفت أم تتجاهله؟</string>
+    <string name="screens_calc_wizard_resume_continue">متابعة</string>
+    <string name="screens_calc_wizard_resume_discard">تجاهل</string>
+    <string name="screens_calc_wizard_title">قرض جديد · الخطوة %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">رجوع</string>
+    <string name="screens_calc_wizard_step_principal_question">كم تريد أن تقترض؟</string>
+    <string name="screens_calc_wizard_step_principal_label">مبلغ أصل الدين</string>
+    <string name="screens_calc_wizard_step_tenure_question">على مدى كم شهرًا؟</string>
+    <string name="screens_calc_wizard_step_tenure_label">المدة (بالأشهر)</string>
+    <string name="screens_calc_wizard_step_rate_question">بأي معدل سنوي؟</string>
+    <string name="screens_calc_wizard_step_rate_label">المعدل السنوي (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">القسط الشهري</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">إجمالي المستحق: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">أصل المبلغ</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">المدة</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d شهرًا</string>
+    <string name="screens_calc_wizard_step_review_rate_label">المعدل</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">إجمالي الفائدة</string>
+    <string name="screens_calc_wizard_step_name_message">سمِّ هذا السيناريو لتجده لاحقًا ضمن قروضك.</string>
+    <string name="screens_calc_wizard_step_name_label">اسم السيناريو</string>
+    <string name="screens_calc_wizard_step_name_required">مطلوب — اكتب اسمًا لتفعيل الحفظ.</string>
+    <string name="screens_calc_wizard_button_back">رجوع</string>
+    <string name="screens_calc_wizard_button_next">التالي</string>
+    <string name="screens_calc_wizard_button_save">حفظ كقرض</string>
+</resources>

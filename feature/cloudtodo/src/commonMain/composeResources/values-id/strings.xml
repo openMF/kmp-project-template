@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">Tugas cloud</string>
+    <string name="screens_cloudtodo_detail_intro">Satu-satunya pengguna createMutableStore + MutationGateway. Matikan jaringan untuk melihat cabang offline.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Alihkan (optimistis)</string>
+    <string name="screens_cloudtodo_complete_online_text">Selesaikan (perlu online)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Selesaikan konflik</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Tutup</string>
+    <string name="screens_cloudtodo_status_completed">Selesai</string>
+    <string name="screens_cloudtodo_status_not_completed">Belum selesai</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">Diterapkan secara lokal</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Penulisan Room lebih dulu. Sinkronisasi jaringan diantrekan dan dicoba lagi saat tersambung kembali.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Diterapkan · tersinkron</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">Server mengonfirmasi penulisan.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Diterapkan · diantrekan</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Ditulis secara lokal; sinkronisasi diantrekan dan akan dicoba lagi saat koneksi kembali.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Diblokir</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Offline — penulisan yang memerlukan koneksi ditolak, bukan ditulis lokal. Tidak ada yang ditulis.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">Tidak terautentikasi untuk operasi ini. Tidak ada yang ditulis.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">Prasyarat server gagal sebelum penulisan apa pun. Tidak ada yang ditulis.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Konflik tercatat</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">Server juga mengubah catatan ini. Versinya diterapkan dan versi Anda disimpan — pilih mana yang berlaku.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Gagal</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — penulisan lokal optimistis dibatalkan.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — status lokal dipertahankan.</string>
+    <string name="screens_cloudtodo_conflicts_title">Konflik sinkronisasi</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">Tidak ada konflik yang belum diselesaikan.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Pertahankan versi server</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Coba lagi versi saya</string>
+</resources>

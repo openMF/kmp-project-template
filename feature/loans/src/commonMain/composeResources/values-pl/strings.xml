@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">Dodaj kredyt</string>
+    <string name="screens_loans_edit_title">Edytuj kredyt</string>
+    <string name="screens_loans_addedit_back_cd">Wstecz</string>
+    <string name="screens_loans_addedit_name_label">Nazwa kredytu</string>
+    <string name="screens_loans_addedit_kind_label">Rodzaj</string>
+    <string name="screens_loans_addedit_kind_cd">Wybierz rodzaj kredytu</string>
+    <string name="screens_loans_addedit_principal_label">Kapitał początkowy</string>
+    <string name="screens_loans_addedit_principal_remaining_label">Pozostały kapitał</string>
+    <string name="screens_loans_addedit_annual_rate_label">Roczna stopa procentowa (%)</string>
+    <string name="screens_loans_addedit_tenure_label">Okres (miesiące)</string>
+    <string name="screens_loans_addedit_months_remaining_label">Pozostałe miesiące</string>
+    <string name="screens_loans_addedit_next_due_date_label">Następny termin (RRRR-MM-DD)</string>
+    <string name="screens_loans_addedit_total_paid_label">Zapłacono do tej pory</string>
+    <string name="screens_loans_addedit_monthly_emi_label">Rata miesięczna</string>
+    <string name="screens_loans_addedit_total_interest_preview">Łączne odsetki: %1$s</string>
+    <string name="screens_loans_add_submit">Zapisz kredyt</string>
+    <string name="screens_loans_edit_submit">Zaktualizuj kredyt</string>
+    <string name="screens_loans_addedit_status_saving">Zapisywanie…</string>
+    <string name="screens_loans_addedit_status_saved">Zapisano ✓</string>
+    <string name="screens_loans_addedit_status_offline">Zapisano offline — zsynchronizuje się po połączeniu.</string>
+    <string name="screens_loans_addedit_status_failed">Nie udało się zapisać: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">nieznany błąd</string>
+    <string name="screens_loans_addedit_retry_button">Ponów</string>
+    <string name="screens_loans_addedit_dismiss_button">Odrzuć</string>
+    <string name="screens_loans_addedit_draft_resume_title">Wznowić kredyt?</string>
+    <string name="screens_loans_addedit_draft_resume_message">Masz niezapisaną wersję roboczą kredytu. Wznów edycję, odrzuć ją lub utwórz nową.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">Wznów edycję</string>
+    <string name="screens_loans_addedit_draft_resume_discard">Odrzuć wersję roboczą</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">Zacznij od nowa</string>
+    <string name="screens_loans_detail_title">Szczegóły kredytu</string>
+    <string name="screens_loans_detail_back_cd">Wstecz</string>
+    <string name="screens_loans_detail_delete_dialog_title">Usunąć kredyt?</string>
+    <string name="screens_loans_detail_delete_dialog_message">Ten kredyt i historia jego śledzenia zostaną usunięte.</string>
+    <string name="screens_loans_detail_delete_confirm">Usuń</string>
+    <string name="screens_loans_detail_delete_cancel">Anuluj</string>
+    <string name="screens_loans_detail_principal_remaining_label">Pozostały kapitał</string>
+    <string name="screens_loans_detail_months_remaining_value">Pozostało %1$d mies.</string>
+    <string name="screens_loans_detail_original_principal_label">Kapitał początkowy</string>
+    <string name="screens_loans_detail_monthly_payment_label">Płatność miesięczna (rata)</string>
+    <string name="screens_loans_detail_total_paid_label">Zapłacono do tej pory</string>
+    <string name="screens_loans_detail_annual_rate_label">Stopa roczna</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">Następny termin</string>
+    <string name="screens_loans_detail_tenure_label">Okres</string>
+    <string name="screens_loans_detail_tenure_value">%1$d mies.</string>
+    <string name="screens_loans_detail_tenure_progress_label">Postęp okresu</string>
+    <string name="screens_loans_detail_tenure_progress_value">ukończono %1$d%%</string>
+    <string name="screens_loans_detail_edit_button">Edytuj</string>
+    <string name="screens_loans_detail_schedule_button">Harmonogram</string>
+    <string name="screens_loans_detail_delete_button">Usuń</string>
+    <string name="screens_loans_list_title">Kredyty osobiste</string>
+    <string name="screens_loans_list_back_cd">Wstecz</string>
+    <string name="screens_loans_list_new_fab_text">Nowy kredyt</string>
+    <string name="screens_loans_list_delete_dialog_title">Usunąć kredyt?</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' zostanie usunięty. Nie można tego cofnąć.</string>
+    <string name="screens_loans_list_delete_confirm">Usuń</string>
+    <string name="screens_loans_list_delete_cancel">Anuluj</string>
+    <string name="screens_loans_list_total_outstanding_label">Łącznie do spłaty</string>
+    <string name="screens_loans_list_active_count_single">%1$d aktywny kredyt</string>
+    <string name="screens_loans_list_active_count_plural">%1$d aktywnych kredytów</string>
+    <string name="screens_loans_list_monthly_emi_label">Rata miesięczna</string>
+    <string name="screens_loans_row_remaining_label">Pozostało</string>
+    <string name="screens_loans_row_monthly_emi_label">Rata miesięczna</string>
+    <string name="screens_loans_row_progress_value">spłacono %1$d%%</string>
+    <string name="screens_loans_row_next_due_value">Następna: %1$s</string>
+</resources>

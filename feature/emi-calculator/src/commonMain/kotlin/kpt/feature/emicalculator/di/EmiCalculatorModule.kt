@@ -9,10 +9,21 @@
  */
 package kpt.feature.emicalculator.di
 
+import kpt.core.domain.emi.calculateEmi
+import kpt.core.store.emi.impl.EmiCompute
 import kpt.feature.emicalculator.ui.EmiCalculatorViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val EmiCalculatorModule = module {
+    // Binds the compute PORT declared by core/store. core/store cannot import core/domain
+    // (store → domain → data → store would be a cycle), so the feature — which already sees
+    // both — supplies the implementation and Koin joins them at runtime. See EmiStore.kt.
+    single<EmiCompute> {
+        EmiCompute { params ->
+            calculateEmi(params.principal, params.ratePercent, params.tenureMonths)
+        }
+    }
+
     viewModelOf(::EmiCalculatorViewModel)
 }

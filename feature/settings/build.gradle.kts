@@ -8,7 +8,7 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
-import java.util.Properties
+import org.convention.forkProp
 
 plugins {
     alias(libs.plugins.cmp.feature.convention)
@@ -28,6 +28,9 @@ kotlin {
             implementation(projects.core.store)
             // Firebase analytics (AnalyticsHelper + Compose TrackScreenView/rememberAnalyticsHelper) via core/firebase.
             implementation(projects.core.firebase)
+            // AppReviewManager + the generated AppReviewConfig for the "Rate this app" row. Same rule
+            // as core/store above: depend on core/platform, which `api`-re-exposes core-base/platform.
+            implementation(projects.core.platform)
 
             implementation(compose.ui)
             implementation(compose.foundation)
@@ -48,10 +51,9 @@ compose {
 // `gradle/fork.properties#app.display.name` — the build-bridge that syncForkConfig generates from the
 // SoT `app-profile/app.yaml#identity.app_name`. SettingsScreen's footer renders this instead of a
 // hardcoded string resource, so a fork rebrands in app-profile, not 7 locale strings.xml files (S9/T10).
-val settingsForkProps = Properties().apply {
-    val f = rootProject.file("gradle/fork.properties")
-    if (f.exists()) f.inputStream().use { load(it) }
-}
+// Read through the ONE Gradle-side reader (org.convention.ForkProperties) rather than a local
+// Properties().load() — see that file for why independent parsers are the defect class.
+val settingsAppDisplayName = forkProp("app.display.name", "App")
 
 buildkonfig {
     packageName = "kpt.feature.settings"
@@ -59,7 +61,7 @@ buildkonfig {
         buildConfigField(
             STRING,
             "APP_DISPLAY_NAME",
-            settingsForkProps.getProperty("app.display.name").orEmpty().ifBlank { "App" },
+            settingsAppDisplayName,
         )
     }
 }

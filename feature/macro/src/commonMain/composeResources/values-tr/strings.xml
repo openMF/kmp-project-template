@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">Geri</string>
+    <string name="screens_macro_country_title">Ülke makro verileri</string>
+    <string name="screens_macro_refresh_all_cd">Tümünü yenile</string>
+    <string name="screens_macro_stale_chip">ESKİ — önbellekteki veriler gösteriliyor</string>
+    <string name="screens_macro_picker_title">Ülke seç</string>
+    <string name="screens_macro_picker_search_placeholder">Ülke veya ISO kodu ara</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">Kaynak: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">Yıl yıl</string>
+    <string name="screens_macro_card_empty">Bu gösterge için yayımlanmış veri yok.</string>
+    <string name="screens_macro_card_captive_portal">Captive portal arkasında — devam etmek için giriş yapın.</string>
+    <string name="screens_macro_card_offline">Çevrimdışı — bu göstergeyi almak için bağlanın.</string>
+    <string name="screens_macro_card_generic_error">Bu gösterge yüklenemedi.</string>
+    <string name="screens_macro_card_auth_required">Kimlik doğrulama gerekli.</string>
+    <string name="screens_macro_card_latest_year">En son: %1$s</string>
+    <string name="screens_macro_card_loading">Yükleniyor…</string>
+    <string name="screens_macro_card_retry">Yeniden dene</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

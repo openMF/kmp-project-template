@@ -18,7 +18,9 @@ import com.russhwolf.settings.Settings
  * - Android: EncryptedSharedPreferences -> SharedPreferencesSettings
  * - iOS: KeychainSettings (serviceName = "kpt.secure")
  * - Desktop: AES-encrypted PropertiesSettings
- * - Web: In-memory (full SubtleCrypto deferred to Phase 4)
+ * - Web: AES-GCM via WebCrypto, key non-extractable in IndexedDB. The web actual additionally
+ *   requires `SecureSettingsFactory.warmUp()` to complete before `create()`, because
+ *   WebCrypto is async-only while this factory is not.
  */
 expect class SecureSettingsFactory {
     fun create(): Settings

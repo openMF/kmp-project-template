@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
@@ -20,9 +21,9 @@ import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.base.ui.viewmodel.BaseMutationViewModel
 import kpt.core.base.ui.viewmodel.MutationMode
-import kpt.core.data.demo.banking.LoanRepository
-import kpt.core.model.demo.banking.Loan
-import kpt.core.model.demo.banking.LoanKind
+import kpt.core.data.banking.LoanRepository
+import kpt.core.model.banking.Loan
+import kpt.core.model.banking.LoanKind
 import kotlin.random.Random
 import kotlin.time.Clock
 
@@ -71,7 +72,14 @@ class EditLoanViewModel(
         // snapshot is a "ready" sentinel, not display data.
         if (loanId != null) {
             viewModelScope.launch {
-                repository.getById(loanId)?.let { hydrateFromExisting(it) }
+                // One-shot hydrate THROUGH the store — take the first SETTLED value off the
+                // store-backed detail stream rather than a raw `repository.getById`. The one-shot
+                // semantics that matter here are preserved (a live stream would clobber the user's
+                // in-progress edits on every unrelated write), but the read now goes through
+                // Store5: same SoT, same cache, same error path as every other read in the app.
+                val settled = repository.loanDetailStream(loanId, viewModelScope).state
+                    .firstOrNull { it is ScreenState.Content<Loan> || it is ScreenState.Empty }
+                (settled as? ScreenState.Content<Loan>)?.data?.let { hydrateFromExisting(it) }
                 mutableScreenState.value = ScreenState.Content(formSnapshot())
             }
         } else {

@@ -62,7 +62,7 @@ This playbook provides step-by-step deployment procedures for all 5 platforms.
 
 - [ ] **iOS setup complete** - Run `./scripts/ios/verify_ios_deployment.sh`
 - [ ] **Match certificates valid** - Run `bundle exec fastlane match adhoc --readonly`
-- [ ] **ComposeApp XCFramework assembles** - Run `./gradlew :cmp-shared:assembleComposeAppReleaseXCFramework` (SwiftPM/XCFramework; no CocoaPods)
+- [ ] **ComposeApp XCFramework assembles** - Run `./gradlew :cmp-shared:assembleComposeAppReleaseXCFramework` (SwiftPM/XCFramework)
 - [ ] **App Store Connect access** - Can login to App Store Connect
 - [ ] **Screenshots uploaded** (App Store only) - Check App Store Connect
 - [ ] **Privacy policy URL set** (App Store only) - Check App Information
@@ -403,7 +403,7 @@ Firebase receives: 2026.1.1-beta.0.9 ✅ (pre-release OK)
 # Check Match certificates (appstore profile needed)
 bundle exec fastlane match appstore --readonly
 
-# Assemble the ComposeApp XCFramework (SwiftPM/XCFramework; no CocoaPods)
+# Assemble the ComposeApp XCFramework (SwiftPM/XCFramework)
 ./gradlew :cmp-shared:assembleComposeAppReleaseXCFramework
 
 # Check version

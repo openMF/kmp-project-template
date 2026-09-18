@@ -11,6 +11,7 @@ package kpt.core.base.store.error
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 
@@ -32,6 +33,87 @@ class ErrorCategoryTest {
         assertEquals(
             ErrorCategory.Network,
             categorize(IOException("disconnect")),
+        )
+    }
+
+    // ─── REAL engine exception names ────────────────────────────────────────
+    // The cases above use invented names that obviously contain the matched substrings. These use
+    // the names the transport layers ACTUALLY throw, which is the only thing that decides whether a
+    // real offline device gets the offline-first Empty or a blocking NoNetwork.
+
+    @Test
+    fun categorize_ktorDarwinTransportFailure_returnsNetwork() {
+        // Ktor's Darwin engine (iOS/macOS — `ktor-client-darwin`, wired in libs.versions.toml) raises
+        // `DarwinHttpRequestException` for a TRANSPORT failure, wrapping the NSError. Verified
+        // against the cached klib for ktor-client-darwin 3.2.1, which declares exactly
+        // `DarwinHttpRequestException` and the deprecated `IosHttpRequestException`.
+        //
+        // The NSError is a PROPERTY of that exception, not its `cause`, so classNameChain() stops at
+        // the Darwin name and never sees "offline". None of IOException / Connect / Timeout /
+        // UnknownHost / SSLException / Offline appears in it — so before this case it categorized
+        // Generic, `isExpectedWhenOffline()` rejected it, and DecisionEngine fell through to a
+        // blocking NoNetwork. That is the exact user-facing bug the offline-first rule exists to
+        // prevent, reachable on every iOS cold start with an empty cache.
+        class DarwinHttpRequestException : RuntimeException()
+        assertEquals(
+            ErrorCategory.Network,
+            categorize(DarwinHttpRequestException()),
+        )
+    }
+
+    @Test
+    fun categorize_ktorDarwinLegacyName_returnsNetwork() {
+        class IosHttpRequestException : RuntimeException()
+        assertEquals(
+            ErrorCategory.Network,
+            categorize(IosHttpRequestException()),
+        )
+    }
+
+    @Test
+    fun categorize_socketException_returnsNetwork() {
+        // java.net.SocketException IS an IOException subclass, but categorize() matches on the NAME,
+        // not the type — and "SocketException" contains none of the six patterns. A dropped
+        // connection on JVM/Android therefore categorized Generic while its sibling
+        // SocketTimeoutException matched (via "Timeout"), which is an inconsistency no caller could
+        // have predicted.
+        class SocketException : RuntimeException()
+        assertEquals(
+            ErrorCategory.Network,
+            categorize(SocketException()),
+        )
+    }
+
+    @Test
+    fun categorize_ktorJsEngineFailure_returnsNetwork() {
+        // Ktor's JS and wasmJs engines wrap EVERY JavaScript-side failure in
+        //   class JsError(origin: dynamic) : Throwable("Error from javascript[...]")
+        // including a rejected fetch and a rejected ReadableStreamDefaultReader.read(). Verified
+        // against ktor main: ktor-client-core/js/.../JsClientEngine.kt and
+        // ktor-client-core/wasmJs/.../browser/BrowserFetch.kt. (The engine moved out of
+        // ktor-client-js into ktor-client-core, which is why looking for a cached ktor-client-js
+        // artifact found nothing.)
+        //
+        // The name carries NO transport word — not IOException, not Connect, not Socket — so before
+        // this case web was the last platform still falling through to a blocking NoNetwork on an
+        // empty offline cache, the same bug the Darwin case fixed for iOS. The browser's own cause
+        // ("TypeError: Failed to fetch") hangs off `origin`, not `cause`, so the chain never sees it.
+        class JsError : RuntimeException()
+        assertEquals(
+            ErrorCategory.Network,
+            categorize(JsError()),
+        )
+    }
+
+    @Test
+    fun categorize_serverResponseException_staysNonNetwork() {
+        // Guard on the widening: Ktor reports HTTP STATUS failures as ResponseException subclasses,
+        // which must NOT become Network — a 500 is real signal from a reachable server, and calling
+        // it Network would let `isExpectedWhenOffline()` swallow it on an offline screen.
+        class ServerResponseException : RuntimeException()
+        assertNotEquals(
+            ErrorCategory.Network,
+            categorize(ServerResponseException()),
         )
     }
 

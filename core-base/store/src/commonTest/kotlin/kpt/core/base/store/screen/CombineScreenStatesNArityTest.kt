@@ -54,7 +54,7 @@ class CombineScreenStatesNArityTest {
     }
 
     @Test
-    fun `3-source any UPDATING (no STALE) produces UPDATING`() = runTest {
+    fun `3-source any UPDATING with no STALE produces UPDATING`() = runTest {
         combineScreenStates(
             content(1),
             content(2, isRefreshing = true),

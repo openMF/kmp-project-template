@@ -47,8 +47,8 @@ import kpt.core.base.store.submit.SubmitState
 import kpt.core.base.ui.draft.DraftResolutionPrompt
 import kpt.core.base.ui.submit.MutationScreenContent
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.demo.banking.BillCategory
-import kpt.core.model.demo.banking.Recurrence
+import kpt.core.model.banking.BillCategory
+import kpt.core.model.banking.Recurrence
 import kpt.feature.bills.generated.resources.Res
 import kpt.feature.bills.generated.resources.screens_bills_add_title
 import kpt.feature.bills.generated.resources.screens_bills_addedit_amount_label
@@ -213,7 +213,7 @@ fun AddOrEditBillReminderScreen(
 }
 
 @Composable
-private fun SubmitStatusLine(
+internal fun SubmitStatusLine(
     submit: SubmitState<*>,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
@@ -271,7 +271,7 @@ private fun SubmitStatusLine(
 }
 
 @Composable
-private fun BasicInfoSection(
+internal fun BasicInfoSection(
     form: BillReminderFormState,
     isSubmitting: Boolean,
     onNameChange: (String) -> Unit,
@@ -315,7 +315,7 @@ private fun BasicInfoSection(
 }
 
 @Composable
-private fun RecurrenceSection(selected: Recurrence, isSubmitting: Boolean, onChange: (Recurrence) -> Unit) {
+internal fun RecurrenceSection(selected: Recurrence, isSubmitting: Boolean, onChange: (Recurrence) -> Unit) {
     val sp = MaterialTheme.spacing
     AppCard {
         Column(
@@ -354,7 +354,7 @@ private fun RecurrenceSection(selected: Recurrence, isSubmitting: Boolean, onCha
 
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
-private fun CategorySection(selected: BillCategory, isSubmitting: Boolean, onChange: (BillCategory) -> Unit) {
+internal fun CategorySection(selected: BillCategory, isSubmitting: Boolean, onChange: (BillCategory) -> Unit) {
     val sp = MaterialTheme.spacing
     AppCard {
         Column(
@@ -391,7 +391,7 @@ private fun CategorySection(selected: BillCategory, isSubmitting: Boolean, onCha
 }
 
 @Composable
-private fun ReminderSettingsSection(
+internal fun ReminderSettingsSection(
     reminderDaysBefore: Int,
     enabled: Boolean,
     isSubmitting: Boolean,

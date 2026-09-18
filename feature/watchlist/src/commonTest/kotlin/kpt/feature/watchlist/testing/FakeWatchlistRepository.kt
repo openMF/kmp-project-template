@@ -19,8 +19,8 @@ import kotlinx.coroutines.flow.update
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
-import kpt.core.data.demo.watchlist.WatchlistRepository
-import kpt.core.model.demo.watchlist.WatchlistItem
+import kpt.core.data.watchlist.WatchlistRepository
+import kpt.core.model.watchlist.WatchlistItem
 
 /**
  * In-memory [WatchlistRepository] for ViewModel- and UI-level tests. Backs the offline-local

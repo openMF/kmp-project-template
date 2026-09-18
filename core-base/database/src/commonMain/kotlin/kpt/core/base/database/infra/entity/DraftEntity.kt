@@ -9,6 +9,7 @@
  */
 package kpt.core.base.database.infra.entity
 
+import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.PrimaryKey
 
@@ -35,6 +36,10 @@ import androidx.room3.PrimaryKey
  * @param createdAtMs Epoch millis when the draft was first saved.
  * @param updatedAtMs Epoch millis of the most recent status transition.
  * @param errorMessage Last failure reason for display in the resume UI (nullable).
+ * @param attemptCount Submit attempts made so far (0 = never attempted). Drives
+ *   [kpt.core.base.store.submit.RetryPolicy] backoff + the maxAttempts cap in
+ *   `OfflineSubmitSyncer`; persisted so the cap survives process death — otherwise a
+ *   crash-looping payload would retry forever across restarts.
  */
 @Entity(tableName = "framework_submit_drafts")
 data class DraftEntity(
@@ -46,4 +51,6 @@ data class DraftEntity(
     val createdAtMs: Long,
     val updatedAtMs: Long,
     val errorMessage: String? = null,
+    @ColumnInfo(defaultValue = "0")
+    val attemptCount: Int = 0,
 )

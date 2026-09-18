@@ -23,8 +23,9 @@ import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.combineContent
 import kpt.core.base.store.screen.emptyIfContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.data.demo.currency.CurrencyRepository
-import kpt.core.model.demo.currency.ExchangeRates
+import kpt.core.data.currency.CurrencyRepository
+import kpt.core.model.currency.ExchangeRates
+import kpt.core.store.config.AppStoreRegistry
 
 /**
  * **Archetype showcase: CACHE_ONLY + NETWORK_ONLY**
@@ -109,6 +110,8 @@ class CurrencyRatesViewModel(
         is RatesAction.Search -> updateState { copy(searchQuery = action.query) }
         is RatesAction.ConverterAmount -> updateState { copy(converterAmount = action.amount) }
         is RatesAction.ConverterTarget -> updateState { copy(converterTarget = action.code) }
+        // This stream reads at NETWORK_WITH_CACHE (the CurrencyRepository default), which already
+        // refetches on every refresh — no force needed. retry() forces fresh on its own.
         RatesAction.Retry -> stream.retry()
         RatesAction.Refresh -> stream.refresh()
     }

@@ -21,8 +21,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kpt.core.base.store.screen.ScreenDataStream
-import kpt.core.data.demo.watchlist.WatchlistRepository
-import kpt.core.model.demo.watchlist.WatchlistItem
+import kpt.core.data.watchlist.WatchlistRepository
+import kpt.core.model.watchlist.WatchlistItem
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

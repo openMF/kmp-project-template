@@ -11,32 +11,10 @@ package cmp.navigation.registry
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import kpt.core.base.ui.nav.popBackStackSafely
-import kpt.core.data.demo.di.ProjectRepositoryModule
-import kpt.core.database.demo.di.ProjectDatabaseModule
-import kpt.core.network.demo.di.ProjectNetworkModule
-import kpt.feature.addtowatchlist.di.AddToWatchlistModule
-import kpt.feature.alerts.di.AlertsModule
-import kpt.feature.alerts.navigation.alertsGraph
-import kpt.feature.amortization.di.AmortizationModule
-import kpt.feature.bills.di.BillsModule
-import kpt.feature.bills.navigation.billsGraph
-import kpt.feature.calculators.di.CalculatorsModule
-import kpt.feature.calculators.navigation.calculatorsGraph
-import kpt.feature.crypto.di.CryptoFeatureModule
-import kpt.feature.crypto.navigation.cryptoGraph
-import kpt.feature.currencyrates.di.CurrencyRatesModule
-import kpt.feature.currencyrates.navigation.currencyRatesGraph
-import kpt.feature.emicalculator.di.EmiCalculatorModule
-import kpt.feature.emicalculator.navigation.emiCalculatorDestination
-import kpt.feature.loans.di.LoansModule
-import kpt.feature.loans.navigation.loansGraph
-import kpt.feature.macro.di.MacroModule
-import kpt.feature.macro.navigation.macroGraph
-import kpt.feature.rates.di.RatesModule
-import kpt.feature.rates.navigation.ratesGraph
-import kpt.feature.watchlist.di.WatchlistModule
-import kpt.feature.watchlist.navigation.watchlistGraph
+import kpt.core.data.di.ProjectRepositoryModule
+import kpt.core.database.di.ProjectDatabaseModule
+import kpt.core.datastore.di.ProjectDatastoreModule
+import kpt.core.network.di.ProjectNetworkModule
 import org.koin.core.module.Module
 
 /**
@@ -57,46 +35,41 @@ object FeatureRegistry {
      * Feature Koin modules the app installs. The framework SHELL modules (Home, Settings) live in
      * [cmp.navigation.di.KoinModules] and are always present; this is the fork's own features.
      */
+    /**
+     * The four per-layer fork seams, plus every `feature/<f>/di` Koin module.
+     *
+     * The feature half is DERIVED — `:cmp-navigation:generateFeatureKoinBindings` reads each
+     * feature module's `di` package and emits [GeneratedFeatureKoinBindings]. Adding a
+     * feature no longer means editing this file: previously it took an import AND a list entry
+     * here, and forgetting either compiled cleanly while the feature's ViewModels failed to
+     * resolve at runtime.
+     *
+     * The `Project*Module` seams stay listed BY HAND on purpose — they are core-layer fork seams,
+     * not features, and nothing under `feature/` declares them.
+     */
     val featureKoinModules: List<Module> = listOf(
-        // demo:begin — default demo feature set + relocated core demo DI aggregators (E1 / C1–C3, F3).
-        // customizer --clean strips this whole fenced block → an empty listOf() for a clean fork.
-        // ── default demo feature set — replace with your fork's ──
-        CurrencyRatesModule,
-        EmiCalculatorModule,
-        BillsModule,
-        LoansModule,
-        AmortizationModule,
-        RatesModule,
-        CalculatorsModule,
-        MacroModule,
-        CryptoFeatureModule,
-        AlertsModule,
-        WatchlistModule,
-        AddToWatchlistModule,
-        // ── relocated core demo DI (were inline fenced blocks in the core aggregators) ──
         ProjectRepositoryModule,
         ProjectNetworkModule,
         ProjectDatabaseModule,
-        // demo:end
+        ProjectDatastoreModule,
+        GeneratedFeatureKoinBindings,
     )
 
     /**
      * Feature nav destinations — registered into the authenticated graph. The shell destinations
      * (settings, notification) stay in [cmp.navigation.authenticated] template; this is the fork's routes.
      */
-    val featureDestinations: NavGraphBuilder.(NavController) -> Unit = { navController ->
-        // demo:begin — default demo feature routes (F3). customizer --clean strips this fenced block →
-        // an empty lambda body for a clean fork; replace with your fork's routes.
-        currencyRatesGraph(navController)
-        emiCalculatorDestination(onBackClick = { navController.popBackStackSafely() })
-        loansGraph(navController)
-        billsGraph(navController)
-        calculatorsGraph(navController)
-        ratesGraph(navController)
-        macroGraph(navController)
-        cryptoGraph(navController)
-        alertsGraph(navController)
-        watchlistGraph(navController)
-        // demo:end
-    }
+    /**
+     * Every top-level feature destination, DERIVED from `@FeatureDestination`.
+     *
+     * `:cmp-navigation:generateFeatureDestinations` scans each feature's `navigation` package and
+     * emits [GeneratedFeatureDestinations]. Adding a screen to the app graph is now a matter of
+     * annotating it where it is declared, rather than editing this file — which previously took an
+     * import AND a call, and where a missed call meant a route that silently did not exist.
+     *
+     * Nested and non-feature-graph entries are left unannotated on purpose:
+     * `amortizationScheduleDestination` is registered inside `loansGraph`, and `cloudTodoGraph`
+     * belongs to ShowcaseRegistry.
+     */
+    val featureDestinations: NavGraphBuilder.(NavController) -> Unit = GeneratedFeatureDestinations
 }

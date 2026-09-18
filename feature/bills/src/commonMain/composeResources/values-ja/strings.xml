@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_bills_add_title">新しい請求リマインダー</string>
+    <string name="screens_bills_edit_title">請求リマインダーを編集</string>
+    <string name="screens_bills_addedit_back_cd">戻る</string>
+    <string name="screens_bills_addedit_save_button">保存</string>
+    <string name="screens_bills_addedit_status_saving">保存中…</string>
+    <string name="screens_bills_addedit_status_saved">保存しました ✓</string>
+    <string name="screens_bills_addedit_status_add_another">続けて追加</string>
+    <string name="screens_bills_addedit_status_offline">オフラインで保存しました — オンラインになると同期します。</string>
+    <string name="screens_bills_addedit_status_failed">保存に失敗しました: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">不明なエラー</string>
+    <string name="screens_bills_addedit_retry_button">再試行</string>
+    <string name="screens_bills_addedit_dismiss_button">閉じる</string>
+    <string name="screens_bills_addedit_name_label">名称（例: 電気代）</string>
+    <string name="screens_bills_addedit_amount_label">金額</string>
+    <string name="screens_bills_addedit_due_day_label">毎月の支払日（1〜31）</string>
+    <string name="screens_bills_addedit_recurrence_title">繰り返し</string>
+    <string name="screens_bills_addedit_category_title">カテゴリ</string>
+    <string name="screens_bills_addedit_remind_days_before_label">何日前に通知するか</string>
+    <string name="screens_bills_addedit_enabled_label">有効</string>
+    <string name="screens_bills_draft_resume_title">下書きを再開しますか？</string>
+    <string name="screens_bills_draft_resume_message">保存されていない請求リマインダーがあります。続きから再開するか、破棄するか、新規作成してください。</string>
+    <string name="screens_bills_draft_resume_resume">再開</string>
+    <string name="screens_bills_draft_resume_discard">下書きを破棄</string>
+    <string name="screens_bills_draft_resume_start_fresh">新規作成</string>
+    <string name="screens_bills_list_title">請求リマインダー</string>
+    <string name="screens_bills_list_back_cd">戻る</string>
+    <string name="screens_bills_list_new_fab_text">新しい請求</string>
+    <string name="screens_bills_list_summary_label">今月の予定</string>
+    <string name="screens_bills_list_summary_due_single">今後7日間に %1$d 件の支払期日</string>
+    <string name="screens_bills_list_summary_due_plural">今後7日間に %1$d 件の支払期日</string>
+    <string name="screens_bills_list_mark_paid_cd">支払済みにする</string>
+    <string name="screens_bills_list_paid_button">支払済み</string>
+    <string name="screens_bills_list_reminders_disabled">リマインダー無効</string>
+</resources>

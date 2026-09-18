@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">المهام السحابية</string>
+    <string name="screens_cloudtodo_detail_intro">هذا هو المستهلك الوحيد لـ createMutableStore + MutationGateway. أوقف الشبكة لرؤية المسارات دون اتصال.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">تبديل (تفاؤلي)</string>
+    <string name="screens_cloudtodo_complete_online_text">إكمال (يتطلب اتصالاً)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">حلّ التعارض</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">تجاهل</string>
+    <string name="screens_cloudtodo_status_completed">مكتملة</string>
+    <string name="screens_cloudtodo_status_not_completed">غير مكتملة</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">طُبِّق محليًا</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">كتابة إلى Room أولاً. المزامنة عبر الشبكة في قائمة الانتظار وستُعاد المحاولة عند إعادة الاتصال.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">طُبِّق · تمت المزامنة</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">أكّد الخادم عملية الكتابة.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">طُبِّق · في قائمة الانتظار</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">كُتب محليًا؛ المزامنة في قائمة الانتظار وستُعاد المحاولة عند عودة الاتصال.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">محظور</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">دون اتصال — عملية الكتابة التي تتطلب اتصالاً تُرفض بدل الكتابة محليًا. لم يُكتب شيء.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">غير مُصادق عليك لهذه العملية. لم يُكتب شيء.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">فشل شرط مسبق على الخادم قبل أي كتابة. لم يُكتب شيء.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">تم تسجيل تعارض</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">غيّر الخادم هذا السجل أيضًا. طُبِّقت نسخته وحُفظت نسختك — اختر أيّهما يسود.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">فشل</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — تم التراجع عن الكتابة المحلية التفاؤلية.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — تم الاحتفاظ بالحالة المحلية.</string>
+    <string name="screens_cloudtodo_conflicts_title">تعارضات المزامنة</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">لا توجد تعارضات دون حل.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">الاحتفاظ بنسخة الخادم</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">إعادة محاولة نسختي</string>
+</resources>

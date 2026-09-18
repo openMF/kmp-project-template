@@ -19,8 +19,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.model.demo.economic.InterestRateSeries
-import kpt.core.model.demo.economic.RateObservation
+import kpt.core.model.economic.InterestRateSeries
+import kpt.core.model.economic.RateObservation
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -37,7 +37,8 @@ import kotlin.test.assertTrue
  *    so the detail screen still renders something rather than crashing.
  *  - Initial state is Loading.
  *  - Content emissions surface as [ScreenState.Content].
- *  - `onRetry()` and `onRefresh()` both refresh the underlying stream.
+ *  - `onRetry()` and `onRefresh()` both refresh the underlying stream (forcing a fresh fetch —
+ *    see RateStreamFactory / ScreenDataStream.refresh(forceFresh)).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class InterestRateDetailViewModelTest {

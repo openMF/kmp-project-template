@@ -49,6 +49,11 @@ import org.koin.compose.viewmodel.koinViewModel
 internal fun AuthenticatedNavbarNavigationScreen(
     navigateToSettingsScreen: () -> Unit,
     homeBody: @Composable () -> Unit,
+    // The OUTER authenticated-graph controller. Used to (a) push a FULL-SCREEN tab (inlineTab = false,
+    // e.g. an immersive focus modal) above the scaffold, and (b) hand INLINE fork tabs a controller for
+    // their drill-downs via TabRegistry.extraInlineTabDestinations. Threaded from authenticatedGraph so
+    // this merge-owned shell stays free of feature imports.
+    outerNavController: NavController,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberKptNavController(
         name = "AuthenticatedNavbarScreen",
@@ -79,6 +84,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
 
     AuthenticatedNavbarNavigationScreenContent(
         navController = navController,
+        outerNavController = outerNavController,
         modifier = modifier,
         navigateToSettingsScreen = navigateToSettingsScreen,
         homeBody = homeBody,
@@ -91,6 +97,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
 @Composable
 internal fun AuthenticatedNavbarNavigationScreenContent(
     navController: NavHostController,
+    outerNavController: NavController,
     navigateToSettingsScreen: () -> Unit,
     homeBody: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -119,9 +126,19 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                         onAction(AuthenticatedNavBarAction.SettingsTabClick)
                     }
 
-                    // Fork extraTabs (TabRegistry.extraTabs) own their own navigation; the backbone
-                    // navbar has no built-in action for them.
-                    else -> Unit
+                    // Fork extra tabs. INLINE tabs (inlineTab = true — the default) swap content inside
+                    // THIS inner NavHost so the bottom bar persists and the tab keeps its own back stack
+                    // (their top screen is registered by TabRegistry.extraInlineTabDestinations below).
+                    // FULL-SCREEN tabs (inlineTab = false, e.g. an immersive focus modal that declares
+                    // bottom_navigation_visible: false) push their route on the OUTER graph, hiding the bar.
+                    else -> if (navigationItem.inlineTab) {
+                        navController.navigateToInlineTab(navigationItem.startDestinationRoute)
+                    } else {
+                        outerNavController.navigate(
+                            navigationItem.startDestinationRoute,
+                            navOptions { launchSingleTop = true },
+                        )
+                    }
                 }
             },
             shouldShowNavigation = navigationItems.any {
@@ -158,8 +175,34 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
             // body). The template shell forwards this opaque body — a fork edits BackboneRegistry, not this
             // file. (WS01 base-feature seam, epic AC7 — mirrors the homeBody wiring.)
             profileDestination(profileBody = { BackboneRegistry.profileBody(navController) })
+
+            // Fork INLINE extra-tab top screens (TabRegistry.extraInlineTabDestinations). Registered in
+            // THIS inner NavHost so tapping the tab swaps content inside the scaffold (bottom bar stays)
+            // — the fork wires each screen's drill-downs on outerNavController (full-screen). Template
+            // default = no-op. Keeps the merge-owned shell feature-import-free (the seam lives in the fork).
+            TabRegistry.extraInlineTabDestinations.invoke(this, navController, outerNavController)
         }
     }
+}
+
+/**
+ * Switch to an INLINE extra tab (its top screen registered in the inner NavHost via
+ * [TabRegistry.extraInlineTabDestinations]). Mirrors [navigateToTabOrRoot]'s bottom-nav semantics for a
+ * plain route string: no-op if already on the tab; otherwise pop up to the graph start saving state,
+ * single-top, and restore the tab's saved back stack — so each tab keeps its own state across switches.
+ */
+private fun NavHostController.navigateToInlineTab(route: String) {
+    if (currentDestination?.hierarchy?.any { it.route == route } == true) return
+    navigate(
+        route,
+        navOptions {
+            popUpTo(graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        },
+    )
 }
 
 private fun NavController.navigateToTabOrRoot(

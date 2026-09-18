@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">Tarea en la nube</string>
+    <string name="screens_cloudtodo_detail_intro">Es el único consumidor de createMutableStore + MutationGateway. Desactiva la red para ver las ramas sin conexión.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Alternar (optimista)</string>
+    <string name="screens_cloudtodo_complete_online_text">Completar (requiere conexión)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Resolver conflicto</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Descartar</string>
+    <string name="screens_cloudtodo_status_completed">Completada</string>
+    <string name="screens_cloudtodo_status_not_completed">No completada</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">Aplicado localmente</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Escritura primero en Room. La sincronización queda en cola y se reintenta al reconectar.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Aplicado · sincronizado</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">El servidor confirmó la escritura.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Aplicado · en cola</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Escrito localmente; la sincronización está en cola y se reintentará cuando vuelva la conexión.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Bloqueado</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Sin conexión: una escritura que requiere conexión se rechaza en lugar de escribir localmente. No se escribió nada.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">No autenticado para esta operación. No se escribió nada.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">Falló una condición previa del servidor antes de escribir. No se escribió nada.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Conflicto registrado</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">El servidor también cambió este registro. Se aplicó su versión y se conservó la tuya: elige cuál prevalece.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Error</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — se revirtió la escritura local optimista.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — se conservó el estado local.</string>
+    <string name="screens_cloudtodo_conflicts_title">Conflictos de sincronización</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">No hay conflictos sin resolver.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Conservar versión del servidor</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Reintentar mi versión</string>
+</resources>

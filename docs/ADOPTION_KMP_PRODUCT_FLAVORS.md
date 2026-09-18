@@ -122,6 +122,13 @@ Both `:cmp-android:assembleDemoDebug` and `:cmp-android:assembleProdRelease` pas
 
 ### iOS Xcode wiring — 2026-06-05
 
+> **Superseded (E6, SwiftPM/XCFramework migration).** Two things below are history, not
+> current state: (a) `$(CONFIGURATION)` is never expanded inside an xcconfig `#include`, so
+> the `iOSApp.xcconfig` umbrella never actually loaded the per-variant file — each build
+> configuration now points at its own `Configs/<variant>.xcconfig` directly, and the dead
+> umbrella has been deleted; (b) the per-configuration optional xcconfig `#include?` is gone with the
+> pod toolchain. Current contract is enforced by G-IOS-SWIFTPM.
+
 Wired the Xcode project for per-flavor builds so the KMP shared framework is resolved from the
 correct variant output directory (`cmp-shared/build/xcode-frameworks/<variant>/`).
 
@@ -129,7 +136,6 @@ correct variant output directory (`cmp-shared/build/xcode-frameworks/<variant>/`
 
 ```
 cmp-ios/Configs/
-├── iOSApp.xcconfig          ← umbrella: #include "$(CONFIGURATION).xcconfig"
 ├── demoDebug.xcconfig       ← KMPF_VARIANT=demoDebug + all KMPF_* vars
 ├── demoStaging.xcconfig
 ├── demoRelease.xcconfig
@@ -146,22 +152,22 @@ cmp-ios/iosApp.xcodeproj/xcshareddata/xcschemes/
 
 **`project.pbxproj` changes:**
 
-- Added `PBXFileReference` for `iOSApp.xcconfig` (ID `CAFE001F00000000000000A1`)
+- Added `PBXFileReference` for `iOSApp.xcconfig` (ID `CAFE001F00000000000000A1`) — *removed at E6*
 - Added `Configs` PBXGroup (ID `CAFE001F00000000000000A2`) in the root group
 - Fixed legacy `FRAMEWORK_SEARCH_PATHS` in Debug/Release target configs (was `../shared/` and
   `../composeApp/` — corrected to `../cmp-shared/`)
 - Added 6 project-level `XCBuildConfiguration` entries (B1–B6: demoDebug … prodRelease),
   base config → `Config.xcconfig`
 - Added 6 target-level `XCBuildConfiguration` entries (C1–C6: demoDebug … prodRelease),
-  base config → `iOSApp.xcconfig`, with:
+  base config → `Configs/<variant>.xcconfig` (was `iOSApp.xcconfig` before E6), with:
   `FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../cmp-shared/build/xcode-frameworks/$(KMPF_VARIANT)/$(SDK_NAME)"`
 - Both `XCConfigurationList` entries updated to include all 6 new configurations
 
 **How the xcconfig chain works:**
 
 1. Each flavor Xcode scheme selects build configuration e.g. `demoDebug`
-2. Target's `baseConfigurationReference` → `Configs/iOSApp.xcconfig`
-3. `iOSApp.xcconfig` executes `#include "$(CONFIGURATION).xcconfig"` → `Configs/demoDebug.xcconfig`
+2. Target's `baseConfigurationReference` → `Configs/demoDebug.xcconfig` (each configuration
+   names its own file; Xcode does not expand `$(CONFIGURATION)` in an `#include`)
 4. `demoDebug.xcconfig` defines `KMPF_VARIANT = demoDebug` (plus all other `KMPF_*` vars)
 5. `FRAMEWORK_SEARCH_PATHS` resolves to `…/cmp-shared/build/xcode-frameworks/demoDebug/iphoneos`
 6. Xcode picks up the KMP framework built for that exact flavor variant
@@ -171,8 +177,8 @@ cmp-ios/iosApp.xcodeproj/xcshareddata/xcschemes/
 ```bash
 PBXPROJ=cmp-ios/iosApp.xcodeproj/project.pbxproj
 
-# AC-5: iOSApp.xcconfig registered in pbxproj
-grep -c "iOSApp.xcconfig" "$PBXPROJ"               # expect ≥1
+# AC-5: the dead pre-E6 umbrella is NOT registered in pbxproj
+grep -c "iOSApp.xcconfig" "$PBXPROJ"               # expect 0
 
 # AC-6: demoDebug and prodDebug configs present
 grep -cE "demoDebug|prodDebug" "$PBXPROJ"           # expect ≥2
@@ -393,7 +399,7 @@ grep -E 'object LocalFlavorsLoader' \
 ls -d build-logic/convention/src/main/kotlin/local/ && echo "✓ local override directory present"
 ```
 
-For details on the fork extension pattern, see [`FLAVORS_EXTENSION.md`](FLAVORS_EXTENSION.md).
+For details on the fork extension pattern, see [`FLAVORS_EXTENSION.md`](cross-cutting/flavors-extension.md).
 
 #### [§12 — AGP 9.x compatibility (conditional)](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
@@ -521,6 +527,6 @@ Forks DON'T maintain an adoption doc. The template's doc IS their adoption doc �
 
 - Library spec: [`MobileByteLabs/kmp-product-flavors`](https://github.com/MobileByteLabs/kmp-product-flavors) + [`docs/adoption/v2.7/`](https://github.com/MobileByteLabs/kmp-product-flavors/tree/development/docs/adoption/v2.7)
 - Template setup guide (user-facing): [`SETUP-PROJECT.md`](SETUP-PROJECT.md)
-- Template fork extension pattern: [`FLAVORS_EXTENSION.md`](FLAVORS_EXTENSION.md)
-- Downstream consumer migration guide (Room 3 + Store 5 + Security): [`CONSUMER_APP_MIGRATION_GUIDE.md`](CONSUMER_APP_MIGRATION_GUIDE.md)
+- Template fork extension pattern: [`FLAVORS_EXTENSION.md`](cross-cutting/flavors-extension.md)
+- Downstream consumer migration guide (Room 3 + Store 5 + Security): [`CONSUMER_APP_MIGRATION_GUIDE.md`](cross-cutting/consumer-app-migration-guide.md)
 - Convention plugin source: [`build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt`](../build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt)

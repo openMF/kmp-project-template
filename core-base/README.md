@@ -64,7 +64,7 @@ the template-shared parts of `core/*` — follows this convention:
   `KptFlowRow`, `KptFlowColumn`, `KptSplitPane`, `KptSidebarLayout`,
   `KptResponsiveLayout` (`core-base/designsystem/layout/`).
 - **Components:** `KptButton` / `KptOutlinedButton` / `KptTextButton`,
-  `KptSnackbarHost`, `KptShimmerLoadingBox`, `KptShimmerListItem`,
+  `KptToastHost`, `KptShimmerLoadingBox`, `KptShimmerListItem`,
   `KptSlideTransition` (`core-base/designsystem/component/`).
 - **App bars:** `KptTopAppBar` (+ size variants `KptSmallTopAppBar` /
   `KptCenterAlignedTopAppBar` / `KptMediumTopAppBar` / `KptLargeTopAppBar`),

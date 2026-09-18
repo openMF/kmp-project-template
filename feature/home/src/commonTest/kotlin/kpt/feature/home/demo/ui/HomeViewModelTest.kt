@@ -30,21 +30,21 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
-import kpt.core.data.demo.banking.BillReminderRepository
-import kpt.core.data.demo.banking.LoanRepository
-import kpt.core.data.demo.currency.CurrencyRepository
-import kpt.core.data.demo.economic.EconomicRatesRepository
-import kpt.core.model.demo.banking.BillCategory
-import kpt.core.model.demo.banking.BillReminder
-import kpt.core.model.demo.banking.Loan
-import kpt.core.model.demo.banking.LoanKind
-import kpt.core.model.demo.banking.Recurrence
-import kpt.core.model.demo.currency.ExchangeRates
-import kpt.core.model.demo.currency.RateHistory
-import kpt.core.model.demo.currency.RateHistoryKey
-import kpt.core.model.demo.economic.InterestRateSeries
-import kpt.core.model.demo.economic.RateObservation
-import kpt.core.store.demo.economic.impl.InterestRateSeriesKey
+import kpt.core.data.banking.BillReminderRepository
+import kpt.core.data.banking.LoanRepository
+import kpt.core.data.currency.CurrencyRepository
+import kpt.core.data.economic.EconomicRatesRepository
+import kpt.core.model.banking.BillCategory
+import kpt.core.model.banking.BillReminder
+import kpt.core.model.banking.Loan
+import kpt.core.model.banking.LoanKind
+import kpt.core.model.banking.Recurrence
+import kpt.core.model.currency.ExchangeRates
+import kpt.core.model.currency.RateHistory
+import kpt.core.model.currency.RateHistoryKey
+import kpt.core.model.economic.InterestRateSeries
+import kpt.core.model.economic.RateObservation
+import kpt.core.store.economic.impl.InterestRateSeriesKey
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -382,22 +382,25 @@ class HomeViewModelTest {
 private class FakeLoanRepository(initial: List<Loan> = emptyList()) : LoanRepository {
     private val rows = MutableStateFlow(initial)
 
-    override fun observeAll(): Flow<List<Loan>> = rows
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<Loan>> = rows
     override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
         screenDataStreamForTesting(rows.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
     override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
         screenDataStreamForTesting(rows.map { r -> r.firstOrNull { it.id == id }?.let { ScreenState.Content(it) } ?: ScreenState.Empty })
-    override fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
-    override suspend fun getById(id: String): Loan? = throw UnsupportedOperationException()
+    fun observeById(id: String): Flow<Loan?> = throw UnsupportedOperationException()
+    suspend fun getById(id: String): Loan? = throw UnsupportedOperationException()
     override suspend fun upsert(loan: Loan) {
         rows.value = rows.value.filterNot { it.id == loan.id } + loan
     }
     override suspend fun delete(id: String) {
         rows.value = rows.value.filterNot { it.id == id }
     }
-    override fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
+    fun observeTotalMonthlyEmi(): Flow<Double> = throw UnsupportedOperationException()
+    fun observeTotalPrincipalRemaining(): Flow<Double> = throw UnsupportedOperationException()
+    fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)
@@ -411,19 +414,29 @@ private class FakeBillReminderRepository : BillReminderRepository {
         upcoming.value = values
     }
 
-    override fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
+    // NOT an interface member any more: LoanRepository/BillReminderRepository dropped
+    // observeAll() (it duplicated the store-backed xxxStream read path). Kept here as a
+    // plain test helper for the assertions below.
+    fun observeAll(): Flow<List<BillReminder>> = throw UnsupportedOperationException()
     override fun billRemindersStream(scope: CoroutineScope): ScreenDataStream<List<BillReminder>> =
         screenDataStreamForTesting(upcoming.map { if (it.isEmpty()) ScreenState.Empty else ScreenState.Content(it) })
+
+    override fun billReminderDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<BillReminder> =
+        screenDataStreamForTesting(
+            upcoming.map { rows ->
+                rows.firstOrNull { it.id == id }?.let { ScreenState.Content(it) } ?: ScreenState.Empty
+            },
+        )
     override fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>> {
         lastRequestedWindow = maxDays
         return upcoming
     }
-    override fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
-    override suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
+    fun observeById(id: String): Flow<BillReminder?> = throw UnsupportedOperationException()
+    suspend fun getById(id: String): BillReminder? = throw UnsupportedOperationException()
     override suspend fun upsert(bill: BillReminder) = throw UnsupportedOperationException()
     override suspend fun delete(id: String) = throw UnsupportedOperationException()
     override fun observeTotalUpcomingAmount(maxDays: Int): Flow<Double> = throw UnsupportedOperationException()
-    override fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
+    fun observeCount(): Flow<Int> = throw UnsupportedOperationException()
 }
 
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)

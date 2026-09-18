@@ -24,6 +24,7 @@ import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreBuilder
 import org.mobilenativefoundation.store.store5.Updater
+import org.mobilenativefoundation.store.store5.UpdaterResult
 import org.mobilenativefoundation.store.store5.Validator
 import kpt.core.base.store.combine.ScreenWithMutationStream
 import kpt.core.base.store.combine.internal.ScreenWithMutationStreamImpl
@@ -128,6 +129,51 @@ object StoreFactory {
         .build()
 
     /**
+     * Creates a [MutableStore] for a LOCAL-ONLY entity — every mutation flows through
+     * `store.write` / `store.clear` (→ the [sourceOfTruth] writer/delete, i.e. Room), but there is
+     * NO network. The [Updater] is a no-op "success" and the [Bookkeeper] never records anything, so
+     * `MutationGateway.upsert`/`delete` (Optimistic) persist locally and report `synced = true`
+     * without any remote call.
+     *
+     * This is the WRITE half for `OFFLINE_LOCAL_ONLY` features that route every mutation through the
+     * store (the single write door — no repo-level DAO writes), pairing with a [createOfflineStore]
+     * read store over the same table. The caller's SoT writer/delete SHOULD wrap the DAO call in
+     * a plain DAO write so wasmJs read collectors re-emit (Room 3 alpha05 invalidation gap).
+     *
+     * @param Key per-item key (e.g. the row id wrapped in a value class).
+     * @param Output the domain type persisted + exposed.
+     * @param sourceOfTruth local persistence (Room) — its writer/delete are the ONLY DAO callers.
+     */
+    @OptIn(ExperimentalStoreApi::class)
+    fun <Key : Any, Output : Any> createOfflineMutableStore(
+        sourceOfTruth: SourceOfTruth<Key, Output, Output>,
+    ): MutableStore<Key, Output> {
+        val identity = Converter.Builder<Output, Output, Output>()
+            .fromNetworkToLocal { it }
+            .fromOutputToLocal { it }
+            .build()
+        val noopUpdater = Updater.by<Key, Output, Output>(
+            post = { _, value -> UpdaterResult.Success.Typed(value) },
+        )
+        return StoreBuilder
+            .from(
+                fetcher = Fetcher.ofFlow<Key, Output> { _ -> emptyFlow() },
+                sourceOfTruth = sourceOfTruth,
+                converter = identity,
+            )
+            .toMutableStoreBuilder(identity)
+            .build(updater = noopUpdater, bookkeeper = NoopBookkeeper())
+    }
+
+    /** No-network [Bookkeeper] for [createOfflineMutableStore] — local writes never fail-to-sync. */
+    private class NoopBookkeeper<Key : Any> : Bookkeeper<Key> {
+        override suspend fun getLastFailedSync(key: Key): Long? = null
+        override suspend fun setLastFailedSync(key: Key, timestamp: Long): Boolean = true
+        override suspend fun clear(key: Key): Boolean = true
+        override suspend fun clearAll(): Boolean = true
+    }
+
+    /**
      * Creates a [MutableStore] that supports reads, writes, and offline sync.
      *
      * Uses a [Converter] to transform between network, local, and output types.
@@ -144,14 +190,15 @@ object StoreFactory {
      * @param updater Writes data back to the server (e.g., POST/PUT API call).
      * @param bookkeeper Tracks unsynced local changes for retry on reconnection.
      * @param validator Optional cache validity check.
-     * @param conflictStrategy Optional reconciliation policy for server/client divergence.
-     *   **Currently informational — Store5's [Updater] does not automatically consume a
-     *   `ConflictStrategy<O>`.** Forks should apply conflict resolution inside their own
-     *   `Updater` block by calling `conflictStrategy.resolve(server, client)` and writing
-     *   back the resolved value. The parameter is exposed here so the strategy choice is
-     *   visible at Store-construction time (discovery + audit), and so a future
-     *   wiring-in-place upgrade is non-breaking — forks already declaring the parameter
-     *   pick up auto-wiring without an API change. Defaults to `null` (no policy declared).
+     * **Conflict resolution is NOT a parameter here.** Store5's [Updater] is typed
+     * `Updater<Key, Output, *>` — the server response type is star-projected, so the factory
+     * cannot reach the server value a [ConflictStrategy] needs. Resolution therefore belongs
+     * inside the caller's own `Updater`, which DOES have both sides:
+     * `conflictStrategy.resolve(server = serverEcho, client = value)` — see
+     * `provideCloudTodoStore` for the canonical shape. This factory previously accepted a
+     * `conflictStrategy` parameter that was `@Suppress("UNUSED_PARAMETER")` and had zero runtime
+     * effect: passing `ServerWins()` and passing nothing behaved identically, which read as
+     * configuration but was decoration.
      * @return A configured [MutableStore] ready for reads and writes.
      */
     @OptIn(ExperimentalStoreApi::class)
@@ -162,8 +209,6 @@ object StoreFactory {
         updater: Updater<Key, Output, *>,
         bookkeeper: Bookkeeper<Key>,
         validator: Validator<Output>? = null,
-        @Suppress("UNUSED_PARAMETER")
-        conflictStrategy: ConflictStrategy<Output>? = null,
     ): MutableStore<Key, Output> {
         var builder = StoreBuilder.from(
             fetcher = fetcher,

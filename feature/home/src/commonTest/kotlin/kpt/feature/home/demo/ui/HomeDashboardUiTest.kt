@@ -12,7 +12,7 @@ package kpt.feature.home.demo.ui
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import kpt.core.designsystem.theme.KptTheme
 import kpt.feature.home.demo.HomeDashboard
 import kpt.feature.home.ui.TestTags

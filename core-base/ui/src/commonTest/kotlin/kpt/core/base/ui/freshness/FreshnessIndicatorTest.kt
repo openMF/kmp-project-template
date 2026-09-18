@@ -49,7 +49,7 @@ class FreshnessIndicatorTest {
     }
 
     @Test
-    fun `VeryStale without error (pure age-based) uses Tertiary tint`() {
+    fun `VeryStale without error — pure age-based — uses Tertiary tint`() {
         // Age > 3*ttl with no last error — show the warning icon but stay tertiary;
         // not an error condition, just heavily stale.
         val v = freshnessVisualFor(FreshnessBand.VeryStale, errorCategory = null)
@@ -105,7 +105,7 @@ class FreshnessIndicatorTest {
     // === freshnessTooltipBody ===
 
     @Test
-    fun `Fresh body is empty (PlainTooltip shows title only)`() {
+    fun `Fresh body is empty — PlainTooltip shows title only`() {
         assertEquals("", freshnessTooltipBody(FreshnessBand.Fresh, errorCategory = null))
     }
 

@@ -17,6 +17,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.calculators.affordability.AffordabilityCalculatorScreen
@@ -59,6 +60,7 @@ fun NavController.navigateToLoanCalcWizard(scenarioId: String? = null, navOption
     navigate(route = LoanCalcWizardRoute(scenarioId), navOptions = navOptions)
 }
 
+@FeatureDestination
 fun NavGraphBuilder.calculatorsGraph(navController: NavController) {
     navigation<CalculatorsGraphRoute>(
         startDestination = AffordabilityCalculatorRoute,

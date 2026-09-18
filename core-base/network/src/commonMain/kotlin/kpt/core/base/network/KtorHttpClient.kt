@@ -82,7 +82,11 @@ data class AuthProviders(
  * @param baseUrl The base URL to be applied to all requests unless explicitly overridden.
  * @param isReleaseBuild When true, restricts logging to headers-only and disables pretty-printed JSON.
  * @param authRequiredUrl A list of hostnames that require authentication.
- * @param defaultHeaders Headers that are applied to every request.
+ * @param defaultHeaders STATIC headers applied to every request — captured once, at client build.
+ * @param dynamicHeaders Headers resolved on EVERY request. This is the hook a runtime credential
+ *        needs: the client is a singleton built at Koin start, long before anyone signs in, so a
+ *        value captured in [defaultHeaders] can never become a post-login token. The lambda is
+ *        invoked inside `defaultRequest`, which runs per call.
  * @param requestTimeout Timeout in milliseconds for entire request lifecycle.
  * @param socketTimeout Timeout in milliseconds for socket-level communication.
  * @param httpLogger A logger used for HTTP logging (defaults to `Logger.DEFAULT`).
@@ -116,6 +120,7 @@ fun setupDefaultHttpClient(
     isReleaseBuild: Boolean = false,
     authRequiredUrl: List<String> = emptyList(),
     defaultHeaders: Map<String, String> = emptyMap(),
+    dynamicHeaders: () -> Map<String, String> = { emptyMap() },
     requestTimeout: Long = 60_000L,
     socketTimeout: Long = 60_000L,
     httpLogger: Logger = Logger.DEFAULT,
@@ -198,6 +203,11 @@ fun setupDefaultHttpClient(
     defaultRequest {
         url(baseUrl)
         defaultHeaders.forEach { (key, value) ->
+            headers.append(key, value)
+        }
+        // Evaluated HERE, per request — that is the whole point. A login that lands after this client
+        // was constructed still reaches the next call.
+        dynamicHeaders().forEach { (key, value) ->
             headers.append(key, value)
         }
     }

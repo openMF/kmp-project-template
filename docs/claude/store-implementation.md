@@ -234,82 +234,39 @@ Priority when combining: `NoNetwork > Loading > Error > Content`.
 
 ---
 
-## Room Invalidation Bridge — `core-base/database/invalidation/`
+## Room invalidation on web — no bridge needed
 
-> **TL;DR for feature authors:** when your repository writes to a Room table, wrap the
-> write with `notifyingWrite("my_table") { dao.upsert(...) }`. When your repository
-> exposes a `Flow<T>` backed by a Room DAO, wrap the read with
-> `daoFlow("my_table") { dao.observeXxx() }`. That's it.
+> **TL;DR for feature authors:** write with the DAO (`dao.upsert(...)`) and read with the DAO's
+> Room `Flow` (`dao.observeXxx()`). Room's `InvalidationTracker` re-emits to live collectors after
+> a write on every target, web included. There is nothing to wrap.
 
-### Why this is here
+### History (removed 2026-09-17)
 
-Room 3 alpha05's `InvalidationTracker.refreshAsync()` schedules its post-write fan-out
-via `database.getCoroutineScope().launch { ... }`. On Android/Desktop/iOS this is fine
-because real parallel threads run the launched refresh concurrently with the writer.
-On **wasmJs** there is one thread (the JS event loop): the launched refresh is queued
-on the same task list as Compose recomposition, your ViewModel's StateFlow updates,
-and the worker's message round-trips. Two failure modes follow:
+A `RoomChangeBus` / `daoFlow { }` / `notifyingWrite { }` bridge used to sit in
+`core-base/database/invalidation/`, added against Room 3 **alpha05** on the belief that
+`InvalidationTracker` did not fan out to live collectors on the single-threaded wasmJs event loop.
 
-1. **Starvation** — by the time the refresh actually completes, the user has navigated
-   away; the original Flow collector's downstream `combine(...)` has already emitted
-   stale state.
-2. **`pendingRefresh` AtomicBoolean stuck** — if the launched refresh hasn't finished,
-   subsequent `refreshAsync()` calls become no-ops, silently dropping a write's signal.
+On **Room 3.1.0-alpha01** that no longer reproduces. Measured in ChromeHeadless 153 on **both js
+and wasmJs** (`core/database/src/{js,wasmJs}Test/.../WebInvalidationProbeTest.kt`):
 
-Net effect on wasmJs: long-lived Flow collectors (a Home dashboard's `combine{}` that
-the user keeps mounted across navigation) stop refreshing after writes. A fresh-mounted
-screen still sees the latest data via Room's `createFlow(emitInitialState = true)`
-initial query, so the bug masquerades as "Bills screen works, Home stays stale."
-
-### The three primitives
-
-The bridge lives in `core-base/database/src/commonMain/kotlin/kpt/core/base/database/invalidation/`:
-
-| Primitive | Use for |
+| scenario | result |
 |---|---|
-| `RoomChangeBus.notify("my_table")` | Manual signal publishing when you can't use `notifyingWrite{}` (e.g. raw `db.useWriterConnection { ... }`) |
-| `daoFlow("my_table") { dao.observeXxx() }` | Wrap a Room DAO `Flow` so it re-emits on matching writes |
-| `notifyingWrite("my_table") { dao.upsert(...) }` | Wrap a write so the bus is notified iff the block succeeds |
+| single write | ✅ re-emits |
+| two writes in rapid succession | ✅ re-emits (signals coalesce into one emission) |
+| 20-write burst while the event loop is contended | ✅ terminal state observed |
 
-The bus is a process-wide singleton; no lifecycle, no DI. The wraps work on every
-platform — on Android/Desktop/iOS they run alongside Room's own InvalidationTracker
-at microsecond cost; on wasmJs they are the reliable propagation path.
+So the bridge was removed and every call site unwrapped. The probe tests stay as the regression
+guard: if a future Room release regresses here, they fail and the bridge case must be reopened.
 
-### Integration recipe — new features
+### The measurement trap, if you ever re-test this
 
-When you add a feature with its own Room entity:
-
-1. **Pick the table name(s).** Use the same string Room's `@Entity(tableName = "…")`
-   uses. Multi-table writes (joins, transactions touching multiple tables) pass them
-   all: `notifyingWrite("a", "b") { ... }`, `daoFlow("a", "b") { ... }`.
-2. **Wrap every write.** Every `dao.insert/update/upsert/delete` in the repository goes
-   inside `notifyingWrite("my_table") { ... }`.
-3. **Wrap every read.** Every `dao.observeXxx()`-returning method in the repository
-   wraps with `daoFlow("my_table") { ... }`. Wrap the Store5 SourceOfTruth reader too:
-   `reader = { _: Unit -> daoFlow("my_table") { dao.observeAll() } }`.
-
-### Reference impls
-
-- `core/store/.../banking/impl/BillRemindersStore.kt` + `LoansStore.kt` — Store5 wiring
-- `core/data/.../banking/impl/BillReminderRepositoryImpl.kt` + `LoanRepositoryImpl.kt` —
-  repository wiring with `notifyingWrite{}` on writes and `daoFlow{}` on direct-DAO reads
-- `core-base/database/.../invalidation/README.md` — full rationale, design notes, and
-  the removal plan for when Room 3 stable lands (codemod-friendly).
-
-### When **not** to use
-
-- Reads that aren't backed by a Room `Flow` (network flows, `MutableStateFlow` you
-  mutate yourself, derived flows from a `StateFlow<DomainModel>`).
-- Cross-tab / cross-process invalidation — Room 3 alpha05 has no multi-instance support
-  on web; neither does this bridge.
-
-### Removal
-
-When Room 3 stable ships, the three primitives can be converted to no-op pass-throughs
-(deprecated, codemod-friendly), then the call sites can be removed across the repo with
-a mechanical search-replace. No `feature/*` changes needed. Full plan in the README.
-
----
+Do **not** measure web database behaviour with turbine's `awaitItem()` inside `runTest`. `runTest`
+runs on virtual time; waiting there for a value that can only arrive from a real web-worker round
+trip spins the single JS thread, the browser stops answering Karma's pings, and the run dies with
+`Disconnected (0 times) reconnect failed before timeout of 2000ms (ping timeout)`. That looks
+exactly like "Room lost the invalidation" and is not — it is the harness blocking the event loop
+the driver needs. It produced one wrong conclusion already. Use real waits on
+`Dispatchers.Default` and a plain `launch` + list, as the probe test does.
 
 ## Customisation Seam — `core/store/`
 

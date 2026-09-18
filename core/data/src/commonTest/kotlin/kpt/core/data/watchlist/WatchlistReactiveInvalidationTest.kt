@@ -32,11 +32,11 @@ import kotlin.test.assertEquals
 /**
  * Locks the wasmJs invalidation-bridge wiring for the watchlist surface — reads flow through the
  * Store5 `SourceOfTruth` + the repository's `ScreenDataStream` (`watchlistStream(scope)` →
- * `watchlistStore.asScreenStream(...)`); writes go through `notifyingWrite(WATCHLIST_TABLE)`.
+ * `watchlistStore.asScreenStream(...)`); writes are plain DAO calls.
  *
  * [FakeWatchlistDao] returns **cold snapshot** flows that never self-re-emit (modelling Room 3
  * alpha05 on wasmJs). The assertions can only pass because the Store reader is wrapped in
- * `daoFlow(WATCHLIST_TABLE)` and the writes publish the paired bus signal. Regression guard.
+ * the plain Room `Flow` and the writes publish the paired bus signal. Regression guard.
  */
 class WatchlistReactiveInvalidationTest {
 

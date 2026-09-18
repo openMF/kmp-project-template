@@ -777,10 +777,21 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // (\b guards against appId matching a longer key), so appDisplayName is never touched.
         val re = Regex("^(\\s*" + Regex.escape(key) + "\\s*=\\s*)\"[^\"]*\"(.*)$")
         var hit = false
+        // A `(PLACEHOLDER — …)` note on the trailing comment describes the OLD unset value. Carrying
+        // it through verbatim leaves the catalog asserting something false the moment a fork is
+        // branded: `iosTeamId = "L432S2FZP5"   # … (PLACEHOLDER — set in app-profile/…)`. A reader
+        // then cannot tell a real value from an unfilled one, which is exactly what the marker is
+        // for. Drop the parenthetical when the value written is real; keep the descriptive half.
+        val valueIsReal = value.isNotBlank() &&
+            !value.startsWith("YOUR_") &&
+            !value.contains("example.com") &&
+            value != "XXXXXXXXXX"
+        val placeholderNote = Regex("\\s*\\((?:PLACEHOLDER|placeholder)\\b[^)]*\\)")
         val out = lines.map { line ->
             val m = re.find(line) ?: return@map line
             hit = true
-            "${m.groupValues[1]}\"$value\"${m.groupValues[2]}"
+            val rest = if (valueIsReal) placeholderNote.replace(m.groupValues[2], "") else m.groupValues[2]
+            "${m.groupValues[1]}\"$value\"$rest"
         }
         if (hit && out != lines) {
             toml.writeText(out.joinToString("\n") + "\n")

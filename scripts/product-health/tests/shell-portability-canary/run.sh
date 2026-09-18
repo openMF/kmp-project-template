@@ -34,5 +34,6 @@ cell() { # <fixture> <expected-exit> <label> [expected-substring]
 echo "── shell portability (shell-portability.sh) ──"
 cell red-bsd-inplace  1 "BSD-only \`sed -i ''\` → FAIL"        "SP-1"
 cell red-no-fallback  1 "\`stat -f\` with no GNU fallback → FAIL" "SP-2"
+cell red-continuation-comment 1 "comment inside a \` \\\` continuation → FAIL" "SP-3"
 cell green            0 "portable spellings → PASS"            "shell portable"
 exit "$rc_ok"

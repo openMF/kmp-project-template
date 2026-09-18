@@ -1674,9 +1674,9 @@
 |    |    |    |         |         +--- org.jetbrains.compose.foundation:foundation:1.11.1 -> 1.12.0 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0 -> 1.11.0 (*)
 |    |    |    |         |         +--- com.squareup.okio:okio:3.16.4 -> 3.17.0 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlinx:atomicfu:0.23.2 -> 0.24.0
-|    |    |    |         |         |    \--- org.jetbrains.kotlinx:atomicfu-jvm:0.24.0
-|    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:{prefer 1.9.21} -> 2.4.20 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:atomicfu:0.23.2 -> 0.33.0
+|    |    |    |         |         |    \--- org.jetbrains.kotlinx:atomicfu-jvm:0.33.0
+|    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:{prefer 2.2.21} -> 2.4.20 (*)
 |    |    |    |         |         \--- androidx.collection:collection:1.5.0 (*)
 |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.20 (*)
 |    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.11.1 -> 1.12.0 (*)
@@ -1712,34 +1712,34 @@
 |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    |    +--- project ':core-base:store'
-|    |    |    |    +--- org.mobilenativefoundation.store:store5:5.1.0-alpha10
-|    |    |    |    |    \--- org.mobilenativefoundation.store:store5-android:5.1.0-alpha10
-|    |    |    |    |         +--- org.jetbrains.kotlinx:atomicfu:0.24.0 (*)
-|    |    |    |    |         +--- org.mobilenativefoundation.store:core5:5.1.0-alpha10
-|    |    |    |    |         |    \--- org.mobilenativefoundation.store:core5-android:5.1.0-alpha10
-|    |    |    |    |         |         +--- org.jetbrains.kotlinx:atomicfu:0.24.0 (*)
-|    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.4.20 (*)
-|    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.4.20 (*)
-|    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1 -> 1.11.0 (*)
-|    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3 -> 1.11.0 (*)
-|    |    |    |    |         +--- co.touchlab:kermit:2.0.5 -> 2.1.0
-|    |    |    |    |         |    \--- co.touchlab:kermit-android:2.1.0
-|    |    |    |    |         |         +--- co.touchlab:kermit-core:2.1.0
-|    |    |    |    |         |         |    \--- co.touchlab:kermit-core-android:2.1.0
-|    |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.2.0 -> 2.4.20 (*)
-|    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.2.0 -> 2.4.20 (*)
-|    |    |    |    |         +--- org.mobilenativefoundation.store:multicast5:5.1.0-alpha10
-|    |    |    |    |         |    \--- org.mobilenativefoundation.store:multicast5-android:5.1.0-alpha10
-|    |    |    |    |         |         +--- org.jetbrains.kotlinx:atomicfu:0.24.0 (*)
-|    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.4.20 (*)
-|    |    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1 -> 1.11.0 (*)
-|    |    |    |    |         \--- org.mobilenativefoundation.store:cache5:5.1.0-alpha10
-|    |    |    |    |              \--- org.mobilenativefoundation.store:cache5-android:5.1.0-alpha10
-|    |    |    |    |                   +--- org.jetbrains.kotlinx:atomicfu:0.24.0 (*)
-|    |    |    |    |                   +--- org.mobilenativefoundation.store:core5:5.1.0-alpha10 (*)
-|    |    |    |    |                   +--- org.jetbrains.kotlin:kotlin-stdlib:2.0.20 -> 2.4.20 (*)
-|    |    |    |    |                   \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1 -> 1.11.0 (*)
-|    |    |    |    +--- org.mobilenativefoundation.store:cache5:5.1.0-alpha10 (*)
+|    |    |    |    +--- org.mobilenativefoundation.store:store5:5.1.0-alpha10 -> 5.1.0-beta01
+|    |    |    |    |    \--- org.mobilenativefoundation.store:store5-android:5.1.0-beta01
+|    |    |    |    |         +--- org.jetbrains.kotlinx:atomicfu:0.33.0 (*)
+|    |    |    |    |         +--- org.mobilenativefoundation.store:core5:5.1.0-beta01
+|    |    |    |    |         |    \--- org.mobilenativefoundation.store:core5-android:5.1.0-beta01
+|    |    |    |    |         |         +--- org.jetbrains.kotlinx:atomicfu:0.33.0 (*)
+|    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0 (*)
+|    |    |    |    |         +--- co.touchlab:kermit:2.1.0 -> 2.2.0
+|    |    |    |    |         |    \--- co.touchlab:kermit-android:2.2.0
+|    |    |    |    |         |         +--- co.touchlab:kermit-core:2.2.0
+|    |    |    |    |         |         |    \--- co.touchlab:kermit-core-android:2.2.0
+|    |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |    |         +--- org.mobilenativefoundation.store:multicast5:5.1.0-beta01
+|    |    |    |    |         |    \--- org.mobilenativefoundation.store:multicast5-android:5.1.0-beta01
+|    |    |    |    |         |         +--- org.jetbrains.kotlinx:atomicfu:0.33.0 (*)
+|    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |    |         \--- org.mobilenativefoundation.store:cache5:5.1.0-beta01
+|    |    |    |    |              \--- org.mobilenativefoundation.store:cache5-android:5.1.0-beta01
+|    |    |    |    |                   +--- org.jetbrains.kotlinx:atomicfu:0.33.0 (*)
+|    |    |    |    |                   +--- org.mobilenativefoundation.store:core5:5.1.0-beta01 (*)
+|    |    |    |    |                   +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |    |                   \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |    +--- org.mobilenativefoundation.store:cache5:5.1.0-alpha10 -> 5.1.0-beta01 (*)
 |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28
 |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-network-monitor-android:3.5.28
 |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
@@ -1753,7 +1753,7 @@
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    +--- project ':core-base:common'
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
-|    |    |    |    |    +--- co.touchlab:kermit:2.1.0 (*)
+|    |    |    |    |    +--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
 |    |    |    |    |    +--- com.squareup.okio:okio:3.17.0 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
@@ -1770,51 +1770,51 @@
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    \--- project ':core-base:database'
-|    |    |    |         +--- androidx.sqlite:sqlite-bundled:2.7.0
-|    |    |    |         |    \--- androidx.sqlite:sqlite-bundled-android:2.7.0
-|    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0
-|    |    |    |         |         |    \--- androidx.sqlite:sqlite-android:2.7.0
+|    |    |    |         +--- androidx.sqlite:sqlite-bundled:2.7.0 -> 2.8.0-alpha01
+|    |    |    |         |    \--- androidx.sqlite:sqlite-bundled-android:2.8.0-alpha01
+|    |    |    |         |         +--- androidx.sqlite:sqlite:2.8.0-alpha01
+|    |    |    |         |         |    \--- androidx.sqlite:sqlite-android:2.8.0-alpha01
 |    |    |    |         |         |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
 |    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.20 (*)
-|    |    |    |         |         |         +--- androidx.sqlite:sqlite-async:2.7.0 (c)
-|    |    |    |         |         |         +--- androidx.sqlite:sqlite-framework:2.7.0 (c)
-|    |    |    |         |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0 (c)
+|    |    |    |         |         |         +--- androidx.sqlite:sqlite-async:2.8.0-alpha01 (c)
+|    |    |    |         |         |         +--- androidx.sqlite:sqlite-framework:2.8.0-alpha01 (c)
+|    |    |    |         |         |         \--- androidx.sqlite:sqlite-bundled:2.8.0-alpha01 (c)
 |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.20 (*)
-|    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0 (c)
-|    |    |    |         |         +--- androidx.sqlite:sqlite-async:2.7.0 (c)
-|    |    |    |         |         \--- androidx.sqlite:sqlite-framework:2.7.0 (c)
+|    |    |    |         |         +--- androidx.sqlite:sqlite:2.8.0-alpha01 (c)
+|    |    |    |         |         +--- androidx.sqlite:sqlite-async:2.8.0-alpha01 (c)
+|    |    |    |         |         \--- androidx.sqlite:sqlite-framework:2.8.0-alpha01 (c)
 |    |    |    |         +--- io.insert-koin:koin-android:4.2.2 (*)
-|    |    |    |         +--- androidx.room3:room3-runtime:3.0.1
-|    |    |    |         |    \--- androidx.room3:room3-runtime-android:3.0.1
+|    |    |    |         +--- androidx.room3:room3-runtime:3.1.0-alpha01
+|    |    |    |         |    \--- androidx.room3:room3-runtime-android:3.1.0-alpha01
 |    |    |    |         |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
 |    |    |    |         |         +--- androidx.annotation:annotation-experimental:1.5.0 -> 1.5.1 (*)
 |    |    |    |         |         +--- androidx.collection:collection:1.5.0 (*)
-|    |    |    |         |         +--- androidx.room3:room3-common:3.0.1
-|    |    |    |         |         |    \--- androidx.room3:room3-common-jvm:3.0.1
+|    |    |    |         |         +--- androidx.room3:room3-common:3.1.0-alpha01
+|    |    |    |         |         |    \--- androidx.room3:room3-common-jvm:3.1.0-alpha01
 |    |    |    |         |         |         +--- androidx.annotation:annotation:1.9.1 -> 1.10.0 (*)
 |    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.20 (*)
-|    |    |    |         |         |         \--- androidx.room3:room3-runtime:3.0.1 (c)
-|    |    |    |         |         +--- androidx.sqlite:sqlite:2.7.0 (*)
-|    |    |    |         |         +--- androidx.sqlite:sqlite-async:2.7.0
-|    |    |    |         |         |    \--- androidx.sqlite:sqlite-async-android:2.7.0
-|    |    |    |         |         |         +--- androidx.sqlite:sqlite:2.7.0 (*)
+|    |    |    |         |         |         \--- androidx.room3:room3-runtime:3.1.0-alpha01 (c)
+|    |    |    |         |         +--- androidx.sqlite:sqlite:2.8.0-alpha01 (*)
+|    |    |    |         |         +--- androidx.sqlite:sqlite-async:2.8.0-alpha01
+|    |    |    |         |         |    \--- androidx.sqlite:sqlite-async-android:2.8.0-alpha01
+|    |    |    |         |         |         +--- androidx.sqlite:sqlite:2.8.0-alpha01 (*)
 |    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.20 (*)
-|    |    |    |         |         |         +--- androidx.sqlite:sqlite:2.7.0 (c)
-|    |    |    |         |         |         +--- androidx.sqlite:sqlite-framework:2.7.0 (c)
-|    |    |    |         |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0 (c)
-|    |    |    |         |         +--- androidx.sqlite:sqlite-framework:2.7.0
-|    |    |    |         |         |    \--- androidx.sqlite:sqlite-framework-android:2.7.0
+|    |    |    |         |         |         +--- androidx.sqlite:sqlite:2.8.0-alpha01 (c)
+|    |    |    |         |         |         +--- androidx.sqlite:sqlite-framework:2.8.0-alpha01 (c)
+|    |    |    |         |         |         \--- androidx.sqlite:sqlite-bundled:2.8.0-alpha01 (c)
+|    |    |    |         |         +--- androidx.sqlite:sqlite-framework:2.8.0-alpha01
+|    |    |    |         |         |    \--- androidx.sqlite:sqlite-framework-android:2.8.0-alpha01
 |    |    |    |         |         |         +--- androidx.annotation:annotation:1.8.1 -> 1.10.0 (*)
-|    |    |    |         |         |         +--- androidx.sqlite:sqlite:2.7.0 (*)
+|    |    |    |         |         |         +--- androidx.sqlite:sqlite:2.8.0-alpha01 (*)
 |    |    |    |         |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.20 (*)
-|    |    |    |         |         |         +--- androidx.sqlite:sqlite:2.7.0 (c)
-|    |    |    |         |         |         +--- androidx.sqlite:sqlite-async:2.7.0 (c)
-|    |    |    |         |         |         \--- androidx.sqlite:sqlite-bundled:2.7.0 (c)
+|    |    |    |         |         |         +--- androidx.sqlite:sqlite:2.8.0-alpha01 (c)
+|    |    |    |         |         |         +--- androidx.sqlite:sqlite-async:2.8.0-alpha01 (c)
+|    |    |    |         |         |         \--- androidx.sqlite:sqlite-bundled:2.8.0-alpha01 (c)
 |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.20 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0 -> 1.11.0 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0 -> 1.11.0 (*)
 |    |    |    |         |         +--- org.jspecify:jspecify:1.0.0
-|    |    |    |         |         \--- androidx.room3:room3-common:3.0.1 (c)
+|    |    |    |         |         \--- androidx.room3:room3-common:3.1.0-alpha01 (c)
 |    |    |    |         +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |         +--- io.insert-koin:koin-bom:4.2.2 (*)
@@ -2253,7 +2253,7 @@
 |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
-|    |    |    |    |         +--- co.touchlab:kermit:2.0.5 -> 2.1.0 (*)
+|    |    |    |    |         +--- co.touchlab:kermit:2.0.5 -> 2.2.0 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    |    |    |         +--- io.ktor:ktor-client-core:3.2.1 -> 3.5.1 (*)
 |    |    |    |    |         +--- io.ktor:ktor-client-content-negotiation:3.2.1 -> 3.5.1
@@ -2480,7 +2480,7 @@
 |    |    |    |    +--- project ':core:database'
 |    |    |    |    |    +--- io.insert-koin:koin-android:4.2.2 (*)
 |    |    |    |    |    +--- project ':core:common'
-|    |    |    |    |    |    +--- co.touchlab:kermit:2.1.0 (*)
+|    |    |    |    |    |    +--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |    |    +--- project ':core-base:common' (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
@@ -2495,9 +2495,9 @@
 |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
-|    |    |    |    |    +--- androidx.room3:room3-runtime:3.0.1 (*)
+|    |    |    |    |    +--- androidx.room3:room3-runtime:3.1.0-alpha01 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    |    |    +--- co.touchlab:kermit:2.1.0 (*)
+|    |    |    |    |    +--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
 |    |    |    |    |    +--- project ':core:model'
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
@@ -2569,7 +2569,7 @@
 |    |    |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 -> 2.4.20 (*)
 |    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 -> 2.4.20 (*)
 |    |    |    |    |    |    |         \--- io.ktor:ktor-client-okhttp:3.5.0 -> 3.5.1 (*)
-|    |    |    |    |    |    +--- co.touchlab:kermit:2.1.0 (*)
+|    |    |    |    |    |    +--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    |    |    |    +--- io.github.jan-tennert.supabase:postgrest-kt:3.6.0
 |    |    |    |    |    |    |    \--- io.github.jan-tennert.supabase:postgrest-kt-android:3.6.0
@@ -2582,7 +2582,7 @@
 |    |    |    |    |    |    |         |         |         +--- androidx.lifecycle:lifecycle-process:2.10.0 -> 2.11.0-beta01 (*)
 |    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 -> 0.8.0 (*)
 |    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
-|    |    |    |    |    |    |         |         |         +--- co.touchlab:kermit:2.1.0 (*)
+|    |    |    |    |    |    |         |         |         +--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
 |    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-client-core:3.4.3 -> 3.5.1 (*)
 |    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-client-content-negotiation:3.4.3 -> 3.5.1 (*)
 |    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-serialization-kotlinx-json:3.4.3 -> 3.5.1 (*)
@@ -2739,7 +2739,7 @@
 |    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28 (*)
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
-|    |    |    |    \--- co.touchlab:kermit:2.1.0 (*)
+|    |    |    |    \--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.12.0 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui-util:1.12.0 (*)
 |    |    |    +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
@@ -2820,9 +2820,9 @@
 |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:1.9.24 -> 2.4.20 (*)
 |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.2 (*)
 |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1 (*)
-|    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.6
-|    |    \--- io.github.mobilebytelabs:worker-app-annotations-android:4.0.6
-|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.7
+|    |    \--- io.github.mobilebytelabs:worker-app-annotations-android:4.0.7
+|    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    +--- project ':cmp-navigation'
 |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
 |    |    +--- io.insert-koin:koin-android:4.2.2 (*)
@@ -2979,12 +2979,12 @@
 |    |    |    +--- io.insert-koin:koin-core-viewmodel:4.2.2 (*)
 |    |    |    +--- project ':core:data' (*)
 |    |    |    +--- project ':core-base:datastore' (*)
-|    |    |    +--- io.github.mobilebytelabs:worker-kmp:4.0.6
-|    |    |    |    \--- io.github.mobilebytelabs:worker-kmp-jvm:4.0.6
-|    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
+|    |    |    +--- io.github.mobilebytelabs:worker-kmp:4.0.7
+|    |    |    |    \--- io.github.mobilebytelabs:worker-kmp-jvm:4.0.7
+|    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
-|    |    |    |         +--- co.touchlab:kermit:2.0.6 -> 2.1.0 (*)
-|    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |         +--- co.touchlab:kermit:2.2.0 (*)
+|    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
@@ -3006,16 +3006,16 @@
 |    |    |    +--- org.jetbrains.androidx.core:core-bundle:1.0.1 (*)
 |    |    |    +--- org.jetbrains.androidx.navigation:navigation-compose:2.9.2 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1 (*)
-|    |    |    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.6 (*)
-|    |    |    +--- io.github.mobilebytelabs:worker-compose-all:4.0.6
-|    |    |    |    \--- io.github.mobilebytelabs:worker-compose-all-android:4.0.6
-|    |    |    |         +--- io.github.mobilebytelabs:worker-android:4.0.6
-|    |    |    |         |    \--- io.github.mobilebytelabs:worker-android-android:4.0.6
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 -> 1.11.0 (*)
-|    |    |    |         |         +--- androidx.work:work-runtime-ktx:2.11.0
-|    |    |    |         |         |    +--- androidx.work:work-runtime:2.11.0
+|    |    |    +--- io.github.mobilebytelabs:worker-app-annotations:4.0.7 (*)
+|    |    |    +--- io.github.mobilebytelabs:worker-compose-all:4.0.7
+|    |    |    |    \--- io.github.mobilebytelabs:worker-compose-all-android:4.0.7
+|    |    |    |         +--- io.github.mobilebytelabs:worker-android:4.0.7
+|    |    |    |         |    \--- io.github.mobilebytelabs:worker-android-android:4.0.7
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.7 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
+|    |    |    |         |         +--- androidx.work:work-runtime-ktx:2.11.2
+|    |    |    |         |         |    +--- androidx.work:work-runtime:2.11.2
 |    |    |    |         |         |    |    +--- androidx.annotation:annotation-experimental:1.4.1 -> 1.5.1 (*)
 |    |    |    |         |         |    |    +--- androidx.concurrent:concurrent-futures-ktx:1.1.0
 |    |    |    |         |         |    |    |    +--- androidx.concurrent:concurrent-futures:1.1.0 (*)
@@ -3036,8 +3036,8 @@
 |    |    |    |         |         |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.20 (*)
 |    |    |    |         |         |    |    |         |         +--- androidx.room:room-runtime:2.7.0 (c)
 |    |    |    |         |         |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.10 -> 2.4.20 (c)
-|    |    |    |         |         |    |    |         +--- androidx.sqlite:sqlite:2.5.0 -> 2.7.0 (*)
-|    |    |    |         |         |    |    |         +--- androidx.sqlite:sqlite-framework:2.5.0 -> 2.7.0 (*)
+|    |    |    |         |         |    |    |         +--- androidx.sqlite:sqlite:2.5.0 -> 2.8.0-alpha01 (*)
+|    |    |    |         |         |    |    |         +--- androidx.sqlite:sqlite-framework:2.5.0 -> 2.8.0-alpha01 (*)
 |    |    |    |         |         |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.20 (*)
 |    |    |    |         |         |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3 -> 1.11.0 (*)
 |    |    |    |         |         |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3 -> 1.11.0 (*)
@@ -3050,58 +3050,58 @@
 |    |    |    |         |         |    |    +--- org.jetbrains.kotlin:kotlin-stdlib -> 2.4.20 (*)
 |    |    |    |         |         |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0 -> 1.11.0 (*)
 |    |    |    |         |         |    |    +--- org.jspecify:jspecify:1.0.0
-|    |    |    |         |         |    |    +--- androidx.work:work-runtime-ktx:2.11.0 (c)
+|    |    |    |         |         |    |    +--- androidx.work:work-runtime-ktx:2.11.2 (c)
 |    |    |    |         |         |    |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.20 -> 2.4.20 (c)
-|    |    |    |         |         |    \--- androidx.work:work-runtime:2.11.0 (c)
-|    |    |    |         |         +--- org.jetbrains.compose.runtime:runtime:1.11.0 -> 1.12.0 (*)
+|    |    |    |         |         |    \--- androidx.work:work-runtime:2.11.2 (c)
+|    |    |    |         |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
 |    |    |    |         |         +--- androidx.activity:activity-compose:1.13.0 (*)
-|    |    |    |         |         \--- io.insert-koin:koin-android:4.0.4 -> 4.2.2 (*)
-|    |    |    |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
-|    |    |    |         +--- io.github.mobilebytelabs:worker-compose:4.0.6
-|    |    |    |         |    \--- io.github.mobilebytelabs:worker-compose-android:4.0.6
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
-|    |    |    |         |         +--- org.jetbrains.compose.runtime:runtime:1.11.0 -> 1.12.0 (*)
-|    |    |    |         |         +--- org.jetbrains.compose.ui:ui:1.11.0 -> 1.12.0 (*)
-|    |    |    |         |         +--- org.jetbrains.compose.foundation:foundation:1.11.0 -> 1.12.0 (*)
+|    |    |    |         |         \--- io.insert-koin:koin-android:4.2.2 (*)
+|    |    |    |         +--- io.github.mobilebytelabs:worker-kmp:4.0.7 (*)
+|    |    |    |         +--- io.github.mobilebytelabs:worker-compose:4.0.7
+|    |    |    |         |    \--- io.github.mobilebytelabs:worker-compose-android:4.0.7
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.7 (*)
+|    |    |    |         |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
+|    |    |    |         |         +--- org.jetbrains.compose.ui:ui:1.12.0 (*)
+|    |    |    |         |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
 |    |    |    |         |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2 -> 1.11.0 (*)
-|    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
-|    |    |    |         +--- io.github.mobilebytelabs:worker-koin:4.0.6
-|    |    |    |         |    \--- io.github.mobilebytelabs:worker-koin-jvm:4.0.6
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
-|    |    |    |         |         +--- io.insert-koin:koin-core:4.0.4 -> 4.2.2 (*)
-|    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
-|    |    |    |         +--- io.github.mobilebytelabs:worker-sync:4.0.6
-|    |    |    |         |    \--- io.github.mobilebytelabs:worker-sync-jvm:4.0.6
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-koin:4.0.6 (*)
-|    |    |    |         |         +--- io.insert-koin:koin-core:4.0.4 -> 4.2.2 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
-|    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
-|    |    |    |         +--- io.github.mobilebytelabs:worker-scheduler:4.0.6
-|    |    |    |         |    \--- io.github.mobilebytelabs:worker-scheduler-android:4.0.6
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-android:4.0.6 (*)
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
-|    |    |    |         |         +--- androidx.work:work-runtime-ktx:2.11.0 (*)
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-koin:4.0.6 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
+|    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |         +--- io.github.mobilebytelabs:worker-koin:4.0.7
+|    |    |    |         |    \--- io.github.mobilebytelabs:worker-koin-jvm:4.0.7
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.7 (*)
+|    |    |    |         |         +--- io.insert-koin:koin-core:4.2.2 (*)
+|    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         +--- io.github.mobilebytelabs:worker-sync:4.0.7
+|    |    |    |         |    \--- io.github.mobilebytelabs:worker-sync-jvm:4.0.7
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.7 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-koin:4.0.7 (*)
+|    |    |    |         |         +--- io.insert-koin:koin-core:4.2.2 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |         +--- io.github.mobilebytelabs:worker-scheduler:4.0.7
+|    |    |    |         |    \--- io.github.mobilebytelabs:worker-scheduler-android:4.0.7
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-android:4.0.7 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.7 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         |         +--- androidx.work:work-runtime-ktx:2.11.2 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-koin:4.0.7 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
-|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1 -> 1.11.0 (*)
-|    |    |    |         |         \--- io.insert-koin:koin-core:4.0.4 -> 4.2.2 (*)
-|    |    |    |         +--- io.github.mobilebytelabs:worker-store5:4.0.6
-|    |    |    |         |    \--- io.github.mobilebytelabs:worker-store5-jvm:4.0.6
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
-|    |    |    |         |         +--- io.github.mobilebytelabs:worker-scheduler:4.0.6 (*)
-|    |    |    |         |         +--- org.mobilenativefoundation.store:store5:5.1.0-alpha06 -> 5.1.0-alpha10 (*)
-|    |    |    |         |         +--- io.insert-koin:koin-core:4.0.4 -> 4.2.2 (*)
-|    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
-|    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
+|    |    |    |         |         \--- io.insert-koin:koin-core:4.2.2 (*)
+|    |    |    |         +--- io.github.mobilebytelabs:worker-store5:4.0.7
+|    |    |    |         |    \--- io.github.mobilebytelabs:worker-store5-jvm:4.0.7
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-kmp:4.0.7 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:worker-scheduler:4.0.7 (*)
+|    |    |    |         |         +--- org.mobilenativefoundation.store:store5:5.1.0-beta01 (*)
+|    |    |    |         |         +--- io.insert-koin:koin-core:4.2.2 (*)
+|    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    +--- project ':core:common' (*)
 |    |    |    +--- project ':core:datastore' (*)
 |    |    |    +--- project ':core:model' (*)
-|    |    |    +--- io.github.mobilebytelabs:worker-sync:4.0.6 (*)
+|    |    |    +--- io.github.mobilebytelabs:worker-sync:4.0.7 (*)
 |    |    |    +--- io.github.mirzemehdi:kmpnotifier-local:2.0.0
 |    |    |    |    \--- io.github.mirzemehdi:kmpnotifier-local-android:2.0.0
 |    |    |    |         +--- io.github.mirzemehdi:kmpnotifier-core:2.0.0
@@ -3658,8 +3658,8 @@
 |    +--- org.jetbrains.compose.components:components-resources:1.12.0 (*)
 |    +--- project ':core:platform' (*)
 |    +--- io.coil-kt.coil3:coil-compose-core:3.5.0 (*)
-|    +--- io.github.mobilebytelabs:worker-kmp:4.0.6 (*)
-|    +--- io.github.mobilebytelabs:worker-compose-all:4.0.6 (*)
+|    +--- io.github.mobilebytelabs:worker-kmp:4.0.7 (*)
+|    +--- io.github.mobilebytelabs:worker-compose-all:4.0.7 (*)
 |    +--- project ':sync' (*)
 |    \--- project ':core:datastore' (*)
 +--- project ':core:ui' (*)
@@ -3687,7 +3687,7 @@
 +--- co.touchlab:kermit-koin:2.1.0
 |    \--- co.touchlab:kermit-koin-android:2.1.0
 |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.2.0 -> 2.4.20 (*)
-|         +--- co.touchlab:kermit:2.1.0 (*)
+|         +--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
 |         \--- io.insert-koin:koin-core:4.1.0 -> 4.2.2 (*)
 +--- io.coil-kt.coil3:coil:3.5.0 (*)
 +--- io.github.vinceglb:filekit-core:0.14.2 (*)

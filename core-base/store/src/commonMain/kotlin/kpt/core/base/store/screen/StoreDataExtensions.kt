@@ -181,7 +181,7 @@ internal fun <Key : Any, Output : Any> Store<Key, Output>.streamDataForPolicy(
         // in Store5 5.1.0-alpha08 keeps the subscription open on the store's
         // [org.mobilenativefoundation.store.store5.SourceOfTruth] (when present)
         // and re-emits on every SoT write — proven by
-        // `RoomChangeBusSwrTest.notifyingWriteTriggersDaoFlowReEmissionUnderSwr`.
+        // `SourceOfTruthReEmissionSwrTest.sourceOfTruthReEmissionRefreshesSwrStream`.
         // This is the mechanism SWR revalidation depends on: `asScreenStream`'s
         // band gate launches an independent `stream(StoreReadRequest.fresh(...))`
         // side-fetch whose network response writes SoT, and the SoT write

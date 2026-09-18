@@ -138,7 +138,7 @@ object StoreFactory {
      * This is the WRITE half for `OFFLINE_LOCAL_ONLY` features that route every mutation through the
      * store (the single write door — no repo-level DAO writes), pairing with a [createOfflineStore]
      * read store over the same table. The caller's SoT writer/delete SHOULD wrap the DAO call in
-     * `notifyingWrite` so wasmJs read collectors re-emit (Room 3 alpha05 invalidation gap).
+     * a plain DAO write so wasmJs read collectors re-emit (Room 3 alpha05 invalidation gap).
      *
      * @param Key per-item key (e.g. the row id wrapped in a value class).
      * @param Output the domain type persisted + exposed.

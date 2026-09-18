@@ -31,7 +31,7 @@ migrations:
     order: 10
     title: the sync engine moved from the source root into scripts/white-label/
     why: >
-      `sync-dirs.sh`, `customize.sh`, `keystore.sh` and `firebase.sh` sat at the repo root. They are
+      `sync-dirs.sh`, `fork-init.sh`, `keystore.sh` and `firebase.sh` sat at the repo root. They are
       the white-label lifecycle, not app code, and root-level scripts collide with whatever a fork
       keeps at its own root. A fork left on the flat layout runs a STALE ENGINE: the sync self-updates
       `scripts/white-label/sync-dirs.sh`, so the root copy it actually executes never advances.

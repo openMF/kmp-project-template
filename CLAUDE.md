@@ -1,10 +1,32 @@
-# Claude Code - App Toolkit (KMP white-label template)
+# Claude Code — App Toolkit (KMP white-label template)
 
-**Last Updated:** 2026-08-14
-**Project Type:** Kotlin Multiplatform (KMP) — brand-neutral white-label template
-**Platforms:** Android | iOS | macOS | Desktop (Windows/macOS/Linux) | Web
-
----
+> ## ⛳ The architecture SoT is `docs/architecture/`
+>
+> **Start there: [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md)** — the
+> table of contents for every module guide, cross-cutting concern and pattern.
+>
+> That directory is the **single source of truth for this template's architecture**, for humans and
+> for AI, high-level and low-level:
+>
+> | | |
+> |---|---|
+> | [`ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) | high-level design + generated TOC |
+> | [`CONTRACT.yaml`](docs/architecture/CONTRACT.yaml) | machine-verified low-level contract — every module, annotation, processor, generated aggregate, seam |
+> | [`modules/`](docs/architecture/modules/) | one guide per module (25), named 1:1 with its training-corpus surface |
+> | [`cross-cutting/`](docs/architecture/cross-cutting/) | store architecture, source sets, flavors, customization surface, style guide, migration |
+> | [`patterns/`](docs/architecture/patterns/) | named recipes spanning two or more modules |
+>
+> **This file is a ROUTER, not a second source of truth.** It stays because Claude Code auto-loads
+> it; its job is to point at `docs/architecture/` and carry the operational quick-reference below.
+> When this file and a module guide disagree, **the guide wins** — and that disagreement is a bug to
+> fix, not a judgement call to make.
+>
+> **Changing the template?** `docs/architecture/` updates in the SAME change. A new annotation needs
+> its `CONTRACT.yaml` row; a new module needs its guide. Both are enforced at write time by
+> `architecture-contract-guard` / `architecture-docs-guard`, and verified by
+> `framework-verify-architecture-contract.sh`. This is what lets
+> `/kmp-project-template-retrain` drive the corpus and every generator with no manual training step
+> and no silent gap.
 
 ## Quick Links
 
@@ -23,7 +45,6 @@
 - [Patterns & Best Practices](docs/claude/patterns.md)
 - [Independent Cards Pattern](docs/claude/PATTERN-independent-cards.md) - Multi-card dashboards where each card has its own ScreenState (loading / error / empty / content) — `IndependentCardLayout` + `DashboardProgressBar` + `aggregateDashboardProgress`
 - [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
-- [Room Invalidation Bridge](core-base/database/src/commonMain/kotlin/kpt/core/base/database/invalidation/README.md) - `RoomChangeBus` + `daoFlow{}` + `notifyingWrite{}` — absorbs Room 3 alpha05's wasmJs async-fan-out gap so DAO Flow consumers re-emit after writes; no-op on Android/Desktop/iOS
 - [Motion + Transitions](core-base/ui/MOTION.md) - Symmetric durations, M3 patterns, debug Transition Gallery
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)
 - [Secrets Management](docs/claude/secrets-management.md)
@@ -95,200 +116,16 @@ the per-feature branding, or selectively remove features they don't need.
 
 ## Store Archetype Showcases
 
-The generator routes on **`feature_profile.store_archetype`** — the primary key that picks the
-`core/store` factory and the module chain. There are **8 archetypes**; every row below resolves to
-a real demo `*Store.kt` / `*ViewModel.kt` / `*Test.kt`. The decision matrix + module chain is
-`FEATURE_AUTHORING.md` (in-repo summary) and `docs/architecture/STORE_DATA_API.md` (canonical).
-
-> **The archetype ↔ showcase contract is enforced, not just documented.**
-> `core/store/STORE_ARCHETYPES.yaml` is the machine-readable source of truth; the table below is a
-> human projection of it. `scripts/product-health/checks/store-archetype-coverage.sh` fails the build
-> if any archetype loses its last showcase, or if a showcase stops calling its declared factory.
+> **Moved.** The 8-archetype decision matrix, the archetype ↔ showcase contract and the
+> `@StoreProvider` declaration rules now live in the architecture SoT:
 >
-> That registry also declares **`cache_first`** per archetype. Two are non-cache-first *by
-> definition* — **MEMORY_ONLY** (no SourceOfTruth, so the cache dies with the process) and
-> **NETWORK_ONLY** (network-first, cache only as a failure fallback). Do not "fix" them to be
-> cache-first: that deletes the archetype demo. This is not hypothetical — it happened, the two
-> guarding tests were `assertTrue(true, …)` and passed, and the gates above exist because of it.
-
-| `store_archetype` | Store factory | Store | ViewModel | Test |
-|---|---|---|---|---|
-| OFFLINE_LOCAL_ONLY | `createOfflineStore` | `AlertsStore.kt`, `LoansStore.kt`, `BillRemindersStore.kt` | `AmortizationScheduleViewModel.kt` | `AlertsStoreTest.kt`, `LoansStoreTest.kt`, `AmortizationScheduleViewModelTest.kt` |
-| NETWORK_WITH_CACHE | `createStore` | `ExchangeRatesStore.kt`, `InterestRateSeriesStore.kt` | `CurrencyRatesViewModel.kt`, `InterestRatesViewModel.kt` | `store-archetype-coverage.sh` (AC-3) |
-| NETWORK_ONLY | `createStore` + `FetchPolicy.NETWORK_ONLY` | `SpotRateLookupStore.kt` | `CurrencyRatesViewModel.kt` (online) | `SpotRateLookupStoreTest.kt` |
-| CACHE_ONLY | `createStore` + `FetchPolicy.CACHE_ONLY` | `SpotRateLookupStore.kt` | `CurrencyRatesViewModel.kt` (offline) | `CurrencyConverterViewModelTest.kt` |
-| PERIODIC | `createStore` + `@StoreProvider(ttl = …)` | `ExchangeRatesStore.kt` | `HomeViewModel.kt` tile | `HomeDashboardViewModelTest.kt` |
-| MEMORY_ONLY | `createMemoryStore` | `MacroIndicatorStore.kt` | `CountryMacroViewModel.kt` | `store-archetype-coverage.sh` (AC-3) |
-| LOAD_ONCE | `createStore` + `asLoadOnceStream` | `LoansStore.kt` | `LoanDetailViewModel.kt` | `LoanDetailViewModelTest.kt` |
-| MUTABLE | `createMutableStore` + `Bookkeeper` | `CloudTodoStore.kt` | `EditBillReminderViewModel.kt` | `EditBillReminderViewModelTest.kt`, `OfflineSubmitSyncerTest.kt` |
-
-### Store declaration — `@StoreProvider` is the SoT
-
-**One place declares a store: the annotation on its provider function.** `tools/store-ksp` derives
-everything else. There is no registry file to edit, no YAML row to add, and no DI module to register
-into.
-
-```kotlin
-@StoreProvider(id = "loans")
-@CacheKey(name = "LIST", key = "loans")
-@CacheKey(fn = "item", key = "loan:{id}", params = ["id:String"])
-fun provideLoansStore(dao: LoanDao): Store<Unit, List<Loan>> = StoreFactory.createOfflineStore(…)
-```
-
-generates three files — two aggregates in `config/` plus the DI module:
-
-| Generated | Carries |
-|---|---|
-| `config/AppStoreRegistry` | every Koin qualifier flat (`AppStoreRegistry.Loans`) + a nested `Ttl` object (`AppStoreRegistry.Ttl.COIN_MARKETS`) |
-| `config/AppCacheKeys` | the cache keys, nested one object per store (`AppCacheKeys.Loans.LIST`, `AppCacheKeys.Loans.item(id)`) |
-| `di/GeneratedStoreBindings` | `single(AppStoreRegistry.Loans) { provideLoansStore(dao = get()) }` **and** the `StoreCacheManager` logout registration |
-
-Cache keys nest per store because the annotations name them by ROLE (`LIST`, `item`, `of`) and those
-roles repeat across stores — flat would collide, nested cannot. Qualifiers and TTLs are unique by
-construction (the processor errors on a duplicate `id`/`qualifier`), so they stay flat.
-
-**Dependencies come from the function signature.** Never restate them — that is the whole reason
-this is an annotation rather than a declaration file.
-
-**Generated output is a BUILD ARTIFACT** under `build/generated/ksp/…`, never committed source.
-Nothing to hand-edit, nothing to keep in sync on a template sync, no ownership row to declare for it,
-and nothing for `remove-demo.sh` to reset. Delete a demo package and its bindings cease to exist
-because the annotations went with it.
-
-**`logout` drives both the binding and the purge.** A store bound but never registered survives
-sign-out and shows the previous user's cached rows to the next person on a shared device. They cannot
-disagree when one field produces both. Set `logout = false` only for a `MutableStore` — Store5 5.1
-does not make it a `Store` subtype, so `register` cannot accept one; its rows still go via the paired
-read store's table.
-
-**Ownership stays in `app-profile/app.yaml#core_store.packages[]`** — one `owner: template | fork`
-per package, which is what `remove-demo.sh` reads. A store inherits its package's lifecycle rather
-than declaring its own.
-
-**Validation is a build error, not a later gate.** The processor fails the build on a duplicate id or
-qualifier, a duplicate cache-key string (two streams sharing a key share a fetched-at stamp, so one
-refresh silently marks the other fresh), a placeholder with no matching param, or a malformed `ttl`.
-
-> **For `/kmp-project-template-retrain` and `/implement`:** across `core/store`, `core/database` and
-> `core/network` the ANNOTATION is the only input. Do not re-add `core_store.stores[]` /
-> `core_store.cache_keys[]`, `database.entities[]` / `database.daos[]` / `database.type_converters[]`,
-> or an access point's `api:` field to app-profile. Do not author `AppStoreRegistry.kt`,
-> `AppCacheKeys.kt` or `AppDatabase.kt`, do not hand-write entries in `GeneratedStoreBindings`,
-> `GeneratedDaoBindings`, `GeneratedConverterBindings` or `GeneratedApiBindings`, and do not recreate a
-> `ProjectStoreModule` seam. All of those existed before the KSP migrations and were removed;
-> regenerating any of them produces duplicate declarations that fail the build.
-
-### Write side — one unified mutation ViewModel
-
-The write path uses a **single** base view-model, `BaseMutationViewModel<T, R>`
-(`core-base/ui/.../viewmodel/BaseMutationViewModel.kt`), parameterized by **`MutationMode`**:
-
-- **`MutationMode.InSession`** — single-shot submit, no persistence.
-- **`MutationMode.Draft`** — offline-resilient draft with 3-case resume (fresh / resume-in-progress /
-  resume-after-crash), persisting the payload across restarts.
-
-An earlier design split these into two separate base view-models; they were collapsed into this one,
-and `MutationMode` now expresses the mode. The **Sync & Drafts** surface
-(`feature/settings/.../SyncAndDraftsViewModel.kt`) lists in-flight drafts from both modes. Wire the
-screen with `MutationScreenContent` + `SubmitHandler` / `DraftSubmitHandler`.
-
-### Customization seams (real registry names)
-
-The app shell reads features + backbone + tabs + stores + network from registries — a fork adds one
-line per surface, never edits the shell:
-
-- **`FeatureRegistry`** (`cmp-navigation/.../registry/FeatureRegistry.kt`) — registers demo/fork
-  features into `AuthenticatedNavigation`. Its `featureKoinModules` list has TWO regions: the fork's
-  per-layer `Project*Module` seams **outside** the `// demo:begin … // demo:end` fence (they survive
-  `--clean`), and the demo feature set + `Demo*Module` aggregators **inside** it (stripped).
-- **Per-layer fork DI seams** — `core/{data,database,network}/.../di/Project*Module.kt`. Empty
-  on the template; this is where a fork registers its own repositories, DAOs, stores and network
-  singles. They live outside `demo/` so `remove-demo.sh` leaves them standing; their demo
-  counterparts (`.../demo/di/Demo*Module.kt`) are deleted by the same strip. Enforced by
-  `scripts/product-health/checks/white-label-di-seams.sh` (WLS-1…WLS-5).
-  **`core/store` has no such seam**: stores are declared with `@StoreProvider`, so there is nothing to
-  hand-register. A fork needing a bespoke Koin module adds it to `FeatureRegistry`, which is fork-owned.
-- **`BackboneRegistry`** (`cmp-navigation/.../registry/BackboneRegistry.kt`) — home/profile/settings
-  backbone graph.
-- **`TabRegistry`** (`cmp-navigation/.../registry/TabRegistry.kt`) — bottom-nav tab set.
-- **Store5 stores** — NOT a registry file. Each provider carries `@StoreProvider` and
-  `tools/store-ksp` generates its `<Store>Keys` object (qualifier + TTL + cache keys) and its
-  binding. See "Store declaration — `@StoreProvider` is the SoT" above.
-- **`AppAccessPoints`** + **`AccessPointRegistry`** (`core-base/network/.../AccessPointRegistry.kt`) —
-  the declared network endpoints (see Network below).
-- **`core/store`** — `config/AppScreenStateDefaults`, `config/AppErrorMapper` (template-owned; a
-  fork extends them via the `ProjectErrorMapper` / `ProjectScreenStateDefaults` seams).
-
-### Network — N REST + N Supabase access points
-
-Every endpoint the app talks to is declared once in `app-profile/app.yaml#network.access_points`
-(`type: rest | supabase`). **`./gradlew syncForkConfig` projects that one list onto every derived
-surface**, so the only thing a fork writes is the API type itself:
-
-| Generated surface | What it carries |
-|---|---|
-| `AppAccessPoints.points` | the registry list (`AccessPointRegistry` wraps it in `NetworkModule`) |
-| `AppUrlTypes` | one `UrlType` constant per endpoint, for runtime base-URL switching |
-| `GeneratedApiBindings` | the Koin binding for every API type annotated `@ApiBinding` — included by `ProjectNetworkModule` |
-| `AppSupabaseAnonKeys` | one row per Supabase point; value from `BuildKonfig` via `anon_key_env:` |
-
-**Adding an endpoint is two steps: declare it in `app.yaml`, then write the API type and annotate it
-`@ApiBinding("<id>")`.** There is no wiring step — REST and Supabase alike.
-
-The split is deliberate. The endpoint's `base_url` / `type` / `owner` / `secret_alias` /
-`anon_key_env` are per-fork DEPLOYMENT config and stay in app-profile; the class↔point link is a
-property of the class and lives on it. Putting a URL in an annotation would force a fork to edit a
-template-owned API class to change it — the 3-way merge this contract exists to remove.
-
-- **REST** — `restApi<T>("<id>")` builds the Ktor client + Ktorfit from the access point (base URL,
-  loggable host, proxy). `@ApiBinding("<id>")` on `FooApi` generates `restApi("<id>") { it.createFooApi() }`.
-- **Supabase** — `supabaseApi<T>("<id>")` is the exact twin, resolving a per-point
-  `SupabaseConfigClient` (URL from the registry, anon key by id) via `SupabaseClientFactory`.
-  `@ApiBinding("<id>")` on `FooApi` generates `supabaseApi("<id>") { FooApi(it) }`, so the facade needs
-  a single-arg constructor taking `SupabaseConfigClient`. N Supabase projects, not one hardcoded client.
-  Unlike REST there is no generated stub — supabase-kt has no interface-generation step, so `T` is the
-  fork's own typed wrapper over `client.postgrest`.
-
-`AppAccessPoints` / `AppUrlTypes` / `AppSupabaseAnonKeys` are **committed** (a fresh clone must build
-without running Gradle), so nothing inherently forces them to still match `app.yaml`;
-`GeneratedApiBindings` is a build artifact derived from the annotations.
-`scripts/product-health/checks/network-access-points.sh` (NAP-1…NAP-9) is what keeps them honest: it
-fails on a declared-but-unprojected endpoint, a stale base URL, a missing `UrlType`, an `@ApiBinding`
-naming an undeclared point (or none at all, which would make the check vacuous), a Supabase point with
-no anon-key row, an anon key committed as a literal, and any hand-written `restApi(`/`supabaseApi(`
-outside the generated file. Two of those are
-otherwise silent — a missing `UrlType` constant makes `getBaseUrl` fall back to `MAIN`'s URL rather
-than fail, and a committed anon key works fine right up until it needs rotating.
-
-### Tech Stack
-
-**Languages:**
-- Kotlin (shared business logic)
-- Kotlin/Native (iOS, macOS)
-- Kotlin/JVM (Android, Desktop)
-- Kotlin/JS (Web)
-- Swift (iOS platform code)
-- Ruby (Fastlane)
-- Bash (automation scripts)
-
-**Frameworks:**
-- Compose Multiplatform (UI framework for all platforms)
-- Ktor (networking)
-- Room 3 (database)
-- Koin (dependency injection)
-
-**CI/CD:**
-- GitHub Actions with the **v2 reusable workflows** from `openMF/mifos-x-actionhub` (per-workflow pins — the wrapper file is authoritative; see `.github/CLAUDE.md`)
-- **13 custom actions** (4 Android, 4 iOS, 2 macOS, 1 Desktop, 1 Web, 1 Static Analysis)
-- **Fastlane** (8 lanes across 8 deployment targets in `deployment/<platform>/<target>/lane.rb`)
-- **17 bash scripts** for setup, deployment, and verification
-
-**Code Quality:**
-- Spotless (code formatting)
-- Detekt (Kotlin static analysis & linting)
-- Dependency Guard (dependency validation)
-
----
+> - [`modules/core/store.md`](docs/architecture/modules/core/store.md) — the module, its contracts and failure modes
+> - [`cross-cutting/store-architecture.md`](docs/architecture/cross-cutting/store-architecture.md) — the archetypes end to end
+> - [`cross-cutting/store-data-api.md`](docs/architecture/cross-cutting/store-data-api.md) — the canonical API reference
+>
+> `core/store/STORE_ARCHETYPES.yaml` remains the machine-readable registry;
+> `scripts/product-health/checks/store-archetype-coverage.sh` still fails the build if an archetype
+> loses its last showcase.
 
 ## Deployment Targets
 

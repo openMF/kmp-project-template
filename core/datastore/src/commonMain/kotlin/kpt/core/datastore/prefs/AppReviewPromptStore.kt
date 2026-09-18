@@ -38,6 +38,10 @@ data class AppReviewPromptState(
  * `AppReviewConfig.shouldPromptForReview(...)`, whose thresholds are generated from app-profile —
  * so the policy lives with the config and this stays a dumb ledger.
  */
+// datastore-scope: per-device — launch count, install date and last-prompt date gate a
+// cooldown that must survive sign-out; a user who declined yesterday must not be asked again
+// today merely because they logged out in between. clearUserData() deliberately does NOT
+// reach these, which is why they are not fields on UserData.
 interface AppReviewPromptStore {
 
     /**

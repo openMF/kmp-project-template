@@ -5,7 +5,7 @@
 > store factories (`provide*Store`) annotated with `@StoreProvider`; qualifiers, cache keys and DI are generated.
 >
 > The archetype → factory → FetchPolicy catalogue and the write path are in
-> [`docs/architecture/STORE_ARCHITECTURE.md`](../../docs/architecture/STORE_ARCHITECTURE.md) — this
+> [`docs/architecture/cross-cutting/store-architecture.md`](../../docs/architecture/cross-cutting/store-architecture.md) — this
 > contract is the streamlined "what to call" summary. (Generator-side training guides live in the
 > framework repo, not in this repository.)
 

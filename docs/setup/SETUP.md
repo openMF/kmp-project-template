@@ -52,7 +52,7 @@ cd kmp-project-template
 The project includes a customization script that will update package names, application IDs, and other project identifiers to match your organization's naming conventions.
 
 ```bash
-scripts/white-label/customize.sh org.example.myapp MyKMPProject
+scripts/white-label/fork-init.sh org.example.myapp MyKMPProject
 ```
 
 Parameters:

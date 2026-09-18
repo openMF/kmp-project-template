@@ -399,7 +399,7 @@ grep -E 'object LocalFlavorsLoader' \
 ls -d build-logic/convention/src/main/kotlin/local/ && echo "✓ local override directory present"
 ```
 
-For details on the fork extension pattern, see [`FLAVORS_EXTENSION.md`](FLAVORS_EXTENSION.md).
+For details on the fork extension pattern, see [`FLAVORS_EXTENSION.md`](cross-cutting/flavors-extension.md).
 
 #### [§12 — AGP 9.x compatibility (conditional)](https://github.com/MobileByteLabs/kmp-product-flavors/blob/development/README.md)
 
@@ -527,6 +527,6 @@ Forks DON'T maintain an adoption doc. The template's doc IS their adoption doc �
 
 - Library spec: [`MobileByteLabs/kmp-product-flavors`](https://github.com/MobileByteLabs/kmp-product-flavors) + [`docs/adoption/v2.7/`](https://github.com/MobileByteLabs/kmp-product-flavors/tree/development/docs/adoption/v2.7)
 - Template setup guide (user-facing): [`SETUP-PROJECT.md`](SETUP-PROJECT.md)
-- Template fork extension pattern: [`FLAVORS_EXTENSION.md`](FLAVORS_EXTENSION.md)
-- Downstream consumer migration guide (Room 3 + Store 5 + Security): [`CONSUMER_APP_MIGRATION_GUIDE.md`](CONSUMER_APP_MIGRATION_GUIDE.md)
+- Template fork extension pattern: [`FLAVORS_EXTENSION.md`](cross-cutting/flavors-extension.md)
+- Downstream consumer migration guide (Room 3 + Store 5 + Security): [`CONSUMER_APP_MIGRATION_GUIDE.md`](cross-cutting/consumer-app-migration-guide.md)
 - Convention plugin source: [`build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt`](../build-logic/convention/src/main/kotlin/KMPFlavorsConventionPlugin.kt)

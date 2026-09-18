@@ -13,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kpt.core.base.data.annotation.FromStore
 import kpt.core.base.data.annotation.RepositoryBinding
-import kpt.core.base.database.invalidation.daoFlow
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.asScreenStream
@@ -34,7 +33,7 @@ import kotlin.time.Clock
  * (add) / `store.clear` (remove). The repository never touches the DAO for writes; the write store's
  * `SourceOfTruth` writer/delete are the only DAO write callers, so Room stays the durable SoT and the
  * paired read store ([watchlistStore]) re-projects reactively (same `personal_watchlist` table). The
- * SoT writer/delete fire [notifyingWrite] so wasmJs collectors re-emit after add/remove even when
+ * SoT writer/delete are plain DAO writes so wasmJs collectors re-emit after add/remove even when
  * Room 3 alpha05's async InvalidationTracker fails to fan out (no-op on Android/Desktop/iOS). See
  * `core-base/database/.../invalidation/README.md`. The [dao] is retained only for the reactive
  * [contains] membership read.
@@ -55,7 +54,7 @@ internal class WatchlistRepositoryImpl(
             isEmpty = { it.isEmpty() },
         )
 
-    override fun contains(coinId: String): Flow<Boolean> = daoFlow(WATCHLIST_TABLE) { dao.observeContains(coinId) }
+    override fun contains(coinId: String): Flow<Boolean> = dao.observeContains(coinId)
 
     override suspend fun add(coinId: String) {
         // Write through the store — persists to the Room SoT (via the SoT writer); the read store re-emits.

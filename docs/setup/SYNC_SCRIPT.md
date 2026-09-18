@@ -178,7 +178,7 @@ demo/sample code or your fork's customization seam**:
 - **`*/demo/*` (and any `demo/` leaf)** — every demo domain package lives under a
   `demo/` segment (`kpt.core.<module>.demo.<domain>`). Excluding the glob means the
   template's demo never lands in your fork via sync, and your own `demo/` code is
-  never clobbered. This is the same `**/demo/**` glob `scripts/white-label/customize.sh --clean` deletes.
+  never clobbered. This is the same `**/demo/**` glob `scripts/white-label/fork-init.sh --clean` deletes.
 - **The `core/store` customization seam** — `AppScreenStateDefaults.kt`,
   `config/AppErrorMapper.kt` and `config/AppScreenStateDefaults.kt` are the files a
   fork edits to brand state visuals and register its own stores (see

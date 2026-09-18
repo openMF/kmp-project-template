@@ -50,14 +50,6 @@ buildkonfig {
     }
 }
 
-androidComponents {
-    finalizeDsl { ext ->
-        ext.withHostTest {
-            isReturnDefaultValues = true
-            isIncludeAndroidResources = true
-        }
-    }
-}
 
 kotlin {
     sourceSets {

@@ -3,7 +3,7 @@
 #
 # GeneratedApiBindings.kt is derived from the FORK's app-profile, so it is not demo content — but it
 # used to live under `core/network/.../demo/di/`, and remove-demo.sh deletes every `**/demo/**`
-# package outright. That combination was silently destructive: `customize.sh` strips the demo BY
+# package outright. That combination was silently destructive: `fork-init.sh` strips the demo BY
 # DEFAULT ("forking = starting clean"), so a fork lost the generated file, and the generator's
 # `if (!dir.isDirectory) return` guard then made every later syncForkConfig a NO-OP. A fork could
 # declare an endpoint forever and never get a binding, with nothing reporting it.

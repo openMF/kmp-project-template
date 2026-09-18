@@ -35,9 +35,9 @@ is_allowed() {
     */org/convention/ForkProperties.kt|*/scripts/_shared/fork-props.sh) return 0 ;;
     */checks/fork-props-single-reader.sh) return 0 ;;
     # WRITERS + the generator. SyncForkConfigPlugin owns app-profile → ENV → catalog because it
-    # produces the bridge; derive.rb writes it; customize.sh authors app.id; setup-project.sh seeds
+    # produces the bridge; derive.rb writes it; fork-init.sh authors app.id; setup-project.sh seeds
     # the file from .template and writes the keystore DN. A writer cannot go through a reader.
-    */SyncForkConfigPlugin.kt|*/white-label/derive.rb|*/white-label/customize.sh|*/setup-project.sh) return 0 ;;
+    */SyncForkConfigPlugin.kt|*/white-label/derive.rb|*/white-label/fork-init.sh|*/setup-project.sh) return 0 ;;
     # deployment/Appfile is self-sufficient ON PURPOSE: fastlane's CredentialsManager evaluates the
     # Appfile BEFORE the Fastfile imports config.rb, which raised
     # `uninitialized constant CredentialsManager::AppfileConfig::FastlaneConfig`. Its own header

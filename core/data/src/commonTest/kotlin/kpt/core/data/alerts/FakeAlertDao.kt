@@ -10,45 +10,46 @@
 package kpt.core.data.alerts
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kpt.core.database.alerts.AlertDao
 import kpt.core.database.alerts.AlertEntity
 
 /**
- * In-memory fake of [AlertDao] whose [observeAll] is a **cold snapshot** — each subscription
- * emits the current rows once, then completes.
+ * In-memory fake of [AlertDao] whose reactive reads are backed by a [MutableStateFlow], so a live
+ * collector re-emits after every write — what a real Room DAO `Flow` does.
  *
- * Models the wasmJs failure mode the invalidation bridge absorbs (Room 3 alpha05's
- * `InvalidationTracker` does not fan out to a live collector after a write), so the ONLY
- * re-emit source is `daoFlow(ALERTS_TABLE) { }` re-subscribing on the `RoomChangeBus` signal
- * published by `notifyingWrite(ALERTS_TABLE) { }`. Cold — not a hot `MutableStateFlow` — so
- * there is no Turbine race (the reason the banking hot-fake reactive tests are `@Ignore`d).
+ * These reads were COLD until 2026-09-17, modelling a wasmJs invalidation gap so that re-emission
+ * could only come from the `RoomChangeBus`/`daoFlow`/`notifyingWrite` bridge. That bridge is gone
+ * (Room 3.1.0-alpha01 measured re-emitting correctly on js and wasmJs — see
+ * `core/database/src/{js,wasmJs}Test/.../WebInvalidationProbeTest.kt`), so a cold fake would now
+ * assert the absence of a mechanism production depends on.
  */
 internal class FakeAlertDao : AlertDao {
 
-    private val rows = mutableListOf<AlertEntity>()
+    private val rows = MutableStateFlow<List<AlertEntity>>(emptyList())
 
     override fun observeAll(): Flow<List<AlertEntity>> =
-        flow { emit(rows.sortedByDescending { it.createdAt }) }
+        rows.map { list -> list.sortedByDescending { it.createdAt } }
 
     override fun observeById(id: String): Flow<AlertEntity?> =
-        flow { emit(rows.firstOrNull { it.id == id }) }
+        rows.map { list -> list.firstOrNull { it.id == id } }
 
     override suspend fun upsert(alert: AlertEntity) {
-        rows.removeAll { it.id == alert.id }
-        rows.add(alert)
+        rows.update { list -> list.filterNot { it.id == alert.id } + alert }
     }
 
     override suspend fun upsertAll(alerts: List<AlertEntity>) {
-        alerts.forEach { a -> rows.removeAll { it.id == a.id } }
-        rows.addAll(alerts)
+        val ids = alerts.map { it.id }.toSet()
+        rows.update { list -> list.filterNot { it.id in ids } + alerts }
     }
 
     override suspend fun deleteById(id: String) {
-        rows.removeAll { it.id == id }
+        rows.update { list -> list.filterNot { it.id == id } }
     }
 
     override suspend fun deleteAll() {
-        rows.clear()
+        rows.update { emptyList() }
     }
 }

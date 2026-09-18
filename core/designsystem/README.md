@@ -52,5 +52,5 @@ CompositionLocalProvider(LocalFinanceColors provides myForkFinanceColors()) {
 ```
 
 See `CONSUMPTION.md` for the full call sequence and `FEATURE_AUTHORING.md` +
-`docs/architecture/STYLE_GUIDE.md` for when a new widget belongs here vs. `core-base/designsystem`
+`docs/architecture/cross-cutting/style-guide.md` for when a new widget belongs here vs. `core-base/designsystem`
 vs. `feature/{F}`.

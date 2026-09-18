@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # checks/white-label-di-seams.sh — every core layer keeps a FORK DI seam that survives `--clean`.
 #
-# `customize.sh` strips the demo BY DEFAULT ("forking = starting clean"), and `remove-demo.sh` does
+# `fork-init.sh` strips the demo BY DEFAULT ("forking = starting clean"), and `remove-demo.sh` does
 # that by deleting every `**/demo/**` package plus every `// demo:begin … // demo:end` block. So
 # anything a FORK needs must live outside both.
 #

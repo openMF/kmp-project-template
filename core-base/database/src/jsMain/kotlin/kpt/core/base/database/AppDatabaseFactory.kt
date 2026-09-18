@@ -59,10 +59,23 @@ class AppDatabaseFactory {
             Room.databaseBuilder<T>(name = databaseName)
                 .setDriver(WebWorkerSQLiteDriver(createSQLiteWasmWorker()))
         } else {
+            // Same rule as the isolated branch: no default driver exists on js, so the
+            // non-isolated fallback needs one too. Its wasmJs sibling sets it in both branches.
             Room.inMemoryDatabaseBuilder<T>()
+                .setDriver(WebWorkerSQLiteDriver(createSQLiteWasmWorker()))
         }
     }
 
+    /**
+     * In-memory database for tests and ephemeral sessions.
+     *
+     * The driver is NOT optional. Room 3 KMP has no default driver on js/wasmJs — a builder
+     * without [setDriver] throws when `build()` runs, which surfaces to a caller as an opaque
+     * `InstanceCreationException` rather than anything naming SQLite. This overload previously
+     * omitted it while its wasmJs sibling set it, so every js in-memory database failed to
+     * construct; the test harness could not build one at all.
+     */
     inline fun <reified T : RoomDatabase> createInMemoryDatabase(): RoomDatabase.Builder<T> =
         Room.inMemoryDatabaseBuilder<T>()
+            .setDriver(WebWorkerSQLiteDriver(createSQLiteWasmWorker()))
 }

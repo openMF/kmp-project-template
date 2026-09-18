@@ -76,8 +76,8 @@ interface MutationGateway {
 
     /**
      * Local-only mutation for a CACHE_ONLY feature (no `MutableStore` / `Updater`): runs [mutate] as a
-     * write-through to Room inside `notifyingWrite([table])`, so the table's reactive readers (Store
-     * streams AND Dao `daoFlow` queries) re-emit. This is the single write door for local-only features
+     * write-through to Room inside a plain DAO write, so the table's reactive readers (Store
+     * streams AND Dao the Room `Flow` queries) re-emit. This is the single write door for local-only features
      * — the repository never calls a `Dao` write in its own body; it hands the write to the gateway.
      * Always `Applied(synced = true)` (a local commit has no network leg) or `Failed` on a DB error.
      */

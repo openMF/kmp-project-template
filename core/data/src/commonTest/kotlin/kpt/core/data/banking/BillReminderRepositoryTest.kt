@@ -192,7 +192,7 @@ class BillReminderRepositoryTest {
     @Test
     fun detailStreamEmitsReminderForKnownId() = runTest {
         // Was `repo.getById` (raw DAO); now the store-backed detail read. Asserts PRESENCE only —
-        // the post-delete transition hits the fake-DAO + RoomChangeBus + Turbine timing issue this
+        // the post-delete transition hits the fake-DAO + fake-DAO + Turbine timing issue this
         // file's siblings already document, and a flaky assertion is worse than an absent one.
         val bill = sampleBill(id = "B1")
         repo.upsert(bill)
@@ -213,7 +213,7 @@ class BillReminderRepositoryTest {
         suspend fun count(): Int = repo.billRemindersStream(backgroundScope).state
             .mapNotNull { it.billsOrNull() }.first().size
         // Only the initial read is asserted — re-emission after each write is the documented
-        // fake-DAO/RoomChangeBus timing issue, not something this test can pin deterministically.
+        // fake-DAO timing issue, not something this test can pin deterministically.
         assertEquals(0, count())
     }
 

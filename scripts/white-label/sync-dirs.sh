@@ -132,7 +132,7 @@ SYNC_FILES=(
     ".claudeignore"                 # Claude tooling ignore baseline
     # --- blueprint setup / customization scripts (root-level, not under scripts/) ---
     "setup-project.sh"              # master fork setup script
-    "scripts/white-label/customize.sh"                 # fork customization driver
+    "scripts/white-label/fork-init.sh"                 # fork customization driver
     "scripts/white-label/keystore.sh"           # keystore generate/encode/add operations
     "scripts/white-label/firebase.sh"             # Firebase project configuration
     "generateModuleGraphs.sh"       # module dependency-graph generator
@@ -192,7 +192,7 @@ declare -A EXCLUSIONS=(
     # mifos-x-group-banking, mifos-x-open-banking, reels-downloader-new, ...) may
     # create build-logic/convention/src/main/kotlin/local/LocalFlavors.kt to add
     # their own flavors / dimensions / overrides on top of the synced base.
-    # See docs/architecture/FLAVORS_EXTENSION.md for the pattern.
+    # See docs/architecture/cross-cutting/flavors-extension.md for the pattern.
     ["build-logic"]="convention/src/main/kotlin/local:dir"
     # Feature backbone (WS4/T5) — home/profile/settings are owner:template and now sync,
     # but their demo/** showcases (and feature/home's generated/**) stay fork-owned. These

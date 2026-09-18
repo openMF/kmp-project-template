@@ -11,13 +11,6 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
 }
 
-androidComponents {
-    finalizeDsl { ext ->
-        ext.withHostTest {
-            isReturnDefaultValues = true
-        }
-    }
-}
 
 kotlin {
     sourceSets {
@@ -40,6 +33,9 @@ kotlin {
             // MapSettings — an in-memory Settings, so the review-counter tests exercise the real
             // read/write path rather than a hand-rolled fake that could drift from it.
             implementation(libs.multiplatform.settings.test)
+            // runTest — clearUserData() is suspend, and the sign-out contract (identity gone,
+            // device preferences kept) is only assertable by actually calling it.
+            implementation(libs.kotlinx.coroutines.test)
         }
     }
 }

@@ -2,7 +2,7 @@
 #
 # remove-demo.sh — strip the kmp-project-template demo showcase, leaving a clean fork.
 #
-# Invoked by `scripts/white-label/customize.sh --clean`. Convention (showcase-framework-separation epic):
+# Invoked by `scripts/white-label/fork-init.sh --clean`. Convention (showcase-framework-separation epic):
 #   • demo domain code lives under **/demo/** packages,
 #   • demo feature modules are include()d inside a `// demo:begin … // demo:end` block
 #     in settings.gradle.kts,
@@ -389,7 +389,7 @@ fi
 
 # ── 6c. Re-derive every syncForkConfig-generated surface from the STRIPPED app-profile ───
 #     Stripping the demo fence removes the DECLARATION; the generated OUTPUT is committed source and
-#     must be rebuilt from what survives. `customize.sh` runs syncForkConfig BEFORE this script, which
+#     must be rebuilt from what survives. `fork-init.sh` runs syncForkConfig BEFORE this script, which
 #     is the wrong side of the strip — so a cleaned fork kept AppAccessPoints / AppUrlTypes /
 #     AppSupabaseAnonKeys listing the 5 demo endpoints that app.yaml no longer declares (NAP-1 + NAP-3
 #     both fail on it).

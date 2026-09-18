@@ -57,8 +57,8 @@ import kotlin.time.ExperimentalTime
  * rather than inventing new ones so the canary matches how production ViewModels
  * consume the API. Stores that need to observe the SoT-re-emission invariant
  * (AC-2) are built with a `MutableStateFlow`-backed [SourceOfTruth] reader —
- * the same shape [RoomChangeBusSwrTest] uses to simulate the DAO Flow /
- * `RoomChangeBus` production contract, hermetic to `core-base/store`.
+ * the same shape [SourceOfTruthReEmissionSwrTest] uses to simulate the DAO Flow /
+ * Room's InvalidationTracker production contract, hermetic to `core-base/store`.
  */
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class CacheFirstSwrTest {
@@ -196,7 +196,7 @@ class CacheFirstSwrTest {
         //       suppresses re-fires while the band remains stale (no thrash)
         //
         // Uses a SoT-backed store (MutableStateFlow reader/writer, matching
-        // `RoomChangeBusSwrTest`) so the fresh() SoT write actually propagates
+        // `SourceOfTruthReEmissionSwrTest`) so the fresh() SoT write actually propagates
         // to the base subscription — the mechanism the fix relies on.
         //
         // Staleness is PINNED, not raced. The band is computed from the drift between two

@@ -4,7 +4,7 @@
 # It DRIVES and VERIFIES every stage of adopting the white-label template — and re-audits ALL stages on
 # every run, so a fork is never silently half-set-up or drifted from the template. app-profile/
 # {app.yaml, platforms/**} is the ONE fork source of truth; everything else is DERIVED. This one command
-# replaces the scattered surface (scripts/white-label/customize.sh + scripts/white-label/firebase.sh + scripts/white-label/keystore.sh +
+# replaces the scattered surface (scripts/white-label/fork-init.sh + scripts/white-label/firebase.sh + scripts/white-label/keystore.sh +
 # setup_ios_complete.sh + scripts/white-label/sync-dirs.sh + syncForkConfig + secrets pull).
 #
 # Stages (each is DRIVEN when incomplete, and VERIFIED every run):

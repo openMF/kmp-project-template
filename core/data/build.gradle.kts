@@ -12,14 +12,6 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-androidComponents {
-    finalizeDsl { ext ->
-        ext.withHostTest {
-            isIncludeAndroidResources = true
-            isReturnDefaultValues = true
-        }
-    }
-}
 
 kotlin {
     sourceSets {

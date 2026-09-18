@@ -231,7 +231,7 @@ else
 fi
 echo "──────────────────────────────────────────────"
 echo "Successful tasks: ${#successful_tasks[@]}"
-for t in "${successful_tasks[@]}"; do echo "  ✅ $t"; done
+for t in ${successful_tasks[@]+"${successful_tasks[@]}"}; do echo "  ✅ $t"; done
 
 if [ "${#healed_tasks[@]}" -gt 0 ]; then
     echo ""

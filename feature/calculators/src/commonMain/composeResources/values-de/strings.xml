@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">Finanzierbarkeit</string>
+    <string name="screens_calc_affordability_back_cd">Zurück</string>
+    <string name="screens_calc_affordability_income_label">Monatliches Einkommen</string>
+    <string name="screens_calc_affordability_obligations_label">Bestehende monatliche Schulden</string>
+    <string name="screens_calc_affordability_dti_label">Schuldenquote-Obergrenze (%)</string>
+    <string name="screens_calc_affordability_rate_label">Jahreszins (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Laufzeit (Monate)</string>
+    <string name="screens_calc_affordability_max_principal_label">Maximale Darlehenssumme</string>
+    <string name="screens_calc_affordability_max_emi_label">Maximale Rate</string>
+    <string name="screens_calc_amortization_title">Tilgung</string>
+    <string name="screens_calc_amortization_title_with_source">Tilgung · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Zurück</string>
+    <string name="screens_calc_amortization_principal_label">Tilgung</string>
+    <string name="screens_calc_amortization_rate_label">Jahreszins (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Laufzeit (Monate)</string>
+    <string name="screens_calc_amortization_emi_label">Monatliche Rate</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Zinsen %1$s · Gesamt %2$s</string>
+    <string name="screens_calc_amortization_header_month">Nr.</string>
+    <string name="screens_calc_amortization_header_principal">Tilgung</string>
+    <string name="screens_calc_amortization_header_interest">Zinsen</string>
+    <string name="screens_calc_amortization_header_balance">Restschuld</string>
+    <string name="screens_calc_compare_title">Darlehen vergleichen</string>
+    <string name="screens_calc_compare_back_cd">Zurück</string>
+    <string name="screens_calc_compare_best_emi_label">Beste Rate · Szenario %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/Mon.</string>
+    <string name="screens_calc_compare_savings_text">Spart insgesamt %1$s gegenüber dem teuersten</string>
+    <string name="screens_calc_compare_helper_text">Bearbeite unten ein Szenario, um den Vergleich live zu aktualisieren.</string>
+    <string name="screens_calc_compare_scenario_label">Szenario %1$d</string>
+    <string name="screens_calc_compare_best_badge">Beste</string>
+    <string name="screens_calc_compare_principal_label">Darlehensbetrag</string>
+    <string name="screens_calc_compare_rate_label">Zins (%)</string>
+    <string name="screens_calc_compare_tenure_label">Laufzeit (Monate)</string>
+    <string name="screens_calc_compare_result_emi">Rate</string>
+    <string name="screens_calc_compare_result_interest">Zinsen</string>
+    <string name="screens_calc_compare_result_total">Gesamt</string>
+    <string name="screens_calc_wizard_resume_title">Unfertigen Assistenten fortsetzen?</string>
+    <string name="screens_calc_wizard_resume_message">Du hast einen Darlehensrechner-Assistenten bei Schritt %1$d. Dort weitermachen oder verwerfen?</string>
+    <string name="screens_calc_wizard_resume_continue">Fortsetzen</string>
+    <string name="screens_calc_wizard_resume_discard">Verwerfen</string>
+    <string name="screens_calc_wizard_title">Neues Darlehen · Schritt %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Zurück</string>
+    <string name="screens_calc_wizard_step_principal_question">Wie viel möchtest du aufnehmen?</string>
+    <string name="screens_calc_wizard_step_principal_label">Darlehensbetrag</string>
+    <string name="screens_calc_wizard_step_tenure_question">Über wie viele Monate?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Laufzeit (Monate)</string>
+    <string name="screens_calc_wizard_step_rate_question">Zu welchem Jahreszins?</string>
+    <string name="screens_calc_wizard_step_rate_label">Jahreszins (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Monatliche Rate</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Gesamt zu zahlen: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Darlehensbetrag</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Laufzeit</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d Monate</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Zins</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Zinsen gesamt</string>
+    <string name="screens_calc_wizard_step_name_message">Benenne dieses Szenario, damit du es später in deinen Darlehen wiederfindest.</string>
+    <string name="screens_calc_wizard_step_name_label">Szenarioname</string>
+    <string name="screens_calc_wizard_step_name_required">Erforderlich – gib einen Namen ein, um Speichern zu aktivieren.</string>
+    <string name="screens_calc_wizard_button_back">Zurück</string>
+    <string name="screens_calc_wizard_button_next">Weiter</string>
+    <string name="screens_calc_wizard_button_save">Als Darlehen speichern</string>
+</resources>

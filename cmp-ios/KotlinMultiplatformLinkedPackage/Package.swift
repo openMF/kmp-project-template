@@ -13,17 +13,17 @@ let package = Package(
     )
   ],
   dependencies: [
-    .package(path: "subpackages/dev_gitlive_firebase_crashlytics_3_0_0_alpha01"),
-    .package(path: "subpackages/dev_gitlive_firebase_analytics_3_0_0_alpha01"),
-    .package(path: "subpackages/dev_gitlive_firebase_app_3_0_0_alpha01")
+    .package(path: "subpackages/dev_gitlive_firebase_crashlytics_3_0_0_alpha02"),
+    .package(path: "subpackages/dev_gitlive_firebase_analytics_3_0_0_alpha02"),
+    .package(path: "subpackages/dev_gitlive_firebase_app_3_0_0_alpha02")
   ],
   targets: [
     .target(
       name: "KotlinMultiplatformLinkedPackage",
       dependencies: [
-        .product(name: "dev_gitlive_firebase_crashlytics_3_0_0_alpha01", package: "dev_gitlive_firebase_crashlytics_3_0_0_alpha01"),
-        .product(name: "dev_gitlive_firebase_analytics_3_0_0_alpha01", package: "dev_gitlive_firebase_analytics_3_0_0_alpha01"),
-        .product(name: "dev_gitlive_firebase_app_3_0_0_alpha01", package: "dev_gitlive_firebase_app_3_0_0_alpha01")
+        .product(name: "dev_gitlive_firebase_crashlytics_3_0_0_alpha02", package: "dev_gitlive_firebase_crashlytics_3_0_0_alpha02"),
+        .product(name: "dev_gitlive_firebase_analytics_3_0_0_alpha02", package: "dev_gitlive_firebase_analytics_3_0_0_alpha02"),
+        .product(name: "dev_gitlive_firebase_app_3_0_0_alpha02", package: "dev_gitlive_firebase_app_3_0_0_alpha02")
       ]
     )
   ]

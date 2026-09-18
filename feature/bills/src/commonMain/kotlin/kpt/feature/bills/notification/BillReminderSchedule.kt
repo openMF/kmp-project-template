@@ -12,7 +12,7 @@ package kpt.feature.bills.notification
 /**
  * Feature-local payload describing a single bill-reminder notification.
  *
- * Producers (the bill ViewModels) build this from a [kpt.core.model.demo.banking.BillReminder] by
+ * Producers (the bill ViewModels) build this from a [kpt.core.model.banking.BillReminder] by
  * computing the next concrete `triggerAtMs` instant; [BillNotificationGateway] maps it onto the
  * cross-platform `sync` scheduling infra (worker-kmp + KMPNotifier).
  *

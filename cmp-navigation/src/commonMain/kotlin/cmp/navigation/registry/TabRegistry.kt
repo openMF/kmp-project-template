@@ -13,7 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import cmp.navigation.authenticatednavbar.AuthenticatedNavBarTabItem
-import kpt.core.ui.NavigationItem
+import kpt.core.ui.navigation.NavigationItem
 
 /**
  * TabRegistry — the FORK-OWNED white-label seam for the authenticated bottom-nav tabs.
@@ -26,7 +26,17 @@ import kpt.core.ui.NavigationItem
  */
 object TabRegistry {
     /** Fork tabs appended after the backbone Home/Profile tabs. Template default = none. */
-    val extraTabs: List<NavigationItem> = emptyList()
+    /**
+     * Feature-contributed bottom-nav tabs, DERIVED from `@FeatureTab`.
+     *
+     * `:cmp-navigation:generateFeatureTabs` collects every `@FeatureTab` object across the feature
+     * modules into [GeneratedFeatureTabs], so a feature declares its own tab rather than the fork
+     * editing this file. Empty until some feature annotates one.
+     *
+     * An INLINE tab still has to register its top screen on the inner NavHost via
+     * [extraInlineTabDestinations] — this list puts the tab in the bar, not its destination.
+     */
+    val extraTabs: List<NavigationItem> = GeneratedFeatureTabs
 
     /**
      * Fork registration of INLINE extra-tab TOP destinations into the navbar's INNER NavHost.

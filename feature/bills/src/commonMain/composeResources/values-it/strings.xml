@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_bills_add_title">Nuovo promemoria bolletta</string>
+    <string name="screens_bills_edit_title">Modifica promemoria</string>
+    <string name="screens_bills_addedit_back_cd">Indietro</string>
+    <string name="screens_bills_addedit_save_button">Salva</string>
+    <string name="screens_bills_addedit_status_saving">Salvataggio…</string>
+    <string name="screens_bills_addedit_status_saved">Salvato ✓</string>
+    <string name="screens_bills_addedit_status_add_another">Aggiungine un altro</string>
+    <string name="screens_bills_addedit_status_offline">Salvato offline — verrà sincronizzato quando torni online.</string>
+    <string name="screens_bills_addedit_status_failed">Salvataggio non riuscito: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">errore sconosciuto</string>
+    <string name="screens_bills_addedit_retry_button">Riprova</string>
+    <string name="screens_bills_addedit_dismiss_button">Ignora</string>
+    <string name="screens_bills_addedit_name_label">Nome (es. Elettricità)</string>
+    <string name="screens_bills_addedit_amount_label">Importo</string>
+    <string name="screens_bills_addedit_due_day_label">Giorno di scadenza del mese (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">Ricorrenza</string>
+    <string name="screens_bills_addedit_category_title">Categoria</string>
+    <string name="screens_bills_addedit_remind_days_before_label">Ricorda giorni prima</string>
+    <string name="screens_bills_addedit_enabled_label">Attivo</string>
+    <string name="screens_bills_draft_resume_title">Riprendere la bozza?</string>
+    <string name="screens_bills_draft_resume_message">Hai un promemoria bolletta non salvato. Riprendi da dove eri, eliminalo o creane uno nuovo.</string>
+    <string name="screens_bills_draft_resume_resume">Riprendi</string>
+    <string name="screens_bills_draft_resume_discard">Elimina bozza</string>
+    <string name="screens_bills_draft_resume_start_fresh">Ricomincia</string>
+    <string name="screens_bills_list_title">Promemoria bollette</string>
+    <string name="screens_bills_list_back_cd">Indietro</string>
+    <string name="screens_bills_list_new_fab_text">Nuova bolletta</string>
+    <string name="screens_bills_list_summary_label">In scadenza questo mese</string>
+    <string name="screens_bills_list_summary_due_single">%1$d bolletta in scadenza nei prossimi 7 giorni</string>
+    <string name="screens_bills_list_summary_due_plural">%1$d bollette in scadenza nei prossimi 7 giorni</string>
+    <string name="screens_bills_list_mark_paid_cd">Segna come pagata</string>
+    <string name="screens_bills_list_paid_button">Pagata</string>
+    <string name="screens_bills_list_reminders_disabled">Promemoria disattivati</string>
+</resources>

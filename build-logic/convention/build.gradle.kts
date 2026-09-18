@@ -74,6 +74,11 @@ gradlePlugin {
             implementationClass = "AndroidApplicationConventionPlugin"
         }
 
+        register("featureAggregate") {
+            id = "org.convention.feature.aggregate"
+            implementationClass = "FeatureAggregateConventionPlugin"
+        }
+
         register("kmpFlavors") {
             id = "org.convention.kmp.flavors"
             implementationClass = "KMPFlavorsConventionPlugin"
@@ -155,10 +160,5 @@ gradlePlugin {
             description = "Wires the worker-kmp app plugin + the worker-compose-all bundle into a Compose Multiplatform module. Use on the module that hosts the consumer-facing workers + WorkScheduler."
         }
         // Supabase Config Plugin
-        register("supabaseConfig") {
-            id = "org.convention.kmp.supabase.config"
-            implementationClass = "SupabaseConfigConventionPlugin"
-            description = "Generates Supabase credentials from secrets file"
-        }
     }
 }

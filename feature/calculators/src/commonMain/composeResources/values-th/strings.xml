@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">ความสามารถในการกู้</string>
+    <string name="screens_calc_affordability_back_cd">ย้อนกลับ</string>
+    <string name="screens_calc_affordability_income_label">รายได้ต่อเดือน</string>
+    <string name="screens_calc_affordability_obligations_label">ภาระหนี้รายเดือนที่มีอยู่</string>
+    <string name="screens_calc_affordability_dti_label">เพดานสัดส่วนหนี้ต่อรายได้ (%)</string>
+    <string name="screens_calc_affordability_rate_label">อัตราต่อปี (%)</string>
+    <string name="screens_calc_affordability_tenure_label">ระยะเวลา (เดือน)</string>
+    <string name="screens_calc_affordability_max_principal_label">เงินต้นกู้สูงสุด</string>
+    <string name="screens_calc_affordability_max_emi_label">ค่างวดสูงสุด</string>
+    <string name="screens_calc_amortization_title">การผ่อนชำระ</string>
+    <string name="screens_calc_amortization_title_with_source">การผ่อนชำระ · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">ย้อนกลับ</string>
+    <string name="screens_calc_amortization_principal_label">เงินต้น</string>
+    <string name="screens_calc_amortization_rate_label">อัตราต่อปี (%)</string>
+    <string name="screens_calc_amortization_tenure_label">ระยะเวลา (เดือน)</string>
+    <string name="screens_calc_amortization_emi_label">ค่างวดรายเดือน</string>
+    <string name="screens_calc_amortization_interest_total_supporting">ดอกเบี้ย %1$s · รวม %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">เงินต้น</string>
+    <string name="screens_calc_amortization_header_interest">ดอกเบี้ย</string>
+    <string name="screens_calc_amortization_header_balance">ยอดคงเหลือ</string>
+    <string name="screens_calc_compare_title">เปรียบเทียบสินเชื่อ</string>
+    <string name="screens_calc_compare_back_cd">ย้อนกลับ</string>
+    <string name="screens_calc_compare_best_emi_label">ค่างวดดีที่สุด · สถานการณ์ %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/เดือน</string>
+    <string name="screens_calc_compare_savings_text">ประหยัดรวม %1$s เทียบกับแบบที่แพงที่สุด</string>
+    <string name="screens_calc_compare_helper_text">แก้ไขสถานการณ์ใดก็ได้ด้านล่างเพื่อดูการเปรียบเทียบอัปเดตทันที</string>
+    <string name="screens_calc_compare_scenario_label">สถานการณ์ %1$d</string>
+    <string name="screens_calc_compare_best_badge">ดีที่สุด</string>
+    <string name="screens_calc_compare_principal_label">เงินต้น</string>
+    <string name="screens_calc_compare_rate_label">อัตรา (%)</string>
+    <string name="screens_calc_compare_tenure_label">ระยะเวลา (เดือน)</string>
+    <string name="screens_calc_compare_result_emi">ค่างวด</string>
+    <string name="screens_calc_compare_result_interest">ดอกเบี้ย</string>
+    <string name="screens_calc_compare_result_total">รวม</string>
+    <string name="screens_calc_wizard_resume_title">ดำเนินตัวช่วยที่ค้างอยู่ต่อไหม</string>
+    <string name="screens_calc_wizard_resume_message">คุณมีตัวช่วยคำนวณสินเชื่อค้างอยู่ที่ขั้นตอน %1$d จะทำต่อจากเดิมหรือทิ้งไป</string>
+    <string name="screens_calc_wizard_resume_continue">ทำต่อ</string>
+    <string name="screens_calc_wizard_resume_discard">ทิ้ง</string>
+    <string name="screens_calc_wizard_title">สินเชื่อใหม่ · ขั้นตอน %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">ย้อนกลับ</string>
+    <string name="screens_calc_wizard_step_principal_question">คุณต้องการกู้เท่าไร</string>
+    <string name="screens_calc_wizard_step_principal_label">จำนวนเงินต้น</string>
+    <string name="screens_calc_wizard_step_tenure_question">ผ่อนกี่เดือน</string>
+    <string name="screens_calc_wizard_step_tenure_label">ระยะเวลา (เดือน)</string>
+    <string name="screens_calc_wizard_step_rate_question">อัตราต่อปีเท่าไร</string>
+    <string name="screens_calc_wizard_step_rate_label">อัตราต่อปี (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">ค่างวดรายเดือน</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">ยอดชำระทั้งหมด: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">เงินต้น</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">ระยะเวลา</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d เดือน</string>
+    <string name="screens_calc_wizard_step_review_rate_label">อัตรา</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">ดอกเบี้ยรวม</string>
+    <string name="screens_calc_wizard_step_name_message">ตั้งชื่อสถานการณ์นี้เพื่อให้กลับมาหาได้ในรายการสินเชื่อของคุณ</string>
+    <string name="screens_calc_wizard_step_name_label">ชื่อสถานการณ์</string>
+    <string name="screens_calc_wizard_step_name_required">จำเป็น — พิมพ์ชื่อเพื่อเปิดใช้งานปุ่มบันทึก</string>
+    <string name="screens_calc_wizard_button_back">ย้อนกลับ</string>
+    <string name="screens_calc_wizard_button_next">ถัดไป</string>
+    <string name="screens_calc_wizard_button_save">บันทึกเป็นสินเชื่อ</string>
+</resources>

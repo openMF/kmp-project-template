@@ -9,6 +9,7 @@
  */
 package kpt.core.base.network
 
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.logging.LogLevel
 
 /**
@@ -25,6 +26,13 @@ class SupabaseClientFactory(
     private val registry: AccessPointRegistry,
     private val anonKeyFor: (id: String) -> String,
     private val logLevel: LogLevel = LogLevel.INFO,
+    /**
+     * Per-access-point fork seam: extra supabase-kt modules to install on that point's client
+     * (Auth, ComposeAuth, Realtime, Storage). Defaults to none, which is the neutral template.
+     *
+     * Keyed by id because a fork may run several projects and want Auth on only one of them.
+     */
+    private val installExtrasFor: (id: String) -> SupabaseClientBuilder.() -> Unit = { {} },
 ) {
     private val cache: MutableMap<String, SupabaseConfigClient> = mutableMapOf()
 
@@ -38,9 +46,26 @@ class SupabaseClientFactory(
                     override val anonKey: String = anonKeyFor(id)
                 },
                 logLevel = logLevel,
+                installExtras = installExtrasFor(id),
             )
         }
     }
+
+    /**
+     * Client for [id], or throw naming every declared Supabase point.
+     *
+     * The [clientFor] null is right for "probe whether this fork configured Supabase"; it is wrong for
+     * DI wiring, where a typo'd or undeclared id must fail loudly at graph construction rather than
+     * inject a null-shaped absence. This is the Supabase twin of [ktorfitFor]'s error, and [supabaseApi]
+     * is its only intended caller.
+     */
+    fun requireClientFor(id: String): SupabaseConfigClient =
+        clientFor(id) ?: error(
+            "No SUPABASE access point '$id' declared in app-profile network.access_points " +
+                "(AccessPointRegistry). Declared Supabase points: " +
+                registry.supabasePoints().joinToString { it.id }.ifEmpty { "(none)" } +
+                ". Declare it there with `type: supabase`, or fix the id.",
+        )
 
     /** Map of every declared Supabase access-point id → its client. */
     fun clients(): Map<String, SupabaseConfigClient> =

@@ -16,18 +16,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.runtime.getValue
 import androidx.core.os.LocaleListCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import cmp.shared.SharedApp
 import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
 import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AppLifecycleTracker
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
-import kpt.core.base.data.infra.NetworkMonitor
+import kotlinx.coroutines.launch
 import kpt.core.base.platform.update.AppUpdateManager
-import kpt.core.base.platform.update.AppUpdateManagerImpl
 import kpt.core.base.ui.util.ShareUtils
 import kpt.core.data.user.UserDataRepository
 import org.koin.android.ext.android.inject
@@ -43,11 +41,14 @@ import java.util.Locale
 @Suppress("UnusedPrivateProperty")
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appUpdateManager: AppUpdateManager
+    // INJECTED, not constructed. `platformModule` already binds
+    // `single<AppUpdateManager> { AppUpdateManagerImpl() }`, so building one here produced a SECOND
+    // instance and left that binding dead on Android — anything resolving AppUpdateManager from Koin
+    // (or reading LocalAppUpdateManager) talked to a different object than the one this activity
+    // drives through onCreate/onResume.
+    private val appUpdateManager: AppUpdateManager by inject()
 
     private val userPreferencesRepository: UserDataRepository by inject()
-
-    private val networkMonitor: NetworkMonitor by inject()
 
     private val analyticsHelper: AnalyticsHelper by inject()
     private val lifecycleTracker by lazy { AppLifecycleTracker(analyticsHelper) }
@@ -57,7 +58,6 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen().setKeepOnScreenCondition { shouldShowSplashScreen }
 
         super.onCreate(savedInstanceState)
-        appUpdateManager = AppUpdateManagerImpl(this)
 
         val darkThemeConfigFlow = userPreferencesRepository.observeDarkThemeConfig
 
@@ -69,12 +69,10 @@ class MainActivity : AppCompatActivity() {
         analyticsHelper.setUserId(deviceData)
 
         setContent {
-            val status by networkMonitor.isOnline.collectAsStateWithLifecycle(false)
-
-            if (status) {
-                appUpdateManager.checkForAppUpdate()
-            }
-
+            // The update CHECK moved to AppViewModel.init (commonMain) so every platform performs
+            // it, not just Android. What stays here is `checkForResumeUpdateState()` in onResume —
+            // genuinely an Android lifecycle concern, because Play's flexible update can be
+            // interrupted by backgrounding and must be re-offered on return.
             lifecycleTracker.markAppLaunchComplete()
 
             SharedApp(
@@ -116,7 +114,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        appUpdateManager.checkForResumeUpdateState()
+        lifecycleScope.launch { appUpdateManager.checkForResumeUpdateState() }
         lifecycleTracker.onEnterBackground()
     }
 

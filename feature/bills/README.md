@@ -7,7 +7,7 @@ Recurring bill reminders — dashboard plus an add/edit form, the `DraftSubmitHa
 - **ViewModels:** `BillRemindersListViewModel` — combines `observeAll()`,
   `observeUpcoming(7)`, and `observeTotalUpcomingAmount(30)` into one dashboard state;
   `EditBillReminderViewModel` — a `BaseMutationViewModel` (`MutationMode.Draft`) showcase,
-  draft-persisted via `SubmitOutbox<BillReminder>` (`OutboxQualifiers.BillReminder`).
+  draft-persisted via `SubmitOutbox<BillReminder>` (`DemoOutboxQualifiers.BillReminder`).
 - **Routes:** `BillsGraphRoute` (root) → `BillRemindersListRoute` (start),
   `AddOrEditBillReminderRoute(billId?)` (`null` = create, non-null = edit). Entry point:
   `NavController.navigateToBills()`.

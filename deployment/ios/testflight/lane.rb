@@ -33,7 +33,7 @@ platform :ios do
 
     pilot(
       api_key:                              Actions.lane_context[SharedValues::APP_STORE_CONNECT_API_KEY],
-      apple_id:                             ios_config[:apple_id] || "6744892773",
+      apple_id:                             ios_config[:apple_id],
       ipa:                                  ipa_path,
       beta_app_review_info:                 testflight_config[:beta_app_review_info].dup,
       beta_app_feedback_email:              testflight_config[:beta_app_feedback_email],
@@ -77,8 +77,8 @@ platform :ios do
     setup_ci_if_needed
     load_api_key(options)
 
-    # E6 — assemble the Kotlin `ComposeApp` XCFramework (SwiftPM/XCFramework; the
-    # CocoaPods-free replacement for the old pod-install step) so the `iosApp.xcodeproj`
+    # E6 — assemble the Kotlin `ComposeApp` XCFramework (SwiftPM/XCFramework) so the
+    # `iosApp.xcodeproj`
     # archive links the framework the app's Package.swift binary target + embed
     # Run-Script phase consume. Staging → Release slice.
     assemble_ios_xcframework(build_ty.to_s)

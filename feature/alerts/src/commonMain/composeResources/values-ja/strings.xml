@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">価格アラート</string>
+    <string name="screens_alerts_back_cd">戻る</string>
+    <string name="screens_alerts_create_cd">アラートを作成</string>
+    <string name="screens_alerts_delete_cd">アラートを削除</string>
+    <string name="screens_alerts_row_above">以上</string>
+    <string name="screens_alerts_row_below">以下</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">変動率</string>
+    <string name="screens_alert_create_title">新しい価格アラート</string>
+    <string name="screens_alert_create_back_cd">戻る</string>
+    <string name="screens_alert_create_coin_label">コイン</string>
+    <string name="screens_alert_create_target_label">目標価格</string>
+    <string name="screens_alert_create_dir_above">以上</string>
+    <string name="screens_alert_create_dir_below">以下</string>
+    <string name="screens_alert_create_submit">アラートを作成</string>
+    <string name="screens_alert_create_draft_resume_title">アラートを再開しますか？</string>
+    <string name="screens_alert_create_draft_resume_message">保存されていない価格アラートがあります。編集を再開するか、破棄するか、新規作成してください。</string>
+    <string name="screens_alert_create_draft_resume_resume">編集を再開</string>
+    <string name="screens_alert_create_draft_resume_discard">下書きを破棄</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">新規作成</string>
+</resources>

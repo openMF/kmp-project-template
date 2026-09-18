@@ -17,7 +17,7 @@ import org.koin.dsl.module
  * Koin module for the embedded add-to-watchlist star (`submit_offline_write` demo).
  * [AddToWatchlistViewModel] takes a runtime `coinId` parameter (`parametersOf(coinId)`),
  * so it is registered as a parameterised `viewModel { params -> ... }`. The
- * [kpt.core.data.demo.watchlist.WatchlistRepository] is DI-provided and shared with feat-watchlist.
+ * [kpt.core.data.watchlist.WatchlistRepository] is DI-provided and shared with feat-watchlist.
  */
 val AddToWatchlistModule = module {
     viewModel { params ->

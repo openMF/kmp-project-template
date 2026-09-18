@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_showcase_state_gallery_intro">Visueller Smoke-Test für jede ScreenState-Variante und jedes Zustands-Primitive auf Komponentenebene aus core/designsystem.</string>
+    <string name="screens_showcase_state_gallery_loading">Loading</string>
+    <string name="screens_showcase_state_gallery_empty">Empty</string>
+    <string name="screens_showcase_state_gallery_error">Error</string>
+    <string name="screens_showcase_state_gallery_nonet">NoNetwork</string>
+    <string name="screens_showcase_state_gallery_content">Content</string>
+    <string name="screens_showcase_state_gallery_preview_empty">Empty (Standardwerte – Titel + Nachricht)</string>
+    <string name="screens_showcase_state_gallery_preview_error">Error im Vollbild</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_captive">NoNetwork – Captive-Portal-CTA</string>
+    <string name="screens_showcase_state_gallery_preview_nonet_offline">NoNetwork – einfach offline</string>
+    <string name="screens_showcase_state_gallery_error_chip_tapped">getippt ×%1$d</string>
+    <string name="screens_showcase_transition_gallery_intro">Tippe auf jede Kachel, um einen Demobildschirm mit diesem Übergang zu öffnen. Das Ziel schließt sich nach 2 s automatisch. Achte auf Flackern.</string>
+    <string name="screens_showcase_transition_demo_label">Demo: %1$s\n(schließt nach 2 s)</string>
+</resources>

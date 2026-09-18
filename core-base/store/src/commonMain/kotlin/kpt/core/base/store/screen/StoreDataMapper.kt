@@ -247,6 +247,35 @@ internal fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToStoreDataNoFall
 
             is StoreReadResponse.NoNewData -> {
                 refreshing = false
+                // Same DecisionEngine-starvation class the Loading branch above already fixes.
+                // Store5 answers NoNewData when a read resolves to "there is nothing" — most
+                // importantly a CACHE_ONLY `localOnly(key)` read whose SourceOfTruth row does not
+                // exist (a detail screen opened on a deleted id or a bad deep link). Swallowing it
+                // emitted NO StoreData at all, so `combine(storeFlow, networkStatusFlow)` in
+                // asScreenStream never fired, DecisionEngine never ran, and the screen sat on
+                // stateIn's initial Loading FOREVER — no Empty, no error, no retry.
+                //
+                // DecisionEngine already has the correct terminal rule for this
+                // (`CACHE_ONLY && error == null -> ScreenState.Empty`, "no fetcher can ever fill
+                // it"); it was simply unreachable because nothing downstream ever emitted. Emit the
+                // empty sentinel so that rule is reached.
+                //
+                // Guarded on `lastData == null`: NoNewData ALSO arrives after a successful refresh
+                // that produced no change, and emitting an empty sentinel there would blank content
+                // that is legitimately on screen.
+                if (lastData == null) {
+                    @Suppress("UNCHECKED_CAST")
+                    emit(
+                        StoreData(
+                            data = EMPTY_SENTINEL as Output,
+                            origin = DataOrigin.CACHE,
+                            isRefreshing = false,
+                            fetchedAt = lastFetchMark,
+                            fetchedAtInstant = lastFetchInstant,
+                            isEmpty = true,
+                        ),
+                    )
+                }
             }
 
             is StoreReadResponse.Error -> {

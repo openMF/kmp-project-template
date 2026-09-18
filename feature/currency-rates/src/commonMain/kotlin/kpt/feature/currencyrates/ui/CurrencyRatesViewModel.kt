@@ -23,8 +23,9 @@ import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.combineContent
 import kpt.core.base.store.screen.emptyIfContent
 import kpt.core.base.ui.viewmodel.BaseViewModel
-import kpt.core.data.demo.currency.CurrencyRepository
-import kpt.core.model.demo.currency.ExchangeRates
+import kpt.core.data.currency.CurrencyRepository
+import kpt.core.model.currency.ExchangeRates
+import kpt.core.store.config.AppStoreRegistry
 
 /**
  * **Archetype showcase: CACHE_ONLY + NETWORK_ONLY**

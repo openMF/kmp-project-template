@@ -14,8 +14,10 @@ import kpt.core.base.common.di.CommonModule
 import kpt.core.base.datastore.di.DatastoreBaseModule
 import kpt.core.base.datastore.infra.SettingsSyncStatePersister
 import kpt.core.base.datastore.infra.SyncStatePersister
-import kpt.core.datastore.UserPreferencesRepository
-import kpt.core.datastore.UserPreferencesRepositoryImpl
+import kpt.core.datastore.prefs.AppReviewPromptStore
+import kpt.core.datastore.prefs.SettingsAppReviewPromptStore
+import kpt.core.datastore.prefs.UserPreferencesRepository
+import kpt.core.datastore.prefs.UserPreferencesRepositoryImpl
 import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -30,6 +32,12 @@ val DatastoreModule = module {
             dispatcher = get(),
         )
     } bind UserPreferencesRepository::class
+
+    // Review-prompt counters — Settings-backed, DEVICE-scoped (survives sign-out, unlike user prefs).
+    // Read once per launch by the app shell, which asks AppReviewConfig whether they justify a prompt.
+    single<AppReviewPromptStore> {
+        SettingsAppReviewPromptStore(plainSettings = get<Settings>(named("plain")))
+    }
 
     // Sync state persister — Settings-backed (same store as user prefs).
     // Read by Synchronizer at sync start; written on snapshot/changeList completion.

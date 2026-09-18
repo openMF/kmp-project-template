@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_bills_add_title">تذكير فاتورة جديد</string>
+    <string name="screens_bills_edit_title">تعديل تذكير الفاتورة</string>
+    <string name="screens_bills_addedit_back_cd">رجوع</string>
+    <string name="screens_bills_addedit_save_button">حفظ</string>
+    <string name="screens_bills_addedit_status_saving">جارٍ الحفظ…</string>
+    <string name="screens_bills_addedit_status_saved">تم الحفظ ✓</string>
+    <string name="screens_bills_addedit_status_add_another">إضافة آخر</string>
+    <string name="screens_bills_addedit_status_offline">تم الحفظ دون اتصال — ستتم المزامنة عند الاتصال.</string>
+    <string name="screens_bills_addedit_status_failed">فشل الحفظ: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">خطأ غير معروف</string>
+    <string name="screens_bills_addedit_retry_button">أعد المحاولة</string>
+    <string name="screens_bills_addedit_dismiss_button">تجاهل</string>
+    <string name="screens_bills_addedit_name_label">الاسم (مثل الكهرباء)</string>
+    <string name="screens_bills_addedit_amount_label">المبلغ</string>
+    <string name="screens_bills_addedit_due_day_label">يوم الاستحقاق من الشهر (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">التكرار</string>
+    <string name="screens_bills_addedit_category_title">الفئة</string>
+    <string name="screens_bills_addedit_remind_days_before_label">التذكير قبل بعدد أيام</string>
+    <string name="screens_bills_addedit_enabled_label">مُفعَّل</string>
+    <string name="screens_bills_draft_resume_title">هل تريد استئناف مسودتك؟</string>
+    <string name="screens_bills_draft_resume_message">لديك تذكير فاتورة غير محفوظ. تابع من حيث توقفت، أو تجاهله، أو ابدأ واحدًا جديدًا.</string>
+    <string name="screens_bills_draft_resume_resume">متابعة</string>
+    <string name="screens_bills_draft_resume_discard">تجاهل المسودة</string>
+    <string name="screens_bills_draft_resume_start_fresh">ابدأ من جديد</string>
+    <string name="screens_bills_list_title">تذكيرات الفواتير</string>
+    <string name="screens_bills_list_back_cd">رجوع</string>
+    <string name="screens_bills_list_new_fab_text">فاتورة جديدة</string>
+    <string name="screens_bills_list_summary_label">المستحقة هذا الشهر</string>
+    <string name="screens_bills_list_summary_due_single">فاتورة واحدة (%1$d) مستحقة خلال 7 أيام</string>
+    <string name="screens_bills_list_summary_due_plural">%1$d فواتير مستحقة خلال 7 أيام</string>
+    <string name="screens_bills_list_mark_paid_cd">وضع علامة مدفوعة</string>
+    <string name="screens_bills_list_paid_button">مدفوعة</string>
+    <string name="screens_bills_list_reminders_disabled">التذكيرات معطّلة</string>
+</resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">वहनीयता</string>
+    <string name="screens_calc_affordability_back_cd">वापस</string>
+    <string name="screens_calc_affordability_income_label">मासिक आय</string>
+    <string name="screens_calc_affordability_obligations_label">मौजूदा मासिक ऋण</string>
+    <string name="screens_calc_affordability_dti_label">डीटीआई सीमा (%)</string>
+    <string name="screens_calc_affordability_rate_label">वार्षिक दर (%)</string>
+    <string name="screens_calc_affordability_tenure_label">अवधि (महीने)</string>
+    <string name="screens_calc_affordability_max_principal_label">अधिकतम ऋण मूलधन</string>
+    <string name="screens_calc_affordability_max_emi_label">अधिकतम ईएमआई</string>
+    <string name="screens_calc_amortization_title">परिशोधन</string>
+    <string name="screens_calc_amortization_title_with_source">परिशोधन · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">वापस</string>
+    <string name="screens_calc_amortization_principal_label">मूलधन</string>
+    <string name="screens_calc_amortization_rate_label">वार्षिक दर (%)</string>
+    <string name="screens_calc_amortization_tenure_label">अवधि (महीने)</string>
+    <string name="screens_calc_amortization_emi_label">मासिक ईएमआई</string>
+    <string name="screens_calc_amortization_interest_total_supporting">ब्याज %1$s · कुल %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">मूलधन</string>
+    <string name="screens_calc_amortization_header_interest">ब्याज</string>
+    <string name="screens_calc_amortization_header_balance">शेष</string>
+    <string name="screens_calc_compare_title">ऋण तुलना</string>
+    <string name="screens_calc_compare_back_cd">वापस</string>
+    <string name="screens_calc_compare_best_emi_label">सर्वोत्तम ईएमआई · परिदृश्य %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/माह</string>
+    <string name="screens_calc_compare_savings_text">सबसे महँगे की तुलना में कुल %1$s की बचत</string>
+    <string name="screens_calc_compare_helper_text">नीचे किसी भी परिदृश्य को बदलें और तुलना लाइव अपडेट होते देखें।</string>
+    <string name="screens_calc_compare_scenario_label">परिदृश्य %1$d</string>
+    <string name="screens_calc_compare_best_badge">सर्वोत्तम</string>
+    <string name="screens_calc_compare_principal_label">मूलधन</string>
+    <string name="screens_calc_compare_rate_label">दर (%)</string>
+    <string name="screens_calc_compare_tenure_label">अवधि (महीने)</string>
+    <string name="screens_calc_compare_result_emi">ईएमआई</string>
+    <string name="screens_calc_compare_result_interest">ब्याज</string>
+    <string name="screens_calc_compare_result_total">कुल</string>
+    <string name="screens_calc_wizard_resume_title">अधूरा विज़ार्ड फिर से शुरू करें?</string>
+    <string name="screens_calc_wizard_resume_message">आपका ऋण-गणना विज़ार्ड चरण %1$d पर है। जहाँ छोड़ा था वहीं से जारी रखें या हटा दें?</string>
+    <string name="screens_calc_wizard_resume_continue">जारी रखें</string>
+    <string name="screens_calc_wizard_resume_discard">हटाएँ</string>
+    <string name="screens_calc_wizard_title">नया ऋण · चरण %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">वापस</string>
+    <string name="screens_calc_wizard_step_principal_question">आप कितना उधार लेना चाहते हैं?</string>
+    <string name="screens_calc_wizard_step_principal_label">मूलधन राशि</string>
+    <string name="screens_calc_wizard_step_tenure_question">कितने महीनों में?</string>
+    <string name="screens_calc_wizard_step_tenure_label">अवधि (महीने)</string>
+    <string name="screens_calc_wizard_step_rate_question">वार्षिक दर क्या है?</string>
+    <string name="screens_calc_wizard_step_rate_label">वार्षिक दर (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">मासिक ईएमआई</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">कुल देय: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">मूलधन</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">अवधि</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d महीने</string>
+    <string name="screens_calc_wizard_step_review_rate_label">दर</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">कुल ब्याज</string>
+    <string name="screens_calc_wizard_step_name_message">इस परिदृश्य को नाम दें ताकि आप इसे अपने ऋणों में फिर से पा सकें।</string>
+    <string name="screens_calc_wizard_step_name_label">परिदृश्य का नाम</string>
+    <string name="screens_calc_wizard_step_name_required">आवश्यक — सहेजें सक्षम करने के लिए नाम लिखें।</string>
+    <string name="screens_calc_wizard_button_back">पीछे</string>
+    <string name="screens_calc_wizard_button_next">आगे</string>
+    <string name="screens_calc_wizard_button_save">ऋण के रूप में सहेजें</string>
+</resources>

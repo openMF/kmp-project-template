@@ -1,0 +1,81 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
+package kpt.core.data.banking.impl
+
+import kotlinx.coroutines.CoroutineScope
+import kpt.core.base.data.annotation.FromStore
+import kpt.core.base.data.annotation.RepositoryBinding
+import kpt.core.base.store.screen.FetchPolicy
+import kpt.core.base.store.screen.ScreenDataStream
+import kpt.core.base.store.screen.asScreenStream
+import kpt.core.data.banking.LoanRepository
+import kpt.core.database.banking.dao.LoanDao
+import kpt.core.model.banking.Loan
+import kpt.core.store.banking.impl.provideLoanDetailStore
+import kpt.core.store.config.AppCacheKeys
+import kpt.core.store.config.AppStoreIds
+import org.mobilenativefoundation.store.store5.MutableStore
+import org.mobilenativefoundation.store.store5.Store
+import org.mobilenativefoundation.store.store5.StoreWriteRequest
+
+/**
+ * Local-only impl of [LoanRepository].
+ *
+ * Read-path contract: [loansStream] builds the offline-local [ScreenDataStream] (CACHE_ONLY) over
+ * the domain-emitting [kpt.core.store.banking.impl.provideLoansStore]; read screens consume
+ * `.state`. Direct-DAO `Flow` reads (`observeById`, the dashboard aggregates) are wrapped with
+ * a plain Room `Flow` and writes with a plain DAO write so the wasmJs target's long-lived collectors re-emit
+ * after writes even when Room 3 alpha05's async InvalidationTracker fails to fan out (no-op on
+ * Android/Desktop/iOS). See `core-base/database/.../invalidation/README.md`.
+ */
+@RepositoryBinding(binds = LoanRepository::class)
+internal class LoanRepositoryImpl(
+    @FromStore(AppStoreIds.Loans) private val loansStore: Store<Unit, List<Loan>>,
+    @FromStore(AppStoreIds.LoansMutable) private val loansWriteStore: MutableStore<String, Loan>,
+    private val loanDao: LoanDao,
+) : LoanRepository {
+
+    override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
+        loansStore.asScreenStream(
+            key = Unit,
+            cacheKey = AppCacheKeys.Loans.LIST,
+            scope = scope,
+            fetchPolicy = FetchPolicy.CACHE_ONLY,
+            isEmpty = { it.isEmpty() },
+        )
+
+    // Repository-internal keyed detail store — a single loan as a ScreenDataStream (absent id → Empty).
+    private val loanDetailStore = provideLoanDetailStore(loanDao)
+
+    override fun loanDetailStream(id: String, scope: CoroutineScope): ScreenDataStream<Loan> =
+        loanDetailStore.asScreenStream(
+            key = id,
+            cacheKey = AppCacheKeys.Loans.item(id),
+            scope = scope,
+            fetchPolicy = FetchPolicy.CACHE_ONLY,
+        )
+
+    override suspend fun upsert(loan: Loan) {
+        // Write through the store — persists to the Room SoT (via the SoT writer); the read store re-emits.
+        loansWriteStore.write(
+            StoreWriteRequest.of<String, Loan, Any>(key = loan.id, value = loan),
+        )
+    }
+
+    override suspend fun delete(id: String) {
+        // Clear through the store — removes the row from the Room SoT (via the SoT delete).
+        loansWriteStore.clear(id)
+    }
+
+    private companion object {
+        /** Room `@Entity(tableName = …)` for [kpt.core.database.banking.entity.LoanEntity]. */
+        const val LOANS_TABLE = "banking_loans"
+    }
+}

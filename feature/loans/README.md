@@ -9,7 +9,7 @@ archetype showcase.
   totals (`observeTotalMonthlyEmi`, `observeTotalPrincipalRemaining`); `LoanDetailViewModel`
   — single-loan observe, routes to edit/amortization; `EditLoanViewModel` — **the canonical
   multi-formKey `BaseMutationViewModel` (`MutationMode.Draft`) showcase**, draft-persisted via
-  `SubmitOutbox<Loan>` (`OutboxQualifiers.Loan`).
+  `SubmitOutbox<Loan>` (`DemoOutboxQualifiers.Loan`).
 - **Routes:** `LoansGraphRoute` → `PersonalLoansListRoute` (start), `LoanDetailRoute(loanId)`,
   `AddOrEditLoanRoute(loanId?)`; the graph also mounts `feature/amortization`'s
   `amortizationScheduleDestination`. Entry point: `NavController.navigateToLoans()`.

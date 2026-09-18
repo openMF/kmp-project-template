@@ -2,9 +2,9 @@
 
 Internal-contributor guide to the Store5 factory primitives module (91 Kotlin files,
 `commonMain`/`commonTest` only — pure Kotlin, no platform actuals). For how a **fork**
-consumes this module (branding hooks, `AppScreenStateDefaults`, `AppStoreRegistry`), see
+consumes this module (branding hooks, `config/AppScreenStateDefaults`, `@StoreProvider`-declared stores), see
 [`../../core/store/CONSUMPTION.md`](../../core/store/CONSUMPTION.md) — this doc does not
-repeat that content. Architecture reference: [`docs/architecture/STORE_DATA_API.md`](../../docs/architecture/STORE_DATA_API.md);
+repeat that content. Architecture reference: [`docs/architecture/cross-cutting/store-data-api.md`](../../docs/architecture/cross-cutting/store-data-api.md);
 worked examples: [`docs/claude/store-implementation.md`](../../docs/claude/store-implementation.md).
 
 ## Purpose

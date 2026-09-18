@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">Capacidade de pagamento</string>
+    <string name="screens_calc_affordability_back_cd">Voltar</string>
+    <string name="screens_calc_affordability_income_label">Renda mensal</string>
+    <string name="screens_calc_affordability_obligations_label">Dívida mensal existente</string>
+    <string name="screens_calc_affordability_dti_label">Teto de DTI (%)</string>
+    <string name="screens_calc_affordability_rate_label">Taxa anual (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Prazo (meses)</string>
+    <string name="screens_calc_affordability_max_principal_label">Principal máximo do empréstimo</string>
+    <string name="screens_calc_affordability_max_emi_label">Parcela máxima</string>
+    <string name="screens_calc_amortization_title">Amortização</string>
+    <string name="screens_calc_amortization_title_with_source">Amortização · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Voltar</string>
+    <string name="screens_calc_amortization_principal_label">Principal</string>
+    <string name="screens_calc_amortization_rate_label">Taxa anual (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Prazo (meses)</string>
+    <string name="screens_calc_amortization_emi_label">Parcela mensal</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Juros %1$s · Total %2$s</string>
+    <string name="screens_calc_amortization_header_month">Nº</string>
+    <string name="screens_calc_amortization_header_principal">Principal</string>
+    <string name="screens_calc_amortization_header_interest">Juros</string>
+    <string name="screens_calc_amortization_header_balance">Saldo</string>
+    <string name="screens_calc_compare_title">Comparar empréstimos</string>
+    <string name="screens_calc_compare_back_cd">Voltar</string>
+    <string name="screens_calc_compare_best_emi_label">Melhor parcela · Cenário %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/mês</string>
+    <string name="screens_calc_compare_savings_text">Economiza %1$s no total em relação ao mais caro</string>
+    <string name="screens_calc_compare_helper_text">Edite qualquer cenário abaixo para ver a comparação atualizar ao vivo.</string>
+    <string name="screens_calc_compare_scenario_label">Cenário %1$d</string>
+    <string name="screens_calc_compare_best_badge">Melhor</string>
+    <string name="screens_calc_compare_principal_label">Principal</string>
+    <string name="screens_calc_compare_rate_label">Taxa (%)</string>
+    <string name="screens_calc_compare_tenure_label">Prazo (meses)</string>
+    <string name="screens_calc_compare_result_emi">Parcela</string>
+    <string name="screens_calc_compare_result_interest">Juros</string>
+    <string name="screens_calc_compare_result_total">Total</string>
+    <string name="screens_calc_wizard_resume_title">Retomar o assistente inacabado?</string>
+    <string name="screens_calc_wizard_resume_message">Você tem um assistente de cálculo de empréstimo na etapa %1$d. Continuar de onde parou ou descartar?</string>
+    <string name="screens_calc_wizard_resume_continue">Continuar</string>
+    <string name="screens_calc_wizard_resume_discard">Descartar</string>
+    <string name="screens_calc_wizard_title">Novo empréstimo · Etapa %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Voltar</string>
+    <string name="screens_calc_wizard_step_principal_question">Quanto você quer pegar emprestado?</string>
+    <string name="screens_calc_wizard_step_principal_label">Valor principal</string>
+    <string name="screens_calc_wizard_step_tenure_question">Em quantos meses?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Prazo (meses)</string>
+    <string name="screens_calc_wizard_step_rate_question">A que taxa anual?</string>
+    <string name="screens_calc_wizard_step_rate_label">Taxa anual (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Parcela mensal</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Total a pagar: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Principal</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Prazo</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d meses</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Taxa</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Juros totais</string>
+    <string name="screens_calc_wizard_step_name_message">Dê um nome a este cenário para encontrá-lo depois nos seus empréstimos.</string>
+    <string name="screens_calc_wizard_step_name_label">Nome do cenário</string>
+    <string name="screens_calc_wizard_step_name_required">Obrigatório — digite um nome para habilitar Salvar.</string>
+    <string name="screens_calc_wizard_button_back">Voltar</string>
+    <string name="screens_calc_wizard_button_next">Avançar</string>
+    <string name="screens_calc_wizard_button_save">Salvar como empréstimo</string>
+</resources>

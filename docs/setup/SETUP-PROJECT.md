@@ -661,7 +661,7 @@ If you prefer more control or need to re-run specific steps:
 
 ```bash
 # Step 1: Customization only
-bash scripts/white-label/customize.sh com.company.app MyApp "My Application"
+bash scripts/white-label/fork-init.sh com.company.app MyApp "My Application"
 
 # Step 2: Firebase only
 bash scripts/white-label/firebase.sh my-firebase-project com.company.app

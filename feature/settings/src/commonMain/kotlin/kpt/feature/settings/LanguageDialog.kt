@@ -33,6 +33,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kpt.core.base.store.screen.ScreenState
+import kpt.core.base.ui.screen.ScreenContent
 import kpt.core.model.user.LanguageConfig
 import kpt.feature.settings.generated.resources.Res
 import kpt.feature.settings.generated.resources.feature_settings_dismiss_dialog_button_text
@@ -43,18 +45,20 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LanguageDialog(onDismiss: () -> Unit, viewModel: SettingsViewModel = koinViewModel()) {
-    val settingsUiState by viewModel.settingsUiState.collectAsStateWithLifecycle()
+    val settingsState by viewModel.settingsState.collectAsStateWithLifecycle()
     LanguageDialog(
         onDismiss = onDismiss,
-        settingsUiState = settingsUiState,
+        settingsState = settingsState,
+        onRetry = viewModel::onRetry,
         onChangeLanguage = viewModel::updateLanguage,
     )
 }
 
 @Composable
 fun LanguageDialog(
-    settingsUiState: SettingsUiState,
+    settingsState: ScreenState<UserEditableSettings>,
     onDismiss: () -> Unit,
+    onRetry: () -> Unit,
     onChangeLanguage: (language: LanguageConfig) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -71,20 +75,24 @@ fun LanguageDialog(
         text = {
             HorizontalDivider()
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                when (settingsUiState) {
-                    SettingsUiState.Loading -> {
+                // Store5 read surface — same wrapper as every other read screen. `loading` keeps
+                // the dialog's compact copy (a full-screen spinner would be wrong in an
+                // AlertDialog); Error/NoNetwork now render with a retry wired to the store,
+                // which the previous hand-rolled Loading|Success pair could not express.
+                ScreenContent(
+                    state = settingsState,
+                    onRetry = onRetry,
+                    loading = {
                         Text(
                             text = stringResource(resource = Res.string.feature_settings_loading),
                             modifier = Modifier.padding(vertical = 16.dp),
                         )
-                    }
-
-                    is SettingsUiState.Success -> {
-                        LanguagePanel(
-                            currentLanguage = settingsUiState.settings.language,
-                            onChangeLanguage = onChangeLanguage,
-                        )
-                    }
+                    },
+                ) { settings, _ ->
+                    LanguagePanel(
+                        currentLanguage = settings.language,
+                        onChangeLanguage = onChangeLanguage,
+                    )
                 }
             }
         },

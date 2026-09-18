@@ -18,9 +18,9 @@ import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenDataStream
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.screenDataStreamForTesting
-import kpt.core.data.demo.economic.MacroIndicatorsRepository
-import kpt.core.model.demo.economic.MacroIndicator
-import kpt.core.store.demo.economic.impl.MacroIndicatorKey
+import kpt.core.data.economic.MacroIndicatorsRepository
+import kpt.core.model.economic.MacroIndicator
+import kpt.core.store.economic.impl.MacroIndicatorKey
 
 /**
  * Minimal [MacroIndicatorsRepository] fake for Compose UI tests.

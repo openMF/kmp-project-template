@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">Рынки монет</string>
+    <string name="screens_crypto_coin_markets_back_cd">Назад</string>
+    <string name="screens_crypto_coin_markets_empty">Пока нет монет для отображения.</string>
+    <string name="screens_crypto_coin_markets_error_retry">Повторить</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">Загрузка ещё…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">Вы просмотрели всё</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">Текущая цена</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">Изменение за 24 ч</string>
+    <string name="screens_crypto_coin_detail_back_cd">Назад</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">Обновить</string>
+    <string name="screens_crypto_coin_detail_rank_label">Место по капитализации</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">Рыночная капитализация</string>
+    <string name="screens_crypto_coin_detail_high_label">Максимум за 24 ч</string>
+    <string name="screens_crypto_coin_detail_low_label">Минимум за 24 ч</string>
+    <string name="screens_crypto_coin_detail_circulating_label">Оборотное предложение</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">Максимальное предложение</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">Без ограничений</string>
+    <string name="screens_crypto_coin_detail_about_label">О монете</string>
+</resources>

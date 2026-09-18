@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">मूल्य अलर्ट</string>
+    <string name="screens_alerts_back_cd">वापस</string>
+    <string name="screens_alerts_create_cd">अलर्ट बनाएँ</string>
+    <string name="screens_alerts_delete_cd">अलर्ट हटाएँ</string>
+    <string name="screens_alerts_row_above">इससे ऊपर</string>
+    <string name="screens_alerts_row_below">इससे नीचे</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% बदलाव</string>
+    <string name="screens_alert_create_title">नया मूल्य अलर्ट</string>
+    <string name="screens_alert_create_back_cd">वापस</string>
+    <string name="screens_alert_create_coin_label">कॉइन</string>
+    <string name="screens_alert_create_target_label">लक्ष्य मूल्य</string>
+    <string name="screens_alert_create_dir_above">इससे ऊपर</string>
+    <string name="screens_alert_create_dir_below">इससे नीचे</string>
+    <string name="screens_alert_create_submit">अलर्ट बनाएँ</string>
+    <string name="screens_alert_create_draft_resume_title">अपना अलर्ट फिर से शुरू करें?</string>
+    <string name="screens_alert_create_draft_resume_message">आपके पास एक असहेजा मूल्य अलर्ट है। संपादन जारी रखें, उसे हटाएँ, या नया बनाएँ।</string>
+    <string name="screens_alert_create_draft_resume_resume">संपादन जारी रखें</string>
+    <string name="screens_alert_create_draft_resume_discard">ड्राफ़्ट हटाएँ</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">नया शुरू करें</string>
+</resources>

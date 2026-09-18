@@ -20,7 +20,7 @@ import kpt.core.base.store.mutation.conflict.ConflictResolution
 /**
  * Test [MutationGateway] for repository tests — the real [DefaultMutationGateway] wired online with a
  * no-op conflict inbox. It exercises the production Optimistic-local write door
- * (`localMutation` → `notifyingWrite`) exactly as the app does, so reactive-invalidation reads
+ * (`localMutation` → DAO write) exactly as the app does, so reactive-invalidation reads
  * re-emit after a gateway-routed write. No fake gateway: the repos are tested against the real seam.
  */
 fun testMutationGateway(isOnline: Boolean = true): MutationGateway =

@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import kpt.core.ui.NavigationItem
+import kpt.core.ui.navigation.NavigationItem
 
 @Composable
 fun KptBottomBar(

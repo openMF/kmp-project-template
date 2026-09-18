@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">Công việc trên đám mây</string>
+    <string name="screens_cloudtodo_detail_intro">Đây là nơi duy nhất dùng createMutableStore + MutationGateway. Hãy tắt mạng để xem các nhánh ngoại tuyến.</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">Chuyển đổi (lạc quan)</string>
+    <string name="screens_cloudtodo_complete_online_text">Hoàn tất (cần kết nối)</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">Giải quyết xung đột</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">Bỏ qua</string>
+    <string name="screens_cloudtodo_status_completed">Đã hoàn tất</string>
+    <string name="screens_cloudtodo_status_not_completed">Chưa hoàn tất</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">Đã áp dụng cục bộ</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Ghi vào Room trước. Việc đồng bộ mạng đã xếp hàng và sẽ thử lại khi kết nối lại.</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">Đã áp dụng · đã đồng bộ</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">Máy chủ đã xác nhận thao tác ghi.</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">Đã áp dụng · đang xếp hàng</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">Đã ghi cục bộ; việc đồng bộ đang xếp hàng và sẽ thử lại khi có kết nối.</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">Bị chặn</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">Ngoại tuyến — thao tác ghi yêu cầu kết nối sẽ bị từ chối thay vì ghi cục bộ. Không có gì được ghi.</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">Chưa xác thực cho thao tác này. Không có gì được ghi.</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">Một điều kiện tiên quyết của máy chủ đã thất bại trước khi ghi. Không có gì được ghi.</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">Đã ghi nhận xung đột</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">Máy chủ cũng đã thay đổi bản ghi này. Phiên bản của máy chủ đã được áp dụng và phiên bản của bạn được giữ lại — hãy chọn bên nào thắng.</string>
+    <string name="screens_cloudtodo_outcome_failed_title">Thất bại</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — thao tác ghi cục bộ lạc quan đã được hoàn tác.</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — trạng thái cục bộ được giữ lại.</string>
+    <string name="screens_cloudtodo_conflicts_title">Xung đột đồng bộ</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">Không có xung đột chưa giải quyết.</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">Giữ phiên bản máy chủ</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">Thử lại phiên bản của tôi</string>
+</resources>

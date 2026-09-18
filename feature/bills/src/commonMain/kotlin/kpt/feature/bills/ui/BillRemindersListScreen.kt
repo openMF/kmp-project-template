@@ -56,7 +56,7 @@ import kpt.core.designsystem.component.Urgency
 import kpt.core.designsystem.component.UrgencyDot
 import kpt.core.designsystem.theme.finance
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.demo.banking.BillReminder
+import kpt.core.model.banking.BillReminder
 import kpt.feature.bills.generated.resources.Res
 import kpt.feature.bills.generated.resources.screens_bills_list_back_cd
 import kpt.feature.bills.generated.resources.screens_bills_list_mark_paid_cd
@@ -158,7 +158,7 @@ fun BillRemindersListScreen(
 }
 
 @Composable
-private fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
+internal fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
     HeroCard {
         AmountDisplay(
             amountText = formatCurrency(totalAmount),
@@ -178,7 +178,7 @@ private fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
 }
 
 @Composable
-private fun BillReminderRow(bill: BillReminder, today: Int, onMarkPaid: () -> Unit, onClick: () -> Unit) {
+internal fun BillReminderRow(bill: BillReminder, today: Int, onMarkPaid: () -> Unit, onClick: () -> Unit) {
     val sp = MaterialTheme.spacing
     val diff = bill.dueDay - today
     val urgency = when {

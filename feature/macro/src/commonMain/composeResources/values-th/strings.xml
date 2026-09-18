@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_macro_back_cd">ย้อนกลับ</string>
+    <string name="screens_macro_country_title">ข้อมูลมหภาครายประเทศ</string>
+    <string name="screens_macro_refresh_all_cd">รีเฟรชทั้งหมด</string>
+    <string name="screens_macro_stale_chip">ล้าสมัย — กำลังแสดงข้อมูลแคช</string>
+    <string name="screens_macro_picker_title">เลือกประเทศ</string>
+    <string name="screens_macro_picker_search_placeholder">ค้นหาประเทศหรือรหัส ISO</string>
+    <string name="screens_macro_detail_title">%1$s • %2$s</string>
+    <string name="screens_macro_detail_source_label">แหล่งที่มา: %1$s</string>
+    <string name="screens_macro_detail_year_by_year">รายปี</string>
+    <string name="screens_macro_card_empty">ไม่มีข้อมูลเผยแพร่สำหรับตัวชี้วัดนี้</string>
+    <string name="screens_macro_card_captive_portal">อยู่หลัง captive portal — ลงชื่อเข้าใช้เพื่อดำเนินการต่อ</string>
+    <string name="screens_macro_card_offline">ออฟไลน์ — เชื่อมต่อเพื่อดึงตัวชี้วัดนี้</string>
+    <string name="screens_macro_card_generic_error">โหลดตัวชี้วัดนี้ไม่สำเร็จ</string>
+    <string name="screens_macro_card_auth_required">ต้องมีการยืนยันตัวตน</string>
+    <string name="screens_macro_card_latest_year">ล่าสุด: %1$s</string>
+    <string name="screens_macro_card_loading">กำลังโหลด…</string>
+    <string name="screens_macro_card_retry">ลองใหม่</string>
+    <string name="screens_macro_sparkline_empty">—</string>
+</resources>

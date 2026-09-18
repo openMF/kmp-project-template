@@ -10,7 +10,7 @@
 package cmp.navigation.ui
 
 import kotlinx.collections.immutable.ImmutableList
-import kpt.core.ui.NavigationItem
+import kpt.core.ui.navigation.NavigationItem
 
 data class ScaffoldNavigationData(
     val onNavigationClick: (NavigationItem) -> Unit,

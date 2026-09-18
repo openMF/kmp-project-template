@@ -25,6 +25,11 @@ internal fun Project.configureDetekt(extension: DetektExtension) = extension.app
         exclude("**/generated/**")
         exclude("**/build-logic/**")
         exclude("**/spotless/**")
+        // product-health canary fixtures. `source(files(rootDir))` means EVERY module's detekt task
+        // scans the whole repo, so these get linted by all of them. They are deliberately-malformed
+        // sample code — a RED fixture exists precisely to be wrong, and a GREEN one is a fragment with
+        // no package/consumer — so linting them reports defects that are the fixture's whole purpose.
+        exclude("scripts/product-health/tests/**")
         // TODO:: Remove this exclusion
         exclude("core-base/designsystem/**")
         exclude("feature/home/**")

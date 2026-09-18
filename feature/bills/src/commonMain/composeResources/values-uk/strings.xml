@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_bills_add_title">Нове нагадування про рахунок</string>
+    <string name="screens_bills_edit_title">Редагувати нагадування</string>
+    <string name="screens_bills_addedit_back_cd">Назад</string>
+    <string name="screens_bills_addedit_save_button">Зберегти</string>
+    <string name="screens_bills_addedit_status_saving">Збереження…</string>
+    <string name="screens_bills_addedit_status_saved">Збережено ✓</string>
+    <string name="screens_bills_addedit_status_add_another">Додати ще</string>
+    <string name="screens_bills_addedit_status_offline">Збережено офлайн — синхронізується, коли зʼявиться мережа.</string>
+    <string name="screens_bills_addedit_status_failed">Не вдалося зберегти: %1$s</string>
+    <string name="screens_bills_addedit_status_failed_unknown">невідома помилка</string>
+    <string name="screens_bills_addedit_retry_button">Повторити</string>
+    <string name="screens_bills_addedit_dismiss_button">Закрити</string>
+    <string name="screens_bills_addedit_name_label">Назва (напр. Електроенергія)</string>
+    <string name="screens_bills_addedit_amount_label">Сума</string>
+    <string name="screens_bills_addedit_due_day_label">День оплати в місяці (1-31)</string>
+    <string name="screens_bills_addedit_recurrence_title">Періодичність</string>
+    <string name="screens_bills_addedit_category_title">Категорія</string>
+    <string name="screens_bills_addedit_remind_days_before_label">Нагадати за (днів)</string>
+    <string name="screens_bills_addedit_enabled_label">Увімкнено</string>
+    <string name="screens_bills_draft_resume_title">Продовжити чернетку?</string>
+    <string name="screens_bills_draft_resume_message">У вас є незбережене нагадування про рахунок. Продовжте з місця зупинки, відхиліть його або створіть нове.</string>
+    <string name="screens_bills_draft_resume_resume">Продовжити</string>
+    <string name="screens_bills_draft_resume_discard">Відхилити чернетку</string>
+    <string name="screens_bills_draft_resume_start_fresh">Почати спочатку</string>
+    <string name="screens_bills_list_title">Нагадування про рахунки</string>
+    <string name="screens_bills_list_back_cd">Назад</string>
+    <string name="screens_bills_list_new_fab_text">Новий рахунок</string>
+    <string name="screens_bills_list_summary_label">Найближчі цього місяця</string>
+    <string name="screens_bills_list_summary_due_single">Рахунків до сплати за 7 днів: %1$d</string>
+    <string name="screens_bills_list_summary_due_plural">Рахунків до сплати за 7 днів: %1$d</string>
+    <string name="screens_bills_list_mark_paid_cd">Позначити оплаченим</string>
+    <string name="screens_bills_list_paid_button">Оплачено</string>
+    <string name="screens_bills_list_reminders_disabled">Нагадування вимкнено</string>
+</resources>

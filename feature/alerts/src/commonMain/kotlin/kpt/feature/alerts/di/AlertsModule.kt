@@ -9,7 +9,7 @@
  */
 package kpt.feature.alerts.di
 
-import kpt.core.data.di.OutboxQualifiers
+import kpt.core.data.config.AppOutboxQualifiers
 import kpt.feature.alerts.ui.AlertCreateViewModel
 import kpt.feature.alerts.ui.AlertsListViewModel
 import org.koin.core.module.dsl.viewModel
@@ -18,9 +18,9 @@ import org.koin.dsl.module
 /**
  * Koin module for the Alerts feature (`submit_offline_write` demo).
  *
- * - [AlertsListViewModel] reads the reactive [kpt.core.data.demo.alerts.AlertsRepository].
+ * - [AlertsListViewModel] reads the reactive [kpt.core.data.alerts.AlertsRepository].
  * - [AlertCreateViewModel] injects the DI-qualified `SubmitOutbox<PriceAlert>`
- *   (`OutboxQualifiers.PriceAlert`) so its draft handler persists to the shared
+ *   (`AppOutboxQualifiers.PriceAlert`) so its draft handler persists to the shared
  *   `framework_submit_drafts` outbox — the offline-first write seam.
  */
 val AlertsModule = module {
@@ -28,7 +28,7 @@ val AlertsModule = module {
     viewModel {
         AlertCreateViewModel(
             repository = get(),
-            outbox = get(qualifier = OutboxQualifiers.PriceAlert),
+            outbox = get(qualifier = AppOutboxQualifiers.PriceAlert),
         )
     }
 }

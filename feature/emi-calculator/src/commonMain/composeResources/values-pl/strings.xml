@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_emicalculator_title">Kalkulator raty</string>
+    <string name="screens_emicalculator_back_cd">Wstecz</string>
+    <string name="screens_emicalculator_principal_label">Kwota kapitału</string>
+    <string name="screens_emicalculator_rate_label">Stopa roczna (%)</string>
+    <string name="screens_emicalculator_tenure_label">Okres (miesiące)</string>
+    <string name="screens_emicalculator_monthly_emi_label">Rata miesięczna</string>
+    <string name="screens_emicalculator_total_payment_label">Łączna spłata</string>
+    <string name="screens_emicalculator_total_interest_label">Łączne odsetki</string>
+</resources>

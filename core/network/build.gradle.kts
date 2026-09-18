@@ -14,7 +14,6 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.ktrofit)
     alias(libs.plugins.buildkonfig)
-    alias(libs.plugins.kmp.supabase.config)
     id("kotlinx-serialization")
     id("com.google.devtools.ksp")
 }
@@ -29,6 +28,9 @@ buildkonfig {
     // `kpt.core.network.BuildKonfig` is imported without ceremony.
     packageName = "kpt.core.network"
     defaultConfigs {
+        // demo:begin — FRED is a DEMO access point; `scripts/remove-demo.sh` deletes FredApi/FredApiConfig
+        // and DemoNetworkModule, so this field must go with them. Unfenced, a cleaned fork kept a
+        // BuildKonfig field for an API it no longer has.
         // FRED_API_KEY is a VAULT-managed client secret, NOT a hardcoded key. It is declared as the
         // `mifos-x-fred-api-key` alias (category env_var_client) in secrets-manifest.yaml, and the "fred"
         // access point in app-profile/app.yaml references it. `/secrets pull` materializes it to
@@ -39,25 +41,15 @@ buildkonfig {
             STRING, "FRED_API_KEY",
             System.getenv("FRED_API_KEY") ?: localProps.getProperty("FRED_API_KEY", ""),
         )
+        // demo:end
+        // syncForkConfig:buildkonfig:begin — GENERATED from `app-profile/app.yaml`: one field per
+        // access point declaring `anon_key_env:`/`api_key_env:`, plus every `network.build_config_fields`
+        // entry. DO NOT HAND-EDIT — declare the key in app-profile and re-run `./gradlew syncForkConfig`.
+        // Values are read at BUILD time from the env var or local.properties, so no secret is committed.
+        // syncForkConfig:buildkonfig:end
     }
 }
 
-// Supabase credentials are sourced dynamically from the gitignored `secrets/live/supabase/supabaseCredentialsFile.json`
-// (url + anonKey) via the shared SupabaseConfigConventionPlugin — the project's established secrets
-// mechanism — which generates `kpt.core.network.config.SupabaseCredentials`. When the file is absent
-// (the toolkit ships no Supabase project) it generates empty creds, so SupabaseConfigClient stays inert.
-supabaseConfig {
-    packageName = "kpt.core.network.config"
-}
-
-androidComponents {
-    finalizeDsl { ext ->
-        ext.withHostTest {
-            isReturnDefaultValues = true
-            isIncludeAndroidResources = true
-        }
-    }
-}
 
 kotlin {
     sourceSets {
@@ -105,10 +97,63 @@ kotlin {
 
 dependencies {
     add("kspCommonMainMetadata", libs.ktorfit.ksp)
+    // Koin API bindings, derived from @ApiBinding on the API types. Metadata-only: the bindings are
+    // ONE commonMain file every target shares, unlike ktorfit's per-target `create*Api()` factories.
+    add("kspCommonMainMetadata", project(":tools:network-ksp"))
     add("kspAndroid", libs.ktorfit.ksp)
     add("kspJs", libs.ktorfit.ksp)
     add("kspWasmJs", libs.ktorfit.ksp)
     add("kspDesktop", libs.ktorfit.ksp)
     add("kspIosArm64", libs.ktorfit.ksp)
     add("kspIosSimulatorArm64", libs.ktorfit.ksp)
+}
+
+// ── Fork-owned dependency seam (white-label, mirrors `feature-deps.gradle.kts`) ────────────────
+// A fork adds its OWN dependencies for this module in `core/network/module-deps.gradle.kts` — never in
+// this file. That is what lets THIS build file be `owner: template` and FULL-COPY on a template
+// sync: the fork's deps live in a file the sync never touches, so a template plugin/version bump
+// can no longer drop them and no 3-way merge is needed.
+//
+// String `"commonMainImplementation"(...)` notation is used in the seam, not the type-safe
+// `libs.`/`projects.` accessors: those are NOT generated for `apply(from = ...)` script plugins.
+//
+// Guarded like feature-deps: a fork that adopted the template BEFORE this seam existed may not have
+// the file yet, and an unconditional apply would fail the whole configuration.
+project.file("module-deps.gradle.kts").takeIf { it.exists() }?.let { apply(from = it) }
+
+/*
+ * The access-point KINDS, passed to :tools:network-ksp.
+ *
+ * A class cannot know whether its endpoint is REST or Supabase in a given fork — that is the point's
+ * `type:`, and the whole endpoint topology (URL, kind, owner, secrets) deliberately stays in
+ * app-profile as per-fork deployment config. `@ApiBinding` carries only the class<->point link, so
+ * the processor still needs the kind to pick the binding shape. Feeding the DECLARED ids in also
+ * makes an `@ApiBinding("typo")` a build error instead of a binding that fails at Koin graph
+ * construction on a device.
+ */
+val accessPointKinds = providers.provider {
+    val yaml = rootProject.file("app-profile/app.yaml")
+    if (!yaml.isFile) return@provider ""
+    val rows = mutableListOf<String>()
+    var inPoints = false
+    var id: String? = null
+    yaml.forEachLine { raw ->
+        val line = raw.substringBefore('#').trimEnd()
+        when {
+            line.matches(Regex("^  access_points:\\s*$")) -> inPoints = true
+            line.matches(Regex("^  [a-zA-Z_]+:.*$")) -> inPoints = false
+            line.matches(Regex("^[a-zA-Z_]+:.*$")) -> inPoints = false
+            inPoints -> {
+                Regex("^\\s*- id:\\s*([A-Za-z0-9_-]+)").find(line)?.let { id = it.groupValues[1] }
+                Regex("^\\s*type:\\s*([a-z]+)").find(line)?.let { m ->
+                    id?.let { rows += "$it:${m.groupValues[1]}" }
+                }
+            }
+        }
+    }
+    rows.joinToString("|")
+}
+
+ksp {
+    arg("kpt.network.accessPointKinds", accessPointKinds.get())
 }

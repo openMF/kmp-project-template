@@ -11,7 +11,7 @@ entire UI.
   — the Compose Multiplatform root exported from `cmp-shared`'s `nativeMain/ViewController.kt`).
 - **`Package.swift`** — a SwiftPM binary target exposing the `ComposeApp` XCFramework
   (`cmp-shared/build/XCFrameworks/release/ComposeApp.xcframework`) as a Swift package product. No
-  CocoaPods / Ruby pod toolchain (E6 migration).
+  Ruby package-manager toolchain.
 - **`scripts/embed-xcframework.sh`** — the `[KMP] Embed and Sign ComposeApp XCFramework` Xcode
   Run-Script build phase. Maps Xcode's flavored `$CONFIGURATION` (e.g. `demoDebug`, `prodRelease`)
   to a Kotlin build type, runs `:cmp-shared:assembleComposeApp{Debug,Release}XCFramework`, and

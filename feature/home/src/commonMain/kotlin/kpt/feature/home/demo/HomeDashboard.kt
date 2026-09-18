@@ -59,8 +59,8 @@ import kpt.core.base.ui.dashboard.DashboardProgressBar
 import kpt.core.base.ui.dashboard.toDashboardProgressState
 import kpt.core.base.ui.freshness.FreshnessIndicator
 import kpt.core.base.ui.screen.ScreenContent
-import kpt.core.common.formatDecimal
-import kpt.core.common.formatGrouped
+import kpt.core.common.format.formatDecimal
+import kpt.core.common.format.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
 import kpt.core.designsystem.component.MoneyText
 import kpt.core.designsystem.component.MoneyTone
@@ -70,7 +70,7 @@ import kpt.core.designsystem.component.SectionHeader
 import kpt.core.designsystem.component.Urgency
 import kpt.core.designsystem.component.UrgencyDot
 import kpt.core.designsystem.theme.spacing
-import kpt.core.model.demo.banking.BillReminder
+import kpt.core.model.banking.BillReminder
 import kpt.feature.home.demo.ui.HomeAction
 import kpt.feature.home.demo.ui.HomeViewModel
 import kpt.feature.home.demo.ui.LoansSummary
@@ -385,7 +385,7 @@ private fun LoansCarousel(state: ScreenState<LoansSummary>, onLoanClick: () -> U
 
 /** Compact per-loan tile used by [LoansCarousel]. Sized to fit 2–2.5 cards on a phone screen. */
 @Composable
-private fun LoanCarouselTile(loan: kpt.core.model.demo.banking.Loan, onClick: () -> Unit) {
+private fun LoanCarouselTile(loan: kpt.core.model.banking.Loan, onClick: () -> Unit) {
     val sp = MaterialTheme.spacing
     val progress = if (loan.principal > 0) {
         (1.0 - (loan.principalRemaining / loan.principal)).toFloat().coerceIn(0f, 1f)
@@ -441,18 +441,18 @@ private fun LoanCarouselTile(loan: kpt.core.model.demo.banking.Loan, onClick: ()
 }
 
 /**
- * Maps each [kpt.core.model.demo.banking.LoanKind] to a distinct accent stripe colour so
+ * Maps each [kpt.core.model.banking.LoanKind] to a distinct accent stripe colour so
  * users can scan a list of loans and identify mortgage vs. auto vs. personal vs. business
  * vs. student at a glance — same vocabulary as [PersonalLoansListScreen]'s LoanRowCard.
  */
 @Composable
-private fun loanKindAccent(kind: kpt.core.model.demo.banking.LoanKind): androidx.compose.ui.graphics.Color? = when (kind) {
-    kpt.core.model.demo.banking.LoanKind.MORTGAGE -> MaterialTheme.colorScheme.secondary
-    kpt.core.model.demo.banking.LoanKind.BUSINESS -> MaterialTheme.colorScheme.secondary
-    kpt.core.model.demo.banking.LoanKind.AUTO -> MaterialTheme.colorScheme.tertiary
-    kpt.core.model.demo.banking.LoanKind.STUDENT -> MaterialTheme.colorScheme.tertiary
-    kpt.core.model.demo.banking.LoanKind.PERSONAL -> MaterialTheme.colorScheme.primary
-    kpt.core.model.demo.banking.LoanKind.OTHER -> null
+private fun loanKindAccent(kind: kpt.core.model.banking.LoanKind): androidx.compose.ui.graphics.Color? = when (kind) {
+    kpt.core.model.banking.LoanKind.MORTGAGE -> MaterialTheme.colorScheme.secondary
+    kpt.core.model.banking.LoanKind.BUSINESS -> MaterialTheme.colorScheme.secondary
+    kpt.core.model.banking.LoanKind.AUTO -> MaterialTheme.colorScheme.tertiary
+    kpt.core.model.banking.LoanKind.STUDENT -> MaterialTheme.colorScheme.tertiary
+    kpt.core.model.banking.LoanKind.PERSONAL -> MaterialTheme.colorScheme.primary
+    kpt.core.model.banking.LoanKind.OTHER -> null
 }
 
 @Composable
@@ -571,7 +571,7 @@ private fun RatesQuickCard(
 
 @Composable
 private fun ExchangeRateCard(
-    state: ScreenState<kpt.core.model.demo.currency.ExchangeRates>,
+    state: ScreenState<kpt.core.model.currency.ExchangeRates>,
     freshness: FreshnessSignal,
     onRetry: () -> Unit,
     onSeeAll: () -> Unit,

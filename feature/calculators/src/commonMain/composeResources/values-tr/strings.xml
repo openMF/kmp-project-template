@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_calc_affordability_title">Ödeme gücü</string>
+    <string name="screens_calc_affordability_back_cd">Geri</string>
+    <string name="screens_calc_affordability_income_label">Aylık gelir</string>
+    <string name="screens_calc_affordability_obligations_label">Mevcut aylık borç</string>
+    <string name="screens_calc_affordability_dti_label">Borç/gelir üst sınırı (%)</string>
+    <string name="screens_calc_affordability_rate_label">Yıllık oran (%)</string>
+    <string name="screens_calc_affordability_tenure_label">Vade (ay)</string>
+    <string name="screens_calc_affordability_max_principal_label">Azami kredi anaparası</string>
+    <string name="screens_calc_affordability_max_emi_label">Azami taksit</string>
+    <string name="screens_calc_amortization_title">Amortisman</string>
+    <string name="screens_calc_amortization_title_with_source">Amortisman · %1$s</string>
+    <string name="screens_calc_amortization_back_cd">Geri</string>
+    <string name="screens_calc_amortization_principal_label">Anapara</string>
+    <string name="screens_calc_amortization_rate_label">Yıllık oran (%)</string>
+    <string name="screens_calc_amortization_tenure_label">Vade (ay)</string>
+    <string name="screens_calc_amortization_emi_label">Aylık taksit</string>
+    <string name="screens_calc_amortization_interest_total_supporting">Faiz %1$s · Toplam %2$s</string>
+    <string name="screens_calc_amortization_header_month">#</string>
+    <string name="screens_calc_amortization_header_principal">Anapara</string>
+    <string name="screens_calc_amortization_header_interest">Faiz</string>
+    <string name="screens_calc_amortization_header_balance">Bakiye</string>
+    <string name="screens_calc_compare_title">Kredileri karşılaştır</string>
+    <string name="screens_calc_compare_back_cd">Geri</string>
+    <string name="screens_calc_compare_best_emi_label">En iyi taksit · Senaryo %1$d</string>
+    <string name="screens_calc_compare_best_emi_value">%1$s/ay</string>
+    <string name="screens_calc_compare_savings_text">En pahalıya kıyasla toplam %1$s tasarruf</string>
+    <string name="screens_calc_compare_helper_text">Aşağıdaki bir senaryoyu düzenleyin, karşılaştırma anında güncellensin.</string>
+    <string name="screens_calc_compare_scenario_label">Senaryo %1$d</string>
+    <string name="screens_calc_compare_best_badge">En iyi</string>
+    <string name="screens_calc_compare_principal_label">Anapara</string>
+    <string name="screens_calc_compare_rate_label">Oran (%)</string>
+    <string name="screens_calc_compare_tenure_label">Vade (ay)</string>
+    <string name="screens_calc_compare_result_emi">Taksit</string>
+    <string name="screens_calc_compare_result_interest">Faiz</string>
+    <string name="screens_calc_compare_result_total">Toplam</string>
+    <string name="screens_calc_wizard_resume_title">Tamamlanmamış sihirbaza devam edilsin mi?</string>
+    <string name="screens_calc_wizard_resume_message">%1$d. adımda kalmış bir kredi hesaplama sihirbazınız var. Kaldığınız yerden devam mı, silmek mi?</string>
+    <string name="screens_calc_wizard_resume_continue">Devam et</string>
+    <string name="screens_calc_wizard_resume_discard">Sil</string>
+    <string name="screens_calc_wizard_title">Yeni kredi · Adım %1$d/%2$d</string>
+    <string name="screens_calc_wizard_back_cd">Geri</string>
+    <string name="screens_calc_wizard_step_principal_question">Ne kadar borçlanmak istiyorsunuz?</string>
+    <string name="screens_calc_wizard_step_principal_label">Anapara tutarı</string>
+    <string name="screens_calc_wizard_step_tenure_question">Kaç ay boyunca?</string>
+    <string name="screens_calc_wizard_step_tenure_label">Vade (ay)</string>
+    <string name="screens_calc_wizard_step_rate_question">Hangi yıllık oranla?</string>
+    <string name="screens_calc_wizard_step_rate_label">Yıllık oran (%)</string>
+    <string name="screens_calc_wizard_step_review_emi_label">Aylık taksit</string>
+    <string name="screens_calc_wizard_step_review_total_supporting">Toplam ödenecek: %1$s</string>
+    <string name="screens_calc_wizard_step_review_principal_label">Anapara</string>
+    <string name="screens_calc_wizard_step_review_tenure_label">Vade</string>
+    <string name="screens_calc_wizard_step_review_tenure_value">%1$d ay</string>
+    <string name="screens_calc_wizard_step_review_rate_label">Oran</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_total_interest_label">Toplam faiz</string>
+    <string name="screens_calc_wizard_step_name_message">Kredilerinizde tekrar bulabilmek için bu senaryoya bir ad verin.</string>
+    <string name="screens_calc_wizard_step_name_label">Senaryo adı</string>
+    <string name="screens_calc_wizard_step_name_required">Zorunlu — Kaydet\'i etkinleştirmek için bir ad yazın.</string>
+    <string name="screens_calc_wizard_button_back">Geri</string>
+    <string name="screens_calc_wizard_button_next">İleri</string>
+    <string name="screens_calc_wizard_button_save">Kredi olarak kaydet</string>
+</resources>

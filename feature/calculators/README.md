@@ -11,7 +11,7 @@ one wizard opts into an offline draft write.
   scenarios compared side-by-side, cheapest-by-total-payable highlighted.
 - **Loan Calc Wizard:** `LoanCalcWizardScreen` / `LoanCalcWizardViewModel` — multi-step wizard
   state machine, a `BaseMutationViewModel` (`MutationMode.Draft`) writer via
-  `SubmitOutbox<LoanCalcScenario>` (`OutboxQualifiers.LoanCalcScenario`).
+  `SubmitOutbox<LoanCalcScenario>` (`DemoOutboxQualifiers.LoanCalcScenario`).
 - **Routes:** `CalculatorsGraphRoute` (start = `AffordabilityCalculatorRoute`) →
   `AffordabilityCalculatorRoute`, `AmortizationRoute(loanId?)`, `LoanComparisonRoute`,
   `LoanCalcWizardRoute(scenarioId?)`. Entry point: `NavController.navigateToCalculators()`.

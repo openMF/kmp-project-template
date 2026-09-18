@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_loans_add_title">Darlehen hinzufügen</string>
+    <string name="screens_loans_edit_title">Darlehen bearbeiten</string>
+    <string name="screens_loans_addedit_back_cd">Zurück</string>
+    <string name="screens_loans_addedit_name_label">Darlehensname</string>
+    <string name="screens_loans_addedit_kind_label">Art</string>
+    <string name="screens_loans_addedit_kind_cd">Darlehensart wählen</string>
+    <string name="screens_loans_addedit_principal_label">Ursprüngliche Darlehenssumme</string>
+    <string name="screens_loans_addedit_principal_remaining_label">Restschuld</string>
+    <string name="screens_loans_addedit_annual_rate_label">Jährlicher Zinssatz (%)</string>
+    <string name="screens_loans_addedit_tenure_label">Laufzeit (Monate)</string>
+    <string name="screens_loans_addedit_months_remaining_label">Verbleibende Monate</string>
+    <string name="screens_loans_addedit_next_due_date_label">Nächste Fälligkeit (JJJJ-MM-TT)</string>
+    <string name="screens_loans_addedit_total_paid_label">Bisher gezahlt</string>
+    <string name="screens_loans_addedit_monthly_emi_label">Monatliche Rate</string>
+    <string name="screens_loans_addedit_total_interest_preview">Zinsen gesamt: %1$s</string>
+    <string name="screens_loans_add_submit">Darlehen speichern</string>
+    <string name="screens_loans_edit_submit">Darlehen aktualisieren</string>
+    <string name="screens_loans_addedit_status_saving">Wird gespeichert…</string>
+    <string name="screens_loans_addedit_status_saved">Gespeichert ✓</string>
+    <string name="screens_loans_addedit_status_offline">Offline gespeichert – wird synchronisiert, sobald du online bist.</string>
+    <string name="screens_loans_addedit_status_failed">Speichern fehlgeschlagen: %1$s</string>
+    <string name="screens_loans_addedit_status_failed_unknown">unbekannter Fehler</string>
+    <string name="screens_loans_addedit_retry_button">Wiederholen</string>
+    <string name="screens_loans_addedit_dismiss_button">Verwerfen</string>
+    <string name="screens_loans_addedit_draft_resume_title">Darlehen fortsetzen?</string>
+    <string name="screens_loans_addedit_draft_resume_message">Du hast einen ungespeicherten Darlehensentwurf. Bearbeitung fortsetzen, verwerfen oder neu beginnen.</string>
+    <string name="screens_loans_addedit_draft_resume_resume">Bearbeitung fortsetzen</string>
+    <string name="screens_loans_addedit_draft_resume_discard">Entwurf verwerfen</string>
+    <string name="screens_loans_addedit_draft_resume_start_fresh">Neu beginnen</string>
+    <string name="screens_loans_detail_title">Darlehensdetails</string>
+    <string name="screens_loans_detail_back_cd">Zurück</string>
+    <string name="screens_loans_detail_delete_dialog_title">Darlehen löschen?</string>
+    <string name="screens_loans_detail_delete_dialog_message">Dieses Darlehen und sein Verlauf werden entfernt.</string>
+    <string name="screens_loans_detail_delete_confirm">Löschen</string>
+    <string name="screens_loans_detail_delete_cancel">Abbrechen</string>
+    <string name="screens_loans_detail_principal_remaining_label">Restschuld</string>
+    <string name="screens_loans_detail_months_remaining_value">Noch %1$d Monate</string>
+    <string name="screens_loans_detail_original_principal_label">Ursprüngliche Darlehenssumme</string>
+    <string name="screens_loans_detail_monthly_payment_label">Monatliche Zahlung (Rate)</string>
+    <string name="screens_loans_detail_total_paid_label">Bisher gezahlt</string>
+    <string name="screens_loans_detail_annual_rate_label">Jahreszins</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_next_due_label">Nächste Fälligkeit</string>
+    <string name="screens_loans_detail_tenure_label">Laufzeit</string>
+    <string name="screens_loans_detail_tenure_value">%1$d Monate</string>
+    <string name="screens_loans_detail_tenure_progress_label">Laufzeitfortschritt</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d%% abgeschlossen</string>
+    <string name="screens_loans_detail_edit_button">Bearbeiten</string>
+    <string name="screens_loans_detail_schedule_button">Tilgungsplan</string>
+    <string name="screens_loans_detail_delete_button">Löschen</string>
+    <string name="screens_loans_list_title">Privatdarlehen</string>
+    <string name="screens_loans_list_back_cd">Zurück</string>
+    <string name="screens_loans_list_new_fab_text">Neues Darlehen</string>
+    <string name="screens_loans_list_delete_dialog_title">Darlehen löschen?</string>
+    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' wird entfernt. Das lässt sich nicht rückgängig machen.</string>
+    <string name="screens_loans_list_delete_confirm">Löschen</string>
+    <string name="screens_loans_list_delete_cancel">Abbrechen</string>
+    <string name="screens_loans_list_total_outstanding_label">Gesamt offen</string>
+    <string name="screens_loans_list_active_count_single">%1$d aktives Darlehen</string>
+    <string name="screens_loans_list_active_count_plural">%1$d aktive Darlehen</string>
+    <string name="screens_loans_list_monthly_emi_label">Monatliche Rate</string>
+    <string name="screens_loans_row_remaining_label">Verbleibend</string>
+    <string name="screens_loans_row_monthly_emi_label">Monatliche Rate</string>
+    <string name="screens_loans_row_progress_value">%1$d%% getilgt</string>
+    <string name="screens_loans_row_next_due_value">Nächste: %1$s</string>
+</resources>

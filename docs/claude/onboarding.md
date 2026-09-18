@@ -118,7 +118,7 @@ ruby --version  # Should be 2.7+
 
 # 7. Bundler (for Fastlane gems)
 sudo gem install bundler
-# (iOS links the Kotlin ComposeApp framework via SwiftPM/XCFramework — no CocoaPods to install.)
+# (iOS links the Kotlin ComposeApp framework via SwiftPM/XCFramework — nothing extra to install.)
 
 # Optional: GitHub CLI (for workflow management)
 brew install gh
@@ -268,7 +268,7 @@ ls -la cmp-android/build/outputs/apk/debug/
 
 ```bash
 # iOS integrates the Kotlin ComposeApp framework as an XCFramework (SwiftPM binary
-# target, cmp-ios/Package.swift) — no CocoaPods. Open the Xcode project; its
+# target, cmp-ios/Package.swift). Open the Xcode project; its
 # [KMP] Embed and Sign ComposeApp XCFramework Run-Script phase assembles + embeds
 # the framework on every build:
 open cmp-ios/iosApp.xcodeproj
@@ -310,12 +310,11 @@ ls -la cmp-web/build/distributions/
 
 ### macOS Build (macOS only)
 
+macOS ships through the Compose Desktop target, not a separate Xcode app — there is no
+`cmp-macos` module and no `.xcworkspace`:
+
 ```bash
-# Similar to iOS
-xcodebuild -workspace cmp-macos/macosApp.xcworkspace \
-  -scheme macosApp \
-  -configuration Debug \
-  build
+./gradlew :cmp-desktop:packageDmg
 ```
 
 ### Success!
@@ -631,7 +630,7 @@ struct ContentView: View {
 ./gradlew :cmp-android:assembleDebug
 ./gradlew :cmp-android:connectedDebugAndroidTest
 
-# Test iOS (if on macOS) — no CocoaPods step; the Xcode Run-Script phase assembles the
+# Test iOS (if on macOS) — no dependency-install step; the Xcode Run-Script phase assembles the
 # ComposeApp XCFramework, and the app builds from the .xcodeproj (no .xcworkspace)
 xcodebuild test -project cmp-ios/iosApp.xcodeproj -scheme iosApp
 
@@ -854,7 +853,7 @@ dependencies: [
 ],
 ```
 
-Xcode resolves the package on the next build — there is no CocoaPods step.
+Xcode resolves the package on the next build — there is no dependency-install step.
 
 **After adding dependencies:**
 

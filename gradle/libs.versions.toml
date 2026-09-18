@@ -1,17 +1,17 @@
 [versions]
 buildkonfig = "0.21.2"
-kmpProductFlavors = "2.8.3"
+kmpProductFlavors = "2.10.0"
 
 # ── Fork Identity — edit ONLY these 5 lines, then run ./gradlew syncForkConfig ──────────────────
 appId            = "org.mifos.kmp.template"   # Android applicationId + iOS bundle ID
 appDisplayName   = "Money Toolkit"    # Android app_name, iOS CFBundleDisplayName
-desktopAppName   = "App Toolkit"     # JVM package name, dock name
+desktopAppName   = "Money Toolkit"     # JVM package name, dock name
 projectName      = "kmp-project-template"      # rootProject.name, Fastlane PROJECT_NAME
 iosTeamId        = "YOUR_TEAM_ID"             # Apple Developer Team ID (PLACEHOLDER — set in app-profile/platforms/apple/apple.yaml#team_id)
 # ─────────────────────────────────────────────────────────────────────────────────────────────────
 # Android
 androidDesugarJdkLibs = "2.1.5"
-androidGradlePlugin = "9.3.1"
+androidGradlePlugin = "9.4.0"
 androidTools = "32.3.1"
 compileSdk = "37"
 minSdk = "26"
@@ -63,14 +63,13 @@ bouncycastle = "1.84"
 dependencyGuard = "0.5.0"
 googleOss = "17.5.1"
 googleOssPlugin = "0.12.0"
-review = "2.0.2"
 appUpdate = "2.1.0"
 integrity = "1.6.0"
 
 # Static Analysis & Code Formatting
 ktlint = "14.2.0"
 detekt = "1.23.8"
-spotlessVersion = "8.8.0"
+spotlessVersion = "8.10.2"
 turbine = "1.2.1"
 twitter-detekt-compose = "0.0.26"
 moduleGraph = "2.9.0"
@@ -80,8 +79,8 @@ moduleGraph = "2.9.0"
 typesafeConventions = "0.5.0"
 
 # Kotlin KMP Dependencies
-kotlin = "2.4.0"
-kover = "0.9.8"
+kotlin = "2.4.20"
+kover = "0.9.9"
 kotlinInject = "0.9.0"
 kotlinxBrowser = "0.5.0"
 kotlinxCoroutines = "1.11.0"
@@ -103,11 +102,21 @@ koinAnnotationsVersion = "4.2.2"
 
 
 # KMP Toolkit Libraries
-# 3.5.11: cmp-firebase analytics+crashlytics engine + cmp-firebase-compose companion (KmpToolkit dev).
-kmptoolkit = "3.5.11"
+# 3.5.28: adds cmp-app-review, cmp-clipboard, cmp-app-intents, cmp-bubble, cmp-pdf-generator and
+#         cmp-toast to this template. Also drops nine transitive artifacts (firebase-perf,
+#         firebase-config, firebase-abt, protobuf-javalite, dagger and friends): cmp-observe no
+#         longer bundles the Firebase hooks — they moved to cmp-observe-firebase, which this
+#         template does not depend on and never registered. Add that artifact explicitly if a fork
+#         wants FirebaseCrashlyticsAttributionHook / FirebaseAnalyticsHealthHook / Performance.
+# 3.5.21: cmp-firebase on GitLive 3.0.0-alpha02 (Firebase BoM 34.18.0) — wasmJs PROMOTED from the
+#         Measurement-Protocol tier to the native Firebase tier, so wasmJs now reads FirebaseConfig.web
+#         (the same `web` entry as js) and needs applicationId/apiKey/projectId/authDomain populated.
+#         Also: cmp-share direct-to-app share (ShareOptions.targetPackage) + file:// → FileProvider
+#         content:// resolution; cmp-remote-config min/max app-version gate.
+kmptoolkit = "3.5.28"
 
 # CMP Libraries
-compose-plugin = "1.11.1"
+compose-plugin = "1.12.0"
 coil = "3.5.0"
 backHandlerVersion = "2.5.0"
 constraintLayout = "0.8.0"
@@ -133,7 +142,6 @@ composeNavigation = "2.9.2"
 jbCoreBundle = "1.0.1"
 jbSavedState = "1.4.0"
 material3adaptive = "1.2.0"
-gitLive = "2.4.0"
 aboutLibraries = "15.0.3"
 
 # Desktop Version
@@ -143,16 +151,22 @@ desktopPackageVersion = "1.0.0"
 store = "5.1.0-alpha10"
 
 #Room 3
-room = "3.0.1"
+room = "3.1.0-alpha01"
 sqliteBundled = "2.7.0"
 sqliteWeb = "2.7.0"
 
 # worker-kmp — single-API background + foreground worker scheduling across
 # Android / iOS / Desktop / Web. See https://github.com/MobileByteLabs/worker-kmp.
 # Pin tracks last published release on Maven Central.
-# 4.0.6: fixes the config-cache serialization discard (KSP/Gradle) seen on 4.0.4. See
-# https://github.com/MobileByteLabs/worker-kmp/releases/tag/v4.0.6.
-worker-version = "4.0.6"
+# 4.0.6: fixes the config-cache serialization discard (KSP/Gradle) seen on 4.0.4.
+# 4.0.7: aligns worker-kmp's own toolchain with this template's — Kotlin 2.4.20, AGP 9.4.0,
+#   Gradle 9.7.1, Compose MP 1.12.0 — and moves it to compileSdk 37, which upstream flags as
+#   BREAKING. This template is already on compileSdk 37 (see `compileSdk` above), so that break
+#   is pre-satisfied here. See https://github.com/MobileByteLabs/worker-kmp/releases/tag/v4.0.7.
+#   NOTE: that release body lists `cmp-`-prefixed module names (`cmp-worker-kmp`, ...). Those are
+#   NOT published — `cmp-worker-kmp` has no pom and no maven-metadata on Central. The real, and
+#   only, coordinates remain the un-prefixed ones used below.
+worker-version = "4.0.7"
 # KMPNotifier — Kotlin Multiplatform local + push notifications (Android/iOS/Desktop/Web).
 kmpnotifier = "2.0.0"
 
@@ -246,8 +260,6 @@ app-update = { module = "com.google.android.play:app-update", version.ref = "app
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdate" }
 integrity = { module = "com.google.android.play:integrity", version.ref = "integrity" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
-review = { module = "com.google.android.play:review", version.ref = "review" }
-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "review" }
 
 # jb Compose
 jb-kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
@@ -369,6 +381,15 @@ ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.r
 
 cmp-intent-launcher = { module = "io.github.mobilebytelabs:cmp-intent-launcher", version.ref = "kmptoolkit" }
 cmp-share = { module = "io.github.mobilebytelabs:cmp-share", version.ref = "kmptoolkit" }
+# cmp-open-url — commonMain URL opening (openUrl / openInBrowser / openWithApp / canOpen).
+# Ships `actual`s for 11 targets, so consumers stay in commonMain.
+cmp-open-url = { module = "io.github.mobilebytelabs:cmp-open-url", version.ref = "kmptoolkit" }
+# cmp-inapp-update — 11-target update check + store launch. Replaces the Play-Core-only
+# AppUpdateManagerImpl whose nonAndroidMain twin was two empty method bodies.
+# Alias is `cmp-inapp-update`, NOT `cmp-in-app-update`: the generated accessor would be
+# `libs.cmp.in.app.update` and `in` is a Kotlin keyword — the build script fails to compile.
+# The published coordinate is unchanged.
+cmp-inapp-update = { module = "io.github.mobilebytelabs:cmp-in-app-update", version.ref = "kmptoolkit" }
 cmp-network-monitor = { module = "io.github.mobilebytelabs:cmp-network-monitor", version.ref = "kmptoolkit" }
 cmp-network-monitor-compose = { module = "io.github.mobilebytelabs:cmp-network-monitor-compose", version.ref = "kmptoolkit" }
 # cmp-deep-link — commonMain deep-link handler. Android capture is auto-init (ContentProvider +
@@ -378,16 +399,44 @@ cmp-deep-link = { module = "io.github.mobilebytelabs:cmp-deep-link", version.ref
 # cmp-firebase — unified Firebase (Analytics + Crashlytics) engine + Compose companion.
 cmp-firebase = { module = "io.github.mobilebytelabs:cmp-firebase", version.ref = "kmptoolkit" }
 cmp-firebase-compose = { module = "io.github.mobilebytelabs:cmp-firebase-compose", version.ref = "kmptoolkit" }
+# Platform capabilities wired into core-base/platform (+ cmp-toast into core-base/designsystem).
+# All 21-target headless libraries except cmp-toast, which is Compose-only at 7.
+#
+# Bound in platformModule as the TOOLKIT types, not behind template-owned wrappers: a wrapper would
+# either mirror each library or hide most of it, and neither insulation nor testability justified
+# the cost — every one of these ships a public Fake* in its main artifact. cmp-app-review is the
+# exception, kept behind kpt.core.base.platform.review.AppReviewManager because that interface
+# already existed and reshapes rather than forwards.
+#
+# cmp-app-review replaces the hand-rolled AppReviewManagerImpl pair whose nonAndroidMain twin was an
+# empty `promptForReview() {}` + TODO — every non-Android fork shipped a review prompt that silently
+# did nothing. cmp-toast replaces KptSnackbarHost so ViewModels depend on an injectable
+# ToastDispatcher instead of a Compose SnackbarHostState.
+cmp-app-review = { module = "io.github.mobilebytelabs:cmp-app-review", version.ref = "kmptoolkit" }
+cmp-clipboard = { module = "io.github.mobilebytelabs:cmp-clipboard", version.ref = "kmptoolkit" }
+cmp-app-intents = { module = "io.github.mobilebytelabs:cmp-app-intents", version.ref = "kmptoolkit" }
+cmp-bubble = { module = "io.github.mobilebytelabs:cmp-bubble", version.ref = "kmptoolkit" }
+cmp-pdf-generator = { module = "io.github.mobilebytelabs:cmp-pdf-generator", version.ref = "kmptoolkit" }
+cmp-toast = { module = "io.github.mobilebytelabs:cmp-toast", version.ref = "kmptoolkit" }
+# Compose surfaces for cores already integrated above. Added to core-base/ui as `api`, which the
+# feature convention plugin already gives every feature. Taken for their COMPOSABLES — ShareButton /
+# ShareSheet / AppIntentsRegistry / rememberSupportsIntent — which call the libraries' global entry
+# points directly and do not depend on the CompositionLocals these modules also export.
+#
+# Their exported locals (LocalShareManager, LocalIntentManager, LocalAppIntentsManager) carry the
+# SAME simple names as the template's own in kpt.core.base.platform, and none of them throws when
+# unprovided — each falls back to constructing its own impl. All three are therefore PROVIDED by
+# LocalManagerProvider from the same DI instances, so either import resolves to the app's manager
+# rather than a private second one. See the note in LocalManagerProviders.kt.
+cmp-share-compose = { module = "io.github.mobilebytelabs:cmp-share-compose", version.ref = "kmptoolkit" }
+cmp-intent-launcher-compose = { module = "io.github.mobilebytelabs:cmp-intent-launcher-compose", version.ref = "kmptoolkit" }
+cmp-app-intents-compose = { module = "io.github.mobilebytelabs:cmp-app-intents-compose", version.ref = "kmptoolkit" }
 
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-cloud-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-performance = { group = "com.google.firebase", name = "firebase-perf" }
-
-gitlive-firebase-analytics = { module = "dev.gitlive:firebase-analytics", version.ref = "gitLive" }
-gitlive-firebase-crashlytics = { module = "dev.gitlive:firebase-crashlytics", version.ref = "gitLive" }
-gitlive-firebase-performance = { module = "dev.gitlive:firebase-performance", version.ref = "gitLive" }
 
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
@@ -441,9 +490,7 @@ android-kmp-library = { id = "com.android.kotlin.multiplatform.library", version
 typesafe-conventions = { id = "dev.panuszewski.typesafe-conventions", version.ref = "typesafeConventions" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 # SKIE — applied in cmp-shared/build.gradle.kts to Swift-enhance the exported
-# ComposeApp framework/XCFramework (E6). Replaces the Kotlin CocoaPods plugin
-# (`org.jetbrains.kotlin.native.cocoapods`), which was removed with the CocoaPods
-# → SwiftPM/XCFramework migration.
+# ComposeApp framework/XCFramework (E6). iOS integration is SwiftPM/XCFramework.
 skie = { id = "co.touchlab.skie", version.ref = "skie" }
 
 android-application-convention = { id = "org.convention.android.application" }
@@ -499,4 +546,3 @@ mifos-kmp-room = { id = "mifos.kmp.room" }
 worker-app = { id = "io.github.mobilebytelabs.worker-app", version.ref = "worker-version" }
 
 # Supabase Config Plugin
-kmp-supabase-config = { id = "org.convention.kmp.supabase.config" }

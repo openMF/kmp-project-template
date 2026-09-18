@@ -1,10 +1,32 @@
-# Claude Code - App Toolkit (KMP white-label template)
+# Claude Code — App Toolkit (KMP white-label template)
 
-**Last Updated:** 2026-08-14
-**Project Type:** Kotlin Multiplatform (KMP) — brand-neutral white-label template
-**Platforms:** Android | iOS | macOS | Desktop (Windows/macOS/Linux) | Web
-
----
+> ## ⛳ The architecture SoT is `docs/architecture/`
+>
+> **Start there: [`docs/architecture/ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md)** — the
+> table of contents for every module guide, cross-cutting concern and pattern.
+>
+> That directory is the **single source of truth for this template's architecture**, for humans and
+> for AI, high-level and low-level:
+>
+> | | |
+> |---|---|
+> | [`ARCHITECTURE.md`](docs/architecture/ARCHITECTURE.md) | high-level design + generated TOC |
+> | [`CONTRACT.yaml`](docs/architecture/CONTRACT.yaml) | machine-verified low-level contract — every module, annotation, processor, generated aggregate, seam |
+> | [`modules/`](docs/architecture/modules/) | one guide per module (25), named 1:1 with its training-corpus surface |
+> | [`cross-cutting/`](docs/architecture/cross-cutting/) | store architecture, source sets, flavors, customization surface, style guide, migration |
+> | [`patterns/`](docs/architecture/patterns/) | named recipes spanning two or more modules |
+>
+> **This file is a ROUTER, not a second source of truth.** It stays because Claude Code auto-loads
+> it; its job is to point at `docs/architecture/` and carry the operational quick-reference below.
+> When this file and a module guide disagree, **the guide wins** — and that disagreement is a bug to
+> fix, not a judgement call to make.
+>
+> **Changing the template?** `docs/architecture/` updates in the SAME change. A new annotation needs
+> its `CONTRACT.yaml` row; a new module needs its guide. Both are enforced at write time by
+> `architecture-contract-guard` / `architecture-docs-guard`, and verified by
+> `framework-verify-architecture-contract.sh`. This is what lets
+> `/kmp-project-template-retrain` drive the corpus and every generator with no manual training step
+> and no silent gap.
 
 ## Quick Links
 
@@ -23,7 +45,6 @@
 - [Patterns & Best Practices](docs/claude/patterns.md)
 - [Independent Cards Pattern](docs/claude/PATTERN-independent-cards.md) - Multi-card dashboards where each card has its own ScreenState (loading / error / empty / content) — `IndependentCardLayout` + `DashboardProgressBar` + `aggregateDashboardProgress`
 - [Store Implementation Guide](docs/claude/store-implementation.md) - Offline-first streams, mutations, FetchPolicy, cache lifecycle
-- [Room Invalidation Bridge](core-base/database/src/commonMain/kotlin/kpt/core/base/database/invalidation/README.md) - `RoomChangeBus` + `daoFlow{}` + `notifyingWrite{}` — absorbs Room 3 alpha05's wasmJs async-fan-out gap so DAO Flow consumers re-emit after writes; no-op on Android/Desktop/iOS
 - [Motion + Transitions](core-base/ui/MOTION.md) - Symmetric durations, M3 patterns, debug Transition Gallery
 - [GitHub Actions Deep Dive](docs/claude/github-actions-deep-dive.md)
 - [Secrets Management](docs/claude/secrets-management.md)
@@ -95,94 +116,16 @@ the per-feature branding, or selectively remove features they don't need.
 
 ## Store Archetype Showcases
 
-The generator routes on **`feature_profile.store_archetype`** — the primary key that picks the
-`core/store` factory and the module chain. There are **8 archetypes**; every row below resolves to
-a real demo `*Store.kt` / `*ViewModel.kt` / `*Test.kt`. The decision matrix + module chain is
-`FEATURE_AUTHORING.md` (in-repo summary) and `docs/architecture/STORE_DATA_API.md` (canonical).
-
-| `store_archetype` | Store factory | Store | ViewModel | Test |
-|---|---|---|---|---|
-| OFFLINE_LOCAL_ONLY | `createOfflineStore` | `AlertsStore.kt`, `LoansStore.kt`, `BillRemindersStore.kt` | `AmortizationScheduleViewModel.kt` | `AlertsStoreTest.kt`, `LoansStoreTest.kt`, `AmortizationScheduleViewModelTest.kt` |
-| NETWORK_WITH_CACHE | `createStore` | `ExchangeRatesStore.kt`, `InterestRateSeriesStore.kt` | `CurrencyRatesViewModel.kt`, `InterestRatesViewModel.kt` | `EconomicMemoryOnlyTest.kt` |
-| NETWORK_ONLY | `createStore` + `FetchPolicy.NETWORK_ONLY` | `SpotRateLookupStore.kt` | `CurrencyRatesViewModel.kt` (online) | `SpotRateLookupStoreTest.kt` |
-| CACHE_ONLY | `createStore` + `FetchPolicy.CACHE_ONLY` | `SpotRateLookupStore.kt` | `CurrencyRatesViewModel.kt` (offline) | `CurrencyConverterViewModelTest.kt` |
-| PERIODIC | `createStore` + TTL in `AppStoreRegistry` | `ExchangeRatesStore.kt` | `HomeViewModel.kt` tile | `HomeDashboardViewModelTest.kt` |
-| MEMORY_ONLY | `createMemoryStore` | `MacroIndicatorStore.kt` | `CountryMacroViewModel.kt` | `EconomicMemoryOnlyTest.kt` |
-| LOAD_ONCE | `createStore` + `asLoadOnceStream` | `LoansStore.kt` | `LoanDetailViewModel.kt` | `LoanDetailViewModelTest.kt` |
-| MUTABLE | `createMutableStore` + `Bookkeeper` | `CloudTodoStore.kt` | `EditBillReminderViewModel.kt` | `EditBillReminderViewModelTest.kt`, `OfflineSubmitSyncerTest.kt` |
-
-### Write side — one unified mutation ViewModel
-
-The write path uses a **single** base view-model, `BaseMutationViewModel<T, R>`
-(`core-base/ui/.../viewmodel/BaseMutationViewModel.kt`), parameterized by **`MutationMode`**:
-
-- **`MutationMode.InSession`** — single-shot submit, no persistence.
-- **`MutationMode.Draft`** — offline-resilient draft with 3-case resume (fresh / resume-in-progress /
-  resume-after-crash), persisting the payload across restarts.
-
-An earlier design split these into two separate base view-models; they were collapsed into this one,
-and `MutationMode` now expresses the mode. The **Sync & Drafts** surface
-(`feature/settings/.../SyncAndDraftsViewModel.kt`) lists in-flight drafts from both modes. Wire the
-screen with `MutationScreenContent` + `SubmitHandler` / `DraftSubmitHandler`.
-
-### Customization seams (real registry names)
-
-The app shell reads features + backbone + tabs + stores + network from registries — a fork adds one
-line per surface, never edits the shell:
-
-- **`FeatureRegistry`** (`cmp-navigation/.../registry/FeatureRegistry.kt`) — registers demo/fork
-  features into `AuthenticatedNavigation`.
-- **`BackboneRegistry`** (`cmp-navigation/.../registry/BackboneRegistry.kt`) — home/profile/settings
-  backbone graph.
-- **`TabRegistry`** (`cmp-navigation/.../registry/TabRegistry.kt`) — bottom-nav tab set.
-- **`AppStoreRegistry`** (`core/store/.../AppStoreRegistry.kt`) — feature-tagged Store5 factories.
-- **`AppAccessPoints`** + **`AccessPointRegistry`** (`core-base/network/.../AccessPointRegistry.kt`) —
-  the declared network endpoints (see Network below).
-- **`core/store`** — `AppScreenStateDefaults`, `AppErrorMapper`, `appStoreModule` (branded state
-  visuals + error mapping + DI).
-
-### Network — N REST + N Supabase access points
-
-Every endpoint the app talks to is declared once in
-`app-profile/app.yaml#network.access_points` (`type: rest | supabase`) and generated into
-`AppAccessPoints.points`, which the fork registers as `AccessPointRegistry(AppAccessPoints.points)`
-in its `NetworkModule`. The registry resolves any number of REST **and** Supabase points:
-
-- **REST** — `restApi<T>("<id>")` DSL + `AccessPointRegistry.restBaseUrl(type)`; `core-base/network`
-  owns the transport, so a fork writes only the API interface + one `restApi("<id>")` line.
-- **Supabase** — `AccessPointRegistry.supabasePoints()` returns every declared Supabase point;
-  a per-point `SupabaseConfigClient` factory builds the client (URL from the registry, key from
-  secrets by id). `supabasePoints()` supports N Supabase projects, not a single hardcoded client.
-
-### Tech Stack
-
-**Languages:**
-- Kotlin (shared business logic)
-- Kotlin/Native (iOS, macOS)
-- Kotlin/JVM (Android, Desktop)
-- Kotlin/JS (Web)
-- Swift (iOS platform code)
-- Ruby (Fastlane)
-- Bash (automation scripts)
-
-**Frameworks:**
-- Compose Multiplatform (UI framework for all platforms)
-- Ktor (networking)
-- Room 3 (database)
-- Koin (dependency injection)
-
-**CI/CD:**
-- GitHub Actions with the **v2 reusable workflows** from `openMF/mifos-x-actionhub` (per-workflow pins — the wrapper file is authoritative; see `.github/CLAUDE.md`)
-- **13 custom actions** (4 Android, 4 iOS, 2 macOS, 1 Desktop, 1 Web, 1 Static Analysis)
-- **Fastlane** (8 lanes across 8 deployment targets in `deployment/<platform>/<target>/lane.rb`)
-- **17 bash scripts** for setup, deployment, and verification
-
-**Code Quality:**
-- Spotless (code formatting)
-- Detekt (Kotlin static analysis & linting)
-- Dependency Guard (dependency validation)
-
----
+> **Moved.** The 8-archetype decision matrix, the archetype ↔ showcase contract and the
+> `@StoreProvider` declaration rules now live in the architecture SoT:
+>
+> - [`modules/core/store.md`](docs/architecture/modules/core/store.md) — the module, its contracts and failure modes
+> - [`cross-cutting/store-architecture.md`](docs/architecture/cross-cutting/store-architecture.md) — the archetypes end to end
+> - [`cross-cutting/store-data-api.md`](docs/architecture/cross-cutting/store-data-api.md) — the canonical API reference
+>
+> `core/store/STORE_ARCHETYPES.yaml` remains the machine-readable registry;
+> `scripts/product-health/checks/store-archetype-coverage.sh` still fails the build if an archetype
+> loses its last showcase.
 
 ## Deployment Targets
 
@@ -346,8 +289,8 @@ Customize in **`core/store`** (the single discoverable seam):
 
 - **`AppScreenStateDefaults`** — brand visuals, copy, Lottie animations, telemetry hooks
 - **`AppErrorMapper`** — domain-error → user-message mapping (extends `categorize()`)
-- **`AppStoreRegistry`** — your named Store qualifiers
-- **`appStoreModule`** — Koin DI module for Store factories
+- **`@StoreProvider` on your provider fn** — qualifier, TTL, cache keys, binding and logout purge,
+  all generated. There is no registry to edit and no DI module to add it to.
 
 See `core/store/README.md` for the "what you get for free" list and full integration
 pattern.
@@ -473,7 +416,8 @@ re-deriving it:
 3. Author a feature and **declare its `store_archetype`** (one of the 8) in its `feature_profile`.
 4. Run codegen (`/kmp-implement` → `kmp-store-gen`) — it reads `store_archetype` and emits the matching
    `core/store` factory (`createStore` / `createMemoryStore` / `createOfflineStore` /
-   `createMutableStore`) + `FetchPolicy`, registered into `AppStoreRegistry`.
+   `createMutableStore`) + `FetchPolicy`, and annotates the provider with `@StoreProvider` — codegen
+   does the registering.
 5. **Build / run**, then periodically run **`/kmp-project-template-sync`** to pull future white-label
    improvements from the upstream template without losing your fork's work.
 
@@ -545,7 +489,7 @@ See [Secrets Management Guide](docs/claude/secrets-management.md) for complete r
 - **Bundle ID:** authored in `app-profile/app.yaml#identity.app_id` (the single source of truth) — same value as the Android applicationId; `syncForkConfig` regenerates `fork.properties#app.id` + writes `gradle/libs.versions.toml#appId`, which the build reads. Edit it in app-profile — don't hand-edit fork.properties or the catalog.
 - **Min Version:** iOS 15.0, **Target:** iOS 17.0
 - **Code Signing:** Fastlane Match (adhoc for Firebase, appstore for TestFlight/App Store)
-- **Shared framework integration:** SwiftPM / XCFramework (`cmp-ios/Package.swift` binary target + the `[KMP] Embed and Sign ComposeApp XCFramework` Xcode Run-Script phase). No CocoaPods / Ruby pod toolchain.
+- **Shared framework integration:** SwiftPM / XCFramework (`cmp-ios/Package.swift` binary target + the `[KMP] Embed and Sign ComposeApp XCFramework` Xcode Run-Script phase). No Ruby package-manager toolchain.
 
 ### macOS
 - **Code Signing:** Manual keychain setup with .p12 certificates

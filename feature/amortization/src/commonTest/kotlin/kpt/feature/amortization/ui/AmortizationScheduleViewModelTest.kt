@@ -17,8 +17,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.LocalDate
 import kpt.core.base.store.screen.ScreenState
-import kpt.core.model.demo.banking.Loan
-import kpt.core.model.demo.banking.LoanKind
+import kpt.core.model.banking.Loan
+import kpt.core.model.banking.LoanKind
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Ignore

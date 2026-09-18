@@ -10,7 +10,7 @@
 # so its `ComposeApp.framework/composeResources/` directory is NOT present in the runtime `.app`.
 # But Compose Multiplatform's iOS resource reader resolves resources relative to the MAIN bundle:
 #     <App>.app/compose-resources/composeResources/<qualified.pkg>.generated.resources/<type>/<file>
-# With the CocoaPods integration removed (E6), the old `[CP] Copy Pods Resources` phase that used
+# Compose resources are copied by this script (there is no package-manager phase that would
 # to place them there is gone — so fonts/images silently never ship and the UI crashes on first
 # access with `org.jetbrains.compose.resources.MissingResourceException`. This phase restores that
 # copy: it takes the composeResources OUT of the flavor-matched framework slice that

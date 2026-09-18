@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">Alertes de prix</string>
+    <string name="screens_alerts_back_cd">Retour</string>
+    <string name="screens_alerts_create_cd">Créer une alerte</string>
+    <string name="screens_alerts_delete_cd">Supprimer l\'alerte</string>
+    <string name="screens_alerts_row_above">Au-dessus</string>
+    <string name="screens_alerts_row_below">En dessous</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% de variation</string>
+    <string name="screens_alert_create_title">Nouvelle alerte de prix</string>
+    <string name="screens_alert_create_back_cd">Retour</string>
+    <string name="screens_alert_create_coin_label">Crypto</string>
+    <string name="screens_alert_create_target_label">Prix cible</string>
+    <string name="screens_alert_create_dir_above">Au-dessus</string>
+    <string name="screens_alert_create_dir_below">En dessous</string>
+    <string name="screens_alert_create_submit">Créer une alerte</string>
+    <string name="screens_alert_create_draft_resume_title">Reprendre votre alerte ?</string>
+    <string name="screens_alert_create_draft_resume_message">Vous avez une alerte de prix non enregistrée. Reprenez la modification, supprimez-la ou créez-en une nouvelle.</string>
+    <string name="screens_alert_create_draft_resume_resume">Reprendre la modification</string>
+    <string name="screens_alert_create_draft_resume_discard">Supprimer le brouillon</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">Recommencer</string>
+</resources>

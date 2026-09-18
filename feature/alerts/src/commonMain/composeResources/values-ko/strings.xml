@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_alerts_title">가격 알림</string>
+    <string name="screens_alerts_back_cd">뒤로</string>
+    <string name="screens_alerts_create_cd">알림 만들기</string>
+    <string name="screens_alerts_delete_cd">알림 삭제</string>
+    <string name="screens_alerts_row_above">이상</string>
+    <string name="screens_alerts_row_below">이하</string>
+    <string name="screens_alerts_row_supporting">%1$s %2$s</string>
+    <string name="screens_alerts_row_pct_change">% 변동</string>
+    <string name="screens_alert_create_title">새 가격 알림</string>
+    <string name="screens_alert_create_back_cd">뒤로</string>
+    <string name="screens_alert_create_coin_label">코인</string>
+    <string name="screens_alert_create_target_label">목표 가격</string>
+    <string name="screens_alert_create_dir_above">이상</string>
+    <string name="screens_alert_create_dir_below">이하</string>
+    <string name="screens_alert_create_submit">알림 만들기</string>
+    <string name="screens_alert_create_draft_resume_title">알림을 이어서 작성할까요?</string>
+    <string name="screens_alert_create_draft_resume_message">저장하지 않은 가격 알림이 있습니다. 편집을 이어가거나 삭제하거나 새로 만드세요.</string>
+    <string name="screens_alert_create_draft_resume_resume">편집 이어가기</string>
+    <string name="screens_alert_create_draft_resume_discard">임시 저장 삭제</string>
+    <string name="screens_alert_create_draft_resume_start_fresh">새로 시작</string>
+</resources>

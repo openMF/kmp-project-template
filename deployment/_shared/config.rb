@@ -90,7 +90,25 @@ module AppProfile
   MAP = {
     # ── identity / app ──
     "app.id"                             => "identity.app_id",
+    # identity.app_name is authored in app-profile and documented (CLAUDE.md) as flowing to
+    # fork.properties#app.display.name → BuildKonfig.APP_DISPLAY_NAME, but had no MAP entry, so a
+    # properly-DERIVED bridge never carried it: feature/settings + core-base/ui silently fell back
+    # to "App" / "App Toolkit". Only a hand-authored fork.properties ever had the key.
+    "app.display.name"                   => "identity.app_name",
     "app.description"                    => "store.app_description",
+
+    # Per-flavor network endpoints + demo credentials + log tag. app.yaml documents these as flowing
+    # to gradle/fork.properties, and KMPFlavorsConventionPlugin reads them into per-flavor
+    # BuildConfig (BASE_URL / DEMO_USERNAME / DEMO_PASSWORD / LOG_TAG). They were mapped in Kotlin's
+    # APP_PROFILE_MAP but NOT here, so the pure-Ruby derive.rb path (used by CI and doctor's fast
+    # lane) produced a bridge missing them while syncForkConfig's produced one with them — two
+    # writers of one file with different coverage. Paths taken verbatim from the Kotlin map, which
+    # agreed with this one on all 113 shared keys.
+    "network.base.url.demo"              => "network.demo_base_url",
+    "network.base.url.prod"              => "network.prod_base_url",
+    "demo.username"                      => "network.demo_username",
+    "demo.password"                      => "network.demo_password",
+    "log.tag"                            => "network.log_tag",
     # ── org ──
     "org.name"                           => "org.name",
     "org.email"                          => "org.email",
@@ -136,6 +154,7 @@ module AppProfile
     "play.testers.closed.googlegroup"    => "android.play_testers.closed_googlegroup",
     # ── apple (shared iOS + macOS) ──
     "apple.team.id"                      => "apple.team_id",
+    "apple.app.store.id"                 => "apple.app_store_id",
     "apple.match.git.url"                => "apple.match.git.url",
     "apple.match.git.branch"             => "apple.match.git.branch",
     "firebase.ios.prod.app.id"           => "apple.firebase.ios_app_id_prod",
@@ -379,8 +398,8 @@ module FastlaneConfig
 
     BUILD_CONFIG = {
       scheme:                        "iosApp",
-      # E6 — the app opens as a plain `.xcodeproj` (SwiftPM/XCFramework); the CocoaPods
-      # `iosApp.xcworkspace` was removed, so `build_app` archives from `project:` below.
+      # E6 — the app opens as a plain `.xcodeproj` (SwiftPM/XCFramework); there is no
+      # generated `.xcworkspace`, so `build_app` archives from `project:` below.
       project_path:                  File.join(DEPLOYMENT_REPO_ROOT, "cmp-ios/iosApp.xcodeproj"),
       app_identifier:                ForkIdentity::APP_ID,
       team_id:                       ForkIdentity::IOS_TEAM_ID,
@@ -641,15 +660,25 @@ module FastlaneConfig
 
     # Read storeFile dynamically so forks can rename the keystore without
     # touching config.rb (storeFile key in upload_keystore.properties is canonical).
-    default_jks = "#{ks_dir}/#{props.fetch("storeFile", "upload_keystore.keystore")}"
+    # `fetch` only falls back when the key is ABSENT. secrets/LAYOUT.yaml can emit a `storeFile`
+    # key whose vault alias is unresolvable ("not resolvable from vault → skip"), leaving the key
+    # PRESENT but EMPTY — fetch then returns "" and this collapses to the bare directory:
+    #   Keystore file '.../secrets/live/android/keystores' not found for signing config 'release'
+    # which surfaces only after a full release build. Treat empty as absent (2026-09-04).
+    store_file_name = props["storeFile"].to_s.strip
+    store_file_name = "upload_keystore.keystore" if store_file_name.empty?
+    default_jks = "#{ks_dir}/#{store_file_name}"
+
+    # Resolved once, because the key password falls back to it (see below).
+    store_password = options[:keystore_password] ||
+                     ENV["KEYSTORE_PASSWORD"]    ||
+                     props["storePassword"]      || ""
 
     {
       keystore_path:     options[:keystore_path]     ||
                          ENV["KEYSTORE_PATH"]        ||
                          default_jks,
-      keystore_password: options[:keystore_password] ||
-                         ENV["KEYSTORE_PASSWORD"]    ||
-                         props["storePassword"]      || "",
+      keystore_password: store_password,
       # Honor BOTH env conventions: KEY_ALIAS (CI pre_fastlane_script) AND KEYSTORE_ALIAS
       # (build.gradle.kts + buildAndSignApp / vault materialization). props (upload_keystore.properties)
       # is the file source. The literal "release" is a LAST-RESORT default — it is WRONG for keystores
@@ -659,10 +688,17 @@ module FastlaneConfig
                          ENV["KEY_ALIAS"]            ||
                          ENV["KEYSTORE_ALIAS"]       ||
                          props["keyAlias"]           || "release",
+      # Falls back to the STORE password, never to "". A PKCS12 keystore has no separate
+      # key password — keytool discards `-keypass` at creation — so the store password IS
+      # the key password. Measured with jarsigner against a real PKCS12 keystore: signing
+      # succeeds when the key password is absent or equal to the store password, and FAILS
+      # ("key associated with <alias> not a private key") when it is empty or different.
+      # An empty default is therefore not a graceful degradation, it is one of the two
+      # failure values — and it fails only in CI, after the local build has gone green.
       key_password:      options[:key_password]      ||
                          ENV["KEY_PASSWORD"]         ||
                          ENV["KEYSTORE_ALIAS_PASSWORD"] ||
-                         props["keyPassword"]        || "",
+                         props["keyPassword"]        || store_password,
     }
   end
 end
@@ -751,19 +787,19 @@ def with_ios_preamble(options = {})
     end
   end
 
-  # E6 — SwiftPM/XCFramework, no CocoaPods. The iOS app links the Kotlin `ComposeApp`
+  # E6 — SwiftPM/XCFramework. The iOS app links the Kotlin `ComposeApp`
   # framework as an XCFramework (cmp-ios/Package.swift binary target) that the Xcode
   # `[KMP] Embed and Sign ComposeApp XCFramework` Run-Script build phase assembles +
   # signs + embeds on every archive (cmp-ios/scripts/embed-xcframework.sh). There is no
-  # `Podfile` / `pod install` / `cmp_shared.podspec` step anymore — the per-variant
+  # separate iOS dependency-install step — the per-variant
   # lanes assemble the XCFramework explicitly (see `assemble_ios_xcframework`) before
   # `build_app`, so a cold CI runner produces the framework the archive consumes.
 end
 
-# Assemble the Kotlin `ComposeApp` XCFramework for the given Xcode build type — the
-# SwiftPM/XCFramework replacement for `pod install`. Staging maps to the Release
-# XCFramework slice (mirrors the old cocoapods xcodeConfigurationToNativeBuildType:
-# only *Debug is debuggable). Registered by the `XCFramework("ComposeApp")` DSL in
+# Assemble the Kotlin `ComposeApp` XCFramework for the given Xcode build type.
+# Staging maps to the Release XCFramework slice (only *Debug is debuggable, matching
+# the flavor-aware mapping in cmp-ios/scripts/embed-xcframework.sh).
+# Registered by the `XCFramework("ComposeApp")` DSL in
 # cmp-shared/build.gradle.kts (assembleComposeApp{Debug,Release}XCFramework).
 def assemble_ios_xcframework(build_type = "release")
   xcf_type = build_type.to_s.downcase == "debug" ? "Debug" : "Release"
@@ -1350,8 +1386,8 @@ def build_ios_project(options = {})
   cfg = FastlaneConfig::IosConfig::BUILD_CONFIG
   build_app(
     scheme:           options[:scheme]        || cfg[:scheme],
-    # E6 — archive from the `.xcodeproj` (SwiftPM/XCFramework), NOT a CocoaPods
-    # `.xcworkspace` (removed). The `[KMP] Embed and Sign ComposeApp XCFramework`
+    # E6 — archive from the `.xcodeproj` (SwiftPM/XCFramework), not a generated
+    # `.xcworkspace`. The `[KMP] Embed and Sign ComposeApp XCFramework`
     # Run-Script phase builds + embeds the Kotlin framework during this archive.
     project:          options[:project]       || cfg[:project_path],
     configuration:    options[:configuration] || "Release",
@@ -1451,7 +1487,9 @@ def buildAndSignApp(taskName:, buildType: "Release", **signing_config)
   ENV["KEYSTORE_PATH"]           = keystore_abs
   ENV["KEYSTORE_PASSWORD"]       = signing_config[:keystore_password] || ENV["KEYSTORE_PASSWORD"] || ""
   ENV["KEYSTORE_ALIAS"]          = signing_config[:key_alias]         || ENV["KEYSTORE_ALIAS"] || "release"
-  ENV["KEYSTORE_ALIAS_PASSWORD"] = signing_config[:key_password]      || ENV["KEYSTORE_ALIAS_PASSWORD"] || ""
+  # Never "" — an empty key password is a measured signing FAILURE, not an unset value.
+  # PKCS12 has no separate key password, so the store password is the correct last resort.
+  ENV["KEYSTORE_ALIAS_PASSWORD"] = signing_config[:key_password]      || ENV["KEYSTORE_ALIAS_PASSWORD"] || ENV["KEYSTORE_PASSWORD"]
 
   # -p tells Gradle to use repo root as project dir, overriding whatever cwd
   # Fastlane sets (deployment/fastlane/) when running the lane. NO signing on the command line.

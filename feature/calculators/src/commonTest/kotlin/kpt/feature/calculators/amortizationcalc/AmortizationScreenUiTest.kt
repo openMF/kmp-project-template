@@ -12,7 +12,7 @@ package kpt.feature.calculators.amortizationcalc
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import kpt.core.designsystem.theme.KptTheme
 import kpt.feature.calculators.TestTags
 import kpt.feature.calculators.wizard.FakeLoanRepository
@@ -34,6 +34,7 @@ class AmortizationScreenUiTest {
     fun screenIsDisplayed() = runComposeUiTest {
         val viewModel = AmortizationViewModel(
             repository = FakeLoanRepository(),
+            calcRepository = FakeAmortizationCalcRepository(),
             loanId = null,
         )
         setContent {

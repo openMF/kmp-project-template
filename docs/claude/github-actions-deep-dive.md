@@ -305,9 +305,9 @@ steps:
 - `shared_module` - Shared module name (`cmp-shared`; the `ComposeApp` XCFramework producer)
 - `xcode_version` - Xcode version
 
-> The old CocoaPods toggle input is gone — since the E6 SwiftPM/XCFramework migration the
+> Since the E6 SwiftPM/XCFramework migration the
 > iOS job assembles the Kotlin `ComposeApp` XCFramework via Gradle and archives the plain
-> `.xcodeproj` (no CocoaPods step).
+> `.xcodeproj` (no dependency-install step).
 
 **Secrets:**
 - `appstore_key_id` - App Store Connect API key ID
@@ -343,7 +343,7 @@ steps:
 
   # 5. Run Fastlane lane — the lane calls `assemble_ios_xcframework`, which runs
   #    `./gradlew :cmp-shared:assembleComposeApp{Debug,Release}XCFramework` and then
-  #    `build_app` archives cmp-ios/iosApp.xcodeproj (no CocoaPods step).
+  #    `build_app` archives cmp-ios/iosApp.xcodeproj (no dependency-install step).
   - run: bundle exec fastlane ios deploy_on_firebase
 
   # 6. Clean up secrets
@@ -760,7 +760,7 @@ gh secret set KEYSTORE_FILE < keystores/original-release-key.jks.b64
 
 **Kotlin/Native + SwiftPM Caching (iOS):**
 
-Since the E6 SwiftPM/XCFramework migration there is no CocoaPods `Pods/` directory or
+Since the E6 SwiftPM/XCFramework migration there is no vendored dependency directory or
 lockfile to cache. The iOS job caches the Kotlin/Native (`konan`) toolchain + the resolved
 SwiftPM packages instead — the actionhub `pr-check-v2` iOS job already does this:
 

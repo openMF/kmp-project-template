@@ -52,6 +52,7 @@ fun SettingsDemoBody(
     onSyncAndDraftsClick: () -> Unit,
     modifier: Modifier = Modifier,
     devMenuEntries: List<DevMenuEntry> = emptyList(),
+    onRateAppClick: (() -> Unit)? = null,
 ) {
     val analyticsHelper = rememberAnalyticsHelper()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
@@ -106,6 +107,16 @@ fun SettingsDemoBody(
         },
         onSyncAndDraftsClick = onSyncAndDraftsClick,
         onFooterLongClick = onFooterLongClick,
+        // Resolved by the CALLER, not injected here. This body is a pure-UI composable — its UI
+        // test renders it directly with no Koin application started — so a `koinInject` inside it
+        // turns every such render into "KoinApplication has not been started". cmp-navigation's
+        // BackboneRegistry supplies this, where the app shell already resolves managers.
+        onRateAppClick = onRateAppClick?.let { rate ->
+            {
+                analyticsHelper.logRateAppRequested()
+                rate()
+            }
+        },
     )
 
     TrackScreenView(screenName = "SettingsScreen")
@@ -151,6 +162,13 @@ private fun AnalyticsHelper.logSettingsDialogVisible(visible: Boolean) {
         type = "settings_dialog_visible",
         params = mapOf("visible" to visible.toString()),
     )
+}
+
+private fun AnalyticsHelper.logRateAppRequested() {
+    // Logged at the TAP, not on a resulting review submission — neither Play nor StoreKit reports
+    // whether the user actually left a review, by design. Reading this metric as a review count
+    // would overstate it.
+    logEvent(type = "rate_app_requested", params = emptyMap())
 }
 
 private fun AnalyticsHelper.logLanguageDialogVisible(visible: Boolean) {

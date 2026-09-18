@@ -12,6 +12,7 @@ package kpt.core.base.store.screen
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.networkStatusDebouncedState
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlinx.coroutines.CoroutineScope
@@ -304,6 +305,16 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     reconnectDebounceMs: Long = DEFAULT_RECONNECT_DEBOUNCE_MS,
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
     ttl: Duration = 24.hours,
+    // The SWR band gate's time source. Defaulted, so no production call site changes.
+    //
+    // It exists because the band is computed from the DRIFT between two real-clock reads: the mapper
+    // stamps `lastFetchInstant = Clock.System.now()` on the first cache emission, and this gate then
+    // reads `now()` again. With a small `ttl` the whole outcome hinges on whether the clock happened
+    // to tick in between — `age == 0` lands on `age <= ttl` -> Fresh and no revalidation fires. That
+    // made `CacheFirstSwrTest.staleBandTriggersBackgroundSwap` pass on desktop/iOS/JS by luck and
+    // hang on wasm/node, whose clock does not tick in that window. A test can now pin the instant
+    // instead of hoping for drift.
+    clock: Clock = Clock.System,
 ): ScreenDataStream<Output> {
     // Single debounced NetworkStatus StateFlow shared by reconnect trigger, screen state,
     // and freshness combine. When reconnectDebounceMs > 0, transient WiFi↔Cell handoffs
@@ -417,7 +428,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     // That path drives the fetcher AND writes the SourceOfTruth; the base
     // storeFlow (built on `cached(key, refresh = false)`, see
     // `streamDataForPolicy`) continuously observes the SoT and re-emits the
-    // swapped-in fresh value automatically. See `RoomChangeBusSwrTest` for the
+    // swapped-in fresh value automatically. See `SourceOfTruthReEmissionSwrTest` for the
     // invariant this fix relies on: a SoT write DOES re-fan-out through an
     // already-open `cached(refresh = false)` subscription.
     //
@@ -440,7 +451,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             var lastBand: FreshnessBand? = null
             storeFlow.collect { storeData ->
                 val band = FreshnessBands.bandFor(
-                    now = kotlin.time.Clock.System.now(),
+                    now = clock.now(),
                     lastSyncedAt = storeData.fetchedAtInstant,
                     ttl = ttl,
                     lastError = storeData.error,
@@ -554,6 +565,16 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
     reconnectDebounceMs: Long = DEFAULT_RECONNECT_DEBOUNCE_MS,
     userRefreshDebounceMs: Long = DEFAULT_USER_REFRESH_DEBOUNCE_MS,
     ttl: Duration = 24.hours,
+    // The SWR band gate's time source. Defaulted, so no production call site changes.
+    //
+    // It exists because the band is computed from the DRIFT between two real-clock reads: the mapper
+    // stamps `lastFetchInstant = Clock.System.now()` on the first cache emission, and this gate then
+    // reads `now()` again. With a small `ttl` the whole outcome hinges on whether the clock happened
+    // to tick in between — `age == 0` lands on `age <= ttl` -> Fresh and no revalidation fires. That
+    // made `CacheFirstSwrTest.staleBandTriggersBackgroundSwap` pass on desktop/iOS/JS by luck and
+    // hang on wasm/node, whose clock does not tick in that window. A test can now pin the instant
+    // instead of hoping for drift.
+    clock: Clock = Clock.System,
 ): ScreenDataStream<Output> {
     val networkStatusFlow: StateFlow<NetworkStatus> = if (reconnectDebounceMs > 0L) {
         networkMonitor.networkStatusDebouncedState(scope, reconnectDebounceMs)
@@ -666,7 +687,7 @@ fun <Key : Any, Output : Any> Store<Key, Output>.asScreenStream(
             var lastBand: FreshnessBand? = null
             storeFlow.collect { storeData ->
                 val band = FreshnessBands.bandFor(
-                    now = kotlin.time.Clock.System.now(),
+                    now = clock.now(),
                     lastSyncedAt = storeData.fetchedAtInstant,
                     ttl = ttl,
                     lastError = storeData.error,

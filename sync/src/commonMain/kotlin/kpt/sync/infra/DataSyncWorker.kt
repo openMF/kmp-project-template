@@ -20,8 +20,8 @@ import kotlinx.coroutines.coroutineScope
 import kpt.core.base.data.infra.Synchronizer
 import kpt.core.base.datastore.infra.ChangeListVersions
 import kpt.core.base.datastore.infra.SyncStatePersister
-import kpt.core.data.demo.currency.CurrencyRepository
-import kpt.core.data.demo.economic.MacroIndicatorsRepository
+import kpt.core.data.currency.CurrencyRepository
+import kpt.core.data.economic.MacroIndicatorsRepository
 
 /**
  * Single data-sync worker. Implements [Synchronizer] so its two [Syncable]

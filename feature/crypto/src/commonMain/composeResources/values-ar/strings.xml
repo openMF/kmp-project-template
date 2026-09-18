@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">أسواق العملات</string>
+    <string name="screens_crypto_coin_markets_back_cd">رجوع</string>
+    <string name="screens_crypto_coin_markets_empty">لا توجد عملات لعرضها بعد.</string>
+    <string name="screens_crypto_coin_markets_error_retry">أعد المحاولة</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">جارٍ تحميل المزيد…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">لقد اطّلعت على كل شيء</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">السعر الحالي</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">تغيّر 24 ساعة</string>
+    <string name="screens_crypto_coin_detail_back_cd">رجوع</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">تحديث</string>
+    <string name="screens_crypto_coin_detail_rank_label">ترتيب القيمة السوقية</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">القيمة السوقية</string>
+    <string name="screens_crypto_coin_detail_high_label">أعلى سعر خلال 24 ساعة</string>
+    <string name="screens_crypto_coin_detail_low_label">أدنى سعر خلال 24 ساعة</string>
+    <string name="screens_crypto_coin_detail_circulating_label">المعروض المتداول</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">الحد الأقصى للمعروض</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">غير محدود</string>
+    <string name="screens_crypto_coin_detail_about_label">نبذة</string>
+</resources>

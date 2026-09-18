@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_crypto_coin_markets_title">Pasar koin</string>
+    <string name="screens_crypto_coin_markets_back_cd">Kembali</string>
+    <string name="screens_crypto_coin_markets_empty">Belum ada koin untuk ditampilkan.</string>
+    <string name="screens_crypto_coin_markets_error_retry">Coba lagi</string>
+    <string name="screens_crypto_coin_markets_load_more_loading">Memuat lainnya…</string>
+    <string name="screens_crypto_coin_markets_load_more_end">Anda sudah melihat semuanya</string>
+    <string name="screens_crypto_coin_markets_row_price_cd">Harga saat ini</string>
+    <string name="screens_crypto_coin_markets_row_change_cd">Perubahan 24 jam</string>
+    <string name="screens_crypto_coin_detail_back_cd">Kembali</string>
+    <string name="screens_crypto_coin_detail_refresh_cd">Segarkan</string>
+    <string name="screens_crypto_coin_detail_rank_label">Peringkat kapitalisasi pasar</string>
+    <string name="screens_crypto_coin_detail_rank_value">#%1$d</string>
+    <string name="screens_crypto_coin_detail_market_cap_label">Kapitalisasi pasar</string>
+    <string name="screens_crypto_coin_detail_high_label">Tertinggi 24j</string>
+    <string name="screens_crypto_coin_detail_low_label">Terendah 24j</string>
+    <string name="screens_crypto_coin_detail_circulating_label">Pasokan beredar</string>
+    <string name="screens_crypto_coin_detail_max_supply_label">Pasokan maksimum</string>
+    <string name="screens_crypto_coin_detail_max_supply_unlimited">Tak terbatas</string>
+    <string name="screens_crypto_coin_detail_about_label">Tentang</string>
+</resources>

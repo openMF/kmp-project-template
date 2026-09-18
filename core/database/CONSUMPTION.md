@@ -14,7 +14,8 @@
    `deleteById` / `deleteAll` — mirror `LoanDao`.
 3. **Register both** on `AppDatabase` (`@Database(entities = [...])` + `abstract val yourDao: YourDao`)
    and expose the DAO singleton in `DatabaseModule` (`single { get<AppDatabase>().yourDao }`).
-4. **Wrap DAO reads in `daoFlow(TABLE) { dao.observeAll() }`** (from `core-base/database`) inside the
+4. **Expose DAO reads as plain Room `Flow`s** — Room's `InvalidationTracker` re-emits to live
+   collectors after a write on every target, web included. Inside the
    store's `SourceOfTruth.reader` so wasmJs collectors re-emit after writes despite Room 3 alpha's
    async InvalidationTracker (no-op on Android/Desktop/iOS).
 

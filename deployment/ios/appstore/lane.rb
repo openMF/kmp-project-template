@@ -156,9 +156,8 @@ platform :ios do
     setup_ci_if_needed
     load_api_key(options)
 
-    # E6 — assemble the Kotlin `ComposeApp` XCFramework (SwiftPM/XCFramework; the
-    # CocoaPods-free replacement for the old pod-install step) before the
-    # `iosApp.xcodeproj` archive. Staging → Release slice.
+    # E6 — assemble the Kotlin `ComposeApp` XCFramework (SwiftPM/XCFramework) before
+    # the `iosApp.xcodeproj` archive. Staging → Release slice.
     assemble_ios_xcframework(build_ty.to_s)
 
     fetch_certificates_with_match(options.merge(match_type: "appstore"))

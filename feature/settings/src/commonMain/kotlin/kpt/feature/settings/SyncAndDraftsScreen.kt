@@ -209,7 +209,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.draftSection(
 }
 
 @Composable
-private fun DraftRow(record: DraftRecord, onRetry: (() -> Unit)?, onDiscard: () -> Unit) {
+internal fun DraftRow(record: DraftRecord, onRetry: (() -> Unit)?, onDiscard: () -> Unit) {
     val sp = MaterialTheme.spacing
     AppCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxWidth().padding(sp.md), verticalArrangement = Arrangement.spacedBy(sp.xs)) {
@@ -258,7 +258,7 @@ private fun DraftRow(record: DraftRecord, onRetry: (() -> Unit)?, onDiscard: () 
 }
 
 @Composable
-private fun StatusChip(status: SubmitOutboxStatus) {
+internal fun StatusChip(status: SubmitOutboxStatus) {
     val (labelRes, container, content) = when (status) {
         SubmitOutboxStatus.FAILED -> Triple(
             Res.string.feature_settings_sync_drafts_status_failed,
@@ -286,7 +286,7 @@ private fun StatusChip(status: SubmitOutboxStatus) {
 }
 
 @Composable
-private fun LoadingState() {
+internal fun LoadingState() {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -297,7 +297,7 @@ private fun LoadingState() {
 }
 
 @Composable
-private fun EmptyState() {
+internal fun EmptyState() {
     val sp = MaterialTheme.spacing
     Column(
         modifier = Modifier.fillMaxSize().padding(sp.lg),
@@ -359,7 +359,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.conflictSection(
 }
 
 @Composable
-private fun ConflictRowCard(
+internal fun ConflictRowCard(
     conflict: ConflictEntry,
     onAcceptServer: (String) -> Unit,
     onRetryLocal: (String) -> Unit,

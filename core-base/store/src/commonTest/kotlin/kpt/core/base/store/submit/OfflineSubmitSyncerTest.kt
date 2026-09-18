@@ -196,4 +196,69 @@ class OfflineSubmitSyncerTest {
                 "OnlineOrCaptivePortal must retry on captive portal (assumes portal signed in)",
             )
         }
+
+    // ─── RetryPolicy is APPLIED (v14+) ────────────────────────────────────────
+    //
+    // Before this, OfflineSubmitSyncer accepted a RetryPolicy and ignored it — every PENDING entry
+    // fired once per reconnect with no backoff and no attempt cap, so a caller passing
+    // `RetryPolicy(maxAttempts = 5)` got none of it. These lock the wiring.
+
+    @Test
+    fun `entry at maxAttempts is failed permanently and never re-submitted`() =
+        runTest(UnconfinedTestDispatcher()) {
+            val outbox = FakeSubmitOutbox<String>()
+            val id = outbox.save(formKey, "payload")
+            // Simulate three prior failed cycles — the default policy allows 3 attempts.
+            outbox.seedAttemptCount(id, 3)
+
+            val networkStatus = MutableStateFlow<NetworkStatus>(NetworkStatus.Unavailable)
+            var submitCount = 0
+
+            backgroundScope.offlineSubmitSyncer<String, Unit>(
+                outbox = outbox,
+                networkStatusFlow = networkStatus,
+                submitBlock = { submitCount++ },
+                retryPolicy = RetryPolicy(maxAttempts = 3),
+            ).start()
+
+            networkStatus.value = onlineWifi
+
+            assertEquals(0, submitCount, "an entry past its attempt cap must NOT be re-submitted")
+            assertTrue(outbox.getAllPending().isEmpty(), "it must be terminally FAILED, not left PENDING")
+        }
+
+    @Test
+    fun `backoff delays the retry by the policy interval`() = runTest(UnconfinedTestDispatcher()) {
+        val outbox = FakeSubmitOutbox<String>()
+        val id = outbox.save(formKey, "payload")
+        // One prior attempt → the next retry waits delayFor(1) == initialDelayMs (jitter disabled).
+        outbox.seedAttemptCount(id, 1)
+
+        val networkStatus = MutableStateFlow<NetworkStatus>(NetworkStatus.Unavailable)
+        var submitCount = 0
+
+        backgroundScope.offlineSubmitSyncer<String, Unit>(
+            outbox = outbox,
+            networkStatusFlow = networkStatus,
+            submitBlock = { submitCount++ },
+            retryPolicy = RetryPolicy(maxAttempts = 3, initialDelayMs = 5_000L, jitterFraction = 0.0),
+        ).start()
+
+        val before = testScheduler.currentTime
+        networkStatus.value = onlineWifi
+
+        // The backoff `delay` suspends the collector, so the retry has NOT run yet — that suspension
+        // is the behaviour under test. Before the fix there was no delay and the submit landed
+        // synchronously here.
+        assertEquals(0, submitCount, "retry must not fire before the backoff elapses")
+
+        testScheduler.advanceTimeBy(6_000L)
+        testScheduler.runCurrent()
+        assertEquals(1, submitCount, "the entry is still within its attempt cap, so it retries")
+        assertTrue(
+            testScheduler.currentTime - before >= 5_000L,
+            "retry must wait the policy backoff; virtual time advanced only " +
+                "${testScheduler.currentTime - before}ms",
+        )
+    }
 }

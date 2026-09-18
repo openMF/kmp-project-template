@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_cloudtodo_detail_title">云端待办</string>
+    <string name="screens_cloudtodo_detail_intro">这是 createMutableStore + MutationGateway 的唯一使用方。关闭网络即可看到离线分支。</string>
+    <string name="screens_cloudtodo_toggle_optimistic_text">切换（乐观更新）</string>
+    <string name="screens_cloudtodo_complete_online_text">完成（需要联网）</string>
+    <string name="screens_cloudtodo_outcome_resolve_text">解决冲突</string>
+    <string name="screens_cloudtodo_outcome_dismiss_text">忽略</string>
+    <string name="screens_cloudtodo_status_completed">已完成</string>
+    <string name="screens_cloudtodo_status_not_completed">未完成</string>
+    <string name="screens_cloudtodo_outcome_applied_local_title">已在本地应用</string>
+    <string name="screens_cloudtodo_outcome_applied_local_body">Room 优先写入。网络同步已排队，重新连接后会重试。</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_title">已应用 · 已同步</string>
+    <string name="screens_cloudtodo_outcome_applied_synced_body">服务器已确认此次写入。</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_title">已应用 · 已排队</string>
+    <string name="screens_cloudtodo_outcome_applied_queued_body">已在本地写入；同步已排队，恢复连接后会重试。</string>
+    <string name="screens_cloudtodo_outcome_blocked_title">已阻止</string>
+    <string name="screens_cloudtodo_outcome_blocked_offline">离线 — 需要联网的写入会直接拒绝，而不会写入本地。未写入任何内容。</string>
+    <string name="screens_cloudtodo_outcome_blocked_unauthenticated">此操作未通过身份验证。未写入任何内容。</string>
+    <string name="screens_cloudtodo_outcome_blocked_precondition">写入前服务器前置条件校验失败。未写入任何内容。</string>
+    <string name="screens_cloudtodo_outcome_conflicted_title">已记录冲突</string>
+    <string name="screens_cloudtodo_outcome_conflicted_body">服务器也修改了这条记录。已应用服务器版本并保留了你的版本 — 请选择以哪个为准。</string>
+    <string name="screens_cloudtodo_outcome_failed_title">失败</string>
+    <string name="screens_cloudtodo_outcome_failed_rolled_back">%1$s — 已回滚乐观的本地写入。</string>
+    <string name="screens_cloudtodo_outcome_failed_kept">%1$s — 已保留本地状态。</string>
+    <string name="screens_cloudtodo_conflicts_title">同步冲突</string>
+    <string name="screens_cloudtodo_conflicts_empty_text">没有未解决的冲突。</string>
+    <string name="screens_cloudtodo_conflict_accept_server_text">保留服务器版本</string>
+    <string name="screens_cloudtodo_conflict_retry_local_text">重试我的版本</string>
+</resources>

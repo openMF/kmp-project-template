@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_amortization_schedule_title">График платежей</string>
+    <string name="screens_amortization_schedule_back_cd">Назад</string>
+    <string name="screens_amortization_schedule_header_month">№</string>
+    <string name="screens_amortization_schedule_header_principal">Основной долг</string>
+    <string name="screens_amortization_schedule_header_interest">Проценты</string>
+    <string name="screens_amortization_schedule_header_balance">Остаток</string>
+    <string name="screens_amortization_schedule_summary_title">Сводка</string>
+    <string name="screens_amortization_schedule_summary_total_payments">Всего платежей</string>
+    <string name="screens_amortization_schedule_summary_total_principal">Всего основного долга</string>
+    <string name="screens_amortization_schedule_summary_total_interest">Всего процентов</string>
+</resources>

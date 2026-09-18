@@ -24,7 +24,6 @@
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
-		CAFE001F00000000000000A1 /* iOSApp.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = iOSApp.xcconfig; sourceTree = "<group>"; };
 		CAFE001F00000000000000D1 /* demoDebug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = demoDebug.xcconfig; sourceTree = "<group>"; };
 		CAFE001F00000000000000D2 /* demoStaging.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = demoStaging.xcconfig; sourceTree = "<group>"; };
 		CAFE001F00000000000000D3 /* demoRelease.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = demoRelease.xcconfig; sourceTree = "<group>"; };
@@ -96,7 +95,6 @@
 		CAFE001F00000000000000A2 /* Configs */ = {
 			isa = PBXGroup;
 			children = (
-				CAFE001F00000000000000A1 /* iOSApp.xcconfig */,
 				CAFE001F00000000000000D1 /* demoDebug.xcconfig */,
 				CAFE001F00000000000000D2 /* demoStaging.xcconfig */,
 				CAFE001F00000000000000D3 /* demoRelease.xcconfig */,
@@ -191,13 +189,16 @@
 			files = (
 			);
 			inputFileListPaths = (
+				"$(SRCROOT)/kotlin-sources.xcfilelist",
 			);
 			inputPaths = (
+				"$(SRCROOT)/scripts/embed-xcframework.sh",
 			);
 			name = "[KMP] Embed and Sign ComposeApp XCFramework";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(SRCROOT)/../cmp-shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)/ComposeApp.framework/ComposeApp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -212,11 +213,14 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/scripts/copy-compose-resources.sh",
+				"$(SRCROOT)/../cmp-shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)/ComposeApp.framework/composeResources",
 			);
 			name = "[KMP] Copy Compose Resources";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(WRAPPER_NAME)/compose-resources",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -30,6 +30,9 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 /**
@@ -54,8 +57,8 @@ import kotlin.time.ExperimentalTime
  * rather than inventing new ones so the canary matches how production ViewModels
  * consume the API. Stores that need to observe the SoT-re-emission invariant
  * (AC-2) are built with a `MutableStateFlow`-backed [SourceOfTruth] reader —
- * the same shape [RoomChangeBusSwrTest] uses to simulate the DAO Flow /
- * `RoomChangeBus` production contract, hermetic to `core-base/store`.
+ * the same shape [SourceOfTruthReEmissionSwrTest] uses to simulate the DAO Flow /
+ * Room's InvalidationTracker production contract, hermetic to `core-base/store`.
  */
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTime::class)
 class CacheFirstSwrTest {
@@ -193,13 +196,15 @@ class CacheFirstSwrTest {
         //       suppresses re-fires while the band remains stale (no thrash)
         //
         // Uses a SoT-backed store (MutableStateFlow reader/writer, matching
-        // `RoomChangeBusSwrTest`) so the fresh() SoT write actually propagates
+        // `SourceOfTruthReEmissionSwrTest`) so the fresh() SoT write actually propagates
         // to the base subscription — the mechanism the fix relies on.
         //
-        // Forces staleness with `ttl = 0.milliseconds`: any positive real-clock
-        // drift between the base flow's first cache emission and the band-gate
-        // check pushes `age` past `ttl * 3`, so the band computes VeryStale on
-        // the very first emission and the edge triggers immediately.
+        // Staleness is PINNED, not raced. The band is computed from the drift between two
+        // real-clock reads — the mapper stamps `lastFetchInstant = Clock.System.now()` on the first
+        // cache emission, the gate reads `now()` again — so with `ttl = 0` the outcome depended on
+        // whether the clock ticked in between. It usually did on desktop/iOS/JS and never did on
+        // wasm/node, where this test hung. Handing the gate a clock an hour ahead makes `age` about
+        // an hour against a 5-minute ttl: VeryStale by arithmetic, on every platform.
 
         val sotState = MutableStateFlow<List<String>>(listOf("stale-cached"))
         var fetchCount = 0
@@ -230,7 +235,12 @@ class CacheFirstSwrTest {
             fetchPolicy = FetchPolicy.CACHE_FIRST_SWR,
             reconnectDebounceMs = 0L, // suppress reconnect refresh path
             userRefreshDebounceMs = 0L,
-            ttl = 0.milliseconds, // force stale band on first emission
+            ttl = 5.minutes,
+            clock = object : Clock {
+                // An hour ahead of whatever the mapper stamps, so age >> ttl * 3 regardless of the
+                // platform's clock granularity.
+                override fun now(): Instant = Clock.System.now() + 1.hours
+            },
         )
 
         stream.state.test {

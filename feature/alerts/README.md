@@ -7,7 +7,7 @@ Price alerts — list plus a create form, the toolkit's canonical `submit_offlin
   `AlertsRepository.alertsStream` (OFFLINE_LOCAL_ONLY read side); `AlertCreateViewModel` —
   extends `BaseMutationViewModel` in `MutationMode.Draft`, persisting the draft to the
   `framework_submit_drafts` outbox (`SubmitOutbox<PriceAlert>`, DI-qualified
-  `OutboxQualifiers.PriceAlert`) before it hits the repository, so an offline submit survives
+  `DemoOutboxQualifiers.PriceAlert`) before it hits the repository, so an offline submit survives
   and retries via `OfflineSubmitSyncer`.
 - **Routes:** `AlertsGraphRoute` (root) → `AlertsListRoute` (start) → `AlertCreateRoute`.
   Entry point: `NavController.navigateToAlertsGraph()`.

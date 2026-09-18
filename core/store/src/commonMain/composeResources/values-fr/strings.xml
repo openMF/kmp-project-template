@@ -23,5 +23,9 @@
     <string name="error_category_auth">Votre session a expiré. Veuillez vous reconnecter.</string>
     <string name="error_category_ratelimit">Trop de requêtes. Veuillez patienter et réessayer.</string>
     <string name="error_category_server">Nos serveurs rencontrent un problème. Réessayez bientôt.</string>
+    <string name="error_category_timeout_connect">Délai de connexion dépassé. Vérifiez votre connexion et réessayez.</string>
+    <string name="error_category_timeout_read">Le serveur a mis trop de temps à répondre. Réessayez sous peu.</string>
+    <string name="error_category_quota">Quota atteint. Passez à une offre supérieure ou patientez.</string>
+    <string name="error_category_client">Échec de la requête. Veuillez réessayer.</string>
     <string name="error_category_generic">Une erreur est survenue</string>
 </resources>

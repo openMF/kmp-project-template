@@ -17,6 +17,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.amortization.navigation.AmortizationScheduleRoute
@@ -41,6 +42,7 @@ fun NavController.navigateToLoans(navOptions: NavOptions? = null) {
     navigate(route = LoansGraphRoute, navOptions = navOptions)
 }
 
+@FeatureDestination
 fun NavGraphBuilder.loansGraph(navController: NavController) {
     navigation<LoansGraphRoute>(startDestination = PersonalLoansListRoute) {
         composableWithPushTransitions<PersonalLoansListRoute> {

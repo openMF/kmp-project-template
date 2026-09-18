@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright 2026 Mifos Initiative
+
+    This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+    If a copy of the MPL was not distributed with this file,
+    You can obtain one at https://mozilla.org/MPL/2.0/.
+
+    See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+-->
+<resources>
+    <string name="screens_emicalculator_title">Máy tính trả góp</string>
+    <string name="screens_emicalculator_back_cd">Quay lại</string>
+    <string name="screens_emicalculator_principal_label">Số tiền gốc</string>
+    <string name="screens_emicalculator_rate_label">Lãi suất năm (%)</string>
+    <string name="screens_emicalculator_tenure_label">Kỳ hạn (tháng)</string>
+    <string name="screens_emicalculator_monthly_emi_label">Trả góp hằng tháng</string>
+    <string name="screens_emicalculator_total_payment_label">Tổng thanh toán</string>
+    <string name="screens_emicalculator_total_interest_label">Tổng lãi</string>
+</resources>

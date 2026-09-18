@@ -15,6 +15,13 @@ plugins {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(projects.core.data)
+            implementation(projects.core.model)
+            implementation(projects.core.store)
+            // koinNavViewModel(), imported aliased as `retainedKoinViewModel` — same contract
+            // as feature/home's demo body.
+            implementation(libs.koin.compose.navigation)
+
             implementation(compose.ui)
             implementation(compose.foundation)
             implementation(compose.material3)

@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kmp.library.convention)
     alias(libs.plugins.cmp.feature.convention)
     alias(libs.plugins.kmp.koin.convention)
+    id("org.convention.feature.aggregate")
 }
 
 kotlin {
@@ -34,6 +35,9 @@ kotlin {
             // is warranted for a security module the shell itself assembles. Feature modules NEVER
             // depend on core-base — enforced by the encapsulation gate (Phase A).
             implementation(projects.coreBase.security)
+            // KptRootScaffold's snackbarHost slot defaults to KptToastHost, so the app-wide
+            // transient-message surface exists without every screen wiring one.
+            implementation(projects.coreBase.designsystem)
 
             // Backbone shell features (template-owned) — always present in every fork.
             implementation(projects.feature.home)

@@ -35,11 +35,53 @@ enum class AccessPointKind {
 data class AccessPoint(
     val id: String,
     val kind: AccessPointKind,
+    /**
+     * ORIGIN only — scheme + host, ending at the first `/` (`https://sandbox.mifos.community/`).
+     *
+     * Split from [basePath] because they change for different reasons and at different times. The
+     * origin is what a fork swaps (sandbox -> production, or a per-flavour host) and what
+     * [DynamicBaseUrlPlugin] rewrites per [UrlType] at runtime; the path is a property of the API
+     * itself and travels with the endpoint. Keeping them in one string meant a fork could not
+     * repoint the host without also copying the vendor's path — and a runtime host swap silently
+     * dropped it.
+     */
     val baseUrl: String,
+    /**
+     * API path under [baseUrl] (`fineract-provider/api/v1/`). Empty when the API lives at the root.
+     *
+     * Joined to the origin exactly once, with a single `/` between, so neither side has to be
+     * careful about trailing slashes.
+     */
+    val basePath: String = "",
     val loggableHost: String,
     val proxiedHost: String? = null,
     val type: UrlType = UrlType(id.uppercase()),
-)
+    /**
+     * Headers sent on every request to this endpoint, declared in
+     * `app-profile/app.yaml#network.access_points[].headers[]`. Static values are baked in; a
+     * `runtimeKey` header takes its value from [RuntimeHeaderStore] at request time (login, OAuth).
+     */
+    val headers: List<HeaderSpec> = emptyList(),
+    /**
+     * How this endpoint authenticates. Declaring it makes the `Authorization` header automatic —
+     * the generator emits its spec and the auth bridge fills the value in the right wire format, so
+     * no call site formats a credential by hand.
+     */
+    val auth: AuthScheme = AuthScheme.NONE,
+) {
+    /**
+     * The URL requests are actually made against — [baseUrl] + [basePath], normalised.
+     *
+     * Ktor resolves a relative request path against this, so the trailing slash matters: without it
+     * the last segment is replaced rather than appended, and `offices` would hit
+     * `…/api/offices` instead of `…/api/v1/offices`.
+     */
+    val effectiveUrl: String
+        get() = when {
+            basePath.isBlank() -> baseUrl
+            else -> baseUrl.trimEnd('/') + "/" + basePath.trim('/') + "/"
+        }
+}
 
 /**
  * Template registry MECHANISM over a fork-provided list of [points].
@@ -57,7 +99,7 @@ class AccessPointRegistry(val points: List<AccessPoint>) {
 
     /** Resolve the REST base URL registered for [type], or `null` if none is declared. */
     fun restBaseUrl(type: UrlType): String? =
-        points.firstOrNull { it.type == type && it.kind == AccessPointKind.REST }?.baseUrl
+        points.firstOrNull { it.type == type && it.kind == AccessPointKind.REST }?.effectiveUrl
 
     /** Every declared Supabase access point, in registry order. Empty if none declared. */
     fun supabasePoints(): List<AccessPoint> =

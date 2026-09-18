@@ -1,7 +1,7 @@
 import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import java.util.Properties
+import org.convention.forkPropFirst
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -46,6 +46,7 @@ kotlin {
                 implementation(projects.core.database)
                 implementation(projects.core.model)
                 implementation(projects.core.datastore)
+                implementation(projects.coreBase.datastore)
 
                 implementation(compose.runtime)
                 implementation(compose.ui)
@@ -58,6 +59,7 @@ kotlin {
                 implementation(libs.multiplatform.settings.coroutines)
 
                 implementation(libs.koin.core)
+                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.client.js)
             }
         }
@@ -85,22 +87,13 @@ val webTitleSuffix = activeFlavorConfig?.webTitleSuffix?.orNull ?: ""
 // index.html link-preview / SEO meta is white-labelled from the app-profile store SoT, materialized to
 // gradle/fork.properties by syncForkConfig (task `syncForkConfig`). Without this the template's
 // mobile-wallet og:image URLs + "Kotlin Multiplatform Template" copy ship on every fork's web build.
-val forkProps = Properties()
-rootProject.file("gradle/fork.properties").let { f ->
-    if (f.exists()) f.inputStream().use { s -> forkProps.load(s) }
-}
-fun forkProp(vararg keys: String): String {
-    for (k in keys) {
-        val v = forkProps.getProperty(k)
-        if (!v.isNullOrBlank()) return v
-    }
-    return ""
-}
-val webDescription = forkProp("store.android.short.description", "store.subtitle").ifBlank { appDisplayName }
-val webKeywords    = forkProp("store.ios.keywords", "store.macos.keywords")
-val webCopyright   = forkProp("store.copyright", "org.copyright").ifBlank { appDisplayName }
-val webAuthor      = forkProp("org.name", "store.copyright").ifBlank { appDisplayName }
-val webUrl         = forkProp("web.custom.domain", "org.marketing.url", "org.support.url")
+// Read through the ONE Gradle-side reader (org.convention.ForkProperties). `forkPropFirst` keeps
+// this file's first-non-blank-wins semantics: each value has an ordered list of source keys.
+val webDescription = forkPropFirst("store.android.short.description", "store.subtitle").ifBlank { appDisplayName }
+val webKeywords    = forkPropFirst("store.ios.keywords", "store.macos.keywords")
+val webCopyright   = forkPropFirst("store.copyright", "org.copyright").ifBlank { appDisplayName }
+val webAuthor      = forkPropFirst("org.name", "store.copyright").ifBlank { appDisplayName }
+val webUrl         = forkPropFirst("web.custom.domain", "org.marketing.url", "org.support.url")
 val webOgImage     = "./og-image.png"   // materialized by syncForkConfig from app-profile/platforms/web/media
 
 tasks.matching { it.name == "jsProcessResources" || it.name == "wasmJsProcessResources" }

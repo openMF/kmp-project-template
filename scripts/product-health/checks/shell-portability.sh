@@ -20,6 +20,9 @@
 #         line onto the command, so a `# …` line there ENDS the command: every argument below it is
 #         silently dropped, and the first orphaned line runs as a command of its own. Put the
 #         explanation ABOVE the command.
+#   SP-5  no bash-4-only builtin (`declare -A`, `mapfile`, `readarray`, `${x,,}`/`${x^^}`) unless the
+#         file opts out with `# bash4-required: <reason>`. macOS ships bash 3.2 as /bin/bash, and a
+#         `#!/bin/bash` shebang pins a script to it outright — no PATH escape.
 #   SP-4  no bare `"${arr[@]}"` expansion of an array that is initialised EMPTY, unless a count
 #         guard (`if … ${#arr[@]} -gt/-ne 0`) stands within the three lines above it. On bash 3.2 —
 #         still `/bin/bash` on macOS — expanding an empty array under `set -u` raises
@@ -160,6 +163,36 @@ if [ -n "$empty_arr_expand" ]; then
   echo "       this raises \"unbound variable\" under \`set -u\` and aborts the script:"
   printf '%s\n' "$empty_arr_expand" | sed 's/^/       /'
   echo "       Use:  \${arr[@]+\"\\\${arr[@]}\"}   (keeps inner quoting; multi-word entries survive)"
+  fail=1
+fi
+
+# ── SP-5 — bash-4-only builtins on a system whose /bin/bash is 3.2 ─────────────────────────────
+#
+# Hit 2026-09-18 in deployment/_shared/scripts/keystore-manager.sh, and it did NOT announce itself.
+# That file's shebang is `#!/bin/bash` — pinned to 3.2 on macOS, so a Homebrew bash 5 does not save
+# it — and it used `declare -A` for four maps. bash 3.2 REJECTS the declaration, then treats the
+# name as an INDEXED array and evaluates each subscript arithmetically, so
+# `MAP["google-services.json"]=X` fails with "invalid arithmetic operator" and the map stays EMPTY.
+# None of that trips `set -e`. Measured before the fix: the secrets scan found 0 of 3 present files
+# and reported success. Silent corruption in a credential tool, on every Mac.
+#
+# `mapfile`/`readarray` fail more quietly still — "command not found", leaving the array empty, so
+# a check built on one passes having examined nothing.
+#
+# Opt-out (the script genuinely requires bash 4+, and says so):  # bash4-required: <reason>
+bash4_only="$(printf '%s\n' "$scripts" | while IFS= read -r f; do
+  grep -q 'bash4-required:' "$f" 2>/dev/null && continue
+  uncommented "$f" \
+    | grep -nE "(^|[^A-Za-z0-9_])(declare|typeset)[[:space:]]+-[A-Za-z]*A[[:space:]]|(^|[[:space:]])(mapfile|readarray)[[:space:]]|\\\$\{[A-Za-z_][A-Za-z0-9_]*(\[[^]]*\])?(,,|\^\^)" 2>/dev/null \
+    | sed "s|^|${f}:|"
+done)"
+if [ -n "$bash4_only" ]; then
+  echo "${C_RED}✗ SP-5${C_RST}: bash-4-only builtin — macOS /bin/bash is 3.2, and a \`#!/bin/bash\` shebang"
+  echo "       pins the script to it. \`declare -A\` there silently yields an EMPTY map, not an error:"
+  printf '%s\n' "$bash4_only" | sed 's/^/       /'
+  echo "       Use: \"key|value\" pair lists, index-matched parallel arrays, a \`case\` lookup, or"
+  echo "            a sentinel-delimited string for sets. \`mapfile\` → \`while IFS= read -r l; do a+=(\"\$l\"); done < <(…)\`."
+  echo "       Genuinely needs bash 4+? Add:  # bash4-required: <reason>"
   fail=1
 fi
 

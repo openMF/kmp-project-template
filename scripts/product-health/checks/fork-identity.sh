@@ -26,16 +26,20 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
 : "${HEALTH_ROOT:?fork-identity: HEALTH_ROOT not set (run via product-health.sh)}"
 
 # Signing/org fields checked, mapped to their WHITE_LABEL_PLACEHOLDERS.yaml category.
-declare -A FIELD_CAT=(
-  [apple.team.id]=apple_team_id
-  [apple.match.git.url]=apple_match_git_url
-  [org.name]=org_name
+# "field|category" pairs rather than an associative array: macOS ships bash 3.2 as /bin/bash, where
+# `declare -A` is rejected and the initializer then writes every entry to index 0 of an INDEXED
+# array — so the map silently holds one wrong value instead of three right ones.
+FIELD_CAT_PAIRS=(
+  "apple.team.id|apple_team_id"
+  "apple.match.git.url|apple_match_git_url"
+  "org.name|org_name"
 )
 
 fail=0
 is_template="${TEMPLATE_SELF_BUILD:-0}"
-for key in "${!FIELD_CAT[@]}"; do
-  cat="${FIELD_CAT[$key]}"
+for _pair in ${FIELD_CAT_PAIRS[@]+"${FIELD_CAT_PAIRS[@]}"}; do
+  key="${_pair%%|*}"
+  cat="${_pair#*|}"
   val="$(fp_get "$key")"
   if wl_matches_any "$val" "$cat"; then
     # value IS a declared placeholder

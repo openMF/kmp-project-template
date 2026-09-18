@@ -31,7 +31,11 @@ cd "$HEALTH_ROOT" || exit 2
 fails=0
 
 # Production source only: skip test source sets and KDoc lines (` * ...`).
-mapfile -t hits < <(
+# `mapfile` is bash 4+; macOS still ships bash 3.2 as /bin/bash, where it is "command not found"
+# and the array silently stays empty — a check that then passes having examined nothing. Read the
+# lines in a loop instead, which both shells accept.
+hits=()
+while IFS= read -r _l; do [ -n "$_l" ] && hits+=("$_l"); done < <(
   grep -rn 'cacheKey = "' --include='*.kt' \
     --exclude-dir=build core core-base feature cmp-navigation cmp-shared 2>/dev/null \
   | grep -vE '/(commonTest|desktopTest|androidUnitTest|jsTest|wasmJsTest|nativeTest|iosTest)/' \
@@ -48,7 +52,8 @@ fi
 
 # CK-2 — the keyFlow overload takes a BUILDER lambda, so a literal hides one line lower than CK-1
 # looks. Scan the lambda body (the arg line plus the two following lines) for a quoted string.
-mapfile -t lambda_hits < <(
+lambda_hits=()
+while IFS= read -r _l; do [ -n "$_l" ] && lambda_hits+=("$_l"); done < <(
   grep -rn -A2 'cacheKeyFor = ' --include='*.kt' \
     --exclude-dir=build core core-base feature cmp-navigation cmp-shared 2>/dev/null \
   | grep -vE '/(commonTest|desktopTest|androidUnitTest|jsTest|wasmJsTest|nativeTest|iosTest)/' \

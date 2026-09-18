@@ -650,12 +650,25 @@ cs_main() {
       printf '%s\n' "$CS_M_OWNER"
       ;;
     report)
-      local f; declare -A cnt=()
+      # Owner->count tally as index-matched parallel arrays; bash 3.2 (macOS /bin/bash) has no
+      # associative arrays, and would silently collapse every owner onto index 0.
+      local f; local _owners=(); local _counts=()
       while IFS= read -r f; do
-        cs_match_g "$f"; cnt[$CS_M_OWNER]=$(( ${cnt[$CS_M_OWNER]:-0} + 1 ))
+        cs_match_g "$f"
+        local _oi=0; local _found=0
+        while [ "$_oi" -lt "${#_owners[@]}" ]; do
+          if [ "${_owners[$_oi]}" = "$CS_M_OWNER" ]; then
+            _counts[$_oi]=$(( ${_counts[$_oi]} + 1 )); _found=1; break
+          fi
+          _oi=$(( _oi + 1 ))
+        done
+        [ "$_found" = "0" ] && { _owners+=("$CS_M_OWNER"); _counts+=(1); }
         printf '%s\t%s\n' "$CS_M_OWNER" "$f"
       done < <(git -C "$CS_ROOT" ls-files) | sort
-      local k; for k in "${!cnt[@]}"; do printf '# %-9s %d files\n' "$k" "${cnt[$k]}" >&2; done
+      local _ki=0
+      while [ "$_ki" -lt "${#_owners[@]}" ]; do
+        printf '# %-9s %d files\n' "${_owners[$_ki]}" "${_counts[$_ki]}" >&2; _ki=$(( _ki + 1 ))
+      done
       ;;
     verify)
       local unclassified=0 total=0 f

@@ -554,22 +554,34 @@ encode_secrets_directory_files() {
     echo -e "${BLUE}Encoding files from secrets/ directory${NC}"
     echo -e "${BLUE}==================================================================${NC}"
 
-    # Define mapping of file names to secret names
-    declare -A FILE_TO_SECRET_MAP
-    FILE_TO_SECRET_MAP["firebaseAppDistributionServiceCredentialsFile.json"]="FIREBASECREDS"
-    FILE_TO_SECRET_MAP["google-services.json"]="GOOGLESERVICES"
-    FILE_TO_SECRET_MAP["playStorePublishServiceCredentialsFile.json"]="PLAYSTORECREDS"
-    FILE_TO_SECRET_MAP["AuthKey.p8"]="APPSTORE_AUTH_KEY"
-    FILE_TO_SECRET_MAP["match_ci_key"]="MATCH_GIT_PRIVATE_KEY"
-    # macOS App Store certificates and provisioning profiles
-    FILE_TO_SECRET_MAP["mac_app_distribution.p12"]="MAC_APP_DISTRIBUTION_CERTIFICATE_B64"
-    FILE_TO_SECRET_MAP["mac_installer_distribution.p12"]="MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64"
-    FILE_TO_SECRET_MAP["mac_embedded.provisionprofile"]="MAC_EMBEDDED_PROVISION_B64"
-    FILE_TO_SECRET_MAP["mac_runtime.provisionprofile"]="MAC_RUNTIME_PROVISION_B64"
+    # Mapping of file names to secret names, as "file|secret" pairs.
+    #
+    # An associative array (`declare -A`) would read better, but this file's shebang is
+    # `#!/bin/bash` — which on macOS is bash 3.2, where `declare -A` is rejected outright. bash then
+    # treats the name as an INDEXED array and evaluates each subscript arithmetically, so
+    # `MAP["google-services.json"]=X` fails with "invalid arithmetic operator" and the map stays
+    # EMPTY. Nothing aborts (the errors do not trip `set -e`), so the scan below simply found no
+    # secrets and the script reported success having encoded nothing. A "|" separator is safe here:
+    # neither a secret file name nor a secret env-var name contains one.
+    local FILE_TO_SECRET_PAIRS=(
+        "firebaseAppDistributionServiceCredentialsFile.json|FIREBASECREDS"
+        "google-services.json|GOOGLESERVICES"
+        "playStorePublishServiceCredentialsFile.json|PLAYSTORECREDS"
+        "AuthKey.p8|APPSTORE_AUTH_KEY"
+        "match_ci_key|MATCH_GIT_PRIVATE_KEY"
+        # macOS App Store certificates and provisioning profiles
+        "mac_app_distribution.p12|MAC_APP_DISTRIBUTION_CERTIFICATE_B64"
+        "mac_installer_distribution.p12|MAC_INSTALLER_DISTRIBUTION_CERTIFICATE_B64"
+        "mac_embedded.provisionprofile|MAC_EMBEDDED_PROVISION_B64"
+        "mac_runtime.provisionprofile|MAC_RUNTIME_PROVISION_B64"
+    )
 
     local secrets_found=0
     local secrets_encoded=0
-    declare -A ENCODED_SECRETS
+    # Index-matched parallel arrays stand in for the associative map (see the bash 3.2 note above).
+    # `local` keeps the dynamic scope the child function relies on, exactly as `declare -A` did.
+    local ENCODED_NAMES=()
+    local ENCODED_VALUES=()
 
     # Check if secrets directory exists
     if [ ! -d "secrets" ]; then
@@ -578,9 +590,10 @@ encode_secrets_directory_files() {
     fi
 
     # Scan secrets directory for known files
-    for file_name in "${!FILE_TO_SECRET_MAP[@]}"; do
+    for pair in ${FILE_TO_SECRET_PAIRS[@]+"${FILE_TO_SECRET_PAIRS[@]}"}; do
+        local file_name="${pair%%|*}"
+        local secret_name="${pair#*|}"
         local file_path="secrets/$file_name"
-        local secret_name="${FILE_TO_SECRET_MAP[$file_name]}"
 
         if [ -f "$file_path" ]; then
             secrets_found=$((secrets_found + 1))
@@ -589,7 +602,8 @@ encode_secrets_directory_files() {
 
             local encoded=$(encode_base64 "$file_path")
             if [ $? -eq 0 ]; then
-                ENCODED_SECRETS["$secret_name"]="$encoded"
+                ENCODED_NAMES+=("$secret_name")
+                ENCODED_VALUES+=("$encoded")
                 secrets_encoded=$((secrets_encoded + 1))
                 echo -e "${GREEN}✓ Successfully encoded $file_name${NC}"
             else
@@ -631,13 +645,15 @@ update_secrets_env_with_files() {
     local multiline_end=""
     local current_key=""
 
-    # Read existing secrets.env and track which sections exist
-    declare -A existing_sections
+    # Read existing secrets.env and track which sections exist. A "|"-delimited string stands in for
+    # the set (bash 3.2 has no associative arrays — see the note in the encode function). Both ends
+    # carry a sentinel "|" so a `*"|key|"*` match can never hit a partial key.
+    local existing_sections="|"
 
     while IFS= read -r line || [ -n "$line" ]; do
         if [ "$in_multiline" = false ] && [[ "$line" == *"<<EOF" ]]; then
             current_key=$(echo "$line" | cut -d '<' -f1 | xargs)
-            existing_sections["$current_key"]=1
+            existing_sections="${existing_sections}${current_key}|"
             multiline_end="EOF"
             in_multiline=true
         elif [ "$in_multiline" = true ] && [[ "$line" == "$multiline_end" ]]; then
@@ -650,10 +666,13 @@ update_secrets_env_with_files() {
     in_multiline=false
 
     # For each encoded secret, update or append
-    for secret_name in "${!ENCODED_SECRETS[@]}"; do
-        local encoded_value="${ENCODED_SECRETS[$secret_name]}"
+    local _i=0
+    while [ "$_i" -lt "${#ENCODED_NAMES[@]}" ]; do
+        local secret_name="${ENCODED_NAMES[$_i]}"
+        local encoded_value="${ENCODED_VALUES[$_i]}"
+        _i=$((_i + 1))
 
-        if [ -n "${existing_sections[$secret_name]}" ]; then
+        if case "$existing_sections" in *"|${secret_name}|"*) true ;; *) false ;; esac; then
             # Update existing section
             echo -e "${BLUE}Updating existing section: $secret_name${NC}"
             local temp_file2="${temp_file}.2"
@@ -982,10 +1001,16 @@ validate_sync_result() {
     )
 
     # Map alternative key names used in this project (Play App Signing single-keystore)
-    declare -A key_aliases
-    key_aliases["KEYSTORE_PASSWORD"]="UPLOAD_KEYSTORE_FILE_PASSWORD"
-    key_aliases["KEYALIAS"]="UPLOAD_KEYSTORE_ALIAS"
-    key_aliases["KEY_PASSWORD"]="UPLOAD_KEYSTORE_ALIAS_PASSWORD"
+    # Alias lookup as a `case` (bash 3.2 has no associative arrays — see the encode function).
+    # Returns the empty string when a secret has no alternative name.
+    _key_alias_for() {
+        case "$1" in
+            KEYSTORE_PASSWORD) echo "UPLOAD_KEYSTORE_FILE_PASSWORD" ;;
+            KEYALIAS)          echo "UPLOAD_KEYSTORE_ALIAS" ;;
+            KEY_PASSWORD)      echo "UPLOAD_KEYSTORE_ALIAS_PASSWORD" ;;
+            *)                 echo "" ;;
+        esac
+    }
 
     # Check Android secrets
     for secret in "${required_android[@]}"; do
@@ -995,8 +1020,8 @@ validate_sync_result() {
         if grep -q "^${secret}=" "$SECRETS_FILE" || grep -q "^${secret}<<" "$SECRETS_FILE"; then
             found=true
         # Check alternative names
-        elif [[ -n "${key_aliases[$secret]}" ]]; then
-            IFS='|' read -ra alternatives <<< "${key_aliases[$secret]}"
+        elif [ -n "$(_key_alias_for "$secret")" ]; then
+            IFS='|' read -ra alternatives <<< "$(_key_alias_for "$secret")"
             for alt in "${alternatives[@]}"; do
                 if grep -q "^${alt}=" "$SECRETS_FILE" || grep -q "^${alt}<<" "$SECRETS_FILE"; then
                     found=true

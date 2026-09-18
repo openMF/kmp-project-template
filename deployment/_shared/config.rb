@@ -1123,7 +1123,16 @@ def sync_testflight_testers(app_identifier:, config: nil)
 
   specs.each do |gs|
     begin
-      grp = (app.get_beta_groups(filter: { name: gs[:name] }) || []).first
+      # App Store Connect scopes beta-group name uniqueness WITHIN a group type, not across the
+      # app: an INTERNAL and an EXTERNAL group may legitimately share one name (verified live —
+      # `sensei-app-testers` exists under both Internal Testing and External Testing on a shipped
+      # fork). So the lookup MUST key on (name, is_internal_group). Filtering by name alone and
+      # taking .first returns whichever type ASC lists first (the internal one), which made the
+      # external spec resolve to the INTERNAL group, skip creation via `grp ||=`, and then log
+      # itself as "external". The external group never existed, and promoteToExternalBeta later
+      # died on Apple's `Cannot add internal group to a build.`
+      grp = (app.get_beta_groups(filter: { name: gs[:name] }) || [])
+              .find { |g| !!g.is_internal_group == !!gs[:internal] }
       grp ||= app.create_beta_group(
         group_name:                gs[:name],
         is_internal_group:         gs[:internal],
@@ -1145,21 +1154,58 @@ def sync_testflight_testers(app_identifier:, config: nil)
       # SoT: app-profile apple.testers.external_emails ← _org/company.yaml. Internal group is team-
       # only (members must be added by Apple-ID in App Store Connect), so we never push emails there.
       if !gs[:internal]
-        (cfg[:external_emails] || []).each do |em|
+        roster = (cfg[:external_emails] || [])
+        unless roster.empty?
           begin
-            fn = em.split("@").first.to_s.gsub(/[^A-Za-z0-9]/, " ").strip[0, 30]
-            fn = "Tester" if fn.empty?
-            # last_name is a required ASC field but carries no product meaning — keep it brand-neutral
-            # (never a fork's initials) so a synced fork doesn't stamp its testers with another org's name.
-            Spaceship::ConnectAPI.create_beta_tester(group_id: grp.id, email: em, first_name: fn, last_name: "Tester")
-            UI.success("   ➕ external tester added to '#{gs[:name]}': #{em}")
-          rescue => e
-            msg = e.message.to_s.lines.first&.strip
-            if msg.to_s =~ /already|exist|taken|duplicate/i
-              UI.message("   ✓ external tester already in '#{gs[:name]}': #{em}")
-            else
-              UI.important("   ⚠️  could not add external tester #{em}: #{msg}")
+            # `Spaceship::ConnectAPI.create_beta_tester` DOES NOT EXIST (verified against fastlane
+            # 2.239.0 — it raises `undefined method 'create_beta_tester'` for every email while the
+            # surrounding rescue downgrades it to a warning, so the lane reports success having added
+            # nobody). `POST /v1/bulkBetaTesterAssignments` is ALSO retired by Apple ("The resource
+            # 'v1/bulkBetaTesterAssignments' does not exist") even though spaceship still ships the
+            # helper — and that message contains "exist", so an /already|exist/ rescue silently
+            # swallows it too. The live endpoint is `POST /v1/betaTesters` with the betaGroups
+            # relationship. A tester that already exists ACCOUNT-WIDE (an org-shared roster is
+            # already on sibling apps) 409s there — look that tester up and attach the EXISTING id.
+            testers = roster.map do |em|
+              fn = em.split("@").first.to_s.gsub(/[^A-Za-z0-9]/, " ").strip[0, 30]
+              fn = "Tester" if fn.empty?
+              # last_name is a required ASC field but carries no product meaning — keep it brand-neutral
+              # (never a fork's initials) so a synced fork doesn't stamp its testers with another org's name.
+              { email: em, firstName: fn, lastName: "Tester" }
             end
+            testers.each do |t|
+              begin
+                Spaceship::ConnectAPI.post_beta_tester_assignment(
+                  beta_group_ids: [grp.id],
+                  attributes: { email: t[:email], firstName: t[:firstName], lastName: t[:lastName] },
+                )
+              rescue => e
+                existing = (Spaceship::ConnectAPI.get_beta_testers(filter: { email: t[:email] })
+                                                 .to_models.first rescue nil)
+                if existing
+                  grp.add_beta_testers(beta_tester_ids: [existing.id])
+                else
+                  UI.important("   ⚠️  #{t[:email]}: #{e.message.to_s.lines.first&.strip}")
+                end
+              end
+            end
+            # VERIFY, never assume: read the group's membership back and report which roster emails
+            # are actually present. Both broken APIs above reported success while adding nobody.
+            present = begin
+              Spaceship::ConnectAPI.get_beta_testers(filter: { betaGroups: grp.id }, limit: 200)
+                                   .to_models.map { |t| t.email.to_s.downcase }
+            rescue => e
+              UI.important("   ⚠️  could not read back '#{gs[:name]}' membership: #{e.message.to_s.lines.first&.strip}")
+              nil
+            end
+            if present
+              hit  = roster.select { |em| present.include?(em.downcase) }
+              miss = roster - hit
+              UI.success("   ➕ external testers on '#{gs[:name]}': #{hit.size}/#{roster.size} present")
+              UI.important("   ⚠️  NOT on '#{gs[:name]}': #{miss.join(', ')}") unless miss.empty?
+            end
+          rescue => e
+            UI.important("   ⚠️  could not assign external tester roster to '#{gs[:name]}': #{e.message.to_s.lines.first&.strip}")
           end
         end
       end

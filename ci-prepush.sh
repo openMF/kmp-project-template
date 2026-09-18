@@ -192,12 +192,12 @@ GRADLE_FLAGS=(
 
 echo ""
 echo "→ Phase 2: parallel build (${#GRADLE_TASK_ARGS[@]} tasks)"
-printf '    %s\n' "${GRADLE_TASK_ARGS[@]}"
+printf '    %s\n' ${GRADLE_TASK_ARGS[@]+"${GRADLE_TASK_ARGS[@]}"}
 
-if ./gradlew "${GRADLE_TASK_ARGS[@]}" "${GRADLE_FLAGS[@]}"; then
-    successful_tasks+=("${GRADLE_TASK_ARGS[@]}")
+if ./gradlew ${GRADLE_TASK_ARGS[@]+"${GRADLE_TASK_ARGS[@]}"} "${GRADLE_FLAGS[@]}"; then
+    successful_tasks+=(${GRADLE_TASK_ARGS[@]+"${GRADLE_TASK_ARGS[@]}"})
 else
-    failed_tasks+=("${GRADLE_TASK_ARGS[@]}")
+    failed_tasks+=(${GRADLE_TASK_ARGS[@]+"${GRADLE_TASK_ARGS[@]}"})
 
     if [ "$AUTO_FIX_MODE" = "1" ]; then
         echo ""

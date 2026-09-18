@@ -1,7 +1,30 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# bash4-required: EXCLUSIONS is an associative array load-bearing across 23 sites; see the guard below.
 
 # scripts/white-label/sync-dirs.sh
 # Script to sync directories and files from upstream repository
+
+# ── bash 4+ REQUIRED — fail loudly rather than silently overwrite a fork's branding ──────────────
+#
+# This script's EXCLUSIONS map is what PRESERVES fork-owned files across a sync (branded Android
+# res/, google-services.json, the iOS asset catalog, deployment config, secrets, …). It is an
+# associative array, and bash 3.2 — still /bin/bash on macOS — does not have those.
+#
+# The old `#!/bin/bash` shebang pinned this script to 3.2 there, and the failure was SILENT and
+# DESTRUCTIVE rather than loud: `declare -A` is rejected, but the `=( [k]=v … )` initializer still
+# runs as an INDEXED assignment, so every key evaluates arithmetically to 0, all nine entries
+# collide, and the last one wins. Measured: `${!EXCLUSIONS[@]}` yields the single key `0`, so 8 of
+# 9 modules get NO exclusions and the sync overwrites exactly the files the map exists to protect.
+#
+# `env bash` picks up a Homebrew bash 5 where present; this guard catches the case where it does not.
+if [ -z "${BASH_VERSINFO:-}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+    echo "error: sync-dirs.sh requires bash 4+ (found ${BASH_VERSION:-unknown} at $(command -v bash))." >&2
+    echo "       macOS ships bash 3.2 as /bin/bash. Install a newer one and re-run, e.g.:" >&2
+    echo "         brew install bash && exec \"\$(brew --prefix)/bin/bash\" \"$0\" \"\$@\"" >&2
+    echo "       Refusing to continue: without associative arrays the exclusion map silently" >&2
+    echo "       collapses and this sync would OVERWRITE fork-owned branded files." >&2
+    exit 1
+fi
 
 # Repo root (this script lives at the template repo ROOT) — used to source the
 # customization-surface contract library (white-label-template-completion E0/T3).

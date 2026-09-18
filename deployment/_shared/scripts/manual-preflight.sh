@@ -178,7 +178,7 @@ if [ "$FAIL" -gt 0 ]; then
     echo
     echo "❌ manual-preflight: FAIL"
     echo
-    for row in "${FAIL_ROWS[@]}"; do
+    for row in ${FAIL_ROWS[@]+"${FAIL_ROWS[@]}"}; do
         IFS='|' read -r r_canon r_hint r_placeholder r_gha r_reason <<< "$row"
         echo "[FAIL] needs[].canonical=$r_canon"
         echo "       source_hint:    $r_hint"

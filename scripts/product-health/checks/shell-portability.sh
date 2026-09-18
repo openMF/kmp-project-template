@@ -20,6 +20,11 @@
 #         line onto the command, so a `# …` line there ENDS the command: every argument below it is
 #         silently dropped, and the first orphaned line runs as a command of its own. Put the
 #         explanation ABOVE the command.
+#   SP-4  no bare `"${arr[@]}"` expansion of an array that is initialised EMPTY, unless a count
+#         guard (`if … ${#arr[@]} -gt/-ne 0`) stands within the three lines above it. On bash 3.2 —
+#         still `/bin/bash` on macOS — expanding an empty array under `set -u` raises
+#         "unbound variable" and kills the script. Use `${arr[@]+"${arr[@]}"}`, which keeps the
+#         inner quoting so multi-word entries survive.
 #
 # Scope: TRACKED *.sh only (git ls-files), comment lines stripped (a commented-out form never
 # runs). Two exclusions: product-health/tests/** (canary fixtures deliberately contain the
@@ -113,6 +118,48 @@ if [ -n "$cont_comment" ]; then
   echo "       every argument below it is silently dropped (then runs as its own command):"
   printf '%s\n' "$cont_comment" | sed 's/^/       /'
   echo "       Move the comment ABOVE the command."
+  fail=1
+fi
+
+# ── SP-4 — an empty array expanded under `set -u` kills the script on bash 3.2 ─────────────────
+#
+# macOS still ships bash 3.2 as /bin/bash while every CI runner has bash 5, so this ENTIRE class is
+# invisible to CI by construction — it can only ever bite a contributor, on their machine, and CI
+# will stay green while it does. That asymmetry is the whole reason it needs a static gate.
+#
+# Hit 2026-09-02 in ci-prepush.sh: `successful_tasks` is empty when every task fails, so the summary
+# died at its own first loop and the "Failed tasks" list below it never printed — the script aborted
+# precisely when it had something useful to say, after a 15-25 minute run.
+#
+# A count guard within the three lines above is accepted, because that is how the healed/failed
+# loops in the same file are already written. The guard must be a CONDITIONAL: an
+# `echo "count: ${#arr[@]}"` on the line above is not a guard, and reading one as such is exactly
+# how the ci-prepush.sh loop looked safe.
+#
+# Only arrays declared `arr=()` are considered. One populated from a literal is not at risk, and
+# flagging it would push this rule into the false positives that get a check switched off.
+empty_arr_expand="$(printf '%s\n' "$scripts" | while IFS= read -r f; do
+  vars="$(grep -oE '^[[:space:]]*(declare -a[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=\(\)[[:space:]]*$' "$f" 2>/dev/null \
+          | sed -E 's/^[[:space:]]*(declare -a[[:space:]]+)?//; s/=\(\)[[:space:]]*$//')"
+  [ -z "$vars" ] && continue
+  for v in $vars; do
+    # A line ALREADY using the guarded idiom contains `${v[@]+"${v[@]}"}` — whose inner half matches
+    # the bare pattern. Excluding it is what keeps the rule from flagging the very fix it prescribes.
+    uncommented "$f" | grep -nE "\"\\\$\{$v\[@\]\}\"" 2>/dev/null | grep -vE "\\\$\{$v\[@\]\+" | while IFS= read -r hit; do
+      ln="${hit%%:*}"
+      # three lines above must carry `if … ${#v[@]} … -gt|-ne 0` for this to be guarded
+      start=$(( ln > 3 ? ln - 3 : 1 ))
+      sed -n "${start},$(( ln - 1 ))p" "$f" 2>/dev/null \
+        | grep -qE "if[^#]*\\\$\{#$v\[@\]\}[^#]*-(gt|ne)[[:space:]]*0" && continue
+      printf '%s:%s\n' "$f" "$hit"
+    done
+  done
+done)"
+if [ -n "$empty_arr_expand" ]; then
+  echo "${C_RED}✗ SP-4${C_RST}: bare expansion of an array initialised empty — on bash 3.2 (macOS /bin/bash)"
+  echo "       this raises \"unbound variable\" under \`set -u\` and aborts the script:"
+  printf '%s\n' "$empty_arr_expand" | sed 's/^/       /'
+  echo "       Use:  \${arr[@]+\"\\\${arr[@]}\"}   (keeps inner quoting; multi-word entries survive)"
   fail=1
 fi
 

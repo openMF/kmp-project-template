@@ -241,6 +241,17 @@ platform :ios do
                       testflight_config[:external_groups] ||
                       ["External Beta"]
 
+    # Pin each group NAME to the external group's ID. pilot selects with
+    # `BetaGroup#matches_identifiers?` = `identifiers.include?(name) || identifiers.include?(id)` —
+    # NAME-ONLY matching with no internal/external awareness. A name shared by an internal AND an
+    # external group (supported by ASC, and a common org convention) therefore matches BOTH, and
+    # `add_beta_groups` fails the whole call on the internal one with Apple's
+    # `Cannot add internal group to a build.` An id selects exactly one group.
+    external_groups = external_groups.map do |n|
+      (app_for_groups ||= Spaceship::ConnectAPI::App.find(ios_config[:app_identifier]))
+        .get_beta_groups(filter: { name: n }).to_a.find { |g| !g.is_internal_group }&.id || n
+    end
+
     UI.important("📦 Promoting TF build #{build_number} → external testers (#{external_groups.join(', ')})")
 
     # pilot in distribute-only mode — Spaceship updates the build's group

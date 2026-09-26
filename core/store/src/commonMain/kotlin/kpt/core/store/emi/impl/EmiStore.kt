@@ -65,6 +65,14 @@ fun interface EmiCompute {
     key = "emi:{principal}:{ratePercent}:{tenureMonths}",
     params = ["principal:Double", "ratePercent:Double", "tenureMonths:Int"],
 )
+/**
+ * EMI calculation — `MEMORY_ONLY` over a pure `core/domain` use-case.
+ *
+ * The parameter set IS the cache key, so a repeated calculation is served from cache and the
+ * result reaches the screen as a `ScreenState` like every other read surface. The use-case is
+ * injected through a port bound in the feature module: importing `core/domain` from `core/store`
+ * would close a store → domain → data → store cycle.
+ */
 fun provideEmiStore(compute: EmiCompute): Store<EmiParams, EmiResult> =
     StoreFactory.createMemoryStore(
         fetcher = Fetcher.of { params: EmiParams -> compute(params) },

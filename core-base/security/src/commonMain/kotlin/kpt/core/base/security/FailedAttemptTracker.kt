@@ -59,6 +59,13 @@ class FailedAttemptTracker(
     }
 }
 
+/**
+ * What the tracker did in response to a failed attempt — the caller's cue for what to show next.
+ *
+ * Escalates in order: the attempt was counted, the account locked, or the local data was wiped after
+ * the final permitted attempt. [DATA_WIPED] is terminal and irreversible, so a caller must treat it
+ * as a state change rather than an error message.
+ */
 enum class FailureAction {
     ATTEMPT_RECORDED,
     LOCKED_OUT,

@@ -12,6 +12,9 @@ package kpt.core.network.frankfurter.dto
 import kotlinx.serialization.Serializable
 import kpt.core.model.currency.ExchangeRates
 
+/**
+ * Wire shape of the Frankfurter `/latest` response — base currency plus a rate map.
+ */
 @Serializable
 data class ExchangeRatesDto(
     val amount: Double,

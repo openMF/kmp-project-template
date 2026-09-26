@@ -57,6 +57,12 @@ fun interface AmortizationCompute {
     key = "amortizationCalc:{principal}:{ratePercent}:{tenureMonths}",
     params = ["principal:Double", "ratePercent:Double", "tenureMonths:Int"],
 )
+/**
+ * Amortization schedule for a loan — `MEMORY_ONLY`, computed rather than fetched.
+ *
+ * Store-backed even though nothing persists: the schedule is expensive and deterministic in its
+ * inputs, so the key doubles as the cache key and a revisit is free.
+ */
 fun provideAmortizationCalcStore(
     compute: AmortizationCompute,
 ): Store<AmortizationCalcParams, AmortizationBreakdown> =

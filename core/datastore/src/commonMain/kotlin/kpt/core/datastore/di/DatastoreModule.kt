@@ -22,6 +22,13 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
+/**
+ * Koin module for `core/datastore` — the fork's preference stores, over the plain and secure
+ * `Settings` instances that `DatastoreBaseModule` binds.
+ *
+ * Preferences only. Room-backed rows belong in `core/database`; conflating the two is how a value
+ * that must survive a reinstall ends up in storage that does not.
+ */
 val DatastoreModule = module {
     includes(CommonModule, DatastoreBaseModule)
 

@@ -36,6 +36,10 @@ import kotlin.time.Clock
     key = "economic:macro:{countryCode}:{indicator}:{years}y",
     params = ["countryCode:String", "indicator:String", "years:Int"],
 )
+/**
+ * World Bank macro indicator for a (country, indicator) key — `NETWORK_WITH_CACHE` with a long TTL,
+ * since the underlying series updates at most quarterly.
+ */
 fun provideMacroIndicatorStore(
     api: WorldBankApi,
     networkMonitor: NetworkMonitor,

@@ -1,91 +1,66 @@
 # `core-base/crypto`
 
-> **Layer:** `core-base` — framework-shared. Generators **consume** these contracts and
-> **never write here**; a fix belongs upstream in the template, not in a fork.
-> **Instruction surface:** `CORE_BASE_CRYPTO.md` — the generator-facing instruction for this module,
-> held in the framework at `training-layer/instructions/stream-first/latest/`. This guide
-> is the architecture SoT; that surface is how it reaches codegen, and
-> `/kmp-project-template-retrain` keeps the two in step.
-> **Shape:** 22 Kotlin files (4 test) · source sets: `androidMain`, `commonMain`, `desktopMain`, `jsCommonMain`, `jsCommonTest`, `jsMain`, `jsTest`, `nativeMain`, `wasmJsMain`, `wasmJsTest`
-
-
-
-## When implementing a feature
-
-**You do not write here.** `core-base` is framework-shared: a feature consumes these
-contracts and never modifies them. If a feature seems to need a change here, that is a
-TEMPLATE change — it flows upstream as a draft PR (RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001),
-never a local edit, because every fork shares this code and a local fix is drift.
-
-What a feature *does* do is import from here and satisfy the contracts this module
-defines. The module guides under `../core/` show where the feature-side code goes.
-
-## Position in the module graph
-
-No module dependencies — this is a leaf.
-
-**Consumed by** 1 module(s): `core/database`
-
-## Codegen contracts
-
-**None.** Nothing here is declared by annotation, so there is no aggregate to
-generate and no propagation target. A generator writing into this module takes its
-idiom from `CORE_BASE_CRYPTO.md`.
+> **Layer:** core-base — framework-shared; generators CONSUME, never write
+> **Corpus surface:** `CORE_BASE_CRYPTO.md`
+> **Measured:** 22 Kotlin files, 1 test files
 
 ## Principal types
 
-- **`FieldEncryptor`** — Platform-specific AES-256-GCM field encryption for sensitive data.
-- **`SecureKeyProvider`** — Platform-specific secure key storage and retrieval.
-- **`SecureRandom`** — Platform-specific cryptographically secure random number generator.
-- **`WebSecureCrypto`** — Web AES-GCM backed by WebCrypto, with a **non-extractable** key held in IndexedDB.
-
-## Demo showcase exposure
-
-**None.** No `demo/` package and no `// demo:begin` fence — `remove-demo.sh` does not
-touch this module, so a stripped fork keeps it verbatim.
-
-## Tests
-
-4 test file(s) under `core-base/crypto/src/commonTest/`. 
-Shared idiom: `CORE_TESTING.md`.
-
-
-
-## Sample implementation
-
-Real code from this module — the shape a generator should follow here.
-
-```kotlin
-/**
- * Platform-specific AES-256-GCM field encryption for sensitive data.
- *
- * Encrypts individual fields BEFORE they are stored in Room or Settings.
- * Keys are managed by [SecureKeyProvider] using hardware-backed storage
- * where available (Android Keystore, iOS Keychain, etc.).
- */
-expect class FieldEncryptor {
-    /**
-     * Encrypts plaintext to a Base64-encoded ciphertext string.
-     * The returned value is prefixed with "ENC:" for format detection.
-     */
-    fun encrypt(plaintext: String): String
-
-    /** Decrypts a Base64-encoded ciphertext string back to plaintext. */
-    fun decrypt(ciphertext: String): String
-
-    /** Encrypts raw bytes. */
-    fun encrypt(data: ByteArray): ByteArray
-
-    /** Decrypts raw bytes. */
-    fun decrypt(data: ByteArray): ByteArray
-}
-    // … (excerpt)
-```
-
-Source: [`src/commonMain/kotlin/kpt/core/base/crypto/FieldEncryptor.kt`](../../../../core-base/crypto/src/commonMain/kotlin/kpt/core/base/crypto/FieldEncryptor.kt) — excerpt; read the file for the full implementation.
+`FieldEncryptor`, `SecureKeyProvider`, `SecureRandom`, `WebSecureCrypto`
 
 <!-- scaffold:end -->
 
 ## Notes
 
 _Authored prose below this marker is preserved by the scaffolder._
+
+<!-- api-docs:begin module=core-base/crypto sha=b06e517b74fe26d300ac9cd4d4c86aa17a427243 -->
+## API reference
+
+_Generated from `core-base/crypto` at tree `b06e517b74fe` by `scripts/docs/api-docs-gen.sh`._
+_Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
+
+This module is **framework-shared and read-only to generators** (D9). Everything below is
+something a feature CALLS; re-declaring one of these in `core/**` is the duplicate-the-
+framework defect. A change here is a TEMPLATE change and flows upstream as a draft PR
+(RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001), never a local fix.
+
+### `core-base/crypto/src/commonMain/kotlin/kpt/core/base/crypto/FieldEncryptor.kt`
+
+```kotlin
+expect class FieldEncryptor
+```
+Platform-specific AES-256-GCM field encryption for sensitive data. Encrypts individual fields BEFORE they are stored in Room or Settings.
+
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/converter/ChargeTypeConverters.kt:37</code></summary>
+
+```kotlin
+    companion object {
+        @kotlin.concurrent.Volatile
+        private var encryptor: FieldEncryptor? = null
+
+        /**
+         * Install a [FieldEncryptor] for all converter instances.
+         * Call once during app initialization, before any database access.
+```
+
+</details>
+
+### `core-base/crypto/src/commonMain/kotlin/kpt/core/base/crypto/SecureKeyProvider.kt`
+
+```kotlin
+expect class SecureKeyProvider
+```
+Platform-specific secure key storage and retrieval.
+
+### `core-base/crypto/src/commonMain/kotlin/kpt/core/base/crypto/SecureRandom.kt`
+
+```kotlin
+expect class SecureRandom
+```
+Platform-specific cryptographically secure random number generator.
+
+---
+
+_3 type(s), 0 function(s)/property(ies); 3 carry KDoc at source; 0 authored example(s); 1 live call site(s)._
+<!-- api-docs:end -->

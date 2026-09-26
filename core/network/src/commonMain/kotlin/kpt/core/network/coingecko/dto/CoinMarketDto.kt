@@ -13,6 +13,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kpt.core.model.crypto.CoinMarket
 
+/**
+ * One row of CoinGecko's `/coins/markets` response — the paged market list.
+ */
 @Serializable
 data class CoinMarketDto(
     val id: String,
@@ -40,9 +43,15 @@ data class CoinMarketDto(
     )
 }
 
+/**
+ * Image URL set for a coin; only the large variant is used.
+ */
 @Serializable
 data class CoinImageDto(val large: String? = null)
 
+/**
+ * Nested market figures (price, market cap, 24h change) inside a coin detail response.
+ */
 @Serializable
 data class MarketDataDto(
     @SerialName("current_price") val currentPrice: Map<String, Double>? = null,

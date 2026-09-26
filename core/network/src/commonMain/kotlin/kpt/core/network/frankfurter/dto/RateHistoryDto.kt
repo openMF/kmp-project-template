@@ -14,6 +14,9 @@ import kotlinx.serialization.Serializable
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RatePoint
 
+/**
+ * Wire shape of the Frankfurter time-series response — a date-keyed map of rate maps.
+ */
 @Serializable
 data class RateHistoryDto(
     val amount: Double,

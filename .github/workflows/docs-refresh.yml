@@ -1,0 +1,230 @@
+# .github/workflows/docs-refresh.yml — keep the generated API reference in step with source.
+#
+# CLAUDE.md already states the contract: "Changing the template? docs/architecture/ updates in the
+# SAME change." This workflow is the CI half of that — the write-time guards catch it locally, this
+# catches it when someone pushes anyway.
+#
+# TWO MODES, because the right response differs:
+#
+#   pull_request  →  CHECK ONLY. Fails with the exact pages that are stale and the one command that
+#                    fixes them. It must not push to a contributor's branch (a fork PR has no write
+#                    token, and rewriting someone's branch mid-review is hostile).
+#
+#   push to dev   →  REFRESH + open a PR when drift exists. Never commits straight to the branch:
+#                    dev is protected (CLAUDE.md "NEVER commit directly to master or dev"), and a
+#                    docs refresh deserves the same review as any other change. Matches the
+#                    convention already used by sync-dirs.yaml.
+#
+# WHY IT ONLY NEEDS BASH
+# The generator lives in the TEMPLATE (scripts/docs/), not in the framework, precisely so this job
+# needs no framework checkout, no JDK, and no Gradle — and so every fork inherits the same capability.
+name: Docs · API reference
+run-name: "📚 Docs refresh · ${{ github.event.pull_request.title || github.ref_name }}"
+
+on:
+  pull_request:
+    paths:
+      - 'core-base/**/*.kt'
+      - 'core/**/*.kt'
+      # A NEW MODULE arrives as a new directory + build file, which no *.kt pattern above matches on
+      # its own — and a new module is exactly the case the scaffold exists to handle.
+      - 'core-base/*/build.gradle.kts'
+      - 'core/*/build.gradle.kts'
+      - 'docs/**'
+      - 'scripts/docs/**'
+      - '.github/workflows/docs-refresh.yml'
+  push:
+    branches: [dev]
+    paths:
+      - 'core-base/**/*.kt'
+      - 'core/**/*.kt'
+      - 'core-base/*/build.gradle.kts'
+      - 'core/*/build.gradle.kts'
+      - 'scripts/docs/**'
+  workflow_dispatch:
+    inputs:
+      force_pr:
+        description: 'Open a PR even if no drift is detected'
+        type: boolean
+        default: false
+
+concurrency:
+  group: docs-refresh-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Docs are current with source
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Verify generated docs match source
+        run: |
+          set -euo pipefail
+          chmod +x scripts/docs/*.sh
+          if ! bash scripts/docs/refresh.sh --check; then
+            {
+              echo "### 📚 Docs are out of step with source"
+              echo
+              echo "This PR changes Kotlin under \`core-base/\` or \`core/\` without refreshing the"
+              echo "generated API reference. The pages listed above are derived from KDoc + signatures,"
+              echo "so they cannot be updated by hand."
+              echo
+              echo '```bash'
+              echo 'bash scripts/docs/refresh.sh'
+              echo '```'
+              echo
+              echo "Then commit the result. Prose outside the \`<!-- api-docs -->\` markers is never touched."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "✅ generated docs match source" >> "$GITHUB_STEP_SUMMARY"
+
+  refresh:
+    name: Refresh and propose
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # A PAT is required for the PR to trigger downstream workflows; GITHUB_TOKEN-authored PRs
+          # do not. Same reason sync-dirs.yaml uses it.
+          token: ${{ secrets.PAT_TOKEN || github.token }}
+
+      - name: Regenerate the API reference
+        run: |
+          set -euo pipefail
+          chmod +x scripts/docs/*.sh
+          bash scripts/docs/refresh.sh
+
+      - name: Detect drift
+        id: drift
+        run: |
+          if [[ -n "$(git status --porcelain docs/)" ]]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            echo "Pages refreshed:"
+            git status --short docs/
+            {
+              echo "### 📚 Docs refreshed"
+              echo
+              echo '```'
+              git status --short docs/
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "✅ already in step — nothing to propose" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Open Pull Request
+        if: steps.drift.outputs.has_changes == 'true' || inputs.force_pr
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          branch: chore/docs-api-refresh
+          delete-branch: true
+          commit-message: "docs: refresh generated API reference from source"
+          title: "docs: refresh generated API reference from source"
+          body: |
+            Automated refresh of the generated API reference.
+
+            Produced by `scripts/docs/refresh.sh`, which regenerates the
+            `<!-- api-docs:begin … -->` blocks in `docs/architecture/modules/**` from the
+            KDoc and signatures in `core-base/**` and `core/**`, then rebuilds
+            `docs/_sidebar.md` from the page tree.
+
+            **What changed and why it is safe to merge:**
+            - only content BETWEEN the `api-docs` markers, plus the generated sidebar
+            - authored prose outside those markers is preserved byte-for-byte
+            - every block records the module's content hash, so `G-TEMPLATE-API-DOCS`
+              can prove the page is current rather than assuming it
+
+            Browse locally with `npx docsify-cli serve docs`.
+          labels: documentation
+
+  publish:
+    name: Publish to Cloudflare Pages
+    # Runs only after the docs on `dev` are current — publishing from a PR would race branches onto
+    # one site, and publishing before the refresh would ship the previous revision's API reference.
+    if: github.event_name != 'pull_request'
+    needs: refresh
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Resolve identity from the fork SoT
+        id: id
+        run: |
+          set -euo pipefail
+          # `fork.project.name` is the slug the whole build already keys on (it is what
+          # settings.gradle.kts uses for rootProject.name), so the Pages project cannot collide
+          # between forks of this template.
+          slug="$(grep -E '^fork\.project\.name=' gradle.properties | cut -d= -f2- | tr -d '[:space:]')"
+          [ -n "$slug" ] || slug="kmp-project-template"
+          echo "project=docs-$slug" >> "$GITHUB_OUTPUT"
+
+          # docs_domain is OPTIONAL. Unset → no custom domain, and the deploy still publishes to the
+          # free *.pages.dev URL. Never derived from app_id: a reversed package id is not a domain a
+          # fork owns, and guessing one hands out a link that does not resolve.
+          # Strip the trailing `# comment` BEFORE unquoting: without that the inline example in
+          # app.yaml was captured as part of the value and produced a nonsense host.
+          domain="$(grep -E '^[[:space:]]*docs_domain:' app-profile/app.yaml | head -1 \
+                    | cut -d: -f2- | sed -E 's/#.*$//' | tr -d '\"'\''[:space:]' || true)"
+          if [ -n "$domain" ]; then
+            echo "host=docs.$domain" >> "$GITHUB_OUTPUT"
+          else
+            echo "host=" >> "$GITHUB_OUTPUT"
+          fi
+          echo "Pages project : docs-$slug"
+          echo "Custom domain : ${domain:+docs.$domain}${domain:+ }${domain:-<unset — publishing to *.pages.dev only>}"
+
+      - name: Refuse to publish stale docs
+        # The refresh job opens a PR rather than committing, so `dev` can still be behind while this
+        # runs. Publishing anyway would put an API reference on the public site that does not match
+        # the code it documents — the exact failure the whole gate exists to prevent.
+        run: |
+          set -euo pipefail
+          chmod +x scripts/docs/*.sh
+          bash scripts/docs/refresh.sh --check
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy docs
+            --project-name=${{ steps.id.outputs.project }}
+            --branch=main
+            --commit-dirty=true
+
+      - name: Summary
+        run: |
+          {
+            echo "### 📚 Docs published"
+            echo
+            echo "- Pages project: \`${{ steps.id.outputs.project }}\`"
+            if [ -n "${{ steps.id.outputs.host }}" ]; then
+              echo "- Custom domain: https://${{ steps.id.outputs.host }}"
+              echo
+              echo "> The custom domain is attached ONCE, in the Cloudflare dashboard or via"
+              echo "> \`wrangler pages domain add\`. A deploy does not create DNS, so the first"
+              echo "> publish lands on the \`*.pages.dev\` URL until that is done."
+            else
+              echo "- Custom domain: not set — publishing to the \`*.pages.dev\` URL."
+              echo
+              echo "> Set \`identity.docs_domain\` in \`app-profile/app.yaml\` to publish under"
+              echo "> \`docs.<your-domain>\`."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

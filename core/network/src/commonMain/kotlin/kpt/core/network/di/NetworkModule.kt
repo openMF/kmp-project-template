@@ -46,6 +46,12 @@ import org.koin.dsl.module
 // (`kpt.core.network.<id>.api`), their bindings are GENERATED into [GeneratedApiBindings], and any
 // non-derivable single goes in the fork-owned [ProjectNetworkModule]. So this aggregator carries no
 // endpoint-specific reference at all and a template sync can blind-copy it.
+/**
+ * Koin module for `core/network` — the Ktorfit API bindings over the shared client.
+ *
+ * Bindings are GENERATED from `app-profile/app.yaml#network.access_points` by `syncForkConfig`;
+ * declare an endpoint there and write its API interface, and the wiring follows.
+ */
 val NetworkModule = module {
     // Runtime header values — written at login (Basic / OAuth), read on EVERY request. A singleton,
     // because the whole point is that a value set after the clients were built still reaches them.

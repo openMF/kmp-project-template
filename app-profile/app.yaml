@@ -11,6 +11,13 @@ identity:
   app_id: org.mifos.kmp.template          # REFERENCE example identity — the template ships as the Mifos "Money Toolkit" working demo (a fork re-brands via customize / app-profile). SoT for appId; mirrored to gradle/libs.versions.toml.
   app_name: Money Toolkit                  # REFERENCE app display name (Android app_name, iOS CFBundleDisplayName, settings footer)
   namespace: org.mifos.kmp.template       # mirrors app_id
+  # Apex domain the ARCHITECTURE DOCS publish under, as `docs.<this value>`. OPTIONAL and UNSET by
+  # default: with no value the docs workflow still deploys, to the Cloudflare Pages `*.pages.dev`
+  # URL it gets for free, and simply attaches no custom domain. It is declared here rather than
+  # derived from `app_id` because a reversed package id is not a domain a fork necessarily owns —
+  # guessing one would publish to a host nobody controls and hand out a link that never resolves.
+  # The Pages PROJECT name is always `docs-<fork.project.name>`, so it is unique without this.
+  docs_domain: ""                          # e.g. "mifos.org" → docs.mifos.org
 
 # Per-flavor network endpoints + demo credentials + log tag. syncForkConfig emits these into
 # gradle/fork.properties (network.base.url.{demo,prod} / demo.username / demo.password / log.tag),

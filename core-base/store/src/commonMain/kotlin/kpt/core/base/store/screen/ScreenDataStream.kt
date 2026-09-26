@@ -87,13 +87,13 @@ const val DEFAULT_USER_REFRESH_DEBOUNCE_MS: Long = 1_000L
  * }
  * ```
  */
-@OptIn(kotlin.time.ExperimentalTime::class)
 /**
  * One-shot carrier for force-fresh intent between [ScreenDataStream]'s refresh entry points and the
  * `storeFlow` built in `asScreenStream`. Deliberately NOT a Flow: merging a second flow into the read
  * pipeline added an async subscription hop, and `refreshTrigger` has replay = 0, so a reconnect
  * `tryEmit` landing inside that window was dropped.
  */
+@OptIn(kotlin.time.ExperimentalTime::class)
 internal class ForceFreshLatch {
     var pending: Boolean = false
 
@@ -101,6 +101,14 @@ internal class ForceFreshLatch {
     fun consume(): Boolean = pending.also { pending = false }
 }
 
+/**
+ * One screen's read surface: a cold [ScreenState] flow plus the refresh/retry controls that drive it.
+ *
+ * This is what a repository returns and a ViewModel collects — the single seam where loading,
+ * empty, error, no-network and content are decided ONCE, so no screen re-derives them. Construct it
+ * via `Store.asScreenStream(…)` / `asPagingScreenStream(…)` rather than directly; the constructor is
+ * internal because the flow and the trigger must be wired consistently.
+ */
 class ScreenDataStream<T> internal constructor(
     /**
      * Cold Flow of ScreenState decisions. Consumer should call .stateIn() once.
@@ -228,6 +236,14 @@ class ScreenDataStream<T> internal constructor(
     message = "This API is for unit tests of ScreenDataStream consumers only. " +
         "Do not call from production code.",
 )
+/**
+ * Opt-in marker for the testing-only [ScreenDataStream] constructors.
+ *
+ * Those entry points let a test supply an arbitrary state flow, which bypasses the Store that
+ * normally decides state — useful in a unit test, wrong in production, where it would silently
+ * detach a screen from its cache and freshness rules. Warning rather than error so a test can opt in
+ * locally without a module-wide flag.
+ */
 @Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalScreenDataStreamTestingApi
 

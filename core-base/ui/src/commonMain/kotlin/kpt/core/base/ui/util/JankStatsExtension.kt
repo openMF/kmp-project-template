@@ -12,5 +12,12 @@ package kpt.core.base.ui.util
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.runtime.Composable
 
+/**
+ * Reports dropped frames during scrolling of [scrollableState], tagged [stateName] so one screen's
+ * jank is attributable in a trace.
+ *
+ * Android-only in practice; a no-op `actual` elsewhere, which lets a shared screen call it
+ * unconditionally rather than guarding every use site.
+ */
 @Composable
 expect fun TrackScrollJank(scrollableState: ScrollableState, stateName: String)

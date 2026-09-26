@@ -35,6 +35,13 @@ interface SyncStatePersister {
 
 private const val SYNC_VERSIONS_KEY = "sync_change_list_versions"
 
+/**
+ * [SyncStatePersister] backed by multiplatform-settings — the per-feature last-synced version map,
+ * serialised under a single key.
+ *
+ * Survives process restart but not a data wipe, which is the correct durability: losing it makes the
+ * next sync re-read from the beginning rather than silently skipping a change list.
+ */
 class SettingsSyncStatePersister(
     private val plainSettings: Settings,
 ) : SyncStatePersister {

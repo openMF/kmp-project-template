@@ -39,6 +39,12 @@ import kotlin.time.Clock
     key = "currency:rateHistory:{from}-{to}-{days}d",
     params = ["from:String", "to:String", "days:Int"],
 )
+/**
+ * Historical FX series for a (from, to, window) key — `NETWORK_WITH_CACHE`.
+ *
+ * Widening the window is a NEW key and therefore a full re-fetch, not a page append: the series is
+ * windowed, never paged.
+ */
 fun provideRateHistoryStore(
     api: FrankfurterApi,
     networkMonitor: NetworkMonitor,

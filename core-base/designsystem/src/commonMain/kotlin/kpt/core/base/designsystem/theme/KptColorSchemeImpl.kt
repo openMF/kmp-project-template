@@ -28,6 +28,12 @@ import kpt.core.base.designsystem.core.KptSpacing
 import kpt.core.base.designsystem.core.KptThemeProvider
 import kpt.core.base.designsystem.core.KptTypography
 
+/**
+ * Default [KptColorScheme] — the Material 3 baseline palette.
+ *
+ * `@Immutable` so Compose can skip recomposition when the instance is unchanged. A fork overrides
+ * only the roles it brands and inherits the rest, rather than restating all fifty.
+ */
 @Immutable
 data class KptColorSchemeImpl(
     override val primary: Color = Color(0xFF6750A4),
@@ -80,6 +86,9 @@ data class KptColorSchemeImpl(
     override val onTertiaryFixedVariant: Color = Color(0xFF4D2733),
 ) : KptColorScheme
 
+/**
+ * Default [KptTypography] — the Material 3 type scale at its standard sizes and weights.
+ */
 @Immutable
 data class KptTypographyImpl(
     override val displayLarge: TextStyle = TextStyle(
@@ -174,6 +183,9 @@ data class KptTypographyImpl(
     ),
 ) : KptTypography
 
+/**
+ * Default [KptShapes] — the Material 3 corner scale, 4dp through 28dp.
+ */
 @Immutable
 data class KptShapesImpl(
     override val extraSmall: CornerBasedShape = RoundedCornerShape(4.dp),
@@ -183,6 +195,10 @@ data class KptShapesImpl(
     override val extraLarge: CornerBasedShape = RoundedCornerShape(28.dp),
 ) : KptShapes
 
+/**
+ * Default [KptSpacing] — a 4dp-based scale. Components reference these rather than literal `.dp`,
+ * so retuning density is one edit here instead of a sweep through every layout.
+ */
 @Immutable
 data class KptSpacingImpl(
     override val xs: Dp = 4.dp,
@@ -193,6 +209,9 @@ data class KptSpacingImpl(
     override val xxl: Dp = 64.dp,
 ) : KptSpacing
 
+/**
+ * Default [KptElevation] — Material 3 levels 0–5.
+ */
 @Immutable
 data class KptElevationImpl(
     override val level0: Dp = 0.dp,
@@ -203,6 +222,9 @@ data class KptElevationImpl(
     override val level5: Dp = 12.dp,
 ) : KptElevation
 
+/**
+ * Default [KptThemeProvider], composing the five default scales into one design language.
+ */
 @Immutable
 data class KptThemeProviderImpl(
     override val colors: KptColorScheme = KptColorSchemeImpl(),
@@ -212,12 +234,31 @@ data class KptThemeProviderImpl(
     override val elevation: KptElevation = KptElevationImpl(),
 ) : KptThemeProvider
 
+/**
+ * CompositionLocal carrying the active [KptColorScheme]. `static` because the theme changes rarely —
+ * a read does not subscribe, so a palette swap recomposes the subtree rather than every reader.
+ */
 val LocalKptColors = staticCompositionLocalOf<KptColorScheme> { KptColorSchemeImpl() }
+/**
+ * CompositionLocal carrying the active [KptTypography].
+ */
 val LocalKptTypography = staticCompositionLocalOf<KptTypography> { KptTypographyImpl() }
+/**
+ * CompositionLocal carrying the active [KptShapes].
+ */
 val LocalKptShapes = staticCompositionLocalOf<KptShapes> { KptShapesImpl() }
+/**
+ * CompositionLocal carrying the active [KptSpacing].
+ */
 val LocalKptSpacing = staticCompositionLocalOf<KptSpacing> { KptSpacingImpl() }
+/**
+ * CompositionLocal carrying the active [KptElevation].
+ */
 val LocalKptElevation = staticCompositionLocalOf<KptElevation> { KptElevationImpl() }
 
+/**
+ * DSL builder for a complete [KptThemeProvider]. Entry point: [kptTheme].
+ */
 @ComponentDsl
 class KptThemeBuilder {
     private var colors: KptColorScheme = KptColorSchemeImpl()
@@ -255,6 +296,9 @@ class KptThemeBuilder {
     )
 }
 
+/**
+ * DSL builder for a [KptColorScheme]; unset roles keep their defaults.
+ */
 @ComponentDsl
 class KptColorSchemeBuilder {
     var primary: Color = Color(0xFF6750A4)
@@ -310,6 +354,9 @@ class KptColorSchemeBuilder {
     )
 }
 
+/**
+ * DSL builder for a [KptTypography]; unset styles keep their defaults.
+ */
 @ComponentDsl
 class KptTypographyBuilder {
     var displayLarge: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 57.sp)
@@ -347,6 +394,9 @@ class KptTypographyBuilder {
     )
 }
 
+/**
+ * DSL builder for a [KptShapes]; unset corners keep their defaults.
+ */
 @ComponentDsl
 class KptShapesBuilder {
     var extraSmall: CornerBasedShape = RoundedCornerShape(4.dp)
@@ -364,6 +414,9 @@ class KptShapesBuilder {
     )
 }
 
+/**
+ * DSL builder for a [KptSpacing]; unset steps keep their defaults.
+ */
 @ComponentDsl
 class KptSpacingBuilder {
     var xs: Dp = 4.dp
@@ -383,6 +436,9 @@ class KptSpacingBuilder {
     )
 }
 
+/**
+ * DSL builder for a [KptElevation]; unset levels keep their defaults.
+ */
 @ComponentDsl
 class KptElevationBuilder {
     var level0: Dp = 0.dp
@@ -402,6 +458,12 @@ class KptElevationBuilder {
     )
 }
 
+/**
+ * Composition-local accessor for the active design language — `KptTheme.colors`, `.typography`,
+ * `.shapes`, `.spacing`, `.elevation`.
+ *
+ * The read side of the theme; [kptTheme] is the write side.
+ */
 object KptTheme {
     val colorScheme: KptColorScheme
         @Composable get() = LocalKptColors.current
@@ -419,6 +481,13 @@ object KptTheme {
         @Composable get() = LocalKptElevation.current
 }
 
+/**
+ * Builds a [KptThemeProvider] with the DSL, overriding only what a fork brands:
+ *
+ * ```kotlin
+ * val theme = kptTheme { colors { primary = BrandPurple } }
+ * ```
+ */
 fun kptTheme(block: KptThemeBuilder.() -> Unit): KptThemeProvider {
     return KptThemeBuilder().apply(block).build()
 }

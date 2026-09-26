@@ -1,136 +1,525 @@
 # `core/store`
 
-> **Layer:** `core` — fork-owned implementation, and a **codegen target**.
-> **Instruction surface:** `CORE_STORE.md` — the generator-facing instruction for this module,
-> held in the framework at `training-layer/instructions/stream-first/latest/`. This guide
-> is the architecture SoT; that surface is how it reaches codegen, and
-> `/kmp-project-template-retrain` keeps the two in step.
-> **Shape:** 35 Kotlin files (6 test) · source sets: `commonMain`, `commonTest`
-
-
-
-## When implementing a feature
-
-**Tier 4** of the codegen chain, written by **`kmp-store-gen`**.
-
-**Does your feature need this module?** Use when /kmp-implement needs the Store5 keystone layer (StoreFactory.createStore / createMutableStore, declared by @StoreProvider + @CacheKey — store-ksp generates the registry, ids, cache keys, Koin binding and logout register; no registry or DI edit).
-
-**Where the code goes**
-
-```
-core/store/src/commonMain/kotlin/kpt/core/store/<your-domain>/
-```
-
-One package per domain — the template's own `UserDataStore.kt` sits at `kpt/core/store/prefs/impl/`. Do not flatten
-everything into the module root, and do not add to `di/`, `config/` or `migrations/`:
-those are infrastructure, not feature surface.
-
-**How it wires**
-
-Annotate — that is the whole registration. There is no DI file to edit:
-
-- `@StoreProvider` → generates `config/AppStoreRegistry, config/AppStoreIds, di/GeneratedStoreBindings`
-- `@CacheKey` → generates `config/AppCacheKeys`
-
-The aggregates above are **build artifacts**. Authoring one in source produces
-duplicate declarations that fail the build, so a feature adds its annotation and
-nothing else.
-
-**Next in the chain:** tier 5 (`core/data`, `core/designsystem`).
-
-## Position in the module graph
-
-**Exposes transitively** (`api`) — a consumer of this module also sees these:
-
-- [`core-base/store`](../core-base/store.md)
-- [`core-base/ui`](../core-base/ui.md)
-
-**Uses internally** (`implementation`) — not visible to consumers:
-
-`core-base/database`, `core/database`, `core/model`, `core/network`
-
-**Consumed by** 17 module(s): `core/data`, `core/designsystem`, `feature/add-to-watchlist`, `feature/alerts`, `feature/amortization`, `feature/bills`, `feature/calculators`, `feature/cloudtodo`, `feature/crypto`, `feature/home`, `feature/loans`, `feature/macro` …and 5 more
+> **Layer:** core — fork-owned; a codegen target
+> **Corpus surface:** `CORE_STORE.md`
+> **Measured:** 35 Kotlin files, 6 test files
 
 ## Codegen contracts owned here
 
-These annotations **are** the declaration. Their aggregates are build artifacts;
-authoring one in source produces duplicate declarations that fail the build.
+| annotation | processor | generates |
+|---|---|---|
+| `@StoreProvider` | `store-ksp` | config/AppStoreRegistry, config/AppStoreIds, di/GeneratedStoreBindings |
+| `@CacheKey` | `store-ksp` | config/AppCacheKeys |
 
-| annotation | target | processor | generates |
-|---|---|---|---|
-| `@StoreProvider` | `FUNCTION` | `store-ksp` | config/AppStoreRegistry, config/AppStoreIds, di/GeneratedStoreBindings |
-| `@CacheKey` | `FUNCTION` | `store-ksp` | config/AppCacheKeys |
-
-**`@StoreProvider`** — Declares qualifier, TTL and the logout purge in one place. `logout` drives BOTH the binding and the purge, so they cannot disagree; `logout = false` only for a MutableStore, which Store5 5.1 cannot register.
-
-**`@CacheKey`** — Keys nest per store because roles (LIST, item) repeat across stores and flat would collide. A duplicate key STRING is a build error: two streams sharing a key share a fetched-at stamp.
-
-Declared in [`CONTRACT.yaml`](../../CONTRACT.yaml), which is verified equal to the
-code in both directions by `framework-verify-architecture-contract.sh`.
+Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machine-verified SoT and this table is its human projection.
 
 ## Principal types
 
-- **`AmortizationCalcParams`** — Store key for one amortization calculation — the calculator's inputs.
-- **`AmortizationCompute`** — The compute PORT for the amortization store.
-- **`CloudTodoConflictResolver`** — The named conflict surface for the cloud-todo MUTABLE archetype (S5-CONFLICT).
-- **`CloudTodoSyncOrchestrator`** — Drains the cloud-todo write backlog when connectivity returns (S5-SYNC).
-- **`EmiCompute`** — The compute PORT for the EMI store.
-- **`EmiParams`** — The Store key for a single EMI computation — the calculator's inputs.
-- **`ErrorMessageOverrides`** — The fork's error-copy extension point, declared HERE so it is TEMPLATE-owned and full-copied by
-- **`InterestRateSeriesKey`** — Composite key identifying a single FRED series request. FRED's
-- **`MacroIndicatorKey`** — Composite key identifying a single World Bank macro-indicator request.
-- **`ProfileInfoSource`** — The read PORT for the profile store.
-- **`ProjectErrorMapper`** — THE FORK'S domain-error copy. Neutral on the template — this is yours to fill.
-- **`ProjectScreenStateDefaults`** — THE FORK'S branding for the shared empty / error / no-network / loading visuals. Neutral on the
-- …and 2 more documented types
-
-Undocumented: `CloudTodoKey`
-
-## Demo showcase exposure
-
-**None.** No `demo/` package and no `// demo:begin` fence — `remove-demo.sh` does not
-touch this module, so a stripped fork keeps it verbatim.
-
-## Tests
-
-6 test file(s) under `core/store/src/commonTest/`. 
-Shared idiom: `CORE_TESTING.md`.
-
-
-
-## Sample implementation
-
-Real code from this module, showing the `@StoreProvider` contract in use.
-
-```kotlin
-/**
- * MEMORY_ONLY Store5 store over a pure computation (`feature_profile.combo_id: calculator_pure`).
- *
- * There is no network and no source of truth, so the Store contributes exactly one thing:
- * an in-memory cache keyed on [EmiParams]. Re-entering a parameter set the user already tried
- * — the common case while dragging a tenure slider back and forth — is served from cache
- * instead of recomputed, and the result reaches the screen as a `ScreenState` like every other
- * read surface, so the calculator renders through the same `ScreenContent` wrapper as the rest
- * of the app rather than a bespoke nullable `StateFlow`.
- *
- * MEMORY_ONLY is only legal because no `cache_strategy` is declared for this feature (SC2).
- */
-@StoreProvider(id = "emi")
-@CacheKey(
-    fn = "of",
-    key = "emi:{principal}:{ratePercent}:{tenureMonths}",
-    params = ["principal:Double", "ratePercent:Double", "tenureMonths:Int"],
-)
-fun provideEmiStore(compute: EmiCompute): Store<EmiParams, EmiResult> =
-    StoreFactory.createMemoryStore(
-        fetcher = Fetcher.of { params: EmiParams -> compute(params) },
-    )
-```
-
-Source: [`src/commonMain/kotlin/kpt/core/store/emi/impl/EmiStore.kt`](../../../../core/store/src/commonMain/kotlin/kpt/core/store/emi/impl/EmiStore.kt).
+`AmortizationCalcParams`, `AmortizationCompute`, `CloudTodoConflictResolver`, `CloudTodoKey`, `CloudTodoSyncOrchestrator`, `EmiCompute`, `EmiParams`, `ErrorMessageOverrides`, `InterestRateSeriesKey`, `MacroIndicatorKey`, `ProfileInfoSource`, `ProjectErrorMapper`, `ProjectScreenStateDefaults`, `ScreenStateOverrides`  …and 1 more
 
 <!-- scaffold:end -->
 
 ## Notes
 
 _Authored prose below this marker is preserved by the scaffolder._
+
+<!-- api-docs:begin module=core/store sha=cb65fd213a62c3161b86de59bce0790c6019b185 -->
+## API reference
+
+_Generated from `core/store` at tree `cb65fd213a62` by `scripts/docs/api-docs-gen.sh`._
+_Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertMappers.kt`
+
+```kotlin
+fun AlertEntity.toPriceAlert(): PriceAlert = PriceAlert(
+```
+Entity ⇄ domain mappers for the price-alerts feature.
+
+```kotlin
+fun PriceAlert.toAlertEntity(): AlertEntity = AlertEntity(
+```
+@see toPriceAlert — the persistable inverse used by the repository's write path.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertsStore.kt`
+
+```kotlin
+fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFactory.createOfflineStore(
+```
+Build an offline-only `Store` for price alerts. Backed exclusively by `AlertDao` — there is no remote fetcher.
+
+```kotlin
+fun provideAlertsWriteStore(dao: AlertDao): MutableStore<String, PriceAlert> =
+```
+Per-item WRITE store for price alerts (keyed by alert id).
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/banking/impl/BillReminderMappers.kt`
+
+```kotlin
+fun BillReminderEntity.toDomain(): BillReminder = BillReminder(
+```
+Entity ⇄ domain mappers for the bill-reminders feature.
+
+```kotlin
+fun BillReminder.toEntity(): BillReminderEntity = BillReminderEntity(
+```
+@see toDomain — the persistable inverse used by the repository's write path.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/banking/impl/BillRemindersStore.kt`
+
+```kotlin
+fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillReminder>> =
+```
+Build an offline-only `Store` for recurring bill reminders. Backed exclusively by `BillReminderDao` (OFFLINE_LOCAL_ONLY archetype) — bill reminders are user-created local records with no remote source.
+
+```kotlin
+fun provideBillReminderDetailStore(dao: BillReminderDao): Store<String, BillReminder> =
+```
+_No KDoc at source._
+
+```kotlin
+fun provideBillRemindersWriteStore(dao: BillReminderDao): MutableStore<String, BillReminder> =
+```
+Per-item WRITE store for bill reminders (keyed by bill id). Every mutation flows through `store.write` / `store.clear`, so the repository never touches the DAO for writes — the SoT writer/delete are the single DAO callers.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/banking/impl/LoanMappers.kt`
+
+```kotlin
+fun LoanEntity.toDomain(): Loan = Loan(
+```
+Entity ⇄ domain mappers for the loans feature.
+
+```kotlin
+fun Loan.toEntity(): LoanEntity = LoanEntity(
+```
+@see toDomain — the persistable inverse used by the repository's write path.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/banking/impl/LoansStore.kt`
+
+```kotlin
+fun provideLoansStore(dao: LoanDao): Store<Unit, List<Loan>> = StoreFactory.createOfflineStore(
+```
+Build an offline-only `Store` for tracked personal loans. Backed exclusively by `LoanDao` (OFFLINE_LOCAL_ONLY archetype) — loans are user-managed local records with no remote sync.
+
+```kotlin
+fun provideLoanDetailStore(dao: LoanDao): Store<String, Loan> = StoreFactory.createOfflineStore(
+```
+_No KDoc at source._
+
+```kotlin
+fun provideLoansWriteStore(dao: LoanDao): MutableStore<String, Loan> =
+```
+Per-item WRITE store for loans (keyed by loan id). Every mutation flows through `store.write` / `store.clear`, so the repository never touches the DAO — the SoT writer/delete are the single DAO callers.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/calc/impl/AmortizationCalcStore.kt`
+
+```kotlin
+data class AmortizationCalcParams(
+```
+Store key for one amortization calculation — the calculator's inputs. An amortization schedule for a 240-month loan is a 240-row list rebuilt on every keystroke when it is derived straight off a form `StateFlow`.
+
+<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/amortizationcalc/AmortizationViewModel.kt:65</code></summary>
+
+```kotlin
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val breakdownState: StateFlow<ScreenState<AmortizationBreakdown>> = stateFlow
+        .map { AmortizationCalcParams(it.principal, it.ratePercent, it.tenureMonths) }
+        .distinctUntilChanged()
+        .flatMapLatest { params ->
+            if (params.isComputable) {
+                calcRepository.breakdownStream(params, viewModelScope)
+```
+
+</details>
+
+```kotlin
+fun interface AmortizationCompute
+```
+The compute PORT for the amortization store.
+
+```kotlin
+fun provideAmortizationCalcStore(
+```
+_No KDoc at source._
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/cloudtodo/impl/CloudTodoConflictResolver.kt`
+
+```kotlin
+class CloudTodoConflictResolver(
+```
+The named conflict surface for the cloud-todo MUTABLE archetype (S5-CONFLICT).
+
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/cloudtodo/impl/CloudTodoStore.kt:78</code></summary>
+
+```kotlin
+    bookkeeper: Bookkeeper<CloudTodoKey>,
+): MutableStore<CloudTodoKey, CloudTodo> {
+    val conflictResolver = CloudTodoConflictResolver()
+
+    val converter = Converter.Builder<CloudTodoDto, CloudTodoEntity, CloudTodo>()
+        // fetch -> SoT: network DTO mapped through domain to the Room entity.
+        .fromNetworkToLocal { network: CloudTodoDto -> network.toDomain().toEntity() }
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/cloudtodo/impl/CloudTodoKey.kt`
+
+```kotlin
+data class CloudTodoKey(val id: Int)
+```
+Single-todo Store5 key (jsonplaceholder addresses todos by numeric id).
+
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/impl/CloudTodoRepositoryImpl.kt:36</code></summary>
+
+```kotlin
+@RepositoryBinding(binds = CloudTodoRepository::class)
+class CloudTodoRepositoryImpl(
+    @FromStore(AppStoreIds.CloudTodo) private val readStore: Store<CloudTodoKey, CloudTodo>,
+    @FromStore(AppStoreIds.CloudTodoMutable) private val writeStore: MutableStore<CloudTodoKey, CloudTodo>,
+    private val gateway: MutationGateway,
+) : CloudTodoRepository {
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/cloudtodo/impl/CloudTodoStore.kt`
+
+```kotlin
+fun provideCloudTodoReadStore(
+```
+cloud-todo READ store (`createStore`) — the offline-first read half of the MUTABLE archetype.
+
+```kotlin
+fun provideCloudTodoStore(
+```
+cloud-todo — the toolkit's **MUTABLE (offline-write) Store5 archetype** showcase, and the only demo that writes back to a server (jsonplaceholder `/todos` accepts PUT).
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/cloudtodo/impl/CloudTodoSyncOrchestrator.kt`
+
+```kotlin
+class CloudTodoSyncOrchestrator(
+```
+Drains the cloud-todo write backlog when connectivity returns (S5-SYNC). The MUTABLE archetype records a failed write through its `Bookkeeper` — but recording is only half of offline-first.
+
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/CloudTodoDataProviders.kt:47</code></summary>
+
+```kotlin
+ */
+@DataProvider(createdAtStart = true)
+fun provideCloudTodoSyncOrchestrator(
+    scope: CoroutineScope,
+    networkMonitor: NetworkMonitor,
+    bookkeeperDao: BookkeeperDao,
+    bookkeeper: Bookkeeper<CloudTodoKey>,
+```
+
+</details>
+
+```kotlin
+fun String.toCloudTodoKeyOrNull(): CloudTodoKey? =
+```
+Parse a bookkeeper key back into a `CloudTodoKey`, or `null` when it belongs to a different store.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/config/AppErrorMapper.kt`
+
+```kotlin
+fun errorCategoryToken(error: Throwable): String = when (val cat = categorize(error))
+```
+Application-level error → user-facing message mapper. ONE source of user-facing copy: `rememberAppErrorMessageFor`, which resolves every `ErrorCategory` through `stringResource(...)`.
+
+```kotlin
+interface ErrorMessageOverrides
+```
+The fork's error-copy extension point, declared HERE so it is TEMPLATE-owned and full-copied by every sync. `ProjectErrorMapper` implements it and is the only fork-owned half.
+
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/ProjectErrorMapper.kt:50</code></summary>
+
+```kotlin
+ * stop refetching. Declare the key on its store instead.
+ */
+object ProjectErrorMapper : ErrorMessageOverrides
+```
+
+</details>
+
+- `fun message(error: Throwable): String? = null` — Fork copy for `error`, or null to fall through to the framework's categorised message.
+
+```kotlin
+fun rememberAppErrorMessageFor(): (Throwable) -> String
+```
+Composable factory that resolves per-category copy via `stringResource(...)`, returning a pure-Kotlin `(Throwable) -> String` lambda safe to pass through to `kpt.core.base.ui.screen.ScreenStateError.messageFor` (which is invoked from inside composition where these strings are already memoised). Reuses `categorize` to bucket the error, then picks the localized string.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt`
+
+```kotlin
+fun appScreenStateDefaults(): ScreenStateDefaults
+```
+TEMPLATE-OWNED framework defaults. Brand your app in `ProjectScreenStateDefaults` instead — do NOT edit this file. It used to say "!!
+
+```kotlin
+interface ScreenStateOverrides
+```
+The fork's screen-state branding extension point, declared HERE so it is TEMPLATE-owned and full-copied by every sync. `ProjectScreenStateDefaults` implements it and is the only fork-owned half.
+
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/ProjectScreenStateDefaults.kt:39</code></summary>
+
+```kotlin
+ * that introduces it.
+ */
+object ProjectScreenStateDefaults : ScreenStateOverrides
+```
+
+</details>
+
+- `fun customize(defaults: ScreenStateDefaults): ScreenStateDefaults = defaults` — Return `defaults` with the fork's branding applied, or `defaults` unchanged.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/config/ProjectErrorMapper.kt`
+
+```kotlin
+object ProjectErrorMapper : ErrorMessageOverrides
+```
+THE FORK'S domain-error copy. Neutral on the template — this is yours to fill.
+
+<details><summary>Example</summary>
+
+```kotlin
+object ProjectErrorMapper : ErrorMessageOverrides {
+    override fun message(error: Throwable): String? = when (error) {
+        is InsufficientFundsException -> "Not enough balance for this transfer."
+        is CardDeclinedException -> "That card was declined. Try another payment method."
+        else -> null
+    }
+}
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppErrorMapper.kt:101</code></summary>
+
+```kotlin
+    val clientCopy = stringResource(Res.string.error_category_client)
+    val genericCopy = stringResource(Res.string.error_category_generic)
+    val projectCopy = ProjectErrorMapper::message
+    return remember(
+        networkCopy,
+        connectTimeoutCopy,
+        readTimeoutCopy,
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/config/ProjectScreenStateDefaults.kt`
+
+```kotlin
+object ProjectScreenStateDefaults : ScreenStateOverrides
+```
+THE FORK'S branding for the shared empty / error / no-network / loading visuals. Neutral on the template — this is yours to fill. Implements the TEMPLATE-owned `ScreenStateOverrides`.
+
+<details><summary>Example</summary>
+
+```kotlin
+object ProjectScreenStateDefaults : ScreenStateOverrides {
+    override fun customize(defaults: ScreenStateDefaults): ScreenStateDefaults = defaults.copy(
+        empty = defaults.empty.copy(visual = ScreenStateVisual.Lottie(spec = MyBrandAnimations.empty)),
+        error = defaults.error.copy(onShown = { e -> AppTelemetry.recordError("screen_state_error", e) }),
+    )
+}
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt:102</code></summary>
+
+```kotlin
+                retryText = nonetRetry,
+            ),
+        ).let(ProjectScreenStateDefaults::customize)
+    }
+}
+
+/**
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinDetailStore.kt`
+
+```kotlin
+fun provideCoinDetailStore(
+```
+_No KDoc at source._
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt`
+
+```kotlin
+fun provideCoinMarketsStore(
+```
+_No KDoc at source._
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/currency/impl/ExchangeRatesStore.kt`
+
+```kotlin
+fun provideExchangeRatesStore(
+```
+_No KDoc at source._
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/currency/impl/RateHistoryStore.kt`
+
+```kotlin
+fun provideRateHistoryStore(
+```
+_No KDoc at source._
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt`
+
+```kotlin
+val appStoreModule: Module = module
+```
+App-level Store wiring — FRAMEWORK ONLY.
+
+<details><summary>Example</summary>
+
+```kotlin
+@StoreProvider(id = "myThing", ttl = "5m")
+@CacheKey(name = "LIST", key = "myThing")
+fun provideMyThingStore(api: MyApi, dao: MyDao): Store<Unit, List<MyThing>> = …
+startKoin { modules(appStoreModule, /* … */) }
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/economic/impl/InterestRateSeriesKey.kt`
+
+```kotlin
+data class InterestRateSeriesKey(
+```
+Composite key identifying a single FRED series request.
+
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/ui/HomeViewModel.kt:206</code></summary>
+
+```kotlin
+
+        /** Effective Federal Funds Rate — the overnight bank-to-bank lending rate. */
+        val FedFundsKey: InterestRateSeriesKey = InterestRateSeriesKey(
+            seriesId = "DFF",
+            name = "Federal Funds Rate",
+            unit = "%",
+            days = 30,
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/economic/impl/InterestRateSeriesStore.kt`
+
+```kotlin
+fun provideInterestRateSeriesStore(
+```
+Build a `Store` for FRED interest-rate series with `InterestRateSeriesDao`-backed offline cache (NETWORK_WITH_CACHE archetype). Previously in-memory only.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/economic/impl/MacroIndicatorKey.kt`
+
+```kotlin
+data class MacroIndicatorKey(
+```
+Composite key identifying a single World Bank macro-indicator request.
+
+<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroViewModel.kt:64</code></summary>
+
+```kotlin
+
+        TRACKED_INDICATORS.forEach { kind ->
+            val key = MacroIndicatorKey(countryCode = countryCode, indicator = kind)
+            val stream = repository.macroIndicatorStream(key = key, scope = viewModelScope)
+            streams[kind] = stream
+            // Reset the per-cell state to Loading on re-subscription so the
+            // card visibly indicates "fetching for new country" instead of
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/economic/impl/MacroIndicatorStore.kt`
+
+```kotlin
+fun provideMacroIndicatorStore(
+```
+_No KDoc at source._
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/emi/impl/EmiStore.kt`
+
+```kotlin
+data class EmiParams(
+```
+The Store key for a single EMI computation — the calculator's inputs. A calculator has no remote resource to key on, so the INPUTS are the key: two identical parameter sets are the same cache entry, and changing any field is a new entry.
+
+<details><summary>Used in the template — <code>feature/emi-calculator/src/commonMain/kotlin/kpt/feature/emicalculator/ui/EmiCalculatorViewModel.kt:45</code></summary>
+
+```kotlin
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val emiState: StateFlow<ScreenState<EmiResult>> = stateFlow
+        .map { EmiParams(it.principal, it.ratePercent, it.tenureMonths) }
+        .distinctUntilChanged()
+        .flatMapLatest { params ->
+            if (params.isComputable) {
+                repository.emiStream(params, viewModelScope)
+```
+
+</details>
+
+```kotlin
+fun interface EmiCompute
+```
+The compute PORT for the EMI store.
+
+```kotlin
+fun provideEmiStore(compute: EmiCompute): Store<EmiParams, EmiResult> =
+```
+_No KDoc at source._
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/exchange/impl/SpotRateLookupStore.kt`
+
+```kotlin
+fun provideSpotRateLookupStore(
+```
+Build a network-backed `Store` for spot (current) exchange-rate lookups.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt`
+
+```kotlin
+fun interface UserDataSource
+```
+The read PORT for the user-preferences store. The preferences themselves live in `core/datastore`, which `core/store` does not depend on (and must not — `core/datastore` sits beside it in the layer order, not below).
+
+```kotlin
+fun provideUserDataStore(source: UserDataSource): Store<Unit, UserData> =
+```
+OFFLINE_LOCAL_ONLY Store5 store over user preferences (`feature_profile.combo_id: local_only_prefs`).
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/profile/impl/ProfileStore.kt`
+
+```kotlin
+fun interface ProfileInfoSource
+```
+The read PORT for the profile store. The template's profile data is the app display name, which comes from `AppInfo` in `core-base/ui` — a Compose-side module `core/store` does not depend on.
+
+```kotlin
+fun provideProfileStore(source: ProfileInfoSource): Store<Unit, ProfileInfo> =
+```
+MEMORY_ONLY Store5 store for the profile screen (`feature_profile.combo_id: static_content`). The template's profile is a static local placeholder, so this store is deliberately thin — its value is the SEAM, not the caching.
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/watchlist/impl/WatchlistStore.kt`
+
+```kotlin
+fun provideWatchlistStore(dao: WatchlistDao): Store<Unit, List<WatchlistItem>> = StoreFactory.createOfflineStore(
+```
+Offline-only `Store` for the personal watchlist (`read_local_list` demo). Backed exclusively by `WatchlistDao` — no remote fetcher.
+
+```kotlin
+fun provideWatchlistWriteStore(dao: WatchlistDao): MutableStore<String, WatchlistItem> =
+```
+Per-item WRITE store for the watchlist (keyed by coin id).
+
+---
+
+_11 type(s), 40 function(s)/property(ies); 42 carry KDoc at source; 3 authored example(s); 11 live call site(s)._
+<!-- api-docs:end -->

@@ -1,132 +1,226 @@
 # `core/datastore`
 
-> **Layer:** `core` — fork-owned implementation, and a **codegen target**.
-> **Instruction surface:** `CORE_DATASTORE.md` — the generator-facing instruction for this module,
-> held in the framework at `training-layer/instructions/stream-first/latest/`. This guide
-> is the architecture SoT; that surface is how it reaches codegen, and
-> `/kmp-project-template-retrain` keeps the two in step.
-> **Shape:** 9 Kotlin files (2 test) · source sets: `androidMain`, `commonMain`, `commonTest`
-
-
-
-## When implementing a feature
-
-**Tier 2** of the codegen chain, written by **`kmp-datastore-gen`**.
-
-**Does your feature need this module?** Use when /kmp-implement determines a feature is local-only (no api / no remote data-flow) and needs persisted prefs.
-
-**Where the code goes**
-
-```
-core/datastore/src/commonMain/kotlin/kpt/core/datastore/<your-domain>/
-```
-
-One package per domain — the template's own `AppReviewPromptStore.kt` sits at `kpt/core/datastore/prefs/`. Do not flatten
-everything into the module root, and do not add to `di/`, `config/` or `migrations/`:
-those are infrastructure, not feature surface.
-
-**How it wires**
-
-No annotation contract in this module — follow the DI convention already present in
-its `di/` module, and prefer extending an existing seam over adding a new one.
-
-**Next in the chain:** tier 3 (`core/network`).
-
-## Position in the module graph
-
-**Uses internally** (`implementation`) — not visible to consumers:
-
-`core-base/common`, `core-base/datastore`, `core/common`, `core/model`
-
-**Consumed by** 2 module(s): `core/data`, `core/network`
-
-## Codegen contracts
-
-**None.** Nothing here is declared by annotation, so there is no aggregate to
-generate and no propagation target. A generator writing into this module takes its
-idiom from `CORE_DATASTORE.md`.
+> **Layer:** core — fork-owned; a codegen target
+> **Corpus surface:** `CORE_DATASTORE.md`
+> **Measured:** 9 Kotlin files, 2 test files
 
 ## Principal types
 
-- **`AppReviewPromptState`** — What the review policy needs to know at app open, derived from [AppReviewPromptStore].
-- **`ProjectPreferencesRepository`** — THE FORK'S preferences. Extends the framework's — this is yours to fill.
-- **`ProjectPreferencesRepositoryImpl`** — Fork implementation of [ProjectPreferencesRepository]. `owner: fork` — never synced.
-- **`SettingsAppReviewPromptStore`** — [Settings]-backed [AppReviewPromptStore], using the same plain store as user preferences.
-- **`UserPreferencesRepository`** — Repository interface for managing user preferences with reactive
-- **`UserPreferencesRepositoryImpl`** — Splits user data storage between plain (UI preferences) and secure
-
-Undocumented: `AppReviewPromptStore`
-
-## Demo showcase exposure
-
-**None.** No `demo/` package and no `// demo:begin` fence — `remove-demo.sh` does not
-touch this module, so a stripped fork keeps it verbatim.
-
-## Tests
-
-2 test file(s) under `core/datastore/src/commonTest/`. 
-Shared idiom: `CORE_TESTING.md`.
-
-
-
-## Sample implementation
-
-Real code from this module — the shape a generator should follow here.
-
-```kotlin
-/**
- * What the review policy needs to know at app open, derived from [AppReviewPromptStore].
- *
- * @property launchCount completed app launches, including this one.
- * @property daysSinceInstall whole days since first launch.
- * @property daysSinceLastPrompt whole days since the last prompt, or `null` if never prompted.
- */
-data class AppReviewPromptState(
-    val launchCount: Int,
-    val daysSinceInstall: Int,
-    val daysSinceLastPrompt: Int?,
-)
-
-/**
- * Tracks the three counters that gate the automatic review prompt.
- *
- * Deliberately NOT part of [UserPreferencesRepository]: this is DEVICE state, not user state. It
- * must survive sign-out — a user who declined a prompt yesterday should not be asked again today
- * because they logged out in between — whereas `clearUserData()` exists to discard per-user state.
- * Keeping it separate means a fork that later makes `clearUserData()` actually clear the blob
- * cannot silently reset everyone's cooldown.
- *
- * It stores COUNTERS only. Whether those counters justify a prompt is
- * `AppReviewConfig.shouldPromptForReview(...)`, whose thresholds are generated from app-profile —
- * so the policy lives with the config and this stays a dumb ledger.
- */
-// datastore-scope: per-device — launch count, install date and last-prompt date gate a
-// cooldown that must survive sign-out; a user who declined yesterday must not be asked again
-// today merely because they logged out in between. clearUserData() deliberately does NOT
-// reach these, which is why they are not fields on UserData.
-interface AppReviewPromptStore {
-
-    /**
-     * Record an app launch and return the resulting state.
-     *
-     * Called once per launch from the app shell. On first ever call it stamps the install date, so
-     * `daysSinceInstall` is 0 rather than "since the epoch" — without the stamp every fresh install
-     * would read as decades old and clear the install-age threshold immediately.
-     */
-    fun recordLaunch(): AppReviewPromptState
-
-    /**
-     * Stamp that a prompt was just requested, starting the cooldown.
-     *
-     * Recorded on REQUEST, not on a completed review, because neither Play nor StoreKit reports
-     * whether the user actually reviewed. Treating "asked" as the cooldown trigger is the only
-    // … (excerpt)
-```
-
-Source: [`src/commonMain/kotlin/kpt/core/datastore/prefs/AppReviewPromptStore.kt`](../../../../core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/AppReviewPromptStore.kt) — excerpt; read the file for the full implementation.
+`AppReviewPromptState`, `AppReviewPromptStore`, `ProjectPreferencesRepository`, `ProjectPreferencesRepositoryImpl`, `SettingsAppReviewPromptStore`, `UserPreferencesRepository`, `UserPreferencesRepositoryImpl`
 
 <!-- scaffold:end -->
 
 ## Notes
 
 _Authored prose below this marker is preserved by the scaffolder._
+
+<!-- api-docs:begin module=core/datastore sha=70a5f34bf469fd297d7686e083f25bd6c50c3b37 -->
+## API reference
+
+_Generated from `core/datastore` at tree `70a5f34bf469` by `scripts/docs/api-docs-gen.sh`._
+_Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
+
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt`
+
+```kotlin
+val DatastoreModule = module
+```
+_No KDoc at source._
+
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:42</code></summary>
+
+```kotlin
+ */
+val DataModule = module {
+    includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
+
+    // Every repository's Koin binding, GENERATED from `@RepositoryBinding` on the implementation.
+    // Emitted into this same package, so this file needs no import and keeps its zero-demo-reference
+    // property — which is what lets a template sync blind-copy it. A stripped fork simply generates
+```
+
+</details>
+
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ProjectDatastoreModule.kt`
+
+```kotlin
+val ProjectDatastoreModule = module
+```
+THE FORK'S datastore DI seam. Empty on the neutral template — this is yours to fill. `DatastoreModule` beside it is `owner: template` and FULL-COPIES on a sync, so a binding added there is replaced on the next adopt.
+
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/AppReviewPromptStore.kt`
+
+```kotlin
+data class AppReviewPromptState(
+```
+What the review policy needs to know at app open, derived from `AppReviewPromptStore`.
+
+```kotlin
+interface AppReviewPromptStore
+```
+_No KDoc at source._
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:38</code></summary>
+
+```kotlin
+    // Review-prompt counters — Settings-backed, DEVICE-scoped (survives sign-out, unlike user prefs).
+    // Read once per launch by the app shell, which asks AppReviewConfig whether they justify a prompt.
+    single<AppReviewPromptStore> {
+        SettingsAppReviewPromptStore(plainSettings = get<Settings>(named("plain")))
+    }
+
+    // Sync state persister — Settings-backed (same store as user prefs).
+```
+
+</details>
+
+- `fun recordLaunch(): AppReviewPromptState` — Record an app launch and return the resulting state. Called once per launch from the app shell.
+- `fun recordPromptShown()` — Stamp that a prompt was just requested, starting the cooldown. Recorded on REQUEST, not on a completed review, because neither Play nor StoreKit reports whether the user actually reviewed.
+
+```kotlin
+class SettingsAppReviewPromptStore(
+```
+`Settings`-backed `AppReviewPromptStore`, using the same plain store as user preferences.
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:39</code></summary>
+
+```kotlin
+    // Read once per launch by the app shell, which asks AppReviewConfig whether they justify a prompt.
+    single<AppReviewPromptStore> {
+        SettingsAppReviewPromptStore(plainSettings = get<Settings>(named("plain")))
+    }
+
+    // Sync state persister — Settings-backed (same store as user prefs).
+    // Read by Synchronizer at sync start; written on snapshot/changeList completion.
+```
+
+</details>
+
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepository.kt`
+
+```kotlin
+interface ProjectPreferencesRepository : UserPreferencesRepository
+```
+THE FORK'S preferences. Extends the framework's — this is yours to fill.
+
+<details><summary>Example</summary>
+
+```kotlin
+interface ProjectPreferencesRepository : UserPreferencesRepository {
+    val observeMyFlag: Flow<Boolean>
+    suspend fun setMyFlag(enabled: Boolean)
+}
+override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
+    analytics.log("theme_changed")
+    delegate.setDarkThemeConfig(darkThemeConfig)
+}
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:63</code></summary>
+
+```kotlin
+    val secureSettings: Settings,
+    val dispatcher: DispatcherManager,
+) : ProjectPreferencesRepository, UserPreferencesRepository by delegate
+```
+
+</details>
+
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt`
+
+```kotlin
+class ProjectPreferencesRepositoryImpl(
+```
+Fork implementation of `ProjectPreferencesRepository`. `owner: fork` — never synced.
+
+<details><summary>Example</summary>
+
+```kotlin
+override val observeMyFlag: Flow<Boolean> =
+    MutableStateFlow(plainSettings.getBoolean(KEY_MY_FLAG, false))
+
+override suspend fun setMyFlag(enabled: Boolean) = withContext(dispatcher.io) {
+    plainSettings.putBoolean(KEY_MY_FLAG, enabled)
+}
+override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
+    analytics.log("theme_changed")
+    delegate.setDarkThemeConfig(darkThemeConfig)
+}
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ProjectDatastoreModule.kt:32</code></summary>
+
+```kotlin
+val ProjectDatastoreModule = module {
+    single<ProjectPreferencesRepository> {
+        ProjectPreferencesRepositoryImpl(
+            delegate = get<UserPreferencesRepository>(),
+            // The SAME instances the framework's impl uses — an ownership boundary, not a second
+            // store. Namespace fork keys so they cannot collide with a future framework preference.
+            plainSettings = get<Settings>(named("plain")),
+```
+
+</details>
+
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/UserPreferencesRepository.kt`
+
+```kotlin
+interface UserPreferencesRepository
+```
+Repository interface for managing user preferences with reactive capabilities. This interface provides reactive access to user preferences including theme settings, dark mode configuration, and dynamic color preferences.
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepository.kt:51</code></summary>
+
+```kotlin
+ * structural rather than a rule: drop one and this interface no longer satisfies its supertype.
+ */
+interface ProjectPreferencesRepository : UserPreferencesRepository
+```
+
+</details>
+
+- `val userData: StateFlow<UserData>`
+- `val authToken: String?` — The stored credential, or null when signed out. Synchronous read for a caller that already has one in hand; prefer `observeAuthToken` when the value can change under you.
+- `val observeAuthToken: Flow<String?>` — The credential as a stream, re-emitting on sign-in and sign-out.
+- `val passcode: String`
+- `val observeLanguage: Flow<LanguageConfig>`
+- `val observeDarkThemeConfig: Flow<DarkThemeConfig>`
+- `val observeDynamicColorPreference: Flow<Boolean>`
+- `val observeScreenCapturePreference: Flow<Boolean>`
+- `suspend fun setAuthToken(token: String?)` — Persist `token` into the ENCRYPTED store, or clear it when null. Call on sign-in with the value the auth endpoint returned (for Basic, the base64 of `user:password`; for OAuth, the access token) and on sign-out with null.
+- `suspend fun setLanguage(language: LanguageConfig)`
+- `suspend fun setThemeBrand(themeBrand: ThemeBrand)`
+- `suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)`
+- `suspend fun setDynamicColorPreference(useDynamicColor: Boolean)`
+- `suspend fun setIsAuthenticated(isAuthenticated: Boolean)`
+  _…more members; read the file._
+
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/UserPreferencesRepositoryImpl.kt`
+
+```kotlin
+class UserPreferencesRepositoryImpl(
+```
+Splits user data storage between plain (UI preferences) and secure (credentials/auth state) Settings backends.
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:29</code></summary>
+
+```kotlin
+
+    single {
+        UserPreferencesRepositoryImpl(
+            plainSettings = get<Settings>(named("plain")),
+            secureSettings = get<Settings>(named("secure")),
+            dispatcher = get(),
+        )
+```
+
+</details>
+
+---
+
+_7 type(s), 18 function(s)/property(ies); 12 carry KDoc at source; 2 authored example(s); 7 live call site(s)._
+<!-- api-docs:end -->

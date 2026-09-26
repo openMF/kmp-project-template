@@ -28,6 +28,11 @@ import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
+/**
+ * Paged coin-market list — `NETWORK_WITH_CACHE`, keyed by `PageKey` and read via
+ * `asPagingScreenStream`. The write path replaces a page atomically, so a scrolling reader never
+ * observes a half-empty page.
+ */
 @StoreProvider(id = "coinMarkets", ttl = "2m")
 @CacheKey(name = "LIST", key = "crypto:coinMarkets")
 fun provideCoinMarketsStore(

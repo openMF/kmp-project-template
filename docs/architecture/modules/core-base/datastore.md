@@ -1,92 +1,125 @@
 # `core-base/datastore`
 
-> **Layer:** `core-base` — framework-shared. Generators **consume** these contracts and
-> **never write here**; a fix belongs upstream in the template, not in a fork.
-> **Instruction surface:** `CORE_BASE_DATASTORE.md` — the generator-facing instruction for this module,
-> held in the framework at `training-layer/instructions/stream-first/latest/`. This guide
-> is the architecture SoT; that surface is how it reaches codegen, and
-> `/kmp-project-template-retrain` keeps the two in step.
-> **Shape:** 17 Kotlin files (2 test) · source sets: `androidMain`, `commonMain`, `commonTest`, `desktopMain`, `desktopTest`, `jsCommonMain`, `nativeMain`
-
-
-
-## When implementing a feature
-
-**You do not write here.** `core-base` is framework-shared: a feature consumes these
-contracts and never modifies them. If a feature seems to need a change here, that is a
-TEMPLATE change — it flows upstream as a draft PR (RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001),
-never a local edit, because every fork shares this code and a local fix is drift.
-
-What a feature *does* do is import from here and satisfy the contracts this module
-defines. The module guides under `../core/` show where the feature-side code goes.
-
-## Position in the module graph
-
-No module dependencies — this is a leaf.
-
-**Consumed by** 3 module(s): `core-base/data`, `core/data`, `core/datastore`
-
-## Codegen contracts
-
-**None.** Nothing here is declared by annotation, so there is no aggregate to
-generate and no propagation target. A generator writing into this module takes its
-idiom from `CORE_BASE_DATASTORE.md`.
+> **Layer:** core-base — framework-shared; generators CONSUME, never write
+> **Corpus surface:** `CORE_BASE_DATASTORE.md`
+> **Measured:** 17 Kotlin files, 2 test files
 
 ## Principal types
 
-- **`CachedSecureSettings`** — A [Settings] view over an already-decrypted in-memory map.
-- **`SecureBlobStorage`** — Seam over the browser key-value store.
-- **`SecureSettingsFactory`** — Platform-specific factory that creates an encrypted [Settings] instance.
-- **`SecureStoreCore`** — The web secure store's behaviour, independent of the browser.
-- **`SyncStatePersister`** — Persistence seam for the [Synchronizer]'s per-feature last-synced version map.
-- **`WebSecureStore`** — Process-wide backing store for web secure settings.
-
-Undocumented: `BrowserStorage`, `ChangeListVersions`, `SecureCipher`, `SettingsSyncStatePersister`, `WebCryptoCipher`
-
-## Demo showcase exposure
-
-**None.** No `demo/` package and no `// demo:begin` fence — `remove-demo.sh` does not
-touch this module, so a stripped fork keeps it verbatim.
-
-## Tests
-
-2 test file(s) under `core-base/datastore/src/commonTest/`. 
-Shared idiom: `CORE_TESTING.md`.
-
-
-
-## Sample implementation
-
-Real code from this module — the shape a generator should follow here.
-
-```kotlin
-/**
- * Seam over the browser key-value store.
- *
- * It exists so the store's LOGIC — legacy adoption, prefix discrimination, degraded mode — carries
- * no platform dependency. That is what lets this file live in commonMain and be tested on desktop,
- * iOS and JS alike, rather than only where a browser exists. The browser-backed implementation is
- * `BrowserStorage` in jsCommonMain.
- */
-internal interface SecureBlobStorage {
-    fun get(key: String): String?
-    fun set(key: String, value: String)
-    fun remove(key: String)
-    fun keys(): List<String>
-}
-
-/** Seam over WebCrypto. [warmUp] returns false when crypto is unavailable rather than throwing. */
-internal interface SecureCipher {
-    suspend fun warmUp(): Boolean
-    suspend fun encrypt(plaintext: String): String
-    suspend fun decrypt(ciphertext: String): String
-}
-```
-
-Source: [`src/commonMain/kotlin/kpt/core/base/datastore/SecureStoreCore.kt`](../../../../core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/SecureStoreCore.kt).
+`BrowserStorage`, `CachedSecureSettings`, `ChangeListVersions`, `SecureBlobStorage`, `SecureCipher`, `SecureSettingsFactory`, `SecureStoreCore`, `SettingsSyncStatePersister`, `SyncStatePersister`, `WebCryptoCipher`, `WebSecureStore`
 
 <!-- scaffold:end -->
 
 ## Notes
 
 _Authored prose below this marker is preserved by the scaffolder._
+
+<!-- api-docs:begin module=core-base/datastore sha=34a6943c1e27a12f5e4918eb83a21f79278cb9c6 -->
+## API reference
+
+_Generated from `core-base/datastore` at tree `34a6943c1e27` by `scripts/docs/api-docs-gen.sh`._
+_Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
+
+This module is **framework-shared and read-only to generators** (D9). Everything below is
+something a feature CALLS; re-declaring one of these in `core/**` is the duplicate-the-
+framework defect. A change here is a TEMPLATE change and flows upstream as a draft PR
+(RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001), never a local fix.
+
+### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/di/DatastoreBaseModule.kt`
+
+```kotlin
+expect val datastoreBasePlatformModule: Module
+```
+Platform-specific module that provides `SecureSettingsFactory`. Android needs Context; other platforms use no-arg constructors.
+
+```kotlin
+val DatastoreBaseModule = module
+```
+Provides two `Settings` instances via Koin named qualifiers: - `named("plain")`: Standard unencrypted settings - `named("secure")`: Encrypted settings backed by platform secure storage
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:26</code></summary>
+
+```kotlin
+
+val DatastoreModule = module {
+    includes(CommonModule, DatastoreBaseModule)
+
+    single {
+        UserPreferencesRepositoryImpl(
+            plainSettings = get<Settings>(named("plain")),
+```
+
+</details>
+
+### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/infra/ChangeListVersions.kt`
+
+```kotlin
+data class ChangeListVersions(val versions: Map<String, Long> = emptyMap())
+```
+Per-feature last-synced version map.
+
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/ChangeListVersionsTest.kt:26</code></summary>
+
+```kotlin
+    @Test
+    fun round_trips_through_kotlinx_serialization() {
+        val original = ChangeListVersions(
+            mapOf("currency-rates" to 1_700_000_000L, "macro-indicators" to 42L),
+        )
+        val encoded = Json.encodeToString(ChangeListVersions.serializer(), original)
+        val decoded = Json.decodeFromString(ChangeListVersions.serializer(), encoded)
+```
+
+</details>
+
+### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/infra/SyncStatePersister.kt`
+
+```kotlin
+interface SyncStatePersister
+```
+Persistence seam for the `Synchronizer`'s per-feature last-synced version map. Backed by Multiplatform Settings (same store used by `UserPreferencesRepositoryImpl` for plain user prefs) — survives process restart but not data wipe.
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:44</code></summary>
+
+```kotlin
+    // Sync state persister — Settings-backed (same store as user prefs).
+    // Read by Synchronizer at sync start; written on snapshot/changeList completion.
+    single<SyncStatePersister> {
+        SettingsSyncStatePersister(plainSettings = get<Settings>(named("plain")))
+    }
+}
+```
+
+</details>
+
+- `suspend fun read(): ChangeListVersions`
+- `suspend fun write(versions: ChangeListVersions)`
+
+```kotlin
+class SettingsSyncStatePersister(
+```
+`SyncStatePersister` backed by multiplatform-settings — the per-feature last-synced version map, serialised under a single key.
+
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:45</code></summary>
+
+```kotlin
+    // Read by Synchronizer at sync start; written on snapshot/changeList completion.
+    single<SyncStatePersister> {
+        SettingsSyncStatePersister(plainSettings = get<Settings>(named("plain")))
+    }
+}
+```
+
+</details>
+
+### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/SecureSettingsFactory.kt`
+
+```kotlin
+expect class SecureSettingsFactory
+```
+Platform-specific factory that creates an encrypted `Settings` instance. Returns the standard `Settings` interface — zero API change for consumers.
+
+---
+
+_4 type(s), 4 function(s)/property(ies); 6 carry KDoc at source; 0 authored example(s); 4 live call site(s)._
+<!-- api-docs:end -->

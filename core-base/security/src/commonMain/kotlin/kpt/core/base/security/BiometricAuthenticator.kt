@@ -29,6 +29,13 @@ expect class BiometricAuthenticator() {
     suspend fun authenticate(reason: String): BiometricResult
 }
 
+/**
+ * The outcome of one biometric prompt.
+ *
+ * [Cancelled] and [Unavailable] are deliberately distinct from [Failure]: the user dismissing the
+ * sheet and the device having no enrolled biometric are not authentication failures, and treating
+ * them as such would count them toward a lockout the user cannot clear.
+ */
 sealed class BiometricResult {
     data object Success : BiometricResult()
     data class Failure(val message: String) : BiometricResult()

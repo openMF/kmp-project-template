@@ -13,6 +13,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kpt.core.model.crypto.CoinDetail
 
+/**
+ * Wire shape of CoinGecko's `/coins/{id}` response. Mapped to the domain model in the Store's
+ * `SourceOfTruth`; nothing outside `core/network` should see this type.
+ */
 @Serializable
 data class CoinDetailDto(
     val id: String,
@@ -39,5 +43,8 @@ data class CoinDetailDto(
     )
 }
 
+/**
+ * Localised description block; only `en` is consumed.
+ */
 @Serializable
 data class DescriptionDto(val en: String? = null)

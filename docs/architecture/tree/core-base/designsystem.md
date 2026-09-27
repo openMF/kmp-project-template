@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/designsystem sha=a745e73e38f51bc227e09c25426ebe4d82bb620e -->
+<!-- api-docs:begin module=core-base/designsystem sha=291000339409186969c2aaff8a3c5bb01535cb83 -->
 ## API reference
 
-_Generated from `core-base/designsystem` at tree `a745e73e38f5` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/designsystem` at tree `291000339409` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -84,7 +84,7 @@ object SparklineGeometry
 ```
 Pure-function path geometry for sparkline / area chart composables. Extracted from the `Canvas { drawPath() }` block so the math is unit-testable without a Compose test rule.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptSparkline.kt:50</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptAreaChart.kt:49</code></summary>
 
 ```kotlin
         if (values.isEmpty()) return@Canvas
@@ -115,16 +115,16 @@ fun AppCard(
 ```
 Material 3 elevated card for grouping related content (loan rows, form sections, dashboard tiles).
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:193</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/AddOrEditBillReminderScreen.kt:282</code></summary>
 
 ```kotlin
-        }
-
-        AppCard {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(sp.md),
+) {
+    val sp = MaterialTheme.spacing
+    AppCard {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(sp.md),
 ```
 
 </details>
@@ -153,16 +153,16 @@ fun HeroCard(
 ```
 Hero card — the dashboard's first impression.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:177</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:163</code></summary>
 
 ```kotlin
-        }
-
-        HeroCard {
-            AmountDisplay(
-                amountText = formatMoney(loan.principalRemaining),
-                label = stringResource(Res.string.screens_loans_detail_principal_remaining_label),
-                supporting = {
+@Composable
+internal fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
+    HeroCard {
+        AmountDisplay(
+            amountText = formatCurrency(totalAmount),
+            label = stringResource(Res.string.screens_bills_list_summary_label),
+            supporting = {
 ```
 
 </details>
@@ -257,16 +257,16 @@ fun KptShimmerLoadingBox(
 ```
 Animated shimmer placeholder box. **Future migration:** new call sites should prefer `KptProgress(KptProgress.Shimmer(...))` from `kpt.core.base.designsystem.component.progress` — the unified progress family.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/state/RowLoadingShimmer.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/state/CardLoadingSkeleton.kt:36</code></summary>
 
 ```kotlin
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        KptShimmerLoadingBox(
-            modifier = Modifier.size(40.dp),
-            shape = CircleShape,
-        )
-        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            KptShimmerLoadingBox(
+                modifier = Modifier.fillMaxWidth().height(20.dp),
+                shape = RoundedCornerShape(4.dp),
+            )
+            KptShimmerLoadingBox(
 ```
 
 </details>
@@ -533,16 +533,16 @@ interface Clickable
 ```
 Mixed into components that respond to a tap. `interactionSource` is exposed so a caller can hoist ripple/press state — a component that owns it privately cannot participate in a parent's interaction handling.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanRowCard.kt:59</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/input/RevealSwipe.kt:203</code></summary>
 
 ```kotlin
-
-    AppCard(
-        modifier = modifier.combinedClickable(onClick = onClick, onLongClick = onLongPress),
-        accentColor = loanKindAccent(loan.kind),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
+            val clickableModifier = when {
+                onContentClick != null && !closeOnContentClick -> {
+                    Modifier.combinedClickable(
+                        onClick = onContentClick,
+                        onLongClick = {
+                            onContentLongClick?.let {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
 ```
 
 </details>
@@ -1005,16 +1005,15 @@ KptTheme {
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreenPreview.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:37</code></summary>
 
 ```kotlin
 @Composable
-internal fun LoanFormFieldsEnabledPreview() {
-    KptTheme {
-        Column {
-            LoanKindDropdown(value = LoanKind.AUTO, onChange = {}, enabled = true)
-            DoubleField(label = "Principal", value = 100_000.0, onChange = {}, enabled = true)
-            IntField(label = "Tenure (months)", value = 60, onChange = {}, enabled = true)
+private fun FinancePalettePreviewLight() {
+    KptTheme(darkTheme = false) {
+        Surface { FinancePaletteSwatches() }
+    }
+}
 ```
 
 </details>
@@ -1504,16 +1503,15 @@ object KptTheme
 ```
 Composition-local accessor for the active design language — `KptTheme.colors`, `.typography`, `.shapes`, `.spacing`, `.elevation`. The read side of the theme; `kptTheme` is the write side.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreenPreview.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:37</code></summary>
 
 ```kotlin
 @Composable
-internal fun LoanFormFieldsEnabledPreview() {
-    KptTheme {
-        Column {
-            LoanKindDropdown(value = LoanKind.AUTO, onChange = {}, enabled = true)
-            DoubleField(label = "Principal", value = 100_000.0, onChange = {}, enabled = true)
-            IntField(label = "Tenure (months)", value = 60, onChange = {}, enabled = true)
+private fun FinancePalettePreviewLight() {
+    KptTheme(darkTheme = false) {
+        Surface { FinancePaletteSwatches() }
+    }
+}
 ```
 
 </details>

@@ -35,16 +35,16 @@ interface CoinGeckoApi
 ```
 CoinGecko public API v3. Base URL: `BASE_URL`.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:39</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinDetailStore.kt:36</code></summary>
 
 ```kotlin
-@CacheKey(name = "LIST", key = "crypto:coinMarkets")
-fun provideCoinMarketsStore(
+@CacheKey(fn = "item", key = "crypto:coinDetail:{coinId}", params = ["coinId:String"])
+fun provideCoinDetailStore(
     api: CoinGeckoApi,
     networkMonitor: NetworkMonitor,
-    dao: CoinMarketDao,
-): Store<PageKey, List<CoinMarket>> {
-    val validator = DefaultValidator.withTtl<List<CoinMarket>>(AppStoreRegistry.Ttl.COIN_MARKETS)
+    dao: CoinDetailDao,
+): Store<String, CoinDetail> {
+    val validator = DefaultValidator.withTtl<CoinDetail>(AppStoreRegistry.Ttl.COIN_DETAIL)
 ```
 
 </details>
@@ -365,16 +365,16 @@ interface FrankfurterApi
 ```
 Frankfurter open-source exchange rate API. Base URL: `BASE_URL`.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/exchange/impl/SpotRateLookupStore.kt:43</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/currency/impl/ExchangeRatesStore.kt:37</code></summary>
 
 ```kotlin
-@CacheKey(fn = "of", key = "currency:spotRate:{baseCurrency}", params = ["baseCurrency:String"])
-fun provideSpotRateLookupStore(
+@CacheKey(fn = "of", key = "currency:exchangeRates:{baseCurrency}", params = ["baseCurrency:String"])
+fun provideExchangeRatesStore(
     api: FrankfurterApi,
     networkMonitor: NetworkMonitor,
     dao: ExchangeRatesDao,
-): Store<String, ExchangeRates> = StoreFactory.createStore(
-    fetcher = Fetcher.of { baseCurrency: String ->
+): Store<String, ExchangeRates> {
+    val validator = DefaultValidator.withTtl<ExchangeRates>(AppStoreRegistry.Ttl.EXCHANGE_RATES)
 ```
 
 </details>
@@ -547,16 +547,16 @@ data class CloudTodoDto(
 ```
 Wire shape for jsonplaceholder `/todos`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/jsonplaceholder/api/JsonPlaceholderApi.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/cloudtodo/CloudTodoRepositoryTest.kt:92</code></summary>
 
 ```kotlin
-     */
-    @GET("todos/{id}")
-    suspend fun getTodo(@Path("id") id: Int): CloudTodoDto
-
-    /** Write-back (`PUT /todos/{id}`) — jsonplaceholder echoes the body as if persisted. */
-    @PUT("todos/{id}")
-    suspend fun updateTodo(@Path("id") id: Int, @Body todo: CloudTodoDto): CloudTodoDto
+private class FakeJsonPlaceholderApi : JsonPlaceholderApi {
+    var updateCalled = false
+    override suspend fun getTodo(id: Int): CloudTodoDto =
+        CloudTodoDto(id = id, title = "todo-$id", completed = false)
+    override suspend fun updateTodo(id: Int, todo: CloudTodoDto): CloudTodoDto {
+        updateCalled = true
+        return todo // the server echoes the write back
 ```
 
 </details>
@@ -614,15 +614,16 @@ data class RemoteAppConfigDto(
 ```
 One row of a Supabase `app_config` table — the canonical "runtime server config" shape a fork fetches at start-up (feature flags, a minimum supported version, a maintenance banner).
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:39</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/AppConfigApi.kt:31</code></summary>
 
 ```kotlin
-    override val isConfigured: Boolean get() = supabase.isConfigured
 
-    override suspend fun fetchConfig(): List<RemoteAppConfigDto> {
-        if (!isConfigured) return emptyList()
-        return supabase.data.from(TABLE).select().decodeList<RemoteAppConfigDto>()
-    }
+    /** Every `app_config` row, or an empty list when Supabase is not configured. */
+    suspend fun fetchConfig(): List<RemoteAppConfigDto>
+
+    /** The value for [key], or `null` when absent or unconfigured. */
+    suspend fun fetchValue(key: String): String?
+}
 ```
 
 </details>

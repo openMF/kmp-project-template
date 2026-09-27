@@ -65,16 +65,15 @@ data class AlertEntity(
 ```
 Persistent row for a price alert. Stored in the `alerts` table (v9+). Each row represents a single threshold-based alert for a given symbol.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/alerts/AlertDao.kt:31</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/alerts/FakeAlertDao.kt:31</code></summary>
 
 ```kotlin
-    /** Observe all alerts, ordered newest-first. */
-    @Query("SELECT * FROM alerts ORDER BY createdAt DESC")
-    fun observeAll(): Flow<List<AlertEntity>>
+internal class FakeAlertDao : AlertDao {
 
-    /** Observe a single alert by id — the per-item write store's SourceOfTruth reader. */
-    @Query("SELECT * FROM alerts WHERE id = :id")
-    fun observeById(id: String): Flow<AlertEntity?>
+    private val rows = MutableStateFlow<List<AlertEntity>>(emptyList())
+
+    override fun observeAll(): Flow<List<AlertEntity>> =
+        rows.map { list -> list.sortedByDescending { it.createdAt } }
 ```
 
 </details>
@@ -107,16 +106,15 @@ interface BillReminderDao
 ```
 Data-access object for the `banking_bill_reminders` table. Reads are reactive `Flow`s; writes are `suspend`. Natural sort order is by `BillReminderEntity.dueDay` ascending — bills due earliest in the month appear first in the dashboard.
 
-<details><summary>Used in the template — <code>core/database/src/nonWebTest/kotlin/kpt/core/database/banking/dao/BillReminderDaoTest.kt:37</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/impl/BillReminderRepositoryImpl.kt:53</code></summary>
 
 ```kotlin
-
-    private lateinit var database: AppDatabase
-    private lateinit var dao: BillReminderDao
-
-    @BeforeTest
-    fun setup() {
-        // Built through `testPlatformModule`, NOT a hand-rolled Room builder: the driver is
+    @FromStore(AppStoreIds.BillRemindersMutable)
+    private val billRemindersWriteStore: MutableStore<String, BillReminder>,
+    private val billReminderDao: BillReminderDao,
+    private val clock: Clock = Clock.System,
+    private val timeZone: TimeZone = TimeZone.currentSystemDefault(),
+) : BillReminderRepository {
 ```
 
 </details>
@@ -137,16 +135,16 @@ interface LoanDao
 ```
 Data-access object for the `banking_loans` table. Reads are reactive `Flow`s; writes are `suspend`. Standard Room 3 KMP shape.
 
-<details><summary>Used in the template — <code>core/database/src/nonWebTest/kotlin/kpt/core/database/banking/dao/LoanDaoTest.kt:41</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/impl/LoanRepositoryImpl.kt:42</code></summary>
 
 ```kotlin
+    @FromStore(AppStoreIds.Loans) private val loansStore: Store<Unit, List<Loan>>,
+    @FromStore(AppStoreIds.LoansMutable) private val loansWriteStore: MutableStore<String, Loan>,
+    private val loanDao: LoanDao,
+) : LoanRepository {
 
-    private lateinit var database: AppDatabase
-    private lateinit var dao: LoanDao
-
-    @BeforeTest
-    fun setup() {
-        // Built through `testPlatformModule`, NOT a hand-rolled Room builder: the driver is
+    override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
+        loansStore.asScreenStream(
 ```
 
 </details>
@@ -168,16 +166,16 @@ data class BillReminderEntity(
 ```
 Persistent row for a recurring (or one-time) bill reminder. Mirrors `kpt.core.model.banking.BillReminder`; mapping lives in `core/data/banking/`. Stored locally only — no remote sync.
 
-<details><summary>Used in the template — <code>core/database/src/jsTest/kotlin/kpt/core/database/infra/WebInvalidationProbeTest.kt:153</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/banking/FakeBillReminderDao.kt:26</code></summary>
 
 ```kotlin
-    }
+internal class FakeBillReminderDao : BillReminderDao {
 
-    private fun bill(id: String): BillReminderEntity = BillReminderEntity(
-        id = id,
-        name = "Probe $id",
-        amount = 100.0,
-        dueDay = 15,
+    private val state = MutableStateFlow<List<BillReminderEntity>>(emptyList())
+
+    override fun observeAll(): Flow<List<BillReminderEntity>> = state.map { rows ->
+        rows.sortedWith(compareBy({ it.dueDay }, { it.createdAtMs }))
+    }
 ```
 
 </details>
@@ -189,16 +187,16 @@ data class LoanEntity(
 ```
 Persistent row for a personal loan tracked by the user. Mirrors `kpt.core.model.banking.Loan`; mapping lives in the repository layer (`core/data/banking/`). Stored locally only — no remote sync.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/banking/dao/LoanDao.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/banking/FakeLoanDao.kt:26</code></summary>
 
 ```kotlin
-    /** Observe all loans, soonest-due first. Emits on every change. */
-    @Query("SELECT * FROM banking_loans ORDER BY nextDueDate ASC, createdAtMs ASC")
-    fun observeAll(): Flow<List<LoanEntity>>
+internal class FakeLoanDao : LoanDao {
 
-    /** Observe a single loan by [id]. Emits `null` if it has been deleted. */
-    @Query("SELECT * FROM banking_loans WHERE id = :id LIMIT 1")
-    fun observeById(id: String): Flow<LoanEntity?>
+    private val state = MutableStateFlow<List<LoanEntity>>(emptyList())
+
+    override fun observeAll(): Flow<List<LoanEntity>> = state.map { rows ->
+        rows.sortedWith(compareBy({ it.nextDueDate }, { it.createdAtMs }))
+    }
 ```
 
 </details>
@@ -237,16 +235,16 @@ data class CloudTodoEntity(
 ```
 Room mirror of a `kpt.core.model.cloudtodo.CloudTodo` (the Store5 MutableStore SoT).
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/cloudtodo/CloudTodoDao.kt:31</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/cloudtodo/CloudTodoRepositoryTest.kt:76</code></summary>
 
 ```kotlin
-    /** Streams one todo, emitting null while it is absent — the Store's local read. */
-    @Query("SELECT * FROM cloud_todos WHERE id = :id")
-    fun observeById(id: Int): Flow<CloudTodoEntity?>
 
-    /** One-shot read, for the Updater's read-modify-write. */
-    @Query("SELECT * FROM cloud_todos WHERE id = :id")
-    suspend fun getById(id: Int): CloudTodoEntity?
+private class FakeCloudTodoDao : CloudTodoDao {
+    private val rows = mutableMapOf<Int, CloudTodoEntity>()
+    override fun observeById(id: Int): Flow<CloudTodoEntity?> = flow { emit(rows[id]) }
+    override suspend fun getById(id: Int): CloudTodoEntity? = rows[id]
+    override suspend fun upsert(entity: CloudTodoEntity) {
+        rows[entity.id] = entity
 ```
 
 </details>
@@ -471,16 +469,16 @@ interface ExchangeRatesDao
 ```
 Room DAO for cached FX rates, keyed by base currency. Bound into the Store's `SourceOfTruth` — the reader/writer/delete lambdas are the ONLY callers of these members (S5-1).
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/exchange/impl/SpotRateLookupStore.kt:45</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/currency/impl/ExchangeRatesStore.kt:39</code></summary>
 
 ```kotlin
     api: FrankfurterApi,
     networkMonitor: NetworkMonitor,
     dao: ExchangeRatesDao,
-): Store<String, ExchangeRates> = StoreFactory.createStore(
-    fetcher = Fetcher.of { baseCurrency: String ->
-        networkMonitor.executeWithRetry(
-            RetryPolicy { maxAttempts = 1 },
+): Store<String, ExchangeRates> {
+    val validator = DefaultValidator.withTtl<ExchangeRates>(AppStoreRegistry.Ttl.EXCHANGE_RATES)
+    return StoreFactory.createStore(
+        fetcher = Fetcher.of { baseCurrency: String ->
 ```
 
 </details>
@@ -590,12 +588,16 @@ val DatabaseModule = module
 ```
 Koin module that provides the `AppDatabase` instance and the framework-infra DAO singletons.
 
-<details><summary>Used in the template — <code>core/database/src/desktopMain/kotlin/kpt/core/database/di/DatabaseModule.desktop.kt:23</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:42</code></summary>
 
 ```kotlin
- * which is why this is an actual rather than one shared module.
  */
-actual val platformModule: Module = platformDatabaseModule<AppDatabase>(appDatabaseNaming)
+val DataModule = module {
+    includes(platformModule, CommonModule, DatabaseModule, DatastoreModule, NetworkModule)
+
+    // Every repository's Koin binding, GENERATED from `@RepositoryBinding` on the implementation.
+    // Emitted into this same package, so this file needs no import and keeps its zero-demo-reference
+    // property — which is what lets a template sync blind-copy it. A stripped fork simply generates
 ```
 
 </details>
@@ -711,16 +713,15 @@ data class WatchlistEntity(
 ```
 Persistent row representing a coin in the user's personal watchlist. Local-only: no Store5 caching layer, no remote sync.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/watchlist/dao/WatchlistDao.kt:31</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/watchlist/FakeWatchlistDao.kt:33</code></summary>
 
 ```kotlin
-    /** Observe the full watchlist, ordered by addition time (newest first). */
-    @Query("SELECT * FROM personal_watchlist ORDER BY addedAtMs DESC")
-    fun observeAll(): Flow<List<WatchlistEntity>>
+internal class FakeWatchlistDao : WatchlistDao {
 
-    /** Reactive in-membership check for a given coin — emits whenever the watchlist changes. */
-    @Query("SELECT EXISTS(SELECT 1 FROM personal_watchlist WHERE coinId = :coinId)")
-    fun observeContains(coinId: String): Flow<Boolean>
+    private val rows = MutableStateFlow<List<WatchlistEntity>>(emptyList())
+
+    override fun observeAll(): Flow<List<WatchlistEntity>> =
+        rows.map { list -> list.sortedByDescending { it.addedAtMs } }
 ```
 
 </details>

@@ -32,16 +32,16 @@ data class AffordabilityResult(
 ```
 Output of `maxAffordableLoan`.
 
-<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/affordability/AffordabilityCalculatorScreenPreview.kt:35</code></summary>
+<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/affordability/AffordabilityCalculatorScreen.kt:94</code></summary>
 
 ```kotlin
-        AffordabilityCalculatorScreenContent(
-            state = AffordabilityState(),
-            result = AffordabilityResult(
-                maxEmi = 1_500.0,
-                maxPrincipal = 193_500.0,
-                rationale = "40% of $5,000 income minus $500 obligations",
-            ),
+internal fun AffordabilityCalculatorScreenContent(
+    state: AffordabilityState,
+    result: AffordabilityResult,
+    onBackClick: () -> Unit,
+    onIncomeChange: (Double) -> Unit,
+    onObligationsChange: (Double) -> Unit,
+    onDtiPercentChange: (Int) -> Unit,
 ```
 
 </details>
@@ -63,16 +63,16 @@ data class AmortizationRow(
 ```
 A single line in an amortization schedule.
 
-<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/di/CalculatorsModule.kt:61</code></summary>
+<details><summary>Used in the template — <code>core/model/src/commonMain/kotlin/kpt/core/model/banking/AmortizationRow.kt:23</code></summary>
 
 ```kotlin
-                    params.tenureMonths,
-                ).map { row ->
-                    AmortizationRow(
-                        month = row.installmentNumber,
-                        payment = row.principalPaid + row.interestPaid,
-                        principal = row.principalPaid,
-                        interest = row.interestPaid,
+ * @property balance   Outstanding principal remaining after this payment.
+ */
+data class AmortizationRow(
+    val month: Int,
+    val payment: Double,
+    val principal: Double,
+    val interest: Double,
 ```
 
 </details>

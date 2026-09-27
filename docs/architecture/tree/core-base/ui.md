@@ -34,16 +34,16 @@ object AppInfo
 ```
 The SINGLE common-code accessor for the app's user-facing display name.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsScreen.kt:145</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/HomeScreen.kt:61</code></summary>
 
 ```kotlin
-    }
-    Text(
-        text = AppInfo.appDisplayName,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        textAlign = TextAlign.Center,
-        modifier = rowModifier,
+                        // App title from the common AppInfo.appDisplayName accessor (BuildKonfig →
+                        // fork.properties#app.display.name), never a hardcoded brand string.
+                        text = AppInfo.appDisplayName,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                        ),
+                    )
 ```
 
 </details>
@@ -88,16 +88,15 @@ IndependentCardLayout(states = cards, onRetry = vm::onRetryCard) { i, content ->
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -107,16 +106,16 @@ fun List<ScreenState<*>>.toDashboardProgressState(): DashboardProgressState =
 ```
 Pure conversion from a list of per-card states to a single `DashboardProgressState`. Exposed so tests + non-Flow call sites can re-use the aggregation contract.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/PersonalLoansListViewModel.kt:77</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsRepository.kt:34</code></summary>
 
 ```kotlin
-data class LoansListUiState(
-    /** The loans, ordered by next due-date. */
-    val loans: List<Loan>,
-    /** Sum of every loan's EMI — the summary header's headline figure. */
-    val totalMonthlyEmi: Double,
-    /** Sum of every outstanding balance. */
-    val totalPrincipalRemaining: Double,
+
+    /** Reactive list of committed alerts as a Store5-backed [ScreenDataStream] (offline-local). */
+    fun alertsStream(scope: CoroutineScope): ScreenDataStream<List<PriceAlert>>
+
+    /**
+     * Direct API submit — used by `DraftSubmitHandler`'s block parameter and by
+     * `OfflineSubmitSyncer` for reconnect retries. Throws on failure; the
 ```
 
 </details>
@@ -262,16 +261,16 @@ fun DraftResolutionPrompt(
 ```
 The **three-case** draft-resolution prompt shown when a user re-opens a form that already has a saved draft.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreen.kt:122</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreen.kt:119</code></summary>
 
 ```kotlin
     // resume it, discard it, or start fresh (the draft stays recoverable in Settings → Sync & Drafts).
-    if (ui.hasResumableDraft) {
+    if (hasResumableDraft) {
         DraftResolutionPrompt(
-            onResume = viewModel::onResume,
-            onDiscard = viewModel::onDiscardSavedDraft,
-            onStartFresh = viewModel::onStartFresh,
-            onDismiss = viewModel::onStartFresh,
+            onResume = onResume,
+            onDiscard = onDiscardSavedDraft,
+            onStartFresh = onStartFresh,
+            onDismiss = onStartFresh,
 ```
 
 </details>
@@ -321,16 +320,16 @@ fun FreshnessIndicator(
 ```
 Per-card freshness indicator: a small Material 3 info / clock / warning icon anchored to a `TooltipBox`.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:546</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinDetailScreen.kt:90</code></summary>
 
 ```kotlin
-        onSeeAll = onSeeAll,
-        trailing = {
-            FreshnessIndicator(
-                signal = freshness,
-                onRefresh = onRetry,
-            )
-        },
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(coinId)
+                        FreshnessIndicator(
+                            signal = freshness,
+                            onRefresh = viewModel::onRefresh,
+                            modifier = Modifier.padding(start = 4.dp),
+                        )
 ```
 
 </details>
@@ -492,16 +491,16 @@ public annotation class FeatureDestination
 ```
 Marks a `NavGraphBuilder` extension as a TOP-LEVEL feature destination — one the app shell registers directly on the authenticated graph.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/navigation/LoansNavigation.kt:67</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/navigation/AlertsNavigation.kt:48</code></summary>
 
 ```kotlin
- * @param navController used for back navigation and for moving between list, detail and form.
+ * into the top-level RootNavGraph by calling [alertsGraph] inside its own `NavHost { ... }`.
  */
 @FeatureDestination
-fun NavGraphBuilder.loansGraph(navController: NavController) {
-    navigation<LoansGraphRoute>(startDestination = PersonalLoansListRoute) {
-        composableWithPushTransitions<PersonalLoansListRoute> {
-            PersonalLoansListScreen(
+fun NavGraphBuilder.alertsGraph(navController: NavController) {
+    navigation<AlertsGraphRoute>(startDestination = AlertsListRoute) {
+        composableWithPushTransitions<AlertsListRoute> {
+            AlertsListScreen(
 ```
 
 </details>
@@ -766,16 +765,16 @@ fun SavingsScreen(vm: SavingsViewModel) {
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:109</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertsListScreen.kt:87</code></summary>
 
 ```kotlin
         },
     ) { padding ->
         ScreenContent(
-            state = screenState,
-            onRetry = viewModel::onRetry,
-            modifier = Modifier
-                .fillMaxSize()
+            stream = viewModel.alerts,
+            modifier = Modifier.fillMaxSize().padding(padding),
+        ) { alerts, _ ->
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
 ```
 
 </details>
@@ -794,16 +793,16 @@ ScreenContent(stream = viewModel.alerts) { alerts, _ -> LazyColumn { … } }
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:109</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertsListScreen.kt:87</code></summary>
 
 ```kotlin
         },
     ) { padding ->
         ScreenContent(
-            state = screenState,
-            onRetry = viewModel::onRetry,
-            modifier = Modifier
-                .fillMaxSize()
+            stream = viewModel.alerts,
+            modifier = Modifier.fillMaxSize().padding(padding),
+        ) { alerts, _ ->
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
 ```
 
 </details>
@@ -1026,16 +1025,16 @@ CompositionLocalProvider(LocalScreenStateDefaults provides myDefaults) { App() }
 
 </details>
 
-<details><summary>Used in the template — <code>feature/showcase/src/commonMain/kotlin/kpt/feature/showcase/stategallery/StateGalleryScreen.kt:70</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:160</code></summary>
 
 ```kotlin
-fun StateGalleryScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
-    val sp = MaterialTheme.spacing
-    val defaults = LocalScreenStateDefaults.current
-    KptScaffold(
-        onNavigationIconClick = onBackClick,
-        title = "State Gallery (dev)",
-        modifier = modifier.testTag(TestTags.StateGallery.SCREEN),
+            LocalSpacing provides Spacing(),
+            LocalElevation provides Elevation(),
+            LocalScreenStateDefaults provides screenStateDefaults,
+        ) {
+            content()
+        }
+    }
 ```
 
 </details>
@@ -1142,16 +1141,16 @@ MutationScreenContent(
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreen.kt:166</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreen.kt:148</code></summary>
 
 ```kotlin
-        // success). The persistent inline status line is supplied via the `submitStatus` slot so
-        // the "Saved" / "Failed / retry / offline" affordances render in-place.
+        },
+    ) { padding ->
         MutationScreenContent(
-            state = ui,
-            onRetry = viewModel::onRetry,
-            onSubmitted = { onSaved() },
-            modifier = Modifier.padding(padding),
+            screenState = screenState,
+            submitState = submitState,
+            onRetry = onRetry,
+            onSubmitted = { onSubmitted() },
 ```
 
 </details>
@@ -1175,16 +1174,16 @@ MutationScreenContent(
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreen.kt:166</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreen.kt:148</code></summary>
 
 ```kotlin
-        // success). The persistent inline status line is supplied via the `submitStatus` slot so
-        // the "Saved" / "Failed / retry / offline" affordances render in-place.
+        },
+    ) { padding ->
         MutationScreenContent(
-            state = ui,
-            onRetry = viewModel::onRetry,
-            onSubmitted = { onSaved() },
-            modifier = Modifier.padding(padding),
+            screenState = screenState,
+            submitState = submitState,
+            onRetry = onRetry,
+            onSubmitted = { onSubmitted() },
 ```
 
 </details>
@@ -1208,16 +1207,16 @@ MutationScreenContent(
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreen.kt:166</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreen.kt:148</code></summary>
 
 ```kotlin
-        // success). The persistent inline status line is supplied via the `submitStatus` slot so
-        // the "Saved" / "Failed / retry / offline" affordances render in-place.
+        },
+    ) { padding ->
         MutationScreenContent(
-            state = ui,
-            onRetry = viewModel::onRetry,
-            onSubmitted = { onSaved() },
-            modifier = Modifier.padding(padding),
+            screenState = screenState,
+            submitState = submitState,
+            onRetry = onRetry,
+            onSubmitted = { onSubmitted() },
 ```
 
 </details>
@@ -1245,16 +1244,16 @@ MutationScreenContent(
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreen.kt:166</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreen.kt:148</code></summary>
 
 ```kotlin
-        // success). The persistent inline status line is supplied via the `submitStatus` slot so
-        // the "Saved" / "Failed / retry / offline" affordances render in-place.
+        },
+    ) { padding ->
         MutationScreenContent(
-            state = ui,
-            onRetry = viewModel::onRetry,
-            onSubmitted = { onSaved() },
-            modifier = Modifier.padding(padding),
+            screenState = screenState,
+            submitState = submitState,
+            onRetry = onRetry,
+            onSubmitted = { onSubmitted() },
 ```
 
 </details>
@@ -1264,16 +1263,16 @@ fun <T, R> MutationScreenContent(
 ```
 `MutationUiState`-typed draft-aware overload. Combines read state, write state, and draft resume into a single call.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreen.kt:166</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreen.kt:148</code></summary>
 
 ```kotlin
-        // success). The persistent inline status line is supplied via the `submitStatus` slot so
-        // the "Saved" / "Failed / retry / offline" affordances render in-place.
+        },
+    ) { padding ->
         MutationScreenContent(
-            state = ui,
-            onRetry = viewModel::onRetry,
-            onSubmitted = { onSaved() },
-            modifier = Modifier.padding(padding),
+            screenState = screenState,
+            submitState = submitState,
+            onRetry = onRetry,
+            onSubmitted = { onSubmitted() },
 ```
 
 </details>
@@ -1552,16 +1551,16 @@ class EditEntityViewModel(
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/EditLoanViewModel.kt:59</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateViewModel.kt:45</code></summary>
 
 ```kotlin
-     */
-    val loanId: String?,
-) : BaseMutationViewModel<Loan, Loan>(
+    outbox: SubmitOutbox<PriceAlert>,
+    private val clock: Clock = Clock.System,
+) : BaseMutationViewModel<PriceAlert, PriceAlert>(
     MutationMode.Draft(
         outbox = outbox,
         formKey = FORM_KEY,
-        uniqueKey = loanId ?: NEW_LOAN_KEY,
+        uniqueKey = FORM_KEY,
 ```
 
 </details>
@@ -1584,16 +1583,16 @@ abstract class BaseViewModel<S, E, A>(
 ```
 A base `ViewModel` that helps enforce the unidirectional data flow pattern and associated responsibilities of a typical ViewModel: - Maintaining and emitting a current state (of type `S`) with the given `initialState`.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:53</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonMain/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModel.kt:43</code></summary>
 
 ```kotlin
-    private val repository: LoanRepository,
-    private val loanId: String,
-) : BaseViewModel<Unit, Nothing, LoanDetailAction>(Unit) {
+    private val repository: WatchlistRepository,
+    private val coinId: String,
+) : BaseViewModel<Unit, Nothing, AddToWatchlistAction>(Unit) {
 
-    /**
-     * Continuous reactive stream — emits every time the loan row changes in Room. Consumes the
-     * repository's per-loan [kpt.core.base.store.screen.ScreenDataStream] (absent id → Empty); the
+    private val toggleSubmitHandler = viewModelScope.submitHandler<Unit>()
+
+    /** Read side — filled/outline. Seeded `false` until `contains()` first emits. */
 ```
 
 </details>
@@ -1617,15 +1616,15 @@ sealed interface MutationMode<out T>
 ```
 How a `BaseMutationViewModel` handles its submit — the single knob that replaces the old `BaseSubmitMutationViewModel` / `BaseDraftMutationViewModel` class split.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/EditLoanViewModel.kt:60</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateViewModel.kt:46</code></summary>
 
 ```kotlin
-    val loanId: String?,
-) : BaseMutationViewModel<Loan, Loan>(
+    private val clock: Clock = Clock.System,
+) : BaseMutationViewModel<PriceAlert, PriceAlert>(
     MutationMode.Draft(
         outbox = outbox,
         formKey = FORM_KEY,
-        uniqueKey = loanId ?: NEW_LOAN_KEY,
+        uniqueKey = FORM_KEY,
         autoSaveDraft = true,
 ```
 

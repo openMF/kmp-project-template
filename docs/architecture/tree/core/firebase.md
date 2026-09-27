@@ -248,16 +248,16 @@ object LoansEventTypes
 ```
 `loans` feature analytics keys — DEMO-SHOWCASE, deleted by `--clean` with the loans feature. A fork's equivalent for its own feature is fork-owned and needs no declaration.
 
-<details><summary>Used in the template — <code>core/firebase/src/commonMain/kotlin/kpt/core/firebase/loans/LoansAnalyticsTracker.kt:41</code></summary>
+<details><summary>Used in the template — <code>core/firebase/src/commonMain/kotlin/kpt/core/firebase/loans/LoansAnalyticsExtensions.kt:33</code></summary>
 
 ```kotlin
-        analyticsHelper.logEvent(
-            AnalyticsEvent(
-                LoansEventTypes.LOANS_LIST_VIEWED,
-                listOf(Param(LoansParamKeys.LOAN_COUNT, loanCount.toString())),
+    logEvent(
+        AnalyticsEvent(
+            if (completed) LoansEventTypes.LOAN_FORM_OPENED else LoansEventTypes.LOAN_FORM_ABANDONED,
+            listOf(
+                Param(LoansParamKeys.FORM_STEP, step),
+                Param(ParamKeys.SUCCESS, completed.toString()),
             ),
-        )
-    }
 ```
 
 </details>
@@ -279,15 +279,16 @@ object LoansParamKeys
 ```
 `loans` parameter keys. NOTE none of these carry money or identity. `principal` is bucketed by `LoansParamValues`, and the loan id is deliberately absent: a Firebase event is not the place to reconstruct a user's debts.
 
-<details><summary>Used in the template — <code>core/firebase/src/commonMain/kotlin/kpt/core/firebase/loans/LoansAnalyticsTracker.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/firebase/src/commonMain/kotlin/kpt/core/firebase/loans/LoansAnalyticsExtensions.kt:35</code></summary>
 
 ```kotlin
-            AnalyticsEvent(
-                LoansEventTypes.LOANS_LIST_VIEWED,
-                listOf(Param(LoansParamKeys.LOAN_COUNT, loanCount.toString())),
+            if (completed) LoansEventTypes.LOAN_FORM_OPENED else LoansEventTypes.LOAN_FORM_ABANDONED,
+            listOf(
+                Param(LoansParamKeys.FORM_STEP, step),
+                Param(ParamKeys.SUCCESS, completed.toString()),
             ),
-        )
-    }
+        ),
+    )
 ```
 
 </details>
@@ -305,16 +306,16 @@ object LoansParamValues
 ```
 `loans` parameter values. Bands rather than amounts. Analytics answers "do people track large loans?", which a band answers and an exact figure answers at the cost of shipping a financial profile to a third party.
 
-<details><summary>Used in the template — <code>core/firebase/src/commonMain/kotlin/kpt/core/firebase/loans/LoansCrashExtensions.kt:61</code></summary>
+<details><summary>Used in the template — <code>core/firebase/src/commonMain/kotlin/kpt/core/firebase/loans/LoansAnalyticsTracker.kt:58</code></summary>
 
 ```kotlin
 
-private fun principalBand(principal: Double): String = when {
-    principal < 1_000 -> LoansParamValues.PRINCIPAL_BAND_SMALL
-    principal < 10_000 -> LoansParamValues.PRINCIPAL_BAND_MEDIUM
-    principal < 100_000 -> LoansParamValues.PRINCIPAL_BAND_LARGE
-    else -> LoansParamValues.PRINCIPAL_BAND_XLARGE
-}
+    /** Add/edit form opened. [step] is one of the `LoansParamValues.FORM_STEP_*` values. */
+    fun trackFormOpened(editing: Boolean, step: String = LoansParamValues.FORM_STEP_DETAILS) {
+        analyticsHelper.logEvent(
+            AnalyticsEvent(
+                LoansEventTypes.LOAN_FORM_OPENED,
+                listOf(
 ```
 
 </details>

@@ -36,16 +36,16 @@ annotation class StoreProvider(
 ```
 Marks a Store5 provider function.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:55</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertsStore.kt:41</code></summary>
 
 ```kotlin
- * is deliberately not part of this store's contract.
+ * no-op alongside Room's native invalidation.
  */
-@StoreProvider(id = "userData")
-@CacheKey(name = "KEY", key = "userData")
-fun provideUserDataStore(source: UserDataSource): Store<Unit, UserData> =
-    StoreFactory.createOfflineStore(
-        sourceOfTruth = SourceOfTruth.of(
+@StoreProvider(id = "alerts")
+@CacheKey(name = "LIST", key = "alerts")
+fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFactory.createOfflineStore(
+    sourceOfTruth = SourceOfTruth.of(
+        // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
 ```
 
 </details>
@@ -55,16 +55,16 @@ annotation class CacheKey(
 ```
 A stream cache key for the annotated store — the string that keys per-stream freshness tracking.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:56</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertsStore.kt:42</code></summary>
 
 ```kotlin
  */
-@StoreProvider(id = "userData")
-@CacheKey(name = "KEY", key = "userData")
-fun provideUserDataStore(source: UserDataSource): Store<Unit, UserData> =
-    StoreFactory.createOfflineStore(
-        sourceOfTruth = SourceOfTruth.of(
-            reader = { _: Unit -> source.observe() },
+@StoreProvider(id = "alerts")
+@CacheKey(name = "LIST", key = "alerts")
+fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFactory.createOfflineStore(
+    sourceOfTruth = SourceOfTruth.of(
+        // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
+        reader = { _: Unit ->
 ```
 
 </details>
@@ -157,16 +157,16 @@ sealed interface ErrorCategory
 ```
 High-level classification of a `Throwable` for state-aware UI rendering. Pure logic — no platform calls, no side effects. Lives in `core-base/store` (state layer) so both UI and non-UI consumers can branch on the same categorization.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreenPreview.kt:83</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppErrorMapper.kt:49</code></summary>
 
 ```kotlin
-            submit = SubmitState.Failed(
-                error = IllegalStateException("no connection"),
-                category = ErrorCategory.Network,
-            ),
-            onRetry = {},
-            onDismiss = {},
-        )
+ */
+fun errorCategoryToken(error: Throwable): String = when (val cat = categorize(error)) {
+    ErrorCategory.Network -> "network"
+    ErrorCategory.Timeout.Connect -> "timeout_connect"
+    ErrorCategory.Timeout.Read -> "timeout_read"
+    ErrorCategory.Auth -> "auth"
+    ErrorCategory.RateLimit -> "rate_limit"
 ```
 
 </details>
@@ -204,16 +204,16 @@ enum class FreshnessBand
 ```
 Pure time-relative staleness band for cached data — independent of network state. Computed by `FreshnessBands.bandFor` from `(now, lastSyncedAt, ttl, lastError)` alone.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/ui/HomeViewModel.kt:181</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonTest/kotlin/kpt/feature/crypto/ui/CoinDetailViewModelTest.kt:124</code></summary>
 
 ```kotlin
-     * Stale < VeryStale (higher = worse).
-     */
-    private fun FreshnessBand.severity(): Int = when (this) {
-        FreshnessBand.Initial -> 0
-        FreshnessBand.Fresh -> 1
-        FreshnessBand.Stale -> 2
-        FreshnessBand.VeryStale -> 3
+            ttl = 1.hours,
+            lastError = null,
+            band = FreshnessBand.Stale,
+        )
+        val repo = FakeCryptoRepository(
+            detailState = MutableStateFlow(ScreenState.Content(detail("bitcoin"))),
+            detailFreshness = MutableStateFlow(stale),
 ```
 
 </details>
@@ -235,16 +235,16 @@ data class FreshnessSignal(
 ```
 Pure-staleness signal carried by `kpt.core.base.store.screen.ScreenDataStream.freshness` alongside `state`. Decouples cache age from network connectivity.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:537</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinDetailViewModel.kt:54</code></summary>
 
 ```kotlin
-private fun RatesQuickCard(
-    state: ScreenState<RatesQuickView>,
-    freshness: FreshnessSignal,
-    onRetry: () -> Unit,
-    onSeeAll: () -> Unit,
-) {
-    SectionCard(
+     * the global `ConnectivityBanner`.
+     */
+    val freshness: StateFlow<FreshnessSignal> = detail.freshness
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FreshnessSignal.initial())
+
+    fun onRetry() {
+        trySendAction(CoinDetailAction.Retry)
 ```
 
 </details>
@@ -297,16 +297,16 @@ class DefaultValidator<Output : Any>(
 ```
 A TTL-based `Validator` that marks cached data as stale after a given duration. Tracks when data was last fetched using `TimeSource.Monotonic` and considers it invalid once the `ttl` has elapsed. Call `markFresh` when fresh data arrives.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:43</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinDetailStore.kt:40</code></summary>
 
 ```kotlin
-    dao: CoinMarketDao,
-): Store<PageKey, List<CoinMarket>> {
-    val validator = DefaultValidator.withTtl<List<CoinMarket>>(AppStoreRegistry.Ttl.COIN_MARKETS)
+    dao: CoinDetailDao,
+): Store<String, CoinDetail> {
+    val validator = DefaultValidator.withTtl<CoinDetail>(AppStoreRegistry.Ttl.COIN_DETAIL)
     return StoreFactory.createStore(
-        fetcher = Fetcher.of { key: PageKey ->
+        fetcher = Fetcher.of { coinId: String ->
             networkMonitor.executeWithRetry(
-                // Retry policy: 1 attempt per fetch. HTTP 401 is handled transparently
+                RetryPolicy { maxAttempts = 1 },
 ```
 
 </details>
@@ -318,16 +318,16 @@ interface DraftInventory
 ```
 Framework-shared, **cross-form** view over every draft the app is holding. `SubmitOutbox` is generic in a single payload type `P` (one instance per form).
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsViewModel.kt:35</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt:72</code></summary>
 
 ```kotlin
- */
-class SyncAndDraftsViewModel(
-    private val draftInventory: DraftInventory,
-) : BaseViewModel<SyncAndDraftsUiState, Nothing, SyncAndDraftsAction>(SyncAndDraftsUiState.Loading) {
+    // Cross-form drafts inventory — the live feed + actions behind the template-level
+    // Settings → "Sync & Drafts" screen. Framework infra (not a demo store); survives sync.
+    single<DraftInventory> { DraftInventoryImpl(draftDao = get()) }
 
-    init {
-        draftInventory.observeAll()
+    // Every declared store: its qualifier binding AND its logout registration.
+    includes(GeneratedStoreBindings)
+}
 ```
 
 </details>
@@ -342,16 +342,16 @@ data class DraftRecord(
 ```
 One draft row as seen by the cross-form `DraftInventory` — untyped (no deserialized payload), because the Sync & Drafts screen renders every form's drafts side-by-side and cannot know each `P`.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:188</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsPreview.kt:37</code></summary>
 
 ```kotlin
-private fun androidx.compose.foundation.lazy.LazyListScope.draftSection(
-    titleRes: StringResource,
-    rows: List<DraftRecord>,
-    onRetry: ((Long) -> Unit)?,
-    onDiscardRequest: (Long) -> Unit,
-) {
-    if (rows.isEmpty()) return
+            uiState = SyncAndDraftsUiState.Success(
+                drafts = listOf(
+                    DraftRecord(3, "bill", "electricity", SubmitOutboxStatus.PENDING, 0, 0, null),
+                    DraftRecord(4, "loan", "home-loan", SubmitOutboxStatus.PENDING, 0, 0, null),
+                ),
+                syncing = listOf(
+                    DraftRecord(2, "alert", "btc-alert", SubmitOutboxStatus.RETRYING, 0, 0, null),
 ```
 
 </details>
@@ -363,15 +363,16 @@ interface FetchedAtRepository
 ```
 Persists "when was this Store's data last successfully fetched from network", keyed by `storeKey`.
 
-<details><summary>Used in the template — <code>feature/crypto/src/commonTest/kotlin/kpt/feature/crypto/ui/FakeCryptoRepository.kt:144</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:56</code></summary>
 
 ```kotlin
- */
-@OptIn(ExperimentalTime::class)
-private object NoOpFetchedAtRepository : FetchedAtRepository {
-    override suspend fun read(storeKey: String): Instant? = null
-    override suspend fun write(storeKey: String, instant: Instant) = Unit
-}
+    // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
+    // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
+    single<FetchedAtRepository> { RoomFetchedAtRepository(get<AppDatabase>().fetchedAtDao) }
+
+    // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
+    single { get<AppDatabase>().draftDao }
+    // Framework BookkeeperDao — backing store for the MutableStore retry ledger.
 ```
 
 </details>
@@ -535,16 +536,16 @@ object StoreFactory
 ```
 Factory for creating `Store` and `MutableStore` instances with sensible defaults.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:58</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertsStore.kt:43</code></summary>
 
 ```kotlin
-@CacheKey(name = "KEY", key = "userData")
-fun provideUserDataStore(source: UserDataSource): Store<Unit, UserData> =
-    StoreFactory.createOfflineStore(
-        sourceOfTruth = SourceOfTruth.of(
-            reader = { _: Unit -> source.observe() },
-            // Writes go through UserDataRepository's typed setters (see KDoc above); this
-            // writer exists only to satisfy SourceOfTruth's shape and is never invoked,
+@StoreProvider(id = "alerts")
+@CacheKey(name = "LIST", key = "alerts")
+fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFactory.createOfflineStore(
+    sourceOfTruth = SourceOfTruth.of(
+        // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
+        reader = { _: Unit ->
+            dao.observeAll().map { rows -> rows.map(AlertEntity::toPriceAlert) }
 ```
 
 </details>
@@ -584,16 +585,16 @@ interface ConflictInbox
 ```
 Durable inbox of write conflicts surfaced to the user in Settings.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/ConflictInboxViewModel.kt:29</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:29</code></summary>
 
 ```kotlin
- */
-class ConflictInboxViewModel(
-    private val conflictInbox: ConflictInbox,
-) : BaseViewModel<ConflictInboxUiState, Nothing, ConflictInboxAction>(ConflictInboxUiState.Loading) {
+    DefaultMutationGateway(isOnline = { isOnline }, conflictInbox = NoopConflictInbox)
 
-    init {
-        conflictInbox.observePending()
+private object NoopConflictInbox : ConflictInbox {
+    override suspend fun record(
+        entity: String,
+        key: String,
+        localPayloadJson: String,
 ```
 
 </details>
@@ -607,16 +608,13 @@ enum class ConflictResolution
 ```
 How the user chose to settle a `ConflictEntry`.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/ConflictInboxViewModel.kt:41</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:40</code></summary>
 
 ```kotlin
-        when (action) {
-            is ConflictInboxAction.AcceptServer ->
-                viewModelScope.launch { conflictInbox.resolve(action.id, ConflictResolution.ACCEPT_SERVER) }
-            is ConflictInboxAction.RetryLocal ->
-                viewModelScope.launch { conflictInbox.resolve(action.id, ConflictResolution.RETRY_LOCAL) }
-        }
-    }
+    override fun observePending(): Flow<List<ConflictEntry>> = flowOf(emptyList())
+
+    override suspend fun resolve(conflictId: String, resolution: ConflictResolution) = Unit
+}
 ```
 
 </details>
@@ -631,16 +629,15 @@ data class ConflictEntry(
 ```
 A single recorded write conflict awaiting user resolution.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:108</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:38</code></summary>
 
 ```kotlin
-    onPrune: () -> Unit,
-    modifier: Modifier = Modifier,
-    conflicts: List<ConflictEntry> = emptyList(),
-    onAcceptServer: (String) -> Unit = {},
-    onRetryLocal: (String) -> Unit = {},
-) {
-    val sp = MaterialTheme.spacing
+    ): String = "noop"
+
+    override fun observePending(): Flow<List<ConflictEntry>> = flowOf(emptyList())
+
+    override suspend fun resolve(conflictId: String, resolution: ConflictResolution) = Unit
+}
 ```
 
 </details>
@@ -728,16 +725,13 @@ sealed interface MutationResult<out T>
 ```
 The exhaustive outcome of a mutation. The caller (ViewModel) must handle every arm, so an offline write or a conflict can never be silently swallowed.
 
-<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoViewModel.kt:88</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/CloudTodoRepository.kt:39</code></summary>
 
 ```kotlin
- * result arm must not compile until it has somewhere to render.
- */
-internal fun MutationResult<CloudTodo>.toOutcome(): MutationOutcome = when (this) {
-    is MutationResult.Applied ->
-        if (synced) MutationOutcome.AppliedSynced else MutationOutcome.AppliedQueued
-    is MutationResult.Blocked -> MutationOutcome.Blocked(reason)
-    is MutationResult.Conflicted -> MutationOutcome.Conflicted(conflictId)
+     * network-first mutations that must not show an unconfirmed local state (payments, approvals).
+     */
+    suspend fun completeOnline(todo: CloudTodo): kpt.core.base.store.mutation.MutationResult<CloudTodo>
+}
 ```
 
 </details>
@@ -747,16 +741,15 @@ enum class BlockReason
 ```
 Why an `MutationPolicy.OnlineRequired` mutation was `MutationResult.Blocked`.
 
-<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoScreen.kt:245</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/cloudtodo/CloudTodoRepositoryTest.kt:58</code></summary>
 
 ```kotlin
-    MutationOutcome.AppliedQueued -> stringResource(Res.string.screens_cloudtodo_outcome_applied_queued_body)
-    is MutationOutcome.Blocked -> when (reason) {
-        BlockReason.OFFLINE -> stringResource(Res.string.screens_cloudtodo_outcome_blocked_offline)
-        BlockReason.UNAUTHENTICATED -> stringResource(Res.string.screens_cloudtodo_outcome_blocked_unauthenticated)
-        BlockReason.PRECONDITION_FAILED -> stringResource(Res.string.screens_cloudtodo_outcome_blocked_precondition)
+            .completeOnline(CloudTodo(id = 1, title = "buy milk", completed = false))
+        val blocked = assertIs<MutationResult.Blocked>(r)
+        assertEquals(BlockReason.OFFLINE, blocked.reason)
+        assertFalse(api.updateCalled, "OnlineRequired offline must not touch the network")
+        assertNull(dao.getById(1), "OnlineRequired offline must not write locally (no optimistic state)")
     }
-    is MutationOutcome.Conflicted -> stringResource(Res.string.screens_cloudtodo_outcome_conflicted_body)
 ```
 
 </details>
@@ -787,15 +780,16 @@ fun loadMore() = pagingStream.loadNextPage()
 
 </details>
 
-<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinMarketsViewModel.kt:34</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/CryptoRepository.kt:26</code></summary>
 
 ```kotlin
-     * state.
-     */
-    val pagingStream: PagingScreenStream<CoinMarket> = repository.coinMarketsStream(
-        scope = viewModelScope,
-        pageSize = DEFAULT_PAGE_SIZE,
-    )
+interface CryptoRepository {
+    /** Streams the CoinGecko coin-markets list as a paged screen stream. */
+    fun coinMarketsStream(scope: CoroutineScope, pageSize: Int = 20): PagingScreenStream<CoinMarket>
+
+    /**
+     * Offline-first stream for one coin's detail.
+     *
 ```
 
 </details>
@@ -805,16 +799,16 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
 ```
 Creates a `PagingScreenStream` with network-fused state via cmp-network-monitor.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/impl/AlertsRepositoryImpl.kt:35</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = CryptoRepository::class)
-class CryptoRepositoryImpl(
-    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
-) : CryptoRepository {
+@RepositoryBinding(binds = AlertsRepository::class)
+internal class AlertsRepositoryImpl(
+    @FromStore(AppStoreIds.Alerts) private val alertsStore: Store<Unit, List<PriceAlert>>,
+    @FromStore(AppStoreIds.AlertsMutable) private val alertsWriteStore: MutableStore<String, PriceAlert>,
+) : AlertsRepository {
 
-    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
+    // Read-path contract: the repository builds the ScreenDataStream (offline-local → CACHE_ONLY);
 ```
 
 </details>
@@ -824,16 +818,16 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
 ```
 `asPagingScreenStream` overload taking a bundled `ScreenStreamContext` instead of the two infra deps — so a paginated repository reads `store.asPagingScreenStream(screen, cacheKey, scope, …)` with `screen` its one injected `ScreenStreamContext`. Delegates to the primary overload.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/impl/AlertsRepositoryImpl.kt:35</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = CryptoRepository::class)
-class CryptoRepositoryImpl(
-    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
-) : CryptoRepository {
+@RepositoryBinding(binds = AlertsRepository::class)
+internal class AlertsRepositoryImpl(
+    @FromStore(AppStoreIds.Alerts) private val alertsStore: Store<Unit, List<PriceAlert>>,
+    @FromStore(AppStoreIds.AlertsMutable) private val alertsWriteStore: MutableStore<String, PriceAlert>,
+) : AlertsRepository {
 
-    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
+    // Read-path contract: the repository builds the ScreenDataStream (offline-local → CACHE_ONLY);
 ```
 
 </details>
@@ -845,16 +839,16 @@ data class PageKey(
 ```
 Key for paginated Store requests. Use this as the Store key type when the data source supports pagination. The Store will cache each page independently.
 
-<details><summary>Used in the template — <code>feature/crypto/src/commonTest/kotlin/kpt/feature/crypto/ui/FakeCryptoRepository.kt:88</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
 
 ```kotlin
-        lastPageSize = pageSize
-        val store = StoreBuilder
-            .from<PageKey, List<CoinMarket>>(
-                fetcher = Fetcher.of {
-                    fetches.value += 1
-                    emptyList()
-                },
+@RepositoryBinding(binds = CryptoRepository::class)
+class CryptoRepositoryImpl(
+    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
+    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
+) : CryptoRepository {
+
+    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
 ```
 
 </details>
@@ -881,16 +875,16 @@ class ClientPagingSource(
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/impl/AlertsRepositoryImpl.kt:35</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = CryptoRepository::class)
-class CryptoRepositoryImpl(
-    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
-) : CryptoRepository {
+@RepositoryBinding(binds = AlertsRepository::class)
+internal class AlertsRepositoryImpl(
+    @FromStore(AppStoreIds.Alerts) private val alertsStore: Store<Unit, List<PriceAlert>>,
+    @FromStore(AppStoreIds.AlertsMutable) private val alertsWriteStore: MutableStore<String, PriceAlert>,
+) : AlertsRepository {
 
-    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
+    // Read-path contract: the repository builds the ScreenDataStream (offline-local → CACHE_ONLY);
 ```
 
 </details>
@@ -939,16 +933,16 @@ sealed interface FetchPolicy
 ```
 Controls whether a screen stream reads from cache, hits the network, or both. Pass to `ScreenDataStream.asScreenStream`, `LoadOnceStream.asLoadOnceStream`, or `PagingScreenStream` to override that entry point's default.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/ui/HomeViewModel.kt:73</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/impl/AlertsRepositoryImpl.kt:46</code></summary>
 
 ```kotlin
-        baseCurrency = "USD",
-        scope = viewModelScope,
-        fetchPolicy = FetchPolicy.PERIODIC(intervalMillis = EXCHANGE_RATE_REFRESH_INTERVAL_MS),
-    )
+            cacheKey = AppCacheKeys.Alerts.LIST,
+            scope = scope,
+            fetchPolicy = FetchPolicy.CACHE_ONLY,
+            isEmpty = { it.isEmpty() },
+        )
 
-    private val fedFundsStream = economicRatesRepository.interestRateSeriesStream(
-        key = FedFundsKey,
+    override suspend fun submitAlert(alert: PriceAlert): PriceAlert {
 ```
 
 </details>
@@ -967,16 +961,16 @@ class ScreenDataStream<T> internal constructor(
 ```
 One screen's read surface: a cold `ScreenState` flow plus the refresh/retry controls that drive it.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/FakeLoanRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsRepository.kt:34</code></summary>
 
 ```kotlin
-    }
 
-    override fun loansStream(scope: CoroutineScope): ScreenDataStream<List<Loan>> =
-        // Mirror production: the DAO sorts `nextDueDate ASC, createdAtMs ASC`, so the stream must too.
-        screenDataStreamForTesting(
-            state.map { rows ->
-                if (rows.isEmpty()) {
+    /** Reactive list of committed alerts as a Store5-backed [ScreenDataStream] (offline-local). */
+    fun alertsStream(scope: CoroutineScope): ScreenDataStream<List<PriceAlert>>
+
+    /**
+     * Direct API submit — used by `DraftSubmitHandler`'s block parameter and by
+     * `OfflineSubmitSyncer` for reconnect retries. Throws on failure; the
 ```
 
 </details>
@@ -986,16 +980,15 @@ annotation class ExperimentalScreenDataStreamTestingApi
 ```
 Opt-in marker for the testing-only `ScreenDataStream` constructors.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/FakeLoanRepository.kt:10</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonTest/kotlin/kpt/feature/alerts/ui/AlertCreateViewModelTest.kt:57</code></summary>
 
 ```kotlin
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * not reach the domain model as anything but a defined value.
  */
-@file:OptIn(kpt.core.base.store.screen.ExperimentalScreenDataStreamTestingApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalScreenDataStreamTestingApi::class)
+class AlertCreateViewModelTest {
 
-package kpt.feature.loans.ui
-
-import kotlinx.coroutines.CoroutineScope
+    private val dispatcher = StandardTestDispatcher()
 ```
 
 </details>
@@ -1022,16 +1015,16 @@ sealed interface ScreenState<out T>
 ```
 Unified UI state produced by `ScreenDataStream`. Replaces per-ViewModel ScreenUiState + isFromCache + isRefreshing + networkStatus.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:66</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/alerts/AlertsReactiveInvalidationTest.kt:100</code></summary>
 
 ```kotlin
-     * framework's, not this screen's.
-     */
-    val screenState: StateFlow<ScreenState<Loan>> = detailStream.state
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
-    /**
-     * Re-fetch the loan detail — wired to the read-side retry affordance surfaced by
+/** Extract alert ids from a `ScreenState` list (Content → ids, Empty → ∅, Loading/Error → null-skip). */
+private fun ScreenState<List<PriceAlert>>.idsOrNull(): Set<String>? = when (this) {
+    is ScreenState.Content -> data.map { it.id }.toSet()
+    ScreenState.Empty -> emptySet()
+    else -> null
+}
 ```
 
 </details>
@@ -1043,16 +1036,15 @@ fun <T, R> Flow<ScreenState<T>>.mapContent(
 ```
 Transforms only `ScreenState.Content` data, passing through all other states unchanged.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1062,16 +1054,15 @@ fun <T, S, R> Flow<ScreenState<T>>.combineContent(
 ```
 Combines ScreenState with a local state flow for reactive filter/sort/preferences.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1081,16 +1072,15 @@ fun <T> Flow<ScreenState<T>>.emptyIfContent(
 ```
 Converts Content to Empty when business-level predicate says data is empty. Applied AFTER DecisionEngine (which only handles structural empty from Store).
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1110,16 +1100,15 @@ fun <T> Flow<ScreenState<T>>.mapError(
 ```
 Maps Error throwable to a user-facing type.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1300,16 +1289,15 @@ fun <T, R> Flow<StoreData<T>>.mapData(transform: (T) -> R): Flow<StoreData<R>>
 ```
 Maps a Flow of `StoreData` content while preserving all metadata.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1326,16 +1314,15 @@ fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToStoreData(
 ```
 Maps a `StoreReadResponse` flow into `Flow<StoreData<Output>>`.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1345,16 +1332,15 @@ fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToStoreDataWithErrors(
 ```
 Like `mapToStoreData` but also emits on errors, carrying the last known data.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1366,16 +1352,15 @@ fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToResult(): Flow<Result<Ou
 ```
 Maps a `StoreReadResponse` flow to `Flow<Result<Output>>`. - `StoreReadResponse.Data` → `Result.success` - `StoreReadResponse.Error` → `Result.failure` - `StoreReadResponse.Loading` and `StoreReadResponse.NoNewData` are filtered out.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1385,16 +1370,15 @@ fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToData(): Flow<Output>
 ```
 Maps a `StoreReadResponse` flow to `Flow<Output>`, emitting only data values. Loading, error, and no-data responses are silently filtered out. Use `mapToResult` when error handling is needed.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
 
 ```kotlin
-        }
+     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
+     */
+    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
 
-    override fun observePending(formKey: String): Flow<SubmitOutboxEntry<P>?> = _entries.map { list ->
-        list.firstOrNull {
-            it.formKey == formKey && it.uniqueKey == null && it.status == SubmitOutboxStatus.PENDING
-        }
-    }
+    /** Insert-or-replace. Idempotent. */
+    suspend fun upsert(bill: BillReminder)
 ```
 
 </details>
@@ -1645,16 +1629,16 @@ data class RetryPolicy(
 ```
 Exponential-backoff-with-jitter retry policy for outbox-style retries. Pure data — no scheduler, no side effects. Consumers compute the next delay via `delayFor` and apply it themselves (e.g. `delay(policy.delayFor(attempt))`).
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:50</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/cloudtodo/impl/CloudTodoSyncOrchestrator.kt:63</code></summary>
 
 ```kotlin
-                // by the Ktor Auth interceptor (refresh-and-retry once). All other
-                // failures propagate immediately to PagingScreenStream → DecisionEngine.
-                RetryPolicy { maxAttempts = 1 },
-            ) {
-                api.getMarkets(page = key.page + 1, perPage = key.pageSize)
-                    .map { it.toDomain() }
-            }
+    private val writeBlock: suspend (CloudTodo) -> Unit,
+    private val retryOnStatus: RetryOnNetworkStatus = RetryOnNetworkStatus.OnlineOnly,
+    private val retryPolicy: RetryPolicy = RetryPolicy(),
+    private val onReplayError: (Throwable) -> Unit = {},
+) {
+
+    /**
 ```
 
 </details>
@@ -1689,16 +1673,16 @@ Box(Modifier.fillMaxSize()) {
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:117</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonMain/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModel.kt:45</code></summary>
 
 ```kotlin
-     * used directly. For Store-backed entities, prefer `StoreFactory.createScreenWithMutation`.
-     */
-    private val editSubmitHandler = viewModelScope.submitHandler<Loan>()
+) : BaseViewModel<Unit, Nothing, AddToWatchlistAction>(Unit) {
 
-    /**
-     * The loan's read state folded together with the edit mutation's state.
-     *
+    private val toggleSubmitHandler = viewModelScope.submitHandler<Unit>()
+
+    /** Read side — filled/outline. Seeded `false` until `contains()` first emits. */
+    val isTracked: StateFlow<Boolean> = repository.contains(coinId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 ```
 
 </details>
@@ -1744,16 +1728,16 @@ interface SubmitOutbox<P>
 ```
 Durable outbox for form payloads that failed to reach the server. Persist a payload on network failure → the user can resume later from any session.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/EditLoanViewModel.kt:53</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt:24</code></summary>
 
 ```kotlin
-class EditLoanViewModel(
-    private val repository: LoanRepository,
-    outbox: SubmitOutbox<Loan>,
-    /**
-     * The loan being edited, or null when adding. Also the draft's unique key, so an edit draft never collides with
-     * the add slot.
-     */
+/** Outbox for PriceAlert payloads — RoomSubmitOutbox writes to `framework_submit_drafts`. */
+@DataProvider(qualifier = "outbox.priceAlert")
+fun providePriceAlertOutbox(dao: DraftDao): SubmitOutbox<PriceAlert> =
+    RoomSubmitOutbox(dao = dao, serializer = PriceAlert.serializer())
+
+/**
+ * Eager: starts watching online events at Koin start and retries pending alerts on reconnect.
 ```
 
 </details>
@@ -1778,7 +1762,7 @@ data class SubmitOutboxEntry<out P>(
 ```
 A single outbox record as seen by the framework.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:29</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonTest/kotlin/kpt/feature/alerts/testing/InMemorySubmitOutbox.kt:35</code></summary>
 
 ```kotlin
 internal class InMemorySubmitOutbox<P> : SubmitOutbox<P> {
@@ -1796,7 +1780,7 @@ enum class SubmitOutboxStatus
 ```
 Lifecycle states for a `SubmitOutboxEntry`.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonTest/kotlin/kpt/feature/loans/ui/InMemorySubmitOutbox.kt:36</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonTest/kotlin/kpt/feature/alerts/testing/InMemorySubmitOutbox.kt:42</code></summary>
 
 ```kotlin
     override suspend fun save(formKey: String, payload: P): Long {
@@ -1828,16 +1812,16 @@ State machine for a single form/action submission lifecycle.
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:134</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonMain/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModel.kt:52</code></summary>
 
 ```kotlin
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = CombinedState(read = ScreenState.Loading, mutation = SubmitState.Idle),
-    )
 
-    /**
-     * Submit an edit of the current loan. Transitions [combinedState.mutation] through
+    /** Write side — Idle / Submitting / Submitted / Failed. */
+    val submitState: StateFlow<SubmitState<Unit>> = toggleSubmitHandler.state
+
+    override fun handleAction(action: AddToWatchlistAction) {
+        when (action) {
+            is AddToWatchlistAction.Toggle -> onToggle()
 ```
 
 </details>

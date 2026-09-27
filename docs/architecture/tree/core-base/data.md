@@ -47,16 +47,16 @@ internal class LoanRepositoryImpl(
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:30</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/impl/AlertsRepositoryImpl.kt:33</code></summary>
 
 ```kotlin
- * Default [CryptoRepository], wrapping the coin-market and coin-detail Stores.
+ * device-local (no backend), so there is no gateway online/command path here.
  */
-@RepositoryBinding(binds = CryptoRepository::class)
-class CryptoRepositoryImpl(
-    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
-) : CryptoRepository {
+@RepositoryBinding(binds = AlertsRepository::class)
+internal class AlertsRepositoryImpl(
+    @FromStore(AppStoreIds.Alerts) private val alertsStore: Store<Unit, List<PriceAlert>>,
+    @FromStore(AppStoreIds.AlertsMutable) private val alertsWriteStore: MutableStore<String, PriceAlert>,
+) : AlertsRepository {
 ```
 
 </details>
@@ -66,16 +66,16 @@ annotation class FromStore(val id: String)
 ```
 Resolves this parameter from the store registry rather than by bare type.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/impl/AlertsRepositoryImpl.kt:35</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = CryptoRepository::class)
-class CryptoRepositoryImpl(
-    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
-) : CryptoRepository {
+@RepositoryBinding(binds = AlertsRepository::class)
+internal class AlertsRepositoryImpl(
+    @FromStore(AppStoreIds.Alerts) private val alertsStore: Store<Unit, List<PriceAlert>>,
+    @FromStore(AppStoreIds.AlertsMutable) private val alertsWriteStore: MutableStore<String, PriceAlert>,
+) : AlertsRepository {
 
-    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
+    // Read-path contract: the repository builds the ScreenDataStream (offline-local → CACHE_ONLY);
 ```
 
 </details>
@@ -95,14 +95,14 @@ fun provideLoanOutbox(dao: DraftDao): SubmitOutbox<Loan> =
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:31</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt:23</code></summary>
 
 ```kotlin
- * `accessPointId` — the parameter exists precisely so that is a substitution, not a rewrite.
- */
-@DataProvider
-fun provideAuthTokenSource(preferences: UserPreferencesRepository): AuthTokenSource =
-    AuthTokenSource { _: String -> preferences.observeAuthToken }
+
+/** Outbox for PriceAlert payloads — RoomSubmitOutbox writes to `framework_submit_drafts`. */
+@DataProvider(qualifier = "outbox.priceAlert")
+fun providePriceAlertOutbox(dao: DraftDao): SubmitOutbox<PriceAlert> =
+    RoomSubmitOutbox(dao = dao, serializer = PriceAlert.serializer())
 
 /**
 ```
@@ -142,16 +142,16 @@ typealias NetworkMonitor = io.github.mobilebytelabs.kmptoolkit.networkmonitor.Ne
 ```
 Backward-compatible typealias — existing consumers keep their import. Delegates to cmp-network-monitor's full-featured NetworkMonitor interface.
 
-<details><summary>Used in the template — <code>feature/currency-rates/src/commonMain/kotlin/kpt/feature/currencyrates/ui/CurrencyRatesViewModel.kt:43</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt:38</code></summary>
 
 ```kotlin
-class CurrencyRatesViewModel(
-    private val currencyRepository: CurrencyRepository,
-    private val networkMonitor: NetworkMonitor,
-) : BaseViewModel<RatesLocalState, Nothing, RatesAction>(RatesLocalState()) {
-
-    private val stream = currencyRepository.exchangeRatesStream(
-        baseCurrency = "USD",
+    scope: CoroutineScope,
+    @FromQualifier("outbox.priceAlert") outbox: SubmitOutbox<PriceAlert>,
+    networkMonitor: NetworkMonitor,
+    repository: AlertsRepository,
+): OfflineSubmitSyncer<PriceAlert, PriceAlert> = OfflineSubmitSyncer<PriceAlert, PriceAlert>(
+    scope = scope,
+    outbox = outbox,
 ```
 
 </details>
@@ -188,15 +188,16 @@ interface Synchronizer
 ```
 Synchronization contract — ports Now in Android's `core/data/SyncUtilities.kt`.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:471</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/currency/impl/CurrencyRepositoryImpl.kt:102</code></summary>
 
 ```kotlin
-@OptIn(ExperimentalScreenDataStreamTestingApi::class)
-private class FakeCurrencyRepository : CurrencyRepository {
-    override suspend fun syncWith(synchronizer: Synchronizer): Boolean = true
-    private val source = MutableStateFlow<ScreenState<ExchangeRates>>(ScreenState.Loading)
-    var refreshCount: Int = 0
-        private set
+     * which the worker's `runCatching` guard turns into false → Result.retry().
+     */
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean =
+        synchronizer.snapshotSync(name = "currency-rates") {
+            coroutineScope {
+                PINNED_BASE_CURRENCIES.map { base ->
+                    async {
 ```
 
 </details>
@@ -233,16 +234,16 @@ interface Syncable
 ```
 Adopter contract. A `Syncable` knows how to bring its slice of local state up to date with the network. At v1 the contract is intentionally minimal (no payload arg) — the worker enqueues all-pinned-keys per adopter at fixed defaults.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/MacroIndicatorsRepository.kt:30</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/currency/CurrencyRepository.kt:29</code></summary>
 
 ```kotlin
- * [syncWith] to force-refresh the macro cache on a schedule.
+ * or from a pull-to-refresh gesture.
  */
-interface MacroIndicatorsRepository : Syncable {
-
+interface CurrencyRepository : Syncable {
     /**
-     * Stream observations for a single static (country, indicator) pair.
+     * Stream of exchange rates for [baseCurrency].
      *
+     * @param fetchPolicy Controls network vs. cache strategy. Defaults to
 ```
 
 </details>
@@ -276,13 +277,13 @@ interface TimeZoneMonitor
 ```
 Utility for reporting current timezone the device has set. It always emits at least once with default setting and then for each TZ change.
 
-<details><summary>Used in the template — <code>core/data/src/nonAndroidMain/kotlin/kpt/core/data/di/PlatformModule.kt:20</code></summary>
+<details><summary>Used in the template — <code>core/data/src/androidMain/kotlin/kpt/core/data/di/PlatformDependentDataModule.android.kt:27</code></summary>
 
 ```kotlin
-actual val platformModule: Module
-    get() = module {
-        single<TimeZoneMonitor> { TimeZoneMonitorImpl() }
-    }
+    includes(CommonModule)
+
+    singleOf(::TimeZoneMonitorImpl) bind TimeZoneMonitor::class
+}
 ```
 
 </details>

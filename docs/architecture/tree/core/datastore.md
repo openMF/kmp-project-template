@@ -118,12 +118,16 @@ override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:76</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ProjectDatastoreModule.kt:31</code></summary>
 
 ```kotlin
-     */
-    val dispatcher: DispatcherManager,
-) : ProjectPreferencesRepository, UserPreferencesRepository by delegate
+ */
+val ProjectDatastoreModule = module {
+    single<ProjectPreferencesRepository> {
+        ProjectPreferencesRepositoryImpl(
+            delegate = get<UserPreferencesRepository>(),
+            // The SAME instances the framework's impl uses — an ownership boundary, not a second
+            // store. Namespace fork keys so they cannot collide with a future framework preference.
 ```
 
 </details>
@@ -173,12 +177,15 @@ interface UserPreferencesRepository
 ```
 Repository interface for managing user preferences with reactive capabilities. This interface provides reactive access to user preferences including theme settings, dark mode configuration, and dynamic color preferences.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepository.kt:51</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:53</code></summary>
 
 ```kotlin
- * structural rather than a rule: drop one and this interface no longer satisfies its supertype.
- */
-interface ProjectPreferencesRepository : UserPreferencesRepository
+    // Binds the read PORT declared by core/store — core/store cannot depend on core/datastore,
+    // so this module (which owns UserPreferencesRepository) supplies the preferences flow.
+    single<UserDataSource> { UserDataSource { get<UserPreferencesRepository>().userData } }
+    // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
+    // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
+    single<FetchedAtRepository> { RoomFetchedAtRepository(get<AppDatabase>().fetchedAtDao) }
 ```
 
 </details>

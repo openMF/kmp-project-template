@@ -27,16 +27,16 @@ object ChartTokens
 ```
 Shared visual tokens for every chart in `core/designsystem/chart/`. Reads from `MaterialTheme.colorScheme`, `MaterialTheme.typography`, and `MaterialTheme.finance`.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptSparkline.kt:44</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptAreaChart.kt:66</code></summary>
 
 ```kotlin
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
-    strokeWidth: Dp = ChartTokens.defaultStrokeWidth,
-    markerAtEnd: Boolean = false,
-) {
-    Canvas(modifier = modifier) {
-        if (values.isEmpty()) return@Canvas
+        drawPath(
+            path = areaPath,
+            brush = ChartTokens.areaFillBrush(fillColor),
+        )
+
+        // Top line.
+        val linePath = Path().apply {
 ```
 
 </details>
@@ -148,16 +148,16 @@ fun AmountDisplay(
 ```
 Big-and-bold currency presentation used at the top of dashboards and detail screens. Layout: optional label (small, dimmed) → large amount → optional supporting metadata row.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:178</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:164</code></summary>
 
 ```kotlin
-
-        HeroCard {
-            AmountDisplay(
-                amountText = formatMoney(loan.principalRemaining),
-                label = stringResource(Res.string.screens_loans_detail_principal_remaining_label),
-                supporting = {
-                    Text(
+internal fun UpcomingSummaryHero(totalAmount: Double, upcomingCount: Int) {
+    HeroCard {
+        AmountDisplay(
+            amountText = formatCurrency(totalAmount),
+            label = stringResource(Res.string.screens_bills_list_summary_label),
+            supporting = {
+                Text(
 ```
 
 </details>
@@ -169,16 +169,16 @@ fun MoneyText(
 ```
 Currency text that picks its color from `MaterialTheme.finance` based on the amount's sign (or a forced `MoneyTone`). Use everywhere a monetary value is rendered so the app has a single visual grammar for money.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanRowCard.kt:87</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:222</code></summary>
 
 ```kotlin
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                MoneyText(
-                    text = formatMoney(loan.principalRemaining),
-                    tone = kpt.core.designsystem.component.MoneyTone.Negative,
-                    style = MaterialTheme.typography.titleLarge,
-                )
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            )
+            MoneyText(
+                text = formatCurrency(bill.amount),
+                tone = MoneyTone.Negative,
+                style = MaterialTheme.typography.titleMedium,
+            )
 ```
 
 </details>
@@ -190,16 +190,16 @@ enum class MoneyTone
 ```
 Money tone — how a monetary amount should be colored regardless of the raw value's sign.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanRowCard.kt:89</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/MoneyText.kt:36</code></summary>
 
 ```kotlin
-                MoneyText(
-                    text = formatMoney(loan.principalRemaining),
-                    tone = kpt.core.designsystem.component.MoneyTone.Negative,
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            }
-            Column(horizontalAlignment = Alignment.End) {
+    modifier: Modifier = Modifier,
+    amount: Double = 0.0,
+    tone: MoneyTone = MoneyTone.AutoFromSign,
+    style: TextStyle = MaterialTheme.typography.bodyLarge,
+    weight: FontWeight = FontWeight.SemiBold,
+) {
+    val color = resolveMoneyColor(tone, amount)
 ```
 
 </details>
@@ -232,16 +232,16 @@ enum class RateDirection
 ```
 Direction of a rate / price / metric change relative to the prior period.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:564</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/RateBadge.kt:44</code></summary>
 
 ```kotlin
-                        rates.fedFundsPercent.formatDecimal(2),
-                    ),
-                    direction = RateDirection.Flat,
-                    delta = stringResource(Res.string.screens_home_rates_delta_flat),
-                )
-                RateRow(
-                    label = stringResource(Res.string.screens_home_rates_mortgage_30y_label),
+ */
+@Composable
+fun RateBadge(delta: String, direction: RateDirection, modifier: Modifier = Modifier) {
+    val (container, content, icon) = resolveRateColors(direction)
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(50))
 ```
 
 </details>
@@ -274,16 +274,16 @@ fun CardLoadingSkeleton(modifier: Modifier = Modifier)
 ```
 Whole-card shimmer placeholder. Drop in for `AppCard` / `Card` while the underlying data loads. Renders 3 stacked shimmer bars to suggest a typical card layout (title + 2 body lines).
 
-<details><summary>Used in the template — <code>feature/showcase/src/commonMain/kotlin/kpt/feature/showcase/stategallery/StateGalleryScreen.kt:128</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/state/CardStateBox.kt:46</code></summary>
 
 ```kotlin
-
-            // ── CardLoadingSkeleton ─────────────────────────────────────
-            SectionHeader("CardLoadingSkeleton")
-            CardLoadingSkeleton()
-
-            // ── CardStateBox ────────────────────────────────────────────
-            SectionHeader("CardStateBox — every variant")
+) {
+    when (state) {
+        is ScreenState.Loading -> CardLoadingSkeleton(modifier = modifier)
+        is ScreenState.Empty -> Card(modifier = modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                contentAlignment = Alignment.Center,
 ```
 
 </details>
@@ -337,16 +337,16 @@ fun InlineErrorPill(message: String, modifier: Modifier = Modifier, onRetry: (()
 ```
 Pill-shaped inline error chip — for component-scale failures (a single row failing in an otherwise-loaded list, a stale field in a form, a card-local fetch failure).
 
-<details><summary>Used in the template — <code>feature/showcase/src/commonMain/kotlin/kpt/feature/showcase/stategallery/StateGalleryScreen.kt:91</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/state/CardStateBox.kt:64</code></summary>
 
 ```kotlin
-
-            // ── InlineErrorPill ─────────────────────────────────────────
-            LabelRow("InlineErrorPill (no retry)") {
-                InlineErrorPill(message = "Couldn't refresh balance")
+                contentAlignment = Alignment.Center,
+            ) {
+                InlineErrorPill(message = state.error.message ?: "Something went wrong")
             }
-            LabelRow("InlineErrorPill (with retry)") {
-                InlineErrorPill(message = "Network error", onRetry = {})
+        }
+        is ScreenState.NoNetwork -> Card(modifier = modifier.fillMaxWidth()) {
+            Box(
 ```
 
 </details>
@@ -379,16 +379,16 @@ fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modi
 ```
 Compact colored pill used to convey state at a glance — bill status, loan stage, rate direction, sync state. Stays one line; no icons (use `UrgencyDot` when you want a leading accent).
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:171</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:238</code></summary>
 
 ```kotlin
-                modifier = Modifier.weight(1f),
-            )
+            horizontalArrangement = Arrangement.spacedBy(sp.sm),
+        ) {
+            StatusChip(text = shortDueLabel(diff), intent = statusIntent)
             StatusChip(
-                text = loanKindLabel(loan.kind),
-                intent = StatusChipIntent.Info,
+                text = bill.category.name.lowercase().replaceFirstChar { it.uppercase() },
+                intent = StatusChipIntent.Neutral,
             )
-        }
 ```
 
 </details>
@@ -400,16 +400,16 @@ enum class StatusChipIntent
 ```
 Semantic intent of a `StatusChip`. Maps to a (container, content) color pair derived from the active Material color scheme + finance palette.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:173</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/StatusChip.kt:33</code></summary>
 
 ```kotlin
-            StatusChip(
-                text = loanKindLabel(loan.kind),
-                intent = StatusChipIntent.Info,
-            )
-        }
-
-        HeroCard {
+ */
+@Composable
+fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modifier) {
+    val (container, content) = resolveChipColors(intent)
+    Text(
+        text = text,
+        modifier = modifier
 ```
 
 </details>
@@ -421,16 +421,16 @@ enum class Urgency
 ```
 Due-date urgency tier — informs the color of a leading dot on a list row.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:781</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:86</code></summary>
 
 ```kotlin
-
-/** Heuristic mapping bill due-day to an urgency tier for the [UrgencyDot]. */
-private fun urgencyForDay(dueDay: Int): Urgency = when {
-    dueDay <= 1 -> Urgency.Today
-    dueDay <= 3 -> Urgency.Upcoming
-    dueDay <= 7 -> Urgency.Upcoming
-    else -> Urgency.Distant
+        SwatchRow("freshnessUpdating", f.freshnessUpdating)
+        SwatchRow("freshnessOffline", f.freshnessOffline)
+        SectionLabel("Urgency")
+        SwatchRow("urgencyOverdue", f.urgencyOverdue)
+        SwatchRow("urgencyToday", f.urgencyToday)
+        SwatchRow("urgencyUpcoming", f.urgencyUpcoming)
+        SwatchRow("urgencyDistant", f.urgencyDistant)
 ```
 
 </details>
@@ -442,16 +442,16 @@ fun UrgencyDot(urgency: Urgency, modifier: Modifier = Modifier, size: Dp = 10.dp
 ```
 Solid colored dot used as the leading accent on a list row (bill reminder, loan due, task). Pairs cheaply with any list-item layout to encode urgency at a glance without stealing focus from the row's text content.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:508</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:214</code></summary>
 
 ```kotlin
-                        horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),
-                    ) {
-                        UrgencyDot(urgency = urgencyForDay(bill.dueDay))
-                        Text(
-                            text = bill.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(sp.md),
+        ) {
+            UrgencyDot(urgency = urgency)
+            Text(
+                text = bill.name,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.weight(1f),
 ```
 
 </details>
@@ -463,16 +463,16 @@ object AppIcons
 ```
 The app's icon set, named by ROLE rather than by glyph.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsScreenPreview.kt:105</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/input/PasswordStrengthIndicator.kt:152</code></summary>
 
 ```kotlin
-    KptTheme {
-        SettingsRowCard(
-            icon = AppIcons.Language,
-            title = "Change the application display language and region format",
-            contentDescription = "Opens the language picker",
-            accentColor = MaterialTheme.colorScheme.tertiary,
-            onClick = {},
+        AnimatedContent(
+            targetState = if (minimumRequirementMet) {
+                AppIcons.CheckCircle
+            } else {
+                AppIcons.Close
+            },
+            label = "iconForMinimumCharacterCount",
 ```
 
 </details>
@@ -852,16 +852,16 @@ data class Elevation(
 ```
 Shared elevation tier scale — five named tiers matching Material 3 elevation guidance. Access from any Composable via `MaterialTheme.elevation`.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptBottomBar.kt:39</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:58</code></summary>
 
 ```kotlin
-        windowInsets = windowInsets,
-        modifier = modifier.fillMaxWidth(),
-        tonalElevation = 0.dp,
-    ) {
-        navigationItems.forEach { navigationItem ->
-            KptNavigationBarItem(
-                contentDescriptionRes = navigationItem.contentDescriptionRes,
+}
+
+@Preview(name = "Elevation tiers", showBackground = true, widthDp = 360)
+@Composable
+private fun ElevationTiersPreview() {
+    KptTheme(darkTheme = false) {
+        Surface { ElevationSwatches() }
 ```
 
 </details>
@@ -972,16 +972,15 @@ fun KptTheme(
 ```
 The main theme composable for the application. This composable uses KptMaterialTheme under the hood to provide seamless integration between KptTheme design tokens and Material3 theming system.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/AddOrEditLoanScreenPreview.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:37</code></summary>
 
 ```kotlin
 @Composable
-internal fun LoanFormFieldsEnabledPreview() {
-    KptTheme {
-        Column {
-            LoanKindDropdown(value = LoanKind.AUTO, onChange = {}, enabled = true)
-            DoubleField(label = "Principal", value = 100_000.0, onChange = {}, enabled = true)
-            IntField(label = "Tenure (months)", value = 60, onChange = {}, enabled = true)
+private fun FinancePalettePreviewLight() {
+    KptTheme(darkTheme = false) {
+        Surface { FinancePaletteSwatches() }
+    }
+}
 ```
 
 </details>
@@ -998,16 +997,16 @@ data class Spacing(
 ```
 Shared spacing scale — replaces raw `.dp` literals scattered across features with a disciplined 4 / 8 / 12 / 16 / 24 / 32 / 48 progression. Access from any Composable via `MaterialTheme.spacing`.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptCandlestick.kt:79</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:50</code></summary>
 
 ```kotlin
-        val priceRange = (priceMax - priceMin).takeIf { it > 0f } ?: 1f
+}
 
-        val candleSpacing = size.width / candles.size
-        val candleBodyWidth = candleSpacing * 0.7f
-        val wickStrokePx = wickWidth.toPx()
-
-        candles.forEachIndexed { index, candle ->
+@Preview(name = "Spacing scale", showBackground = true, widthDp = 360)
+@Composable
+private fun SpacingScalePreview() {
+    KptTheme(darkTheme = false) {
+        Surface { SpacingSwatches() }
 ```
 
 </details>

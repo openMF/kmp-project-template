@@ -75,7 +75,16 @@ PYEOF
 
 say ""
 say "── A4  generated pages current with source ────────────────────────────────────"
-if bash "$D/refresh.sh" --check >/dev/null 2>&1; then say "  ✓ in step"; else say "  ✗ stale — run scripts/docs/refresh.sh"; FAIL=1; fi
+# The drift detail is PRINTED, not swallowed. `refresh.sh --check` already names the exact pages;
+# discarding that left CI reporting a bare "stale" for a generator whose output was not reproducible
+# across filesystems, and the named pages were the fastest way to see it.
+if _a4="$(bash "$D/refresh.sh" --check 2>&1)"; then
+  say "  ✓ in step"
+else
+  say "  ✗ stale — run scripts/docs/refresh.sh"
+  printf '%s\n' "$_a4" | sed -n '/DRIFT/,$p' | sed 's/^/  /'
+  FAIL=1
+fi
 
 say "── A5  authored prose names files that exist ──────────────────────────────────"
 if bash "$D/doc-refs.sh" --strict >/dev/null 2>&1; then say "  ✓ every reference resolves"; else bash "$D/doc-refs.sh" --strict 2>&1 | sed -n '/^DEAD/,$p' | sed 's/^/  /'; FAIL=1; fi

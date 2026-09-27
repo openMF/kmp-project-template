@@ -34,16 +34,15 @@ val CommonModule = module
 ```
 Koin module for `core-base/common` — currently the platform `dispatcherManagerModule` binding. Include it once from the app's module graph; every other core module assumes a `DispatcherManager` is already resolvable.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/data/src/androidMain/kotlin/kpt/core/data/di/PlatformDependentDataModule.android.kt:25</code></summary>
 
 ```kotlin
  */
-val DatastoreModule = module {
-    includes(CommonModule, DatastoreBaseModule)
+actual val platformModule: Module = module {
+    includes(CommonModule)
 
-    single {
-        UserPreferencesRepositoryImpl(
-            plainSettings = get<Settings>(named("plain")),
+    singleOf(::TimeZoneMonitorImpl) bind TimeZoneMonitor::class
+}
 ```
 
 </details>
@@ -97,13 +96,15 @@ interface DispatcherManager
 ```
 Injectable access to the app's coroutine dispatchers.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:75</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:35</code></summary>
 
 ```kotlin
-     * control.
-     */
-    val dispatcher: DispatcherManager,
-) : ProjectPreferencesRepository, UserPreferencesRepository by delegate
+    private val repository: UserPreferencesRepository,
+    private val storeCacheManager: StoreCacheManager,
+    dispatcherManager: DispatcherManager,
+) : UserLogoutManager {
+
+    private val scope = CoroutineScope(dispatcherManager.unconfined)
 ```
 
 </details>

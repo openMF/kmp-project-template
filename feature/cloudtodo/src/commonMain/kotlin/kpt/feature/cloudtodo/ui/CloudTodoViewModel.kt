@@ -122,6 +122,8 @@ sealed interface MutationOutcome {
      * Permanent failure. [rolledBack] is true when the optimistic local write was undone.
      *
      * @property message what to show the user.
+     *
+     * @property rolledBack whether the optimistic local write was undone. False means local and server have diverged.
      */
     data class Failed(val message: String, val rolledBack: Boolean) : MutationOutcome
 }

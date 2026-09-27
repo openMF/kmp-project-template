@@ -53,10 +53,18 @@ class ConflictInboxViewModel(
 
 /** Per-row conflict actions accepted by [ConflictInboxViewModel]. */
 sealed interface ConflictInboxAction {
-    /** Accept the server record for conflict [id]. */
+    /**
+     * Accept the server record for conflict [id].
+     *
+     * @property id which conflict to resolve in the server's favour.
+     */
     data class AcceptServer(val id: String) : ConflictInboxAction
 
-    /** Retry the recorded local payload for conflict [id]. */
+    /**
+     * Retry the recorded local payload for conflict [id].
+     *
+     * @property id which conflict to retry locally.
+     */
     data class RetryLocal(val id: String) : ConflictInboxAction
 }
 

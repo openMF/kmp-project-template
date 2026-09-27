@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/store sha=b3ea71eeac8a0a38fef3b69f369256b7ef5a31c3 -->
+<!-- api-docs:begin module=core-base/store sha=70c418a719c5f84fb17ff461d07796af5dba8aa7 -->
 ## API reference
 
-_Generated from `core-base/store` at tree `b3ea71eeac8a` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/store` at tree `70c418a719c5` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -76,11 +76,11 @@ data class CombinedState<R, W>(
 ```
 Snapshot pairing the read-side `ScreenState` with the write-side `SubmitState` — the single value a screen needs to render every read-write cycle (form preload, submission progress, post-submit outcome, offline outbox indicator).
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:119</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:126</code></summary>
 
 ```kotlin
-    private val editSubmitHandler = viewModelScope.submitHandler<Loan>()
-
+     * factory over repeating this.
+     */
     val combinedState: StateFlow<CombinedState<Loan, Loan>> = combine(
         loadOnceScreenState,
         editSubmitHandler.state,
@@ -235,7 +235,7 @@ data class FreshnessSignal(
 ```
 Pure-staleness signal carried by `kpt.core.base.store.screen.ScreenDataStream.freshness` alongside `state`. Decouples cache age from network connectivity.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:528</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:536</code></summary>
 
 ```kotlin
 private fun RatesQuickCard(
@@ -1696,9 +1696,9 @@ Box(Modifier.fillMaxSize()) {
      */
     private val editSubmitHandler = viewModelScope.submitHandler<Loan>()
 
-    val combinedState: StateFlow<CombinedState<Loan, Loan>> = combine(
-        loadOnceScreenState,
-        editSubmitHandler.state,
+    /**
+     * The loan's read state folded together with the edit mutation's state.
+     *
 ```
 
 </details>
@@ -1828,7 +1828,7 @@ State machine for a single form/action submission lifecycle.
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:127</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:134</code></summary>
 
 ```kotlin
         scope = viewModelScope,

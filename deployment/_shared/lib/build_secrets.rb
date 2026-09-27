@@ -27,11 +27,14 @@ module BuildSecrets
   # Product-flavor → applicationId suffix. Mirrors org.convention.AppFlavor.
   FLAVOR_SUFFIX = { "prod" => "", "demo" => ".demo" }.freeze
 
+  # An accessor bound to one flavor/variant pair, so every lookup resolves the right
+  # `{flavor}` / `{variant}` placeholder without the caller repeating them.
   def self.for(flavor: :prod, variant: :release)
     Accessor.new(flavor.to_s, variant.to_s)
   end
 
   class Accessor
+    # Bind this accessor to a flavor and variant and load secrets/LAYOUT.yaml once.
     def initialize(flavor, variant)
       @flavor  = flavor
       @variant = variant
@@ -79,6 +82,7 @@ module BuildSecrets
       candidate_paths(key).find { |p| File.exist?(abs(p)) } || candidate_paths(key).last
     end
 
+    # True when any candidate path for key is present on disk.
     def exists?(key)
       candidate_paths(key).any? { |p| File.exist?(abs(p)) }
     end
@@ -229,6 +233,8 @@ module BuildSecrets
 
     private
 
+    # Where a secret should be written for this flavor/variant, from its LAYOUT entry.
+    # An env-var secret lands under `_env/`; everything else uses its declared consume_at.
     def materialize_dest(key, s)
       live = @doc["roots"].fetch("live")
       return s["consume_at"].gsub("{flavor}", @flavor).gsub("{variant}", @variant) if s["consume_at"]
@@ -236,6 +242,7 @@ module BuildSecrets
       File.join(live, rel(key))
     end
 
+    # The bytes to write for a secret, by kind — a literal, an env-var value, or a file copy.
     def materialize_body(_key, s, kind, from_env)
       case kind
       when "literal"

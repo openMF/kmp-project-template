@@ -42,6 +42,9 @@ data class DonutSlice(
      * the total.
      */
     val label: String,
+    /**
+     * Slice magnitude in data units. Converted to an arc as a share of the set's total, so values need not sum to 100.
+     */
     val value: Float,
     /** Slice colour, or null to take the next hue from [ChartTokens.multiSeriesColors]. */
     val color: Color? = null,

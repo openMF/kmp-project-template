@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/designsystem sha=7b65af282d281631c2470e9bf2a088d8f7adbbbe -->
+<!-- api-docs:begin module=core/designsystem sha=e87f493c86f180e0a159595bfad7cb79f935e13c -->
 ## API reference
 
-_Generated from `core/designsystem` at tree `7b65af282d28` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/designsystem` at tree `e87f493c86f1` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/ChartTokens.kt`
@@ -211,7 +211,7 @@ fun RateBadge(delta: String, direction: RateDirection, modifier: Modifier = Modi
 ```
 Compact rate-change indicator — directional icon + percentage / delta text, both colored from `MaterialTheme.finance` (rateUp / rateDown / rateFlat). Renders inside a tinted container so it reads as a single visual unit.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:712</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:720</code></summary>
 
 ```kotlin
         )
@@ -232,7 +232,7 @@ enum class RateDirection
 ```
 Direction of a rate / price / metric change relative to the prior period.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:555</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:563</code></summary>
 
 ```kotlin
                         rates.fedFundsPercent.formatDecimal(2),
@@ -253,7 +253,7 @@ fun SectionHeader(
 ```
 Section header — title (+ optional supporting text) + optional trailing action button. Use to break dashboards into scannable groups (Loans, Bills, Rates, Currencies).
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:191</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:199</code></summary>
 
 ```kotlin
 
@@ -421,7 +421,7 @@ enum class Urgency
 ```
 Due-date urgency tier — informs the color of a leading dot on a list row.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:772</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:780</code></summary>
 
 ```kotlin
 
@@ -442,7 +442,7 @@ fun UrgencyDot(urgency: Urgency, modifier: Modifier = Modifier, size: Dp = 10.dp
 ```
 Solid colored dot used as the leading accent on a list row (bill reminder, loan due, task). Pairs cheaply with any list-item layout to encode urgency at a glance without stealing focus from the row's text content.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:499</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:507</code></summary>
 
 ```kotlin
                         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm),

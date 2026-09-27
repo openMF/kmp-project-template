@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/model sha=7fd090fbb2d7a3055cd6cc04d0491fb6a33d568a -->
+<!-- api-docs:begin module=core/model sha=114b9e0a8fb52539a66c3e076020f08b3f655b2c -->
 ## API reference
 
-_Generated from `core/model` at tree `7fd090fbb2d7` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/model` at tree `114b9e0a8fb5` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/model/src/commonMain/kotlin/kpt/core/model/alerts/PriceAlert.kt`
@@ -337,7 +337,7 @@ data class ExchangeRates(
 ```
 FX rates for one base currency on one day — the `rates` map is quote-code → rate.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:574</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:582</code></summary>
 
 ```kotlin
 @Composable

@@ -97,11 +97,11 @@ interface DispatcherManager
 ```
 Injectable access to the app's coroutine dispatchers.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:66</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:75</code></summary>
 
 ```kotlin
-    val plainSettings: Settings,
-    val secureSettings: Settings,
+     * control.
+     */
     val dispatcher: DispatcherManager,
 ) : ProjectPreferencesRepository, UserPreferencesRepository by delegate
 ```

@@ -30,6 +30,10 @@ internal fun Project.configureDetekt(extension: DetektExtension) = extension.app
         // sample code — a RED fixture exists precisely to be wrong, and a GREEN one is a fragment with
         // no package/consumer — so linting them reports defects that are the fixture's whole purpose.
         exclude("scripts/product-health/tests/**")
+        // Same reason for the doc-scanner's fixtures: scripts/docs/tests/** holds deliberately
+        // UNDOCUMENTED declarations so scripts/docs/scanners/kotlin.awk can be proven to find them.
+        // Documenting a red fixture deletes the evidence that the scanner works.
+        exclude("scripts/docs/tests/**")
         // TODO:: Remove this exclusion
         exclude("core-base/designsystem/**")
         exclude("feature/home/**")

@@ -159,6 +159,8 @@ sealed class StorePageResult<out T> {
     /**
      * A page that failed to load. The footer maps [error] to copy via its `ErrorCategory`, so an offline page-load
      * reads as offline rather than as a server fault.
+      *
+      * @property error the failure that ended this page load. Transient: the page is retried, not skipped.
      */
     data class Error(val error: Throwable) : StorePageResult<Nothing>()
 }

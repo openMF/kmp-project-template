@@ -3,6 +3,10 @@ package org.convention
 import com.diffplug.gradle.spotless.SpotlessExtension
 import org.gradle.api.Project
 
+/**
+ * ktlint version Spotless runs. Pinned here rather than in the catalog: Spotless resolves it at configuration time,
+ * before the catalog is available to build-logic.
+ */
 const val ktlintVersion = "1.0.1"
 
 /**

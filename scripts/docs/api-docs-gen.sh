@@ -303,6 +303,9 @@ page_for() {  # $1 = layer/module → docs path
   printf '%s/docs/architecture/modules/%s/%s.md' "$TMPL" "${1%%/*}" "${1##*/}"
 }
 
+# Regenerate one module's api-docs block in place.
+# Builds the body into a temp file first, so a failed generation leaves the page
+# untouched rather than half-written.
 write_module() {  # $1 = layer/module
   local lm="$1" page tmp body
   page="$(page_for "$lm")"

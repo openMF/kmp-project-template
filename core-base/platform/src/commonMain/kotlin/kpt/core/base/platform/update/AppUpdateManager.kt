@@ -52,7 +52,11 @@ sealed interface UpdateOutcome {
     /** The user dismissed the update flow. */
     data object Cancelled : UpdateOutcome
 
-    /** This target has no in-app update mechanism; [reason] says why. */
+    /**
+     * This target has no in-app update mechanism; [reason] says why.
+     *
+     * @property reason why this target has no in-app update mechanism. A diagnostic, not user-facing copy.
+     */
     data class NotSupported(val reason: String) : UpdateOutcome
 
     /**

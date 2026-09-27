@@ -129,6 +129,14 @@ import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 // public (not internal): rendered as the default home body by cmp-navigation's fork-owned
 // BackboneRegistry.homeBody seam (epic pure-white-label-store5-network, T7). Lives in the
 // fork-owned `demo/` package; customizer --clean deletes it together with the seam's default.
+/**
+ * The demo dashboard: loans summary, upcoming bills, rates and an exchange rate, each an
+ * independent card.
+ *
+ * Public rather than internal because `cmp-navigation`'s fork-owned `BackboneRegistry.homeBody`
+ * seam renders it as the default home body. It lives in the fork-owned `demo/` package, so
+ * `--clean` removes it together with that default.
+ */
 @Composable
 fun HomeDashboard(
     onNavigateToLoans: () -> Unit,

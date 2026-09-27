@@ -63,6 +63,7 @@ end
 
 TOKEN = jwt(opts[:key_id], opts[:issuer], opts[:p8])
 
+# Issue one App Store Connect API request and parse the JSON response.
 def api(method, path, body = nil)
   uri = URI("https://api.appstoreconnect.apple.com/v1/#{path}")
   klass = { get: Net::HTTP::Get, post: Net::HTTP::Post, patch: Net::HTTP::Patch, delete: Net::HTTP::Delete }[method]
@@ -75,11 +76,15 @@ def api(method, path, body = nil)
   [res.code.to_i, (JSON.parse(res.body) rescue res.body)]
 end
 
+# True when the app needs an ITAR/encryption declaration before it can be submitted.
+# Apple blocks the submission rather than warning, so this is checked up front instead of
+# letting the upload fail at the end of a long build.
 def ita_gate?(errors)
   Array(errors).any? { |e| e.to_json.include?('REGULATED_PERSONAL_SERVICE') || e.to_json.include?('ITA_CANNOT_SUBMIT') } ||
     Array(errors).any? { |e| e.dig('meta', 'associatedErrors')&.to_json.to_s.include?('REGULATED_PERSONAL_SERVICE') }
 end
 
+# Print what the encryption declaration requires and how to satisfy it.
 def print_ita_gate
   warn <<~GATE
     ⛔ HUMAN GATE — Part XX Income Tax Act (ITA) declaration (Apple exposes NO API for this).

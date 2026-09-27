@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/designsystem sha=e9e3bdf32154cb2319670a5343e947580e0f9bec -->
+<!-- api-docs:begin module=core-base/designsystem sha=85bea3039eb247ab8645740fe8c5387e01dab28b -->
 ## API reference
 
-_Generated from `core-base/designsystem` at tree `e9e3bdf32154` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/designsystem` at tree `85bea3039eb2` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -36,7 +36,7 @@ object BarGeometry
 ```
 Pure-function math for bar chart composables. Normalizes each bar to a fraction in `[0f, 1f]` against the series' max. **Degenerate-input contracts**: - Empty list → empty result.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptBarChart.kt:76</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptBarChart.kt:80</code></summary>
 
 ```kotlin
 ) {
@@ -60,7 +60,7 @@ object DonutGeometry
 ```
 Pure-function math for donut chart composables. Extracted from the Composable so sweep-angle correctness can be tested without a Compose test rule. **Degenerate-input contracts**: - Empty list → empty result.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptDonutChart.kt:72</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptDonutChart.kt:75</code></summary>
 
 ```kotlin
 ) {
@@ -524,9 +524,9 @@ interface KptComponent
 ```
 The base contract every `Kpt*` component satisfies: a test tag, a content description and a caller-supplied `Modifier`.
 
-- `val testTag: String?`
-- `val contentDescription: String?`
-- `val modifier: Modifier`
+- `val testTag: String?` — Stable identifier for UI tests. Null means the component is not addressable — acceptable only for purely decorative content.
+- `val contentDescription: String?` — Screen-reader description, or null when the component is decorative and should be skipped by accessibility services.
+- `val modifier: Modifier` — Caller-supplied modifier, applied to the component's outermost node so padding and sizing from the call site win.
 
 ```kotlin
 interface Clickable
@@ -547,25 +547,25 @@ Mixed into components that respond to a tap. `interactionSource` is exposed so a
 
 </details>
 
-- `val onClick: () -> Unit`
-- `val enabled: Boolean`
-- `val interactionSource: MutableInteractionSource?`
+- `val onClick: () -> Unit` — Invoked on tap. Not called while `enabled` is false.
+- `val enabled: Boolean` — Whether the tap is accepted. A disabled component still renders and is still read by accessibility services.
+- `val interactionSource: MutableInteractionSource?` — Hoisted press/ripple state, or null to let the component own it. Pass one when a parent must react to the same interaction.
 
 ```kotlin
 interface Styleable
 ```
 Mixed into components whose colors, shape and elevation can be overridden at the call site.
 
-- `val colors: ComponentColors?`
-- `val shape: Shape?`
-- `val elevation: ComponentElevation?`
+- `val colors: ComponentColors?` — Color overrides, or null to inherit the theme's.
+- `val shape: Shape?` — Shape override, or null to inherit the theme's shape for this component's size class.
+- `val elevation: ComponentElevation?` — Elevation override, or null to inherit the theme's.
 
 ```kotlin
 interface Themeable
 ```
 Mixed into components that accept a whole `ComponentTheme` rather than individual style slots.
 
-- `val theme: ComponentTheme?`
+- `val theme: ComponentTheme?` — A complete theme for this component, or null to resolve from the ambient one.
 
 ```kotlin
 interface ComponentColors
@@ -587,29 +587,29 @@ interface ThemeStrategy
 ```
 Resolves the `ComponentTheme` for a component, letting a fork swap the whole theming rule rather than overriding components one at a time.
 
-- `fun applyTheme(component: KptComponent): ComponentTheme`
+- `fun applyTheme(component: KptComponent): ComponentTheme` — Resolves the theme for `component`. Called per render, so it must be cheap and free of side effects.
 
 ```kotlin
 interface ComponentFactory<T : KptComponent>
 ```
 Builds a component of type `T` from a `ComponentConfiguration` — the seam that lets components be constructed from data (a registry, a server-driven layout) instead of only from Kotlin call sites.
 
-- `fun create(configuration: ComponentConfiguration): T`
+- `fun create(configuration: ComponentConfiguration): T` — Builds the component described by `configuration`.
 
 ```kotlin
 interface ComponentConfiguration
 ```
 A component's declarative description, convertible to the component itself via `build`.
 
-- `fun build(): KptComponent`
+- `fun build(): KptComponent` — Materialises this description into a component.
 
 ```kotlin
 interface ComponentState<T>
 ```
 Observable holder for one component's mutable value. `@Stable` so Compose can skip recomposition when the reference is unchanged; mutate through `update` rather than replacing the holder, or that guarantee is lost.
 
-- `val value: T`
-- `fun update(newValue: T)`
+- `val value: T` — The current value.
+- `fun update(newValue: T)` — Replaces the value in place. Mutating through this preserves the `@Stable` contract; swapping the holder does not.
 
 ```kotlin
 sealed interface ComponentVariant
@@ -621,35 +621,35 @@ interface ComponentComposer
 ```
 Renders a list of components as one composition — used where a screen's content is assembled from data rather than written out.
 
-- `fun compose(components: List<KptComponent>): Unit`
+- `fun compose(components: List<KptComponent>): Unit` — Renders `components` in order as one composition.
 
 ```kotlin
 interface Animatable
 ```
 Mixed into components with a tunable transition. See `theme/Motion.kt` for the shared durations; overriding per component is what makes an app's motion feel inconsistent.
 
-- `val animationDuration: Long`
-- `val animationEasing: androidx.compose.animation.core.Easing?`
+- `val animationDuration: Long` — Transition length in milliseconds. Prefer the shared values in `theme/Motion.kt`; a per-component number is what makes motion feel uneven.
+- `val animationEasing: androidx.compose.animation.core.Easing?` — Easing curve, or null for the theme's default.
 
 ```kotlin
 interface AccessibilityProvider
 ```
 Supplies a component's semantics — description, role and any extra properties. Separate from `KptComponent` so a component can delegate accessibility to a wrapper rather than re-declaring it.
 
-- `val semantics: androidx.compose.ui.semantics.SemanticsPropertyReceiver.() -> Unit`
-- `val contentDescription: String?`
-- `val role: androidx.compose.ui.semantics.Role?`
+- `val semantics: androidx.compose.ui.semantics.SemanticsPropertyReceiver.() -> Unit` — Extra semantics applied to the component's node, beyond description and role.
+- `val contentDescription: String?` — Screen-reader description, or null when the component is decorative and should be skipped by accessibility services.
+- `val role: androidx.compose.ui.semantics.Role?` — The component's accessibility role, or null to let the platform infer it.
 
 ```kotlin
 interface KptThemeProvider
 ```
 The whole design language in one object: colors, typography, shapes, spacing and elevation. A fork supplies its own and every component follows, which is the point of the indirection.
 
-- `val colors: KptColorScheme`
-- `val typography: KptTypography`
-- `val shapes: KptShapes`
-- `val spacing: KptSpacing`
-- `val elevation: KptElevation`
+- `val colors: KptColorScheme` — Color overrides, or null to inherit the theme's.
+- `val typography: KptTypography` — The type scale.
+- `val shapes: KptShapes` — The corner-shape scale.
+- `val spacing: KptSpacing` — The spacing scale.
+- `val elevation: KptElevation` — Elevation override, or null to inherit the theme's.
 
 ```kotlin
 interface KptColorScheme
@@ -670,20 +670,20 @@ The full Material 3 color role set. Roles, not literal colors — a component as
 
 </details>
 
-- `val primary: Color`
-- `val onPrimary: Color`
-- `val primaryContainer: Color`
-- `val onPrimaryContainer: Color`
-- `val inversePrimary: Color`
-- `val secondary: Color`
-- `val onSecondary: Color`
-- `val secondaryContainer: Color`
-- `val onSecondaryContainer: Color`
-- `val tertiary: Color`
-- `val onTertiary: Color`
-- `val tertiaryContainer: Color`
-- `val onTertiaryContainer: Color`
-- `val background: Color`
+- `val primary: Color` — The brand's main accent — filled buttons, active selection, the FAB.
+- `val onPrimary: Color` — Content drawn on `primary`. Guaranteed to meet contrast against it.
+- `val primaryContainer: Color` — A low-emphasis primary surface, for a tonal button or a selected chip.
+- `val onPrimaryContainer: Color` — Content drawn on `primaryContainer`.
+- `val inversePrimary: Color` — Primary as seen on an inverted surface — a snackbar's action, which sits on `inverseSurface`.
+- `val secondary: Color` — A supporting accent, for controls that must be visible without competing with `primary`.
+- `val onSecondary: Color` — Content drawn on `secondary`.
+- `val secondaryContainer: Color` — A low-emphasis secondary surface, typically a navigation item's selected indicator.
+- `val onSecondaryContainer: Color` — Content drawn on `secondaryContainer`.
+- `val tertiary: Color` — A contrasting accent used to draw attention to a distinct third category — not a third brand colour.
+- `val onTertiary: Color` — Content drawn on `tertiary`.
+- `val tertiaryContainer: Color` — A low-emphasis tertiary surface.
+- `val onTertiaryContainer: Color` — Content drawn on `tertiaryContainer`.
+- `val background: Color` — The window's base colour, behind all content.
   _…more members; read the file._
 
 ```kotlin
@@ -705,20 +705,20 @@ The Material 3 type scale — display through label, each in three sizes.
 
 </details>
 
-- `val displayLarge: androidx.compose.ui.text.TextStyle`
-- `val displayMedium: androidx.compose.ui.text.TextStyle`
-- `val displaySmall: androidx.compose.ui.text.TextStyle`
-- `val headlineLarge: androidx.compose.ui.text.TextStyle`
-- `val headlineMedium: androidx.compose.ui.text.TextStyle`
-- `val headlineSmall: androidx.compose.ui.text.TextStyle`
-- `val titleLarge: androidx.compose.ui.text.TextStyle`
-- `val titleMedium: androidx.compose.ui.text.TextStyle`
-- `val titleSmall: androidx.compose.ui.text.TextStyle`
-- `val bodyLarge: androidx.compose.ui.text.TextStyle`
-- `val bodyMedium: androidx.compose.ui.text.TextStyle`
-- `val bodySmall: androidx.compose.ui.text.TextStyle`
-- `val labelLarge: androidx.compose.ui.text.TextStyle`
-- `val labelMedium: androidx.compose.ui.text.TextStyle`
+- `val displayLarge: androidx.compose.ui.text.TextStyle` — The largest type — a single short string on a splash or hero. Never body copy.
+- `val displayMedium: androidx.compose.ui.text.TextStyle` — Display at medium size.
+- `val displaySmall: androidx.compose.ui.text.TextStyle` — Display at small size.
+- `val headlineLarge: androidx.compose.ui.text.TextStyle` — A screen's title.
+- `val headlineMedium: androidx.compose.ui.text.TextStyle` — A major section heading.
+- `val headlineSmall: androidx.compose.ui.text.TextStyle` — A minor section heading.
+- `val titleLarge: androidx.compose.ui.text.TextStyle` — A card or dialog title.
+- `val titleMedium: androidx.compose.ui.text.TextStyle` — A list item's primary line.
+- `val titleSmall: androidx.compose.ui.text.TextStyle` — A dense list item's primary line.
+- `val bodyLarge: androidx.compose.ui.text.TextStyle` — Default reading copy — the longest text on a screen.
+- `val bodyMedium: androidx.compose.ui.text.TextStyle` — Secondary copy and supporting text.
+- `val bodySmall: androidx.compose.ui.text.TextStyle` — Captions, timestamps and footnotes.
+- `val labelLarge: androidx.compose.ui.text.TextStyle` — A button's label.
+- `val labelMedium: androidx.compose.ui.text.TextStyle` — A chip or tab label.
   _…more members; read the file._
 
 ```kotlin
@@ -726,50 +726,50 @@ interface KptShapes
 ```
 The corner-shape scale, from `extraSmall` to `extraLarge`, applied by component size rather than chosen per call site.
 
-- `val extraSmall: CornerBasedShape`
-- `val small: CornerBasedShape`
-- `val medium: CornerBasedShape`
-- `val large: CornerBasedShape`
-- `val extraLarge: CornerBasedShape`
+- `val extraSmall: CornerBasedShape` — Tightest corner — a badge or a small chip.
+- `val small: CornerBasedShape` — A text field or a compact button.
+- `val medium: CornerBasedShape` — The default: cards and most containers.
+- `val large: CornerBasedShape` — A bottom sheet or a large dialog.
+- `val extraLarge: CornerBasedShape` — A full-bleed or hero surface.
 
 ```kotlin
 interface KptSpacing
 ```
 The spacing scale every layout measures with. Components reference these rather than literal `.dp` values so density stays uniform and a fork can retune the whole app's rhythm in one place.
 
-- `val xs: Dp`
-- `val sm: Dp`
-- `val md: Dp`
-- `val lg: Dp`
-- `val xl: Dp`
-- `val xxl: Dp`
+- `val xs: Dp` — Tightest step — icon-to-label gaps and chip padding.
+- `val sm: Dp` — Padding inside a compact control.
+- `val md: Dp` — The default step: padding inside a card, and the gap between sibling controls.
+- `val lg: Dp` — Gap between sections of a screen.
+- `val xl: Dp` — Screen-edge margin on a large window.
+- `val xxl: Dp` — Reserved for full-bleed layouts; rarely the right answer inside a card.
 
 ```kotlin
 interface KptElevation
 ```
 The elevation scale, in Material 3 levels 0–5.
 
-- `val level0: Dp`
-- `val level1: Dp`
-- `val level2: Dp`
-- `val level3: Dp`
-- `val level4: Dp`
-- `val level5: Dp`
+- `val level0: Dp` — Flat on the surface — no tint, no shadow.
+- `val level1: Dp` — A resting card.
+- `val level2: Dp` — A resting menu or a raised button.
+- `val level3: Dp` — A dialog, or a card while pressed.
+- `val level4: Dp` — A navigation drawer.
+- `val level5: Dp` — The highest step — reserved for a temporary overlay above everything else.
 
 ```kotlin
 interface ComponentRenderer<T : KptComponent>
 ```
 Renders component type `T`. Registered in a `ComponentRegistry` so a data-driven layout can resolve a renderer by type at runtime.
 
-- `fun render(component: T)`
+- `fun render(component: T)` — Renders `component`.
 
 ```kotlin
 interface ComponentRegistry
 ```
 Maps component types to their renderers and factories — the lookup a `ComponentComposer` uses.
 
-- `fun <T : KptComponent> register(type: KClass<T>, renderer: ComponentRenderer<T>)`
-- `fun <T : KptComponent> getRenderer(type: KClass<T>): ComponentRenderer<T>?`
+- `fun <T : KptComponent> register(type: KClass<T>, renderer: ComponentRenderer<T>)` — Registers `renderer` for `type`, replacing any previous registration.
+- `fun <T : KptComponent> getRenderer(type: KClass<T>): ComponentRenderer<T>?` — The renderer for `type`, or null when none is registered — a data-driven layout must handle null rather than assume coverage.
 
 ```kotlin
 annotation class ComponentDsl
@@ -1207,7 +1207,7 @@ interface PaneScaffoldItem<T : Any>
 ```
 An item the scaffold can show in either pane, carrying the identity it is selected by.
 
-- `val id: T`
+- `val id: T` — The item's identity, used to match a selection across a pane change. Must be stable across recompositions, or the detail pane loses its selection on rotation or a fold.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/AdaptiveNavigableSupportingPaneScaffold.kt`
 
@@ -1249,7 +1249,7 @@ interface GridScope
 ```
 Receiver for `KptGrid` content — declare items and spans here.
 
-- `fun Modifier.gridItem(span: Int = 1): Modifier`
+- `fun Modifier.gridItem(span: Int = 1): Modifier` — Claims `span` columns for this item. Clamped to the grid's column count, so an over-wide span degrades to full width instead of overflowing.
 
 ```kotlin
 data class GridConfiguration(
@@ -1485,11 +1485,11 @@ internal fun LoanFormFieldsEnabledPreview() {
 
 </details>
 
-- `val colorScheme: KptColorScheme`
-- `val typography: KptTypography`
-- `val shapes: KptShapes`
-- `val spacing: KptSpacing`
-- `val elevation: KptElevation`
+- `val colorScheme: KptColorScheme` — Sets `KptElevation.colorScheme`.
+- `val typography: KptTypography` — Sets `KptElevation.typography`.
+- `val shapes: KptShapes` — Sets `KptElevation.shapes`.
+- `val spacing: KptSpacing` — Sets `KptElevation.spacing`.
+- `val elevation: KptElevation` — Sets `KptElevation.elevation`.
 
 ```kotlin
 fun kptTheme(block: KptThemeBuilder.() -> Unit): KptThemeProvider
@@ -1556,5 +1556,5 @@ Last-read snapshot of the active `Motion`. Updated as a side effect whenever any
 
 ---
 
-_64 type(s), 179 function(s)/property(ies); 152 carry KDoc at source; 17 authored example(s); 24 live call site(s)._
+_64 type(s), 179 function(s)/property(ies); 233 carry KDoc at source; 17 authored example(s); 24 live call site(s)._
 <!-- api-docs:end -->

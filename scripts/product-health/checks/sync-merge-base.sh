@@ -40,7 +40,9 @@ CS="${MB_CS:-$HEALTH_ROOT/scripts/customization-surface.sh}"
 TV="${MB_TV:-$HEALTH_ROOT/.template-version}"
 
 fail=0
+# Print one check result, prefixed with its id ($1) so a failure names the rung it broke.
 say() { printf '  %-7s %s\n' "$1" "$2"; }
+# Print a failure via `say` and set the fail flag.
 bad() { say "❌ $1" "$2"; fail=1; }
 
 [ -f "$ENGINE" ] || { bad MB-0 "engine not found: $ENGINE"; exit 1; }

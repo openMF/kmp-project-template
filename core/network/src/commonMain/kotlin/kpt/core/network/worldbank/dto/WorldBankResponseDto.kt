@@ -42,6 +42,10 @@ import kpt.core.model.economic.MacroIndicator
 data class WorldBankResponseDto(
     /** First array element. Null when the API omits it — the observations still stand on their own. */
     val metadata: WorldBankMetadataDto?,
+    /**
+     * The rows from the response's second array element. Empty rather than null when the World Bank has no data for
+     * the pair.
+     */
     val observations: List<WorldBankObservationDto>,
 ) {
     /**
@@ -85,6 +89,10 @@ data class WorldBankMetadataDto(
     /** Page size the API applied. */
     @SerialName("per_page")
     val perPage: Int? = null,
+    /**
+     * Total matching rows. The only metadata field the toolkit needs — zero means no data for this (country,
+     * indicator).
+     */
     val total: Int? = null,
     /** World Bank's source-dataset id. */
     val sourceid: String? = null,

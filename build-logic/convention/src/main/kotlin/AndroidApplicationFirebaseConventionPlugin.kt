@@ -23,6 +23,12 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 
+/**
+ * Adds Firebase (Analytics, Crashlytics, Performance) to an Android application module.
+ *
+ * Separate from the base application plugin so a fork that ships without Firebase simply does not apply it, rather
+ * than having to strip config out of a shared one.
+ */
 class AndroidApplicationFirebaseConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {

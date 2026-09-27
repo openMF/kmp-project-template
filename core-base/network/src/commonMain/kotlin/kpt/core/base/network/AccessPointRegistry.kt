@@ -91,6 +91,9 @@ data class AccessPoint(
  * owns the resolution logic + the [restApi]/[ktorfitFor] DSL — so a fork writes only API interfaces plus
  * one `restApi("<id>")` line each, and there is exactly one source of truth for "which servers this app
  * talks to" (`app-profile/app.yaml#network.access_points`).
+  *
+  * @property points every access point this fork declares, from `app-profile#network.access_points`. Order is
+  *   irrelevant — lookup is by id.
  */
 class AccessPointRegistry(val points: List<AccessPoint>) {
 

@@ -83,6 +83,10 @@ data class LoansListUiState(
 
 /** Action sealed-hierarchy for the loans-list MVI loop. */
 sealed interface LoansListAction {
-    /** User confirmed deletion of [id] (typically via long-press / swipe-to-dismiss). */
+    /**
+     * User confirmed deletion of [id] (typically via long-press / swipe-to-dismiss).
+     *
+     * @property id which loan to delete.
+     */
     data class DeleteLoan(val id: String) : LoansListAction
 }

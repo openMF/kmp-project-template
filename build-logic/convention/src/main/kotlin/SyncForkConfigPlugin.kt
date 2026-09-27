@@ -49,17 +49,38 @@ class SyncForkConfigPlugin : Plugin<Project> {
     }
 }
 
+/**
+ * Projects `app-profile/` onto every generated surface: `gradle/fork.properties`, the version catalog,
+ * `Config.xcconfig`, per-module BuildKonfig, icons and store metadata.
+ *
+ * Caching is disabled on purpose — it reads a gitignored `fork.properties` and writes outside the build directory, so
+ * a cached result would be wrong on a machine whose fork config differs.
+ */
 @DisableCachingByDefault(because = "Reads gitignored fork.properties; writes local.properties and metadata files")
 abstract class SyncForkConfigTask : DefaultTask() {
 
+    /**
+     * The repository root. Every other path is resolved from it, so the task has no dependency on the invoking
+     * project's location.
+     */
     @get:Internal abstract val projectRootDir:     DirectoryProperty
+    /** `app-profile/icons/` — the fork-owned icon source. Missing or empty means the template's own icons are kept. */
     @get:Internal abstract val iconSourceDir:    DirectoryProperty
+    /** Destination for the iOS `AppIcon.appiconset`. */
     @get:Internal abstract val iosAppIconDir:      DirectoryProperty
+    /** Destination for the Kotlin/JS favicon. */
     @get:Internal abstract val jsResourcesDir:     DirectoryProperty
+    /** Destination for the Kotlin/Wasm favicon. */
     @get:Internal abstract val wasmJsResourcesDir: DirectoryProperty
+    /** Destination for the desktop `.icns` / `.ico` / `.png` icons. */
     @get:Internal abstract val desktopIconsDir:    DirectoryProperty
+    /** Destination for a pre-built Android res tree, for the adaptive icons Image Asset Studio must generate. */
     @get:Internal abstract val androidResDir:      DirectoryProperty
 
+    /**
+     * Runs the whole projection. Idempotent: re-running with an unchanged `app-profile/` rewrites identical content,
+     * which is what lets a template sync be followed by an unconditional `syncForkConfig`.
+     */
     @TaskAction
     fun sync() {
         val root = projectRootDir.get().asFile
@@ -1275,9 +1296,14 @@ abstract class SyncForkConfigTask : DefaultTask() {
             }
             append(end)
         }
+        /** The file's content before patching, so the task can report only a real change. */
         val before = file.readText()
         patchSentinel(file, begin, end, body)
         if (file.readText() != before) {
+            /**
+             * How many fields were newly added, for the log line — distinct from the total, which would report work on
+             * every run.
+             */
             val emitted = fields.keys.count { it !in existing }
             logger.lifecycle("syncForkConfig: regenerated core/network buildkonfig fields ($emitted field(s))")
         }

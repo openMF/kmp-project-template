@@ -52,6 +52,11 @@ class AlertCreateViewModel(
 ) {
 
     private val _formState = MutableStateFlow(AlertFormState())
+
+    /**
+     * The alert form as it currently stands. Auto-saved as a draft, so a part-filled alert survives
+     * process death.
+     */
     val formState: StateFlow<AlertFormState> = _formState.asStateFlow()
 
     init {

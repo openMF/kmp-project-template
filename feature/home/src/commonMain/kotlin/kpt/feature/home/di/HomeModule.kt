@@ -13,6 +13,10 @@ import kpt.feature.home.demo.ui.HomeViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
+/**
+ * Koin bindings for the home feature. Picked up by the generated feature-module aggregate, so
+ * removing the feature removes the module with it.
+ */
 val HomeModule = module {
     // demo:begin
     viewModelOf(::HomeViewModel)

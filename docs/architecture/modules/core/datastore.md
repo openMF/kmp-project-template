@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/datastore sha=171a5737241ddd563d5cb53d19ec82fe0ef0f183 -->
+<!-- api-docs:begin module=core/datastore sha=95e53d431d5198bce91fbab477abee42736a93c2 -->
 ## API reference
 
-_Generated from `core/datastore` at tree `171a5737241d` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/datastore` at tree `95e53d431d51` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt`
@@ -118,10 +118,10 @@ override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:67</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:76</code></summary>
 
 ```kotlin
-    val secureSettings: Settings,
+     */
     val dispatcher: DispatcherManager,
 ) : ProjectPreferencesRepository, UserPreferencesRepository by delegate
 ```

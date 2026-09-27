@@ -102,11 +102,23 @@ fun KptSidebarLayout(
  */
 @Immutable
 data class SidebarConfiguration(
+    /** Sidebar width when expanded. 300.dp is the Material navigation-drawer width. */
     val width: Dp = 300.dp,
+    /** Which edge the sidebar occupies. `Start`, so it mirrors automatically in an RTL locale. */
     val position: SidebarPosition = SidebarPosition.Start,
+    /**
+     * Whether the user can collapse it. False pins it open — right for a desktop tool, wrong for a window that can get
+     * narrow.
+     */
     val collapsible: Boolean = true,
+    /**
+     * True draws the sidebar OVER the content; false insets the content beside it. Overlay suits a temporary drawer,
+     * inset a permanent rail.
+     */
     val overlay: Boolean = false,
+    /** Sidebar background, or null to inherit the theme surface. */
     val backgroundColor: Color? = null,
+    /** Colour of the edge between sidebar and content, or null for the theme's outline-variant. */
     val dividerColor: Color? = null,
 )
 

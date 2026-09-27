@@ -36,6 +36,10 @@ val Project.libs
  */
 val Project.dynamicVersion
     get(): String {
+        /**
+         * The version catalog, resolved from the file rather than the `libs` accessor — a convention plugin runs
+         * before the accessor exists.
+         */
         val fromFile = runCatching {
             rootProject.file("version.txt").takeIf { it.exists() }?.readText()?.trim()
         }.getOrNull()?.takeIf { it.isNotBlank() && it != "unspecified" && it != "0.0.0" }

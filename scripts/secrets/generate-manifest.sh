@@ -14,6 +14,9 @@ set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; . "$DIR/_lib.sh"
 MANIFEST="$REPO_ROOT/secrets-manifest.yaml"
 
+# Emit the whole secrets-manifest.yaml to stdout, header first.
+# The header says GENERATED — this file is rewritten wholesale, so a hand edit is lost
+# on the next run.
 render() {
   cat <<'HDR'
 # =============================================================================

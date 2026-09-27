@@ -41,6 +41,8 @@ set -uo pipefail
 CS="$HEALTH_ROOT/scripts/customization-surface.sh"
 APP_YAML="${MP_YAML:-$HEALTH_ROOT/app-profile/app.yaml}"   # kept for compatibility; rows now live per-module
 fails=0
+# Print an informational line that does NOT fail the check.
+# Separate from the failure path so a skipped module reads as a skip, not a pass.
 note() { echo "  $1"; fails=$((fails + 1)); }
 
 # <yaml key>:<module dir>:<demo-dir-must-be-gone>

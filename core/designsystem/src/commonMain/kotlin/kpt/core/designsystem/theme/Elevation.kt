@@ -33,10 +33,15 @@ import androidx.compose.ui.unit.dp
  */
 @Immutable
 data class Elevation(
+    /** 0.dp — a surface-level, filled or tonal card. Material 3 conveys this with colour rather than shadow. */
     val resting: Dp = 0.dp,
+    /** 1.dp — the default for an elevated card. */
     val low: Dp = 1.dp,
+    /** 3.dp — hovered, pressed or otherwise highlighted. */
     val medium: Dp = 3.dp,
+    /** 6.dp — a FAB or a snackbar, above ordinary content. */
     val high: Dp = 6.dp,
+    /** 12.dp — an item held during drag-and-drop, which must read as lifted off the page. */
     val dragging: Dp = 12.dp,
 )
 

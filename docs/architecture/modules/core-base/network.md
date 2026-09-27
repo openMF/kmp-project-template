@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/network sha=30cbae534091cc862050dd5b7cbf0501ec9bc405 -->
+<!-- api-docs:begin module=core-base/network sha=3453e5b1753e0cc703f8a4c3df14537be64db3ce -->
 ## API reference
 
-_Generated from `core-base/network` at tree `30cbae534091` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `3453e5b1753e` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -34,7 +34,7 @@ enum class AccessPointKind
 ```
 Transport kind of a declared network access point.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:36</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:40</code></summary>
 
 ```kotlin
         AccessPoint(
@@ -53,11 +53,11 @@ data class AccessPoint(
 ```
 One declared network access point — a named endpoint the app talks to.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:37</code></summary>
 
 ```kotlin
-    // Edit access points THERE (the SoT) and run `./gradlew syncForkConfig`; do not hand-edit this block.
-    // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.
+     * there, not here.
+     */
     val points: List<AccessPoint> = listOf(
         AccessPoint(
             id = "main",
@@ -122,7 +122,7 @@ enum class AuthScheme
 ```
 How an access point authenticates, declared as `auth:` in `app-profile/app.yaml#network.access_points[]`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:83</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:87</code></summary>
 
 ```kotlin
             basePath = "fineract-provider/api/v1/",
@@ -363,7 +363,7 @@ data class HeaderSpec(
 ```
 A header an access point sends on every request, declared in `app-profile/app.yaml#network.access_points[].headers[]`. Two kinds, because they have different lifetimes: - **static** (`value` set) — known at build time.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:85</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:89</code></summary>
 
 ```kotlin
             auth = AuthScheme.BASIC,

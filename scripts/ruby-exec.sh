@@ -191,6 +191,10 @@ ruby_bundle() {
   fi
 }
 
+# Print which interpreter was chosen and why.
+# stdout of the resolver is silenced but stderr is NOT: that is where the actionable
+# message lives ("pins X but it is not installed — rbenv install X"), and swallowing it
+# left the report saying `none (unresolved)` with no cause and no next step.
 ruby_exec_report() {
   # stdout only is silenced. stderr carries the ACTIONABLE message ("pins X but it is not installed
   # — rbenv install X"), and swallowing it left the report saying `none (unresolved)` with no hint of

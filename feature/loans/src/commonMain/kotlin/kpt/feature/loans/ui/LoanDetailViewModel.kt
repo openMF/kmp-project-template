@@ -116,6 +116,13 @@ class LoanDetailViewModel(
      */
     private val editSubmitHandler = viewModelScope.submitHandler<Loan>()
 
+    /**
+     * The loan's read state folded together with the edit mutation's state.
+     *
+     * Combined by hand because the loan comes from a DAO flow rather than a Store, so
+     * `StoreFactory.createScreenWithMutation` cannot be used. For a Store-backed entity, prefer that
+     * factory over repeating this.
+     */
     val combinedState: StateFlow<CombinedState<Loan, Loan>> = combine(
         loadOnceScreenState,
         editSubmitHandler.state,

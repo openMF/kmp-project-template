@@ -114,6 +114,13 @@ val MaterialTheme.motion: Motion
  * the very first transition is well-defined even before any `@Composable` read.
  */
 object MotionSnapshot {
+    /**
+     * The motion values last published by the theme.
+     *
+     * A snapshot outside composition, for the transition builders that must run where `LocalMotion` cannot be read.
+     * `@Volatile` because it is written on the composition thread and read from animation callbacks; defaults to
+     * `Motion()` so the first transition is defined before any read.
+     */
     @kotlin.concurrent.Volatile
     var current: Motion = Motion()
         internal set

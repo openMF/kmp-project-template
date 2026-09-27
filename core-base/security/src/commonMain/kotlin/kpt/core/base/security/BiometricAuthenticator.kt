@@ -39,7 +39,12 @@ expect class BiometricAuthenticator() {
 sealed class BiometricResult {
     /** The user authenticated. */
     data object Success : BiometricResult()
-    /** Authentication was attempted and rejected; [message] explains why. Counts toward lockout. */
+    /**
+     * Authentication was attempted and rejected; [message] explains why. Counts toward lockout.
+     *
+     * @property message why authentication failed. Deliberately coarse — a precise reason would reveal which factor
+     *   is enrolled.
+     */
     data class Failure(val message: String) : BiometricResult()
     /** The user dismissed the prompt. NOT a failure — it must not count toward lockout. */
     data object Cancelled : BiometricResult()

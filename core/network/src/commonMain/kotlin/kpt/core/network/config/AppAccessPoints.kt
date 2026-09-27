@@ -30,6 +30,10 @@ object AppAccessPoints {
     // syncForkConfig:access-points:begin — GENERATED from app-profile/app.yaml#network.access_points.
     // Edit access points THERE (the SoT) and run `./gradlew syncForkConfig`; do not hand-edit this block.
     // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.
+    /**
+     * This project's declared access points. Generated from `app-profile#network.access_points` — add an endpoint
+     * there, not here.
+     */
     val points: List<AccessPoint> = listOf(
         AccessPoint(
             id = "main",

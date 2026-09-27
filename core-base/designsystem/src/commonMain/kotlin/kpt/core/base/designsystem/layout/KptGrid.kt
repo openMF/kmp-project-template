@@ -123,6 +123,10 @@ fun KptGrid(
  * Receiver for [KptGrid] content — declare items and spans here.
  */
 interface GridScope {
+    /**
+     * Claims [span] columns for this item. Clamped to the grid's column count, so an over-wide span degrades to full
+     * width instead of overflowing.
+     */
     fun Modifier.gridItem(span: Int = 1): Modifier
 }
 
@@ -158,11 +162,21 @@ private data class GridItemModifier(
  */
 @Immutable
 data class GridConfiguration(
+    /** Gutter between cells, both axes. */
     val spacing: Dp,
+    /** Inset from the grid's own edges. Distinct from [spacing] so the outer margin and the inner gutter can differ. */
     val horizontalPadding: Dp,
+    /** Column count at the widest breakpoint. 12 by default — the divisor that supports halves, thirds and quarters. */
     val columns: Int = 12,
+    /** Width thresholds that reduce [columns] on a narrow window. */
     val breakpoints: BreakpointConfiguration = BreakpointConfiguration(),
 ) {
+    /**
+     * The column count for the CURRENT window width, read from `LocalWindowInfo`.
+     *
+     * Composable because it observes window size — a resize or a fold recomposes the grid. Thresholds are checked
+     * widest-first, so the first match wins.
+     */
     @Composable
     fun getColumnsForCurrentScreen(): Int {
         val window = LocalWindowInfo.current
@@ -183,14 +197,24 @@ data class GridConfiguration(
  */
 @Immutable
 data class BreakpointConfiguration(
+    /** Floor threshold — always 0.dp, so the smallest bucket always matches. */
     val xs: Dp = 0.dp,
+    /** Small-window threshold; the Material 3 compact/medium boundary. */
     val sm: Dp = 600.dp,
+    /** Medium-window threshold — a large phone in landscape, or a small tablet. */
     val md: Dp = 840.dp,
+    /** Large-window threshold — a tablet or a small desktop window. */
     val lg: Dp = 1200.dp,
+    /** Extra-large threshold — a full desktop window. */
     val xl: Dp = 1600.dp,
+    /** Columns below [sm]. Four, because a phone cannot subdivide further and stay legible. */
     val xsColumns: Int = 4,
+    /** Columns from [sm] up to [md]. */
     val smColumns: Int = 8,
+    /** Columns from [md] up to [lg]. */
     val mdColumns: Int = 12,
+    /** Columns from [lg] up to [xl]. */
     val lgColumns: Int = 12,
+    /** Columns at [xl] and above. */
     val xlColumns: Int = 12,
 )

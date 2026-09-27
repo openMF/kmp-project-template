@@ -359,5 +359,9 @@ sealed interface SelectionVisibilityState {
  * An item the scaffold can show in either pane, carrying the identity it is selected by.
  */
 interface PaneScaffoldItem<T : Any> {
+    /**
+     * The item's identity, used to match a selection across a pane change. Must be stable across recompositions, or
+     * the detail pane loses its selection on rotation or a fold.
+     */
     val id: T
 }

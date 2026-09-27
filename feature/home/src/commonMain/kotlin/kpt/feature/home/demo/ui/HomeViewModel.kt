@@ -185,6 +185,7 @@ class HomeViewModel(
         FreshnessBand.VeryStale -> 3
     }
 
+    /** Stream tuning shared by every card on the dashboard. */
     companion object {
         /** WhileSubscribed timeout for the per-card freshness StateFlows. */
         private const val STATE_TIMEOUT_MS: Long = 5_000L

@@ -34,9 +34,6 @@ internal fun Project.configureDetekt(extension: DetektExtension) = extension.app
         // UNDOCUMENTED declarations so scripts/docs/scanners/kotlin.awk can be proven to find them.
         // Documenting a red fixture deletes the evidence that the scanner works.
         exclude("scripts/docs/tests/**")
-        // TODO:: Remove this exclusion
-        exclude("core-base/designsystem/**")
-        exclude("feature/home/**")
         reports {
             xml.required.set(true)
             html.required.set(true)

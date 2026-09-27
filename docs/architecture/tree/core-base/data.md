@@ -188,7 +188,7 @@ interface Synchronizer
 ```
 Synchronization contract — ports Now in Android's `core/data/SyncUtilities.kt`.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:483</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:471</code></summary>
 
 ```kotlin
 @OptIn(ExperimentalScreenDataStreamTestingApi::class)

@@ -26,3 +26,12 @@
 1	public	class	Col	kdoc
 1	public	property	docAboveAnno	kdoc
 1	public	property	noDocAtAll	none
+1	public	enum	Size	kdoc
+1	public	enum-entry	Xs	none
+1	public	enum-entry	Sm	none
+1	public	enum	Way	kdoc
+1	public	enum-entry	Left	none
+1	public	enum-entry	Right	none
+1	public	class	WithCompanion	kdoc
+1	public	object	Companion	none
+1	public	property	DOCUMENTED	kdoc

@@ -2,7 +2,7 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_DESIGNSYSTEM.md`
-> **Measured:** 36 Kotlin files, 1 test files
+> **Measured:** 41 Kotlin files, 6 test files
 
 **Defines annotations:** `@ComponentDsl`, `@TopAppBarDsl`
 
@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/designsystem sha=85bea3039eb247ab8645740fe8c5387e01dab28b -->
+<!-- api-docs:begin module=core-base/designsystem sha=a745e73e38f51bc227e09c25426ebe4d82bb620e -->
 ## API reference
 
-_Generated from `core-base/designsystem` at tree `85bea3039eb2` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/designsystem` at tree `a745e73e38f5` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -286,7 +286,7 @@ The app's transient-message host. Place once near the root of the UI. Replaces `
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/KptTopAppBar.kt`
 
 ```kotlin
-fun KptTopAppBar(configuration: KptTopAppBarConfiguration)
+fun KptTopAppBar(
 ```
 Top app bar built from a declarative `KptTopAppBarConfiguration`. The DSL form — prefer it when a screen's bar is assembled from data or varies by state; the parameter overloads below are shorthands over this.
 
@@ -451,7 +451,7 @@ Single dispatch composable for every "something is in progress" UI in the toolki
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/ProgressSizeSpec.kt`
 
 ```kotlin
-enum class ProgressSize { Xs, Sm, Md, Lg }
+enum class ProgressSize
 ```
 T-shirt sizes for `KptProgress` variants. Maps to (diameter, stroke) dp pairs via `ProgressSizeSpec.dpFor` — keeps every project-wide progress indicator on a single set of rhythm-aligned dimensions.
 
@@ -463,7 +463,7 @@ fun KptSlideTransition(
 Slides `content` in and out along `direction`, using the shared motion durations.
 
 ```kotlin
-enum class SlideDirection { Left, Right, Up, Down }
+enum class SlideDirection
 ```
 Direction a `KptSlideTransition` enters from.
 
@@ -621,7 +621,7 @@ interface ComponentComposer
 ```
 Renders a list of components as one composition — used where a screen's content is assembled from data rather than written out.
 
-- `fun compose(components: List<KptComponent>): Unit` — Renders `components` in order as one composition.
+- `fun Compose(components: List<KptComponent>)` — Renders `components` in order as one composition.
 
 ```kotlin
 interface Animatable
@@ -761,7 +761,7 @@ interface ComponentRenderer<T : KptComponent>
 ```
 Renders component type `T`. Registered in a `ComponentRegistry` so a data-driven layout can resolve a renderer by type at runtime.
 
-- `fun render(component: T)` — Renders `component`.
+- `fun Render(component: T)` — Renders `component`.
 
 ```kotlin
 interface ComponentRegistry
@@ -897,6 +897,18 @@ fun KptMaterialTheme(
 ```
 KptMaterialTheme provides Material3 integration for KptTheme. This composable applies KptTheme values to MaterialTheme automatically, making all Material3 components use KptTheme design tokens.
 
+<details><summary>Example</summary>
+
+```kotlin
+KptMaterialTheme {
+    MaterialTheme.colorScheme.primary   // == KptTheme.colorScheme.primary
+    MaterialTheme.typography.titleLarge // == KptTheme.typography.titleLarge
+    KptTheme.spacing.md                 // Kpt-only tokens stay reachable
+}
+```
+
+</details>
+
 <details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
 
 ```kotlin
@@ -916,6 +928,17 @@ fun KptMaterialTheme(
 ```
 KptMaterialTheme with dark theme support. Provides automatic light/dark theme switching with Material3 integration.
 
+<details><summary>Example</summary>
+
+```kotlin
+KptMaterialTheme(
+    lightTheme = kptTheme { colors { primary = Color.Blue } },
+    darkThemeProvider = kptTheme { colors { primary = Color.Cyan } },
+) { /* switches with the system setting */ }
+```
+
+</details>
+
 <details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
 
 ```kotlin
@@ -933,7 +956,17 @@ KptMaterialTheme with dark theme support. Provides automatic light/dark theme sw
 ```kotlin
 fun KptMaterialTheme(
 ```
-DSL builder for creating KptMaterialTheme with custom configuration
+Builds the theme from the dark-mode flag, for a palette that differs by more than a few colours.
+
+<details><summary>Example</summary>
+
+```kotlin
+KptMaterialTheme(themeBuilder = { isDark ->
+    kptTheme { colors { primary = if (isDark) Color.Cyan else Color.Blue } }
+}) { /* content */ }
+```
+
+</details>
 
 <details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
 
@@ -1340,7 +1373,7 @@ fun MyScreen() {
 ```kotlin
 fun KptSidebarLayout(
 ```
-Persistent sidebar beside content, for wide windows.
+Persistent sidebar beside content, for wide windows. `sidebarVisible` is hoisted, so this never toggles itself: it reports a user-initiated dismissal through `onSidebarVisibilityChange` and leaves the decision to the caller.
 
 ```kotlin
 data class SidebarConfiguration(
@@ -1348,7 +1381,7 @@ data class SidebarConfiguration(
 Width and behaviour of a `KptSidebarLayout` sidebar.
 
 ```kotlin
-enum class SidebarPosition { Start, End }
+enum class SidebarPosition
 ```
 Which edge the sidebar occupies.
 
@@ -1485,11 +1518,11 @@ internal fun LoanFormFieldsEnabledPreview() {
 
 </details>
 
-- `val colorScheme: KptColorScheme` — Sets `KptElevation.colorScheme`.
-- `val typography: KptTypography` — Sets `KptElevation.typography`.
-- `val shapes: KptShapes` — Sets `KptElevation.shapes`.
-- `val spacing: KptSpacing` — Sets `KptElevation.spacing`.
-- `val elevation: KptElevation` — Sets `KptElevation.elevation`.
+- `val colorScheme: KptColorScheme` — The active colour scheme, from the nearest `KptTheme` in the composition.
+- `val typography: KptTypography` — The active type scale.
+- `val shapes: KptShapes` — The active corner-shape scale.
+- `val spacing: KptSpacing` — The active spacing scale — what every layout measures with.
+- `val elevation: KptElevation` — The active elevation scale, Material 3 levels 0–5.
 
 ```kotlin
 fun kptTheme(block: KptThemeBuilder.() -> Unit): KptThemeProvider
@@ -1556,5 +1589,5 @@ Last-read snapshot of the active `Motion`. Updated as a side effect whenever any
 
 ---
 
-_64 type(s), 179 function(s)/property(ies); 233 carry KDoc at source; 17 authored example(s); 24 live call site(s)._
+_64 type(s), 179 function(s)/property(ies); 233 carry KDoc at source; 20 authored example(s); 24 live call site(s)._
 <!-- api-docs:end -->

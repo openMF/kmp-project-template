@@ -96,3 +96,20 @@ data class Col(
     @PrimaryKey
     val noDocAtAll: String,
 )
+
+/** A single-line enum body — its entries never get a line of their own. */
+enum class Size { Xs, Sm }
+
+/** Entries are Capitalised, not SCREAMING — an all-caps pattern misses them. */
+enum class Way {
+    Left,
+    Right,
+}
+
+/** A companion object has no name after the keyword. */
+class WithCompanion {
+    companion object {
+        /** Documented. */
+        const val DOCUMENTED = 1
+    }
+}

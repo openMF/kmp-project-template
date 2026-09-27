@@ -235,7 +235,7 @@ data class FreshnessSignal(
 ```
 Pure-staleness signal carried by `kpt.core.base.store.screen.ScreenDataStream.freshness` alongside `state`. Decouples cache age from network connectivity.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:536</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:537</code></summary>
 
 ```kotlin
 private fun RatesQuickCard(

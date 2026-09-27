@@ -9,6 +9,9 @@
  */
 package kpt.core.base.designsystem.layout
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +31,28 @@ import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.theme.KptTheme
 
 /**
+ * The sidebar panel itself. Shared by the docked and overlay paths so the two cannot drift apart.
+ */
+@Composable
+private fun SidebarPanel(
+    configuration: SidebarConfiguration,
+    modifier: Modifier = Modifier,
+    shadowElevation: Dp = 0.dp,
+    content: @Composable () -> Unit,
+) = Surface(
+    modifier = modifier.width(configuration.width),
+    color = configuration.backgroundColor ?: KptTheme.colorScheme.surface,
+    shadowElevation = shadowElevation,
+    content = content,
+)
+
+/**
  * Persistent sidebar beside content, for wide windows.
+ *
+ * [sidebarVisible] is hoisted, so this never toggles itself: it reports a user-initiated dismissal
+ * through [onSidebarVisibilityChange] and leaves the decision to the caller. The only such gesture
+ * is a tap on the scrim of an `overlay` sidebar, and only when the configuration says it is
+ * [SidebarConfiguration.collapsible] — a pinned rail has nothing to dismiss.
  */
 @Composable
 fun KptSidebarLayout(
@@ -38,23 +63,20 @@ fun KptSidebarLayout(
     onSidebarVisibilityChange: (Boolean) -> Unit = {},
     content: @Composable () -> Unit,
 ) {
+    // Docked and overlay are mutually exclusive presentations of the same panel. Gating the in-Row
+    // panel on !overlay is what stops an overlay sidebar being drawn twice — once inset beside the
+    // content and once floating over it.
+    val docked = sidebarVisible && !configuration.overlay
+    val dividerColor = configuration.dividerColor ?: KptTheme.colorScheme.outline
+
     Row(
         modifier = modifier
             .fillMaxSize()
             .testTag("KptSidebarLayout"),
     ) {
-        if (configuration.position == SidebarPosition.Start && sidebarVisible) {
-            Surface(
-                modifier = Modifier.width(configuration.width),
-                color = configuration.backgroundColor ?: KptTheme.colorScheme.surface,
-                content = sidebarContent,
-            )
-
-            if (!configuration.overlay) {
-                VerticalDivider(
-                    color = configuration.dividerColor ?: KptTheme.colorScheme.outline,
-                )
-            }
+        if (docked && configuration.position == SidebarPosition.Start) {
+            SidebarPanel(configuration, content = sidebarContent)
+            VerticalDivider(color = dividerColor)
         }
 
         Box(
@@ -63,9 +85,24 @@ fun KptSidebarLayout(
             content()
 
             if (configuration.overlay && sidebarVisible) {
-                Surface(
+                if (configuration.collapsible) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(KptTheme.colorScheme.scrim.copy(alpha = 0.32f))
+                            .testTag("KptSidebarScrim")
+                            // No indication: a ripple spreading across a full-screen scrim reads as
+                            // a rendering fault rather than a press.
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                            ) { onSidebarVisibilityChange(false) },
+                    )
+                }
+
+                SidebarPanel(
+                    configuration = configuration,
                     modifier = Modifier
-                        .width(configuration.width)
                         .fillMaxHeight()
                         .align(
                             if (configuration.position == SidebarPosition.Start) {
@@ -74,25 +111,15 @@ fun KptSidebarLayout(
                                 Alignment.CenterEnd
                             },
                         ),
-                    color = configuration.backgroundColor ?: KptTheme.colorScheme.surface,
                     shadowElevation = 8.dp,
                     content = sidebarContent,
                 )
             }
         }
 
-        if (configuration.position == SidebarPosition.End && sidebarVisible) {
-            if (!configuration.overlay) {
-                VerticalDivider(
-                    color = configuration.dividerColor ?: KptTheme.colorScheme.outline,
-                )
-            }
-
-            Surface(
-                modifier = Modifier.width(configuration.width),
-                color = configuration.backgroundColor ?: KptTheme.colorScheme.surface,
-                content = sidebarContent,
-            )
+        if (docked && configuration.position == SidebarPosition.End) {
+            VerticalDivider(color = dividerColor)
+            SidebarPanel(configuration, content = sidebarContent)
         }
     }
 }
@@ -125,4 +152,10 @@ data class SidebarConfiguration(
 /**
  * Which edge the sidebar occupies.
  */
-enum class SidebarPosition { Start, End }
+enum class SidebarPosition {
+    /** The reading-start edge — left in LTR, right in RTL. The usual choice, since it mirrors. */
+    Start,
+
+    /** The reading-end edge. Use only when the sidebar is genuinely secondary to the content. */
+    End,
+}

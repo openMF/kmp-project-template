@@ -1,7 +1,7 @@
 # `scripts/docs/`
 
 > Part of [`scripts/`](../scripts.md)  
-> **Measured:** 14 tracked files — 8× `.sh`, 4× `.awk`, 1× `.kt`, 1× `.tsv`
+> **Measured:** 17 tracked files — 11× `.sh`, 4× `.awk`, 1× `.kt`, 1× `.tsv`
 
 ### Scripts
 
@@ -9,12 +9,15 @@
 |---|---|
 | `_kdoc-lib.sh` | the ONE upward walk from a declaration to the line that closes its KDoc. |
 | `api-docs-gen.sh` | scan-bounded: pure bash + grep/find/sed over one template module tree (RULE-CI-001). Never idea-layer. |
+| `doc-audit.sh` | is the documentation actually complete? One command, seven checks. |
+| `doc-refs.sh` | does the AUTHORED prose still name files that exist? |
 | `doc-scan.sh` | one full-project documentation scan, every language. |
 | `kdoc-coverage.sh` | who is missing KDoc, and where. |
 | `module-hash.sh` | scan-bounded: pure bash + find/shasum over one module tree (RULE-CI-001). Never idea-layer. |
 | `refresh.sh` | ONE entry point that brings the whole docs tree back in step with source. |
 | `scaffold.sh` | create/refresh the docs/architecture tree FROM DISK. |
 | `workflow.sh` | GitHub Actions workflows and their dispatch inputs. |
+| `tree-scaffold.sh` | a docs page for EVERY top-level area of the project, shaped like the tree. |
 
 <!-- tree-scaffold:end -->
 ## Significance

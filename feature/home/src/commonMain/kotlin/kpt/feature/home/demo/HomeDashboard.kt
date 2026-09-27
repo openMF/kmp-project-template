@@ -151,6 +151,7 @@ fun HomeDashboard(
     onNavigateToLoanComparison: () -> Unit,
     onNavigateToLoanCalcWizard: () -> Unit,
     onNavigateToCrypto: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = retainedKoinViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -164,7 +165,7 @@ fun HomeDashboard(
     // saved-instance-state Bundle). No per-screen retention code.
     val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = sp.lg)
             .verticalScroll(scrollState)

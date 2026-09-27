@@ -396,7 +396,7 @@ data class InterestRateSeriesKey(
 ```
 Composite key identifying a single FRED series request.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/ui/HomeViewModel.kt:206</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/ui/HomeViewModel.kt:207</code></summary>
 
 ```kotlin
 

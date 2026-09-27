@@ -550,23 +550,23 @@ class KptElevationBuilder {
  * The read side of the theme; [kptTheme] is the write side.
  */
 object KptTheme {
-    /** Sets [KptElevation.colorScheme]. */
+    /** The active colour scheme, from the nearest [KptTheme] in the composition. */
     val colorScheme: KptColorScheme
-    /** Sets [KptElevation.typography]. */
         @Composable get() = LocalKptColors.current
 
+    /** The active type scale. */
     val typography: KptTypography
-    /** Sets [KptElevation.shapes]. */
         @Composable get() = LocalKptTypography.current
 
+    /** The active corner-shape scale. */
     val shapes: KptShapes
-    /** Sets [KptElevation.spacing]. */
         @Composable get() = LocalKptShapes.current
 
+    /** The active spacing scale — what every layout measures with. */
     val spacing: KptSpacing
-    /** Sets [KptElevation.elevation]. */
         @Composable get() = LocalKptSpacing.current
 
+    /** The active elevation scale, Material 3 levels 0–5. */
     val elevation: KptElevation
         @Composable get() = LocalKptElevation.current
 }

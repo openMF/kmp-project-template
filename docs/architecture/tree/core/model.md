@@ -337,7 +337,7 @@ data class ExchangeRates(
 ```
 FX rates for one base currency on one day — the `rates` map is quote-code → rate.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:582</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:583</code></summary>
 
 ```kotlin
 @Composable
@@ -356,7 +356,7 @@ data class RateHistoryKey(
 ```
 Store key for a historical series: currency pair plus window length. The window is PART of the key, so widening it is a different key and a full re-fetch. That is the `read_windowed_series` contract — a widened window is not a page append.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:510</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:501</code></summary>
 
 ```kotlin
 
@@ -375,7 +375,7 @@ data class RateHistory(
 ```
 A historical FX series for one pair over a date range.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:512</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:503</code></summary>
 
 ```kotlin
         keyFlow: Flow<RateHistoryKey>,

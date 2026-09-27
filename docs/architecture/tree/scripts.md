@@ -1,14 +1,14 @@
 # `scripts/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 426 tracked files — 141× `.kt`, 116× `.sh`, 56× `.md`, 29× `.yaml`, 12× `.gitkeep`
+> **Measured:** 429 tracked files — 141× `.kt`, 119× `.sh`, 56× `.md`, 29× `.yaml`, 12× `.gitkeep`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
 | `scripts/product-health/` | 370 |
-| `scripts/docs/` | 14 |
+| `scripts/docs/` | 17 |
 | `scripts/white-label/` | 10 |
 | (files at the root) | 9 |
 | `scripts/ci/` | 7 |
@@ -28,7 +28,7 @@
 | Unit | Files | Page |
 |---|---:|---|
 | `scripts/ci/` | 7 | [ci](scripts/ci.md) |
-| `scripts/docs/` | 14 | [docs](scripts/docs.md) |
+| `scripts/docs/` | 17 | [docs](scripts/docs.md) |
 | `scripts/ios/` | 5 | [ios](scripts/ios.md) |
 | `scripts/product-health/` | 370 | [product-health](scripts/product-health.md) |
 | `scripts/secrets/` | 6 | [secrets](scripts/secrets.md) |

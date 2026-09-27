@@ -1594,6 +1594,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
         }
     }
 
+    /**
+     * The flat-key → app-profile-path map, mirrored key-for-key with the Ruby side.
+     */
     companion object {
         // Flat gradle/fork.properties key → dotted path in the merged app-profile map.
         // MIRRORS deployment/_shared/config.rb `AppProfile::MAP` KEY-FOR-KEY so the Ruby (fastlane)

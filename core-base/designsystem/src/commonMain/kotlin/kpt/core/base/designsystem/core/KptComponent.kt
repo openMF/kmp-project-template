@@ -166,7 +166,7 @@ sealed interface ComponentVariant {
 interface ComponentComposer {
     /** Renders [components] in order as one composition. */
     @Composable
-    fun compose(components: List<KptComponent>): Unit
+    fun Compose(components: List<KptComponent>)
 }
 
 /**
@@ -434,7 +434,7 @@ interface KptElevation {
 interface ComponentRenderer<T : KptComponent> {
     /** Renders [component]. */
     @Composable
-    fun render(component: T)
+    fun Render(component: T)
 }
 
 /**

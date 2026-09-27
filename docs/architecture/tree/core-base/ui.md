@@ -128,7 +128,7 @@ fun DashboardProgressBar(
 ```
 Top-of-dashboard **freshness** strip: shows *when* the data was last loaded — "Updated 5m ago" — NOT a "2 of 4 loaded" count.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:183</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:184</code></summary>
 
 ```kotlin
         // It shows a subtle "Loading…" bar until the first card has data and hides once
@@ -149,7 +149,7 @@ data class DashboardProgressState(
 ```
 Aggregate progress snapshot for a multi-card dashboard.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:189</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:190</code></summary>
 
 ```kotlin
                 state.rates,
@@ -321,7 +321,7 @@ fun FreshnessIndicator(
 ```
 Per-card freshness indicator: a small Material 3 info / clock / warning icon anchored to a `TooltipBox`.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:545</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:546</code></summary>
 
 ```kotlin
         onSeeAll = onSeeAll,

@@ -130,7 +130,7 @@ BEGIN { FS = "\n" }
 FNR == 1 {
   DEPTH=0; STR=0; RAW=0; in_kdoc=0; sp=0
   reset_doc(); pend_anno=0; anno_paren=0
-  pend_type=""; pend_props=""; pend_enum=0; ctor_paren=0; ctor_props=""; sig_paren=0; sig_init=0; pend_vis="public"; ctor_vis="public"; ctor_more=0; ctor_init=0; ctor_line_doc="none"; ctor_line_words=0
+  pend_type=""; pend_props=""; pend_enum=0; ctor_paren=0; ctor_props=""; sig_paren=0; sig_init=0; pend_vis="public"; ctor_vis="public"; ctor_more=0; ctor_init=0; ctor_line_doc="none"; ctor_line_words=0; single_enum=""
   SKIP = (FILENAME ~ /\/src\/[A-Za-z]*Test\//) || (FILENAME ~ /\/test\//)
 }
 SKIP { next }
@@ -180,9 +180,14 @@ SKIP { next }
   else if (L ~ /(^|[[:space:]])protected[[:space:]]/) vis = "protected"
 
   kind=""; name=""
-  if (match(L, /(^|[[:space:]])(class|interface|object)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*/)) {
+  # A `companion object` has NO name after the keyword, so a name-requiring match skips it entirely —
+  # detekt reports it as UndocumentedPublicClass and the scanner said nothing.
+  if (L ~ /(^|[[:space:]])companion[[:space:]]+object([[:space:]]*\{|[[:space:]]*$)/) {
+    kind = "object"; name = "Companion"; pend_type = "type"; pend_props = doc_props; pend_vis = vis
+  } else if (match(L, /(^|[[:space:]])(class|interface|object)[[:space:]]+[A-Za-z_][A-Za-z0-9_]*/)) {
     seg=substr(L,RSTART,RLENGTH); split(seg,p,/[[:space:]]+/); kind=p[length(p)-1]; name=p[length(p)]
     if (L ~ /enum[[:space:]]+class/)       kind="enum"
+    if (kind == "enum" && L ~ /\{[^}]*\}/) single_enum = L
     if (L ~ /annotation[[:space:]]+class/) kind="annotation"
     pend_type=kind; pend_props=doc_props; pend_enum=(kind=="enum"); pend_vis=vis
     ctor_vis = vis
@@ -223,8 +228,10 @@ SKIP { next }
     match(L, /(val|var)[[:space:]]+[A-Za-z_][A-Za-z0-9_.]*/)
     seg=substr(L,RSTART,RLENGTH); sub(/^(val|var)[[:space:]]+/,"",seg)
     np=split(seg,pp,/\./); name=pp[np]; kind="property"
-  } else if (enclosing_is_enum() && match(L, /^[[:space:]]*[A-Z][A-Z0-9_]*[[:space:]]*[,(;]/)) {
-    seg=substr(L,RSTART,RLENGTH); gsub(/[^A-Z0-9_]/,"",seg); name=seg; kind="enum-entry"
+  } else if (enclosing_is_enum() && match(L, /^[[:space:]]*[A-Z][A-Za-z0-9_]*[[:space:]]*[,(;{]/)) {
+    # Entries are Capitalised, not necessarily SCREAMING: `Left`, `Xs`, `FOLLOW_SYSTEM` all occur here.
+    # An all-caps-only pattern silently skipped every mixed-case one.
+    seg=substr(L,RSTART,RLENGTH); gsub(/[^A-Za-z0-9_]/,"",seg); name=seg; kind="enum-entry"
   }
 
   if (kind != "") {
@@ -245,6 +252,24 @@ SKIP { next }
   } else if (!pend_anno) { reset_doc() }
   pend_anno=0
 
+  # Entries of a single-line enum, emitted from the brace span. They share the class's line, so each is
+  # undocumented unless the class KDoc tags it — which is what detekt concludes too.
+  if (single_enum != "") {
+    body = single_enum
+    sub(/^[^{]*\{/, "", body); sub(/\}.*$/, "", body)
+    ecount = split(body, ents, ",")
+    for (ei = 1; ei <= ecount; ei++) {
+      enm = ents[ei]
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", enm)
+      sub(/[(=].*$/, "", enm)
+      if (enm ~ /^[A-Za-z_][A-Za-z0-9_]*$/) {
+        est = "none"; ew = 0
+        if (doc_props ~ ("[[:space:]]" enm "[[:space:]]")) { est = "property-tag"; ew = 1 }
+        printf "%s\t%d\t%s\tenum-entry\t%s\t%s\t%d\n", FILENAME, FNR, vis, enm, est, ew
+      }
+    }
+    single_enum = ""
+  }
   if (ctor_paren > 0 || ctor_more) {
     emit_ctor_props(L, FNR, ctor_line_doc, ctor_line_words)
     ctor_more = 0; ctor_line_doc = "none"; ctor_line_words = 0

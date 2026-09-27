@@ -1,7 +1,7 @@
 # `core-base/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 474 tracked files — 392× `.kt`, 28× `.md`, 22× `.xml`, 13× `.kts`, 6× `.gitignore`
+> **Measured:** 479 tracked files — 397× `.kt`, 28× `.md`, 22× `.xml`, 13× `.kts`, 6× `.gitignore`
 
 ## Shape
 
@@ -10,7 +10,7 @@
 | `core-base/store/` | 112 |
 | `core-base/ui/` | 108 |
 | `core-base/security/` | 47 |
-| `core-base/designsystem/` | 40 |
+| `core-base/designsystem/` | 45 |
 | `core-base/database/` | 29 |
 | `core-base/platform/` | 28 |
 | `core-base/network/` | 26 |
@@ -31,7 +31,7 @@
 | `core-base:data` | 9 Kotlin files — [guide](core-base/data.md) |
 | `core-base:database` | 20 Kotlin files — [guide](core-base/database.md) |
 | `core-base:datastore` | 17 Kotlin files — [guide](core-base/datastore.md) |
-| `core-base:designsystem` | 36 Kotlin files — [guide](core-base/designsystem.md) |
+| `core-base:designsystem` | 41 Kotlin files — [guide](core-base/designsystem.md) |
 | `core-base:firebase` | 1 Kotlin files — [guide](core-base/firebase.md) |
 | `core-base:network` | 21 Kotlin files — [guide](core-base/network.md) |
 | `core-base:observability` | 4 Kotlin files — [guide](core-base/observability.md) |

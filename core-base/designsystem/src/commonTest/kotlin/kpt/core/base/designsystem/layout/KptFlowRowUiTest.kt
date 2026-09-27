@@ -34,7 +34,7 @@ import kotlin.test.Test
  * was a crash, and the cheapest guard against its return is a composition that has to succeed.
  */
 @OptIn(ExperimentalTestApi::class)
-class KptFlowRowTest {
+class KptFlowRowUiTest {
 
     @Test
     fun rendersASingleRowWithoutCrashing() = runComposeUiTest {

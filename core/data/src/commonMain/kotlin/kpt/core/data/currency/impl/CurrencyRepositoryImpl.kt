@@ -40,6 +40,9 @@ import org.mobilenativefoundation.store.store5.StoreReadResponse
  */
 private val PINNED_BASE_CURRENCIES = listOf("USD", "EUR", "INR")
 
+/**
+ * Default `CurrencyRepository` over the Frankfurter-backed exchange-rate and history Stores.
+ */
 @RepositoryBinding(binds = CurrencyRepository::class)
 class CurrencyRepositoryImpl(
     @FromStore(AppStoreIds.ExchangeRates) private val exchangeRatesStore: Store<String, ExchangeRates>,

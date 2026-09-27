@@ -1121,32 +1121,6 @@ abstract class SyncForkConfigTask : DefaultTask() {
         }
     }
 
-    /**
-     * Refill `AppDatabase.kt`'s four `fork-*` regions from `app-profile/app.yaml#database`.
-     *
-     * This is what lets `core/database/**/AppDatabase.kt` be `owner: template` (FULL-COPY on a
-     * template sync) instead of a permanent 3-way merge: Room needs one compile-time
-     * `entities = [...]` array literal, so a fork's tables cannot live in a separate file — but they
-     * CAN be re-derived into the copied file afterwards. A sync full-copies the template's
-     * AppDatabase (fork regions empty), then the mandatory post-sync `syncForkConfig` projects the
-     * fork's declared schema back in. Same shape as the deployment metadata/screenshot regeneration.
-     *
-     * Hand-editing a `fork-*` region is pointless — this overwrites it. Declare in app-profile.
-     */
-    /**
-     * Give every declared access point its OWN package under `core/network`:
-     * `kpt/core/network/<id>/{api,dto}`.
-     *
-     * Endpoint code used to live in DOMAIN packages under `demo/` (`demo/economic` held BOTH the fred
-     * and worldbank APIs), which tied it to the demo lifecycle: `remove-demo.sh` deletes every
-     * a `demo` package, so a fork's endpoint code could not live beside the template's, and a
-     * cleaned fork had nowhere structural to put an API at all. Naming the package for the ACCESS
-     * POINT makes the layout a pure projection of app-profile — declare an endpoint, get a package,
-     * write the interface in it — and lets the strip delete exactly the endpoints it removed.
-     *
-     * Scaffolds only; never overwrites. Each new package gets a README so git tracks the directory
-     * and the next person knows what belongs there.
-     */
     private fun declaredStores(appProfile: Map<String, Any?>): List<Map<*, *>> {
         val block = (appProfile["core_store"] as? Map<*, *>).orEmpty()
         return ((block["stores"] as? List<*>) ?: emptyList<Any?>()).mapNotNull { it as? Map<*, *> }
@@ -1183,6 +1157,20 @@ abstract class SyncForkConfigTask : DefaultTask() {
         sb.append(" */\n")
     }
 
+    /**
+     * Give every declared access point its OWN package under `core/network`:
+     * `kpt/core/network/<id>/{api,dto}`.
+     *
+     * Endpoint code used to live in DOMAIN packages under `demo/` (`demo/economic` held BOTH the fred
+     * and worldbank APIs), which tied it to the demo lifecycle: `remove-demo.sh` deletes every
+     * a `demo` package, so a fork's endpoint code could not live beside the template's, and a
+     * cleaned fork had nowhere structural to put an API at all. Naming the package for the ACCESS
+     * POINT makes the layout a pure projection of app-profile — declare an endpoint, get a package,
+     * write the interface in it — and lets the strip delete exactly the endpoints it removed.
+     *
+     * Scaffolds only; never overwrites. Each new package gets a README so git tracks the directory
+     * and the next person knows what belongs there.
+     */
     private fun scaffoldAccessPointPackages(root: File, appProfile: Map<String, Any?>) {
         val base = File(root, "core/network/src/commonMain/kotlin/kpt/core/network")
         if (!base.isDirectory) return
@@ -1295,6 +1283,15 @@ abstract class SyncForkConfigTask : DefaultTask() {
         }
     }
 
+    /** Parse `app-profile/migration-ledger.yaml` -> ordered (from, to, specFqn?) rows. */
+    private fun readLedgerVersion(root: File): Int? {
+        val ledger = File(root, "app-profile/migration-ledger.yaml")
+        if (!ledger.isFile) return null
+        return ledger.readLines().firstNotNullOfOrNull { raw ->
+            Regex("""^version:\s*(\d+)""").find(raw.substringBefore('#'))?.groupValues?.get(1)?.toInt()
+        }
+    }
+
     /**
      * Append any template migration unit this fork has not applied yet, at the fork's next free
      * version. APPEND-ONLY — an existing row is never renumbered.
@@ -1309,15 +1306,6 @@ abstract class SyncForkConfigTask : DefaultTask() {
      * Renumbering is the one forbidden move: a shipped from/to edge is a contract with every
      * installed device, and rewriting it strands them.
      */
-    /** Parse `app-profile/migration-ledger.yaml` -> ordered (from, to, specFqn?) rows. */
-    private fun readLedgerVersion(root: File): Int? {
-        val ledger = File(root, "app-profile/migration-ledger.yaml")
-        if (!ledger.isFile) return null
-        return ledger.readLines().firstNotNullOfOrNull { raw ->
-            Regex("""^version:\s*(\d+)""").find(raw.substringBefore('#'))?.groupValues?.get(1)?.toInt()
-        }
-    }
-
     private fun reconcileMigrationLedger(root: File, appProfile: Map<String, Any?>) {
         val ledger = File(root, "app-profile/migration-ledger.yaml")
         if (!ledger.isFile) return

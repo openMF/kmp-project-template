@@ -56,6 +56,10 @@ import kpt.core.base.common.manager.DispatcherManager
  * ```
  */
 class ProjectPreferencesRepositoryImpl(
+    /**
+     * The framework-shared implementation every call forwards to. Exposed so a fork can reach a base member it has not
+     * overridden.
+     */
     val delegate: UserPreferencesRepository,
     val plainSettings: Settings,
     val secureSettings: Settings,

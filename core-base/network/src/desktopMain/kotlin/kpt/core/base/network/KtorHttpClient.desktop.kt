@@ -15,6 +15,7 @@ import io.ktor.client.engine.okhttp.OkHttp
 import okhttp3.CertificatePinner
 import kpt.core.base.security.CertificatePinConfig
 
+/** `httpClient` on Desktop (JVM). */
 actual fun httpClient(config: HttpClientConfig<*>.() -> Unit) = HttpClient(OkHttp) {
     config(this)
 }

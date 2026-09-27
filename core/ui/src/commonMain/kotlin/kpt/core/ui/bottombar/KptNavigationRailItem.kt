@@ -26,6 +26,9 @@ import kpt.core.base.designsystem.theme.KptTheme
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
+/**
+ * One item in [KptNavigationRail].
+ */
 @Composable
 fun ColumnScope.KptNavigationRailItem(
     contentDescriptionRes: StringResource,

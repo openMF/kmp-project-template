@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/store sha=44f1d50182d1812bf7ea381fe195b12e4d92d4fc -->
+<!-- api-docs:begin module=core-base/store sha=b3ea71eeac8a0a38fef3b69f369256b7ef5a31c3 -->
 ## API reference
 
-_Generated from `core-base/store` at tree `44f1d50182d1` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/store` at tree `b3ea71eeac8a` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -36,7 +36,7 @@ annotation class StoreProvider(
 ```
 Marks a Store5 provider function.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:51</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:55</code></summary>
 
 ```kotlin
  * is deliberately not part of this store's contract.
@@ -55,7 +55,7 @@ annotation class CacheKey(
 ```
 A stream cache key for the annotated store — the string that keys per-stream freshness tracking.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:52</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:56</code></summary>
 
 ```kotlin
  */
@@ -76,7 +76,7 @@ data class CombinedState<R, W>(
 ```
 Snapshot pairing the read-side `ScreenState` with the write-side `SubmitState` — the single value a screen needs to render every read-write cycle (form preload, submission progress, post-submit outcome, offline outbox indicator).
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:115</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:119</code></summary>
 
 ```kotlin
     private val editSubmitHandler = viewModelScope.submitHandler<Loan>()
@@ -225,7 +225,7 @@ object FreshnessBands
 ```
 Pure computation of `FreshnessBand` from time + last-error inputs only. Decision table (first match wins): 1. `lastSyncedAt == null && lastError == null` → `FreshnessBand.Initial` 2.
 
-- `fun bandFor(`
+- `fun bandFor(` — Derives the freshness band from a last-synced instant and a TTL. Pure, so the banding rule is unit-testable without standing up a Store.
 - `val age = now - lastSyncedAt`
 
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/freshness/FreshnessSignal.kt`
@@ -297,7 +297,7 @@ class DefaultValidator<Output : Any>(
 ```
 A TTL-based `Validator` that marks cached data as stale after a given duration. Tracks when data was last fetched using `TimeSource.Monotonic` and considers it invalid once the `ttl` has elapsed. Call `markFresh` when fresh data arrives.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:38</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:43</code></summary>
 
 ```kotlin
     dao: CoinMarketDao,
@@ -510,7 +510,7 @@ interface StoreCacheManager
 ```
 Manages Store cache lifecycle. - Call `clearAll` on logout to prevent stale data leaking across user sessions. - Call `pruneExpiredDrafts` on app start to clean up old SUBMITTED/FAILED draft rows.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:28</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:34</code></summary>
 
 ```kotlin
 class UserLogoutManagerImpl(
@@ -535,7 +535,7 @@ object StoreFactory
 ```
 Factory for creating `Store` and `MutableStore` instances with sensible defaults.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:54</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/prefs/impl/UserDataStore.kt:58</code></summary>
 
 ```kotlin
 @CacheKey(name = "KEY", key = "userData")
@@ -687,7 +687,7 @@ interface MutationGateway
 ```
 The single WRITE door for every mutation in the app.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/impl/CloudTodoRepositoryImpl.kt:38</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/impl/CloudTodoRepositoryImpl.kt:44</code></summary>
 
 ```kotlin
     @FromStore(AppStoreIds.CloudTodo) private val readStore: Store<CloudTodoKey, CloudTodo>,
@@ -711,7 +711,7 @@ sealed interface MutationPolicy
 ```
 How a mutation reaches the network relative to the local write. Two policies only — "optimistic" already means queue-and-retry; there is no separate queue-only mode.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/impl/CloudTodoRepositoryImpl.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/impl/CloudTodoRepositoryImpl.kt:75</code></summary>
 
 ```kotlin
             key = CloudTodoKey(todo.id),
@@ -728,7 +728,7 @@ sealed interface MutationResult<out T>
 ```
 The exhaustive outcome of a mutation. The caller (ViewModel) must handle every arm, so an offline write or a conflict can never be silently swallowed.
 
-<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoViewModel.kt:82</code></summary>
+<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoViewModel.kt:88</code></summary>
 
 ```kotlin
  * result arm must not compile until it has somewhere to render.
@@ -787,11 +787,11 @@ fun loadMore() = pagingStream.loadNextPage()
 
 </details>
 
-<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinMarketsViewModel.kt:30</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinMarketsViewModel.kt:34</code></summary>
 
 ```kotlin
-) : BaseViewModel<Unit, Nothing, CoinMarketsAction>(Unit) {
-
+     * state.
+     */
     val pagingStream: PagingScreenStream<CoinMarket> = repository.coinMarketsStream(
         scope = viewModelScope,
         pageSize = DEFAULT_PAGE_SIZE,
@@ -805,7 +805,7 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
 ```
 Creates a `PagingScreenStream` with network-fused state via cmp-network-monitor.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:29</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
 
 ```kotlin
 @RepositoryBinding(binds = CryptoRepository::class)
@@ -824,7 +824,7 @@ fun <Value : Any> Store<PageKey, List<Value>>.asPagingScreenStream(
 ```
 `asPagingScreenStream` overload taking a bundled `ScreenStreamContext` instead of the two infra deps — so a paginated repository reads `store.asPagingScreenStream(screen, cacheKey, scope, …)` with `screen` its one injected `ScreenStreamContext`. Delegates to the primary overload.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:29</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
 
 ```kotlin
 @RepositoryBinding(binds = CryptoRepository::class)
@@ -881,7 +881,7 @@ class ClientPagingSource(
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:29</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
 
 ```kotlin
 @RepositoryBinding(binds = CryptoRepository::class)
@@ -1022,11 +1022,11 @@ sealed interface ScreenState<out T>
 ```
 Unified UI state produced by `ScreenDataStream`. Replaces per-ViewModel ScreenUiState + isFromCache + isRefreshing + networkStatus.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:62</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:66</code></summary>
 
 ```kotlin
-    private val detailStream = repository.loanDetailStream(loanId, viewModelScope)
-
+     * framework's, not this screen's.
+     */
     val screenState: StateFlow<ScreenState<Loan>> = detailStream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
@@ -1645,7 +1645,7 @@ data class RetryPolicy(
 ```
 Exponential-backoff-with-jitter retry policy for outbox-style retries. Pure data — no scheduler, no side effects. Consumers compute the next delay via `delayFor` and apply it themselves (e.g. `delay(policy.delayFor(attempt))`).
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:45</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:50</code></summary>
 
 ```kotlin
                 // by the Ktor Auth interceptor (refresh-and-retry once). All other
@@ -1689,7 +1689,7 @@ Box(Modifier.fillMaxSize()) {
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:113</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:117</code></summary>
 
 ```kotlin
      * used directly. For Store-backed entities, prefer `StoreFactory.createScreenWithMutation`.
@@ -1750,10 +1750,10 @@ Durable outbox for form payloads that failed to reach the server. Persist a payl
 class EditLoanViewModel(
     private val repository: LoanRepository,
     outbox: SubmitOutbox<Loan>,
-    val loanId: String?,
-) : BaseMutationViewModel<Loan, Loan>(
-    MutationMode.Draft(
-        outbox = outbox,
+    /**
+     * The loan being edited, or null when adding. Also the draft's unique key, so an edit draft never collides with
+     * the add slot.
+     */
 ```
 
 </details>
@@ -1828,7 +1828,7 @@ State machine for a single form/action submission lifecycle.
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:123</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:127</code></summary>
 
 ```kotlin
         scope = viewModelScope,
@@ -1881,5 +1881,5 @@ Returns the `ErrorCategory` for `SubmitState.Failed`, or null for all other stat
 
 ---
 
-_65 type(s), 113 function(s)/property(ies); 163 carry KDoc at source; 22 authored example(s); 55 live call site(s)._
+_65 type(s), 113 function(s)/property(ies); 164 carry KDoc at source; 22 authored example(s); 55 live call site(s)._
 <!-- api-docs:end -->

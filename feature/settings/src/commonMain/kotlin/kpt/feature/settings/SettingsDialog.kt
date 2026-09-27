@@ -56,6 +56,7 @@ import kpt.feature.settings.generated.resources.feature_settings_title
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+/** Settings dialog, resolving its own ViewModel. The entry point a screen calls. */
 @Composable
 fun SettingsDialog(onDismiss: () -> Unit, viewModel: SettingsViewModel = koinViewModel()) {
     val settingsState by viewModel.settingsState.collectAsStateWithLifecycle()
@@ -69,6 +70,7 @@ fun SettingsDialog(onDismiss: () -> Unit, viewModel: SettingsViewModel = koinVie
     )
 }
 
+/** Settings dialog over explicit state — the testable overload. */
 @Composable
 fun SettingsDialog(
     settingsState: ScreenState<UserEditableSettings>,
@@ -208,6 +210,7 @@ private fun SettingsDialogSectionTitle(text: String, modifier: Modifier = Modifi
     )
 }
 
+/** One selectable theme row. */
 @Composable
 fun SettingsDialogThemeChooserRow(
     text: String,

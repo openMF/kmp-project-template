@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/datastore sha=70a5f34bf469fd297d7686e083f25bd6c50c3b37 -->
+<!-- api-docs:begin module=core/datastore sha=171a5737241ddd563d5cb53d19ec82fe0ef0f183 -->
 ## API reference
 
-_Generated from `core/datastore` at tree `70a5f34bf469` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/datastore` at tree `171a5737241d` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt`
@@ -25,7 +25,7 @@ _Do not hand-edit inside this block — re-run the generator. Authored prose bel
 ```kotlin
 val DatastoreModule = module
 ```
-_No KDoc at source._
+Koin module for `core/datastore` — the fork's preference stores, over the plain and secure `Settings` instances that `DatastoreBaseModule` binds. Preferences only.
 
 <details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:42</code></summary>
 
@@ -58,9 +58,9 @@ What the review policy needs to know at app open, derived from `AppReviewPromptS
 ```kotlin
 interface AppReviewPromptStore
 ```
-_No KDoc at source._
+Persisted state behind the in-app review prompt — when it was last shown and whether the user already responded.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:38</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:45</code></summary>
 
 ```kotlin
     // Review-prompt counters — Settings-backed, DEVICE-scoped (survives sign-out, unlike user prefs).
@@ -82,7 +82,7 @@ class SettingsAppReviewPromptStore(
 ```
 `Settings`-backed `AppReviewPromptStore`, using the same plain store as user preferences.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:39</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:46</code></summary>
 
 ```kotlin
     // Read once per launch by the app shell, which asks AppReviewConfig whether they justify a prompt.
@@ -118,7 +118,7 @@ override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:63</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:67</code></summary>
 
 ```kotlin
     val secureSettings: Settings,
@@ -183,20 +183,20 @@ interface ProjectPreferencesRepository : UserPreferencesRepository
 
 </details>
 
-- `val userData: StateFlow<UserData>`
+- `val userData: StateFlow<UserData>` — The whole preference aggregate as hot state. A StateFlow, not a Flow, because almost every screen reads it during composition and needs a value immediately.
 - `val authToken: String?` — The stored credential, or null when signed out. Synchronous read for a caller that already has one in hand; prefer `observeAuthToken` when the value can change under you.
 - `val observeAuthToken: Flow<String?>` — The credential as a stream, re-emitting on sign-in and sign-out.
-- `val passcode: String`
-- `val observeLanguage: Flow<LanguageConfig>`
-- `val observeDarkThemeConfig: Flow<DarkThemeConfig>`
-- `val observeDynamicColorPreference: Flow<Boolean>`
-- `val observeScreenCapturePreference: Flow<Boolean>`
+- `val passcode: String` — The app-lock passcode. Synchronous — the lock screen compares it on each keystroke.
+- `val observeLanguage: Flow<LanguageConfig>` — Selected language, re-emitting on change so the locale switch takes effect without a restart.
+- `val observeDarkThemeConfig: Flow<DarkThemeConfig>` — Dark-mode preference as a stream.
+- `val observeDynamicColorPreference: Flow<Boolean>` — Whether to derive the palette from platform dynamic colour.
+- `val observeScreenCapturePreference: Flow<Boolean>` — Whether screenshots and screen recording are permitted.
 - `suspend fun setAuthToken(token: String?)` — Persist `token` into the ENCRYPTED store, or clear it when null. Call on sign-in with the value the auth endpoint returned (for Basic, the base64 of `user:password`; for OAuth, the access token) and on sign-out with null.
-- `suspend fun setLanguage(language: LanguageConfig)`
-- `suspend fun setThemeBrand(themeBrand: ThemeBrand)`
-- `suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)`
-- `suspend fun setDynamicColorPreference(useDynamicColor: Boolean)`
-- `suspend fun setIsAuthenticated(isAuthenticated: Boolean)`
+- `suspend fun setLanguage(language: LanguageConfig)` — Persists the app language.
+- `suspend fun setThemeBrand(themeBrand: ThemeBrand)` — Persists the colour brand.
+- `suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)` — Persists the dark-mode preference.
+- `suspend fun setDynamicColorPreference(useDynamicColor: Boolean)` — Persists whether to use platform dynamic colour.
+- `suspend fun setIsAuthenticated(isAuthenticated: Boolean)` — Persists session presence. Does not clear the token — use `setAuthToken` for that.
   _…more members; read the file._
 
 ### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/UserPreferencesRepositoryImpl.kt`
@@ -206,7 +206,7 @@ class UserPreferencesRepositoryImpl(
 ```
 Splits user data storage between plain (UI preferences) and secure (credentials/auth state) Settings backends.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:29</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:36</code></summary>
 
 ```kotlin
 
@@ -222,5 +222,5 @@ Splits user data storage between plain (UI preferences) and secure (credentials/
 
 ---
 
-_7 type(s), 18 function(s)/property(ies); 12 carry KDoc at source; 2 authored example(s); 7 live call site(s)._
+_7 type(s), 18 function(s)/property(ies); 25 carry KDoc at source; 2 authored example(s); 7 live call site(s)._
 <!-- api-docs:end -->

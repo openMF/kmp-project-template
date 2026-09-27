@@ -51,6 +51,10 @@ class AmortizationScheduleViewModel(
     // and project the computed schedule via mapContent; a fully-paid loan yields no rows → Empty.
     private val stream = repository.loanDetailStream(loanId, viewModelScope)
 
+    /**
+     * The schedule as a screen state, projected from the loan repository — `OFFLINE_LOCAL_ONLY`, so it works with no
+     * network at all.
+     */
     val screenState: StateFlow<ScreenState<List<AmortizationRow>>> = stream.state
         .mapContent { loan, _ -> if (loan.monthsRemaining <= 0) emptyList() else computeSchedule(loan) }
         .emptyIfContent { it.isEmpty() }

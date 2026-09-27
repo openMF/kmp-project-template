@@ -66,4 +66,8 @@ val DataModule = module {
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 }
 
+/**
+ * Per-target repository bindings supplied by each `actual` — the pieces that cannot be expressed in
+ * common code.
+ */
 expect val platformModule: Module

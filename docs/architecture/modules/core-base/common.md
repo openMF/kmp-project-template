@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/common sha=0d96434ddf63a007186e6db82c6514c62a1a150a -->
+<!-- api-docs:begin module=core-base/common sha=41fe46584162e7cd65c947f285b7caa74947b7fd -->
 ## API reference
 
-_Generated from `core-base/common` at tree `0d96434ddf63` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/common` at tree `41fe46584162` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -34,10 +34,10 @@ val CommonModule = module
 ```
 Koin module for `core-base/common` — currently the platform `dispatcherManagerModule` binding. Include it once from the app's module graph; every other core module assumes a `DispatcherManager` is already resolvable.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:26</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:33</code></summary>
 
 ```kotlin
-
+ */
 val DatastoreModule = module {
     includes(CommonModule, DatastoreBaseModule)
 
@@ -97,7 +97,7 @@ interface DispatcherManager
 ```
 Injectable access to the app's coroutine dispatchers.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:62</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt:66</code></summary>
 
 ```kotlin
     val plainSettings: Settings,
@@ -112,7 +112,7 @@ Injectable access to the app's coroutine dispatchers.
 - `val main: MainCoroutineDispatcher` — The `MainCoroutineDispatcher` for the app.
 - `val io: CoroutineDispatcher` — The IO `CoroutineDispatcher` for the app.
 - `val unconfined: CoroutineDispatcher` — The unconfined `CoroutineDispatcher` for the app.
-- `val appScope: CoroutineScope`
+- `val appScope: CoroutineScope` — Application-lifetime scope for work that must outlive any screen — cancelled only at process end.
 
 ### `core-base/common/src/commonMain/kotlin/kpt/core/base/common/Parcelize.kt`
 
@@ -136,8 +136,8 @@ expect interface Parceler<P>
 ```
 Custom parcelling for a type the platform cannot serialise on its own — a value class, a third-party type, anything needing a narrower wire form than its fields. Pair it with `TypeParceler` at the use site.
 
-- `fun create(parcel: Parcel): P`
-- `fun P.write(parcel: Parcel, flags: Int)`
+- `fun create(parcel: Parcel): P` — Reconstructs a `P` from `parcel`. Must read fields in exactly the order `write` produced them.
+- `fun P.write(parcel: Parcel, flags: Int)` — Writes this `P` into `parcel`. The read side depends on this order — see `create`.
 
 ```kotlin
 expect annotation class TypeParceler<T, P : Parceler<in T>>()
@@ -151,5 +151,5 @@ The platform write buffer a `Parceler` reads from and writes to. Strictly POSITI
 
 ---
 
-_7 type(s), 16 function(s)/property(ies); 20 carry KDoc at source; 0 authored example(s); 2 live call site(s)._
+_7 type(s), 16 function(s)/property(ies); 23 carry KDoc at source; 0 authored example(s); 2 live call site(s)._
 <!-- api-docs:end -->

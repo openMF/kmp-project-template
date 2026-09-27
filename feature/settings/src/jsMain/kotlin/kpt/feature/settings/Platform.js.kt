@@ -9,5 +9,8 @@
  */
 package kpt.feature.settings
 
+/** Identifies this target as JS, with its version where the platform exposes one. */
 actual fun getPlatform(): Platform = Platform.JS
+
+/** Whether a system-derived palette is available. Always false — JS has no system palette to read. */
 actual fun supportsDynamicTheming(): Boolean = false

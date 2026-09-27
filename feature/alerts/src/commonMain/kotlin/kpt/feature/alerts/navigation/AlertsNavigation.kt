@@ -32,6 +32,11 @@ data object AlertsListRoute
 @Serializable
 data object AlertCreateRoute
 
+/**
+ * Navigates to the alerts graph.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToAlertsGraph(navOptions: NavOptions? = null) {
     navigate(route = AlertsGraphRoute, navOptions = navOptions)
 }

@@ -25,6 +25,9 @@ import kpt.core.base.designsystem.toKptTypography
 import kpt.core.base.ui.screen.LocalScreenStateDefaults
 import kpt.core.store.config.appScreenStateDefaults
 
+/**
+ * The assembled Material 3 light scheme, wired from the palette tokens in `Color.kt`.
+ */
 val lightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
@@ -63,6 +66,9 @@ val lightScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
+/**
+ * The assembled Material 3 dark scheme, wired from the palette tokens in `Color.kt`.
+ */
 val darkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
@@ -158,5 +164,11 @@ fun KptTheme(
     }
 }
 
+/**
+ * Resolves the active colour scheme per platform.
+ *
+ * [dynamicColor] is honoured only where the OS supplies one (Android 12+); every other target
+ * falls back to [lightScheme]/[darkScheme], so a caller can request it unconditionally.
+ */
 @Composable
 expect fun platformColorScheme(useDarkTheme: Boolean, dynamicColor: Boolean): ColorScheme

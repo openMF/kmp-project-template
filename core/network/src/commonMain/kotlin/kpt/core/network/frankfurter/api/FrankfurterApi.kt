@@ -20,9 +20,22 @@ import kpt.core.network.frankfurter.dto.RateHistoryDto
 @ApiBinding("frankfurter")
 interface FrankfurterApi {
 
+    /**
+     * Latest rates for one base currency.
+     *
+     * @param from base currency code, e.g. `USD`.
+     */
     @GET("v1/latest")
     suspend fun getLatestRates(@Query("from") from: String): ExchangeRatesDto
 
+    /**
+     * Rates for one pair over a date range.
+     *
+     * @param startDate first day, `YYYY-MM-DD`.
+     * @param endDate last day, `YYYY-MM-DD`.
+     * @param from base currency code.
+     * @param to quote currency code.
+     */
     @GET("v1/{startDate}..{endDate}")
     suspend fun getHistoricalRates(
         @Path("startDate") startDate: String,

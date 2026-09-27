@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainCoroutineDispatcher
 import kotlinx.coroutines.SupervisorJob
 
+/** Non-Android targets implementation of `DispatcherManagerImpl`. */
 class DispatcherManagerImpl : DispatcherManager {
     override val default: CoroutineDispatcher = Dispatchers.Default
 

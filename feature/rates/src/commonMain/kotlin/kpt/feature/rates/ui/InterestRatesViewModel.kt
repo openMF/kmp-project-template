@@ -134,12 +134,17 @@ internal class InterestRatesViewModel(
  * `combineScreenStates` reduce.
  */
 data class RatesUiState(
+    /** Federal funds rate cell — its own state, so one slow series does not hold the others. */
     val fedFunds: ScreenState<InterestRateSeries> = ScreenState.Loading,
+    /** Bank prime rate cell. Its own state, so one FRED series failing does not blank the dashboard. */
     val prime: ScreenState<InterestRateSeries> = ScreenState.Loading,
+    /** 30-year mortgage rate cell. */
     val mortgage30Y: ScreenState<InterestRateSeries> = ScreenState.Loading,
+    /** 10-year treasury yield cell. */
     val treasury10Y: ScreenState<InterestRateSeries> = ScreenState.Loading,
 )
 
+/** What the dashboard can be asked to do. */
 sealed interface RatesAction {
     /** Pull-to-refresh — fans out to every backing stream. */
     data object RefreshAll : RatesAction

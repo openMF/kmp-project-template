@@ -63,10 +63,16 @@ class CloudTodoViewModel(
         }
     }
 
+    /**
+     * Toggles the todo optimistically — the local write lands immediately and the server call follows, queued by the
+     * Bookkeeper when offline.
+     */
     fun onToggleOptimistic(todo: CloudTodo) = trySendAction(CloudTodoAction.ToggleOptimistic(todo))
 
+    /** Completes the todo requiring the network, so the user is told rather than silently queued. */
     fun onCompleteOnline(todo: CloudTodo) = trySendAction(CloudTodoAction.CompleteOnline(todo))
 
+    /** Dismisses the outcome banner. */
     fun onDismissOutcome() = trySendAction(CloudTodoAction.DismissOutcome)
 
     private companion object {
@@ -98,19 +104,47 @@ sealed interface MutationOutcome {
     /** Applied locally, network sync still queued (optimistic, offline). */
     data object AppliedQueued : MutationOutcome
 
-    /** Online-required write refused — nothing was written. */
+    /**
+     * Online-required write refused — nothing was written.
+     *
+     * @property reason which precondition refused the mutation.
+     */
     data class Blocked(val reason: BlockReason) : MutationOutcome
 
-    /** Server diverged; server-wins applied, the user's version is in the conflict inbox. */
+    /**
+     * Server diverged; server-wins applied, the user's version is in the conflict inbox.
+     *
+     * @property conflictId addresses the inbox row, so the conflict can be resolved from settings.
+     */
     data class Conflicted(val conflictId: String) : MutationOutcome
 
-    /** Permanent failure. [rolledBack] is true when the optimistic local write was undone. */
+    /**
+     * Permanent failure. [rolledBack] is true when the optimistic local write was undone.
+     *
+     * @property message what to show the user.
+     */
     data class Failed(val message: String, val rolledBack: Boolean) : MutationOutcome
 }
 
 /** One-shot actions accepted by [CloudTodoViewModel]. */
 sealed interface CloudTodoAction {
+    /**
+     * Toggle optimistically.
+     *
+     * @property todo the todo to toggle.
+     */
     data class ToggleOptimistic(val todo: CloudTodo) : CloudTodoAction
+
+    /**
+     * Complete, requiring the network.
+     *
+     * @property todo the todo to complete.
+     */
     data class CompleteOnline(val todo: CloudTodo) : CloudTodoAction
+
+    /**
+     * Dismiss the outcome banner. Clears the displayed outcome only — a queued or conflicted write is untouched, so
+     * dismissing never abandons a pending mutation.
+     */
     data object DismissOutcome : CloudTodoAction
 }

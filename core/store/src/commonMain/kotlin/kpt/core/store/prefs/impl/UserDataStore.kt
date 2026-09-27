@@ -28,6 +28,10 @@ import org.mobilenativefoundation.store.store5.Store
  * `UserDataRepositoryImpl` and its `UserPreferencesRepository`, supplies it.
  */
 fun interface UserDataSource {
+    /**
+     * Streams the preference aggregate. A pass-through to the preferences repository, kept as a store-shaped surface
+     * so a screen depends on `core/store` alone.
+     */
     fun observe(): Flow<UserData>
 }
 

@@ -14,6 +14,12 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
+/**
+ * The brand colour scheme. [dynamicColor] is ignored — no non-Android target exposes a system palette.
+ *
+ * @param useDarkTheme whether to build the dark scheme.
+ * @param dynamicColor accepted for signature parity, never honoured.
+ */
 @Composable
 actual fun platformColorScheme(useDarkTheme: Boolean, dynamicColor: Boolean): ColorScheme {
     return when (useDarkTheme) {

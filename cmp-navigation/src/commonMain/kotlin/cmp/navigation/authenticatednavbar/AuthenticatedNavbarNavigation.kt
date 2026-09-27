@@ -18,6 +18,7 @@ import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.composableWithStayTransitions
 
+/** Route for the signed-in shell that hosts the bottom bar. */
 @Serializable
 data object AuthenticatedNavbarRoute
 

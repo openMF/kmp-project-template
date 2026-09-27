@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/network sha=a9d5261dcebfab423de4c411f931317292a6f16a -->
+<!-- api-docs:begin module=core-base/network sha=30cbae534091cc862050dd5b7cbf0501ec9bc405 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `a9d5261dcebf` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `30cbae534091` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -72,7 +72,7 @@ class AccessPointRegistry(val points: List<AccessPoint>)
 ```
 Template registry MECHANISM over a fork-provided list of `points`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:75</code></summary>
 
 ```kotlin
     // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
@@ -182,7 +182,7 @@ object ProjectNetworkHeaders : DefaultHeaderProvider {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:57</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:63</code></summary>
 
 ```kotlin
     // built by `restApi(...)` resolves this, so a fork adds an app-wide header without hand-building
@@ -322,7 +322,7 @@ interface MultiUrlConfigProvider : DynamicUrlConfigProvider
 ```
 Extension of `DynamicUrlConfigProvider` for applications that expose more than one endpoint (identified by an open `UrlType` — the project names them in `core/`).
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:74</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:80</code></summary>
 
 ```kotlin
     // AccessPointRegistry. Clients thread it via
@@ -394,7 +394,7 @@ runtimeHeaders.clear(FineractHeaders.AUTH)
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:52</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:58</code></summary>
 
 ```kotlin
     // Runtime header values — written at login (Basic / OAuth), read on EVERY request. A singleton,
@@ -475,7 +475,7 @@ class SupabaseClientFactory(
 ```
 Per-point Supabase client factory. Builds one `SupabaseConfigClient` per declared Supabase `AccessPoint`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:78</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:84</code></summary>
 
 ```kotlin
     // Per-point Supabase client factory — URL from AccessPointRegistry, anon key by id.

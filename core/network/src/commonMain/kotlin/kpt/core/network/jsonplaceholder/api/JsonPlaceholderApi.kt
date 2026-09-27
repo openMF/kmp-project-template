@@ -24,6 +24,11 @@ import kpt.core.network.jsonplaceholder.dto.CloudTodoDto
  */
 @ApiBinding("jsonplaceholder")
 interface JsonPlaceholderApi {
+    /**
+     * One todo by id.
+     *
+     * @param id jsonplaceholder's todo id.
+     */
     @GET("todos/{id}")
     suspend fun getTodo(@Path("id") id: Int): CloudTodoDto
 

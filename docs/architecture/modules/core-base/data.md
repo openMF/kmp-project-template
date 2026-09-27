@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/data sha=46953f4ae629eca14c1aa9d67f2784748bdf0ff4 -->
+<!-- api-docs:begin module=core-base/data sha=c7d15945f536b9de0e55a8622150f30c81384389 -->
 ## API reference
 
-_Generated from `core-base/data` at tree `46953f4ae629` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/data` at tree `c7d15945f536` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -47,11 +47,11 @@ internal class LoanRepositoryImpl(
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:27</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:30</code></summary>
 
 ```kotlin
-import org.mobilenativefoundation.store.store5.Store
-
+ * Default [CryptoRepository], wrapping the coin-market and coin-detail Stores.
+ */
 @RepositoryBinding(binds = CryptoRepository::class)
 class CryptoRepositoryImpl(
     @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
@@ -66,7 +66,7 @@ annotation class FromStore(val id: String)
 ```
 Resolves this parameter from the store registry rather than by bare type.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:29</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
 
 ```kotlin
 @RepositoryBinding(binds = CryptoRepository::class)
@@ -201,8 +201,8 @@ private class FakeCurrencyRepository : CurrencyRepository {
 
 </details>
 
-- `suspend fun getChangeListVersions(): ChangeListVersions`
-- `suspend fun updateChangeListVersions(update: ChangeListVersions.() -> ChangeListVersions)`
+- `suspend fun getChangeListVersions(): ChangeListVersions` — The per-feature last-synced versions, so a sync resumes rather than re-reading everything.
+- `suspend fun updateChangeListVersions(update: ChangeListVersions.() -> ChangeListVersions)` — Updates the stored versions after a successful sync.
 - `suspend fun Syncable.sync(): Boolean = this.syncWith(this@Synchronizer)` — Convenience: call `someSyncable.sync()` to run `Syncable.syncWith` against this.
 
 ```kotlin
@@ -224,9 +224,9 @@ Identified network record. Used by `changeListSync` to partition deletes from up
 
 </details>
 
-- `val id: String`
-- `val changeListVersion: Int`
-- `val isDelete: Boolean`
+- `val id: String` — Identity of the changed record.
+- `val changeListVersion: Int` — Version this change was published at — the cursor a later sync resumes from.
+- `val isDelete: Boolean` — Whether the change is a deletion, which must be applied rather than fetched.
 
 ```kotlin
 interface Syncable
@@ -247,7 +247,7 @@ interface MacroIndicatorsRepository : Syncable {
 
 </details>
 
-- `suspend fun syncWith(synchronizer: Synchronizer): Boolean`
+- `suspend fun syncWith(synchronizer: Synchronizer): Boolean` — Syncs this entity using `synchronizer`. Returns false if the sync could not complete, so the caller leaves the stored version untouched and retries.
 
 ```kotlin
 suspend fun <T : NetworkChange> Synchronizer.changeListSync(
@@ -266,8 +266,8 @@ interface SyncManager
 ```
 Observer surface for the in-flight sync state. NiA-port. Single binary signal — `isSyncing` — collected by composables that want to surface "Refreshing…" indicators globally (typically the top app bar, the home dashboard hero, etc.).
 
-- `val isSyncing: Flow<Boolean>`
-- `fun requestSync()`
+- `val isSyncing: Flow<Boolean>` — Whether a sync is in flight — drives the refreshing affordance without each screen tracking it.
+- `fun requestSync()` — Requests a sync. Advisory: the manager may coalesce it with one already running.
 
 ### `core-base/data/src/commonMain/kotlin/kpt/core/base/data/infra/TimeZoneMonitor.kt`
 
@@ -276,7 +276,7 @@ interface TimeZoneMonitor
 ```
 Utility for reporting current timezone the device has set. It always emits at least once with default setting and then for each TZ change.
 
-<details><summary>Used in the template — <code>core/data/src/nonAndroidMain/kotlin/kpt/core/data/di/PlatformModule.kt:19</code></summary>
+<details><summary>Used in the template — <code>core/data/src/nonAndroidMain/kotlin/kpt/core/data/di/PlatformModule.kt:20</code></summary>
 
 ```kotlin
 actual val platformModule: Module
@@ -287,9 +287,9 @@ actual val platformModule: Module
 
 </details>
 
-- `val currentTimeZone: Flow<TimeZone>`
+- `val currentTimeZone: Flow<TimeZone>` — The device time zone, re-emitting when it changes — so a date rendered while travelling updates rather than silently going wrong.
 
 ---
 
-_12 type(s), 15 function(s)/property(ies); 18 carry KDoc at source; 2 authored example(s); 10 live call site(s)._
+_12 type(s), 15 function(s)/property(ies); 27 carry KDoc at source; 2 authored example(s); 10 live call site(s)._
 <!-- api-docs:end -->

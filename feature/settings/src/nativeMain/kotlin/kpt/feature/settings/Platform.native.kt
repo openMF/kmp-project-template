@@ -9,5 +9,8 @@
  */
 package kpt.feature.settings
 
+/** Identifies this target as iOS, with its version where the platform exposes one. */
 actual fun getPlatform(): Platform = Platform.IOS
+
+/** Whether a system-derived palette is available. Always false — iOS has no system palette to read. */
 actual fun supportsDynamicTheming(): Boolean = false

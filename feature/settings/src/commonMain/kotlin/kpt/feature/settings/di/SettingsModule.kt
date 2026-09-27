@@ -15,6 +15,7 @@ import kpt.feature.settings.SyncAndDraftsViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
+/** Koin bindings for the settings feature. */
 val SettingsModule = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SyncAndDraftsViewModel)

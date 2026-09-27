@@ -22,6 +22,10 @@ import kpt.core.data.currency.CurrencyRepository
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RateHistoryKey
 
+/**
+ * Drives the historical chart. The pair and window form the store key, so changing either re-keys the stream rather
+ * than filtering in memory.
+ */
 class RateHistoryViewModel(
     currencyRepository: CurrencyRepository,
 ) : BaseViewModel<HistoryLocalState, Nothing, HistoryAction>(HistoryLocalState()) {
@@ -35,6 +39,10 @@ class RateHistoryViewModel(
         scope = viewModelScope,
     )
 
+    /**
+     * The series as a screen state. Re-keys whenever the pair or window changes, so a selection change produces a
+     * fresh load rather than an in-memory filter of the previous one.
+     */
     val screenState: StateFlow<ScreenState<RateHistory>> = stream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
 
@@ -49,6 +57,7 @@ class RateHistoryViewModel(
     val freshness: StateFlow<FreshnessSignal> = stream.freshness
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FreshnessSignal.initial())
 
+    /** Retries the failed fetch. */
     fun onRetry() {
         trySendAction(HistoryAction.Retry)
     }
@@ -60,10 +69,30 @@ class RateHistoryViewModel(
     }
 }
 
+/**
+ * The chart's selection — which pair and how far back.
+ *
+ * @property targetCurrency the quote currency to chart.
+ * @property periodDays how far back to chart, in days.
+ */
 data class HistoryLocalState(val targetCurrency: String = "INR", val periodDays: Int = 30)
 
+/** What the chart can be asked to do. */
 sealed interface HistoryAction {
+    /**
+     * The target currency changed.
+     *
+     * @property code the target currency code.
+     */
     data class SelectCurrency(val code: String) : HistoryAction
+
+    /**
+     * The window length changed. A different window is a different store key, not a filter.
+     *
+     * @property days the window length in days.
+     */
     data class SelectPeriod(val days: Int) : HistoryAction
+
+    /** Retry the failed fetch. */
     data object Retry : HistoryAction
 }

@@ -17,6 +17,12 @@ import androidx.navigation.compose.rememberNavController
 import co.touchlab.kermit.Logger
 import io.github.mobilebytelabs.kmptoolkit.firebase.analytics.AnalyticsHelper
 
+/**
+ * Remembers a `NavController` with the given navigators installed.
+ *
+ * @param name a label carried into analytics, so a destination change can be attributed to the right nav host.
+ * @param navigators extra navigators beyond the defaults.
+ */
 @Composable
 fun rememberKptNavController(name: String, vararg navigators: Navigator<out NavDestination>): NavHostController =
     rememberNavController(navigators = navigators).apply {
@@ -26,6 +32,11 @@ fun rememberKptNavController(name: String, vararg navigators: Navigator<out NavD
         }
     }
 
+/**
+ * Logs a destination change.
+ *
+ * @param route the route navigated to.
+ */
 fun AnalyticsHelper.logDestinationChanged(route: String) {
     logEvent(
         type = "destination_changed",

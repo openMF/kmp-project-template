@@ -9,6 +9,7 @@
  */
 package kpt.core.base.platform.garbage
 
+/** `garbageCollector` on Android. */
 @Suppress("ExplicitGarbageCollectionCall")
 actual val garbageCollector: () -> Unit
     get() = { Runtime.getRuntime().gc() }

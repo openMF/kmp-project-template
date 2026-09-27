@@ -42,6 +42,7 @@ set -uo pipefail
 # for the framework (which drives the same script against a checkout elsewhere) and for canaries.
 TMPL="${TEMPLATE_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 FW="$TMPL"
+. "$(dirname "${BASH_SOURCE[0]}")/_kdoc-lib.sh"
 
 TARGET="${1:-}"
 SHA_ONLY=0
@@ -69,15 +70,8 @@ module_sha() {  # $1 = layer/module → the ONE shared working-tree anchor
 # generator needs to pick the right call, and the tags are noise at index density.
 kdoc_summary() {  # $1 = file  $2 = declaration line number
   local f="$1" ln="$2" i txt line acc="" _kl=""
-  i=$((ln-1))
-  # skip annotations/blank lines between the KDoc and the declaration
-  while [ "$i" -gt 0 ]; do
-    line="$(sed -n "${i}p" "$f")"
-    case "$(printf '%s' "$line" | sed -E 's/^[[:space:]]+//')" in
-      "@"*|"") i=$((i-1)); continue ;;
-    esac
-    break
-  done
+  # Shared walk: crosses blank lines, single-line annotations AND multi-line annotation arg lists.
+  i="$(kdoc_close_line "$f" "$ln")"
   # The line must now CLOSE a KDoc block — in either of its two shapes. A single-line
   # `/** Summary. */` closes and opens on the same line, so a test that only accepts a leading `*/`
   # misses it entirely. That is not rare styling: it is how nearly every one-line doc in this
@@ -123,14 +117,8 @@ kdoc_summary() {  # $1 = file  $2 = declaration line number
 # reformatted example is a different example.
 kdoc_example() {  # $1 = file  $2 = declaration line number
   local f="$1" ln="$2" start=0 i
-  # walk up to the `/**` that opens this symbol's KDoc
-  i=$((ln-1))
-  while [ "$i" -gt 0 ]; do
-    case "$(sed -n "${i}p" "$f" | sed -E 's/^[[:space:]]+//')" in
-      "@"*|"") i=$((i-1)); continue ;;
-    esac
-    break
-  done
+  # walk up to the `/**` that opens this symbol's KDoc — same shared walk as kdoc_summary
+  i="$(kdoc_close_line "$f" "$ln")"
   [ "$i" -gt 0 ] || return 1
   case "$(sed -n "${i}p" "$f" | sed -E 's/^[[:space:]]+//')" in
     "*/"|"*/ "*) ;;

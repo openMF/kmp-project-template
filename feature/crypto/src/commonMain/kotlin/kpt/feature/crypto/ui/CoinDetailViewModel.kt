@@ -67,7 +67,11 @@ internal class CoinDetailViewModel(
     }
 }
 
+/** What the detail screen can be asked to do. */
 sealed interface CoinDetailAction {
+    /** Retry the failed fetch. */
     data object Retry : CoinDetailAction
+
+    /** Force a fetch, bypassing the cache. */
     data object Refresh : CoinDetailAction
 }

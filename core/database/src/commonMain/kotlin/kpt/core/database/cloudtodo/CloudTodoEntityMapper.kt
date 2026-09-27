@@ -11,6 +11,13 @@ package kpt.core.database.cloudtodo
 
 import kpt.core.model.cloudtodo.CloudTodo
 
+/**
+ * Row → domain. Called from the Store's `SourceOfTruth.reader`, which is what keeps the entity type
+ * out of every layer above `core/store`.
+ */
 fun CloudTodoEntity.toDomain(): CloudTodo = CloudTodo(id = id, title = title, completed = completed)
 
+/**
+ * Domain → row. Called from the `SourceOfTruth.writer`.
+ */
 fun CloudTodo.toEntity(): CloudTodoEntity = CloudTodoEntity(id = id, title = title, completed = completed)

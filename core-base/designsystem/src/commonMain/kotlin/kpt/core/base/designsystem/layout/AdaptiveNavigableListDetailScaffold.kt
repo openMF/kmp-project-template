@@ -96,6 +96,13 @@ import kotlinx.coroutines.launch
     ExperimentalComposeUiApi::class,
     ExperimentalSharedTransitionApi::class,
 )
+/**
+ * List-detail scaffold that adapts to window size: two panes side by side when wide, and a
+ * navigable single pane when narrow.
+ *
+ * Back behaviour differs between those shapes, which is why this exists rather than a manual
+ * width branch — getting it wrong strands the user on the detail pane.
+ */
 @Composable
 fun <T : PaneScaffoldItem<*>> AdaptiveNavigableListDetailPaneScaffold(
     items: List<T>,
@@ -348,6 +355,9 @@ sealed interface SelectionVisibilityState {
     ) : SelectionVisibilityState
 }
 
+/**
+ * An item the scaffold can show in either pane, carrying the identity it is selected by.
+ */
 interface PaneScaffoldItem<T : Any> {
     val id: T
 }

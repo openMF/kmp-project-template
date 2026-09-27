@@ -25,10 +25,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/data sha=973cfd49ec164663ab03b622d5c7c86f18aa5904 -->
+<!-- api-docs:begin module=core/data sha=b423fb853046072d18ddf040d578005ad11307f9 -->
 ## API reference
 
-_Generated from `core/data` at tree `973cfd49ec16` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/data` at tree `b423fb853046` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt`
@@ -78,12 +78,12 @@ Banking's submit-path wiring, declared where the feature lives.
 ```kotlin
 fun provideBillReminderOutbox(dao: DraftDao): SubmitOutbox<BillReminder> =
 ```
-_No KDoc at source._
+Offline outbox for bill-reminder submissions — a Room-backed queue of drafts awaiting the network.
 
 ```kotlin
 fun provideLoanCalcScenarioOutbox(dao: DraftDao): SubmitOutbox<LoanCalcScenario> =
 ```
-_No KDoc at source._
+Offline outbox for saved loan-comparison scenarios.
 
 ```kotlin
 class LoanSubmitSyncer internal constructor(
@@ -103,7 +103,7 @@ Eager: a syncer built only on first injection never starts watching for reconnec
 ```kotlin
 fun provideBillReminderSubmitSyncer(
 ```
-_No KDoc at source._
+Drains the bill-reminder outbox whenever connectivity returns. `createdAtStart = true` because a syncer that is only built on first use never runs for a draft queued in a previous session — which is precisely the case the outbox exists for.
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt`
 
@@ -214,7 +214,7 @@ class CloudTodoViewModel(
 
 </details>
 
-- `fun todoStream(id: Int, scope: CoroutineScope): ScreenDataStream<CloudTodo>`
+- `fun todoStream(id: Int, scope: CoroutineScope): ScreenDataStream<CloudTodo>` — Offline-first stream for one todo.
 - `suspend fun toggleCompleted(todo: CloudTodo)` — Flips `completed` and writes back through the MutableStore (Updater → server; Bookkeeper on failure).
 - `suspend fun completeOnline(todo: CloudTodo): kpt.core.base.store.mutation.MutationResult<CloudTodo>` — Mark `todo` complete with the `OnlineRequired` policy — the network PUT is awaited first and the server record ingested; when offline the mutation is `kpt.core.base.store.mutation.MutationResult.Blocked` and nothing is written locally (unlike the optimistic `toggleCompleted`). The demo reference for network-first mutations that must not show an unconfirmed local state (payments, approvals).
 
@@ -223,7 +223,7 @@ class CloudTodoViewModel(
 ```kotlin
 class CloudTodoRepositoryImpl(
 ```
-_No KDoc at source._
+The MUTABLE (offline-write) Store5 archetype, wired end to end: reads stream from Room, a toggle writes through the Updater, and a write that fails offline is left to the Bookkeeper to retry.
 
 <details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/cloudtodo/CloudTodoRepositoryTest.kt:47</code></summary>
 
@@ -244,7 +244,7 @@ _No KDoc at source._
 ```kotlin
 interface CryptoRepository
 ```
-_No KDoc at source._
+Read surface for CoinGecko-backed crypto data. Returns `ScreenDataStream` / `PagingScreenStream`, never raw values: loading, empty, error and no-network are decided in the Store, so no screen re-derives them.
 
 <details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinDetailViewModel.kt:40</code></summary>
 
@@ -261,14 +261,14 @@ internal class CoinDetailViewModel(
 </details>
 
 - `fun coinMarketsStream(scope: CoroutineScope, pageSize: Int = 20): PagingScreenStream<CoinMarket>` — Streams the CoinGecko coin-markets list as a paged screen stream.
-- `fun coinDetailStream(coinId: String, scope: CoroutineScope): ScreenDataStream<CoinDetail>`
+- `fun coinDetailStream(coinId: String, scope: CoroutineScope): ScreenDataStream<CoinDetail>` — Offline-first stream for one coin's detail.
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt`
 
 ```kotlin
 class CryptoRepositoryImpl(
 ```
-_No KDoc at source._
+Default `CryptoRepository`, wrapping the coin-market and coin-detail Stores.
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/currency/CurrencyRepository.kt`
 
@@ -292,7 +292,7 @@ Repository surface for exchange rates + historical rate data.
 </details>
 
 - `fun exchangeRatesStream(` — Stream of exchange rates for `baseCurrency`.
-- `fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>`
+- `fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>` — Offline-first stream for a historical series, re-keying whenever `keyFlow` emits. The key arrives as a Flow rather than a value so a pair or window change re-fetches without the screen rebuilding the stream.
 - `fun spotRateStream(baseCurrency: String, online: Boolean, scope: CoroutineScope): ScreenDataStream<ExchangeRates>` — Spot conversion-rate stream with a connectivity-driven `FetchPolicy`: `online` `true` → `FetchPolicy.NETWORK_ONLY` (always fresh), `false` → `FetchPolicy.CACHE_ONLY` (no error flicker offline).
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/currency/impl/CurrencyRepositoryImpl.kt`
@@ -300,7 +300,7 @@ Repository surface for exchange rates + historical rate data.
 ```kotlin
 class CurrencyRepositoryImpl(
 ```
-_No KDoc at source._
+Default `CurrencyRepository` over the Frankfurter-backed exchange-rate and history Stores.
 
 <details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/currency/CurrencyRepositorySyncWithTest.kt:58</code></summary>
 
@@ -370,7 +370,7 @@ DataModule — the INFRA-ONLY (framework) data aggregator, `owner: template` (E1
 ```kotlin
 expect val platformModule: Module
 ```
-_No KDoc at source._
+Per-target repository bindings supplied by each `actual` — the pieces that cannot be expressed in common code.
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/economic/EconomicRatesRepository.kt`
 
@@ -401,14 +401,14 @@ Repository surface for FRED-sourced interest-rate time series.
 ```kotlin
 class EconomicRatesRepositoryImpl(
 ```
-_No KDoc at source._
+Default `EconomicRatesRepository` over the FRED-backed interest-rate series Store.
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt`
 
 ```kotlin
 class MacroIndicatorsRepositoryImpl(
 ```
-_No KDoc at source._
+Default `MacroIndicatorsRepository` over the World Bank macro-indicator Store.
 
 <details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/economic/MacroIndicatorsRepositorySyncWithTest.kt:54</code></summary>
 
@@ -453,7 +453,7 @@ object SupportedCountries
 ```
 Curated list of countries the Banking Utility Toolkit's macro-snapshot screen ships with out of the box. Selection criteria: - The G20 plus a handful of other large economies the template's adopters are most likely to demo against.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:124</code></summary>
+<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:123</code></summary>
 
 ```kotlin
     modifier: Modifier = Modifier,
@@ -536,14 +536,14 @@ Eager: starts collecting the credential at graph construction. `createdAtStart` 
 ```kotlin
 class UserDataRepositoryImpl(
 ```
-_No KDoc at source._
+Default `UserDataRepository`.
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt`
 
 ```kotlin
 class UserLogoutManagerImpl(
 ```
-_No KDoc at source._
+Default `UserLogoutManager`: clears every Store cache and draft row, then emits the logout event. Cache-clearing is the load-bearing half — a Store that survives logout would serve the previous user's data to the next one.
 
 <details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:66</code></summary>
 
@@ -553,7 +553,8 @@ _No KDoc at source._
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 }
 
-expect val platformModule: Module
+/**
+ * Per-target repository bindings supplied by each `actual` — the pieces that cannot be expressed in
 ```
 
 </details>
@@ -565,7 +566,7 @@ data class LogoutEvent(
 ```
 Result class to share the `loggedOutUserId` of a user that was successfully logged out.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:34</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:40</code></summary>
 
 ```kotlin
     private val scope = CoroutineScope(dispatcherManager.unconfined)
@@ -586,7 +587,7 @@ sealed class LogoutReason
 ```
 Indicates the reason that the user is being logged out.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:48</code></summary>
 
 ```kotlin
      */
@@ -621,20 +622,20 @@ class SettingsViewModel(
 
 </details>
 
-- `val userData: StateFlow<UserData>`
+- `val userData: StateFlow<UserData>` — The whole preference aggregate as hot state, so a screen has a value at first composition.
 - `fun userDataStream(scope: CoroutineScope): ScreenDataStream<UserData>` — Store5-backed read of the same preferences, as a `ScreenDataStream`. `userData` stays for the many call sites that just want the current value (auth, theme bootstrap).
-- `val authToken: String?`
-- `val passcode: String`
-- `val observeLanguage: Flow<LanguageConfig>`
-- `val observeDarkThemeConfig: Flow<DarkThemeConfig>`
-- `val observeDynamicColorPreference: Flow<Boolean>`
-- `val observeScreenCapturePreference: Flow<Boolean>`
-- `suspend fun setLanguage(language: LanguageConfig)`
-- `suspend fun setThemeBrand(themeBrand: ThemeBrand)`
-- `suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)`
-- `suspend fun setDynamicColorPreference(useDynamicColor: Boolean)`
-- `suspend fun setIsAuthenticated(isAuthenticated: Boolean)`
-- `suspend fun setIsUnlocked(isUnlocked: Boolean)`
+- `val authToken: String?` — The stored credential, or null when signed out. Synchronous read; prefer a stream when the value can change under you.
+- `val passcode: String` — The app-lock passcode.
+- `val observeLanguage: Flow<LanguageConfig>` — Selected language, re-emitting on change.
+- `val observeDarkThemeConfig: Flow<DarkThemeConfig>` — Dark-mode preference as a stream.
+- `val observeDynamicColorPreference: Flow<Boolean>` — Whether to derive the palette from platform dynamic colour.
+- `val observeScreenCapturePreference: Flow<Boolean>` — Whether screenshots and screen recording are permitted.
+- `suspend fun setLanguage(language: LanguageConfig)` — Persists the app language.
+- `suspend fun setThemeBrand(themeBrand: ThemeBrand)` — Persists the colour brand.
+- `suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)` — Persists the dark-mode preference.
+- `suspend fun setDynamicColorPreference(useDynamicColor: Boolean)` — Persists whether to use platform dynamic colour.
+- `suspend fun setIsAuthenticated(isAuthenticated: Boolean)` — Persists session presence.
+- `suspend fun setIsUnlocked(isUnlocked: Boolean)` — Persists whether the app-lock is currently satisfied.
   _…more members; read the file._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/user/UserLogoutManager.kt`
@@ -642,7 +643,7 @@ class SettingsViewModel(
 ```kotlin
 interface UserLogoutManager
 ```
-_No KDoc at source._
+Coordinates logout across the app: wipes local state and notifies observers. Centralised so "what must be cleared on logout" is answered once. A feature clearing its own slice is how one gets missed.
 
 <details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:66</code></summary>
 
@@ -652,7 +653,8 @@ _No KDoc at source._
     single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
 }
 
-expect val platformModule: Module
+/**
+ * Per-target repository bindings supplied by each `actual` — the pieces that cannot be expressed in
 ```
 
 </details>
@@ -696,5 +698,5 @@ class AddToWatchlistViewModel(
 
 ---
 
-_27 type(s), 69 function(s)/property(ies); 65 carry KDoc at source; 2 authored example(s); 22 live call site(s)._
+_27 type(s), 69 function(s)/property(ies); 94 carry KDoc at source; 2 authored example(s); 22 live call site(s)._
 <!-- api-docs:end -->

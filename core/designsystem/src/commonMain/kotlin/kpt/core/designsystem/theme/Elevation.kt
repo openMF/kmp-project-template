@@ -40,6 +40,10 @@ data class Elevation(
     val dragging: Dp = 12.dp,
 )
 
+/**
+ * CompositionLocal carrying the app's elevation scale. `static` because it changes only with the
+ * theme, so a read does not subscribe.
+ */
 val LocalElevation = staticCompositionLocalOf { Elevation() }
 
 /** Resolve the active [Elevation] tier scale from composition. */

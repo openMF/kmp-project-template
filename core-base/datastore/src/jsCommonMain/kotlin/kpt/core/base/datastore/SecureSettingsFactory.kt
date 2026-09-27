@@ -31,8 +31,13 @@ import com.russhwolf.settings.Settings
  */
 actual class SecureSettingsFactory {
 
+    /**
+     * Web secure settings, backed by `WebSecureStore`'s AES-GCM store. Requires `warmUp()` to have completed — the
+     * decryption key loads asynchronously, and building this before it lands throws.
+     */
     actual fun create(): Settings = WebSecureStore.settings()
 
+    /** Factory entry points. */
     companion object {
 
         /**

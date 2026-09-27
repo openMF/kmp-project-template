@@ -27,6 +27,13 @@ import kpt.core.store.config.AppCacheKeys
 import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.Store
 
+/**
+ * Default `UserDataRepository`.
+ *
+ * Reads flow through the Store; WRITES go through typed setters here rather than `store.write`,
+ * because routing each individual preference through one whole-blob write would serialise every
+ * setting change behind every other for no benefit.
+ */
 @RepositoryBinding(binds = UserDataRepository::class)
 class UserDataRepositoryImpl(
     private val preferencesRepository: UserPreferencesRepository,

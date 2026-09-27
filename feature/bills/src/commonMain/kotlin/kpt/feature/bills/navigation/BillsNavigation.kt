@@ -33,6 +33,8 @@ data object BillRemindersListRoute
 
 /**
  * Add-or-edit screen. `billId == null` means "create new"; non-null means "edit existing".
+ *
+ * @property billId the bill to edit, or null when adding.
  */
 @Serializable
 data class AddOrEditBillReminderRoute(val billId: String? = null)

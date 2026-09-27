@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.max
 
+/**
+ * Row that wraps onto additional lines when content exceeds the available width.
+ */
 @Composable
 fun KptFlowRow(
     modifier: Modifier = Modifier,

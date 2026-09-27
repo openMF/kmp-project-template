@@ -21,6 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 
+/**
+ * Slides [content] in and out along [direction], using the shared motion durations.
+ */
 @Composable
 fun KptSlideTransition(
     visible: Boolean,
@@ -51,4 +54,7 @@ fun KptSlideTransition(
     )
 }
 
+/**
+ * Direction a [KptSlideTransition] enters from.
+ */
 enum class SlideDirection { Left, Right, Up, Down }

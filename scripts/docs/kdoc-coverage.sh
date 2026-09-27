@@ -19,6 +19,7 @@
 set -uo pipefail
 ROOT="${TEMPLATE_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$ROOT" || exit 2
+. "$(dirname "${BASH_SOURCE[0]}")/_kdoc-lib.sh"
 
 MIN=""
 TARGET=""
@@ -34,14 +35,8 @@ DECL_RE='^(public |internal )?(expect |actual )?(annotation |data |sealed |enum 
 
 # has_kdoc <file> <declaration-line-no> → 0 when a KDoc block closes directly above it
 has_kdoc() {
-  local f="$1" ln="$2" i line t
-  i=$((ln-1))
-  while [ "$i" -gt 0 ]; do
-    line="$(sed -n "${i}p" "$f")"
-    t="$(printf '%s' "$line" | sed -E 's/^[[:space:]]+//')"
-    case "$t" in "@"*|"") i=$((i-1)); continue ;; esac
-    break
-  done
+  local f="$1" ln="$2" i t
+  i="$(kdoc_close_line "$f" "$ln")"
   [ "$i" -gt 0 ] || return 1
   t="$(printf '%s' "$(sed -n "${i}p" "$f")" | sed -E 's/^[[:space:]]+//')"
   # Both KDoc shapes count. A single-line `/** Summary. */` opens and closes on one line, so testing

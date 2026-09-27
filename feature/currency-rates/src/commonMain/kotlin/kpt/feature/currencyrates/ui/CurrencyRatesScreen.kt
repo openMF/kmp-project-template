@@ -59,6 +59,7 @@ import kpt.feature.currencyrates.generated.resources.screens_currencyrates_list_
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
+/** Live FX rates for a base currency, with search and an inline converter. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencyRatesScreen(

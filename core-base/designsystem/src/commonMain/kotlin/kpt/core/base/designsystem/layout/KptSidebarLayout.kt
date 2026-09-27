@@ -26,6 +26,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.theme.KptTheme
 
+/**
+ * Persistent sidebar beside content, for wide windows.
+ */
 @Composable
 fun KptSidebarLayout(
     sidebarContent: @Composable () -> Unit,
@@ -94,6 +97,9 @@ fun KptSidebarLayout(
     }
 }
 
+/**
+ * Width and behaviour of a [KptSidebarLayout] sidebar.
+ */
 @Immutable
 data class SidebarConfiguration(
     val width: Dp = 300.dp,
@@ -104,4 +110,7 @@ data class SidebarConfiguration(
     val dividerColor: Color? = null,
 )
 
+/**
+ * Which edge the sidebar occupies.
+ */
 enum class SidebarPosition { Start, End }

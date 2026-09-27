@@ -77,6 +77,7 @@ internal fun IndicatorKind.accentColor(): Color = when (this) {
     IndicatorKind.GINI -> MaterialTheme.colorScheme.tertiary
 }
 
+/** The card body for a loaded indicator — headline figure plus its sparkline. */
 @Composable
 fun MacroContentBody(indicator: MacroIndicator, modifier: Modifier = Modifier) {
     Row(
@@ -107,6 +108,7 @@ fun MacroContentBody(indicator: MacroIndicator, modifier: Modifier = Modifier) {
     }
 }
 
+/** The card body while the indicator loads, sized to match the content body so the card does not jump. */
 @Composable
 fun MacroLoadingBody(modifier: Modifier = Modifier) {
     Box(
@@ -124,6 +126,7 @@ fun MacroLoadingBody(modifier: Modifier = Modifier) {
     }
 }
 
+/** An in-card message with a retry action, for a cell that failed while its siblings succeeded. */
 @Composable
 fun MacroInlineMessage(text: String, onRetry: () -> Unit, modifier: Modifier = Modifier) {
     Row(

@@ -28,10 +28,26 @@ package kpt.core.firebase.loans
  * chance of the crash path leaking a precision the analytics path deliberately dropped.
  */
 object LoansCrashKeys {
+    /** Category of the loan being acted on. */
     const val LOAN_KIND = "loans_kind"
+
+    /**
+     * Principal as a BAND, never the amount. A crash report leaves the device, so an exact balance must not be in it.
+     */
     const val PRINCIPAL_BAND = "loans_principal_band"
+
+    /** Tenure in months — the input that drives schedule size, and so the memory a schedule crash scales with. */
     const val TENURE_MONTHS = "loans_tenure_months"
+
+    /** How many rows the amortization schedule produced, which is what an out-of-memory crash there scales with. */
     const val SCHEDULE_ROWS = "loans_schedule_rows"
+
+    /**
+     * Which wizard step was active when the crash happened, so a step-specific crash is not averaged across the whole
+     * form.
+     */
     const val FORM_STEP = "loans_form_step"
+
+    /** How many loans the user has. */
     const val LOAN_COUNT = "loans_count"
 }

@@ -19,13 +19,28 @@ import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.amortization.ui.AmortizationScheduleScreen
 
+/**
+ * Route for one loan's amortization schedule.
+ *
+ * @property loanId the loan whose schedule to show.
+ */
 @Serializable
 data class AmortizationScheduleRoute(val loanId: String)
 
+/**
+ * Navigates to a loan's amortization schedule.
+ *
+ * @param loanId the loan to show.
+ */
 fun NavController.navigateToAmortizationSchedule(loanId: String) {
     navigate(AmortizationScheduleRoute(loanId))
 }
 
+/**
+ * Registers the amortization-schedule destination.
+ *
+ * @param navController used for back navigation.
+ */
 fun NavGraphBuilder.amortizationScheduleDestination(navController: NavController) {
     composableWithPushTransitions<AmortizationScheduleRoute> { entry ->
         val route = entry.toRoute<AmortizationScheduleRoute>()

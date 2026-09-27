@@ -17,7 +17,10 @@ import kpt.core.base.database.annotation.DbEntity
 @DbEntity
 @Entity(tableName = "cloud_todos")
 data class CloudTodoEntity(
+    /** jsonplaceholder's todo id, reused as the primary key. */
     @PrimaryKey val id: Int,
+    /** Todo text. */
     val title: String,
+    /** Whether it is done. */
     val completed: Boolean,
 )

@@ -24,6 +24,9 @@ import kpt.core.store.config.AppCacheKeys
 import kpt.core.store.config.AppStoreIds
 import org.mobilenativefoundation.store.store5.Store
 
+/**
+ * Default [CryptoRepository], wrapping the coin-market and coin-detail Stores.
+ */
 @RepositoryBinding(binds = CryptoRepository::class)
 class CryptoRepositoryImpl(
     @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,

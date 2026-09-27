@@ -51,6 +51,12 @@ data class Spacing(
     val touchTargetMin: Dp = 48.dp,
 )
 
+/**
+ * CompositionLocal carrying the app's spacing scale.
+ *
+ * Read this instead of writing literal `.dp`: the whole app's rhythm is retuned here, and a
+ * hardcoded value silently opts a screen out of that.
+ */
 val LocalSpacing = staticCompositionLocalOf { Spacing() }
 
 /** Resolve the active [Spacing] scale from composition. */

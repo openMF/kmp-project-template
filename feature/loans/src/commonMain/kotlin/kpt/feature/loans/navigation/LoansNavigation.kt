@@ -26,22 +26,44 @@ import kpt.feature.loans.ui.AddOrEditLoanScreen
 import kpt.feature.loans.ui.LoanDetailScreen
 import kpt.feature.loans.ui.PersonalLoansListScreen
 
+/** Route for the loans nested graph. */
 @Serializable
 data object LoansGraphRoute
 
+/** Route for the loan list — the graph's start destination. */
 @Serializable
 data object PersonalLoansListRoute
 
+/**
+ * Route for one loan's detail.
+ *
+ * @property loanId the loan to show.
+ */
 @Serializable
 data class LoanDetailRoute(val loanId: String)
 
+/**
+ * Route for the add/edit form. One route for both, since the form is identical and the id decides which.
+ *
+ * @property loanId the loan to edit, or null when adding.
+ */
 @Serializable
 data class AddOrEditLoanRoute(val loanId: String? = null)
 
+/**
+ * Navigates to the loans graph.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToLoans(navOptions: NavOptions? = null) {
     navigate(route = LoansGraphRoute, navOptions = navOptions)
 }
 
+/**
+ * Registers the loans nested graph.
+ *
+ * @param navController used for back navigation and for moving between list, detail and form.
+ */
 @FeatureDestination
 fun NavGraphBuilder.loansGraph(navController: NavController) {
     navigation<LoansGraphRoute>(startDestination = PersonalLoansListRoute) {

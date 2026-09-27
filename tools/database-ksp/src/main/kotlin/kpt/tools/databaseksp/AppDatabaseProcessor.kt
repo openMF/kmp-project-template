@@ -327,6 +327,9 @@ class AppDatabaseProcessor(
     }
 }
 
+/**
+ * KSP entry point — what the `META-INF/services` registration names, so Gradle can instantiate [AppDatabaseProcessor].
+ */
 class AppDatabaseProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
         AppDatabaseProcessor(environment.codeGenerator, environment.logger, environment.options)

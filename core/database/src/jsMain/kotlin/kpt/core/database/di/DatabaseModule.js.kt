@@ -15,4 +15,8 @@ import org.koin.core.module.Module
 
 // Delegates to the template-owned platformDatabaseModule<T> (core-base/database), which selects
 // the WebWorker/OPFS-or-in-memory driver and Default dispatcher.
+/**
+ * Koin bindings for the js Room driver. The builder differs per platform (file path, bundled driver, in-memory), which
+ * is why this is an actual rather than one shared module.
+ */
 actual val platformModule: Module = platformDatabaseModule<AppDatabase>(appDatabaseNaming)

@@ -21,8 +21,13 @@ import kpt.feature.home.HomeRoute
 import kpt.feature.profile.ProfileRoute
 import org.jetbrains.compose.resources.StringResource
 
+/**
+ * The bottom-bar tabs. A sealed hierarchy rather than a list so the bar and the nav graph cannot drift — adding a tab
+ * is a compile error until both are updated.
+ */
 sealed class AuthenticatedNavBarTabItem : NavigationItem {
 
+    /** The dashboard tab — the bar's start destination, and where a back press from any other tab lands. */
     data object HomeTab : AuthenticatedNavBarTabItem() {
         override val selectedIcon: ImageVector
             get() = AppIcons.HomeBoarder
@@ -40,6 +45,10 @@ sealed class AuthenticatedNavBarTabItem : NavigationItem {
             get() = "HomeTab"
     }
 
+    /**
+     * The profile tab. In the template this is a signed-out placeholder; a fork swaps the screen behind the route
+     * without touching the bar.
+     */
     data object ProfileTab : AuthenticatedNavBarTabItem() {
         override val selectedIcon: ImageVector
             get() = AppIcons.ProfileBoarder

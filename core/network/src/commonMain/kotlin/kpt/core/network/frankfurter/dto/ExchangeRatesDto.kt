@@ -17,11 +17,16 @@ import kpt.core.model.currency.ExchangeRates
  */
 @Serializable
 data class ExchangeRatesDto(
+    /** The amount the rates are quoted for — always 1 for `/latest`, so it is not mapped to the domain. */
     val amount: Double,
+    /** Base currency code. */
     val base: String,
+    /** The day these rates are for, `YYYY-MM-DD`. */
     val date: String,
+    /** Quote-code → rate against [base]. */
     val rates: Map<String, Double>,
 ) {
+    /** Maps to the domain model, dropping [amount]. */
     fun toDomain(): ExchangeRates = ExchangeRates(
         base = base,
         date = date,

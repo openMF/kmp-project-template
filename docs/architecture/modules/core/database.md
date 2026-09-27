@@ -24,10 +24,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/database sha=79ec8dfbdce605a87b2f76b351a8bd222e4bc9b3 -->
+<!-- api-docs:begin module=core/database sha=4fb0596767bea1f2064a8991a5908a3a510629ea -->
 ## API reference
 
-_Generated from `core/database` at tree `79ec8dfbdce6` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/database` at tree `4fb0596767be` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/alerts/AlertDao.kt`
@@ -121,14 +121,14 @@ Data-access object for the `banking_bill_reminders` table. Reads are reactive `F
 
 </details>
 
-- `fun observeAll(): Flow<List<BillReminderEntity>>`
-- `fun observeUpcoming(dueDays: Set<Int>): Flow<List<BillReminderEntity>>`
+- `fun observeAll(): Flow<List<BillReminderEntity>>` — Observe all bill reminders, ordered by day-of-month then creation.
+- `fun observeUpcoming(dueDays: Set<Int>): Flow<List<BillReminderEntity>>` — Observe reminders whose `dueDay` falls within the supplied set of day-of-month integers. The repository computes the set from today's date + `maxDays`. Returns only enabled reminders by default.
 - `fun observeById(id: String): Flow<BillReminderEntity?>` — Observe a single bill reminder. Emits `null` after deletion.
 - `suspend fun getById(id: String): BillReminderEntity?` — One-shot read for non-reactive callers.
 - `fun count(): Flow<Int>` — Reactive row count — used by the dashboard badge.
 - `suspend fun upsert(entity: BillReminderEntity)` — Insert-or-replace by primary key.
 - `suspend fun deleteById(id: String)` — Delete a bill reminder by id. No-op if absent.
-- `suspend fun deleteAll()`
+- `suspend fun deleteAll()` — Clears every row. Called on logout via `StoreCacheManager.clearAll()`.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/banking/dao/LoanDao.kt`
 
@@ -157,9 +157,9 @@ Data-access object for the `banking_loans` table. Reads are reactive `Flow`s; wr
 - `fun count(): Flow<Int>` — Reactive row count — used by the dashboard badge.
 - `suspend fun upsert(entity: LoanEntity)` — Insert-or-replace. The `id` is the primary key, so re-saving overwrites.
 - `suspend fun deleteById(id: String)` — Remove a loan by `id`. No-op if absent.
-- `suspend fun deleteAll()`
-- `fun observeAllByNextDue(): Flow<List<LoanEntity>> = observeAll()`
-- `val UPSERT_STRATEGY = OnConflictStrategy.REPLACE`
+- `suspend fun deleteAll()` — Clears every row. Called on logout via `StoreCacheManager.clearAll()`.
+- `fun observeAllByNextDue(): Flow<List<LoanEntity>> = observeAll()` — Loans ordered by next due-date. The ordering is in the `observeAll` query, so this is a naming alias rather than a second query to keep in step.
+- `val UPSERT_STRATEGY = OnConflictStrategy.REPLACE` — REPLACE: a re-synced loan overwrites the local row wholesale. Safe here because the tracker has no field the server does not also own.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/banking/entity/BillReminderEntity.kt`
 
@@ -208,7 +208,7 @@ Persistent row for a personal loan tracked by the user. Mirrors `kpt.core.model.
 ```kotlin
 interface CloudTodoDao
 ```
-_No KDoc at source._
+Room DAO for the cloud-todo demo rows — the MUTABLE (offline-write) archetype's source of truth. Bound into the Store's `SourceOfTruth` — the reader/writer/delete lambdas are the ONLY callers of these members (S5-1).
 
 <details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/CloudTodoDataProviders.kt:52</code></summary>
 
@@ -224,11 +224,11 @@ _No KDoc at source._
 
 </details>
 
-- `fun observeById(id: Int): Flow<CloudTodoEntity?>`
-- `suspend fun getById(id: Int): CloudTodoEntity?`
-- `suspend fun upsert(entity: CloudTodoEntity)`
-- `suspend fun deleteById(id: Int)`
-- `suspend fun deleteAll()`
+- `fun observeById(id: Int): Flow<CloudTodoEntity?>` — Streams one todo, emitting null while it is absent — the Store's local read.
+- `suspend fun getById(id: Int): CloudTodoEntity?` — One-shot read, for the Updater's read-modify-write.
+- `suspend fun upsert(entity: CloudTodoEntity)` — Inserts or replaces — the Store's local write.
+- `suspend fun deleteById(id: Int)` — Removes one todo.
+- `suspend fun deleteAll()` — Clears every row. Called on logout.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/cloudtodo/CloudTodoEntity.kt`
 
@@ -237,13 +237,14 @@ data class CloudTodoEntity(
 ```
 Room mirror of a `kpt.core.model.cloudtodo.CloudTodo` (the Store5 MutableStore SoT).
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/cloudtodo/CloudTodoDao.kt:23</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/cloudtodo/CloudTodoDao.kt:31</code></summary>
 
 ```kotlin
-interface CloudTodoDao {
+    /** Streams one todo, emitting null while it is absent — the Store's local read. */
     @Query("SELECT * FROM cloud_todos WHERE id = :id")
     fun observeById(id: Int): Flow<CloudTodoEntity?>
 
+    /** One-shot read, for the Updater's read-modify-write. */
     @Query("SELECT * FROM cloud_todos WHERE id = :id")
     suspend fun getById(id: Int): CloudTodoEntity?
 ```
@@ -255,12 +256,12 @@ interface CloudTodoDao {
 ```kotlin
 fun CloudTodoEntity.toDomain(): CloudTodo = CloudTodo(id = id, title = title, completed = completed)
 ```
-_No KDoc at source._
+Row → domain. Called from the Store's `SourceOfTruth.reader`, which is what keeps the entity type out of every layer above `core/store`.
 
 ```kotlin
 fun CloudTodo.toEntity(): CloudTodoEntity = CloudTodoEntity(id = id, title = title, completed = completed)
 ```
-_No KDoc at source._
+Domain → row. Called from the `SourceOfTruth.writer`.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/config/DatabaseConfig.kt`
 
@@ -293,21 +294,21 @@ object ForkDatabaseConfig
 ```
 The fork's Room schema version. `owner: fork` — PRESERVED across `/kmp-project-template-sync`. GENERATED from `app-profile/migration-ledger.yaml#version` by `./gradlew syncForkConfig`; do not hand-edit.
 
-- `const val VERSION = 13`
+- `const val VERSION = 13` — The fork's Room schema version — kept equal to `app-profile/migration-ledger.yaml#version` by product-health check LG-5.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/crypto/converter/FintechTypeConverters.kt`
 
 ```kotlin
 class FintechTypeConverters
 ```
-_No KDoc at source._
+Room type converters for the composite values these tables store (rate-point lists, maps).
 
 ```kotlin
 data class RatePointPair(
 ```
-_No KDoc at source._
+Serialisable (date, value) pair — the wire form a rate-point list is stored as.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/mapper/RateHistoryEntityMapper.kt:24</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/mapper/RateHistoryEntityMapper.kt:27</code></summary>
 
 ```kotlin
     startDate = startDate,
@@ -316,7 +317,7 @@ _No KDoc at source._
     fetchedAt = Clock.System.now().toEpochMilliseconds(),
 )
 
-fun RateHistoryEntity.toDomain(): RateHistory = RateHistory(
+/**
 ```
 
 </details>
@@ -326,9 +327,9 @@ fun RateHistoryEntity.toDomain(): RateHistory = RateHistory(
 ```kotlin
 interface CoinDetailDao
 ```
-_No KDoc at source._
+Room DAO for cached coin detail — the offline fallback behind `NETWORK_WITH_CACHE`. Bound into the Store's `SourceOfTruth` — the reader/writer/delete lambdas are the ONLY callers of these members (S5-1).
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinDetailStore.kt:35</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinDetailStore.kt:38</code></summary>
 
 ```kotlin
     api: CoinGeckoApi,
@@ -342,19 +343,19 @@ _No KDoc at source._
 
 </details>
 
-- `suspend fun upsert(entity: CoinDetailEntity)`
-- `fun getById(coinId: String): Flow<CoinDetailEntity?>`
-- `suspend fun delete(coinId: String)`
-- `suspend fun deleteAll()`
+- `suspend fun upsert(entity: CoinDetailEntity)` — Inserts or replaces the cached detail row.
+- `fun getById(coinId: String): Flow<CoinDetailEntity?>` — Streams one coin's detail, emitting null when nothing is cached.
+- `suspend fun delete(coinId: String)` — Evicts one coin's cached detail. Used for a targeted refresh; the list cache in `coin_market` is unaffected, so the row stays visible while its detail re-fetches.
+- `suspend fun deleteAll()` — Clears the cache. Called on logout.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/crypto/dao/CoinMarketDao.kt`
 
 ```kotlin
 interface CoinMarketDao
 ```
-_No KDoc at source._
+Room DAO for the paged coin-market list. `replacePage` is `@Transaction` on purpose: delete-then-upsert as two calls lets an in-flight reader observe an empty page (S5-PAGE-ATOMIC).
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:36</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:41</code></summary>
 
 ```kotlin
     api: CoinGeckoApi,
@@ -368,12 +369,12 @@ _No KDoc at source._
 
 </details>
 
-- `suspend fun upsertAll(entities: List<CoinMarketEntity>)`
-- `fun getPage(limit: Int, offset: Int): Flow<List<CoinMarketEntity>>`
-- `fun getAll(): Flow<List<CoinMarketEntity>>`
-- `suspend fun deleteByPage(page: Int)`
-- `suspend fun deleteAll()`
-- `suspend fun count(): Int`
+- `suspend fun upsertAll(entities: List<CoinMarketEntity>)` — Inserts or replaces a whole page in one transaction, so a partial page never becomes visible.
+- `fun getPage(limit: Int, offset: Int): Flow<List<CoinMarketEntity>>` — One page of the market list, by limit/offset.
+- `fun getAll(): Flow<List<CoinMarketEntity>>` — Every cached row across all pages — what the paging stream accumulates over.
+- `suspend fun deleteByPage(page: Int)` — Evicts one page, for a targeted refresh.
+- `suspend fun deleteAll()` — Clears the cache. Called on logout.
+- `suspend fun count(): Int` — How many rows are cached — used to decide whether another page exists.
 - `suspend fun replacePage(page: Int, entities: List<CoinMarketEntity>)` — Atomically swap the rows of one page (S5-3 PAGINATION_RACE).
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/crypto/entity/CoinDetailEntity.kt`
@@ -381,15 +382,16 @@ _No KDoc at source._
 ```kotlin
 data class CoinDetailEntity(
 ```
-_No KDoc at source._
+Room row for a cached coin detail. An ENTITY, not the domain model — the entity↔domain mapping lives in the Store's `SourceOfTruth`, so nothing above `core/store` sees this type.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/dao/CoinDetailDao.kt:24</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/dao/CoinDetailDao.kt:32</code></summary>
 
 ```kotlin
-
+    /** Inserts or replaces the cached detail row. */
     @Upsert
     suspend fun upsert(entity: CoinDetailEntity)
 
+    /** Streams one coin's detail, emitting null when nothing is cached. */
     @Query("SELECT * FROM coin_detail WHERE id = :coinId LIMIT 1")
     fun getById(coinId: String): Flow<CoinDetailEntity?>
 ```
@@ -401,15 +403,16 @@ _No KDoc at source._
 ```kotlin
 data class CoinMarketEntity(
 ```
-_No KDoc at source._
+Room row for one cached coin-market row; `page` is the cursor bucket `replacePage` swaps atomically.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/dao/CoinMarketDao.kt:25</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/dao/CoinMarketDao.kt:36</code></summary>
 
 ```kotlin
-
+    /** Inserts or replaces a whole page in one transaction, so a partial page never becomes visible. */
     @Upsert
     suspend fun upsertAll(entities: List<CoinMarketEntity>)
 
+    /** One page of the market list, by limit/offset. */
     @Query("SELECT * FROM coin_markets ORDER BY marketCapRank ASC LIMIT :limit OFFSET :offset")
     fun getPage(limit: Int, offset: Int): Flow<List<CoinMarketEntity>>
 ```
@@ -421,24 +424,24 @@ _No KDoc at source._
 ```kotlin
 fun CoinDetail.toEntity(): CoinDetailEntity = CoinDetailEntity(
 ```
-_No KDoc at source._
+Domain → row, for the Store's writer.
 
 ```kotlin
 fun CoinDetailEntity.toDomain(): CoinDetail = CoinDetail(
 ```
-_No KDoc at source._
+Row → domain, for the Store's reader.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/crypto/mapper/CoinMarketEntityMapper.kt`
 
 ```kotlin
 fun CoinMarket.toEntity(page: Int): CoinMarketEntity = CoinMarketEntity(
 ```
-_No KDoc at source._
+Domain → row, stamping the `page` this item belongs to so `replacePage` can swap one bucket.
 
 ```kotlin
 fun CoinMarketEntity.toDomain(): CoinMarket = CoinMarket(
 ```
-_No KDoc at source._
+Row → domain, dropping the paging bookkeeping.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/currency/converter/ChargeTypeConverters.kt`
 
@@ -466,7 +469,7 @@ class ChargeTypeConvertersTest {
 ```kotlin
 interface ExchangeRatesDao
 ```
-_No KDoc at source._
+Room DAO for cached FX rates, keyed by base currency. Bound into the Store's `SourceOfTruth` — the reader/writer/delete lambdas are the ONLY callers of these members (S5-1).
 
 <details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/exchange/impl/SpotRateLookupStore.kt:45</code></summary>
 
@@ -482,20 +485,20 @@ _No KDoc at source._
 
 </details>
 
-- `suspend fun upsert(entity: ExchangeRatesEntity)`
-- `fun getByBase(currency: String): Flow<ExchangeRatesEntity?>`
-- `suspend fun deleteByBase(currency: String)`
-- `suspend fun deleteAll()`
-- `suspend fun deleteOlderThan(epochMillis: Long)`
+- `suspend fun upsert(entity: ExchangeRatesEntity)` — Inserts or replaces the cached rates for one base currency.
+- `fun getByBase(currency: String): Flow<ExchangeRatesEntity?>` — Streams the cached rates for one base currency, emitting null when nothing is cached.
+- `suspend fun deleteByBase(currency: String)` — Evicts the cached rates for one base currency, leaving every other base intact — so switching base re-fetches only what changed.
+- `suspend fun deleteAll()` — Clears the cache. Called on logout.
+- `suspend fun deleteOlderThan(epochMillis: Long)` — Prunes rows cached before `epochMillis` — the cold-start sweep, so a stale day's rates are not served as current.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/currency/dao/RateHistoryDao.kt`
 
 ```kotlin
 interface RateHistoryDao
 ```
-_No KDoc at source._
+Room DAO for cached historical FX series, keyed by pair and window. Bound into the Store's `SourceOfTruth` — the reader/writer/delete lambdas are the ONLY callers of these members (S5-1).
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/currency/impl/RateHistoryStore.kt:45</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/currency/impl/RateHistoryStore.kt:51</code></summary>
 
 ```kotlin
     api: FrankfurterApi,
@@ -509,25 +512,26 @@ _No KDoc at source._
 
 </details>
 
-- `suspend fun upsert(entity: RateHistoryEntity)`
-- `fun get(from: String, to: String, startDate: String, endDate: String): Flow<RateHistoryEntity?>`
-- `suspend fun delete(from: String, to: String)`
-- `suspend fun deleteAll()`
+- `suspend fun upsert(entity: RateHistoryEntity)` — Inserts or replaces one cached series.
+- `fun get(from: String, to: String, startDate: String, endDate: String): Flow<RateHistoryEntity?>` — Streams one exact series. The date range is part of the lookup because a widened window is a different key, not a page append.
+- `suspend fun delete(from: String, to: String)` — Evicts every series for one pair.
+- `suspend fun deleteAll()` — Clears the cache. Called on logout.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/currency/entity/ExchangeRatesEntity.kt`
 
 ```kotlin
 data class ExchangeRatesEntity(
 ```
-_No KDoc at source._
+Room row for a cached FX rate set for one base currency. An ENTITY, not the domain model — the entity↔domain mapping lives in the Store's `SourceOfTruth`, so nothing above `core/store` sees this type.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/dao/ExchangeRatesDao.kt:24</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/dao/ExchangeRatesDao.kt:32</code></summary>
 
 ```kotlin
-
+    /** Inserts or replaces the cached rates for one base currency. */
     @Upsert
     suspend fun upsert(entity: ExchangeRatesEntity)
 
+    /** Streams the cached rates for one base currency, emitting null when nothing is cached. */
     @Query("SELECT * FROM exchange_rates WHERE baseCurrency = :currency LIMIT 1")
     fun getByBase(currency: String): Flow<ExchangeRatesEntity?>
 ```
@@ -539,18 +543,18 @@ _No KDoc at source._
 ```kotlin
 data class RateHistoryEntity(
 ```
-_No KDoc at source._
+Room row for a cached historical FX series. An ENTITY, not the domain model — the entity↔domain mapping lives in the Store's `SourceOfTruth`, so nothing above `core/store` sees this type.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/dao/RateHistoryDao.kt:24</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/dao/RateHistoryDao.kt:32</code></summary>
 
 ```kotlin
-
+    /** Inserts or replaces one cached series. */
     @Upsert
     suspend fun upsert(entity: RateHistoryEntity)
 
-    @Query(
-        """
-        SELECT * FROM rate_history
+    /**
+     * Streams one exact series. The date range is part of the lookup because a widened window is a different key, not
+     * a page append.
 ```
 
 </details>
@@ -560,24 +564,24 @@ _No KDoc at source._
 ```kotlin
 fun ExchangeRates.toEntity(baseCurrency: String): ExchangeRatesEntity = ExchangeRatesEntity(
 ```
-_No KDoc at source._
+Domain → row, keyed by `baseCurrency`.
 
 ```kotlin
 fun ExchangeRatesEntity.toDomain(): ExchangeRates = ExchangeRates(
 ```
-_No KDoc at source._
+Row → domain.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/currency/mapper/RateHistoryEntityMapper.kt`
 
 ```kotlin
 fun RateHistory.toEntity(): RateHistoryEntity = RateHistoryEntity(
 ```
-_No KDoc at source._
+Domain → row, serialising the sample list through the type converters.
 
 ```kotlin
 fun RateHistoryEntity.toDomain(): RateHistory = RateHistory(
 ```
-_No KDoc at source._
+Row → domain, deserialising the sample list.
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/di/DatabaseModule.kt`
 
@@ -586,11 +590,11 @@ val DatabaseModule = module
 ```
 Koin module that provides the `AppDatabase` instance and the framework-infra DAO singletons.
 
-<details><summary>Used in the template — <code>core/database/src/desktopMain/kotlin/kpt/core/database/di/DatabaseModule.desktop.kt:19</code></summary>
+<details><summary>Used in the template — <code>core/database/src/desktopMain/kotlin/kpt/core/database/di/DatabaseModule.desktop.kt:23</code></summary>
 
 ```kotlin
-// the desktop SQLite driver + IO dispatcher + fallback and resolves the OS data dir from
-// appDatabaseNaming.desktopDirName.
+ * which is why this is an actual rather than one shared module.
+ */
 actual val platformModule: Module = platformDatabaseModule<AppDatabase>(appDatabaseNaming)
 ```
 
@@ -723,5 +727,5 @@ Persistent row representing a coin in the user's personal watchlist. Local-only:
 
 ---
 
-_27 type(s), 76 function(s)/property(ies); 51 carry KDoc at source; 1 authored example(s); 25 live call site(s)._
+_27 type(s), 76 function(s)/property(ies); 103 carry KDoc at source; 1 authored example(s); 25 live call site(s)._
 <!-- api-docs:end -->

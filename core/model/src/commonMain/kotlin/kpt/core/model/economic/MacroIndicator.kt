@@ -70,6 +70,7 @@ enum class IndicatorKind(val worldBankCode: String) {
     GINI("SI.POV.GINI"),
     ;
 
+    /** Catalogue of the indicator codes the World Bank API accepts. */
     companion object {
         /**
          * Resolve a [IndicatorKind] from a World Bank indicator code, or `null` when

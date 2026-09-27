@@ -24,6 +24,11 @@ import kpt.feature.watchlist.ui.WatchlistScreen
 @Serializable
 data object WatchlistRoute
 
+/**
+ * Navigates to the watchlist.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToWatchlist(navOptions: NavOptions? = null) {
     navigate(route = WatchlistRoute, navOptions = navOptions)
 }

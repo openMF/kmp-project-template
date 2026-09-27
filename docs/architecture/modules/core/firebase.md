@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/firebase sha=c6c694a210f1b9fda03efaf54150bbee9a97003c -->
+<!-- api-docs:begin module=core/firebase sha=332e953a8f1ffda079c1ea2eba8d3d8a37ef2b54 -->
 ## API reference
 
-_Generated from `core/firebase` at tree `c6c694a210f1` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/firebase` at tree `332e953a8f1f` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/firebase/src/commonMain/kotlin/kpt/core/firebase/config/analytics/KptAnalyticsEvents.kt`
@@ -41,20 +41,20 @@ CROSS-CUTTING analytics event keys — TEMPLATE-OWNED, full-copied by every sync
 
 </details>
 
-- `const val LOGIN_SUCCESS = "login_success"`
-- `const val LOGIN_FAILURE = "login_failure"`
-- `const val LOGOUT = "logout"`
-- `const val SESSION_START = "session_start"`
-- `const val SESSION_END = "session_end"`
-- `const val SESSION_TIMEOUT = "session_timeout"`
-- `const val BIOMETRIC_AUTH_SUCCESS = "biometric_auth_success"`
-- `const val BIOMETRIC_AUTH_FAILURE = "biometric_auth_failure"`
-- `const val SCREEN_VIEW = "screen_view"`
-- `const val NAVIGATION = "navigation"`
-- `const val DEEP_LINK_OPENED = "deep_link_opened"`
-- `const val BACK_PRESSED = "back_pressed"`
-- `const val API_CALL_SUCCESS = "api_call_success"`
-- `const val API_CALL_FAILURE = "api_call_failure"`
+- `const val LOGIN_SUCCESS = "login_success"` — Session + authentication: login success. Emitted as `login_success`.
+- `const val LOGIN_FAILURE = "login_failure"` — Session + authentication: login failure. Emitted as `login_failure`.
+- `const val LOGOUT = "logout"` — Session + authentication: logout. Emitted as `logout`.
+- `const val SESSION_START = "session_start"` — Session + authentication: session start. Emitted as `session_start`.
+- `const val SESSION_END = "session_end"` — Session + authentication: session end. Emitted as `session_end`.
+- `const val SESSION_TIMEOUT = "session_timeout"` — Session + authentication: session timeout. Emitted as `session_timeout`.
+- `const val BIOMETRIC_AUTH_SUCCESS = "biometric_auth_success"` — Session + authentication: biometric auth success. Emitted as `biometric_auth_success`.
+- `const val BIOMETRIC_AUTH_FAILURE = "biometric_auth_failure"` — Session + authentication: biometric auth failure. Emitted as `biometric_auth_failure`.
+- `const val SCREEN_VIEW = "screen_view"` — Navigation: screen view. Emitted as `screen_view`.
+- `const val NAVIGATION = "navigation"` — Event logged on every destination change. One event with from/to params rather than a per-screen event, so a funnel can be built without knowing the screen set in advance.
+- `const val DEEP_LINK_OPENED = "deep_link_opened"` — Navigation: deep link opened. Emitted as `deep_link_opened`.
+- `const val BACK_PRESSED = "back_pressed"` — Navigation: back pressed. Emitted as `back_pressed`.
+- `const val API_CALL_SUCCESS = "api_call_success"` — Network + API: api call success. Emitted as `api_call_success`.
+- `const val API_CALL_FAILURE = "api_call_failure"` — Network + API: api call failure. Emitted as `api_call_failure`.
   _…more members; read the file._
 
 ```kotlin
@@ -76,20 +76,20 @@ CROSS-CUTTING parameter keys — TEMPLATE-OWNED, full-copied by every sync.
 
 </details>
 
-- `const val LOGIN_METHOD = "login_method"`
-- `const val SESSION_DURATION_MS = "session_duration_ms"`
-- `const val SCREEN_NAME = "screen_name"`
-- `const val FROM_SCREEN = "from_screen"`
-- `const val TO_SCREEN = "to_screen"`
-- `const val TRIGGER = "trigger"`
-- `const val ENDPOINT = "endpoint"`
-- `const val HTTP_METHOD = "http_method"`
-- `const val STATUS_CODE = "status_code"`
-- `const val DURATION_MS = "duration_ms"`
-- `const val SYNC_TYPE = "sync_type"`
-- `const val RECORDS_SYNCED = "records_synced"`
-- `const val CONFLICT_STRATEGY = "conflict_strategy"`
-- `const val ERROR_TYPE = "error_type"`
+- `const val LOGIN_METHOD = "login_method"` — Session: login method. Emitted as `login_method`.
+- `const val SESSION_DURATION_MS = "session_duration_ms"` — Session: session duration ms. Emitted as `session_duration_ms`.
+- `const val SCREEN_NAME = "screen_name"` — Navigation: screen name. Emitted as `screen_name`.
+- `const val FROM_SCREEN = "from_screen"` — Route navigated FROM. Empty on the first destination of a session, which is how a cold start is told from an in- app move.
+- `const val TO_SCREEN = "to_screen"` — Route navigated TO.
+- `const val TRIGGER = "trigger"` — What caused the navigation — a tap, a back press, a deep link. Separates user intent from a programmatic redirect, which otherwise look identical in the funnel.
+- `const val ENDPOINT = "endpoint"` — Network / API: endpoint. Emitted as `endpoint`.
+- `const val HTTP_METHOD = "http_method"` — Network / API: http method. Emitted as `http_method`.
+- `const val STATUS_CODE = "status_code"` — Network / API: status code. Emitted as `status_code`.
+- `const val DURATION_MS = "duration_ms"` — Network / API: duration ms. Emitted as `duration_ms`.
+- `const val SYNC_TYPE = "sync_type"` — Sync: sync type. Emitted as `sync_type`.
+- `const val RECORDS_SYNCED = "records_synced"` — Sync: records synced. Emitted as `records_synced`.
+- `const val CONFLICT_STRATEGY = "conflict_strategy"` — Sync: conflict strategy. Emitted as `conflict_strategy`.
+- `const val ERROR_TYPE = "error_type"` — Errors: error type. Emitted as `error_type`.
   _…more members; read the file._
 
 ```kotlin
@@ -111,16 +111,16 @@ CROSS-CUTTING parameter values — TEMPLATE-OWNED, full-copied by every sync. On
 
 </details>
 
-- `const val TRIGGER_USER_ACTION = "user_action"`
-- `const val TRIGGER_DEEP_LINK = "deep_link"`
-- `const val TRIGGER_NOTIFICATION = "notification"`
-- `const val TRIGGER_SYSTEM = "system"`
-- `const val SYNC_FULL = "full"`
-- `const val SYNC_INCREMENTAL = "incremental"`
-- `const val SYNC_MANUAL = "manual"`
-- `const val RESULT_SUCCESS = "success"`
-- `const val RESULT_FAILURE = "failure"`
-- `const val RESULT_CANCELLED = "cancelled"`
+- `const val TRIGGER_USER_ACTION = "user_action"` — Trigger sources: trigger user action. Emitted as `user_action`.
+- `const val TRIGGER_DEEP_LINK = "deep_link"` — Trigger sources: trigger deep link. Emitted as `deep_link`.
+- `const val TRIGGER_NOTIFICATION = "notification"` — Trigger sources: trigger notification. Emitted as `notification`.
+- `const val TRIGGER_SYSTEM = "system"` — Trigger sources: trigger system. Emitted as `system`.
+- `const val SYNC_FULL = "full"` — Sync kinds: sync full. Emitted as `full`.
+- `const val SYNC_INCREMENTAL = "incremental"` — Sync kinds: sync incremental. Emitted as `incremental`.
+- `const val SYNC_MANUAL = "manual"` — Sync kinds: sync manual. Emitted as `manual`.
+- `const val RESULT_SUCCESS = "success"` — Outcomes: result success. Emitted as `success`.
+- `const val RESULT_FAILURE = "failure"` — Outcomes: result failure. Emitted as `failure`.
+- `const val RESULT_CANCELLED = "cancelled"` — Outcomes: result cancelled. Emitted as `cancelled`.
 
 ### `core/firebase/src/commonMain/kotlin/kpt/core/firebase/config/analytics/KptAnalyticsExtensions.kt`
 
@@ -223,16 +223,16 @@ fun CrashReporter.setCurrentScreen(screenName: String, previousScreen: String? =
 
 </details>
 
-- `const val CURRENT_SCREEN = "current_screen"`
-- `const val PREVIOUS_SCREEN = "previous_screen"`
-- `const val SESSION_ID = "session_id"`
-- `const val NETWORK_STATE = "network_state"`
-- `const val SYNC_IN_FLIGHT = "sync_in_flight"`
-- `const val LAST_ENDPOINT = "last_endpoint"`
-- `const val LAST_STATUS_CODE = "last_status_code"`
-- `const val APP_LOCALE = "app_locale"`
-- `const val THEME_MODE = "theme_mode"`
-- `const val PENDING_WRITES = "pending_writes"`
+- `const val CURRENT_SCREEN = "current_screen"` — Route the user is on — the single most useful key for reproducing a crash.
+- `const val PREVIOUS_SCREEN = "previous_screen"` — Route they came from, which distinguishes a bad destination from a bad transition.
+- `const val SESSION_ID = "session_id"` — Groups every crash and breadcrumb from one app run.
+- `const val NETWORK_STATE = "network_state"` — Connectivity at crash time; separates an offline path from a server fault.
+- `const val SYNC_IN_FLIGHT = "sync_in_flight"` — Whether a background sync was running — the usual source of a race.
+- `const val LAST_ENDPOINT = "last_endpoint"` — Most recent request path.
+- `const val LAST_STATUS_CODE = "last_status_code"` — HTTP status of the last response. Paired with `LAST_ENDPOINT` it distinguishes a crash after a 401 from one after a 500, which usually have different causes.
+- `const val APP_LOCALE = "app_locale"` — Active locale, for a crash that only reproduces under one translation or script direction.
+- `const val THEME_MODE = "theme_mode"` — Light/dark, for a crash confined to one palette.
+- `const val PENDING_WRITES = "pending_writes"` — How many queued offline mutations were outstanding.
 
 ### `core/firebase/src/commonMain/kotlin/kpt/core/firebase/di/AnalyticsModule.kt`
 
@@ -262,17 +262,17 @@ object LoansEventTypes
 
 </details>
 
-- `const val LOANS_LIST_VIEWED = "loans_list_viewed"`
-- `const val LOAN_DETAIL_VIEWED = "loan_detail_viewed"`
-- `const val LOAN_AMORTIZATION_VIEWED = "loan_amortization_viewed"`
-- `const val LOAN_FORM_OPENED = "loan_form_opened"`
-- `const val LOAN_FORM_ABANDONED = "loan_form_abandoned"`
-- `const val LOAN_CREATED = "loan_created"`
-- `const val LOAN_UPDATED = "loan_updated"`
-- `const val LOAN_DELETED = "loan_deleted"`
-- `const val LOAN_REMINDER_SCHEDULED = "loan_reminder_scheduled"`
-- `const val LOAN_REMINDER_CANCELLED = "loan_reminder_cancelled"`
-- `const val LOAN_REMINDER_FIRED = "loan_reminder_fired"`
+- `const val LOANS_LIST_VIEWED = "loans_list_viewed"` — The loan list was opened.
+- `const val LOAN_DETAIL_VIEWED = "loan_detail_viewed"` — A loan's detail screen was opened. Carries `LOAN_KIND` and the principal BAND, never the loan's id or amount.
+- `const val LOAN_AMORTIZATION_VIEWED = "loan_amortization_viewed"` — The amortization schedule was opened.
+- `const val LOAN_FORM_OPENED = "loan_form_opened"` — The add/edit form was opened. Paired with `LOAN_FORM_ABANDONED` this gives the form's drop-off rate.
+- `const val LOAN_FORM_ABANDONED = "loan_form_abandoned"` — The form was left without submitting — paired with `LOAN_FORM_OPENED` this gives the drop-off rate.
+- `const val LOAN_CREATED = "loan_created"` — A loan was committed for the first time. Fires on the local commit, so it counts even for a fork whose submit never reaches a server.
+- `const val LOAN_UPDATED = "loan_updated"` — An existing loan was committed again. Distinct from `LOAN_CREATED` so edit frequency is measurable on its own.
+- `const val LOAN_DELETED = "loan_deleted"` — A loan was deleted. Carries only `LOAN_KIND` — a deleted loan's figures have no analytic use.
+- `const val LOAN_REMINDER_SCHEDULED = "loan_reminder_scheduled"` — A payment reminder was registered with the platform scheduler.
+- `const val LOAN_REMINDER_CANCELLED = "loan_reminder_cancelled"` — A payment reminder was withdrawn, because the loan was deleted or reminders were turned off.
+- `const val LOAN_REMINDER_FIRED = "loan_reminder_fired"` — A payment reminder was delivered. Fired-minus-scheduled is how reminder loss on a given platform is spotted.
 
 ```kotlin
 object LoansParamKeys
@@ -292,13 +292,13 @@ object LoansParamKeys
 
 </details>
 
-- `const val LOAN_KIND = "loan_kind"`
-- `const val PRINCIPAL_BAND = "principal_band"`
-- `const val TENURE_MONTHS = "tenure_months"`
-- `const val RATE_BAND = "rate_band"`
-- `const val FORM_STEP = "form_step"`
-- `const val LOAN_COUNT = "loan_count"`
-- `const val REMINDER_LEAD_DAYS = "reminder_lead_days"`
+- `const val LOAN_KIND = "loan_kind"` — The loan's category. Low-cardinality by construction, so it is safe to break every event down by it.
+- `const val PRINCIPAL_BAND = "principal_band"` — Principal as a BAND, never the amount — an exact figure would make the event personal data.
+- `const val TENURE_MONTHS = "tenure_months"` — Tenure in months. A raw number rather than a band — tenure is not identifying on its own the way an amount is.
+- `const val RATE_BAND = "rate_band"` — APR as a band, for the same reason as `PRINCIPAL_BAND`.
+- `const val FORM_STEP = "form_step"` — Which wizard step the event refers to, so abandonment can be attributed to a specific step rather than to the form as a whole.
+- `const val LOAN_COUNT = "loan_count"` — How many loans the user has.
+- `const val REMINDER_LEAD_DAYS = "reminder_lead_days"` — How many days before the due date the reminder is set for.
 
 ```kotlin
 object LoansParamValues
@@ -319,16 +319,16 @@ private fun principalBand(principal: Double): String = when {
 
 </details>
 
-- `const val PRINCIPAL_BAND_SMALL = "lt_1k"`
-- `const val PRINCIPAL_BAND_MEDIUM = "1k_10k"`
-- `const val PRINCIPAL_BAND_LARGE = "10k_100k"`
-- `const val PRINCIPAL_BAND_XLARGE = "gte_100k"`
-- `const val RATE_BAND_LOW = "lt_5pct"`
-- `const val RATE_BAND_MID = "5_15pct"`
-- `const val RATE_BAND_HIGH = "gte_15pct"`
-- `const val FORM_STEP_DETAILS = "details"`
-- `const val FORM_STEP_TERMS = "terms"`
-- `const val FORM_STEP_REVIEW = "review"`
+- `const val PRINCIPAL_BAND_SMALL = "lt_1k"` — Under 1,000.
+- `const val PRINCIPAL_BAND_MEDIUM = "1k_10k"` — 1,000 to 10,000.
+- `const val PRINCIPAL_BAND_LARGE = "10k_100k"` — 10,000 to 100,000.
+- `const val PRINCIPAL_BAND_XLARGE = "gte_100k"` — 100,000 and above.
+- `const val RATE_BAND_LOW = "lt_5pct"` — Under 5%.
+- `const val RATE_BAND_MID = "5_15pct"` — 5% to 15%.
+- `const val RATE_BAND_HIGH = "gte_15pct"` — 15% and above.
+- `const val FORM_STEP_DETAILS = "details"` — Name and category.
+- `const val FORM_STEP_TERMS = "terms"` — Principal, rate and tenure.
+- `const val FORM_STEP_REVIEW = "review"` — Final confirmation.
 
 ### `core/firebase/src/commonMain/kotlin/kpt/core/firebase/loans/LoansAnalyticsExtensions.kt`
 
@@ -402,14 +402,14 @@ object LoansCrashKeys
 
 </details>
 
-- `const val LOAN_KIND = "loans_kind"`
-- `const val PRINCIPAL_BAND = "loans_principal_band"`
-- `const val TENURE_MONTHS = "loans_tenure_months"`
-- `const val SCHEDULE_ROWS = "loans_schedule_rows"`
-- `const val FORM_STEP = "loans_form_step"`
-- `const val LOAN_COUNT = "loans_count"`
+- `const val LOAN_KIND = "loans_kind"` — Category of the loan being acted on.
+- `const val PRINCIPAL_BAND = "loans_principal_band"` — Principal as a BAND, never the amount. A crash report leaves the device, so an exact balance must not be in it.
+- `const val TENURE_MONTHS = "loans_tenure_months"` — Tenure in months — the input that drives schedule size, and so the memory a schedule crash scales with.
+- `const val SCHEDULE_ROWS = "loans_schedule_rows"` — How many rows the amortization schedule produced, which is what an out-of-memory crash there scales with.
+- `const val FORM_STEP = "loans_form_step"` — Which wizard step was active when the crash happened, so a step-specific crash is not averaged across the whole form.
+- `const val LOAN_COUNT = "loans_count"` — How many loans the user has.
 
 ---
 
-_10 type(s), 105 function(s)/property(ies); 33 carry KDoc at source; 0 authored example(s); 8 live call site(s)._
+_10 type(s), 105 function(s)/property(ies); 115 carry KDoc at source; 0 authored example(s); 8 live call site(s)._
 <!-- api-docs:end -->

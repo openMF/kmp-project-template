@@ -9,6 +9,13 @@
  */
 package kpt.core.model.currency
 
+/**
+ * Maps an ISO country code to its flag emoji, by offsetting ASCII letters into the Unicode
+ * regional-indicator range.
+ *
+ * Computed rather than shipped as assets: 250 flag images would dwarf the rest of the app, and the
+ * platform already renders these.
+ */
 object CountryFlagUtils {
 
     /**
@@ -84,6 +91,10 @@ object CountryFlagUtils {
     }
 }
 
+/**
+ * The static country/currency catalogue the picker offers. Static because it changes on the order of
+ * once a decade and a network round-trip for it would be absurd.
+ */
 val worldCountries: List<Country> = listOf(
     Country(
         code = "ES",

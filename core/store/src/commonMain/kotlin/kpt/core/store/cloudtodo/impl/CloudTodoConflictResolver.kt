@@ -39,6 +39,15 @@ class CloudTodoConflictResolver(
         val diverged: Boolean,
     )
 
+    /**
+     * Reconciles a server echo against the client value.
+     *
+     * Divergence is judged on the user-visible fields only, so a server that rewrites a timestamp or an id does not
+     * present itself as a conflict.
+     *
+     * @param server the value the server returned.
+     * @param client the value optimistically written locally.
+     */
     fun resolve(server: CloudTodo, client: CloudTodo): Resolution = Resolution(
         value = strategy.resolve(server = server, client = client),
         diverged = server.completed != client.completed || server.title != client.title,

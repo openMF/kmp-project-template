@@ -32,7 +32,7 @@ import kotlin.test.assertTrue
  * `minLeftWidth` and `minRightWidth` were three parameters that could not affect anything.
  */
 @OptIn(ExperimentalTestApi::class)
-class KptSplitPaneTest {
+class KptSplitPaneUiTest {
 
     private fun leftWidth(test: androidx.compose.ui.test.ComposeUiTest): Int =
         test.onNodeWithTag("left").fetchSemanticsNode().size.width

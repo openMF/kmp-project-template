@@ -32,7 +32,7 @@ import kotlin.test.assertNull
  * TWICE: once inset beside the content and once floating over it.
  */
 @OptIn(ExperimentalTestApi::class)
-class KptSidebarLayoutTest {
+class KptSidebarLayoutUiTest {
 
     private val panelTag = "sidebar-panel"
 

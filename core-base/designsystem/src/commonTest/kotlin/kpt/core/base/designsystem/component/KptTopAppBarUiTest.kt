@@ -27,7 +27,7 @@ import kotlin.test.assertEquals
  * body, which is what stops them drifting apart again.
  */
 @OptIn(ExperimentalTestApi::class)
-class KptTopAppBarTest {
+class KptTopAppBarUiTest {
 
     @Test
     fun smallForwardsTheNavigationClick() = runComposeUiTest {

@@ -30,7 +30,7 @@ import kotlin.test.Test
  * so the pair cannot drift apart again.
  */
 @OptIn(ExperimentalTestApi::class)
-class KptFlowColumnTest {
+class KptFlowColumnUiTest {
 
     @Test
     fun rendersASingleColumnWithoutCrashing() = runComposeUiTest {

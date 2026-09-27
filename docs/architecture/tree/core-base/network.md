@@ -72,16 +72,16 @@ class AccessPointRegistry(val points: List<AccessPoint>)
 ```
 Template registry MECHANISM over a fork-provided list of `points`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:75</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:45</code></summary>
 
 ```kotlin
-    // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
-    // The restApi("<id>") DSL and AppMultiUrlConfigProvider both resolve transports/base-URLs from this.
-    single { AccessPointRegistry(AppAccessPoints.points) }
-
-    // Unified access-point provider — resolves every named UrlType to its REST base URL from the
-    // AccessPointRegistry. Clients thread it via
-    // setupDefaultHttpClient(multiUrlProvider = get(), urlType = AppUrlTypes.<NAME>).
+@DataProvider(createdAtStart = true)
+fun provideAuthHeaderBridge(
+    registry: AccessPointRegistry,
+    tokenSource: AuthTokenSource,
+    headers: RuntimeHeaderStore,
+    scope: CoroutineScope,
+): AuthHeaderBridge = AuthHeaderBridge(
 ```
 
 </details>
@@ -102,15 +102,16 @@ interface CoinGeckoApi { ... }
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt:20</code></summary>
 
 ```kotlin
- * so Koin can build the binding on an unconfigured fork safely.
- */
-@ApiBinding("lwmswhoxvvoagzkqxiyd")
-class AppConfigApiImpl(
-    private val supabase: SupabaseConfigClient,
-) : AppConfigApi {
+
+/** CoinGecko public API v3. Base URL: [BASE_URL]. */
+@ApiBinding("coingecko")
+interface CoinGeckoApi {
+
+    /**
+     * One page of the market list, ordered by market cap descending by default.
 ```
 
 </details>
@@ -148,16 +149,16 @@ class AuthHeaderBridge(
 ```
 Keeps `RuntimeHeaderStore` in step with the stored credential, so `Authorization` is automatic.
 
-<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/AuthSchemeTest.kt:60</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:44</code></summary>
 
 ```kotlin
-        val key = AuthScheme.runtimeKeyFor("fineract")
-
-        AuthHeaderBridge(
-            points = listOf(point("fineract", AuthScheme.BASIC)),
-            tokenSource = AuthTokenSource { token },
-            headers = headers,
-        ).start(TestScope(testScheduler))
+ */
+@DataProvider(createdAtStart = true)
+fun provideAuthHeaderBridge(
+    registry: AccessPointRegistry,
+    tokenSource: AuthTokenSource,
+    headers: RuntimeHeaderStore,
+    scope: CoroutineScope,
 ```
 
 </details>
@@ -182,16 +183,12 @@ object ProjectNetworkHeaders : DefaultHeaderProvider {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:63</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/ProjectNetworkHeaders.kt:44</code></summary>
 
 ```kotlin
-    // built by `restApi(...)` resolves this, so a fork adds an app-wide header without hand-building
-    // a Ktorfit and giving up the generated @ApiBinding wiring. Neutral on the template.
-    single<DefaultHeaderProvider> { ProjectNetworkHeaders }
-
-    // Every declared endpoint's Koin binding, GENERATED from app-profile#network.access_points into
-    // the sibling [GeneratedApiBindings] (same package — no import, so this file keeps its zero-demo
-    // -imports property and stays blind-copyable on a template sync). It lives HERE rather than in the
+ * this map is read once per client rather than once per call.
+ */
+object ProjectNetworkHeaders : DefaultHeaderProvider
 ```
 
 </details>
@@ -322,16 +319,16 @@ interface MultiUrlConfigProvider : DynamicUrlConfigProvider
 ```
 Extension of `DynamicUrlConfigProvider` for applications that expose more than one endpoint (identified by an open `UrlType` — the project names them in `core/`).
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:80</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppMultiUrlConfigProvider.kt:29</code></summary>
 
 ```kotlin
-    // AccessPointRegistry. Clients thread it via
-    // setupDefaultHttpClient(multiUrlProvider = get(), urlType = AppUrlTypes.<NAME>).
-    single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider(get()) }
+class AppMultiUrlConfigProvider(
+    private val registry: AccessPointRegistry,
+) : MultiUrlConfigProvider {
 
-    // Per-point Supabase client factory — URL from AccessPointRegistry, anon key by id.
-    single {
-        SupabaseClientFactory(
+    override fun getBaseUrl(type: UrlType): String =
+        registry.restBaseUrl(type)
+            ?: registry.restBaseUrl(UrlType.MAIN)
 ```
 
 </details>
@@ -394,16 +391,16 @@ runtimeHeaders.clear(FineractHeaders.AUTH)
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:58</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:47</code></summary>
 
 ```kotlin
-    // Runtime header values — written at login (Basic / OAuth), read on EVERY request. A singleton,
-    // because the whole point is that a value set after the clients were built still reaches them.
-    single { RuntimeHeaderStore() }
-
-    // Default request headers, from the fork-owned ProjectNetworkHeaders seam. Every REST client
-    // built by `restApi(...)` resolves this, so a fork adds an app-wide header without hand-building
-    // a Ktorfit and giving up the generated @ApiBinding wiring. Neutral on the template.
+    registry: AccessPointRegistry,
+    tokenSource: AuthTokenSource,
+    headers: RuntimeHeaderStore,
+    scope: CoroutineScope,
+): AuthHeaderBridge = AuthHeaderBridge(
+    points = registry.points,
+    tokenSource = tokenSource,
 ```
 
 </details>
@@ -514,15 +511,13 @@ if (configClient.isConfigured) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:34</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:106</code></summary>
 
 ```kotlin
-@ApiBinding("lwmswhoxvvoagzkqxiyd")
-class AppConfigApiImpl(
-    private val supabase: SupabaseConfigClient,
-) : AppConfigApi {
-
-    override val isConfigured: Boolean get() = supabase.isConfigured
+    // `single<SupabaseConfigClient>`: "the" Supabase client is not a meaningful concept once a fork
+    // can declare N projects, and the per-id `supabaseApi("<id>")` binding is how consumers reach one.
+    single<Map<String, SupabaseConfigClient>> { get<SupabaseClientFactory>().clients() }
+}
 ```
 
 </details>

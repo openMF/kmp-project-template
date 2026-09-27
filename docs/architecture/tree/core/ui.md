@@ -243,15 +243,15 @@ fun KptScaffold(
 ```
 App screen scaffold for a screen with a BACK affordance — the nav icon is always shown and `onNavigationIconClick` is required. Wraps the top bar, pull-to-refresh, snackbar host and FAB so a feature screen declares content and nothing else.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:135</code></summary>
+<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoScreen.kt:89</code></summary>
 
 ```kotlin
-    }
+    val outcome by viewModel.lastOutcome.collectAsStateWithLifecycle()
 
     KptScaffold(
-        title = stringResource(Res.string.feature_settings_sync_drafts_title),
         onNavigationIconClick = onBackClick,
-        modifier = modifier,
+        title = stringResource(Res.string.screens_cloudtodo_detail_title),
+        modifier = modifier.testTag(TestTags.CloudTodo.SCREEN),
     ) {
 ```
 
@@ -262,15 +262,15 @@ fun KptScaffold(
 ```
 App screen scaffold whose back affordance is CONDITIONAL — pass `showNavigationIcon` when the same screen is reachable both as a tab root and as a pushed destination.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:135</code></summary>
+<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoScreen.kt:89</code></summary>
 
 ```kotlin
-    }
+    val outcome by viewModel.lastOutcome.collectAsStateWithLifecycle()
 
     KptScaffold(
-        title = stringResource(Res.string.feature_settings_sync_drafts_title),
         onNavigationIconClick = onBackClick,
-        modifier = modifier,
+        title = stringResource(Res.string.screens_cloudtodo_detail_title),
+        modifier = modifier.testTag(TestTags.CloudTodo.SCREEN),
     ) {
 ```
 
@@ -281,15 +281,15 @@ fun KptScaffold(
 ```
 Fully slot-based scaffold: the caller supplies `topBar`, `bottomBar` and the FAB composables.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:135</code></summary>
+<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoScreen.kt:89</code></summary>
 
 ```kotlin
-    }
+    val outcome by viewModel.lastOutcome.collectAsStateWithLifecycle()
 
     KptScaffold(
-        title = stringResource(Res.string.feature_settings_sync_drafts_title),
         onNavigationIconClick = onBackClick,
-        modifier = modifier,
+        title = stringResource(Res.string.screens_cloudtodo_detail_title),
+        modifier = modifier.testTag(TestTags.CloudTodo.SCREEN),
     ) {
 ```
 
@@ -333,16 +333,15 @@ enum class PasswordStrength
 ```
 Password strength bands used by `PasswordChecker`.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/utils/PasswordStrengthExtensions.kt:17</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/utils/PasswordChecker.kt:44</code></summary>
 
 ```kotlin
- */
-@Suppress("MagicNumber")
-fun Int.toPasswordStrengthOrNull(): PasswordStrength? = when (this) {
-    0 -> PasswordStrength.LEVEL_0
-    1 -> PasswordStrength.LEVEL_1
-    2 -> PasswordStrength.LEVEL_2
-    3 -> PasswordStrength.LEVEL_3
+        }
+
+        val result = getPasswordStrength(password)
+
+        return PasswordStrengthResult.Success(result)
+    }
 ```
 
 </details>

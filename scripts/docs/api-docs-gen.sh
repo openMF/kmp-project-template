@@ -162,7 +162,15 @@ build_callsite_index() {
   #
   # One pass rather than grep-per-symbol: the per-symbol version blew a 10-minute timeout on a single
   # module, and a grep|awk pipeline still re-read the tree. Everything here is read once.
+  #
+  # `| sort` is LOAD-BEARING, not tidiness. call_site() picks a symbol's example with `head -1`, so
+  # the example it renders is whichever matching file this index lists FIRST. `find` emits directory
+  # order, which is a property of the filesystem — APFS and ext4 disagree — so without the sort the
+  # generated API blocks differ between a contributor's Mac and the Linux CI runner, and
+  # `refresh.sh --check` reports DRIFT on one while reporting IN STEP on the other. Generated output
+  # has to be a pure function of the tree; every other `find` in this file is already sorted.
   find "$TMPL/feature" "$TMPL/core" -name '*.kt' -type f -not -path '*/build/*' 2>/dev/null \
+    | sort \
     | xargs awk '
         /^[[:space:]]*(import|package)[[:space:]]/ { next }
         /^[[:space:]]*(\/\/|\*|\/\*)/          { next }

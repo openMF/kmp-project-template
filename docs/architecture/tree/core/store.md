@@ -118,16 +118,15 @@ data class AmortizationCalcParams(
 ```
 Store key for one amortization calculation — the calculator's inputs. An amortization schedule for a 240-month loan is a 240-row list rebuilt on every keystroke when it is derived straight off a form `StateFlow`.
 
-<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/amortizationcalc/AmortizationViewModel.kt:65</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/calc/AmortizationCalcRepository.kt:22</code></summary>
 
 ```kotlin
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val breakdownState: StateFlow<ScreenState<AmortizationBreakdown>> = stateFlow
-        .map { AmortizationCalcParams(it.principal, it.ratePercent, it.tenureMonths) }
-        .distinctUntilChanged()
-        .flatMapLatest { params ->
-            if (params.isComputable) {
-                calcRepository.breakdownStream(params, viewModelScope)
+    /** A [ScreenDataStream] over the breakdown computed for [params]. */
+    fun breakdownStream(
+        params: AmortizationCalcParams,
+        scope: CoroutineScope,
+    ): ScreenDataStream<AmortizationBreakdown>
+}
 ```
 
 </details>
@@ -170,15 +169,16 @@ data class CloudTodoKey(val id: Int)
 ```
 Single-todo Store5 key (jsonplaceholder addresses todos by numeric id).
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/impl/CloudTodoRepositoryImpl.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/CloudTodoDataProviders.kt:33</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = CloudTodoRepository::class)
-class CloudTodoRepositoryImpl(
-    @FromStore(AppStoreIds.CloudTodo) private val readStore: Store<CloudTodoKey, CloudTodo>,
-    @FromStore(AppStoreIds.CloudTodoMutable) private val writeStore: MutableStore<CloudTodoKey, CloudTodo>,
-    private val gateway: MutationGateway,
-) : CloudTodoRepository {
+ */
+@DataProvider
+fun provideCloudTodoBookkeeper(dao: BookkeeperDao): Bookkeeper<CloudTodoKey> =
+    RoomBookkeeper(dao = dao, keySerializer = { "$CLOUD_TODO_KEY_PREFIX${it.id}" })
+
+/**
+ * Eager: drains the cloud-todo write backlog on the offline -> online edge.
 ```
 
 </details>
@@ -396,16 +396,16 @@ data class InterestRateSeriesKey(
 ```
 Composite key identifying a single FRED series request.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/ui/HomeViewModel.kt:207</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/EconomicRatesRepository.kt:34</code></summary>
 
 ```kotlin
+     */
+    fun interestRateSeriesStream(
+        key: InterestRateSeriesKey,
+        scope: CoroutineScope,
+    ): ScreenDataStream<InterestRateSeries>
 
-        /** Effective Federal Funds Rate — the overnight bank-to-bank lending rate. */
-        val FedFundsKey: InterestRateSeriesKey = InterestRateSeriesKey(
-            seriesId = "DFF",
-            name = "Federal Funds Rate",
-            unit = "%",
-            days = 30,
+    /**
 ```
 
 </details>
@@ -424,16 +424,16 @@ data class MacroIndicatorKey(
 ```
 Composite key identifying a single World Bank macro-indicator request.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroViewModel.kt:64</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt:42</code></summary>
 
 ```kotlin
+ */
+private val PINNED_MACRO_KEYS = listOf(
+    MacroIndicatorKey(countryCode = "US", indicator = IndicatorKind.GDP),
+    MacroIndicatorKey(countryCode = "IN", indicator = IndicatorKind.GDP),
+)
 
-        TRACKED_INDICATORS.forEach { kind ->
-            val key = MacroIndicatorKey(countryCode = countryCode, indicator = kind)
-            val stream = repository.macroIndicatorStream(key = key, scope = viewModelScope)
-            streams[kind] = stream
-            // Reset the per-cell state to Loading on re-subscription so the
-            // card visibly indicates "fetching for new country" instead of
+/**
 ```
 
 </details>
@@ -452,16 +452,13 @@ data class EmiParams(
 ```
 The Store key for a single EMI computation — the calculator's inputs. A calculator has no remote resource to key on, so the INPUTS are the key: two identical parameter sets are the same cache entry, and changing any field is a new entry.
 
-<details><summary>Used in the template — <code>feature/emi-calculator/src/commonMain/kotlin/kpt/feature/emicalculator/ui/EmiCalculatorViewModel.kt:46</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/emi/EmiCalculatorRepository.kt:26</code></summary>
 
 ```kotlin
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val emiState: StateFlow<ScreenState<EmiResult>> = stateFlow
-        .map { EmiParams(it.principal, it.ratePercent, it.tenureMonths) }
-        .distinctUntilChanged()
-        .flatMapLatest { params ->
-            if (params.isComputable) {
-                repository.emiStream(params, viewModelScope)
+
+    /** A [ScreenDataStream] over the EMI computed for [params]. */
+    fun emiStream(params: EmiParams, scope: CoroutineScope): ScreenDataStream<EmiResult>
+}
 ```
 
 </details>

@@ -49,16 +49,16 @@ interface CrashReporter
 ```
 Fork-customization seam for crash + non-fatal-error reporting. The toolkit ships `ConsoleCrashReporter` which writes everything to stdout — sufficient for local development but not for shipped builds.
 
-<details><summary>Used in the template — <code>core/firebase/src/commonMain/kotlin/kpt/core/firebase/loans/LoansCrashExtensions.kt:31</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/CloudTodoDataProviders.kt:54</code></summary>
 
 ```kotlin
- * what reaches the report, exactly as `LoansAnalyticsTracker` does.
- */
-fun CrashReporter.setLoanContext(
-    kind: String,
-    principal: Double,
-    tenureMonths: Int,
-) {
+    todoDao: CloudTodoDao,
+    repository: CloudTodoRepository,
+    crashReporter: CrashReporter?,
+): CloudTodoSyncOrchestrator = CloudTodoSyncOrchestrator(
+    scope = scope,
+    networkMonitor = networkMonitor,
+    bookkeeperDao = bookkeeperDao,
 ```
 
 </details>

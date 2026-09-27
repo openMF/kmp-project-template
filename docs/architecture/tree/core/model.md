@@ -27,16 +27,16 @@ data class PriceAlert(
 ```
 A price alert configured by the user for a specific coin.
 
-<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertsListScreen.kt:92</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt:24</code></summary>
 
 ```kotlin
-        ) { alerts, _ ->
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(items = alerts, key = PriceAlert::id) { alert ->
-                    AlertRow(alert = alert, onDelete = { viewModel.onDelete(alert.id) })
-                }
-            }
-        }
+/** Outbox for PriceAlert payloads — RoomSubmitOutbox writes to `framework_submit_drafts`. */
+@DataProvider(qualifier = "outbox.priceAlert")
+fun providePriceAlertOutbox(dao: DraftDao): SubmitOutbox<PriceAlert> =
+    RoomSubmitOutbox(dao = dao, serializer = PriceAlert.serializer())
+
+/**
+ * Eager: starts watching online events at Koin start and retries pending alerts on reconnect.
 ```
 
 </details>
@@ -46,16 +46,16 @@ enum class AlertDirection
 ```
 Which way a price must cross the threshold to fire the alert (above or below).
 
-<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertsListScreen.kt:107</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/alerts/AlertsReactiveInvalidationTest.kt:93</code></summary>
 
 ```kotlin
-) {
-    val directionLabel = when (alert.direction) {
-        AlertDirection.ABOVE -> stringResource(Res.string.screens_alerts_row_above)
-        AlertDirection.BELOW -> stringResource(Res.string.screens_alerts_row_below)
-        AlertDirection.PCT_CHANGE -> stringResource(Res.string.screens_alerts_row_pct_change)
-    }
-    ListItem(
+        id = id,
+        coinId = "coin-$id",
+        direction = AlertDirection.ABOVE,
+        targetValue = 100.0,
+        createdAtMs = 1_700_000_000_000L,
+    )
+}
 ```
 
 </details>
@@ -67,16 +67,16 @@ data class AmortizationRow(
 ```
 A single monthly row in a reducing-balance amortization schedule. Every row satisfies: `payment` = `principal` + `interest` (within floating-point tolerance).
 
-<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/di/CalculatorsModule.kt:61</code></summary>
+<details><summary>Used in the template — <code>core/domain/src/commonMain/kotlin/kpt/core/domain/calc/EmiCalculator.kt:76</code></summary>
 
 ```kotlin
-                    params.tenureMonths,
-                ).map { row ->
-                    AmortizationRow(
-                        month = row.installmentNumber,
-                        payment = row.principalPaid + row.interestPaid,
-                        principal = row.principalPaid,
-                        interest = row.interestPaid,
+ * pipe straight into a `LazyColumn` without guarding.
+ */
+fun amortizationSchedule(principal: Double, annualRatePercent: Double, tenureMonths: Int): List<AmortizationRow> {
+    if (principal <= 0.0 || tenureMonths <= 0) return emptyList()
+    val monthlyRate = annualRatePercent / 12.0 / 100.0
+    val emi = computeEmi(principal, annualRatePercent, tenureMonths).emi
+    val rows = ArrayList<AmortizationRow>(tenureMonths)
 ```
 
 </details>
@@ -88,16 +88,16 @@ data class BillReminder(
 ```
 A recurring (or one-time) bill the user wants to be reminded about. Purely local — no remote sync, no calendar export. The "reminder" itself is delivered by the in-app notification surface; this record is the declarative configuration.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsPreview.kt:88</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BankingDataProviders.kt:42</code></summary>
 
 ```kotlin
-            onPrune = {},
-            conflicts = listOf(
-                ConflictEntry("c1", "BillReminder", "rent-2026-08", "{}", "{}", null, 0),
-                ConflictEntry("c2", "Loan", "home-loan", "{}", "{}", null, 0),
-            ),
-            onAcceptServer = {},
-            onRetryLocal = {},
+ */
+@DataProvider(qualifier = "outbox.billReminder")
+fun provideBillReminderOutbox(dao: DraftDao): SubmitOutbox<BillReminder> =
+    RoomSubmitOutbox(dao = dao, serializer = BillReminder.serializer())
+
+/**
+ * Offline outbox for saved loan-comparison scenarios.
 ```
 
 </details>
@@ -107,16 +107,16 @@ enum class Recurrence
 ```
 How often a bill repeats.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:359</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/banking/BillReminderRepositoryTest.kt:224</code></summary>
 
 ```kotlin
-        amount = 75.0,
-        dueDay = 15,
-        recurrence = Recurrence.MONTHLY,
-        category = BillCategory.UTILITIES,
-        enabled = true,
-        reminderDaysBefore = 1,
-        createdAtMs = 0,
+        dueDay: Int = 15,
+        amount: Double = 100.0,
+        recurrence: Recurrence = Recurrence.MONTHLY,
+        category: BillCategory = BillCategory.UTILITIES,
+        enabled: Boolean = true,
+    ): BillReminder = BillReminder(
+        id = id,
 ```
 
 </details>
@@ -126,16 +126,16 @@ enum class BillCategory
 ```
 Coarse spending category — drives icons and dashboard grouping.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:360</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/banking/BillReminderRepositoryTest.kt:225</code></summary>
 
 ```kotlin
-        dueDay = 15,
-        recurrence = Recurrence.MONTHLY,
-        category = BillCategory.UTILITIES,
-        enabled = true,
-        reminderDaysBefore = 1,
-        createdAtMs = 0,
-        updatedAtMs = 0,
+        amount: Double = 100.0,
+        recurrence: Recurrence = Recurrence.MONTHLY,
+        category: BillCategory = BillCategory.UTILITIES,
+        enabled: Boolean = true,
+    ): BillReminder = BillReminder(
+        id = id,
+        name = "Bill $id",
 ```
 
 </details>
@@ -147,16 +147,16 @@ data class Loan(
 ```
 A personal loan tracked by the user — purely local, no remote sync.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:66</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BankingDataProviders.kt:32</code></summary>
 
 ```kotlin
-     * framework's, not this screen's.
-     */
-    val screenState: StateFlow<ScreenState<Loan>> = detailStream.state
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
+ */
+@DataProvider(qualifier = "outbox.loan")
+fun provideLoanOutbox(dao: DraftDao): SubmitOutbox<Loan> =
+    RoomSubmitOutbox(dao = dao, serializer = Loan.serializer())
 
-    /**
-     * Re-fetch the loan detail — wired to the read-side retry affordance surfaced by
+/**
+ * Offline outbox for bill-reminder submissions — a Room-backed queue of drafts awaiting the network.
 ```
 
 </details>
@@ -166,16 +166,16 @@ enum class LoanKind
 ```
 High-level loan category used for grouping, icons, and analytics.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanLabels.kt:21</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/banking/LoanRepositoryTest.kt:147</code></summary>
 
 ```kotlin
- * template we keep it inline so the multi-formKey showcase has zero infra dependencies.
- */
-internal fun loanKindLabel(kind: LoanKind): String = when (kind) {
-    LoanKind.PERSONAL -> "Personal"
-    LoanKind.MORTGAGE -> "Mortgage"
-    LoanKind.AUTO -> "Auto"
-    LoanKind.STUDENT -> "Student"
+    private fun sampleLoan(
+        id: String,
+        kind: LoanKind = LoanKind.MORTGAGE,
+        principal: Double = 250_000.0,
+        principalRemaining: Double = 200_000.0,
+        monthlyPayment: Double = 1_580.17,
+        nextDueDate: LocalDate = LocalDate(2026, 6, 1),
 ```
 
 </details>
@@ -187,16 +187,16 @@ data class LoanCalcScenario(
 ```
 Wizard payload — the serialized snapshot of the loan-calc wizard at the current step. Serializable so the offline-resilient `DraftSubmitHandler` can persist it across process death and the next session can resume in-place.
 
-<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/di/CalculatorsModule.kt:79</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BankingDataProviders.kt:49</code></summary>
 
 ```kotlin
-    viewModel { (scenarioId: String?) ->
-        LoanCalcWizardViewModel(
-            outbox = get(qualifier = AppOutboxQualifiers.LoanCalcScenario),
-            repository = get(),
-            scenarioIdArg = scenarioId,
-        )
-    }
+ */
+@DataProvider(qualifier = "outbox.loanCalcScenario")
+fun provideLoanCalcScenarioOutbox(dao: DraftDao): SubmitOutbox<LoanCalcScenario> =
+    RoomSubmitOutbox(dao = dao, serializer = LoanCalcScenario.serializer())
+
+/**
+ * Marker wrapper around the Loan syncer.
 ```
 
 </details>
@@ -208,16 +208,13 @@ data class AmortizationBreakdown(
 ```
 One amortization calculation: the per-installment `rows` and the `summary` totals.
 
-<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/di/CalculatorsModule.kt:55</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/calc/AmortizationCalcRepository.kt:24</code></summary>
 
 ```kotlin
-    single<AmortizationCompute> {
-        AmortizationCompute { params ->
-            AmortizationBreakdown(
-                rows = amortizationSchedule(
-                    params.principal,
-                    params.ratePercent,
-                    params.tenureMonths,
+        params: AmortizationCalcParams,
+        scope: CoroutineScope,
+    ): ScreenDataStream<AmortizationBreakdown>
+}
 ```
 
 </details>
@@ -229,16 +226,15 @@ data class CloudTodo(
 ```
 A cloud-synced todo — the toolkit's MUTABLE (offline-write) Store5 archetype showcase.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreenPreview.kt:146</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/CloudTodoRepository.kt:28</code></summary>
 
 ```kotlin
-            conflict = ConflictEntry(
-                id = "c-1",
-                entity = "CloudTodo",
-                key = "1",
-                localPayloadJson = """{"completed":true}""",
-                serverPayloadJson = """{"completed":false}""",
-                formRoute = null,
+     * @param scope scope the underlying Store shares — usually the ViewModel's, so the stream ends with the screen.
+     */
+    fun todoStream(id: Int, scope: CoroutineScope): ScreenDataStream<CloudTodo>
+
+    /** Flips `completed` and writes back through the MutableStore (Updater → server; Bookkeeper on failure). */
+    suspend fun toggleCompleted(todo: CloudTodo)
 ```
 
 </details>
@@ -250,16 +246,16 @@ data class CoinMarket(
 ```
 One row of the coin market list — the fields a list item renders, nothing more.
 
-<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinMarketsScreen.kt:118</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/CryptoRepository.kt:26</code></summary>
 
 ```kotlin
+interface CryptoRepository {
+    /** Streams the CoinGecko coin-markets list as a paged screen stream. */
+    fun coinMarketsStream(scope: CoroutineScope, pageSize: Int = 20): PagingScreenStream<CoinMarket>
 
-@Composable
-internal fun CoinMarketRow(coin: CoinMarket, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
+    /**
+     * Offline-first stream for one coin's detail.
+     *
 ```
 
 </details>
@@ -269,15 +265,13 @@ data class CoinDetail(
 ```
 A single coin's full detail, as shown on its own screen.
 
-<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinDetailViewModel.kt:44</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/CryptoRepository.kt:34</code></summary>
 
 ```kotlin
-
-    /** The repository-built stream — the screen renders it directly via `ScreenContent(stream)`. */
-    val detail: ScreenDataStream<CoinDetail> = repository.coinDetailStream(
-        coinId = coinId,
-        scope = viewModelScope,
-    )
+     * @param scope scope the underlying Store shares.
+     */
+    fun coinDetailStream(coinId: String, scope: CoroutineScope): ScreenDataStream<CoinDetail>
+}
 ```
 
 </details>
@@ -289,16 +283,16 @@ data class Country(
 ```
 A currency-bearing country: ISO code, display name and the currency it uses.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryPickerViewModel.kt:50</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/SupportedCountries.kt:33</code></summary>
 
 ```kotlin
-data class CountryPickerState(
-    val searchQuery: String,
-    val results: List<Country>,
-)
 
-/** User intents the picker accepts. */
-sealed interface CountryPickerAction {
+    /** Curated G20-plus list — alphabetised by display name for stable UX. */
+    val list: List<Country> = listOf(
+        Country(code = "AR", name = "Argentina", flagEmoji = "🇦🇷"),
+        Country(code = "AU", name = "Australia", flagEmoji = "🇦🇺"),
+        Country(code = "BR", name = "Brazil", flagEmoji = "🇧🇷"),
+        Country(code = "CA", name = "Canada", flagEmoji = "🇨🇦"),
 ```
 
 </details>
@@ -337,16 +331,16 @@ data class ExchangeRates(
 ```
 FX rates for one base currency on one day — the `rates` map is quote-code → rate.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:583</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/currency/CurrencyRepository.kt:42</code></summary>
 
 ```kotlin
-@Composable
-private fun ExchangeRateCard(
-    state: ScreenState<kpt.core.model.currency.ExchangeRates>,
-    freshness: FreshnessSignal,
-    onRetry: () -> Unit,
-    onSeeAll: () -> Unit,
-) {
+        scope: CoroutineScope,
+        fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
+    ): ScreenDataStream<ExchangeRates>
+
+    /**
+     * Offline-first stream for a historical series, re-keying whenever [keyFlow] emits.
+     *
 ```
 
 </details>
@@ -356,16 +350,16 @@ data class RateHistoryKey(
 ```
 Store key for a historical series: currency pair plus window length. The window is PART of the key, so widening it is a different key and a full re-fetch. That is the `read_windowed_series` contract — a widened window is not a page append.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:501</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/currency/CurrencyRepository.kt:53</code></summary>
 
 ```kotlin
+     * @param scope scope the underlying Store shares.
+     */
+    fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>
 
-    override fun rateHistoryStream(
-        keyFlow: Flow<RateHistoryKey>,
-        scope: CoroutineScope,
-    ): ScreenDataStream<RateHistory> = throw UnsupportedOperationException(
-        "Home dashboard does not subscribe to rate-history streams.",
-    )
+    /**
+     * Spot conversion-rate stream with a connectivity-driven [FetchPolicy]: [online] `true` →
+     * [FetchPolicy.NETWORK_ONLY] (always fresh), `false` → [FetchPolicy.CACHE_ONLY] (no error
 ```
 
 </details>
@@ -375,15 +369,16 @@ data class RateHistory(
 ```
 A historical FX series for one pair over a date range.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:503</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/currency/CurrencyRepository.kt:53</code></summary>
 
 ```kotlin
-        keyFlow: Flow<RateHistoryKey>,
-        scope: CoroutineScope,
-    ): ScreenDataStream<RateHistory> = throw UnsupportedOperationException(
-        "Home dashboard does not subscribe to rate-history streams.",
-    )
-}
+     * @param scope scope the underlying Store shares.
+     */
+    fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>
+
+    /**
+     * Spot conversion-rate stream with a connectivity-driven [FetchPolicy]: [online] `true` →
+     * [FetchPolicy.NETWORK_ONLY] (always fresh), `false` → [FetchPolicy.CACHE_ONLY] (no error
 ```
 
 </details>
@@ -411,16 +406,16 @@ data class Country(
 ```
 Country reference for the Banking Utility Toolkit's macro-indicator screens. Distinct from `kpt.core.model.currency.Country` which is a phone-number-formatting model.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryPickerViewModel.kt:50</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/SupportedCountries.kt:33</code></summary>
 
 ```kotlin
-data class CountryPickerState(
-    val searchQuery: String,
-    val results: List<Country>,
-)
 
-/** User intents the picker accepts. */
-sealed interface CountryPickerAction {
+    /** Curated G20-plus list — alphabetised by display name for stable UX. */
+    val list: List<Country> = listOf(
+        Country(code = "AR", name = "Argentina", flagEmoji = "🇦🇷"),
+        Country(code = "AU", name = "Australia", flagEmoji = "🇦🇺"),
+        Country(code = "BR", name = "Brazil", flagEmoji = "🇧🇷"),
+        Country(code = "CA", name = "Canada", flagEmoji = "🇨🇦"),
 ```
 
 </details>
@@ -432,16 +427,16 @@ data class InterestRateSeries(
 ```
 Domain representation of an interest-rate time series sourced from FRED (Federal Reserve Economic Data). The default consumer is the Banking Utility Toolkit's "B7 Interest Rate Tracker" screen.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:162</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/EconomicRatesRepository.kt:36</code></summary>
 
 ```kotlin
-    @Test
-    fun ratesWidgetIsLoadingUntilBothFredStreamsReachContent() = runTest {
-        val fed = MutableStateFlow<ScreenState<InterestRateSeries>>(ScreenState.Loading)
-        val mortgage = MutableStateFlow<ScreenState<InterestRateSeries>>(ScreenState.Loading)
-        val rates = FakeEconomicRatesRepository(
-            fed = fed,
-            mortgage = mortgage,
+        key: InterestRateSeriesKey,
+        scope: CoroutineScope,
+    ): ScreenDataStream<InterestRateSeries>
+
+    /**
+     * Stream observations for a parameter-flow whose value can change at
+     * runtime (e.g. user switches series in the UI). Each new emission on
 ```
 
 </details>
@@ -451,16 +446,16 @@ data class RateObservation(
 ```
 Single observation in an interest-rate time series.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:372</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/fred/dto/FredObservationsDto.kt:103</code></summary>
 
 ```kotlin
-        current = current,
-        unit = "%",
-        observations = listOf(RateObservation(LocalDate(2026, 5, 23), current)),
-        source = "FRED",
-    )
-
-    // endregion
+     * Callers should treat `null` as "drop this row" — never as "value = 0".
+     */
+    fun toDomainOrNull(): RateObservation? {
+        val numeric = if (value == NO_DATA_MARKER) null else value.toDoubleOrNull()
+        val parsedDate = runCatching { LocalDate.parse(date) }.getOrNull()
+        return if (numeric != null && parsedDate != null) {
+            RateObservation(date = parsedDate, value = numeric)
 ```
 
 </details>
@@ -472,16 +467,16 @@ data class MacroIndicator(
 ```
 Domain representation of a country-level macro indicator sourced from the World Bank Open Data API. The default consumer is the Banking Utility Toolkit's "B8 Country Macro Snapshot" screen.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroViewModel.kt:48</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt:51</code></summary>
 
 ```kotlin
-) {
+@RepositoryBinding(binds = MacroIndicatorsRepository::class)
+class MacroIndicatorsRepositoryImpl(
+    @FromStore(AppStoreIds.MacroIndicator) private val macroIndicatorStore: Store<MacroIndicatorKey, MacroIndicator>,
+) : MacroIndicatorsRepository {
 
-    private val streams: MutableMap<IndicatorKind, ScreenDataStream<MacroIndicator>> =
-        mutableMapOf()
-    private val subscriptionJobs: MutableMap<IndicatorKind, Job> = mutableMapOf()
-
-    init {
+    override fun macroIndicatorStream(
+        key: MacroIndicatorKey,
 ```
 
 </details>
@@ -491,15 +486,16 @@ data class IndicatorObservation(
 ```
 Single year-level macro observation.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreenPreview.kt:38</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/worldbank/dto/WorldBankResponseDto.kt:65</code></summary>
 
 ```kotlin
-    indicator = kind,
-    observations = listOf(
-        IndicatorObservation(year = 2024, value = value),
-        IndicatorObservation(year = 2025, value = value * 1.02),
-    ),
-)
+            ?: countryCode
+        val parsed = observations
+            .map { IndicatorObservation(year = it.dateAsYear(), value = it.value) }
+            .filter { it.year > 0 }
+            .sortedBy { it.year }
+        return MacroIndicator(
+            countryCode = countryCode,
 ```
 
 </details>
@@ -509,16 +505,16 @@ enum class IndicatorKind(val worldBankCode: String)
 ```
 Macro indicators surfaced by the toolkit. Each kind maps to a stable World Bank indicator code via `worldBankCode`.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:83</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt:42</code></summary>
 
 ```kotlin
-    onBackClick: () -> Unit,
-    onPickCountry: () -> Unit,
-    onOpenIndicator: (IndicatorKind) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: CountryMacroViewModel = koinViewModel { parametersOf(countryCode) },
-) {
-    val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
+ */
+private val PINNED_MACRO_KEYS = listOf(
+    MacroIndicatorKey(countryCode = "US", indicator = IndicatorKind.GDP),
+    MacroIndicatorKey(countryCode = "IN", indicator = IndicatorKind.GDP),
+)
+
+/**
 ```
 
 </details>
@@ -530,16 +526,13 @@ data class EmiResult(
 ```
 Output of an EMI calculation: the monthly instalment plus the totals it implies.
 
-<details><summary>Used in the template — <code>feature/emi-calculator/src/commonMain/kotlin/kpt/feature/emicalculator/ui/EmiCalculatorScreenPreview.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/emi/EmiCalculatorRepository.kt:26</code></summary>
 
 ```kotlin
- */
 
-private val sampleResult = EmiResult(
-    emi = 8_722.61,
-    totalPayment = 104_671.32,
-    totalInterest = 4_671.32,
-)
+    /** A [ScreenDataStream] over the EMI computed for [params]. */
+    fun emiStream(params: EmiParams, scope: CoroutineScope): ScreenDataStream<EmiResult>
+}
 ```
 
 </details>
@@ -551,13 +544,16 @@ data class ProfileInfo(
 ```
 What the profile screen displays. In the template this carries only the app's display name — the demo profile is a local, signed-out placeholder.
 
-<details><summary>Used in the template — <code>feature/profile/src/commonMain/kotlin/kpt/feature/profile/demo/ui/ProfileViewModel.kt:41</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/profile/impl/ProfileRepositoryImpl.kt:32</code></summary>
 
 ```kotlin
+@RepositoryBinding(binds = ProfileRepository::class)
+internal class ProfileRepositoryImpl(
+    @FromStore(AppStoreIds.Profile) private val profileStore: Store<Unit, ProfileInfo>,
+) : ProfileRepository {
 
-    /** The repository-built stream — the screen renders it directly. */
-    val profile: ScreenDataStream<ProfileInfo> = repository.profileStream(viewModelScope)
-}
+    override fun profileStream(scope: CoroutineScope): ScreenDataStream<ProfileInfo> =
+        profileStore.asScreenStream(
 ```
 
 </details>
@@ -576,16 +572,16 @@ enum class DarkThemeConfig(val configName: String, val osValue: Int)
 ```
 The user's dark-mode preference: follow the system, or force light/dark. `osValue` maps to the platform's own night-mode constant, so the choice can be handed straight to the OS rather than re-interpreted per platform.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsViewModel.kt:74</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:62</code></summary>
 
 ```kotlin
-            is SettingsAction.UpdateDarkThemeConfig -> viewModelScope.launch {
-                analyticsHelper.logThemeChanged(action.darkThemeConfig)
-                settingsRepository.setDarkThemeConfig(action.darkThemeConfig)
-            }
-            is SettingsAction.UpdateDynamicColor -> viewModelScope.launch {
-                analyticsHelper.logDynamicColorPreferences(action.useDynamicColor)
-                settingsRepository.setDynamicColorPreference(action.useDynamicColor)
+        get() = preferencesRepository.observeLanguage
+
+    override val observeDarkThemeConfig: Flow<DarkThemeConfig>
+        get() = preferencesRepository.observeDarkThemeConfig
+
+    override val observeDynamicColorPreference: Flow<Boolean>
+        get() = preferencesRepository.observeDynamicColorPreference
 ```
 
 </details>
@@ -597,16 +593,16 @@ enum class LanguageConfig(
 ```
 Every language the app can be switched to, in the user's OWN language. GENERATED from core/registries/LOCALE_REGISTRY.yaml by `core/scripts/language-picker-sync.sh --write` — DO NOT HAND-EDIT.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/LanguageDialog.kt:64</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:59</code></summary>
 
 ```kotlin
-    onDismiss: () -> Unit,
-    onRetry: () -> Unit,
-    onChangeLanguage: (language: LanguageConfig) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    AlertDialog(
-        properties = DialogProperties(usePlatformDefaultWidth = false),
+        get() = preferencesRepository.passcode
+
+    override val observeLanguage: Flow<LanguageConfig>
+        get() = preferencesRepository.observeLanguage
+
+    override val observeDarkThemeConfig: Flow<DarkThemeConfig>
+        get() = preferencesRepository.observeDarkThemeConfig
 ```
 
 </details>
@@ -618,16 +614,15 @@ enum class ThemeBrand(val brandName: String)
 ```
 The selected colour brand. A fork extends this to offer its own palettes.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsViewModel.kt:70</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:73</code></summary>
 
 ```kotlin
-            is SettingsAction.UpdateThemeBrand -> viewModelScope.launch {
-                analyticsHelper.logThemeBrandChanged(action.themeBrand)
-                settingsRepository.setThemeBrand(action.themeBrand)
-            }
-            is SettingsAction.UpdateDarkThemeConfig -> viewModelScope.launch {
-                analyticsHelper.logThemeChanged(action.darkThemeConfig)
-                settingsRepository.setDarkThemeConfig(action.darkThemeConfig)
+    override suspend fun setLanguage(language: LanguageConfig) = preferencesRepository.setLanguage(language)
+
+    override suspend fun setThemeBrand(themeBrand: ThemeBrand) = preferencesRepository.setThemeBrand(themeBrand)
+
+    override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) =
+        preferencesRepository.setDarkThemeConfig(darkThemeConfig)
 ```
 
 </details>
@@ -646,16 +641,15 @@ data class UserData(
 ```
 Everything the app persists about the current user — theme, language, onboarding progress and the lock state.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonTest/kotlin/kpt/feature/settings/SettingsViewModelTest.kt:78</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:40</code></summary>
 
 ```kotlin
-     */
-    private class FakeUserDataRepository(
-        private val initial: UserData,
-        private val stateFlowOverride: Flow<ScreenState<UserData>>? = null,
-        private val refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
-    ) : UserDataRepository {
-        val current = MutableStateFlow(initial)
+class UserDataRepositoryImpl(
+    private val preferencesRepository: UserPreferencesRepository,
+    @FromStore(AppStoreIds.UserData) private val userDataStore: Store<Unit, UserData>,
+) : UserDataRepository {
+    override val userData: StateFlow<UserData>
+        get() = preferencesRepository.userData
 ```
 
 </details>
@@ -667,14 +661,15 @@ data class WatchlistItem(
 ```
 Domain model for a personal-watchlist row (the `read_local_list` demo).
 
-<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:118</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/watchlist/impl/WatchlistRepositoryImpl.kt:43</code></summary>
 
 ```kotlin
-    }
-
-    override fun watchlistStream(scope: CoroutineScope): ScreenDataStream<List<WatchlistItem>> =
-        error("watchlistStream is the read-side feature's concern; not used by AddToWatchlistViewModel")
-}
+@RepositoryBinding(binds = WatchlistRepository::class)
+internal class WatchlistRepositoryImpl(
+    @FromStore(AppStoreIds.Watchlist) private val watchlistStore: Store<Unit, List<WatchlistItem>>,
+    @FromStore(AppStoreIds.WatchlistMutable) private val watchlistWriteStore: MutableStore<String, WatchlistItem>,
+    private val dao: WatchlistDao,
+) : WatchlistRepository {
 ```
 
 </details>

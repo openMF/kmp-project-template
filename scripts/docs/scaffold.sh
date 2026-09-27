@@ -119,7 +119,10 @@ def contract_rows(m_path):
 
 made, kept = 0, 0
 for base, m in mods:
-    d = os.path.join(ARCH, "modules", base)
+    # The module pages live UNDER THE TREE: docs/architecture/tree/<layer>/<module>.md.
+    # One hierarchy, so a reader navigating `core/` from the project tree lands on the module
+    # guides rather than being sent to a parallel `modules/` directory.
+    d = os.path.join(ARCH, "tree", base)
     path = os.path.join(d, "%s.md" % m)
     f = facts(base, m)
     mp = "%s/%s" % (base, m)
@@ -196,6 +199,21 @@ lines = [TOC_BEGIN, "", "## Contents", "",
          "are the instruction surface.", "",
          "### Modules", "",
          "One guide per module, named 1:1 with its training-corpus surface.", ""]
+
+# The project tree section, generated so the TOC cannot drift from the pages that exist. It is inserted
+# BEFORE "### Modules" because a reader who does not know the repo needs its shape before a per-module
+# API reference — `feature/` is the largest area here and had no page at all until this existed.
+_tree_dir = os.path.join(tpl, "docs/architecture/tree")
+if os.path.isdir(_tree_dir):
+    _t = ["### Project tree", "",
+          "Every top-level area of the repository — measured facts, plus authored significance.", "",
+          "- [All areas](PROJECT_TREE.md)"]
+    for _f in sorted(os.listdir(_tree_dir)):
+        if _f.endswith(".md"):
+            _t.append("- [`%s/`](tree/%s)" % (_f[:-3], _f))
+    _t.append("")
+    _at = lines.index("### Modules")
+    lines[_at:_at] = _t
 for base in ("core-base", "core"):
     group = [(b, m) for b, m in mods if b == base]
     if not group: continue
@@ -206,7 +224,7 @@ for base in ("core-base", "core"):
     for b, m in group:
         rows = contract_rows("%s/%s" % (b, m))
         tag = "  ·  contracts: " + ", ".join("`@%s`" % r[0] for r in rows) if rows else ""
-        lines.append("- [`%s/%s`](modules/%s/%s.md)%s" % (b, m, b, m, tag))
+        lines.append("- [`%s/%s`](tree/%s/%s.md)%s" % (b, m, b, m, tag))
     lines.append("")
 lines += ["### Cross-cutting", "",
           "Concerns that span modules and are anchored by content digest rather than a module tree.", ""]

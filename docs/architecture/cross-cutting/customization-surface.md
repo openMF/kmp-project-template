@@ -31,7 +31,7 @@ that whole class of silent loss becomes impossible.
 > The most-edited `owner: fork` files are the **white-label extension seams** — the registries a fork
 > uses to add features, tabs, the home body, and startup hooks without touching template infra. They are
 > documented in
-> [`cmp-navigation/.../registry/README.md`](../../cmp-navigation/src/commonMain/kotlin/cmp/navigation/registry/README.md).
+> [`cmp-navigation/.../registry/README.md`](../README.md).
 
 ## Precedence
 

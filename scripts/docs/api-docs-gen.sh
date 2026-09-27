@@ -14,7 +14,7 @@
 # Measured 2026-09-26 on kmp-project-template:
 #   · core-base/* commonMain: 1,674 public declarations, 959 KDoc blocks (57% documented at source)
 #   · the generator-facing CORE_BASE_*.md guides: 38 callable signatures documented (2%)
-#   · docs/architecture/modules/core-base/*.md: prose-level ("you do not write here"), ~9 API lines
+#   · docs/architecture/tree/core-base/*.md: prose-level ("you do not write here"), ~9 API lines
 # So the KDoc largely EXISTS in source and simply never reaches a reader. This script is the bridge.
 #
 # SoT IS THE TEMPLATE, ALWAYS
@@ -300,7 +300,8 @@ emit_module() {  # $1 = layer/module
 # the block is injected between markers and everything outside them is preserved byte-for-byte —
 # the same contract `architecture-docs-scaffold.sh` uses for `<!-- scaffold:end -->`.
 page_for() {  # $1 = layer/module → docs path
-  printf '%s/docs/architecture/modules/%s/%s.md' "$TMPL" "${1%%/*}" "${1##*/}"
+  # Module guides live under the TREE — one hierarchy, not a parallel modules/ directory.
+  printf '%s/docs/architecture/tree/%s/%s.md' "$TMPL" "${1%%/*}" "${1##*/}"
 }
 
 # Regenerate one module's api-docs block in place.
@@ -381,13 +382,23 @@ write_sidebar() {
         done < <(find "$TMPL/docs/architecture/$d" -maxdepth 1 -name '*.md' 2>/dev/null | sort)
       fi
     done
+    # Project tree FIRST among the sections: it is the map, and a reader who does not yet know the
+    # repo needs the shape before the per-module API reference.
+    if [ -f "$TMPL/docs/architecture/PROJECT_TREE.md" ]; then
+      printf -- '\n- **Project tree**\n'
+      printf -- '  - [All areas](/architecture/PROJECT_TREE.md)\n'
+      while IFS= read -r f; do
+        [ -z "$f" ] && continue
+        printf -- '  - [%s/](/architecture/tree/%s)\n' "$(basename "$f" .md)" "$(basename "$f")"
+      done < <(find "$TMPL/docs/architecture/tree" -maxdepth 1 -name '*.md' 2>/dev/null | sort)
+    fi
     for layer in core-base core; do
-      if [ -d "$TMPL/docs/architecture/modules/$layer" ]; then
+      if [ -d "$TMPL/docs/architecture/tree/$layer" ]; then
         printf -- '\n- **`%s/` API reference**\n' "$layer"
         while IFS= read -r f; do
           [ -z "$f" ] && continue
-          printf -- '  - [%s/%s](/architecture/modules/%s/%s)\n' "$layer" "$(basename "$f" .md)" "$layer" "$(basename "$f")"
-        done < <(find "$TMPL/docs/architecture/modules/$layer" -maxdepth 1 -name '*.md' 2>/dev/null | sort)
+          printf -- '  - [%s/%s](/architecture/tree/%s/%s)\n' "$layer" "$(basename "$f" .md)" "$layer" "$(basename "$f")"
+        done < <(find "$TMPL/docs/architecture/tree/$layer" -maxdepth 1 -name '*.md' 2>/dev/null | sort)
       fi
     done
     for d in setup deployment release secrets ios claude reports; do

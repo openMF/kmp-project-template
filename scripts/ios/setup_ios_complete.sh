@@ -513,15 +513,17 @@ print_warning "IMPORTANT: Keep these files secure and NEVER commit them to git!"
 print_info "They are already in .gitignore"
 echo
 
+# Deployment is Fastlane lanes invoked from deployment/ — the scripts/deploy/ wrappers this used to
+# point at were removed. Printing a path that does not exist sends the reader nowhere.
 print_info "Next Steps:"
 echo "  1. Test deployment to Firebase:"
-echo "     bash scripts/deploy/deploy_firebase.sh"
+echo "     (cd deployment && bundle exec fastlane ios deploy_on_firebase)"
 echo
 echo "  2. Test deployment to TestFlight:"
-echo "     bash scripts/deploy/deploy_testflight.sh"
+echo "     (cd deployment && bundle exec fastlane ios beta)"
 echo
 echo "  3. Deploy to App Store (when ready):"
-echo "     bash scripts/deploy/deploy_appstore.sh"
+echo "     (cd deployment && bundle exec fastlane ios release)"
 echo
 
 print_info "Optional: Setup APN for push notifications"

@@ -18,5 +18,6 @@ package kpt.core.model.profile
  * model and returning it from the store, with the ViewModel and Composable untouched.
  */
 data class ProfileInfo(
+    /** The fork's display name, from `app-profile` — the only field the signed-out demo profile has to show. */
     val appDisplayName: String,
 )

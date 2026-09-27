@@ -9,5 +9,9 @@
  */
 package kpt.core.store.cloudtodo.impl
 
-/** Single-todo Store5 key (jsonplaceholder addresses todos by numeric id). */
+/**
+ * Single-todo Store5 key (jsonplaceholder addresses todos by numeric id).
+ *
+ * @property id jsonplaceholder's numeric todo id.
+ */
 data class CloudTodoKey(val id: Int)

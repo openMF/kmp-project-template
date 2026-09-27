@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/designsystem sha=ddef521cde7ed6cfc7c0a4f15a29a9308d55e04f -->
+<!-- api-docs:begin module=core-base/designsystem sha=e9e3bdf32154cb2319670a5343e947580e0f9bec -->
 ## API reference
 
-_Generated from `core-base/designsystem` at tree `ddef521cde7e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/designsystem` at tree `e9e3bdf32154` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -36,7 +36,7 @@ object BarGeometry
 ```
 Pure-function math for bar chart composables. Normalizes each bar to a fraction in `[0f, 1f]` against the series' max. **Degenerate-input contracts**: - Empty list → empty result.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptBarChart.kt:74</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptBarChart.kt:76</code></summary>
 
 ```kotlin
 ) {
@@ -60,7 +60,7 @@ object DonutGeometry
 ```
 Pure-function math for donut chart composables. Extracted from the Composable so sweep-angle correctness can be tested without a Compose test rule. **Degenerate-input contracts**: - Empty list → empty result.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptDonutChart.kt:67</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptDonutChart.kt:72</code></summary>
 
 ```kotlin
 ) {
@@ -115,7 +115,7 @@ fun AppCard(
 ```
 Material 3 elevated card for grouping related content (loan rows, form sections, dashboard tiles).
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:192</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:193</code></summary>
 
 ```kotlin
         }
@@ -153,7 +153,7 @@ fun HeroCard(
 ```
 Hero card — the dashboard's first impression.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:176</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:177</code></summary>
 
 ```kotlin
         }
@@ -274,7 +274,7 @@ Animated shimmer placeholder box. **Future migration:** new call sites should pr
 ```kotlin
 fun KptShimmerListItem(
 ```
-_No KDoc at source._
+Shimmer placeholder shaped like a list row — avatar, title and subtitle blocks. A loading affordance, not content: it must never outlive the load, or it reads as a broken row.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/KptToastHost.kt`
 
@@ -288,28 +288,9 @@ The app's transient-message host. Place once near the root of the UI. Replaces `
 ```kotlin
 fun KptTopAppBar(configuration: KptTopAppBarConfiguration)
 ```
-_No KDoc at source._
+Top app bar built from a declarative `KptTopAppBarConfiguration`. The DSL form — prefer it when a screen's bar is assembled from data or varies by state; the parameter overloads below are shorthands over this.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:62</code></summary>
-
-```kotlin
-        topBar = {
-            if (title != null) {
-                KptTopAppBar(
-                    title = title,
-                    onNavigationIconClick = onNavigationIconClick,
-                    actions = actions,
-                )
-```
-
-</details>
-
-```kotlin
-fun KptTopAppBar(
-```
-_No KDoc at source._
-
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:62</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -326,28 +307,9 @@ _No KDoc at source._
 ```kotlin
 fun KptTopAppBar(
 ```
-_No KDoc at source._
+Title-only bar with no navigation icon — a tab root. `variant` selects the Material 3 size.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:62</code></summary>
-
-```kotlin
-        topBar = {
-            if (title != null) {
-                KptTopAppBar(
-                    title = title,
-                    onNavigationIconClick = onNavigationIconClick,
-                    actions = actions,
-                )
-```
-
-</details>
-
-```kotlin
-fun KptTopAppBar(
-```
-_No KDoc at source._
-
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:62</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -364,9 +326,9 @@ _No KDoc at source._
 ```kotlin
 fun KptTopAppBar(
 ```
-_No KDoc at source._
+Title plus a back affordance, always shown — a pushed detail screen.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:62</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -383,9 +345,47 @@ _No KDoc at source._
 ```kotlin
 fun KptTopAppBar(
 ```
-_No KDoc at source._
+Title with a CONDITIONAL back affordance, for a screen reachable both as a tab root and as a pushed destination.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:62</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
+
+```kotlin
+        topBar = {
+            if (title != null) {
+                KptTopAppBar(
+                    title = title,
+                    onNavigationIconClick = onNavigationIconClick,
+                    actions = actions,
+                )
+```
+
+</details>
+
+```kotlin
+fun KptTopAppBar(
+```
+Two-line bar: title over a subtitle, for a screen whose context needs naming (an account, a date range) without stealing the title.
+
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
+
+```kotlin
+        topBar = {
+            if (title != null) {
+                KptTopAppBar(
+                    title = title,
+                    onNavigationIconClick = onNavigationIconClick,
+                    actions = actions,
+                )
+```
+
+</details>
+
+```kotlin
+fun KptTopAppBar(
+```
+Title plus ONE trailing action. For more than one, use the configuration overload rather than growing the parameter list.
+
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -402,37 +402,37 @@ _No KDoc at source._
 ```kotlin
 fun KptSearchAppBar(
 ```
-_No KDoc at source._
+Bar whose title area is a live search field, with the query hoisted to the caller.
 
 ```kotlin
 fun KptProfileAppBar(
 ```
-_No KDoc at source._
+Bar carrying a profile avatar as its trailing action.
 
 ```kotlin
 fun KptSettingsAppBar(
 ```
-_No KDoc at source._
+Bar preset for settings screens — back affordance plus the settings title treatment.
 
 ```kotlin
 fun KptSmallTopAppBar(
 ```
-_No KDoc at source._
+Shorthand for the Small Material 3 bar — the default height.
 
 ```kotlin
 fun KptCenterAlignedTopAppBar(
 ```
-_No KDoc at source._
+Shorthand for the centre-aligned bar.
 
 ```kotlin
 fun KptMediumTopAppBar(
 ```
-_No KDoc at source._
+Shorthand for the Medium (collapsing) bar.
 
 ```kotlin
 fun KptLargeTopAppBar(
 ```
-_No KDoc at source._
+Shorthand for the Large (collapsing) bar.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/KptProgress.kt`
 
@@ -460,12 +460,12 @@ T-shirt sizes for `KptProgress` variants. Maps to (diameter, stroke) dp pairs vi
 ```kotlin
 fun KptSlideTransition(
 ```
-_No KDoc at source._
+Slides `content` in and out along `direction`, using the shared motion durations.
 
 ```kotlin
 enum class SlideDirection { Left, Right, Up, Down }
 ```
-_No KDoc at source._
+Direction a `KptSlideTransition` enters from.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/core/ComponentStateHolder.kt`
 
@@ -656,7 +656,7 @@ interface KptColorScheme
 ```
 The full Material 3 color role set. Roles, not literal colors — a component asks for `onSurfaceVariant`, never a hex value, so light and dark themes and a fork's palette all work without touching the component.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:126</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:132</code></summary>
 
 ```kotlin
         androidTheme -> if (darkTheme) darkColorScheme() else lightColorScheme()
@@ -691,7 +691,7 @@ interface KptTypography
 ```
 The Material 3 type scale — display through label, each in three sizes.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:128</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:134</code></summary>
 
 ```kotlin
     }.toKptColorScheme()
@@ -819,7 +819,7 @@ data class TopAppBarAction(
 ```
 Represents an action button in the top app bar. Action buttons are displayed on the right side of the top app bar and provide quick access to common functions like search, menu, or other contextual actions.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:56</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:63</code></summary>
 
 ```kotlin
         .only(WindowInsetsSides.Horizontal),
@@ -836,7 +836,7 @@ Represents an action button in the top app bar. Action buttons are displayed on 
 ```kotlin
 annotation class TopAppBarDsl
 ```
-_No KDoc at source._
+DSL marker for the top-app-bar builders, so a nested block cannot implicitly configure an outer bar.
 
 ```kotlin
 class KptTopAppBarBuilder
@@ -897,7 +897,7 @@ fun KptMaterialTheme(
 ```
 KptMaterialTheme provides Material3 integration for KptTheme. This composable applies KptTheme values to MaterialTheme automatically, making all Material3 components use KptTheme design tokens.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:138</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
 
 ```kotlin
     val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
@@ -916,7 +916,7 @@ fun KptMaterialTheme(
 ```
 KptMaterialTheme with dark theme support. Provides automatic light/dark theme switching with Material3 integration.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:138</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
 
 ```kotlin
     val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
@@ -935,7 +935,7 @@ fun KptMaterialTheme(
 ```
 DSL builder for creating KptMaterialTheme with custom configuration
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:138</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
 
 ```kotlin
     val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
@@ -1033,12 +1033,12 @@ Card(
 ```kotlin
 fun KptTypography.toMaterial3Typography(fontFamily: FontFamily? = FontFamily.Default): Typography
 ```
-_No KDoc at source._
+Adapts a `KptTypography` to Material 3's `Typography`, so Kpt components and raw Material components render the same type.
 
 ```kotlin
 fun Typography.toKptTypography(fontFamily: FontFamily? = FontFamily.Default): KptTypography =
 ```
-_No KDoc at source._
+Adapts a Material 3 `Typography` into a `KptTypography`, applying `fontFamily` to every style. The bridge for a fork that already themes with `MaterialTheme` — its existing scale drives the Kpt components without maintaining the type twice.
 
 ```kotlin
 fun KptTypography.toMaterial3Typography(): Typography
@@ -1048,7 +1048,7 @@ Extension function to convert KptTypography to Material3 Typography This ensures
 ```kotlin
 fun Typography.toKptTypography(): KptTypography = KptTypographyImpl(
 ```
-_No KDoc at source._
+Adapts a Material 3 `Typography` into a `KptTypography`, keeping each style's own font family.
 
 ```kotlin
 fun KptColorScheme.toMaterial3ColorScheme(): ColorScheme
@@ -1058,7 +1058,7 @@ Extension function to convert KptColorScheme to Material3 ColorScheme This ensur
 ```kotlin
 fun ColorScheme.toKptColorScheme(): KptColorScheme = KptColorSchemeImpl(
 ```
-_No KDoc at source._
+Adapts a Material 3 `ColorScheme` into a `KptColorScheme` — role for role, no colour invented.
 
 ```kotlin
 fun KptShapes.toMaterial3Shapes(): Shapes
@@ -1068,7 +1068,7 @@ Extension function to convert KptShapes to Material3 Shapes This ensures that al
 ```kotlin
 fun Shapes.toKptShapes(): KptShapes = KptShapesImpl(
 ```
-_No KDoc at source._
+Adapts a Material 3 `Shapes` into a `KptShapes`.
 
 ```kotlin
 fun KptElevation.cardElevation(
@@ -1195,7 +1195,7 @@ AdaptiveListDetailPaneScaffold(
 ```kotlin
 fun <T : PaneScaffoldItem<*>> AdaptiveNavigableListDetailPaneScaffold(
 ```
-_No KDoc at source._
+List-detail scaffold that adapts to window size: two panes side by side when wide, and a navigable single pane when narrow.
 
 ```kotlin
 sealed interface SelectionVisibilityState
@@ -1205,7 +1205,7 @@ Describes the current selection state for the list pane within an adaptive layou
 ```kotlin
 interface PaneScaffoldItem<T : Any>
 ```
-_No KDoc at source._
+An item the scaffold can show in either pane, carrying the identity it is selected by.
 
 - `val id: T`
 
@@ -1228,45 +1228,45 @@ A responsive scaffold that adapts the navigation UI (drawer, rail, or bottom bar
 ```kotlin
 fun KptFlowColumn(
 ```
-_No KDoc at source._
+Column that wraps into additional columns when content exceeds the available height.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptFlowRow.kt`
 
 ```kotlin
 fun KptFlowRow(
 ```
-_No KDoc at source._
+Row that wraps onto additional lines when content exceeds the available width.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptGrid.kt`
 
 ```kotlin
 fun KptGrid(
 ```
-_No KDoc at source._
+Responsive grid whose column count derives from the available width via `BreakpointConfiguration`.
 
 ```kotlin
 interface GridScope
 ```
-_No KDoc at source._
+Receiver for `KptGrid` content — declare items and spans here.
 
 - `fun Modifier.gridItem(span: Int = 1): Modifier`
 
 ```kotlin
 data class GridConfiguration(
 ```
-_No KDoc at source._
+Spacing and padding for a `KptGrid`; defaults come from the theme spacing scale.
 
 ```kotlin
 data class BreakpointConfiguration(
 ```
-_No KDoc at source._
+Width thresholds mapping available width to a column count.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptMasonryGrid.kt`
 
 ```kotlin
 fun KptMasonryGrid(
 ```
-_No KDoc at source._
+Staggered grid for items of differing heights, packing each column independently.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptResponsiveLayout.kt`
 
@@ -1340,31 +1340,31 @@ fun MyScreen() {
 ```kotlin
 fun KptSidebarLayout(
 ```
-_No KDoc at source._
+Persistent sidebar beside content, for wide windows.
 
 ```kotlin
 data class SidebarConfiguration(
 ```
-_No KDoc at source._
+Width and behaviour of a `KptSidebarLayout` sidebar.
 
 ```kotlin
 enum class SidebarPosition { Start, End }
 ```
-_No KDoc at source._
+Which edge the sidebar occupies.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptSplitPane.kt`
 
 ```kotlin
 fun KptSplitPane(
 ```
-_No KDoc at source._
+Two panes with a draggable divider, for wide windows. `minLeftWidth` stops the divider being dragged to a width where the left pane is unusable.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptStack.kt`
 
 ```kotlin
 fun KptStack(
 ```
-_No KDoc at source._
+Z-stacks its children with a shared alignment — overlays, badges, layered art.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/theme/KptColorSchemeImpl.kt`
 
@@ -1398,7 +1398,7 @@ data class KptThemeProviderImpl(
 ```
 Default `KptThemeProvider`, composing the five default scales into one design language.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:130</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:136</code></summary>
 
 ```kotlin
     val mifosTypography = Typography().toKptTypography(fontFamily)
@@ -1511,7 +1511,7 @@ data class Motion(
 ```
 Shared motion specs — durations, easings, and motion-pattern parameters. Values align with Material 3 motion guidance (https://m3.material.io/styles/motion/easing-and-duration). All durations in milliseconds.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:151</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:157</code></summary>
 
 ```kotlin
         CompositionLocalProvider(
@@ -1528,9 +1528,9 @@ Shared motion specs — durations, easings, and motion-pattern parameters. Value
 ```kotlin
 val LocalMotion = staticCompositionLocalOf { Motion() }
 ```
-_No KDoc at source._
+CompositionLocal carrying the app's motion scale — the shared durations and easings. Read this rather than hardcoding a duration: symmetric enter/exit timings are what make transitions feel like one system instead of per-screen choices.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:151</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:157</code></summary>
 
 ```kotlin
         CompositionLocalProvider(
@@ -1556,5 +1556,5 @@ Last-read snapshot of the active `Motion`. Updated as a side effect whenever any
 
 ---
 
-_64 type(s), 179 function(s)/property(ies); 115 carry KDoc at source; 17 authored example(s); 24 live call site(s)._
+_64 type(s), 179 function(s)/property(ies); 152 carry KDoc at source; 17 authored example(s); 24 live call site(s)._
 <!-- api-docs:end -->

@@ -11,6 +11,11 @@ package cmp.android.app
 
 import kpt.core.model.user.DarkThemeConfig
 
+/**
+ * Resolves this preference against the system setting.
+ *
+ * @param isSystemDarkMode what the OS currently reports, used only by `FOLLOW_SYSTEM`.
+ */
 fun DarkThemeConfig.isDarkMode(isSystemDarkMode: Boolean): Boolean = when (this) {
     DarkThemeConfig.FOLLOW_SYSTEM -> isSystemDarkMode
     DarkThemeConfig.DARK -> true

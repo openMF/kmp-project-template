@@ -26,6 +26,8 @@ package kpt.feature.settings
  * (e.g. `ShowcaseRegistry`) import it from here.
  */
 data class DevMenuEntry(
+    /** What the dev menu shows. */
     val label: String,
+    /** What the entry does. */
     val onClick: () -> Unit,
 )

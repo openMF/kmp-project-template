@@ -54,6 +54,7 @@ interface DefaultHeaderProvider {
      */
     fun headersFor(accessPointId: String): Map<String, String> = emptyMap()
 
+    /** Provider presets. */
     companion object {
         /** The no-op default. Bound by `NetworkModule` unless a fork binds its own. */
         val None: DefaultHeaderProvider = object : DefaultHeaderProvider {}

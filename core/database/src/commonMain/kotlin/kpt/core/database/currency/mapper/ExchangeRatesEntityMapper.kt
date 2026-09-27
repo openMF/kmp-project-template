@@ -14,6 +14,9 @@ import kpt.core.database.currency.entity.ExchangeRatesEntity
 import kpt.core.model.currency.ExchangeRates
 import kotlin.time.Clock
 
+/**
+ * Domain → row, keyed by [baseCurrency].
+ */
 fun ExchangeRates.toEntity(baseCurrency: String): ExchangeRatesEntity = ExchangeRatesEntity(
     baseCurrency = baseCurrency,
     date = date,
@@ -21,6 +24,9 @@ fun ExchangeRates.toEntity(baseCurrency: String): ExchangeRatesEntity = Exchange
     fetchedAt = Clock.System.now().toEpochMilliseconds(),
 )
 
+/**
+ * Row → domain.
+ */
 fun ExchangeRatesEntity.toDomain(): ExchangeRates = ExchangeRates(
     base = baseCurrency,
     date = date,

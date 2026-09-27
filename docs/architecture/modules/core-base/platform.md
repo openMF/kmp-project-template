@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/platform sha=b3ca4cb2c7a44b3a7b6d2584197b085794bc6e55 -->
+<!-- api-docs:begin module=core-base/platform sha=ab60cce532dbea3feb6ec3dc5ce0f99897cbb0b3 -->
 ## API reference
 
-_Generated from `core-base/platform` at tree `b3ca4cb2c7a4` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/platform` at tree `ab60cce532db` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -37,7 +37,7 @@ expect val LocalContext: ProvidableCompositionLocal<AppContext>
 ```
 A composition local that provides the current `AppContext` to the composition tree. This allows composable functions to access the platform-specific context without explicit parameters.
 
-<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/Theme.android.kt:23</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/Theme.android.kt:29</code></summary>
 
 ```kotlin
     return when {

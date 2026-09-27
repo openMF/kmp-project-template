@@ -65,7 +65,11 @@ sealed interface ConflictInboxUiState {
     /** Initial state before the first [ConflictInbox.observePending] emission. */
     data object Loading : ConflictInboxUiState
 
-    /** The live pending-conflict feed, newest first. */
+    /**
+     * The live pending-conflict feed, newest first.
+     *
+     * @property conflicts the unresolved conflicts; empty is the healthy case, not an empty state.
+     */
     data class Success(val conflicts: List<ConflictEntry>) : ConflictInboxUiState {
         /** True when there are no pending conflicts — drives the empty state. */
         val isEmpty: Boolean get() = conflicts.isEmpty()

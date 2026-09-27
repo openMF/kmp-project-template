@@ -42,5 +42,6 @@ interface DispatcherManager {
      */
     val unconfined: CoroutineDispatcher
 
+    /** Application-lifetime scope for work that must outlive any screen — cancelled only at process end. */
     val appScope: CoroutineScope
 }

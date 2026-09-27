@@ -15,6 +15,10 @@ import kpt.feature.emicalculator.ui.EmiCalculatorViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
+/**
+ * Koin bindings for the EMI calculator. Listed in `FeatureRegistry`'s generated bindings, so a fork that removes this
+ * feature drops the module with it.
+ */
 val EmiCalculatorModule = module {
     // Binds the compute PORT declared by core/store. core/store cannot import core/domain
     // (store → domain → data → store would be a cycle), so the feature — which already sees

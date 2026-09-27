@@ -77,6 +77,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+/** The multi-step loan wizard — the `DraftSubmitHandler` showcase, so a part-filled form survives process death. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoanCalcWizardScreen(

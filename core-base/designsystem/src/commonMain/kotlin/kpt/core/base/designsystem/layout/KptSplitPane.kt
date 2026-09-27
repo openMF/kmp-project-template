@@ -25,6 +25,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.theme.KptTheme
 
+/**
+ * Two panes with a draggable divider, for wide windows.
+ *
+ * [minLeftWidth] stops the divider being dragged to a width where the left pane is unusable.
+ */
 @Composable
 fun KptSplitPane(
     leftContent: @Composable () -> Unit,

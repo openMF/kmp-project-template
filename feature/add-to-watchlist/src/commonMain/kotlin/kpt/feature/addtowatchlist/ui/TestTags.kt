@@ -11,6 +11,10 @@ package kpt.feature.addtowatchlist.ui
 
 /** Stable test tags for the embedded add-to-watchlist star toggle. */
 object TestTags {
+    /**
+     * Test tags for the add-to-watchlist sheet. Constants rather than literals so a UI test and the composable cannot
+     * drift.
+     */
     object AddToWatchlist {
         /** Per-coin star toggle: `watchlist_star_{coinId}` (mirrors idea-layer ui.yaml). */
         const val STAR_PREFIX = "watchlist_star_"

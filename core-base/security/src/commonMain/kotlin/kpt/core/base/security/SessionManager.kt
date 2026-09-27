@@ -31,6 +31,7 @@ class SessionManager(
     private val clock: () -> Long = { currentTimeMillis() },
 ) {
     private val _isSessionActive = MutableStateFlow(false)
+    /** Whether a session is currently active. Flips false on timeout or explicit logout. */
     val isSessionActive: StateFlow<Boolean> = _isSessionActive.asStateFlow()
 
     @kotlin.concurrent.Volatile

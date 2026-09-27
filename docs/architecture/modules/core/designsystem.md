@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/designsystem sha=6da2cb3909fa0147077cd9fc984c697cae34453f -->
+<!-- api-docs:begin module=core/designsystem sha=7b65af282d281631c2470e9bf2a088d8f7adbbbe -->
 ## API reference
 
-_Generated from `core/designsystem` at tree `6da2cb3909fa` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/designsystem` at tree `7b65af282d28` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/ChartTokens.kt`
@@ -41,13 +41,13 @@ Shared visual tokens for every chart in `core/designsystem/chart/`. Reads from `
 
 </details>
 
-- `fun multiSeriesColors(): List<Color>`
+- `fun multiSeriesColors(): List<Color>` — Six distinguishable series hues, in a fixed order so the same series keeps its colour across recompositions and across charts.
 - `val finance = MaterialTheme.finance`
-- `fun axisLabelStyle(): TextStyle = MaterialTheme.typography.bodySmall.copy(`
-- `fun gridlineColor(): Color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)`
-- `fun areaFillBrush(strokeColor: Color): Brush = Brush.verticalGradient(`
-- `val defaultStrokeWidth = 1.5.dp`
-- `val defaultAxisStrokeWidth = 1.0.dp`
+- `fun axisLabelStyle(): TextStyle = MaterialTheme.typography.bodySmall.copy(` — Text style for axis labels.
+- `fun gridlineColor(): Color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)` — Gridline colour — outline-variant at half alpha, so gridlines sit behind the data rather than competing with it.
+- `fun areaFillBrush(strokeColor: Color): Brush = Brush.verticalGradient(` — Vertical gradient from `strokeColor` at 24% alpha down to transparent, for the fill under a line series.
+- `val defaultStrokeWidth = 1.5.dp` — Line width for a data series.
+- `val defaultAxisStrokeWidth = 1.0.dp` — Line width for an axis — deliberately thinner than `defaultStrokeWidth`.
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptAreaChart.kt`
 
@@ -148,7 +148,7 @@ fun AmountDisplay(
 ```
 Big-and-bold currency presentation used at the top of dashboards and detail screens. Layout: optional label (small, dimmed) → large amount → optional supporting metadata row.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:177</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:178</code></summary>
 
 ```kotlin
 
@@ -186,7 +186,7 @@ Currency text that picks its color from `MaterialTheme.finance` based on the amo
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/MoneyTone.kt`
 
 ```kotlin
-enum class MoneyTone { AutoFromSign, Positive, Negative, Neutral, Inherit }
+enum class MoneyTone
 ```
 Money tone — how a monetary amount should be colored regardless of the raw value's sign.
 
@@ -228,7 +228,7 @@ Compact rate-change indicator — directional icon + percentage / delta text, bo
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/RateDirection.kt`
 
 ```kotlin
-enum class RateDirection { Up, Down, Flat }
+enum class RateDirection
 ```
 Direction of a rate / price / metric change relative to the prior period.
 
@@ -379,7 +379,7 @@ fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modi
 ```
 Compact colored pill used to convey state at a glance — bill status, loan stage, rate direction, sync state. Stays one line; no icons (use `UrgencyDot` when you want a leading accent).
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:170</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:171</code></summary>
 
 ```kotlin
                 modifier = Modifier.weight(1f),
@@ -400,7 +400,7 @@ enum class StatusChipIntent
 ```
 Semantic intent of a `StatusChip`. Maps to a (container, content) color pair derived from the active Material color scheme + finance palette.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:172</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:173</code></summary>
 
 ```kotlin
             StatusChip(
@@ -417,7 +417,7 @@ Semantic intent of a `StatusChip`. Maps to a (container, content) color pair der
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/Urgency.kt`
 
 ```kotlin
-enum class Urgency { Overdue, Today, Upcoming, Distant }
+enum class Urgency
 ```
 Due-date urgency tier — informs the color of a leading dot on a list row.
 
@@ -461,7 +461,7 @@ Solid colored dot used as the leading accent on a list row (bill reminder, loan 
 ```kotlin
 object AppIcons
 ```
-_No KDoc at source._
+The app's icon set, named by ROLE rather than by glyph.
 
 <details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsScreenPreview.kt:105</code></summary>
 
@@ -477,20 +477,20 @@ _No KDoc at source._
 
 </details>
 
-- `val Language: ImageVector = Icons.Default.ArrowOutward`
-- `val CheckCircle: ImageVector = Icons.Filled.CheckCircle`
-- `val OutlinedInfo = Icons.Outlined.Info`
-- `val OutlinedLock = Icons.Outlined.Lock`
-- `val OutlinedNotifications = Icons.Outlined.Notifications`
-- `val ChevronRight: ImageVector = Icons.Filled.ChevronRight`
-- `val QrCode: ImageVector = Icons.Filled.QrCode`
-- `val Close: ImageVector = Icons.Filled.Close`
-- `val AttachMoney: ImageVector = Icons.Filled.AttachMoney`
-- `val OutlinedVisibilityOff: ImageVector = Icons.Outlined.VisibilityOff`
-- `val OutlinedVisibility: ImageVector = Icons.Outlined.Visibility`
-- `val VisibilityOff: ImageVector = Icons.Filled.VisibilityOff`
-- `val Visibility: ImageVector = Icons.Filled.Visibility`
-- `val Check: ImageVector = Icons.Default.Check`
+- `val Language: ImageVector = Icons.Default.ArrowOutward` — `language` role — Material default `ArrowOutward`.
+- `val CheckCircle: ImageVector = Icons.Filled.CheckCircle` — `check circle` role — Material filled `CheckCircle`.
+- `val OutlinedInfo = Icons.Outlined.Info` — `outlined info` role — Material outlined `Info`.
+- `val OutlinedLock = Icons.Outlined.Lock` — `outlined lock` role — Material outlined `Lock`.
+- `val OutlinedNotifications = Icons.Outlined.Notifications` — `outlined notifications` role — Material outlined `Notifications`.
+- `val ChevronRight: ImageVector = Icons.Filled.ChevronRight` — `chevron right` role — Material filled `ChevronRight`.
+- `val QrCode: ImageVector = Icons.Filled.QrCode` — `qr code` role — Material filled `QrCode`.
+- `val Close: ImageVector = Icons.Filled.Close` — `close` role — Material filled `Close`.
+- `val AttachMoney: ImageVector = Icons.Filled.AttachMoney` — `attach money` role — Material filled `AttachMoney`.
+- `val OutlinedVisibilityOff: ImageVector = Icons.Outlined.VisibilityOff` — `outlined visibility off` role — Material outlined `VisibilityOff`.
+- `val OutlinedVisibility: ImageVector = Icons.Outlined.Visibility` — `outlined visibility` role — Material outlined `Visibility`.
+- `val VisibilityOff: ImageVector = Icons.Filled.VisibilityOff` — `visibility off` role — Material filled `VisibilityOff`.
+- `val Visibility: ImageVector = Icons.Filled.Visibility` — `visibility` role — Material filled `Visibility`.
+- `val Check: ImageVector = Icons.Default.Check` — `check` role — Material default `Check`.
   _…more members; read the file._
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/Color.kt`
@@ -498,352 +498,352 @@ _No KDoc at source._
 ```kotlin
 val primaryLight = Color(0xFF4338CA)
 ```
-_No KDoc at source._
+Material `primary` role, light scheme — Trust Indigo. The app's main brand role — key actions and selected states.
 
 ```kotlin
 val onPrimaryLight = Color(0xFFFFFFFF)
 ```
-_No KDoc at source._
+Content colour on `primaryLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val primaryContainerLight = Color(0xFFE0E7FF)
 ```
-_No KDoc at source._
+Material `primary container` role, light scheme — Trust Indigo. The app's main brand role — key actions and selected states.
 
 ```kotlin
 val onPrimaryContainerLight = Color(0xFF1F1D75)
 ```
-_No KDoc at source._
+Content colour on `primaryContainerLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val secondaryLight = Color(0xFF059669)
 ```
-_No KDoc at source._
+Material `secondary` role, light scheme — Emerald. Supporting role — positive deltas and secondary CTAs.
 
 ```kotlin
 val onSecondaryLight = Color(0xFFFFFFFF)
 ```
-_No KDoc at source._
+Content colour on `secondaryLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val secondaryContainerLight = Color(0xFFD1FAE5)
 ```
-_No KDoc at source._
+Material `secondary container` role, light scheme — Emerald. Supporting role — positive deltas and secondary CTAs.
 
 ```kotlin
 val onSecondaryContainerLight = Color(0xFF064E3B)
 ```
-_No KDoc at source._
+Content colour on `secondaryContainerLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val tertiaryLight = Color(0xFFD97706)
 ```
-_No KDoc at source._
+Material `tertiary` role, light scheme — Warm Amber. Accent role — highlights and badges; NOT an error signal.
 
 ```kotlin
 val onTertiaryLight = Color(0xFFFFFFFF)
 ```
-_No KDoc at source._
+Content colour on `tertiaryLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val tertiaryContainerLight = Color(0xFFFEF3C7)
 ```
-_No KDoc at source._
+Material `tertiary container` role, light scheme — Warm Amber. Accent role — highlights and badges; NOT an error signal.
 
 ```kotlin
 val onTertiaryContainerLight = Color(0xFF78350F)
 ```
-_No KDoc at source._
+Content colour on `tertiaryContainerLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val errorLight = Color(0xFFF87171)
 ```
-_No KDoc at source._
+Material `error` role, light scheme — warm red-orange. Failure role — destructive actions and validation failures.
 
 ```kotlin
 val onErrorLight = Color(0xFFFFFFFF)
 ```
-_No KDoc at source._
+Content colour on `errorLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val errorContainerLight = Color(0xFFFFE4E1)
 ```
-_No KDoc at source._
+Material `error container` role, light scheme — warm red-orange. Failure role — destructive actions and validation failures.
 
 ```kotlin
 val onErrorContainerLight = Color(0xFF9F1239)
 ```
-_No KDoc at source._
+Content colour on `errorContainerLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val backgroundLight = Color(0xFFFAFAFB)
 ```
-_No KDoc at source._
+Material `background` role, light scheme. The window behind all content.
 
 ```kotlin
 val onBackgroundLight = Color(0xFF0F172A)
 ```
-_No KDoc at source._
+Content colour on `backgroundLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val surfaceLight = Color(0xFFFAFAFB)
 ```
-_No KDoc at source._
+Material `surface` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val onSurfaceLight = Color(0xFF0F172A)
 ```
-_No KDoc at source._
+Content colour on `surfaceLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val surfaceVariantLight = Color(0xFFE2E8F0)
 ```
-_No KDoc at source._
+Material `surface variant` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val onSurfaceVariantLight = Color(0xFF475569)
 ```
-_No KDoc at source._
+Content colour on `surfaceVariantLight` (light scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val outlineLight = Color(0xFF94A3B8)
 ```
-_No KDoc at source._
+Material `outline` role, light scheme. Borders and dividers.
 
 ```kotlin
 val outlineVariantLight = Color(0xFFCBD5E1)
 ```
-_No KDoc at source._
+Material `outline variant` role, light scheme. Borders and dividers.
 
 ```kotlin
 val scrimLight = Color(0xFF000000)
 ```
-_No KDoc at source._
+Material `scrim` role, light scheme. The dim behind a modal.
 
 ```kotlin
 val inverseSurfaceLight = Color(0xFF1E293B)
 ```
-_No KDoc at source._
+Material `inverse surface` role, light scheme. Inverted pairing, for snackbars and tooltips over content.
 
 ```kotlin
 val inverseOnSurfaceLight = Color(0xFFF1F5F9)
 ```
-_No KDoc at source._
+Material `inverse on surface` role, light scheme. Inverted pairing, for snackbars and tooltips over content.
 
 ```kotlin
 val inversePrimaryLight = Color(0xFFA5B4FC)
 ```
-_No KDoc at source._
+Material `inverse primary` role, light scheme. Inverted pairing, for snackbars and tooltips over content.
 
 ```kotlin
 val surfaceDimLight = Color(0xFFE2E8F0)
 ```
-_No KDoc at source._
+Material `surface dim` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceBrightLight = Color(0xFFFAFAFB)
 ```
-_No KDoc at source._
+Material `surface bright` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerLowestLight = Color(0xFFFFFFFF)
 ```
-_No KDoc at source._
+Material `surface container lowest` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerLowLight = Color(0xFFF8FAFC)
 ```
-_No KDoc at source._
+Material `surface container low` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerLight = Color(0xFFF1F5F9)
 ```
-_No KDoc at source._
+Material `surface container` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerHighLight = Color(0xFFE2E8F0)
 ```
-_No KDoc at source._
+Material `surface container high` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerHighestLight = Color(0xFFCBD5E1)
 ```
-_No KDoc at source._
+Material `surface container highest` role, light scheme. The base sheet components sit on.
 
 ```kotlin
 val primaryDark = Color(0xFFA5B4FC)
 ```
-_No KDoc at source._
+Material `primary` role, dark scheme — Trust Indigo. The app's main brand role — key actions and selected states.
 
 ```kotlin
 val onPrimaryDark = Color(0xFF1F1D75)
 ```
-_No KDoc at source._
+Content colour on `primaryDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val primaryContainerDark = Color(0xFF3730A3)
 ```
-_No KDoc at source._
+Material `primary container` role, dark scheme — Trust Indigo. The app's main brand role — key actions and selected states.
 
 ```kotlin
 val onPrimaryContainerDark = Color(0xFFE0E7FF)
 ```
-_No KDoc at source._
+Content colour on `primaryContainerDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val secondaryDark = Color(0xFF6EE7B7)
 ```
-_No KDoc at source._
+Material `secondary` role, dark scheme — Emerald. Supporting role — positive deltas and secondary CTAs.
 
 ```kotlin
 val onSecondaryDark = Color(0xFF064E3B)
 ```
-_No KDoc at source._
+Content colour on `secondaryDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val secondaryContainerDark = Color(0xFF065F46)
 ```
-_No KDoc at source._
+Material `secondary container` role, dark scheme — Emerald. Supporting role — positive deltas and secondary CTAs.
 
 ```kotlin
 val onSecondaryContainerDark = Color(0xFFD1FAE5)
 ```
-_No KDoc at source._
+Content colour on `secondaryContainerDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val tertiaryDark = Color(0xFFFCD34D)
 ```
-_No KDoc at source._
+Material `tertiary` role, dark scheme — Warm Amber. Accent role — highlights and badges; NOT an error signal.
 
 ```kotlin
 val onTertiaryDark = Color(0xFF78350F)
 ```
-_No KDoc at source._
+Content colour on `tertiaryDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val tertiaryContainerDark = Color(0xFF92400E)
 ```
-_No KDoc at source._
+Material `tertiary container` role, dark scheme — Warm Amber. Accent role — highlights and badges; NOT an error signal.
 
 ```kotlin
 val onTertiaryContainerDark = Color(0xFFFEF3C7)
 ```
-_No KDoc at source._
+Content colour on `tertiaryContainerDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val errorDark = Color(0xFFFDBA74)
 ```
-_No KDoc at source._
+Material `error` role, dark scheme — warm red-orange. Failure role — destructive actions and validation failures.
 
 ```kotlin
 val onErrorDark = Color(0xFF7C2D12)
 ```
-_No KDoc at source._
+Content colour on `errorDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val errorContainerDark = Color(0xFFC2410C)
 ```
-_No KDoc at source._
+Material `error container` role, dark scheme — warm red-orange. Failure role — destructive actions and validation failures.
 
 ```kotlin
 val onErrorContainerDark = Color(0xFFFFEDD5)
 ```
-_No KDoc at source._
+Content colour on `errorContainerDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val backgroundDark = Color(0xFF0F172A)
 ```
-_No KDoc at source._
+Material `background` role, dark scheme. The window behind all content.
 
 ```kotlin
 val onBackgroundDark = Color(0xFFF1F5F9)
 ```
-_No KDoc at source._
+Content colour on `backgroundDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val surfaceDark = Color(0xFF0F172A)
 ```
-_No KDoc at source._
+Material `surface` role, dark scheme. The base sheet components sit on.
 
 ```kotlin
 val onSurfaceDark = Color(0xFFF1F5F9)
 ```
-_No KDoc at source._
+Content colour on `surfaceDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val surfaceVariantDark = Color(0xFF1E293B)
 ```
-_No KDoc at source._
+Material `surface variant` role, dark scheme. The base sheet components sit on.
 
 ```kotlin
 val onSurfaceVariantDark = Color(0xFFCBD5E1)
 ```
-_No KDoc at source._
+Content colour on `surfaceVariantDark` (dark scheme) — text and icons drawn over it. Contrast-paired; do not substitute another colour here.
 
 ```kotlin
 val outlineDark = Color(0xFF64748B)
 ```
-_No KDoc at source._
+Material `outline` role, dark scheme. Borders and dividers.
 
 ```kotlin
 val outlineVariantDark = Color(0xFF334155)
 ```
-_No KDoc at source._
+Material `outline variant` role, dark scheme. Borders and dividers.
 
 ```kotlin
 val scrimDark = Color(0xFF000000)
 ```
-_No KDoc at source._
+Material `scrim` role, dark scheme. The dim behind a modal.
 
 ```kotlin
 val inverseSurfaceDark = Color(0xFFF1F5F9)
 ```
-_No KDoc at source._
+Material `inverse surface` role, dark scheme. Inverted pairing, for snackbars and tooltips over content.
 
 ```kotlin
 val inverseOnSurfaceDark = Color(0xFF1E293B)
 ```
-_No KDoc at source._
+Material `inverse on surface` role, dark scheme. Inverted pairing, for snackbars and tooltips over content.
 
 ```kotlin
 val inversePrimaryDark = Color(0xFF4338CA)
 ```
-_No KDoc at source._
+Material `inverse primary` role, dark scheme. Inverted pairing, for snackbars and tooltips over content.
 
 ```kotlin
 val surfaceDimDark = Color(0xFF0F172A)
 ```
-_No KDoc at source._
+Material `surface dim` role, dark scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceBrightDark = Color(0xFF374558)
 ```
-_No KDoc at source._
+Material `surface bright` role, dark scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerLowestDark = Color(0xFF020617)
 ```
-_No KDoc at source._
+Material `surface container lowest` role, dark scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerLowDark = Color(0xFF1E293B)
 ```
-_No KDoc at source._
+Material `surface container low` role, dark scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerDark = Color(0xFF243044)
 ```
-_No KDoc at source._
+Material `surface container` role, dark scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerHighDark = Color(0xFF2D3B52)
 ```
-_No KDoc at source._
+Material `surface container high` role, dark scheme. The base sheet components sit on.
 
 ```kotlin
 val surfaceContainerHighestDark = Color(0xFF374558)
 ```
-_No KDoc at source._
+Material `surface container highest` role, dark scheme. The base sheet components sit on.
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/Elevation.kt`
 
@@ -852,7 +852,7 @@ data class Elevation(
 ```
 Shared elevation tier scale — five named tiers matching Material 3 elevation guidance. Access from any Composable via `MaterialTheme.elevation`.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptBottomBar.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptBottomBar.kt:39</code></summary>
 
 ```kotlin
         windowInsets = windowInsets,
@@ -869,9 +869,9 @@ Shared elevation tier scale — five named tiers matching Material 3 elevation g
 ```kotlin
 val LocalElevation = staticCompositionLocalOf { Elevation() }
 ```
-_No KDoc at source._
+CompositionLocal carrying the app's elevation scale. `static` because it changes only with the theme, so a read does not subscribe.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:153</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:159</code></summary>
 
 ```kotlin
             LocalMotion provides Motion(),
@@ -907,7 +907,7 @@ CompositionLocalProvider(LocalFinanceColors provides myForkFinanceColors()) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:136</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:142</code></summary>
 
 ```kotlin
 
@@ -936,7 +936,7 @@ val LocalFinanceColors = staticCompositionLocalOf<FinanceColors>
 ```
 CompositionLocal for the active `FinanceColors`. Provided by `KptTheme`. Direct access discouraged — use `MaterialTheme.finance` extension instead.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:150</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:156</code></summary>
 
 ```kotlin
         // core/store/AppScreenStateDefaults.kt — that's the single fork seam.
@@ -960,12 +960,12 @@ Resolve the active `FinanceColors` from composition.
 ```kotlin
 val lightScheme = lightColorScheme(
 ```
-_No KDoc at source._
+The assembled Material 3 light scheme, wired from the palette tokens in `Color.kt`.
 
 ```kotlin
 val darkScheme = darkColorScheme(
 ```
-_No KDoc at source._
+The assembled Material 3 dark scheme, wired from the palette tokens in `Color.kt`.
 
 ```kotlin
 fun KptTheme(
@@ -989,7 +989,7 @@ internal fun LoanFormFieldsEnabledPreview() {
 ```kotlin
 expect fun platformColorScheme(useDarkTheme: Boolean, dynamicColor: Boolean): ColorScheme
 ```
-_No KDoc at source._
+Resolves the active colour scheme per platform. `dynamicColor` is honoured only where the OS supplies one (Android 12+); every other target falls back to `lightScheme`/`darkScheme`, so a caller can request it unconditionally.
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/Spacing.kt`
 
@@ -998,7 +998,7 @@ data class Spacing(
 ```
 Shared spacing scale — replaces raw `.dp` literals scattered across features with a disciplined 4 / 8 / 12 / 16 / 24 / 32 / 48 progression. Access from any Composable via `MaterialTheme.spacing`.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptCandlestick.kt:72</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptCandlestick.kt:79</code></summary>
 
 ```kotlin
         val priceRange = (priceMax - priceMin).takeIf { it > 0f } ?: 1f
@@ -1015,9 +1015,9 @@ Shared spacing scale — replaces raw `.dp` literals scattered across features w
 ```kotlin
 val LocalSpacing = staticCompositionLocalOf { Spacing() }
 ```
-_No KDoc at source._
+CompositionLocal carrying the app's spacing scale. Read this instead of writing literal `.dp`: the whole app's rhythm is retuned here, and a hardcoded value silently opts a screen out of that.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:152</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:158</code></summary>
 
 ```kotlin
             LocalFinanceColors provides financeColors,
@@ -1041,33 +1041,33 @@ Resolve the active `Spacing` scale from composition.
 ```kotlin
 val fontFamily: FontFamily
 ```
-_No KDoc at source._
+The app's font family, applied across the type scale. A fork overrides this to brand its typography without restating every style.
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/utils/ModifierExt.kt`
 
 ```kotlin
 fun Modifier.mirrorIfRtl() = composed
 ```
-_No KDoc at source._
+Horizontally mirrors content when the layout direction is RTL. For glyphs with a direction (a back chevron, a progress arrow). NOT for text or logos, which must not be flipped.
 
 ```kotlin
 fun Modifier.tabNavigation() = composed
 ```
-_No KDoc at source._
+Makes the element reachable and actionable by keyboard tab — desktop and web, where a tap target alone leaves it unusable.
 
 ```kotlin
 fun Modifier.onClick(
 ```
-_No KDoc at source._
+Click handling with the app's ripple and accessibility semantics already attached, so a clickable element is announced correctly without each call site remembering to say so.
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/utils/NonLetterColorVisualTransformation.kt`
 
 ```kotlin
 fun nonLetterColorVisualTransformation(): VisualTransformation
 ```
-_No KDoc at source._
+Tints digits and symbols differently from letters in a text field — used for passwords and codes, where character class is hard to read at a glance. Presentation only: it never alters the field's value.
 
 ---
 
-_12 type(s), 124 function(s)/property(ies); 34 carry KDoc at source; 1 authored example(s); 27 live call site(s)._
+_12 type(s), 124 function(s)/property(ies); 135 carry KDoc at source; 1 authored example(s); 27 live call site(s)._
 <!-- api-docs:end -->

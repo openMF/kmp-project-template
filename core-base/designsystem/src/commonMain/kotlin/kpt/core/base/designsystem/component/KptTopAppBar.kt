@@ -42,6 +42,12 @@ import kpt.core.base.designsystem.core.TopAppBarAction
 import kpt.core.base.designsystem.core.TopAppBarVariant
 import kpt.core.base.designsystem.theme.KptTheme
 
+/**
+ * Top app bar built from a declarative [KptTopAppBarConfiguration].
+ *
+ * The DSL form — prefer it when a screen's bar is assembled from data or varies by state; the
+ * parameter overloads below are shorthands over this.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun KptTopAppBar(configuration: KptTopAppBarConfiguration) {
@@ -146,6 +152,9 @@ fun KptTopAppBar(configuration: KptTopAppBarConfiguration) {
     }
 }
 
+/**
+ * Title-only bar with no navigation icon — a tab root. [variant] selects the Material 3 size.
+ */
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -161,6 +170,9 @@ fun KptTopAppBar(
     )
 }
 
+/**
+ * Title plus a back affordance, always shown — a pushed detail screen.
+ */
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -182,6 +194,10 @@ fun KptTopAppBar(
     )
 }
 
+/**
+ * Title with a CONDITIONAL back affordance, for a screen reachable both as a tab root and as a
+ * pushed destination.
+ */
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -204,6 +220,10 @@ fun KptTopAppBar(
     )
 }
 
+/**
+ * Two-line bar: title over a subtitle, for a screen whose context needs naming (an account, a date
+ * range) without stealing the title.
+ */
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -225,6 +245,10 @@ fun KptTopAppBar(
     )
 }
 
+/**
+ * Title plus ONE trailing action. For more than one, use the configuration overload rather than
+ * growing the parameter list.
+ */
 @Composable
 fun KptTopAppBar(
     title: String,
@@ -250,6 +274,9 @@ fun KptTopAppBar(
     )
 }
 
+/**
+ * Bar whose title area is a live search field, with the query hoisted to the caller.
+ */
 @Composable
 fun KptSearchAppBar(
     searchQuery: String,
@@ -295,6 +322,9 @@ fun KptSearchAppBar(
     )
 }
 
+/**
+ * Bar carrying a profile avatar as its trailing action.
+ */
 @Composable
 fun KptProfileAppBar(
     title: String,
@@ -321,6 +351,9 @@ fun KptProfileAppBar(
     )
 }
 
+/**
+ * Bar preset for settings screens — back affordance plus the settings title treatment.
+ */
 @Composable
 fun KptSettingsAppBar(
     title: String = "Settings",
@@ -350,6 +383,9 @@ fun KptSettingsAppBar(
     )
 }
 
+/**
+ * Shorthand for the Small Material 3 bar — the default height.
+ */
 @Composable
 fun KptSmallTopAppBar(
     title: String,
@@ -366,6 +402,9 @@ fun KptSmallTopAppBar(
     } ?: KptTopAppBar(title, modifier, TopAppBarVariant.Small)
 }
 
+/**
+ * Shorthand for the centre-aligned bar.
+ */
 @Composable
 fun KptCenterAlignedTopAppBar(
     title: String,
@@ -380,6 +419,9 @@ fun KptCenterAlignedTopAppBar(
     )
 } ?: KptTopAppBar(title, modifier, TopAppBarVariant.CenterAligned)
 
+/**
+ * Shorthand for the Medium (collapsing) bar.
+ */
 @Composable
 fun KptMediumTopAppBar(
     title: String,
@@ -387,6 +429,9 @@ fun KptMediumTopAppBar(
     modifier: Modifier = Modifier,
 ) = KptTopAppBar(title, modifier, TopAppBarVariant.Medium)
 
+/**
+ * Shorthand for the Large (collapsing) bar.
+ */
 @Composable
 fun KptLargeTopAppBar(
     title: String,

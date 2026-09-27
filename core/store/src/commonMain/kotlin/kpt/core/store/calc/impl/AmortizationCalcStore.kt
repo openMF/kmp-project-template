@@ -24,8 +24,14 @@ import org.mobilenativefoundation.store.store5.Store
  * free and, more importantly, puts the result on the standard `ScreenState` read path.
  */
 data class AmortizationCalcParams(
+    /** Loan amount. */
     val principal: Double,
+    /** APR as a percentage, e.g. `6.5`. */
     val ratePercent: Double,
+    /**
+     * Tenure in months. Must be > 0 — a zero tenure would divide by zero in the EMI formula, so the caller validates
+     * before building the params.
+     */
     val tenureMonths: Int,
 ) {
     /** True when the inputs describe a computable loan — the store is only read when valid. */
@@ -42,10 +48,16 @@ data class AmortizationCalcParams(
  * `core/model`'s `AmortizationRow`, so nothing below the feature layer depends on core/domain.
  */
 fun interface AmortizationCompute {
+    /** Computes the schedule for [params]. Pure — no Store, no cache; the params ARE the key. */
     suspend operator fun invoke(params: AmortizationCalcParams): AmortizationBreakdown
 }
 
 /**
+ * Amortization schedule for a loan — `MEMORY_ONLY`, computed rather than fetched.
+ *
+ * Store-backed even though nothing persists: the schedule is expensive and deterministic in its
+ * inputs, so the key doubles as the cache key and a revisit is free.
+ *
  * MEMORY_ONLY Store5 store over the amortization computation
  * (`feature_profile.combo_id: calculator_multi`).
  *
@@ -57,12 +69,6 @@ fun interface AmortizationCompute {
     key = "amortizationCalc:{principal}:{ratePercent}:{tenureMonths}",
     params = ["principal:Double", "ratePercent:Double", "tenureMonths:Int"],
 )
-/**
- * Amortization schedule for a loan — `MEMORY_ONLY`, computed rather than fetched.
- *
- * Store-backed even though nothing persists: the schedule is expensive and deterministic in its
- * inputs, so the key doubles as the cache key and a revisit is free.
- */
 fun provideAmortizationCalcStore(
     compute: AmortizationCompute,
 ): Store<AmortizationCalcParams, AmortizationBreakdown> =

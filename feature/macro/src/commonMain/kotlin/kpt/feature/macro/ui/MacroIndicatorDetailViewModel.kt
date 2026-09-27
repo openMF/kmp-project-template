@@ -38,6 +38,7 @@ class MacroIndicatorDetailViewModel(
         scope = viewModelScope,
     )
 
+    /** Retries the failed fetch. */
     fun onRetry() {
         trySendAction(MacroDetailAction.Retry)
     }
@@ -48,7 +49,11 @@ class MacroIndicatorDetailViewModel(
     }
 }
 
+/** What the detail screen can be asked to do. */
 sealed interface MacroDetailAction {
+    /** Retry the failed fetch. */
     data object Retry : MacroDetailAction
+
+    /** Force a fetch, bypassing the cache. */
     data object Refresh : MacroDetailAction
 }

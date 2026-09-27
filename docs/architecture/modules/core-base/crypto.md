@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/crypto sha=b06e517b74fe26d300ac9cd4d4c86aa17a427243 -->
+<!-- api-docs:begin module=core-base/crypto sha=5612a9641cf675ea8975244106393fc11d1beef9 -->
 ## API reference
 
-_Generated from `core-base/crypto` at tree `b06e517b74fe` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/crypto` at tree `5612a9641cf6` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -32,7 +32,7 @@ expect class FieldEncryptor
 ```
 Platform-specific AES-256-GCM field encryption for sensitive data. Encrypts individual fields BEFORE they are stored in Room or Settings.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/converter/ChargeTypeConverters.kt:37</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/converter/ChargeTypeConverters.kt:38</code></summary>
 
 ```kotlin
     companion object {

@@ -17,6 +17,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.util.fastMap
 import kpt.core.base.designsystem.theme.KptTheme
 
+/**
+ * Staggered grid for items of differing heights, packing each column independently.
+ */
 @Composable
 fun KptMasonryGrid(
     columns: Int,

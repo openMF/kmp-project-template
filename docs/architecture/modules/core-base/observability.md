@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/observability sha=586c421b447a4e8525906a7c89b687e93b26b38d -->
+<!-- api-docs:begin module=core-base/observability sha=86f28414ed60921fa595874ce5ee7e5f17000e4b -->
 ## API reference
 
-_Generated from `core-base/observability` at tree `586c421b447a` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/observability` at tree `86f28414ed60` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is

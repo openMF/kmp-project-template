@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.max
 
+/**
+ * Column that wraps into additional columns when content exceeds the available height.
+ */
 @Composable
 fun KptFlowColumn(
     modifier: Modifier = Modifier,

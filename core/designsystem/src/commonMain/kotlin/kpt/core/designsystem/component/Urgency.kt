@@ -10,4 +10,19 @@
 package kpt.core.designsystem.component
 
 /** Due-date urgency tier — informs the color of a leading dot on a list row. */
-enum class Urgency { Overdue, Today, Upcoming, Distant }
+enum class Urgency {
+    /** Due date has passed. */
+    Overdue,
+
+    /**
+     * Due today. Its own band rather than part of `Upcoming`, because today is the only one that is still actionable
+     * and not yet late.
+     */
+    Today,
+
+    /** Due within the reminder window. */
+    Upcoming,
+
+    /** Beyond the reminder window — listed, but not highlighted. */
+    Distant,
+}

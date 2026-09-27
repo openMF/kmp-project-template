@@ -55,6 +55,10 @@ sealed interface UpdateOutcome {
     /** This target has no in-app update mechanism; [reason] says why. */
     data class NotSupported(val reason: String) : UpdateOutcome
 
-    /** The check or the flow failed. */
+    /**
+     * The check or the flow failed.
+     *
+     * @property message what failed, for logging — not user-facing copy.
+     */
     data class Failed(val message: String) : UpdateOutcome
 }

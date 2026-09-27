@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/ui sha=255e300cb59150a1186b90f2ef9c32468c8c9f1a -->
+<!-- api-docs:begin module=core-base/ui sha=b14a3bf8d795badeeb052520f767878c45872b19 -->
 ## API reference
 
-_Generated from `core-base/ui` at tree `255e300cb591` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/ui` at tree `b14a3bf8d795` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -48,7 +48,7 @@ The SINGLE common-code accessor for the app's user-facing display name.
 
 </details>
 
-- `val appDisplayName: String get() = BuildKonfig.APP_DISPLAY_NAME`
+- `val appDisplayName: String get() = BuildKonfig.APP_DISPLAY_NAME` — The fork's display name, from `app-profile` via BuildKonfig — never hardcoded, so a rebrand needs no code change.
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/captiveportal/CaptivePortalLauncher.kt`
 
@@ -107,15 +107,16 @@ fun List<ScreenState<*>>.toDashboardProgressState(): DashboardProgressState =
 ```
 Pure conversion from a list of per-card states to a single `DashboardProgressState`. Exposed so tests + non-Flow call sites can re-use the aggregation contract.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/PersonalLoansListViewModel.kt:75</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/PersonalLoansListViewModel.kt:77</code></summary>
 
 ```kotlin
- */
 data class LoansListUiState(
+    /** The loans, ordered by next due-date. */
     val loans: List<Loan>,
+    /** Sum of every loan's EMI — the summary header's headline figure. */
     val totalMonthlyEmi: Double,
+    /** Sum of every outstanding balance. */
     val totalPrincipalRemaining: Double,
-)
 ```
 
 </details>
@@ -169,7 +170,7 @@ fun <T> IndependentCardLayout(
 ```
 Renders a vertical stack of cards where each card carries its OWN `ScreenState` — so a slow card can still spin while a fast one shows content, and a single failed fetch only ruins one card instead of blanking the whole dashboard.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:192</code></summary>
+<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:191</code></summary>
 
 ```kotlin
             )
@@ -198,7 +199,7 @@ IndependentCardLayout(
 
 </details>
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:192</code></summary>
+<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:191</code></summary>
 
 ```kotlin
             )
@@ -430,10 +431,10 @@ object KptFadeThrough
 ```
 Fade-through enter/exit factories. Use for **sibling navigation** — bottom-nav tab switches, settings section switches, paged tabs.
 
-- `fun enter(): EnterTransition = enter(MaterialTheme.motion)`
-- `fun enter(motion: Motion): EnterTransition = fadeIn(`
-- `fun exit(): ExitTransition = exit(MaterialTheme.motion)`
-- `fun exit(motion: Motion): ExitTransition = fadeOut(`
+- `fun enter(): EnterTransition = enter(MaterialTheme.motion)` — Fade-through enter using the ambient theme motion. Composable — call from composition.
+- `fun enter(motion: Motion): EnterTransition = fadeIn(` — Fade-through enter using an explicit `motion`, so it is callable outside composition.
+- `fun exit(): ExitTransition = exit(MaterialTheme.motion)` — Fade-through exit using the ambient theme motion.
+- `fun exit(motion: Motion): ExitTransition = fadeOut(` — Fade-through exit using an explicit `motion`.
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/motion/KptListItemEnter.kt`
 
@@ -472,16 +473,16 @@ object KptSharedAxis
 Shared-axis-X enter/exit factories, per Material Motion. Use for **forward/back navigation in a single stack** — pushing onto the stack slides left-and-fades, popping reverses.
 
 - `fun enterForward(): EnterTransition = enterForward(MaterialTheme.motion)` — Forward push — new screen slides in from the right, old screen slides out left.
-- `fun enterForward(motion: Motion): EnterTransition`
+- `fun enterForward(motion: Motion): EnterTransition` — Shared-axis enter for moving forward/deeper in a flow.
 - `val slide = motion.sharedAxisSlideDistance`
 - `fun exitForward(): ExitTransition = exitForward(MaterialTheme.motion)` — Forward push — companion exit (the popped/replaced screen).
-- `fun exitForward(motion: Motion): ExitTransition`
+- `fun exitForward(motion: Motion): ExitTransition` — Shared-axis exit for moving forward/deeper in a flow.
 - `val slide = motion.sharedAxisSlideDistance`
 - `fun enterBack(): EnterTransition = enterBack(MaterialTheme.motion)` — Back/pop — new screen slides in from the left, mirroring `enterForward`.
-- `fun enterBack(motion: Motion): EnterTransition`
+- `fun enterBack(motion: Motion): EnterTransition` — Shared-axis enter for moving back.
 - `val slide = motion.sharedAxisSlideDistance`
 - `fun exitBack(): ExitTransition = exitBack(MaterialTheme.motion)` — Back/pop — companion exit (the screen being popped).
-- `fun exitBack(motion: Motion): ExitTransition`
+- `fun exitBack(motion: Motion): ExitTransition` — Shared-axis exit for moving back.
 - `val slide = motion.sharedAxisSlideDistance`
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/nav/FeatureDestination.kt`
@@ -491,11 +492,11 @@ public annotation class FeatureDestination
 ```
 Marks a `NavGraphBuilder` extension as a TOP-LEVEL feature destination — one the app shell registers directly on the authenticated graph.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/navigation/LoansNavigation.kt:45</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/navigation/LoansNavigation.kt:67</code></summary>
 
 ```kotlin
-}
-
+ * @param navController used for back navigation and for moving between list, detail and form.
+ */
 @FeatureDestination
 fun NavGraphBuilder.loansGraph(navController: NavController) {
     navigation<LoansGraphRoute>(startDestination = PersonalLoansListRoute) {
@@ -711,10 +712,10 @@ ScreenStateVisual.Lottie(spec = {
 
 </details>
 
-- `val empty: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/empty.json") }`
-- `val error: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/error.json") }`
-- `val noNetwork: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/no_network.json") }`
-- `val loading: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/loading.json") }`
+- `val empty: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/empty.json") }` — Animation for the empty state.
+- `val error: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/error.json") }` — Animation for the error state.
+- `val noNetwork: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/no_network.json") }` — Animation for the no-network state.
+- `val loading: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/loading.json") }` — Animation for the loading state.
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/screen/RefreshableScreenContent.kt`
 
@@ -765,7 +766,7 @@ fun SavingsScreen(vm: SavingsViewModel) {
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:108</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:109</code></summary>
 
 ```kotlin
         },
@@ -793,7 +794,7 @@ ScreenContent(stream = viewModel.alerts) { alerts, _ -> LazyColumn { … } }
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:108</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailScreen.kt:109</code></summary>
 
 ```kotlin
         },
@@ -888,7 +889,7 @@ fun KptTheme(content: @Composable () -> Unit) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:135</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:141</code></summary>
 
 ```kotlin
     )
@@ -1482,9 +1483,9 @@ Contains standard "transition providers" that may be used to specify the `EnterT
 - `val slideDown: ExitTransitionProvider =` — Slides the current screen down to the bottom of the screen. Note that this represents a `null` transition when navigating between different nested navigation graphs.
 - `val stay: ExitTransitionProvider =` — A "no-op" transition: this changes nothing about the screen but "lasts" as long as other standard transitions in order to leave the screen in place such that it does not immediately disappear while the other screen transitions into place.
 - `val sharedAxisForward: EnterTransitionProvider = TransitionProviders.Enter.pushLeft` — Hardcoded aliases — kept for callers that don't have a `Motion` in scope.
-- `val sharedAxisBack: EnterTransitionProvider = TransitionProviders.Enter.pushRight`
-- `val fadeThrough: EnterTransitionProvider = TransitionProviders.Enter.fadeIn`
-- `val slideUp: EnterTransitionProvider = TransitionProviders.Enter.slideUp`
+- `val sharedAxisBack: EnterTransitionProvider = TransitionProviders.Enter.pushRight` — Back shared-axis — the mirror of the forward move, for returning.
+- `val fadeThrough: EnterTransitionProvider = TransitionProviders.Enter.fadeIn` — Fade-through — a lateral move between peers with no spatial relationship.
+- `val slideUp: EnterTransitionProvider = TransitionProviders.Enter.slideUp` — Slide-up — a modal-style arrival.
   _…more members; read the file._
 
 ```kotlin
@@ -1505,7 +1506,7 @@ Contains standard "transition providers" that may be used to specify the `EnterT
 - `val slideDown: NonNullExitTransitionProvider =` — Slides the current screen down to the bottom of the screen.
 - `val stay: NonNullExitTransitionProvider =` — A "no-op" transition: this changes nothing about the screen but "lasts" as long as other standard transitions in order to leave the screen in place such that it does not immediately disappear while the other screen transitions into place.
 - `val sharedAxisForward: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.pushLeft` — Hardcoded aliases — kept for callers that don't have a `Motion` in scope.
-- `val sharedAxisBack: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.pushRight`
+- `val sharedAxisBack: NonNullEnterTransitionProvider = RootTransitionProviders.Enter.pushRight` — Back shared-axis — the mirror of the forward move, for returning.
   _…more members; read the file._
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/viewmodel/BackgroundEvent.kt`
@@ -1551,10 +1552,10 @@ class EditEntityViewModel(
 
 </details>
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/EditLoanViewModel.kt:55</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/EditLoanViewModel.kt:59</code></summary>
 
 ```kotlin
-    outbox: SubmitOutbox<Loan>,
+     */
     val loanId: String?,
 ) : BaseMutationViewModel<Loan, Loan>(
     MutationMode.Draft(
@@ -1616,7 +1617,7 @@ sealed interface MutationMode<out T>
 ```
 How a `BaseMutationViewModel` handles its submit — the single knob that replaces the old `BaseSubmitMutationViewModel` / `BaseDraftMutationViewModel` class split.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/EditLoanViewModel.kt:56</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/EditLoanViewModel.kt:60</code></summary>
 
 ```kotlin
     val loanId: String?,
@@ -1632,5 +1633,5 @@ How a `BaseMutationViewModel` handles its submit — the single knob that replac
 
 ---
 
-_26 type(s), 140 function(s)/property(ies); 144 carry KDoc at source; 32 authored example(s); 36 live call site(s)._
+_26 type(s), 140 function(s)/property(ies); 161 carry KDoc at source; 32 authored example(s); 36 live call site(s)._
 <!-- api-docs:end -->

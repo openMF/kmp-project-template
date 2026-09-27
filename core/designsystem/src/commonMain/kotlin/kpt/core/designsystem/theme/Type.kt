@@ -24,6 +24,10 @@ import kpt.core.designsystem.generated.resources.outfit_semi_bold
 import kpt.core.designsystem.generated.resources.outfit_thin
 import org.jetbrains.compose.resources.Font
 
+/**
+ * The app's font family, applied across the type scale. A fork overrides this to brand its
+ * typography without restating every style.
+ */
 val fontFamily: FontFamily
     @Composable get() = FontFamily(
         Font(Res.font.outfit_black, FontWeight.Black),

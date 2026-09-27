@@ -11,6 +11,12 @@ package kpt.core.data.user
 
 import kotlinx.coroutines.flow.SharedFlow
 
+/**
+ * Coordinates logout across the app: wipes local state and notifies observers.
+ *
+ * Centralised so "what must be cleared on logout" is answered once. A feature clearing its own
+ * slice is how one gets missed.
+ */
 interface UserLogoutManager {
     /**
      * Observable flow of [LogoutEvent]s

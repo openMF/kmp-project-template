@@ -9,5 +9,6 @@
  */
 package kpt.core.base.platform.garbage
 
+/** `garbageCollector` on Non-Android targets. */
 actual val garbageCollector: () -> Unit
     get() = {}

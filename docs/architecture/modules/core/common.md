@@ -10,10 +10,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/common sha=85bebc59fe537ea1e4350abc62d05c8b0edfefc8 -->
+<!-- api-docs:begin module=core/common sha=963241eb79585cb1e9da407d5bfc63b4f341556a -->
 ## API reference
 
-_Generated from `core/common` at tree `85bebc59fe53` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/common` at tree `963241eb7958` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/common/src/commonMain/kotlin/kpt/core/common/format/FormatDate.kt`
@@ -21,7 +21,7 @@ _Do not hand-edit inside this block — re-run the generator. Authored prose bel
 ```kotlin
 fun formatDate(millis: Long): String
 ```
-_No KDoc at source._
+Formats an epoch-millis timestamp for display in the device's locale.
 
 ### `core/common/src/commonMain/kotlin/kpt/core/common/format/FormatDuration.kt`
 
@@ -35,19 +35,19 @@ Returns a human-readable "X ago" label for a past `instant`, e.g. "just now", "5
 ```kotlin
 fun Double.formatDecimal(places: Int): String
 ```
-_No KDoc at source._
+Formats to exactly `places` decimals, zero-padded so a column of figures stays aligned. Hand-rolled because `String.format` is JVM-only — it fails to link on Kotlin/JS and Native, so a shared UI cannot use it.
 
 ```kotlin
 fun Double.formatGrouped(places: Int): String
 ```
-_No KDoc at source._
+Formats with `,` thousands separators and exactly `places` decimals — the money/quantity form.
 
 ```kotlin
 fun Long.formatGrouped(): String
 ```
-_No KDoc at source._
+Formats a whole number with `,` thousands separators — counts and sizes, no fractional part.
 
 ---
 
-_0 type(s), 5 function(s)/property(ies); 1 carry KDoc at source; 0 authored example(s); 0 live call site(s)._
+_0 type(s), 5 function(s)/property(ies); 5 carry KDoc at source; 0 authored example(s); 0 live call site(s)._
 <!-- api-docs:end -->

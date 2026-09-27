@@ -114,8 +114,11 @@ class AlertCreateViewModel(
  * through the domain model.
  */
 data class AlertFormState(
+    /** Which coin the alert watches. */
     val coinId: String = "",
+    /** Whether it fires above or below the target. */
     val direction: AlertDirection = AlertDirection.ABOVE,
+    /** The target as raw text, so a partially typed number survives recomposition — parsed only on submit. */
     val targetValueText: String = "",
 ) {
     /** A submit is only allowed once the coin id and a parseable positive target exist. */

@@ -22,10 +22,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=756406ac87d21a6ce14026ed520fee2480531b06 -->
+<!-- api-docs:begin module=core/network sha=b1f606c1b488a12bcabe8df6ef1d6359f0cee16c -->
 ## API reference
 
-_Generated from `core/network` at tree `756406ac87d2` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `b1f606c1b488` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`
@@ -35,7 +35,7 @@ interface CoinGeckoApi
 ```
 CoinGecko public API v3. Base URL: `BASE_URL`.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:34</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt:39</code></summary>
 
 ```kotlin
 @CacheKey(name = "LIST", key = "crypto:coinMarkets")
@@ -49,17 +49,17 @@ fun provideCoinMarketsStore(
 
 </details>
 
-- `suspend fun getMarkets(`
-- `suspend fun getCoinDetail(`
+- `suspend fun getMarkets(` — One page of the market list, ordered by market cap descending by default.
+- `suspend fun getCoinDetail(` — Full detail for one coin. The four `false` defaults switch off payload sections the detail screen does not render — CoinGecko returns them by default and they dominate the response size.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/dto/CoinDetailDto.kt`
 
 ```kotlin
 data class CoinDetailDto(
 ```
-_No KDoc at source._
+Wire shape of CoinGecko's `/coins/{id}` response. Mapped to the domain model in the Store's `SourceOfTruth`; nothing outside `core/network` should see this type.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt:38</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt:54</code></summary>
 
 ```kotlin
         @Query("community_data") communityData: Boolean = false,
@@ -73,25 +73,25 @@ _No KDoc at source._
 ```kotlin
 data class DescriptionDto(val en: String? = null)
 ```
-_No KDoc at source._
+Localised description block; only `en` is consumed.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/dto/CoinMarketDto.kt`
 
 ```kotlin
 data class CoinMarketDto(
 ```
-_No KDoc at source._
+One row of CoinGecko's `/coins/markets` response — the paged market list.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt:29</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt:37</code></summary>
 
 ```kotlin
         @Query("per_page") perPage: Int,
         @Query("page") page: Int,
     ): List<CoinMarketDto>
 
-    @GET("api/v3/coins/{id}")
-    suspend fun getCoinDetail(
-        @Path("id") id: String,
+    /**
+     * Full detail for one coin.
+     *
 ```
 
 </details>
@@ -99,18 +99,18 @@ _No KDoc at source._
 ```kotlin
 data class CoinImageDto(val large: String? = null)
 ```
-_No KDoc at source._
+Image URL set for a coin; only the large variant is used.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/dto/CoinDetailDto.kt:21</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/dto/CoinDetailDto.kt:29</code></summary>
 
 ```kotlin
-    val name: String,
     val symbol: String,
+    /** Image URL set, or null when CoinGecko omits it. */
     val image: CoinImageDto? = null,
-    @SerialName("market_data") val marketData: MarketDataDto? = null,
-    val description: DescriptionDto? = null,
-) {
-    fun toDomain(): CoinDetail = CoinDetail(
+    /**
+     * Price and market figures. Nullable because the endpoint can omit the block; [toDomain] substitutes zeroes rather
+     * than failing the whole response.
+     */
 ```
 
 </details>
@@ -118,18 +118,18 @@ _No KDoc at source._
 ```kotlin
 data class MarketDataDto(
 ```
-_No KDoc at source._
+Nested market figures (price, market cap, 24h change) inside a coin detail response.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/dto/CoinDetailDto.kt:22</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/dto/CoinDetailDto.kt:34</code></summary>
 
 ```kotlin
-    val symbol: String,
-    val image: CoinImageDto? = null,
+     * than failing the whole response.
+     */
     @SerialName("market_data") val marketData: MarketDataDto? = null,
+    /** Localised descriptions, of which only `en` is consumed. */
     val description: DescriptionDto? = null,
 ) {
-    fun toDomain(): CoinDetail = CoinDetail(
-        id = id,
+    /**
 ```
 
 </details>
@@ -141,7 +141,7 @@ object AppAccessPoints
 ```
 The per-fork list of network access points this app talks to — REST and Supabase in ONE place.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:75</code></summary>
 
 ```kotlin
     // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
@@ -164,7 +164,7 @@ class AppMultiUrlConfigProvider(
 ```
 Concrete `MultiUrlConfigProvider` backed by the declarative `AccessPointRegistry`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:74</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:80</code></summary>
 
 ```kotlin
     // AccessPointRegistry. Clients thread it via
@@ -185,7 +185,7 @@ object AppSupabaseAnonKeys
 ```
 The per-fork map of Supabase access-point id → anon key. **SoT: `app-profile/app.yaml#network.access_points`** (rows) **+ the build environment** (values).
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:80</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:86</code></summary>
 
 ```kotlin
         SupabaseClientFactory(
@@ -242,7 +242,7 @@ object ProjectNetworkHeaders : DefaultHeaderProvider {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:57</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:63</code></summary>
 
 ```kotlin
     // built by `restApi(...)` resolves this, so a fork adds an app-wide header without hand-building
@@ -261,7 +261,7 @@ object ProjectNetworkHeaders : DefaultHeaderProvider {
 ```kotlin
 val NetworkModule = module
 ```
-_No KDoc at source._
+Koin module for `core/network` — the Ktorfit API bindings over the shared client.
 
 <details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:42</code></summary>
 
@@ -379,26 +379,26 @@ fun provideSpotRateLookupStore(
 
 </details>
 
-- `suspend fun getLatestRates(@Query("from") from: String): ExchangeRatesDto`
-- `suspend fun getHistoricalRates(`
+- `suspend fun getLatestRates(@Query("from") from: String): ExchangeRatesDto` — Latest rates for one base currency.
+- `suspend fun getHistoricalRates(` — Rates for one pair over a date range.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/frankfurter/dto/ExchangeRatesDto.kt`
 
 ```kotlin
 data class ExchangeRatesDto(
 ```
-_No KDoc at source._
+Wire shape of the Frankfurter `/latest` response — base currency plus a rate map.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/frankfurter/api/FrankfurterApi.kt:24</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/frankfurter/api/FrankfurterApi.kt:29</code></summary>
 
 ```kotlin
-
+     */
     @GET("v1/latest")
     suspend fun getLatestRates(@Query("from") from: String): ExchangeRatesDto
 
-    @GET("v1/{startDate}..{endDate}")
-    suspend fun getHistoricalRates(
-        @Path("startDate") startDate: String,
+    /**
+     * Rates for one pair over a date range.
+     *
 ```
 
 </details>
@@ -408,9 +408,9 @@ _No KDoc at source._
 ```kotlin
 data class RateHistoryDto(
 ```
-_No KDoc at source._
+Wire shape of the Frankfurter time-series response — a date-keyed map of rate maps.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/frankfurter/api/FrankfurterApi.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/frankfurter/api/FrankfurterApi.kt:45</code></summary>
 
 ```kotlin
         @Query("from") from: String,
@@ -537,7 +537,7 @@ private class FakeJsonPlaceholderApi : JsonPlaceholderApi {
 
 </details>
 
-- `suspend fun getTodo(@Path("id") id: Int): CloudTodoDto`
+- `suspend fun getTodo(@Path("id") id: Int): CloudTodoDto` — One todo by id.
 - `suspend fun updateTodo(@Path("id") id: Int, @Body todo: CloudTodoDto): CloudTodoDto` — Write-back (`PUT /todos/{id}`) — jsonplaceholder echoes the body as if persisted.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/jsonplaceholder/dto/CloudTodoDto.kt`
@@ -547,10 +547,10 @@ data class CloudTodoDto(
 ```
 Wire shape for jsonplaceholder `/todos`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/jsonplaceholder/api/JsonPlaceholderApi.kt:28</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/jsonplaceholder/api/JsonPlaceholderApi.kt:33</code></summary>
 
 ```kotlin
-interface JsonPlaceholderApi {
+     */
     @GET("todos/{id}")
     suspend fun getTodo(@Path("id") id: Int): CloudTodoDto
 
@@ -701,5 +701,5 @@ Custom serializer that destructures the World Bank's `[metadata, observations[]]
 
 ---
 
-_32 type(s), 38 function(s)/property(ies); 45 carry KDoc at source; 3 authored example(s); 26 live call site(s)._
+_32 type(s), 38 function(s)/property(ies); 58 carry KDoc at source; 3 authored example(s); 26 live call site(s)._
 <!-- api-docs:end -->

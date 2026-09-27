@@ -52,6 +52,10 @@ data class CountryPickerState(
 
 /** User intents the picker accepts. */
 sealed interface CountryPickerAction {
-    /** Free-text search; empty restores the full list. */
+    /**
+     * Free-text search; empty restores the full list.
+     *
+     * @property query the new search text.
+     */
     data class Search(val query: String) : CountryPickerAction
 }

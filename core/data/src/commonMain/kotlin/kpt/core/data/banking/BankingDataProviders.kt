@@ -32,10 +32,19 @@ import kpt.core.model.banking.LoanCalcScenario
 fun provideLoanOutbox(dao: DraftDao): SubmitOutbox<Loan> =
     RoomSubmitOutbox(dao = dao, serializer = Loan.serializer())
 
+/**
+ * Offline outbox for bill-reminder submissions — a Room-backed queue of drafts awaiting the network.
+ *
+ * Durable so a submission made offline survives process death and retries on reconnect, instead of
+ * being lost with the ViewModel that created it.
+ */
 @DataProvider(qualifier = "outbox.billReminder")
 fun provideBillReminderOutbox(dao: DraftDao): SubmitOutbox<BillReminder> =
     RoomSubmitOutbox(dao = dao, serializer = BillReminder.serializer())
 
+/**
+ * Offline outbox for saved loan-comparison scenarios.
+ */
 @DataProvider(qualifier = "outbox.loanCalcScenario")
 fun provideLoanCalcScenarioOutbox(dao: DraftDao): SubmitOutbox<LoanCalcScenario> =
     RoomSubmitOutbox(dao = dao, serializer = LoanCalcScenario.serializer())
@@ -47,11 +56,16 @@ fun provideLoanCalcScenarioOutbox(dao: DraftDao): SubmitOutbox<LoanCalcScenario>
  * to one runtime class across every payload and would collide with the other syncers.
  */
 class LoanSubmitSyncer internal constructor(
+    /**
+     * The wrapped syncer. Injected for its constructor side effect of starting the reconnect watch, which is why it is
+     * `@Suppress("unused")` rather than removed.
+     */
     @Suppress("unused") val syncer: OfflineSubmitSyncer<Loan, Loan>,
 )
 
 /** Marker wrapper around the BillReminder syncer — same erasure reason as [LoanSubmitSyncer]. */
 class BillReminderSubmitSyncer internal constructor(
+    /** The wrapped syncer — see [LoanSubmitSyncer.syncer]. */
     @Suppress("unused") val syncer: OfflineSubmitSyncer<BillReminder, BillReminder>,
 )
 
@@ -78,6 +92,12 @@ fun provideLoanSubmitSyncer(
     ).also { it.start() },
 )
 
+/**
+ * Drains the bill-reminder outbox whenever connectivity returns.
+ *
+ * `createdAtStart = true` because a syncer that is only built on first use never runs for a draft
+ * queued in a previous session — which is precisely the case the outbox exists for.
+ */
 @DataProvider(createdAtStart = true)
 fun provideBillReminderSubmitSyncer(
     scope: CoroutineScope,

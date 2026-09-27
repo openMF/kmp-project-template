@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/model sha=ee39068ed853b329912887ee2112944876713647 -->
+<!-- api-docs:begin module=core/model sha=7fd090fbb2d7a3055cd6cc04d0491fb6a33d568a -->
 ## API reference
 
-_Generated from `core/model` at tree `ee39068ed853` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/model` at tree `7fd090fbb2d7` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/model/src/commonMain/kotlin/kpt/core/model/alerts/PriceAlert.kt`
@@ -44,7 +44,7 @@ A price alert configured by the user for a specific coin.
 ```kotlin
 enum class AlertDirection
 ```
-_No KDoc at source._
+Which way a price must cross the threshold to fire the alert (above or below).
 
 <details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertsListScreen.kt:107</code></summary>
 
@@ -147,11 +147,11 @@ data class Loan(
 ```
 A personal loan tracked by the user — purely local, no remote sync.
 
-<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:62</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanDetailViewModel.kt:66</code></summary>
 
 ```kotlin
-    private val detailStream = repository.loanDetailStream(loanId, viewModelScope)
-
+     * framework's, not this screen's.
+     */
     val screenState: StateFlow<ScreenState<Loan>> = detailStream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
@@ -248,7 +248,7 @@ A cloud-synced todo — the toolkit's MUTABLE (offline-write) Store5 archetype s
 ```kotlin
 data class CoinMarket(
 ```
-_No KDoc at source._
+One row of the coin market list — the fields a list item renders, nothing more.
 
 <details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinMarketsScreen.kt:118</code></summary>
 
@@ -267,7 +267,7 @@ internal fun CoinMarketRow(coin: CoinMarket, onClick: () -> Unit, modifier: Modi
 ```kotlin
 data class CoinDetail(
 ```
-_No KDoc at source._
+A single coin's full detail, as shown on its own screen.
 
 <details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinDetailViewModel.kt:44</code></summary>
 
@@ -287,7 +287,7 @@ _No KDoc at source._
 ```kotlin
 data class Country(
 ```
-_No KDoc at source._
+A currency-bearing country: ISO code, display name and the currency it uses.
 
 <details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryPickerViewModel.kt:50</code></summary>
 
@@ -308,7 +308,7 @@ sealed interface CountryPickerAction {
 ```kotlin
 object CountryFlagUtils
 ```
-_No KDoc at source._
+Maps an ISO country code to its flag emoji, by offsetting ASCII letters into the Unicode regional-indicator range.
 
 - `fun detectCountryFromPhoneNumber(phoneNumber: String): Country?` — Get country by phone number (auto-detect)
 - `val cleanedNumber = phoneNumber.filter { it.isDigit() || it == '+' }`
@@ -328,14 +328,14 @@ _No KDoc at source._
 ```kotlin
 val worldCountries: List<Country> = listOf(
 ```
-_No KDoc at source._
+The static country/currency catalogue the picker offers. Static because it changes on the order of once a decade and a network round-trip for it would be absurd.
 
 ### `core/model/src/commonMain/kotlin/kpt/core/model/currency/ExchangeRates.kt`
 
 ```kotlin
 data class ExchangeRates(
 ```
-_No KDoc at source._
+FX rates for one base currency on one day — the `rates` map is quote-code → rate.
 
 <details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:574</code></summary>
 
@@ -354,7 +354,7 @@ private fun ExchangeRateCard(
 ```kotlin
 data class RateHistoryKey(
 ```
-_No KDoc at source._
+Store key for a historical series: currency pair plus window length. The window is PART of the key, so widening it is a different key and a full re-fetch. That is the `read_windowed_series` contract — a widened window is not a page append.
 
 <details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:510</code></summary>
 
@@ -373,7 +373,7 @@ _No KDoc at source._
 ```kotlin
 data class RateHistory(
 ```
-_No KDoc at source._
+A historical FX series for one pair over a date range.
 
 <details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeViewModelTest.kt:512</code></summary>
 
@@ -391,9 +391,9 @@ _No KDoc at source._
 ```kotlin
 data class RatePoint(
 ```
-_No KDoc at source._
+One (date, rate) sample within a `RateHistory`.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/mapper/RateHistoryEntityMapper.kt:34</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/currency/mapper/RateHistoryEntityMapper.kt:40</code></summary>
 
 ```kotlin
     endDate = endDate,
@@ -509,7 +509,7 @@ enum class IndicatorKind(val worldBankCode: String)
 ```
 Macro indicators surfaced by the toolkit. Each kind maps to a stable World Bank indicator code via `worldBankCode`.
 
-<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:84</code></summary>
+<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:83</code></summary>
 
 ```kotlin
     onBackClick: () -> Unit,
@@ -528,7 +528,7 @@ Macro indicators surfaced by the toolkit. Each kind maps to a stable World Bank 
 ```kotlin
 data class EmiResult(
 ```
-_No KDoc at source._
+Output of an EMI calculation: the monthly instalment plus the totals it implies.
 
 <details><summary>Used in the template — <code>feature/emi-calculator/src/commonMain/kotlin/kpt/feature/emicalculator/ui/EmiCalculatorScreenPreview.kt:32</code></summary>
 
@@ -574,7 +574,7 @@ Models high level auth state for the application.
 ```kotlin
 enum class DarkThemeConfig(val configName: String, val osValue: Int)
 ```
-_No KDoc at source._
+The user's dark-mode preference: follow the system, or force light/dark. `osValue` maps to the platform's own night-mode constant, so the choice can be handed straight to the OS rather than re-interpreted per platform.
 
 <details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsViewModel.kt:74</code></summary>
 
@@ -597,7 +597,7 @@ enum class LanguageConfig(
 ```
 Every language the app can be switched to, in the user's OWN language. GENERATED from core/registries/LOCALE_REGISTRY.yaml by `core/scripts/language-picker-sync.sh --write` — DO NOT HAND-EDIT.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/LanguageDialog.kt:62</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/LanguageDialog.kt:64</code></summary>
 
 ```kotlin
     onDismiss: () -> Unit,
@@ -616,7 +616,7 @@ Every language the app can be switched to, in the user's OWN language. GENERATED
 ```kotlin
 enum class ThemeBrand(val brandName: String)
 ```
-_No KDoc at source._
+The selected colour brand. A fork extends this to offer its own palettes.
 
 <details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsViewModel.kt:70</code></summary>
 
@@ -637,14 +637,14 @@ _No KDoc at source._
 ```kotlin
 enum class UnlockType
 ```
-_No KDoc at source._
+How the user unlocks the app — passcode or biometric.
 
 ### `core/model/src/commonMain/kotlin/kpt/core/model/user/UserData.kt`
 
 ```kotlin
 data class UserData(
 ```
-_No KDoc at source._
+Everything the app persists about the current user — theme, language, onboarding progress and the lock state.
 
 <details><summary>Used in the template — <code>feature/settings/src/commonTest/kotlin/kpt/feature/settings/SettingsViewModelTest.kt:78</code></summary>
 
@@ -681,5 +681,5 @@ Domain model for a personal-watchlist row (the `read_local_list` demo).
 
 ---
 
-_34 type(s), 15 function(s)/property(ies); 26 carry KDoc at source; 0 authored example(s); 31 live call site(s)._
+_34 type(s), 15 function(s)/property(ies); 41 carry KDoc at source; 0 authored example(s); 31 live call site(s)._
 <!-- api-docs:end -->

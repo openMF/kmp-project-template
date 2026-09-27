@@ -29,6 +29,9 @@ import kpt.core.base.designsystem.theme.KptTheme
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
+/**
+ * One item in [KptBottomBar]: icon, label and selected state.
+ */
 @Composable
 fun RowScope.KptNavigationBarItem(
     contentDescriptionRes: StringResource,

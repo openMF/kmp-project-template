@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/datastore sha=34a6943c1e27a12f5e4918eb83a21f79278cb9c6 -->
+<!-- api-docs:begin module=core-base/datastore sha=45681c67563f8da7add99119da7f189ddfd910fb -->
 ## API reference
 
-_Generated from `core-base/datastore` at tree `34a6943c1e27` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/datastore` at tree `45681c67563f` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -37,10 +37,10 @@ val DatastoreBaseModule = module
 ```
 Provides two `Settings` instances via Koin named qualifiers: - `named("plain")`: Standard unencrypted settings - `named("secure")`: Encrypted settings backed by platform secure storage
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:26</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:33</code></summary>
 
 ```kotlin
-
+ */
 val DatastoreModule = module {
     includes(CommonModule, DatastoreBaseModule)
 
@@ -79,7 +79,7 @@ interface SyncStatePersister
 ```
 Persistence seam for the `Synchronizer`'s per-feature last-synced version map. Backed by Multiplatform Settings (same store used by `UserPreferencesRepositoryImpl` for plain user prefs) — survives process restart but not data wipe.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:44</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:51</code></summary>
 
 ```kotlin
     // Sync state persister — Settings-backed (same store as user prefs).
@@ -92,15 +92,15 @@ Persistence seam for the `Synchronizer`'s per-feature last-synced version map. B
 
 </details>
 
-- `suspend fun read(): ChangeListVersions`
-- `suspend fun write(versions: ChangeListVersions)`
+- `suspend fun read(): ChangeListVersions` — Reads the stored versions; an empty map means nothing has synced yet.
+- `suspend fun write(versions: ChangeListVersions)` — Persists the versions after a successful sync.
 
 ```kotlin
 class SettingsSyncStatePersister(
 ```
 `SyncStatePersister` backed by multiplatform-settings — the per-feature last-synced version map, serialised under a single key.
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:45</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt:52</code></summary>
 
 ```kotlin
     // Read by Synchronizer at sync start; written on snapshot/changeList completion.
@@ -121,5 +121,5 @@ Platform-specific factory that creates an encrypted `Settings` instance. Returns
 
 ---
 
-_4 type(s), 4 function(s)/property(ies); 6 carry KDoc at source; 0 authored example(s); 4 live call site(s)._
+_4 type(s), 4 function(s)/property(ies); 8 carry KDoc at source; 0 authored example(s); 4 live call site(s)._
 <!-- api-docs:end -->

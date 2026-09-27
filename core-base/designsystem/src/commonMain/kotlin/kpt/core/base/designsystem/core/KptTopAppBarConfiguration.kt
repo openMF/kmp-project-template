@@ -147,6 +147,9 @@ data class TopAppBarAction(
     val testTag: String? = null,
 )
 
+/**
+ * DSL marker for the top-app-bar builders, so a nested block cannot implicitly configure an outer bar.
+ */
 @DslMarker
 annotation class TopAppBarDsl
 

@@ -33,18 +33,18 @@ import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 import kotlin.time.Clock
 
-@StoreProvider(id = "rateHistory", ttl = "1h")
-@CacheKey(
-    fn = "of",
-    key = "currency:rateHistory:{from}-{to}-{days}d",
-    params = ["from:String", "to:String", "days:Int"],
-)
 /**
  * Historical FX series for a (from, to, window) key — `NETWORK_WITH_CACHE`.
  *
  * Widening the window is a NEW key and therefore a full re-fetch, not a page append: the series is
  * windowed, never paged.
  */
+@StoreProvider(id = "rateHistory", ttl = "1h")
+@CacheKey(
+    fn = "of",
+    key = "currency:rateHistory:{from}-{to}-{days}d",
+    params = ["from:String", "to:String", "days:Int"],
+)
 fun provideRateHistoryStore(
     api: FrankfurterApi,
     networkMonitor: NetworkMonitor,

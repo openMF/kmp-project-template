@@ -56,8 +56,11 @@ import kotlin.time.Instant
  */
 @OptIn(ExperimentalTime::class)
 class PagingScreenStream<T : Any> internal constructor(
+    /** The page-aware screen state, already accumulated across every loaded page. */
     val state: Flow<ScreenState<List<T>>>,
+    /** Whether another page exists — what the footer keys on to offer 'load more' versus end-of-list. */
     val hasMore: StateFlow<Boolean>,
+    /** Whether a page load is in flight, so the footer shows progress without a second state source. */
     val isLoadingMore: StateFlow<Boolean>,
     /** The most recent load-more error, or null. Cleared on next loadNextPage/refresh. */
     val loadMoreError: StateFlow<Throwable?>,
@@ -136,6 +139,9 @@ class PagingScreenStream<T : Any> internal constructor(
         }
     }
 
+    /**
+     * Retries the failed page load. An alias for refresh, so a footer retry and a pull-to-refresh do the same thing.
+     */
     fun retry() = refresh()
 
     internal fun loadInitialPage(refresh: Boolean = false) {

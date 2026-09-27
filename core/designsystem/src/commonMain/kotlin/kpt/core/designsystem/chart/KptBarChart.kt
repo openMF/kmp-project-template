@@ -42,8 +42,10 @@ import kpt.core.designsystem.theme.spacing
  * bar to a fraction of the running max.
  */
 data class BarDatum(
+    /** Category label shown under the bar. */
     val label: String,
     val value: Float,
+    /** Bar colour, or null to take the next hue from [ChartTokens.multiSeriesColors]. */
     val color: Color? = null,
 )
 

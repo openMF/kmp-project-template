@@ -28,6 +28,9 @@ import androidx.compose.ui.util.fastMaxBy
 import kpt.core.base.designsystem.theme.KptTheme
 import kotlin.math.min
 
+/**
+ * Responsive grid whose column count derives from the available width via [BreakpointConfiguration].
+ */
 @Composable
 fun KptGrid(
     modifier: Modifier = Modifier,
@@ -116,6 +119,9 @@ fun KptGrid(
     }
 }
 
+/**
+ * Receiver for [KptGrid] content — declare items and spans here.
+ */
 interface GridScope {
     fun Modifier.gridItem(span: Int = 1): Modifier
 }
@@ -147,6 +153,9 @@ private data class GridItemModifier(
     }
 }
 
+/**
+ * Spacing and padding for a [KptGrid]; defaults come from the theme spacing scale.
+ */
 @Immutable
 data class GridConfiguration(
     val spacing: Dp,
@@ -169,6 +178,9 @@ data class GridConfiguration(
     }
 }
 
+/**
+ * Width thresholds mapping available width to a column count.
+ */
 @Immutable
 data class BreakpointConfiguration(
     val xs: Dp = 0.dp,

@@ -23,10 +23,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/store sha=cb65fd213a62c3161b86de59bce0790c6019b185 -->
+<!-- api-docs:begin module=core/store sha=6eff5ac7f0b2eb7d0a3aa79d7d86e457241a9e7b -->
 ## API reference
 
-_Generated from `core/store` at tree `cb65fd213a62` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/store` at tree `6eff5ac7f0b2` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertMappers.kt`
@@ -75,7 +75,7 @@ Build an offline-only `Store` for recurring bill reminders. Backed exclusively b
 ```kotlin
 fun provideBillReminderDetailStore(dao: BillReminderDao): Store<String, BillReminder> =
 ```
-_No KDoc at source._
+Single bill reminder by id — `OFFLINE_LOCAL_ONLY`, Room is the authority. Keyed by id rather than reusing the list store so a detail screen re-reads only its own row.
 
 ```kotlin
 fun provideBillRemindersWriteStore(dao: BillReminderDao): MutableStore<String, BillReminder> =
@@ -104,7 +104,7 @@ Build an offline-only `Store` for tracked personal loans. Backed exclusively by 
 ```kotlin
 fun provideLoanDetailStore(dao: LoanDao): Store<String, Loan> = StoreFactory.createOfflineStore(
 ```
-_No KDoc at source._
+Single loan by id — `OFFLINE_LOCAL_ONLY`, Room is the authority.
 
 ```kotlin
 fun provideLoansWriteStore(dao: LoanDao): MutableStore<String, Loan> =
@@ -140,7 +140,7 @@ The compute PORT for the amortization store.
 ```kotlin
 fun provideAmortizationCalcStore(
 ```
-_No KDoc at source._
+Amortization schedule for a loan — `MEMORY_ONLY`, computed rather than fetched. Store-backed even though nothing persists: the schedule is expensive and deterministic in its inputs, so the key doubles as the cache key and a revisit is free.
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/cloudtodo/impl/CloudTodoConflictResolver.kt`
 
@@ -170,7 +170,7 @@ data class CloudTodoKey(val id: Int)
 ```
 Single-todo Store5 key (jsonplaceholder addresses todos by numeric id).
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/impl/CloudTodoRepositoryImpl.kt:36</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/impl/CloudTodoRepositoryImpl.kt:42</code></summary>
 
 ```kotlin
 @RepositoryBinding(binds = CloudTodoRepository::class)
@@ -348,28 +348,28 @@ object ProjectScreenStateDefaults : ScreenStateOverrides {
 ```kotlin
 fun provideCoinDetailStore(
 ```
-_No KDoc at source._
+Single coin's detail from CoinGecko — `NETWORK_WITH_CACHE`, Room as the offline fallback.
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinMarketsStore.kt`
 
 ```kotlin
 fun provideCoinMarketsStore(
 ```
-_No KDoc at source._
+Paged coin-market list — `NETWORK_WITH_CACHE`, keyed by `PageKey` and read via `asPagingScreenStream`. The write path replaces a page atomically, so a scrolling reader never observes a half-empty page.
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/currency/impl/ExchangeRatesStore.kt`
 
 ```kotlin
 fun provideExchangeRatesStore(
 ```
-_No KDoc at source._
+FX rates by base currency — `NETWORK_WITH_CACHE`; the TTL is what keeps call volume inside the provider's free quota.
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/currency/impl/RateHistoryStore.kt`
 
 ```kotlin
 fun provideRateHistoryStore(
 ```
-_No KDoc at source._
+Historical FX series for a (from, to, window) key — `NETWORK_WITH_CACHE`. Widening the window is a NEW key and therefore a full re-fetch, not a page append: the series is windowed, never paged.
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt`
 
@@ -443,7 +443,7 @@ Composite key identifying a single World Bank macro-indicator request.
 ```kotlin
 fun provideMacroIndicatorStore(
 ```
-_No KDoc at source._
+World Bank macro indicator for a (country, indicator) key — `NETWORK_WITH_CACHE` with a long TTL, since the underlying series updates at most quarterly. Build an in-memory `Store` for World Bank macro indicators.
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/emi/impl/EmiStore.kt`
 
@@ -452,7 +452,7 @@ data class EmiParams(
 ```
 The Store key for a single EMI computation — the calculator's inputs. A calculator has no remote resource to key on, so the INPUTS are the key: two identical parameter sets are the same cache entry, and changing any field is a new entry.
 
-<details><summary>Used in the template — <code>feature/emi-calculator/src/commonMain/kotlin/kpt/feature/emicalculator/ui/EmiCalculatorViewModel.kt:45</code></summary>
+<details><summary>Used in the template — <code>feature/emi-calculator/src/commonMain/kotlin/kpt/feature/emicalculator/ui/EmiCalculatorViewModel.kt:46</code></summary>
 
 ```kotlin
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -474,7 +474,7 @@ The compute PORT for the EMI store.
 ```kotlin
 fun provideEmiStore(compute: EmiCompute): Store<EmiParams, EmiResult> =
 ```
-_No KDoc at source._
+EMI calculation — `MEMORY_ONLY` over a pure `core/domain` use-case. The parameter set IS the cache key, so a repeated calculation is served from cache and the result reaches the screen as a `ScreenState` like every other read surface.
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/exchange/impl/SpotRateLookupStore.kt`
 
@@ -521,5 +521,5 @@ Per-item WRITE store for the watchlist (keyed by coin id).
 
 ---
 
-_11 type(s), 40 function(s)/property(ies); 42 carry KDoc at source; 3 authored example(s); 11 live call site(s)._
+_11 type(s), 40 function(s)/property(ies); 51 carry KDoc at source; 3 authored example(s); 11 live call site(s)._
 <!-- api-docs:end -->

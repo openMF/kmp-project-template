@@ -19,6 +19,12 @@ import kpt.core.model.cloudtodo.CloudTodo
  * (Updater PUT + Bookkeeper offline-queue) — the toolkit's only MUTABLE-archetype consumer.
  */
 interface CloudTodoRepository {
+    /**
+     * Offline-first stream for one todo.
+     *
+     * @param id the todo id.
+     * @param scope scope the underlying Store shares — usually the ViewModel's, so the stream ends with the screen.
+     */
     fun todoStream(id: Int, scope: CoroutineScope): ScreenDataStream<CloudTodo>
 
     /** Flips `completed` and writes back through the MutableStore (Updater → server; Bookkeeper on failure). */

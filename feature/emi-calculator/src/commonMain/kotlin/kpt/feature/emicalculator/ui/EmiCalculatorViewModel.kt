@@ -40,6 +40,7 @@ class EmiCalculatorViewModel(
     /** The stream backing the CURRENT key — retained so [onRetry] re-runs the live one. */
     private var currentStream: ScreenDataStream<EmiResult>? = null
 
+    /** The computed EMI as a screen state, derived from [stateFlow] so it cannot disagree with the inputs on screen. */
     @OptIn(ExperimentalCoroutinesApi::class)
     val emiState: StateFlow<ScreenState<EmiResult>> = stateFlow
         .map { EmiParams(it.principal, it.ratePercent, it.tenureMonths) }
@@ -58,6 +59,7 @@ class EmiCalculatorViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ScreenState.Loading)
 
+    /** Recomputes after a failure. */
     fun onRetry() {
         currentStream?.retry()
     }
@@ -69,14 +71,36 @@ class EmiCalculatorViewModel(
     }
 }
 
+/** The calculator's inputs. */
 data class EmiState(
+    /** Loan amount. */
     val principal: Double = 100000.0,
+    /** APR as a percentage. */
     val ratePercent: Double = 8.5,
+    /** Tenure in months. Must be > 0; the EMI formula divides by it, so the store validates before computing. */
     val tenureMonths: Int = 12,
 )
 
+/** One action per input. */
 sealed class EmiAction {
+    /**
+     * Principal changed.
+     *
+     * @property value the new value.
+     */
     data class UpdatePrincipal(val value: Double) : EmiAction()
+
+    /**
+     * Rate changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateRate(val value: Double) : EmiAction()
+
+    /**
+     * Tenure changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateTenure(val value: Int) : EmiAction()
 }

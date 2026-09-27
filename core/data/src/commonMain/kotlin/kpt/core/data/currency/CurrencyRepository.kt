@@ -41,6 +41,15 @@ interface CurrencyRepository : Syncable {
         fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
     ): ScreenDataStream<ExchangeRates>
 
+    /**
+     * Offline-first stream for a historical series, re-keying whenever [keyFlow] emits.
+     *
+     * The key arrives as a Flow rather than a value so a pair or window change re-fetches without the screen
+     * rebuilding the stream.
+     *
+     * @param keyFlow the current series key.
+     * @param scope scope the underlying Store shares.
+     */
     fun rateHistoryStream(keyFlow: Flow<RateHistoryKey>, scope: CoroutineScope): ScreenDataStream<RateHistory>
 
     /**

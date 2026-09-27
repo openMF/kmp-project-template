@@ -59,6 +59,10 @@ class LoanDetailViewModel(
      */
     private val detailStream = repository.loanDetailStream(loanId, viewModelScope)
 
+    /**
+     * The loan as a screen state, straight from the store-backed detail stream — so loading, empty and error are the
+     * framework's, not this screen's.
+     */
     val screenState: StateFlow<ScreenState<Loan>> = detailStream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 

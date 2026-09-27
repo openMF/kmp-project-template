@@ -31,6 +31,10 @@ import kpt.core.model.emi.EmiResult
 class LoanComparisonViewModel :
     BaseViewModel<LoanComparisonState, Nothing, LoanComparisonAction>(LoanComparisonState()) {
 
+    /**
+     * Derived comparison — per-scenario EMI results plus which is cheapest. Recomputed from [stateFlow], so it can
+     * never disagree with the inputs on screen.
+     */
     val analysis: StateFlow<LoanComparisonAnalysis> = stateFlow
         .map { s ->
             val results = s.scenarios.map { sc ->
@@ -64,18 +68,29 @@ class LoanComparisonViewModel :
         }
     }
 
+    /** Shape of the comparison. */
     companion object {
+        /** How many scenarios are compared. Fixed, because the screen lays them out side by side. */
         const val SCENARIO_COUNT: Int = 3
     }
 }
 
+/** One loan being compared. */
 data class LoanScenario(
+    /** Loan amount. */
     val principal: Double = 100_000.0,
+    /** APR as a percentage. */
     val ratePercent: Double = 7.5,
+    /**
+     * Tenure in months. Staggered across the three default scenarios so the comparison shows a real difference before
+     * anything is edited.
+     */
     val tenureMonths: Int = 60,
 )
 
+/** The scenarios under comparison. */
 data class LoanComparisonState(
+    /** The scenarios, staggered by default so the screen is meaningful before anything is edited. */
     val scenarios: List<LoanScenario> = List(LoanComparisonViewModel.SCENARIO_COUNT) {
         // Stagger defaults so the comparison is meaningful out-of-the-box.
         LoanScenario(
@@ -86,12 +101,25 @@ data class LoanComparisonState(
     },
 )
 
+/**
+ * The computed comparison: one EMI result per scenario plus which is cheapest. Derived state — never stored, so it
+ * cannot fall out of step with the scenarios on screen.
+ */
 data class LoanComparisonAnalysis(
+    /** Per-scenario EMI results, in the same order as the scenarios. */
     val results: List<EmiResult>,
     /** Index of the cheapest scenario by total payable, or -1 if none have valid inputs. */
     val cheapestIndex: Int,
 )
 
+/** What the comparison can be asked to do. */
 sealed class LoanComparisonAction {
+    /**
+     * Replaces one scenario. Carries the index because the scenarios are positional — the screen's columns are their
+     * identity.
+     *
+     * @property index which column to replace — the scenarios are positional.
+     * @property scenario the replacement.
+     */
     data class UpdateScenario(val index: Int, val scenario: LoanScenario) : LoanComparisonAction()
 }

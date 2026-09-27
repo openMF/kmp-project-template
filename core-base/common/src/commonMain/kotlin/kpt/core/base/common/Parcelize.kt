@@ -41,8 +41,10 @@ expect annotation class IgnoredOnParcel()
  * than failing at the one that moved.
  */
 expect interface Parceler<P> {
+    /** Reconstructs a [P] from [parcel]. Must read fields in exactly the order [write] produced them. */
     fun create(parcel: Parcel): P
 
+    /** Writes this [P] into [parcel]. The read side depends on this order — see [create]. */
     fun P.write(parcel: Parcel, flags: Int)
 }
 
@@ -60,18 +62,31 @@ expect annotation class TypeParceler<T, P : Parceler<in T>>()
  * [Parceler], which keeps the shared surface identical on every target.
  */
 expect class Parcel {
+    /** Reads the next byte. */
     fun readByte(): Byte
+    /** Reads the next int. */
     fun readInt(): Int
 
+    /** Reads the next float. */
     fun readFloat(): Float
+    /** Reads the next double. */
     fun readDouble(): Double
+    /** Reads the next string, which may be null. */
     fun readString(): String?
 
+    /**
+     * Writes a byte. Read back with the matching `readByte` — order is the format, so reads must mirror writes
+     * exactly.
+     */
     fun writeByte(value: Byte)
+    /** Writes a 32-bit int. */
     fun writeInt(value: Int)
 
+    /** Writes a 32-bit float. */
     fun writeFloat(value: Float)
 
+    /** Writes a 64-bit double. */
     fun writeDouble(value: Double)
+    /** Writes a string, which may be null. */
     fun writeString(value: String?)
 }

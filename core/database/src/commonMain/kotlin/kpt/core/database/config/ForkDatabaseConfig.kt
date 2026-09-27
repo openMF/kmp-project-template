@@ -27,5 +27,9 @@ package kpt.core.database.config
  * slot. Same unit, different version per fork, no collision.
  */
 object ForkDatabaseConfig {
+    /**
+     * The fork's Room schema version — kept equal to `app-profile/migration-ledger.yaml#version` by product-health
+     * check LG-5.
+     */
     const val VERSION = 13
 }

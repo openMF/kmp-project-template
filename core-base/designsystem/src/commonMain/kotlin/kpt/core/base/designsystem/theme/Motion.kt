@@ -82,6 +82,12 @@ data class Motion(
     val listItemEnterMaxAnimated: Int = 20,
 )
 
+/**
+ * CompositionLocal carrying the app's motion scale — the shared durations and easings.
+ *
+ * Read this rather than hardcoding a duration: symmetric enter/exit timings are what make
+ * transitions feel like one system instead of per-screen choices.
+ */
 val LocalMotion = staticCompositionLocalOf { Motion() }
 
 /** Resolve the active [Motion] specs from composition. */

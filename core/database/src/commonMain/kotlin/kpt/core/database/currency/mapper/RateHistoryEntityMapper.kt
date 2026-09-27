@@ -16,6 +16,9 @@ import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RatePoint
 import kotlin.time.Clock
 
+/**
+ * Domain → row, serialising the sample list through the type converters.
+ */
 fun RateHistory.toEntity(): RateHistoryEntity = RateHistoryEntity(
     fromCurrency = from,
     toCurrency = to,
@@ -25,6 +28,9 @@ fun RateHistory.toEntity(): RateHistoryEntity = RateHistoryEntity(
     fetchedAt = Clock.System.now().toEpochMilliseconds(),
 )
 
+/**
+ * Row → domain, deserialising the sample list.
+ */
 fun RateHistoryEntity.toDomain(): RateHistory = RateHistory(
     from = fromCurrency,
     to = toCurrency,

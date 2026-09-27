@@ -29,7 +29,9 @@ import kotlinx.serialization.ExperimentalSerializationApi
  * writes.
  */
 interface SyncStatePersister {
+    /** Reads the stored versions; an empty map means nothing has synced yet. */
     suspend fun read(): ChangeListVersions
+    /** Persists the versions after a successful sync. */
     suspend fun write(versions: ChangeListVersions)
 }
 

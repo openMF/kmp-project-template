@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/database sha=9bdd1cd324a2e9bc4f218a1e3364b619892f1506 -->
+<!-- api-docs:begin module=core-base/database sha=08ce07a7feec0722889dcf66f4db2fc4b6f12e9d -->
 ## API reference
 
-_Generated from `core-base/database` at tree `9bdd1cd324a2` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/database` at tree `08ce07a7feec` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -44,16 +44,16 @@ data class LoanEntity(...)
 
 </details>
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/entity/CoinDetailEntity.kt:16</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/entity/CoinDetailEntity.kt:22</code></summary>
 
 ```kotlin
-import kpt.core.base.database.annotation.DbEntity
-
+ * `SourceOfTruth`, so nothing above `core/store` sees this type.
+ */
 @DbEntity
 @Entity(tableName = "coin_detail")
 data class CoinDetailEntity(
-    @PrimaryKey
-    val id: String,
+    /**
+     * CoinGecko's coin id, e.g. `bitcoin`. Primary key, and the key every other endpoint takes — never the ticker,
 ```
 
 </details>
@@ -73,16 +73,16 @@ interface LoanDao { ... }
 
 </details>
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/dao/CoinMarketDao.kt:20</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/dao/CoinMarketDao.kt:30</code></summary>
 
 ```kotlin
-import kpt.core.database.crypto.entity.CoinMarketEntity
-
+ * freshness entirely.
+ */
 @DbDao
 @Dao
 interface CoinMarketDao {
 
-    @Upsert
+    /** Inserts or replaces a whole page in one transaction, so a partial page never becomes visible. */
 ```
 
 </details>
@@ -92,16 +92,16 @@ annotation class DbConverters
 ```
 Marks a class holding Room `@TypeConverter` functions. Collected into the generated `@ColumnTypeConverters(...)` annotation on `AppDatabase`. Same declare-once contract as `DbEntity`: the converter class is the only place it is named.
 
-<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/converter/FintechTypeConverters.kt:16</code></summary>
+<details><summary>Used in the template — <code>core/database/src/commonMain/kotlin/kpt/core/database/crypto/converter/FintechTypeConverters.kt:22</code></summary>
 
 ```kotlin
-import kpt.core.base.database.annotation.DbConverters
-
+ * converter set without that annotation compiles and then fails at first query.
+ */
 @DbConverters
 class FintechTypeConverters {
 
+    /** Stores a code→rate map as JSON. */
     @ColumnTypeConverter
-    fun mapToString(map: Map<String, Double>): String = Json.encodeToString(map)
 ```
 
 </details>
@@ -147,10 +147,10 @@ fun provideCloudTodoBookkeeper(dao: BookkeeperDao): Bookkeeper<CloudTodoKey> =
 
 </details>
 
-- `suspend fun getLastFailedSync(key: String): Long?`
-- `suspend fun upsert(entity: BookkeeperEntity)`
-- `suspend fun delete(key: String)`
-- `suspend fun deleteAll()`
+- `suspend fun getLastFailedSync(key: String): Long?` — When the write for `key` last failed, or null if it has never failed. Drives retry backoff.
+- `suspend fun upsert(entity: BookkeeperEntity)` — Records a failed sync for a key.
+- `suspend fun delete(key: String)` — Clears the failure record for `key` — called once its write finally succeeds.
+- `suspend fun deleteAll()` — Clears every failure record. Called on logout.
 - `suspend fun pendingKeys(): List<String>` — Every key with a recorded sync failure, oldest failure first. A `org.mobilenativefoundation.store.store5.Bookkeeper` can only answer "did THIS key fail?" — `getLastFailedSync(key)` needs the key you are already holding.
 
 ### `core-base/database/src/commonMain/kotlin/kpt/core/base/database/infra/dao/ConflictDao.kt`
@@ -160,10 +160,10 @@ interface ConflictDao
 ```
 DAO for the framework write-conflict inbox (`framework_write_conflicts`).
 
-- `suspend fun insert(entity: ConflictEntity): Long`
+- `suspend fun insert(entity: ConflictEntity): Long` — Records a conflict, returning its row id.
 - `fun observePending(): Flow<List<ConflictEntity>>` — Pending (unresolved) conflicts, newest first — drives the Settings inbox list + badge.
-- `suspend fun getById(id: Long): ConflictEntity?`
-- `suspend fun markResolved(id: Long)`
+- `suspend fun getById(id: Long): ConflictEntity?` — One conflict by row id, or null once resolved and pruned.
+- `suspend fun markResolved(id: Long)` — Marks a conflict resolved. The row is kept so the inbox can show what was decided.
 
 ### `core-base/database/src/commonMain/kotlin/kpt/core/base/database/infra/dao/DraftDao.kt`
 
@@ -186,20 +186,20 @@ fun providePriceAlertOutbox(dao: DraftDao): SubmitOutbox<PriceAlert> =
 
 </details>
 
-- `suspend fun insert(entity: DraftEntity): Long`
-- `suspend fun getById(id: Long): DraftEntity?`
-- `suspend fun getPendingByFormKey(formKey: String): DraftEntity?`
-- `fun observePendingByFormKey(formKey: String): Flow<DraftEntity?>`
-- `suspend fun getPendingByUniqueKey(formKey: String, uniqueKey: String): DraftEntity?`
-- `fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<DraftEntity?>`
-- `fun observeAllByFormKey(formKey: String): Flow<List<DraftEntity>>`
-- `suspend fun getAllPending(): List<DraftEntity>`
-- `fun observeAll(): Flow<List<DraftEntity>>`
-- `suspend fun markRetrying(id: Long, nowMs: Long)`
-- `suspend fun markSubmitted(id: Long, nowMs: Long)`
-- `suspend fun requeue(id: Long, nowMs: Long)`
-- `suspend fun markFailed(id: Long, nowMs: Long, error: String?)`
-- `suspend fun updatePayload(id: Long, payloadJson: String, nowMs: Long)`
+- `suspend fun insert(entity: DraftEntity): Long` — Inserts a draft, returning its new row id.
+- `suspend fun getById(id: Long): DraftEntity?` — One draft by row id, or null if it has been submitted and pruned.
+- `suspend fun getPendingByFormKey(formKey: String): DraftEntity?` — The PENDING draft for a form, if the user has an unsent edit for it.
+- `fun observePendingByFormKey(formKey: String): Flow<DraftEntity?>` — Observes the pending draft for a form, so a form screen re-opens with the user's unsent edit.
+- `suspend fun getPendingByUniqueKey(formKey: String, uniqueKey: String): DraftEntity?` — Multi-pending companion to `getPendingByFormKey`. Reads the PENDING draft for a specific `(formKey, uniqueKey)` pair — N concurrent independent drafts can coexist under one `formKey` when each carries a distinct `uniqueKey` (e.g.
+- `fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<DraftEntity?>` — Streaming variant of `getPendingByUniqueKey`.
+- `fun observeAllByFormKey(formKey: String): Flow<List<DraftEntity>>` — Observes ALL non-terminal drafts (PENDING / RETRYING / FAILED) for a `formKey`, ordered newest-first by `createdAtMs`. Includes singleton drafts (uniqueKey IS NULL) and all multi-pending rows.
+- `suspend fun getAllPending(): List<DraftEntity>` — Every draft still awaiting submission — what the syncer drains on reconnect.
+- `fun observeAll(): Flow<List<DraftEntity>>` — Observes ALL non-terminal drafts (PENDING / RETRYING / FAILED) across EVERY formKey, newest-first.
+- `suspend fun markRetrying(id: Long, nowMs: Long)` — Marks a draft as being retried now, bumping its attempt count.
+- `suspend fun markSubmitted(id: Long, nowMs: Long)` — Marks a draft submitted. It stays until pruned, so the outcome remains visible to the user.
+- `suspend fun requeue(id: Long, nowMs: Long)` — Re-queues a draft for sync: transitions any state (typically FAILED) back to PENDING and clears `DraftEntity.errorMessage`, so `kpt.core.base.store.submit.OfflineSubmitSyncer` — which drains PENDING via `getAllPending` (RETRYING is excluded) — re-attempts it on the next online transition. The MANUAL counterpart to the automatic reconnect retry, surfaced by the template-level **Sync & Drafts** screen's per-row Retry action.
+- `suspend fun markFailed(id: Long, nowMs: Long, error: String?)` — Marks a draft failed, recording `error` so the user can be told WHY rather than just that it failed.
+- `suspend fun updatePayload(id: Long, payloadJson: String, nowMs: Long)` — Replaces a draft's payload — the user edited an unsent draft rather than creating another.
   _…more members; read the file._
 
 ### `core-base/database/src/commonMain/kotlin/kpt/core/base/database/infra/dao/FetchedAtDao.kt`
@@ -223,8 +223,8 @@ DAO for the framework-owned `framework_fetched_at` table. Backing store for `kpt
 
 </details>
 
-- `suspend fun read(storeKey: String): Long?`
-- `suspend fun upsert(entity: FetchedAtEntity)`
+- `suspend fun read(storeKey: String): Long?` — When `storeKey` was last fetched, epoch millis, or null if never — the input to every freshness decision.
+- `suspend fun upsert(entity: FetchedAtEntity)` — Stamps a store key as fetched now.
 
 ### `core-base/database/src/commonMain/kotlin/kpt/core/base/database/infra/entity/BookkeeperEntity.kt`
 
@@ -284,5 +284,5 @@ Persistent record of the last successful network fetch for a Store, keyed by the
 
 ---
 
-_12 type(s), 25 function(s)/property(ies); 14 carry KDoc at source; 2 authored example(s); 9 live call site(s)._
+_12 type(s), 25 function(s)/property(ies); 37 carry KDoc at source; 2 authored example(s); 9 live call site(s)._
 <!-- api-docs:end -->

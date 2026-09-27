@@ -219,8 +219,8 @@ will still pass in this state, by design — see `RT-8` above.
 **template-first** (`**` → `template`); fork territory is declared explicitly. A path resolving
 `template` unexpectedly means no rule claims it.
 
-Deeper guides: [Troubleshooting](../docs/claude/troubleshooting.md) ·
-[Deployment Playbook](../docs/claude/deployment-playbook.md) ·
-[Secrets Management](../docs/claude/secrets-management.md)
+Deeper guides: [Troubleshooting](../docs/troubleshooting.md) ·
+[Deployment Playbook](../docs/architecture/tree/deployment/playbook.md) ·
+[Secrets Management](../docs/architecture/tree/secrets/management.md)
 
 [← Back to Main](../CLAUDE.md)

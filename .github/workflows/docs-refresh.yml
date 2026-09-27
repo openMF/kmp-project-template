@@ -30,9 +30,22 @@ on:
       # its own — and a new module is exactly the case the scaffold exists to handle.
       - 'core-base/*/build.gradle.kts'
       - 'core/*/build.gradle.kts'
+      # The docs now cover the WHOLE tree (scripts/docs/tree-scaffold.sh), so a change anywhere that has
+      # a page has to re-run the check. Watching only core*/ left a page for `feature/` — the largest
+      # area in the repo — able to go stale with CI silent, which is the drift the gate exists to catch.
+      - 'feature/**'
+      - 'cmp-*/**'
+      - 'deployment/**'
+      - 'app-profile/**'
+      - 'build-logic/**'
+      - 'tools/**'
+      - 'sync/**'
+      - 'legal/**'
+      - 'gradle/**'
+      - 'scripts/**'
+      - 'tests/**'
       - 'docs/**'
-      - 'scripts/docs/**'
-      - '.github/workflows/docs-refresh.yml'
+      - '.github/workflows/**'
   push:
     branches: [dev]
     paths:
@@ -40,7 +53,17 @@ on:
       - 'core/**/*.kt'
       - 'core-base/*/build.gradle.kts'
       - 'core/*/build.gradle.kts'
-      - 'scripts/docs/**'
+      - 'feature/**'
+      - 'cmp-*/**'
+      - 'deployment/**'
+      - 'app-profile/**'
+      - 'build-logic/**'
+      - 'tools/**'
+      - 'sync/**'
+      - 'legal/**'
+      - 'gradle/**'
+      - 'scripts/**'
+      - 'tests/**'
   workflow_dispatch:
     inputs:
       force_pr:
@@ -63,10 +86,31 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Verify generated docs match source
+      - name: Audit the documentation end to end
         run: |
           set -euo pipefail
           chmod +x scripts/docs/*.sh
+          # doc-audit.sh is the SUPERSET: it runs the currency check plus area/unit coverage, authored
+          # substance, authored-reference resolution, repo-wide links and symbol coverage. Running only
+          # `refresh.sh --check` here verified the half of the docs that had just been re-derived, which
+          # is guaranteed to match — the other five checks are the ones that can actually fail.
+          if ! bash scripts/docs/doc-audit.sh; then
+            {
+              echo "### 📚 Documentation audit failed"
+              echo
+              echo "See the step log for the named gaps. Locally:"
+              echo
+              echo '```bash'
+              echo 'bash scripts/docs/doc-audit.sh'
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "✅ documentation audit complete" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify generated docs match source
+        run: |
+          set -euo pipefail
           if ! bash scripts/docs/refresh.sh --check; then
             {
               echo "### 📚 Docs are out of step with source"

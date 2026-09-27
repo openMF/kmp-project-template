@@ -238,28 +238,29 @@ warn "Firebase credentials exist" \
 # ============================================================================
 # 6. Deployment Scripts
 # ============================================================================
-print_section "6. Deployment Scripts"
+print_section "6. Deployment (Fastlane lanes)"
 
-check "deploy_firebase.sh exists" \
-    "[ -f 'scripts/deploy/deploy_firebase.sh' ]"
+# These SIX checks used to assert that scripts/deploy/deploy_{firebase,testflight,appstore}.sh exist and
+# are executable. Those wrappers were deliberately removed — deployment is Fastlane lanes invoked from
+# deployment/ — so the checks had been failing on a correct repository, which is worse than no check:
+# it trains a reader to ignore red output. They now verify the path deployment ACTUALLY takes.
+check "deployment/Fastfile exists" \
+    "[ -f 'deployment/Fastfile' ]"
 
-check "deploy_testflight.sh exists" \
-    "[ -f 'scripts/deploy/deploy_testflight.sh' ]"
+check "iOS lane file exists" \
+    "[ -f 'deployment/ios/firebase/lane.rb' ] || [ -d 'deployment/ios' ]"
 
-check "deploy_appstore.sh exists" \
-    "[ -f 'scripts/deploy/deploy_appstore.sh' ]"
+check "iOS deploy lanes are declared" \
+    "grep -rqE '^[[:space:]]*lane :(deploy_on_firebase|beta)' deployment"
+
+check "Gemfile pins the Fastlane toolchain" \
+    "[ -f 'deployment/Gemfile' ]"
+
+check "the pinned Ruby is declared" \
+    "[ -f 'deployment/.ruby-version' ] || [ -f '.ruby-version' ]"
 
 check "check_ios_version.sh exists" \
     "[ -f 'scripts/ios/check_ios_version.sh' ]"
-
-check "deploy_firebase.sh is executable" \
-    "[ -x 'scripts/deploy/deploy_firebase.sh' ]"
-
-check "deploy_testflight.sh is executable" \
-    "[ -x 'scripts/deploy/deploy_testflight.sh' ]"
-
-check "deploy_appstore.sh is executable" \
-    "[ -x 'scripts/deploy/deploy_appstore.sh' ]"
 
 check "check_ios_version.sh is executable" \
     "[ -x 'scripts/ios/check_ios_version.sh' ]"

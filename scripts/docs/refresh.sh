@@ -8,7 +8,7 @@
 # of pages is final. Remembering that order by hand is how a refresh half-runs and looks complete.
 # So there is one command, it runs them in dependency order, and CI runs the same one.
 #
-# WHAT IS GENERATED vs AUTHORED (measured 2026-09-26 across docs/architecture/modules/**):
+# WHAT IS GENERATED vs AUTHORED (measured 2026-09-26 across docs/architecture/tree/**):
 #   generated  6,226 lines (68%)  — the `<!-- api-docs:begin … -->` blocks, from Kotlin + KDoc
 #   authored   2,927 lines (32%)  — prose outside those markers, plus all of cross-cutting/,
 #                                   patterns/, claude/, setup/, deployment/, ios/, secrets/
@@ -23,10 +23,21 @@
 #                   annotations defined/consumed
 #   directory       which module pages exist                → docs/_sidebar.md        (api-docs-gen.sh --sidebar)
 #   whole template  the module tree + layer contract        → architecture/ARCHITECTURE.md TOC
+#   project tree    every top-level area, from git ls-files → architecture/tree/*.md +
+#                                                             architecture/PROJECT_TREE.md
+#                                                                                  (tree-scaffold.sh)
+#
+# The tree level was added because the three levels above it covered `core/` and `core-base/` — 911 of
+# ~3,200 tracked files. `feature/` (656 files), `scripts/` (426) and `app-profile/` (161) had no page at
+# all, so a reader could learn how a Store works and nothing about how the app is built or released.
 #
 # Usage:
 #   scripts/docs/refresh.sh            # regenerate everything in order
 #   scripts/docs/refresh.sh --check    # CHANGE NOTHING; exit 1 if anything would change
+#
+# `--check` verifies the GENERATED half plus authored references. For the complete picture — area and
+# unit coverage, whether each authored half says anything, repo-wide links, symbol coverage — run
+# `scripts/docs/doc-audit.sh`, which is what CI runs.
 #
 # `--check` is what a PR gate runs: it regenerates into a scratch copy and diffs, so a PR that edits
 # Kotlin without refreshing docs fails with the exact pages named.
@@ -38,7 +49,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT" || exit 2
 GEN="scripts/docs/api-docs-gen.sh"
 SCAFFOLD="scripts/docs/scaffold.sh"
-for _s in "$GEN" "$SCAFFOLD"; do
+TREE="scripts/docs/tree-scaffold.sh"
+REFS="scripts/docs/doc-refs.sh"
+for _s in "$GEN" "$SCAFFOLD" "$TREE" "$REFS"; do
   [ -f "$_s" ] || { echo "docs-refresh: missing $_s" >&2; exit 2; }
 done
 
@@ -54,11 +67,19 @@ if [ "$CHECK" -eq 1 ]; then
   # The scaffold runs here as well: without it a NEWLY ADDED module has no page, nothing to diff,
   # and --check would report IN STEP for a module that is entirely undocumented.
   bash "$SCAFFOLD" --write  >/dev/null 2>&1
+  bash "$TREE" --write      >/dev/null 2>&1
   bash "$GEN" --all --write >/dev/null 2>&1
   bash "$GEN" --sidebar    >/dev/null 2>&1
   if diff -rq "$SNAP/docs" docs >/dev/null 2>&1; then
     rm -rf docs && cp -R "$SNAP/docs" docs
-    echo "docs-refresh --check: IN STEP — generated docs match source"
+    # The generated half matches. Now the AUTHORED half: does its prose still name files that exist?
+    # Without this, `--check` verifies only what it just re-derived — which is guaranteed to match.
+    if ! bash "$REFS" --strict; then
+      echo
+      echo "docs-refresh --check: authored prose names files that do not exist (listed above)."
+      exit 1
+    fi
+    echo "docs-refresh --check: IN STEP — generated docs match source, authored references resolve"
     exit 0
   fi
   echo "docs-refresh --check: DRIFT — these pages are not current with source:"
@@ -71,12 +92,16 @@ if [ "$CHECK" -eq 1 ]; then
 fi
 
 echo "── refreshing docs from source ───────────────────────────────"
-echo "1/3  module pages (from the module tree + measured facts)"
+echo "1/5  module pages (from the module tree + measured facts)"
 bash "$SCAFFOLD" --write || exit 2
-echo "2/3  API reference (function/class level, from KDoc + signatures)"
+echo "2/5  project-tree pages (one per top-level area, + PROJECT_TREE.md)"
+bash "$TREE" --write || exit 2
+echo "3/5  API reference (function/class level, from KDoc + signatures)"
 bash "$GEN" --all --write || exit 2
-echo "3/3  navigation (docs/_sidebar.md, from the page tree)"
+echo "4/5  navigation (docs/_sidebar.md, from the page tree)"
 bash "$GEN" --sidebar || exit 2
+echo "5/5  authored references (do the paths in hand-written prose still exist?)"
+bash "$REFS" || exit 2
 [ -f docs/.nojekyll ] || : > docs/.nojekyll
 echo "─────────────────────────────────────────────────────────────"
 echo "Done. Browse with:  npx docsify-cli serve docs"

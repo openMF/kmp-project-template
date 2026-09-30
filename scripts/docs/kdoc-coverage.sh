@@ -17,6 +17,15 @@
 # Env: TEMPLATE_PATH
 # Exit: 0 ok · 1 below --min · 2 usage
 set -uo pipefail
+
+# Byte-deterministic text processing. Generated output must be a pure function of the tree, and the
+# locale silently breaks that in two ways: `sort` collates differently (a UTF-8 locale folds case, so
+# `di/SecurityModule.kt` sorts before `FailedAttemptTracker.kt` while C order puts it after), and `.`
+# in a length-bounded regex counts CHARACTERS under UTF-8 but BYTES under C — so a 241-character KDoc
+# summary containing an em dash (243 bytes) kept its second sentence on a Mac and lost it on the
+# Linux CI runner. Pinning to C fixes the comparison basis everywhere; no script here runs Python, so
+# this cannot force a Python stdout to ASCII.
+export LC_ALL=C
 ROOT="${TEMPLATE_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$ROOT" || exit 2
 . "$(dirname "${BASH_SOURCE[0]}")/_kdoc-lib.sh"
@@ -66,7 +75,7 @@ scan() {  # $1 = layer/module, $2 = "list" to print undocumented symbols
         printf '  %s:%s\n    %s\n' "${f#$ROOT/}" "$ln" "$sig"
       fi
     done < <(grep -nE "$DECL_RE" "$f" 2>/dev/null)
-  done < <(find "$src" -name '*.kt' -type f 2>/dev/null | sort)
+  done < <(find "$src" -name '*.kt' -type f 2>/dev/null | LC_ALL=C sort)
   [ "$mode" = list ] || echo "$total $documented"
 }
 

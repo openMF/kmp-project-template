@@ -25,10 +25,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/data sha=91cf20a437ec4a2bd59f310833f33e86b32b4677 -->
+<!-- api-docs:begin module=core/data sha=4f801e6c686d8bb540918be22bfe792b945bb981 -->
 ## API reference
 
-_Generated from `core/data` at tree `91cf20a437ec` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/data` at tree `4f801e6c686d` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt`
@@ -103,7 +103,7 @@ Eager: a syncer built only on first injection never starts watching for reconnec
 ```kotlin
 fun provideBillReminderSubmitSyncer(
 ```
-Drains the bill-reminder outbox whenever connectivity returns. `createdAtStart = true` because a syncer that is only built on first use never runs for a draft queued in a previous session — which is precisely the case the outbox exists for.
+Drains the bill-reminder outbox whenever connectivity returns.
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt`
 
@@ -396,33 +396,6 @@ class EconomicRatesRepositoryImpl(
 - `fun interestRateSeriesStream(` — Stream observations for a single static series.
 - `fun interestRateSeriesStream(` — Stream observations for a parameter-flow whose value can change at runtime (e.g. user switches series in the UI). Each new emission on `keyFlow` triggers a fresh load (cache-first).
 
-### `core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/EconomicRatesRepositoryImpl.kt`
-
-```kotlin
-class EconomicRatesRepositoryImpl(
-```
-Default `EconomicRatesRepository` over the FRED-backed interest-rate series Store.
-
-### `core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt`
-
-```kotlin
-class MacroIndicatorsRepositoryImpl(
-```
-Default `MacroIndicatorsRepository` over the World Bank macro-indicator Store.
-
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/economic/MacroIndicatorsRepositorySyncWithTest.kt:54</code></summary>
-
-```kotlin
-            .build()
-
-        val repo = MacroIndicatorsRepositoryImpl(
-            macroIndicatorStore = macroIndicatorStore,
-        )
-        val synchronizer = RecordingSynchronizer()
-```
-
-</details>
-
 ### `core/data/src/commonMain/kotlin/kpt/core/data/economic/MacroIndicatorsRepository.kt`
 
 ```kotlin
@@ -471,6 +444,33 @@ Curated list of countries the Banking Utility Toolkit's macro-snapshot screen sh
 - `fun search(query: String): List<Country>` — Filter the list by a free-text query. Matches a country's ISO code as a prefix OR its localised name as a substring, both case-insensitively.
 - `val trimmed = query.trim()`
 - `val upper = trimmed.uppercase()`
+
+### `core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/EconomicRatesRepositoryImpl.kt`
+
+```kotlin
+class EconomicRatesRepositoryImpl(
+```
+Default `EconomicRatesRepository` over the FRED-backed interest-rate series Store.
+
+### `core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt`
+
+```kotlin
+class MacroIndicatorsRepositoryImpl(
+```
+Default `MacroIndicatorsRepository` over the World Bank macro-indicator Store.
+
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/economic/MacroIndicatorsRepositorySyncWithTest.kt:54</code></summary>
+
+```kotlin
+            .build()
+
+        val repo = MacroIndicatorsRepositoryImpl(
+            macroIndicatorStore = macroIndicatorStore,
+        )
+        val synchronizer = RecordingSynchronizer()
+```
+
+</details>
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/emi/EmiCalculatorRepository.kt`
 
@@ -528,34 +528,6 @@ fun provideAuthHeaderBridge(
 ```
 Eager: starts collecting the credential at graph construction. `createdAtStart` is load-bearing. Built lazily, this would construct on first injection — and nothing injects it, because its whole job is a side effect.
 
-### `core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt`
-
-```kotlin
-class UserDataRepositoryImpl(
-```
-Default `UserDataRepository`.
-
-### `core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt`
-
-```kotlin
-class UserLogoutManagerImpl(
-```
-Default `UserLogoutManager`: clears every Store cache and draft row, then emits the logout event. Cache-clearing is the load-bearing half — a Store that survives logout would serve the previous user's data to the next one.
-
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:66</code></summary>
-
-```kotlin
-    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
-
-    single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
-}
-
-/**
- * Per-target repository bindings supplied by each `actual` — the pieces that cannot be expressed in
-```
-
-</details>
-
 ### `core/data/src/commonMain/kotlin/kpt/core/data/user/LogoutEvent.kt`
 
 ```kotlin
@@ -563,16 +535,16 @@ data class LogoutEvent(
 ```
 Result class to share the `loggedOutUserId` of a user that was successfully logged out.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:40</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/UserLogoutManager.kt:24</code></summary>
 
 ```kotlin
-    private val scope = CoroutineScope(dispatcherManager.unconfined)
-
-    private val mutableLogoutEventFlow: MutableSharedFlow<LogoutEvent> = bufferedMutableSharedFlow()
-    override val logoutEventFlow: SharedFlow<LogoutEvent> = mutableLogoutEventFlow.asSharedFlow()
+     * Observable flow of [LogoutEvent]s
+     */
+    val logoutEventFlow: SharedFlow<LogoutEvent>
 
     /**
      * Completely logs out the given [userId], removing all data. The [reason] indicates why the
+     * user is being logged out.
 ```
 
 </details>
@@ -584,16 +556,16 @@ sealed class LogoutReason
 ```
 Indicates the reason that the user is being logged out.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:48</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/UserLogoutManager.kt:30</code></summary>
 
 ```kotlin
+     * user is being logged out.
      */
-    // TODO:: Currently, both methods (logout and softLogout) perform the same action.
-    override fun logout(userId: Long, reason: LogoutReason) {
-        Logger.d { "User Logout - $userId, $reason" }
+    fun logout(userId: Long, reason: LogoutReason)
 
-        clearUserData()
-        mutableLogoutEventFlow.tryEmit(LogoutEvent(userId))
+    /**
+     * Partially logs out the given [userId]. All data for the given [userId] will be removed with
+     * the exception of basic account data. The [reason] indicates why the user is being logged out.
 ```
 
 </details>
@@ -659,6 +631,34 @@ Coordinates logout across the app: wipes local state and notifies observers. Cen
 - `val logoutEventFlow: SharedFlow<LogoutEvent>` — Observable flow of `LogoutEvent`s
 - `fun logout(userId: Long, reason: LogoutReason)` — Completely logs out the given `userId`, removing all data. The `reason` indicates why the user is being logged out.
 - `fun softLogout(userId: Long, reason: LogoutReason)` — Partially logs out the given `userId`. All data for the given `userId` will be removed with the exception of basic account data. The `reason` indicates why the user is being logged out.
+
+### `core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt`
+
+```kotlin
+class UserDataRepositoryImpl(
+```
+Default `UserDataRepository`.
+
+### `core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt`
+
+```kotlin
+class UserLogoutManagerImpl(
+```
+Default `UserLogoutManager`: clears every Store cache and draft row, then emits the logout event. Cache-clearing is the load-bearing half — a Store that survives logout would serve the previous user's data to the next one.
+
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:66</code></summary>
+
+```kotlin
+    single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+
+    single<UserLogoutManager> { UserLogoutManagerImpl(get(), get(), get()) }
+}
+
+/**
+ * Per-target repository bindings supplied by each `actual` — the pieces that cannot be expressed in
+```
+
+</details>
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/util/SharedFlowExtensions.kt`
 

@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/ui sha=6b7b4ec7d0f3122e7d8b4b6c7370882f613c61f1 -->
+<!-- api-docs:begin module=core-base/ui sha=5d381c29101ef6c23307e388ed14dc03cd5e28b3 -->
 ## API reference
 
-_Generated from `core-base/ui` at tree `6b7b4ec7d0f3` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/ui` at tree `5d381c29101e` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -49,6 +49,81 @@ The SINGLE common-code accessor for the app's user-facing display name.
 </details>
 
 - `val appDisplayName: String get() = BuildKonfig.APP_DISPLAY_NAME` — The fork's display name, from `app-profile` via BuildKonfig — never hardcoded, so a rebrand needs no code change.
+
+### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/GestureDetector.kt`
+
+```kotlin
+fun Modifier.detectMultiTapGesture(
+```
+Modifier that detects a multi-tap gesture within a configurable timeout window.
+
+<details><summary>Example</summary>
+
+```kotlin
+Text(
+    text = "Tap me 5 times!",
+    modifier = Modifier
+        .detectMultiTapGesture {
+            // Show hidden feature
+            showDebugMenu = true
+        }
+)
+Text(
+    text = "Tap me 3 times quickly!",
+    modifier = Modifier
+        .detectMultiTapGesture(
+            tapCount = 3,
+            tapTimeoutMs = 500L,
+        ) {
+            // Show hidden feature
+        }
+)
+```
+
+</details>
+
+```kotlin
+fun Modifier.detectLongPressGesture(
+```
+Modifier that detects a long press gesture.
+
+<details><summary>Example</summary>
+
+```kotlin
+Box(
+    modifier = Modifier
+        .detectLongPressGesture {
+            // Handle long press
+        }
+)
+```
+
+</details>
+
+```kotlin
+fun Modifier.detectDoubleTapGesture(
+```
+Modifier that detects a double tap gesture.
+
+<details><summary>Example</summary>
+
+```kotlin
+Image(
+    modifier = Modifier
+        .detectDoubleTapGesture {
+            // Handle double tap (e.g., like action)
+        }
+)
+```
+
+</details>
+
+### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/KptConnectivityBanner.kt`
+
+```kotlin
+fun KptConnectivityBanner(
+```
+Thin wrapper around `ConnectivityBanner` from `cmp-network-monitor-compose`.
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/captiveportal/CaptivePortalLauncher.kt`
 
@@ -347,81 +422,6 @@ Humanises a duration into a "X ago" tooltip phrase for `FreshnessIndicator`.
 fun RefreshStateChip(
 ```
 Inline dismissible "we're showing previous data" chip for **input-type screens** (Rate History period/currency picker, etc.) where the previous selection's data is preserved as a stale fallback while the new key's fetch is in-flight or has failed. Renders nothing unless `signal`.band is `FreshnessBand.VeryStale` — i.e. the preserved data is significantly out of date OR a fetch error has occurred. The chip's label categorises the error via `categorize` when `signal`.lastError is non-null ("No network · Showing previous data ↺", "Server error · Showing previous data ↺", etc.); falls back to a generic age-based label otherwise. Pair this with the per-card `FreshnessIndicator` on the title: the indicator surfaces the staleness, the chip explains it inline next to the content.
-
-### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/GestureDetector.kt`
-
-```kotlin
-fun Modifier.detectMultiTapGesture(
-```
-Modifier that detects a multi-tap gesture within a configurable timeout window.
-
-<details><summary>Example</summary>
-
-```kotlin
-Text(
-    text = "Tap me 5 times!",
-    modifier = Modifier
-        .detectMultiTapGesture {
-            // Show hidden feature
-            showDebugMenu = true
-        }
-)
-Text(
-    text = "Tap me 3 times quickly!",
-    modifier = Modifier
-        .detectMultiTapGesture(
-            tapCount = 3,
-            tapTimeoutMs = 500L,
-        ) {
-            // Show hidden feature
-        }
-)
-```
-
-</details>
-
-```kotlin
-fun Modifier.detectLongPressGesture(
-```
-Modifier that detects a long press gesture.
-
-<details><summary>Example</summary>
-
-```kotlin
-Box(
-    modifier = Modifier
-        .detectLongPressGesture {
-            // Handle long press
-        }
-)
-```
-
-</details>
-
-```kotlin
-fun Modifier.detectDoubleTapGesture(
-```
-Modifier that detects a double tap gesture.
-
-<details><summary>Example</summary>
-
-```kotlin
-Image(
-    modifier = Modifier
-        .detectDoubleTapGesture {
-            // Handle double tap (e.g., like action)
-        }
-)
-```
-
-</details>
-
-### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/KptConnectivityBanner.kt`
-
-```kotlin
-fun KptConnectivityBanner(
-```
-Thin wrapper around `ConnectivityBanner` from `cmp-network-monitor-compose`.
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/motion/KptFadeThrough.kt`
 
@@ -1397,18 +1397,6 @@ fun TrackScrollJank(scrollableState: ScrollableState, stateName: String) {
 
 </details>
 
-### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/util/SharedElementExt.kt`
-
-```kotlin
-val LocalAnimatedVisibilityScope = compositionLocalOf<AnimatedVisibilityScope?> { null }
-```
-CompositionLocal that provides access to an `AnimatedVisibilityScope` within the composition. Default value is null, requiring an explicit provider upstream in the composition.
-
-```kotlin
-val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope?> { null }
-```
-CompositionLocal that provides access to a `SharedTransitionScope` within the composition. Used for creating shared element transitions between composables. Default value is null, requiring an explicit provider upstream in the composition.
-
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/util/ShareUtils.kt`
 
 ```kotlin
@@ -1426,6 +1414,18 @@ Platform-specific utility for sharing content with other applications. This expe
 - `fun sendViaSMS(number: String, message: String)` — Opens the platform SMS composer with the given parameters.
 - `fun copyText(text: String)` — Copies the given text to the system clipboard.
 - `suspend fun shareApp(storeLink: String, message: String = "")` — Shares the app store link with a custom message. Opens the platform share sheet with the store link and message combined, allowing users to share the app with others via various apps.
+
+### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/util/SharedElementExt.kt`
+
+```kotlin
+val LocalAnimatedVisibilityScope = compositionLocalOf<AnimatedVisibilityScope?> { null }
+```
+CompositionLocal that provides access to an `AnimatedVisibilityScope` within the composition. Default value is null, requiring an explicit provider upstream in the composition.
+
+```kotlin
+val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope?> { null }
+```
+CompositionLocal that provides access to a `SharedTransitionScope` within the composition. Used for creating shared element transitions between composables. Default value is null, requiring an explicit provider upstream in the composition.
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/util/StringExt.kt`
 
@@ -1520,7 +1520,7 @@ Almost all the events in the app involve navigation or toasts. To prevent accide
 ```kotlin
 abstract class BaseMutationViewModel<T, R>(
 ```
-The single base class for edit/mutation-screen ViewModels — the one a feature module extends. It bundles a read stream (`mutableScreenState`) with a submit lifecycle, exposing both through the inherited MVI `stateFlow` as `MutationUiState`.
+The single base class for edit/mutation-screen ViewModels — the one a feature module extends.
 
 <details><summary>Example</summary>
 

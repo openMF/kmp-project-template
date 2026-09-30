@@ -467,16 +467,16 @@ data class MacroIndicator(
 ```
 Domain representation of a country-level macro indicator sourced from the World Bank Open Data API. The default consumer is the Banking Utility Toolkit's "B8 Country Macro Snapshot" screen.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt:51</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/MacroIndicatorsRepository.kt:43</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = MacroIndicatorsRepository::class)
-class MacroIndicatorsRepositoryImpl(
-    @FromStore(AppStoreIds.MacroIndicator) private val macroIndicatorStore: Store<MacroIndicatorKey, MacroIndicator>,
-) : MacroIndicatorsRepository {
+        scope: CoroutineScope,
+        fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
+    ): ScreenDataStream<MacroIndicator>
 
-    override fun macroIndicatorStream(
-        key: MacroIndicatorKey,
+    /**
+     * Stream observations for a parameter-flow — typically driven by a UI
+     * picker that lets the user switch countries / indicators.
 ```
 
 </details>
@@ -544,16 +544,13 @@ data class ProfileInfo(
 ```
 What the profile screen displays. In the template this carries only the app's display name — the demo profile is a local, signed-out placeholder.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/profile/impl/ProfileRepositoryImpl.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/profile/ProfileRepository.kt:20</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = ProfileRepository::class)
-internal class ProfileRepositoryImpl(
-    @FromStore(AppStoreIds.Profile) private val profileStore: Store<Unit, ProfileInfo>,
-) : ProfileRepository {
 
-    override fun profileStream(scope: CoroutineScope): ScreenDataStream<ProfileInfo> =
-        profileStore.asScreenStream(
+    /** A [ScreenDataStream] over the profile info. */
+    fun profileStream(scope: CoroutineScope): ScreenDataStream<ProfileInfo>
+}
 ```
 
 </details>
@@ -572,16 +569,15 @@ enum class DarkThemeConfig(val configName: String, val osValue: Int)
 ```
 The user's dark-mode preference: follow the system, or force light/dark. `osValue` maps to the platform's own night-mode constant, so the choice can be handed straight to the OS rather than re-interpreted per platform.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:62</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/UserDataRepository.kt:55</code></summary>
 
 ```kotlin
-        get() = preferencesRepository.observeLanguage
 
-    override val observeDarkThemeConfig: Flow<DarkThemeConfig>
-        get() = preferencesRepository.observeDarkThemeConfig
+    /** Dark-mode preference as a stream. */
+    val observeDarkThemeConfig: Flow<DarkThemeConfig>
 
-    override val observeDynamicColorPreference: Flow<Boolean>
-        get() = preferencesRepository.observeDynamicColorPreference
+    /** Whether to derive the palette from platform dynamic colour. */
+    val observeDynamicColorPreference: Flow<Boolean>
 ```
 
 </details>
@@ -593,16 +589,15 @@ enum class LanguageConfig(
 ```
 Every language the app can be switched to, in the user's OWN language. GENERATED from core/registries/LOCALE_REGISTRY.yaml by `core/scripts/language-picker-sync.sh --write` — DO NOT HAND-EDIT.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:59</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/UserDataRepository.kt:52</code></summary>
 
 ```kotlin
-        get() = preferencesRepository.passcode
 
-    override val observeLanguage: Flow<LanguageConfig>
-        get() = preferencesRepository.observeLanguage
+    /** Selected language, re-emitting on change. */
+    val observeLanguage: Flow<LanguageConfig>
 
-    override val observeDarkThemeConfig: Flow<DarkThemeConfig>
-        get() = preferencesRepository.observeDarkThemeConfig
+    /** Dark-mode preference as a stream. */
+    val observeDarkThemeConfig: Flow<DarkThemeConfig>
 ```
 
 </details>
@@ -614,15 +609,15 @@ enum class ThemeBrand(val brandName: String)
 ```
 The selected colour brand. A fork extends this to offer its own palettes.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:73</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/UserDataRepository.kt:67</code></summary>
 
 ```kotlin
-    override suspend fun setLanguage(language: LanguageConfig) = preferencesRepository.setLanguage(language)
 
-    override suspend fun setThemeBrand(themeBrand: ThemeBrand) = preferencesRepository.setThemeBrand(themeBrand)
+    /** Persists the colour brand. */
+    suspend fun setThemeBrand(themeBrand: ThemeBrand)
 
-    override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) =
-        preferencesRepository.setDarkThemeConfig(darkThemeConfig)
+    /** Persists the dark-mode preference. */
+    suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)
 ```
 
 </details>
@@ -641,15 +636,16 @@ data class UserData(
 ```
 Everything the app persists about the current user — theme, language, onboarding progress and the lock state.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:40</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/UserDataRepository.kt:31</code></summary>
 
 ```kotlin
-class UserDataRepositoryImpl(
-    private val preferencesRepository: UserPreferencesRepository,
-    @FromStore(AppStoreIds.UserData) private val userDataStore: Store<Unit, UserData>,
-) : UserDataRepository {
-    override val userData: StateFlow<UserData>
-        get() = preferencesRepository.userData
+
+    /** The whole preference aggregate as hot state, so a screen has a value at first composition. */
+    val userData: StateFlow<UserData>
+
+    /**
+     * Store5-backed read of the same preferences, as a [ScreenDataStream].
+     *
 ```
 
 </details>
@@ -661,15 +657,15 @@ data class WatchlistItem(
 ```
 Domain model for a personal-watchlist row (the `read_local_list` demo).
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/watchlist/impl/WatchlistRepositoryImpl.kt:43</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/watchlist/WatchlistRepository.kt:29</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = WatchlistRepository::class)
-internal class WatchlistRepositoryImpl(
-    @FromStore(AppStoreIds.Watchlist) private val watchlistStore: Store<Unit, List<WatchlistItem>>,
-    @FromStore(AppStoreIds.WatchlistMutable) private val watchlistWriteStore: MutableStore<String, WatchlistItem>,
-    private val dao: WatchlistDao,
-) : WatchlistRepository {
+
+    /** Observe the watchlist as a Store5-backed [ScreenDataStream] (offline-local, newest-added first). */
+    fun watchlistStream(scope: CoroutineScope): ScreenDataStream<List<WatchlistItem>>
+
+    /** Reactive in-membership check. Used by the star toggle to render filled/outline. */
+    fun contains(coinId: String): Flow<Boolean>
 ```
 
 </details>

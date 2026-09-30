@@ -139,7 +139,7 @@ The compute PORT for the amortization store.
 ```kotlin
 fun provideAmortizationCalcStore(
 ```
-Amortization schedule for a loan — `MEMORY_ONLY`, computed rather than fetched. Store-backed even though nothing persists: the schedule is expensive and deterministic in its inputs, so the key doubles as the cache key and a revisit is free.
+Amortization schedule for a loan — `MEMORY_ONLY`, computed rather than fetched.
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/cloudtodo/impl/CloudTodoConflictResolver.kt`
 
@@ -424,16 +424,15 @@ data class MacroIndicatorKey(
 ```
 Composite key identifying a single World Bank macro-indicator request.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/MacroIndicatorsRepository.kt:40</code></summary>
 
 ```kotlin
- */
-private val PINNED_MACRO_KEYS = listOf(
-    MacroIndicatorKey(countryCode = "US", indicator = IndicatorKind.GDP),
-    MacroIndicatorKey(countryCode = "IN", indicator = IndicatorKind.GDP),
-)
-
-/**
+     */
+    fun macroIndicatorStream(
+        key: MacroIndicatorKey,
+        scope: CoroutineScope,
+        fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
+    ): ScreenDataStream<MacroIndicator>
 ```
 
 </details>

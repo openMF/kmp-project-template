@@ -12,6 +12,7 @@
 #   A5  every path named in authored prose exists             → doc-refs.sh --strict
 #   A6  every internal markdown link resolves, repo-wide
 #   A7  every public symbol is documented                     → doc-scan.sh
+#   A8  the generators are DETERMINISTIC across platforms     → static, see below
 #
 # Usage: scripts/docs/doc-audit.sh [--quiet]
 # Exit:  0 complete · 1 gaps found (each named) · 2 cannot run
@@ -118,6 +119,52 @@ if [ "$(bash "$D/doc-scan.sh" --gaps 2>/dev/null | wc -l | tr -d ' ')" = "0" ]; 
 else
   bash "$D/doc-scan.sh" --summary 2>/dev/null | tail -3 | sed 's/^/  /'; FAIL=1
 fi
+
+say "── A8  generators are platform-deterministic ─────────────────────────────────"
+# A4 asks whether the committed pages match what the generator produces HERE. It cannot ask whether
+# the generator produces the same thing ELSEWHERE — and four separate non-determinisms shipped
+# through that blind spot, each of which made A4 pass on macOS and fail on the Linux runner:
+#
+#   1. an unsorted `find` feeding call_site()'s `head -1`, so the rendered example was whichever
+#      file the FILESYSTEM listed first (APFS and ext4 disagree)
+#   2. `sort` under a UTF-8 locale folds case, so `di/SecurityModule.kt` sorted before
+#      `FailedAttemptTracker.kt` where C order puts it after — and module-hash.sh hashes that list,
+#      so the sha= anchor moved with it
+#   3. mawk (Ubuntu's /usr/bin/awk, hence the runner's) accepts `{2,}` but is NOT greedy with it: it
+#      matched `Kpt`/`The`/`Foo` where BSD awk and gawk match `KptTheme`. The index filled with
+#      three-letter fragments and EVERY call-site block silently vanished on Linux
+#   4. `.` in a length-bounded regex counts characters under UTF-8 and bytes under C, so a
+#      241-character / 243-byte KDoc summary kept its second sentence on one platform only
+#
+# Each is cheap to detect statically and expensive to find empirically — it took a Linux container to
+# see any of them. So this check is static on purpose: it holds the invariant without CI having to
+# run the generator twice on two operating systems.
+_d8=0
+for _g in "$D/api-docs-gen.sh" "$D/module-hash.sh" "$D/kdoc-coverage.sh" "$D/doc-scan.sh"; do
+  grep -q '^export LC_ALL=C' "$_g" || { say "  ✗ $_g does not pin LC_ALL=C — sort order and regex length become locale-dependent"; _d8=1; }
+done
+# An unpinned `sort` in a script that does not export LC_ALL=C. Anchored to a PIPE rather than to
+# whitespace: the looser form matched the word "sort" inside this check's own message string and
+# reported doc-audit.sh against itself — the same mistake RT-9 makes when it reads `bundle exec`
+# inside an echoed string. Every sort in these generators is pipe-fed, so the pipe IS the signal.
+while IFS= read -r _hit; do
+  [ -n "$_hit" ] || continue
+  _f="${_hit%%:*}"
+  grep -q '^export LC_ALL=C' "$_f" 2>/dev/null && continue
+  say "  ✗ $_hit"; say "      unpinned sort: prefix LC_ALL=C, or export it at the top of the script"; _d8=1
+done <<EOF2
+$(grep -nE '\|[[:space:]]*sort([^A-Za-z0-9_-]|$)' "$D"/*.sh 2>/dev/null | grep -v 'LC_ALL=C sort' | grep -vE ':[[:space:]]*#')
+EOF2
+# awk interval quantifiers — accepted everywhere, greedy only in some awks.
+while IFS= read -r _hit; do
+  [ -n "$_hit" ] || continue
+  say "  ✗ $_hit"
+  say "      awk interval quantifier is not greedy in mawk — use an explicit [..][..]+ form"
+  _d8=1
+done <<EOF3
+$(grep -nE 'match\(.*\{[0-9]+,[0-9]*\}' "$D"/*.sh "$D"/scanners/*.awk 2>/dev/null | grep -vE ':[[:space:]]*#')
+EOF3
+if [ "$_d8" -eq 0 ]; then say "  ✓ no locale- or awk-dependent construct in the generators"; else FAIL=1; fi
 
 say ""
 if [ "$FAIL" -eq 0 ]; then say "✅ DOCUMENTATION AUDIT: complete"; else say "❌ DOCUMENTATION AUDIT: gaps above"; fi

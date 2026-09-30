@@ -26,6 +26,15 @@
 # printed "0 gaps" — indistinguishable from fully documented, and a gate built on that passes while
 # measuring nothing. Every scanner invocation is checked, and any failure aborts with a message.
 set -uo pipefail
+
+# Byte-deterministic text processing. Generated output must be a pure function of the tree, and the
+# locale silently breaks that in two ways: `sort` collates differently (a UTF-8 locale folds case, so
+# `di/SecurityModule.kt` sorts before `FailedAttemptTracker.kt` while C order puts it after), and `.`
+# in a length-bounded regex counts CHARACTERS under UTF-8 but BYTES under C — so a 241-character KDoc
+# summary containing an em dash (243 bytes) kept its second sentence on a Mac and lost it on the
+# Linux CI runner. Pinning to C fixes the comparison basis everywhere; no script here runs Python, so
+# this cannot force a Python stdout to ASCII.
+export LC_ALL=C
 FAILED=0
 run() {                       # run <scanner-cmd…> — abort the whole scan if it errors
   if ! "$@"; then
@@ -91,7 +100,7 @@ case "$MODE" in
         d = ($6 == "none") ? 0 : 1
         printf "%s\t%s\t%d\n", s, $4, d
       }' \
-    | sort | awk -F'\t' '
+    | LC_ALL=C sort | awk -F'\t' '
       { k = $1 "\t" $2; tot[k]++; doc[k] += $3; T++; D += $3; if (!(k in seen)) { seen[k]=1; ord[++n]=k } }
       END {
         printf "%-14s %-13s %7s %7s %7s %6s\n", "SURFACE","SYMBOL","total","docd","missing","pct"

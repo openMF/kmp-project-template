@@ -14,16 +14,63 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/platform sha=7f224aeb288794f2421414da09f9712029c552d0 -->
+<!-- api-docs:begin module=core-base/platform sha=21d373afc497d57fc10dbdcabdd0ff5bdf9ae921 -->
 ## API reference
 
-_Generated from `core-base/platform` at tree `7f224aeb2887` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/platform` at tree `21d373afc497` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
 something a feature CALLS; re-declaring one of these in `core/**` is the duplicate-the-
 framework defect. A change here is a TEMPLATE change and flows upstream as a draft PR
 (RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001), never a local fix.
+
+### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt`
+
+```kotlin
+fun LocalManagerProvider(
+```
+Provides every platform manager to composition. This was an `expect fun` with androidMain and nonAndroidMain actuals.
+
+```kotlin
+val LocalAppReviewManager: ProvidableCompositionLocal<AppReviewManager> =
+```
+Prompts for an app-store review. Provided by `LocalManagerProvider`.
+
+```kotlin
+val LocalIntentManager: ProvidableCompositionLocal<IntentManager> =
+```
+Launches platform intents — view, pick, open settings. Provided by `LocalManagerProvider`.
+
+```kotlin
+val LocalUrlLauncher: ProvidableCompositionLocal<UrlLauncher> =
+```
+Opens URLs, email, maps, phone and SMS. Provided by `LocalManagerProvider`.
+
+```kotlin
+val LocalShareManager: ProvidableCompositionLocal<ShareManager> =
+```
+Shares text, URLs, files and images to other apps. Provided by `LocalManagerProvider`.
+
+```kotlin
+val LocalAppUpdateManager: ProvidableCompositionLocal<AppUpdateManager> =
+```
+Checks for and starts app updates. Provided by `LocalManagerProvider`.
+
+```kotlin
+val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager> =
+```
+Reads and writes the system clipboard, plus history, change observation and URL detection. Typed as the toolkit's `ClipboardManager` rather than a template wrapper — see the note in `platformModule`.
+
+```kotlin
+val LocalBubbleManager: ProvidableCompositionLocal<Bubble> =
+```
+Shows floating bubbles, overlays and heads-up UI. Provided by `LocalManagerProvider`.
+
+```kotlin
+val LocalPdfManager: ProvidableCompositionLocal<PdfManager> =
+```
+Generates PDFs — statements, receipts, invoices. Provided by `LocalManagerProvider`.
 
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/context/AppContext.kt`
 
@@ -100,53 +147,6 @@ Asks the OS for a specific system screen or document flow, and reports what came
 class IntentManagerImpl : IntentManager
 ```
 The one `IntentManager`, for every target. `cmp-intent-launcher` carries the per-target `actual`s, so there is no source-set split here.
-
-### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt`
-
-```kotlin
-fun LocalManagerProvider(
-```
-Provides every platform manager to composition. This was an `expect fun` with androidMain and nonAndroidMain actuals.
-
-```kotlin
-val LocalAppReviewManager: ProvidableCompositionLocal<AppReviewManager> =
-```
-Prompts for an app-store review. Provided by `LocalManagerProvider`.
-
-```kotlin
-val LocalIntentManager: ProvidableCompositionLocal<IntentManager> =
-```
-Launches platform intents — view, pick, open settings. Provided by `LocalManagerProvider`.
-
-```kotlin
-val LocalUrlLauncher: ProvidableCompositionLocal<UrlLauncher> =
-```
-Opens URLs, email, maps, phone and SMS. Provided by `LocalManagerProvider`.
-
-```kotlin
-val LocalShareManager: ProvidableCompositionLocal<ShareManager> =
-```
-Shares text, URLs, files and images to other apps. Provided by `LocalManagerProvider`.
-
-```kotlin
-val LocalAppUpdateManager: ProvidableCompositionLocal<AppUpdateManager> =
-```
-Checks for and starts app updates. Provided by `LocalManagerProvider`.
-
-```kotlin
-val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager> =
-```
-Reads and writes the system clipboard, plus history, change observation and URL detection. Typed as the toolkit's `ClipboardManager` rather than a template wrapper — see the note in `platformModule`.
-
-```kotlin
-val LocalBubbleManager: ProvidableCompositionLocal<Bubble> =
-```
-Shows floating bubbles, overlays and heads-up UI. Provided by `LocalManagerProvider`.
-
-```kotlin
-val LocalPdfManager: ProvidableCompositionLocal<PdfManager> =
-```
-Generates PDFs — statements, receipts, invoices. Provided by `LocalManagerProvider`.
 
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/model/MimeType.kt`
 

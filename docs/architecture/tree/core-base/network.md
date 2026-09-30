@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/network sha=3453e5b1753e0cc703f8a4c3df14537be64db3ce -->
+<!-- api-docs:begin module=core-base/network sha=3fa5371ad90ed7d13ff479e34e1ada4572c9ef06 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `3453e5b1753e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `3fa5371ad90e` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -82,36 +82,6 @@ fun provideAuthHeaderBridge(
     headers: RuntimeHeaderStore,
     scope: CoroutineScope,
 ): AuthHeaderBridge = AuthHeaderBridge(
-```
-
-</details>
-
-### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/annotation/ApiBinding.kt`
-
-```kotlin
-annotation class ApiBinding(val accessPoint: String)
-```
-Binds this API type to a declared access point, so its Koin binding is derived rather than written.
-
-<details><summary>Example</summary>
-
-```kotlin
-@ApiBinding("coingecko")
-interface CoinGeckoApi { ... }
-```
-
-</details>
-
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt:20</code></summary>
-
-```kotlin
-
-/** CoinGecko public API v3. Base URL: [BASE_URL]. */
-@ApiBinding("coingecko")
-interface CoinGeckoApi {
-
-    /**
-     * One page of the market list, ordered by market cap descending by default.
 ```
 
 </details>
@@ -335,24 +305,6 @@ class AppMultiUrlConfigProvider(
 
 - `fun getBaseUrl(type: UrlType): String` — Returns the base URL for the specified `type`.
 
-### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/factory/ResultSuspendConverterFactory.kt`
-
-```kotlin
-class ResultSuspendConverterFactory : Converter.Factory
-```
-A custom `Converter.Factory` for Ktorfit that provides a suspend response converter which wraps successful or error HTTP responses into a sealed `NetworkResult` type.
-
-<details><summary>Example</summary>
-
-```kotlin
-interface ApiService {
-    @GET("users")
-    suspend fun getUsers(): Result<List<User>, RemoteError>
-}
-```
-
-</details>
-
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/HeaderSpec.kt`
 
 ```kotlin
@@ -574,6 +526,54 @@ single<SupabaseExtrasProvider> {
             }
         }
     }
+}
+```
+
+</details>
+
+### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/annotation/ApiBinding.kt`
+
+```kotlin
+annotation class ApiBinding(val accessPoint: String)
+```
+Binds this API type to a declared access point, so its Koin binding is derived rather than written.
+
+<details><summary>Example</summary>
+
+```kotlin
+@ApiBinding("coingecko")
+interface CoinGeckoApi { ... }
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt:20</code></summary>
+
+```kotlin
+
+/** CoinGecko public API v3. Base URL: [BASE_URL]. */
+@ApiBinding("coingecko")
+interface CoinGeckoApi {
+
+    /**
+     * One page of the market list, ordered by market cap descending by default.
+```
+
+</details>
+
+### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/factory/ResultSuspendConverterFactory.kt`
+
+```kotlin
+class ResultSuspendConverterFactory : Converter.Factory
+```
+A custom `Converter.Factory` for Ktorfit that provides a suspend response converter which wraps successful or error HTTP responses into a sealed `NetworkResult` type.
+
+<details><summary>Example</summary>
+
+```kotlin
+interface ApiService {
+    @GET("users")
+    suspend fun getUsers(): Result<List<User>, RemoteError>
 }
 ```
 

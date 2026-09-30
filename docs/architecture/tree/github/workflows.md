@@ -1,9 +1,9 @@
 # `.github/workflows/`
 
 > Part of [`.github/`](../github.md)  
-> **Measured:** 13 tracked files — 11× `.yml`, 2× `.yaml`
+> **Measured:** 14 tracked files — 12× `.yml`, 2× `.yaml`
 
-13 tracked files.
+14 tracked files.
 
 <!-- tree-scaffold:end -->
 ## Significance

@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/designsystem sha=e87f493c86f180e0a159595bfad7cb79f935e13c -->
+<!-- api-docs:begin module=core/designsystem sha=38b7657b1d25877ded0d82769f25c36c63283275 -->
 ## API reference
 
-_Generated from `core/designsystem` at tree `e87f493c86f1` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/designsystem` at tree `38b7657b1d25` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/ChartTokens.kt`
@@ -106,7 +106,7 @@ One open-high-low-close bar for `KptCandlestick`. All values are in the same uni
 ```kotlin
 fun KptCandlestick(
 ```
-Classic OHLC candlestick chart for price-like time series. Up candles (close ≥ open) use `upColor`; down candles use `downColor`. Default up/down colors resolve from `MaterialTheme.finance` so they brand-shift with theme without code edits.
+Classic OHLC candlestick chart for price-like time series. Up candles (close ≥ open) use `upColor`; down candles use `downColor`.
 
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/chart/KptDonutChart.kt`
 
@@ -267,6 +267,90 @@ Section header — title (+ optional supporting text) + optional trailing action
 
 </details>
 
+### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/StatusChip.kt`
+
+```kotlin
+fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modifier)
+```
+Compact colored pill used to convey state at a glance — bill status, loan stage, rate direction, sync state. Stays one line; no icons (use `UrgencyDot` when you want a leading accent).
+
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:238</code></summary>
+
+```kotlin
+            horizontalArrangement = Arrangement.spacedBy(sp.sm),
+        ) {
+            StatusChip(text = shortDueLabel(diff), intent = statusIntent)
+            StatusChip(
+                text = bill.category.name.lowercase().replaceFirstChar { it.uppercase() },
+                intent = StatusChipIntent.Neutral,
+            )
+```
+
+</details>
+
+### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/StatusChipIntent.kt`
+
+```kotlin
+enum class StatusChipIntent
+```
+Semantic intent of a `StatusChip`. Maps to a (container, content) color pair derived from the active Material color scheme + finance palette.
+
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/StatusChip.kt:33</code></summary>
+
+```kotlin
+ */
+@Composable
+fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modifier) {
+    val (container, content) = resolveChipColors(intent)
+    Text(
+        text = text,
+        modifier = modifier
+```
+
+</details>
+
+### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/Urgency.kt`
+
+```kotlin
+enum class Urgency
+```
+Due-date urgency tier — informs the color of a leading dot on a list row.
+
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:86</code></summary>
+
+```kotlin
+        SwatchRow("freshnessUpdating", f.freshnessUpdating)
+        SwatchRow("freshnessOffline", f.freshnessOffline)
+        SectionLabel("Urgency")
+        SwatchRow("urgencyOverdue", f.urgencyOverdue)
+        SwatchRow("urgencyToday", f.urgencyToday)
+        SwatchRow("urgencyUpcoming", f.urgencyUpcoming)
+        SwatchRow("urgencyDistant", f.urgencyDistant)
+```
+
+</details>
+
+### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/UrgencyDot.kt`
+
+```kotlin
+fun UrgencyDot(urgency: Urgency, modifier: Modifier = Modifier, size: Dp = 10.dp)
+```
+Solid colored dot used as the leading accent on a list row (bill reminder, loan due, task). Pairs cheaply with any list-item layout to encode urgency at a glance without stealing focus from the row's text content.
+
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:214</code></summary>
+
+```kotlin
+            horizontalArrangement = Arrangement.spacedBy(sp.md),
+        ) {
+            UrgencyDot(urgency = urgency)
+            Text(
+                text = bill.name,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.weight(1f),
+```
+
+</details>
+
 ### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/state/CardLoadingSkeleton.kt`
 
 ```kotlin
@@ -368,90 +452,6 @@ Single-row shimmer placeholder. Use inside LazyColumn `items()` while paged data
                 Column {
                     repeat(3) {
                         RowLoadingShimmer()
-```
-
-</details>
-
-### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/StatusChip.kt`
-
-```kotlin
-fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modifier)
-```
-Compact colored pill used to convey state at a glance — bill status, loan stage, rate direction, sync state. Stays one line; no icons (use `UrgencyDot` when you want a leading accent).
-
-<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:238</code></summary>
-
-```kotlin
-            horizontalArrangement = Arrangement.spacedBy(sp.sm),
-        ) {
-            StatusChip(text = shortDueLabel(diff), intent = statusIntent)
-            StatusChip(
-                text = bill.category.name.lowercase().replaceFirstChar { it.uppercase() },
-                intent = StatusChipIntent.Neutral,
-            )
-```
-
-</details>
-
-### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/StatusChipIntent.kt`
-
-```kotlin
-enum class StatusChipIntent
-```
-Semantic intent of a `StatusChip`. Maps to a (container, content) color pair derived from the active Material color scheme + finance palette.
-
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/StatusChip.kt:33</code></summary>
-
-```kotlin
- */
-@Composable
-fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modifier) {
-    val (container, content) = resolveChipColors(intent)
-    Text(
-        text = text,
-        modifier = modifier
-```
-
-</details>
-
-### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/Urgency.kt`
-
-```kotlin
-enum class Urgency
-```
-Due-date urgency tier — informs the color of a leading dot on a list row.
-
-<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:86</code></summary>
-
-```kotlin
-        SwatchRow("freshnessUpdating", f.freshnessUpdating)
-        SwatchRow("freshnessOffline", f.freshnessOffline)
-        SectionLabel("Urgency")
-        SwatchRow("urgencyOverdue", f.urgencyOverdue)
-        SwatchRow("urgencyToday", f.urgencyToday)
-        SwatchRow("urgencyUpcoming", f.urgencyUpcoming)
-        SwatchRow("urgencyDistant", f.urgencyDistant)
-```
-
-</details>
-
-### `core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/UrgencyDot.kt`
-
-```kotlin
-fun UrgencyDot(urgency: Urgency, modifier: Modifier = Modifier, size: Dp = 10.dp)
-```
-Solid colored dot used as the leading accent on a list row (bill reminder, loan due, task). Pairs cheaply with any list-item layout to encode urgency at a glance without stealing focus from the row's text content.
-
-<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:214</code></summary>
-
-```kotlin
-            horizontalArrangement = Arrangement.spacedBy(sp.md),
-        ) {
-            UrgencyDot(urgency = urgency)
-            Text(
-                text = bill.name,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                modifier = Modifier.weight(1f),
 ```
 
 </details>

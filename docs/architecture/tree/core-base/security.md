@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/security sha=e677c53035bff77a8b8399b3daa7c7e8e72ce405 -->
+<!-- api-docs:begin module=core-base/security sha=05436799b84990d7f648791f00a41c2cce08b22e -->
 ## API reference
 
-_Generated from `core-base/security` at tree `e677c53035bf` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/security` at tree `05436799b849` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -57,18 +57,6 @@ Configuration for TLS certificate pinning per hostname. Consumer apps must confi
 class DeepLinkValidator(
 ```
 Validates deep link URIs against a whitelist of allowed schemes and hosts to prevent open-redirect and injection attacks. Consumer apps register their allowed patterns during initialization.
-
-### `core-base/security/src/commonMain/kotlin/kpt/core/base/security/di/SecurityModule.kt`
-
-```kotlin
-val SecurityModule = module
-```
-Zero-config security Koin module. Auto-detects build type via platform-specific `kpt.core.base.security.isReleaseBuild` and registers all security components with sensible defaults.
-
-```kotlin
-expect val platformSecurityModule: Module
-```
-Per-target security bindings supplied by each `actual` — the keystore/keychain backing and the platform biometric prompt.
 
 ### `core-base/security/src/commonMain/kotlin/kpt/core/base/security/FailedAttemptTracker.kt`
 
@@ -181,6 +169,18 @@ Manages user session lifecycle with inactivity timeout. Call `touch` on every us
 expect class TamperDetector()
 ```
 Detects runtime environment tampering such as root/jailbreak, debugger attachment, and signature mismatch. Each platform provides its own detection heuristics via `expect/actual`.
+
+### `core-base/security/src/commonMain/kotlin/kpt/core/base/security/di/SecurityModule.kt`
+
+```kotlin
+val SecurityModule = module
+```
+Zero-config security Koin module. Auto-detects build type via platform-specific `kpt.core.base.security.isReleaseBuild` and registers all security components with sensible defaults.
+
+```kotlin
+expect val platformSecurityModule: Module
+```
+Per-target security bindings supplied by each `actual` — the keystore/keychain backing and the platform biometric prompt.
 
 ---
 

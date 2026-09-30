@@ -241,7 +241,7 @@ KptScaffold(
 ```kotlin
 fun KptScaffold(
 ```
-App screen scaffold for a screen with a BACK affordance — the nav icon is always shown and `onNavigationIconClick` is required. Wraps the top bar, pull-to-refresh, snackbar host and FAB so a feature screen declares content and nothing else.
+App screen scaffold for a screen with a BACK affordance — the nav icon is always shown and `onNavigationIconClick` is required.
 
 <details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoScreen.kt:89</code></summary>
 

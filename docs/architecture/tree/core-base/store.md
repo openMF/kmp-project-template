@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/store sha=70c418a719c5f84fb17ff461d07796af5dba8aa7 -->
+<!-- api-docs:begin module=core-base/store sha=b9422e072374ce9a850497de27cea969fb7c722c -->
 ## API reference
 
-_Generated from `core-base/store` at tree `70c418a719c5` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/store` at tree `b9422e072374` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -380,6 +380,80 @@ Persists "when was this Store's data last successfully fetched from network", ke
 - `suspend fun read(storeKey: String): Instant?` — Returns the last persisted timestamp for `storeKey`, or null if none.
 - `suspend fun write(storeKey: String, instant: Instant)` — Persists `instant` as the latest fetch time for `storeKey`.
 
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/StoreCacheManager.kt`
+
+```kotlin
+interface StoreCacheManager
+```
+Manages Store cache lifecycle. - Call `clearAll` on logout to prevent stale data leaking across user sessions. - Call `pruneExpiredDrafts` on app start to clean up old SUBMITTED/FAILED draft rows.
+
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:34</code></summary>
+
+```kotlin
+class UserLogoutManagerImpl(
+    private val repository: UserPreferencesRepository,
+    private val storeCacheManager: StoreCacheManager,
+    dispatcherManager: DispatcherManager,
+) : UserLogoutManager {
+
+    private val scope = CoroutineScope(dispatcherManager.unconfined)
+```
+
+</details>
+
+- `suspend fun clearAll()` — Clears all store caches (in-memory + database). Call on logout.
+- `suspend fun pruneExpiredDrafts(maxAgeMs: Long = DEFAULT_DRAFT_TTL_MS)` — Removes SUBMITTED and FAILED draft rows older than `maxAgeMs` milliseconds. PENDING drafts are never removed — users can still resume them offline. Default retention is 30 days. Call once on app start.
+- `const val DEFAULT_DRAFT_TTL_MS: Long = 30L * 24 * 60 * 60 * 1000` — 30 days in milliseconds.
+
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/StoreFactory.kt`
+
+```kotlin
+object StoreFactory
+```
+Factory for creating `Store` and `MutableStore` instances with sensible defaults.
+
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertsStore.kt:43</code></summary>
+
+```kotlin
+@StoreProvider(id = "alerts")
+@CacheKey(name = "LIST", key = "alerts")
+fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFactory.createOfflineStore(
+    sourceOfTruth = SourceOfTruth.of(
+        // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
+        reader = { _: Unit ->
+            dao.observeAll().map { rows -> rows.map(AlertEntity::toPriceAlert) }
+```
+
+</details>
+
+- `fun <Key : Any, Input : Any, Output : Any> createStore(` — Creates a read-only `Store` where the fetcher output type matches the source of truth input type (no conversion needed).
+- `fun <Key : Any, Output : Any> createMemoryStore(` — Creates a read-only `Store` backed only by a `Fetcher` (no local persistence). Data is cached in-memory only. Useful for transient data that doesn't need to survive process death.
+- `fun <Key : Any, Output : Any> createOfflineStore(` — Creates a read-only `Store` backed only by a `SourceOfTruth` (no network fetcher).
+- `fun <Key : Any, Output : Any> createOfflineMutableStore(` — Creates a `MutableStore` for a LOCAL-ONLY entity — every mutation flows through `store.write` / `store.clear` (→ the `sourceOfTruth` writer/delete, i.e. Room), but there is NO network.
+- `val identity = Converter.Builder<Output, Output, Output>()`
+- `val noopUpdater = Updater.by<Key, Output, Output>(`
+- `fun <Key : Any, Network : Any, Local : Any, Output : Any> createMutableStore(` — Creates a `MutableStore` that supports reads, writes, and offline sync. Uses a `Converter` to transform between network, local, and output types.
+- `fun <Key : Any, R : Any, W : Any> createScreenWithMutation(` — Creates a `ScreenWithMutationStream` — a fused read + write + sync seam for screens that both display data and submit mutations against the same domain object (edit forms, settings panels, in-place record updates).
+- `val readStream = store.asScreenStream(`
+
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/StoreRegistry.kt`
+
+```kotlin
+abstract class StoreRegistry
+```
+Base registry for Store DI qualifiers (Koin).
+
+<details><summary>Example</summary>
+
+```kotlin
+object AppStoreRegistry : StoreRegistry() {
+    val ExchangeRates = store("exchangeRates")
+    val CoinMarkets = store("coinMarkets")
+}
+```
+
+</details>
+
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/impl/DraftInventoryImpl.kt`
 
 ```kotlin
@@ -504,151 +578,6 @@ Registration-based cache manager. Feature DI modules call `register` for each St
 
 </details>
 
-### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/StoreCacheManager.kt`
-
-```kotlin
-interface StoreCacheManager
-```
-Manages Store cache lifecycle. - Call `clearAll` on logout to prevent stale data leaking across user sessions. - Call `pruneExpiredDrafts` on app start to clean up old SUBMITTED/FAILED draft rows.
-
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:34</code></summary>
-
-```kotlin
-class UserLogoutManagerImpl(
-    private val repository: UserPreferencesRepository,
-    private val storeCacheManager: StoreCacheManager,
-    dispatcherManager: DispatcherManager,
-) : UserLogoutManager {
-
-    private val scope = CoroutineScope(dispatcherManager.unconfined)
-```
-
-</details>
-
-- `suspend fun clearAll()` — Clears all store caches (in-memory + database). Call on logout.
-- `suspend fun pruneExpiredDrafts(maxAgeMs: Long = DEFAULT_DRAFT_TTL_MS)` — Removes SUBMITTED and FAILED draft rows older than `maxAgeMs` milliseconds. PENDING drafts are never removed — users can still resume them offline. Default retention is 30 days. Call once on app start.
-- `const val DEFAULT_DRAFT_TTL_MS: Long = 30L * 24 * 60 * 60 * 1000` — 30 days in milliseconds.
-
-### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/StoreFactory.kt`
-
-```kotlin
-object StoreFactory
-```
-Factory for creating `Store` and `MutableStore` instances with sensible defaults.
-
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertsStore.kt:43</code></summary>
-
-```kotlin
-@StoreProvider(id = "alerts")
-@CacheKey(name = "LIST", key = "alerts")
-fun provideAlertsStore(dao: AlertDao): Store<Unit, List<PriceAlert>> = StoreFactory.createOfflineStore(
-    sourceOfTruth = SourceOfTruth.of(
-        // Emit the DOMAIN model — the entity→domain map lives in the SourceOfTruth (read-path contract).
-        reader = { _: Unit ->
-            dao.observeAll().map { rows -> rows.map(AlertEntity::toPriceAlert) }
-```
-
-</details>
-
-- `fun <Key : Any, Input : Any, Output : Any> createStore(` — Creates a read-only `Store` where the fetcher output type matches the source of truth input type (no conversion needed).
-- `fun <Key : Any, Output : Any> createMemoryStore(` — Creates a read-only `Store` backed only by a `Fetcher` (no local persistence). Data is cached in-memory only. Useful for transient data that doesn't need to survive process death.
-- `fun <Key : Any, Output : Any> createOfflineStore(` — Creates a read-only `Store` backed only by a `SourceOfTruth` (no network fetcher).
-- `fun <Key : Any, Output : Any> createOfflineMutableStore(` — Creates a `MutableStore` for a LOCAL-ONLY entity — every mutation flows through `store.write` / `store.clear` (→ the `sourceOfTruth` writer/delete, i.e. Room), but there is NO network.
-- `val identity = Converter.Builder<Output, Output, Output>()`
-- `val noopUpdater = Updater.by<Key, Output, Output>(`
-- `fun <Key : Any, Network : Any, Local : Any, Output : Any> createMutableStore(` — Creates a `MutableStore` that supports reads, writes, and offline sync. Uses a `Converter` to transform between network, local, and output types.
-- `fun <Key : Any, R : Any, W : Any> createScreenWithMutation(` — Creates a `ScreenWithMutationStream` — a fused read + write + sync seam for screens that both display data and submit mutations against the same domain object (edit forms, settings panels, in-place record updates).
-- `val readStream = store.asScreenStream(`
-
-### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/StoreRegistry.kt`
-
-```kotlin
-abstract class StoreRegistry
-```
-Base registry for Store DI qualifiers (Koin).
-
-<details><summary>Example</summary>
-
-```kotlin
-object AppStoreRegistry : StoreRegistry() {
-    val ExchangeRates = store("exchangeRates")
-    val CoinMarkets = store("coinMarkets")
-}
-```
-
-</details>
-
-### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/conflict/ConflictInbox.kt`
-
-```kotlin
-interface ConflictInbox
-```
-Durable inbox of write conflicts surfaced to the user in Settings.
-
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:29</code></summary>
-
-```kotlin
-    DefaultMutationGateway(isOnline = { isOnline }, conflictInbox = NoopConflictInbox)
-
-private object NoopConflictInbox : ConflictInbox {
-    override suspend fun record(
-        entity: String,
-        key: String,
-        localPayloadJson: String,
-```
-
-</details>
-
-- `suspend fun record(` — Record a conflict; returns the new conflict id.
-- `fun observePending(): Flow<List<ConflictEntry>>` — Observe the pending (unresolved) conflicts, newest first — drives the Settings badge + list.
-- `suspend fun resolve(conflictId: String, resolution: ConflictResolution)` — Resolve a recorded conflict; the entry is cleared once resolution is applied by the caller.
-
-```kotlin
-enum class ConflictResolution
-```
-How the user chose to settle a `ConflictEntry`.
-
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:40</code></summary>
-
-```kotlin
-    override fun observePending(): Flow<List<ConflictEntry>> = flowOf(emptyList())
-
-    override suspend fun resolve(conflictId: String, resolution: ConflictResolution) = Unit
-}
-```
-
-</details>
-
-```kotlin
-data class ConflictReport(
-```
-A conflict the caller detected between its local payload and the server result — returned by a command's `conflictOf` so the gateway can record it.
-
-```kotlin
-data class ConflictEntry(
-```
-A single recorded write conflict awaiting user resolution.
-
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:38</code></summary>
-
-```kotlin
-    ): String = "noop"
-
-    override fun observePending(): Flow<List<ConflictEntry>> = flowOf(emptyList())
-
-    override suspend fun resolve(conflictId: String, resolution: ConflictResolution) = Unit
-}
-```
-
-</details>
-
-### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/conflict/impl/RoomConflictInbox.kt`
-
-```kotlin
-class RoomConflictInbox(
-```
-Room-backed `ConflictInbox` — persists write conflicts in the `framework_write_conflicts` table so they survive process death and are surfaced in Settings.
-
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/DefaultMutationGateway.kt`
 
 ```kotlin
@@ -669,13 +598,6 @@ private object NoopConflictInbox : ConflictInbox {
 ```
 
 </details>
-
-### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/delete/DeleteSync.kt`
-
-```kotlin
-class DeleteSync<K : Any>(
-```
-The network-DELETE-with-sync primitive Store5 lacks (its `Updater` is write-only).
 
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/MutationGateway.kt`
 
@@ -758,6 +680,84 @@ Why an `MutationPolicy.OnlineRequired` mutation was `MutationResult.Blocked`.
 class CommandSpec<P : Any, R : Any>(
 ```
 Describes a command / RPC mutation for `MutationGateway.command`.
+
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/conflict/ConflictInbox.kt`
+
+```kotlin
+interface ConflictInbox
+```
+Durable inbox of write conflicts surfaced to the user in Settings.
+
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:29</code></summary>
+
+```kotlin
+    DefaultMutationGateway(isOnline = { isOnline }, conflictInbox = NoopConflictInbox)
+
+private object NoopConflictInbox : ConflictInbox {
+    override suspend fun record(
+        entity: String,
+        key: String,
+        localPayloadJson: String,
+```
+
+</details>
+
+- `suspend fun record(` — Record a conflict; returns the new conflict id.
+- `fun observePending(): Flow<List<ConflictEntry>>` — Observe the pending (unresolved) conflicts, newest first — drives the Settings badge + list.
+- `suspend fun resolve(conflictId: String, resolution: ConflictResolution)` — Resolve a recorded conflict; the entry is cleared once resolution is applied by the caller.
+
+```kotlin
+enum class ConflictResolution
+```
+How the user chose to settle a `ConflictEntry`.
+
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:40</code></summary>
+
+```kotlin
+    override fun observePending(): Flow<List<ConflictEntry>> = flowOf(emptyList())
+
+    override suspend fun resolve(conflictId: String, resolution: ConflictResolution) = Unit
+}
+```
+
+</details>
+
+```kotlin
+data class ConflictReport(
+```
+A conflict the caller detected between its local payload and the server result — returned by a command's `conflictOf` so the gateway can record it.
+
+```kotlin
+data class ConflictEntry(
+```
+A single recorded write conflict awaiting user resolution.
+
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:38</code></summary>
+
+```kotlin
+    ): String = "noop"
+
+    override fun observePending(): Flow<List<ConflictEntry>> = flowOf(emptyList())
+
+    override suspend fun resolve(conflictId: String, resolution: ConflictResolution) = Unit
+}
+```
+
+</details>
+
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/conflict/impl/RoomConflictInbox.kt`
+
+```kotlin
+class RoomConflictInbox(
+```
+Room-backed `ConflictInbox` — persists write conflicts in the `framework_write_conflicts` table so they survive process death and are surfaced in Settings.
+
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/delete/DeleteSync.kt`
+
+```kotlin
+class DeleteSync<K : Any>(
+```
+The network-DELETE-with-sync primitive Store5 lacks (its `Updater` is write-only).
 
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/paging/PagingScreenStream.kt`
 
@@ -1209,7 +1209,7 @@ Combines N independent `ScreenState` flows (list form). Mirror of the vararg ove
 ```kotlin
 class ScreenStreamContext(
 ```
-Bundles the app-infra dependencies that `asScreenStream` needs — the `NetworkMonitor` and the `FetchedAtRepository` — so a repository injects ONE screen-stream context instead of threading two framework singletons through every read method.
+Bundles the app-infra dependencies that `asScreenStream` needs — the `NetworkMonitor` and the `FetchedAtRepository` — so a repository injects ONE screen-stream context instead of threading two framework singletons through every read method. Homed here in `core-base/store` next to `asScreenStream` and DI-provided once (a single). Note: with Koin constructor injection, one injected param is the floor — a repository can't reach zero without a `KoinComponent` service-locator (an anti-pattern). This collapses the two scattered infra params into one clearly-named context owned by `core-base/store`.
 
 <details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/alerts/AlertsReactiveInvalidationTest.kt:64</code></summary>
 

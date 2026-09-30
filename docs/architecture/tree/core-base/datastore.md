@@ -14,16 +14,23 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/datastore sha=45681c67563f8da7add99119da7f189ddfd910fb -->
+<!-- api-docs:begin module=core-base/datastore sha=cc5290aea37557ac0e3f2ca15e0e81fd8f5708ab -->
 ## API reference
 
-_Generated from `core-base/datastore` at tree `45681c67563f` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/datastore` at tree `cc5290aea375` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
 something a feature CALLS; re-declaring one of these in `core/**` is the duplicate-the-
 framework defect. A change here is a TEMPLATE change and flows upstream as a draft PR
 (RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001), never a local fix.
+
+### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/SecureSettingsFactory.kt`
+
+```kotlin
+expect class SecureSettingsFactory
+```
+Platform-specific factory that creates an encrypted `Settings` instance. Returns the standard `Settings` interface — zero API change for consumers.
 
 ### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/di/DatastoreBaseModule.kt`
 
@@ -111,13 +118,6 @@ class SettingsSyncStatePersister(
 ```
 
 </details>
-
-### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/SecureSettingsFactory.kt`
-
-```kotlin
-expect class SecureSettingsFactory
-```
-Platform-specific factory that creates an encrypted `Settings` instance. Returns the standard `Settings` interface — zero API change for consumers.
 
 ---
 

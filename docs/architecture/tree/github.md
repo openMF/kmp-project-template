@@ -1,13 +1,13 @@
 # `.github/`
 
 > **Kind:** GitHub Actions  
-> **Measured:** 15 tracked files — 11× `.yml`, 2× `.yaml`, 1× `.md`, 1× `.properties`
+> **Measured:** 16 tracked files — 12× `.yml`, 2× `.yaml`, 1× `.md`, 1× `.properties`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `.github/workflows/` | 13 |
+| `.github/workflows/` | 14 |
 | (files at the root) | 2 |
 
 ## Workflows
@@ -17,7 +17,8 @@
 | `cache-cleanup.yaml` | Cleanup Cache |
 | `cla-check.yml` | CLA contributor check |
 | `deployment-status.yml` | Deployment Status |
-| `docs-refresh.yml` | Docs · API reference |
+| `docs-check.yml` | Docs · API reference |
+| `docs-refresh.yml` | Docs · refresh and publish |
 | `pr-check.yml` | PR Check |
 | `quality-gate.yml` | Quality Gate |
 | `release-android-only.yml` | Release · Android Only |
@@ -32,7 +33,7 @@
 
 | Unit | Files | Page |
 |---|---:|---|
-| `.github/workflows/` | 13 | [workflows](github/workflows.md) |
+| `.github/workflows/` | 14 | [workflows](github/workflows.md) |
 
 ## Docs in the tree
 

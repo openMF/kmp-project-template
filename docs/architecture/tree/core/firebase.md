@@ -25,7 +25,7 @@ _Do not hand-edit inside this block — re-run the generator. Authored prose bel
 ```kotlin
 object KptEventTypes
 ```
-CROSS-CUTTING analytics event keys — TEMPLATE-OWNED, full-copied by every sync. Everything here is true of ANY app built on this template: a session begins, a screen is shown, a request succeeds or fails, data syncs, a permission is granted.
+CROSS-CUTTING analytics event keys — TEMPLATE-OWNED, full-copied by every sync.
 
 <details><summary>Used in the template — <code>core/firebase/src/commonMain/kotlin/kpt/core/firebase/config/analytics/KptAnalyticsExtensions.kt:39</code></summary>
 

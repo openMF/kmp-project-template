@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/data sha=c7d15945f536b9de0e55a8622150f30c81384389 -->
+<!-- api-docs:begin module=core-base/data sha=e2ad05c56b0da5c3c1331799d9d567f5d74434c3 -->
 ## API reference
 
-_Generated from `core-base/data` at tree `c7d15945f536` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/data` at tree `e2ad05c56b0d` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -128,13 +128,6 @@ fun providePriceAlertSubmitSyncer(
 
 </details>
 
-### `core-base/data/src/commonMain/kotlin/kpt/core/base/data/infra/impl/NetworkMonitorImpl.kt`
-
-```kotlin
-class NetworkMonitorImpl : NetworkMonitor by NetworkMonitorProvider.install()
-```
-Singleton NetworkMonitor backed by cmp-network-monitor. Auto-initializes on first access via NetworkMonitorProvider.
-
 ### `core-base/data/src/commonMain/kotlin/kpt/core/base/data/infra/NetworkMonitor.kt`
 
 ```kotlin
@@ -180,6 +173,16 @@ Framework contract for `NetworkMonitor` implementations. The bundled `cmp-networ
 - `const val MIN_DEBOUNCE_MS: Long = 100L` — Minimum sane reconnect-debounce window (anything lower thrashes on flaps).
 - `const val DEFAULT_DEBOUNCE_MS: Long = 300L` — Default reconnect-debounce window — sensible balance for most apps.
 - `const val MAX_DEBOUNCE_MS: Long = 5_000L` — Upper bound — beyond this, the user perceives the app as unresponsive to network changes.
+
+### `core-base/data/src/commonMain/kotlin/kpt/core/base/data/infra/SyncManager.kt`
+
+```kotlin
+interface SyncManager
+```
+Observer surface for the in-flight sync state. NiA-port. Single binary signal — `isSyncing` — collected by composables that want to surface "Refreshing…" indicators globally (typically the top app bar, the home dashboard hero, etc.).
+
+- `val isSyncing: Flow<Boolean>` — Whether a sync is in flight — drives the refreshing affordance without each screen tracking it.
+- `fun requestSync()` — Requests a sync. Advisory: the manager may coalesce it with one already running.
 
 ### `core-base/data/src/commonMain/kotlin/kpt/core/base/data/infra/Synchronizer.kt`
 
@@ -260,16 +263,6 @@ suspend fun Synchronizer.snapshotSync(name: String, fetcher: suspend () -> Unit)
 ```
 Snapshot-API algorithm. Used by both canonical adopters (`CurrencyRepository` over Frankfurter; `MacroIndicatorsRepository` over World Bank).
 
-### `core-base/data/src/commonMain/kotlin/kpt/core/base/data/infra/SyncManager.kt`
-
-```kotlin
-interface SyncManager
-```
-Observer surface for the in-flight sync state. NiA-port. Single binary signal — `isSyncing` — collected by composables that want to surface "Refreshing…" indicators globally (typically the top app bar, the home dashboard hero, etc.).
-
-- `val isSyncing: Flow<Boolean>` — Whether a sync is in flight — drives the refreshing affordance without each screen tracking it.
-- `fun requestSync()` — Requests a sync. Advisory: the manager may coalesce it with one already running.
-
 ### `core-base/data/src/commonMain/kotlin/kpt/core/base/data/infra/TimeZoneMonitor.kt`
 
 ```kotlin
@@ -289,6 +282,13 @@ Utility for reporting current timezone the device has set. It always emits at le
 </details>
 
 - `val currentTimeZone: Flow<TimeZone>` — The device time zone, re-emitting when it changes — so a date rendered while travelling updates rather than silently going wrong.
+
+### `core-base/data/src/commonMain/kotlin/kpt/core/base/data/infra/impl/NetworkMonitorImpl.kt`
+
+```kotlin
+class NetworkMonitorImpl : NetworkMonitor by NetworkMonitorProvider.install()
+```
+Singleton NetworkMonitor backed by cmp-network-monitor. Auto-initializes on first access via NetworkMonitorProvider.
 
 ---
 

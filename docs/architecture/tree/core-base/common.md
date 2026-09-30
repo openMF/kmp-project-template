@@ -16,41 +16,16 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/common sha=41fe46584162e7cd65c947f285b7caa74947b7fd -->
+<!-- api-docs:begin module=core-base/common sha=38df64ce7a550d1b91c32ee4e064975bebebac8b -->
 ## API reference
 
-_Generated from `core-base/common` at tree `41fe46584162` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/common` at tree `38df64ce7a55` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
 something a feature CALLS; re-declaring one of these in `core/**` is the duplicate-the-
 framework defect. A change here is a TEMPLATE change and flows upstream as a draft PR
 (RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001), never a local fix.
-
-### `core-base/common/src/commonMain/kotlin/kpt/core/base/common/di/CommonModule.kt`
-
-```kotlin
-val CommonModule = module
-```
-Koin module for `core-base/common` — currently the platform `dispatcherManagerModule` binding. Include it once from the app's module graph; every other core module assumes a `DispatcherManager` is already resolvable.
-
-<details><summary>Used in the template — <code>core/data/src/androidMain/kotlin/kpt/core/data/di/PlatformDependentDataModule.android.kt:25</code></summary>
-
-```kotlin
- */
-actual val platformModule: Module = module {
-    includes(CommonModule)
-
-    singleOf(::TimeZoneMonitorImpl) bind TimeZoneMonitor::class
-}
-```
-
-</details>
-
-```kotlin
-expect val dispatcherManagerModule: Module
-```
-The per-platform `DispatcherManager` binding, supplied by each target's `actual`. Separate from `CommonModule` because the dispatcher set is the one part of this module that cannot be expressed in common code.
 
 ### `core-base/common/src/commonMain/kotlin/kpt/core/base/common/ImageExtension.kt`
 
@@ -89,32 +64,6 @@ fun String.extractMimeTypeFromDataUri(): String?
 ```
 Extension function to extract MIME type from Base64 data URI
 
-### `core-base/common/src/commonMain/kotlin/kpt/core/base/common/manager/DispatcherManager.kt`
-
-```kotlin
-interface DispatcherManager
-```
-Injectable access to the app's coroutine dispatchers.
-
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:35</code></summary>
-
-```kotlin
-    private val repository: UserPreferencesRepository,
-    private val storeCacheManager: StoreCacheManager,
-    dispatcherManager: DispatcherManager,
-) : UserLogoutManager {
-
-    private val scope = CoroutineScope(dispatcherManager.unconfined)
-```
-
-</details>
-
-- `val default: CoroutineDispatcher` — The default `CoroutineDispatcher` for the app.
-- `val main: MainCoroutineDispatcher` — The `MainCoroutineDispatcher` for the app.
-- `val io: CoroutineDispatcher` — The IO `CoroutineDispatcher` for the app.
-- `val unconfined: CoroutineDispatcher` — The unconfined `CoroutineDispatcher` for the app.
-- `val appScope: CoroutineScope` — Application-lifetime scope for work that must outlive any screen — cancelled only at process end.
-
 ### `core-base/common/src/commonMain/kotlin/kpt/core/base/common/Parcelize.kt`
 
 ```kotlin
@@ -149,6 +98,57 @@ Binds a `Parceler` to type `T` for one property or file, so a shared model can c
 expect class Parcel
 ```
 The platform write buffer a `Parceler` reads from and writes to. Strictly POSITIONAL — there are no field names on the wire, so reads must mirror the write order exactly.
+
+### `core-base/common/src/commonMain/kotlin/kpt/core/base/common/di/CommonModule.kt`
+
+```kotlin
+val CommonModule = module
+```
+Koin module for `core-base/common` — currently the platform `dispatcherManagerModule` binding. Include it once from the app's module graph; every other core module assumes a `DispatcherManager` is already resolvable.
+
+<details><summary>Used in the template — <code>core/data/src/androidMain/kotlin/kpt/core/data/di/PlatformDependentDataModule.android.kt:25</code></summary>
+
+```kotlin
+ */
+actual val platformModule: Module = module {
+    includes(CommonModule)
+
+    singleOf(::TimeZoneMonitorImpl) bind TimeZoneMonitor::class
+}
+```
+
+</details>
+
+```kotlin
+expect val dispatcherManagerModule: Module
+```
+The per-platform `DispatcherManager` binding, supplied by each target's `actual`. Separate from `CommonModule` because the dispatcher set is the one part of this module that cannot be expressed in common code.
+
+### `core-base/common/src/commonMain/kotlin/kpt/core/base/common/manager/DispatcherManager.kt`
+
+```kotlin
+interface DispatcherManager
+```
+Injectable access to the app's coroutine dispatchers.
+
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserLogoutManagerImpl.kt:35</code></summary>
+
+```kotlin
+    private val repository: UserPreferencesRepository,
+    private val storeCacheManager: StoreCacheManager,
+    dispatcherManager: DispatcherManager,
+) : UserLogoutManager {
+
+    private val scope = CoroutineScope(dispatcherManager.unconfined)
+```
+
+</details>
+
+- `val default: CoroutineDispatcher` — The default `CoroutineDispatcher` for the app.
+- `val main: MainCoroutineDispatcher` — The `MainCoroutineDispatcher` for the app.
+- `val io: CoroutineDispatcher` — The IO `CoroutineDispatcher` for the app.
+- `val unconfined: CoroutineDispatcher` — The unconfined `CoroutineDispatcher` for the app.
+- `val appScope: CoroutineScope` — Application-lifetime scope for work that must outlive any screen — cancelled only at process end.
 
 ---
 

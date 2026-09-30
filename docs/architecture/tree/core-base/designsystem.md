@@ -18,16 +18,316 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/designsystem sha=291000339409186969c2aaff8a3c5bb01535cb83 -->
+<!-- api-docs:begin module=core-base/designsystem sha=216f50c4a462f278d242b8a726167e5e219b0021 -->
 ## API reference
 
-_Generated from `core-base/designsystem` at tree `291000339409` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/designsystem` at tree `216f50c4a462` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
 something a feature CALLS; re-declaring one of these in `core/**` is the duplicate-the-
 framework defect. A change here is a TEMPLATE change and flows upstream as a draft PR
 (RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001), never a local fix.
+
+### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt`
+
+```kotlin
+fun KptMaterialTheme(
+```
+KptMaterialTheme provides Material3 integration for KptTheme. This composable applies KptTheme values to MaterialTheme automatically, making all Material3 components use KptTheme design tokens.
+
+<details><summary>Example</summary>
+
+```kotlin
+KptMaterialTheme {
+    MaterialTheme.colorScheme.primary   // == KptTheme.colorScheme.primary
+    MaterialTheme.typography.titleLarge // == KptTheme.typography.titleLarge
+    KptTheme.spacing.md                 // Kpt-only tokens stay reachable
+}
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
+
+```kotlin
+    val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
+
+    KptMaterialTheme(theme = themeProvider) {
+        // Provide the design-system token CompositionLocals app-wide so every widget
+        // built on `core/designsystem/component/`, `chart/`, and `motion/` resolves
+        // semantic finance colors, motion specs, spacing scale, and elevation tiers
+        // without per-call wiring. Forks override any subset via
+```
+
+</details>
+
+```kotlin
+fun KptMaterialTheme(
+```
+KptMaterialTheme with dark theme support. Provides automatic light/dark theme switching with Material3 integration.
+
+<details><summary>Example</summary>
+
+```kotlin
+KptMaterialTheme(
+    lightTheme = kptTheme { colors { primary = Color.Blue } },
+    darkThemeProvider = kptTheme { colors { primary = Color.Cyan } },
+) { /* switches with the system setting */ }
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
+
+```kotlin
+    val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
+
+    KptMaterialTheme(theme = themeProvider) {
+        // Provide the design-system token CompositionLocals app-wide so every widget
+        // built on `core/designsystem/component/`, `chart/`, and `motion/` resolves
+        // semantic finance colors, motion specs, spacing scale, and elevation tiers
+        // without per-call wiring. Forks override any subset via
+```
+
+</details>
+
+```kotlin
+fun KptMaterialTheme(
+```
+Builds the theme from the dark-mode flag, for a palette that differs by more than a few colours.
+
+<details><summary>Example</summary>
+
+```kotlin
+KptMaterialTheme(themeBuilder = { isDark ->
+    kptTheme { colors { primary = if (isDark) Color.Cyan else Color.Blue } }
+}) { /* content */ }
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
+
+```kotlin
+    val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
+
+    KptMaterialTheme(theme = themeProvider) {
+        // Provide the design-system token CompositionLocals app-wide so every widget
+        // built on `core/designsystem/component/`, `chart/`, and `motion/` resolves
+        // semantic finance colors, motion specs, spacing scale, and elevation tiers
+        // without per-call wiring. Forks override any subset via
+```
+
+</details>
+
+### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptTheme.kt`
+
+```kotlin
+fun KptTheme(
+```
+KptTheme provides the core theming composable that makes all KPT design tokens available to child components through Composition Locals.
+
+<details><summary>Example</summary>
+
+```kotlin
+KptTheme {
+    // All child components can now access:
+    // KptTheme.colorScheme
+    // KptTheme.typography
+    // KptTheme.shapes
+    // KptTheme.spacing
+    // KptTheme.elevation
+    MyScreen()
+}
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:37</code></summary>
+
+```kotlin
+@Composable
+private fun FinancePalettePreviewLight() {
+    KptTheme(darkTheme = false) {
+        Surface { FinancePaletteSwatches() }
+    }
+}
+```
+
+</details>
+
+### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptThemeExtensions.kt`
+
+```kotlin
+fun KptSpacing.paddingValues(
+```
+Creates `PaddingValues` using KPT spacing tokens with horizontal and vertical values. This extension function provides a convenient way to create consistent padding using the design system's spacing scale.
+
+<details><summary>Example</summary>
+
+```kotlin
+Box(
+    modifier = Modifier.padding(
+        KptTheme.spacing.paddingValues(
+            horizontal = KptTheme.spacing.lg,
+            vertical = KptTheme.spacing.md
+        )
+    )
+)
+```
+
+</details>
+
+```kotlin
+fun KptSpacing.paddingValues(
+```
+Creates `PaddingValues` using KPT spacing tokens with individual edge values. This extension function provides fine-grained control over padding for each edge while maintaining consistency with the design system's spacing scale.
+
+<details><summary>Example</summary>
+
+```kotlin
+Card(
+    modifier = Modifier.padding(
+        KptTheme.spacing.paddingValues(
+            start = KptTheme.spacing.lg,
+            top = KptTheme.spacing.md,
+            end = KptTheme.spacing.lg,
+            bottom = KptTheme.spacing.xl
+        )
+    )
+)
+```
+
+</details>
+
+```kotlin
+fun KptTypography.toMaterial3Typography(fontFamily: FontFamily? = FontFamily.Default): Typography
+```
+Adapts a `KptTypography` to Material 3's `Typography`, so Kpt components and raw Material components render the same type.
+
+```kotlin
+fun Typography.toKptTypography(fontFamily: FontFamily? = FontFamily.Default): KptTypography =
+```
+Adapts a Material 3 `Typography` into a `KptTypography`, applying `fontFamily` to every style.
+
+```kotlin
+fun KptTypography.toMaterial3Typography(): Typography
+```
+Extension function to convert KptTypography to Material3 Typography This ensures that all Material3 components automatically use KptTheme typography
+
+```kotlin
+fun Typography.toKptTypography(): KptTypography = KptTypographyImpl(
+```
+Adapts a Material 3 `Typography` into a `KptTypography`, keeping each style's own font family.
+
+```kotlin
+fun KptColorScheme.toMaterial3ColorScheme(): ColorScheme
+```
+Extension function to convert KptColorScheme to Material3 ColorScheme This ensures that all Material3 components automatically use KptTheme colors
+
+```kotlin
+fun ColorScheme.toKptColorScheme(): KptColorScheme = KptColorSchemeImpl(
+```
+Adapts a Material 3 `ColorScheme` into a `KptColorScheme` — role for role, no colour invented.
+
+```kotlin
+fun KptShapes.toMaterial3Shapes(): Shapes
+```
+Extension function to convert KptShapes to Material3 Shapes This ensures that all Material3 components automatically use KptTheme shapes
+
+```kotlin
+fun Shapes.toKptShapes(): KptShapes = KptShapesImpl(
+```
+Adapts a Material 3 `Shapes` into a `KptShapes`.
+
+```kotlin
+fun KptElevation.cardElevation(
+```
+Get CardDefaults.cardElevation using KptTheme elevation
+
+```kotlin
+object KptSpacingDefaults
+```
+Predefined spacing combinations for common UI patterns. This object provides convenient access to commonly used padding configurations that follow design system best practices.
+
+<details><summary>Example</summary>
+
+```kotlin
+// Apply standard screen padding
+Column(
+    modifier = Modifier.padding(KptSpacingDefaults.screenPadding())
+) {
+    // Screen content
+}
+
+// Apply card content padding
+Card {
+    Column(
+        modifier = Modifier.padding(KptSpacingDefaults.cardPadding())
+    ) {
+        // Card content
+    }
+}
+```
+
+</details>
+
+- `fun screenPadding() = KptTheme.spacing.paddingValues(` — Standard padding for screen-level content.
+- `fun cardPadding() = KptTheme.spacing.paddingValues(` — Standard padding for card content.
+- `fun buttonPadding() = KptTheme.spacing.paddingValues(` — Standard padding for button content.
+
+```kotlin
+object KptElevationDefaults
+```
+Predefined elevation configurations for common UI patterns. This object provides semantically meaningful elevation presets that follow Material Design elevation guidelines.
+
+<details><summary>Example</summary>
+
+```kotlin
+// Standard card elevation
+Card(elevation = KptElevationDefaults.card()) {
+    // Card content
+}
+
+// Prominent card for important content
+Card(elevation = KptElevationDefaults.raisedCard()) {
+    // Important content
+}
+```
+
+</details>
+
+- `fun card() = KptTheme.elevation.cardElevation(` — Standard card elevation for normal content.
+- `fun raisedCard() = KptTheme.elevation.cardElevation(` — Elevated card for prominent content.
+- `fun dialogCard() = KptTheme.elevation.cardElevation(` — High elevation for modal content.
+
+```kotlin
+val KptColorScheme.containerColors: ContainerColors
+```
+Provides convenient access to container color combinations. This extension property groups related container colors and their corresponding content colors for easy access.
+
+<details><summary>Example</summary>
+
+```kotlin
+val colors = KptTheme.colorScheme.containerColors
+
+Card(
+    colors = CardDefaults.cardColors(
+        containerColor = colors.primary,
+        contentColor = colors.onPrimary
+    )
+) {
+    // Card content
+}
+```
+
+</details>
+
+```kotlin
+data class ContainerColors(
+```
+A collection of container colors and their corresponding content colors.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/chart/BarGeometry.kt`
 
@@ -434,6 +734,18 @@ fun KptLargeTopAppBar(
 ```
 Shorthand for the Large (collapsing) bar.
 
+### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/SlideTransition.kt`
+
+```kotlin
+fun KptSlideTransition(
+```
+Slides `content` in and out along `direction`, using the shared motion durations.
+
+```kotlin
+enum class SlideDirection
+```
+Direction a `KptSlideTransition` enters from.
+
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/KptProgress.kt`
 
 ```kotlin
@@ -454,18 +766,6 @@ Single dispatch composable for every "something is in progress" UI in the toolki
 enum class ProgressSize
 ```
 T-shirt sizes for `KptProgress` variants. Maps to (diameter, stroke) dp pairs via `ProgressSizeSpec.dpFor` — keeps every project-wide progress indicator on a single set of rhythm-aligned dimensions.
-
-### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/SlideTransition.kt`
-
-```kotlin
-fun KptSlideTransition(
-```
-Slides `content` in and out along `direction`, using the shared motion durations.
-
-```kotlin
-enum class SlideDirection
-```
-Direction a `KptSlideTransition` enters from.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/core/ComponentStateHolder.kt`
 
@@ -889,306 +1189,6 @@ KptTopAppBar(topAppBarConfig)
 ```
 
 </details>
-
-### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt`
-
-```kotlin
-fun KptMaterialTheme(
-```
-KptMaterialTheme provides Material3 integration for KptTheme. This composable applies KptTheme values to MaterialTheme automatically, making all Material3 components use KptTheme design tokens.
-
-<details><summary>Example</summary>
-
-```kotlin
-KptMaterialTheme {
-    MaterialTheme.colorScheme.primary   // == KptTheme.colorScheme.primary
-    MaterialTheme.typography.titleLarge // == KptTheme.typography.titleLarge
-    KptTheme.spacing.md                 // Kpt-only tokens stay reachable
-}
-```
-
-</details>
-
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
-
-```kotlin
-    val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
-
-    KptMaterialTheme(theme = themeProvider) {
-        // Provide the design-system token CompositionLocals app-wide so every widget
-        // built on `core/designsystem/component/`, `chart/`, and `motion/` resolves
-        // semantic finance colors, motion specs, spacing scale, and elevation tiers
-        // without per-call wiring. Forks override any subset via
-```
-
-</details>
-
-```kotlin
-fun KptMaterialTheme(
-```
-KptMaterialTheme with dark theme support. Provides automatic light/dark theme switching with Material3 integration.
-
-<details><summary>Example</summary>
-
-```kotlin
-KptMaterialTheme(
-    lightTheme = kptTheme { colors { primary = Color.Blue } },
-    darkThemeProvider = kptTheme { colors { primary = Color.Cyan } },
-) { /* switches with the system setting */ }
-```
-
-</details>
-
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
-
-```kotlin
-    val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
-
-    KptMaterialTheme(theme = themeProvider) {
-        // Provide the design-system token CompositionLocals app-wide so every widget
-        // built on `core/designsystem/component/`, `chart/`, and `motion/` resolves
-        // semantic finance colors, motion specs, spacing scale, and elevation tiers
-        // without per-call wiring. Forks override any subset via
-```
-
-</details>
-
-```kotlin
-fun KptMaterialTheme(
-```
-Builds the theme from the dark-mode flag, for a palette that differs by more than a few colours.
-
-<details><summary>Example</summary>
-
-```kotlin
-KptMaterialTheme(themeBuilder = { isDark ->
-    kptTheme { colors { primary = if (isDark) Color.Cyan else Color.Blue } }
-}) { /* content */ }
-```
-
-</details>
-
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
-
-```kotlin
-    val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
-
-    KptMaterialTheme(theme = themeProvider) {
-        // Provide the design-system token CompositionLocals app-wide so every widget
-        // built on `core/designsystem/component/`, `chart/`, and `motion/` resolves
-        // semantic finance colors, motion specs, spacing scale, and elevation tiers
-        // without per-call wiring. Forks override any subset via
-```
-
-</details>
-
-### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptTheme.kt`
-
-```kotlin
-fun KptTheme(
-```
-KptTheme provides the core theming composable that makes all KPT design tokens available to child components through Composition Locals.
-
-<details><summary>Example</summary>
-
-```kotlin
-KptTheme {
-    // All child components can now access:
-    // KptTheme.colorScheme
-    // KptTheme.typography
-    // KptTheme.shapes
-    // KptTheme.spacing
-    // KptTheme.elevation
-    MyScreen()
-}
-```
-
-</details>
-
-<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:37</code></summary>
-
-```kotlin
-@Composable
-private fun FinancePalettePreviewLight() {
-    KptTheme(darkTheme = false) {
-        Surface { FinancePaletteSwatches() }
-    }
-}
-```
-
-</details>
-
-### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptThemeExtensions.kt`
-
-```kotlin
-fun KptSpacing.paddingValues(
-```
-Creates `PaddingValues` using KPT spacing tokens with horizontal and vertical values. This extension function provides a convenient way to create consistent padding using the design system's spacing scale.
-
-<details><summary>Example</summary>
-
-```kotlin
-Box(
-    modifier = Modifier.padding(
-        KptTheme.spacing.paddingValues(
-            horizontal = KptTheme.spacing.lg,
-            vertical = KptTheme.spacing.md
-        )
-    )
-)
-```
-
-</details>
-
-```kotlin
-fun KptSpacing.paddingValues(
-```
-Creates `PaddingValues` using KPT spacing tokens with individual edge values. This extension function provides fine-grained control over padding for each edge while maintaining consistency with the design system's spacing scale.
-
-<details><summary>Example</summary>
-
-```kotlin
-Card(
-    modifier = Modifier.padding(
-        KptTheme.spacing.paddingValues(
-            start = KptTheme.spacing.lg,
-            top = KptTheme.spacing.md,
-            end = KptTheme.spacing.lg,
-            bottom = KptTheme.spacing.xl
-        )
-    )
-)
-```
-
-</details>
-
-```kotlin
-fun KptTypography.toMaterial3Typography(fontFamily: FontFamily? = FontFamily.Default): Typography
-```
-Adapts a `KptTypography` to Material 3's `Typography`, so Kpt components and raw Material components render the same type.
-
-```kotlin
-fun Typography.toKptTypography(fontFamily: FontFamily? = FontFamily.Default): KptTypography =
-```
-Adapts a Material 3 `Typography` into a `KptTypography`, applying `fontFamily` to every style. The bridge for a fork that already themes with `MaterialTheme` — its existing scale drives the Kpt components without maintaining the type twice.
-
-```kotlin
-fun KptTypography.toMaterial3Typography(): Typography
-```
-Extension function to convert KptTypography to Material3 Typography This ensures that all Material3 components automatically use KptTheme typography
-
-```kotlin
-fun Typography.toKptTypography(): KptTypography = KptTypographyImpl(
-```
-Adapts a Material 3 `Typography` into a `KptTypography`, keeping each style's own font family.
-
-```kotlin
-fun KptColorScheme.toMaterial3ColorScheme(): ColorScheme
-```
-Extension function to convert KptColorScheme to Material3 ColorScheme This ensures that all Material3 components automatically use KptTheme colors
-
-```kotlin
-fun ColorScheme.toKptColorScheme(): KptColorScheme = KptColorSchemeImpl(
-```
-Adapts a Material 3 `ColorScheme` into a `KptColorScheme` — role for role, no colour invented.
-
-```kotlin
-fun KptShapes.toMaterial3Shapes(): Shapes
-```
-Extension function to convert KptShapes to Material3 Shapes This ensures that all Material3 components automatically use KptTheme shapes
-
-```kotlin
-fun Shapes.toKptShapes(): KptShapes = KptShapesImpl(
-```
-Adapts a Material 3 `Shapes` into a `KptShapes`.
-
-```kotlin
-fun KptElevation.cardElevation(
-```
-Get CardDefaults.cardElevation using KptTheme elevation
-
-```kotlin
-object KptSpacingDefaults
-```
-Predefined spacing combinations for common UI patterns. This object provides convenient access to commonly used padding configurations that follow design system best practices.
-
-<details><summary>Example</summary>
-
-```kotlin
-// Apply standard screen padding
-Column(
-    modifier = Modifier.padding(KptSpacingDefaults.screenPadding())
-) {
-    // Screen content
-}
-
-// Apply card content padding
-Card {
-    Column(
-        modifier = Modifier.padding(KptSpacingDefaults.cardPadding())
-    ) {
-        // Card content
-    }
-}
-```
-
-</details>
-
-- `fun screenPadding() = KptTheme.spacing.paddingValues(` — Standard padding for screen-level content.
-- `fun cardPadding() = KptTheme.spacing.paddingValues(` — Standard padding for card content.
-- `fun buttonPadding() = KptTheme.spacing.paddingValues(` — Standard padding for button content.
-
-```kotlin
-object KptElevationDefaults
-```
-Predefined elevation configurations for common UI patterns. This object provides semantically meaningful elevation presets that follow Material Design elevation guidelines.
-
-<details><summary>Example</summary>
-
-```kotlin
-// Standard card elevation
-Card(elevation = KptElevationDefaults.card()) {
-    // Card content
-}
-
-// Prominent card for important content
-Card(elevation = KptElevationDefaults.raisedCard()) {
-    // Important content
-}
-```
-
-</details>
-
-- `fun card() = KptTheme.elevation.cardElevation(` — Standard card elevation for normal content.
-- `fun raisedCard() = KptTheme.elevation.cardElevation(` — Elevated card for prominent content.
-- `fun dialogCard() = KptTheme.elevation.cardElevation(` — High elevation for modal content.
-
-```kotlin
-val KptColorScheme.containerColors: ContainerColors
-```
-Provides convenient access to container color combinations. This extension property groups related container colors and their corresponding content colors for easy access.
-
-<details><summary>Example</summary>
-
-```kotlin
-val colors = KptTheme.colorScheme.containerColors
-
-Card(
-    colors = CardDefaults.cardColors(
-        containerColor = colors.primary,
-        contentColor = colors.onPrimary
-    )
-) {
-    // Card content
-}
-```
-
-</details>
-
-```kotlin
-data class ContainerColors(
-```
-A collection of container colors and their corresponding content colors.
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/AdaptiveListDetailPaneScaffold.kt`
 

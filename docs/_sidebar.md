@@ -10,9 +10,9 @@
   - [store-architecture](/architecture/cross-cutting/store-architecture.md)
   - [store-data-api](/architecture/cross-cutting/store-data-api.md)
   - [style-guide](/architecture/cross-cutting/style-guide.md)
+  - [README](/architecture/patterns/README.md)
   - [independent-cards](/architecture/patterns/independent-cards.md)
   - [navigation-safety](/architecture/patterns/navigation-safety.md)
-  - [README](/architecture/patterns/README.md)
 
 - **Project tree**
   - [All areas](/architecture/PROJECT_TREE.md)

@@ -37,6 +37,15 @@
 # Exit: 0 ok · 2 usage / module not found
 set -uo pipefail
 
+# Byte-deterministic text processing. Generated output must be a pure function of the tree, and the
+# locale silently breaks that in two ways: `sort` collates differently (a UTF-8 locale folds case, so
+# `di/SecurityModule.kt` sorts before `FailedAttemptTracker.kt` while C order puts it after), and `.`
+# in a length-bounded regex counts CHARACTERS under UTF-8 but BYTES under C — so a 241-character KDoc
+# summary containing an em dash (243 bytes) kept its second sentence on a Mac and lost it on the
+# Linux CI runner. Pinning to C fixes the comparison basis everywhere; no script here runs Python, so
+# this cannot force a Python stdout to ASCII.
+export LC_ALL=C
+
 # This file SHIPS IN THE TEMPLATE: the tree it documents is the repository it lives in, so a fork
 # and a GitHub Action both get the generator with no framework checkout. TEMPLATE_PATH overrides it
 # for the framework (which drives the same script against a checkout elsewhere) and for canaries.
@@ -170,13 +179,19 @@ build_callsite_index() {
   # `refresh.sh --check` reports DRIFT on one while reporting IN STEP on the other. Generated output
   # has to be a pure function of the tree; every other `find` in this file is already sorted.
   find "$TMPL/feature" "$TMPL/core" -name '*.kt' -type f -not -path '*/build/*' 2>/dev/null \
-    | sort \
+    | LC_ALL=C sort \
     | xargs awk '
         /^[[:space:]]*(import|package)[[:space:]]/ { next }
         /^[[:space:]]*(\/\/|\*|\/\*)/          { next }
         {
           line = $0
-          while (match(line, /[A-Z][A-Za-z0-9_]{2,}/)) {
+          # `[A-Za-z0-9_][A-Za-z0-9_]+` rather than the equivalent-looking `{2,}`: mawk — which is
+          # /usr/bin/awk on Ubuntu, so on the CI runner — ACCEPTS the interval but does not apply it
+          # greedily. It matched `Kpt`, `The`, `Foo` where BSD awk and gawk match `KptTheme`, so the
+          # index filled with three-letter fragments, every symbol lookup missed, and the published
+          # pages silently lost ALL their "Used in the template" examples on Linux while keeping
+          # them on a Mac. `+` is greedy in every awk.
+          while (match(line, /[A-Z][A-Za-z0-9_][A-Za-z0-9_]+/)) {
             print substr(line, RSTART, RLENGTH) "|" FILENAME "|" FNR
             line = substr(line, RSTART + RLENGTH)
           }
@@ -295,7 +310,7 @@ emit_module() {  # $1 = layer/module
           [ "$c" -gt 0 ] && printf '\n' ;;
       esac
     done < <(grep -nE '^(public )?(expect |actual )?(annotation |data |sealed |enum |value |abstract |open )*(suspend )?(fun|val|var|class|interface|object|typealias)[[:space:]]' "$f" 2>/dev/null)
-  done < <(find "$src" -name '*.kt' -type f 2>/dev/null | sort)
+  done < <(find "$src" -name '*.kt' -type f 2>/dev/null | LC_ALL=C sort)
 
   printf -- '---\n\n'
   printf '_%s type(s), %s function(s)/property(ies); %s carry KDoc at source; %s authored example(s); %s live call site(s)._\n' "$n_types" "$n_funs" "$n_doc" "$n_ex" "$n_cs"
@@ -387,7 +402,7 @@ write_sidebar() {
           [ -z "$f" ] && continue
           title="$(basename "$f" .md)"
           printf -- '  - [%s](/architecture/%s/%s)\n' "$title" "$d" "$(basename "$f")"
-        done < <(find "$TMPL/docs/architecture/$d" -maxdepth 1 -name '*.md' 2>/dev/null | sort)
+        done < <(find "$TMPL/docs/architecture/$d" -maxdepth 1 -name '*.md' 2>/dev/null | LC_ALL=C sort)
       fi
     done
     # Project tree FIRST among the sections: it is the map, and a reader who does not yet know the
@@ -398,7 +413,7 @@ write_sidebar() {
       while IFS= read -r f; do
         [ -z "$f" ] && continue
         printf -- '  - [%s/](/architecture/tree/%s)\n' "$(basename "$f" .md)" "$(basename "$f")"
-      done < <(find "$TMPL/docs/architecture/tree" -maxdepth 1 -name '*.md' 2>/dev/null | sort)
+      done < <(find "$TMPL/docs/architecture/tree" -maxdepth 1 -name '*.md' 2>/dev/null | LC_ALL=C sort)
     fi
     for layer in core-base core; do
       if [ -d "$TMPL/docs/architecture/tree/$layer" ]; then
@@ -406,7 +421,7 @@ write_sidebar() {
         while IFS= read -r f; do
           [ -z "$f" ] && continue
           printf -- '  - [%s/%s](/architecture/tree/%s/%s)\n' "$layer" "$(basename "$f" .md)" "$layer" "$(basename "$f")"
-        done < <(find "$TMPL/docs/architecture/tree/$layer" -maxdepth 1 -name '*.md' 2>/dev/null | sort)
+        done < <(find "$TMPL/docs/architecture/tree/$layer" -maxdepth 1 -name '*.md' 2>/dev/null | LC_ALL=C sort)
       fi
     done
     for d in setup deployment release secrets ios claude reports; do
@@ -416,7 +431,7 @@ write_sidebar() {
           [ -z "$f" ] && continue
           [ "$any" -eq 0 ] && { printf -- '\n- **%s**\n' "$d"; any=1; }
           printf -- '  - [%s](/%s/%s)\n' "$(basename "$f" .md)" "$d" "$(basename "$f")"
-        done < <(find "$TMPL/docs/$d" -maxdepth 1 -name '*.md' 2>/dev/null | sort)
+        done < <(find "$TMPL/docs/$d" -maxdepth 1 -name '*.md' 2>/dev/null | LC_ALL=C sort)
       fi
     done
     local any_root=0
@@ -424,7 +439,7 @@ write_sidebar() {
       [ -z "$f" ] && continue
       [ "$any_root" -eq 0 ] && { printf -- '\n- **Reference**\n'; any_root=1; }
       printf -- '  - [%s](/%s)\n' "$(basename "$f" .md)" "$(basename "$f")"
-    done < <(find "$TMPL/docs" -maxdepth 1 -name '*.md' ! -name '_*' 2>/dev/null | sort)
+    done < <(find "$TMPL/docs" -maxdepth 1 -name '*.md' ! -name '_*' 2>/dev/null | LC_ALL=C sort)
   } > "$tmp"
   [ -s "$tmp" ] || { rm -f "$tmp"; echo "sidebar generation produced nothing — refused" >&2; return 2; }
   if cmp -s "$tmp" "$out" 2>/dev/null; then rm -f "$tmp"; echo "  = docs/_sidebar.md (current)"; return 0; fi

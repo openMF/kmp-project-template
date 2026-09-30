@@ -28,6 +28,15 @@
 # Exit:  0 + 40-hex digest on stdout · 2 usage / module missing · 3 no Kotlin sources matched
 set -uo pipefail
 
+# Byte-deterministic text processing. Generated output must be a pure function of the tree, and the
+# locale silently breaks that in two ways: `sort` collates differently (a UTF-8 locale folds case, so
+# `di/SecurityModule.kt` sorts before `FailedAttemptTracker.kt` while C order puts it after), and `.`
+# in a length-bounded regex counts CHARACTERS under UTF-8 but BYTES under C — so a 241-character KDoc
+# summary containing an em dash (243 bytes) kept its second sentence on a Mac and lost it on the
+# Linux CI runner. Pinning to C fixes the comparison basis everywhere; no script here runs Python, so
+# this cannot force a Python stdout to ASCII.
+export LC_ALL=C
+
 # Repo-root resolved from this script's own location: this file SHIPS IN THE TEMPLATE, so the tree it
 # measures is the repository it lives in. TEMPLATE_PATH still overrides for canaries and for the
 # framework, which drives this same script against a checkout elsewhere.
@@ -41,7 +50,7 @@ LM="${1:-}"
 # change the digest. Hash the per-file digests rather than concatenated bytes so a file RENAME moves
 # the anchor too (a moved public API is an API change).
 DIGEST="$(find "$TMPL/$LM" -type f -name '*.kt' -not -path '*/build/*' -print0 2>/dev/null \
-  | sort -z \
+  | LC_ALL=C sort -z \
   | xargs -0 shasum -a 256 2>/dev/null \
   | sed "s|$TMPL/||" \
   | shasum -a 256 | cut -c1-40)"

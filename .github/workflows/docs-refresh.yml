@@ -1,51 +1,23 @@
-# .github/workflows/docs-refresh.yml — keep the generated API reference in step with source.
+# .github/workflows/docs-refresh.yml — the POST-MERGE half: regenerate, propose, publish.
 #
 # CLAUDE.md already states the contract: "Changing the template? docs/architecture/ updates in the
-# SAME change." This workflow is the CI half of that — the write-time guards catch it locally, this
-# catches it when someone pushes anyway.
+# SAME change." This is the half that runs AFTER a merge; the pull-request check lives in
+# docs-check.yml, split out so a PR shows one check rather than one result plus two skipped rows.
 #
-# TWO MODES, because the right response differs:
+# push to dev  →  REFRESH + open a PR when drift exists. Never commits straight to the branch: dev is
+#                 protected (CLAUDE.md "NEVER commit directly to master or dev"), and a docs refresh
+#                 deserves the same review as any other change. Matches sync-dirs.yaml.
 #
-#   pull_request  →  CHECK ONLY. Fails with the exact pages that are stale and the one command that
-#                    fixes them. It must not push to a contributor's branch (a fork PR has no write
-#                    token, and rewriting someone's branch mid-review is hostile).
-#
-#   push to dev   →  REFRESH + open a PR when drift exists. Never commits straight to the branch:
-#                    dev is protected (CLAUDE.md "NEVER commit directly to master or dev"), and a
-#                    docs refresh deserves the same review as any other change. Matches the
-#                    convention already used by sync-dirs.yaml.
+# This workflow does NOT trigger on pull_request, which is what keeps its two jobs — and their
+# `contents: write` / `pull-requests: write` / `deployments: write` scopes — off PR runs entirely.
 #
 # WHY IT ONLY NEEDS BASH
 # The generator lives in the TEMPLATE (scripts/docs/), not in the framework, precisely so this job
 # needs no framework checkout, no JDK, and no Gradle — and so every fork inherits the same capability.
-name: Docs · API reference
-run-name: "📚 Docs refresh · ${{ github.event.pull_request.title || github.ref_name }}"
+name: Docs · refresh and publish
+run-name: "📚 Docs refresh · ${{ github.ref_name }}"
 
 on:
-  pull_request:
-    paths:
-      - 'core-base/**/*.kt'
-      - 'core/**/*.kt'
-      # A NEW MODULE arrives as a new directory + build file, which no *.kt pattern above matches on
-      # its own — and a new module is exactly the case the scaffold exists to handle.
-      - 'core-base/*/build.gradle.kts'
-      - 'core/*/build.gradle.kts'
-      # The docs now cover the WHOLE tree (scripts/docs/tree-scaffold.sh), so a change anywhere that has
-      # a page has to re-run the check. Watching only core*/ left a page for `feature/` — the largest
-      # area in the repo — able to go stale with CI silent, which is the drift the gate exists to catch.
-      - 'feature/**'
-      - 'cmp-*/**'
-      - 'deployment/**'
-      - 'app-profile/**'
-      - 'build-logic/**'
-      - 'tools/**'
-      - 'sync/**'
-      - 'legal/**'
-      - 'gradle/**'
-      - 'scripts/**'
-      - 'tests/**'
-      - 'docs/**'
-      - '.github/workflows/**'
   push:
     branches: [dev]
     paths:
@@ -79,59 +51,8 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    name: Docs are current with source
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Audit the documentation end to end
-        run: |
-          set -euo pipefail
-          chmod +x scripts/docs/*.sh
-          # doc-audit.sh is the SUPERSET: it runs the currency check plus area/unit coverage, authored
-          # substance, authored-reference resolution, repo-wide links and symbol coverage. Running only
-          # `refresh.sh --check` here verified the half of the docs that had just been re-derived, which
-          # is guaranteed to match — the other five checks are the ones that can actually fail.
-          if ! bash scripts/docs/doc-audit.sh; then
-            {
-              echo "### 📚 Documentation audit failed"
-              echo
-              echo "See the step log for the named gaps. Locally:"
-              echo
-              echo '```bash'
-              echo 'bash scripts/docs/doc-audit.sh'
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-          echo "✅ documentation audit complete" >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Verify generated docs match source
-        run: |
-          set -euo pipefail
-          if ! bash scripts/docs/refresh.sh --check; then
-            {
-              echo "### 📚 Docs are out of step with source"
-              echo
-              echo "This PR changes Kotlin under \`core-base/\` or \`core/\` without refreshing the"
-              echo "generated API reference. The pages listed above are derived from KDoc + signatures,"
-              echo "so they cannot be updated by hand."
-              echo
-              echo '```bash'
-              echo 'bash scripts/docs/refresh.sh'
-              echo '```'
-              echo
-              echo "Then commit the result. Prose outside the \`<!-- api-docs -->\` markers is never touched."
-            } >> "$GITHUB_STEP_SUMMARY"
-            exit 1
-          fi
-          echo "✅ generated docs match source" >> "$GITHUB_STEP_SUMMARY"
-
   refresh:
     name: Refresh and propose
-    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -198,7 +119,6 @@ jobs:
     name: Publish to Cloudflare Pages
     # Runs only after the docs on `dev` are current — publishing from a PR would race branches onto
     # one site, and publishing before the refresh would ship the previous revision's API reference.
-    if: github.event_name != 'pull_request'
     needs: refresh
     runs-on: ubuntu-latest
     permissions:

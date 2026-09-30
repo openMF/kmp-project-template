@@ -47,7 +47,7 @@
 | Area | Files | Page |
 |---|---:|---|
 | `deployment/` | 174 | [`deployment/`](tree/deployment.md) |
-| `.github/` | 15 | [`.github/`](tree/github.md) |
+| `.github/` | 16 | [`.github/`](tree/github.md) |
 | `fastlane/` | 4 | [`fastlane/`](tree/fastlane.md) |
 | `fastlane-config/` | 1 | [`fastlane-config/`](tree/fastlane-config.md) |
 | `legal/` | 6 | [`legal/`](tree/legal.md) |

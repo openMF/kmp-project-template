@@ -22,10 +22,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=9a075b78e34ffa5235d59d52d88f02aa3a20b249 -->
+<!-- api-docs:begin module=core/network sha=8dba0c4d90923b1c7635e7530074e40b03584b2a -->
 ## API reference
 
-_Generated from `core/network` at tree `9a075b78e34f` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `8dba0c4d9092` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`
@@ -141,7 +141,7 @@ object AppAccessPoints
 ```
 The per-fork list of network access points this app talks to — REST and Supabase in ONE place.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:75</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:76</code></summary>
 
 ```kotlin
     // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
@@ -164,7 +164,7 @@ class AppMultiUrlConfigProvider(
 ```
 Concrete `MultiUrlConfigProvider` backed by the declarative `AccessPointRegistry`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:80</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:81</code></summary>
 
 ```kotlin
     // AccessPointRegistry. Clients thread it via
@@ -185,7 +185,7 @@ object AppSupabaseAnonKeys
 ```
 The per-fork map of Supabase access-point id → anon key. **SoT: `app-profile/app.yaml#network.access_points`** (rows) **+ the build environment** (values).
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:86</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:87</code></summary>
 
 ```kotlin
         SupabaseClientFactory(
@@ -242,7 +242,7 @@ object ProjectNetworkHeaders : DefaultHeaderProvider {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:63</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:64</code></summary>
 
 ```kotlin
     // built by `restApi(...)` resolves this, so a fork adds an app-wide header without hand-building
@@ -263,7 +263,7 @@ val NetworkModule = module
 ```
 Koin module for `core/network` — the Ktorfit API bindings over the shared client.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:39</code></summary>
 
 ```kotlin
  */

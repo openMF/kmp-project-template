@@ -13,7 +13,7 @@
 | `doc-refs.sh` | does the AUTHORED prose still name files that exist? |
 | `doc-scan.sh` | one full-project documentation scan, every language. |
 | `kdoc-coverage.sh` | who is missing KDoc, and where. |
-| `module-hash.sh` | scan-bounded: pure bash + find/shasum over one module tree (RULE-CI-001). Never idea-layer. |
+| `module-hash.sh` | scan-bounded: pure bash + find/sha256 over one module tree (RULE-CI-001). Never idea-layer. |
 | `refresh.sh` | ONE entry point that brings the whole docs tree back in step with source. |
 | `scaffold.sh` | create/refresh the docs/architecture tree FROM DISK. |
 | `workflow.sh` | GitHub Actions workflows and their dispatch inputs. |

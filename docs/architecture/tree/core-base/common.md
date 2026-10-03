@@ -71,20 +71,76 @@ expect annotation class Parcelize()
 ```
 Marks a class as parcelable so it can cross an Android process/configuration boundary.
 
+<details><summary>Used in the template — <code>core-base/common/src/androidMain/kotlin/kpt/core/base/common/Parcelize.android.kt:19</code></summary>
+
+```kotlin
+import kotlinx.parcelize.TypeParceler
+
+actual typealias Parcelize = Parcelize
+
+actual typealias Parcelable = Parcelable
+
+actual typealias IgnoredOnParcel = IgnoredOnParcel
+```
+
+</details>
+
 ```kotlin
 expect interface Parcelable
 ```
 The platform's parcelable contract — `android.os.Parcelable` on Android, an empty marker elsewhere. Implement it on a shared model together with `Parcelize`; do not hand-write the read/write pair.
+
+<details><summary>Used in the template — <code>core-base/common/src/androidMain/kotlin/kpt/core/base/common/Parcelize.android.kt:21</code></summary>
+
+```kotlin
+actual typealias Parcelize = Parcelize
+
+actual typealias Parcelable = Parcelable
+
+actual typealias IgnoredOnParcel = IgnoredOnParcel
+
+actual typealias Parceler<P> = Parceler<P>
+```
+
+</details>
 
 ```kotlin
 expect annotation class IgnoredOnParcel()
 ```
 Excludes one property from parcelling, for values that are derived or cannot cross a process boundary (a lambda, a coroutine scope, a cached bitmap). The property must have a default, since it is reconstructed rather than restored.
 
+<details><summary>Used in the template — <code>core-base/common/src/androidMain/kotlin/kpt/core/base/common/Parcelize.android.kt:23</code></summary>
+
+```kotlin
+actual typealias Parcelable = Parcelable
+
+actual typealias IgnoredOnParcel = IgnoredOnParcel
+
+actual typealias Parceler<P> = Parceler<P>
+
+actual typealias TypeParceler<T, P> = TypeParceler<T, P>
+```
+
+</details>
+
 ```kotlin
 expect interface Parceler<P>
 ```
 Custom parcelling for a type the platform cannot serialise on its own — a value class, a third-party type, anything needing a narrower wire form than its fields. Pair it with `TypeParceler` at the use site.
+
+<details><summary>Used in the template — <code>core-base/common/src/androidMain/kotlin/kpt/core/base/common/Parcelize.android.kt:25</code></summary>
+
+```kotlin
+actual typealias IgnoredOnParcel = IgnoredOnParcel
+
+actual typealias Parceler<P> = Parceler<P>
+
+actual typealias TypeParceler<T, P> = TypeParceler<T, P>
+
+actual typealias Parcel = Parcel
+```
+
+</details>
 
 - `fun create(parcel: Parcel): P` — Reconstructs a `P` from `parcel`. Must read fields in exactly the order `write` produced them.
 - `fun P.write(parcel: Parcel, flags: Int)` — Writes this `P` into `parcel`. The read side depends on this order — see `create`.
@@ -94,10 +150,32 @@ expect annotation class TypeParceler<T, P : Parceler<in T>>()
 ```
 Binds a `Parceler` to type `T` for one property or file, so a shared model can carry a type the platform does not know how to parcel.
 
+<details><summary>Used in the template — <code>core-base/common/src/androidMain/kotlin/kpt/core/base/common/Parcelize.android.kt:27</code></summary>
+
+```kotlin
+actual typealias Parceler<P> = Parceler<P>
+
+actual typealias TypeParceler<T, P> = TypeParceler<T, P>
+
+actual typealias Parcel = Parcel
+```
+
+</details>
+
 ```kotlin
 expect class Parcel
 ```
 The platform write buffer a `Parceler` reads from and writes to. Strictly POSITIONAL — there are no field names on the wire, so reads must mirror the write order exactly.
+
+<details><summary>Used in the template — <code>core-base/common/src/androidMain/kotlin/kpt/core/base/common/Parcelize.android.kt:29</code></summary>
+
+```kotlin
+actual typealias TypeParceler<T, P> = TypeParceler<T, P>
+
+actual typealias Parcel = Parcel
+```
+
+</details>
 
 ### `core-base/common/src/commonMain/kotlin/kpt/core/base/common/di/CommonModule.kt`
 
@@ -152,5 +230,5 @@ Injectable access to the app's coroutine dispatchers.
 
 ---
 
-_7 type(s), 16 function(s)/property(ies); 23 carry KDoc at source; 0 authored example(s); 2 live call site(s)._
+_7 type(s), 16 function(s)/property(ies); 23 carry KDoc at source; 0 authored example(s); 8 live call site(s)._
 <!-- api-docs:end -->

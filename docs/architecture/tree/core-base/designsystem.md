@@ -144,15 +144,16 @@ KptTheme {
 
 </details>
 
-<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:37</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreenPreview.kt:39</code></summary>
 
 ```kotlin
-@Composable
-private fun FinancePalettePreviewLight() {
-    KptTheme(darkTheme = false) {
-        Surface { FinancePaletteSwatches() }
-    }
-}
+    hasResumableDraft: Boolean = false,
+) {
+    KptTheme {
+        AlertCreateScreenContent(
+            form = form,
+            screenState = ScreenState.Content(previewAlert()),
+            submitState = submitState,
 ```
 
 </details>
@@ -492,6 +493,20 @@ val animatedScale by animateFloatAsState(
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/BounceAnimation.kt:82</code></summary>
+
+```kotlin
+    visible: Boolean,
+    modifier: Modifier = Modifier,
+    animationSpec: FiniteAnimationSpec<Float> = KptAnimationSpecs.medium,
+    content: @Composable () -> Unit,
+) {
+    AnimatedVisibility(
+        visible = visible,
+```
+
+</details>
+
 - `val fast = tween<Float>(durationMillis = 150, easing = FastOutSlowInEasing)` — Fast tween animation (150ms) for quick transitions like state changes. Best used for: button states, small UI element appearances/disappearances.
 - `val medium = tween<Float>(durationMillis = 300, easing = FastOutSlowInEasing)` — Medium tween animation (300ms) for standard UI transitions. Best used for: screen transitions, modal appearances, content changes.
 - `val slow = tween<Float>(durationMillis = 500, easing = FastOutSlowInEasing)` — Slow tween animation (500ms) for complex or large-scale transitions. Best used for: page transitions, complex layout changes, dramatic effects.
@@ -540,6 +555,20 @@ KptButton(onClick = viewModel::onSubmit, enabled = uiState.canInteract) {
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/DraftResumeBanner.kt:77</code></summary>
+
+```kotlin
+                    Text("Discard")
+                }
+                KptButton(onClick = onResume) {
+                    Text("Resume")
+                }
+            }
+        }
+```
+
+</details>
+
 ```kotlin
 fun KptOutlinedButton(
 ```
@@ -549,6 +578,20 @@ Outlined variant of `KptButton`.
 fun KptTextButton(
 ```
 Text (flat) variant of `KptButton`.
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/DraftResumeBanner.kt:74</code></summary>
+
+```kotlin
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                KptTextButton(onClick = onDiscard) {
+                    Text("Discard")
+                }
+                KptButton(onClick = onResume) {
+                    Text("Resume")
+```
+
+</details>
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/KptShimmerLoadingBox.kt`
 
@@ -575,6 +618,20 @@ Animated shimmer placeholder box. **Future migration:** new call sites should pr
 fun KptShimmerListItem(
 ```
 Shimmer placeholder shaped like a list row — avatar, title and subtitle blocks. A loading affordance, not content: it must never outlive the load, or it reads as a broken row.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/KptProgressRenderer.kt:92</code></summary>
+
+```kotlin
+            ) {
+                repeat(variant.rowCount) {
+                    KptShimmerListItem(modifier = Modifier.fillMaxWidth())
+                }
+            }
+        }
+    }
+```
+
+</details>
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/KptToastHost.kt`
 
@@ -719,20 +776,72 @@ fun KptSmallTopAppBar(
 ```
 Shorthand for the Small Material 3 bar — the default height.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/component/KptTopAppBarUiTest.kt:35</code></summary>
+
+```kotlin
+    fun smallForwardsTheNavigationClick() = runComposeUiTest {
+        var clicked = 0
+        setContent { KptSmallTopAppBar(title = "T", onNavigationIconClick = { clicked++ }) }
+        onNodeWithContentDescription("Navigation").performClick()
+        assertEquals(1, clicked)
+    }
+```
+
+</details>
+
 ```kotlin
 fun KptCenterAlignedTopAppBar(
 ```
 Shorthand for the centre-aligned bar.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/component/KptTopAppBarUiTest.kt:43</code></summary>
+
+```kotlin
+    fun centerAlignedForwardsTheNavigationClick() = runComposeUiTest {
+        var clicked = 0
+        setContent { KptCenterAlignedTopAppBar(title = "T", onNavigationIconClick = { clicked++ }) }
+        onNodeWithContentDescription("Navigation").performClick()
+        assertEquals(1, clicked)
+    }
+```
+
+</details>
 
 ```kotlin
 fun KptMediumTopAppBar(
 ```
 Shorthand for the Medium (collapsing) bar.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/component/KptTopAppBarUiTest.kt:51</code></summary>
+
+```kotlin
+    fun mediumForwardsTheNavigationClick() = runComposeUiTest {
+        var clicked = 0
+        setContent { KptMediumTopAppBar(title = "T", onNavigationIconClick = { clicked++ }) }
+        onNodeWithContentDescription("Navigation").performClick()
+        assertEquals(1, clicked)
+    }
+```
+
+</details>
+
 ```kotlin
 fun KptLargeTopAppBar(
 ```
 Shorthand for the Large (collapsing) bar.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/component/KptTopAppBarUiTest.kt:59</code></summary>
+
+```kotlin
+    fun largeForwardsTheNavigationClick() = runComposeUiTest {
+        var clicked = 0
+        setContent { KptLargeTopAppBar(title = "T", onNavigationIconClick = { clicked++ }) }
+        onNodeWithContentDescription("Navigation").performClick()
+        assertEquals(1, clicked)
+    }
+```
+
+</details>
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/SlideTransition.kt`
 
@@ -746,12 +855,40 @@ enum class SlideDirection
 ```
 Direction a `KptSlideTransition` enters from.
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/util/Transition.kt:294</code></summary>
+
+```kotlin
+            fun slideUp(motion: Motion): EnterTransitionProvider = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(motion.durationLong1, easing = motion.easingEmphasized),
+                ).takeIf { isSameGraphNavigation }
+            }
+            // "stay" holds 0.99 alpha so Compose doesn't optimize it away — duration must
+```
+
+</details>
+
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/KptProgress.kt`
 
 ```kotlin
 sealed interface KptProgress
 ```
 Sealed family of "something is in progress" UI variants.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/KptProgressRenderer.kt:41</code></summary>
+
+```kotlin
+ */
+@Composable
+fun KptProgress(
+    variant: KptProgress,
+    modifier: Modifier = Modifier,
+) {
+    val (diameter, stroke) = ProgressSizeSpec.dpFor(variant.size)
+```
+
+</details>
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/KptProgressRenderer.kt`
 
@@ -760,12 +897,40 @@ fun KptProgress(
 ```
 Single dispatch composable for every "something is in progress" UI in the toolkit. Pick a `KptProgress` variant; this renderer wires it to the right primitive at the right size.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/KptProgress.kt:22</code></summary>
+
+```kotlin
+ * Use via the `KptProgress(variant, modifier)` composable in [KptProgressRenderer].
+ */
+sealed interface KptProgress {
+    /** T-shirt size — drives diameter/stroke for Circular, height for Linear, row sizing for Skeleton. */
+    val size: ProgressSize
+
+    /**
+```
+
+</details>
+
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/ProgressSizeSpec.kt`
 
 ```kotlin
 enum class ProgressSize
 ```
 T-shirt sizes for `KptProgress` variants. Maps to (diameter, stroke) dp pairs via `ProgressSizeSpec.dpFor` — keeps every project-wide progress indicator on a single set of rhythm-aligned dimensions.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/progress/KptProgress.kt:24</code></summary>
+
+```kotlin
+sealed interface KptProgress {
+    /** T-shirt size — drives diameter/stroke for Circular, height for Linear, row sizing for Skeleton. */
+    val size: ProgressSize
+
+    /**
+     * Material 3 [androidx.compose.material3.LinearProgressIndicator]. Use for top-of-
+     * screen progress (refresh banners, multi-step flows).
+```
+
+</details>
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/core/ComponentStateHolder.kt`
 
@@ -833,16 +998,16 @@ interface Clickable
 ```
 Mixed into components that respond to a tap. `interactionSource` is exposed so a caller can hoist ripple/press state — a component that owns it privately cannot participate in a parent's interaction handling.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/input/RevealSwipe.kt:203</code></summary>
+<details><summary>Used in the template — <code>feature/loans/src/commonMain/kotlin/kpt/feature/loans/ui/LoanRowCard.kt:59</code></summary>
 
 ```kotlin
-            val clickableModifier = when {
-                onContentClick != null && !closeOnContentClick -> {
-                    Modifier.combinedClickable(
-                        onClick = onContentClick,
-                        onLongClick = {
-                            onContentLongClick?.let {
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+
+    AppCard(
+        modifier = modifier.combinedClickable(onClick = onClick, onLongClick = onLongPress),
+        accentColor = loanKindAccent(loan.kind),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
 ```
 
 </details>
@@ -908,6 +1073,20 @@ interface ComponentState<T>
 ```
 Observable holder for one component's mutable value. `@Stable` so Compose can skip recomposition when the reference is unchanged; mutate through `update` rather than replacing the holder, or that guarantee is lost.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/core/ComponentStateHolder.kt:48</code></summary>
+
+```kotlin
+ */
+@Stable
+class ComponentStateHolder<T>(initialValue: T) : ComponentState<T> {
+    /**
+     * The current value of the state. Reading this property in a composable
+     * will cause that composable to recompose when the value changes.
+     *
+```
+
+</details>
+
 - `val value: T` — The current value.
 - `fun update(newValue: T)` — Replaces the value in place. Mutating through this preserves the `@Stable` contract; swapping the holder does not.
 
@@ -915,6 +1094,20 @@ Observable holder for one component's mutable value. `@Stable` so Compose can sk
 sealed interface ComponentVariant
 ```
 A named visual variant of a component (filled, outlined, tonal, …). Sealed so the variant set is closed and exhaustively handled at each render site.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/core/KptTopAppBarConfiguration.kt:28</code></summary>
+
+```kotlin
+ * @see KptTopAppBarConfiguration
+ */
+sealed interface TopAppBarVariant : ComponentVariant {
+    override val name: String
+
+    /**
+     * Standard compact top app bar suitable for most screens.
+```
+
+</details>
 
 ```kotlin
 interface ComponentComposer
@@ -944,6 +1137,20 @@ Supplies a component's semantics — description, role and any extra properties.
 interface KptThemeProvider
 ```
 The whole design language in one object: colors, typography, shapes, spacing and elevation. A fork supplies its own and every component follows, which is the point of the indirection.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:46</code></summary>
+
+```kotlin
+@Composable
+fun KptMaterialTheme(
+    theme: KptThemeProvider = KptThemeProviderImpl(),
+    content: @Composable () -> Unit,
+) {
+    // Convert KptTheme values to Material3 equivalents
+    val materialColorScheme = theme.colors.toMaterial3ColorScheme()
+```
+
+</details>
 
 - `val colors: KptColorScheme` — Color overrides, or null to inherit the theme's.
 - `val typography: KptTypography` — The type scale.
@@ -1026,6 +1233,20 @@ interface KptShapes
 ```
 The corner-shape scale, from `extraSmall` to `extraLarge`, applied by component size rather than chosen per call site.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptThemeExtensions.kt:389</code></summary>
+
+```kotlin
+ * This ensures that all Material3 components automatically use KptTheme shapes
+ */
+fun KptShapes.toMaterial3Shapes(): Shapes {
+    return Shapes(
+        extraSmall = this.extraSmall,
+        small = this.small,
+        medium = this.medium,
+```
+
+</details>
+
 - `val extraSmall: CornerBasedShape` — Tightest corner — a badge or a small chip.
 - `val small: CornerBasedShape` — A text field or a compact button.
 - `val medium: CornerBasedShape` — The default: cards and most containers.
@@ -1036,6 +1257,19 @@ The corner-shape scale, from `extraSmall` to `extraLarge`, applied by component 
 interface KptSpacing
 ```
 The spacing scale every layout measures with. Components reference these rather than literal `.dp` values so density stays uniform and a fork can retune the whole app's rhythm in one place.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptThemeExtensions.kt:61</code></summary>
+
+```kotlin
+ */
+@Composable
+fun KptSpacing.paddingValues(
+    horizontal: Dp = md,
+    vertical: Dp = md,
+): PaddingValues = PaddingValues(horizontal = horizontal, vertical = vertical)
+```
+
+</details>
 
 - `val xs: Dp` — Tightest step — icon-to-label gaps and chip padding.
 - `val sm: Dp` — Padding inside a compact control.
@@ -1048,6 +1282,20 @@ The spacing scale every layout measures with. Components reference these rather 
 interface KptElevation
 ```
 The elevation scale, in Material 3 levels 0–5.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptThemeExtensions.kt:414</code></summary>
+
+```kotlin
+ */
+@Composable
+fun KptElevation.cardElevation(
+    defaultElevation: Dp = level1,
+    pressedElevation: Dp = level2,
+    focusedElevation: Dp = level2,
+    hoveredElevation: Dp = level2,
+```
+
+</details>
 
 - `val level0: Dp` — Flat on the surface — no tint, no shadow.
 - `val level1: Dp` — A resting card.
@@ -1076,6 +1324,20 @@ annotation class ComponentDsl
 ```
 DSL marker for the component-configuration builders. Stops an inner builder from implicitly seeing an outer scope's receivers, which is how nested DSL blocks silently configure the wrong component.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/theme/KptColorSchemeImpl.kt:262</code></summary>
+
+```kotlin
+ * DSL builder for a complete [KptThemeProvider]. Entry point: [kptTheme].
+ */
+@ComponentDsl
+class KptThemeBuilder {
+    private var colors: KptColorScheme = KptColorSchemeImpl()
+    private var typography: KptTypography = KptTypographyImpl()
+    private var shapes: KptShapes = KptShapesImpl()
+```
+
+</details>
+
 ```kotlin
 interface ComponentConfigurationScope
 ```
@@ -1087,6 +1349,20 @@ Receiver for the component-configuration DSL, scoped by `ComponentDsl`.
 sealed interface TopAppBarVariant : ComponentVariant
 ```
 Defines the visual variants available for the KPT top app bar. Each variant corresponds to a different Material3 top app bar style with different visual characteristics and use cases.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/KptTopAppBar.kt:130</code></summary>
+
+```kotlin
+
+    when (configuration.variant) {
+        TopAppBarVariant.Small -> TopAppBar(
+            title = titleContent,
+            modifier = finalModifier,
+            navigationIcon = { NavigationIconSlot(configuration) },
+            actions = actionsContent,
+```
+
+</details>
 
 ```kotlin
 data class KptTopAppBarConfiguration(
@@ -1110,6 +1386,20 @@ val config = KptTopAppBarConfiguration(
     ),
     subtitle = "Optional subtitle"
 )
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/component/KptTopAppBar.kt:55</code></summary>
+
+```kotlin
+ */
+@Composable
+private fun NavigationIconSlot(configuration: KptTopAppBarConfiguration) {
+    val icon = configuration.navigationIcon ?: return
+    IconButton(
+        onClick = configuration.onNavigationIonClick ?: {},
+        enabled = configuration.onNavigationIonClick != null,
 ```
 
 </details>
@@ -1262,12 +1552,40 @@ fun KptFlowColumn(
 ```
 Column that wraps into additional columns when content exceeds the available height.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/layout/KptFlowColumnUiTest.kt:38</code></summary>
+
+```kotlin
+    fun rendersASingleColumnWithoutCrashing() = runComposeUiTest {
+        setContent {
+            KptFlowColumn {
+                Box(Modifier.size(20.dp).testTag("a"))
+                Box(Modifier.size(20.dp).testTag("b"))
+            }
+        }
+```
+
+</details>
+
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptFlowRow.kt`
 
 ```kotlin
 fun KptFlowRow(
 ```
 Row that wraps onto additional lines when content exceeds the available width.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/layout/KptFlowRowUiTest.kt:42</code></summary>
+
+```kotlin
+    fun rendersASingleRowWithoutCrashing() = runComposeUiTest {
+        setContent {
+            KptFlowRow {
+                Box(Modifier.size(20.dp).testTag("a"))
+                Box(Modifier.size(20.dp).testTag("b"))
+            }
+        }
+```
+
+</details>
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptGrid.kt`
 
@@ -1374,10 +1692,38 @@ fun KptSidebarLayout(
 ```
 Persistent sidebar beside content, for wide windows. `sidebarVisible` is hoisted, so this never toggles itself: it reports a user-initiated dismissal through `onSidebarVisibilityChange` and leaves the decision to the caller.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/layout/KptSidebarLayoutUiTest.kt:42</code></summary>
+
+```kotlin
+    fun anOverlaySidebarIsComposedExactlyOnce() = runComposeUiTest {
+        setContent {
+            KptSidebarLayout(
+                sidebarContent = { Box(Modifier.fillMaxSize().testTag(panelTag)) },
+                configuration = SidebarConfiguration(overlay = true),
+                sidebarVisible = true,
+                content = { Box(Modifier.fillMaxSize()) },
+```
+
+</details>
+
 ```kotlin
 data class SidebarConfiguration(
 ```
 Width and behaviour of a `KptSidebarLayout` sidebar.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/layout/KptSidebarLayoutUiTest.kt:44</code></summary>
+
+```kotlin
+            KptSidebarLayout(
+                sidebarContent = { Box(Modifier.fillMaxSize().testTag(panelTag)) },
+                configuration = SidebarConfiguration(overlay = true),
+                sidebarVisible = true,
+                content = { Box(Modifier.fillMaxSize()) },
+            )
+        }
+```
+
+</details>
 
 ```kotlin
 enum class SidebarPosition
@@ -1390,6 +1736,20 @@ Which edge the sidebar occupies.
 fun KptSplitPane(
 ```
 Two panes with a draggable divider, for wide windows. `minLeftWidth` stops the divider being dragged to a width where the left pane is unusable.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonTest/kotlin/kpt/core/base/designsystem/layout/KptSplitPaneUiTest.kt:43</code></summary>
+
+```kotlin
+    fun draggingTheDividerMovesTheSplit() = runComposeUiTest {
+        setContent {
+            KptSplitPane(
+                leftContent = { Box(Modifier.fillMaxSize().testTag("left")) },
+                rightContent = { Box(Modifier.fillMaxSize().testTag("right")) },
+                minLeftWidth = 0.dp,
+                minRightWidth = 0.dp,
+```
+
+</details>
 
 ### `core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/layout/KptStack.kt`
 
@@ -1405,15 +1765,57 @@ data class KptColorSchemeImpl(
 ```
 Default `KptColorScheme` — the Material 3 baseline palette. `@Immutable` so Compose can skip recomposition when the instance is unchanged. A fork overrides only the roles it brands and inherits the rest, rather than restating all fifty.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptThemeExtensions.kt:346</code></summary>
+
+```kotlin
+ * Adapts a Material 3 `ColorScheme` into a [KptColorScheme] — role for role, no colour invented.
+ */
+fun ColorScheme.toKptColorScheme(): KptColorScheme = KptColorSchemeImpl(
+    primary = this.primary,
+    onPrimary = this.onPrimary,
+    primaryContainer = this.primaryContainer,
+    onPrimaryContainer = this.onPrimaryContainer,
+```
+
+</details>
+
 ```kotlin
 data class KptTypographyImpl(
 ```
 Default `KptTypography` — the Material 3 type scale at its standard sizes and weights.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptThemeExtensions.kt:178</code></summary>
+
+```kotlin
+ */
+fun Typography.toKptTypography(fontFamily: FontFamily? = FontFamily.Default): KptTypography =
+    KptTypographyImpl(
+        displayLarge = this.displayLarge.copy(fontFamily = fontFamily),
+        displayMedium = this.displayMedium.copy(fontFamily = fontFamily),
+        displaySmall = this.displaySmall.copy(fontFamily = fontFamily),
+        headlineLarge = this.headlineLarge.copy(fontFamily = fontFamily),
+```
+
+</details>
+
 ```kotlin
 data class KptShapesImpl(
 ```
 Default `KptShapes` — the Material 3 corner scale, 4dp through 28dp.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptThemeExtensions.kt:402</code></summary>
+
+```kotlin
+ * Adapts a Material 3 `Shapes` into a [KptShapes].
+ */
+fun Shapes.toKptShapes(): KptShapes = KptShapesImpl(
+    extraSmall = this.extraSmall,
+    small = this.small,
+    medium = this.medium,
+    large = this.large,
+```
+
+</details>
 
 ```kotlin
 data class KptSpacingImpl(
@@ -1448,25 +1850,95 @@ val LocalKptColors = staticCompositionLocalOf<KptColorScheme> { KptColorSchemeIm
 ```
 CompositionLocal carrying the active `KptColorScheme`. `static` because the theme changes rarely — a read does not subscribe, so a palette swap recomposes the subtree rather than every reader.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:56</code></summary>
+
+```kotlin
+    // Provide both KptTheme composition locals and MaterialTheme
+    CompositionLocalProvider(
+        LocalKptColors provides theme.colors,
+        LocalKptTypography provides theme.typography,
+        LocalKptShapes provides theme.shapes,
+        LocalKptSpacing provides theme.spacing,
+        LocalKptElevation provides theme.elevation,
+```
+
+</details>
+
 ```kotlin
 val LocalKptTypography = staticCompositionLocalOf<KptTypography> { KptTypographyImpl() }
 ```
 CompositionLocal carrying the active `KptTypography`.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:57</code></summary>
+
+```kotlin
+    CompositionLocalProvider(
+        LocalKptColors provides theme.colors,
+        LocalKptTypography provides theme.typography,
+        LocalKptShapes provides theme.shapes,
+        LocalKptSpacing provides theme.spacing,
+        LocalKptElevation provides theme.elevation,
+    ) {
+```
+
+</details>
 
 ```kotlin
 val LocalKptShapes = staticCompositionLocalOf<KptShapes> { KptShapesImpl() }
 ```
 CompositionLocal carrying the active `KptShapes`.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:58</code></summary>
+
+```kotlin
+        LocalKptColors provides theme.colors,
+        LocalKptTypography provides theme.typography,
+        LocalKptShapes provides theme.shapes,
+        LocalKptSpacing provides theme.spacing,
+        LocalKptElevation provides theme.elevation,
+    ) {
+        MaterialTheme(
+```
+
+</details>
+
 ```kotlin
 val LocalKptSpacing = staticCompositionLocalOf<KptSpacing> { KptSpacingImpl() }
 ```
 CompositionLocal carrying the active `KptSpacing`.
 
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:59</code></summary>
+
+```kotlin
+        LocalKptTypography provides theme.typography,
+        LocalKptShapes provides theme.shapes,
+        LocalKptSpacing provides theme.spacing,
+        LocalKptElevation provides theme.elevation,
+    ) {
+        MaterialTheme(
+            colorScheme = materialColorScheme,
+```
+
+</details>
+
 ```kotlin
 val LocalKptElevation = staticCompositionLocalOf<KptElevation> { KptElevationImpl() }
 ```
 CompositionLocal carrying the active `KptElevation`.
+
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:60</code></summary>
+
+```kotlin
+        LocalKptShapes provides theme.shapes,
+        LocalKptSpacing provides theme.spacing,
+        LocalKptElevation provides theme.elevation,
+    ) {
+        MaterialTheme(
+            colorScheme = materialColorScheme,
+            typography = materialTypography,
+```
+
+</details>
 
 ```kotlin
 class KptThemeBuilder
@@ -1503,15 +1975,16 @@ object KptTheme
 ```
 Composition-local accessor for the active design language — `KptTheme.colors`, `.typography`, `.shapes`, `.spacing`, `.elevation`. The read side of the theme; `kptTheme` is the write side.
 
-<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:37</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreenPreview.kt:39</code></summary>
 
 ```kotlin
-@Composable
-private fun FinancePalettePreviewLight() {
-    KptTheme(darkTheme = false) {
-        Surface { FinancePaletteSwatches() }
-    }
-}
+    hasResumableDraft: Boolean = false,
+) {
+    KptTheme {
+        AlertCreateScreenContent(
+            form = form,
+            screenState = ScreenState.Content(previewAlert()),
+            submitState = submitState,
 ```
 
 </details>
@@ -1585,7 +2058,21 @@ object MotionSnapshot
 ```
 Last-read snapshot of the active `Motion`. Updated as a side effect whenever any `@Composable` site reads `MaterialTheme.motion`.
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/nav/NavGraphBuilderExtensions.kt:42</code></summary>
+
+```kotlin
+    deepLinks: List<NavDeepLink> = emptyList(),
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+) = composableWithSlideTransitions<T>(MotionSnapshot.current, typeMap, deepLinks, content)
+
+/** Registers a destination with slide transitions — a modal-style arrival. */
+inline fun <reified T : Any> NavGraphBuilder.composableWithSlideTransitions(
+    motion: Motion,
+```
+
+</details>
+
 ---
 
-_64 type(s), 179 function(s)/property(ies); 233 carry KDoc at source; 20 authored example(s); 24 live call site(s)._
+_64 type(s), 179 function(s)/property(ies); 233 carry KDoc at source; 20 authored example(s); 59 live call site(s)._
 <!-- api-docs:end -->

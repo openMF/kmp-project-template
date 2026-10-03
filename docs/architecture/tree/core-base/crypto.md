@@ -53,6 +53,20 @@ expect class SecureKeyProvider
 ```
 Platform-specific secure key storage and retrieval.
 
+<details><summary>Used in the template — <code>core-base/crypto/src/androidMain/kotlin/kpt/core/base/crypto/FieldEncryptor.kt:22</code></summary>
+
+```kotlin
+
+/** Android — AES/GCM via `javax.crypto`, keyed from the AndroidKeyStore. */
+actual class FieldEncryptor(private val keyProvider: SecureKeyProvider) {
+
+    /** `encrypt` on this target. Android — AES/GCM via `javax.crypto`, keyed from the AndroidKeyStore. */
+    actual fun encrypt(plaintext: String): String {
+        val encrypted = encrypt(plaintext.encodeToByteArray())
+```
+
+</details>
+
 ### `core-base/crypto/src/commonMain/kotlin/kpt/core/base/crypto/SecureRandom.kt`
 
 ```kotlin
@@ -60,7 +74,21 @@ expect class SecureRandom
 ```
 Platform-specific cryptographically secure random number generator.
 
+<details><summary>Used in the template — <code>core-base/crypto/src/androidMain/kotlin/kpt/core/base/crypto/SecureRandom.kt:13</code></summary>
+
+```kotlin
+
+/** Android — AES/GCM via `javax.crypto`, keyed from the AndroidKeyStore. */
+actual class SecureRandom {
+    private val random = java.security.SecureRandom()
+
+    /** `nextBytes` on this target. Android — AES/GCM via `javax.crypto`, keyed from the AndroidKeyStore. */
+    actual fun nextBytes(size: Int): ByteArray {
+```
+
+</details>
+
 ---
 
-_3 type(s), 0 function(s)/property(ies); 3 carry KDoc at source; 0 authored example(s); 1 live call site(s)._
+_3 type(s), 0 function(s)/property(ies); 3 carry KDoc at source; 0 authored example(s); 3 live call site(s)._
 <!-- api-docs:end -->

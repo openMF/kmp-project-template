@@ -25,10 +25,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/data sha=4f801e6c686d8bb540918be22bfe792b945bb981 -->
+<!-- api-docs:begin module=core/data sha=656aa9d9a469a3b5dee1f7283ce404b73d91be39 -->
 ## API reference
 
-_Generated from `core/data` at tree `4f801e6c686d` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/data` at tree `656aa9d9a469` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt`
@@ -50,16 +50,16 @@ interface AlertsRepository
 ```
 Repository for the Price Alerts feature. Read side: observable list of committed alerts (from the Store-backed `AlertsRepository.alertsStream`).
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt:39</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateViewModel.kt:42</code></summary>
 
 ```kotlin
-    @FromQualifier("outbox.priceAlert") outbox: SubmitOutbox<PriceAlert>,
-    networkMonitor: NetworkMonitor,
-    repository: AlertsRepository,
-): OfflineSubmitSyncer<PriceAlert, PriceAlert> = OfflineSubmitSyncer<PriceAlert, PriceAlert>(
-    scope = scope,
-    outbox = outbox,
-    networkStatusFlow = networkMonitor.networkStatus,
+ */
+class AlertCreateViewModel(
+    private val repository: AlertsRepository,
+    outbox: SubmitOutbox<PriceAlert>,
+    private val clock: Clock = Clock.System,
+) : BaseMutationViewModel<PriceAlert, PriceAlert>(
+    MutationMode.Draft(
 ```
 
 </details>
@@ -112,16 +112,15 @@ interface BillReminderRepository
 ```
 User's bill reminders — purely local persistence, no remote sync. Backs the B4 Bill Reminders feature. Reads are reactive `Flow`s; writes are `suspend`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BankingDataProviders.kt:106</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListViewModel.kt:41</code></summary>
 
 ```kotlin
-    @FromQualifier("outbox.billReminder") outbox: SubmitOutbox<BillReminder>,
-    networkMonitor: NetworkMonitor,
-    repository: BillReminderRepository,
-): BillReminderSubmitSyncer = BillReminderSubmitSyncer(
-    syncer = OfflineSubmitSyncer<BillReminder, BillReminder>(
-        scope = scope,
-        outbox = outbox,
+ */
+class BillRemindersListViewModel(
+    private val repository: BillReminderRepository,
+    private val scheduler: BillNotificationGateway,
+    private val clock: Clock = Clock.System,
+) : BaseViewModel<Unit, Nothing, BillRemindersAction>(Unit) {
 ```
 
 </details>
@@ -140,16 +139,16 @@ interface LoanRepository
 ```
 User's personal loan portfolio — purely local persistence, no remote sync. Backs the B1 Loan Tracker feature. Reads are reactive `Flow`s; writes are `suspend` and go through `upsert` / `delete`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BankingDataProviders.kt:82</code></summary>
+<details><summary>Used in the template — <code>feature/amortization/src/commonMain/kotlin/kpt/feature/amortization/ui/AmortizationScheduleViewModel.kt:44</code></summary>
 
 ```kotlin
-    @FromQualifier("outbox.loan") outbox: SubmitOutbox<Loan>,
-    networkMonitor: NetworkMonitor,
+ */
+class AmortizationScheduleViewModel(
     repository: LoanRepository,
-): LoanSubmitSyncer = LoanSubmitSyncer(
-    syncer = OfflineSubmitSyncer<Loan, Loan>(
-        scope = scope,
-        outbox = outbox,
+    loanId: String,
+) : BaseViewModel<Unit, Nothing, Nothing>(Unit) {
+
+    override fun handleAction(action: Nothing): Unit = Unit
 ```
 
 </details>
@@ -166,15 +165,16 @@ interface AmortizationCalcRepository
 ```
 Read surface for the amortization calculator (`calculator_multi`, MEMORY_ONLY).
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/calc/impl/AmortizationCalcRepositoryImpl.kt:31</code></summary>
+<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/amortizationcalc/AmortizationViewModel.kt:48</code></summary>
 
 ```kotlin
- * gate on and nothing to revalidate.
- */
-@RepositoryBinding(binds = AmortizationCalcRepository::class)
-internal class AmortizationCalcRepositoryImpl(
-    @FromStore(AppStoreIds.AmortizationCalc) private val store: Store<AmortizationCalcParams, AmortizationBreakdown>,
-) : AmortizationCalcRepository {
+class AmortizationViewModel(
+    private val repository: LoanRepository,
+    private val calcRepository: AmortizationCalcRepository,
+    private val loanId: String? = null,
+) : BaseViewModel<AmortizationState, Nothing, AmortizationAction>(AmortizationState()) {
+
+    /** The stream backing the CURRENT key — retained so [onRetry] re-runs the live one. */
 ```
 
 </details>
@@ -200,16 +200,16 @@ interface CloudTodoRepository
 ```
 Read + offline-write surface over the cloud-todo `org.mobilenativefoundation.store.store5.MutableStore`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/CloudTodoDataProviders.kt:53</code></summary>
+<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoViewModel.kt:37</code></summary>
 
 ```kotlin
-    bookkeeper: Bookkeeper<CloudTodoKey>,
-    todoDao: CloudTodoDao,
-    repository: CloudTodoRepository,
-    crashReporter: CrashReporter?,
-): CloudTodoSyncOrchestrator = CloudTodoSyncOrchestrator(
-    scope = scope,
-    networkMonitor = networkMonitor,
+ */
+class CloudTodoViewModel(
+    private val repository: CloudTodoRepository,
+) : BaseViewModel<Unit, Nothing, CloudTodoAction>(Unit) {
+
+    /** Read side — CACHE_FIRST_SWR stream over the read Store (shares `cloud_todos` with the write store). */
+    val todo: ScreenDataStream<CloudTodo> = repository.todoStream(DEMO_TODO_ID, viewModelScope)
 ```
 
 </details>
@@ -246,16 +246,16 @@ interface CryptoRepository
 ```
 Read surface for CoinGecko-backed crypto data. Returns `ScreenDataStream` / `PagingScreenStream`, never raw values: loading, empty, error and no-network are decided in the Store, so no screen re-derives them.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:30</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinDetailViewModel.kt:40</code></summary>
 
 ```kotlin
- * Default [CryptoRepository], wrapping the coin-market and coin-detail Stores.
- */
-@RepositoryBinding(binds = CryptoRepository::class)
-class CryptoRepositoryImpl(
-    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
-) : CryptoRepository {
+internal class CoinDetailViewModel(
+    coinId: String,
+    repository: CryptoRepository,
+) : BaseViewModel<Unit, Nothing, CoinDetailAction>(Unit) {
+
+    /** The repository-built stream — the screen renders it directly via `ScreenContent(stream)`. */
+    val detail: ScreenDataStream<CoinDetail> = repository.coinDetailStream(
 ```
 
 </details>
@@ -277,16 +277,16 @@ interface CurrencyRepository : Syncable
 ```
 Repository surface for exchange rates + historical rate data.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/currency/impl/CurrencyRepositoryImpl.kt:46</code></summary>
+<details><summary>Used in the template — <code>feature/currency-rates/src/commonMain/kotlin/kpt/feature/currencyrates/ui/CurrencyRatesViewModel.kt:42</code></summary>
 
 ```kotlin
- * Default `CurrencyRepository` over the Frankfurter-backed exchange-rate and history Stores.
  */
-@RepositoryBinding(binds = CurrencyRepository::class)
-class CurrencyRepositoryImpl(
-    @FromStore(AppStoreIds.ExchangeRates) private val exchangeRatesStore: Store<String, ExchangeRates>,
-    @FromStore(AppStoreIds.RateHistory) private val rateHistoryStore: Store<RateHistoryKey, RateHistory>,
-    @FromStore(AppStoreIds.SpotRate) private val spotRateStore: Store<String, ExchangeRates>,
+class CurrencyRatesViewModel(
+    private val currencyRepository: CurrencyRepository,
+    private val networkMonitor: NetworkMonitor,
+) : BaseViewModel<RatesLocalState, Nothing, RatesAction>(RatesLocalState()) {
+
+    private val stream = currencyRepository.exchangeRatesStream(
 ```
 
 </details>
@@ -379,16 +379,16 @@ interface EconomicRatesRepository
 ```
 Repository surface for FRED-sourced interest-rate time series.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/EconomicRatesRepositoryImpl.kt:28</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/ui/HomeViewModel.kt:57</code></summary>
 
 ```kotlin
- * Default `EconomicRatesRepository` over the FRED-backed interest-rate series Store.
- */
-@RepositoryBinding(binds = EconomicRatesRepository::class)
-class EconomicRatesRepositoryImpl(
-    @FromStore(AppStoreIds.InterestRateSeries)
-    private val interestRateSeriesStore: Store<InterestRateSeriesKey, InterestRateSeries>,
-) : EconomicRatesRepository {
+    private val loanRepository: LoanRepository,
+    private val billReminderRepository: BillReminderRepository,
+    private val economicRatesRepository: EconomicRatesRepository,
+    private val currencyRepository: CurrencyRepository,
+) : BaseViewModel<HomeUiState, Nothing, HomeAction>(HomeUiState()) {
+
+    /**
 ```
 
 </details>
@@ -403,15 +403,15 @@ interface MacroIndicatorsRepository : Syncable
 ```
 Repository surface for World Bank macro-indicator series.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/impl/MacroIndicatorsRepositoryImpl.kt:49</code></summary>
+<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroViewModel.kt:43</code></summary>
 
 ```kotlin
- * Default `MacroIndicatorsRepository` over the World Bank macro-indicator Store.
- */
-@RepositoryBinding(binds = MacroIndicatorsRepository::class)
-class MacroIndicatorsRepositoryImpl(
-    @FromStore(AppStoreIds.MacroIndicator) private val macroIndicatorStore: Store<MacroIndicatorKey, MacroIndicator>,
-) : MacroIndicatorsRepository {
+class CountryMacroViewModel(
+    initialCountryCode: String,
+    private val repository: MacroIndicatorsRepository,
+) : BaseViewModel<MacroUiState, Nothing, MacroAction>(
+    MacroUiState(countryCode = initialCountryCode),
+) {
 ```
 
 </details>
@@ -426,15 +426,16 @@ object SupportedCountries
 ```
 Curated list of countries the Banking Utility Toolkit's macro-snapshot screen ships with out of the box. Selection criteria: - The G20 plus a handful of other large economies the template's adopters are most likely to demo against.
 
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/economic/SupportedCountriesTest.kt:35</code></summary>
+<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroScreen.kt:123</code></summary>
 
 ```kotlin
-        // protect against accidental whole-world inserts in a curated list.
-        assertTrue(
-            SupportedCountries.list.size in 20..250,
-            "Expected ~30 curated countries, got ${SupportedCountries.list.size}",
-        )
-    }
+    modifier: Modifier = Modifier,
+) {
+    val country = SupportedCountries.findByCode(uiState.countryCode)
+
+    val sp = MaterialTheme.spacing
+    Scaffold(
+        modifier = modifier.testTag(TestTags.CountryMacro.SCREEN),
 ```
 
 </details>
@@ -479,15 +480,16 @@ interface EmiCalculatorRepository
 ```
 Read surface for the EMI calculator (`calculator_pure`, MEMORY_ONLY). The repository owns the Store and exposes exactly one function, matching the read-path contract every other feature follows — the ViewModel never touches a `Store`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/emi/impl/EmiCalculatorRepositoryImpl.kt:32</code></summary>
+<details><summary>Used in the template — <code>feature/emi-calculator/src/commonMain/kotlin/kpt/feature/emicalculator/ui/EmiCalculatorViewModel.kt:37</code></summary>
 
 ```kotlin
- * makes a repeated parameter set free; a new one computes once.
  */
-@RepositoryBinding(binds = EmiCalculatorRepository::class)
-internal class EmiCalculatorRepositoryImpl(
-    @FromStore(AppStoreIds.Emi) private val emiStore: Store<EmiParams, EmiResult>,
-) : EmiCalculatorRepository {
+class EmiCalculatorViewModel(
+    private val repository: EmiCalculatorRepository,
+) : BaseViewModel<EmiState, Nothing, EmiAction>(EmiState()) {
+
+    /** The stream backing the CURRENT key — retained so [onRetry] re-runs the live one. */
+    private var currentStream: ScreenDataStream<EmiResult>? = null
 ```
 
 </details>
@@ -501,15 +503,16 @@ interface ProfileRepository
 ```
 Read surface for the profile screen (`static_content`, MEMORY_ONLY).
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/profile/impl/ProfileRepositoryImpl.kt:30</code></summary>
+<details><summary>Used in the template — <code>feature/profile/src/commonMain/kotlin/kpt/feature/profile/demo/ui/ProfileViewModel.kt:37</code></summary>
 
 ```kotlin
- * changes this policy (and the store's fetcher); nothing above this line moves.
  */
-@RepositoryBinding(binds = ProfileRepository::class)
-internal class ProfileRepositoryImpl(
-    @FromStore(AppStoreIds.Profile) private val profileStore: Store<Unit, ProfileInfo>,
-) : ProfileRepository {
+class ProfileViewModel(
+    repository: ProfileRepository,
+) : ViewModel() {
+
+    /** The repository-built stream — the screen renders it directly. */
+    val profile: ScreenDataStream<ProfileInfo> = repository.profileStream(viewModelScope)
 ```
 
 </details>
@@ -577,16 +580,16 @@ interface UserDataRepository
 ```
 Repository interface for managing user preferences with reactive capabilities. This interface provides reactive access to user preferences including theme settings, dark mode configuration, and dynamic color preferences.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/impl/UserDataRepositoryImpl.kt:37</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsViewModel.kt:44</code></summary>
 
 ```kotlin
- * setting change behind every other for no benefit.
  */
-@RepositoryBinding(binds = UserDataRepository::class)
-class UserDataRepositoryImpl(
-    private val preferencesRepository: UserPreferencesRepository,
-    @FromStore(AppStoreIds.UserData) private val userDataStore: Store<Unit, UserData>,
-) : UserDataRepository {
+class SettingsViewModel(
+    private val settingsRepository: UserDataRepository,
+    private val analyticsHelper: AnalyticsHelper,
+) : BaseViewModel<Unit, Nothing, SettingsAction>(Unit) {
+
+    /** The store-backed preferences read — retained so [onRetry] re-runs it. */
 ```
 
 </details>
@@ -614,7 +617,7 @@ interface UserLogoutManager
 ```
 Coordinates logout across the app: wipes local state and notifies observers. Centralised so "what must be cleared on logout" is answered once. A feature clearing its own slice is how one gets missed.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:66</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:60</code></summary>
 
 ```kotlin
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
@@ -646,7 +649,7 @@ class UserLogoutManagerImpl(
 ```
 Default `UserLogoutManager`: clears every Store cache and draft row, then emits the logout event. Cache-clearing is the load-bearing half — a Store that survives logout would serve the previous user's data to the next one.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:66</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:60</code></summary>
 
 ```kotlin
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
@@ -674,16 +677,16 @@ interface WatchlistRepository
 ```
 User's personal watchlist of coins — purely local persistence, no remote sync.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/watchlist/impl/WatchlistRepositoryImpl.kt:41</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonMain/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModel.kt:41</code></summary>
 
 ```kotlin
- * [contains] membership read.
  */
-@RepositoryBinding(binds = WatchlistRepository::class)
-internal class WatchlistRepositoryImpl(
-    @FromStore(AppStoreIds.Watchlist) private val watchlistStore: Store<Unit, List<WatchlistItem>>,
-    @FromStore(AppStoreIds.WatchlistMutable) private val watchlistWriteStore: MutableStore<String, WatchlistItem>,
-    private val dao: WatchlistDao,
+class AddToWatchlistViewModel(
+    private val repository: WatchlistRepository,
+    private val coinId: String,
+) : BaseViewModel<Unit, Nothing, AddToWatchlistAction>(Unit) {
+
+    private val toggleSubmitHandler = viewModelScope.submitHandler<Unit>()
 ```
 
 </details>

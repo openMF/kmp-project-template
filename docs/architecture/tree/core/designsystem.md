@@ -190,16 +190,15 @@ enum class MoneyTone
 ```
 Money tone — how a monetary amount should be colored regardless of the raw value's sign.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/MoneyText.kt:36</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:224</code></summary>
 
 ```kotlin
-    modifier: Modifier = Modifier,
-    amount: Double = 0.0,
-    tone: MoneyTone = MoneyTone.AutoFromSign,
-    style: TextStyle = MaterialTheme.typography.bodyLarge,
-    weight: FontWeight = FontWeight.SemiBold,
-) {
-    val color = resolveMoneyColor(tone, amount)
+            MoneyText(
+                text = formatCurrency(bill.amount),
+                tone = MoneyTone.Negative,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
 ```
 
 </details>
@@ -232,16 +231,16 @@ enum class RateDirection
 ```
 Direction of a rate / price / metric change relative to the prior period.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/RateBadge.kt:44</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:564</code></summary>
 
 ```kotlin
- */
-@Composable
-fun RateBadge(delta: String, direction: RateDirection, modifier: Modifier = Modifier) {
-    val (container, content, icon) = resolveRateColors(direction)
-    Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(50))
+                        rates.fedFundsPercent.formatDecimal(2),
+                    ),
+                    direction = RateDirection.Flat,
+                    delta = stringResource(Res.string.screens_home_rates_delta_flat),
+                )
+                RateRow(
+                    label = stringResource(Res.string.screens_home_rates_mortgage_30y_label),
 ```
 
 </details>
@@ -295,16 +294,16 @@ enum class StatusChipIntent
 ```
 Semantic intent of a `StatusChip`. Maps to a (container, content) color pair derived from the active Material color scheme + finance palette.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/StatusChip.kt:33</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:192</code></summary>
 
 ```kotlin
- */
-@Composable
-fun StatusChip(text: String, intent: StatusChipIntent, modifier: Modifier = Modifier) {
-    val (container, content) = resolveChipColors(intent)
-    Text(
-        text = text,
-        modifier = modifier
+    }
+    val statusIntent = when {
+        diff < 0 -> StatusChipIntent.Danger
+        diff <= 1 -> StatusChipIntent.Warning
+        diff <= 7 -> StatusChipIntent.Info
+        else -> StatusChipIntent.Neutral
+    }
 ```
 
 </details>
@@ -316,16 +315,16 @@ enum class Urgency
 ```
 Due-date urgency tier — informs the color of a leading dot on a list row.
 
-<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:86</code></summary>
+<details><summary>Used in the template — <code>feature/bills/src/commonMain/kotlin/kpt/feature/bills/ui/BillRemindersListScreen.kt:186</code></summary>
 
 ```kotlin
-        SwatchRow("freshnessUpdating", f.freshnessUpdating)
-        SwatchRow("freshnessOffline", f.freshnessOffline)
-        SectionLabel("Urgency")
-        SwatchRow("urgencyOverdue", f.urgencyOverdue)
-        SwatchRow("urgencyToday", f.urgencyToday)
-        SwatchRow("urgencyUpcoming", f.urgencyUpcoming)
-        SwatchRow("urgencyDistant", f.urgencyDistant)
+    val diff = bill.dueDay - today
+    val urgency = when {
+        diff < 0 -> Urgency.Overdue
+        diff == 0 -> Urgency.Today
+        diff <= 7 -> Urgency.Upcoming
+        else -> Urgency.Distant
+    }
 ```
 
 </details>
@@ -358,16 +357,16 @@ fun CardLoadingSkeleton(modifier: Modifier = Modifier)
 ```
 Whole-card shimmer placeholder. Drop in for `AppCard` / `Card` while the underlying data loads. Renders 3 stacked shimmer bars to suggest a typical card layout (title + 2 body lines).
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/state/CardStateBox.kt:46</code></summary>
+<details><summary>Used in the template — <code>feature/showcase/src/commonMain/kotlin/kpt/feature/showcase/stategallery/StateGalleryScreen.kt:128</code></summary>
 
 ```kotlin
-) {
-    when (state) {
-        is ScreenState.Loading -> CardLoadingSkeleton(modifier = modifier)
-        is ScreenState.Empty -> Card(modifier = modifier.fillMaxWidth()) {
-            Box(
-                modifier = Modifier.fillMaxWidth().padding(24.dp),
-                contentAlignment = Alignment.Center,
+
+            // ── CardLoadingSkeleton ─────────────────────────────────────
+            SectionHeader("CardLoadingSkeleton")
+            CardLoadingSkeleton()
+
+            // ── CardStateBox ────────────────────────────────────────────
+            SectionHeader("CardStateBox — every variant")
 ```
 
 </details>
@@ -421,16 +420,16 @@ fun InlineErrorPill(message: String, modifier: Modifier = Modifier, onRetry: (()
 ```
 Pill-shaped inline error chip — for component-scale failures (a single row failing in an otherwise-loaded list, a stale field in a form, a card-local fetch failure).
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/component/state/CardStateBox.kt:64</code></summary>
+<details><summary>Used in the template — <code>feature/showcase/src/commonMain/kotlin/kpt/feature/showcase/stategallery/StateGalleryScreen.kt:91</code></summary>
 
 ```kotlin
-                contentAlignment = Alignment.Center,
-            ) {
-                InlineErrorPill(message = state.error.message ?: "Something went wrong")
+
+            // ── InlineErrorPill ─────────────────────────────────────────
+            LabelRow("InlineErrorPill (no retry)") {
+                InlineErrorPill(message = "Couldn't refresh balance")
             }
-        }
-        is ScreenState.NoNetwork -> Card(modifier = modifier.fillMaxWidth()) {
-            Box(
+            LabelRow("InlineErrorPill (with retry)") {
+                InlineErrorPill(message = "Network error", onRetry = {})
 ```
 
 </details>
@@ -463,16 +462,16 @@ object AppIcons
 ```
 The app's icon set, named by ROLE rather than by glyph.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/input/PasswordStrengthIndicator.kt:152</code></summary>
+<details><summary>Used in the template — <code>feature/profile/src/commonMain/kotlin/kpt/feature/profile/demo/ProfileDemoBody.kt:84</code></summary>
 
 ```kotlin
-        AnimatedContent(
-            targetState = if (minimumRequirementMet) {
-                AppIcons.CheckCircle
-            } else {
-                AppIcons.Close
-            },
-            label = "iconForMinimumCharacterCount",
+            ) {
+                Icon(
+                    imageVector = AppIcons.AccountCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                )
+                Text(
 ```
 
 </details>
@@ -972,15 +971,16 @@ fun KptTheme(
 ```
 The main theme composable for the application. This composable uses KptMaterialTheme under the hood to provide seamless integration between KptTheme design tokens and Material3 theming system.
 
-<details><summary>Used in the template — <code>core/designsystem/src/androidMain/kotlin/kpt/core/designsystem/theme/FinanceTokenPreview.kt:37</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreenPreview.kt:39</code></summary>
 
 ```kotlin
-@Composable
-private fun FinancePalettePreviewLight() {
-    KptTheme(darkTheme = false) {
-        Surface { FinancePaletteSwatches() }
-    }
-}
+    hasResumableDraft: Boolean = false,
+) {
+    KptTheme {
+        AlertCreateScreenContent(
+            form = form,
+            screenState = ScreenState.Content(previewAlert()),
+            submitState = submitState,
 ```
 
 </details>

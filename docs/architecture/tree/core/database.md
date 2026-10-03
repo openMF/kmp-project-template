@@ -24,10 +24,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/database sha=4fb0596767bea1f2064a8991a5908a3a510629ea -->
+<!-- api-docs:begin module=core/database sha=a87d2c41939a4ea1228f9391978814e06f934c5a -->
 ## API reference
 
-_Generated from `core/database` at tree `4fb0596767be` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/database` at tree `a87d2c41939a` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/alerts/AlertDao.kt`
@@ -588,7 +588,7 @@ val DatabaseModule = module
 ```
 Koin module that provides the `AppDatabase` instance and the framework-infra DAO singletons.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:39</code></summary>
 
 ```kotlin
  */

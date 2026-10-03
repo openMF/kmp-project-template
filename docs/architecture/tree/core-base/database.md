@@ -156,6 +156,20 @@ interface ConflictDao
 ```
 DAO for the framework write-conflict inbox (`framework_write_conflicts`).
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/conflict/impl/RoomConflictInbox.kt:28</code></summary>
+
+```kotlin
+ */
+class RoomConflictInbox(
+    private val dao: ConflictDao,
+    private val now: () -> Long,
+) : ConflictInbox {
+
+    override suspend fun record(
+```
+
+</details>
+
 - `suspend fun insert(entity: ConflictEntity): Long` — Records a conflict, returning its row id.
 - `fun observePending(): Flow<List<ConflictEntity>>` — Pending (unresolved) conflicts, newest first — drives the Settings inbox list + badge.
 - `suspend fun getById(id: Long): ConflictEntity?` — One conflict by row id, or null once resolved and pruned.
@@ -229,12 +243,40 @@ data class BookkeeperEntity(
 ```
 Tracks failed sync timestamps for `org.mobilenativefoundation.store.store5.MutableStore` write-back operations. Used by `kpt.core.data.store.RoomBookkeeper` to persist bookkeeper state across process restarts.
 
+<details><summary>Used in the template — <code>core-base/database/src/commonMain/kotlin/kpt/core/base/database/infra/dao/BookkeeperDao.kt:30</code></summary>
+
+```kotlin
+    /** Records a failed sync for a key. */
+    @Upsert
+    suspend fun upsert(entity: BookkeeperEntity)
+
+    /** Clears the failure record for [key] — called once its write finally succeeds. */
+    @Query("DELETE FROM store_bookkeeper WHERE `key` = :key")
+    suspend fun delete(key: String)
+```
+
+</details>
+
 ### `core-base/database/src/commonMain/kotlin/kpt/core/base/database/infra/entity/ConflictEntity.kt`
 
 ```kotlin
 data class ConflictEntity(
 ```
 A recorded write conflict awaiting user resolution — the durable backing for the framework `ConflictInbox` surfaced in Settings. Purely additive framework table (`framework_write_conflicts`).
+
+<details><summary>Used in the template — <code>core-base/database/src/commonMain/kotlin/kpt/core/base/database/infra/dao/ConflictDao.kt:24</code></summary>
+
+```kotlin
+    /** Records a conflict, returning its row id. */
+    @Insert
+    suspend fun insert(entity: ConflictEntity): Long
+
+    /** Pending (unresolved) conflicts, newest first — drives the Settings inbox list + badge. */
+    @Query("SELECT * FROM framework_write_conflicts WHERE resolved = 0 ORDER BY recordedAtMs DESC")
+    fun observePending(): Flow<List<ConflictEntity>>
+```
+
+</details>
 
 ### `core-base/database/src/commonMain/kotlin/kpt/core/base/database/infra/entity/DraftEntity.kt`
 
@@ -279,5 +321,5 @@ Persistent record of the last successful network fetch for a Store, keyed by the
 
 ---
 
-_12 type(s), 25 function(s)/property(ies); 37 carry KDoc at source; 2 authored example(s); 9 live call site(s)._
+_12 type(s), 25 function(s)/property(ies); 37 carry KDoc at source; 2 authored example(s); 12 live call site(s)._
 <!-- api-docs:end -->

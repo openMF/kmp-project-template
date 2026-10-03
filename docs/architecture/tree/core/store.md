@@ -2,7 +2,7 @@
 
 > **Layer:** core — fork-owned; a codegen target
 > **Corpus surface:** `CORE_STORE.md`
-> **Measured:** 35 Kotlin files, 6 test files
+> **Measured:** 36 Kotlin files, 6 test files
 
 ## Codegen contracts owned here
 
@@ -23,10 +23,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/store sha=6eff5ac7f0b2eb7d0a3aa79d7d86e457241a9e7b -->
+<!-- api-docs:begin module=core/store sha=144118da5757408cb2fcaff889319a46db410dce -->
 ## API reference
 
-_Generated from `core/store` at tree `6eff5ac7f0b2` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/store` at tree `144118da5757` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertMappers.kt`
@@ -118,15 +118,16 @@ data class AmortizationCalcParams(
 ```
 Store key for one amortization calculation — the calculator's inputs. An amortization schedule for a 240-month loan is a 240-row list rebuilt on every keystroke when it is derived straight off a form `StateFlow`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/calc/AmortizationCalcRepository.kt:22</code></summary>
+<details><summary>Used in the template — <code>feature/calculators/src/commonMain/kotlin/kpt/feature/calculators/amortizationcalc/AmortizationViewModel.kt:65</code></summary>
 
 ```kotlin
-    /** A [ScreenDataStream] over the breakdown computed for [params]. */
-    fun breakdownStream(
-        params: AmortizationCalcParams,
-        scope: CoroutineScope,
-    ): ScreenDataStream<AmortizationBreakdown>
-}
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val breakdownState: StateFlow<ScreenState<AmortizationBreakdown>> = stateFlow
+        .map { AmortizationCalcParams(it.principal, it.ratePercent, it.tenureMonths) }
+        .distinctUntilChanged()
+        .flatMapLatest { params ->
+            if (params.isComputable) {
+                calcRepository.breakdownStream(params, viewModelScope)
 ```
 
 </details>
@@ -371,6 +372,26 @@ fun provideRateHistoryStore(
 ```
 Historical FX series for a (from, to, window) key — `NETWORK_WITH_CACHE`. Widening the window is a NEW key and therefore a full re-fetch, not a page append: the series is windowed, never paged.
 
+### `core/store/src/commonMain/kotlin/kpt/core/store/di/ProjectStoreModule.kt`
+
+```kotlin
+val ProjectStoreModule = module
+```
+THE FORK'S store-layer DI seam. Empty on the neutral template — this is yours to fill.
+
+<details><summary>Example</summary>
+
+```kotlin
+@StoreProvider(id = "myThing", ttl = "5m")
+@CacheKey(name = "LIST", key = "myThing")
+fun provideMyThingStore(api: MyApi, dao: MyDao): Store<Unit, List<MyThing>> = …
+val ProjectStoreModule = module {
+    single<DraftInventory> { MyForkDraftInventory(draftDao = get(), audit = get()) }
+}
+```
+
+</details>
+
 ### `core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt`
 
 ```kotlin
@@ -396,16 +417,16 @@ data class InterestRateSeriesKey(
 ```
 Composite key identifying a single FRED series request.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/EconomicRatesRepository.kt:34</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/ui/HomeViewModel.kt:207</code></summary>
 
 ```kotlin
-     */
-    fun interestRateSeriesStream(
-        key: InterestRateSeriesKey,
-        scope: CoroutineScope,
-    ): ScreenDataStream<InterestRateSeries>
 
-    /**
+        /** Effective Federal Funds Rate — the overnight bank-to-bank lending rate. */
+        val FedFundsKey: InterestRateSeriesKey = InterestRateSeriesKey(
+            seriesId = "DFF",
+            name = "Federal Funds Rate",
+            unit = "%",
+            days = 30,
 ```
 
 </details>
@@ -424,15 +445,16 @@ data class MacroIndicatorKey(
 ```
 Composite key identifying a single World Bank macro-indicator request.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/economic/MacroIndicatorsRepository.kt:40</code></summary>
+<details><summary>Used in the template — <code>feature/macro/src/commonMain/kotlin/kpt/feature/macro/ui/CountryMacroViewModel.kt:64</code></summary>
 
 ```kotlin
-     */
-    fun macroIndicatorStream(
-        key: MacroIndicatorKey,
-        scope: CoroutineScope,
-        fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
-    ): ScreenDataStream<MacroIndicator>
+
+        TRACKED_INDICATORS.forEach { kind ->
+            val key = MacroIndicatorKey(countryCode = countryCode, indicator = kind)
+            val stream = repository.macroIndicatorStream(key = key, scope = viewModelScope)
+            streams[kind] = stream
+            // Reset the per-cell state to Loading on re-subscription so the
+            // card visibly indicates "fetching for new country" instead of
 ```
 
 </details>
@@ -451,13 +473,16 @@ data class EmiParams(
 ```
 The Store key for a single EMI computation — the calculator's inputs. A calculator has no remote resource to key on, so the INPUTS are the key: two identical parameter sets are the same cache entry, and changing any field is a new entry.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/emi/EmiCalculatorRepository.kt:26</code></summary>
+<details><summary>Used in the template — <code>feature/emi-calculator/src/commonMain/kotlin/kpt/feature/emicalculator/ui/EmiCalculatorViewModel.kt:46</code></summary>
 
 ```kotlin
-
-    /** A [ScreenDataStream] over the EMI computed for [params]. */
-    fun emiStream(params: EmiParams, scope: CoroutineScope): ScreenDataStream<EmiResult>
-}
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val emiState: StateFlow<ScreenState<EmiResult>> = stateFlow
+        .map { EmiParams(it.principal, it.ratePercent, it.tenureMonths) }
+        .distinctUntilChanged()
+        .flatMapLatest { params ->
+            if (params.isComputable) {
+                repository.emiStream(params, viewModelScope)
 ```
 
 </details>
@@ -517,5 +542,5 @@ Per-item WRITE store for the watchlist (keyed by coin id).
 
 ---
 
-_11 type(s), 40 function(s)/property(ies); 51 carry KDoc at source; 3 authored example(s); 11 live call site(s)._
+_11 type(s), 41 function(s)/property(ies); 52 carry KDoc at source; 4 authored example(s); 11 live call site(s)._
 <!-- api-docs:end -->

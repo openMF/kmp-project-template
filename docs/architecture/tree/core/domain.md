@@ -63,16 +63,16 @@ data class AmortizationRow(
 ```
 A single line in an amortization schedule.
 
-<details><summary>Used in the template — <code>core/model/src/commonMain/kotlin/kpt/core/model/banking/AmortizationRow.kt:23</code></summary>
+<details><summary>Used in the template — <code>feature/amortization/src/commonMain/kotlin/kpt/feature/amortization/ui/AmortizationScheduleScreen.kt:100</code></summary>
 
 ```kotlin
- * @property balance   Outstanding principal remaining after this payment.
- */
-data class AmortizationRow(
-    val month: Int,
-    val payment: Double,
-    val principal: Double,
-    val interest: Double,
+
+@Composable
+internal fun AmortizationTable(rows: List<AmortizationRow>, modifier: Modifier = Modifier) {
+    LazyColumn(modifier = modifier.fillMaxSize()) {
+        item { ScheduleTableHeader() }
+        item { HorizontalDivider(thickness = 1.5.dp) }
+        itemsIndexed(rows) { index, row ->
 ```
 
 </details>

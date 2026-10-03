@@ -46,8 +46,6 @@ val DatabaseModule = module {
 
     includes(platformModule)
     // infra (framework) — always kept
-    single { get<AppDatabase>().bookkeeperDao }
-    single { get<AppDatabase>().conflictDao }
 }
 
 /**

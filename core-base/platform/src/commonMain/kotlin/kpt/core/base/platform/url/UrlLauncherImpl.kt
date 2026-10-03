@@ -17,9 +17,13 @@ import com.mobilebytelabs.kmptoolkit.openurl.openUrl
  * The one [UrlLauncher], for every target.
  *
  * `cmp-open-url` carries the per-target `actual`s, so there is no source-set split here.
+ *
+ * These are plain imports, and safely so: [UrlLauncher]'s methods are `launch*` while the delegates
+ * are `open*`/`canOpen`, so no member can shadow an import here. That naming is load-bearing — a
+ * same-named delegation is self-recursion, not delegation; see the rationale on [UrlLauncher].
  */
 class UrlLauncherImpl : UrlLauncher {
-    override fun open(url: String): Boolean = openUrl(url)
-    override fun openInBrowser(url: String): Boolean = openInBrowser(url)
-    override fun canOpen(url: String): Boolean = canOpen(url)
+    override fun launch(url: String): Boolean = openUrl(url)
+    override fun launchInBrowser(url: String): Boolean = openInBrowser(url)
+    override fun canLaunch(url: String): Boolean = canOpen(url)
 }

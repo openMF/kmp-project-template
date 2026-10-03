@@ -2,7 +2,7 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_PLATFORM.md`
-> **Measured:** 23 Kotlin files, 0 test files
+> **Measured:** 24 Kotlin files, 1 test files
 
 ## Principal types
 
@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/platform sha=21d373afc497d57fc10dbdcabdd0ff5bdf9ae921 -->
+<!-- api-docs:begin module=core-base/platform sha=e18f54f47c2ba2064746fec64e454840448f7c7c -->
 ## API reference
 
-_Generated from `core-base/platform` at tree `21d373afc497` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/platform` at tree `e18f54f47c2b` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -79,6 +79,20 @@ expect abstract class AppContext
 ```
 Represents an abstract context for the application that provides platform-specific functionality. This class must be implemented in each platform-specific source set.
 
+<details><summary>Used in the template — <code>core-base/platform/src/androidMain/kotlin/kpt/core/base/platform/context/AppContext.android.kt:23</code></summary>
+
+```kotlin
+ * and other platform functionality.
+ */
+actual typealias AppContext = android.content.Context
+
+/**
+ * Android-specific implementation of LocalContext.
+ *
+```
+
+</details>
+
 ```kotlin
 expect val LocalContext: ProvidableCompositionLocal<AppContext>
 ```
@@ -117,6 +131,20 @@ interface GarbageCollectionManager
 ```
 A hint to the platform that now is a reasonable moment to reclaim memory. A HINT, never a guarantee — no runtime here promises to collect on request.
 
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:49</code></summary>
+
+```kotlin
+
+    single<CoroutineDispatcher> { Dispatchers.Unconfined }
+    single<GarbageCollectionManager> { GarbageCollectionManagerImpl(get()) }
+
+    // The three platform-capability managers. Bound here as well as provided through the
+    // CompositionLocals in LocalManagerProviders, so a ViewModel or repository can inject one
+    // without reaching into composition. All three are stateless — the per-target behaviour lives
+```
+
+</details>
+
 - `fun tryCollect()` — Calls the garbage collector on the `Runtime` in an effort to clear the unused resources in the heap.
 
 ```kotlin
@@ -131,12 +159,40 @@ class GarbageCollectionManagerImpl(
 ```
 Default `GarbageCollectionManager`: forwards to the platform `garbageCollector` on `dispatcher`, keeping a single in-flight job so repeated calls coalesce instead of queueing pauses.
 
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:49</code></summary>
+
+```kotlin
+
+    single<CoroutineDispatcher> { Dispatchers.Unconfined }
+    single<GarbageCollectionManager> { GarbageCollectionManagerImpl(get()) }
+
+    // The three platform-capability managers. Bound here as well as provided through the
+    // CompositionLocals in LocalManagerProviders, so a ViewModel or repository can inject one
+    // without reaching into composition. All three are stateless — the per-target behaviour lives
+```
+
+</details>
+
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/intent/IntentManager.kt`
 
 ```kotlin
 interface IntentManager
 ```
 Asks the OS for a specific system screen or document flow, and reports what came back. ## Scope — system intents ONLY This interface used to also carry `launchUri` and the `share*` family, which conflated three different acts.
+
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:144</code></summary>
+
+```kotlin
+
+/** Launches platform intents — view, pick, open settings. Provided by [LocalManagerProvider]. */
+val LocalIntentManager: ProvidableCompositionLocal<IntentManager> =
+    managerCompositionLocal("LocalIntentManager")
+
+/** Opens URLs, email, maps, phone and SMS. Provided by [LocalManagerProvider]. */
+val LocalUrlLauncher: ProvidableCompositionLocal<UrlLauncher> =
+```
+
+</details>
 
 - `suspend fun openAppSettings(): IntentResult` — Open this app's entry in system settings — the target for a denied-permission rationale.
 - `suspend fun createDocument(fileName: String, mimeType: String = "*/*"): IntentResult` — Ask the OS for a save location, returning the chosen document's uri.
@@ -148,6 +204,20 @@ class IntentManagerImpl : IntentManager
 ```
 The one `IntentManager`, for every target. `cmp-intent-launcher` carries the per-target `actual`s, so there is no source-set split here.
 
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:57</code></summary>
+
+```kotlin
+    single<UrlLauncher> { UrlLauncherImpl() }
+    single<ShareManager> { ShareManagerImpl() }
+    single<IntentManager> { IntentManagerImpl() }
+
+    // Bindable as a single since cmp-in-app-update replaced the Play Core impl: the engine
+    // resolves the target itself, so there is no Activity to hold and nothing per-platform
+    // to construct.
+```
+
+</details>
+
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/model/MimeType.kt`
 
 ```kotlin
@@ -155,12 +225,39 @@ enum class MimeType(val value: String, vararg val extensions: String)
 ```
 Represents standardized MIME (Multipurpose Internet Mail Extensions) types for various file formats.
 
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/share/ShareManager.kt:35</code></summary>
+
+```kotlin
+
+    /** Share a file by uri. [mimeType] decides which apps the chooser offers. */
+    suspend fun shareFile(fileUri: String, mimeType: MimeType)
+
+    /** Share a file alongside a message — one chooser, both payloads. */
+    suspend fun shareFile(fileUri: String, mimeType: MimeType, extraText: String)
+```
+
+</details>
+
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/review/AppReviewManager.kt`
 
 ```kotlin
 interface AppReviewManager
 ```
 Manages application review requests across platforms. This interface abstracts the platform-specific implementations for requesting user reviews of the application.
+
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:140</code></summary>
+
+```kotlin
+
+/** Prompts for an app-store review. Provided by [LocalManagerProvider]. */
+val LocalAppReviewManager: ProvidableCompositionLocal<AppReviewManager> =
+    managerCompositionLocal("LocalAppReviewManager")
+
+/** Launches platform intents — view, pick, open settings. Provided by [LocalManagerProvider]. */
+val LocalIntentManager: ProvidableCompositionLocal<IntentManager> =
+```
+
+</details>
 
 - `val capabilities: AppReviewCapabilities` — What review means on THIS target: `nativeInAppReview`, `storeListing`, and the derived `canRequestReview`.
 - `val canRequestReview: Boolean` — Whether a review can actually be requested on THIS target right now. Ask before rendering a "Rate this app" affordance.
@@ -174,12 +271,40 @@ class AppReviewManagerImpl : AppReviewManager
 ```
 The single implementation of `AppReviewManager`, for every target. Replaces the previous androidMain/nonAndroidMain pair.
 
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:73</code></summary>
+
+```kotlin
+    // the global `AppReview` object directly, so nothing needs the toolkit's binding. A fork that
+    // wants the toolkit module should pass its own listing: `includes(appReviewModule(listing))`.
+    single<AppReviewManager> { AppReviewManagerImpl() }
+
+    // Capabilities added with the 3.5.28 toolkit bump. Each library ships its OWN Koin module, so
+    // they are INCLUDED rather than re-declared here — the toolkit owns what its bindings are, and
+    // hand-rolling them is the same duplication-that-drifts problem as wrapping the libraries.
+```
+
+</details>
+
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/share/ShareManager.kt`
 
 ```kotlin
 interface ShareManager
 ```
 Hands content to the platform share chooser.
+
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:152</code></summary>
+
+```kotlin
+
+/** Shares text, URLs, files and images to other apps. Provided by [LocalManagerProvider]. */
+val LocalShareManager: ProvidableCompositionLocal<ShareManager> =
+    managerCompositionLocal("LocalShareManager")
+
+/** Checks for and starts app updates. Provided by [LocalManagerProvider]. */
+val LocalAppUpdateManager: ProvidableCompositionLocal<AppUpdateManager> =
+```
+
+</details>
 
 - `suspend fun shareText(text: String)` — Share plain text.
 - `suspend fun shareUrl(url: String)` — Share a URL as a link rather than as text, so receivers render a preview.
@@ -194,12 +319,40 @@ class ShareManagerImpl : ShareManager
 ```
 The one `ShareManager`, for every target. `cmp-share` carries the per-target `actual`s.
 
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:56</code></summary>
+
+```kotlin
+    // in the toolkit engines they delegate to — so `single` is safe.
+    single<UrlLauncher> { UrlLauncherImpl() }
+    single<ShareManager> { ShareManagerImpl() }
+    single<IntentManager> { IntentManagerImpl() }
+
+    // Bindable as a single since cmp-in-app-update replaced the Play Core impl: the engine
+    // resolves the target itself, so there is no Activity to hold and nothing per-platform
+```
+
+</details>
+
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/update/AppUpdateManager.kt`
 
 ```kotlin
 interface AppUpdateManager
 ```
 In-app update check, with real behaviour on every target.
+
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:156</code></summary>
+
+```kotlin
+
+/** Checks for and starts app updates. Provided by [LocalManagerProvider]. */
+val LocalAppUpdateManager: ProvidableCompositionLocal<AppUpdateManager> =
+    managerCompositionLocal("LocalAppUpdateManager")
+
+/**
+ * Reads and writes the system clipboard, plus history, change observation and URL detection.
+```
+
+</details>
 
 - `suspend fun checkForAppUpdate(): UpdateOutcome` — Check for an update and, if one is available, start the flow.
 - `suspend fun checkForResumeUpdateState(): UpdateOutcome` — Re-check after the app returns to the foreground, so an update the user backgrounded mid-flow is offered again. Call from the host's resume hook.
@@ -210,12 +363,40 @@ sealed interface UpdateOutcome
 ```
 What an update check concluded. Flattened from the engine's richer result type.
 
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/update/AppUpdateManagerImpl.kt:33</code></summary>
+
+```kotlin
+) : AppUpdateManager {
+
+    override suspend fun checkForAppUpdate(): UpdateOutcome {
+        val result = AppUpdate.checkForUpdate(config)
+        if (result !is UpdateResult.Success) return result.toOutcome()
+        // Start it here rather than returning "available" and trusting the caller: a check that
+        // reports availability and never offers the update is the failure this class exists to end.
+```
+
+</details>
+
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/update/AppUpdateManagerImpl.kt`
 
 ```kotlin
 class AppUpdateManagerImpl(
 ```
 The one `AppUpdateManager`, for every target. There is deliberately no `androidMain` / `nonAndroidMain` split: `cmp-in-app-update` carries the per-target `actual`s.
+
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:62</code></summary>
+
+```kotlin
+    // resolves the target itself, so there is no Activity to hold and nothing per-platform
+    // to construct.
+    single<AppUpdateManager> { AppUpdateManagerImpl() }
+
+    // AppReviewManager moved here once cmp-app-review replaced the Play-Core-plus-no-op pair —
+    // it no longer takes an Activity, so it is a single like the rest instead of being
+    // constructed inside composition.
+```
+
+</details>
 
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/url/UrlLauncher.kt`
 
@@ -224,9 +405,23 @@ interface UrlLauncher
 ```
 Opens a URL in whatever the platform considers the right handler.
 
-- `fun open(url: String): Boolean` — Open `url` with the platform's default handler. Returns false if nothing could handle it.
-- `fun openInBrowser(url: String): Boolean` — Open `url` in a browser specifically, bypassing any app that claims the link.
-- `fun canOpen(url: String): Boolean` — Whether `url` has a handler — check before offering the action, not after it fails.
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:148</code></summary>
+
+```kotlin
+
+/** Opens URLs, email, maps, phone and SMS. Provided by [LocalManagerProvider]. */
+val LocalUrlLauncher: ProvidableCompositionLocal<UrlLauncher> =
+    managerCompositionLocal("LocalUrlLauncher")
+
+/** Shares text, URLs, files and images to other apps. Provided by [LocalManagerProvider]. */
+val LocalShareManager: ProvidableCompositionLocal<ShareManager> =
+```
+
+</details>
+
+- `fun launch(url: String): Boolean` — Launch `url` with the platform's default handler. Returns false if nothing could handle it.
+- `fun launchInBrowser(url: String): Boolean` — Launch `url` in a browser specifically, bypassing any app that claims the link.
+- `fun canLaunch(url: String): Boolean` — Whether `url` has a handler — check before offering the action, not after it fails.
 
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/url/UrlLauncherImpl.kt`
 
@@ -235,7 +430,21 @@ class UrlLauncherImpl : UrlLauncher
 ```
 The one `UrlLauncher`, for every target. `cmp-open-url` carries the per-target `actual`s, so there is no source-set split here.
 
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:55</code></summary>
+
+```kotlin
+    // without reaching into composition. All three are stateless — the per-target behaviour lives
+    // in the toolkit engines they delegate to — so `single` is safe.
+    single<UrlLauncher> { UrlLauncherImpl() }
+    single<ShareManager> { ShareManagerImpl() }
+    single<IntentManager> { IntentManagerImpl() }
+
+    // Bindable as a single since cmp-in-app-update replaced the Play Core impl: the engine
+```
+
+</details>
+
 ---
 
-_15 type(s), 31 function(s)/property(ies); 46 carry KDoc at source; 0 authored example(s); 1 live call site(s)._
+_15 type(s), 31 function(s)/property(ies); 46 carry KDoc at source; 0 authored example(s); 16 live call site(s)._
 <!-- api-docs:end -->

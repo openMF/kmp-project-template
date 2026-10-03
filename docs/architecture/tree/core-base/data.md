@@ -135,16 +135,16 @@ typealias NetworkMonitor = io.github.mobilebytelabs.kmptoolkit.networkmonitor.Ne
 ```
 Backward-compatible typealias — existing consumers keep their import. Delegates to cmp-network-monitor's full-featured NetworkMonitor interface.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt:38</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonTest/kotlin/kpt/feature/crypto/ui/FakeCryptoRepository.kt:125</code></summary>
 
 ```kotlin
-    scope: CoroutineScope,
-    @FromQualifier("outbox.priceAlert") outbox: SubmitOutbox<PriceAlert>,
-    networkMonitor: NetworkMonitor,
-    repository: AlertsRepository,
-): OfflineSubmitSyncer<PriceAlert, PriceAlert> = OfflineSubmitSyncer<PriceAlert, PriceAlert>(
-    scope = scope,
-    outbox = outbox,
+ * [NetworkStatus.Available] connection. No network I/O is performed.
+ */
+private object AlwaysOnlineNetworkMonitor : NetworkMonitor {
+
+    private val _status = MutableStateFlow<NetworkStatus>(
+        NetworkStatus.Available(NetworkInfo()),
+    )
 ```
 
 </details>
@@ -191,16 +191,16 @@ interface Synchronizer
 ```
 Synchronization contract — ports Now in Android's `core/data/SyncUtilities.kt`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/currency/impl/CurrencyRepositoryImpl.kt:102</code></summary>
+<details><summary>Used in the template — <code>feature/currency-rates/src/commonTest/kotlin/kpt/feature/currencyrates/ui/FakeCurrencyRepository.kt:36</code></summary>
 
 ```kotlin
-     * which the worker's `runCatching` guard turns into false → Result.retry().
-     */
-    override suspend fun syncWith(synchronizer: Synchronizer): Boolean =
-        synchronizer.snapshotSync(name = "currency-rates") {
-            coroutineScope {
-                PINNED_BASE_CURRENCIES.map { base ->
-                    async {
+@OptIn(ExperimentalScreenDataStreamTestingApi::class)
+internal class FakeCurrencyRepository : CurrencyRepository {
+    override suspend fun syncWith(synchronizer: Synchronizer): Boolean = true
+
+    val exchangeRatesState: MutableStateFlow<ScreenState<ExchangeRates>> =
+        MutableStateFlow(ScreenState.Loading)
+    val exchangeRatesRefresh: MutableSharedFlow<Unit> =
 ```
 
 </details>

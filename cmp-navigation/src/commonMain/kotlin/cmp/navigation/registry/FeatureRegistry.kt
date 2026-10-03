@@ -15,6 +15,7 @@ import kpt.core.data.di.ProjectRepositoryModule
 import kpt.core.database.di.ProjectDatabaseModule
 import kpt.core.datastore.di.ProjectDatastoreModule
 import kpt.core.network.di.ProjectNetworkModule
+import kpt.core.store.di.ProjectStoreModule
 import org.koin.core.module.Module
 
 /**
@@ -51,6 +52,7 @@ object FeatureRegistry {
         ProjectNetworkModule,
         ProjectDatabaseModule,
         ProjectDatastoreModule,
+        ProjectStoreModule,
         GeneratedFeatureKoinBindings,
     )
 

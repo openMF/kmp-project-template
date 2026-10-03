@@ -31,7 +31,7 @@
 #
 # Usage:
 #   scripts/docs/api-docs-gen.sh <layer>/<module>            # e.g. core-base/store, core/data
-#   scripts/docs/api-docs-gen.sh --all                       # every core-base/* and core/* module
+#   scripts/docs/api-docs-gen.sh --all                       # every core-base/*, core/* and feature/* module
 #   scripts/docs/api-docs-gen.sh <layer>/<module> --sha       # print the module tree sha only
 # Env: TEMPLATE_PATH  override the template root (canaries)
 # Exit: 0 ok · 2 usage / module not found
@@ -178,8 +178,22 @@ build_callsite_index() {
   # generated API blocks differ between a contributor's Mac and the Linux CI runner, and
   # `refresh.sh --check` reports DRIFT on one while reporting IN STEP on the other. Generated output
   # has to be a pure function of the tree; every other `find` in this file is already sorted.
-  find "$TMPL/feature" "$TMPL/core" -name '*.kt' -type f -not -path '*/build/*' 2>/dev/null \
-    | LC_ALL=C sort \
+  # THREE PASSES, IN PREFERENCE ORDER — not one sorted list. call_site() takes `head -1`, so the
+  # order here decides WHICH example a reader is shown, and the useful answer is "the one closest to
+  # what a generator writes": a feature call site beats a core one, which beats a core-base internal.
+  # A single `sort` over all three would put `core-base/...` first for every symbol by collation
+  # alone and demote every feature example. Each pass is sorted INTERNALLY, so the result is still a
+  # pure function of the tree.
+  #
+  # Within a pass, `commonMain` sorts before `commonTest`, so production usage is preferred over a
+  # test automatically — and tests still provide the fallback. That fallback is why `core-base` is
+  # scanned at all: nothing in feature/ or core/ calls `core-base/security`, so its 21 symbols had
+  # ZERO examples while its own 7 test files exercised them (77 such files across core-base).
+  {
+    find "$TMPL/feature"   -name '*.kt' -type f -not -path '*/build/*' 2>/dev/null | LC_ALL=C sort
+    find "$TMPL/core"      -name '*.kt' -type f -not -path '*/build/*' 2>/dev/null | LC_ALL=C sort
+    find "$TMPL/core-base" -name '*.kt' -type f -not -path '*/build/*' 2>/dev/null | LC_ALL=C sort
+  } \
     | xargs awk '
         /^[[:space:]]*(import|package)[[:space:]]/ { next }
         /^[[:space:]]*(\/\/|\*|\/\*)/          { next }
@@ -224,6 +238,12 @@ emit_module() {  # $1 = layer/module
   printf '## API reference\n\n'
   printf '_Generated from `%s` at tree `%s` by `scripts/docs/api-docs-gen.sh`._\n' "$lm" "${sha:0:12}"
   printf '_Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._\n\n'
+  if [ "$layer" = "feature" ]; then
+    printf 'This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published\n'
+    printf 'here as a WORKED EXAMPLE: this is the shape a generator should produce for a new feature,\n'
+    printf 'with its real Screen / ViewModel / Route wiring. Call into `core/**` and `core-base/**`\n'
+    printf 'rather than re-declaring what they already own.\n\n'
+  fi
   if [ "$layer" = "core-base" ]; then
     printf 'This module is **framework-shared and read-only to generators** (D9). Everything below is\n'
     printf 'something a feature CALLS; re-declaring one of these in `core/**` is the duplicate-the-\n'
@@ -377,7 +397,11 @@ for a in "$@"; do [ "$a" = "--write" ] && DO_WRITE=1; done
 if [ "$WANT_SIDEBAR" -eq 1 ]; then
   :   # sidebar-only run; handled at the end, after write_sidebar is defined
 elif [ "$TARGET" = "--all" ]; then
-  for d in "$TMPL"/core-base/*/ "$TMPL"/core/*/; do
+  # feature/ is IN SCOPE. The generator-facing corpus teaches how to BUILD a feature, and the 17
+  # feature modules here are the only worked examples of that in the repo — 254 .kt files that
+  # compile, against 11 Kotlin fences in FEATURE_LAYER.md. Leaving them undocumented meant 0 of 17
+  # feature pages carried an API block while every core*/ page did.
+  for d in "$TMPL"/core-base/*/ "$TMPL"/core/*/ "$TMPL"/feature/*/; do
     [ -d "$d/src" ] || continue
     p="${d%/}"; lm="${p#"$TMPL"/}"
     if [ "$DO_WRITE" -eq 1 ]; then write_module "$lm"; else emit_module "$lm"; echo; fi

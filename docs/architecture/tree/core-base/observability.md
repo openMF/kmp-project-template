@@ -42,6 +42,17 @@ Default `CrashReporter` binding that writes events to stdout. Suitable for local
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/observability/src/commonMain/kotlin/kpt/core/base/observability/di/ObservabilityModule.kt:31</code></summary>
+
+```kotlin
+ */
+val observabilityModule = module {
+    singleOf(::ConsoleCrashReporter) bind CrashReporter::class
+}
+```
+
+</details>
+
 ### `core-base/observability/src/commonMain/kotlin/kpt/core/base/observability/CrashReporter.kt`
 
 ```kotlin
@@ -73,6 +84,20 @@ enum class CrashSeverity
 ```
 Severity vocabulary for `CrashReporter.recordMessage`.
 
+<details><summary>Used in the template — <code>core-base/observability/src/commonMain/kotlin/kpt/core/base/observability/ConsoleCrashReporter.kt:46</code></summary>
+
+```kotlin
+    }
+
+    override fun recordMessage(message: String, level: CrashSeverity) {
+        println("[CrashReporter] $level: $message")
+    }
+
+    override fun setUser(userId: String?) {
+```
+
+</details>
+
 ### `core-base/observability/src/commonMain/kotlin/kpt/core/base/observability/di/ObservabilityModule.kt`
 
 ```kotlin
@@ -91,5 +116,5 @@ single<CrashReporter> { FirebaseCrashlyticsReporter() }
 
 ---
 
-_3 type(s), 5 function(s)/property(ies); 8 carry KDoc at source; 2 authored example(s); 1 live call site(s)._
+_3 type(s), 5 function(s)/property(ies); 8 carry KDoc at source; 2 authored example(s); 3 live call site(s)._
 <!-- api-docs:end -->

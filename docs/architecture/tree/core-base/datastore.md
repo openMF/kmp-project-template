@@ -32,6 +32,20 @@ expect class SecureSettingsFactory
 ```
 Platform-specific factory that creates an encrypted `Settings` instance. Returns the standard `Settings` interface — zero API change for consumers.
 
+<details><summary>Used in the template — <code>core-base/datastore/src/androidMain/kotlin/kpt/core/base/datastore/SecureSettingsFactory.kt:19</code></summary>
+
+```kotlin
+
+/** Android implementation of `SecureSettingsFactory`. */
+actual class SecureSettingsFactory(private val context: Context) {
+    /**
+     * Android secure settings, backed by EncryptedSharedPreferences with a Keystore-held master key. Synchronous: the
+     * key never leaves the Keystore but reads do not need to await it.
+     */
+```
+
+</details>
+
 ### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/di/DatastoreBaseModule.kt`
 
 ```kotlin
@@ -121,5 +135,5 @@ class SettingsSyncStatePersister(
 
 ---
 
-_4 type(s), 4 function(s)/property(ies); 8 carry KDoc at source; 0 authored example(s); 4 live call site(s)._
+_4 type(s), 4 function(s)/property(ies); 8 carry KDoc at source; 0 authored example(s); 5 live call site(s)._
 <!-- api-docs:end -->

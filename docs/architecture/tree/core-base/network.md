@@ -2,7 +2,7 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_NETWORK.md`
-> **Measured:** 21 Kotlin files, 0 test files
+> **Measured:** 22 Kotlin files, 0 test files
 
 **Defines annotations:** `@ApiBinding`
 
@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/network sha=3fa5371ad90ed7d13ff479e34e1ada4572c9ef06 -->
+<!-- api-docs:begin module=core-base/network sha=aca6d29ac5f1e56724691126e2c0cd0988d4ef81 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `3fa5371ad90e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `aca6d29ac5f1` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -199,6 +199,19 @@ val stagingClient = httpClient {
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:255</code></summary>
+
+```kotlin
+    // static-URL path is unchanged (no regression).
+    when {
+        multiUrlProvider != null -> install(DynamicBaseUrlPlugin) {
+            multiConfigProvider = multiUrlProvider
+            this.urlType = urlType
+        }
+```
+
+</details>
+
 ```kotlin
 class DynamicBaseUrlConfig
 ```
@@ -246,6 +259,20 @@ class MyConfigProvider(
         preferencesRepository.selectedServer.value?.host ?: "default.api.com"
     )
 }
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/DynamicBaseUrlPlugin.kt:60</code></summary>
+
+```kotlin
+ */
+class DynamicBaseUrlPlugin private constructor(
+    private val configProvider: DynamicUrlConfigProvider?,
+    private val multiConfigProvider: MultiUrlConfigProvider?,
+    private val urlType: UrlType,
+) {
+    /**
 ```
 
 </details>
@@ -417,6 +444,19 @@ sealed interface NetworkResult<out D, out E : NetworkError>
 ```
 Represents the result of a network or remote operation, encapsulating either a success or an error.
 
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/factory/ResultSuspendConverterFactory.kt:65</code></summary>
+
+```kotlin
+        ktorfit: Ktorfit,
+    ): Converter.SuspendResponseConverter<HttpResponse, *>? {
+        if (typeData.typeInfo.type == NetworkResult::class) {
+            val successType = typeData.typeArgs.first().typeInfo
+            return object :
+                Converter.SuspendResponseConverter<HttpResponse, NetworkResult<Any, NetworkError>> {
+```
+
+</details>
+
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/SupabaseClientFactory.kt`
 
 ```kotlin
@@ -424,7 +464,7 @@ class SupabaseClientFactory(
 ```
 Per-point Supabase client factory. Builds one `SupabaseConfigClient` per declared Supabase `AccessPoint`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:84</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:85</code></summary>
 
 ```kotlin
     // Per-point Supabase client factory — URL from AccessPointRegistry, anon key by id.
@@ -463,13 +503,15 @@ if (configClient.isConfigured) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:106</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:34</code></summary>
 
 ```kotlin
-    // `single<SupabaseConfigClient>`: "the" Supabase client is not a meaningful concept once a fork
-    // can declare N projects, and the per-id `supabaseApi("<id>")` binding is how consumers reach one.
-    single<Map<String, SupabaseConfigClient>> { get<SupabaseClientFactory>().clients() }
-}
+@ApiBinding("lwmswhoxvvoagzkqxiyd")
+class AppConfigApiImpl(
+    private val supabase: SupabaseConfigClient,
+) : AppConfigApi {
+
+    override val isConfigured: Boolean get() = supabase.isConfigured
 ```
 
 </details>
@@ -486,6 +528,20 @@ object MySupabaseCredentials : SupabaseCredentials {
     override val url: String = BuildConfig.SUPABASE_URL
     override val anonKey: String = BuildConfig.SUPABASE_ANON_KEY
 }
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/SupabaseClientFactory.kt:44</code></summary>
+
+```kotlin
+        return cache.getOrPut(id) {
+            SupabaseConfigClient(
+                credentials = object : SupabaseCredentials {
+                    override val url: String = point.baseUrl
+                    override val anonKey: String = anonKeyFor(id)
+                },
+                logLevel = logLevel,
 ```
 
 </details>
@@ -561,6 +617,26 @@ interface CoinGeckoApi {
 
 </details>
 
+### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/di/NetworkBaseModule.kt`
+
+```kotlin
+val NetworkBaseModule = module
+```
+Framework network wiring — the half of the network graph a fork never configures. ## Why these bindings are here and not in `core/network` A binding belongs in `core-base` when it touches nothing the fork generates.
+
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:56</code></summary>
+
+```kotlin
+val NetworkModule = module {
+    // Framework half — bindings that touch nothing app-profile generates.
+    includes(NetworkBaseModule)
+
+    // Runtime header values — written at login (Basic / OAuth), read on EVERY request. A singleton,
+    // because the whole point is that a value set after the clients were built still reaches them.
+```
+
+</details>
+
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/factory/ResultSuspendConverterFactory.kt`
 
 ```kotlin
@@ -581,5 +657,5 @@ interface ApiService {
 
 ---
 
-_22 type(s), 13 function(s)/property(ies); 35 carry KDoc at source; 12 authored example(s); 14 live call site(s)._
+_22 type(s), 14 function(s)/property(ies); 36 carry KDoc at source; 12 authored example(s); 19 live call site(s)._
 <!-- api-docs:end -->

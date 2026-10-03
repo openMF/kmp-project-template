@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scan-bounded: pure bash + find/shasum over one module tree (RULE-CI-001). Never idea-layer.
+# scan-bounded: pure bash + find/sha256 over one module tree (RULE-CI-001). Never idea-layer.
 #
 # scripts/docs/module-hash.sh — the ONE anchor for "has this template module's source changed?"
 #
@@ -23,10 +23,39 @@
 # generated output whose churn is not an API change, and including it would make the anchor move on
 # every compile, training everyone to ignore the gate.
 #
+# RELATIONSHIP TO TTD-6 — these are two SCOPES, not two anchors for one thing
+# ───────────────────────────────────────────────────────────────────────────
+# `framework-verify-template-training-drift.sh` TTD-6 anchors each training surface on
+# `git rev-parse <canonical-ref>:<module>` — the tree on upstream/dev. That answers "has the template
+# moved since we TRAINED", which must be stable across sessions and so cannot read a working tree.
+# This script answers "are the DOCS current with what is on disk", which must see uncommitted work
+# for the reason measured above. Same property, deliberately different scope; the two values are not
+# expected to match and neither can replace the other.
+#
+# PORTABILITY — `shasum` is NOT universal
+# ──────────────────────────────────────
+# `shasum` is a Perl script. It is present on macOS and on the GitHub runner, and ABSENT from a plain
+# `ubuntu:24.04` image (verified 2026-09-30 while reproducing a CI failure in a container), where the
+# equivalent is coreutils `sha256sum`. With neither, the old pipeline produced an EMPTY digest and
+# exited 3 — reported as "no Kotlin sources matched", which names the wrong cause entirely.
+#
 # Usage: scripts/docs/module-hash.sh <layer>/<module>          # e.g. core-base/store
 # Env:   TEMPLATE_PATH  override the template root (canaries)
 # Exit:  0 + 40-hex digest on stdout · 2 usage / module missing · 3 no Kotlin sources matched
 set -uo pipefail
+
+# One sha256 front-end for whichever tool this machine ships, resolved as a COMMAND rather than a
+# shell function: `xargs` execs directly without a shell, so an exported function is invisible to it
+# and the pipeline silently hashes nothing — which yields e3b0c442…, the sha256 of the empty string,
+# and looks like a valid anchor. Verified on this machine before shipping.
+if command -v shasum >/dev/null 2>&1; then
+  SHA256_CMD=(shasum -a 256)
+elif command -v sha256sum >/dev/null 2>&1; then
+  SHA256_CMD=(sha256sum)
+else
+  echo "module-hash: neither shasum nor sha256sum on PATH — cannot anchor" >&2
+  exit 2
+fi
 
 # Byte-deterministic text processing. Generated output must be a pure function of the tree, and the
 # locale silently breaks that in two ways: `sort` collates differently (a UTF-8 locale folds case, so
@@ -51,9 +80,9 @@ LM="${1:-}"
 # the anchor too (a moved public API is an API change).
 DIGEST="$(find "$TMPL/$LM" -type f -name '*.kt' -not -path '*/build/*' -print0 2>/dev/null \
   | LC_ALL=C sort -z \
-  | xargs -0 shasum -a 256 2>/dev/null \
+  | xargs -0 "${SHA256_CMD[@]}" 2>/dev/null \
   | sed "s|$TMPL/||" \
-  | shasum -a 256 | cut -c1-40)"
+  | "${SHA256_CMD[@]}" | cut -c1-40)"
 
 case "$DIGEST" in
   ""|*[!0-9a-f]*) echo "module-hash: no Kotlin sources under $LM (or hashing failed)" >&2; exit 3 ;;

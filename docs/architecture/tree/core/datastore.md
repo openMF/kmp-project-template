@@ -27,7 +27,7 @@ val DatastoreModule = module
 ```
 Koin module for `core/datastore` — the fork's preference stores, over the plain and secure `Settings` instances that `DatastoreBaseModule` binds. Preferences only.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:39</code></summary>
 
 ```kotlin
  */
@@ -177,7 +177,7 @@ interface UserPreferencesRepository
 ```
 Repository interface for managing user preferences with reactive capabilities. This interface provides reactive access to user preferences including theme settings, dark mode configuration, and dynamic color preferences.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:53</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:50</code></summary>
 
 ```kotlin
     // Binds the read PORT declared by core/store — core/store cannot depend on core/datastore,
@@ -185,7 +185,8 @@ Repository interface for managing user preferences with reactive capabilities. T
     single<UserDataSource> { UserDataSource { get<UserPreferencesRepository>().userData } }
     // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
     // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
-    single<FetchedAtRepository> { RoomFetchedAtRepository(get<AppDatabase>().fetchedAtDao) }
+
+    // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
 ```
 
 </details>

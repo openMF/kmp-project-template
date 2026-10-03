@@ -13,7 +13,7 @@ on:
 jobs:
   sync-directories:
     if: github.repository != 'openMF/kmp-project-template'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
       pull-requests: write

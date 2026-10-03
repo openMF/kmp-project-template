@@ -55,7 +55,7 @@ permissions:
 jobs:
   check:
     name: Docs are current with source
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v5
 

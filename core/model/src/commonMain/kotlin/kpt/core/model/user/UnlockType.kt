@@ -9,8 +9,13 @@
  */
 package kpt.core.model.user
 
+/**
+ * How the user unlocks the app — passcode or biometric.
+ */
 enum class UnlockType {
+    /** Alphanumeric password — no length or character policy is implied here; that lives in `PasswordChecker`. */
     PASSWORD,
 
+    /** Numeric PIN. Shows a digits-only keypad, which is the only behavioural difference from [PASSWORD]. */
     PIN,
 }

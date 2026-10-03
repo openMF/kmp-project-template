@@ -14,5 +14,6 @@ package kpt.core.data.user
  * that was successfully logged out.
  */
 data class LogoutEvent(
+    /** Who logged out. Carried so a listener can purge exactly that user's caches rather than everything. */
     val loggedOutUserId: Long,
 )

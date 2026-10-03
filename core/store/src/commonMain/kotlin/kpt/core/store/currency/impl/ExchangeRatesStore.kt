@@ -27,6 +27,10 @@ import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
+/**
+ * FX rates by base currency — `NETWORK_WITH_CACHE`; the TTL is what keeps call volume inside the
+ * provider's free quota.
+ */
 @StoreProvider(id = "exchangeRates", ttl = "5m")
 @CacheKey(fn = "of", key = "currency:exchangeRates:{baseCurrency}", params = ["baseCurrency:String"])
 fun provideExchangeRatesStore(

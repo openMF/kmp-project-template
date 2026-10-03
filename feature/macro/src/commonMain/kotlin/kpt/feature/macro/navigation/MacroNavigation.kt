@@ -30,6 +30,8 @@ data object MacroGraphRoute
 /**
  * Dashboard entry. The default country is the United States; the picker
  * round-trips a new code via [CountryPickerRoute].
+ *
+ * @property countryCode ISO country code to show; defaults to the United States.
  */
 @Serializable
 data class CountryMacroRoute(val countryCode: String = "US")
@@ -47,10 +49,23 @@ data object CountryPickerRoute
  */
 @Serializable
 data class IndicatorDetailRoute(
+    /**
+     * ISO 3166-1 country code. Alpha-2 or alpha-3 both work — the World Bank accepts either and the value is forwarded
+     * unchanged.
+     */
     val countryCode: String,
+    /**
+     * The `IndicatorKind` as its `name()`, so Compose Navigation's type-safe serializer needs no registered
+     * KSerializer for the enum.
+     */
     val indicatorKindName: String,
 )
 
+/**
+ * Navigates to the macro graph.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToMacroGraph(navOptions: NavOptions? = null) {
     navigate(route = MacroGraphRoute, navOptions = navOptions)
 }

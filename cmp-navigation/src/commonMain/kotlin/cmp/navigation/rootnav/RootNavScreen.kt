@@ -51,6 +51,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
 
+/** Renders whichever destination `RootNavViewModel` resolved: splash, onboarding, auth, lock or the signed-in shell. */
 @OptIn(ExperimentalAtomicApi::class)
 @Suppress("LongMethod", "CyclomaticComplexMethod")
 @Composable

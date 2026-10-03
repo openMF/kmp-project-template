@@ -62,6 +62,7 @@ import kpt.feature.loans.generated.resources.screens_loans_list_total_outstandin
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 
+/** The loan list, with per-row swipe actions and a summary header. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonalLoansListScreen(

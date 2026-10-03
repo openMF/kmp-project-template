@@ -30,6 +30,7 @@ import kpt.core.base.common.manager.DispatcherManager
 import kpt.core.base.data.infra.TimeZoneMonitor
 import java.time.ZoneId
 
+/** Android implementation of `TimeZoneMonitorImpl`. */
 class TimeZoneMonitorImpl(
     private val context: Context,
     dispatchManager: DispatcherManager,

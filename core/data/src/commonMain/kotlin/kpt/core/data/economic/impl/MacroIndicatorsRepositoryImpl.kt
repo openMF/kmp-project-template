@@ -43,6 +43,9 @@ private val PINNED_MACRO_KEYS = listOf(
     MacroIndicatorKey(countryCode = "IN", indicator = IndicatorKind.GDP),
 )
 
+/**
+ * Default `MacroIndicatorsRepository` over the World Bank macro-indicator Store.
+ */
 @RepositoryBinding(binds = MacroIndicatorsRepository::class)
 class MacroIndicatorsRepositoryImpl(
     @FromStore(AppStoreIds.MacroIndicator) private val macroIndicatorStore: Store<MacroIndicatorKey, MacroIndicator>,

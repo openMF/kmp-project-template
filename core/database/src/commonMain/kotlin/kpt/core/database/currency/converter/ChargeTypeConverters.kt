@@ -32,6 +32,7 @@ private const val ENC_PREFIX = "ENC:"
 @DbConverters
 class ChargeTypeConverters {
 
+    /** Shared JSON codec. */
     companion object {
         @kotlin.concurrent.Volatile
         private var encryptor: FieldEncryptor? = null

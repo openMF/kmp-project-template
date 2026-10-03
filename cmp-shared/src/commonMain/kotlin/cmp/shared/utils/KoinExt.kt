@@ -17,10 +17,19 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.koinApplication
 
+/**
+ * The Koin application, configured but not started — what a Compose `KoinApplication` takes and what a test can build
+ * in isolation.
+ */
 fun koinConfiguration() = koinApplication {
     modules(KoinModules.allModules)
 }
 
+/**
+ * Starts Koin with the app's modules.
+ *
+ * @param config extra declarations, e.g. a platform module or a test override.
+ */
 fun initKoin(config: KoinAppDeclaration? = null) {
     startKoin {
         config?.invoke(this)

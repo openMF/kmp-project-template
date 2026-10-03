@@ -185,6 +185,7 @@ class HomeViewModel(
         FreshnessBand.VeryStale -> 3
     }
 
+    /** Stream tuning shared by every card on the dashboard. */
     companion object {
         /** WhileSubscribed timeout for the per-card freshness StateFlows. */
         private const val STATE_TIMEOUT_MS: Long = 5_000L
@@ -227,9 +228,13 @@ class HomeViewModel(
  * Loading / Empty / Error / Content states.
  */
 data class HomeUiState(
+    /** Loans summary card. Its own state, so a slow card never blocks its siblings. */
     val loans: ScreenState<LoansSummary> = ScreenState.Loading,
+    /** Upcoming bills card. */
     val bills: ScreenState<List<BillReminder>> = ScreenState.Loading,
+    /** Interest-rates card. */
     val rates: ScreenState<RatesQuickView> = ScreenState.Loading,
+    /** USD exchange-rate card. */
     val exchangeRate: ScreenState<ExchangeRates> = ScreenState.Loading,
 )
 
@@ -266,6 +271,7 @@ data class RatesQuickView(
     val mortgage30YPercent: Double,
 )
 
+/** What the dashboard can be asked to do. */
 sealed interface HomeAction {
     /** Pull-to-refresh — fans out to every network-backed stream. */
     data object RefreshAll : HomeAction

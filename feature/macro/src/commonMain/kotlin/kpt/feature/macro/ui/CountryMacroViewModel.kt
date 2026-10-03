@@ -100,6 +100,7 @@ class CountryMacroViewModel(
             IndicatorKind.GDP_PER_CAPITA, IndicatorKind.GINI -> this
         }
 
+    /** Which indicators the dashboard tracks. */
     companion object {
         /** Indicators rendered on the Country Macro Snapshot dashboard. */
         val TRACKED_INDICATORS: List<IndicatorKind> = listOf(
@@ -120,9 +121,16 @@ class CountryMacroViewModel(
  * having to manually fold the three.
  */
 data class MacroUiState(
+    /**
+     * Which country the three cards describe. Changing it re-keys all three stores, so every cell returns to Loading
+     * together.
+     */
     val countryCode: String,
+    /** GDP cell — its own state, so one slow indicator does not hold the other two. */
     val gdp: ScreenState<MacroIndicator> = ScreenState.Loading,
+    /** CPI inflation cell. */
     val inflation: ScreenState<MacroIndicator> = ScreenState.Loading,
+    /** Unemployment cell. Its own state, so the card can show a failure while GDP and inflation render content. */
     val unemployment: ScreenState<MacroIndicator> = ScreenState.Loading,
 ) {
     /**
@@ -163,6 +171,10 @@ sealed interface MacroAction {
     /** Retry only the Unemployment card. */
     data object RetryUnemployment : MacroAction
 
-    /** Switch the dashboard to a new country — re-keys all 3 streams. */
+    /**
+     * Switch the dashboard to a new country — re-keys all 3 streams.
+     *
+     * @property code the country code to switch to.
+     */
     data class ChangeCountry(val code: String) : MacroAction
 }

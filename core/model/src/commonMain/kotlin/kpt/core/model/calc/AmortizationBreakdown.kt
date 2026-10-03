@@ -23,6 +23,8 @@ import kpt.core.model.emi.EmiResult
  * renders, so the two amortization surfaces agree on one shape.
  */
 data class AmortizationBreakdown(
+    /** One row per instalment, ordered from the first payment. Length equals the tenure in months. */
     val rows: List<AmortizationRow>,
+    /** The totals the rows sum to. Precomputed so a screen need not fold the list to show a header. */
     val summary: EmiResult,
 )

@@ -27,6 +27,12 @@ import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreWriteRequest
 
 /**
+ * The MUTABLE (offline-write) Store5 archetype, wired end to end: reads stream from Room, a toggle
+ * writes through the Updater, and a write that fails offline is left to the Bookkeeper to retry.
+ *
+ * Split into a read half and a write half because Store5 models them as separate types. Both sit on
+ * the same table, which is what makes an optimistic write visible in the read stream immediately.
+ *
  * @param readStore `createStore` read half — drives `asScreenStream`.
  * @param writeStore `createMutableStore` write half — drives the Updater (PUT) + Bookkeeper.
  *   Both are backed by the same `cloud_todos` Room table, so a write is reflected in the read stream.

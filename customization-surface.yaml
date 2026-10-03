@@ -36,6 +36,11 @@
 
 version: 1
 
+# Path-ownership rules, evaluated LAST-MATCH-WINS.
+# Each rule declares owner (template | fork | merge) and, for merge, the strategy. The default
+# is template-first (`**` → template), so fork territory is claimed explicitly — a path no rule
+# names resolves to template, which is why a new fork-owned directory needs a rule here before
+# the next sync overwrites it.
 rules:
   # ── DEMO feature modules — declared before the merge-required globs below ──
   # Same first-match accident as core-base. The repo-wide `**/composeResources/**/strings.xml → merge`

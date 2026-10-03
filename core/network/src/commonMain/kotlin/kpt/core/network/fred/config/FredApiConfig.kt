@@ -30,6 +30,7 @@ package kpt.core.network.fred.config
  * configured" error rather than firing the network request with `apiKey=null`.
  */
 data class FredApiConfig(
+    /** The FRED developer key, or null when the fork has not configured one — see [isConfigured]. */
     val apiKey: String?,
     // Base URL is no longer here — the "fred" access point (app-profile network.access_points) owns it.
 ) {
@@ -37,6 +38,7 @@ data class FredApiConfig(
     val isConfigured: Boolean
         get() = !apiKey.isNullOrBlank()
 
+    /** Sentinels. */
     companion object {
         /** Sentinel for forks that haven't wired the FRED key yet. */
         val Unconfigured: FredApiConfig = FredApiConfig(apiKey = null)

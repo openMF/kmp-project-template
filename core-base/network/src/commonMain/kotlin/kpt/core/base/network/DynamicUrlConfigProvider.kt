@@ -67,9 +67,13 @@ interface DynamicUrlConfigProvider {
  *     val STAGING = UrlType("STAGING")
  * }
  * ```
+ *
+ * @property key the access-point key, as declared in
+ *   `app-profile#network.access_points`.
  */
 @JvmInline
 value class UrlType(val key: String) {
+    /** Known url types. */
     companion object {
         /** The single generic default. Every project has at least this one. */
         val MAIN: UrlType = UrlType("MAIN")

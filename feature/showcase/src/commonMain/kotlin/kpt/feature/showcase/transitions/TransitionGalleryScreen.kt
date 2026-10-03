@@ -75,15 +75,36 @@ fun TransitionGalleryScreen(
     }
 }
 
-/** The transition factories the gallery exercises. */
+/**
+ * The transition factories the gallery exercises.
+ *
+ * @property displayName what the gallery lists it as.
+ */
 enum class TransitionVariant(val displayName: String) {
+    /** Shared-axis, moving forward/deeper. */
     SharedAxisForward("Shared-axis push forward"),
+
+    /** Shared-axis reversed, for a pop. Mirrors [SharedAxisForward] so a push and its pop read as one movement. */
     SharedAxisBack("Shared-axis pop back"),
+
+    /** Fade-through, for a sibling swap where neither side moves. */
     FadeThrough("Fade-through (siblings)"),
+
+    /** Both sides slide left — the arriving screen enters from the right as the leaving one exits left. */
     PushLeft("Push left (enter+exit)"),
+
+    /** Both sides slide right, the mirror of [PushLeft]. */
     PushRight("Push right (enter+exit)"),
+
+    /** Arrives from the bottom edge — the sheet-like entry. */
     SlideUp("Slide up"),
+
+    /** Arrives from the top edge. */
     SlideDown("Slide down"),
+
+    /** Hold in place while the sibling animates. */
     Stay("Stay (no-op)"),
+
+    /** No animation. */
     None("None"),
 }

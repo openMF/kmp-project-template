@@ -39,7 +39,22 @@ package local
 import com.mobilebytelabs.kmpflavors.KmpFlavorExtension
 import org.gradle.api.Project
 
+/**
+ * Fork-owned hook for extra product-flavor dimensions.
+ *
+ * Ships EMPTY with a worked example in comments. It is `owner: fork` so a template sync never overwrites it — which is
+ * exactly why the template cannot put anything real here.
+ */
 object LocalFlavors {
+    /**
+     * Adds this fork's flavor dimensions to [ext].
+     *
+     * Called by the flavors convention plugin after the template's own dimensions, so a fork adds to them rather than
+     * replacing them.
+     *
+     * @param ext the flavor extension to configure.
+     * @param project the project being configured, for reading properties.
+     */
     @JvmStatic
     fun apply(ext: KmpFlavorExtension, project: Project) {
 

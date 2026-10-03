@@ -65,6 +65,8 @@ class EditBillReminderViewModel(
 ) {
 
     private val _formState = MutableStateFlow(initialFormState())
+
+    /** The form as it currently stands. */
     val formState: StateFlow<BillReminderFormState> = _formState.asStateFlow()
 
     init {
@@ -129,24 +131,43 @@ class EditBillReminderViewModel(
         )
     }
 
+    /**
+     * Records a new label. Not validated here — blankness is checked once, by `isValid`, so the field can be empty
+     * mid-typing.
+     */
     fun onNameChange(value: String) {
         _formState.update { it.copy(name = value) }
     }
+
+    /** Records a new amount. Zero is allowed while typing; `isValid` is what refuses it on submit. */
     fun onAmountChange(value: Double) {
         _formState.update { it.copy(amount = value) }
     }
+
+    /** Day of month changed. */
     fun onDueDayChange(value: Int) {
         _formState.update { it.copy(dueDay = value.coerceIn(MIN_DUE_DAY, MAX_DUE_DAY)) }
     }
+
+    /**
+     * Records a new recurrence. Changing it does not re-derive the next due-date — that is computed from `dueDay` and
+     * today at read time.
+     */
     fun onRecurrenceChange(value: Recurrence) {
         _formState.update { it.copy(recurrence = value) }
     }
+
+    /** Records a new category. Drives the row icon and the spending grouping, nothing else. */
     fun onCategoryChange(value: BillCategory) {
         _formState.update { it.copy(category = value) }
     }
+
+    /** Enabled flag changed. */
     fun onEnabledChange(value: Boolean) {
         _formState.update { it.copy(enabled = value) }
     }
+
+    /** Reminder lead time changed. */
     fun onReminderDaysBeforeChange(value: Int) {
         _formState.update { it.copy(reminderDaysBefore = value.coerceIn(0, MAX_REMINDER_DAYS_BEFORE)) }
     }
@@ -223,6 +244,7 @@ class EditBillReminderViewModel(
         return (1..ID_LENGTH).map { chars[Random.nextInt(chars.size)] }.joinToString("")
     }
 
+    /** Outbox keys. */
     companion object {
         /** Stable form key shared across every bill — `uniqueKey` discriminates per row. */
         const val FORM_KEY: String = "bill"
@@ -242,11 +264,21 @@ class EditBillReminderViewModel(
  * Defaults to "Electricity bill, $50, day 1, monthly, utilities, enabled, 1 day before".
  */
 data class BillReminderFormState(
+    /** Bill label. */
     val name: String = "",
+    /** Amount due per occurrence. */
     val amount: Double = 0.0,
+    /** Day of the month it falls due, 1–31. Clamped to the month's length at read time, so 31 is safe in February. */
     val dueDay: Int = 1,
+    /** How often it repeats. */
     val recurrence: Recurrence = Recurrence.MONTHLY,
+    /**
+     * Spending category. Defaults to UTILITIES because it is the most common first reminder, not because it is a
+     * neutral value.
+     */
     val category: BillCategory = BillCategory.UTILITIES,
+    /** Whether reminders fire. */
     val enabled: Boolean = true,
+    /** How many days ahead to notify. */
     val reminderDaysBefore: Int = 1,
 )

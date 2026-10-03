@@ -24,6 +24,9 @@ import org.mobilenativefoundation.store.store5.Store
 import kotlin.time.Clock
 
 /**
+ * World Bank macro indicator for a (country, indicator) key — `NETWORK_WITH_CACHE` with a long TTL,
+ * since the underlying series updates at most quarterly.
+ *
  * Build an in-memory [Store] for World Bank macro indicators.
  *
  * In-memory only — no on-device DAO for economic data. The 7-day TTL combined

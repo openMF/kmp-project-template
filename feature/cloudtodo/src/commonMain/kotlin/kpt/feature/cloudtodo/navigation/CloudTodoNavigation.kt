@@ -18,9 +18,14 @@ import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.cloudtodo.ui.CloudTodoScreen
 
+/** Route for the cloud-todo screen — the MUTABLE archetype showcase. */
 @Serializable
 data object CloudTodoRoute
 
+/**
+ * Navigates to the cloud-todo screen. Takes no nav options: it is reached from the showcase list, never as a start
+ * destination or a back-stack-clearing jump.
+ */
 fun NavController.navigateToCloudTodo() = navigate(CloudTodoRoute)
 
 /**

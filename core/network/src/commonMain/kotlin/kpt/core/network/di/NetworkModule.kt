@@ -12,10 +12,9 @@ package kpt.core.network.di
 import kpt.core.base.network.AccessPointRegistry
 import kpt.core.base.network.DefaultHeaderProvider
 import kpt.core.base.network.MultiUrlConfigProvider
-import kpt.core.base.network.RuntimeHeaderStore
 import kpt.core.base.network.SupabaseClientFactory
-import kpt.core.base.network.SupabaseConfigClient
 import kpt.core.base.network.SupabaseExtrasProvider
+import kpt.core.base.network.di.NetworkBaseModule
 import kpt.core.network.config.AppAccessPoints
 import kpt.core.network.config.AppMultiUrlConfigProvider
 import kpt.core.network.config.AppSupabaseAnonKeys
@@ -46,10 +45,18 @@ import org.koin.dsl.module
 // (`kpt.core.network.<id>.api`), their bindings are GENERATED into [GeneratedApiBindings], and any
 // non-derivable single goes in the fork-owned [ProjectNetworkModule]. So this aggregator carries no
 // endpoint-specific reference at all and a template sync can blind-copy it.
+/**
+ * Koin module for `core/network` — the Ktorfit API bindings over the shared client.
+ *
+ * Bindings are GENERATED from `app-profile/app.yaml#network.access_points` by `syncForkConfig`;
+ * declare an endpoint there and write its API interface, and the wiring follows.
+ */
 val NetworkModule = module {
+    // Framework half — bindings that touch nothing app-profile generates.
+    includes(NetworkBaseModule)
+
     // Runtime header values — written at login (Basic / OAuth), read on EVERY request. A singleton,
     // because the whole point is that a value set after the clients were built still reaches them.
-    single { RuntimeHeaderStore() }
 
     // Default request headers, from the fork-owned ProjectNetworkHeaders seam. Every REST client
     // built by `restApi(...)` resolves this, so a fork adds an app-wide header without hand-building
@@ -97,5 +104,4 @@ val NetworkModule = module {
     // This is the ONLY Supabase client surface. There is deliberately no unnamed
     // `single<SupabaseConfigClient>`: "the" Supabase client is not a meaningful concept once a fork
     // can declare N projects, and the per-id `supabaseApi("<id>")` binding is how consumers reach one.
-    single<Map<String, SupabaseConfigClient>> { get<SupabaseClientFactory>().clients() }
 }

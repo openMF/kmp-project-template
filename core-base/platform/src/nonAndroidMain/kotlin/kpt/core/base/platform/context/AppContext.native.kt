@@ -13,15 +13,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 
+/**
+ * Apple/native `AppContext`. No platform context object exists on these targets, so this carries no state — it exists
+ * only to satisfy the `expect` so commonMain can name one type.
+ */
 actual abstract class AppContext private constructor() {
+    /** Accessors. */
     companion object {
+        /** `INSTANCE` on Non-Android targets. */
         val INSTANCE = object : AppContext() {}
     }
 }
 
+/** `LocalContext` on Non-Android targets. */
 actual val LocalContext: ProvidableCompositionLocal<AppContext>
     get() = staticCompositionLocalOf { AppContext.INSTANCE }
 
+/** `AppContext` on Non-Android targets. */
 actual val AppContext.activity: Any
     @Composable
     get() = AppContext.INSTANCE

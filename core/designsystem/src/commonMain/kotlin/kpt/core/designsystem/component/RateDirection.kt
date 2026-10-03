@@ -10,4 +10,13 @@
 package kpt.core.designsystem.component
 
 /** Direction of a rate / price / metric change relative to the prior period. */
-enum class RateDirection { Up, Down, Flat }
+enum class RateDirection {
+    /** Rate rose. */
+    Up,
+
+    /** Rate fell. */
+    Down,
+
+    /** Rate is unchanged. Distinct from an unknown change — this states that it did not move. */
+    Flat,
+}

@@ -48,6 +48,7 @@ enum class AuthScheme {
         else -> "Bearer $token"
     }
 
+    /** Built-in schemes. */
     companion object {
         /** Parse the `auth:` value; unknown or absent means [NONE]. */
         fun from(raw: String?): AuthScheme =

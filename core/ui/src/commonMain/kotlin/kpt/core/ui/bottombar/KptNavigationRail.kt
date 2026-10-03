@@ -29,6 +29,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.ui.navigation.NavigationItem
 
+/**
+ * The side rail used instead of a bottom bar on wide windows — same tab source, different surface.
+ */
 @Composable
 fun KptNavigationRail(
     navigationItems: List<NavigationItem>,

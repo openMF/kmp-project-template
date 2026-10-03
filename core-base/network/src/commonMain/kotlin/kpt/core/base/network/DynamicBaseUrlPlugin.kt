@@ -61,6 +61,10 @@ class DynamicBaseUrlPlugin private constructor(
     private val multiConfigProvider: MultiUrlConfigProvider?,
     private val urlType: UrlType,
 ) {
+    /**
+     * Ktor plugin installer — rewrites each request's base URL from the resolved access point, so an endpoint change
+     * needs no per-call wiring.
+     */
     companion object Plugin : HttpClientPlugin<DynamicBaseUrlConfig, DynamicBaseUrlPlugin> {
         override val key: AttributeKey<DynamicBaseUrlPlugin> =
             AttributeKey("DynamicBaseUrlPlugin")

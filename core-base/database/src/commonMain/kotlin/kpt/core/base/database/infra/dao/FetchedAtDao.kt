@@ -23,9 +23,11 @@ import kpt.core.base.database.infra.entity.FetchedAtEntity
 @Dao
 interface FetchedAtDao {
 
+    /** When [storeKey] was last fetched, epoch millis, or null if never — the input to every freshness decision. */
     @Query("SELECT lastFetchedMillis FROM framework_fetched_at WHERE storeKey = :storeKey")
     suspend fun read(storeKey: String): Long?
 
+    /** Stamps a store key as fetched now. */
     @Upsert
     suspend fun upsert(entity: FetchedAtEntity)
 }

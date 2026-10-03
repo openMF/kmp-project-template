@@ -14,16 +14,32 @@ import kotlinx.serialization.Serializable
 import kpt.core.model.currency.RateHistory
 import kpt.core.model.currency.RatePoint
 
+/**
+ * Wire shape of the Frankfurter time-series response — a date-keyed map of rate maps.
+ */
 @Serializable
 data class RateHistoryDto(
+    /** The amount the rates are quoted for — always 1, so it is not mapped. */
     val amount: Double,
+    /** Base currency code. */
     val base: String,
+    /** First day in the series, `YYYY-MM-DD`. */
     @SerialName("start_date")
     val startDate: String,
+    /** Last day in the series, `YYYY-MM-DD`. */
     @SerialName("end_date")
     val endDate: String,
+    /** Date → (quote-code → rate). Frankfurter returns every requested quote per day, hence the nested map. */
     val rates: Map<String, Map<String, Double>>,
 ) {
+    /**
+     * Flattens to a single-pair series for [targetCurrency], sorted by date ascending.
+     *
+     * Days where the pair is absent are dropped rather than zero-filled — a chart with a gap is honest, a chart
+     * through zero is not.
+     *
+     * @param targetCurrency which quote currency to project out of the nested map.
+     */
     fun toDomain(targetCurrency: String): RateHistory = RateHistory(
         from = base,
         to = targetCurrency,

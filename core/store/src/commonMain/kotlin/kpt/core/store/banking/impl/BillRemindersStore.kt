@@ -65,6 +65,11 @@ fun provideBillRemindersStore(dao: BillReminderDao): Store<Unit, List<BillRemind
  * beside it did not.
  */
 // store-binding: internal — repository-internal; see the KDoc above for the S5-2/S5-10 rationale
+/**
+ * Single bill reminder by id — `OFFLINE_LOCAL_ONLY`, Room is the authority.
+ *
+ * Keyed by id rather than reusing the list store so a detail screen re-reads only its own row.
+ */
 fun provideBillReminderDetailStore(dao: BillReminderDao): Store<String, BillReminder> =
     StoreFactory.createOfflineStore(
         sourceOfTruth = SourceOfTruth.of(

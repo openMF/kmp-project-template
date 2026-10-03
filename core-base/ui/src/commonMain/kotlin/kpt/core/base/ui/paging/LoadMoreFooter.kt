@@ -167,6 +167,12 @@ internal data class LoadMoreFooterCopy(
     val icon: ImageVector,
 )
 
+/**
+ * Maps a paging failure to footer copy via its `ErrorCategory`, so an offline page-load reads
+ * "No internet" rather than a server message.
+ *
+ * A pure function for testability: the mapping is asserted without composing the footer.
+ */
 internal fun loadMoreFooterCopy(error: Throwable): LoadMoreFooterCopy =
     when (categorize(error)) {
         ErrorCategory.Network,

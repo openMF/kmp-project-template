@@ -11,6 +11,7 @@ package kpt.core.base.ui.effects
 
 import androidx.compose.runtime.Composable
 
+/** `ReportDrawnWhen` on Android. */
 @Composable
 actual fun ReportDrawnWhen(block: () -> Boolean) {
     androidx.activity.compose.ReportDrawnWhen { block() }

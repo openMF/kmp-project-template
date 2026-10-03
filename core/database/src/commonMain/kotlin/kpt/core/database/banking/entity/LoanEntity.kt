@@ -27,18 +27,34 @@ import kpt.core.model.banking.LoanKind
 @DbEntity
 @Entity(tableName = "banking_loans")
 data class LoanEntity(
+    /** Client-generated UUID. Primary key. */
     @PrimaryKey
     val id: String,
+    /** User-facing label, e.g. "Home Mortgage". */
     val name: String,
+    /** Loan category — drives icons and grouping. */
     val kind: LoanKind,
+    /** Original loan amount. */
     val principal: Double,
+    /** Outstanding balance. User-maintained, not derived from a payment history. */
     val principalRemaining: Double,
+    /** APR as a percentage, e.g. `6.5` for 6.5%. */
     val annualRatePercent: Double,
+    /**
+     * Tenure the loan was taken for, in months. Never changes — [monthsRemaining] is what moves, and the pair is what
+     * a progress bar needs.
+     */
     val tenureMonths: Int,
+    /** Months until payoff. User-maintained. */
     val monthsRemaining: Int,
+    /** The EMI. */
     val monthlyPayment: Double,
+    /** Next payment due-date. Stored as ISO-8601 text — see `BankingTypeConverters`. */
     val nextDueDate: LocalDate,
+    /** Amount paid to date. User-maintained. */
     val totalPaid: Double,
+    /** Epoch millis when the loan was added. */
     val createdAtMs: Long,
+    /** Epoch millis of the most recent edit. */
     val updatedAtMs: Long,
 )

@@ -67,8 +67,12 @@ helper, or `RUBY_EXEC_AUTO_INSTALL=1`) and otherwise **fails loudly with the exa
 than silently running the wrong ruby.
 
 **Enforced:** `RT-9` in `product-health/checks/ruby-toolchain-coherence.sh` fails the build if any
-tracked `*.sh` invokes `bundle` directly. Echoed instructions for a human are fine — the match is
-anchored to command position.
+tracked `*.sh` invokes `bundle` directly. The match is anchored to command position — start of line,
+or after `;` `&` `|` `(` `&&` `||` — and a shell comment is exempt. **A quoted string is not**: the
+matcher sees text, so `echo "(cd deployment && bundle exec …)"` trips it just as a real invocation
+would. That is the right outcome rather than a false positive, because an instruction telling a human
+to type a bare `bundle exec` teaches the very failure this file opens with. Print the `ruby_bundle`
+form instead, as `scripts/ios/setup_ios_complete.sh` does.
 
 **`RT-8`** in the same file asks whether *this repo* can reach the pinned interpreter — it runs the
 resolver and checks the answer. It does **not** ask whether the `ruby` on your PATH happens to be the
@@ -219,8 +223,8 @@ will still pass in this state, by design — see `RT-8` above.
 **template-first** (`**` → `template`); fork territory is declared explicitly. A path resolving
 `template` unexpectedly means no rule claims it.
 
-Deeper guides: [Troubleshooting](../docs/claude/troubleshooting.md) ·
-[Deployment Playbook](../docs/claude/deployment-playbook.md) ·
-[Secrets Management](../docs/claude/secrets-management.md)
+Deeper guides: [Troubleshooting](../docs/troubleshooting.md) ·
+[Deployment Playbook](../docs/architecture/tree/deployment/playbook.md) ·
+[Secrets Management](../docs/architecture/tree/secrets/management.md)
 
 [← Back to Main](../CLAUDE.md)

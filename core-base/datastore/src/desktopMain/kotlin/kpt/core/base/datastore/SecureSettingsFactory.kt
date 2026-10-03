@@ -61,6 +61,7 @@ actual class SecureSettingsFactory {
     private val secureFile: File by lazy { File(secureDir, "secure_settings.properties") }
     private val encryptor: FieldEncryptor by lazy { FieldEncryptor(SecureKeyProvider()) }
 
+    /** `create` on Desktop (JVM). */
     actual fun create(): Settings {
         val onDisk = Properties()
         if (secureFile.exists()) {

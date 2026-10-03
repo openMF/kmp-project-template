@@ -45,4 +45,11 @@ val SecurityModule = module {
     single { SecureAuthManager(get(), get(), get()) }
 }
 
+/**
+ * Per-target security bindings supplied by each `actual` — the keystore/keychain backing and the
+ * platform biometric prompt.
+ *
+ * Separate from the common module because these are the members that genuinely cannot be expressed
+ * in common code; everything else in `core-base/security` is shared.
+ */
 expect val platformSecurityModule: Module

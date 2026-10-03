@@ -16,6 +16,7 @@ import kpt.core.base.crypto.FieldEncryptor
 import kpt.core.base.crypto.SecureKeyProvider
 import kpt.core.base.crypto.SecureRandom
 
+/** `platformSecurityModule` on Apple/native. */
 actual val platformSecurityModule: Module = module {
     single { SecureKeyProvider() }
     single { FieldEncryptor(get()) }

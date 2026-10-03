@@ -82,6 +82,11 @@ fun KptShimmerLoadingBox(
     )
 }
 
+/**
+ * Shimmer placeholder shaped like a list row — avatar, title and subtitle blocks.
+ *
+ * A loading affordance, not content: it must never outlive the load, or it reads as a broken row.
+ */
 @Composable
 fun KptShimmerListItem(
     modifier: Modifier = Modifier,

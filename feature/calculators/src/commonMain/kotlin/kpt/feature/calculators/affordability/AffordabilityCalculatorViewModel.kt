@@ -56,18 +56,60 @@ class AffordabilityCalculatorViewModel :
     }
 }
 
+/** The calculator's inputs. Pure local state — nothing is persisted or fetched, so the state IS the screen. */
 data class AffordabilityState(
+    /**
+     * Gross monthly income, before tax and before [monthlyObligations] are subtracted. The default is a placeholder,
+     * not a recommendation.
+     */
     val monthlyIncome: Double = 5_000.0,
+    /** Existing monthly commitments, subtracted before the ratio is applied. */
     val monthlyObligations: Double = 500.0,
+    /** Debt-to-income ceiling as a fraction, e.g. `0.4` for 40%. */
     val dtiRatio: Double = 0.4,
+    /** APR to assume, as a percentage. */
     val ratePercent: Double = 7.0,
+    /**
+     * Tenure to assume, in months. 240 (20 years) by default, because affordability is usually explored at mortgage
+     * length rather than at a personal-loan length.
+     */
     val tenureMonths: Int = 240,
 )
 
+/** One action per input, so a change is a single well-typed event rather than a whole-state replacement. */
 sealed class AffordabilityAction {
+    /**
+     * Income changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateIncome(val value: Double) : AffordabilityAction()
+
+    /**
+     * Obligations changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateObligations(val value: Double) : AffordabilityAction()
+
+    /**
+     * The debt-to-income ceiling changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateDti(val value: Double) : AffordabilityAction()
+
+    /**
+     * The assumed rate changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateRate(val value: Double) : AffordabilityAction()
+
+    /**
+     * The assumed tenure changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateTenure(val value: Int) : AffordabilityAction()
 }

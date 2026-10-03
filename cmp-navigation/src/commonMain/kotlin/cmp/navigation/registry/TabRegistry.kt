@@ -25,7 +25,6 @@ import kpt.core.ui.navigation.NavigationItem
  * customization-surface.yaml (S6 heal, epic pure-white-label-store5-network T7).
  */
 object TabRegistry {
-    /** Fork tabs appended after the backbone Home/Profile tabs. Template default = none. */
     /**
      * Feature-contributed bottom-nav tabs, DERIVED from `@FeatureTab`.
      *
@@ -35,6 +34,7 @@ object TabRegistry {
      *
      * An INLINE tab still has to register its top screen on the inner NavHost via
      * [extraInlineTabDestinations] — this list puts the tab in the bar, not its destination.
+     *
      */
     val extraTabs: List<NavigationItem> = GeneratedFeatureTabs
 

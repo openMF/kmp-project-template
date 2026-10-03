@@ -101,23 +101,47 @@ class SettingsViewModel(
 
 /** Preference-mutation intents accepted by [SettingsViewModel]. */
 sealed interface SettingsAction {
-    /** Change the theme brand (Android / default). */
+    /**
+     * Change the theme brand (Android / default).
+     *
+     * @property themeBrand the brand to switch to.
+     */
     data class UpdateThemeBrand(val themeBrand: ThemeBrand) : SettingsAction
 
-    /** Change the dark-theme configuration (system / light / dark). */
+    /**
+     * Change the dark-theme configuration (system / light / dark).
+     *
+     * @property darkThemeConfig the preference to apply.
+     */
     data class UpdateDarkThemeConfig(val darkThemeConfig: DarkThemeConfig) : SettingsAction
 
-    /** Toggle Material You dynamic color. */
+    /**
+     * Toggle Material You dynamic color.
+     *
+     * @property useDynamicColor the new value.
+     */
     data class UpdateDynamicColor(val useDynamicColor: Boolean) : SettingsAction
 
-    /** Change the app language. */
+    /**
+     * Change the app language.
+     *
+     * @property language the language to switch to.
+     */
     data class UpdateLanguage(val language: LanguageConfig) : SettingsAction
 }
 
+/**
+ * The subset of preferences this screen owns — deliberately narrower than `UserData`, so a settings screen cannot
+ * write a lock or session field.
+ */
 data class UserEditableSettings(
+    /** Selected colour brand. */
     val brand: ThemeBrand,
+    /** Whether to derive the palette from platform dynamic colour. */
     val useDynamicColor: Boolean,
+    /** Dark-mode preference. */
     val darkThemeConfig: DarkThemeConfig,
+    /** Selected app language. */
     val language: LanguageConfig,
 )
 

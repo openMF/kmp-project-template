@@ -44,6 +44,10 @@ class WatchlistViewModel(
 
 /** One-shot actions accepted by [WatchlistViewModel]. */
 sealed interface WatchlistAction {
-    /** Remove a coin from the watchlist. Idempotent — no-op if not present. */
+    /**
+     * Remove a coin from the watchlist. Idempotent — no-op if not present.
+     *
+     * @property coinId which coin to remove.
+     */
     data class Remove(val coinId: String) : WatchlistAction
 }

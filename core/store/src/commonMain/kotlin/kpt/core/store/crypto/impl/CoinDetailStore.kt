@@ -27,6 +27,9 @@ import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 
+/**
+ * Single coin's detail from CoinGecko — `NETWORK_WITH_CACHE`, Room as the offline fallback.
+ */
 @StoreProvider(id = "coinDetail", ttl = "5m")
 @CacheKey(fn = "item", key = "crypto:coinDetail:{coinId}", params = ["coinId:String"])
 fun provideCoinDetailStore(

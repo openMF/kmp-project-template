@@ -93,6 +93,23 @@ class AppDatabaseProcessor(
         return emptyList()
     }
 
+    /**
+     * The framework's own DAOs — `BookkeeperDao`, `ConflictDao`, `DraftDao` — declared in
+     * `core-base/database` and supplied by Gradle rather than by `@DbDao`, because a template-owned
+     * module cannot carry a per-fork annotation.
+     *
+     * Shared by BOTH renderers on purpose. It used to be parsed inside `render` alone, so the
+     * accessors reached `AppDatabase` while their Koin bindings did not — and the gap was filled by
+     * hand in two different modules, which then drifted: `bookkeeperDao` ended up bound in
+     * `DatabaseModule` AND `RepositoryModule`, both of which reach the same container. One
+     * annotation-shaped fact, two hand-written copies — the defect `@DbDao` exists to remove.
+     */
+    private fun infraDaos(): List<Pair<String, String>> =
+        opt(OPT_INFRA_DAOS).mapNotNull {
+            val (n, t) = it.split(':', limit = 2).let { p -> p.getOrNull(0) to p.getOrNull(1) }
+            if (n.isNullOrBlank() || t.isNullOrBlank()) null else n to t
+        }
+
     // ── inputs Gradle supplies (see the class KDoc for why these are not annotations) ───────────
     private fun opt(key: String): List<String> =
         options[key]?.split('|')?.map(String::trim)?.filter(String::isNotEmpty).orEmpty()
@@ -103,10 +120,6 @@ class AppDatabaseProcessor(
         converters: List<String>,
     ): String {
         val infraEntities = opt(OPT_INFRA_ENTITIES)
-        val infraDaos = opt(OPT_INFRA_DAOS).mapNotNull {
-            val (n, t) = it.split(':', limit = 2).let { p -> p.getOrNull(0) to p.getOrNull(1) }
-            if (n.isNullOrBlank() || t.isNullOrBlank()) null else n to t
-        }
         val migrations = opt(OPT_MIGRATIONS)
 
         return buildString {
@@ -141,8 +154,9 @@ class AppDatabaseProcessor(
             }
             append("@ConstructedBy(AppDatabaseConstructor::class)\n")
             append("abstract class AppDatabase : RoomDatabase() {\n\n")
-            infraDaos.forEach { (n, t) -> append("    abstract val $n: $t\n") }
-            if (infraDaos.isNotEmpty() && daos.isNotEmpty()) append("\n")
+            val infra = infraDaos()
+            infra.forEach { (n, t) -> append("    abstract val $n: $t\n") }
+            if (infra.isNotEmpty() && daos.isNotEmpty()) append("\n")
             daos.forEach { (n, t) -> append("    abstract val $n: $t\n") }
             append(COMPANION)
             append("}\n")
@@ -162,7 +176,7 @@ class AppDatabaseProcessor(
         append("import org.koin.core.module.Module\n")
         append("import org.koin.dsl.module\n\n")
         append("/**\n")
-        append(" * GENERATED from `@DbDao` — one Koin binding per DAO. DO NOT HAND-EDIT.\n")
+        append(" * GENERATED — one Koin binding per DAO, framework and fork alike. DO NOT HAND-EDIT.\n")
         append(" *\n")
         append(" * To add a DAO: annotate it `@DbDao`. That is the whole wiring step — the accessor on\n")
         append(" * `AppDatabase` and this binding both come from that one annotation.\n")
@@ -170,6 +184,10 @@ class AppDatabaseProcessor(
         append(" * Pulled in by `DatabaseModule` via `includes(GeneratedDaoBindings)`.\n")
         append(" */\n")
         append("val GeneratedDaoBindings: Module = module {\n")
+        // Framework DAOs FIRST, then the fork's. Both now come from the same source as their
+        // AppDatabase accessor, so a binding can no longer be missing for a DAO the database
+        // exposes — which is what forced the hand-written copies this replaces.
+        infraDaos().forEach { (accessor, _) -> append("    single { get<AppDatabase>().$accessor }\n") }
         daos.forEach { (accessor, _) -> append("    single { get<AppDatabase>().$accessor }\n") }
         append("}\n")
     }
@@ -327,6 +345,9 @@ class AppDatabaseProcessor(
     }
 }
 
+/**
+ * KSP entry point — what the `META-INF/services` registration names, so Gradle can instantiate [AppDatabaseProcessor].
+ */
 class AppDatabaseProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
         AppDatabaseProcessor(environment.codeGenerator, environment.logger, environment.options)

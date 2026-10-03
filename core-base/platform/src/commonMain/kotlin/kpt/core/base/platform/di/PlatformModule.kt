@@ -32,6 +32,13 @@ import kpt.core.base.platform.update.AppUpdateManagerImpl
 import kpt.core.base.platform.url.UrlLauncher
 import kpt.core.base.platform.url.UrlLauncherImpl
 
+/**
+ * Koin module binding every `core-base/platform` capability — toast, share, URL launch, app update,
+ * garbage-collection hint — plus the per-target bindings from each `actual`.
+ *
+ * Include it once from the app graph. Features resolve these interfaces rather than reaching for a
+ * platform API directly, which is what keeps a feature module compilable on every target.
+ */
 val platformModule = module {
     // cmp-toast's own module, included rather than re-declared: it binds ONE ToastHostState and
     // exposes that SAME instance as ToastDispatcher. Two `single { }` declarations would build

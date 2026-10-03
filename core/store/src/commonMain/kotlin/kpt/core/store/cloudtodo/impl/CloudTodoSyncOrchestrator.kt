@@ -147,4 +147,5 @@ fun String.toCloudTodoKeyOrNull(): CloudTodoKey? =
         ?.toIntOrNull()
         ?.let(::CloudTodoKey)
 
+/** Namespace for this store's Bookkeeper rows, so a failed-write scan can tell them from another store's. */
 const val CLOUD_TODO_KEY_PREFIX = "cloudTodo:"

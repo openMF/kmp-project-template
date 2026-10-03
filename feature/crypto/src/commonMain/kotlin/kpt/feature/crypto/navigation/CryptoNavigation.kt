@@ -54,6 +54,12 @@ fun NavController.navigateToCrypto(navOptions: NavOptions? = null) {
     navigate(route = CryptoGraphRoute, navOptions = navOptions)
 }
 
+/**
+ * Navigates to one coin's detail.
+ *
+ * @param coinId CoinGecko's coin id.
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToCoinDetail(coinId: String, navOptions: NavOptions? = null) {
     navigate(route = CoinDetailRoute(coinId = coinId), navOptions = navOptions)
 }

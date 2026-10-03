@@ -69,6 +69,7 @@ class BillNotificationGatewayImpl(
 
     override suspend fun cancelAll() = workScheduler.cancelWorkByTag(TAG_BILL_REMINDER)
 
+    /** Channel and request-code constants. */
     companion object {
         /** Android notification channel for bill reminders (created by the host app's `App.onCreate`). */
         const val CHANNEL_ID: String = "bill_reminders"

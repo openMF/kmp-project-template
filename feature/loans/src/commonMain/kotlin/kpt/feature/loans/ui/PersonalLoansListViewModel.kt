@@ -40,6 +40,7 @@ class PersonalLoansListViewModel(
     // carries, i.e. a second read path over identical data (the S5-2 split-read defect) and
     // three concurrent collectors on one table. Deriving here means one read, one source of
     // truth, and totals that can never disagree with the list rendered beside them.
+    /** The list as a screen state, from the paging stream. */
     val screenState: StateFlow<ScreenState<LoansListUiState>> = stream.state
         .mapContent { loans, _ ->
             LoansListUiState(
@@ -72,13 +73,20 @@ class PersonalLoansListViewModel(
  * totals tile rendered at the top of the screen.
  */
 data class LoansListUiState(
+    /** The loans, ordered by next due-date. */
     val loans: List<Loan>,
+    /** Sum of every loan's EMI — the summary header's headline figure. */
     val totalMonthlyEmi: Double,
+    /** Sum of every outstanding balance. */
     val totalPrincipalRemaining: Double,
 )
 
 /** Action sealed-hierarchy for the loans-list MVI loop. */
 sealed interface LoansListAction {
-    /** User confirmed deletion of [id] (typically via long-press / swipe-to-dismiss). */
+    /**
+     * User confirmed deletion of [id] (typically via long-press / swipe-to-dismiss).
+     *
+     * @property id which loan to delete.
+     */
     data class DeleteLoan(val id: String) : LoansListAction
 }

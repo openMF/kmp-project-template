@@ -51,6 +51,10 @@ import kotlin.time.Clock
 class EditLoanViewModel(
     private val repository: LoanRepository,
     outbox: SubmitOutbox<Loan>,
+    /**
+     * The loan being edited, or null when adding. Also the draft's unique key, so an edit draft never collides with
+     * the add slot.
+     */
     val loanId: String?,
 ) : BaseMutationViewModel<Loan, Loan>(
     MutationMode.Draft(
@@ -62,6 +66,8 @@ class EditLoanViewModel(
 ) {
 
     private val _formState = MutableStateFlow(LoanFormState())
+
+    /** The form as it currently stands. */
     val formState: StateFlow<LoanFormState> = _formState.asStateFlow()
 
     init {
@@ -137,14 +143,23 @@ class EditLoanViewModel(
         )
     }
 
+    /**
+     * Records a new label into the form, which auto-saves as a draft — so the edit survives process death before it is
+     * ever committed.
+     */
     fun onNameChange(value: String) {
         _formState.update { it.copy(name = value) }
     }
 
+    /** Category changed. */
     fun onKindChange(value: LoanKind) {
         _formState.update { it.copy(kind = value) }
     }
 
+    /**
+     * Records a new principal. Does NOT recompute [LoanFormState.principalRemaining]: the tracker treats the
+     * outstanding balance as user-maintained.
+     */
     fun onPrincipalChange(value: Double) {
         _formState.update {
             it.copy(
@@ -155,14 +170,17 @@ class EditLoanViewModel(
         }
     }
 
+    /** Outstanding balance changed. */
     fun onPrincipalRemainingChange(value: Double) {
         _formState.update { it.copy(principalRemaining = value) }
     }
 
+    /** APR changed. */
     fun onAnnualRatePercentChange(value: Double) {
         _formState.update { it.copy(annualRatePercent = value) }
     }
 
+    /** Records a new tenure. Independent of months-remaining, which the user maintains separately. */
     fun onTenureMonthsChange(value: Int) {
         _formState.update {
             it.copy(
@@ -172,14 +190,23 @@ class EditLoanViewModel(
         }
     }
 
+    /**
+     * Records a new months-remaining. User-maintained rather than derived — the tracker has no payment ledger to
+     * derive it from.
+     */
     fun onMonthsRemainingChange(value: Int) {
         _formState.update { it.copy(monthsRemaining = value) }
     }
 
+    /**
+     * Records a new due-date. Stored as a `LocalDate`, so no timezone is involved and the date a user picks is the
+     * date they see.
+     */
     fun onNextDueDateChange(value: LocalDate) {
         _formState.update { it.copy(nextDueDate = value) }
     }
 
+    /** Amount paid to date changed. */
     fun onTotalPaidChange(value: Double) {
         _formState.update { it.copy(totalPaid = value) }
     }
@@ -235,6 +262,7 @@ class EditLoanViewModel(
         return (1..16).map { chars[Random.nextInt(chars.size)] }.joinToString("")
     }
 
+    /** Outbox keys. */
     companion object {
         /** Stable form-type identifier — groups every loan draft in the outbox. */
         const val FORM_KEY: String = "loan"
@@ -256,14 +284,26 @@ class EditLoanViewModel(
  * 0.0 → empty text-field, "Pick date" → date picker prompt.
  */
 data class LoanFormState(
+    /** User-facing label. */
     val name: String = "",
+    /** Loan category. Drives the row icon and grouping; it carries no financial meaning. */
     val kind: LoanKind = LoanKind.PERSONAL,
+    /** Original loan amount. */
     val principal: Double = 0.0,
+    /** Outstanding balance. */
     val principalRemaining: Double = 0.0,
+    /** APR as a percentage. */
     val annualRatePercent: Double = 0.0,
+    /** Tenure the loan was taken for, in months. Fixed — [monthsRemaining] is what moves. */
     val tenureMonths: Int = 0,
+    /** Months until payoff. */
     val monthsRemaining: Int = 0,
+    /**
+     * Next payment due-date. Defaults to a fixed placeholder so the form renders deterministically in tests and
+     * previews rather than drifting with today's date.
+     */
     val nextDueDate: LocalDate = DEFAULT_DUE_DATE,
+    /** Amount paid to date. */
     val totalPaid: Double = 0.0,
 ) {
     /** Minimum validity for the Save button. */
@@ -281,6 +321,7 @@ data class LoanFormState(
     val previewTotalInterest: Double
         get() = computeTotalInterest(principal, annualRatePercent, tenureMonths)
 
+    /** Form defaults. */
     companion object {
         /** Stable placeholder so the form is deterministic before the user picks a real date. */
         val DEFAULT_DUE_DATE: LocalDate = LocalDate(2026, 1, 1)

@@ -134,6 +134,7 @@ const val FRESHNESS_INDICATOR_TEST_TAG: String = "freshness_indicator"
 /** Theme-agnostic tint slot — the composable resolves to a `MaterialTheme.colorScheme` color. */
 internal enum class FreshnessTint { Neutral, Tertiary, Error }
 
+/** The resolved (icon, tint) pair for one freshness band — the output of the mapping below. */
 internal data class FreshnessVisual(
     val icon: ImageVector,
     val tint: FreshnessTint,

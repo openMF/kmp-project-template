@@ -34,33 +34,44 @@ class BankingTypeConverters {
 
     // --- LoanKind ---
 
+    /** Stores a [LoanKind] as its enum name. */
     @ColumnTypeConverter
     fun fromLoanKind(value: LoanKind): String = value.name
 
+    /**
+     * Reads a [LoanKind] back. Throws on an unknown name — a renamed constant needs a migration, not a silent
+     * fallback.
+     */
     @ColumnTypeConverter
     fun toLoanKind(value: String): LoanKind = LoanKind.valueOf(value)
 
     // --- Recurrence ---
 
+    /** Stores a [Recurrence] as its enum name. */
     @ColumnTypeConverter
     fun fromRecurrence(value: Recurrence): String = value.name
 
+    /** Reads a [Recurrence] back. */
     @ColumnTypeConverter
     fun toRecurrence(value: String): Recurrence = Recurrence.valueOf(value)
 
     // --- BillCategory ---
 
+    /** Stores a [BillCategory] as its enum name. */
     @ColumnTypeConverter
     fun fromBillCategory(value: BillCategory): String = value.name
 
+    /** Reads a [BillCategory] back. */
     @ColumnTypeConverter
     fun toBillCategory(value: String): BillCategory = BillCategory.valueOf(value)
 
     // --- LocalDate (ISO-8601 string) ---
 
+    /** Stores a date as ISO-8601 text, so it sorts correctly in SQL. */
     @ColumnTypeConverter
     fun fromLocalDate(value: LocalDate): String = value.toString()
 
+    /** Reads an ISO-8601 date back. */
     @ColumnTypeConverter
     fun toLocalDate(value: String): LocalDate = LocalDate.parse(value)
 }

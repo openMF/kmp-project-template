@@ -20,17 +20,27 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class FineractAuthResponseDto(
+    /** The authenticated username, echoed back. */
     val username: String? = null,
+    /** The credential every subsequent call sends as its auth header — the runtime-header showcase. */
     @SerialName("base64EncodedAuthenticationKey")
     val base64EncodedAuthenticationKey: String? = null,
+    /** Whether the sign-in succeeded. */
     val authenticated: Boolean = false,
+    /** The user's office — the first authenticated field worth showing. */
     val officeName: String? = null,
 )
 
 /** `GET /offices` row — the smallest authenticated read that proves the header reached the server. */
 @Serializable
 data class FineractOfficeDto(
+    /**
+     * Office id. Nullable because every field on this endpoint is — the sandbox omits rather than nulls, and a strict
+     * non-null would fail the whole parse.
+     */
     val id: Long? = null,
+    /** Office name, undecorated. Use [nameDecorated] when rendering a hierarchy. */
     val name: String? = null,
+    /** Name with Fineract's hierarchy indentation, for a tree view. */
     @SerialName("nameDecorated") val nameDecorated: String? = null,
 )

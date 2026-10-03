@@ -33,6 +33,12 @@ import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
 import kotlin.time.Clock
 
+/**
+ * Historical FX series for a (from, to, window) key — `NETWORK_WITH_CACHE`.
+ *
+ * Widening the window is a NEW key and therefore a full re-fetch, not a page append: the series is
+ * windowed, never paged.
+ */
 @StoreProvider(id = "rateHistory", ttl = "1h")
 @CacheKey(
     fn = "of",

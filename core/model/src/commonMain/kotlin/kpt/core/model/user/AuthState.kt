@@ -26,6 +26,8 @@ sealed class AuthState {
 
     /**
      * User is authenticated with the given access token.
+     *
+     * @property accessToken the bearer token for this session.
      */
     data class Authenticated(val accessToken: String) : AuthState()
 }

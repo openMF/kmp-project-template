@@ -15,8 +15,10 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.download
 import kotlinx.coroutines.DelicateCoroutinesApi
 
+/** Web (JS/WasmJS) implementation of `ShareUtils`. */
 @OptIn(DelicateCoroutinesApi::class)
 actual object ShareUtils {
+    /** `shareText` on Web (JS/WasmJS). */
     actual suspend fun shareText(text: String) {
         FileKit.download(
             bytes = text.encodeToByteArray(),
@@ -24,6 +26,7 @@ actual object ShareUtils {
         )
     }
 
+    /** `shareImage` on Web (JS/WasmJS). */
     actual suspend fun shareImage(
         title: String,
         image: ImageBitmap,
@@ -36,6 +39,7 @@ actual object ShareUtils {
         }
     }
 
+    /** `shareImage` on Web (JS/WasmJS). */
     actual suspend fun shareImage(title: String, byte: ByteArray) {
         FileKit.download(
             bytes = byte,
@@ -43,24 +47,31 @@ actual object ShareUtils {
         )
     }
 
+    /** `openUrl` on Web (JS/WasmJS). */
     actual fun openUrl(url: String) {
     }
 
+    /** `openAppInfo` on Web (JS/WasmJS). */
     actual fun openAppInfo() {
     }
 
+    /** `callPhone` on Web (JS/WasmJS). */
     actual fun callPhone(number: String) {
     }
 
+    /** `sendEmail` on Web (JS/WasmJS). */
     actual fun sendEmail(to: String, subject: String?, body: String?) {
     }
 
+    /** `sendViaSMS` on Web (JS/WasmJS). */
     actual fun sendViaSMS(number: String, message: String) {
     }
 
+    /** `copyText` on Web (JS/WasmJS). */
     actual fun copyText(text: String) {
     }
 
+    /** `shareApp` on Web (JS/WasmJS). */
     actual suspend fun shareApp(storeLink: String, message: String) {
         val shareContent = if (message.isNotEmpty()) {
             "$message\n$storeLink"

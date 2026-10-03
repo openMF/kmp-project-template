@@ -20,19 +20,32 @@ import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.currencyrates.ui.CurrencyRatesScreen
 import kpt.feature.currencyrates.ui.RateHistoryScreen
 
+/** Route for the currency-rates nested graph. */
 @Serializable
 data object CurrencyRatesGraphRoute
 
+/** Route for the live rates list — the graph's start destination. */
 @Serializable
 data object CurrencyRatesRoute
 
+/** Route for the historical chart. */
 @Serializable
 data object RateHistoryRoute
 
+/**
+ * Navigates to the rates list.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToCurrencyRates(navOptions: NavOptions? = null) {
     navigate(route = CurrencyRatesGraphRoute, navOptions = navOptions)
 }
 
+/**
+ * Registers the currency-rates nested graph.
+ *
+ * @param navController used for back navigation and for reaching the history screen.
+ */
 @FeatureDestination
 fun NavGraphBuilder.currencyRatesGraph(navController: NavController) {
     navigation<CurrencyRatesGraphRoute>(startDestination = CurrencyRatesRoute) {
@@ -46,6 +59,11 @@ fun NavGraphBuilder.currencyRatesGraph(navController: NavController) {
     }
 }
 
+/**
+ * Navigates to the historical chart.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToRateHistory(navOptions: NavOptions? = null) {
     navigate(route = RateHistoryRoute, navOptions = navOptions)
 }

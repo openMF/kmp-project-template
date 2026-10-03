@@ -9,5 +9,8 @@
  */
 package kpt.feature.settings
 
+/** Identifies this target as Wasm, with its version where the platform exposes one. */
 actual fun getPlatform(): Platform = Platform.Wasm
+
+/** Whether a system-derived palette is available. Always false — Wasm has no system palette to read. */
 actual fun supportsDynamicTheming(): Boolean = false

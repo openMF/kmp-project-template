@@ -7,6 +7,11 @@ import org.gradle.api.tasks.Input
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.FieldVisitor
 
+/**
+ * An ASM visitor that strips every FIELD from the classes it visits, leaving methods intact.
+ *
+ * Used to keep a class's API surface while discarding its state — see [Factory] for which classes are selected.
+ */
 class FieldSkippingClassVisitor(
     apiVersion: Int,
     nextClassVisitor: ClassVisitor,
@@ -21,6 +26,7 @@ class FieldSkippingClassVisitor(
         value: Any?
     ): FieldVisitor? = null
 
+    /** Selects which classes [FieldSkippingClassVisitor] is applied to, from the names in [Parameters.classes]. */
     abstract class Factory : AsmClassVisitorFactory<Parameters> {
 
         private val excludedClasses
@@ -40,7 +46,12 @@ class FieldSkippingClassVisitor(
         }
     }
 
+    /** The instrumentation's inputs. */
     abstract class Parameters : InstrumentationParameters {
+        /**
+         * Fully-qualified names of the classes whose fields are stripped. A `SetProperty` so Gradle tracks it as a
+         * task input and re-instruments when the set changes.
+         */
         @get:Input
         abstract val classes: SetProperty<String>
     }

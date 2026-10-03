@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.TimeZone
 import kpt.core.base.data.infra.TimeZoneMonitor
 
+/** Non-Android targets implementation of `TimeZoneMonitorImpl`. */
 class TimeZoneMonitorImpl : TimeZoneMonitor {
     override val currentTimeZone: Flow<TimeZone>
         get() = flowOf(TimeZone.currentSystemDefault())

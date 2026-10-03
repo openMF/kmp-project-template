@@ -143,10 +143,15 @@ fi
 # them, which is the only way a silent revert shows up.
 if [[ "${1:-}" == "--verify" ]]; then
   fv_fail=0
+  # Print a passing verification line.
   fv_ok()   { echo -e "${GREEN}  ✓ $1${NC}"; }
+  # Print a failing verification line and set fv_fail, so --verify reports every mismatch.
   fv_bad()  { echo -e "${RED}  ✗ $1${NC}"; fv_fail=1; }
+  # Read scalar key $2 from YAML file $1, stripping any trailing `# comment`.
+  # Deliberately not a YAML parser: --verify must run on a bare clone with no toolchain.
   yval()    { grep -E "^[[:space:]]*$2:" "$1" 2>/dev/null | head -1 | cut -d: -f2- \
                 | sed -e 's/[[:space:]]*#.*$//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//'; }
+  # Read the double-quoted value of key $2 from TOML file $1 — the version-catalog shape.
   tval()    { grep -E "^$2[[:space:]]*=" "$1" 2>/dev/null | head -1 | cut -d'"' -f2; }
 
   echo -e "${BOLD}fork-init --verify${NC}"

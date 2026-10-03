@@ -63,6 +63,8 @@ OptionParser.new do |o|
 end.parse!
 %i[bundle_id key_id issuer p8].each { |k| abort "❌ missing --#{k.to_s.tr('_', '-')}" unless opts[k] }
 
+# Mint a short-lived ES256 JWT for App Store Connect.
+# 20-minute expiry — Apple rejects anything longer, so this cannot be cached across a long run.
 def jwt(key_id, issuer, p8_path)
   header  = { alg: 'ES256', kid: key_id, typ: 'JWT' }
   payload = { iss: issuer, iat: Time.now.to_i, exp: Time.now.to_i + 1200, aud: 'appstoreconnect-v1' }
@@ -78,6 +80,7 @@ end
 
 TOKEN = jwt(opts[:key_id], opts[:issuer], opts[:p8])
 
+# Issue one App Store Connect API request and parse the JSON response.
 def api(method, path, body = nil)
   uri = URI("https://api.appstoreconnect.apple.com/v1/#{path}")
   klass = { get: Net::HTTP::Get, post: Net::HTTP::Post, patch: Net::HTTP::Patch }[method]

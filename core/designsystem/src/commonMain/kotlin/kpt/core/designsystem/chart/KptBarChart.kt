@@ -42,8 +42,14 @@ import kpt.core.designsystem.theme.spacing
  * bar to a fraction of the running max.
  */
 data class BarDatum(
+    /** Category label shown under the bar. */
     val label: String,
+    /**
+     * Bar height in data units. The chart scales the axis to the largest value in the set, so units need not be
+     * normalised.
+     */
     val value: Float,
+    /** Bar colour, or null to take the next hue from [ChartTokens.multiSeriesColors]. */
     val color: Color? = null,
 )
 

@@ -13,6 +13,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import kpt.core.base.datastore.SecureSettingsFactory
 
+/** `datastoreBasePlatformModule` on Desktop (JVM). */
 actual val datastoreBasePlatformModule: Module = module {
     single { SecureSettingsFactory() }
 }

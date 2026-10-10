@@ -48,6 +48,10 @@ class CurrencyRatesViewModel(
         scope = viewModelScope,
     )
 
+    /**
+     * The rates as a screen state — the `NETWORK_WITH_CACHE` archetype, so a cached set renders immediately and is
+     * replaced when the fetch lands.
+     */
     val screenState: StateFlow<ScreenState<RatesDisplay>> = stream.state
         .combineContent(stateFlow) { rates, local, _ ->
             RatesDisplay(
@@ -98,10 +102,12 @@ class CurrencyRatesViewModel(
                 initialValue = ScreenState.Loading,
             )
 
+    /** Retries the failed fetch. */
     fun onRetry() {
         trySendAction(RatesAction.Retry)
     }
 
+    /** Forces a fetch, bypassing the cache — what pull-to-refresh calls. */
     fun onRefresh() {
         trySendAction(RatesAction.Refresh)
     }
@@ -130,12 +136,41 @@ data class RatesLocalState(
     val converterTarget: String = "EUR",
 )
 
+/**
+ * What the list renders: the base currency, its date, and the rates.
+ *
+ * @property base the base currency every rate is quoted against.
+ * @property date the day the rates are for.
+ * @property rates quote-code → rate.
+ */
 data class RatesDisplay(val base: String, val date: String, val rates: Map<String, Double>)
 
+/** What the screen can be asked to do. */
 sealed interface RatesAction {
+    /**
+     * The search query changed.
+     *
+     * @property query the new search text.
+     */
     data class Search(val query: String) : RatesAction
+
+    /**
+     * The converter's amount changed.
+     *
+     * @property amount the amount as raw text, so a partially typed number survives recomposition.
+     */
     data class ConverterAmount(val amount: String) : RatesAction
+
+    /**
+     * The converter's target currency changed.
+     *
+     * @property code the target currency code.
+     */
     data class ConverterTarget(val code: String) : RatesAction
+
+    /** Retry the failed fetch. */
     data object Retry : RatesAction
+
+    /** Force a fetch, bypassing the cache. */
     data object Refresh : RatesAction
 }

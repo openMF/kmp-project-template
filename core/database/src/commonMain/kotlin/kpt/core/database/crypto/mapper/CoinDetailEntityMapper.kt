@@ -13,6 +13,9 @@ import kpt.core.database.crypto.entity.CoinDetailEntity
 import kpt.core.model.crypto.CoinDetail
 import kotlin.time.Clock
 
+/**
+ * Domain → row, for the Store's writer.
+ */
 fun CoinDetail.toEntity(): CoinDetailEntity = CoinDetailEntity(
     id = id,
     name = name,
@@ -30,6 +33,9 @@ fun CoinDetail.toEntity(): CoinDetailEntity = CoinDetailEntity(
     fetchedAt = Clock.System.now().toEpochMilliseconds(),
 )
 
+/**
+ * Row → domain, for the Store's reader.
+ */
 fun CoinDetailEntity.toDomain(): CoinDetail = CoinDetail(
     id = id,
     name = name,

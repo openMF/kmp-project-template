@@ -20,7 +20,10 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class RemoteAppConfigDto(
+    /** Config key, e.g. `min_supported_version`. */
     @SerialName("key") val key: String,
+    /** Value as text. Always a string on the wire; the consumer parses it, so adding a typed key needs no migration. */
     @SerialName("value") val value: String,
+    /** When the row last changed, ISO-8601, or null when the table does not track it. */
     @SerialName("updated_at") val updatedAt: String? = null,
 )

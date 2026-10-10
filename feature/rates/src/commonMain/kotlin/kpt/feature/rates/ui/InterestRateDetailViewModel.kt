@@ -68,7 +68,11 @@ internal class InterestRateDetailViewModel(
     }
 }
 
+/** What the detail screen can be asked to do. */
 sealed interface DetailAction {
+    /** Retry the failed fetch. */
     data object Retry : DetailAction
+
+    /** Force a fetch, bypassing the cache. */
     data object Refresh : DetailAction
 }

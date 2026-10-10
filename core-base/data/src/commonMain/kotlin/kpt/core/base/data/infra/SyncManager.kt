@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.Flow
  *    scheduling is a follow-up).
  */
 interface SyncManager {
+    /** Whether a sync is in flight — drives the refreshing affordance without each screen tracking it. */
     val isSyncing: Flow<Boolean>
+    /** Requests a sync. Advisory: the manager may coalesce it with one already running. */
     fun requestSync()
 }

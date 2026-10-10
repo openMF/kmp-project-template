@@ -33,6 +33,12 @@ import kotlinx.serialization.json.Json
 import kpt.core.base.security.CertificatePinConfig
 import co.touchlab.kermit.Logger.Companion as KermitLogger
 
+/**
+ * Creates a Ktor [HttpClient] on the target's own engine (OkHttp, Darwin, JS fetch, CIO).
+ *
+ * [config] is applied on top of the engine defaults, so shared setup — JSON, logging, auth,
+ * certificate pinning — is declared once in common code and the engine choice stays per platform.
+ */
 expect fun httpClient(config: HttpClientConfig<*>.() -> Unit): HttpClient
 
 /**

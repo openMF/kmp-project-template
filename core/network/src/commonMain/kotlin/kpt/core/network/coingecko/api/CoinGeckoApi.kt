@@ -20,6 +20,14 @@ import kpt.core.network.coingecko.dto.CoinMarketDto
 @ApiBinding("coingecko")
 interface CoinGeckoApi {
 
+    /**
+     * One page of the market list, ordered by market cap descending by default.
+     *
+     * @param vsCurrency quote currency every price is expressed in.
+     * @param order CoinGecko's sort key.
+     * @param perPage page size.
+     * @param page 1-based page number.
+     */
     @GET("api/v3/coins/markets")
     suspend fun getMarkets(
         @Query("vs_currency") vsCurrency: String = "usd",
@@ -28,6 +36,14 @@ interface CoinGeckoApi {
         @Query("page") page: Int,
     ): List<CoinMarketDto>
 
+    /**
+     * Full detail for one coin.
+     *
+     * The four `false` defaults switch off payload sections the detail screen does not render — CoinGecko returns them
+     * by default and they dominate the response size.
+     *
+     * @param id CoinGecko's coin id.
+     */
     @GET("api/v3/coins/{id}")
     suspend fun getCoinDetail(
         @Path("id") id: String,

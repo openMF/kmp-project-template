@@ -56,8 +56,21 @@ import kpt.core.base.common.manager.DispatcherManager
  * ```
  */
 class ProjectPreferencesRepositoryImpl(
+    /**
+     * The framework-shared implementation every call forwards to. Exposed so a fork can reach a base member it has not
+     * overridden.
+     */
     val delegate: UserPreferencesRepository,
+    /** Unencrypted preferences — theme, language, onboarding. Cheap to read on every composition. */
     val plainSettings: Settings,
+    /**
+     * Encrypted preferences — passcode and auth token. A separate store because its reads are expensive and its
+     * backing key is platform-held.
+     */
     val secureSettings: Settings,
+    /**
+     * Dispatcher provider, so a write never blocks the caller's thread and tests can run it on a scheduler they
+     * control.
+     */
     val dispatcher: DispatcherManager,
 ) : ProjectPreferencesRepository, UserPreferencesRepository by delegate

@@ -27,12 +27,23 @@ import kpt.feature.showcase.generated.resources.Res
 import kpt.feature.showcase.generated.resources.screens_showcase_transition_demo_label
 import org.jetbrains.compose.resources.stringResource
 
+/** Route for the transition gallery. */
 @Serializable
 data object TransitionGalleryRoute
 
+/**
+ * Route for one transition's demo screen.
+ *
+ * @property variantName which transition to demonstrate, as the enum's `name()`.
+ */
 @Serializable
 data class TransitionDemoRoute(val variantName: String)
 
+/**
+ * Registers the transition-gallery graph.
+ *
+ * @param navController used for back navigation and for pushing each demo.
+ */
 fun NavGraphBuilder.transitionGalleryGraph(navController: NavController) {
     composableWithPushTransitions<TransitionGalleryRoute> {
         TransitionGalleryScreen(

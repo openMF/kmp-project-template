@@ -57,6 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.math.roundToLong
 
+/** Month-by-month payment breakdown for one tracked loan. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AmortizationScheduleScreen(

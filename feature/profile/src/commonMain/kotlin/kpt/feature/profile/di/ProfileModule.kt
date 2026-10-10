@@ -16,6 +16,7 @@ import kpt.feature.profile.demo.ui.ProfileViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
+/** Koin bindings for the profile feature. */
 val ProfileModule = module {
     // Binds the read PORT declared by core/store. `AppInfo` lives in core-base/ui, which
     // core/store does not depend on, so the feature supplies the source. A fork that shows a

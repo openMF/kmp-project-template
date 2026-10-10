@@ -21,15 +21,19 @@ import kpt.core.base.database.infra.entity.BookkeeperEntity
 @Dao
 interface BookkeeperDao {
 
+    /** When the write for [key] last failed, or null if it has never failed. Drives retry backoff. */
     @Query("SELECT lastFailedSync FROM store_bookkeeper WHERE `key` = :key")
     suspend fun getLastFailedSync(key: String): Long?
 
+    /** Records a failed sync for a key. */
     @Upsert
     suspend fun upsert(entity: BookkeeperEntity)
 
+    /** Clears the failure record for [key] — called once its write finally succeeds. */
     @Query("DELETE FROM store_bookkeeper WHERE `key` = :key")
     suspend fun delete(key: String)
 
+    /** Clears every failure record. Called on logout. */
     @Query("DELETE FROM store_bookkeeper")
     suspend fun deleteAll()
 

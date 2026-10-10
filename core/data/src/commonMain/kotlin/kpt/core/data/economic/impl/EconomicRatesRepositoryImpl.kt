@@ -22,6 +22,9 @@ import kpt.core.store.config.AppStoreIds
 import kpt.core.store.economic.impl.InterestRateSeriesKey
 import org.mobilenativefoundation.store.store5.Store
 
+/**
+ * Default `EconomicRatesRepository` over the FRED-backed interest-rate series Store.
+ */
 @RepositoryBinding(binds = EconomicRatesRepository::class)
 class EconomicRatesRepositoryImpl(
     @FromStore(AppStoreIds.InterestRateSeries)

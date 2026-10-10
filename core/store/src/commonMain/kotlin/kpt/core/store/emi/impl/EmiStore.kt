@@ -24,8 +24,14 @@ import org.mobilenativefoundation.store.store5.Store
  * what makes memoisation fall out of the Store rather than being hand-rolled in a ViewModel.
  */
 data class EmiParams(
+    /** Loan amount. */
     val principal: Double,
+    /** APR as a percentage, e.g. `6.5`. */
     val ratePercent: Double,
+    /**
+     * Tenure in months. Must be > 0 — a zero tenure would divide by zero in the EMI formula, so the caller validates
+     * before building the params.
+     */
     val tenureMonths: Int,
 ) {
     /** True when the inputs describe a computable loan — the store is only read when valid. */
@@ -44,10 +50,18 @@ data class EmiParams(
  * domain) is preserved.
  */
 fun interface EmiCompute {
+    /** Computes the EMI and its totals for [params]. Pure — no Store, no cache. */
     suspend operator fun invoke(params: EmiParams): EmiResult
 }
 
 /**
+ * EMI calculation — `MEMORY_ONLY` over a pure `core/domain` use-case.
+ *
+ * The parameter set IS the cache key, so a repeated calculation is served from cache and the
+ * result reaches the screen as a `ScreenState` like every other read surface. The use-case is
+ * injected through a port bound in the feature module: importing `core/domain` from `core/store`
+ * would close a store → domain → data → store cycle.
+ *
  * MEMORY_ONLY Store5 store over a pure computation (`feature_profile.combo_id: calculator_pure`).
  *
  * There is no network and no source of truth, so the Store contributes exactly one thing:

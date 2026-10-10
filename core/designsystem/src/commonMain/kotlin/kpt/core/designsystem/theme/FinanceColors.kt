@@ -59,8 +59,17 @@ data class FinanceColors(
     val rateDown: Color,
     /** Rate unchanged. */
     val rateFlat: Color,
+    /** Container behind an upward rate — the low-emphasis pair for `rateUp`. */
     val rateUpContainer: Color,
+    /**
+     * Container behind a downward rate — the low-emphasis pair for `rateDown`, for a chip or badge background rather
+     * than the figure itself.
+     */
     val rateDownContainer: Color,
+    /**
+     * Container behind an unchanged rate. Deliberately distinct from the surface colour, so "flat" still reads as a
+     * measured value rather than as missing data.
+     */
     val rateFlatContainer: Color,
 
     // ── Freshness semantic — Store5 / data-recency ───────────────────────────

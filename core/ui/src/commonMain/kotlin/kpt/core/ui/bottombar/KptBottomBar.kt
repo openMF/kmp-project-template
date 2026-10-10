@@ -19,6 +19,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kpt.core.ui.navigation.NavigationItem
 
+/**
+ * App-level bottom navigation bar, driven by the generated tab registry.
+ *
+ * Tabs register by `@FeatureTab` annotation — never by editing a list here, which would make adding
+ * a feature a two-place change and silently drop it if one were missed.
+ */
 @Composable
 fun KptBottomBar(
     navigationItems: List<NavigationItem>,

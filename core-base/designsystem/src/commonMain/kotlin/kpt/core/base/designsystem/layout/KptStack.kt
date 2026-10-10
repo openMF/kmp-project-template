@@ -16,6 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 
+/**
+ * Z-stacks its children with a shared alignment — overlays, badges, layered art.
+ */
 @Composable
 fun KptStack(
     modifier: Modifier = Modifier,

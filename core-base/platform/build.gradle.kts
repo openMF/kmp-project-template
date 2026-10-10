@@ -77,5 +77,9 @@ kotlin {
             // Activity, no manager is Activity-bound and LocalManagerProvider's android/nonAndroid
             // split is now a single commonMain implementation.
         }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
     }
 }

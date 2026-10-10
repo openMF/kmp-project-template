@@ -9,8 +9,14 @@
  */
 package kpt.core.model.emi
 
+/**
+ * Output of an EMI calculation: the monthly instalment plus the totals it implies.
+ */
 data class EmiResult(
+    /** The monthly instalment. */
     val emi: Double,
+    /** Principal plus interest over the full tenure. */
     val totalPayment: Double,
+    /** Interest alone — [totalPayment] minus the principal. */
     val totalInterest: Double,
 )

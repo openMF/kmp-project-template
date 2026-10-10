@@ -403,6 +403,10 @@ class RepositoryBindingProcessor(
     }
 }
 
+/**
+ * KSP entry point — what the `META-INF/services` registration names, so Gradle can instantiate
+ * [RepositoryBindingProcessor].
+ */
 class RepositoryBindingProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
         RepositoryBindingProcessor(environment.codeGenerator, environment.logger)

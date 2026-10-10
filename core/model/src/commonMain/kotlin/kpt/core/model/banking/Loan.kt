@@ -58,10 +58,21 @@ data class Loan(
 /** High-level loan category used for grouping, icons, and analytics. */
 @Serializable
 enum class LoanKind {
+    /** Unsecured personal loan. */
     PERSONAL,
+
+    /** Home loan. */
     MORTGAGE,
+
+    /** Vehicle loan. */
     AUTO,
+
+    /** Education loan. */
     STUDENT,
+
+    /** Business or commercial loan. */
     BUSINESS,
+
+    /** Anything the categories above do not cover. */
     OTHER,
 }

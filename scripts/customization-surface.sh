@@ -171,8 +171,12 @@ cs_match_g() {
   CS_M_OWNER="template"; CS_M_STRAT=""; CS_M_DEFAULT="1"
 }
 
+# Print the owner (template | fork | merge) for path $1.
 cs_resolve_owner()    { cs_match_g "$1"; printf '%s' "$CS_M_OWNER"; }
+# Print the merge strategy for path $1, meaningful only when the owner is `merge`.
 cs_resolve_strategy() { cs_match_g "$1"; printf '%s' "$CS_M_STRAT"; }
+# True when path $1 matched only the catch-all `**` rule — i.e. no rule claims it
+# explicitly, so it falls to the template-first default.
 cs_is_default()       { cs_match_g "$1"; [ "$CS_M_DEFAULT" = "1" ]; }
 
 # 3-way merge driver for a `merge`-owned file. This is the general merge strategy
@@ -627,6 +631,7 @@ cs_require_flip_preconditions() {
   return "$bad"
 }
 
+# CLI entry point: dispatch --verify / resolve / merge / self-test.
 cs_main() {
   local cmd="${1:-}"; shift || true
   case "$cmd" in

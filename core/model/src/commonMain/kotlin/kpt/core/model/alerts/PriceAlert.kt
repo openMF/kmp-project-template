@@ -38,6 +38,9 @@ data class PriceAlert(
     val createdAtMs: Long,
 )
 
+/**
+ * Which way a price must cross the threshold to fire the alert (above or below).
+ */
 @Serializable
 enum class AlertDirection {
     /** Trigger when price rises above [PriceAlert.targetValue]. */

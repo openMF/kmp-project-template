@@ -49,17 +49,38 @@ class SyncForkConfigPlugin : Plugin<Project> {
     }
 }
 
+/**
+ * Projects `app-profile/` onto every generated surface: `gradle/fork.properties`, the version catalog,
+ * `Config.xcconfig`, per-module BuildKonfig, icons and store metadata.
+ *
+ * Caching is disabled on purpose — it reads a gitignored `fork.properties` and writes outside the build directory, so
+ * a cached result would be wrong on a machine whose fork config differs.
+ */
 @DisableCachingByDefault(because = "Reads gitignored fork.properties; writes local.properties and metadata files")
 abstract class SyncForkConfigTask : DefaultTask() {
 
+    /**
+     * The repository root. Every other path is resolved from it, so the task has no dependency on the invoking
+     * project's location.
+     */
     @get:Internal abstract val projectRootDir:     DirectoryProperty
+    /** `app-profile/icons/` — the fork-owned icon source. Missing or empty means the template's own icons are kept. */
     @get:Internal abstract val iconSourceDir:    DirectoryProperty
+    /** Destination for the iOS `AppIcon.appiconset`. */
     @get:Internal abstract val iosAppIconDir:      DirectoryProperty
+    /** Destination for the Kotlin/JS favicon. */
     @get:Internal abstract val jsResourcesDir:     DirectoryProperty
+    /** Destination for the Kotlin/Wasm favicon. */
     @get:Internal abstract val wasmJsResourcesDir: DirectoryProperty
+    /** Destination for the desktop `.icns` / `.ico` / `.png` icons. */
     @get:Internal abstract val desktopIconsDir:    DirectoryProperty
+    /** Destination for a pre-built Android res tree, for the adaptive icons Image Asset Studio must generate. */
     @get:Internal abstract val androidResDir:      DirectoryProperty
 
+    /**
+     * Runs the whole projection. Idempotent: re-running with an unchanged `app-profile/` rewrites identical content,
+     * which is what lets a template sync be followed by an unconditional `syncForkConfig`.
+     */
     @TaskAction
     fun sync() {
         val root = projectRootDir.get().asFile
@@ -1121,32 +1142,6 @@ abstract class SyncForkConfigTask : DefaultTask() {
         }
     }
 
-    /**
-     * Refill `AppDatabase.kt`'s four `fork-*` regions from `app-profile/app.yaml#database`.
-     *
-     * This is what lets `core/database/**/AppDatabase.kt` be `owner: template` (FULL-COPY on a
-     * template sync) instead of a permanent 3-way merge: Room needs one compile-time
-     * `entities = [...]` array literal, so a fork's tables cannot live in a separate file — but they
-     * CAN be re-derived into the copied file afterwards. A sync full-copies the template's
-     * AppDatabase (fork regions empty), then the mandatory post-sync `syncForkConfig` projects the
-     * fork's declared schema back in. Same shape as the deployment metadata/screenshot regeneration.
-     *
-     * Hand-editing a `fork-*` region is pointless — this overwrites it. Declare in app-profile.
-     */
-    /**
-     * Give every declared access point its OWN package under `core/network`:
-     * `kpt/core/network/<id>/{api,dto}`.
-     *
-     * Endpoint code used to live in DOMAIN packages under `demo/` (`demo/economic` held BOTH the fred
-     * and worldbank APIs), which tied it to the demo lifecycle: `remove-demo.sh` deletes every
-     * a `demo` package, so a fork's endpoint code could not live beside the template's, and a
-     * cleaned fork had nowhere structural to put an API at all. Naming the package for the ACCESS
-     * POINT makes the layout a pure projection of app-profile — declare an endpoint, get a package,
-     * write the interface in it — and lets the strip delete exactly the endpoints it removed.
-     *
-     * Scaffolds only; never overwrites. Each new package gets a README so git tracks the directory
-     * and the next person knows what belongs there.
-     */
     private fun declaredStores(appProfile: Map<String, Any?>): List<Map<*, *>> {
         val block = (appProfile["core_store"] as? Map<*, *>).orEmpty()
         return ((block["stores"] as? List<*>) ?: emptyList<Any?>()).mapNotNull { it as? Map<*, *> }
@@ -1183,6 +1178,20 @@ abstract class SyncForkConfigTask : DefaultTask() {
         sb.append(" */\n")
     }
 
+    /**
+     * Give every declared access point its OWN package under `core/network`:
+     * `kpt/core/network/<id>/{api,dto}`.
+     *
+     * Endpoint code used to live in DOMAIN packages under `demo/` (`demo/economic` held BOTH the fred
+     * and worldbank APIs), which tied it to the demo lifecycle: `remove-demo.sh` deletes every
+     * a `demo` package, so a fork's endpoint code could not live beside the template's, and a
+     * cleaned fork had nowhere structural to put an API at all. Naming the package for the ACCESS
+     * POINT makes the layout a pure projection of app-profile — declare an endpoint, get a package,
+     * write the interface in it — and lets the strip delete exactly the endpoints it removed.
+     *
+     * Scaffolds only; never overwrites. Each new package gets a README so git tracks the directory
+     * and the next person knows what belongs there.
+     */
     private fun scaffoldAccessPointPackages(root: File, appProfile: Map<String, Any?>) {
         val base = File(root, "core/network/src/commonMain/kotlin/kpt/core/network")
         if (!base.isDirectory) return
@@ -1287,11 +1296,25 @@ abstract class SyncForkConfigTask : DefaultTask() {
             }
             append(end)
         }
+        /** The file's content before patching, so the task can report only a real change. */
         val before = file.readText()
         patchSentinel(file, begin, end, body)
         if (file.readText() != before) {
+            /**
+             * How many fields were newly added, for the log line — distinct from the total, which would report work on
+             * every run.
+             */
             val emitted = fields.keys.count { it !in existing }
             logger.lifecycle("syncForkConfig: regenerated core/network buildkonfig fields ($emitted field(s))")
+        }
+    }
+
+    /** Parse `app-profile/migration-ledger.yaml` -> ordered (from, to, specFqn?) rows. */
+    private fun readLedgerVersion(root: File): Int? {
+        val ledger = File(root, "app-profile/migration-ledger.yaml")
+        if (!ledger.isFile) return null
+        return ledger.readLines().firstNotNullOfOrNull { raw ->
+            Regex("""^version:\s*(\d+)""").find(raw.substringBefore('#'))?.groupValues?.get(1)?.toInt()
         }
     }
 
@@ -1309,15 +1332,6 @@ abstract class SyncForkConfigTask : DefaultTask() {
      * Renumbering is the one forbidden move: a shipped from/to edge is a contract with every
      * installed device, and rewriting it strands them.
      */
-    /** Parse `app-profile/migration-ledger.yaml` -> ordered (from, to, specFqn?) rows. */
-    private fun readLedgerVersion(root: File): Int? {
-        val ledger = File(root, "app-profile/migration-ledger.yaml")
-        if (!ledger.isFile) return null
-        return ledger.readLines().firstNotNullOfOrNull { raw ->
-            Regex("""^version:\s*(\d+)""").find(raw.substringBefore('#'))?.groupValues?.get(1)?.toInt()
-        }
-    }
-
     private fun reconcileMigrationLedger(root: File, appProfile: Map<String, Any?>) {
         val ledger = File(root, "app-profile/migration-ledger.yaml")
         if (!ledger.isFile) return
@@ -1580,6 +1594,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
         }
     }
 
+    /**
+     * The flat-key → app-profile-path map, mirrored key-for-key with the Ruby side.
+     */
     companion object {
         // Flat gradle/fork.properties key → dotted path in the merged app-profile map.
         // MIRRORS deployment/_shared/config.rb `AppProfile::MAP` KEY-FOR-KEY so the Ruby (fastlane)

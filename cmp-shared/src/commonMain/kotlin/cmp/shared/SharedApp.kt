@@ -18,6 +18,7 @@ import kpt.core.base.platform.context.LocalContext
 import kpt.core.base.ui.util.LocalImageLoaderProvider
 import kpt.core.base.ui.util.getDefaultImageLoader
 
+/** The shared app root every platform entry point renders. */
 @Composable
 fun SharedApp(
     updateScreenCapture: (isScreenCaptureAllowed: Boolean) -> Unit,

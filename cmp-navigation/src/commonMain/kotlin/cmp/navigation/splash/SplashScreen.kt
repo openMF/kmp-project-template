@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
+/** Holding screen shown while `RootNavViewModel` resolves the real destination. */
 @Composable
 fun SplashScreen(modifier: Modifier = Modifier) {
     Surface(

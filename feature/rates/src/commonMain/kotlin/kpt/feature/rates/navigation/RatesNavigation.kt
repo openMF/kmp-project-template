@@ -37,10 +37,21 @@ data object RatesListRoute
 @Serializable
 data class RateDetailRoute(val seriesId: String)
 
+/**
+ * Navigates to the interest-rates dashboard.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToRates(navOptions: NavOptions? = null) {
     navigate(route = RatesGraphRoute, navOptions = navOptions)
 }
 
+/**
+ * Navigates to one series' detail.
+ *
+ * @param seriesId the FRED series id.
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToRateDetail(seriesId: String, navOptions: NavOptions? = null) {
     navigate(route = RateDetailRoute(seriesId = seriesId), navOptions = navOptions)
 }

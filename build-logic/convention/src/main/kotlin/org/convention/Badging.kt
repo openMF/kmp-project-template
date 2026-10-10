@@ -34,20 +34,31 @@ import javax.inject.Inject
 @CacheableTask
 abstract class GenerateBadgingTask : DefaultTask() {
 
+    /** Where the dumped badging is written — the task's only output, which is what makes it cacheable. */
     @get:OutputFile
     abstract val badging: RegularFileProperty
 
+    /** The APK to inspect. `PathSensitivity.NONE` because only the bytes matter, not where the file sits. */
     @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
     abstract val apk: RegularFileProperty
 
+    /**
+     * The `aapt2` binary from the build tools. Declared as an input so an SDK upgrade that changes aapt2's output
+     * invalidates the cached result.
+     */
     @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
     abstract val aapt2Executable: RegularFileProperty
 
+    /**
+     * Gradle's process launcher, injected rather than calling `Runtime.exec` so the task stays configuration-cache
+     * compatible.
+     */
     @get:Inject
     abstract val execOperations: ExecOperations
 
+    /** Runs `aapt2 dump badging` and writes stdout to [badging]. */
     @TaskAction
     fun taskAction() {
         execOperations.exec {
@@ -62,28 +73,47 @@ abstract class GenerateBadgingTask : DefaultTask() {
     }
 }
 
+/**
+ * Fails the build when an APK's manifest surface drifts from the committed golden file.
+ *
+ * The guard against a dependency silently adding a permission or an exported component: the diff shows up here rather
+ * than in a store review.
+ */
 @CacheableTask
 abstract class CheckBadgingTask : DefaultTask() {
 
     // In order for the task to be up-to-date when the inputs have not changed,
     // the task must declare an output, even if it's not used. Tasks with no
     // output are always run regardless of whether the inputs changed
+    /**
+     * An unused output directory.
+     *
+     * Gradle treats a task with no declared output as never up-to-date, so a pure verification task must declare one
+     * to stay incremental. Nothing is written here.
+     */
     @get:OutputDirectory
     abstract val output: DirectoryProperty
 
+    /** The committed reference badging — the manifest surface a reviewer has approved. */
     @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
     abstract val goldenBadging: RegularFileProperty
 
+    /** The badging produced from the APK under test. */
     @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
     abstract val generatedBadging: RegularFileProperty
 
+    /**
+     * Name of the task that refreshes the golden file, quoted verbatim in the failure message so the fix is copy-
+     * pasteable.
+     */
     @get:Input
     abstract val updateBadgingTaskName: Property<String>
 
     override fun getGroup(): String = LifecycleBasePlugin.VERIFICATION_GROUP
 
+    /** Runs `aapt2 dump badging` and writes stdout to [badging]. */
     @TaskAction
     fun taskAction() {
         assertWithMessage(
@@ -95,6 +125,12 @@ abstract class CheckBadgingTask : DefaultTask() {
     }
 }
 
+/**
+ * Wires a generate + check task pair for one Android variant.
+ *
+ * @param baseExtension the Android extension, for the aapt2 location.
+ * @param componentsExtension the variant API, to attach one task pair per variant.
+ */
 fun Project.configureBadgingTasks(
     componentsExtension: ApplicationAndroidComponentsExtension,
 ) {

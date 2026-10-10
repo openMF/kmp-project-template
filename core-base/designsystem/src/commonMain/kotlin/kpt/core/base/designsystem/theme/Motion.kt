@@ -82,6 +82,12 @@ data class Motion(
     val listItemEnterMaxAnimated: Int = 20,
 )
 
+/**
+ * CompositionLocal carrying the app's motion scale — the shared durations and easings.
+ *
+ * Read this rather than hardcoding a duration: symmetric enter/exit timings are what make
+ * transitions feel like one system instead of per-screen choices.
+ */
 val LocalMotion = staticCompositionLocalOf { Motion() }
 
 /** Resolve the active [Motion] specs from composition. */
@@ -108,6 +114,13 @@ val MaterialTheme.motion: Motion
  * the very first transition is well-defined even before any `@Composable` read.
  */
 object MotionSnapshot {
+    /**
+     * The motion values last published by the theme.
+     *
+     * A snapshot outside composition, for the transition builders that must run where `LocalMotion` cannot be read.
+     * `@Volatile` because it is written on the composition thread and read from animation callbacks; defaults to
+     * `Motion()` so the first transition is defined before any read.
+     */
     @kotlin.concurrent.Volatile
     var current: Motion = Motion()
         internal set

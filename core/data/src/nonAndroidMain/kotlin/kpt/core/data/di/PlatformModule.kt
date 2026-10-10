@@ -14,6 +14,7 @@ import kpt.core.base.data.infra.impl.TimeZoneMonitorImpl
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
+/** Empty on every non-Android target: the only platform-dependent data binding needs an Android `Context`. */
 actual val platformModule: Module
     get() = module {
         single<TimeZoneMonitor> { TimeZoneMonitorImpl() }

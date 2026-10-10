@@ -15,6 +15,7 @@ import kpt.core.data.di.ProjectRepositoryModule
 import kpt.core.database.di.ProjectDatabaseModule
 import kpt.core.datastore.di.ProjectDatastoreModule
 import kpt.core.network.di.ProjectNetworkModule
+import kpt.core.store.di.ProjectStoreModule
 import org.koin.core.module.Module
 
 /**
@@ -32,10 +33,6 @@ import org.koin.core.module.Module
  */
 object FeatureRegistry {
     /**
-     * Feature Koin modules the app installs. The framework SHELL modules (Home, Settings) live in
-     * [cmp.navigation.di.KoinModules] and are always present; this is the fork's own features.
-     */
-    /**
      * The four per-layer fork seams, plus every `feature/<f>/di` Koin module.
      *
      * The feature half is DERIVED — `:cmp-navigation:generateFeatureKoinBindings` reads each
@@ -46,19 +43,19 @@ object FeatureRegistry {
      *
      * The `Project*Module` seams stay listed BY HAND on purpose — they are core-layer fork seams,
      * not features, and nothing under `feature/` declares them.
+     *
+     * Feature Koin modules the app installs. The framework SHELL modules (Home, Settings) live in
+     * [cmp.navigation.di.KoinModules] and are always present; this is the fork's own features.
      */
     val featureKoinModules: List<Module> = listOf(
         ProjectRepositoryModule,
         ProjectNetworkModule,
         ProjectDatabaseModule,
         ProjectDatastoreModule,
+        ProjectStoreModule,
         GeneratedFeatureKoinBindings,
     )
 
-    /**
-     * Feature nav destinations — registered into the authenticated graph. The shell destinations
-     * (settings, notification) stay in [cmp.navigation.authenticated] template; this is the fork's routes.
-     */
     /**
      * Every top-level feature destination, DERIVED from `@FeatureDestination`.
      *
@@ -70,6 +67,9 @@ object FeatureRegistry {
      * Nested and non-feature-graph entries are left unannotated on purpose:
      * `amortizationScheduleDestination` is registered inside `loansGraph`, and `cloudTodoGraph`
      * belongs to ShowcaseRegistry.
+     *
+     * Feature nav destinations — registered into the authenticated graph. The shell destinations
+     * (settings, notification) stay in [cmp.navigation.authenticated] template; this is the fork's routes.
      */
     val featureDestinations: NavGraphBuilder.(NavController) -> Unit = GeneratedFeatureDestinations
 }

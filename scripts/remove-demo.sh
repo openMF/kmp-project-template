@@ -42,6 +42,7 @@ done
 cd "$(dirname "$0")/.."
 
 MODE=$([ "$APPLY" -eq 1 ] && echo apply || echo dry-run)
+# Print a progress line for one strip step.
 say() { if [ "$APPLY" -eq 1 ]; then echo "  $*"; else echo "  [dry-run] would $*"; fi; }
 
 # ── 1. Demo feature names (parsed from the settings demo-block BEFORE it is stripped) ──

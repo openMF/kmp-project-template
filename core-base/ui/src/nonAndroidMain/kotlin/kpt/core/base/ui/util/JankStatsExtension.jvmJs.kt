@@ -12,6 +12,7 @@ package kpt.core.base.ui.util
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.runtime.Composable
 
+/** `TrackScrollJank` on Non-Android targets. */
 @Composable
 actual fun TrackScrollJank(
     scrollableState: ScrollableState,

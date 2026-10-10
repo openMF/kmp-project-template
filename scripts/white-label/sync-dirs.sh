@@ -429,6 +429,9 @@ is_excluded() {
     return 1  # Path is not excluded
 }
 
+# Remove the `temp_*` working directories a sync creates.
+# Called on completion AND on failure, so an aborted sync does not leave a half-fetched
+# tree that the next run would mistake for real content.
 cleanup_temp_dirs() {
     print_step "Cleaning up temporary directories..."
     find . -type d -name "temp_*" -exec rm -rf {} +
@@ -814,6 +817,9 @@ propagate_template_deletions() {
     done < <(git diff --name-only --diff-filter=D "$PREV_TEMPLATE_SHA" "$temp_branch" -- "$dir" 2>/dev/null)
 }
 
+# Sync one directory $1 from the upstream branch checked out at $2.
+# Ownership is decided per path by customization-surface.yaml, so a fork-owned path inside
+# a synced directory is preserved rather than overwritten.
 sync_directory() {
     local dir=$1
     local temp_branch=$2

@@ -16,6 +16,12 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
+/**
+ * Android's colour scheme, using Material You dynamic colour on API 31+ when [dynamicColor] is set.
+ *
+ * @param useDarkTheme whether to build the dark scheme.
+ * @param dynamicColor whether to derive hues from the device wallpaper; ignored below API 31.
+ */
 @Composable
 actual fun platformColorScheme(useDarkTheme: Boolean, dynamicColor: Boolean): ColorScheme {
     return when {

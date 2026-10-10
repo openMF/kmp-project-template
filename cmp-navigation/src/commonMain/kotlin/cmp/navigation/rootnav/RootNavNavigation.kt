@@ -13,6 +13,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 
+/** Route for the root decision point — see `RootNavViewModel`. */
 @Serializable
 data object RootNavNavigation
 

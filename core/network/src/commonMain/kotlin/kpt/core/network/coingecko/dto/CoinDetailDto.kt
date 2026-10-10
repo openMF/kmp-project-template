@@ -13,15 +13,32 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kpt.core.model.crypto.CoinDetail
 
+/**
+ * Wire shape of CoinGecko's `/coins/{id}` response. Mapped to the domain model in the Store's
+ * `SourceOfTruth`; nothing outside `core/network` should see this type.
+ */
 @Serializable
 data class CoinDetailDto(
+    /** CoinGecko's coin id. */
     val id: String,
+    /** Display name as published upstream. */
     val name: String,
+    /** Ticker, e.g. `btc`. */
     val symbol: String,
+    /** Image URL set, or null when CoinGecko omits it. */
     val image: CoinImageDto? = null,
+    /**
+     * Price and market figures. Nullable because the endpoint can omit the block; [toDomain] substitutes zeroes rather
+     * than failing the whole response.
+     */
     @SerialName("market_data") val marketData: MarketDataDto? = null,
+    /** Localised descriptions, of which only `en` is consumed. */
     val description: DescriptionDto? = null,
 ) {
+    /**
+     * Maps to the domain model, defaulting every absent figure to zero and the description to empty — a partial
+     * response yields a renderable coin rather than an error.
+     */
     fun toDomain(): CoinDetail = CoinDetail(
         id = id,
         name = name,
@@ -39,5 +56,10 @@ data class CoinDetailDto(
     )
 }
 
+/**
+ * Localised description block; only `en` is consumed.
+ *
+ * @property en English description, or null when absent.
+ */
 @Serializable
 data class DescriptionDto(val en: String? = null)

@@ -9,12 +9,22 @@
  */
 package kpt.core.model.user
 
+/**
+ * The selected colour brand. A fork extends this to offer its own palettes.
+ *
+ * @property brandName persisted label — see [fromString].
+ */
 enum class ThemeBrand(val brandName: String) {
+    /** The template's own palette. */
     DEFAULT("Default"),
+
+    /** The Android-green palette. */
     ANDROID("Android"),
     ;
 
+    /** Parsing. */
     companion object {
+        /** Parses a persisted [brandName], case-insensitively, falling back to [DEFAULT] for an unknown value. */
         fun fromString(value: String): ThemeBrand {
             return entries.find { it.brandName.equals(value, ignoreCase = true) } ?: DEFAULT
         }

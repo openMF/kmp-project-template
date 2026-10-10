@@ -58,6 +58,12 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 /**
+ * Stateful entry point — resolves the ViewModel and hands its state to [CountryMacroScreenContent].
+ *
+ * The split follows the template's house pattern (see `SettingsScreen`): everything visual lives in
+ * the stateless content composable so it can be rendered by `@Preview` off `desktopTest` without a
+ * Koin graph, which is what the device-free CMP render tier needs.
+ *
  * Country Macro Snapshot — the toolkit's offline-first multi-source-combine
  * showcase. Three indicator cards (GDP / Inflation / Unemployment) load
  * independently, each with its own retry. A country chip in the TopAppBar
@@ -68,13 +74,6 @@ import org.koin.core.parameter.parametersOf
  * - A refresh icon → triggers [MacroAction.RefreshAll]
  * - A STALE badge (when [MacroUiState.overallBand] is Stale/VeryStale) so users
  *   know they're looking at cached data without per-card inspection
- */
-/**
- * Stateful entry point — resolves the ViewModel and hands its state to [CountryMacroScreenContent].
- *
- * The split follows the template's house pattern (see `SettingsScreen`): everything visual lives in
- * the stateless content composable so it can be rendered by `@Preview` off `desktopTest` without a
- * Koin graph, which is what the device-free CMP render tier needs.
  */
 @Composable
 fun CountryMacroScreen(

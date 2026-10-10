@@ -40,7 +40,12 @@ import kpt.core.model.economic.MacroIndicator
  */
 @Serializable(with = WorldBankResponseSerializer::class)
 data class WorldBankResponseDto(
+    /** First array element. Null when the API omits it — the observations still stand on their own. */
     val metadata: WorldBankMetadataDto?,
+    /**
+     * The rows from the response's second array element. Empty rather than null when the World Bank has no data for
+     * the pair.
+     */
     val observations: List<WorldBankObservationDto>,
 ) {
     /**
@@ -77,12 +82,21 @@ data class WorldBankResponseDto(
  */
 @Serializable
 data class WorldBankMetadataDto(
+    /** 1-based page number. */
     val page: Int? = null,
+    /** Total pages available. */
     val pages: Int? = null,
+    /** Page size the API applied. */
     @SerialName("per_page")
     val perPage: Int? = null,
+    /**
+     * Total matching rows. The only metadata field the toolkit needs — zero means no data for this (country,
+     * indicator).
+     */
     val total: Int? = null,
+    /** World Bank's source-dataset id. */
     val sourceid: String? = null,
+    /** When the source dataset was last refreshed, `YYYY-MM-DD`. */
     val lastupdated: String? = null,
 )
 
@@ -95,14 +109,25 @@ data class WorldBankMetadataDto(
  */
 @Serializable
 data class WorldBankObservationDto(
+    /** Which series this row belongs to, as the World Bank's own id/label pair. */
     val indicator: WorldBankIdValueDto? = null,
+    /** The country, as an id/label pair. Its `value` is where the display name comes from. */
     val country: WorldBankIdValueDto? = null,
+    /** ISO 3166-1 alpha-3 code, e.g. `USA`. */
     val countryiso3code: String? = null,
+    /** The year, as a 4-digit string — see [dateAsYear]. */
     val date: String,
+    /**
+     * The reported figure, or null when the World Bank has no data for this year. Explicitly null on the wire rather
+     * than omitted, so the row still carries its date.
+     */
     val value: Double? = null,
+    /** Unit of measure, where the dataset declares one. */
     val unit: String? = null,
+    /** Observation status flag, e.g. provisional. */
     @SerialName("obs_status")
     val obsStatus: String? = null,
+    /** How many decimal places the source considers significant. */
     val decimal: Int? = null,
 ) {
     /** World Bank publishes annual data; `date` is always a 4-digit year string. */
@@ -115,7 +140,9 @@ data class WorldBankObservationDto(
  */
 @Serializable
 data class WorldBankIdValueDto(
+    /** The code, e.g. `USA` or `NY.GDP.MKTP.CD`. */
     val id: String? = null,
+    /** The human-readable label. */
     val value: String? = null,
 )
 

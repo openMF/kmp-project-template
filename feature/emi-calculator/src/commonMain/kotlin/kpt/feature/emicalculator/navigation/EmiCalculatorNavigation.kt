@@ -20,13 +20,24 @@ import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.emicalculator.ui.EmiCalculatorScreen
 
+/** Route for the EMI calculator. */
 @Serializable
 data object EmiCalculatorRoute
 
+/**
+ * Navigates to the EMI calculator.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToEmiCalculator(navOptions: NavOptions? = null) {
     navigate(route = EmiCalculatorRoute, navOptions = navOptions)
 }
 
+/**
+ * Registers the EMI-calculator destination.
+ *
+ * @param navController used for back navigation.
+ */
 @FeatureDestination
 fun NavGraphBuilder.emiCalculatorDestination(navController: NavController) {
     composableWithPushTransitions<EmiCalculatorRoute> {

@@ -67,10 +67,18 @@ private fun List<DraftRecord>.toUiState(): SyncAndDraftsUiState.Success = SyncAn
 
 /** Cross-form draft actions accepted by [SyncAndDraftsViewModel]. */
 sealed interface SyncAndDraftsAction {
-    /** Re-queue the failed draft [id] for sync (FAILED → PENDING). */
+    /**
+     * Re-queue the failed draft [id] for sync (FAILED → PENDING).
+     *
+     * @property id which draft to retry.
+     */
     data class Retry(val id: Long) : SyncAndDraftsAction
 
-    /** Permanently delete the draft [id]. */
+    /**
+     * Permanently delete the draft [id].
+     *
+     * @property id which draft to discard.
+     */
     data class Discard(val id: Long) : SyncAndDraftsAction
 
     /** Delete SUBMITTED/FAILED drafts older than the retention window. */

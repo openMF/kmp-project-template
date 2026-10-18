@@ -2,6 +2,7 @@
 
 - **Architecture**
   - [Overview](/architecture/ARCHITECTURE.md)
+  - [billing-paycraft](/architecture/cross-cutting/billing-paycraft.md)
   - [consumer-app-migration-guide](/architecture/cross-cutting/consumer-app-migration-guide.md)
   - [customization-surface](/architecture/cross-cutting/customization-surface.md)
   - [demo-showcase](/architecture/cross-cutting/demo-showcase.md)

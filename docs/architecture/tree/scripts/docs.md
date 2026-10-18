@@ -1,7 +1,7 @@
 # `scripts/docs/`
 
 > Part of [`scripts/`](../scripts.md)  
-> **Measured:** 17 tracked files — 11× `.sh`, 4× `.awk`, 1× `.kt`, 1× `.tsv`
+> **Measured:** 18 tracked files — 12× `.sh`, 4× `.awk`, 1× `.kt`, 1× `.tsv`
 
 ### Scripts
 
@@ -9,6 +9,7 @@
 |---|---|
 | `_kdoc-lib.sh` | the ONE upward walk from a declaration to the line that closes its KDoc. |
 | `api-docs-gen.sh` | scan-bounded: pure bash + grep/find/sed over one template module tree (RULE-CI-001). Never idea-layer. |
+| `api-index-gen.sh` | scan-bounded: reads only the GENERATED api-docs blocks under docs/ (RULE-CI-001). Never idea-layer. |
 | `doc-audit.sh` | is the documentation actually complete? One command, seven checks. |
 | `doc-refs.sh` | does the AUTHORED prose still name files that exist? |
 | `doc-scan.sh` | one full-project documentation scan, every language. |

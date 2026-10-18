@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/store sha=b9422e072374ce9a850497de27cea969fb7c722c -->
+<!-- api-docs:begin module=core-base/store sha=772399d04b62de65486b4fdbfbbd73c3b2d842a2 -->
 ## API reference
 
-_Generated from `core-base/store` at tree `b9422e072374` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/store` at tree `772399d04b62` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -124,6 +124,20 @@ ScreenContent(state = combined.read) { data ->
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/combine/internal/ScreenWithMutationStreamImpl.kt:58</code></summary>
+
+```kotlin
+    scope: CoroutineScope,
+    private val onRefresh: () -> Unit,
+) : ScreenWithMutationStream<R, W> {
+
+    override val state: StateFlow<CombinedState<R, W>> = combine(
+        readStream,
+        submitHandler.state,
+```
+
+</details>
+
 - `val state: StateFlow<CombinedState<R, W>>` — Combined read + write + outbox state. Backed by a hot `StateFlow` so the screen can `collectAsStateWithLifecycle()` without rebuilding the pipeline on each subscription.
 - `fun refresh()` — Trigger a network refresh of the read pipeline. No-op if read-policy is `kpt.core.base.store.screen.FetchPolicy.CACHE_ONLY`. Mirrors `kpt.core.base.store.screen.ScreenDataStream.refresh`.
 - `fun submit(payload: W)` — Submit `payload` through the wired write pipeline.
@@ -136,7 +150,7 @@ val StoreModule = module
 ```
 Koin module providing base Store infrastructure. Consumer apps should include this module and add their own store bindings in their `core/data` DI module using `StoreFactory` to create store instances.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt:55</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt:63</code></summary>
 
 ```kotlin
  * ```
@@ -157,16 +171,16 @@ sealed interface ErrorCategory
 ```
 High-level classification of a `Throwable` for state-aware UI rendering. Pure logic — no platform calls, no side effects. Lives in `core-base/store` (state layer) so both UI and non-UI consumers can branch on the same categorization.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppErrorMapper.kt:49</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreenPreview.kt:101</code></summary>
 
 ```kotlin
- */
-fun errorCategoryToken(error: Throwable): String = when (val cat = categorize(error)) {
-    ErrorCategory.Network -> "network"
-    ErrorCategory.Timeout.Connect -> "timeout_connect"
-    ErrorCategory.Timeout.Read -> "timeout_read"
-    ErrorCategory.Auth -> "auth"
-    ErrorCategory.RateLimit -> "rate_limit"
+        submitState = SubmitState.Failed(
+            error = IllegalStateException("no connection"),
+            category = ErrorCategory.Network,
+            draftSaved = true,
+        ),
+    )
+}
 ```
 
 </details>
@@ -225,6 +239,20 @@ object FreshnessBands
 ```
 Pure computation of `FreshnessBand` from time + last-error inputs only. Decision table (first match wins): 1. `lastSyncedAt == null && lastError == null` → `FreshnessBand.Initial` 2.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:176</code></summary>
+
+```kotlin
+        val lastSyncedAt = storeData.fetchedAtInstant
+        val lastError = storeData.error
+        val band = FreshnessBands.bandFor(
+            now = now,
+            lastSyncedAt = lastSyncedAt,
+            ttl = ttl,
+            lastError = lastError,
+```
+
+</details>
+
 - `fun bandFor(` — Derives the freshness band from a last-synced instant and a TTL. Pure, so the banding rule is unit-testable without standing up a Store.
 - `val age = now - lastSyncedAt`
 
@@ -277,6 +305,20 @@ object DecisionEngine
 ```
 Pure function combining StoreData metadata + NetworkStatus into ScreenState. No side effects, no coroutines — exhaustively unit testable. Uses full `NetworkStatus` (not just Boolean) to detect captive portals.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/paging/PagingScreenStream.kt:282</code></summary>
+
+```kotlin
+            isEmpty = itemList.isEmpty(),
+        )
+        DecisionEngine.decide(storeData, status)
+    }
+
+    return PagingScreenStream(
+        state = screenState,
+```
+
+</details>
+
 - `fun <T> decide(` — Maps `storeData` + `networkStatus` to the correct `ScreenState`.
 - `val noData = storeData.isEmpty`
 - `val error = storeData.error`
@@ -318,16 +360,16 @@ interface DraftInventory
 ```
 Framework-shared, **cross-form** view over every draft the app is holding. `SubmitOutbox` is generic in a single payload type `P` (one instance per form).
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt:72</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsViewModel.kt:35</code></summary>
 
 ```kotlin
-    // Cross-form drafts inventory — the live feed + actions behind the template-level
-    // Settings → "Sync & Drafts" screen. Framework infra (not a demo store); survives sync.
-    single<DraftInventory> { DraftInventoryImpl(draftDao = get()) }
+ */
+class SyncAndDraftsViewModel(
+    private val draftInventory: DraftInventory,
+) : BaseViewModel<SyncAndDraftsUiState, Nothing, SyncAndDraftsAction>(SyncAndDraftsUiState.Loading) {
 
-    // Every declared store: its qualifier binding AND its logout registration.
-    includes(GeneratedStoreBindings)
-}
+    init {
+        draftInventory.observeAll()
 ```
 
 </details>
@@ -363,16 +405,15 @@ interface FetchedAtRepository
 ```
 Persists "when was this Store's data last successfully fetched from network", keyed by `storeKey`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:56</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonTest/kotlin/kpt/feature/crypto/ui/FakeCryptoRepository.kt:144</code></summary>
 
 ```kotlin
-    // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
-    // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
-    single<FetchedAtRepository> { RoomFetchedAtRepository(get<AppDatabase>().fetchedAtDao) }
-
-    // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
-    single { get<AppDatabase>().draftDao }
-    // Framework BookkeeperDao — backing store for the MutableStore retry ledger.
+ */
+@OptIn(ExperimentalTime::class)
+private object NoOpFetchedAtRepository : FetchedAtRepository {
+    override suspend fun read(storeKey: String): Instant? = null
+    override suspend fun write(storeKey: String, instant: Instant) = Unit
+}
 ```
 
 </details>
@@ -461,15 +502,12 @@ class DraftInventoryImpl(
 ```
 Room-backed `DraftInventory`. A thin, framework-owned read/action facade over `DraftDao` that exposes the cross-form draft feed the Sync & Drafts screen renders.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt:72</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/di/StoreModule.kt:75</code></summary>
 
 ```kotlin
     // Cross-form drafts inventory — the live feed + actions behind the template-level
-    // Settings → "Sync & Drafts" screen. Framework infra (not a demo store); survives sync.
+    // Settings -> "Sync & Drafts" screen. Framework infra, so it belongs with the framework.
     single<DraftInventory> { DraftInventoryImpl(draftDao = get()) }
-
-    // Every declared store: its qualifier binding AND its logout registration.
-    includes(GeneratedStoreBindings)
 }
 ```
 
@@ -503,16 +541,16 @@ class RoomFetchedAtRepository(
 ```
 Production `FetchedAtRepository` backed by Room (`framework_fetched_at` table). Wired into Koin in `RepositoryModule`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/di/RepositoryModule.kt:56</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/di/StoreModule.kt:54</code></summary>
 
 ```kotlin
-    // Framework FetchedAtRepository — durable lastFetchedAt persistence backing
-    // DataFreshnessIndicator timestamps. Room-only by design (no in-memory fallback).
-    single<FetchedAtRepository> { RoomFetchedAtRepository(get<AppDatabase>().fetchedAtDao) }
+    // core-base/store, and the only dependency arrives through `get()`. ScreenStreamContext right
+    // above already consumes it, so the binding now sits beside its consumer instead of a layer up.
+    single<FetchedAtRepository> { RoomFetchedAtRepository(get()) }
 
-    // Framework DraftDao — backing store for SubmitOutbox / DraftSubmitHandler
-    single { get<AppDatabase>().draftDao }
-    // Framework BookkeeperDao — backing store for the MutableStore retry ledger.
+    single { ScreenStreamContext(networkMonitor = get(), fetchedAtRepository = get()) }
+
+    // Moved DOWN from core/store's appStoreModule. Both the TYPE and the IMPL are core-base
 ```
 
 </details>
@@ -564,10 +602,10 @@ Registration-based cache manager. Feature DI modules call `register` for each St
 
 </details>
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt:64</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/di/StoreModule.kt:67</code></summary>
 
 ```kotlin
-    // Store cache manager — clears all registered caches on logout (registration-based).
+    // appStoreModule, so the same definitions reach the same container either way.
     single<StoreCacheManager> {
         StoreCacheManagerImpl(
             bookkeeperDao = get(),
@@ -647,13 +685,16 @@ sealed interface MutationResult<out T>
 ```
 The exhaustive outcome of a mutation. The caller (ViewModel) must handle every arm, so an offline write or a conflict can never be silently swallowed.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/cloudtodo/CloudTodoRepository.kt:39</code></summary>
+<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoViewModel.kt:88</code></summary>
 
 ```kotlin
-     * network-first mutations that must not show an unconfirmed local state (payments, approvals).
-     */
-    suspend fun completeOnline(todo: CloudTodo): kpt.core.base.store.mutation.MutationResult<CloudTodo>
-}
+ * result arm must not compile until it has somewhere to render.
+ */
+internal fun MutationResult<CloudTodo>.toOutcome(): MutationOutcome = when (this) {
+    is MutationResult.Applied ->
+        if (synced) MutationOutcome.AppliedSynced else MutationOutcome.AppliedQueued
+    is MutationResult.Blocked -> MutationOutcome.Blocked(reason)
+    is MutationResult.Conflicted -> MutationOutcome.Conflicted(conflictId)
 ```
 
 </details>
@@ -663,15 +704,16 @@ enum class BlockReason
 ```
 Why an `MutationPolicy.OnlineRequired` mutation was `MutationResult.Blocked`.
 
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/cloudtodo/CloudTodoRepositoryTest.kt:58</code></summary>
+<details><summary>Used in the template — <code>feature/cloudtodo/src/commonMain/kotlin/kpt/feature/cloudtodo/ui/CloudTodoScreen.kt:245</code></summary>
 
 ```kotlin
-            .completeOnline(CloudTodo(id = 1, title = "buy milk", completed = false))
-        val blocked = assertIs<MutationResult.Blocked>(r)
-        assertEquals(BlockReason.OFFLINE, blocked.reason)
-        assertFalse(api.updateCalled, "OnlineRequired offline must not touch the network")
-        assertNull(dao.getById(1), "OnlineRequired offline must not write locally (no optimistic state)")
+    MutationOutcome.AppliedQueued -> stringResource(Res.string.screens_cloudtodo_outcome_applied_queued_body)
+    is MutationOutcome.Blocked -> when (reason) {
+        BlockReason.OFFLINE -> stringResource(Res.string.screens_cloudtodo_outcome_blocked_offline)
+        BlockReason.UNAUTHENTICATED -> stringResource(Res.string.screens_cloudtodo_outcome_blocked_unauthenticated)
+        BlockReason.PRECONDITION_FAILED -> stringResource(Res.string.screens_cloudtodo_outcome_blocked_precondition)
     }
+    is MutationOutcome.Conflicted -> stringResource(Res.string.screens_cloudtodo_outcome_conflicted_body)
 ```
 
 </details>
@@ -681,6 +723,20 @@ class CommandSpec<P : Any, R : Any>(
 ```
 Describes a command / RPC mutation for `MutationGateway.command`.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/DefaultMutationGateway.kt:96</code></summary>
+
+```kotlin
+
+    override suspend fun <P : Any, R : Any> command(
+        spec: CommandSpec<P, R>,
+        policy: MutationPolicy,
+    ): MutationResult<R> {
+        if (policy is MutationPolicy.OnlineRequired && !isOnline()) {
+            return MutationResult.Blocked(BlockReason.OFFLINE)
+```
+
+</details>
+
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/conflict/ConflictInbox.kt`
 
 ```kotlin
@@ -688,16 +744,16 @@ interface ConflictInbox
 ```
 Durable inbox of write conflicts surfaced to the user in Settings.
 
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:29</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/ConflictInboxViewModel.kt:29</code></summary>
 
 ```kotlin
-    DefaultMutationGateway(isOnline = { isOnline }, conflictInbox = NoopConflictInbox)
+ */
+class ConflictInboxViewModel(
+    private val conflictInbox: ConflictInbox,
+) : BaseViewModel<ConflictInboxUiState, Nothing, ConflictInboxAction>(ConflictInboxUiState.Loading) {
 
-private object NoopConflictInbox : ConflictInbox {
-    override suspend fun record(
-        entity: String,
-        key: String,
-        localPayloadJson: String,
+    init {
+        conflictInbox.observePending()
 ```
 
 </details>
@@ -711,13 +767,16 @@ enum class ConflictResolution
 ```
 How the user chose to settle a `ConflictEntry`.
 
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:40</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/ConflictInboxViewModel.kt:41</code></summary>
 
 ```kotlin
-    override fun observePending(): Flow<List<ConflictEntry>> = flowOf(emptyList())
-
-    override suspend fun resolve(conflictId: String, resolution: ConflictResolution) = Unit
-}
+        when (action) {
+            is ConflictInboxAction.AcceptServer ->
+                viewModelScope.launch { conflictInbox.resolve(action.id, ConflictResolution.ACCEPT_SERVER) }
+            is ConflictInboxAction.RetryLocal ->
+                viewModelScope.launch { conflictInbox.resolve(action.id, ConflictResolution.RETRY_LOCAL) }
+        }
+    }
 ```
 
 </details>
@@ -727,19 +786,31 @@ data class ConflictReport(
 ```
 A conflict the caller detected between its local payload and the server result — returned by a command's `conflictOf` so the gateway can record it.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/MutationGateway.kt:169</code></summary>
+
+```kotlin
+    val resultKeyOf: ((R) -> Any)? = null,
+    /** Detect a conflict between the local payload and the server result; non-null → recorded + Conflicted. */
+    val conflictOf: ((P, R) -> ConflictReport?)? = null,
+)
+```
+
+</details>
+
 ```kotlin
 data class ConflictEntry(
 ```
 A single recorded write conflict awaiting user resolution.
 
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/infra/TestMutationGateway.kt:38</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/ConflictInboxViewModel.kt:81</code></summary>
 
 ```kotlin
-    ): String = "noop"
-
-    override fun observePending(): Flow<List<ConflictEntry>> = flowOf(emptyList())
-
-    override suspend fun resolve(conflictId: String, resolution: ConflictResolution) = Unit
+     * @property conflicts the unresolved conflicts; empty is the healthy case, not an empty state.
+     */
+    data class Success(val conflicts: List<ConflictEntry>) : ConflictInboxUiState {
+        /** True when there are no pending conflicts — drives the empty state. */
+        val isEmpty: Boolean get() = conflicts.isEmpty()
+    }
 }
 ```
 
@@ -752,12 +823,40 @@ class RoomConflictInbox(
 ```
 Room-backed `ConflictInbox` — persists write conflicts in the `framework_write_conflicts` table so they survive process death and are surfaced in Settings.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/di/StoreModule.kt:40</code></summary>
+
+```kotlin
+    // Room-backed conflict inbox surfaced in Settings.
+    single<ConflictInbox> {
+        RoomConflictInbox(dao = get(), now = { Clock.System.now().toEpochMilliseconds() })
+    }
+    // The single write door — composes MutableStore.write + the conflict inbox + connectivity.
+    single<MutationGateway> {
+        DefaultMutationGateway(
+```
+
+</details>
+
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/delete/DeleteSync.kt`
 
 ```kotlin
 class DeleteSync<K : Any>(
 ```
 The network-DELETE-with-sync primitive Store5 lacks (its `Updater` is write-only).
+
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/mutation/DefaultMutationGateway.kt:81</code></summary>
+
+```kotlin
+                // DeleteSync primitive (behaviour unit-tested in DeleteSyncTest); clearing the row is the
+                // only op that can throw here.
+                val deleteSync = DeleteSync(
+                    clearLocal = { store.clear(it) },
+                    deleteEndpoint = deleteEndpoint,
+                    bookkeeper = bookkeeper,
+                    isOnline = isOnline,
+```
+
+</details>
 
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/paging/PagingScreenStream.kt`
 
@@ -780,16 +879,15 @@ fun loadMore() = pagingStream.loadNextPage()
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/CryptoRepository.kt:26</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinMarketsViewModel.kt:34</code></summary>
 
 ```kotlin
-interface CryptoRepository {
-    /** Streams the CoinGecko coin-markets list as a paged screen stream. */
-    fun coinMarketsStream(scope: CoroutineScope, pageSize: Int = 20): PagingScreenStream<CoinMarket>
-
-    /**
-     * Offline-first stream for one coin's detail.
-     *
+     * state.
+     */
+    val pagingStream: PagingScreenStream<CoinMarket> = repository.coinMarketsStream(
+        scope = viewModelScope,
+        pageSize = DEFAULT_PAGE_SIZE,
+    )
 ```
 
 </details>
@@ -839,16 +937,16 @@ data class PageKey(
 ```
 Key for paginated Store requests. Use this as the Store key type when the data source supports pagination. The Store will cache each page independently.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/crypto/impl/CryptoRepositoryImpl.kt:32</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonTest/kotlin/kpt/feature/crypto/ui/FakeCryptoRepository.kt:88</code></summary>
 
 ```kotlin
-@RepositoryBinding(binds = CryptoRepository::class)
-class CryptoRepositoryImpl(
-    @FromStore(AppStoreIds.CoinMarkets) private val coinMarketsStore: Store<PageKey, List<CoinMarket>>,
-    @FromStore(AppStoreIds.CoinDetail) private val coinDetailStore: Store<String, CoinDetail>,
-) : CryptoRepository {
-
-    override fun coinMarketsStream(scope: CoroutineScope, pageSize: Int): PagingScreenStream<CoinMarket> =
+        lastPageSize = pageSize
+        val store = StoreBuilder
+            .from<PageKey, List<CoinMarket>>(
+                fetcher = Fetcher.of {
+                    fetches.value += 1
+                    emptyList()
+                },
 ```
 
 </details>
@@ -905,12 +1003,40 @@ when (result) {
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/paging/PagingScreenStream.kt:95</code></summary>
+
+```kotlin
+            // Pull-to-refresh uses the dedicated refresh() path.
+            when (val result = store.loadPage(pageKey, refresh = false)) {
+                is StorePageResult.Success -> {
+                    items.update { it + result.items }
+                    currentPage.value = nextPage
+                    hasMoreMutable.value = result.nextKey != null
+                    // Only update on actual network success — cache hits keep the previous
+```
+
+</details>
+
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/push/PushEvent.kt`
 
 ```kotlin
 sealed interface PushEvent<K, V>
 ```
 Server-originated push notification that mutates a `org.mobilenativefoundation.store.store5.MutableStore`.
+
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/push/PushStoreAdapter.kt:64</code></summary>
+
+```kotlin
+class PushStoreAdapter<K : Any, V : Any>(
+    private val store: MutableStore<K, V>,
+    private val events: Flow<PushEvent<K, V>>,
+    private val mergeStrategy: PushMergeStrategy<V> = PushMergeStrategy.Replace,
+    private val scope: CoroutineScope,
+    private val readCurrent: (suspend (K) -> V?)? = null,
+) {
+```
+
+</details>
 
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/push/PushMergeStrategy.kt`
 
@@ -919,12 +1045,39 @@ sealed interface PushMergeStrategy<out V>
 ```
 How a `PushEvent.Update` should be combined with the existing local value held by the `org.mobilenativefoundation.store.store5.MutableStore`.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/push/PushStoreAdapter.kt:65</code></summary>
+
+```kotlin
+    private val store: MutableStore<K, V>,
+    private val events: Flow<PushEvent<K, V>>,
+    private val mergeStrategy: PushMergeStrategy<V> = PushMergeStrategy.Replace,
+    private val scope: CoroutineScope,
+    private val readCurrent: (suspend (K) -> V?)? = null,
+) {
+```
+
+</details>
+
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/push/PushStoreAdapter.kt`
 
 ```kotlin
 class PushStoreAdapter<K : Any, V : Any>(
 ```
 Bridges a transport-side `Flow` of `PushEvent`s into a Store5 `MutableStore`, applying the configured `PushMergeStrategy` per `Update` event.
+
+<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/push/PushStoreAdapterTest.kt:46</code></summary>
+
+```kotlin
+    fun `Insert event dispatches store write with the incoming value`() = runTest {
+        val store = FakeMutableStore<String, String>()
+        val adapter = PushStoreAdapter(
+            store = store,
+            events = flowOf<PushEvent<String, String>>(PushEvent.Insert("k1", "v1")),
+            scope = TestScope(testScheduler),
+        )
+```
+
+</details>
 
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/screen/FetchPolicy.kt`
 
@@ -933,16 +1086,16 @@ sealed interface FetchPolicy
 ```
 Controls whether a screen stream reads from cache, hits the network, or both. Pass to `ScreenDataStream.asScreenStream`, `LoadOnceStream.asLoadOnceStream`, or `PagingScreenStream` to override that entry point's default.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/impl/AlertsRepositoryImpl.kt:46</code></summary>
+<details><summary>Used in the template — <code>feature/currency-rates/src/commonTest/kotlin/kpt/feature/currencyrates/ui/FakeCurrencyRepository.kt:58</code></summary>
 
 ```kotlin
-            cacheKey = AppCacheKeys.Alerts.LIST,
-            scope = scope,
-            fetchPolicy = FetchPolicy.CACHE_ONLY,
-            isEmpty = { it.isEmpty() },
-        )
-
-    override suspend fun submitAlert(alert: PriceAlert): PriceAlert {
+        baseCurrency: String,
+        scope: CoroutineScope,
+        fetchPolicy: FetchPolicy,
+    ): ScreenDataStream<ExchangeRates> {
+        lastExchangeRatesBase = baseCurrency
+        return screenDataStreamForTesting(
+            state = exchangeRatesState,
 ```
 
 </details>
@@ -961,16 +1114,14 @@ class ScreenDataStream<T> internal constructor(
 ```
 One screen's read surface: a cold `ScreenState` flow plus the refresh/retry controls that drive it.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsRepository.kt:34</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:118</code></summary>
 
 ```kotlin
+    }
 
-    /** Reactive list of committed alerts as a Store5-backed [ScreenDataStream] (offline-local). */
-    fun alertsStream(scope: CoroutineScope): ScreenDataStream<List<PriceAlert>>
-
-    /**
-     * Direct API submit — used by `DraftSubmitHandler`'s block parameter and by
-     * `OfflineSubmitSyncer` for reconnect retries. Throws on failure; the
+    override fun watchlistStream(scope: CoroutineScope): ScreenDataStream<List<WatchlistItem>> =
+        error("watchlistStream is the read-side feature's concern; not used by AddToWatchlistViewModel")
+}
 ```
 
 </details>
@@ -1015,16 +1166,16 @@ sealed interface ScreenState<out T>
 ```
 Unified UI state produced by `ScreenDataStream`. Replaces per-ViewModel ScreenUiState + isFromCache + isRefreshing + networkStatus.
 
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/alerts/AlertsReactiveInvalidationTest.kt:100</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateScreen.kt:101</code></summary>
 
 ```kotlin
-
-/** Extract alert ids from a `ScreenState` list (Content → ids, Empty → ∅, Loading/Error → null-skip). */
-private fun ScreenState<List<PriceAlert>>.idsOrNull(): Set<String>? = when (this) {
-    is ScreenState.Content -> data.map { it.id }.toSet()
-    ScreenState.Empty -> emptySet()
-    else -> null
-}
+internal fun AlertCreateScreenContent(
+    form: AlertFormState,
+    screenState: ScreenState<PriceAlert>,
+    submitState: SubmitState<PriceAlert>,
+    hasResumableDraft: Boolean,
+    onBackClick: () -> Unit,
+    onSubmitted: () -> Unit,
 ```
 
 </details>
@@ -1036,15 +1187,16 @@ fun <T, R> Flow<ScreenState<T>>.mapContent(
 ```
 Transforms only `ScreenState.Content` data, passing through all other states unchanged.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1054,15 +1206,16 @@ fun <T, S, R> Flow<ScreenState<T>>.combineContent(
 ```
 Combines ScreenState with a local state flow for reactive filter/sort/preferences.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1072,15 +1225,16 @@ fun <T> Flow<ScreenState<T>>.emptyIfContent(
 ```
 Converts Content to Empty when business-level predicate says data is empty. Applied AFTER DecisionEngine (which only handles structural empty from Store).
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1100,15 +1254,16 @@ fun <T> Flow<ScreenState<T>>.mapError(
 ```
 Maps Error throwable to a user-facing type.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1242,10 +1397,38 @@ data class StoreData<out T>(
 ```
 Wraps data with metadata about its origin, freshness, and refresh state.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:48</code></summary>
+
+```kotlin
+     */
+    fun <T> decide(
+        storeData: StoreData<T>,
+        networkStatus: NetworkStatus,
+        fetchPolicy: FetchPolicy = FetchPolicy.NETWORK_WITH_CACHE,
+    ): ScreenState<T> {
+        val noData = storeData.isEmpty
+```
+
+</details>
+
 ```kotlin
 enum class DataOrigin
 ```
 Indicates where a `StoreData` emission originated.
+
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/paging/PagingScreenStream.kt:275</code></summary>
+
+```kotlin
+        val storeData = StoreData(
+            data = itemList,
+            origin = DataOrigin.NETWORK,
+            isRefreshing = loading,
+            fetchedAt = null,
+            fetchedAtInstant = fetchedAt,
+            error = err,
+```
+
+</details>
 
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/screen/StoreDataExtensions.kt`
 
@@ -1289,15 +1472,16 @@ fun <T, R> Flow<StoreData<T>>.mapData(transform: (T) -> R): Flow<StoreData<R>>
 ```
 Maps a Flow of `StoreData` content while preserving all metadata.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1314,15 +1498,16 @@ fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToStoreData(
 ```
 Maps a `StoreReadResponse` flow into `Flow<StoreData<Output>>`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1332,15 +1517,16 @@ fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToStoreDataWithErrors(
 ```
 Like `mapToStoreData` but also emits on errors, carrying the last known data.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1352,15 +1538,16 @@ fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToResult(): Flow<Result<Ou
 ```
 Maps a `StoreReadResponse` flow to `Flow<Result<Output>>`. - `StoreReadResponse.Data` → `Result.success` - `StoreReadResponse.Error` → `Result.failure` - `StoreReadResponse.Loading` and `StoreReadResponse.NoNewData` are filtered out.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1370,15 +1557,16 @@ fun <Output : Any> Flow<StoreReadResponse<Output>>.mapToData(): Flow<Output>
 ```
 Maps a `StoreReadResponse` flow to `Flow<Output>`, emitting only data values. Loading, error, and no-data responses are silently filtered out. Use `mapToResult` when error handling is needed.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -1395,6 +1583,20 @@ class BatchSubmitHandler<P>(
 ```
 Orchestrator for submitting a list of payloads via a single per-payload `submitBlock`. Modes: - `BatchSubmitMode.AllOrNothing` — abort on first failure; remaining payloads are not attempted.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/submit/BatchSubmitHandlerTest.kt:32</code></summary>
+
+```kotlin
+    @Test
+    fun `AllOrNothing all payloads succeed produces full success result`() = runTest {
+        val handler = BatchSubmitHandler<Int>(BatchSubmitMode.AllOrNothing)
+        val attempted = mutableListOf<Int>()
+
+        val result = handler.submitBatch(listOf(1, 2, 3)) { _, payload, _ ->
+            attempted += payload
+```
+
+</details>
+
 ```kotlin
 data class BatchResult(
 ```
@@ -1407,12 +1609,40 @@ sealed interface BatchSubmitMode
 ```
 Semantics for `BatchSubmitHandler.submitBatch` when one or more payloads fail. - `AllOrNothing` — fail-fast: the first failure aborts the remaining submissions and the resulting `BatchResult` records only the payloads attempted so far.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/BatchSubmitHandler.kt:40</code></summary>
+
+```kotlin
+ */
+class BatchSubmitHandler<P>(
+    private val mode: BatchSubmitMode = BatchSubmitMode.AllOrNothing,
+) {
+
+    /**
+     * Submit each payload in [payloads] via [submitBlock], applying the configured [mode].
+```
+
+</details>
+
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/DraftResumeState.kt`
 
 ```kotlin
 sealed interface DraftResumeState<out P>
 ```
 The UI state emitted by a draft-resume stream. Screens collect this to show a "Resume previous submission?" banner when a PENDING draft exists, or to silently prefill a form field set from a saved draft.
+
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/MutationUiState.kt:34</code></summary>
+
+```kotlin
+    val submit: SubmitState<R> = SubmitState.Idle,
+    /** Whether an unsent draft was found for this form, so the screen can offer to resume it. */
+    val resume: DraftResumeState<T> = DraftResumeState.None,
+) {
+    /** True when data is loaded and no submission is in-flight. Use to enable the submit button. */
+    val canInteract: Boolean
+        get() = screen is ScreenState.Content && submit !is SubmitState.Submitting
+```
+
+</details>
 
 ```kotlin
 fun <P> SubmitOutbox<P>.resumeStateFor(formKey: String): Flow<DraftResumeState<P>> =
@@ -1496,6 +1726,20 @@ object IdempotencyKey
 ```
 Idempotency-key generator for client-side de-duplication of retried submissions. The contract: a caller generates one key per logical user intent (e.g.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/BatchSubmitHandler.kt:59</code></summary>
+
+```kotlin
+    suspend fun submitBatch(
+        payloads: List<P>,
+        idempotencyKey: String = IdempotencyKey.generate(),
+        submitBlock: suspend (index: Int, payload: P, key: String) -> Unit,
+    ): BatchResult = when (mode) {
+        BatchSubmitMode.AllOrNothing -> submitAllOrNothing(payloads, idempotencyKey, submitBlock)
+        BatchSubmitMode.Independent -> submitIndependent(payloads, idempotencyKey, submitBlock)
+```
+
+</details>
+
 - `fun generate(): String = Uuid.random().toString()` — Generate a fresh, cryptographically-random idempotency key.
 
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/MutationUiState.kt`
@@ -1511,6 +1755,19 @@ Combined UI state for edit/mutation screens that load existing data before allow
 data class EditClientState(
     val mutation: MutationUiState<ClientDetail, Unit> = MutationUiState(),
 )
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/submit/MutationUiStateTest.kt:26</code></summary>
+
+```kotlin
+    @Test
+    fun defaults_screenIsLoading_submitIsIdle() {
+        val state = MutationUiState<String, Unit>()
+        assertEquals(ScreenState.Loading, state.screen)
+        assertEquals(SubmitState.Idle, state.submit)
+    }
 ```
 
 </details>
@@ -1721,6 +1978,20 @@ submitHandler.submit(
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/SubmitHandler.kt:69</code></summary>
+
+```kotlin
+     * Reset to null when [reset] is called.
+     */
+    private var currentMessages: SubmitMessages? = null
+
+    /**
+     * Execute [block] as a one-shot submission.
+     *
+```
+
+</details>
+
 ### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/SubmitOutbox.kt`
 
 ```kotlin
@@ -1728,16 +1999,16 @@ interface SubmitOutbox<P>
 ```
 Durable outbox for form payloads that failed to reach the server. Persist a payload on network failure → the user can resume later from any session.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt:24</code></summary>
+<details><summary>Used in the template — <code>feature/alerts/src/commonMain/kotlin/kpt/feature/alerts/ui/AlertCreateViewModel.kt:43</code></summary>
 
 ```kotlin
-/** Outbox for PriceAlert payloads — RoomSubmitOutbox writes to `framework_submit_drafts`. */
-@DataProvider(qualifier = "outbox.priceAlert")
-fun providePriceAlertOutbox(dao: DraftDao): SubmitOutbox<PriceAlert> =
-    RoomSubmitOutbox(dao = dao, serializer = PriceAlert.serializer())
-
-/**
- * Eager: starts watching online events at Koin start and retries pending alerts on reconnect.
+class AlertCreateViewModel(
+    private val repository: AlertsRepository,
+    outbox: SubmitOutbox<PriceAlert>,
+    private val clock: Clock = Clock.System,
+) : BaseMutationViewModel<PriceAlert, PriceAlert>(
+    MutationMode.Draft(
+        outbox = outbox,
 ```
 
 </details>
@@ -1865,5 +2136,5 @@ Returns the `ErrorCategory` for `SubmitState.Failed`, or null for all other stat
 
 ---
 
-_65 type(s), 113 function(s)/property(ies); 164 carry KDoc at source; 22 authored example(s); 55 live call site(s)._
+_65 type(s), 113 function(s)/property(ies); 164 carry KDoc at source; 22 authored example(s); 74 live call site(s)._
 <!-- api-docs:end -->

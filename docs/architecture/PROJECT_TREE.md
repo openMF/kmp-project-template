@@ -24,8 +24,8 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `core/` | 437 | [`core/`](tree/core.md) |
-| `core-base/` | 479 | [`core-base/`](tree/core-base.md) |
+| `core/` | 438 | [`core/`](tree/core.md) |
+| `core-base/` | 481 | [`core-base/`](tree/core-base.md) |
 
 ## Codegen
 
@@ -56,7 +56,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 429 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 430 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
 | `tests/` | 9 | [`tests/`](tree/tests.md) |
 
@@ -72,6 +72,6 @@ oversight. A directory missing from a map reads the same as one nobody looked at
 | `.swiftpm-locks/` | 31 | generated SwiftPM resolution locks |
 | `META-INF/` | 1 | one service-registration file |
 | `config/` | 1 | the detekt config — documented where detekt is configured |
-| `docs/` | 128 | this documentation tree |
+| `docs/` | 129 | this documentation tree |
 | `kotlin-js-store/` | 2 | generated yarn.lock for Kotlin/JS |
 | `spotless/` | 3 | the license-header template applied by Spotless |

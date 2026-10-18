@@ -125,6 +125,20 @@ fun KptConnectivityBanner(
 ```
 Thin wrapper around `ConnectivityBanner` from `cmp-network-monitor-compose`.
 
+<details><summary>Used in the template — <code>core-base/ui/src/androidInstrumentedTest/kotlin/kpt/core/base/ui/KptConnectivityBannerTest.kt:49</code></summary>
+
+```kotlin
+    fun bannerNotVisible_whenOnline() {
+        rule.setContent {
+            KptConnectivityBanner(
+                monitor = FakeConnectivityMonitor(online = true),
+                debounceMs = 0L,
+            )
+        }
+```
+
+</details>
+
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/captiveportal/CaptivePortalLauncher.kt`
 
 ```kotlin
@@ -163,15 +177,16 @@ IndependentCardLayout(states = cards, onRetry = vm::onRetryCard) { i, content ->
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/banking/BillReminderRepository.kt:43</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:106</code></summary>
 
 ```kotlin
-     * @param maxDays Lookahead horizon (inclusive). `0` returns reminders due today.
-     */
-    fun observeUpcoming(maxDays: Int): Flow<List<BillReminder>>
+    val removeCalls = mutableListOf<String>()
 
-    /** Insert-or-replace. Idempotent. */
-    suspend fun upsert(bill: BillReminder)
+    override fun contains(coinId: String): Flow<Boolean> = tracked.map { coinId in it }
+
+    override suspend fun add(coinId: String) {
+        addCalls += coinId
+        tracked.update { it + coinId }
 ```
 
 </details>
@@ -181,16 +196,14 @@ fun List<ScreenState<*>>.toDashboardProgressState(): DashboardProgressState =
 ```
 Pure conversion from a list of per-card states to a single `DashboardProgressState`. Exposed so tests + non-Flow call sites can re-use the aggregation contract.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsRepository.kt:34</code></summary>
+<details><summary>Used in the template — <code>feature/add-to-watchlist/src/commonTest/kotlin/kpt/feature/addtowatchlist/ui/AddToWatchlistViewModelTest.kt:118</code></summary>
 
 ```kotlin
+    }
 
-    /** Reactive list of committed alerts as a Store5-backed [ScreenDataStream] (offline-local). */
-    fun alertsStream(scope: CoroutineScope): ScreenDataStream<List<PriceAlert>>
-
-    /**
-     * Direct API submit — used by `DraftSubmitHandler`'s block parameter and by
-     * `OfflineSubmitSyncer` for reconnect retries. Throws on failure; the
+    override fun watchlistStream(scope: CoroutineScope): ScreenDataStream<List<WatchlistItem>> =
+        error("watchlistStream is the read-side feature's concern; not used by AddToWatchlistViewModel")
+}
 ```
 
 </details>
@@ -376,6 +389,18 @@ expect fun ReportDrawnWhen(block: () -> Boolean)
 ```
 Reports to the composition system that content is considered drawn when the specified condition is true. Platform-specific implementation that affects rendering optimizations.
 
+<details><summary>Used in the template — <code>core-base/ui/src/androidMain/kotlin/kpt/core/base/ui/effects/ReportDrawnExt.android.kt:16</code></summary>
+
+```kotlin
+/** `ReportDrawnWhen` on Android. */
+@Composable
+actual fun ReportDrawnWhen(block: () -> Boolean) {
+    androidx.activity.compose.ReportDrawnWhen { block() }
+}
+```
+
+</details>
+
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/freshness/ErrorCategoryMessages.kt`
 
 ```kotlin
@@ -430,6 +455,20 @@ object KptFadeThrough
 ```
 Fade-through enter/exit factories. Use for **sibling navigation** — bottom-nav tab switches, settings section switches, paged tabs.
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/motion/NavTransitions.kt:65</code></summary>
+
+```kotlin
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+) {
+    val enter = KptFadeThrough.enter()
+    val exit = KptFadeThrough.exit()
+    composable<T>(
+        enterTransition = { enter },
+        exitTransition = { exit },
+```
+
+</details>
+
 - `fun enter(): EnterTransition = enter(MaterialTheme.motion)` — Fade-through enter using the ambient theme motion. Composable — call from composition.
 - `fun enter(motion: Motion): EnterTransition = fadeIn(` — Fade-through enter using an explicit `motion`, so it is callable outside composition.
 - `fun exit(): ExitTransition = exit(MaterialTheme.motion)` — Fade-through exit using the ambient theme motion.
@@ -470,6 +509,20 @@ Infinite scale + alpha "breath" while `active` is true. Use to signal **"this su
 object KptSharedAxis
 ```
 Shared-axis-X enter/exit factories, per Material Motion. Use for **forward/back navigation in a single stack** — pushing onto the stack slides left-and-fades, popping reverses.
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/motion/NavTransitions.kt:43</code></summary>
+
+```kotlin
+    // Snapshot @Composable-resolved transitions at graph-build time so the non-Composable
+    // enterTransition lambdas can capture them as plain data.
+    val enterFwd = KptSharedAxis.enterForward()
+    val exitFwd = KptSharedAxis.exitForward()
+    val enterBack = KptSharedAxis.enterBack()
+    val exitBack = KptSharedAxis.exitBack()
+    composable<T>(
+```
+
+</details>
 
 - `fun enterForward(): EnterTransition = enterForward(MaterialTheme.motion)` — Forward push — new screen slides in from the right, old screen slides out left.
 - `fun enterForward(motion: Motion): EnterTransition` — Shared-axis enter for moving forward/deeper in a flow.
@@ -546,10 +599,38 @@ fun <T : Any> LoadMoreFooter(
 ```
 Footer for paginated lists driven by a `PagingScreenStream`. Place as the last item in a LazyColumn. Shows loading indicator, error with retry, or end-of-list.
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/paging/PagingScreenContent.kt:162</code></summary>
+
+```kotlin
+            lazyContent(items)
+            item {
+                LoadMoreFooter(
+                    isLoadingMore = isLoadingMore,
+                    hasMore = hasMore,
+                    loadMoreError = loadMoreError,
+                    onRetry = pagingStream::loadNextPage,
+```
+
+</details>
+
 ```kotlin
 fun LoadMoreFooter(
 ```
 Footer overload taking raw state values. Lets screens that drive paging without exposing `PagingScreenStream` directly still use the canonical footer rendering.
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/paging/PagingScreenContent.kt:162</code></summary>
+
+```kotlin
+            lazyContent(items)
+            item {
+                LoadMoreFooter(
+                    isLoadingMore = isLoadingMore,
+                    hasMore = hasMore,
+                    loadMoreError = loadMoreError,
+                    onRetry = pagingStream::loadNextPage,
+```
+
+</details>
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/paging/LoadMoreTrigger.kt`
 
@@ -672,10 +753,37 @@ fun DataFreshnessIndicator(
 ```
 Compact updating banner shown above content when a background refresh is in flight.
 
+<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/paging/PagingScreenStreamOfflineTest.kt:187</code></summary>
+
+```kotlin
+        assertNotNull(
+            contentState.fetchedAt,
+            "Successful page load must set fetchedAt so DataFreshnessIndicator shows the timestamp.",
+        )
+    }
+}
+```
+
+</details>
+
 ```kotlin
 fun DefaultRefreshingBanner(fetchedAt: Instant? = null)
 ```
 Default refreshing banner used as the initial value of `ScreenContent`'s `refreshingIndicator` slot. Pass `null` for the slot to suppress all in-flight progress UI.
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/screen/ScreenContent.kt:86</code></summary>
+
+```kotlin
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+    refreshingIndicator: (@Composable () -> Unit)? = { DefaultRefreshingBanner() },
+    onDismiss: (() -> Unit)? = null,
+    loading: @Composable () -> Unit = { DefaultLoadingContent() },
+    empty: @Composable () -> Unit = { DefaultEmptyContent() },
+    noNetwork: @Composable (isCaptivePortal: Boolean) -> Unit = { captive ->
+```
+
+</details>
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/screen/DefaultLottieAnimations.kt`
 
@@ -812,10 +920,38 @@ fun DefaultLoadingContent(
 ```
 The framework's loading rendering — spinner, skeleton or branded animation, per `config`.
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/dashboard/IndependentCardLayout.kt:98</code></summary>
+
+```kotlin
+                    { loading(index) }
+                } else {
+                    { DefaultLoadingContent() }
+                },
+                empty = if (empty != null) {
+                    { empty(index) }
+                } else {
+```
+
+</details>
+
 ```kotlin
 fun DefaultEmptyContent(
 ```
 The framework's empty rendering — for a successful read that returned nothing. Distinct from error on purpose: "no results" is a valid outcome, and showing a retry affordance for it invites the user to retry something that already worked.
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/dashboard/IndependentCardLayout.kt:103</code></summary>
+
+```kotlin
+                    { empty(index) }
+                } else {
+                    { DefaultEmptyContent() }
+                },
+                noNetwork = if (noNetwork != null) {
+                    { captive -> noNetwork(index, captive) }
+                } else {
+```
+
+</details>
 
 ```kotlin
 fun DefaultNoNetworkContent(
@@ -974,6 +1110,19 @@ data class ScreenStateCta(
 ```
 A primary call-to-action shown alongside an empty/error state.
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonTest/kotlin/kpt/core/base/ui/screen/ScreenStateDefaultsTest.kt:88</code></summary>
+
+```kotlin
+    @Test
+    fun screenStateEmpty_ctaIsNullByDefaultButCarriesData() {
+        val cta = ScreenStateCta(label = "Add new") { /* no-op */ }
+        val cfg = ScreenStateEmpty(cta = cta)
+        assertEquals("Add new", cfg.cta?.label)
+    }
+```
+
+</details>
+
 ```kotlin
 sealed interface ScreenStateLoading
 ```
@@ -1025,16 +1174,16 @@ CompositionLocalProvider(LocalScreenStateDefaults provides myDefaults) { App() }
 
 </details>
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:160</code></summary>
+<details><summary>Used in the template — <code>feature/showcase/src/commonMain/kotlin/kpt/feature/showcase/stategallery/StateGalleryScreen.kt:70</code></summary>
 
 ```kotlin
-            LocalSpacing provides Spacing(),
-            LocalElevation provides Elevation(),
-            LocalScreenStateDefaults provides screenStateDefaults,
-        ) {
-            content()
-        }
-    }
+fun StateGalleryScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
+    val sp = MaterialTheme.spacing
+    val defaults = LocalScreenStateDefaults.current
+    KptScaffold(
+        onNavigationIconClick = onBackClick,
+        title = "State Gallery (dev)",
+        modifier = modifier.testTag(TestTags.StateGallery.SCREEN),
 ```
 
 </details>
@@ -1091,6 +1240,20 @@ DraftResumeBanner(
     onResume  = viewModel::onResumeDraft,
     onDiscard = viewModel::onDiscardDraft,
 )
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/MutationScreenContent.kt:221</code></summary>
+
+```kotlin
+    )
+    Column(modifier = modifier.fillMaxSize()) {
+        DraftResumeBanner(
+            state = draftResumeState,
+            onResume = onResumeClick,
+            onDiscard = onDiscardClick,
+        )
 ```
 
 </details>
@@ -1317,6 +1480,20 @@ Box(Modifier.fillMaxSize()) {
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/MutationScreenContent.kt:90</code></summary>
+
+```kotlin
+            )
+        }
+        SubmitProgressOverlay(state = submitState)
+    }
+}
+
+// STORE5-COMPLETENESS: mutation-stream — stream overload
+```
+
+</details>
+
 ```kotlin
 fun <R> SubmitProgressOverlay(
 ```
@@ -1326,6 +1503,20 @@ fun <R> SubmitProgressOverlay(
 
 ```kotlin
 SubmitProgressOverlay(state = submitState)
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/MutationScreenContent.kt:90</code></summary>
+
+```kotlin
+            )
+        }
+        SubmitProgressOverlay(state = submitState)
+    }
+}
+
+// STORE5-COMPLETENESS: mutation-stream — stream overload
 ```
 
 </details>
@@ -1355,6 +1546,20 @@ SubmitResultHandler(
         }
     },
 )
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/MutationScreenContent.kt:58</code></summary>
+
+```kotlin
+    content: @Composable (data: T, freshnessSignal: FreshnessSignal) -> Unit,
+) {
+    SubmitResultHandler(
+        state = submitState,
+        onSubmitted = onSubmitted,
+        onFailed = onFailed,
+    )
 ```
 
 </details>
@@ -1403,6 +1608,20 @@ fun TrackScrollJank(scrollableState: ScrollableState, stateName: String) {
 expect object ShareUtils
 ```
 Platform-specific utility for sharing content with other applications. This expect class requires platform-specific implementations.
+
+<details><summary>Used in the template — <code>core-base/ui/src/androidMain/kotlin/kpt/core/base/ui/util/ShareUtils.android.kt:35</code></summary>
+
+```kotlin
+
+/** Android implementation of `ShareUtils`. */
+actual object ShareUtils {
+
+    private var activityProvider: () -> Activity = {
+        throw IllegalArgumentException(
+            "You need to implement the 'activityProvider' to provide the required Activity. " +
+```
+
+</details>
 
 - `suspend fun shareText(text: String)` — Shares text content with other applications.
 - `suspend fun shareImage(title: String, image: ImageBitmap)` — Shares an image with other applications.
@@ -1492,6 +1711,20 @@ object RootTransitionProviders
 ```
 Contains standard "transition providers" that may be used to specify the `EnterTransition` and `ExitTransition` used when building a root `NavHost`, which requires a non-null value.
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/nav/NavGraphBuilderExtensions.kt:54</code></summary>
+
+```kotlin
+        typeMap = typeMap,
+        deepLinks = deepLinks,
+        enterTransition = RootTransitionProviders.Kpt.Enter.slideUp(motion),
+        exitTransition = RootTransitionProviders.Kpt.Exit.stay(motion),
+        popEnterTransition = RootTransitionProviders.Kpt.Enter.stay(motion),
+        popExitTransition = RootTransitionProviders.Kpt.Exit.slideDown(motion),
+        sizeTransform = null,
+```
+
+</details>
+
 - `val fadeIn: NonNullEnterTransitionProvider =` — Fades the new screen in.
 - `val none: NonNullEnterTransitionProvider =` — There is no transition for the entering screen.
 - `val pushLeft: NonNullEnterTransitionProvider =` — Slides the new screen in from the left of the screen.
@@ -1514,6 +1747,20 @@ Contains standard "transition providers" that may be used to specify the `EnterT
 interface BackgroundEvent
 ```
 Almost all the events in the app involve navigation or toasts. To prevent accidentally navigating to the same view twice, by default, events are ignored if the view is not currently resumed.
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/effects/EventsEffect.kt:39</code></summary>
+
+```kotlin
+        viewModel.eventFlow
+            .filter {
+                it is BackgroundEvent ||
+                    lifecycleOwner.currentState.isAtLeast(Lifecycle.State.RESUMED)
+            }
+            .onEach { handler.invoke(it) }
+            .launchIn(this)
+```
+
+</details>
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/viewmodel/BaseMutationViewModel.kt`
 
@@ -1609,6 +1856,20 @@ sealed interface MutationAction<out T>
 ```
 MVI actions emitted by mutation-flow screens (form edit, settings save, etc.).
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/viewmodel/BaseMutationViewModel.kt:80</code></summary>
+
+```kotlin
+abstract class BaseMutationViewModel<T, R>(
+    private val mode: MutationMode<T> = MutationMode.InSession,
+) : BaseViewModel<MutationUiState<T, R>, Nothing, MutationAction<T>>(MutationUiState()) {
+
+    private val draftMode: MutationMode.Draft<T>? = mode as? MutationMode.Draft<T>
+
+    private val inSessionHandler = if (draftMode == null) viewModelScope.submitHandler<R>() else null
+```
+
+</details>
+
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/viewmodel/MutationMode.kt`
 
 ```kotlin
@@ -1632,5 +1893,5 @@ How a `BaseMutationViewModel` handles its submit — the single knob that replac
 
 ---
 
-_26 type(s), 140 function(s)/property(ies); 161 carry KDoc at source; 32 authored example(s); 36 live call site(s)._
+_26 type(s), 140 function(s)/property(ies); 161 carry KDoc at source; 32 authored example(s); 55 live call site(s)._
 <!-- api-docs:end -->

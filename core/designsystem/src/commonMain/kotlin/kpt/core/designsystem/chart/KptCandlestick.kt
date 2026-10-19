@@ -28,9 +28,16 @@ import kpt.core.designsystem.theme.finance
  * the series' min/max.
  */
 data class Candle(
+    /** Opening price. */
     val open: Float,
+    /**
+     * Highest price within the period. Sets the top of the wick; must be ≥ both [open] and [close] or the candle
+     * renders inverted.
+     */
     val high: Float,
+    /** Lowest price within the period. Sets the bottom of the wick. */
     val low: Float,
+    /** Closing price. Compared against [open] to decide the up/down colour. */
     val close: Float,
 ) {
     /** True when the candle closed at or above its open (rendered with `upColor`). */

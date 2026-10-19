@@ -17,12 +17,24 @@ import androidx.navigation.navigation
 import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.composableWithStayTransitions
 
+/**
+ * Route for the home GRAPH — what `navigateToHome` targets.
+ *
+ * Distinct from [HomeRoute] so a fork can nest extra destinations under home without the
+ * bottom bar's selection tracking breaking.
+ */
 @Serializable
 data object HomeDestination
 
+/** Route for the home SCREEN itself, the graph's start destination. */
 @Serializable
 data object HomeRoute
 
+/**
+ * Navigates to the home graph.
+ *
+ * @param navOptions optional nav options, e.g. to clear the back stack after sign-in.
+ */
 fun NavController.navigateToHome(navOptions: NavOptions? = null) {
     navigate(HomeDestination, navOptions)
 }

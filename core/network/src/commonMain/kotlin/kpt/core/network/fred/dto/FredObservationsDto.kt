@@ -24,18 +24,31 @@ import kpt.core.model.economic.RateObservation
  */
 @Serializable
 data class FredObservationsDto(
+    /** Start of FRED's real-time period — which vintage of the data this is. */
     @SerialName("realtime_start") val realtimeStart: String? = null,
+    /** End of FRED's real-time period. */
     @SerialName("realtime_end") val realtimeEnd: String? = null,
+    /** First date requested. */
     @SerialName("observation_start") val observationStart: String? = null,
+    /** Last date requested. */
     @SerialName("observation_end") val observationEnd: String? = null,
+    /** Unit transform FRED applied, e.g. `lin` for levels. */
     val units: String? = null,
+    /** FRED's output-shape code. */
     @SerialName("output_type") val outputType: Int? = null,
+    /** Response format — always `json` here. */
     @SerialName("file_type") val fileType: String? = null,
+    /** Which field FRED sorted by. */
     @SerialName("order_by") val orderBy: String? = null,
+    /** `asc` or `desc`. */
     @SerialName("sort_order") val sortOrder: String? = null,
+    /** Total observations matching the request, before paging. */
     val count: Int? = null,
+    /** Paging offset this page starts at. */
     val offset: Int? = null,
+    /** Page size FRED applied. */
     val limit: Int? = null,
+    /** The rows. Empty rather than null so a caller never has to null-check the list. */
     val observations: List<FredObservationDto> = emptyList(),
 ) {
     /**
@@ -67,9 +80,16 @@ data class FredObservationsDto(
  */
 @Serializable
 data class FredObservationDto(
+    /** Start of the real-time period for this row. */
     @SerialName("realtime_start") val realtimeStart: String? = null,
+    /** End of the real-time period for this row. */
     @SerialName("realtime_end") val realtimeEnd: String? = null,
+    /** Observation date, `YYYY-MM-DD`. */
     val date: String,
+    /**
+     * The value as text. A string because FRED writes `.` for missing data on an otherwise-daily series — see
+     * [NO_DATA_MARKER].
+     */
     val value: String,
 ) {
     /**
@@ -90,6 +110,7 @@ data class FredObservationDto(
         }
     }
 
+    /** Wire constants. */
     companion object {
         /** FRED's explicit "missing value" marker — surfaces in daily-cadence series. */
         const val NO_DATA_MARKER: String = "."

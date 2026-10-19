@@ -27,6 +27,10 @@ class CoinMarketsViewModel(
     private val repository: CryptoRepository,
 ) : BaseViewModel<Unit, Nothing, CoinMarketsAction>(Unit) {
 
+    /**
+     * The market list as a paging stream — the framework owns page accumulation, the load-more trigger and the footer
+     * state.
+     */
     val pagingStream: PagingScreenStream<CoinMarket> = repository.coinMarketsStream(
         scope = viewModelScope,
         pageSize = DEFAULT_PAGE_SIZE,

@@ -31,6 +31,12 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.LayoutDirection
 
+/**
+ * Horizontally mirrors content when the layout direction is RTL.
+ *
+ * For glyphs with a direction (a back chevron, a progress arrow). NOT for text or logos, which
+ * must not be flipped.
+ */
 @Stable
 @Composable
 @Suppress("ModifierComposable")
@@ -42,6 +48,10 @@ fun Modifier.mirrorIfRtl() = composed {
     }
 }
 
+/**
+ * Makes the element reachable and actionable by keyboard tab — desktop and web, where a tap target
+ * alone leaves it unusable.
+ */
 @Stable
 @Composable
 @Suppress("ModifierComposable")
@@ -63,6 +73,10 @@ fun Modifier.tabNavigation() = composed {
     }
 }
 
+/**
+ * Click handling with the app's ripple and accessibility semantics already attached, so a clickable
+ * element is announced correctly without each call site remembering to say so.
+ */
 fun Modifier.onClick(
     indication: Indication? = null,
     enabled: Boolean = true,

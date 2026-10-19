@@ -41,7 +41,12 @@ sealed interface ScreenState<out T> {
 
     /** Error occurred with no usable cached data. */
     data class Error(
+        /** The failure that produced this state. */
         val error: Throwable,
+        /**
+         * Whether it was a connectivity failure. Kept separate because offline has a different remedy than a server
+         * error, and a retry button that cannot succeed is worse than none.
+         */
         val isNetworkError: Boolean = false,
     ) : ScreenState<Nothing>
 

@@ -18,5 +18,9 @@ import kotlinx.datetime.TimeZone
  */
 
 interface TimeZoneMonitor {
+    /**
+     * The device time zone, re-emitting when it changes — so a date rendered while travelling updates rather than
+     * silently going wrong.
+     */
     val currentTimeZone: Flow<TimeZone>
 }

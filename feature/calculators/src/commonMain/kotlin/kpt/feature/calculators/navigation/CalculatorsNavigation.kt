@@ -25,41 +25,86 @@ import kpt.feature.calculators.amortizationcalc.AmortizationScreen
 import kpt.feature.calculators.comparison.LoanComparisonScreen
 import kpt.feature.calculators.wizard.LoanCalcWizardScreen
 
+/** Route for the calculators nested graph. */
 @Serializable
 data object CalculatorsGraphRoute
 
+/** Route for the affordability calculator — the graph's start destination. */
 @Serializable
 data object AffordabilityCalculatorRoute
 
+/**
+ * Route for the amortization schedule.
+ *
+ * @property loanId prefill from this tracked loan, or null to start from the defaults.
+ */
 @Serializable
 data class AmortizationRoute(val loanId: String? = null)
 
+/** Route for the side-by-side loan comparison. */
 @Serializable
 data object LoanComparisonRoute
 
+/**
+ * Route for the multi-step loan wizard.
+ *
+ * @property scenarioId resume this scenario's draft, or null to start a new one.
+ */
 @Serializable
 data class LoanCalcWizardRoute(val scenarioId: String? = null)
 
+/**
+ * Navigates to the calculators graph.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToCalculators(navOptions: NavOptions? = null) {
     navigate(route = CalculatorsGraphRoute, navOptions = navOptions)
 }
 
+/**
+ * Navigates to the affordability calculator.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToAffordability(navOptions: NavOptions? = null) {
     navigate(route = AffordabilityCalculatorRoute, navOptions = navOptions)
 }
 
+/**
+ * Navigates to the amortization schedule.
+ *
+ * @param loanId prefill from this tracked loan, or null to start from the defaults.
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToAmortization(loanId: String? = null, navOptions: NavOptions? = null) {
     navigate(route = AmortizationRoute(loanId), navOptions = navOptions)
 }
 
+/**
+ * Navigates to the loan comparison.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToLoanComparison(navOptions: NavOptions? = null) {
     navigate(route = LoanComparisonRoute, navOptions = navOptions)
 }
 
+/**
+ * Navigates to the loan wizard.
+ *
+ * @param scenarioId resume this scenario's draft, or null to start a new one.
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToLoanCalcWizard(scenarioId: String? = null, navOptions: NavOptions? = null) {
     navigate(route = LoanCalcWizardRoute(scenarioId), navOptions = navOptions)
 }
 
+/**
+ * Registers the calculators nested graph.
+ *
+ * @param navController used for back navigation out of each screen.
+ */
 @FeatureDestination
 fun NavGraphBuilder.calculatorsGraph(navController: NavController) {
     navigation<CalculatorsGraphRoute>(

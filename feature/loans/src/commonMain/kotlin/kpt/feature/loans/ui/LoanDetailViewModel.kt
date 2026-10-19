@@ -59,6 +59,10 @@ class LoanDetailViewModel(
      */
     private val detailStream = repository.loanDetailStream(loanId, viewModelScope)
 
+    /**
+     * The loan as a screen state, straight from the store-backed detail stream — so loading, empty and error are the
+     * framework's, not this screen's.
+     */
     val screenState: StateFlow<ScreenState<Loan>> = detailStream.state
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
@@ -112,6 +116,13 @@ class LoanDetailViewModel(
      */
     private val editSubmitHandler = viewModelScope.submitHandler<Loan>()
 
+    /**
+     * The loan's read state folded together with the edit mutation's state.
+     *
+     * Combined by hand because the loan comes from a DAO flow rather than a Store, so
+     * `StoreFactory.createScreenWithMutation` cannot be used. For a Store-backed entity, prefer that
+     * factory over repeating this.
+     */
     val combinedState: StateFlow<CombinedState<Loan, Loan>> = combine(
         loadOnceScreenState,
         editSubmitHandler.state,

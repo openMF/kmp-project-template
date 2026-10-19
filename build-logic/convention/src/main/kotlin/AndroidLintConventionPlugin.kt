@@ -22,6 +22,12 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
+/**
+ * Configures Android Lint uniformly across every module that has it.
+ *
+ * Centralised so a lint baseline or severity decision is made once; per-module lint config is how two modules end up
+ * disagreeing about the same warning.
+ */
 class AndroidLintConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {

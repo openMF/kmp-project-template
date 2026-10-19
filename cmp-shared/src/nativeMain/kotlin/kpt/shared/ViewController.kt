@@ -20,6 +20,7 @@ import platform.UIKit.UIUserInterfaceStyle
 
 private var secureTextField: UITextField? = null
 
+/** The `UIViewController` the iOS app embeds — the whole Compose app behind one UIKit handle. */
 fun viewController() = ComposeUIViewController(
     configure = {
         initKoin()

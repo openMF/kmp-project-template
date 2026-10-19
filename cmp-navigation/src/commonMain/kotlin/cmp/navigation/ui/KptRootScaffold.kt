@@ -53,6 +53,7 @@ import kpt.core.ui.scaffold.KptPullToRefreshState
 import kpt.core.ui.scaffold.rememberKptPullToRefreshState
 import org.koin.compose.koinInject
 
+/** The signed-in shell: bottom bar (or rail/drawer by window size) around the nav host. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("LongMethod")
 @Composable

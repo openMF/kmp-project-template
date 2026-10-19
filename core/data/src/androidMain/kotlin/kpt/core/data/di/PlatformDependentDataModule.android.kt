@@ -17,6 +17,10 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
+/**
+ * Android-only data bindings — the ones needing a `Context`. Every other platform has nothing to add, hence the empty
+ * `nonAndroidMain` actual.
+ */
 actual val platformModule: Module = module {
     includes(CommonModule)
 

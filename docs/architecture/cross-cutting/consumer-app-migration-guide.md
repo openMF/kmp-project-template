@@ -132,7 +132,7 @@ Phase 8: Verification          — Build, test, verify encryption
 
 ### 4.1 What sync-dirs Does
 
-The `sync-dirs` GitHub Action (`/.github/workflows/sync-dirs.yaml`) automatically syncs infrastructure directories from `kmp-project-template` to consumer app forks. It runs weekly (Monday midnight UTC) and can be triggered manually.
+The `sync-dirs` GitHub Action (`.github/workflows/sync-dirs.yaml`) automatically syncs infrastructure directories from `kmp-project-template` to consumer app forks. It runs weekly (Monday midnight UTC) and can be triggered manually.
 
 **What gets synced (and what it delivers):**
 

@@ -26,6 +26,10 @@ import kpt.core.base.store.screen.ScreenState
  *    performed.
  */
 data class KptPullToRefreshState(
+    /**
+     * Whether the gesture is available at all. Separate from [isRefreshing] so a screen can disable pull-to-refresh
+     * (e.g. while offline) without faking an in-flight refresh.
+     */
     val isEnabled: Boolean,
     val isRefreshing: Boolean,
     val onRefresh: () -> Unit,

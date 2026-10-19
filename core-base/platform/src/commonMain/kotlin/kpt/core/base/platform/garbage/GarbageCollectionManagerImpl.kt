@@ -15,6 +15,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+/**
+ * Default [GarbageCollectionManager]: forwards to the platform [garbageCollector] on [dispatcher],
+ * keeping a single in-flight job so repeated calls coalesce instead of queueing pauses.
+ *
+ * [collector] is injectable so a test can assert the hint was issued without actually collecting.
+ */
 @Suppress("UnusedPrivateProperty")
 class GarbageCollectionManagerImpl(
     private val dispatcher: CoroutineDispatcher,

@@ -52,16 +52,26 @@ interface LoanDao {
     @Query("DELETE FROM banking_loans WHERE id = :id")
     suspend fun deleteById(id: String)
 
+    /** Clears every row. Called on logout via `StoreCacheManager.clearAll()`. */
     @Suppress("unused") // surface for future bulk-clear UX (Settings → Reset)
     @Query("DELETE FROM banking_loans")
     suspend fun deleteAll()
 
+    /**
+     * Loans ordered by next due-date. The ordering is in the [observeAll] query, so this is a naming alias rather than
+     * a second query to keep in step.
+     */
     @Suppress("unused") // explicit alias so call-sites can pick the most readable form
     fun observeAllByNextDue(): Flow<List<LoanEntity>> = observeAll()
 
+    /** Conflict policy. */
     companion object {
         // Pinning [OnConflictStrategy] usage to a constant keeps the
         // `@Upsert` semantics discoverable from grep without touching Room internals.
+        /**
+         * REPLACE: a re-synced loan overwrites the local row wholesale. Safe here because the tracker has no field the
+         * server does not also own.
+         */
         @Suppress("unused")
         val UPSERT_STRATEGY = OnConflictStrategy.REPLACE
     }

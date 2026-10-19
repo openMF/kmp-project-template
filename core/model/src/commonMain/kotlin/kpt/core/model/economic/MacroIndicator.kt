@@ -52,6 +52,9 @@ data class IndicatorObservation(
  *
  * Add new kinds here when new indicators are needed — the World Bank catalogue has
  * ~1,500 indicators, but the toolkit only exposes the five most-used.
+ *
+ * @property worldBankCode the World Bank series code, e.g. `NY.GDP.MKTP.CD`. Held on the enum so callers name the
+ *   indicator, never the code.
  */
 enum class IndicatorKind(val worldBankCode: String) {
     /** Gross Domestic Product (current US$). */
@@ -70,6 +73,7 @@ enum class IndicatorKind(val worldBankCode: String) {
     GINI("SI.POV.GINI"),
     ;
 
+    /** Catalogue of the indicator codes the World Bank API accepts. */
     companion object {
         /**
          * Resolve a [IndicatorKind] from a World Bank indicator code, or `null` when

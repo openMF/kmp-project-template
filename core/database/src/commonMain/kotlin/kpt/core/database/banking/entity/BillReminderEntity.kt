@@ -27,15 +27,25 @@ import kpt.core.model.banking.Recurrence
 @DbEntity
 @Entity(tableName = "banking_bill_reminders")
 data class BillReminderEntity(
+    /** Client-generated UUID. Primary key. */
     @PrimaryKey
     val id: String,
+    /** Bill label, e.g. "Electricity Bill". */
     val name: String,
+    /** Amount due per occurrence. */
     val amount: Double,
+    /** Day of the month it falls due, 1–31. Clamped to the month's length when shorter. */
     val dueDay: Int,
+    /** How often it repeats. */
     val recurrence: Recurrence,
+    /** Spending category, for grouping and icons. */
     val category: BillCategory,
+    /** Whether reminders fire. A disabled bill is still listed. */
     val enabled: Boolean,
+    /** How many days ahead of [dueDay] to notify. */
     val reminderDaysBefore: Int,
+    /** Epoch millis when the reminder was added. */
     val createdAtMs: Long,
+    /** Epoch millis of the most recent edit. */
     val updatedAtMs: Long,
 )

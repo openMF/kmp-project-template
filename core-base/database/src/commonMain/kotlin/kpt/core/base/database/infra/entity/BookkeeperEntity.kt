@@ -19,6 +19,8 @@ import androidx.room3.PrimaryKey
  */
 @Entity(tableName = "store_bookkeeper")
 data class BookkeeperEntity(
+    /** The store key whose write failed. */
     @PrimaryKey val key: String,
+    /** When that write last failed, epoch millis. */
     val lastFailedSync: Long,
 )

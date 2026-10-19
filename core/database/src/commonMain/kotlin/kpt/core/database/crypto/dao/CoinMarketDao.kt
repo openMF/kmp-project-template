@@ -17,25 +17,41 @@ import kotlinx.coroutines.flow.Flow
 import kpt.core.base.database.annotation.DbDao
 import kpt.core.database.crypto.entity.CoinMarketEntity
 
+/**
+ * Room DAO for the paged coin-market list.
+ *
+ * `replacePage` is `@Transaction` on purpose: delete-then-upsert as two calls lets an in-flight
+ * reader observe an empty page (S5-PAGE-ATOMIC).
+ *
+ * Bound into the Store's `SourceOfTruth` — the reader/writer/delete lambdas are the ONLY callers
+ * of these members (S5-1). A repository reaching past the Store to a DAO bypasses caching and
+ * freshness entirely.
+ */
 @DbDao
 @Dao
 interface CoinMarketDao {
 
+    /** Inserts or replaces a whole page in one transaction, so a partial page never becomes visible. */
     @Upsert
     suspend fun upsertAll(entities: List<CoinMarketEntity>)
 
+    /** One page of the market list, by limit/offset. */
     @Query("SELECT * FROM coin_markets ORDER BY marketCapRank ASC LIMIT :limit OFFSET :offset")
     fun getPage(limit: Int, offset: Int): Flow<List<CoinMarketEntity>>
 
+    /** Every cached row across all pages — what the paging stream accumulates over. */
     @Query("SELECT * FROM coin_markets ORDER BY marketCapRank ASC")
     fun getAll(): Flow<List<CoinMarketEntity>>
 
+    /** Evicts one page, for a targeted refresh. */
     @Query("DELETE FROM coin_markets WHERE page = :page")
     suspend fun deleteByPage(page: Int)
 
+    /** Clears the cache. Called on logout. */
     @Query("DELETE FROM coin_markets")
     suspend fun deleteAll()
 
+    /** How many rows are cached — used to decide whether another page exists. */
     @Query("SELECT COUNT(*) FROM coin_markets")
     suspend fun count(): Int
 

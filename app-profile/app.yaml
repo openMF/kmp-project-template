@@ -11,6 +11,13 @@ identity:
   app_id: org.mifos.kmp.template          # REFERENCE example identity — the template ships as the Mifos "Money Toolkit" working demo (a fork re-brands via customize / app-profile). SoT for appId; mirrored to gradle/libs.versions.toml.
   app_name: Money Toolkit                  # REFERENCE app display name (Android app_name, iOS CFBundleDisplayName, settings footer)
   namespace: org.mifos.kmp.template       # mirrors app_id
+  # Apex domain the ARCHITECTURE DOCS publish under, as `docs.<this value>`. OPTIONAL and UNSET by
+  # default: with no value the docs workflow still deploys, to the Cloudflare Pages `*.pages.dev`
+  # URL it gets for free, and simply attaches no custom domain. It is declared here rather than
+  # derived from `app_id` because a reversed package id is not a domain a fork necessarily owns —
+  # guessing one would publish to a host nobody controls and hand out a link that never resolves.
+  # The Pages PROJECT name is always `docs-<fork.project.name>`, so it is unique without this.
+  docs_domain: ""                          # e.g. "mifos.org" → docs.mifos.org
 
 # Per-flavor network endpoints + demo credentials + log tag. syncForkConfig emits these into
 # gradle/fork.properties (network.base.url.{demo,prod} / demo.username / demo.password / log.tag),
@@ -223,18 +230,27 @@ org:
   privacy_url: https://raw.githubusercontent.com/openMF/kmp-project-template/main/legal/output/privacy-policy.md
   support_url: https://github.com/openMF/kmp-project-template
 
+# Legal entity behind the app — rendered into the generated privacy policy and terms.
+# Required before a store submission; a store rejects a listing whose policy names no entity.
 legal:
   company_name: Mifos Initiative
   jurisdiction: United States
   effective_date: June 6, 2026
   contact_email: team@mifos.org
 
+# Distinguished name baked into a generated Android keystore.
+# Used ONCE, at keystore creation. Changing it afterwards has no effect — the existing
+# keystore keeps the DN it was born with, and replacing the keystore breaks app updates.
 keystore_dn:
   org_unit: Mobile
   city: Arusha
   state: Arusha
   country: TZ
 
+# Store-listing copy: title, descriptions, keywords, category.
+# The PLACEHOLDER shipped here is the template's. A branded listing lives in
+# deployment-layer/store-listing/variants/ and reaches this file only by an explicit promote —
+# submitting without that promote publishes the template's text to a live store.
 store:
   primary_locale: en-US
   # REFERENCE store listing — the Mifos "Money Toolkit" working-example copy the template ships.
@@ -272,6 +288,9 @@ in_app_review:
   min_days_since_install: 3
   cooldown_days: 90                          # after a prompt, do not ask again inside this window
 
+# Fork-owned media sources: screenshots, feature graphic, promo video.
+# Paths are relative to app-profile/; a missing file is a skip, not an error, so a fork can add
+# platform media incrementally.
 media:
   root: media
 

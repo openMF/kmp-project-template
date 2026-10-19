@@ -52,6 +52,11 @@ class AlertCreateViewModel(
 ) {
 
     private val _formState = MutableStateFlow(AlertFormState())
+
+    /**
+     * The alert form as it currently stands. Auto-saved as a draft, so a part-filled alert survives
+     * process death.
+     */
     val formState: StateFlow<AlertFormState> = _formState.asStateFlow()
 
     init {
@@ -114,8 +119,11 @@ class AlertCreateViewModel(
  * through the domain model.
  */
 data class AlertFormState(
+    /** Which coin the alert watches. */
     val coinId: String = "",
+    /** Whether it fires above or below the target. */
     val direction: AlertDirection = AlertDirection.ABOVE,
+    /** The target as raw text, so a partially typed number survives recomposition — parsed only on submit. */
     val targetValueText: String = "",
 ) {
     /** A submit is only allowed once the coin id and a parseable positive target exist. */

@@ -27,6 +27,7 @@ interface StoreCacheManager {
      */
     suspend fun pruneExpiredDrafts(maxAgeMs: Long = DEFAULT_DRAFT_TTL_MS)
 
+    /** Manager entry points. */
     companion object {
         /** 30 days in milliseconds. */
         const val DEFAULT_DRAFT_TTL_MS: Long = 30L * 24 * 60 * 60 * 1000

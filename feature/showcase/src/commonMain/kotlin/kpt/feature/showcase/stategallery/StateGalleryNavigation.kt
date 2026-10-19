@@ -17,9 +17,15 @@ import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 
+/** Route for the screen-state gallery — every `ScreenState` rendered side by side. */
 @Serializable
 data object StateGalleryRoute
 
+/**
+ * Registers the state-gallery graph.
+ *
+ * @param navController used for back navigation.
+ */
 fun NavGraphBuilder.stateGalleryGraph(navController: NavController) {
     composableWithPushTransitions<StateGalleryRoute> {
         StateGalleryScreen(

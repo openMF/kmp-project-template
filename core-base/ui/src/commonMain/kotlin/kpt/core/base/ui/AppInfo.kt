@@ -21,5 +21,9 @@ import kpt.core.base.ui.BuildKonfig
  * fork rebrands in app-profile only; the display name flows here automatically.
  */
 object AppInfo {
+    /**
+     * The fork's display name, from `app-profile` via BuildKonfig — never hardcoded, so a rebrand needs no code
+     * change.
+     */
     val appDisplayName: String get() = BuildKonfig.APP_DISPLAY_NAME
 }

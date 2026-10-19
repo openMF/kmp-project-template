@@ -14,6 +14,7 @@ import org.koin.dsl.module
 import kpt.core.base.common.manager.DispatcherManager
 import kpt.core.base.common.manager.DispatcherManagerImpl
 
+/** `dispatcherManagerModule` on Non-Android targets. */
 actual val dispatcherManagerModule: Module
     get() = module {
         single<DispatcherManager> { DispatcherManagerImpl() }

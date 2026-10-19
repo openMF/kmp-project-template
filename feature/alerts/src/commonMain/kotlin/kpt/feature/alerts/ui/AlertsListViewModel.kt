@@ -43,6 +43,10 @@ class AlertsListViewModel(
 
 /** One-shot actions accepted by [AlertsListViewModel]. */
 sealed interface AlertsListAction {
-    /** Delete a price alert. Idempotent — no-op if not present. */
+    /**
+     * Delete a price alert. Idempotent — no-op if not present.
+     *
+     * @property id which alert to delete.
+     */
     data class Delete(val id: String) : AlertsListAction
 }

@@ -53,19 +53,37 @@ data class BillReminder(
 /** How often a bill repeats. */
 @Serializable
 enum class Recurrence {
+    /** Repeats every month. */
     MONTHLY,
+
+    /** Repeats every three months. */
     QUARTERLY,
+
+    /** Repeats every year. */
     ANNUALLY,
+
+    /** A single occurrence — no next due-date is derived after it is paid. */
     ONCE,
 }
 
 /** Coarse spending category — drives icons and dashboard grouping. */
 @Serializable
 enum class BillCategory {
+    /** Power, water, gas, internet, phone. */
     UTILITIES,
+
+    /** Rent, maintenance, property tax. */
     HOUSING,
+
+    /** Fuel, transit passes, vehicle costs. */
     TRANSPORT,
+
+    /** Groceries and meals. */
     FOOD,
+
+    /** Recurring services — streaming, software, memberships. */
     SUBSCRIPTIONS,
+
+    /** Anything the categories above do not cover. */
     OTHER,
 }

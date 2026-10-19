@@ -54,6 +54,10 @@ class BillRemindersListViewModel(
         repository.observeTotalUpcomingAmount(TOTAL_WINDOW_DAYS),
     ) { upcoming, total -> upcoming to total }
 
+    /**
+     * The reminders as a screen state, plus the summary totals the header shows. Grouped by urgency in the stream
+     * rather than in the composable, so the grouping is testable without composition.
+     */
     val screenState: StateFlow<ScreenState<BillRemindersUiState>> = stream.state
         .combineContent(upcomingTiles) { all, (upcoming, total), _ ->
             BillRemindersUiState(all = all, upcoming = upcoming, totalUpcomingAmount = total)
@@ -87,13 +91,6 @@ class BillRemindersListViewModel(
     }
 
     /**
-     * Marks a bill paid. For recurring bills this is a domain no-op in the row itself
-     * (the next-due-date is derived from `dueDay` + today, not stored), but we bump
-     * `updatedAtMs` so the row sorts to the top of "recently touched" surfaces and the
-     * notification scheduler re-registers a fresh request — pinning the contract even
-     * before per-row "lastPaidAtMs" lands.
-     */
-    /**
      * One-shot read of ONE reminder THROUGH the store — the read half of a read-modify-write.
      * Was `repository.getById(...)`, which went straight to the DAO and bypassed the store read
      * path while the paired `upsert` went through the write store (the S5-2 split-read defect).
@@ -105,6 +102,13 @@ class BillRemindersListViewModel(
                 as? ScreenState.Content<BillReminder>
             )?.data
 
+    /**
+     * Marks a bill paid. For recurring bills this is a domain no-op in the row itself
+     * (the next-due-date is derived from `dueDay` + today, not stored), but we bump
+     * `updatedAtMs` so the row sorts to the top of "recently touched" surfaces and the
+     * notification scheduler re-registers a fresh request — pinning the contract even
+     * before per-row "lastPaidAtMs" lands.
+     */
     private suspend fun markPaid(billId: String) {
         val existing = loadOne(billId) ?: return
         repository.upsert(existing.copy(updatedAtMs = clock.now().toEpochMilliseconds()))
@@ -153,12 +157,24 @@ data class BillRemindersUiState(
 
 /** One-shot actions accepted by [BillRemindersListViewModel]. */
 sealed interface BillRemindersAction {
-    /** Bump `updatedAtMs` + cancel the pending notification — the user has just paid this bill. */
+    /**
+     * Bump `updatedAtMs` + cancel the pending notification — the user has just paid this bill.
+     *
+     * @property billId which bill was paid.
+     */
     data class MarkPaid(val billId: String) : BillRemindersAction
 
-    /** Permanently delete the reminder + cancel any pending notification. */
+    /**
+     * Permanently delete the reminder + cancel any pending notification.
+     *
+     * @property billId which bill to delete.
+     */
     data class Delete(val billId: String) : BillRemindersAction
 
-    /** Flip the `enabled` flag — disabling cancels the pending notification but keeps the row. */
+    /**
+     * Flip the `enabled` flag — disabling cancels the pending notification but keeps the row.
+     *
+     * @property billId which bill to enable or disable.
+     */
     data class ToggleEnabled(val billId: String) : BillRemindersAction
 }

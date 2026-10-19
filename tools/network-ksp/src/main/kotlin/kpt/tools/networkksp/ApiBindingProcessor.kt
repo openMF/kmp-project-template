@@ -205,6 +205,9 @@ class ApiBindingProcessor(
     }
 }
 
+/**
+ * KSP entry point — what the `META-INF/services` registration names, so Gradle can instantiate [ApiBindingProcessor].
+ */
 class ApiBindingProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
         ApiBindingProcessor(environment.codeGenerator, environment.logger, environment.options)

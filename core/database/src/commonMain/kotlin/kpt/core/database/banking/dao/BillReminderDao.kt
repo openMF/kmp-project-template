@@ -73,6 +73,7 @@ interface BillReminderDao {
     @Query("DELETE FROM banking_bill_reminders WHERE id = :id")
     suspend fun deleteById(id: String)
 
+    /** Clears every row. Called on logout via `StoreCacheManager.clearAll()`. */
     @Suppress("unused") // future surface for Settings → Reset
     @Query("DELETE FROM banking_bill_reminders")
     suspend fun deleteAll()

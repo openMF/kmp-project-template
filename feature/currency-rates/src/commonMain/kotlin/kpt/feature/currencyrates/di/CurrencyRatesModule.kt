@@ -14,6 +14,7 @@ import kpt.feature.currencyrates.ui.RateHistoryViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
+/** Koin bindings for the currency-rates feature. */
 val CurrencyRatesModule = module {
     viewModel {
         CurrencyRatesViewModel(

@@ -26,6 +26,10 @@ import org.mobilenativefoundation.store.store5.Store
  * the source, exactly as the calculator features bind their compute ports.
  */
 fun interface ProfileInfoSource {
+    /**
+     * Reads the profile once. A suspend one-shot rather than a Flow: the template's profile is derived from build
+     * config and cannot change at runtime.
+     */
     suspend fun load(): ProfileInfo
 }
 

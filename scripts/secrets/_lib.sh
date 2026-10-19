@@ -71,6 +71,9 @@ _secrets_parse_vault_aliases() {
 }
 
 # All (alias, canonical, platforms-csv) across every needs file, dedup'd by alias.
+# Print every alias declared across all platform manifests, de-duplicated.
+# De-duplicates on the CANONICAL name as well as the platform one, so an alias
+# listed under two platforms is reported once rather than twice.
 secrets_all_vault_aliases() {
   local p f plat
   local -A SEEN_CANON SEEN_PLAT

@@ -13,6 +13,9 @@ import kpt.core.database.crypto.entity.CoinMarketEntity
 import kpt.core.model.crypto.CoinMarket
 import kotlin.time.Clock
 
+/**
+ * Domain → row, stamping the [page] this item belongs to so `replacePage` can swap one bucket.
+ */
 fun CoinMarket.toEntity(page: Int): CoinMarketEntity = CoinMarketEntity(
     id = id,
     symbol = symbol,
@@ -28,6 +31,9 @@ fun CoinMarket.toEntity(page: Int): CoinMarketEntity = CoinMarketEntity(
     fetchedAt = Clock.System.now().toEpochMilliseconds(),
 )
 
+/**
+ * Row → domain, dropping the paging bookkeeping.
+ */
 fun CoinMarketEntity.toDomain(): CoinMarket = CoinMarket(
     id = id,
     symbol = symbol,

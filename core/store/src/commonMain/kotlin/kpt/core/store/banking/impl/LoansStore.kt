@@ -57,6 +57,9 @@ fun provideLoansStore(dao: LoanDao): Store<Unit, List<Loan>> = StoreFactory.crea
  * `Flow<Loan?>`. Repository-internal (not DI-registered) — reads the same DAO the list store clears.
  */
 // store-binding: internal — repository-internal; LoanRepository calls it directly and clears via the list store's table
+/**
+ * Single loan by id — `OFFLINE_LOCAL_ONLY`, Room is the authority.
+ */
 fun provideLoanDetailStore(dao: LoanDao): Store<String, Loan> = StoreFactory.createOfflineStore(
     sourceOfTruth = SourceOfTruth.of(
         reader = { id: String -> dao.observeById(id).map { it?.toDomain() } },

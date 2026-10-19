@@ -16,7 +16,10 @@ package kpt.core.model.cloudtodo
  * failed write (offline) is recorded by the RoomBookkeeper for retry on reconnect. Pure Kotlin.
  */
 data class CloudTodo(
+    /** jsonplaceholder's todo id; also the Store key. */
     val id: Int,
+    /** Todo text. */
     val title: String,
+    /** Whether it is done. This is the field the MUTABLE archetype writes back. */
     val completed: Boolean,
 )

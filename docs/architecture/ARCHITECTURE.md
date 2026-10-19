@@ -13,40 +13,68 @@ This directory is the **single source of truth for this template's architecture*
 humans and for AI. `CONTRACT.yaml` is its machine-verified low-level half; the guides below
 are the instruction surface.
 
+### Project tree
+
+Every top-level area of the repository — measured facts, plus authored significance.
+
+- [All areas](PROJECT_TREE.md)
+- [`app-profile/`](tree/app-profile.md)
+- [`build-logic/`](tree/build-logic.md)
+- [`cmp-android/`](tree/cmp-android.md)
+- [`cmp-desktop/`](tree/cmp-desktop.md)
+- [`cmp-ios/`](tree/cmp-ios.md)
+- [`cmp-navigation/`](tree/cmp-navigation.md)
+- [`cmp-shared/`](tree/cmp-shared.md)
+- [`cmp-web/`](tree/cmp-web.md)
+- [`core-base/`](tree/core-base.md)
+- [`core/`](tree/core.md)
+- [`deployment/`](tree/deployment.md)
+- [`fastlane-config/`](tree/fastlane-config.md)
+- [`fastlane/`](tree/fastlane.md)
+- [`feature/`](tree/feature.md)
+- [`github/`](tree/github.md)
+- [`gradle/`](tree/gradle.md)
+- [`legal/`](tree/legal.md)
+- [`scripts/`](tree/scripts.md)
+- [`secrets/`](tree/secrets.md)
+- [`sync/`](tree/sync.md)
+- [`tests/`](tree/tests.md)
+- [`tools/`](tree/tools.md)
+
 ### Modules
 
 One guide per module, named 1:1 with its training-corpus surface.
 
 **`core-base/`** — framework-shared primitives; generators consume, never write
 
-- [`core-base/common`](modules/core-base/common.md)
-- [`core-base/crypto`](modules/core-base/crypto.md)
-- [`core-base/data`](modules/core-base/data.md)
-- [`core-base/database`](modules/core-base/database.md)
-- [`core-base/datastore`](modules/core-base/datastore.md)
-- [`core-base/designsystem`](modules/core-base/designsystem.md)
-- [`core-base/firebase`](modules/core-base/firebase.md)
-- [`core-base/network`](modules/core-base/network.md)
-- [`core-base/observability`](modules/core-base/observability.md)
-- [`core-base/platform`](modules/core-base/platform.md)
-- [`core-base/security`](modules/core-base/security.md)
-- [`core-base/store`](modules/core-base/store.md)
-- [`core-base/ui`](modules/core-base/ui.md)
+- [`core-base/common`](tree/core-base/common.md)
+- [`core-base/crypto`](tree/core-base/crypto.md)
+- [`core-base/data`](tree/core-base/data.md)
+- [`core-base/database`](tree/core-base/database.md)
+- [`core-base/datastore`](tree/core-base/datastore.md)
+- [`core-base/designsystem`](tree/core-base/designsystem.md)
+- [`core-base/firebase`](tree/core-base/firebase.md)
+- [`core-base/network`](tree/core-base/network.md)
+- [`core-base/observability`](tree/core-base/observability.md)
+- [`core-base/platform`](tree/core-base/platform.md)
+- [`core-base/security`](tree/core-base/security.md)
+- [`core-base/store`](tree/core-base/store.md)
+- [`core-base/ui`](tree/core-base/ui.md)
 
 **`core/`** — fork-owned implementation; the codegen target
 
-- [`core/common`](modules/core/common.md)
-- [`core/data`](modules/core/data.md)  ·  contracts: `@RepositoryBinding`, `@DataProvider`, `@FromStore`, `@FromQualifier`
-- [`core/database`](modules/core/database.md)  ·  contracts: `@DbEntity`, `@DbDao`, `@DbConverters`
-- [`core/datastore`](modules/core/datastore.md)
-- [`core/designsystem`](modules/core/designsystem.md)
-- [`core/domain`](modules/core/domain.md)
-- [`core/firebase`](modules/core/firebase.md)
-- [`core/model`](modules/core/model.md)
-- [`core/network`](modules/core/network.md)  ·  contracts: `@ApiBinding`
-- [`core/platform`](modules/core/platform.md)
-- [`core/store`](modules/core/store.md)  ·  contracts: `@StoreProvider`, `@CacheKey`
-- [`core/ui`](modules/core/ui.md)
+- [`core/common`](tree/core/common.md)
+- [`core/data`](tree/core/data.md)  ·  contracts: `@RepositoryBinding`, `@DataProvider`, `@FromStore`, `@FromQualifier`
+- [`core/database`](tree/core/database.md)  ·  contracts: `@DbEntity`, `@DbDao`, `@DbConverters`
+- [`core/datastore`](tree/core/datastore.md)
+- [`core/designsystem`](tree/core/designsystem.md)
+- [`core/domain`](tree/core/domain.md)
+- [`core/firebase`](tree/core/firebase.md)
+- [`core/model`](tree/core/model.md)
+- [`core/network`](tree/core/network.md)  ·  contracts: `@ApiBinding`
+- [`core/platform`](tree/core/platform.md)
+- [`core/store`](tree/core/store.md)  ·  contracts: `@StoreProvider`, `@CacheKey`
+- [`core/ui`](tree/core/ui.md)
 
 ### Cross-cutting
 
@@ -65,7 +93,9 @@ Concerns that span modules and are anchored by content digest rather than a modu
 
 Named recipes spanning two or more modules.
 
-_(none yet)_
+- [`README`](patterns/README.md)
+- [`independent-cards`](patterns/independent-cards.md)
+- [`navigation-safety`](patterns/navigation-safety.md)
 
 ### Machine-readable
 
@@ -252,7 +282,7 @@ common
 ```
 
 For more details on the source set hierarchy, refer to
-the [Source Set Hierarchy](PROJECT_HIERARCHY_TEMPLATE.md) document.
+the [Source Set Hierarchy](cross-cutting/source-set-hierarchy.md) document.
 
 ## Dependency Injection
 
@@ -339,6 +369,6 @@ modules, the project achieves high maintainability, testability, and scalability
 
 For more detailed information, refer to:
 
-- [Setup Guide](../setup/SETUP.md) for environment configuration
-- [Source Set Hierarchy](PROJECT_HIERARCHY_TEMPLATE.md) for code sharing structure
+- [Setup Guide](tree/app-profile/setup.md) for environment configuration
+- [Source Set Hierarchy](cross-cutting/source-set-hierarchy.md) for code sharing structure
 - [Code Style Guide](cross-cutting/style-guide.md) for coding conventions

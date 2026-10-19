@@ -81,6 +81,8 @@ class LoanCalcWizardViewModel(
     private val _formState = MutableStateFlow(
         LoanCalcScenario(scenarioId = scenarioIdArg ?: randomScenarioId()),
     )
+
+    /** The form as it currently stands, across every step. */
     val formState: StateFlow<LoanCalcScenario> = _formState.asStateFlow()
 
     /**
@@ -100,6 +102,10 @@ class LoanCalcWizardViewModel(
      * a pre-existing in-progress draft to surface a "Continue / Discard?" prompt.
      */
     private val _resumeCandidate = MutableStateFlow<LoanCalcScenario?>(null)
+
+    /**
+     * A persisted draft found on first launch, or null. Non-null is what makes the screen offer "Continue / Discard".
+     */
     val resumeCandidate: StateFlow<LoanCalcScenario?> = _resumeCandidate.asStateFlow()
 
     init {
@@ -132,18 +138,27 @@ class LoanCalcWizardViewModel(
         }
     }
 
+    /**
+     * Records a new principal into the wizard's form state, which auto-saves as a draft — so this write is what makes
+     * the value survive process death.
+     */
     fun onUpdatePrincipal(value: Double) {
         _formState.update { it.copy(principal = value) }
     }
 
+    /**
+     * Records a new rate. Feeds the live EMI preview, which becomes meaningful once principal and tenure are also set.
+     */
     fun onUpdateRate(value: Double) {
         _formState.update { it.copy(ratePercent = value) }
     }
 
+    /** Records a new tenure. */
     fun onUpdateTenure(value: Int) {
         _formState.update { it.copy(tenureMonths = value) }
     }
 
+    /** Records a new name. The only field not used by the EMI preview. */
     fun onUpdateName(value: String) {
         _formState.update { it.copy(name = value) }
     }
@@ -233,8 +248,12 @@ class LoanCalcWizardViewModel(
         return LocalDate(YEAR_SEED, MONTH_SEED, DAY_SEED)
     }
 
+    /** Outbox key and step bounds. */
     companion object {
+        /** Namespaces this wizard's drafts in the outbox, so another form's draft is never resumed here. */
         const val FORM_KEY: String = "loan_calc_wizard"
+
+        /** The final step index — what "next" stops at and what submit requires. */
         const val LAST_STEP: Int = 5
 
         /** Sentinel uniqueKey when starting a brand-new wizard with no scenarioId. */

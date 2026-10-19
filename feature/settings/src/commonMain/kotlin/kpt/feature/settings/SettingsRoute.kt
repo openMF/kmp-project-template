@@ -16,19 +16,37 @@ import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
 import kpt.core.base.ui.nav.composableWithPushTransitions
 
+/** Route for the settings screen. */
 @Serializable
 data object SettingsRoute
 
+/** Route for notification settings. */
 @Serializable
 data object NotificationRoute
 
+/** Route for the sync-and-drafts screen — pending writes and saved drafts. */
 @Serializable
 data object SyncAndDraftsRoute
 
+/**
+ * Navigates to settings.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToSettings(navOptions: NavOptions? = null) = navigate(SettingsRoute, navOptions)
 
+/**
+ * Navigates to notification settings.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToNotification(navOptions: NavOptions? = null) = navigate(NotificationRoute, navOptions)
 
+/**
+ * Navigates to the sync-and-drafts screen.
+ *
+ * @param navOptions optional nav options.
+ */
 fun NavController.navigateToSyncAndDrafts(navOptions: NavOptions? = null) = navigate(SyncAndDraftsRoute, navOptions)
 
 /**
@@ -43,6 +61,11 @@ fun NavGraphBuilder.settingsDestination(settingsBody: @Composable () -> Unit = {
     }
 }
 
+/**
+ * Registers the notification-settings destination.
+ *
+ * @param onBackClick invoked to leave the screen.
+ */
 fun NavGraphBuilder.notificationDestination(onBackClick: () -> Unit) {
     composableWithPushTransitions<NotificationRoute> {
         NotificationScreen(
@@ -51,6 +74,11 @@ fun NavGraphBuilder.notificationDestination(onBackClick: () -> Unit) {
     }
 }
 
+/**
+ * Registers the sync-and-drafts destination.
+ *
+ * @param onBackClick invoked to leave the screen.
+ */
 fun NavGraphBuilder.syncAndDraftsDestination(onBackClick: () -> Unit) {
     composableWithPushTransitions<SyncAndDraftsRoute> {
         SyncAndDraftsScreen(

@@ -25,6 +25,7 @@ import kpt.sync.di.SyncModule
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
+/** Every Koin module the app installs, in one place — what the platform entry points hand to `startKoin`. */
 object KoinModules {
     private val dataModule = module {
         includes(DataModule, appStoreModule)
@@ -49,6 +50,7 @@ object KoinModules {
         includes(FeatureRegistry.featureKoinModules)
     }
 
+    /** The full module list. Order is irrelevant to Koin but kept layer-by-layer so a missing module is visible. */
     val allModules = listOf(
         SecurityModule,
         dataModule,

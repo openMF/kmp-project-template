@@ -77,6 +77,10 @@ class AmortizationViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScreenState.Loading)
 
+    /**
+     * Retries the failed schedule computation, via the underlying stream so the screen's state transitions the same
+     * way as on first load.
+     */
     fun onRetry() {
         currentStream?.retry()
     }
@@ -116,16 +120,43 @@ class AmortizationViewModel(
     }
 }
 
+/** The schedule's inputs, plus which tracked loan they were prefilled from. */
 data class AmortizationState(
+    /** Loan amount. */
     val principal: Double = 100_000.0,
+    /** APR as a percentage. */
     val ratePercent: Double = 8.5,
+    /**
+     * Tenure in months. Drives the row count of the generated schedule, so a large value is what makes this screen
+     * expensive.
+     */
     val tenureMonths: Int = 60,
+    /** Id of the tracked loan the inputs came from, or null when entered by hand. */
     val sourceLoanId: String? = null,
+    /** Its name, so the screen can say which loan it is showing. */
     val sourceLoanName: String? = null,
 )
 
+/** One action per input. */
 sealed class AmortizationAction {
+    /**
+     * Principal changed.
+     *
+     * @property value the new value.
+     */
     data class UpdatePrincipal(val value: Double) : AmortizationAction()
+
+    /**
+     * Rate changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateRate(val value: Double) : AmortizationAction()
+
+    /**
+     * Tenure changed.
+     *
+     * @property value the new value.
+     */
     data class UpdateTenure(val value: Int) : AmortizationAction()
 }

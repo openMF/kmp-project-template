@@ -9,11 +9,25 @@
  */
 package kpt.core.ui.utils
 
+/**
+ * Password strength bands used by [PasswordChecker].
+ */
 enum class PasswordStrength {
+    /** Weakest. */
     LEVEL_0,
+
+    /** Very weak. */
     LEVEL_1,
+
+    /** Weak. */
     LEVEL_2,
+
+    /** Moderate. */
     LEVEL_3,
+
+    /** Strong. */
     LEVEL_4,
+
+    /** Strongest. */
     LEVEL_5,
 }

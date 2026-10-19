@@ -104,6 +104,12 @@ class LoansAnalyticsTracker(
         )
     }
 
+    /**
+     * Records a loan deletion.
+     *
+     * @param kind the loan's category — the only attribute carried, since a deleted loan's figures are of no analytic
+     *   use.
+     */
     fun trackDeleted(kind: String) {
         analyticsHelper.logEvent(
             AnalyticsEvent(

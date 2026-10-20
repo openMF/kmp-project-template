@@ -95,6 +95,9 @@ data class AuthProviders(
  *        invoked inside `defaultRequest`, which runs per call.
  * @param requestTimeout Timeout in milliseconds for entire request lifecycle.
  * @param socketTimeout Timeout in milliseconds for socket-level communication.
+ * @param connectTimeout Timeout in milliseconds to ESTABLISH a connection. Without a bound here a
+ *   stalled handshake surfaces as a long spinner rather than an error the offline-first layer can
+ *   retry — see the install(HttpTimeout) block.
  * @param httpLogger A logger used for HTTP logging (defaults to `Logger.DEFAULT`).
  * @param httpLogLevel Level of HTTP logging (e.g. `LogLevel.ALL`).
  * @param loggableHosts A list of hostnames for which HTTP logging is enabled.
@@ -129,6 +132,7 @@ fun setupDefaultHttpClient(
     dynamicHeaders: () -> Map<String, String> = { emptyMap() },
     requestTimeout: Long = 60_000L,
     socketTimeout: Long = 60_000L,
+    connectTimeout: Long = 20_000L,
     httpLogger: Logger = Logger.DEFAULT,
     httpLogLevel: LogLevel = if (isReleaseBuild) LogLevel.HEADERS else LogLevel.ALL,
     loggableHosts: List<String> = emptyList(),
@@ -218,9 +222,24 @@ fun setupDefaultHttpClient(
         }
     }
 
+    // A CONNECT bound, not only request + socket.
+    //
+    // Without one, a call that never completes its TCP/TLS handshake is governed only by the 60s
+    // request timeout — which a user reads as an indefinite spinner rather than a failure, and which
+    // an offline-first layer cannot turn into a retry.
+    //
+    // `mifos-pay` hit this first and worked around it per-client, with the diagnosis written out in
+    // its own NetworkModule: "The corebase default sets request+socket to 60s but no connectTimeout;
+    // a shorter connect bound + request timeout surfaces a stalled call as an Error/Retry the
+    // offline-first layer handles, instead of a long spinner." That workaround covered only its three
+    // hand-wired clients; every client built through this factory still missed it, which is how
+    // `mifos-x-field-officer-app` met the same stall on device in 2026-10.
+    //
+    // 20s is the value that workaround settled on. Overridable per client for a slow endpoint.
     install(HttpTimeout) {
         requestTimeoutMillis = requestTimeout
         socketTimeoutMillis = socketTimeout
+        connectTimeoutMillis = connectTimeout
     }
 
     install(Logging) {

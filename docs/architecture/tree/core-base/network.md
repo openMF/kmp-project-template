@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/network sha=3ab9bbd17d8d0579e0ebaaf9d3f6028fcf65bdd7 -->
+<!-- api-docs:begin module=core-base/network sha=45cc0d511b0eaeeff5818cad4f96bf7f6d487275 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `3ab9bbd17d8d` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `45cc0d511b0e` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -72,7 +72,7 @@ class AccessPointRegistry(val points: List<AccessPoint>)
 ```
 Template registry MECHANISM over a fork-provided list of `points`.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:45</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:46</code></summary>
 
 ```kotlin
 @DataProvider(createdAtStart = true)
@@ -80,8 +80,8 @@ fun provideAuthHeaderBridge(
     registry: AccessPointRegistry,
     tokenSource: AuthTokenSource,
     headers: RuntimeHeaderStore,
+    preferences: UserPreferencesRepository,
     scope: CoroutineScope,
-): AuthHeaderBridge = AuthHeaderBridge(
 ```
 
 </details>
@@ -93,16 +93,16 @@ enum class AuthScheme
 ```
 How an access point authenticates, declared as `auth:` in `app-profile/app.yaml#network.access_points[]`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:81</code></summary>
 
 ```kotlin
-            basePath = "fineract-provider/api/v1/",
-            loggableHost = "sandbox.mifos.community",
-            auth = AuthScheme.BASIC,
-            headers = listOf(
-                HeaderSpec(name = "Fineract-Platform-TenantId", value = "default"),
-                HeaderSpec(name = "Authorization", runtimeKey = "fineract.auth"),
-            ),
+    // compose, let alone fetch.
+    registry.points
+        .filter { point -> point.auth != AuthScheme.NONE }
+        .forEach { point ->
+            val key = AuthScheme.runtimeKeyFor(point.id)
+            when (val value = point.auth.format(preferences.authToken)) {
+                null -> headers.clear(key)
 ```
 
 </details>
@@ -119,7 +119,7 @@ class AuthHeaderBridge(
 ```
 Keeps `RuntimeHeaderStore` in step with the stored credential, so `Authorization` is automatic.
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:44</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:45</code></summary>
 
 ```kotlin
  */
@@ -128,7 +128,7 @@ fun provideAuthHeaderBridge(
     registry: AccessPointRegistry,
     tokenSource: AuthTokenSource,
     headers: RuntimeHeaderStore,
-    scope: CoroutineScope,
+    preferences: UserPreferencesRepository,
 ```
 
 </details>
@@ -199,7 +199,7 @@ val stagingClient = httpClient {
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:291</code></summary>
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:318</code></summary>
 
 ```kotlin
     // static-URL path is unchanged (no regression).
@@ -370,16 +370,16 @@ runtimeHeaders.clear(FineractHeaders.AUTH)
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:47</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonMain/kotlin/kpt/core/data/user/AuthTokenBridge.kt:48</code></summary>
 
 ```kotlin
     registry: AccessPointRegistry,
     tokenSource: AuthTokenSource,
     headers: RuntimeHeaderStore,
+    preferences: UserPreferencesRepository,
     scope: CoroutineScope,
 ): AuthHeaderBridge = AuthHeaderBridge(
     points = registry.points,
-    tokenSource = tokenSource,
 ```
 
 </details>

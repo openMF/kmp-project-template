@@ -204,6 +204,19 @@ The project follows a modular architecture:
 
 ## 📚 Documentation
 
+**📖 Browse it online: <https://docs-kmp-project-template.pages.dev/>**
+
+The whole `docs/` tree is published on every push to `dev` — an architecture guide per module plus a
+generated API reference covering every public symbol. The pages below link to the Markdown sources
+in this repo; the site is the same content, rendered and searchable.
+
+> Forks get their own site for free. The Pages project is named `docs-<fork.project.name>`, so it
+> never collides, and it is created automatically on the first publish — add `CLOUDFLARE_API_TOKEN`
+> and `CLOUDFLARE_ACCOUNT_ID` as repository secrets and the next push to `dev` stands it up. Without
+> them the publish step simply skips, and docs still regenerate locally and in CI. For a custom
+> domain, set `docs_domain` in `app-profile/app.yaml` (a deploy does not create DNS — the domain
+> also needs attaching once with `wrangler pages domain add`).
+
 Our project includes comprehensive documentation to help you get started and understand the
 architecture:
 

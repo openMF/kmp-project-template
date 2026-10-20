@@ -8,7 +8,7 @@
 
 ## Principal types
 
-`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 11 more
+`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 12 more
 
 <!-- scaffold:end -->
 
@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/network sha=aca6d29ac5f1e56724691126e2c0cd0988d4ef81 -->
+<!-- api-docs:begin module=core-base/network sha=3ab9bbd17d8d0579e0ebaaf9d3f6028fcf65bdd7 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `aca6d29ac5f1` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `3ab9bbd17d8d` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -199,7 +199,7 @@ val stagingClient = httpClient {
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:255</code></summary>
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:291</code></summary>
 
 ```kotlin
     // static-URL path is unchanged (no regression).
@@ -395,6 +395,11 @@ Creates a Ktor `HttpClient` on the target's own engine (OkHttp, Darwin, JS fetch
 data class AuthProviders(
 ```
 The auth-credential providers for `setupDefaultHttpClient`, grouped so the client builder stays under the parameter-count limit. All null (the default) installs no `Auth` plugin.
+
+```kotlin
+data class HttpTimeouts(
+```
+The three Ktor timeouts for `setupDefaultHttpClient`, grouped for the same reason `AuthProviders` is: the builder is capped at 20 parameters by detekt's `LongParameterList`, and adding `connectTimeout` as a 21st flat parameter crossed it.
 
 ```kotlin
 fun setupDefaultHttpClient(
@@ -657,5 +662,5 @@ interface ApiService {
 
 ---
 
-_22 type(s), 14 function(s)/property(ies); 36 carry KDoc at source; 12 authored example(s); 19 live call site(s)._
+_23 type(s), 14 function(s)/property(ies); 37 carry KDoc at source; 12 authored example(s); 19 live call site(s)._
 <!-- api-docs:end -->

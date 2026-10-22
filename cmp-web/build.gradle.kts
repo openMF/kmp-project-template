@@ -46,7 +46,6 @@ kotlin {
                 implementation(projects.core.database)
                 implementation(projects.core.model)
                 implementation(projects.core.datastore)
-                implementation(projects.coreBase.datastore)
 
                 implementation(compose.runtime)
                 implementation(compose.ui)

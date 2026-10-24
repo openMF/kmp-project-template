@@ -1,7 +1,7 @@
 # `scripts/product-health/`
 
 > Part of [`scripts/`](../scripts.md)  
-> **Measured:** 370 tracked files — 140× `.kt`, 75× `.sh`, 52× `.md`, 29× `.yaml`, 12× `.gitkeep`
+> **Measured:** 378 tracked files — 142× `.kt`, 77× `.sh`, 52× `.md`, 31× `.yaml`, 12× `.gitkeep`
 
 ### Scripts
 
@@ -9,6 +9,7 @@
 |---|---|
 | `appid-consistency.sh` | gradle/fork.properties#app.id is the AUTHORED single source of truth |
 | `cache-key-call-sites.sh` | no production call site spells a cacheKey string literal. |
+| `compose-strings-apostrophe.sh` | no Android-style `\'` escape in Compose Multiplatform strings. |
 | `core-module-deps.sh` | every core/<mod> build file full-copies, and its fork deps live in a seam. |
 | `core-package-ownership.sh` | declared-package modules stay consistent with the contract. |
 | `demo-strip-coherence.sh` | the POST-`--clean` tree must be coherent, not just the template's. |
@@ -36,9 +37,8 @@
 | `store-listing.sh` | DIRECTIONAL, placeholder-aware store-copy guard. |
 | `store-logout-purge.sh` | every store's rows are reachable by the logout purge. |
 | `sync-merge-base.sh` | an `owner: merge` row must actually 3-way, not silently full-copy. |
-| `test-fixture-honesty.sh` | a test fixture must PRODUCE the failure mode it claims. |
 
-_…and 45 more._
+_…and 47 more._
 
 <!-- tree-scaffold:end -->
 ## Significance

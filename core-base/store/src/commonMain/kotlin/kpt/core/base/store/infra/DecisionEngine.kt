@@ -17,6 +17,7 @@ import kpt.core.base.store.error.ErrorCategory
 import kpt.core.base.store.error.categorize
 import kpt.core.base.store.freshness.FreshnessBands
 import kpt.core.base.store.freshness.FreshnessSignal
+import kpt.core.base.store.screen.DataOrigin
 import kpt.core.base.store.screen.FetchPolicy
 import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.store.screen.StoreData
@@ -58,6 +59,16 @@ object DecisionEngine {
         // within the detekt CyclomaticComplexMethod threshold; behaviour is identical to the
         // inlined when. See those helpers for the full offline-local / offline-first / error rules.)
         if (noData) return decideNoData(fetchPolicy, error, isOnline, isCaptivePortal)
+
+        // An EMPTY collection read from the cache, alongside a fetch error, carries no information
+        // but the error. It is what an unfilled table emits before its first fetch, and a repository
+        // that (rightly) counts an empty list as real content passes no `isEmpty` — so the failure
+        // used to render as content: a 403 on a fresh install showed "No reports found" instead of
+        // why. Measured on device 2026-10-24. A non-empty cache, or an empty list the NETWORK
+        // returned, is real content and keeps the has-data branch.
+        if (error != null && storeData.origin != DataOrigin.NETWORK && storeData.data.isEmptyCollection()) {
+            return decideNoData(fetchPolicy, error, isOnline, isCaptivePortal)
+        }
 
         // === Has data branch ===
         // Phase A of data-freshness-redesign epic (2026-06-17): network state no longer
@@ -186,4 +197,10 @@ object DecisionEngine {
             band = band,
         )
     }
+}
+
+private fun Any?.isEmptyCollection(): Boolean = when (this) {
+    is Collection<*> -> isEmpty()
+    is Map<*, *> -> isEmpty()
+    else -> false
 }

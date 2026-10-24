@@ -31,11 +31,15 @@ import org.koin.core.module.Module
  * [runtimeHeaders] resolves the point's DECLARED `headers[]` (app-profile) at request time: static
  * values are baked in, `runtimeKey` ones are read from the store on every call, so a credential
  * written at login reaches requests made by a client that already existed.
+ *
+ * [onUnauthorized], when given, is told of every 401 on a request that carried credentials — see
+ * [UnauthorizedHandler].
  */
 fun AccessPointRegistry.ktorfitFor(
     accessPointId: String,
     headerProvider: DefaultHeaderProvider = DefaultHeaderProvider.None,
     runtimeHeaders: RuntimeHeaderStore = RuntimeHeaderStore(),
+    onUnauthorized: UnauthorizedHandler? = null,
 ): Ktorfit {
     val ap = byId(accessPointId)
         ?: error(
@@ -47,7 +51,7 @@ fun AccessPointRegistry.ktorfitFor(
     return Ktorfit.Builder()
         .httpClient(
             client = sharedRestClient(accessPointId) {
-                httpClient(
+                httpClient {
                     setupDefaultHttpClient(
                         baseUrl = ap.effectiveUrl,
                         loggableHosts = listOf(ap.loggableHost),
@@ -59,8 +63,9 @@ fun AccessPointRegistry.ktorfitFor(
                         // up the value login wrote after this client was built. This is also what
                         // makes ONE client per access point correct rather than merely cheaper.
                         dynamicHeaders = { runtimeHeaders.resolve(ap.headers) },
-                    ),
-                )
+                    ).invoke(this)
+                    onUnauthorized?.let { notifyUnauthorized(accessPointId, it) }
+                }
             },
         )
         .build()
@@ -87,6 +92,8 @@ inline fun <reified T : Any> Module.restApi(
                 // Optional: a fork that binds no provider gets the empty default, unchanged behaviour.
                 headerProvider = getOrNull<DefaultHeaderProvider>() ?: DefaultHeaderProvider.None,
                 runtimeHeaders = getOrNull<RuntimeHeaderStore>() ?: RuntimeHeaderStore(),
+                // Optional: bound by a fork that wants a rejected session to end it (UnauthorizedHandler).
+                onUnauthorized = getOrNull<UnauthorizedHandler>(),
             ),
         )
     }

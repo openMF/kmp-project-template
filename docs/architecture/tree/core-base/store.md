@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/store sha=772399d04b62de65486b4fdbfbbd73c3b2d842a2 -->
+<!-- api-docs:begin module=core-base/store sha=2bdf526f471c876429ea3f4a90046b8d05e7022b -->
 ## API reference
 
-_Generated from `core-base/store` at tree `772399d04b62` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/store` at tree `2bdf526f471c` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -239,7 +239,7 @@ object FreshnessBands
 ```
 Pure computation of `FreshnessBand` from time + last-error inputs only. Decision table (first match wins): 1. `lastSyncedAt == null && lastError == null` → `FreshnessBand.Initial` 2.
 
-<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:176</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:187</code></summary>
 
 ```kotlin
         val lastSyncedAt = storeData.fetchedAtInstant
@@ -1397,7 +1397,7 @@ data class StoreData<out T>(
 ```
 Wraps data with metadata about its origin, freshness, and refresh state.
 
-<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:48</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:49</code></summary>
 
 ```kotlin
      */
@@ -1416,16 +1416,16 @@ enum class DataOrigin
 ```
 Indicates where a `StoreData` emission originated.
 
-<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/paging/PagingScreenStream.kt:275</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:69</code></summary>
 
 ```kotlin
-        val storeData = StoreData(
-            data = itemList,
-            origin = DataOrigin.NETWORK,
-            isRefreshing = loading,
-            fetchedAt = null,
-            fetchedAtInstant = fetchedAt,
-            error = err,
+        // why. Measured on device 2026-10-24. A non-empty cache, or an empty list the NETWORK
+        // returned, is real content and keeps the has-data branch.
+        if (error != null && storeData.origin != DataOrigin.NETWORK && storeData.data.isEmptyCollection()) {
+            return decideNoData(fetchPolicy, error, isOnline, isCaptivePortal)
+        }
+
+        // === Has data branch ===
 ```
 
 </details>

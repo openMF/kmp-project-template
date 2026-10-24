@@ -143,8 +143,9 @@ class ErrorCategoryTest {
             ErrorCategory.Auth,
             categorize(RuntimeException("HTTP 401 Unauthorized")),
         )
+        // 403 is NOT Auth: signed in, not permitted. It is a client error that keeps its reason.
         assertEquals(
-            ErrorCategory.Auth,
+            ErrorCategory.ClientError(403),
             categorize(RuntimeException("403 Forbidden")),
         )
     }

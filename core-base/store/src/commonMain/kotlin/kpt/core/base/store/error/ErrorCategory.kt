@@ -182,7 +182,11 @@ private fun String.extractHttpCode(): Int? =
     HTTP_CODE_REGEX.find(this)?.groupValues?.get(1)?.toIntOrNull()?.takeIf { it in 100..599 }
 
 private fun categorizeHttpCode(code: Int): ErrorCategory = when (code) {
-    401, 403 -> ErrorCategory.Auth
+    // 401 only. A 403 is "signed in, but not permitted" — signing in again cannot fix it, and as
+    // Auth it became ScreenState.Unauthenticated, which carries NO error, so the server's own reason
+    // ("User has no authority to READ collectionsheets") was replaced by generic copy. As a
+    // ClientError it renders as an error that keeps the server's message. Measured 2026-10-24.
+    401 -> ErrorCategory.Auth
     408 -> ErrorCategory.Timeout.Connect
     429 -> ErrorCategory.RateLimit
     402, 507 -> ErrorCategory.QuotaExceeded
@@ -192,9 +196,9 @@ private fun categorizeHttpCode(code: Int): ErrorCategory = when (code) {
     else -> ErrorCategory.Generic
 }
 
+// "Forbidden" is deliberately absent — see categorizeHttpCode: a 403 is not an authentication failure.
 private fun String.matchesAuthKeyword(): Boolean =
-    contains("Unauthorized", ignoreCase = true) ||
-        contains("Forbidden", ignoreCase = true)
+    contains("Unauthorized", ignoreCase = true)
 
 private fun String.matchesRateLimitKeyword(): Boolean =
     contains("Too Many Requests", ignoreCase = true) ||

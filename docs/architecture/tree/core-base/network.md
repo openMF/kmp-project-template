@@ -2,13 +2,13 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_NETWORK.md`
-> **Measured:** 22 Kotlin files, 0 test files
+> **Measured:** 23 Kotlin files, 0 test files
 
 **Defines annotations:** `@ApiBinding`
 
 ## Principal types
 
-`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 12 more
+`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 13 more
 
 <!-- scaffold:end -->
 
@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/network sha=45cc0d511b0eaeeff5818cad4f96bf7f6d487275 -->
+<!-- api-docs:begin module=core-base/network sha=7ca62ddad36e0c337eb5050cb1ff0ad2a5775df9 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `45cc0d511b0e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `7ca62ddad36e` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -592,6 +592,18 @@ single<SupabaseExtrasProvider> {
 
 </details>
 
+### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/UnauthorizedHandler.kt`
+
+```kotlin
+fun interface UnauthorizedHandler
+```
+Told when a request that CARRIED credentials is answered 401 — the session the app holds has been rejected (expired, revoked, password changed, or issued by another server).
+
+```kotlin
+fun HttpClientConfig<*>.notifyUnauthorized(accessPointId: String, handler: UnauthorizedHandler)
+```
+Notifies `handler` of a 401 on a request that sent an `Authorization` header. A 401 without one — a mistyped password on the sign-in call itself — is not a rejected session and is ignored.
+
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/annotation/ApiBinding.kt`
 
 ```kotlin
@@ -662,5 +674,5 @@ interface ApiService {
 
 ---
 
-_23 type(s), 14 function(s)/property(ies); 37 carry KDoc at source; 12 authored example(s); 19 live call site(s)._
+_23 type(s), 16 function(s)/property(ies); 39 carry KDoc at source; 12 authored example(s); 19 live call site(s)._
 <!-- api-docs:end -->

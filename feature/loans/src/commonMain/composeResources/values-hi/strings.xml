@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">वापस</string>
     <string name="screens_loans_list_new_fab_text">नया ऋण</string>
     <string name="screens_loans_list_delete_dialog_title">ऋण हटाएँ?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' हटा दिया जाएगा। इसे पूर्ववत नहीं किया जा सकता।</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' हटा दिया जाएगा। इसे पूर्ववत नहीं किया जा सकता।</string>
     <string name="screens_loans_list_delete_confirm">हटाएँ</string>
     <string name="screens_loans_list_delete_cancel">रद्द करें</string>
     <string name="screens_loans_list_total_outstanding_label">कुल बकाया</string>

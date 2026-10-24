@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Zurück</string>
     <string name="screens_loans_list_new_fab_text">Neues Darlehen</string>
     <string name="screens_loans_list_delete_dialog_title">Darlehen löschen?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' wird entfernt. Das lässt sich nicht rückgängig machen.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' wird entfernt. Das lässt sich nicht rückgängig machen.</string>
     <string name="screens_loans_list_delete_confirm">Löschen</string>
     <string name="screens_loans_list_delete_cancel">Abbrechen</string>
     <string name="screens_loans_list_total_outstanding_label">Gesamt offen</string>

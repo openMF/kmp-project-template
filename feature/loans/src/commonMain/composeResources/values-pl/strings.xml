@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Wstecz</string>
     <string name="screens_loans_list_new_fab_text">Nowy kredyt</string>
     <string name="screens_loans_list_delete_dialog_title">Usunąć kredyt?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' zostanie usunięty. Nie można tego cofnąć.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' zostanie usunięty. Nie można tego cofnąć.</string>
     <string name="screens_loans_list_delete_confirm">Usuń</string>
     <string name="screens_loans_list_delete_cancel">Anuluj</string>
     <string name="screens_loans_list_total_outstanding_label">Łącznie do spłaty</string>

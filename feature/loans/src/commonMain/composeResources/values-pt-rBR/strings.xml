@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Voltar</string>
     <string name="screens_loans_list_new_fab_text">Novo empréstimo</string>
     <string name="screens_loans_list_delete_dialog_title">Excluir empréstimo?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' será removido. Isso não pode ser desfeito.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' será removido. Isso não pode ser desfeito.</string>
     <string name="screens_loans_list_delete_confirm">Excluir</string>
     <string name="screens_loans_list_delete_cancel">Cancelar</string>
     <string name="screens_loans_list_total_outstanding_label">Total devedor</string>

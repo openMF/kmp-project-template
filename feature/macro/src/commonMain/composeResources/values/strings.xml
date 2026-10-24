@@ -37,7 +37,7 @@
     <string name="screens_macro_card_empty">No data published for this indicator.</string>
     <string name="screens_macro_card_captive_portal">Behind a captive portal — sign in to continue.</string>
     <string name="screens_macro_card_offline">Offline — connect to fetch this indicator.</string>
-    <string name="screens_macro_card_generic_error">Couldn\'t load this indicator.</string>
+    <string name="screens_macro_card_generic_error">Couldn't load this indicator.</string>
     <string name="screens_macro_card_auth_required">Authentication required.</string>
     <string name="screens_macro_card_latest_year">Latest: %1$s</string>
     <string name="screens_macro_card_loading">Loading…</string>

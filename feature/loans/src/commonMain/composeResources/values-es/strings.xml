@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Atrás</string>
     <string name="screens_loans_list_new_fab_text">Nuevo préstamo</string>
     <string name="screens_loans_list_delete_dialog_title">¿Eliminar préstamo?</string>
-    <string name="screens_loans_list_delete_dialog_message">Se eliminará \'%1$s\'. Esta acción no se puede deshacer.</string>
+    <string name="screens_loans_list_delete_dialog_message">Se eliminará '%1$s'. Esta acción no se puede deshacer.</string>
     <string name="screens_loans_list_delete_confirm">Eliminar</string>
     <string name="screens_loans_list_delete_cancel">Cancelar</string>
     <string name="screens_loans_list_total_outstanding_label">Total pendiente</string>

@@ -24,7 +24,7 @@
     <string name="screens_alert_create_dir_above">Sopra</string>
     <string name="screens_alert_create_dir_below">Sotto</string>
     <string name="screens_alert_create_submit">Crea avviso</string>
-    <string name="screens_alert_create_draft_resume_title">Riprendere l\'avviso?</string>
+    <string name="screens_alert_create_draft_resume_title">Riprendere l'avviso?</string>
     <string name="screens_alert_create_draft_resume_message">Hai un avviso di prezzo non salvato. Riprendi la modifica, eliminalo o creane uno nuovo.</string>
     <string name="screens_alert_create_draft_resume_resume">Riprendi modifica</string>
     <string name="screens_alert_create_draft_resume_discard">Elimina bozza</string>

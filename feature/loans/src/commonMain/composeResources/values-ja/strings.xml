@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">戻る</string>
     <string name="screens_loans_list_new_fab_text">新しいローン</string>
     <string name="screens_loans_list_delete_dialog_title">ローンを削除しますか？</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' が削除されます。元に戻せません。</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' が削除されます。元に戻せません。</string>
     <string name="screens_loans_list_delete_confirm">削除</string>
     <string name="screens_loans_list_delete_cancel">キャンセル</string>
     <string name="screens_loans_list_total_outstanding_label">未返済合計</string>

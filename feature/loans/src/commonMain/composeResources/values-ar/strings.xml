@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">رجوع</string>
     <string name="screens_loans_list_new_fab_text">قرض جديد</string>
     <string name="screens_loans_list_delete_dialog_title">حذف القرض؟</string>
-    <string name="screens_loans_list_delete_dialog_message">سيُحذف \'%1$s\'. لا يمكن التراجع عن ذلك.</string>
+    <string name="screens_loans_list_delete_dialog_message">سيُحذف '%1$s'. لا يمكن التراجع عن ذلك.</string>
     <string name="screens_loans_list_delete_confirm">حذف</string>
     <string name="screens_loans_list_delete_cancel">إلغاء</string>
     <string name="screens_loans_list_total_outstanding_label">إجمالي المستحق</string>

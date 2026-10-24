@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Geri</string>
     <string name="screens_loans_list_new_fab_text">Yeni kredi</string>
     <string name="screens_loans_list_delete_dialog_title">Kredi silinsin mi?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' kaldırılacak. Bu geri alınamaz.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' kaldırılacak. Bu geri alınamaz.</string>
     <string name="screens_loans_list_delete_confirm">Sil</string>
     <string name="screens_loans_list_delete_cancel">İptal</string>
     <string name="screens_loans_list_total_outstanding_label">Toplam kalan</string>

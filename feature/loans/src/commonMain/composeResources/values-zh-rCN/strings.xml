@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">返回</string>
     <string name="screens_loans_list_new_fab_text">新建贷款</string>
     <string name="screens_loans_list_delete_dialog_title">删除贷款？</string>
-    <string name="screens_loans_list_delete_dialog_message">将删除\'%1$s\'。此操作无法撤销。</string>
+    <string name="screens_loans_list_delete_dialog_message">将删除'%1$s'。此操作无法撤销。</string>
     <string name="screens_loans_list_delete_confirm">删除</string>
     <string name="screens_loans_list_delete_cancel">取消</string>
     <string name="screens_loans_list_total_outstanding_label">未还总额</string>

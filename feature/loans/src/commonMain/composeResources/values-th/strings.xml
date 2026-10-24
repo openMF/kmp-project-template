@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">ย้อนกลับ</string>
     <string name="screens_loans_list_new_fab_text">สินเชื่อใหม่</string>
     <string name="screens_loans_list_delete_dialog_title">ลบสินเชื่อไหม</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' จะถูกลบ ไม่สามารถย้อนกลับได้</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' จะถูกลบ ไม่สามารถย้อนกลับได้</string>
     <string name="screens_loans_list_delete_confirm">ลบ</string>
     <string name="screens_loans_list_delete_cancel">ยกเลิก</string>
     <string name="screens_loans_list_total_outstanding_label">ยอดคงค้างรวม</string>

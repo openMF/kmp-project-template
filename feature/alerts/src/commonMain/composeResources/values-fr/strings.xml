@@ -12,7 +12,7 @@
     <string name="screens_alerts_title">Alertes de prix</string>
     <string name="screens_alerts_back_cd">Retour</string>
     <string name="screens_alerts_create_cd">Créer une alerte</string>
-    <string name="screens_alerts_delete_cd">Supprimer l\'alerte</string>
+    <string name="screens_alerts_delete_cd">Supprimer l'alerte</string>
     <string name="screens_alerts_row_above">Au-dessus</string>
     <string name="screens_alerts_row_below">En dessous</string>
     <string name="screens_alerts_row_supporting">%1$s %2$s</string>

@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Quay lại</string>
     <string name="screens_loans_list_new_fab_text">Khoản vay mới</string>
     <string name="screens_loans_list_delete_dialog_title">Xóa khoản vay?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' sẽ bị xóa. Không thể hoàn tác.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' sẽ bị xóa. Không thể hoàn tác.</string>
     <string name="screens_loans_list_delete_confirm">Xóa</string>
     <string name="screens_loans_list_delete_cancel">Hủy</string>
     <string name="screens_loans_list_total_outstanding_label">Tổng còn nợ</string>

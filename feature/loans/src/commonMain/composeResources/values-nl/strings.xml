@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Terug</string>
     <string name="screens_loans_list_new_fab_text">Nieuwe lening</string>
     <string name="screens_loans_list_delete_dialog_title">Lening verwijderen?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' wordt verwijderd. Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' wordt verwijderd. Dit kan niet ongedaan worden gemaakt.</string>
     <string name="screens_loans_list_delete_confirm">Verwijderen</string>
     <string name="screens_loans_list_delete_cancel">Annuleren</string>
     <string name="screens_loans_list_total_outstanding_label">Totaal openstaand</string>

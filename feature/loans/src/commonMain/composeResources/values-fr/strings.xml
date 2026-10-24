@@ -17,7 +17,7 @@
     <string name="screens_loans_addedit_kind_cd">Choisir le type de prêt</string>
     <string name="screens_loans_addedit_principal_label">Capital initial</string>
     <string name="screens_loans_addedit_principal_remaining_label">Capital restant dû</string>
-    <string name="screens_loans_addedit_annual_rate_label">Taux d\'intérêt annuel (%)</string>
+    <string name="screens_loans_addedit_annual_rate_label">Taux d'intérêt annuel (%)</string>
     <string name="screens_loans_addedit_tenure_label">Durée (mois)</string>
     <string name="screens_loans_addedit_months_remaining_label">Mois restants</string>
     <string name="screens_loans_addedit_next_due_date_label">Prochaine échéance (AAAA-MM-JJ)</string>
@@ -29,7 +29,7 @@
     <string name="screens_loans_addedit_status_saving">Enregistrement…</string>
     <string name="screens_loans_addedit_status_saved">Enregistré ✓</string>
     <string name="screens_loans_addedit_status_offline">Enregistré hors ligne – synchronisation dès le retour en ligne.</string>
-    <string name="screens_loans_addedit_status_failed">Échec de l\'enregistrement : %1$s</string>
+    <string name="screens_loans_addedit_status_failed">Échec de l'enregistrement : %1$s</string>
     <string name="screens_loans_addedit_status_failed_unknown">erreur inconnue</string>
     <string name="screens_loans_addedit_retry_button">Réessayer</string>
     <string name="screens_loans_addedit_dismiss_button">Ignorer</string>
@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Retour</string>
     <string name="screens_loans_list_new_fab_text">Nouveau prêt</string>
     <string name="screens_loans_list_delete_dialog_title">Supprimer le prêt ?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' sera supprimé. Cette action est irréversible.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' sera supprimé. Cette action est irréversible.</string>
     <string name="screens_loans_list_delete_confirm">Supprimer</string>
     <string name="screens_loans_list_delete_cancel">Annuler</string>
     <string name="screens_loans_list_total_outstanding_label">Total restant dû</string>

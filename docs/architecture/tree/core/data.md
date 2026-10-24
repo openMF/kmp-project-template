@@ -25,10 +25,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/data sha=656aa9d9a469a3b5dee1f7283ce404b73d91be39 -->
+<!-- api-docs:begin module=core/data sha=f269a44412bdd4669e6138947b44bffa53c50ac4 -->
 ## API reference
 
-_Generated from `core/data` at tree `656aa9d9a469` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/data` at tree `f269a44412bd` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt`

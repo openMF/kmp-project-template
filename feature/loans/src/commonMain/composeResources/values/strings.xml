@@ -75,7 +75,7 @@
     <string name="screens_loans_list_back_cd">Back</string>
     <string name="screens_loans_list_new_fab_text">New loan</string>
     <string name="screens_loans_list_delete_dialog_title">Delete loan?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' will be removed. This cannot be undone.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' will be removed. This cannot be undone.</string>
     <string name="screens_loans_list_delete_confirm">Delete</string>
     <string name="screens_loans_list_delete_cancel">Cancel</string>
     <string name="screens_loans_list_total_outstanding_label">Total outstanding</string>

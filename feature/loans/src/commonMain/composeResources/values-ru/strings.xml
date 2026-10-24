@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Назад</string>
     <string name="screens_loans_list_new_fab_text">Новый кредит</string>
     <string name="screens_loans_list_delete_dialog_title">Удалить кредит?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' будет удалён. Отменить это нельзя.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' будет удалён. Отменить это нельзя.</string>
     <string name="screens_loans_list_delete_confirm">Удалить</string>
     <string name="screens_loans_list_delete_cancel">Отмена</string>
     <string name="screens_loans_list_total_outstanding_label">Всего к погашению</string>

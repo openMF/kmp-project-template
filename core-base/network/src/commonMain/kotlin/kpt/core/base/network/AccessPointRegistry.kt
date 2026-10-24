@@ -9,6 +9,8 @@
  */
 package kpt.core.base.network
 
+import io.ktor.client.HttpClient
+
 /** Transport kind of a declared network access point. */
 enum class AccessPointKind {
     /** A REST endpoint reached over Ktor/Ktorfit. */
@@ -96,6 +98,41 @@ data class AccessPoint(
   *   irrelevant — lookup is by id.
  */
 class AccessPointRegistry(val points: List<AccessPoint>) {
+
+    /**
+     * One [HttpClient] per ACCESS POINT, not per API.
+     *
+     * [ktorfitFor] used to build a fresh client on every call, and `restApi(...)` registers one Koin
+     * `single` per API TYPE. For a server exposing many resource APIs that multiplies: each API gets
+     * its own connection pool and TLS session cache, nothing is reused, and every API pays a full
+     * TCP + TLS handshake on first use.
+     *
+     * The network KSP processor already assumed the monolith case — its own comment reads "Fineract
+     * is one server, one base_url, one credential — and 21 resource-oriented APIs over it." The
+     * generator was taught that shape; this factory was not.
+     *
+     * Two forks hit it independently:
+     *  - `mifos-x-field-officer-app` MIGRATED onto `@ApiBinding`: 22 interfaces on one host, 23
+     *    `restApi` lines, 23 HttpClients. On device (2026-10-20, live Fineract) an authenticated
+     *    read never settled — minutes of "Refreshing…" with no error and no retry.
+     *  - `mifos-pay` never migrated, and sidestepped it by hand in its legacy stack: three
+     *    `single<KtorfitClient>` keyed by ROLE, ~24 services from one Ktorfit each. Its template path
+     *    carries 0 `@ApiBinding` APIs, so the defect is latent there rather than absent.
+     *
+     * Keying on the access-point id alone is correct, not merely cheaper: `dynamicHeaders` is a
+     * lambda resolved on EVERY request, so a credential written at login reaches a client built
+     * before it, and `defaultHeaders` are per access point by construction. Distinct access points
+     * keep distinct clients, so a per-endpoint credential never reaches a host that did not need it.
+     *
+     * Not separately locked. Koin serializes `single` creation, so the per-API registrations cannot
+     * race here; and if they ever did, the loser's client is discarded unused rather than observed —
+     * a wasteful outcome, not an incorrect one.
+     */
+    private val restClients: MutableMap<String, HttpClient> = mutableMapOf()
+
+    /** The shared REST client for [accessPointId], built by [build] on first use. */
+    internal fun sharedRestClient(accessPointId: String, build: () -> HttpClient): HttpClient =
+        restClients.getOrPut(accessPointId, build)
 
     /** Resolve the access point declared under [id], or `null`. */
     fun byId(id: String): AccessPoint? = points.firstOrNull { it.id == id }

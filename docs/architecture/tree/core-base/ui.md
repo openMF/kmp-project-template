@@ -2,7 +2,7 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_UI.md`
-> **Measured:** 78 Kotlin files, 13 test files
+> **Measured:** 79 Kotlin files, 14 test files
 
 **Defines annotations:** `@FeatureDestination`
 
@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/ui sha=5d381c29101ef6c23307e388ed14dc03cd5e28b3 -->
+<!-- api-docs:begin module=core-base/ui sha=881a0801a44b98db7ecfef487407d8c1b24da01b -->
 ## API reference
 
-_Generated from `core-base/ui` at tree `5d381c29101e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/ui` at tree `881a0801a44b` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -839,6 +839,20 @@ RefreshableScreenContent(stream = viewModel.rates) { rates, _ -> RatesList(rates
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonTest/kotlin/kpt/core/base/ui/screen/RefreshableScreenContentUiTest.kt:45</code></summary>
+
+```kotlin
+    fun aCallersEmptySlotIsRendered() = runComposeUiTest {
+        setContent {
+            RefreshableScreenContent(
+                state = ScreenState.Empty,
+                onRefresh = {},
+                empty = { Text("none yet", modifier = Modifier.testTag(CUSTOM)) },
+                content = content,
+```
+
+</details>
+
 ```kotlin
 fun <T> RefreshableScreenContent(
 ```
@@ -848,6 +862,20 @@ Non-stream (Store5-optional) overload — a caller with a plain `ScreenState` va
 
 ```kotlin
 RefreshableScreenContent(state = uiState, onRefresh = viewModel::onRefresh) { data, _ -> … }
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonTest/kotlin/kpt/core/base/ui/screen/RefreshableScreenContentUiTest.kt:45</code></summary>
+
+```kotlin
+    fun aCallersEmptySlotIsRendered() = runComposeUiTest {
+        setContent {
+            RefreshableScreenContent(
+                state = ScreenState.Empty,
+                onRefresh = {},
+                empty = { Text("none yet", modifier = Modifier.testTag(CUSTOM)) },
+                content = content,
 ```
 
 </details>
@@ -1893,5 +1921,5 @@ How a `BaseMutationViewModel` handles its submit — the single knob that replac
 
 ---
 
-_26 type(s), 140 function(s)/property(ies); 161 carry KDoc at source; 32 authored example(s); 55 live call site(s)._
+_26 type(s), 140 function(s)/property(ies); 161 carry KDoc at source; 32 authored example(s); 57 live call site(s)._
 <!-- api-docs:end -->

@@ -166,7 +166,13 @@ private fun String.matchesNetworkClassName(): Boolean =
         contains("Connect", ignoreCase = true) ||
         contains("Timeout", ignoreCase = true) ||
         contains("UnknownHost", ignoreCase = true) ||
-        contains("SSLException", ignoreCase = true) ||
+        // `SSL`, not `SSLException`: the JVM's TLS failures are `SSLHandshakeException` /
+        // `SSLPeerUnverifiedException`, which do not contain "SSLException" — measured 2026-10-25,
+        // a server whose TLS was down categorized Generic and sign-in blamed the password.
+        contains("SSL", ignoreCase = true) ||
+        // java.io.EOFException (an IOException the name match cannot see) — the cause under that
+        // handshake failure: the peer closed the connection.
+        contains("EOFException", ignoreCase = true) ||
         contains("Offline", ignoreCase = true) ||
         contains("HttpRequestException", ignoreCase = true) ||
         contains("Socket", ignoreCase = true) ||

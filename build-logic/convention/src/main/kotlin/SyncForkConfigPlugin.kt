@@ -877,6 +877,15 @@ abstract class SyncForkConfigTask : DefaultTask() {
         sb.append("    // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.\n")
         sb.append("    val points: List<AccessPoint> = listOf(\n")
         var count = 0
+        // `main: true` marks the access point whose clients follow the RUNTIME main network config
+        // (core-base NetworkConfigRepository). Two mains is a contradiction the app would only discover
+        // at start-up, so it fails the sync instead.
+        val mains = aps.mapNotNull { it as? Map<*, *> }.filter { it["main"] == true }.map { it["id"] }
+        if (mains.size > 1) {
+            throw org.gradle.api.GradleException(
+                "syncForkConfig: app-profile network.access_points marks ${mains.size} points main: true $mains — mark exactly one",
+            )
+        }
         for (ap in aps) {
             val m = ap as? Map<*, *> ?: continue
             val id = m["id"]?.toString()?.takeIf { it.isNotBlank() } ?: continue
@@ -930,6 +939,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 hdrs
             }
             if (authScheme != "NONE") sb.append("            auth = AuthScheme.$authScheme,\n")
+            if (m["main"] == true) sb.append("            isMain = true,\n")
             if (allHdrs.isNotEmpty()) {
                 sb.append("            headers = listOf(\n")
                 allHdrs.forEach { sb.append("                ").append(it).append(",\n") }

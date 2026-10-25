@@ -10,6 +10,7 @@
 package kpt.core.base.network
 
 import de.jensklingenberg.ktorfit.Ktorfit
+import io.ktor.client.HttpClientConfig
 import org.koin.core.module.Module
 
 /**
@@ -33,13 +34,15 @@ import org.koin.core.module.Module
  * written at login reaches requests made by a client that already existed.
  *
  * [onUnauthorized], when given, is told of every 401 on a request that carried credentials — see
- * [UnauthorizedHandler].
+ * [UnauthorizedHandler]. [networkConfigs], when given, resolves this point's URL and header values per
+ * request — runtime network configs, see [NetworkConfigRepository].
  */
 fun AccessPointRegistry.ktorfitFor(
     accessPointId: String,
     headerProvider: DefaultHeaderProvider = DefaultHeaderProvider.None,
     runtimeHeaders: RuntimeHeaderStore = RuntimeHeaderStore(),
     onUnauthorized: UnauthorizedHandler? = null,
+    networkConfigs: NetworkConfigRepository? = null,
 ): Ktorfit {
     val ap = byId(accessPointId)
         ?: error(
@@ -51,24 +54,47 @@ fun AccessPointRegistry.ktorfitFor(
     return Ktorfit.Builder()
         .httpClient(
             client = sharedRestClient(accessPointId) {
-                httpClient {
-                    setupDefaultHttpClient(
-                        baseUrl = ap.effectiveUrl,
-                        loggableHosts = listOf(ap.loggableHost),
-                        proxiedHosts = ap.proxiedHost?.let { listOf(it) } ?: emptyList(),
-                        // Per access point: a key belongs to ONE endpoint, and sending it to the
-                        // others leaks a credential to hosts that never needed it.
-                        defaultHeaders = headerProvider.headersFor(accessPointId),
-                        // The point's DECLARED headers, resolved per request so a runtimeKey picks
-                        // up the value login wrote after this client was built. This is also what
-                        // makes ONE client per access point correct rather than merely cheaper.
-                        dynamicHeaders = { runtimeHeaders.resolve(ap.headers) },
-                    ).invoke(this)
-                    onUnauthorized?.let { notifyUnauthorized(accessPointId, it) }
-                }
+                httpClient(restClientConfig(ap, headerProvider, runtimeHeaders, onUnauthorized, networkConfigs))
             },
         )
         .build()
+}
+
+/**
+ * The client configuration [ktorfitFor] builds an access point's shared client with — public so it can
+ * be exercised on a test engine exactly as the app runs it.
+ */
+fun restClientConfig(
+    ap: AccessPoint,
+    headerProvider: DefaultHeaderProvider = DefaultHeaderProvider.None,
+    runtimeHeaders: RuntimeHeaderStore = RuntimeHeaderStore(),
+    onUnauthorized: UnauthorizedHandler? = null,
+    networkConfigs: NetworkConfigRepository? = null,
+): HttpClientConfig<*>.() -> Unit = {
+    setupDefaultHttpClient(
+        baseUrl = ap.effectiveUrl,
+        loggableHosts = listOf(ap.loggableHost),
+        proxiedHosts = ap.proxiedHost?.let { listOf(it) } ?: emptyList(),
+        // Per access point: a key belongs to ONE endpoint, and sending it to the others leaks a
+        // credential to hosts that never needed it.
+        defaultHeaders = headerProvider.headersFor(ap.id),
+        // The point's DECLARED headers, resolved per request so a runtimeKey picks up the value login
+        // wrote after this client was built — with the runtime network config's header values applied.
+        // This is also what makes ONE client per access point correct rather than merely cheaper.
+        dynamicHeaders = {
+            val resolved = runtimeHeaders.resolve(ap.headers)
+            networkConfigs?.headersFor(ap, resolved) ?: resolved
+        },
+        // Runtime network configs: the URL is resolved per request, so an edit or a main switch
+        // reaches a client that already exists. Null = the declared URL.
+        dynamicUrlProvider = networkConfigs?.let { configs ->
+            object : DynamicUrlConfigProvider {
+                override fun getBaseUrl(): String = configs.urlFor(ap)
+                override fun getLoggableHosts(): List<String> = listOf(ap.loggableHost)
+            }
+        },
+    ).invoke(this)
+    onUnauthorized?.let { notifyUnauthorized(ap.id, it) }
 }
 
 /**
@@ -94,6 +120,7 @@ inline fun <reified T : Any> Module.restApi(
                 runtimeHeaders = getOrNull<RuntimeHeaderStore>() ?: RuntimeHeaderStore(),
                 // Optional: bound by a fork that wants a rejected session to end it (UnauthorizedHandler).
                 onUnauthorized = getOrNull<UnauthorizedHandler>(),
+                networkConfigs = getOrNull<NetworkConfigRepository>(),
             ),
         )
     }

@@ -2,13 +2,13 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_NETWORK.md`
-> **Measured:** 23 Kotlin files, 0 test files
+> **Measured:** 25 Kotlin files, 0 test files
 
 **Defines annotations:** `@ApiBinding`
 
 ## Principal types
 
-`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 13 more
+`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 19 more
 
 <!-- scaffold:end -->
 
@@ -16,10 +16,50 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/network sha=7ca62ddad36e0c337eb5050cb1ff0ad2a5775df9 -->
+### Runtime network configs — N declared, one main, all switchable
+
+`app-profile/app.yaml#network.access_points` declares the app's servers. `NetworkConfigRepository`
+(`NetworkConfig.kt`, bound by `di/NetworkConfigModule`, included from core/network's `NetworkModule`)
+turns every one of them into a **runtime network config** — `{id, kind, baseUrl, headers, enabled}` —
+that the running app can change without a rebuild:
+
+| operation | what it does | refused when |
+|---|---|---|
+| `update(id, baseUrl, headers)` | edit a config's URL / declared-header values | unknown id |
+| `add(config)` | a config that app-profile never declared (`runtimeAdded = true`) | id already exists |
+| `setMain(id)` | make another config the main one | different `kind`, or disabled |
+| `disable(id)` / `enable(id)` | a disabled config fails its requests rather than silently falling back | it is the main |
+| `remove(id)` | delete a runtime-added config | declared in app-profile, or it is the main |
+| `reset(id)` / `resetAll()` | back to exactly what app-profile declares | — |
+
+**Main vs sub.** At most one access point is `main: true` (the generator refuses two). Clients bound to
+that point follow `mainId`, so `setMain("staging")` repoints every main-bound client at once; every
+other config is a *sub* that keeps serving its own clients. Any kind can be main — a Supabase-backed
+fork marks its Supabase point — but the main only switches between configs of the same kind.
+
+**Where it reaches requests.** `ktorfitFor` / `restApi` resolve `getOrNull<NetworkConfigRepository>()`
+and pass it to `restClientConfig`, which reads the URL (`DynamicBaseUrlPlugin`, with `staticBaseUrl` so
+the declared base path is replaced, not stacked) and the header values **per request**. So a change
+reaches a client that already exists — the shared per-access-point client is never rebuilt.
+`SupabaseClientFactory` rebuilds its cached client when the effective URL changes (the Supabase SDK
+fixes its URL at construction).
+
+**Persistence.** Only the *difference* from app-profile is stored (`NetworkConfigOverrides`, key
+`kpt.network.configs` in the `plain` `Settings`); an unchanged config stores nothing, and a persisted
+`mainId` that app-profile no longer declares falls back to the declared main. With no `plain`
+Settings bound it runs in memory (`InMemoryNetworkConfigStore`), which is what tests use.
+
+**What a fork does with it.** Put a screen over it — a "server" setting is a read of `mainConfig()` and
+a write through `update(mainId, …)`. Do **not** keep a second copy of the server in preferences: that is
+exactly how a settings screen and the HTTP client end up disagreeing about which server is in use.
+Changing the server usually invalidates the session, so sign out on a change.
+
+Tests: `core/network/src/commonTest/.../config/{NetworkConfigRepositoryTest,NetworkConfigRequestTest,DynamicBaseUrlTest}.kt`.
+
+<!-- api-docs:begin module=core-base/network sha=d494ec29670653227c363996418359050779f3fb -->
 ## API reference
 
-_Generated from `core-base/network` at tree `7ca62ddad36e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `d494ec296706` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -34,7 +74,7 @@ enum class AccessPointKind
 ```
 Transport kind of a declared network access point.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:40</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:36</code></summary>
 
 ```kotlin
         AccessPoint(
@@ -42,8 +82,8 @@ Transport kind of a declared network access point.
             kind = AccessPointKind.REST,
             baseUrl = "https://api.example.com/",
             loggableHost = "api.example.com",
+            isMain = true,
         ),
-        AccessPoint(
 ```
 
 </details>
@@ -53,11 +93,11 @@ data class AccessPoint(
 ```
 One declared network access point — a named endpoint the app talks to.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:37</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:33</code></summary>
 
 ```kotlin
-     * there, not here.
-     */
+    // Edit access points THERE (the SoT) and run `./gradlew syncForkConfig`; do not hand-edit this block.
+    // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.
     val points: List<AccessPoint> = listOf(
         AccessPoint(
             id = "main",
@@ -207,6 +247,7 @@ val stagingClient = httpClient {
         multiUrlProvider != null -> install(DynamicBaseUrlPlugin) {
             multiConfigProvider = multiUrlProvider
             this.urlType = urlType
+            staticBaseUrl = baseUrl
         }
 ```
 
@@ -263,16 +304,16 @@ class MyConfigProvider(
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/DynamicBaseUrlPlugin.kt:60</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/DynamicBaseUrlTest.kt:41</code></summary>
 
 ```kotlin
- */
-class DynamicBaseUrlPlugin private constructor(
-    private val configProvider: DynamicUrlConfigProvider?,
-    private val multiConfigProvider: MultiUrlConfigProvider?,
-    private val urlType: UrlType,
-) {
-    /**
+            baseUrl = "https://api.example.org/1.0/field/v1/",
+            dynamicUrlProvider = dynamicBase?.let { base ->
+                object : DynamicUrlConfigProvider {
+                    override fun getBaseUrl() = base
+                    override fun getLoggableHosts() = listOf("other.example")
+                }
+            },
 ```
 
 </details>
@@ -339,7 +380,7 @@ data class HeaderSpec(
 ```
 A header an access point sends on every request, declared in `app-profile/app.yaml#network.access_points[].headers[]`. Two kinds, because they have different lifetimes: - **static** (`value` set) — known at build time.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:89</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:86</code></summary>
 
 ```kotlin
             auth = AuthScheme.BASIC,
@@ -414,12 +455,126 @@ val client = httpClient(setupDefaultHttpClient(baseUrl = "https://api.example.co
 
 </details>
 
+### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/NetworkConfig.kt`
+
+```kotlin
+data class NetworkConfig(
+```
+One network config as the app runs it — a declared access point (`app-profile/app.yaml`) with any runtime changes applied, or a config added at runtime. `baseUrl` is the full URL requests resolve against (origin + API path).
+
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:83</code></summary>
+
+```kotlin
+    fun aConfigAddedAtRuntimeCanBecomeMainAndBeRemoved() {
+        val r = repo()
+        r.add(NetworkConfig(id = "custom", kind = AccessPointKind.REST, baseUrl = "http://10.0.2.2:8080/fineract-provider/api/v1/"))
+        r.setMain("custom")
+        assertEquals("http://10.0.2.2:8080/fineract-provider/api/v1/", r.urlFor(main))
+        assertFailsWith<IllegalArgumentException>("the main cannot be removed") { r.remove("custom") }
+        r.setMain("main")
+```
+
+</details>
+
+```kotlin
+data class NetworkConfigOverrides(
+```
+The persisted half: only what differs from app-profile.
+
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:119</code></summary>
+
+```kotlin
+
+        // A persisted main that app-profile no longer declares.
+        val stale = repo(InMemoryNetworkConfigStore(NetworkConfigOverrides(mainId = "gone")))
+        assertEquals("main", stale.mainId)
+    }
+
+    @Test
+```
+
+</details>
+
+```kotlin
+interface NetworkConfigStore
+```
+Where `NetworkConfigRepository` keeps its overrides.
+
+- `fun load(): NetworkConfigOverrides`
+- `fun save(overrides: NetworkConfigOverrides)`
+
+```kotlin
+class InMemoryNetworkConfigStore(private var overrides: NetworkConfigOverrides = NetworkConfigOverrides()) : NetworkConfigStore
+```
+Not persisted — for tests and for an app that wants changes to last one session only.
+
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:44</code></summary>
+
+```kotlin
+    private val registry = AccessPointRegistry(listOf(main, staging, supabase))
+
+    private fun repo(store: InMemoryNetworkConfigStore = InMemoryNetworkConfigStore()) = NetworkConfigRepository(registry, store)
+
+    @Test
+    fun withNoChangesEveryPointUsesWhatAppProfileDeclares() {
+        val r = repo()
+```
+
+</details>
+
+```kotlin
+class SettingsNetworkConfigStore(private val settings: Settings, private val key: String = KEY) : NetworkConfigStore
+```
+Persists the overrides as JSON in `settings` (the app's plain settings). A corrupt value reads as none.
+
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/di/NetworkConfigModule.kt:31</code></summary>
+
+```kotlin
+        NetworkConfigRepository(
+            registry = get(),
+            store = getOrNull<Settings>(named("plain"))?.let(::SettingsNetworkConfigStore) ?: InMemoryNetworkConfigStore(),
+        )
+    }
+}
+```
+
+</details>
+
+```kotlin
+class NetworkConfigRepository(
+```
+The app's network configs at runtime: every access point app-profile declares, changeable, plus any added at runtime — with one of them MAIN. **Main.** App-profile marks one access point `main: true`.
+
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:44</code></summary>
+
+```kotlin
+    private val registry = AccessPointRegistry(listOf(main, staging, supabase))
+
+    private fun repo(store: InMemoryNetworkConfigStore = InMemoryNetworkConfigStore()) = NetworkConfigRepository(registry, store)
+
+    @Test
+    fun withNoChangesEveryPointUsesWhatAppProfileDeclares() {
+        val r = repo()
+```
+
+</details>
+
+```kotlin
+fun AccessPoint.toNetworkConfig(): NetworkConfig = NetworkConfig(
+```
+A declared point as a `NetworkConfig`: its URL and its static header values.
+
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/NetworkDsl.kt`
 
 ```kotlin
 fun AccessPointRegistry.ktorfitFor(
 ```
 Build a Ktorfit for the REST access point declared under `accessPointId`. Base URL + loggable host + proxied host come from this `AccessPointRegistry`; throws if the id isn't declared.
+
+```kotlin
+fun restClientConfig(
+```
+The client configuration `ktorfitFor` builds an access point's shared client with — public so it can be exercised on a test engine exactly as the app runs it.
 
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/NetworkError.kt`
 
@@ -469,7 +624,7 @@ class SupabaseClientFactory(
 ```
 Per-point Supabase client factory. Builds one `SupabaseConfigClient` per declared Supabase `AccessPoint`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:85</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:88</code></summary>
 
 ```kotlin
     // Per-point Supabase client factory — URL from AccessPointRegistry, anon key by id.
@@ -537,16 +692,16 @@ object MySupabaseCredentials : SupabaseCredentials {
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/SupabaseClientFactory.kt:44</code></summary>
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/SupabaseClientFactory.kt:54</code></summary>
 
 ```kotlin
-        return cache.getOrPut(id) {
-            SupabaseConfigClient(
-                credentials = object : SupabaseCredentials {
-                    override val url: String = point.baseUrl
-                    override val anonKey: String = anonKeyFor(id)
-                },
-                logLevel = logLevel,
+        val anonKey = config?.headers?.get(ANON_KEY_HEADER)?.takeIf { it.isNotBlank() } ?: anonKeyFor(config?.id ?: id)
+        val client = SupabaseConfigClient(
+            credentials = object : SupabaseCredentials {
+                override val url: String = url
+                override val anonKey: String = anonKey
+            },
+            logLevel = logLevel,
 ```
 
 </details>
@@ -641,7 +796,7 @@ val NetworkBaseModule = module
 ```
 Framework network wiring — the half of the network graph a fork never configures. ## Why these bindings are here and not in `core/network` A binding belongs in `core-base` when it touches nothing the fork generates.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:56</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:57</code></summary>
 
 ```kotlin
 val NetworkModule = module {
@@ -650,6 +805,27 @@ val NetworkModule = module {
 
     // Runtime header values — written at login (Basic / OAuth), read on EVERY request. A singleton,
     // because the whole point is that a value set after the clients were built still reaches them.
+```
+
+</details>
+
+### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/di/NetworkConfigModule.kt`
+
+```kotlin
+val NetworkConfigModule = module
+```
+Runtime network configs, bound by core-base — an app includes this module and gets the whole feature: every declared access point editable and switchable at runtime, persisted, with `restApi` and `SupabaseClientFactory` following it.
+
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:75</code></summary>
+
+```kotlin
+    includes(GeneratedApiBindings)
+    // Runtime network configs (core-base): every access point editable/switchable at runtime, persisted.
+    includes(NetworkConfigModule)
+
+    // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
+    // The restApi("<id>") DSL and AppMultiUrlConfigProvider both resolve transports/base-URLs from this.
+    single { AccessPointRegistry(AppAccessPoints.points) }
 ```
 
 </details>
@@ -674,5 +850,5 @@ interface ApiService {
 
 ---
 
-_23 type(s), 16 function(s)/property(ies); 39 carry KDoc at source; 12 authored example(s); 19 live call site(s)._
+_29 type(s), 21 function(s)/property(ies); 48 carry KDoc at source; 12 authored example(s); 25 live call site(s)._
 <!-- api-docs:end -->

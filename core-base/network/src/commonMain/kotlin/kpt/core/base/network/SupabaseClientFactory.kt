@@ -33,22 +33,33 @@ class SupabaseClientFactory(
      * Keyed by id because a fork may run several projects and want Auth on only one of them.
      */
     private val installExtrasFor: (id: String) -> SupabaseClientBuilder.() -> Unit = { {} },
+    /**
+     * Runtime network configs. When bound, a point's client is built against its EFFECTIVE config —
+     * so editing it, or switching main to another Supabase config, repoints it. A client already
+     * handed out keeps its project; the next [clientFor] builds the new one.
+     */
+    private val networkConfigs: NetworkConfigRepository? = null,
 ) {
-    private val cache: MutableMap<String, SupabaseConfigClient> = mutableMapOf()
+    private val cache: MutableMap<String, Pair<String, SupabaseConfigClient>> = mutableMapOf()
 
     /** Client for [id], or `null` if [id] is not a declared Supabase access point. */
     fun clientFor(id: String): SupabaseConfigClient? {
         val point = registry.byId(id)?.takeIf { it.kind == AccessPointKind.SUPABASE } ?: return null
-        return cache.getOrPut(id) {
-            SupabaseConfigClient(
-                credentials = object : SupabaseCredentials {
-                    override val url: String = point.baseUrl
-                    override val anonKey: String = anonKeyFor(id)
-                },
-                logLevel = logLevel,
-                installExtras = installExtrasFor(id),
-            )
-        }
+        val config = networkConfigs?.effectiveFor(point)
+        val url = config?.baseUrl ?: point.baseUrl
+        cache[id]?.let { (builtFor, client) -> if (builtFor == url) return client }
+        // A declared config's key comes from the fork's secrets; one added at runtime carries its own.
+        val anonKey = config?.headers?.get(ANON_KEY_HEADER)?.takeIf { it.isNotBlank() } ?: anonKeyFor(config?.id ?: id)
+        val client = SupabaseConfigClient(
+            credentials = object : SupabaseCredentials {
+                override val url: String = url
+                override val anonKey: String = anonKey
+            },
+            logLevel = logLevel,
+            installExtras = installExtrasFor(id),
+        )
+        cache[id] = url to client
+        return client
     }
 
     /**
@@ -70,4 +81,9 @@ class SupabaseClientFactory(
     /** Map of every declared Supabase access-point id → its client. */
     fun clients(): Map<String, SupabaseConfigClient> =
         registry.supabasePoints().mapNotNull { p -> clientFor(p.id)?.let { p.id to it } }.toMap()
+
+    private companion object {
+        /** The header a Supabase project's anon key travels in — how a runtime-added config supplies it. */
+        const val ANON_KEY_HEADER = "apikey"
+    }
 }

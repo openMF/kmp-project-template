@@ -13,6 +13,7 @@ import kpt.core.base.network.AccessPointRegistry
 import kpt.core.base.network.DefaultHeaderProvider
 import kpt.core.base.network.MultiUrlConfigProvider
 import kpt.core.base.network.SupabaseClientFactory
+import kpt.core.base.network.di.NetworkConfigModule
 import kpt.core.base.network.SupabaseExtrasProvider
 import kpt.core.base.network.di.NetworkBaseModule
 import kpt.core.network.config.AppAccessPoints
@@ -70,6 +71,8 @@ val NetworkModule = module {
     // `**/demo/**` package, which used to take the generated file with it and turn every later
     // syncForkConfig into a silent no-op for a cleaned fork.
     includes(GeneratedApiBindings)
+    // Runtime network configs (core-base): every access point editable/switchable at runtime, persisted.
+    includes(NetworkConfigModule)
 
     // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
     // The restApi("<id>") DSL and AppMultiUrlConfigProvider both resolve transports/base-URLs from this.
@@ -97,6 +100,7 @@ val NetworkModule = module {
             installExtrasFor = { id ->
                 getOrNull<SupabaseExtrasProvider>()?.forId(id) ?: {}
             },
+            networkConfigs = getOrNull(),
         )
     }
 

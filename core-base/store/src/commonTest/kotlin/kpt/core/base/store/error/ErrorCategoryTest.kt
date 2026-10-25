@@ -85,6 +85,16 @@ class ErrorCategoryTest {
     }
 
     @Test
+    fun categorize_tlsHandshakeFailure_returnsNetwork() {
+        // javax.net.ssl.SSLHandshakeException does not contain "SSLException"; its cause, an
+        // EOFException, contains no transport pattern either. Measured on device 2026-10-25.
+        class EOFException : RuntimeException()
+        class SSLHandshakeException(cause: Throwable) : RuntimeException("connection closed", cause)
+        assertEquals(ErrorCategory.Network, categorize(SSLHandshakeException(EOFException())))
+        assertEquals(ErrorCategory.Network, categorize(EOFException()))
+    }
+
+    @Test
     fun categorize_ktorJsEngineFailure_returnsNetwork() {
         // Ktor's JS and wasmJs engines wrap EVERY JavaScript-side failure in
         //   class JsError(origin: dynamic) : Throwable("Error from javascript[...]")

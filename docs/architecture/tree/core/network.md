@@ -2,7 +2,7 @@
 
 > **Layer:** core — fork-owned; a codegen target
 > **Corpus surface:** `CORE_NETWORK.md`
-> **Measured:** 36 Kotlin files, 11 test files
+> **Measured:** 39 Kotlin files, 14 test files
 
 ## Codegen contracts owned here
 
@@ -22,10 +22,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=cba8e33130c32efb9cc5bf3e33b563529a1e0def -->
+<!-- api-docs:begin module=core/network sha=db77bb3bdae3d823451550333bdc1a02ff32c8a8 -->
 ## API reference
 
-_Generated from `core/network` at tree `cba8e33130c3` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `db77bb3bdae3` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`
@@ -141,7 +141,7 @@ object AppAccessPoints
 ```
 The per-fork list of network access points this app talks to — REST and Supabase in ONE place.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:76</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:79</code></summary>
 
 ```kotlin
     // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
@@ -155,7 +155,7 @@ The per-fork list of network access points this app talks to — REST and Supaba
 
 </details>
 
-- `val points: List<AccessPoint> = listOf(` — This project's declared access points. Generated from `app-profile#network.access_points` — add an endpoint there, not here.
+- `val points: List<AccessPoint> = listOf(`
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/config/AppMultiUrlConfigProvider.kt`
 
@@ -164,7 +164,7 @@ class AppMultiUrlConfigProvider(
 ```
 Concrete `MultiUrlConfigProvider` backed by the declarative `AccessPointRegistry`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:81</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:84</code></summary>
 
 ```kotlin
     // AccessPointRegistry. Clients thread it via
@@ -185,7 +185,7 @@ object AppSupabaseAnonKeys
 ```
 The per-fork map of Supabase access-point id → anon key. **SoT: `app-profile/app.yaml#network.access_points`** (rows) **+ the build environment** (values).
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:90</code></summary>
 
 ```kotlin
         SupabaseClientFactory(
@@ -242,7 +242,7 @@ object ProjectNetworkHeaders : DefaultHeaderProvider {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:64</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:65</code></summary>
 
 ```kotlin
     // built by `restApi(...)` resolves this, so a fork adds an app-wide header without hand-building
@@ -702,5 +702,5 @@ Custom serializer that destructures the World Bank's `[metadata, observations[]]
 
 ---
 
-_32 type(s), 38 function(s)/property(ies); 59 carry KDoc at source; 3 authored example(s); 26 live call site(s)._
+_32 type(s), 38 function(s)/property(ies); 58 carry KDoc at source; 3 authored example(s); 26 live call site(s)._
 <!-- api-docs:end -->

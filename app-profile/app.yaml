@@ -55,6 +55,11 @@ network:
   #                  travels with the endpoint. Joined as origin + "/" + path + "/".
   #   loggable_host  host enabled for HTTP logging.
   #   proxied_host   optional — route via the platform proxy (CORS-blocked hosts).
+  #   main           optional, at most ONE point — `main: true`. Its clients follow the RUNTIME main
+  #                  network config (core-base NetworkConfigRepository): the app can edit any config,
+  #                  add one at runtime, disable it, or switch which is main, persisted across restarts.
+  #                  The values declared here are the defaults that `reset` returns to. Any kind may
+  #                  be main (REST or Supabase); the main switches only between configs of its kind.
   #   secret_alias   optional — vault alias for a REQUEST-time key (e.g. FRED's @Query api_key).
   #   (no `api:` field) — the class<->point link lives on the CLASS, as `@ApiBinding("<id>")`, which
   #                  generates the Koin binding into core/network/.../di/GeneratedApiBindings.kt:
@@ -105,6 +110,7 @@ network:
     - id: main
       owner: fork
       type: rest
+      main: true                    # the runtime-switchable server — see `main` above
       base_url: https://api.example.com/
       auth: none                    # the fork's endpoint — set basic/bearer/oauth when you wire sign-in
       loggable_host: api.example.com

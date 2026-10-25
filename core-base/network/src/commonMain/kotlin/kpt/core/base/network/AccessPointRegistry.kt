@@ -70,6 +70,12 @@ data class AccessPoint(
      * no call site formats a credential by hand.
      */
     val auth: AuthScheme = AuthScheme.NONE,
+    /**
+     * `main: true` in app-profile — at most one point. Clients bound to it follow whichever network
+     * config is MAIN at runtime ([NetworkConfigRepository.setMain]); every other point's clients follow
+     * their own config.
+     */
+    val isMain: Boolean = false,
 ) {
     /**
      * The URL requests are actually made against — [baseUrl] + [basePath], normalised.

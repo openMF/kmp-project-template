@@ -71,4 +71,5 @@
     <string name="feature_settings_conflicts_row_label">Conflict</string>
     <string name="feature_settings_conflicts_accept_server">Keep server</string>
     <string name="feature_settings_conflicts_retry_local">Retry mine</string>
+    <string name="feature_settings_sync_drafts_open">Open</string>
 </resources>

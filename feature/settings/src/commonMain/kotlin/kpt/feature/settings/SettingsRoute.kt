@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import kotlinx.serialization.Serializable
+import kpt.core.base.store.infra.DraftRecord
 import kpt.core.base.ui.nav.composableWithPushTransitions
 
 /** Route for the settings screen. */
@@ -79,10 +80,18 @@ fun NavGraphBuilder.notificationDestination(onBackClick: () -> Unit) {
  *
  * @param onBackClick invoked to leave the screen.
  */
-fun NavGraphBuilder.syncAndDraftsDestination(onBackClick: () -> Unit) {
+/**
+ * [draftExtras] lets the app name its drafts and reopen their forms (`DraftRowExtras`): called once
+ * per screen, it returns the per-row lookup. Default = the template's raw form-key rows.
+ */
+fun NavGraphBuilder.syncAndDraftsDestination(
+    onBackClick: () -> Unit,
+    draftExtras: @Composable () -> (DraftRecord) -> DraftRowExtras? = { { null } },
+) {
     composableWithPushTransitions<SyncAndDraftsRoute> {
         SyncAndDraftsScreen(
             onBackClick = onBackClick,
+            draftExtras = draftExtras,
         )
     }
 }

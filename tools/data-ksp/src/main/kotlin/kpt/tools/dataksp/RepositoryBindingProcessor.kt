@@ -237,9 +237,20 @@ class RepositoryBindingProcessor(
             append(" * binding that does not exist, and a binding cannot be left unqualified by accident.\n")
             append(" */\n")
             append("object AppOutboxQualifiers {\n")
+            // The last segment names the member when it is unique ("outbox.note" -> Note); when two
+            // qualifiers share it ("outbox.create", "syncer.create") both take the full path
+            // (OutboxCreate, SyncerCreate) — the short form alone emitted two `val Create`s and the
+            // generated file did not compile.
+            fun String.camel() = split('.', '-', '_').filter { it.isNotEmpty() }
+                .joinToString("") { part -> part.replaceFirstChar { it.uppercaseChar() } }
+            val lastSegmentCount = named.groupingBy { it.qualifier.substringAfterLast('.') }.eachCount()
             named.forEach { p ->
-                val member = p.qualifier.substringAfterLast('.').replaceFirstChar { it.uppercaseChar() }
-                append("    /** `${p.returns.substringAfterLast('.')}` from `${p.fnName}`. */\n")
+                val last = p.qualifier.substringAfterLast('.')
+                val member = if (lastSegmentCount.getValue(last) > 1) p.qualifier.camel() else last.camel()
+                // Simple names throughout ("SubmitOutbox<CreateDraft>"), not the tail of a qualified
+                // generic ("CreateDraft>").
+                val typeLabel = p.returns.replace(Regex("""[A-Za-z_][\w]*\."""), "")
+                append("    /** `$typeLabel` from `${p.fnName}`. */\n")
                 append("    val $member = named(\"${p.qualifier}\")\n")
             }
             append("}\n")

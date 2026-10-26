@@ -93,7 +93,6 @@ class SupabaseAccessPointTest {
         assertFalse(api.isConfigured)
         // The guard matters: without it this would reach `client`, build a Supabase client on an empty
         // URL, and fail at app start-up on every unconfigured fork.
-        assertTrue(api.fetchConfig().isEmpty())
-        assertNull(api.fetchValue("any-key"))
+        assertNull(api.fetchInstancesConfig(), "an unconfigured client reads nothing")
     }
 }

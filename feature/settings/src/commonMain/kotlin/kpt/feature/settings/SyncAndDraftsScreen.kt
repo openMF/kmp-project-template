@@ -56,6 +56,7 @@ import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_dis
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_discard_confirm_title
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_empty_message
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_empty_title
+import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_open
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_prune
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_retry
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_section_drafts
@@ -78,6 +79,7 @@ import org.koin.compose.viewmodel.koinViewModel
 internal fun SyncAndDraftsScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    draftExtras: @Composable () -> (DraftRecord) -> DraftRowExtras? = { { null } },
     viewModel: SyncAndDraftsViewModel = koinViewModel(),
     conflictViewModel: ConflictInboxViewModel = koinViewModel(),
 ) {
@@ -93,6 +95,7 @@ internal fun SyncAndDraftsScreen(
         onPrune = viewModel::pruneExpired,
         onAcceptServer = conflictViewModel::acceptServer,
         onRetryLocal = conflictViewModel::retryLocal,
+        extrasFor = draftExtras(),
         modifier = modifier.testTag(TestTags.SyncAndDrafts.SCREEN),
     )
 }
@@ -108,6 +111,7 @@ internal fun SyncAndDraftsScreenContent(
     conflicts: List<ConflictEntry> = emptyList(),
     onAcceptServer: (String) -> Unit = {},
     onRetryLocal: (String) -> Unit = {},
+    extrasFor: (DraftRecord) -> DraftRowExtras? = { null },
 ) {
     val sp = MaterialTheme.spacing
 
@@ -155,18 +159,21 @@ internal fun SyncAndDraftsScreenContent(
                     draftSection(
                         titleRes = Res.string.feature_settings_sync_drafts_section_failed,
                         rows = uiState.failed,
+                        extrasFor = extrasFor,
                         onRetry = onRetry,
                         onDiscardRequest = { pendingDiscardId = it },
                     )
                     draftSection(
                         titleRes = Res.string.feature_settings_sync_drafts_section_syncing,
                         rows = uiState.syncing,
+                        extrasFor = extrasFor,
                         onRetry = null,
                         onDiscardRequest = { pendingDiscardId = it },
                     )
                     draftSection(
                         titleRes = Res.string.feature_settings_sync_drafts_section_drafts,
                         rows = uiState.drafts,
+                        extrasFor = extrasFor,
                         onRetry = null,
                         onDiscardRequest = { pendingDiscardId = it },
                     )
@@ -188,6 +195,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.draftSection(
     rows: List<DraftRecord>,
     onRetry: ((Long) -> Unit)?,
     onDiscardRequest: (Long) -> Unit,
+    extrasFor: (DraftRecord) -> DraftRowExtras? = { null },
 ) {
     if (rows.isEmpty()) return
     item(key = "header_$titleRes") {
@@ -204,18 +212,24 @@ private fun androidx.compose.foundation.lazy.LazyListScope.draftSection(
             record = record,
             onRetry = onRetry?.let { { it(record.id) } },
             onDiscard = { onDiscardRequest(record.id) },
+            extras = extrasFor(record),
         )
     }
 }
 
 @Composable
-internal fun DraftRow(record: DraftRecord, onRetry: (() -> Unit)?, onDiscard: () -> Unit) {
+internal fun DraftRow(
+    record: DraftRecord,
+    onRetry: (() -> Unit)?,
+    onDiscard: () -> Unit,
+    extras: DraftRowExtras? = null,
+) {
     val sp = MaterialTheme.spacing
     AppCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.fillMaxWidth().padding(sp.md), verticalArrangement = Arrangement.spacedBy(sp.xs)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
                 Text(
-                    text = record.formTitle(),
+                    text = extras?.title ?: record.formTitle(),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
@@ -233,7 +247,15 @@ internal fun DraftRow(record: DraftRecord, onRetry: (() -> Unit)?, onDiscard: ()
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+            extras?.subtitle?.let {
+                Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
+                extras?.onOpen?.let { open ->
+                    TextButton(onClick = open, modifier = Modifier.testTag(TestTags.SyncAndDrafts.OPEN)) {
+                        Text(stringResource(Res.string.feature_settings_sync_drafts_open))
+                    }
+                }
                 if (onRetry != null) {
                     TextButton(onClick = onRetry) {
                         Icon(AppIcons.Payment, contentDescription = null, modifier = Modifier.padding(end = sp.xs))
@@ -387,3 +409,14 @@ internal fun ConflictRowCard(
         }
     }
 }
+
+/**
+ * What an app adds to one draft row: a readable [title] / [subtitle] in place of the raw form key,
+ * and [onOpen] — reopen the form the draft came from, so it can be resumed. Supplied through
+ * [syncAndDraftsDestination]'s `draftExtras`; null fields keep the template's defaults.
+ */
+data class DraftRowExtras(
+    val title: String? = null,
+    val subtitle: String? = null,
+    val onOpen: (() -> Unit)? = null,
+)

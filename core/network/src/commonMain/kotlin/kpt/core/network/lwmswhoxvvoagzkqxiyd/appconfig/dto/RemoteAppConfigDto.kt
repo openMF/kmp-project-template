@@ -9,21 +9,20 @@
  */
 package kpt.core.network.lwmswhoxvvoagzkqxiyd.appconfig.dto
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonArray
 
 /**
- * One row of a Supabase `app_config` table — the canonical "runtime server config" shape a fork
- * fetches at start-up (feature flags, a minimum supported version, a maintenance banner).
+ * One row of the Mifos Supabase `app_config` table — the SHAPE THE LIVE TABLE HAS (read 2026-10-25):
+ * `{id, instances, created_at}`, one row whose `instances` column is the shared server-instance list
+ * every Mifos app reads (mifos-pay's `InstancesConfig`). Each instance names its `supportedApps`.
  *
- * Field names mirror Postgres snake_case columns via [SerialName].
+ * NOT the template's original `{key, value}` rows: that contract never matched this project, so a
+ * key/value read decoded nothing and the app silently stayed on its bundled list.
  */
 @Serializable
 data class RemoteAppConfigDto(
-    /** Config key, e.g. `min_supported_version`. */
-    @SerialName("key") val key: String,
-    /** Value as text. Always a string on the wire; the consumer parses it, so adding a typed key needs no migration. */
-    @SerialName("value") val value: String,
-    /** When the row last changed, ISO-8601, or null when the table does not track it. */
-    @SerialName("updated_at") val updatedAt: String? = null,
+    val id: String? = null,
+    /** Kept as raw JSON: core/network's `parseInstances` owns the instance shape, for this row and the bundled list alike. */
+    val instances: JsonArray = JsonArray(emptyList()),
 )

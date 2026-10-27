@@ -98,15 +98,21 @@ class RoomFormDraftRepository(
 
     override suspend fun delete(form: String, slot: String) = dao.deleteByUniqueKey(form, slot)
 
+    /** Null when the row has no slot or its payload no longer decodes. */
     private fun DraftEntity.toSaved(): SavedFormDraft? {
-        val draft = runCatching { FormDraftJson.decode(FormDraft.serializer(), payloadJson) }.getOrNull() ?: return null
-        return SavedFormDraft(
-            id = id,
-            slot = uniqueKey ?: return null,
-            draft = draft,
-            status = runCatching { SubmitOutboxStatus.valueOf(status) }.getOrDefault(SubmitOutboxStatus.PENDING),
-            updatedAtMs = updatedAtMs,
-            errorMessage = errorMessage,
-        )
+        val draft = runCatching { FormDraftJson.decode(FormDraft.serializer(), payloadJson) }.getOrNull()
+        val slot = uniqueKey
+        return if (draft == null || slot == null) {
+            null
+        } else {
+            SavedFormDraft(
+                id = id,
+                slot = slot,
+                draft = draft,
+                status = runCatching { SubmitOutboxStatus.valueOf(status) }.getOrDefault(SubmitOutboxStatus.PENDING),
+                updatedAtMs = updatedAtMs,
+                errorMessage = errorMessage,
+            )
+        }
     }
 }

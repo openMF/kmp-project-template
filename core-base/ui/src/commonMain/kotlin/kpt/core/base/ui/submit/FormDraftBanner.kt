@@ -36,8 +36,9 @@ import org.jetbrains.compose.resources.stringResource
 
 /**
  * "You have a saved draft" with Resume / Discard — shown when a create form opens on a slot that
- * holds one. Unlike `DraftResumeBanner` (an outbox entry, PENDING only) it also says WHY the draft exists: [failureReason] null = it is waiting to send,
- * non-null = the server refused it, with the server's reason.
+ * holds one. Unlike `DraftResumeBanner` (an outbox entry, PENDING only) it also says WHY the draft
+ * exists: [failureReason] null = it is waiting to send, non-null = the server refused it, with the
+ * server's reason.
  */
 @Composable
 fun FormDraftBanner(
@@ -50,7 +51,11 @@ fun FormDraftBanner(
     Card(
         modifier = modifier.fillMaxWidth().padding(vertical = 8.dp).testTag(FormDraftTestTags.BANNER),
         colors = CardDefaults.cardColors(
-            containerColor = if (failed) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer,
+            containerColor = if (failed) {
+                MaterialTheme.colorScheme.errorContainer
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer
+            },
         ),
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -59,7 +64,10 @@ fun FormDraftBanner(
                 style = MaterialTheme.typography.titleSmall,
             )
             failureReason?.let { Text(text = it, style = MaterialTheme.typography.bodySmall) }
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, androidx.compose.ui.Alignment.End)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, androidx.compose.ui.Alignment.End),
+            ) {
                 TextButton(onClick = onDiscard, modifier = Modifier.testTag(FormDraftTestTags.DISCARD)) {
                     Text(stringResource(Res.string.draft_discard))
                 }

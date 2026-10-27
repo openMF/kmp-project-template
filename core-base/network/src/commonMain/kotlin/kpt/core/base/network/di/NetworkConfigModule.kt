@@ -28,7 +28,8 @@ val NetworkConfigModule = module {
     single {
         NetworkConfigRepository(
             registry = get(),
-            store = getOrNull<Settings>(named("plain"))?.let(::SettingsNetworkConfigStore) ?: InMemoryNetworkConfigStore(),
+            store = getOrNull<Settings>(named("plain"))?.let(::SettingsNetworkConfigStore)
+                ?: InMemoryNetworkConfigStore(),
         )
     }
 }

@@ -89,7 +89,10 @@ class RoomFormDraftRepositoryTest {
             kpt.core.base.store.mutation.MutationResult.Blocked(kpt.core.base.store.mutation.BlockReason.OFFLINE),
             networkFailure.offlineWhenUnsent(),
         )
-        val refused = kpt.core.base.store.mutation.MutationResult.Failed(IllegalStateException("403 Forbidden"), rolledBack = false)
+        val refused = kpt.core.base.store.mutation.MutationResult.Failed(
+            IllegalStateException("403 Forbidden"),
+            rolledBack = false,
+        )
         assertEquals(false, refused.isOffline)
         assertEquals(refused, refused.offlineWhenUnsent())
     }

@@ -47,7 +47,11 @@ class SupabaseClientFactory(
         val point = registry.byId(id)?.takeIf { it.kind == AccessPointKind.SUPABASE } ?: return null
         val config = networkConfigs?.effectiveFor(point)
         val url = config?.baseUrl ?: point.baseUrl
-        cache[id]?.let { (builtFor, client) -> if (builtFor == url) return client }
+        return cache[id]?.takeIf { (builtFor, _) -> builtFor == url }?.second ?: build(id, config, url)
+    }
+
+    /** A fresh client for [id] at [url], cached until the effective URL changes. */
+    private fun build(id: String, config: NetworkConfig?, url: String): SupabaseConfigClient {
         // A declared config's key comes from the fork's secrets; one added at runtime carries its own.
         val anonKey = config?.headers?.get(ANON_KEY_HEADER)?.takeIf { it.isNotBlank() } ?: anonKeyFor(config?.id ?: id)
         val client = SupabaseConfigClient(

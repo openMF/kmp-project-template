@@ -51,7 +51,9 @@ interface NetworkConfigStore {
 }
 
 /** Not persisted — for tests and for an app that wants changes to last one session only. */
-class InMemoryNetworkConfigStore(private var overrides: NetworkConfigOverrides = NetworkConfigOverrides()) : NetworkConfigStore {
+class InMemoryNetworkConfigStore(
+    private var overrides: NetworkConfigOverrides = NetworkConfigOverrides(),
+) : NetworkConfigStore {
     override fun load() = overrides
     override fun save(overrides: NetworkConfigOverrides) {
         this.overrides = overrides
@@ -61,7 +63,9 @@ class InMemoryNetworkConfigStore(private var overrides: NetworkConfigOverrides =
 /** Persists the overrides as JSON in [settings] (the app's plain settings). A corrupt value reads as none. */
 class SettingsNetworkConfigStore(private val settings: Settings, private val key: String = KEY) : NetworkConfigStore {
     override fun load(): NetworkConfigOverrides =
-        settings.getStringOrNull(key)?.let { runCatching { json.decodeFromString<NetworkConfigOverrides>(it) }.getOrNull() }
+        settings.getStringOrNull(key)?.let {
+            runCatching { json.decodeFromString<NetworkConfigOverrides>(it) }.getOrNull()
+        }
             ?: NetworkConfigOverrides()
 
     override fun save(overrides: NetworkConfigOverrides) = settings.putString(key, json.encodeToString(overrides))
@@ -96,7 +100,9 @@ class NetworkConfigRepository(
 
     /** The access point app-profile marks `main: true`, or null when it marks none. */
     val declaredMain: AccessPoint? = registry.points.filter { it.isMain }.let { mains ->
-        require(mains.size <= 1) { "app-profile marks ${mains.size} access points main: ${mains.map { it.id }} — mark exactly one" }
+        require(mains.size <= 1) {
+            "app-profile marks ${mains.size} access points main: ${mains.map { it.id }} — mark exactly one"
+        }
         mains.singleOrNull()
     }
 
@@ -179,7 +185,8 @@ class NetworkConfigRepository(
 
     private fun put(config: NetworkConfig) {
         val changed = config.takeUnless { !it.runtimeAdded && it == declared[it.id] }
-        val next = if (changed == null) overrides.value.configs - config.id else overrides.value.configs + (config.id to config)
+        val configs = overrides.value.configs
+        val next = if (changed == null) configs - config.id else configs + (config.id to config)
         save(overrides.value.copy(configs = next))
     }
 

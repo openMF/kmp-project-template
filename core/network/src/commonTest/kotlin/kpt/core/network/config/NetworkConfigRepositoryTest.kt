@@ -36,7 +36,10 @@ class NetworkConfigRepositoryTest {
         basePath = "1.0/field/v1/",
         loggableHost = "api.example.org",
         isMain = true,
-        headers = listOf(HeaderSpec(name = "X-Tenant-Id", value = "tenant-a"), HeaderSpec(name = "Authorization", runtimeKey = "main.auth")),
+        headers = listOf(
+            HeaderSpec(name = "X-Tenant-Id", value = "tenant-a"),
+            HeaderSpec(name = "Authorization", runtimeKey = "main.auth"),
+        ),
     )
     private val staging = AccessPoint(
         id = "staging",
@@ -46,10 +49,16 @@ class NetworkConfigRepositoryTest {
         loggableHost = "staging.example.org",
         headers = listOf(HeaderSpec(name = "X-Tenant-Id", value = "default")),
     )
-    private val supabase = AccessPoint(id = "project", kind = AccessPointKind.SUPABASE, baseUrl = "https://abc.supabase.co", loggableHost = "abc.supabase.co")
+    private val supabase = AccessPoint(
+        id = "project",
+        kind = AccessPointKind.SUPABASE,
+        baseUrl = "https://abc.supabase.co",
+        loggableHost = "abc.supabase.co",
+    )
     private val registry = AccessPointRegistry(listOf(main, staging, supabase))
 
-    private fun repo(store: InMemoryNetworkConfigStore = InMemoryNetworkConfigStore()) = NetworkConfigRepository(registry, store)
+    private fun repo(store: InMemoryNetworkConfigStore = InMemoryNetworkConfigStore()) =
+        NetworkConfigRepository(registry, store)
 
     @Test
     fun withNoChangesEveryPointUsesWhatAppProfileDeclares() {
@@ -63,7 +72,11 @@ class NetworkConfigRepositoryTest {
     @Test
     fun anEditIsAppliedPersistedAndReloadedAsARestartWould() {
         val store = InMemoryNetworkConfigStore()
-        repo(store).update("main", baseUrl = "https://other.example.org:8443/fineract-provider/api/v1/", headers = mapOf("X-Tenant-Id" to "tenant-b"))
+        repo(store).update(
+            "main",
+            baseUrl = "https://other.example.org:8443/fineract-provider/api/v1/",
+            headers = mapOf("X-Tenant-Id" to "tenant-b"),
+        )
 
         val reloaded = repo(store)
         assertEquals("https://other.example.org:8443/fineract-provider/api/v1/", reloaded.urlFor(main))
@@ -88,7 +101,13 @@ class NetworkConfigRepositoryTest {
     @Test
     fun aConfigAddedAtRuntimeCanBecomeMainAndBeRemoved() {
         val r = repo()
-        r.add(NetworkConfig(id = "custom", kind = AccessPointKind.REST, baseUrl = "http://10.0.2.2:8080/fineract-provider/api/v1/"))
+        r.add(
+            NetworkConfig(
+                id = "custom",
+                kind = AccessPointKind.REST,
+                baseUrl = "http://10.0.2.2:8080/fineract-provider/api/v1/",
+            ),
+        )
         r.setMain("custom")
         assertEquals("http://10.0.2.2:8080/fineract-provider/api/v1/", r.urlFor(main))
         assertFailsWith<IllegalArgumentException>("the main cannot be removed") { r.remove("custom") }

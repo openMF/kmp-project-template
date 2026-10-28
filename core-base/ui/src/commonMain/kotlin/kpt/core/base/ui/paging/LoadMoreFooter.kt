@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.ui.paging
 
@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.progress.KptProgress
 import kpt.core.base.designsystem.component.progress.ProgressSize
 import kpt.core.base.store.error.ErrorCategory
-import kpt.core.base.store.paging.PagingScreenStream
 import kpt.core.base.store.error.categorize
+import kpt.core.base.store.paging.PagingScreenStream
 
 /**
  * Footer for paginated lists driven by a [PagingScreenStream]. Place as the last

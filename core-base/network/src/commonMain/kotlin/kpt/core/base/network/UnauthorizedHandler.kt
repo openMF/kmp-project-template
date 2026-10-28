@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.network
 
@@ -27,6 +27,7 @@ import io.ktor.http.HttpStatusCode
  * Called once per such response, possibly concurrently; make it idempotent. It must not throw.
  */
 fun interface UnauthorizedHandler {
+    /** The server rejected a credentialed request to [accessPointId] with 401. */
     fun onUnauthorized(accessPointId: String)
 }
 

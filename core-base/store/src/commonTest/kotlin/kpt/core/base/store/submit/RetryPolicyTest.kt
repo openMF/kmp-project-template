@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.submit
 
@@ -31,7 +31,8 @@ class RetryPolicyTest {
             maxAttempts = 5,
             initialDelayMs = 1_000L,
             multiplier = 2.0,
-            jitterFraction = 0.0, // zero jitter so the sequence is deterministic
+            // zero jitter so the sequence is deterministic
+            jitterFraction = 0.0,
             maxDelayMs = 60_000L,
         )
 

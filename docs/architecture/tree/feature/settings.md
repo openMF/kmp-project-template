@@ -31,10 +31,10 @@ The **sync-and-drafts** screen makes the offline write queue visible, which is t
 `UserEditableSettings` is deliberately narrower than `UserData`, so a settings screen cannot write a
 session or lock field it has no business touching.
 
-<!-- api-docs:begin module=feature/settings sha=f30840a0e38c2b79e5c8c25c73ba3fc8426a95d3 -->
+<!-- api-docs:begin module=feature/settings sha=a1ca2097a22261d285abf9f83f7d1a345dbc90c1 -->
 ## API reference
 
-_Generated from `feature/settings` at tree `f30840a0e38c` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/settings` at tree `a1ca2097a222` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published
@@ -49,10 +49,10 @@ class ConflictInboxViewModel(
 ```
 ViewModel for the Settings **Sync conflicts** screen — a live window over the `ConflictInbox` pending feed. Each row is a write the app made that the server diverged on (server-wins was applied, the user's version preserved).
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:82</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:84</code></summary>
 
 ```kotlin
-    modifier: Modifier = Modifier,
+    draftExtras: @Composable () -> (DraftRecord) -> DraftRowExtras? = { { null } },
     viewModel: SyncAndDraftsViewModel = koinViewModel(),
     conflictViewModel: ConflictInboxViewModel = koinViewModel(),
 ) {
@@ -73,7 +73,7 @@ sealed interface ConflictInboxUiState
 ```
 UI state for the Sync conflicts screen.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:86</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:88</code></summary>
 
 ```kotlin
     val uiState by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -272,9 +272,9 @@ fun NavGraphBuilder.notificationDestination(onBackClick: () -> Unit)
 Registers the notification-settings destination.
 
 ```kotlin
-fun NavGraphBuilder.syncAndDraftsDestination(onBackClick: () -> Unit)
+fun NavGraphBuilder.syncAndDraftsDestination(
 ```
-Registers the sync-and-drafts destination.
+`draftExtras` lets the app name its drafts and reopen their forms (`DraftRowExtras`): called once per screen, it returns the per-row lookup. Default = the template's raw form-key rows.
 
 ### `feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsViewModel.kt`
 
@@ -321,6 +321,27 @@ fun LanguageDialog(
 
 </details>
 
+### `feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt`
+
+```kotlin
+data class DraftRowExtras(
+```
+What an app adds to one draft row: a readable `title` / `subtitle` in place of the raw form key, and `onOpen` — reopen the form the draft came from, so it can be resumed.
+
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsRoute.kt:89</code></summary>
+
+```kotlin
+fun NavGraphBuilder.syncAndDraftsDestination(
+    onBackClick: () -> Unit,
+    draftExtras: @Composable () -> (DraftRecord) -> DraftRowExtras? = { { null } },
+) {
+    composableWithPushTransitions<SyncAndDraftsRoute> {
+        SyncAndDraftsScreen(
+            onBackClick = onBackClick,
+```
+
+</details>
+
 ### `feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsViewModel.kt`
 
 ```kotlin
@@ -328,11 +349,11 @@ class SyncAndDraftsViewModel(
 ```
 ViewModel for the template-level **Sync & Drafts** screen (Settings).
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:81</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsScreen.kt:83</code></summary>
 
 ```kotlin
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    draftExtras: @Composable () -> (DraftRecord) -> DraftRowExtras? = { { null } },
     viewModel: SyncAndDraftsViewModel = koinViewModel(),
     conflictViewModel: ConflictInboxViewModel = koinViewModel(),
 ) {
@@ -391,6 +412,7 @@ Append-only test-tag registry for the settings feature. Consumed by Compose UI t
 - `const val SCREEN: String = "notification_screen"` — Root scaffold — always rendered regardless of content state.
 - `const val SCREEN: String = "sync_and_drafts_screen"` — Root scaffold — always rendered regardless of content state.
 - `const val PRUNE: String = "sync_and_drafts_prune"` — The manual "Prune expired" button (rendered only when there is content).
+- `const val OPEN: String = "sync_and_drafts_open"` — A draft row's "Open" button, which resumes the draft in its form.
 
 ### `feature/settings/src/commonMain/kotlin/kpt/feature/settings/demo/SettingsDemoBody.kt`
 
@@ -422,5 +444,5 @@ Koin bindings for the settings feature.
 
 ---
 
-_15 type(s), 20 function(s)/property(ies); 35 carry KDoc at source; 0 authored example(s); 14 live call site(s)._
+_16 type(s), 21 function(s)/property(ies); 37 carry KDoc at source; 0 authored example(s); 15 live call site(s)._
 <!-- api-docs:end -->

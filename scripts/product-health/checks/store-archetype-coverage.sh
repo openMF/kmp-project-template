@@ -22,6 +22,16 @@
 set -uo pipefail
 
 ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}"
+
+# The archetype showcases ARE the template's demo stores. A fork that stripped the demo (every demo
+# package `status: removed`, see wl_demos_stripped) no longer ships them and owns its own stores, so
+# the template's "demonstrate all 8" promise does not apply to it.
+# shellcheck source=../lib.sh
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/lib.sh"
+if wl_demos_stripped "$ROOT"; then
+  echo "  ⊘ skip — the demo showcase is stripped (core/store demo packages all removed); archetype showcases are template-only"
+  exit 0
+fi
 REG="$ROOT/core/store/STORE_ARCHETYPES.yaml"
 
 # Print a passing assertion.

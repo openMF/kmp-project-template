@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.screen
 
@@ -26,9 +26,9 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kpt.core.base.store.infra.FakeFetchedAtRepository
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.StoreBuilder
-import kpt.core.base.store.infra.FakeFetchedAtRepository
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -72,10 +72,12 @@ class LoadOnceStreamTest {
     fun loadOnceStream_stopsEmittingAfterFirstContent() = runTest {
         var fetchCount = 0
         val store = StoreBuilder
-            .from(Fetcher.of<String, String> { _ ->
-                fetchCount++
-                "data-$fetchCount"
-            })
+            .from(
+                Fetcher.of<String, String> { _ ->
+                    fetchCount++
+                    "data-$fetchCount"
+                },
+            )
             .build()
 
         val stream = store.asLoadOnceStream(

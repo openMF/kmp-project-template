@@ -5,8 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
+@file:Suppress("ktlint:standard:class-naming")
+// The policy objects keep their SCREAMING_CASE names: they read as enum constants at every call site
+// (`FetchPolicy.CACHE_FIRST_SWR`) and are public API forks already reference, so a rename would break them.
+
 package kpt.core.base.store.screen
 
 /**

@@ -22,7 +22,11 @@ import kotlinx.serialization.json.JsonArray
  */
 @Serializable
 data class RemoteAppConfigDto(
+    /** The row's id. */
     val id: String? = null,
-    /** Kept as raw JSON: core/network's `parseInstances` owns the instance shape, for this row and the bundled list alike. */
+    /**
+     * Kept as raw JSON: core/network's `parseInstances` owns the instance shape, for this row and the
+     * bundled list alike.
+     */
     val instances: JsonArray = JsonArray(emptyList()),
 )

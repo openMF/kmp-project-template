@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.submit
 
@@ -134,7 +134,7 @@ class OfflineSubmitSyncerTest {
     fun `entries already in RETRYING status are not picked up by syncer`() = runTest(UnconfinedTestDispatcher()) {
         val outbox = FakeSubmitOutbox<String>()
         val id = outbox.save(formKey, "payload")
-        outbox.markRetrying(id)  // simulate UI already claiming this entry
+        outbox.markRetrying(id) // simulate UI already claiming this entry
 
         val networkStatus = MutableStateFlow<NetworkStatus>(NetworkStatus.Unavailable)
         var submitCount = 0
@@ -296,7 +296,10 @@ class OfflineSubmitSyncerTest {
         val syncer = backgroundScope.offlineSubmitSyncer<String, Unit>(
             outbox = outbox,
             networkStatusFlow = networkStatus,
-            submitBlock = { calls++; throw RuntimeException("rejected") },
+            submitBlock = {
+                calls++
+                throw RuntimeException("rejected")
+            },
             retryPolicy = RetryPolicy(maxAttempts = 3),
         )
         syncer.start()

@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/designsystem sha=216f50c4a462f278d242b8a726167e5e219b0021 -->
+<!-- api-docs:begin module=core-base/designsystem sha=dc9474dd6da262e5fcb6d683b68581746680a9fa -->
 ## API reference
 
-_Generated from `core-base/designsystem` at tree `216f50c4a462` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/designsystem` at tree `dc9474dd6da2` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -555,13 +555,13 @@ KptButton(onClick = viewModel::onSubmit, enabled = uiState.canInteract) {
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/DraftResumeBanner.kt:77</code></summary>
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/DraftResumeBanner.kt:82</code></summary>
 
 ```kotlin
-                    Text("Discard")
+                    Text(stringResource(Res.string.draft_discard))
                 }
                 KptButton(onClick = onResume) {
-                    Text("Resume")
+                    Text(stringResource(Res.string.draft_resume))
                 }
             }
         }
@@ -579,16 +579,16 @@ fun KptTextButton(
 ```
 Text (flat) variant of `KptButton`.
 
-<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/DraftResumeBanner.kt:74</code></summary>
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/DraftResumeBanner.kt:79</code></summary>
 
 ```kotlin
             )
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 KptTextButton(onClick = onDiscard) {
-                    Text("Discard")
+                    Text(stringResource(Res.string.draft_discard))
                 }
                 KptButton(onClick = onResume) {
-                    Text("Resume")
+                    Text(stringResource(Res.string.draft_resume))
 ```
 
 </details>
@@ -855,7 +855,7 @@ enum class SlideDirection
 ```
 Direction a `KptSlideTransition` enters from.
 
-<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/util/Transition.kt:294</code></summary>
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/util/Transition.kt:301</code></summary>
 
 ```kotlin
             fun slideUp(motion: Motion): EnterTransitionProvider = {
@@ -1138,7 +1138,7 @@ interface KptThemeProvider
 ```
 The whole design language in one object: colors, typography, shapes, spacing and elevation. A fork supplies its own and every component follows, which is the point of the indirection.
 
-<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:46</code></summary>
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:45</code></summary>
 
 ```kotlin
 @Composable
@@ -1324,7 +1324,7 @@ annotation class ComponentDsl
 ```
 DSL marker for the component-configuration builders. Stops an inner builder from implicitly seeing an outer scope's receivers, which is how nested DSL blocks silently configure the wrong component.
 
-<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/theme/KptColorSchemeImpl.kt:262</code></summary>
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/theme/KptColorSchemeImpl.kt:266</code></summary>
 
 ```kotlin
  * DSL builder for a complete [KptThemeProvider]. Entry point: [kptTheme].
@@ -1850,7 +1850,7 @@ val LocalKptColors = staticCompositionLocalOf<KptColorScheme> { KptColorSchemeIm
 ```
 CompositionLocal carrying the active `KptColorScheme`. `static` because the theme changes rarely — a read does not subscribe, so a palette swap recomposes the subtree rather than every reader.
 
-<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:56</code></summary>
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:55</code></summary>
 
 ```kotlin
     // Provide both KptTheme composition locals and MaterialTheme
@@ -1869,7 +1869,7 @@ val LocalKptTypography = staticCompositionLocalOf<KptTypography> { KptTypography
 ```
 CompositionLocal carrying the active `KptTypography`.
 
-<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:57</code></summary>
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:56</code></summary>
 
 ```kotlin
     CompositionLocalProvider(
@@ -1888,7 +1888,7 @@ val LocalKptShapes = staticCompositionLocalOf<KptShapes> { KptShapesImpl() }
 ```
 CompositionLocal carrying the active `KptShapes`.
 
-<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:58</code></summary>
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:57</code></summary>
 
 ```kotlin
         LocalKptColors provides theme.colors,
@@ -1907,7 +1907,7 @@ val LocalKptSpacing = staticCompositionLocalOf<KptSpacing> { KptSpacingImpl() }
 ```
 CompositionLocal carrying the active `KptSpacing`.
 
-<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:59</code></summary>
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:58</code></summary>
 
 ```kotlin
         LocalKptTypography provides theme.typography,
@@ -1926,7 +1926,7 @@ val LocalKptElevation = staticCompositionLocalOf<KptElevation> { KptElevationImp
 ```
 CompositionLocal carrying the active `KptElevation`.
 
-<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:60</code></summary>
+<details><summary>Used in the template — <code>core-base/designsystem/src/commonMain/kotlin/kpt/core/base/designsystem/KptMaterialTheme.kt:59</code></summary>
 
 ```kotlin
         LocalKptShapes provides theme.shapes,
@@ -2058,7 +2058,7 @@ object MotionSnapshot
 ```
 Last-read snapshot of the active `Motion`. Updated as a side effect whenever any `@Composable` site reads `MaterialTheme.motion`.
 
-<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/nav/NavGraphBuilderExtensions.kt:42</code></summary>
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/nav/NavGraphBuilderExtensions.kt:41</code></summary>
 
 ```kotlin
     deepLinks: List<NavDeepLink> = emptyList(),

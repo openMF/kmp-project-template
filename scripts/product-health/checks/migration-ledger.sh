@@ -47,7 +47,10 @@ command -v ruby >/dev/null 2>&1 || { echo "ruby unavailable — cannot audit the
 # unrelated cascade failures.
 HEAD_LEDGER="${LG_HEAD:-}"
 if [ -z "$HEAD_LEDGER" ] && git -C "$HEALTH_ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-  HEAD_LEDGER="$(git -C "$HEALTH_ROOT" show "HEAD:app-profile/migration-ledger.yaml" 2>/dev/null || true)"
+  # `HEAD:./…` resolves against HEALTH_ROOT, not the repo top. A canary fixture lives INSIDE the repo,
+  # and the top-relative form read the repo's own ledger instead of the fixture's, so GREEN passed only
+  # while the real ledger happened to equal the fixture (true on the template, false on any fork).
+  HEAD_LEDGER="$(git -C "$HEALTH_ROOT" show "HEAD:./app-profile/migration-ledger.yaml" 2>/dev/null || true)"
 fi
 
 LG_HEAD="$HEAD_LEDGER" ruby - "$LEDGER" "$UNITS" "$CFG" "$DB" <<'RUBY'

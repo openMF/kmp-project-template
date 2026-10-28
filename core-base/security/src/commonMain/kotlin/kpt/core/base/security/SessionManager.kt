@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.security
 
@@ -31,6 +31,7 @@ class SessionManager(
     private val clock: () -> Long = { currentTimeMillis() },
 ) {
     private val _isSessionActive = MutableStateFlow(false)
+
     /** Whether a session is currently active. Flips false on timeout or explicit logout. */
     val isSessionActive: StateFlow<Boolean> = _isSessionActive.asStateFlow()
 

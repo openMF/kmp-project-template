@@ -5,9 +5,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
-
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -103,25 +102,34 @@ class FeatureAggregateConventionPlugin : Plugin<Project> {
     private companion object {
         /** Gradle task group the three generators appear under. */
         const val GROUP = "feature aggregation"
+
         /**
          * Source set the generators scan. commonMain only — a feature's registrations are declared once, not per
          * platform.
          */
         const val SRC = "src/commonMain/kotlin"
+
         /** Package the aggregates are generated into. */
         const val PKG = "cmp.navigation.registry"
+
         /** [PKG] as a directory path, for writing the files. */
         const val PKG_PATH = "cmp/navigation/registry"
+
         /** Task name for the Koin-module aggregate. */
         const val TASK_KOIN = "generateFeatureKoinBindings"
+
         /** Task name for the nav-destination aggregate. */
         const val TASK_NAV = "generateFeatureDestinations"
+
         /** Task name for the bottom-tab aggregate. */
         const val TASK_TAB = "generateFeatureTabs"
+
         /** Generated object holding every feature's Koin module. */
         const val GENERATED_KOIN = "GeneratedFeatureKoinBindings"
+
         /** Generated object holding every `@FeatureDestination`. */
         const val GENERATED_NAV = "GeneratedFeatureDestinations"
+
         /** Generated object holding every `@FeatureTab`. */
         const val GENERATED_TAB = "GeneratedFeatureTabs"
 

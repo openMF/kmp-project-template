@@ -10,9 +10,9 @@
 package kpt.core.base.network
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.logging.LogLevel
-import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 

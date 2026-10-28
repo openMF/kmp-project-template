@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.screen
 
@@ -102,13 +102,19 @@ class ScreenStateMutationExtensionsTest {
     @Test
     fun submitWhenContent_alreadySubmitting_noOp() = runTest {
         val handler = submitHandler<String>()
-        handler.submit { kotlinx.coroutines.delay(10_000); "first" }
+        handler.submit {
+            kotlinx.coroutines.delay(10_000)
+            "first"
+        }
         assertIs<SubmitState.Submitting>(handler.state.value)
 
         var secondCalled = false
         handler.submitWhenContent(
             ScreenState.Content("data"),
-        ) { secondCalled = true; "second" }
+        ) {
+            secondCalled = true
+            "second"
+        }
 
         assertFalse(secondCalled)
         handler.reset()

@@ -35,6 +35,8 @@ object TestTags {
 
         /** The manual "Prune expired" button (rendered only when there is content). */
         const val PRUNE: String = "sync_and_drafts_prune"
+
+        /** A draft row's "Open" button, which resumes the draft in its form. */
         const val OPEN: String = "sync_and_drafts_open"
     }
 }

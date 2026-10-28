@@ -1,7 +1,7 @@
 # `scripts/product-health/`
 
 > Part of [`scripts/`](../scripts.md)  
-> **Measured:** 378 tracked files — 142× `.kt`, 77× `.sh`, 52× `.md`, 31× `.yaml`, 12× `.gitkeep`
+> **Measured:** 380 tracked files — 142× `.kt`, 77× `.sh`, 52× `.md`, 33× `.yaml`, 12× `.gitkeep`
 
 ### Scripts
 

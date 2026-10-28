@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.mutation.delete
 
@@ -19,9 +19,15 @@ import kotlin.test.assertTrue
 private class FakeBookkeeper<K : Any> : Bookkeeper<K> {
     val failed = mutableMapOf<K, Long>()
     override suspend fun getLastFailedSync(key: K): Long? = failed[key]
-    override suspend fun setLastFailedSync(key: K, timestamp: Long): Boolean { failed[key] = timestamp; return true }
+    override suspend fun setLastFailedSync(key: K, timestamp: Long): Boolean {
+        failed[key] = timestamp
+        return true
+    }
     override suspend fun clear(key: K): Boolean = failed.remove(key) != null
-    override suspend fun clearAll(): Boolean { failed.clear(); return true }
+    override suspend fun clearAll(): Boolean {
+        failed.clear()
+        return true
+    }
 }
 
 /** Tests the [DeleteSync] network-DELETE-with-sync primitive (SP-1/T3). */

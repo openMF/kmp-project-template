@@ -1,3 +1,12 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package org.convention
 
 import com.android.build.api.artifact.SingleArtifact
@@ -17,7 +26,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.register
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.process.ExecOperations
@@ -118,7 +126,7 @@ abstract class CheckBadgingTask : DefaultTask() {
     fun taskAction() {
         assertWithMessage(
             "Generated badging is different from golden badging! " +
-                    "If this change is intended, run ./gradlew ${updateBadgingTaskName.get()}",
+                "If this change is intended, run ./gradlew ${updateBadgingTaskName.get()}",
         )
             .that(generatedBadging.get().asFile.readText())
             .isEqualTo(goldenBadging.get().asFile.readText())
@@ -138,9 +146,13 @@ fun Project.configureBadgingTasks(
     componentsExtension.onVariants { variant ->
         // Registers a new task to verify the app bundle.
         val capitalizedVariantName = variant.name.let {
-            if (it.isEmpty()) it else it[0].titlecase(
-                Locale.getDefault(),
-            ) + it.substring(1)
+            if (it.isEmpty()) {
+                it
+            } else {
+                it[0].titlecase(
+                    Locale.getDefault(),
+                ) + it.substring(1)
+            }
         }
         val generateBadgingTaskName = "generate${capitalizedVariantName}Badging"
         val generateBadging =

@@ -239,18 +239,22 @@ data class KptThemeProviderImpl(
  * a read does not subscribe, so a palette swap recomposes the subtree rather than every reader.
  */
 val LocalKptColors = staticCompositionLocalOf<KptColorScheme> { KptColorSchemeImpl() }
+
 /**
  * CompositionLocal carrying the active [KptTypography].
  */
 val LocalKptTypography = staticCompositionLocalOf<KptTypography> { KptTypographyImpl() }
+
 /**
  * CompositionLocal carrying the active [KptShapes].
  */
 val LocalKptShapes = staticCompositionLocalOf<KptShapes> { KptShapesImpl() }
+
 /**
  * CompositionLocal carrying the active [KptSpacing].
  */
 val LocalKptSpacing = staticCompositionLocalOf<KptSpacing> { KptSpacingImpl() }
+
 /**
  * CompositionLocal carrying the active [KptElevation].
  */
@@ -312,50 +316,73 @@ class KptThemeBuilder {
 class KptColorSchemeBuilder {
     /** Sets [KptColorScheme.primary]. */
     var primary: Color = Color(0xFF6750A4)
+
     /** Sets [KptColorScheme.onPrimary]. */
     var onPrimary: Color = Color(0xFFFFFFFF)
+
     /** Sets [KptColorScheme.primaryContainer]. */
     var primaryContainer: Color = Color(0xFFEADDFF)
+
     /** Sets [KptColorScheme.onPrimaryContainer]. */
     var onPrimaryContainer: Color = Color(0xFF21005D)
+
     /** Sets [KptColorScheme.secondary]. */
     var secondary: Color = Color(0xFF625B71)
+
     /** Sets [KptColorScheme.onSecondary]. */
     var onSecondary: Color = Color(0xFFFFFFFF)
+
     /** Sets [KptColorScheme.secondaryContainer]. */
     var secondaryContainer: Color = Color(0xFFE8DEF8)
+
     /** Sets [KptColorScheme.onSecondaryContainer]. */
     var onSecondaryContainer: Color = Color(0xFF1D192B)
+
     /** Sets [KptColorScheme.tertiary]. */
     var tertiary: Color = Color(0xFF7D5260)
+
     /** Sets [KptColorScheme.onTertiary]. */
     var onTertiary: Color = Color(0xFFFFFFFF)
+
     /** Sets [KptColorScheme.tertiaryContainer]. */
     var tertiaryContainer: Color = Color(0xFFFFD8E4)
+
     /** Sets [KptColorScheme.onTertiaryContainer]. */
     var onTertiaryContainer: Color = Color(0xFF31111D)
+
     /** Sets [KptColorScheme.error]. */
     var error: Color = Color(0xFFBA1A1A)
+
     /** Sets [KptColorScheme.onError]. */
     var onError: Color = Color(0xFFFFFFFF)
+
     /** Sets [KptColorScheme.errorContainer]. */
     var errorContainer: Color = Color(0xFFFFDAD6)
+
     /** Sets [KptColorScheme.onErrorContainer]. */
     var onErrorContainer: Color = Color(0xFF410002)
+
     /** Sets [KptColorScheme.background]. */
     var background: Color = Color(0xFFFFFBFE)
+
     /** Sets [KptColorScheme.onBackground]. */
     var onBackground: Color = Color(0xFF1C1B1F)
+
     /** Sets [KptColorScheme.surface]. */
     var surface: Color = Color(0xFFFFFBFE)
+
     /** Sets [KptColorScheme.onSurface]. */
     var onSurface: Color = Color(0xFF1C1B1F)
+
     /** Sets [KptColorScheme.surfaceVariant]. */
     var surfaceVariant: Color = Color(0xFFE7E0EC)
+
     /** Sets [KptColorScheme.onSurfaceVariant]. */
     var onSurfaceVariant: Color = Color(0xFF49454F)
+
     /** Sets [KptColorScheme.outline]. */
     var outline: Color = Color(0xFF79747E)
+
     /** Sets [KptColorScheme.outlineVariant]. */
     var outlineVariant: Color = Color(0xFFCAC4D0)
 
@@ -398,32 +425,46 @@ class KptColorSchemeBuilder {
 class KptTypographyBuilder {
     /** Sets [KptTypography.displayLarge]. */
     var displayLarge: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 57.sp)
+
     /** Sets [KptTypography.displayMedium]. */
     var displayMedium: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 45.sp)
+
     /** Sets [KptTypography.displaySmall]. */
     var displaySmall: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 36.sp)
+
     /** Sets [KptTypography.headlineLarge]. */
     var headlineLarge: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 32.sp)
+
     /** Sets [KptTypography.headlineMedium]. */
     var headlineMedium: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 28.sp)
+
     /** Sets [KptTypography.headlineSmall]. */
     var headlineSmall: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 24.sp)
+
     /** Sets [KptTypography.titleLarge]. */
     var titleLarge: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 22.sp)
+
     /** Sets [KptTypography.titleMedium]. */
     var titleMedium: TextStyle = TextStyle(fontWeight = FontWeight.Medium, fontSize = 16.sp)
+
     /** Sets [KptTypography.titleSmall]. */
     var titleSmall: TextStyle = TextStyle(fontWeight = FontWeight.Medium, fontSize = 14.sp)
+
     /** Sets [KptTypography.bodyLarge]. */
     var bodyLarge: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 16.sp)
+
     /** Sets [KptTypography.bodyMedium]. */
     var bodyMedium: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 14.sp)
+
     /** Sets [KptTypography.bodySmall]. */
     var bodySmall: TextStyle = TextStyle(fontWeight = FontWeight.Normal, fontSize = 12.sp)
+
     /** Sets [KptTypography.labelLarge]. */
     var labelLarge: TextStyle = TextStyle(fontWeight = FontWeight.Medium, fontSize = 14.sp)
+
     /** Sets [KptTypography.labelMedium]. */
     var labelMedium: TextStyle = TextStyle(fontWeight = FontWeight.Medium, fontSize = 12.sp)
+
     /** Sets [KptTypography.labelSmall]. */
     var labelSmall: TextStyle = TextStyle(fontWeight = FontWeight.Medium, fontSize = 11.sp)
 
@@ -457,12 +498,16 @@ class KptTypographyBuilder {
 class KptShapesBuilder {
     /** Sets [KptShapes.extraSmall]. */
     var extraSmall: CornerBasedShape = RoundedCornerShape(4.dp)
+
     /** Sets [KptShapes.small]. */
     var small: CornerBasedShape = RoundedCornerShape(8.dp)
+
     /** Sets [KptShapes.medium]. */
     var medium: CornerBasedShape = RoundedCornerShape(12.dp)
+
     /** Sets [KptShapes.large]. */
     var large: CornerBasedShape = RoundedCornerShape(16.dp)
+
     /** Sets [KptShapes.extraLarge]. */
     var extraLarge: CornerBasedShape = RoundedCornerShape(28.dp)
 
@@ -486,14 +531,19 @@ class KptShapesBuilder {
 class KptSpacingBuilder {
     /** Sets [KptSpacing.xs]. */
     var xs: Dp = 4.dp
+
     /** Sets [KptSpacing.sm]. */
     var sm: Dp = 8.dp
+
     /** Sets [KptSpacing.md]. */
     var md: Dp = 16.dp
+
     /** Sets [KptSpacing.lg]. */
     var lg: Dp = 24.dp
+
     /** Sets [KptSpacing.xl]. */
     var xl: Dp = 32.dp
+
     /** Sets [KptSpacing.xxl]. */
     var xxl: Dp = 64.dp
 
@@ -518,14 +568,19 @@ class KptSpacingBuilder {
 class KptElevationBuilder {
     /** Sets [KptElevation.level0]. */
     var level0: Dp = 0.dp
+
     /** Sets [KptElevation.level1]. */
     var level1: Dp = 1.dp
+
     /** Sets [KptElevation.level2]. */
     var level2: Dp = 3.dp
+
     /** Sets [KptElevation.level3]. */
     var level3: Dp = 6.dp
+
     /** Sets [KptElevation.level4]. */
     var level4: Dp = 8.dp
+
     /** Sets [KptElevation.level5]. */
     var level5: Dp = 12.dp
 

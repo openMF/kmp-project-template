@@ -64,13 +64,16 @@ expect annotation class TypeParceler<T, P : Parceler<in T>>()
 expect class Parcel {
     /** Reads the next byte. */
     fun readByte(): Byte
+
     /** Reads the next int. */
     fun readInt(): Int
 
     /** Reads the next float. */
     fun readFloat(): Float
+
     /** Reads the next double. */
     fun readDouble(): Double
+
     /** Reads the next string, which may be null. */
     fun readString(): String?
 
@@ -79,6 +82,7 @@ expect class Parcel {
      * exactly.
      */
     fun writeByte(value: Byte)
+
     /** Writes a 32-bit int. */
     fun writeInt(value: Int)
 
@@ -87,6 +91,7 @@ expect class Parcel {
 
     /** Writes a 64-bit double. */
     fun writeDouble(value: Double)
+
     /** Writes a string, which may be null. */
     fun writeString(value: String?)
 }

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.submit.draft
 
@@ -47,12 +47,19 @@ interface FormDraftRepository {
     suspend fun delete(form: String, slot: String)
 }
 
+/** A stored [FormDraft] with its outbox bookkeeping — what a form offers and Sync & Drafts lists. */
 data class SavedFormDraft(
+    /** The outbox row id. */
     val id: Long,
+    /** The [formDraftSlot] it occupies. */
     val slot: String,
+    /** The kept input. */
     val draft: FormDraft,
+    /** PENDING (will be replayed), RETRYING or FAILED. */
     val status: SubmitOutboxStatus,
+    /** When it was last written, epoch millis. */
     val updatedAtMs: Long,
+    /** Why the last attempt failed, or null. */
     val errorMessage: String?,
 )
 

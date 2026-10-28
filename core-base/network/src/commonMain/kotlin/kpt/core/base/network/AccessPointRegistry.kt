@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.network
 
@@ -99,9 +99,9 @@ data class AccessPoint(
  * owns the resolution logic + the [restApi]/[ktorfitFor] DSL — so a fork writes only API interfaces plus
  * one `restApi("<id>")` line each, and there is exactly one source of truth for "which servers this app
  * talks to" (`app-profile/app.yaml#network.access_points`).
-  *
-  * @property points every access point this fork declares, from `app-profile#network.access_points`. Order is
-  *   irrelevant — lookup is by id.
+ *
+ * @property points every access point this fork declares, from `app-profile#network.access_points`. Order is
+ *   irrelevant — lookup is by id.
  */
 class AccessPointRegistry(val points: List<AccessPoint>) {
 

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.security
 
@@ -71,8 +71,10 @@ class FailedAttemptTracker(
 enum class FailureAction {
     /** The attempt was counted; the user may try again. */
     ATTEMPT_RECORDED,
+
     /** The lockout threshold was reached. Recoverable. */
     LOCKED_OUT,
+
     /** The wipe threshold was reached and local data has been destroyed. Terminal and irreversible. */
     DATA_WIPED,
 }

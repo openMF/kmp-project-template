@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.ui.freshness
 
@@ -32,13 +32,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.launch
 import kpt.core.base.store.error.ErrorCategory
 import kpt.core.base.store.error.categorize
 import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessSignal
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 /**
  * Per-card freshness indicator: a small Material 3 info / clock / warning icon

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.ui.submit
 
@@ -112,10 +112,20 @@ fun FormDraftFailure(
     }
 }
 
+/** Test tags for [FormDraftBanner] and [FormDraftFailure]. */
 object FormDraftTestTags {
+    /** The "Save draft" button under a failed create. */
     const val SAVE = "form-draft:save"
+
+    /** The "Draft saved" confirmation that replaces it. */
     const val SAVED = "form-draft:saved"
+
+    /** The Resume / Discard banner. */
     const val BANNER = "form-draft:banner"
+
+    /** The banner's Resume button. */
     const val RESUME = "form-draft:resume"
+
+    /** The banner's Discard button. */
     const val DISCARD = "form-draft:discard"
 }

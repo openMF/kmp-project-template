@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.infra.impl
 
@@ -33,10 +33,8 @@ class DraftInventoryImpl(
         draftDao.observeAll().map { rows -> rows.map { it.toRecord() } }
 
     override suspend fun discard(id: Long) = draftDao.deleteById(id)
-    
 
     override suspend fun retry(id: Long) = draftDao.requeue(id, currentTimeMillis())
-    
 
     override suspend fun pruneExpired() = run {
         val thresholdMs = currentTimeMillis() - StoreCacheManager.DEFAULT_DRAFT_TTL_MS

@@ -2,7 +2,7 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_STORE.md`
-> **Measured:** 108 Kotlin files, 50 test files
+> **Measured:** 112 Kotlin files, 51 test files
 
 **Defines annotations:** `@CacheKey`, `@ExperimentalScreenDataStreamTestingApi`, `@StoreProvider`
 
@@ -10,7 +10,7 @@
 
 ## Principal types
 
-`BatchResult`, `BatchSubmitHandler`, `BatchSubmitMode`, `BlockReason`, `CacheKey`, `CombinedState`, `CommandSpec`, `ConflictEntry`, `ConflictInbox`, `ConflictReport`, `ConflictResolution`, `ConflictStrategy`, `DataOrigin`, `DecisionEngine`  …and 52 more
+`BatchResult`, `BatchSubmitHandler`, `BatchSubmitMode`, `BlockReason`, `CacheKey`, `CombinedState`, `CommandSpec`, `ConflictEntry`, `ConflictInbox`, `ConflictReport`, `ConflictResolution`, `ConflictStrategy`, `DataOrigin`, `DecisionEngine`  …and 58 more
 
 <!-- scaffold:end -->
 
@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/store sha=ad4fa5f3eefba042eb034686a5d777ce0f0e6e55 -->
+<!-- api-docs:begin module=core-base/store sha=1a9160ee6eeef9d937e560688884a29c52f58eea -->
 ## API reference
 
-_Generated from `core-base/store` at tree `ad4fa5f3eefb` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/store` at tree `1a9160ee6eee` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -239,7 +239,7 @@ object FreshnessBands
 ```
 Pure computation of `FreshnessBand` from time + last-error inputs only. Decision table (first match wins): 1. `lastSyncedAt == null && lastError == null` → `FreshnessBand.Initial` 2.
 
-<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:187</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:186</code></summary>
 
 ```kotlin
         val lastSyncedAt = storeData.fetchedAtInstant
@@ -324,6 +324,7 @@ Pure function combining StoreData metadata + NetworkStatus into ScreenState. No 
 - `val error = storeData.error`
 - `val isOnline = networkStatus is NetworkStatus.Available`
 - `val isCaptivePortal = networkStatus is NetworkStatus.CaptivePortal`
+- `val emptyCacheBehindError =`
 - `val fetchedAt = storeData.fetchedAtInstant`
 - `val networkStateNoLongerConsumedHere = isOnline || isCaptivePortal || (error != null)`
 - `fun <T> decideFreshness(` — Pure sibling function: maps `storeData` + `ttl` to a `FreshnessSignal`. Decoupled from `decide`; runs in parallel and outputs the per-card freshness signal consumed by `FreshnessIndicator`.
@@ -384,16 +385,16 @@ data class DraftRecord(
 ```
 One draft row as seen by the cross-form `DraftInventory` — untyped (no deserialized payload), because the Sync & Drafts screen renders every form's drafts side-by-side and cannot know each `P`.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SyncAndDraftsPreview.kt:37</code></summary>
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/SettingsRoute.kt:89</code></summary>
 
 ```kotlin
-            uiState = SyncAndDraftsUiState.Success(
-                drafts = listOf(
-                    DraftRecord(3, "bill", "electricity", SubmitOutboxStatus.PENDING, 0, 0, null),
-                    DraftRecord(4, "loan", "home-loan", SubmitOutboxStatus.PENDING, 0, 0, null),
-                ),
-                syncing = listOf(
-                    DraftRecord(2, "alert", "btc-alert", SubmitOutboxStatus.RETRYING, 0, 0, null),
+fun NavGraphBuilder.syncAndDraftsDestination(
+    onBackClick: () -> Unit,
+    draftExtras: @Composable () -> (DraftRecord) -> DraftRowExtras? = { { null } },
+) {
+    composableWithPushTransitions<SyncAndDraftsRoute> {
+        SyncAndDraftsScreen(
+            onBackClick = onBackClick,
 ```
 
 </details>
@@ -1416,16 +1417,16 @@ enum class DataOrigin
 ```
 Indicates where a `StoreData` emission originated.
 
-<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:69</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/infra/DecisionEngine.kt:68</code></summary>
 
 ```kotlin
-        // why. Measured on device 2026-10-24. A non-empty cache, or an empty list the NETWORK
         // returned, is real content and keeps the has-data branch.
-        if (error != null && storeData.origin != DataOrigin.NETWORK && storeData.data.isEmptyCollection()) {
-            return decideNoData(fetchPolicy, error, isOnline, isCaptivePortal)
-        }
+        val emptyCacheBehindError =
+            error != null && storeData.origin != DataOrigin.NETWORK && storeData.data.isEmptyCollection()
+        if (noData || emptyCacheBehindError) return decideNoData(fetchPolicy, error, isOnline, isCaptivePortal)
 
         // === Has data branch ===
+        // Phase A of data-freshness-redesign epic (2026-06-17): network state no longer
 ```
 
 </details>
@@ -1759,7 +1760,7 @@ data class EditClientState(
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/submit/MutationUiStateTest.kt:26</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/submit/MutationUiStateTest.kt:25</code></summary>
 
 ```kotlin
     @Test
@@ -2021,12 +2022,13 @@ class AlertCreateViewModel(
 - `fun observePendingByUniqueKey(formKey: String, uniqueKey: String): Flow<SubmitOutboxEntry<P>?>` — Streaming variant of `getPendingByUniqueKey`.
 - `fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>>` — Observes ALL non-terminal drafts (PENDING / RETRYING / FAILED) for `formKey`, ordered newest-first. Used by feature UIs that need to display "N drafts pending sync" across multiple uniqueKeys (e.g. Portfolio: "3 holdings pending").
 - `suspend fun getAllPending(): List<SubmitOutboxEntry<P>>` — All entries currently in PENDING status (excludes RETRYING) — used by `OfflineSubmitSyncer`.
+- `fun observePendingIds(): Flow<Set<Long>> = emptyFlow()` — Ids of this outbox's PENDING entries, re-emitted on change — lets the syncer send a draft the moment it becomes pending while online (a Retry tapped in Sync & Drafts), instead of only on the next reconnect.
 - `suspend fun markRetrying(id: Long)` — Claim this entry for retry — transitions PENDING → RETRYING; prevents concurrent UI double-submit.
 - `suspend fun markSubmitted(id: Long)` — Transition the entry identified by `id` to SUBMITTED.
 - `suspend fun markFailed(id: Long, error: String?)` — Transition the entry identified by `id` to FAILED with an optional `error` message.
+- `suspend fun requeue(id: Long, error: String?) = markFailed(id, error)` — Put the entry back to PENDING after a failed attempt that is still within the retry cap, so the syncer tries it again. Its `attemptCount` (bumped by `markRetrying`) is kept.
 - `suspend fun deleteByFormKey(formKey: String)` — Delete all drafts for `formKey` (e.g. on screen close or after successful submit).
-- `suspend fun deleteByUniqueKey(formKey: String, uniqueKey: String)` — Delete a single `(formKey, uniqueKey)` row. Use after a multi-pending draft successfully submits. Does NOT affect the singleton draft (uniqueKey IS NULL) under the same `formKey`.
-- `suspend fun deleteAll()` — Delete every draft — called from `StoreCacheManager.clearAll` on logout.
+  _…more members; read the file._
 
 ```kotlin
 data class SubmitOutboxEntry<out P>(
@@ -2134,7 +2136,143 @@ val <R> SubmitState<R>.categoryOrNull: ErrorCategory?
 ```
 Returns the `ErrorCategory` for `SubmitState.Failed`, or null for all other states.
 
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/draft/FormDraft.kt`
+
+```kotlin
+data class FormDraft(
+```
+A form submission that did not reach the server, kept so it can be RESUMED in its form or REPLAYED by an `OfflineSubmitSyncer` — one row type for every form, in `framework_submit_drafts`.
+
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/draft/FormDraftRepository.kt:44</code></summary>
+
+```kotlin
+     * taps Retry in Sync & Drafts.
+     */
+    suspend fun save(slot: String, draft: FormDraft, failure: String? = null)
+
+    /** Drop the slot's draft — on a successful submit, or Discard. */
+    suspend fun delete(form: String, slot: String)
+}
+```
+
+</details>
+
+```kotlin
+fun formDraftSlot(ownerId: Long?, kind: String? = null): String = ownerId?.let { "${kind ?: "owner"}:$it" } ?: "new"
+```
+The outbox slot: one draft per form per owner — `kind` keeps owner 7 of two kinds apart.
+
+```kotlin
+object FormDraftJson
+```
+The one JSON configuration drafts are written and read with.
+
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/draft/FormDraftRepository.kt:97</code></summary>
+
+```kotlin
+                formKey = draft.form,
+                uniqueKey = slot,
+                payloadJson = FormDraftJson.encode(FormDraft.serializer(), draft),
+                status = if (failure == null) SubmitOutboxStatus.PENDING.name else SubmitOutboxStatus.FAILED.name,
+                createdAtMs = now,
+                updatedAtMs = now,
+                errorMessage = failure,
+```
+
+</details>
+
+- `val json: Json = Json` — Ignores unknown keys, so a draft saved by an older build still decodes.
+- `fun <T> encode(serializer: KSerializer<T>, value: T): String = json.encodeToString(serializer, value)` — `value` as a draft JSON string.
+- `fun <T> decode(serializer: KSerializer<T>, value: String): T = json.decodeFromString(serializer, value)` — A draft JSON string back to `T`. Throws when it no longer matches `serializer`.
+- `fun <T> FormDraft.payloadAs(serializer: KSerializer<T>): T = decode(serializer, payload)` — A replay decodes the payload with the form's own serializer.
+
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/draft/FormDraftRepository.kt`
+
+```kotlin
+interface FormDraftRepository
+```
+Drafts of a set of forms — one slot per form per owner (`formDraftSlot`). A draft is written when a submit does not land, and is either REPLAYED (offline ones, on reconnect) or RESUMED in its form.
+
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/draft/FormDraftSlot.kt:33</code></summary>
+
+```kotlin
+ */
+class FormDraftSlot<S, P>(
+    private val drafts: FormDraftRepository,
+    private val scope: CoroutineScope,
+    /** The form's key — also the outbox `formKey`. */
+    val form: String,
+    private val ownerId: Long?,
+```
+
+</details>
+
+- `fun observe(form: String, slot: String): Flow<SavedFormDraft?>` — The draft in `slot` of `form` — pending, retrying or failed — or null.
+- `fun observeAll(): Flow<List<SavedFormDraft>>` — Every draft of these forms, newest first — what Sync & Drafts lists.
+- `suspend fun save(slot: String, draft: FormDraft, failure: String? = null)` — Keep `draft` in its slot, replacing whatever was there. `failure` null = the submit never reached the server (offline): PENDING, and the syncer sends it on reconnect.
+- `suspend fun delete(form: String, slot: String)` — Drop the slot's draft — on a successful submit, or Discard.
+
+```kotlin
+data class SavedFormDraft(
+```
+A stored `FormDraft` with its outbox bookkeeping — what a form offers and Sync & Drafts lists.
+
+<details><summary>Used in the template — <code>core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/draft/FormDraftSlot.kt:48</code></summary>
+
+```kotlin
+
+    /** The draft to offer on this form, or null. */
+    val offered: StateFlow<SavedFormDraft?> =
+        combine(drafts.observe(form, slot), handled) { draft, done -> draft.takeUnless { done } }
+            .stateIn(scope, SharingStarted.Eagerly, null)
+
+    /** The offered draft's snapshot, and the banner goes. Null when there is nothing to resume. */
+```
+
+</details>
+
+```kotlin
+class RoomFormDraftRepository(
+```
+Over the DAO rather than `RoomSubmitOutbox`: a form must see its FAILED draft too (the outbox's observers are PENDING-only), and a save must replace the slot whatever its status (the outbox upserts only a PENDING row, so saving over a FAILED one would leave two).
+
+<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/submit/draft/RoomFormDraftRepositoryTest.kt:27</code></summary>
+
+```kotlin
+
+    private val dao = FakeDraftDao()
+    private val drafts = RoomFormDraftRepository(dao, listOf("create.group"))
+    private val slot = formDraftSlot(null)
+
+    private fun draft(name: String) = FormDraft(
+        form = "create.group",
+```
+
+</details>
+
+### `core-base/store/src/commonMain/kotlin/kpt/core/base/store/submit/draft/FormDraftSlot.kt`
+
+```kotlin
+class FormDraftSlot<S, P>(
+```
+One form's draft slot — what a ViewModel holds so drafts cost it a few lines. `S` is the form's own snapshot type (what `resume` gives back), `P` the payload its submit sends.
+
+```kotlin
+val MutationResult<*>.isOffline: Boolean
+```
+True when the write never reached the server — the case a draft is kept for automatically.
+
+```kotlin
+fun <T> MutationResult<T>.offlineWhenUnsent(): MutationResult<T> =
+```
+A network failure as the `Blocked(OFFLINE)` it really is, so a form's existing offline handling (keep the draft, say "no connection") covers both shapes of `isOffline`. Anything else unchanged.
+
+```kotlin
+fun MutationResult<*>.failureReason(reasonOf: (Throwable) -> String? = { null }): String = when (this)
+```
+Why a write did not land, for a FAILED draft. `reasonOf` extracts the server's own message from a failure's cause (apps parse their backend's error body); the cause's message is the fallback.
+
 ---
 
-_65 type(s), 113 function(s)/property(ies); 164 carry KDoc at source; 22 authored example(s); 74 live call site(s)._
+_71 type(s), 126 function(s)/property(ies); 182 carry KDoc at source; 22 authored example(s); 79 live call site(s)._
 <!-- api-docs:end -->

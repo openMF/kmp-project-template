@@ -66,5 +66,8 @@ example_identity:
   # Store-copy reference strings the template ships (case-insensitive), consumed by B8/store-listing.
   store_copy_reference:
     - 'Money Toolkit'
-    - 'Mifos Initiative'
-    - 'org\.mifos'
+    # 'Mifos Initiative' is deliberately EXCLUDED: unlike 'Money Toolkit' (a demo app name no real
+    # fork carries), it is the genuine org/copyright text of every openMF Mifos-family fork, so
+    # flagging it false-positives on every real Mifos app. 'org\.mifos\.kmp\.template' is anchored to
+    # the template's FULL package (as bundle_id is): a bare 'org\.mifos' matched any real Mifos id.
+    - 'org\.mifos\.kmp\.template'

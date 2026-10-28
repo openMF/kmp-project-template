@@ -2,7 +2,7 @@
 
 > **Layer:** core — fork-owned; a codegen target
 > **Corpus surface:** `CORE_NETWORK.md`
-> **Measured:** 39 Kotlin files, 14 test files
+> **Measured:** 41 Kotlin files, 16 test files
 
 ## Codegen contracts owned here
 
@@ -22,10 +22,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=db77bb3bdae3d823451550333bdc1a02ff32c8a8 -->
+<!-- api-docs:begin module=core/network sha=aa933b370d60cccc33d8f493bb5fc4e6f14d9fb4 -->
 ## API reference
 
-_Generated from `core/network` at tree `db77bb3bdae3` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `aa933b370d60` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`
@@ -155,7 +155,7 @@ The per-fork list of network access points this app talks to — REST and Supaba
 
 </details>
 
-- `val points: List<AccessPoint> = listOf(`
+- `val points: List<AccessPoint> = listOf(` — This project's declared access points, in app-profile order.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/config/AppMultiUrlConfigProvider.kt`
 
@@ -566,9 +566,9 @@ private class FakeJsonPlaceholderApi : JsonPlaceholderApi {
 ```kotlin
 interface AppConfigApi
 ```
-The `app_config` table's API — the CONTRACT, with no Supabase types in sight.
+The Mifos `app_config` table's API — the CONTRACT, with no Supabase types in sight, so a consumer is tested with a plain fake while `impl.AppConfigApiImpl` is the only thing that needs a live client.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:35</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:28</code></summary>
 
 ```kotlin
 class AppConfigApiImpl(
@@ -577,14 +577,13 @@ class AppConfigApiImpl(
 
     override val isConfigured: Boolean get() = supabase.isConfigured
 
-    override suspend fun fetchConfig(): List<RemoteAppConfigDto> {
+    override suspend fun fetchInstancesConfig(): String? {
 ```
 
 </details>
 
-- `val isConfigured: Boolean` — True when a real project URL + anon key are configured; false on the neutral template.
-- `suspend fun fetchConfig(): List<RemoteAppConfigDto>` — Every `app_config` row, or an empty list when Supabase is not configured.
-- `suspend fun fetchValue(key: String): String?` — The value for `key`, or `null` when absent or unconfigured.
+- `val isConfigured: Boolean` — True when a real project URL + anon key are configured.
+- `suspend fun fetchInstancesConfig(): String?` — The shared instance list as `{"instances": `...`}` JSON — the first `app_config` row — or null when unconfigured or the table has no row. Every app's instances are in it; the caller filters.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt`
 
@@ -602,7 +601,7 @@ Supabase implementation of `AppConfigApi` — a typed facade over `client.postgr
         assertFalse(api.isConfigured)
         // The guard matters: without it this would reach `client`, build a Supabase client on an empty
         // URL, and fail at app start-up on every unconfigured fork.
-        assertTrue(api.fetchConfig().isEmpty())
+        assertNull(api.fetchInstancesConfig(), "an unconfigured client reads nothing")
 ```
 
 </details>
@@ -612,18 +611,17 @@ Supabase implementation of `AppConfigApi` — a typed facade over `client.postgr
 ```kotlin
 data class RemoteAppConfigDto(
 ```
-One row of a Supabase `app_config` table — the canonical "runtime server config" shape a fork fetches at start-up (feature flags, a minimum supported version, a maintenance banner).
+One row of the Mifos Supabase `app_config` table — the SHAPE THE LIVE TABLE HAS (read 2026-10-25): `{id, instances, created_at}`, one row whose `instances` column is the shared server-instance list every Mifos app reads (mifos-pay's `InstancesConfig`). Each instance names its `supportedApps`. NOT the template's original `{key, value}` rows: that contract never matched this project, so a key/value read decoded nothing and the app silently stayed on its bundled list.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/AppConfigApi.kt:31</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:34</code></summary>
 
 ```kotlin
-
-    /** Every `app_config` row, or an empty list when Supabase is not configured. */
-    suspend fun fetchConfig(): List<RemoteAppConfigDto>
-
-    /** The value for [key], or `null` when absent or unconfigured. */
-    suspend fun fetchValue(key: String): String?
-}
+    override suspend fun fetchInstancesConfig(): String? {
+        if (!isConfigured) return null
+        val row = supabase.data.from(TABLE).select(Columns.list("id", "instances")).decodeList<RemoteAppConfigDto>()
+            .firstOrNull()
+        return row?.let { JsonObject(mapOf("instances" to it.instances)).toString() }
+    }
 ```
 
 </details>
@@ -702,5 +700,5 @@ Custom serializer that destructures the World Bank's `[metadata, observations[]]
 
 ---
 
-_32 type(s), 38 function(s)/property(ies); 58 carry KDoc at source; 3 authored example(s); 26 live call site(s)._
+_32 type(s), 37 function(s)/property(ies); 58 carry KDoc at source; 3 authored example(s); 26 live call site(s)._
 <!-- api-docs:end -->

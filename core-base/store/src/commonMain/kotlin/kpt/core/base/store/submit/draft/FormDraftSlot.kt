@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.submit.draft
 
@@ -32,6 +32,7 @@ import kpt.core.base.store.mutation.MutationResult
 class FormDraftSlot<S, P>(
     private val drafts: FormDraftRepository,
     private val scope: CoroutineScope,
+    /** The form's key — also the outbox `formKey`. */
     val form: String,
     private val ownerId: Long?,
     private val stateSerializer: KSerializer<S>,
@@ -55,6 +56,7 @@ class FormDraftSlot<S, P>(
         return runCatching { FormDraftJson.decode(stateSerializer, draft.draft.state) }.getOrNull()
     }
 
+    /** Hide the banner and delete the draft. */
     fun discard() {
         handled.value = true
         scope.launch { drafts.delete(form, slot) }

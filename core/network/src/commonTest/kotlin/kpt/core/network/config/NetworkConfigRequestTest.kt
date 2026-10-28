@@ -57,11 +57,22 @@ class NetworkConfigRequestTest {
         client.get("items")
         assertEquals("https://api.example.org/v1/items" to "tenant-a", seen.last(), "the declared config")
 
-        configs.update("main", baseUrl = "https://other.example.org:8443/api/", headers = mapOf("X-Tenant-Id" to "tenant-b"))
+        configs.update(
+            "main",
+            baseUrl = "https://other.example.org:8443/api/",
+            headers = mapOf("X-Tenant-Id" to "tenant-b"),
+        )
         client.get("items")
         assertEquals("https://other.example.org:8443/api/items" to "tenant-b", seen.last(), "an edit")
 
-        configs.add(NetworkConfig(id = "local", kind = AccessPointKind.REST, baseUrl = "http://10.0.2.2:8080/", headers = mapOf("X-Tenant-Id" to "dev")))
+        configs.add(
+            NetworkConfig(
+                id = "local",
+                kind = AccessPointKind.REST,
+                baseUrl = "http://10.0.2.2:8080/",
+                headers = mapOf("X-Tenant-Id" to "dev"),
+            ),
+        )
         configs.setMain("local")
         client.get("items")
         assertEquals("http://10.0.2.2:8080/items" to "dev", seen.last(), "a runtime-added config made main")

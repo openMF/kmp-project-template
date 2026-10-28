@@ -31,7 +31,13 @@ import kotlin.test.assertEquals
 class UnauthorizedHookTest {
 
     private fun client(status: HttpStatusCode, seen: MutableList<String>) = HttpClient(
-        MockEngine { respond("""{"httpStatusCode":"${status.value}"}""", status, headersOf(HttpHeaders.ContentType, "application/json")) },
+        MockEngine {
+            respond(
+                """{"httpStatusCode":"${status.value}"}""",
+                status,
+                headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        },
     ) {
         setupDefaultHttpClient(baseUrl = "https://example.test/")()
         notifyUnauthorized("main", UnauthorizedHandler { seen += it })

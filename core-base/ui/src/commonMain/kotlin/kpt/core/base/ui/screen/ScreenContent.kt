@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.ui.screen
 
@@ -452,7 +452,8 @@ internal fun ScreenStateVisualRenderer(
     when (visual) {
         is ScreenStateVisual.Vector -> Icon(
             imageVector = visual.image,
-            contentDescription = null, // parent layout owns contentDescription via semantics
+            // parent layout owns contentDescription via semantics
+            contentDescription = null,
             modifier = modifier,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )

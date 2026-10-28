@@ -9,10 +9,10 @@
  */
 package kpt.core.base.common.di
 
-import org.koin.core.module.Module
-import org.koin.dsl.module
 import kpt.core.base.common.manager.DispatcherManager
 import kpt.core.base.common.manager.DispatcherManagerImpl
+import org.koin.core.module.Module
+import org.koin.dsl.module
 
 /** `dispatcherManagerModule` on Non-Android targets. */
 actual val dispatcherManagerModule: Module

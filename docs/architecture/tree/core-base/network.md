@@ -2,7 +2,7 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_NETWORK.md`
-> **Measured:** 25 Kotlin files, 0 test files
+> **Measured:** 26 Kotlin files, 0 test files
 
 **Defines annotations:** `@ApiBinding`
 
@@ -56,10 +56,10 @@ Changing the server usually invalidates the session, so sign out on a change.
 
 Tests: `core/network/src/commonTest/.../config/{NetworkConfigRepositoryTest,NetworkConfigRequestTest,DynamicBaseUrlTest}.kt`.
 
-<!-- api-docs:begin module=core-base/network sha=d494ec29670653227c363996418359050779f3fb -->
+<!-- api-docs:begin module=core-base/network sha=23cc22329d1e01c21361a8485b92b213a1e0f4ea -->
 ## API reference
 
-_Generated from `core-base/network` at tree `d494ec296706` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `23cc22329d1e` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -74,7 +74,7 @@ enum class AccessPointKind
 ```
 Transport kind of a declared network access point.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:36</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:37</code></summary>
 
 ```kotlin
         AccessPoint(
@@ -93,11 +93,11 @@ data class AccessPoint(
 ```
 One declared network access point — a named endpoint the app talks to.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:33</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:34</code></summary>
 
 ```kotlin
-    // Edit access points THERE (the SoT) and run `./gradlew syncForkConfig`; do not hand-edit this block.
     // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.
+    /** This project's declared access points, in app-profile order. */
     val points: List<AccessPoint> = listOf(
         AccessPoint(
             id = "main",
@@ -239,7 +239,7 @@ val stagingClient = httpClient {
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:318</code></summary>
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:320</code></summary>
 
 ```kotlin
     // static-URL path is unchanged (no regression).
@@ -304,7 +304,7 @@ class MyConfigProvider(
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/DynamicBaseUrlTest.kt:41</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/DynamicBaseUrlTest.kt:44</code></summary>
 
 ```kotlin
             baseUrl = "https://api.example.org/1.0/field/v1/",
@@ -380,7 +380,7 @@ data class HeaderSpec(
 ```
 A header an access point sends on every request, declared in `app-profile/app.yaml#network.access_points[].headers[]`. Two kinds, because they have different lifetimes: - **static** (`value` set) — known at build time.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:86</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:87</code></summary>
 
 ```kotlin
             auth = AuthScheme.BASIC,
@@ -462,16 +462,16 @@ data class NetworkConfig(
 ```
 One network config as the app runs it — a declared access point (`app-profile/app.yaml`) with any runtime changes applied, or a config added at runtime. `baseUrl` is the full URL requests resolve against (origin + API path).
 
-<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:83</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:105</code></summary>
 
 ```kotlin
-    fun aConfigAddedAtRuntimeCanBecomeMainAndBeRemoved() {
         val r = repo()
-        r.add(NetworkConfig(id = "custom", kind = AccessPointKind.REST, baseUrl = "http://10.0.2.2:8080/fineract-provider/api/v1/"))
-        r.setMain("custom")
-        assertEquals("http://10.0.2.2:8080/fineract-provider/api/v1/", r.urlFor(main))
-        assertFailsWith<IllegalArgumentException>("the main cannot be removed") { r.remove("custom") }
-        r.setMain("main")
+        r.add(
+            NetworkConfig(
+                id = "custom",
+                kind = AccessPointKind.REST,
+                baseUrl = "http://10.0.2.2:8080/fineract-provider/api/v1/",
+            ),
 ```
 
 </details>
@@ -481,7 +481,7 @@ data class NetworkConfigOverrides(
 ```
 The persisted half: only what differs from app-profile.
 
-<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:119</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:146</code></summary>
 
 ```kotlin
 
@@ -500,24 +500,24 @@ interface NetworkConfigStore
 ```
 Where `NetworkConfigRepository` keeps its overrides.
 
-- `fun load(): NetworkConfigOverrides`
-- `fun save(overrides: NetworkConfigOverrides)`
+- `fun load(): NetworkConfigOverrides` — The saved overrides, or empty ones when nothing was saved. Called once, at construction.
+- `fun save(overrides: NetworkConfigOverrides)` — Replace the saved overrides with `overrides`.
 
 ```kotlin
-class InMemoryNetworkConfigStore(private var overrides: NetworkConfigOverrides = NetworkConfigOverrides()) : NetworkConfigStore
+class InMemoryNetworkConfigStore(
 ```
 Not persisted — for tests and for an app that wants changes to last one session only.
 
-<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:44</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:60</code></summary>
 
 ```kotlin
     private val registry = AccessPointRegistry(listOf(main, staging, supabase))
 
-    private fun repo(store: InMemoryNetworkConfigStore = InMemoryNetworkConfigStore()) = NetworkConfigRepository(registry, store)
+    private fun repo(store: InMemoryNetworkConfigStore = InMemoryNetworkConfigStore()) =
+        NetworkConfigRepository(registry, store)
 
     @Test
     fun withNoChangesEveryPointUsesWhatAppProfileDeclares() {
-        val r = repo()
 ```
 
 </details>
@@ -532,7 +532,8 @@ Persists the overrides as JSON in `settings` (the app's plain settings). A corru
 ```kotlin
         NetworkConfigRepository(
             registry = get(),
-            store = getOrNull<Settings>(named("plain"))?.let(::SettingsNetworkConfigStore) ?: InMemoryNetworkConfigStore(),
+            store = getOrNull<Settings>(named("plain"))?.let(::SettingsNetworkConfigStore)
+                ?: InMemoryNetworkConfigStore(),
         )
     }
 }
@@ -545,12 +546,12 @@ class NetworkConfigRepository(
 ```
 The app's network configs at runtime: every access point app-profile declares, changeable, plus any added at runtime — with one of them MAIN. **Main.** App-profile marks one access point `main: true`.
 
-<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:44</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/config/NetworkConfigRepositoryTest.kt:61</code></summary>
 
 ```kotlin
-    private val registry = AccessPointRegistry(listOf(main, staging, supabase))
 
-    private fun repo(store: InMemoryNetworkConfigStore = InMemoryNetworkConfigStore()) = NetworkConfigRepository(registry, store)
+    private fun repo(store: InMemoryNetworkConfigStore = InMemoryNetworkConfigStore()) =
+        NetworkConfigRepository(registry, store)
 
     @Test
     fun withNoChangesEveryPointUsesWhatAppProfileDeclares() {
@@ -663,7 +664,7 @@ if (configClient.isConfigured) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:34</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:27</code></summary>
 
 ```kotlin
 @ApiBinding("lwmswhoxvvoagzkqxiyd")
@@ -692,7 +693,7 @@ object MySupabaseCredentials : SupabaseCredentials {
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/SupabaseClientFactory.kt:54</code></summary>
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/SupabaseClientFactory.kt:58</code></summary>
 
 ```kotlin
         val anonKey = config?.headers?.get(ANON_KEY_HEADER)?.takeIf { it.isNotBlank() } ?: anonKeyFor(config?.id ?: id)
@@ -850,5 +851,5 @@ interface ApiService {
 
 ---
 
-_29 type(s), 21 function(s)/property(ies); 48 carry KDoc at source; 12 authored example(s); 25 live call site(s)._
+_29 type(s), 21 function(s)/property(ies); 50 carry KDoc at source; 12 authored example(s); 25 live call site(s)._
 <!-- api-docs:end -->

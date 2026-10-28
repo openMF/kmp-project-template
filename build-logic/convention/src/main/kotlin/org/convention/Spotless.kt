@@ -1,3 +1,12 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 package org.convention
 
 import com.diffplug.gradle.spotless.SpotlessExtension
@@ -7,34 +16,51 @@ import org.gradle.api.Project
  * ktlint version Spotless runs. Pinned here rather than in the catalog: Spotless resolves it at configuration time,
  * before the catalog is available to build-logic.
  */
-const val ktlintVersion = "1.0.1"
+const val KTLINT_VERSION = "1.0.1"
 
 /**
  * Configures the Spotless plugin with the [extension] configuration.
  * This includes setting up the `ktlint` formatter and the license header.
+ *
+ * On the ROOT project it formats what no module can see instead: `build-logic/` (an included build,
+ * so no module's Spotless reaches it) and the root `*.kts` files. Every other project formats its own
+ * tree. Both run ktlint on `.kts` too, so build scripts follow the same style as the sources.
  * @see SpotlessExtension
  */
 internal fun Project.configureSpotless(extension: SpotlessExtension) = extension.apply {
+    val root = this@configureSpotless == rootProject
     kotlin {
-        target("**/*.kt")
+        if (root) target("build-logic/**/*.kt") else target("**/*.kt")
         targetExclude("**/build/**/*.kt")
-        ktlint(ktlintVersion).editorConfigOverride(
-            mapOf("android" to "true"),
+        ktlint(KTLINT_VERSION).editorConfigOverride(
+            // build-logic only: ktlint cannot see that `import org.gradle.kotlin.dsl.assign` is used —
+            // it backs every `property = value` on a Gradle Property — so this rule deletes it and
+            // build-logic stops compiling.
+            if (root) {
+                mapOf("android" to "true", "ktlint_standard_no-unused-imports" to "disabled")
+            } else {
+                mapOf("android" to "true")
+            },
         )
         licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
     }
 
-    format("kts") {
-        target("**/*.kts")
+    kotlinGradle {
+        if (root) target("*.kts", "build-logic/**/*.kts") else target("**/*.kts")
         targetExclude("**/build/**/*.kts")
+        ktlint(KTLINT_VERSION).editorConfigOverride(
+            mapOf("android" to "true"),
+        )
         // Look for the first line that doesn't have a block comment (assumed to be the license)
         licenseHeaderFile(rootProject.file("spotless/copyright.kts"), "(^(?![\\/ ]\\*).*$)")
     }
 
-    format("xml") {
-        target("**/*.xml")
-        targetExclude("**/build/**/*.xml")
-        // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
-        licenseHeaderFile(rootProject.file("spotless/copyright.xml"), "(<[^!?])")
+    if (!root) {
+        format("xml") {
+            target("**/*.xml")
+            targetExclude("**/build/**/*.xml")
+            // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
+            licenseHeaderFile(rootProject.file("spotless/copyright.xml"), "(<[^!?])")
+        }
     }
 }

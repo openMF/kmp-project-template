@@ -5,18 +5,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.paging
 
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
-import org.mobilenativefoundation.store.store5.Store
-import org.mobilenativefoundation.store.store5.StoreReadRequest
-import org.mobilenativefoundation.store.store5.StoreReadResponse
 import kpt.core.base.store.screen.DataOrigin
 import kpt.core.base.store.screen.toDataOrigin
 import kpt.core.base.store.screen.toThrowable
+import org.mobilenativefoundation.store.store5.Store
+import org.mobilenativefoundation.store.store5.StoreReadRequest
+import org.mobilenativefoundation.store.store5.StoreReadResponse
 
 /**
  * Key for paginated Store requests.
@@ -159,8 +159,8 @@ sealed class StorePageResult<out T> {
     /**
      * A page that failed to load. The footer maps [error] to copy via its `ErrorCategory`, so an offline page-load
      * reads as offline rather than as a server fault.
-      *
-      * @property error the failure that ended this page load. Transient: the page is retried, not skipped.
+     *
+     * @property error the failure that ended this page load. Transient: the page is retried, not skipped.
      */
     data class Error(val error: Throwable) : StorePageResult<Nothing>()
 }

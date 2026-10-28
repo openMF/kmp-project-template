@@ -24,15 +24,15 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `core/` | 441 | [`core/`](tree/core.md) |
-| `core-base/` | 483 | [`core-base/`](tree/core-base.md) |
+| `core/` | 446 | [`core/`](tree/core.md) |
+| `core-base/` | 493 | [`core-base/`](tree/core-base.md) |
 
 ## Codegen
 
 | Area | Files | Page |
 |---|---:|---|
 | `tools/` | 12 | [`tools/`](tree/tools.md) |
-| `build-logic/` | 41 | [`build-logic/`](tree/build-logic.md) |
+| `build-logic/` | 40 | [`build-logic/`](tree/build-logic.md) |
 
 ## Configuration
 
@@ -40,7 +40,7 @@
 |---|---:|---|
 | `app-profile/` | 161 | [`app-profile/`](tree/app-profile.md) |
 | `gradle/` | 5 | [`gradle/`](tree/gradle.md) |
-| `secrets/` | 55 | [`secrets/`](tree/secrets.md) |
+| `secrets/` | 54 | [`secrets/`](tree/secrets.md) |
 
 ## Build, release, CI
 
@@ -56,7 +56,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 438 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 440 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
 | `tests/` | 9 | [`tests/`](tree/tests.md) |
 

@@ -38,7 +38,8 @@ buildkonfig {
         // the FRED_API_KEY env var (from `/secrets sync-to-ci`). A compiled-in client key must be read at
         // build time — this IS that sanctioned read, so no secret value ever lives in a tracked file.
         buildConfigField(
-            STRING, "FRED_API_KEY",
+            STRING,
+            "FRED_API_KEY",
             System.getenv("FRED_API_KEY") ?: localProps.getProperty("FRED_API_KEY", ""),
         )
         // demo:end
@@ -49,7 +50,6 @@ buildkonfig {
         // syncForkConfig:buildkonfig:end
     }
 }
-
 
 kotlin {
     sourceSets {

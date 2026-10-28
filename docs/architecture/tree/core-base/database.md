@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/database sha=e10788f5bf9faa9435bed9b9ef43af2911bae8a6 -->
+<!-- api-docs:begin module=core-base/database sha=7a240f779c05f03a89e2928a393b351b47bcca17 -->
 ## API reference
 
-_Generated from `core-base/database` at tree `e10788f5bf9f` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/database` at tree `7a240f779c05` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is

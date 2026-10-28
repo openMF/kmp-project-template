@@ -32,8 +32,8 @@ class AppConfigApiImpl(
     override suspend fun fetchInstancesConfig(): String? {
         if (!isConfigured) return null
         val row = supabase.data.from(TABLE).select(Columns.list("id", "instances")).decodeList<RemoteAppConfigDto>()
-            .firstOrNull() ?: return null
-        return JsonObject(mapOf("instances" to row.instances)).toString()
+            .firstOrNull()
+        return row?.let { JsonObject(mapOf("instances" to it.instances)).toString() }
     }
 
     private companion object {

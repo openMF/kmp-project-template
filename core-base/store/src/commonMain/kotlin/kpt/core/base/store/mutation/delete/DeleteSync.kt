@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.mutation.delete
 
@@ -46,8 +46,14 @@ class DeleteSync<K : Any>(
             return false
         }
         return runCatching { deleteEndpoint(key) }.fold(
-            onSuccess = { bookkeeper.clear(key); true },
-            onFailure = { bookkeeper.setLastFailedSync(key, now()); false },
+            onSuccess = {
+                bookkeeper.clear(key)
+                true
+            },
+            onFailure = {
+                bookkeeper.setLastFailedSync(key, now())
+                false
+            },
         )
     }
 
@@ -61,7 +67,10 @@ class DeleteSync<K : Any>(
     suspend fun retry(key: K): Boolean {
         if (bookkeeper.getLastFailedSync(key) == null) return true
         return runCatching { deleteEndpoint(key) }.fold(
-            onSuccess = { bookkeeper.clear(key); true },
+            onSuccess = {
+                bookkeeper.clear(key)
+                true
+            },
             onFailure = { false },
         )
     }

@@ -53,7 +53,7 @@ internal object SharedAxisSpec {
      */
     fun isSymmetric(motion: Motion): Boolean =
         enterForwardSlideMs(motion) == exitForwardSlideMs(motion) &&
-        enterForwardFadeMs(motion) == exitForwardFadeMs(motion) &&
-        enterBackSlideMs(motion) == exitBackSlideMs(motion) &&
-        enterBackFadeMs(motion) == exitBackFadeMs(motion)
+            enterForwardFadeMs(motion) == exitForwardFadeMs(motion) &&
+            enterBackSlideMs(motion) == exitBackSlideMs(motion) &&
+            enterBackFadeMs(motion) == exitBackFadeMs(motion)
 }

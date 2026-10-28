@@ -62,5 +62,5 @@ internal object TransitionPushSpec {
      */
     fun isSymmetric(): Boolean =
         enterSlideDelayMs() == exitSlideDelayMs() &&
-        enterSlideDurationMs() == exitSlideDurationMs()
+            enterSlideDurationMs() == exitSlideDurationMs()
 }

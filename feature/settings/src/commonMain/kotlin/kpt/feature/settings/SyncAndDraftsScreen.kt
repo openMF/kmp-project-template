@@ -248,7 +248,11 @@ internal fun DraftRow(
                 )
             }
             extras?.subtitle?.let {
-                Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(sp.sm)) {
                 extras?.onOpen?.let { open ->
@@ -416,7 +420,10 @@ internal fun ConflictRowCard(
  * [syncAndDraftsDestination]'s `draftExtras`; null fields keep the template's defaults.
  */
 data class DraftRowExtras(
+    /** Shown instead of the raw form key. */
     val title: String? = null,
+    /** A second line under the title. */
     val subtitle: String? = null,
+    /** Reopens the form the draft came from; null hides the Open button. */
     val onOpen: (() -> Unit)? = null,
 )

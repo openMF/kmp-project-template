@@ -1,20 +1,20 @@
 # `secrets/`
 
 > **Kind:** Secret material (gitignored live values)  
-> **Measured:** 55 tracked files — 14× `.md`, 4× `.json`, 2× `.gitkeep`, 2× `.yaml`, 2× `.p8`
+> **Measured:** 54 tracked files — 14× `.md`, 3× `.json`, 2× `.gitkeep`, 2× `.yaml`, 2× `.p8`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `secrets/sample/` | 53 |
+| `secrets/sample/` | 52 |
 | (files at the root) | 2 |
 
 ## Subsections
 
 | Unit | Files | Page |
 |---|---:|---|
-| `secrets/sample/` | 53 | [sample](secrets/sample.md) |
+| `secrets/sample/` | 52 | [sample](secrets/sample.md) |
 
 ## Docs in the tree
 

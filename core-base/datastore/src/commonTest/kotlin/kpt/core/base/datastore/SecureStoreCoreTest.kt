@@ -24,8 +24,12 @@ private const val SECURE = "secure_data_key"
 private class FakeStorage(initial: Map<String, String> = emptyMap()) : SecureBlobStorage {
     val data = linkedMapOf<String, String>().apply { putAll(initial) }
     override fun get(key: String): String? = data[key]
-    override fun set(key: String, value: String) { data[key] = value }
-    override fun remove(key: String) { data.remove(key) }
+    override fun set(key: String, value: String) {
+        data[key] = value
+    }
+    override fun remove(key: String) {
+        data.remove(key)
+    }
     override fun keys(): List<String> = data.keys.toList()
 }
 

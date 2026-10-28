@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.network.config
 
@@ -33,7 +33,10 @@ import kotlin.test.assertEquals
 class DynamicBaseUrlTest {
 
     private fun client(dynamicBase: String?, seen: MutableList<String>) = HttpClient(
-        MockEngine { r -> seen += r.url.toString(); respond("[]", HttpStatusCode.OK, headersOf("Content-Type", "application/json")) },
+        MockEngine { r ->
+            seen += r.url.toString()
+            respond("[]", HttpStatusCode.OK, headersOf("Content-Type", "application/json"))
+        },
     ) {
         setupDefaultHttpClient(
             baseUrl = "https://api.example.org/1.0/field/v1/",

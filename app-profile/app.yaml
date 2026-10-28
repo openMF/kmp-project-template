@@ -81,11 +81,11 @@ network:
   #                      property of the endpoint, not something a ViewModel invents; only the VALUE
   #                      is runtime. An unset runtime header is OMITTED, never sent empty.
   #
-  #                    Do NOT declare `Content-Type` or `Accept`: ContentNegotiation already sets
-  #                    them on every request — Accept from the plugin, Content-Type from the BODY, so
-  #                    a JSON post sends application/json, a text post sends text/plain, and a GET
-  #                    correctly sends none. Declaring them only adds a Content-Type to bodyless
-  #                    requests, describing a body that is not there. Enforced by NAP-13.
+  #                    Do NOT declare `Accept` or `Content-Type: application/json`: the shared client
+  #                    sets them — Accept from ContentNegotiation, and core-base's JsonBodyContentType
+  #                    names JSON for a typed (`@Body`) object, which ContentNegotiation needs before
+  #                    it will serialize one. A text post keeps text/plain and a GET sends none. A
+  #                    server that speaks ANOTHER type declares it here and it wins. Enforced by NAP-13.
   #   anon_key_env   supabase only — env / local.properties key holding the anon key. Generated into
   #                  AppSupabaseAnonKeys as a BuildKonfig read, so no key is ever committed. Omit and
   #                  the point resolves to an empty key (client stays inert, isConfigured == false).

@@ -13,9 +13,9 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHECK="$(cd "$HERE/../../checks" && pwd)/network-access-points.sh"
 rc_ok=0
 
-cell() { # <tree> <expected-exit> <label>
-  local tree="$1" exp="$2" lbl="$3" out rc
-  out="$(HEALTH_ROOT="$HERE" NAP_YAML="$HERE/app.yaml" NAP_NET_DIR="$HERE/$tree" bash "$CHECK" 2>&1)"; rc=$?
+cell() { # <tree> <expected-exit> <label> [app.yaml variant]
+  local tree="$1" exp="$2" lbl="$3" yaml="$HERE/${4:-app.yaml}" out rc
+  out="$(HEALTH_ROOT="$HERE" NAP_YAML="$yaml" NAP_NET_DIR="$HERE/$tree" bash "$CHECK" 2>&1)"; rc=$?
   # The label names the rule (e.g. "NAP-3 ..."); when a leg is expected to FAIL, require the output
   # to actually cite that rule. Exit code alone cannot distinguish "NAP-3 caught it" from "some other
   # rule fired" — nor from a vacuously-passing NAP-3 while a different rule keeps the exit non-zero.
@@ -45,4 +45,6 @@ cell nap7-handwired       1 "NAP-7 hand-wired binding          → FAIL"
 # sanitized to PAY_GW while AccessPoint.type carries UrlType("PAY-GW"), so restBaseUrl never matches
 # and getBaseUrl silently returns MAIN's URL. Nothing fails to compile.
 cell nap3-sanitized-key   1 "NAP-3 UrlType key sanitized too   → FAIL"
+cell good                 1 "NAP-13 restates JSON Content-Type → FAIL" nap13-json-declared.yaml
+cell good                 0 "NAP-13 non-JSON override allowed  → PASS" nap13-override.yaml
 exit "$rc_ok"

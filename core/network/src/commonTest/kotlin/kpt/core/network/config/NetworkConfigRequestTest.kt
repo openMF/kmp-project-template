@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.network.config
 
@@ -33,8 +33,13 @@ import kotlin.test.assertEquals
 class NetworkConfigRequestTest {
 
     private val main = AccessPoint(
-        id = "main", kind = AccessPointKind.REST, baseUrl = "https://api.example.org/", basePath = "v1/",
-        loggableHost = "api.example.org", isMain = true, headers = listOf(HeaderSpec(name = "X-Tenant-Id", value = "tenant-a")),
+        id = "main",
+        kind = AccessPointKind.REST,
+        baseUrl = "https://api.example.org/",
+        basePath = "v1/",
+        loggableHost = "api.example.org",
+        isMain = true,
+        headers = listOf(HeaderSpec(name = "X-Tenant-Id", value = "tenant-a")),
     )
 
     @Test

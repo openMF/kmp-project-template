@@ -13,9 +13,9 @@ import kpt.core.base.network.AccessPointRegistry
 import kpt.core.base.network.DefaultHeaderProvider
 import kpt.core.base.network.MultiUrlConfigProvider
 import kpt.core.base.network.SupabaseClientFactory
-import kpt.core.base.network.di.NetworkConfigModule
 import kpt.core.base.network.SupabaseExtrasProvider
 import kpt.core.base.network.di.NetworkBaseModule
+import kpt.core.base.network.di.NetworkConfigModule
 import kpt.core.network.config.AppAccessPoints
 import kpt.core.network.config.AppMultiUrlConfigProvider
 import kpt.core.network.config.AppSupabaseAnonKeys

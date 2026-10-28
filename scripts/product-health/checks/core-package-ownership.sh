@@ -94,6 +94,9 @@ for spec in $CORE_MODULES; do
 
   while IFS=$'\t' read -r id owner status; do
     [ -z "${id:-}" ] && continue
+    # A demo row the strip removed is KEPT on purpose (the header's `demo:` contract) — its absence is
+    # the expected state, and MP-7 below still proves `removed` is true. Only a live row must exist.
+    [ "$owner" = "demo" ] && [ "$status" = "removed" ] && continue
     # MP-2 — a declared package that does not exist is a row nobody maintains.
     if ! compgen -G "$SRC/*/$PKG_REL/$id" >/dev/null 2>&1; then
       note "❌ MP-2 declared $MOD_LABEL package '$id' has no directory under $PKG_REL/"

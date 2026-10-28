@@ -307,6 +307,8 @@ fun setupDefaultHttpClient(
     install(ContentNegotiation) {
         json(jsonConfig)
     }
+    // A typed body is JSON unless the call says otherwise — so no access point has to declare it.
+    install(JsonBodyContentType)
 
     // Runtime base-URL switching (opt-in). The [DynamicBaseUrlPlugin] rewrites each request's
     // host/scheme at call time — the [baseUrl] above becomes a static fallback. A

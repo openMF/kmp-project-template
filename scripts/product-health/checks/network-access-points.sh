@@ -302,9 +302,12 @@ if bad_auth.any?
              "     → one of none | basic | bearer | oauth (an unknown value silently parses to NONE)")
 end
 
-# ── NAP-13 — transport-negotiated headers are NOT declared ───────────────────
-# `Content-Type` and `Accept` belong to ContentNegotiation, which `setupDefaultHttpClient` installs
-# with `json(jsonConfig)`.
+# ── NAP-13 — the DEFAULT transport headers are NOT declared ──────────────────
+# `Accept` belongs to ContentNegotiation, which `setupDefaultHttpClient` installs with
+# `json(jsonConfig)`; a typed body's `Content-Type: application/json` comes from core-base's
+# JsonBodyContentType. (ContentNegotiation alone does NOT name a type for a typed `@Body` object — it
+# serializes only once one is named, so before JsonBodyContentType a fork had to declare it or every
+# typed POST threw "Fail to prepare request body". The probe below covered String/text bodies only.)
 #
 # MEASURED, not assumed (probe, 2026-09-08) — declared vs not:
 #   declared      GET  Content-Type: application/json   <- on a request with NO body
@@ -320,15 +323,23 @@ end
 # Other codebases carry these as constants (mifos-pay's BaseURL.HEADER_CONTENT_TYPE / HEADER_ACCEPT)
 # because they hand-build requests. Here the client negotiates, so the right number of declarations
 # is zero — and this check exists so that pattern is not ported in by habit.
-negotiated = %w[content-type accept]
-declared_negotiated = points.flat_map do |p|
-  (p["headers"] || []).map { |h| h["name"].to_s }.select { |n| negotiated.include?(n.downcase) }
-                      .map { |n| "#{p['id']}:#{n}" }
+#
+# What IS allowed: a Content-Type that is NOT the default. A server that speaks another type
+# (`application/vnd.api+json`, `application/hal+json`) declares it, and core-base's JsonBodyContentType
+# steps aside for a request that already names one. Only a declaration that restates the default
+# (Accept, or Content-Type: application/json) is redundant — and it is the one that breaks bodyless GETs.
+redundant = points.flat_map do |p|
+  (p["headers"] || []).select do |h|
+    name = h["name"].to_s.downcase
+    value = h["value"].to_s.downcase.split(";").first.to_s.strip
+    name == "accept" || (name == "content-type" && (value.empty? || value == "application/json"))
+  end.map { |h| "#{p['id']}:#{h['name']}" }
 end
-if declared_negotiated.any?
-  fail = bad("❌ NAP-13 transport-negotiated header(s) declared: #{declared_negotiated.join(', ')}\n" \
-             "     → remove them; ContentNegotiation sets Accept and Content-Type per request.\n" \
-             "       They add nothing (the plugin already sets both) and put a Content-Type on bodyless requests.")
+if redundant.any?
+  fail = bad("❌ NAP-13 default transport header(s) declared: #{redundant.join(', ')}\n" \
+             "     → remove them; the shared client already sends Accept and names JSON for a typed body\n" \
+             "       (core-base JsonBodyContentType). Declaring them only puts a Content-Type on bodyless requests.\n" \
+             "       A server that needs a DIFFERENT Content-Type may declare it — that is an override, not noise.")
 end
 
 # ── NAP-11 — the default-header seam stays wired ─────────────────────────────

@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.network.config
 
@@ -30,13 +30,21 @@ import kotlin.test.assertNull
 class NetworkConfigRepositoryTest {
 
     private val main = AccessPoint(
-        id = "main", kind = AccessPointKind.REST, baseUrl = "https://api.example.org/", basePath = "1.0/field/v1/",
-        loggableHost = "api.example.org", isMain = true,
+        id = "main",
+        kind = AccessPointKind.REST,
+        baseUrl = "https://api.example.org/",
+        basePath = "1.0/field/v1/",
+        loggableHost = "api.example.org",
+        isMain = true,
         headers = listOf(HeaderSpec(name = "X-Tenant-Id", value = "tenant-a"), HeaderSpec(name = "Authorization", runtimeKey = "main.auth")),
     )
     private val staging = AccessPoint(
-        id = "staging", kind = AccessPointKind.REST, baseUrl = "https://staging.example.org/", basePath = "fineract-provider/api/v1/",
-        loggableHost = "staging.example.org", headers = listOf(HeaderSpec(name = "X-Tenant-Id", value = "default")),
+        id = "staging",
+        kind = AccessPointKind.REST,
+        baseUrl = "https://staging.example.org/",
+        basePath = "fineract-provider/api/v1/",
+        loggableHost = "staging.example.org",
+        headers = listOf(HeaderSpec(name = "X-Tenant-Id", value = "default")),
     )
     private val supabase = AccessPoint(id = "project", kind = AccessPointKind.SUPABASE, baseUrl = "https://abc.supabase.co", loggableHost = "abc.supabase.co")
     private val registry = AccessPointRegistry(listOf(main, staging, supabase))

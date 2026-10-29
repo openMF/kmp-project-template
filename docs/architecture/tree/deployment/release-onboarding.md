@@ -23,16 +23,25 @@ To unblock, set these GitHub secrets on the consumer fork:
 - [ ] A macOS app record in App Store Connect (separate from iOS)
 Then dispatch with `mac_rung: internal` (or higher).
 
-## 🪟 Windows signed (MSI / Microsoft Store) — needs Azure Trusted Signing
+## 🪟 Windows signed (MSI) / Microsoft Store — needs Azure Trusted Signing or Partner Center
 
-Wired: 8 `azure_*` secrets forwarded to `desktop-win`; the desktop publish repo validates them.
-**Note:** `windows-exe` is NOT unsigned in this chain — it requires the same `azure_*` set as
-`windows-msi-signed`. Only `linux-deb` is secret-free. Windows defaults to `skip`.
+Wired: the `azure_*` and Microsoft Store secrets are forwarded to `desktop-win`; the desktop publish
+repo (`publish-desktop-kmp` v3.0.0+) validates the set its target needs. Windows defaults to `skip`.
+- `linux-deb` and `windows-exe` are secret-free (`windows-exe` ships an unsigned EXE).
+- `windows-msi-signed` needs the Azure Trusted Signing set.
+- `windows-microsoft-store` builds an MSIX and submits it to Partner Center. The Store re-signs it,
+  so it needs the Partner Center creds + MSIX identity, not Azure.
 
-To unblock, set:
+To unblock `windows-msi-signed`, set:
 - [ ] `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
 - [ ] `AZURE_TRUSTED_SIGNING_ENDPOINT`, `AZURE_TRUSTED_SIGNING_ACCOUNT`, `AZURE_CERT_PROFILE_NAME`
-- [ ] (Microsoft Store only) `MICROSOFT_STORE_CLIENT_ID`, `MICROSOFT_STORE_CLIENT_SECRET`
+
+To unblock `windows-microsoft-store`, set:
+- [ ] `MS_APP_ID` — the Store product ID
+- [ ] `MS_PARTNER_CENTER_TENANT_ID`, `MS_PARTNER_CENTER_CLIENT_ID`, `MS_PARTNER_CENTER_CLIENT_SECRET`
+- [ ] `WINDOWS_MSIX_IDENTITY_NAME`, `WINDOWS_MSIX_PUBLISHER`, `WINDOWS_MSIX_PUBLISHER_DISPLAY_NAME`
+
+(These replace the former `MICROSOFT_STORE_CLIENT_ID` / `MICROSOFT_STORE_CLIENT_SECRET`.)
 Then dispatch with `desktop_win_rung: prerelease` (or higher).
 
 ## 🤖 Android Play promotion (internal → beta → production) — needs Play Console

@@ -1,6 +1,6 @@
 # .github/workflows/release-multi-platform.yml
 #
-# Thin wrapper → openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.68
+# Thin wrapper → openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.69
 #
 # All orchestration logic lives in the centralized reusable workflow.
 # This file just declares the dispatch inputs + passes secrets through.
@@ -225,7 +225,7 @@ jobs:
     # @v2.0.15, publish-desktop @v2.0.8, publish-web @v2.0.10 — all carry the flavor
     # dimension). The `with:` block below threads the single dispatched
     # `inputs.flavor` / `inputs.build_type` straight through.
-    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.68
+    uses: openMF/mifos-x-actionhub/.github/workflows/release-multi-platform-v2.yaml@v1.0.69
     with:
       version_tag:          ${{ inputs.version_tag }}
       android_package_name: cmp-android
@@ -399,5 +399,12 @@ jobs:
       azure_trusted_signing_endpoint: ${{ secrets.AZURE_TRUSTED_SIGNING_ENDPOINT }}
       azure_trusted_signing_account:  ${{ secrets.AZURE_TRUSTED_SIGNING_ACCOUNT }}
       azure_cert_profile_name:        ${{ secrets.AZURE_CERT_PROFILE_NAME }}
-      microsoft_store_client_id:      ${{ secrets.MICROSOFT_STORE_CLIENT_ID }}
-      microsoft_store_client_secret:  ${{ secrets.MICROSOFT_STORE_CLIENT_SECRET }}
+      # Microsoft Store MSIX (publish-desktop-kmp v3.0.0): Partner Center creds + MSIX identity.
+      # Replaces MICROSOFT_STORE_CLIENT_ID / _SECRET; the Store re-signs the MSIX, so no Azure here.
+      ms_app_id:                           ${{ secrets.MS_APP_ID }}
+      ms_partner_center_tenant_id:         ${{ secrets.MS_PARTNER_CENTER_TENANT_ID }}
+      ms_partner_center_client_id:         ${{ secrets.MS_PARTNER_CENTER_CLIENT_ID }}
+      ms_partner_center_client_secret:     ${{ secrets.MS_PARTNER_CENTER_CLIENT_SECRET }}
+      windows_msix_identity_name:          ${{ secrets.WINDOWS_MSIX_IDENTITY_NAME }}
+      windows_msix_publisher:              ${{ secrets.WINDOWS_MSIX_PUBLISHER }}
+      windows_msix_publisher_display_name: ${{ secrets.WINDOWS_MSIX_PUBLISHER_DISPLAY_NAME }}

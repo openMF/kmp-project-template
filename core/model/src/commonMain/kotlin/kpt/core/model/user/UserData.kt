@@ -10,6 +10,7 @@
 package kpt.core.model.user
 
 import kotlinx.serialization.Serializable
+import kpt.core.model.config.AppSecurityConfig
 
 /**
  * Everything the app persists about the current user — theme, language, onboarding progress and the
@@ -70,7 +71,9 @@ data class UserData(
             isBiometricsEnabled = false,
             showOnboarding = false,
             firstTimeUser = false,
-            enableScreenCapture = false,
+            // app-profile/app.yaml#security.screen_capture_allowed_by_default (generated) — a fork
+            // decides; the user's later choice is persisted by core/datastore and wins.
+            enableScreenCapture = AppSecurityConfig.SCREEN_CAPTURE_ALLOWED_BY_DEFAULT,
         )
     }
 }

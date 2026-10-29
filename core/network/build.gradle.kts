@@ -8,6 +8,7 @@
  * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING
+import org.convention.readSecretValue
 import java.util.Properties
 
 plugins {
@@ -46,7 +47,13 @@ buildkonfig {
         // syncForkConfig:buildkonfig:begin — GENERATED from `app-profile/app.yaml`: one field per
         // access point declaring `anon_key_env:`/`api_key_env:`, plus every `network.build_config_fields`
         // entry. DO NOT HAND-EDIT — declare the key in app-profile and re-run `./gradlew syncForkConfig`.
-        // Values are read at BUILD time from the env var or local.properties, so no secret is committed.
+        // Values are read at BUILD time — the env var (CI), then the secrets/LAYOUT.yaml `kind: value` row whose
+        // source_env matches (secrets/live/ else the secrets/sample/ fake), then local.properties (legacy).
+        // No secret is committed.
+        buildConfigField(
+            STRING, "SUPABASE_ANON_KEY",
+            System.getenv("SUPABASE_ANON_KEY") ?: project.readSecretValue("supabase_anon_key") ?: localProps.getProperty("SUPABASE_ANON_KEY", ""),
+        )
         // syncForkConfig:buildkonfig:end
     }
 }

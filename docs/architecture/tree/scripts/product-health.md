@@ -1,7 +1,7 @@
 # `scripts/product-health/`
 
 > Part of [`scripts/`](../scripts.md)  
-> **Measured:** 380 tracked files — 142× `.kt`, 77× `.sh`, 52× `.md`, 33× `.yaml`, 12× `.gitkeep`
+> **Measured:** 416 tracked files — 145× `.kt`, 81× `.sh`, 52× `.md`, 50× `.yaml`, 12× `.gitkeep`
 
 ### Scripts
 
@@ -13,6 +13,7 @@
 | `core-module-deps.sh` | every core/<mod> build file full-copies, and its fork deps live in a seam. |
 | `core-package-ownership.sh` | declared-package modules stay consistent with the contract. |
 | `demo-strip-coherence.sh` | the POST-`--clean` tree must be coherent, not just the template's. |
+| `deployment-template-owned.sh` | syncForkConfig never writes fork identity into deployment/. |
 | `deployment-whitelabel.sh` | the white-label boundary between the fork-owned deployment SoT |
 | `fork-identity.sh` | DIRECTIONAL, placeholder-aware signing + org identity guard. |
 | `fork-props-manifest-parity.sh` | the TWO writers of gradle/fork.properties must agree on |
@@ -29,16 +30,15 @@
 | `pbxproj-merge.sh` | the Xcode project survives a template sync intact. |
 | `ruby-toolchain-coherence.sh` | ONE Ruby version, declared once, reachable everywhere. |
 | `secrets-alias-namespace.sh` | DIRECTIONAL guard on the vault-facing secrets files |
+| `secrets-needs-generated.sh` | deployment/**/secrets-needs.yaml agree with secrets/LAYOUT.yaml. |
 | `secrets-no-clobber-tracked.sh` | `/secrets pull` (BuildSecrets#materialize!) must NEVER |
 | `self-test-canaries.sh` | runs every product-health canary (tests/*/run.sh) so the RED/GREEN |
 | `shell-portability.sh` | tracked shell scripts must run on the RUNNERS, not just on a Mac. |
 | `store-archetype-coverage.sh` | the 8 Store5 archetypes each keep a real showcase. |
 | `store-fork-seam-wiring.sh` | the template actually CONSULTS its fork seams. |
 | `store-listing.sh` | DIRECTIONAL, placeholder-aware store-copy guard. |
-| `store-logout-purge.sh` | every store's rows are reachable by the logout purge. |
-| `sync-merge-base.sh` | an `owner: merge` row must actually 3-way, not silently full-copy. |
 
-_…and 47 more._
+_…and 51 more._
 
 <!-- tree-scaffold:end -->
 ## Significance

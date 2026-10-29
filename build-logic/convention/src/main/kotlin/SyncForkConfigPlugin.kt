@@ -388,6 +388,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
             regenerateUrlTypes(root, appProfile)
             regenerateSupabaseAnonKeys(root, appProfile)
             regenerateAppReviewConfig(root, appProfile)
+            regenerateAppSecurityConfig(root, appProfile)
             reconcileMigrationLedger(root, appProfile)
             regenerateBuildKonfigFields(root, appProfile)
             scaffoldAccessPointPackages(root, appProfile)
@@ -1202,6 +1203,29 @@ abstract class SyncForkConfigTask : DefaultTask() {
         }
     }
 
+    /**
+     * Regenerate `AppSecurityConfig` — the security defaults a fresh install starts with, from
+     * `app.yaml#security`. Today: whether screen capture is allowed before the user chooses
+     * (`UserData.DEFAULT.enableScreenCapture` reads it). An absent or unparseable value keeps the
+     * secure default (`false`) rather than silently opening capture.
+     */
+    private fun regenerateAppSecurityConfig(root: File, appProfile: Map<String, Any?>) {
+        if (appProfile.isEmpty()) return
+        val file = File(root, "core/model/src/commonMain/kotlin/kpt/core/model/config/AppSecurityConfig.kt")
+        val security = appProfile["security"] as? Map<*, *>
+        val allowCapture = security?.get("screen_capture_allowed_by_default")?.toString()?.trim()?.lowercase() == "true"
+
+        val sb = StringBuilder()
+        sb.append("// syncForkConfig:app-security:begin — GENERATED from app-profile/app.yaml#security. Do not hand-edit.\n")
+        sb.append("    /** `security.screen_capture_allowed_by_default` — whether a fresh install allows screenshots + recording. */\n")
+        sb.append("    const val SCREEN_CAPTURE_ALLOWED_BY_DEFAULT: Boolean = ").append(allowCapture).append("\n")
+        sb.append("    // syncForkConfig:app-security:end")
+
+        if (patchSentinel(file, "// syncForkConfig:app-security:begin", "// syncForkConfig:app-security:end", sb.toString())) {
+            logger.lifecycle("syncForkConfig: regenerated AppSecurityConfig (screenCaptureAllowedByDefault=$allowCapture)")
+        }
+    }
+
     private fun declaredStores(appProfile: Map<String, Any?>): List<Map<*, *>> {
         val block = (appProfile["core_store"] as? Map<*, *>).orEmpty()
         return ((block["stores"] as? List<*>) ?: emptyList<Any?>()).mapNotNull { it as? Map<*, *> }
@@ -1336,6 +1360,10 @@ abstract class SyncForkConfigTask : DefaultTask() {
             if (valid.matches(env)) fields.putIfAbsent(name, env)
         }
 
+        // env -> secrets/LAYOUT.yaml key, for every single-value `kind: value` row with a `rel:` (what the
+        // resolver's export-paths map can resolve). The generated field then reads that file at build time.
+        val secretKeys = layoutValueKeysByEnv(root)
+
         // Anything already declared outside the region wins — re-emitting it would be a duplicate.
         val outside = text.substringBefore(begin) + text.substringAfter(end)
         val existing = Regex("""buildConfigField\(\s*STRING,\s*"([A-Z0-9_]+)"""")
@@ -1345,13 +1373,16 @@ abstract class SyncForkConfigTask : DefaultTask() {
             append(begin).append(" — GENERATED from `app-profile/app.yaml`: one field per\n")
             append("        // access point declaring `anon_key_env:`/`api_key_env:`, plus every `network.build_config_fields`\n")
             append("        // entry. DO NOT HAND-EDIT — declare the key in app-profile and re-run `./gradlew syncForkConfig`.\n")
-            append("        // Values are read at BUILD time from the env var or local.properties, so no secret is committed.\n")
+            append("        // Values are read at BUILD time — the env var (CI), then the secrets/LAYOUT.yaml `kind: value` row whose\n")
+            append("        // source_env matches (secrets/live/ else the secrets/sample/ fake), then local.properties (legacy).\n")
+            append("        // No secret is committed.\n")
             for ((name, env) in fields) {
                 if (name in existing) continue
                 append("        buildConfigField(\n")
                 append("            STRING, \"").append(name).append("\",\n")
-                append("            System.getenv(\"").append(env).append("\") ?: localProps.getProperty(\"")
-                    .append(env).append("\", \"\"),\n")
+                append("            System.getenv(\"").append(env).append("\")")
+                secretKeys[env]?.let { append(" ?: project.readSecretValue(\"").append(it).append("\")") }
+                append(" ?: localProps.getProperty(\"").append(env).append("\", \"\"),\n")
                 append("        )\n")
             }
             append(end)
@@ -1499,6 +1530,26 @@ abstract class SyncForkConfigTask : DefaultTask() {
      * Every fork receives that file unchanged on sync, so it always names what the committed aliases
      * carry — the code never hardcodes either value. Null (no block / no file) disables the rewrite.
      */
+    /**
+     * `source_env -> key` for every `kind: value` secret in `secrets/LAYOUT.yaml` that has a `rel:` and no
+     * `by_flavor` — the rows the resolver's `export-paths` map resolves to a single file. Empty when the
+     * file is missing or unparsable, so the generated fields fall back to env + local.properties.
+     */
+    private fun layoutValueKeysByEnv(root: File): Map<String, String> {
+        val f = File(root, "secrets/LAYOUT.yaml")
+        if (!f.isFile) return emptyMap()
+        val doc = runCatching { f.inputStream().use { Yaml().load<Any?>(it) } }.getOrNull() as? Map<*, *>
+            ?: return emptyMap()
+        val out = LinkedHashMap<String, String>()
+        for ((key, spec) in (doc["secrets"] as? Map<*, *>).orEmpty()) {
+            val s = spec as? Map<*, *> ?: continue
+            if (s["kind"] != "value" || s["rel"] == null || s["by_flavor"] != null) continue
+            val env = s["source_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
+            out.putIfAbsent(env, key.toString())
+        }
+        return out
+    }
+
     private fun readTemplateAliasNamespaces(root: File): AliasNamespaces? {
         val f = File(root, "secrets/LAYOUT.yaml")
         if (!f.isFile) return null

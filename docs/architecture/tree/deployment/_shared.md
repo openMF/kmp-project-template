@@ -1,7 +1,7 @@
 # `deployment/_shared/`
 
 > Part of [`deployment/`](../deployment.md)  
-> **Measured:** 24 tracked files — 12× `.rb`, 8× `.sh`, 2× `.md`, 2× `.yaml`
+> **Measured:** 25 tracked files — 12× `.rb`, 9× `.sh`, 2× `.md`, 2× `.yaml`
 
 ### Contents
 

@@ -22,10 +22,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=aa933b370d60cccc33d8f493bb5fc4e6f14d9fb4 -->
+<!-- api-docs:begin module=core/network sha=56fc7a740e698a103c15b349c16e9f7d1c55f5c3 -->
 ## API reference
 
-_Generated from `core/network` at tree `aa933b370d60` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `56fc7a740e69` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`

@@ -86,9 +86,11 @@ network:
   #                    names JSON for a typed (`@Body`) object, which ContentNegotiation needs before
   #                    it will serialize one. A text post keeps text/plain and a GET sends none. A
   #                    server that speaks ANOTHER type declares it here and it wins. Enforced by NAP-13.
-  #   anon_key_env   supabase only — env / local.properties key holding the anon key. Generated into
-  #                  AppSupabaseAnonKeys as a BuildKonfig read, so no key is ever committed. Omit and
-  #                  the point resolves to an empty key (client stays inert, isConfigured == false).
+  #   anon_key_env   supabase only — the env var holding the anon key. Generated into AppSupabaseAnonKeys
+  #                  as a BuildKonfig read: env (CI) → the secrets/LAYOUT.yaml `kind: value` row with that
+  #                  source_env (secrets/live/ via `/secrets pull`, else the empty secrets/sample/ fake) →
+  #                  local.properties (legacy). No key is ever committed. Omit and the point resolves to an
+  #                  empty key (client stays inert, isConfigured == false).
   #
   # syncForkConfig regenerates AppAccessPoints.points, AppUrlTypes and AppSupabaseAnonKeys from this
   # list. GeneratedApiBindings comes from `@ApiBinding` instead — see above. (B3, epic
@@ -133,8 +135,7 @@ network:
       base_url: https://lwmswhoxvvoagzkqxiyd.supabase.co
       auth: none                    # Supabase authenticates with its anon key + gotrue, not an Authorization header we set
       loggable_host: lwmswhoxvvoagzkqxiyd.supabase.co
-      # anon_key_env: SUPABASE_ANON_KEY_DATA   # a fork uncomments this on ITS OWN point and supplies
-      # the env var / local.properties entry; without it the row generates "" and the client is inert.
+      anon_key_env: SUPABASE_ANON_KEY   # secrets/LAYOUT.yaml#supabase_anon_key; empty sample → "" → client inert
     - id: jsonplaceholder            # WRITABLE, for the Store5 MUTABLE archetype
       owner: demo
       type: rest
@@ -297,6 +298,15 @@ in_app_review:
   min_launches: 5                            # never on first launch — before the app has earned it
   min_days_since_install: 3
   cooldown_days: 90                          # after a prompt, do not ask again inside this window
+
+# App security defaults. `./gradlew syncForkConfig` projects this block into
+# core/model/.../config/AppSecurityConfig.kt, which UserData.DEFAULT reads.
+security:
+  # Whether a FRESH install allows screenshots + screen recording (false = FLAG_SECURE on Android, the
+  # window also hidden from the recents thumbnail). It is only the starting value: the user's own
+  # choice (Settings → "Allow screen capture") is persisted by core/datastore and wins from then on.
+  # Debug builds always allow capture so QA / device-test tooling can screenshot.
+  screen_capture_allowed_by_default: false
 
 # Fork-owned media sources: screenshots, feature graphic, promo video.
 # Paths are relative to app-profile/; a missing file is a skip, not an error, so a fork can add

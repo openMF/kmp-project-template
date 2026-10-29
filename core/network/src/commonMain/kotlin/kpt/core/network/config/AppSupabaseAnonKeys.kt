@@ -30,7 +30,7 @@ object AppSupabaseAnonKeys {
     // (build-time env / local.properties read, referenced by FQN so no import is needed
     // outside this block); no key is committed. Absent -> "" so the client stays inert.
     private val byId: Map<String, String> = mapOf(
-        "lwmswhoxvvoagzkqxiyd" to "",
+        "lwmswhoxvvoagzkqxiyd" to kpt.core.network.BuildKonfig.SUPABASE_ANON_KEY,
     )
     // syncForkConfig:supabase-anon-keys:end
 

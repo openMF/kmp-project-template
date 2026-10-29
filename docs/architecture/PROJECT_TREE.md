@@ -46,7 +46,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `deployment/` | 173 | [`deployment/`](tree/deployment.md) |
+| `deployment/` | 174 | [`deployment/`](tree/deployment.md) |
 | `.github/` | 16 | [`.github/`](tree/github.md) |
 | `fastlane/` | 4 | [`fastlane/`](tree/fastlane.md) |
 | `fastlane-config/` | 1 | [`fastlane-config/`](tree/fastlane-config.md) |
@@ -56,7 +56,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 439 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 475 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
 | `tests/` | 9 | [`tests/`](tree/tests.md) |
 

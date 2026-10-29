@@ -1,7 +1,7 @@
 # `deployment/desktop/`
 
 > Part of [`deployment/`](../deployment.md)  
-> **Measured:** 47 tracked files — 14× `.yaml`, 8× `.md`, 7× `.yml`, 5× `.rb`, 5× `.sh`
+> **Measured:** 46 tracked files — 14× `.yaml`, 8× `.md`, 7× `.yml`, 5× `.rb`, 5× `.sh`
 
 ### Lanes
 

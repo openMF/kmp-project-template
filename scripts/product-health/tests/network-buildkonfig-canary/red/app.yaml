@@ -116,7 +116,7 @@ network:
       base_url: https://api.stlouisfed.org/
       loggable_host: api.stlouisfed.org
       proxied_host: api.stlouisfed.org   # blocks direct CORS calls → route via platform proxy
-      secret_alias: template-fred-api-key # request-time API key — from the vault (secrets-manifest.yaml),
+      secret_alias: mifos-x-fred-api-key # request-time API key — from the vault (secrets-manifest.yaml),
                                          # materialized to local.properties → BuildKonfig.FRED_API_KEY
     - id: worldbank                  # World Bank macro indicators
       auth: none

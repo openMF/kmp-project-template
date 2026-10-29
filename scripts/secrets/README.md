@@ -9,7 +9,6 @@ scripts/secrets/secrets-status.sh            # what's set up vs missing (all pla
 scripts/secrets/secrets-status.sh apple      # one platform
 scripts/secrets/setup-secrets.sh apple       # interactive: fill the missing apple secrets
 scripts/secrets/setup-secrets.sh all         # walk every platform
-scripts/secrets/generate-manifest.sh         # regenerate the root secrets-manifest.yaml
 ```
 
 ## How it works
@@ -26,7 +25,9 @@ deployment/<platform>/<target>/secrets-needs.yaml
 - `setup-secrets.sh` walks the **missing** ones, prints `source_hint`, and stores what you
   provide at the right `secrets/<platform>/…` path. Passwords use hidden input; files are
   copied from a path you give — **values are never typed on the command line or echoed back**.
-- `generate-manifest.sh` aggregates `vault_aliases[]` into the root `secrets-manifest.yaml`
+- `secrets-manifest.yaml` (repo root) and every `deployment/<platform>/<target>/secrets-needs.yaml` are
+  GENERATED from `secrets/LAYOUT.yaml` by `./gradlew syncForkConfig` — never hand-edit them; edit LAYOUT
+  (per-secret facts) or a target's `needs:` list. CI fails if they drift (`secrets-needs-generated.sh`).
   (don't hand-edit that file — edit the needs files and regenerate).
 
 `deployment/_shared/config.rb` resolves every secret `ENV → secrets/<platform>/ file →

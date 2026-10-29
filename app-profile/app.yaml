@@ -160,7 +160,7 @@ network:
       auth: none                    # keys off a request-time @Query api_key, not a header
       loggable_host: api.stlouisfed.org
       proxied_host: api.stlouisfed.org   # blocks direct CORS calls → route via platform proxy
-      secret_alias: template-fred-api-key # request-time API key — from the vault (secrets-manifest.yaml),
+      secret_alias: mifos-x-fred-api-key # request-time API key — from the vault (secrets-manifest.yaml),
                                          # materialized to local.properties → BuildKonfig.FRED_API_KEY
     - id: fineract                   # Mifos Fineract — the auth-bearing REST showcase
       type: rest

@@ -1,14 +1,13 @@
 # `scripts/secrets/`
 
 > Part of [`scripts/`](../scripts.md)  
-> **Measured:** 6 tracked files — 5× `.sh`, 1× `.md`
+> **Measured:** 5 tracked files — 4× `.sh`, 1× `.md`
 
 ### Scripts
 
 | Script | Purpose |
 |---|---|
 | `_lib.sh` | ============================================================================= |
-| `generate-manifest.sh` | ============================================================================= |
 | `secrets-status.sh` | ============================================================================= |
 | `setup-secrets.sh` | ============================================================================= |
 | `sync-secrets-to-github.sh` | scripts/secrets/sync-secrets-to-github.sh |

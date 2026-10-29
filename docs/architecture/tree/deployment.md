@@ -1,13 +1,13 @@
 # `deployment/`
 
 > **Kind:** Release + deployment automation  
-> **Measured:** 174 tracked files — 39× `.yaml`, 29× `.md`, 29× `.rb`, 24× `.gitkeep`, 19× `.yml`
+> **Measured:** 173 tracked files — 39× `.yaml`, 29× `.md`, 29× `.rb`, 24× `.gitkeep`, 19× `.yml`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `deployment/desktop/` | 47 |
+| `deployment/desktop/` | 46 |
 | `deployment/android/` | 31 |
 | `deployment/ios/` | 27 |
 | `deployment/_shared/` | 24 |
@@ -54,7 +54,7 @@
 |---|---:|---|
 | `deployment/_shared/` | 24 | [_shared](deployment/_shared.md) |
 | `deployment/android/` | 31 | [android](deployment/android.md) |
-| `deployment/desktop/` | 47 | [desktop](deployment/desktop.md) |
+| `deployment/desktop/` | 46 | [desktop](deployment/desktop.md) |
 | `deployment/fastlane/` | 3 | [fastlane](deployment/fastlane.md) |
 | `deployment/ios/` | 27 | [ios](deployment/ios.md) |
 | `deployment/web/` | 22 | [web](deployment/web.md) |

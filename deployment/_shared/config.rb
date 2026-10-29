@@ -115,6 +115,7 @@ module AppProfile
     "org.name"                           => "org.name",
     "org.email"                          => "org.email",
     "org.first.name"                     => "org.first_name",
+    "org.secrets.namespace"              => "org.secrets_namespace",
     "org.last.name"                      => "org.last_name",
     "org.phone"                          => "org.phone",
     "org.copyright"                      => "org.copyright",

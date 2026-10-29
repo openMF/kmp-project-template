@@ -235,6 +235,10 @@ org:
   marketing_url: https://mifos.org
   privacy_url: https://raw.githubusercontent.com/openMF/kmp-project-template/main/legal/output/privacy-policy.md
   support_url: https://github.com/openMF/kmp-project-template
+  # Org-shared vault-alias prefix (`<ws>-<suffix>`): syncForkConfig maps the template's `mifos-x-*`
+  # aliases to `<secrets_namespace>-*`. Keep `mifos-x` for any openMF/Mifos-family fork; a fork in
+  # another org sets its own workspace slug (e.g. `mbs`).
+  secrets_namespace: mifos-x
 
 # Legal entity behind the app — rendered into the generated privacy policy and terms.
 # Required before a store submission; a store rejects a listing whose policy names no entity.

@@ -195,6 +195,13 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val orgFirstName = get("org.first.name", "APPSTORE_REVIEW_FIRST_NAME")
         val orgLastName = get("org.last.name", "APPSTORE_REVIEW_LAST_NAME")
         val orgPhone = get("org.phone", "APPSTORE_REVIEW_PHONE")
+        // Vault-alias namespaces (RULE-SECRETS-NAMING-CONVENTION-001): `<org>-<suffix>` for org-shared
+        // secrets, `<project>-<suffix>` for per-app ones. The SOURCE pair is what the template's committed
+        // secret files carry (declared once in the template-owned secrets/LAYOUT.yaml#alias_namespaces);
+        // the TARGET pair is this checkout's own org (app-profile org.secrets_namespace) + projectName.
+        val templateAliasNs = readTemplateAliasNamespaces(root)
+        val orgSecretsNamespace = get("org.secrets.namespace", "ORG_SECRETS_NAMESPACE")
+            .ifBlank { templateAliasNs?.org.orEmpty() }
         val marketingUrl = get("org.marketing.url", "APP_MARKETING_URL")
         val privacyUrl = get("org.privacy.url", "APP_PRIVACY_URL")
         val supportUrl = get("org.support.url")
@@ -329,6 +336,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 "firebase.ios.app.id" to fbIos, "firebase.groups" to fbGroups,
                 "org.name" to orgName, "org.email" to orgEmail, "org.first.name" to orgFirstName,
                 "org.last.name" to orgLastName, "org.phone" to orgPhone,
+                "org.secrets.namespace" to orgSecretsNamespace,
                 "org.marketing.url" to marketingUrl, "org.privacy.url" to privacyUrl,
                 "org.support.url" to supportUrl, "web.cloudflare.project" to cloudflareProject,
                 "store.primary.locale" to primaryLocale, "store.title" to storeTitle,
@@ -584,7 +592,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // structure is preserved and no store-bound literal survives for a fork.
         written += tokenizeDeploymentFiles(
             root, cloudflareProject, msixIdentityName, msixIdentityPub, msixPublisherDisplay, appDisplayName,
-            projectName,
+            projectName, templateAliasNs, orgSecretsNamespace,
         )
 
         logger.lifecycle("syncForkConfig: wrote $written store metadata files")
@@ -783,15 +791,11 @@ abstract class SyncForkConfigTask : DefaultTask() {
         //       app-profile#apple.match.git.url (== fork.properties#apple.match.git.url). The neutral
         //       template value is the YOUR_ORG placeholder; a fork's authored URL flows here. No real
         //       org literal is ever committed. Fail-soft when blank.
-        //   (b) alias prefix — replace the org (`mifos-x-`) + project (`kmp-project-template-`) alias
-        //       prefixes with the fork's `<aliasNamespace>-`. The project-prefix swap is a natural no-op
-        //       on the upstream template (aliasNamespace == "kmp-project-template"); the org-prefix swap
-        //       is GATED to a real fork (isFork below) so the template's own committed `mifos-x-*`
-        //       aliases stay intact + vault-resolvable — only a genuine fork rewrites them.
+        //   (b) alias prefixes — see rewriteAliasPrefixes(): source namespaces from
+        //       secrets/LAYOUT.yaml#alias_namespaces, target = org.secrets_namespace + projectName.
         run {
             val secretFiles = listOf("secrets-manifest.yaml", "secrets/LAYOUT.yaml")
             val aliasNamespace = projectName
-            val isFork = aliasNamespace.isNotBlank() && aliasNamespace != "kmp-project-template"
             for (rel in secretFiles) {
                 val f = File(root, rel)
                 if (!f.isFile) continue
@@ -804,12 +808,8 @@ abstract class SyncForkConfigTask : DefaultTask() {
                         matchGitUrl,
                     )
                 }
-                // (b) project alias prefix — always safe (no-op on template).
-                if (isFork) {
-                    next = next.replace("kmp-project-template-", "$aliasNamespace-")
-                    // (b) org alias prefix — fork-only, so the template keeps its own `mifos-x-*` aliases.
-                    next = next.replace("mifos-x-", "$aliasNamespace-")
-                }
+                // (b) vault-alias prefixes — no-op on the template itself (source == target).
+                next = rewriteAliasPrefixes(next, templateAliasNs, orgSecretsNamespace, aliasNamespace)
                 if (next != orig) {
                     f.writeText(next)
                     written++
@@ -1468,6 +1468,56 @@ abstract class SyncForkConfigTask : DefaultTask() {
     // Targeted substitution of identity literals in template-owned deployment files (B2 / G6).
     // Regex-replaces only the specific attribute/line values, preserving each file's structure.
     // Returns the count of files rewritten. Skips a file when it is absent or its source value blank.
+    /** The two vault-alias namespaces committed secret files carry: org-shared + per-app. */
+    data class AliasNamespaces(val org: String, val project: String)
+
+    /**
+     * The TEMPLATE's alias namespaces, declared once in the template-owned `secrets/LAYOUT.yaml`:
+     *
+     * ```yaml
+     * alias_namespaces:
+     *   org: <org-slug>          # prefix of org-shared aliases in the committed files
+     *   project: <project-slug>  # prefix of per-app aliases in the committed files
+     * ```
+     *
+     * Every fork receives that file unchanged on sync, so it always names what the committed aliases
+     * carry — the code never hardcodes either value. Null (no block / no file) disables the rewrite.
+     */
+    private fun readTemplateAliasNamespaces(root: File): AliasNamespaces? {
+        val f = File(root, "secrets/LAYOUT.yaml")
+        if (!f.isFile) return null
+        var inBlock = false
+        var org = ""
+        var project = ""
+        for (line in f.readLines()) {
+            if (line.trimEnd() == "alias_namespaces:") {
+                inBlock = true
+                continue
+            }
+            if (!inBlock) continue
+            if (line.isNotBlank() && !line.startsWith(" ")) break
+            val m = Regex("""^\s+(org|project):\s*([A-Za-z0-9._-]+)""").find(line) ?: continue
+            if (m.groupValues[1] == "org") org = m.groupValues[2] else project = m.groupValues[2]
+        }
+        return if (org.isNotBlank() && project.isNotBlank()) AliasNamespaces(org, project) else null
+    }
+
+    /**
+     * Rewrite the template's vault-alias prefixes to this checkout's (RULE-SECRETS-NAMING-CONVENTION-001):
+     * `<src.org>-…` → `<dstOrg>-…` (org-shared), then `<src.project>-…` → `<dstProject>-…` (per-app).
+     * Each swap runs only when source and target differ, so it is a no-op on the template and an
+     * org-shared alias keeps its prefix in a fork of the same org. The org swap runs FIRST so a per-app
+     * alias produced by the project swap (which may itself begin with the org slug) is never rewritten
+     * a second time.
+     */
+    private fun rewriteAliasPrefixes(text: String, src: AliasNamespaces?, dstOrg: String, dstProject: String): String {
+        if (src == null) return text
+        var out = text
+        if (dstOrg.isNotBlank() && dstOrg != src.org) out = out.replace("${src.org}-", "$dstOrg-")
+        if (dstProject.isNotBlank() && dstProject != src.project) out = out.replace("${src.project}-", "$dstProject-")
+        return out
+    }
+
     private fun tokenizeDeploymentFiles(
         root: File,
         cloudflareProject: String,
@@ -1476,6 +1526,8 @@ abstract class SyncForkConfigTask : DefaultTask() {
         msixPublisherDisplay: String,
         appName: String,
         aliasNamespace: String,
+        templateAliasNs: AliasNamespaces?,
+        orgSecretsNamespace: String,
     ): Int {
         var count = 0
 
@@ -1543,28 +1595,22 @@ abstract class SyncForkConfigTask : DefaultTask() {
             logger.lifecycle("syncForkConfig: tokenized Package.appxmanifest")
         }
 
-        // deployment/android/*/secrets-needs.yaml — vault-alias prefix (G2). The committed template
-        // hardcodes `kmp-project-template-upload-keystore[-*]`; derive the prefix from the fork's
-        // project slug (projectName) so each fork's keystore aliases are unique + rename cleanly on
-        // sync. No-op on the upstream template (projectName == "kmp-project-template"). The 4 suffixed
-        // aliases (-storepass/-keyalias/-keypass) share the base token, so replacing the whole
-        // `<slug>-upload-keystore` token rewrites every alias line in one pass. Fail-soft when absent.
-        if (aliasNamespace.isNotBlank()) {
-            File(root, "deployment/android").listFiles()
-                ?.filter { it.isDirectory }
-                ?.sortedBy { it.name }
-                ?.forEach { d ->
-                    val f = File(d, "secrets-needs.yaml")
-                    if (!f.isFile) return@forEach
-                    val orig = f.readText()
-                    val next = orig.replace("kmp-project-template-upload-keystore", "$aliasNamespace-upload-keystore")
-                    if (next != orig) {
-                        f.writeText(next)
-                        count++
-                        logger.lifecycle("syncForkConfig: tokenized ${f.relativeTo(root)} (alias prefix=$aliasNamespace)")
-                    }
+        // deployment/<platform>/<target>/secrets-needs.yaml — vault aliases (G2). The committed template
+        // carries ITS OWN alias namespaces; rewrite them to this checkout's (see rewriteAliasPrefixes) so
+        // every alias a target declares is this fork's. Covers every platform, not only the Android
+        // keystore. No-op on the template itself. Fail-soft when absent.
+        File(root, "deployment").walkTopDown()
+            .filter { it.isFile && it.name == "secrets-needs.yaml" }
+            .sortedBy { it.path }
+            .forEach { f ->
+                val orig = f.readText()
+                val next = rewriteAliasPrefixes(orig, templateAliasNs, orgSecretsNamespace, aliasNamespace)
+                if (next != orig) {
+                    f.writeText(next)
+                    count++
+                    logger.lifecycle("syncForkConfig: tokenized ${f.relativeTo(root)} (alias prefixes)")
                 }
-        }
+            }
 
         return count
     }
@@ -1675,6 +1721,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
             "org.name" to "org.name",
             "org.email" to "org.email",
             "org.first.name" to "org.first_name",
+            "org.secrets.namespace" to "org.secrets_namespace",
             "org.last.name" to "org.last_name",
             "org.phone" to "org.phone",
             "org.copyright" to "org.copyright",

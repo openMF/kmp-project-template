@@ -382,13 +382,13 @@ abstract class SyncForkConfigTask : DefaultTask() {
 
             // B3 — regenerate core/network AccessPointRegistry.points from app-profile#network.access_points.
             // The four passes share one SoT (network.access_points), so a declared endpoint reaches the
-            // registry, the UrlType vocabulary, the anon-key map AND its Koin binding in one run — the
-            // reason a fork only writes the API type.
+            // registry (incl. each Supabase point's publishable key) and the UrlType vocabulary in one
+            // run — the reason a fork only writes the API type.
             regenerateAccessPoints(root, appProfile)
             regenerateUrlTypes(root, appProfile)
-            regenerateSupabaseAnonKeys(root, appProfile)
             regenerateAppReviewConfig(root, appProfile)
             regenerateAppSecurityConfig(root, appProfile)
+            regenerateAppPrivacyConfig(root, appProfile)
             reconcileMigrationLedger(root, appProfile)
             regenerateBuildKonfigFields(root, appProfile)
             scaffoldAccessPointPackages(root, appProfile)
@@ -992,6 +992,15 @@ abstract class SyncForkConfigTask : DefaultTask() {
             }
             if (authScheme != "NONE") sb.append("            auth = AuthScheme.$authScheme,\n")
             if (m["main"] == true) sb.append("            isMain = true,\n")
+            if (kind == "SUPABASE") {
+                // The key is a BuildKonfig REFERENCE (build-time env / secrets read, by FQN so the file needs
+                // no import), never a value — nothing secret is written here. No env -> "" -> client inert.
+                val keyEnv = supabasePublishableKeyEnv(m)
+                val keyExpr = keyEnv?.let { "kpt.core.network.BuildKonfig.$it" } ?: "\"\""
+                sb.append("            supabase = kpt.core.base.network.SupabaseSpec(\n")
+                sb.append("                publishableKey = $keyExpr,\n")
+                sb.append("            ),\n")
+            }
             if (allHdrs.isNotEmpty()) {
                 sb.append("            headers = listOf(\n")
                 allHdrs.forEach { sb.append("                ").append(it).append(",\n") }
@@ -1001,10 +1010,57 @@ abstract class SyncForkConfigTask : DefaultTask() {
             count++
         }
         sb.append("    )\n")
+        appendNetworkPolicy(sb, network)
         sb.append("    ").append(end)
         val endLineEnd = text.indexOf('\n', endIdx).let { if (it < 0) text.length else it }
         file.writeText(text.substring(0, beginIdx) + sb.toString() + text.substring(endLineEnd))
         logger.lifecycle("syncForkConfig: regenerated AppAccessPoints.points from app-profile ($count access points)")
+    }
+
+    /**
+     * Emit `AppAccessPoints.policy` — the app-wide network privacy policy — from `network.logging` and
+     * `network.web_cors_proxy`. Every key is optional and absent means the SECURE default (release logs
+     * nothing, no CORS relay), so a fork whose app.yaml predates these keys becomes safer on sync, never
+     * louder. A value that would ship personal data fails the sync instead: release `body` logging, or a
+     * relay that is not https.
+     */
+    private fun appendNetworkPolicy(sb: StringBuilder, network: Map<*, *>) {
+        val logging = (network["logging"] as? Map<*, *>).orEmpty()
+        fun detail(key: String, allowed: List<String>, default: String): String {
+            val raw = logging[key]?.toString()?.trim()?.lowercase()?.takeIf { it.isNotEmpty() } ?: return default
+            if (raw !in allowed) {
+                throw org.gradle.api.GradleException(
+                    "syncForkConfig: network.logging.$key '$raw' must be one of $allowed" +
+                        if (key == "release" && raw == "body") {
+                            " — request/response bodies carry personal data and must never be logged by a release build."
+                        } else {
+                            "."
+                        },
+                )
+            }
+            return raw
+        }
+        val release = detail("release", listOf("none", "info", "headers"), "none")
+        val debug = detail("debug", listOf("none", "info", "headers", "body"), "body")
+        val identifier = Regex("^[A-Za-z0-9_.-]+$")
+        val redact = (logging["redact_query_params"] as? List<*>).orEmpty().map { it.toString().trim() }
+        redact.firstOrNull { !identifier.matches(it) }?.let {
+            throw org.gradle.api.GradleException("syncForkConfig: network.logging.redact_query_params entry '$it' is not a query-parameter name.")
+        }
+        val proxy = network["web_cors_proxy"]?.toString()?.trim()?.takeIf { it.isNotEmpty() && it != "none" }
+        if (proxy != null && !proxy.startsWith("https://")) {
+            throw org.gradle.api.GradleException("syncForkConfig: network.web_cors_proxy '$proxy' must be an https:// URL (or omitted for no relay).")
+        }
+        fun esc(v: String) = v.replace("\\", "\\\\").replace("\"", "\\\"")
+        sb.append("\n    /** Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`. */\n")
+        sb.append("    val policy: NetworkPolicy = NetworkPolicy(\n")
+        sb.append("        releaseLogging = HttpLogDetail.${release.uppercase()},\n")
+        sb.append("        debugLogging = HttpLogDetail.${debug.uppercase()},\n")
+        if (redact.isNotEmpty()) {
+            sb.append("        redactQueryParams = listOf(").append(redact.joinToString(", ") { "\"${esc(it)}\"" }).append("),\n")
+        }
+        proxy?.let { sb.append("        webCorsProxy = \"${esc(it)}\",\n") }
+        sb.append("    )\n")
     }
 
     /** The `network.access_points` list, normalized to maps with a non-blank `id`. Empty when absent. */
@@ -1085,49 +1141,19 @@ abstract class SyncForkConfigTask : DefaultTask() {
     }
 
     /**
-     * Regenerate `AppSupabaseAnonKeys` — one row per declared SUPABASE access point.
+     * A Supabase point's `publishable_key_env:`, or null when undeclared (the client then stays inert).
      *
-     * A point declaring `anon_key_env: X` emits `BuildKonfig.X` (build-time read of env /
-     * local.properties, the same sanctioned path as FRED_API_KEY), so no key is ever written to a
-     * tracked file. A point WITHOUT it emits `""`, which leaves the client inert
-     * (`isConfigured == false`) rather than half-configured with a fake key.
+     * Fails on the retired `anon_key_env:` instead of ignoring it: ignored, a fork's key would silently
+     * vanish on the next sync and its client would go inert with no error anywhere.
      */
-    private fun regenerateSupabaseAnonKeys(root: File, appProfile: Map<String, Any?>) {
-        val points = accessPoints(appProfile).filter { isSupabase(it) }
-        val file = File(
-            root,
-            "core/network/src/commonMain/kotlin/kpt/core/network/config/AppSupabaseAnonKeys.kt",
-        )
-        val sb = StringBuilder()
-        sb.append("// syncForkConfig:supabase-anon-keys:begin — GENERATED from app-profile/app.yaml.\n")
-        sb.append("    // One row per SUPABASE access point. `anon_key_env: X` on the point emits BuildKonfig.X\n")
-        sb.append("    // (build-time env / local.properties read, referenced by FQN so no import is needed\n")
-        sb.append("    // outside this block); no key is committed. Absent -> \"\" so the client stays inert.\n")
-        sb.append("    private val byId: Map<String, String> = mapOf(\n")
-        var withKey = 0
-        for (m in points) {
-            val id = m["id"].toString()
-            val env = m["anon_key_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() }
-            if (env != null) {
-                sb.append("        \"$id\" to kpt.core.network.BuildKonfig.$env,\n")
-                withKey++
-            } else {
-                sb.append("        \"$id\" to \"\",\n")
-            }
-        }
-        sb.append("    )\n")
-        sb.append("    // syncForkConfig:supabase-anon-keys:end")
-        if (patchSentinel(
-                file,
-                "// syncForkConfig:supabase-anon-keys:begin",
-                "// syncForkConfig:supabase-anon-keys:end",
-                sb.toString(),
-            )
-        ) {
-            logger.lifecycle(
-                "syncForkConfig: regenerated AppSupabaseAnonKeys (${points.size} points, $withKey keyed)",
+    private fun supabasePublishableKeyEnv(m: Map<*, *>): String? {
+        if (m.containsKey("anon_key_env")) {
+            throw org.gradle.api.GradleException(
+                "syncForkConfig: access point '${m["id"]}' declares `anon_key_env:` — renamed to `publishable_key_env:` " +
+                    "(Supabase's client key is the publishable key; the legacy anon JWT still works as its value).",
             )
         }
+        return m["publishable_key_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() }
     }
 
     /**
@@ -1226,6 +1252,38 @@ abstract class SyncForkConfigTask : DefaultTask() {
         }
     }
 
+    /**
+     * Regenerate `AppPrivacyConfig` from `app-profile/app.yaml#privacy` — the consent STARTING values for a
+     * fresh install. Absent (or anything but `true`) means off: consent-based processing must be opt-in, so
+     * a fork whose app.yaml predates the block syncs to the GDPR-safe default, never to collection.
+     */
+    private fun regenerateAppPrivacyConfig(root: File, appProfile: Map<String, Any?>) {
+        if (appProfile.isEmpty()) return
+        val file = File(root, "core/model/src/commonMain/kotlin/kpt/core/model/config/AppPrivacyConfig.kt")
+        val privacy = appProfile["privacy"] as? Map<*, *>
+        fun flag(key: String) = privacy?.get(key)?.toString()?.trim()?.lowercase() == "true"
+        val analytics = flag("analytics_enabled_by_default")
+        val crash = flag("crash_reporting_enabled_by_default")
+        // The privacy POLICY lives on the fork's website (org.privacy_url, the same URL the store listings use);
+        // Settings → Privacy opens it in the in-app browser. Absent → "" and the link is not shown.
+        val policyUrl = ((appProfile["org"] as? Map<*, *>)?.get("privacy_url")?.toString()?.trim().orEmpty())
+            .takeIf { it.startsWith("https://") }.orEmpty()
+
+        val sb = StringBuilder()
+        sb.append("// syncForkConfig:app-privacy:begin — GENERATED from app-profile/app.yaml#privacy. Do not hand-edit.\n")
+        sb.append("    /** `privacy.analytics_enabled_by_default` — whether a fresh install shares usage analytics. */\n")
+        sb.append("    const val ANALYTICS_ENABLED_BY_DEFAULT: Boolean = ").append(analytics).append("\n\n")
+        sb.append("    /** `privacy.crash_reporting_enabled_by_default` — whether a fresh install sends crash reports. */\n")
+        sb.append("    const val CRASH_REPORTING_ENABLED_BY_DEFAULT: Boolean = ").append(crash).append("\n\n")
+        sb.append("    /** `org.privacy_url` — the privacy policy page, opened in the in-app browser; empty when not set. */\n")
+        sb.append("    const val PRIVACY_POLICY_URL: String =\n        \"").append(policyUrl.replace("\\", "\\\\").replace("\"", "\\\"")).append("\"\n")
+        sb.append("    // syncForkConfig:app-privacy:end")
+
+        if (patchSentinel(file, "// syncForkConfig:app-privacy:begin", "// syncForkConfig:app-privacy:end", sb.toString())) {
+            logger.lifecycle("syncForkConfig: regenerated AppPrivacyConfig (analytics=$analytics, crashReporting=$crash)")
+        }
+    }
+
     private fun declaredStores(appProfile: Map<String, Any?>): List<Map<*, *>> {
         val block = (appProfile["core_store"] as? Map<*, *>).orEmpty()
         return ((block["stores"] as? List<*>) ?: emptyList<Any?>()).mapNotNull { it as? Map<*, *> }
@@ -1321,12 +1379,12 @@ abstract class SyncForkConfigTask : DefaultTask() {
      * `buildConfigField` per key a fork declares in app-profile.
      *
      * Closes the half of the endpoint contract that was missing: `syncForkConfig` generated the
-     * REFERENCE (`AppSupabaseAnonKeys` emits `BuildKonfig.<anon_key_env>`) while the DECLARATION had
-     * to be hand-added to this template-owned build file. A fork that declared `anon_key_env: X` got
+     * REFERENCE (`AppAccessPoints` emits `BuildKonfig.<publishable_key_env>`) while the DECLARATION had
+     * to be hand-added to this template-owned build file. A fork that declared a key env `X` got
      * `Unresolved reference: X` and no seam to fix it in. Now the declaration is derived from the same
      * SoT as the reference, so the two cannot drift.
      *
-     * Sources: every access point's `anon_key_env:` / `api_key_env:`, plus `network.build_config_fields`
+     * Sources: every access point's `publishable_key_env:` / `api_key_env:`, plus `network.build_config_fields`
      * for keys not tied to an endpoint. Names already declared OUTSIDE the region (the demo
      * `FRED_API_KEY`) are skipped — a duplicate `buildConfigField` fails the buildkonfig plugin.
      */
@@ -1346,7 +1404,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // (name -> env). LinkedHashMap keeps declaration order stable so the region does not churn.
         val fields = LinkedHashMap<String, String>()
         for (m in accessPoints(appProfile)) {
-            for (key in listOf("anon_key_env", "api_key_env")) {
+            for (key in listOf("publishable_key_env", "api_key_env")) {
                 val env = m[key]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
                 if (valid.matches(env)) fields.putIfAbsent(env, env)
             }
@@ -1360,6 +1418,24 @@ abstract class SyncForkConfigTask : DefaultTask() {
             if (valid.matches(env)) fields.putIfAbsent(name, env)
         }
 
+        // A BuildKonfig field is compiled INTO the app binary, where anyone can extract it. Only
+        // client-safe values belong there (a Supabase publishable key, a public API key). A
+        // privileged credential — Supabase service_role / secret key, a DB password or URL, a
+        // management access token, a JWT secret, a private key — bypasses RLS or grants account
+        // access, so a name that says it is one fails the sync instead of shipping. Such keys stay in
+        // the vault for CI / Edge Functions (scripts/product-health/checks/supabase-client-security.sh
+        // checks the values themselves).
+        val privileged = Regex("SERVICE_ROLE|SERVICE_KEY|SECRET|PASSWORD|DB_URL|DATABASE_URL|ACCESS_TOKEN|JWT|PRIVATE_KEY")
+        fields.entries.firstOrNull { (name, env) -> privileged.containsMatchIn(name) || privileged.containsMatchIn(env) }
+            ?.let { (name, env) ->
+                throw org.gradle.api.GradleException(
+                    "syncForkConfig: app-profile asks to compile '$name' (env $env) into the app via BuildKonfig, " +
+                        "but that name marks a privileged credential. Client apps may carry only client-safe keys " +
+                        "(e.g. the Supabase publishable key); keep service-role/secret/DB/admin keys in the vault " +
+                        "for CI or a Supabase Edge Function.",
+                )
+            }
+
         // env -> secrets/LAYOUT.yaml key, for every single-value `kind: value` row with a `rel:` (what the
         // resolver's export-paths map can resolve). The generated field then reads that file at build time.
         val secretKeys = layoutValueKeysByEnv(root)
@@ -1371,7 +1447,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
 
         val body = buildString {
             append(begin).append(" — GENERATED from `app-profile/app.yaml`: one field per\n")
-            append("        // access point declaring `anon_key_env:`/`api_key_env:`, plus every `network.build_config_fields`\n")
+            append("        // access point declaring `publishable_key_env:`/`api_key_env:`, plus every `network.build_config_fields`\n")
             append("        // entry. DO NOT HAND-EDIT — declare the key in app-profile and re-run `./gradlew syncForkConfig`.\n")
             append("        // Values are read at BUILD time — the env var (CI), then the secrets/LAYOUT.yaml `kind: value` row whose\n")
             append("        // source_env matches (secrets/live/ else the secrets/sample/ fake), then local.properties (legacy).\n")

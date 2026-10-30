@@ -369,12 +369,12 @@ io.github.alexzhirkevich:keight-android:0.0.05
 io.github.alexzhirkevich:keight-core-android:0.0.05
 io.github.alexzhirkevich:keight-core:0.0.05
 io.github.alexzhirkevich:keight:0.0.05
-io.github.jan-tennert.supabase:auth-kt-android:3.6.0
-io.github.jan-tennert.supabase:auth-kt:3.6.0
-io.github.jan-tennert.supabase:postgrest-kt-android:3.6.0
-io.github.jan-tennert.supabase:postgrest-kt:3.6.0
-io.github.jan-tennert.supabase:supabase-kt-android:3.6.0
-io.github.jan-tennert.supabase:supabase-kt:3.6.0
+io.github.jan-tennert.supabase:auth-kt-android:3.8.0
+io.github.jan-tennert.supabase:auth-kt:3.8.0
+io.github.jan-tennert.supabase:postgrest-kt-android:3.8.0
+io.github.jan-tennert.supabase:postgrest-kt:3.8.0
+io.github.jan-tennert.supabase:supabase-kt-android:3.8.0
+io.github.jan-tennert.supabase:supabase-kt:3.8.0
 io.github.mirzemehdi:kmpnotifier-core-android:2.0.0
 io.github.mirzemehdi:kmpnotifier-core:2.0.0
 io.github.mirzemehdi:kmpnotifier-local-android:2.0.0
@@ -570,7 +570,7 @@ org.jetbrains.compose.ui:ui-util:1.12.0
 org.jetbrains.compose.ui:ui:1.12.0
 org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.9.22
 org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.22
-org.jetbrains.kotlin:kotlin-reflect:2.3.21
+org.jetbrains.kotlin:kotlin-reflect:2.4.0
 org.jetbrains.kotlin:kotlin-stdlib-common:2.4.20
 org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22
 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22

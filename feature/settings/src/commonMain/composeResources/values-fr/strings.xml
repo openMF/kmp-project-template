@@ -64,4 +64,11 @@
     <string name="feature_settings_conflicts_row_label">Conflit</string>
     <string name="feature_settings_conflicts_accept_server">Conserver le serveur</string>
     <string name="feature_settings_conflicts_retry_local">Réessayer la mienne</string>
+    <string name="feature_settings_privacy">Confidentialité</string>
+    <string name="feature_settings_privacy_analytics">Partager les statistiques d'utilisation</string>
+    <string name="feature_settings_privacy_crash_reports">Envoyer les rapports de plantage</string>
+    <string name="feature_settings_privacy_row_description">Ouvrir les paramètres de confidentialité</string>
+    <string name="feature_settings_privacy_intro">Vous décidez de ce que cette application partage. Rien n'est envoyé tant que vous ne l'avez pas activé, et vous pouvez le modifier à tout moment.</string>
+    <string name="feature_settings_privacy_analytics_description">Des informations anonymes sur les fonctionnalités utilisées, pour améliorer l'application.</string>
+    <string name="feature_settings_privacy_crash_reports_description">Des détails techniques en cas de plantage de l'application, pour que nous puissions corriger le problème.</string>
 </resources>

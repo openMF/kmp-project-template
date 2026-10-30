@@ -8,7 +8,7 @@
 
 ## Principal types
 
-`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 19 more
+`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 20 more
 
 <!-- scaffold:end -->
 
@@ -56,10 +56,10 @@ Changing the server usually invalidates the session, so sign out on a change.
 
 Tests: `core/network/src/commonTest/.../config/{NetworkConfigRepositoryTest,NetworkConfigRequestTest,DynamicBaseUrlTest}.kt`.
 
-<!-- api-docs:begin module=core-base/network sha=23cc22329d1e01c21361a8485b92b213a1e0f4ea -->
+<!-- api-docs:begin module=core-base/network sha=8578fa12db23f81e63f5c97f7768eb8c21b2d4a2 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `23cc22329d1e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `8578fa12db23` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -380,7 +380,7 @@ data class HeaderSpec(
 ```
 A header an access point sends on every request, declared in `app-profile/app.yaml#network.access_points[].headers[]`. Two kinds, because they have different lifetimes: - **static** (`value` set) — known at build time.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:87</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:90</code></summary>
 
 ```kotlin
             auth = AuthScheme.BASIC,
@@ -623,18 +623,18 @@ Represents the result of a network or remote operation, encapsulating either a s
 ```kotlin
 class SupabaseClientFactory(
 ```
-Per-point Supabase client factory. Builds one `SupabaseConfigClient` per declared Supabase `AccessPoint`.
+Per-point Supabase client factory. Builds one `SupabaseConfigClient` per declared Supabase `AccessPoint`, entirely from that point's generated `AccessPoint.supabase`: URL from `AccessPoint.baseUrl`, key from `SupabaseSpec.publishableKey`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:88</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/config/SupabaseAccessPointTest.kt:47</code></summary>
 
 ```kotlin
-    // Per-point Supabase client factory — URL from AccessPointRegistry, anon key by id.
-    single {
-        SupabaseClientFactory(
-            registry = get(),
-            anonKeyFor = AppSupabaseAnonKeys::forId,
-            // THE LINK THAT MAKES THE SEAM REAL. SupabaseConfigClient and SupabaseClientFactory both
-            // accept the extras hook, but if nothing passes it here the default `{ {} }` wins and a
+    }
+
+    private fun factory() = SupabaseClientFactory(
+        registry = AccessPointRegistry(unconfiguredPoints),
+    )
+
+    @Test
 ```
 
 </details>
@@ -656,21 +656,21 @@ val configClient = supabaseClientFactory.requireClientFor("project")
 // Use the client for queries
 if (configClient.isConfigured) {
     val result = configClient.postgrest
-        .from("app_config")
+        .from("app_server_config")
         .select()
-        .decodeSingle<MyConfig>()
+        .decodeList<MyServer>()
 }
 ```
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:27</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/api/impl/ServerInstanceApiImpl.kt:25</code></summary>
 
 ```kotlin
 @ApiBinding("lwmswhoxvvoagzkqxiyd")
-class AppConfigApiImpl(
+class ServerInstanceApiImpl(
     private val supabase: SupabaseConfigClient,
-) : AppConfigApi {
+) : ServerInstanceApi {
 
     override val isConfigured: Boolean get() = supabase.isConfigured
 ```
@@ -678,45 +678,53 @@ class AppConfigApiImpl(
 </details>
 
 ```kotlin
-interface SupabaseCredentials
+data class SupabaseSpec(
 ```
-Interface for Supabase credentials. Implement this interface to provide Supabase URL and anon key from your project's build configuration or secrets.
+A Supabase access point's client config — GENERATED onto `AccessPoint.supabase` by `syncForkConfig` from `app-profile/app.yaml#network.access_points[]`, so a fork configures Supabase in app-profile only.
 
-<details><summary>Example</summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:53</code></summary>
 
 ```kotlin
-object MySupabaseCredentials : SupabaseCredentials {
-    override val url: String = BuildConfig.SUPABASE_URL
-    override val anonKey: String = BuildConfig.SUPABASE_ANON_KEY
-}
+            baseUrl = "https://lwmswhoxvvoagzkqxiyd.supabase.co",
+            loggableHost = "lwmswhoxvvoagzkqxiyd.supabase.co",
+            supabase = kpt.core.base.network.SupabaseSpec(
+                publishableKey = kpt.core.network.BuildKonfig.SUPABASE_PUBLISHABLE_KEY,
+            ),
+        ),
+        AccessPoint(
 ```
 
 </details>
 
+```kotlin
+interface SupabaseCredentials
+```
+Supabase URL + client key for one `SupabaseConfigClient`.
+
 <details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/SupabaseClientFactory.kt:58</code></summary>
 
 ```kotlin
-        val anonKey = config?.headers?.get(ANON_KEY_HEADER)?.takeIf { it.isNotBlank() } ?: anonKeyFor(config?.id ?: id)
+            ?: registry.byId(id)?.supabase?.publishableKey.orEmpty()
         val client = SupabaseConfigClient(
             credentials = object : SupabaseCredentials {
                 override val url: String = url
-                override val anonKey: String = anonKey
+                override val publishableKey: String = key
             },
             logLevel = logLevel,
 ```
 
 </details>
 
-- `val url: String` — The Supabase project URL.
-- `val anonKey: String` — The Supabase anon (public) key. This key is safe to use in client-side code.
-- `val isConfigured: Boolean` — Checks if the credentials are properly configured. Returns false if URL or key contain placeholder values.
+- `val url: String` — The Supabase project URL, e.g. `https://<ref>.supabase.co`.
+- `val publishableKey: String` — The project's publishable (client) key. Safe in client code; never a `service_role` / `sb_secret_` key, which bypasses RLS (enforced by `scripts/product-health/checks/supabase-client-security.sh`).
+- `val isConfigured: Boolean` — False while the URL or key is blank, a `YOUR_` placeholder, or the URL is not https.
 
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/SupabaseExtrasProvider.kt`
 
 ```kotlin
 fun interface SupabaseExtrasProvider
 ```
-Fork seam for the supabase-kt modules the default exposer does not install. `SupabaseConfigClient` installs Postgrest and nothing else — Auth / ComposeAuth / Realtime / Storage are opt-in.
+Fork seam for the supabase-kt modules the default exposer does not install. `SupabaseConfigClient` installs Postgrest only — Auth / Realtime / Storage are opt-in.
 
 <details><summary>Example</summary>
 
@@ -724,12 +732,11 @@ Fork seam for the supabase-kt modules the default exposer does not install. `Sup
 single<SupabaseExtrasProvider> {
     SupabaseExtrasProvider { id ->
         when (id) {
-            AUTH_PROJECT -> {
-                {
-                    install(Auth) { … }
-                    install(ComposeAuth) { … }
-                }
-            }
+            // Sign-in (Google, Apple, guest): io.github.mobilebytelabs:cmp-supabase-auth installs Auth +
+            // ComposeAuth onto THIS client. Pair it with `kmpSupabaseAuthNetwork(config) {
+            //   get<SupabaseClientFactory>().requireClientFor(AUTH_PROJECT).client }` — see mbs/cappy.
+            // secureStorage (kmp-supabase-auth 0.3.3) keeps the session in encrypted storage.
+            AUTH_PROJECT -> kmpSupabaseAuthInstall(authConfig) { secureStorage(get(named("secure"))) }
             ANALYTICS_PROJECT -> {
                 { install(Realtime) }
             }
@@ -797,7 +804,7 @@ val NetworkBaseModule = module
 ```
 Framework network wiring — the half of the network graph a fork never configures. ## Why these bindings are here and not in `core/network` A binding belongs in `core-base` when it touches nothing the fork generates.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:57</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:53</code></summary>
 
 ```kotlin
 val NetworkModule = module {
@@ -817,7 +824,7 @@ val NetworkConfigModule = module
 ```
 Runtime network configs, bound by core-base — an app includes this module and gets the whole feature: every declared access point editable and switchable at runtime, persisted, with `restApi` and `SupabaseClientFactory` following it.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:75</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:71</code></summary>
 
 ```kotlin
     includes(GeneratedApiBindings)
@@ -851,5 +858,5 @@ interface ApiService {
 
 ---
 
-_29 type(s), 21 function(s)/property(ies); 50 carry KDoc at source; 12 authored example(s); 25 live call site(s)._
+_30 type(s), 21 function(s)/property(ies); 51 carry KDoc at source; 11 authored example(s); 26 live call site(s)._
 <!-- api-docs:end -->

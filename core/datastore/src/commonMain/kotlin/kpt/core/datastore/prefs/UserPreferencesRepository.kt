@@ -61,6 +61,12 @@ interface UserPreferencesRepository {
     /** Whether screenshots and screen recording are permitted. */
     val observeScreenCapturePreference: Flow<Boolean>
 
+    /** The user's consent to share usage analytics. */
+    val observeAnalyticsConsent: Flow<Boolean>
+
+    /** The user's consent to send crash reports. */
+    val observeCrashReportingConsent: Flow<Boolean>
+
     /**
      * Persist [token] into the ENCRYPTED store, or clear it when null.
      *
@@ -108,6 +114,12 @@ interface UserPreferencesRepository {
 
     /** Permits or blocks screenshots and screen recording. */
     suspend fun setScreenCapturePreference(isScreenCaptureEnabled: Boolean)
+
+    /** Records the user's analytics consent — given or withdrawn. */
+    suspend fun setAnalyticsConsent(granted: Boolean)
+
+    /** Records the user's crash-reporting consent — given or withdrawn. */
+    suspend fun setCrashReportingConsent(granted: Boolean)
 
     /**
      * Resets every preference to `UserData.DEFAULT` and clears the encrypted entries. Called on logout, alongside

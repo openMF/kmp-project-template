@@ -64,4 +64,11 @@
     <string name="feature_settings_conflicts_row_label">विरोध</string>
     <string name="feature_settings_conflicts_accept_server">सर्वर वाला रखें</string>
     <string name="feature_settings_conflicts_retry_local">मेरा पुनः आज़माएँ</string>
+    <string name="feature_settings_privacy">गोपनीयता</string>
+    <string name="feature_settings_privacy_analytics">उपयोग विश्लेषण साझा करें</string>
+    <string name="feature_settings_privacy_crash_reports">क्रैश रिपोर्ट भेजें</string>
+    <string name="feature_settings_privacy_row_description">गोपनीयता सेटिंग खोलें</string>
+    <string name="feature_settings_privacy_intro">आप तय करते हैं कि यह ऐप क्या साझा करे। जब तक आप इसे चालू नहीं करते, कुछ भी नहीं भेजा जाता, और आप इसे कभी भी बदल सकते हैं।</string>
+    <string name="feature_settings_privacy_analytics_description">ऐप को बेहतर बनाने के लिए इस्तेमाल की जाने वाली सुविधाओं के बारे में गुमनाम जानकारी।</string>
+    <string name="feature_settings_privacy_crash_reports_description">ऐप क्रैश होने पर तकनीकी विवरण, ताकि हम समस्या ठीक कर सकें।</string>
 </resources>

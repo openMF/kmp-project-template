@@ -64,4 +64,11 @@
     <string name="feature_settings_conflicts_row_label">競合</string>
     <string name="feature_settings_conflicts_accept_server">サーバー版を保持</string>
     <string name="feature_settings_conflicts_retry_local">自分の版で再試行</string>
+    <string name="feature_settings_privacy">プライバシー</string>
+    <string name="feature_settings_privacy_analytics">利用状況の分析を共有</string>
+    <string name="feature_settings_privacy_crash_reports">クラッシュレポートを送信</string>
+    <string name="feature_settings_privacy_row_description">プライバシー設定を開く</string>
+    <string name="feature_settings_privacy_intro">このアプリが共有する内容はあなたが決めます。オンにするまで何も送信されず、いつでも変更できます。</string>
+    <string name="feature_settings_privacy_analytics_description">アプリを改善するための、どの機能が使われているかに関する匿名の情報。</string>
+    <string name="feature_settings_privacy_crash_reports_description">アプリがクラッシュしたときの技術的な詳細。問題の修正に役立てます。</string>
 </resources>

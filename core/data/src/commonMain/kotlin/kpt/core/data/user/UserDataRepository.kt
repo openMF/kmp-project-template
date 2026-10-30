@@ -60,6 +60,18 @@ interface UserDataRepository {
     /** Whether screenshots and screen recording are permitted. */
     val observeScreenCapturePreference: Flow<Boolean>
 
+    /** The user's consent to share usage analytics. */
+    val observeAnalyticsConsent: Flow<Boolean>
+
+    /** The user's consent to send crash reports. */
+    val observeCrashReportingConsent: Flow<Boolean>
+
+    /** Records the user's analytics consent — given or withdrawn. */
+    suspend fun setAnalyticsConsent(granted: Boolean)
+
+    /** Records the user's crash-reporting consent — given or withdrawn. */
+    suspend fun setCrashReportingConsent(granted: Boolean)
+
     /** Persists the app language. */
     suspend fun setLanguage(language: LanguageConfig)
 

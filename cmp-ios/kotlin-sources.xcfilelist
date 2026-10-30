@@ -625,7 +625,6 @@ $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/coingecko/dto/
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/coingecko/dto/CoinMarketDto.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/config/AppMultiUrlConfigProvider.kt
-$(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/config/AppSupabaseAnonKeys.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/config/AppUrlTypes.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/config/ProjectNetworkHeaders.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt
@@ -640,9 +639,9 @@ $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/fred/config/Fr
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/fred/dto/FredObservationsDto.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/jsonplaceholder/api/JsonPlaceholderApi.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/jsonplaceholder/dto/CloudTodoDto.kt
-$(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/AppConfigApi.kt
-$(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt
-$(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/dto/RemoteAppConfigDto.kt
+$(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/api/impl/ServerInstanceApiImpl.kt
+$(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/api/ServerInstanceApi.kt
+$(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/dto/RemoteServerInstanceDto.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/worldbank/api/WorldBankApi.kt
 $(SRCROOT)/../core/network/src/commonMain/kotlin/kpt/core/network/worldbank/dto/WorldBankResponseDto.kt
 $(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/config/AuthSchemeTest.kt
@@ -657,8 +656,8 @@ $(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/config/SharedH
 $(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/config/UnauthorizedHookTest.kt
 $(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/fred/api/FredApiTest.kt
 $(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/fred/dto/FredObservationsDtoTest.kt
-$(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/AppConfigRowTest.kt
 $(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/config/SupabaseAccessPointTest.kt
+$(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/ServerInstanceRowTest.kt
 $(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/worldbank/api/WorldBankApiTest.kt
 $(SRCROOT)/../core/network/src/commonTest/kotlin/kpt/core/network/worldbank/dto/WorldBankResponseDtoTest.kt
 $(SRCROOT)/../core/platform/src/commonMain/kotlin/kpt/core/platform/config/AppReviewConfig.kt

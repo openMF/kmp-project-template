@@ -10,6 +10,7 @@
 package kpt.core.model.user
 
 import kotlinx.serialization.Serializable
+import kpt.core.model.config.AppPrivacyConfig
 import kpt.core.model.config.AppSecurityConfig
 
 /**
@@ -54,6 +55,14 @@ data class UserData(
      * fallback.
      */
     val isBiometricsEnabled: Boolean,
+    /**
+     * The user's consent to share usage analytics (GDPR Art. 6(1)(a)). Defaulted, so a record saved by a build
+     * that predates consent decodes to the generated starting value ([AppPrivacyConfig]) — off unless a fork
+     * declares otherwise — rather than failing to load.
+     */
+    val analyticsConsent: Boolean = AppPrivacyConfig.ANALYTICS_ENABLED_BY_DEFAULT,
+    /** The user's consent to send crash reports. Defaulted for the same reason as [analyticsConsent]. */
+    val crashReportingConsent: Boolean = AppPrivacyConfig.CRASH_REPORTING_ENABLED_BY_DEFAULT,
 ) {
     /** Factory holder. */
     companion object {

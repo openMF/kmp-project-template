@@ -13,6 +13,8 @@ import kpt.core.base.network.AccessPoint
 import kpt.core.base.network.AccessPointKind
 import kpt.core.base.network.AuthScheme
 import kpt.core.base.network.HeaderSpec
+import kpt.core.base.network.HttpLogDetail
+import kpt.core.base.network.NetworkPolicy
 
 /**
  * The per-fork list of network access points this app talks to — REST and Supabase in ONE place.
@@ -50,6 +52,9 @@ object AppAccessPoints {
             kind = AccessPointKind.SUPABASE,
             baseUrl = "https://lwmswhoxvvoagzkqxiyd.supabase.co",
             loggableHost = "lwmswhoxvvoagzkqxiyd.supabase.co",
+            supabase = kpt.core.base.network.SupabaseSpec(
+                publishableKey = kpt.core.network.BuildKonfig.SUPABASE_PUBLISHABLE_KEY,
+            ),
         ),
         AccessPoint(
             id = "jsonplaceholder",
@@ -94,6 +99,13 @@ object AppAccessPoints {
             baseUrl = "https://api.worldbank.org/",
             loggableHost = "api.worldbank.org",
         ),
+    )
+
+    /** Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`. */
+    val policy: NetworkPolicy = NetworkPolicy(
+        releaseLogging = HttpLogDetail.NONE,
+        debugLogging = HttpLogDetail.BODY,
+        webCorsProxy = "https://corsproxy.io",
     )
     // syncForkConfig:access-points:end
 }

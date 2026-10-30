@@ -10,6 +10,7 @@
 package kpt.core.base.platform.url
 
 import com.mobilebytelabs.kmptoolkit.openurl.canOpen
+import com.mobilebytelabs.kmptoolkit.openurl.openInApp
 import com.mobilebytelabs.kmptoolkit.openurl.openInBrowser
 import com.mobilebytelabs.kmptoolkit.openurl.openUrl
 
@@ -25,5 +26,6 @@ import com.mobilebytelabs.kmptoolkit.openurl.openUrl
 class UrlLauncherImpl : UrlLauncher {
     override fun launch(url: String): Boolean = openUrl(url)
     override fun launchInBrowser(url: String): Boolean = openInBrowser(url)
+    override fun launchInApp(url: String): Boolean = openInApp(url)
     override fun canLaunch(url: String): Boolean = canOpen(url)
 }

@@ -78,7 +78,7 @@ class ApiBindingProcessor(
             // SUPABASE: bind the INTERFACE, not the concrete class.
             //
             // `supabaseApi<T>` is `single<T> { … }` with T inferred from the factory lambda, so
-            // `{ AppConfigApiImpl(it) }` would register the IMPL type and `get<AppConfigApi>()` would
+            // `{ ServerInstanceApiImpl(it) }` would register the IMPL type and `get<ServerInstanceApi>()` would
             // fail at runtime — after compiling cleanly, which is the worst place to find it. The
             // annotation stays on the impl (that is what gets constructed); the processor resolves
             // its single directly-implemented interface and binds that instead.

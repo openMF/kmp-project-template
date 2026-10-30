@@ -40,19 +40,19 @@ import org.koin.dsl.module
  * ```
  *
  * ## Supabase modules beyond Postgrest — [SupabaseExtrasProvider]
- * [SupabaseConfigClient] installs Postgrest and nothing else; Auth / ComposeAuth / Realtime / Storage
- * are opt-in. Bind the seam HERE — it is the one place a fork can install them without either editing
- * template code (deleted on the next sync) or building a second `createSupabaseClient`:
+ * [SupabaseConfigClient] installs Postgrest only, under the point's publishable key — enough for an
+ * app with no sign-in. Auth / Realtime / Storage are opt-in. Bind the seam HERE — it is the one place
+ * a fork can install them without either editing template code (deleted on the next sync) or
+ * building a second `createSupabaseClient`:
  * ```
  * single<SupabaseExtrasProvider> {
  *     SupabaseExtrasProvider { id ->
  *         when (id) {
- *             "<your-project-ref>" -> {
- *                 {
- *                     install(Auth) { /* scheme/host for the OAuth redirect */ }
- *                     install(ComposeAuth) { /* native Google/Apple sign-in */ }
- *                 }
- *             }
+ *             // Social sign-in: kmp-supabase-auth (io.github.mobilebytelabs:cmp-supabase-auth[-compose])
+ *             // installs Auth + native Google/Apple onto this client. Never hand-write install(Auth).
+ *             // libs.cmp.supabase.auth.compose (0.3.3). secureStorage keeps the session + PKCE verifier
+ *             // in the encrypted named("secure") Settings instead of supabase-kt's plain default.
+ *             "<your-project-ref>" -> kmpSupabaseAuthInstall(authConfig) { secureStorage(get(named("secure"))) }
  *             // Several projects sharing a module — one branch, no repetition.
  *             "<project-b>", "<project-c>" -> {
  *                 { install(Realtime) }
@@ -68,6 +68,11 @@ import org.koin.dsl.module
  * generated `supabaseApi(...)` binding hands `@ApiBinding` types a DIFFERENT instance carrying no
  * session, so every RLS-gated call resolves no `auth.uid()` — compiling cleanly the whole way. The
  * binding is optional; bind nothing and you get Postgrest only.
+ *
+ * For sign-in, also include the library's client binding over the SAME client (mbs/cappy does exactly this):
+ * ```
+ * includes(kmpSupabaseAuthNetwork(authConfig) { get<SupabaseClientFactory>().requireClientFor("<ref>").client })
+ * ```
  *
  * THIS FILE IS `owner: fork`. `/kmp-project-template-sync` preserves it — the template ships it empty
  * and never overwrites what you add. That is why the seam is bound here and not in the template-owned
@@ -95,12 +100,7 @@ val ProjectNetworkModule = module {
     single<SupabaseExtrasProvider> {
         SupabaseExtrasProvider { id ->
             when (id) {
-                // "<your-project-ref>" -> {
-                //     {
-                //         install(Auth) { /* scheme/host for the OAuth redirect */ }
-                //         install(ComposeAuth) { /* native Google/Apple sign-in */ }
-                //     }
-                // }
+                // "<your-project-ref>" -> kmpSupabaseAuthInstall(authConfig) { secureStorage(get(named("secure"))) }
                 else -> {
                     {}
                 }
@@ -109,7 +109,7 @@ val ProjectNetworkModule = module {
     }
 
     // demo:begin — FRED's key is a request-time @Query param, not client setup, so it cannot be
-    // derived from the access-point declaration the way a base URL or an anon key can. Fenced, so
+    // derived from the access-point declaration the way a base URL or a publishable key can. Fenced, so
     // `remove-demo.sh` drops it together with the `fred` package and its access point.
     single<kpt.core.network.fred.config.FredApiConfig> {
         kpt.core.network.fred.config.FredApiConfig(

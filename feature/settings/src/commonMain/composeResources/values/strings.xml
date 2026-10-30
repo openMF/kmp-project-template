@@ -72,4 +72,11 @@
     <string name="feature_settings_conflicts_accept_server">Keep server</string>
     <string name="feature_settings_conflicts_retry_local">Retry mine</string>
     <string name="feature_settings_sync_drafts_open">Open</string>
+    <string name="feature_settings_privacy">Privacy</string>
+    <string name="feature_settings_privacy_analytics">Share usage analytics</string>
+    <string name="feature_settings_privacy_crash_reports">Send crash reports</string>
+    <string name="feature_settings_privacy_row_description">Open privacy settings</string>
+    <string name="feature_settings_privacy_intro">You decide what this app shares. Nothing is sent until you turn it on, and you can change it at any time.</string>
+    <string name="feature_settings_privacy_analytics_description">Anonymous information about which features are used, to improve the app.</string>
+    <string name="feature_settings_privacy_crash_reports_description">Technical details when the app crashes, so we can fix the problem.</string>
 </resources>

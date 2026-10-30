@@ -10,12 +10,14 @@
 package cmp.shared.utils
 
 import cmp.navigation.di.KoinModules
+import cmp.navigation.privacy.PrivacyConsentApplier
 import cmp.navigation.registry.AppInitializers
 import cmp.shared.generated.WorkerKmpAuto
 import kpt.sync.infra.initSyncNotifier
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.koinApplication
+import org.koin.mp.KoinPlatform
 
 /**
  * The Koin application, configured but not started — what a Compose `KoinApplication` takes and what a test can build
@@ -35,6 +37,10 @@ fun initKoin(config: KoinAppDeclaration? = null) {
         config?.invoke(this)
         modules(KoinModules.allModules)
     }
+
+    // Privacy consent first: analytics starts OFF (core-base) and only the user's stored choice may turn it
+    // on. commonMain, so every platform follows the same consent.
+    KoinPlatform.getKoin().get<PrivacyConsentApplier>().start()
 
     // worker-kmp single-API: ONE commonMain call wires the workers on EVERY platform
     // (Android / iOS / Desktop / Web). It runs after startKoin so the codegen-emitted

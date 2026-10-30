@@ -458,17 +458,22 @@ module BuildSecrets
                    [v["alias"].to_s, c.empty? ? nil : (c.start_with?("env:") || c == "local.properties" ? c : q(c)), m]
                  end
                end
-        list.each do |al, canon, mat|
+        # A PURE alias list (framework schema v3.0, core/schemas/secrets-manifest.schema.json): `canonical` and
+        # `materialize` are rejected there — the framework resolves every destination from the alias via
+        # secrets-resolve-path.sh and never reads `.canonical` (secrets-pull.sh says so). Emitting them failed
+        # `/secrets verify` SV10 and, with it, every command that preflights the vault.
+        list.each do |al, _canon, _mat|
           next if al.to_s.empty? || seen[al]
           seen[al] = true
           rows << "  - alias: #{al}"
-          rows << "    canonical: #{canon}" if canon
-          rows << "    materialize: #{mat}" if mat
         end
       end
       return nil if rows.empty?
-      [MANIFEST_HEADER, "schema_version: \"3.0\"", "project: #{project_id(doc, root)}", "default_account_email: null", "",
-       "needs:", *rows].join("\n") + "\n"
+      pid = project_id(doc, root)
+      # default_vault is the ORG namespace (one vault per org). /secrets-sync refuses a manifest without it
+      # ("no default_vault"), which left every /secrets handoff stranded in the vault, never materialized.
+      [MANIFEST_HEADER, "schema_version: \"3.0\"", "project: #{pid}", "default_vault: #{pid.split('/').first}",
+       "default_account_email: null", "", "needs:", *rows].join("\n") + "\n"
     end
 
     # Validate every target and write — or with check: true, only compare — the root manifest. Returns

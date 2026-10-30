@@ -76,6 +76,11 @@ data class AccessPoint(
      * their own config.
      */
     val isMain: Boolean = false,
+    /**
+     * Supabase client config for a `type: supabase` point — its publishable key. `null` on REST points.
+     * [SupabaseClientFactory] reads it directly, so a fork never wires a key by hand.
+     */
+    val supabase: SupabaseSpec? = null,
 ) {
     /**
      * The URL requests are actually made against — [baseUrl] + [basePath], normalised.
@@ -102,8 +107,13 @@ data class AccessPoint(
  *
  * @property points every access point this fork declares, from `app-profile#network.access_points`. Order is
  *   irrelevant — lookup is by id.
+ * @property policy app-wide network privacy (logging detail per build type, query redaction, web CORS
+ *   relay), from `app-profile/app.yaml#network` via `AppAccessPoints.policy`. Defaults are the secure ones.
  */
-class AccessPointRegistry(val points: List<AccessPoint>) {
+class AccessPointRegistry(
+    val points: List<AccessPoint>,
+    val policy: NetworkPolicy = NetworkPolicy(),
+) {
 
     /**
      * One [HttpClient] per ACCESS POINT, not per API.

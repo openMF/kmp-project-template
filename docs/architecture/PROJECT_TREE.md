@@ -24,7 +24,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `core/` | 446 | [`core/`](tree/core.md) |
+| `core/` | 443 | [`core/`](tree/core.md) |
 | `core-base/` | 493 | [`core-base/`](tree/core-base.md) |
 
 ## Codegen
@@ -40,7 +40,7 @@
 |---|---:|---|
 | `app-profile/` | 161 | [`app-profile/`](tree/app-profile.md) |
 | `gradle/` | 5 | [`gradle/`](tree/gradle.md) |
-| `secrets/` | 54 | [`secrets/`](tree/secrets.md) |
+| `secrets/` | 55 | [`secrets/`](tree/secrets.md) |
 
 ## Build, release, CI
 
@@ -56,7 +56,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 475 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 467 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
 | `tests/` | 9 | [`tests/`](tree/tests.md) |
 

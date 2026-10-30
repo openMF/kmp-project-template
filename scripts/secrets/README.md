@@ -42,6 +42,25 @@ gradle/fork.properties → default`, so once the files are in place, `fastlane` 
 | **web** | Vercel / Cloudflare / Netlify tokens | the host's dashboard |
 | **desktop** | Windows (Azure Trusted Signing), macOS `.p12`, Linux GPG | per-store signing setup |
 
+### Supabase in a client app
+
+A client app carries **two** Supabase values, and neither is the security boundary — Row Level Security
+and Supabase Auth are:
+
+| Value | In the app? | Where it lives |
+|---|---|---|
+| Project URL `https://<ref>.supabase.co` | yes | `app-profile/app.yaml` access point `base_url` (public config) |
+| Publishable key `sb_publishable_…` / legacy `anon` | yes | vault → `secrets/live/supabase/publishable_key`; `secrets/sample/` keeps it **empty** (client stays inert) |
+| Secret key `sb_secret_…` / legacy `service_role` | **never** | vault only — Edge Functions, migrations, seed scripts |
+| DB password / DB URL | **never** | vault only — CI migration jobs |
+| Management access token `sbp_…` | **never** | vault only — CI deploy (Supabase CLI) |
+| JWT secret | **never** | not needed client-side |
+
+Enforced: `syncForkConfig` refuses to compile a privileged-named key into BuildKonfig, and
+`scripts/product-health/checks/supabase-client-security.sh` fails on a privileged value, a non-empty sample,
+or a hand-written Supabase `install(Auth)` — sign-in comes from the kmp-supabase-auth library
+(`io.github.mobilebytelabs:cmp-supabase-auth`), installed through `SupabaseExtrasProvider`. Anything that needs the secret key belongs in a Supabase Edge Function.
+
 Non-secret identity (team id, Match git URL, app ids, store copy) lives in
 **`gradle/fork.properties`** (copy `gradle/fork.properties.template`), *not* here.
 

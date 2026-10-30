@@ -397,7 +397,7 @@ fi
 #     Stripping the demo fence removes the DECLARATION; the generated OUTPUT is committed source and
 #     must be rebuilt from what survives. `fork-init.sh` runs syncForkConfig BEFORE this script, which
 #     is the wrong side of the strip — so a cleaned fork kept AppAccessPoints / AppUrlTypes /
-#     AppSupabaseAnonKeys listing the 5 demo endpoints that app.yaml no longer declares (NAP-1 + NAP-3
+#     AppAccessPoints Supabase specs listing the 5 demo endpoints that app.yaml no longer declares (NAP-1 + NAP-3
 #     both fail on it).
 #
 #     The GENERATOR is the only thing that knows each file's correct empty form — notably these three

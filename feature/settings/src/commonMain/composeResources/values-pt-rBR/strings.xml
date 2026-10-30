@@ -64,4 +64,11 @@
     <string name="feature_settings_conflicts_row_label">Conflito</string>
     <string name="feature_settings_conflicts_accept_server">Manter servidor</string>
     <string name="feature_settings_conflicts_retry_local">Tentar a minha</string>
+    <string name="feature_settings_privacy">Privacidade</string>
+    <string name="feature_settings_privacy_analytics">Compartilhar análises de uso</string>
+    <string name="feature_settings_privacy_crash_reports">Enviar relatórios de falhas</string>
+    <string name="feature_settings_privacy_row_description">Abrir configurações de privacidade</string>
+    <string name="feature_settings_privacy_intro">Você decide o que este app compartilha. Nada é enviado até que você ative, e você pode mudar isso a qualquer momento.</string>
+    <string name="feature_settings_privacy_analytics_description">Informações anônimas sobre quais recursos são usados, para melhorar o app.</string>
+    <string name="feature_settings_privacy_crash_reports_description">Detalhes técnicos quando o app falha, para que possamos corrigir o problema.</string>
 </resources>

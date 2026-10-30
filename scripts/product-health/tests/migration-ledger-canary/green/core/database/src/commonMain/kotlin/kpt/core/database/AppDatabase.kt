@@ -59,7 +59,7 @@ expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
  *
  * Generated members are referenced by FULLY-QUALIFIED name, never via an import: ktlint's
  * `standard:import-ordering` forbids both blank lines and comments inside the import block, so a
- * sentinel region cannot live there. Same reason `AppSupabaseAnonKeys` spells out
+ * sentinel region cannot live there. Same reason `AppAccessPoints` spells out
  * `kpt.core.network.BuildKonfig.<KEY>` inside its own generated block.
  *
  * ## Fresh-fork baseline

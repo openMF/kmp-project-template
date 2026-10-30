@@ -12,13 +12,10 @@ package kpt.core.network.di
 import kpt.core.base.network.AccessPointRegistry
 import kpt.core.base.network.DefaultHeaderProvider
 import kpt.core.base.network.MultiUrlConfigProvider
-import kpt.core.base.network.SupabaseClientFactory
-import kpt.core.base.network.SupabaseExtrasProvider
 import kpt.core.base.network.di.NetworkBaseModule
 import kpt.core.base.network.di.NetworkConfigModule
 import kpt.core.network.config.AppAccessPoints
 import kpt.core.network.config.AppMultiUrlConfigProvider
-import kpt.core.network.config.AppSupabaseAnonKeys
 import kpt.core.network.config.ProjectNetworkHeaders
 import org.koin.dsl.module
 
@@ -30,11 +27,10 @@ import org.koin.dsl.module
 // FRED's API key remains a per-request @Query param (a vault secret: mifos-x-fred-api-key → BuildKonfig).
 // Dynamic server config (consumer-facing, from core-base/network):
 //   - SupabaseConfigClient(s) are registered below so forks can fetch runtime server config from a
-//     Supabase `app_config`-style table. The AccessPointRegistry is the single URL SoT: SupabaseClientFactory
-//     materializes one client per declared SUPABASE access point (URL from AccessPoint.baseUrl). Anon keys
-//     resolve per-id via AppSupabaseAnonKeys, whose rows syncForkConfig generates from app-profile and whose
-//     values come from BuildKonfig (`anon_key_env:`); absent a key the creds are empty, so the client stays
-//     inert (isConfigured == false). Forks edit app-profile only.
+//     Supabase `app_server_config`-style table. The AccessPointRegistry is the single URL SoT: SupabaseClientFactory
+//     materializes one client per declared SUPABASE access point (URL from AccessPoint.baseUrl). Each point's
+//     publishable key (`publishable_key_env:` → BuildKonfig) is generated onto its AccessPoint; absent a
+//     key the client stays inert (isConfigured == false). Forks edit app-profile only.
 //     The legacy single-project path (SupabaseConfigConventionPlugin generating a SupabaseCredentials object
 //     from a secrets file, plus an unnamed single<SupabaseConfigClient>) was REMOVED on 2026-09-06: nothing
 //     referenced the generated object, and the registry had already become the single URL SoT.
@@ -76,34 +72,16 @@ val NetworkModule = module {
 
     // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
     // The restApi("<id>") DSL and AppMultiUrlConfigProvider both resolve transports/base-URLs from this.
-    single { AccessPointRegistry(AppAccessPoints.points) }
+    // + the app-wide network privacy policy (logging per build type, query redaction, web CORS relay).
+    single { AccessPointRegistry(AppAccessPoints.points, AppAccessPoints.policy) }
 
     // Unified access-point provider — resolves every named UrlType to its REST base URL from the
     // AccessPointRegistry. Clients thread it via
     // setupDefaultHttpClient(multiUrlProvider = get(), urlType = AppUrlTypes.<NAME>).
     single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider(get()) }
 
-    // Per-point Supabase client factory — URL from AccessPointRegistry, anon key by id.
-    single {
-        SupabaseClientFactory(
-            registry = get(),
-            anonKeyFor = AppSupabaseAnonKeys::forId,
-            // THE LINK THAT MAKES THE SEAM REAL. SupabaseConfigClient and SupabaseClientFactory both
-            // accept the extras hook, but if nothing passes it here the default `{ {} }` wins and a
-            // fork's `single<SupabaseExtrasProvider>` is never called — Auth is silently not installed,
-            // sign-in and the table APIs stop sharing an authenticated client, and every RLS-gated call
-            // resolves no `auth.uid()`. It compiles, and NAP-7 passes, which is what makes the gap so
-            // easy to ship: each layer is individually correct.
-            //
-            // `getOrNull` because the binding is OPTIONAL — a fork needing only Postgrest binds nothing
-            // and gets the no-op, which is the neutral template's own behaviour.
-            installExtrasFor = { id ->
-                getOrNull<SupabaseExtrasProvider>()?.forId(id) ?: {}
-            },
-            networkConfigs = getOrNull(),
-        )
-    }
-
+    // Supabase clients are bound in core-base NetworkBaseModule (included above): each point's publishable
+    // key is on its generated AccessPoint, so they need nothing from here.
     // Map<id, client> — every declared Supabase access point materializes exactly one client.
     // This is the ONLY Supabase client surface. There is deliberately no unnamed
     // `single<SupabaseConfigClient>`: "the" Supabase client is not a meaningful concept once a fork

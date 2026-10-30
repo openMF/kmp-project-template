@@ -117,7 +117,7 @@ koinAnnotationsVersion = "4.2.2"
 #         (the same `web` entry as js) and needs applicationId/apiKey/projectId/authDomain populated.
 #         Also: cmp-share direct-to-app share (ShareOptions.targetPackage) + file:// → FileProvider
 #         content:// resolution; cmp-remote-config min/max app-version gate.
-kmptoolkit = "3.5.28"
+kmptoolkit = "3.5.34"
 
 # CMP Libraries
 compose-plugin = "1.12.0"

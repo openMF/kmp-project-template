@@ -1455,7 +1455,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
             for ((name, env) in fields) {
                 if (name in existing) continue
                 append("        buildConfigField(\n")
-                append("            STRING, \"").append(name).append("\",\n")
+                // One argument per line: ktlint (spotlessKotlinGradle) rejects a multi-line call that puts two on one.
+                append("            STRING,\n")
+                append("            \"").append(name).append("\",\n")
                 append("            System.getenv(\"").append(env).append("\")")
                 secretKeys[env]?.let { append(" ?: project.readSecretValue(\"").append(it).append("\")") }
                 append(" ?: localProps.getProperty(\"").append(env).append("\", \"\"),\n")

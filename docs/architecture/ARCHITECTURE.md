@@ -37,6 +37,7 @@ Every top-level area of the repository — measured facts, plus authored signifi
 - [`legal/`](tree/legal.md)
 - [`scripts/`](tree/scripts.md)
 - [`secrets/`](tree/secrets.md)
+- [`supabase/`](tree/supabase.md)
 - [`sync/`](tree/sync.md)
 - [`tests/`](tree/tests.md)
 - [`tools/`](tree/tools.md)

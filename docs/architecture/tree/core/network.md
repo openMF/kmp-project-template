@@ -2,7 +2,7 @@
 
 > **Layer:** core — fork-owned; a codegen target
 > **Corpus surface:** `CORE_NETWORK.md`
-> **Measured:** 40 Kotlin files, 16 test files
+> **Measured:** 41 Kotlin files, 17 test files
 
 ## Codegen contracts owned here
 
@@ -22,10 +22,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=cdc34e4885997d29a3a88da91e56c13324e9d657 -->
+<!-- api-docs:begin module=core/network sha=14d58aaecaee0ecd6dbe929d53132e15e4969a3e -->
 ## API reference
 
-_Generated from `core/network` at tree `cdc34e488599` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `14d58aaecaee` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`
@@ -141,12 +141,12 @@ object AppAccessPoints
 ```
 The per-fork list of network access points this app talks to — REST and Supabase in ONE place.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:75</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:76</code></summary>
 
 ```kotlin
-    // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
     // The restApi("<id>") DSL and AppMultiUrlConfigProvider both resolve transports/base-URLs from this.
-    single { AccessPointRegistry(AppAccessPoints.points) }
+    // + the app-wide network privacy policy (logging per build type, query redaction, web CORS relay).
+    single { AccessPointRegistry(AppAccessPoints.points, AppAccessPoints.policy) }
 
     // Unified access-point provider — resolves every named UrlType to its REST base URL from the
     // AccessPointRegistry. Clients thread it via
@@ -156,6 +156,7 @@ The per-fork list of network access points this app talks to — REST and Supaba
 </details>
 
 - `val points: List<AccessPoint> = listOf(` — This project's declared access points, in app-profile order.
+- `val policy: NetworkPolicy = NetworkPolicy(` — Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/config/AppMultiUrlConfigProvider.kt`
 
@@ -164,7 +165,7 @@ class AppMultiUrlConfigProvider(
 ```
 Concrete `MultiUrlConfigProvider` backed by the declarative `AccessPointRegistry`.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:80</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:81</code></summary>
 
 ```kotlin
     // AccessPointRegistry. Clients thread it via
@@ -680,5 +681,5 @@ Custom serializer that destructures the World Bank's `[metadata, observations[]]
 
 ---
 
-_32 type(s), 36 function(s)/property(ies); 57 carry KDoc at source; 3 authored example(s); 25 live call site(s)._
+_32 type(s), 37 function(s)/property(ies); 58 carry KDoc at source; 3 authored example(s); 25 live call site(s)._
 <!-- api-docs:end -->

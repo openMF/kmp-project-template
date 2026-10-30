@@ -10,10 +10,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/firebase sha=420b16439932acce4cb878eb6f985eec60deaff2 -->
+<!-- api-docs:begin module=core-base/firebase sha=5700746cf1cadca0aaa8d493133e5eb40baff98e -->
 ## API reference
 
-_Generated from `core-base/firebase` at tree `420b16439932` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/firebase` at tree `5700746cf1ca` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is

@@ -2,13 +2,13 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_NETWORK.md`
-> **Measured:** 26 Kotlin files, 0 test files
+> **Measured:** 32 Kotlin files, 0 test files
 
 **Defines annotations:** `@ApiBinding`
 
 ## Principal types
 
-`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 20 more
+`AccessPoint`, `AccessPointKind`, `AccessPointRegistry`, `ApiBinding`, `AuthHeaderBridge`, `AuthProviders`, `AuthScheme`, `AuthTokenSource`, `DefaultHeaderProvider`, `DynamicBaseUrlConfig`, `DynamicBaseUrlPlugin`, `DynamicLoggableHosts`, `DynamicUrlConfigProvider`, `HeaderSpec`  …and 22 more
 
 <!-- scaffold:end -->
 
@@ -56,10 +56,10 @@ Changing the server usually invalidates the session, so sign out on a change.
 
 Tests: `core/network/src/commonTest/.../config/{NetworkConfigRepositoryTest,NetworkConfigRequestTest,DynamicBaseUrlTest}.kt`.
 
-<!-- api-docs:begin module=core-base/network sha=8578fa12db23f81e63f5c97f7768eb8c21b2d4a2 -->
+<!-- api-docs:begin module=core-base/network sha=cabd294c250a0d1fa0592b2ba29818ecfd4a9266 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `8578fa12db23` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `cabd294c250a` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -74,7 +74,7 @@ enum class AccessPointKind
 ```
 Transport kind of a declared network access point.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:37</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:39</code></summary>
 
 ```kotlin
         AccessPoint(
@@ -93,7 +93,7 @@ data class AccessPoint(
 ```
 One declared network access point — a named endpoint the app talks to.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:34</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:36</code></summary>
 
 ```kotlin
     // `type` defaults to UrlType(id.uppercase()) — value-class-equal to the AppUrlTypes.* constants.
@@ -108,7 +108,7 @@ One declared network access point — a named endpoint the app talks to.
 </details>
 
 ```kotlin
-class AccessPointRegistry(val points: List<AccessPoint>)
+class AccessPointRegistry(
 ```
 Template registry MECHANISM over a fork-provided list of `points`.
 
@@ -239,7 +239,7 @@ val stagingClient = httpClient {
 
 </details>
 
-<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:320</code></summary>
+<details><summary>Used in the template — <code>core-base/network/src/commonMain/kotlin/kpt/core/base/network/KtorHttpClient.kt:323</code></summary>
 
 ```kotlin
     // static-URL path is unchanged (no regression).
@@ -380,7 +380,7 @@ data class HeaderSpec(
 ```
 A header an access point sends on every request, declared in `app-profile/app.yaml#network.access_points[].headers[]`. Two kinds, because they have different lifetimes: - **static** (`value` set) — known at build time.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:90</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:92</code></summary>
 
 ```kotlin
             auth = AuthScheme.BASIC,
@@ -454,6 +454,11 @@ val client = httpClient(setupDefaultHttpClient(baseUrl = "https://api.example.co
 ```
 
 </details>
+
+```kotlin
+val DEFAULT_SENSITIVE_HEADERS: List<String> = listOf(
+```
+Headers masked in HTTP logs by default — every credential or session carrier the template sends.
 
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/NetworkConfig.kt`
 
@@ -598,6 +603,56 @@ Represents standardized error types for remote or network operations. This enum 
 
 </details>
 
+### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/NetworkPolicy.kt`
+
+```kotlin
+enum class HttpLogDetail(internal val level: LogLevel)
+```
+How much of an HTTP exchange may be written to the device log. Ordered least to most revealing.
+
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:106</code></summary>
+
+```kotlin
+    /** Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`. */
+    val policy: NetworkPolicy = NetworkPolicy(
+        releaseLogging = HttpLogDetail.NONE,
+        debugLogging = HttpLogDetail.BODY,
+        webCorsProxy = "https://corsproxy.io",
+    )
+    // syncForkConfig:access-points:end
+```
+
+</details>
+
+```kotlin
+data class NetworkPolicy(
+```
+App-wide network privacy policy — GENERATED from `app-profile/app.yaml#network` (`logging`, `web_cors_proxy`) onto `AppAccessPoints.policy` by `syncForkConfig`.
+
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:105</code></summary>
+
+```kotlin
+
+    /** Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`. */
+    val policy: NetworkPolicy = NetworkPolicy(
+        releaseLogging = HttpLogDetail.NONE,
+        debugLogging = HttpLogDetail.BODY,
+        webCorsProxy = "https://corsproxy.io",
+    )
+```
+
+</details>
+
+```kotlin
+fun maskQueryParams(message: String, params: List<String>): String
+```
+Mask the values of `params` in `message` — any `name=value` pair after `?` or `&`, so a logged URL keeps its shape (useful for debugging) without the credential.
+
+```kotlin
+expect fun Scope.isDebugBuild(): Boolean
+```
+True only for a DEBUG build of the running app — never "a debugger is attached" (that is `kpt.core.base.security.isReleaseBuild`, a tamper signal, and wrong for this: a debug build with no debugger would read as release).
+
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/NetworkResult.kt`
 
 ```kotlin
@@ -682,7 +737,7 @@ data class SupabaseSpec(
 ```
 A Supabase access point's client config — GENERATED onto `AccessPoint.supabase` by `syncForkConfig` from `app-profile/app.yaml#network.access_points[]`, so a fork configures Supabase in app-profile only.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:53</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/config/AppAccessPoints.kt:55</code></summary>
 
 ```kotlin
             baseUrl = "https://lwmswhoxvvoagzkqxiyd.supabase.co",
@@ -833,7 +888,7 @@ Runtime network configs, bound by core-base — an app includes this module and 
 
     // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
     // The restApi("<id>") DSL and AppMultiUrlConfigProvider both resolve transports/base-URLs from this.
-    single { AccessPointRegistry(AppAccessPoints.points) }
+    // + the app-wide network privacy policy (logging per build type, query redaction, web CORS relay).
 ```
 
 </details>
@@ -858,5 +913,5 @@ interface ApiService {
 
 ---
 
-_30 type(s), 21 function(s)/property(ies); 51 carry KDoc at source; 11 authored example(s); 26 live call site(s)._
+_32 type(s), 24 function(s)/property(ies); 56 carry KDoc at source; 11 authored example(s); 28 live call site(s)._
 <!-- api-docs:end -->

@@ -12,20 +12,20 @@
 | `cmp-desktop/` | 12 | [`cmp-desktop/`](tree/cmp-desktop.md) |
 | `cmp-web/` | 17 | [`cmp-web/`](tree/cmp-web.md) |
 | `cmp-shared/` | 8 | [`cmp-shared/`](tree/cmp-shared.md) |
-| `cmp-navigation/` | 53 | [`cmp-navigation/`](tree/cmp-navigation.md) |
+| `cmp-navigation/` | 55 | [`cmp-navigation/`](tree/cmp-navigation.md) |
 
 ## Features
 
 | Area | Files | Page |
 |---|---:|---|
-| `feature/` | 656 | [`feature/`](tree/feature.md) |
+| `feature/` | 658 | [`feature/`](tree/feature.md) |
 
 ## Core layers
 
 | Area | Files | Page |
 |---|---:|---|
-| `core/` | 443 | [`core/`](tree/core.md) |
-| `core-base/` | 493 | [`core-base/`](tree/core-base.md) |
+| `core/` | 449 | [`core/`](tree/core.md) |
+| `core-base/` | 499 | [`core-base/`](tree/core-base.md) |
 
 ## Codegen
 
@@ -56,9 +56,15 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 467 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 466 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
 | `tests/` | 9 | [`tests/`](tree/tests.md) |
+
+## Other
+
+| Area | Files | Page |
+|---|---:|---|
+| `supabase/` | 1 | [`supabase/`](tree/supabase.md) |
 
 ## No page, and why
 

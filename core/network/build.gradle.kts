@@ -51,7 +51,8 @@ buildkonfig {
         // source_env matches (secrets/live/ else the secrets/sample/ fake), then local.properties (legacy).
         // No secret is committed.
         buildConfigField(
-            STRING, "SUPABASE_PUBLISHABLE_KEY",
+            STRING,
+            "SUPABASE_PUBLISHABLE_KEY",
             System.getenv("SUPABASE_PUBLISHABLE_KEY") ?: project.readSecretValue("supabase_publishable_key") ?: localProps.getProperty("SUPABASE_PUBLISHABLE_KEY", ""),
         )
         // syncForkConfig:buildkonfig:end

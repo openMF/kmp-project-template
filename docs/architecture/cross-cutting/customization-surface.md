@@ -37,9 +37,13 @@ that whole class of silent loss becomes impossible.
 
 Rules are ordered **most-specific → most-general**, and the **first matching rule
 wins**. So the narrow `merge`/`fork` carve-outs are declared *before* the broad
-`template` module globs and correctly win over them. A trailing catch-all `**`
-rule (`owner: fork`, `default: true`) means the runtime never clobbers an unknown
-path — while `--verify` flags anything that reaches it so a human classifies it.
+`template` module globs and correctly win over them. The trailing catch-all `**`
+rule (`owner: template`, `default: true`) is **template-first** — a directory the template adds
+syncs without anyone remembering a rule — but it claims only what the template **ships**: a path
+under no sync root (`scripts/white-label/sync-dirs.sh` `SYNC_DIRS` / `SYNC_FILES`, read by the
+reader, never duplicated in the contract) resolves `fork`. A fork's own `libs/`, `branding/` or
+`maestro/` is therefore fork territory without the template naming it. `--verify` still flags every
+template path that reaches the default, so a human classifies it.
 
 Glob syntax: `*` matches within one path segment; `**` matches across segments;
 `**/x` matches `x` at any depth (including the repo root).
@@ -161,6 +165,40 @@ Proof: `tests/customization-surface/merge-3way-test.sh` — a fork's `RECORD_AUD
 `FOREGROUND_SERVICE_MICROPHONE` survive a template update that adds
 `POST_NOTIFICATIONS`, clean, no markers; a true same-line conflict returns rc=1 with
 markers.
+
+### Overlay vs strict mirror (`--mirror`)
+
+`git checkout <template> -- <dir>` is an **overlay**: it writes every file the template has and never
+removes a file only the fork has. `propagate_template_deletions` removes files the template itself
+deleted since the last sync (when the fork never touched them); nothing removed files the template
+NEVER shipped. A 2026-10-31 audit of 10 forks found fork code living permanently inside
+template-owned roots — components dropped into `kpt/core/designsystem/component/`, whole packages in
+`core-base/` — that a sync never reported and never reconciled.
+
+`sync-dirs.sh --mirror` makes template-owned roots a strict mirror: after the copy lands, every file
+the fork has under the root, the template does not, and the contract resolves **exactly** `template`
+is removed. Never touched: `is_excluded` paths (fork-owned, `**/demo/**`, the `core/store` seam,
+`schemas/`), `merge`-owned and `demo-showcase` paths, and anything listed in the fork-owned
+**`.template-sync-holds`** (`path<TAB>reason` — an extra proposed upstream waits there until the
+template adopts it). `--mirror` is opt-in: `/kmp-project-template-sync` first classifies each extra —
+adopt upstream, move to a fork package, or delete — so nothing is removed unreviewed. Proof:
+`tests/customization-surface/mirror-test.sh`.
+
+### `.template-version` advances only on a COMPLETE sync
+
+The marker is the 3-way base for the next sync, so it must state what the tree fully holds. A failed
+`sync_directory` / `sync_file` used to be ignored and the marker stamped anyway; two audited forks
+recorded the latest base while hundreds of their `core-base` files matched OLDER template versions.
+Every failure is now recorded, and if any occurred the engine names them, leaves the previous marker,
+and exits before committing.
+
+### A conflicted merge never reaches a commit
+
+A `merge`-owned file whose 3-way merge left markers used to be reported ("resolve markers before
+committing the sync") and then committed by the same run. A dry run on a real fork produced a sync
+commit with `<<<<<<<` in 19 files — build-logic plugins, the navigation shell, an Xcode file list.
+Conflicts are now recorded; every path still synced, so `.template-version` is written, but the engine
+exits **3** before committing and lists the files. Resolve them on the sync branch, then commit.
 
 ## Recommended CI wiring
 

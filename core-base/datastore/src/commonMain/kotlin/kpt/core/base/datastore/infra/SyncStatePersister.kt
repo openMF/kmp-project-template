@@ -13,8 +13,6 @@ package kpt.core.base.datastore.infra
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.serialization.decodeValueOrNull
-import com.russhwolf.settings.serialization.encodeValue
 import kotlinx.serialization.ExperimentalSerializationApi
 
 /**
@@ -31,6 +29,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 interface SyncStatePersister {
     /** Reads the stored versions; an empty map means nothing has synced yet. */
     suspend fun read(): ChangeListVersions
+
     /** Persists the versions after a successful sync. */
     suspend fun write(versions: ChangeListVersions)
 }
@@ -48,16 +47,11 @@ class SettingsSyncStatePersister(
     private val plainSettings: Settings,
 ) : SyncStatePersister {
 
-    override suspend fun read(): ChangeListVersions = plainSettings.decodeValueOrNull(
-        key = SYNC_VERSIONS_KEY,
-        serializer = ChangeListVersions.serializer(),
-    ) ?: ChangeListVersions()
+    // JSON, not `encodeValue`: its decoder drops the defaulted `versions` map (see [putJson]).
+    override suspend fun read(): ChangeListVersions =
+        plainSettings.getJsonOrNull(ChangeListVersions.serializer(), SYNC_VERSIONS_KEY) ?: ChangeListVersions()
 
     override suspend fun write(versions: ChangeListVersions) {
-        plainSettings.encodeValue(
-            key = SYNC_VERSIONS_KEY,
-            serializer = ChangeListVersions.serializer(),
-            value = versions,
-        )
+        plainSettings.putJson(ChangeListVersions.serializer(), SYNC_VERSIONS_KEY, versions)
     }
 }

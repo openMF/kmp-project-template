@@ -14,11 +14,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.flow.Flow
-import kpt.core.base.ui.viewmodel.BackgroundEvent
-import kpt.core.base.ui.viewmodel.BaseViewModel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kpt.core.base.ui.viewmodel.BackgroundEvent
+import kpt.core.base.ui.viewmodel.BaseViewModel
 
 /**
  * Convenience method for observing event flow from [BaseViewModel].

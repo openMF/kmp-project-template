@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/crypto sha=5612a9641cf675ea8975244106393fc11d1beef9 -->
+<!-- api-docs:begin module=core-base/crypto sha=5f4b85c997d64421d79b8632773815620b6db0c7 -->
 ## API reference
 
-_Generated from `core-base/crypto` at tree `5612a9641cf6` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/crypto` at tree `5f4b85c997d6` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is

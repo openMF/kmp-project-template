@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.swipeRight
 import androidx.compose.ui.unit.dp
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -49,7 +49,9 @@ class KptSplitPaneUiTest {
         }
         val before = leftWidth(this)
         onNodeWithTag("KptSplitPaneDivider").performTouchInput {
-            down(center); moveBy(Offset(200f, 0f)); up()
+            down(center)
+            moveBy(Offset(200f, 0f))
+            up()
         }
         waitForIdle()
         assertTrue(leftWidth(this) > before, "a rightward drag should widen the left pane")
@@ -65,7 +67,11 @@ class KptSplitPaneUiTest {
             )
         }
         val before = leftWidth(this)
-        onNodeWithTag("KptSplitPaneDivider").performTouchInput { down(center); moveBy(Offset(200f, 0f)); up() }
+        onNodeWithTag("KptSplitPaneDivider").performTouchInput {
+            down(center)
+            moveBy(Offset(200f, 0f))
+            up()
+        }
         waitForIdle()
         assertEquals(before, leftWidth(this), "resizable = false must pin the split")
     }
@@ -81,7 +87,11 @@ class KptSplitPaneUiTest {
                 minRightWidth = 0.dp,
             )
         }
-        onNodeWithTag("KptSplitPaneDivider").performTouchInput { down(center); moveBy(Offset(-200f, 0f)); up() }
+        onNodeWithTag("KptSplitPaneDivider").performTouchInput {
+            down(center)
+            moveBy(Offset(-200f, 0f))
+            up()
+        }
         waitForIdle()
         // Clamped, not collapsed: a pane dragged past its minimum used to have no floor at all.
         assertTrue(leftWidth(this) > 0, "the left pane must not be collapsed past its minimum")
@@ -148,7 +158,11 @@ class KptSplitPaneUiTest {
                 minRightWidth = 9_000.dp,
             )
         }
-        onNodeWithTag("KptSplitPaneDivider").performTouchInput { down(center); moveBy(Offset(120f, 0f)); up() }
+        onNodeWithTag("KptSplitPaneDivider").performTouchInput {
+            down(center)
+            moveBy(Offset(120f, 0f))
+            up()
+        }
         waitForIdle()
         assertTrue(leftWidth(this) > 0, "an unsatisfiable pair of minimums must not collapse a pane")
     }

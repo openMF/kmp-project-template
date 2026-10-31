@@ -43,7 +43,7 @@
 
     <!-- NotificationScreen — empty state -->
     <string name="feature_settings_notifications_empty_title">No notifications yet</string>
-    <string name="feature_settings_notifications_empty_message">You\'ll see bill reminders and rate alerts here.</string>
+    <string name="feature_settings_notifications_empty_message">You'll see bill reminders and rate alerts here.</string>
 
     <!-- Sync &amp; Drafts screen (template-level draft/sync inventory) -->
     <string name="feature_settings_sync_drafts_row">Sync &amp; Drafts</string>
@@ -63,12 +63,20 @@
     <string name="feature_settings_sync_drafts_discard">Discard</string>
     <string name="feature_settings_sync_drafts_prune">Prune expired</string>
     <string name="feature_settings_sync_drafts_discard_confirm_title">Discard draft?</string>
-    <string name="feature_settings_sync_drafts_discard_confirm_message">This permanently deletes the saved draft. This can\'t be undone.</string>
+    <string name="feature_settings_sync_drafts_discard_confirm_message">This permanently deletes the saved draft. This can't be undone.</string>
     <string name="feature_settings_sync_drafts_discard_confirm_cancel">Cancel</string>
     <string name="feature_settings_conflicts_title">Sync conflicts</string>
     <string name="feature_settings_conflicts_empty_title">No conflicts</string>
-    <string name="feature_settings_conflicts_empty_message">When a change you made conflicts with a newer version on the server, it shows up here so you can keep the server\'s version or retry yours.</string>
+    <string name="feature_settings_conflicts_empty_message">When a change you made conflicts with a newer version on the server, it shows up here so you can keep the server's version or retry yours.</string>
     <string name="feature_settings_conflicts_row_label">Conflict</string>
     <string name="feature_settings_conflicts_accept_server">Keep server</string>
     <string name="feature_settings_conflicts_retry_local">Retry mine</string>
+    <string name="feature_settings_sync_drafts_open">Open</string>
+    <string name="feature_settings_privacy">Privacy</string>
+    <string name="feature_settings_privacy_analytics">Share usage analytics</string>
+    <string name="feature_settings_privacy_crash_reports">Send crash reports</string>
+    <string name="feature_settings_privacy_row_description">Open privacy settings</string>
+    <string name="feature_settings_privacy_intro">You decide what this app shares. Nothing is sent until you turn it on, and you can change it at any time.</string>
+    <string name="feature_settings_privacy_analytics_description">Anonymous information about which features are used, to improve the app.</string>
+    <string name="feature_settings_privacy_crash_reports_description">Technical details when the app crashes, so we can fix the problem.</string>
 </resources>

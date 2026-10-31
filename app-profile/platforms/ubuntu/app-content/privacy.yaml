@@ -6,7 +6,7 @@
 # App Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no data
 # collection or transmission of any kind.
 
-privacy_policy_url: https://raw.githubusercontent.com/openMF/kmp-project-template/main/legal/output/privacy-policy.md
+privacy_policy_url: https://mifos-products.pages.dev/mobile/kmp-project-template/privacy/
 
 # Whether the app collects any personal data at all. False for the template — the demo
 # features are entirely local.

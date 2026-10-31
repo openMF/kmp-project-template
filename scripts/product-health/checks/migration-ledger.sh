@@ -16,6 +16,7 @@
 #         at an arbitrary slot, so a rename or conditional drop breaks out of position
 #   LG-5  ForkDatabaseConfig.VERSION agrees with the ledger
 #   LG-6  AppDatabase's autoMigrations match the ledger row-for-row
+#   LG-7  every `baseline_units` id is a declared unit (a fused id leaves the real one un-baselined)
 #
 # LG-2 is the one that matters most: a shipped from/to edge is a contract with every installed
 # device. Renumbering it stands them on a version with no path forward, and nothing else here or in
@@ -46,7 +47,10 @@ command -v ruby >/dev/null 2>&1 || { echo "ruby unavailable — cannot audit the
 # unrelated cascade failures.
 HEAD_LEDGER="${LG_HEAD:-}"
 if [ -z "$HEAD_LEDGER" ] && git -C "$HEALTH_ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-  HEAD_LEDGER="$(git -C "$HEALTH_ROOT" show "HEAD:app-profile/migration-ledger.yaml" 2>/dev/null || true)"
+  # `HEAD:./…` resolves against HEALTH_ROOT, not the repo top. A canary fixture lives INSIDE the repo,
+  # and the top-relative form read the repo's own ledger instead of the fixture's, so GREEN passed only
+  # while the real ledger happened to equal the fixture (true on the template, false on any fork).
+  HEAD_LEDGER="$(git -C "$HEALTH_ROOT" show "HEAD:./app-profile/migration-ledger.yaml" 2>/dev/null || true)"
 fi
 
 LG_HEAD="$HEAD_LEDGER" ruby - "$LEDGER" "$UNITS" "$CFG" "$DB" <<'RUBY'
@@ -107,6 +111,18 @@ if File.exist?(units_p)
                  "     assumes a starting schema and breaks when replayed out of position")
     end
   end
+end
+
+# ── LG-7 every baselined unit is a declared unit ─────────────────────────────
+# An unknown id in the baseline means a declared unit is NOT baselined, so syncForkConfig appends a
+# migration for a table the fresh schema already has. remove-demo.sh used to write exactly that:
+# `paste -d', '` cycles its delimiters, fusing every second pair of ids into `b c`.
+if File.exist?(units_p)
+  declared = ((YAML.safe_load(File.read(units_p)) rescue nil) || {})["migration_units"].to_a
+               .select { |u| u.is_a?(Hash) }.map { |u| u["id"].to_s }
+  unknown = baseline - declared
+  fail = bad("❌ LG-7 baseline_units names undeclared unit(s): #{unknown.map(&:inspect).join(', ')}\n" \
+             "     → a fused or misspelled id leaves the real unit un-baselined; syncForkConfig will migrate it again") if unknown.any?
 end
 
 # ── LG-5 the generated constant agrees with the ledger ───────────────────────

@@ -5,13 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.ui.screen
 
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import kpt.core.base.ui.generated.resources.Res
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 /**
  * Convenience suspend loaders for the bundled default Lottie animations that ship with
@@ -38,10 +38,13 @@ import kpt.core.base.ui.generated.resources.Res
 object DefaultLottieAnimations {
     /** Animation for the empty state. */
     val empty: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/empty.json") }
+
     /** Animation for the error state. */
     val error: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/error.json") }
+
     /** Animation for the no-network state. */
     val noNetwork: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/no_network.json") }
+
     /** Animation for the loading state. */
     val loading: suspend () -> LottieCompositionSpec = { loadJson("files/screenstate/loading.json") }
 }

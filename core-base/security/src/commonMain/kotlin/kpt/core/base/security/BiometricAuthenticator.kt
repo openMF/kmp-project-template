@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.security
 
@@ -39,6 +39,7 @@ expect class BiometricAuthenticator() {
 sealed class BiometricResult {
     /** The user authenticated. */
     data object Success : BiometricResult()
+
     /**
      * Authentication was attempted and rejected; [message] explains why. Counts toward lockout.
      *
@@ -46,8 +47,10 @@ sealed class BiometricResult {
      *   is enrolled.
      */
     data class Failure(val message: String) : BiometricResult()
+
     /** The user dismissed the prompt. NOT a failure — it must not count toward lockout. */
     data object Cancelled : BiometricResult()
+
     /** No biometric is enrolled or the hardware is absent. A capability fact, not an attempt. */
     data object Unavailable : BiometricResult()
 }

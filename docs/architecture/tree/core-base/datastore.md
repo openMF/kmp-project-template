@@ -2,7 +2,7 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_DATASTORE.md`
-> **Measured:** 17 Kotlin files, 2 test files
+> **Measured:** 19 Kotlin files, 3 test files
 
 ## Principal types
 
@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/datastore sha=cc5290aea37557ac0e3f2ca15e0e81fd8f5708ab -->
+<!-- api-docs:begin module=core-base/datastore sha=7c2f8d0f5c79b296eb5e92248932c7b036c27436 -->
 ## API reference
 
-_Generated from `core-base/datastore` at tree `cc5290aea375` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/datastore` at tree `7c2f8d0f5c79` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -93,6 +93,18 @@ Per-feature last-synced version map.
 
 </details>
 
+### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/infra/SettingsJson.kt`
+
+```kotlin
+fun <T> Settings.putJson(serializer: KSerializer<T>, key: String, value: T)
+```
+Store `value` as ONE JSON string at `key`. Use this, not multiplatform-settings' `encodeValue`, for any type with a collection property that has a default.
+
+```kotlin
+fun <T> Settings.getJsonOrNull(serializer: KSerializer<T>, key: String): T? =
+```
+Read a value written by `putJson`.
+
 ### `core-base/datastore/src/commonMain/kotlin/kpt/core/base/datastore/infra/SyncStatePersister.kt`
 
 ```kotlin
@@ -135,5 +147,5 @@ class SettingsSyncStatePersister(
 
 ---
 
-_4 type(s), 4 function(s)/property(ies); 8 carry KDoc at source; 0 authored example(s); 5 live call site(s)._
+_4 type(s), 6 function(s)/property(ies); 10 carry KDoc at source; 0 authored example(s); 5 live call site(s)._
 <!-- api-docs:end -->

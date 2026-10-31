@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/platform sha=e18f54f47c2ba2064746fec64e454840448f7c7c -->
+<!-- api-docs:begin module=core-base/platform sha=1c4a25621b6c6d975bfad8b973b5a60d68afe9de -->
 ## API reference
 
-_Generated from `core-base/platform` at tree `e18f54f47c2b` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/platform` at tree `1c4a25621b6c` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -46,6 +46,20 @@ Launches platform intents — view, pick, open settings. Provided by `LocalManag
 val LocalUrlLauncher: ProvidableCompositionLocal<UrlLauncher> =
 ```
 Opens URLs, email, maps, phone and SMS. Provided by `LocalManagerProvider`.
+
+<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/PrivacySheet.kt:71</code></summary>
+
+```kotlin
+fun PrivacySheet(onDismiss: () -> Unit, viewModel: SettingsViewModel = koinViewModel()) {
+    val settingsState by viewModel.settingsState.collectAsStateWithLifecycle()
+    val urlLauncher = LocalUrlLauncher.current
+    PrivacySheet(
+        settingsState = settingsState,
+        onDismiss = onDismiss,
+        onRetry = viewModel::onRetry,
+```
+
+</details>
 
 ```kotlin
 val LocalShareManager: ProvidableCompositionLocal<ShareManager> =
@@ -421,6 +435,7 @@ val LocalShareManager: ProvidableCompositionLocal<ShareManager> =
 
 - `fun launch(url: String): Boolean` — Launch `url` with the platform's default handler. Returns false if nothing could handle it.
 - `fun launchInBrowser(url: String): Boolean` — Launch `url` in a browser specifically, bypassing any app that claims the link.
+- `fun launchInApp(url: String): Boolean` — Show `url` in a browser INSIDE the app — Custom Tabs on Android, SFSafariViewController on iOS, the system browser where the platform has no in-app one. For pages the user reads and returns from: a privacy policy, terms, help.
 - `fun canLaunch(url: String): Boolean` — Whether `url` has a handler — check before offering the action, not after it fails.
 
 ### `core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/url/UrlLauncherImpl.kt`
@@ -446,5 +461,5 @@ The one `UrlLauncher`, for every target. `cmp-open-url` carries the per-target `
 
 ---
 
-_15 type(s), 31 function(s)/property(ies); 46 carry KDoc at source; 0 authored example(s); 16 live call site(s)._
+_15 type(s), 32 function(s)/property(ies); 47 carry KDoc at source; 0 authored example(s); 17 live call site(s)._
 <!-- api-docs:end -->

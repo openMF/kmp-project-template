@@ -45,8 +45,10 @@ interface Synchronizer {
 interface NetworkChange {
     /** Identity of the changed record. */
     val id: String
+
     /** Version this change was published at — the cursor a later sync resumes from. */
     val changeListVersion: Int
+
     /** Whether the change is a deletion, which must be applied rather than fetched. */
     val isDelete: Boolean
 }

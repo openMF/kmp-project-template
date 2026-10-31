@@ -5,12 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.security.di
 
-import org.koin.core.module.Module
-import org.koin.dsl.module
 import kpt.core.base.security.BiometricAuthenticator
 import kpt.core.base.security.DeepLinkValidator
 import kpt.core.base.security.FailedAttemptTracker
@@ -21,6 +19,8 @@ import kpt.core.base.security.SecurityConfig
 import kpt.core.base.security.SecurityPolicy
 import kpt.core.base.security.SessionManager
 import kpt.core.base.security.TamperDetector
+import org.koin.core.module.Module
+import org.koin.dsl.module
 
 /**
  * Zero-config security Koin module. Auto-detects build type via

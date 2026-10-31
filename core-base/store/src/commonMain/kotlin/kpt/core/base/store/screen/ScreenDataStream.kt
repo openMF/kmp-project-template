@@ -5,16 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.screen
 
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkMonitor
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.networkStatusDebouncedState
-import kotlin.time.Clock
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -31,13 +28,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import org.mobilenativefoundation.store.store5.Store
-import org.mobilenativefoundation.store.store5.StoreReadRequest
 import kpt.core.base.store.freshness.FreshnessBand
 import kpt.core.base.store.freshness.FreshnessBands
 import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.infra.DecisionEngine
 import kpt.core.base.store.infra.FetchedAtRepository
+import org.mobilenativefoundation.store.store5.Store
+import org.mobilenativefoundation.store.store5.StoreReadRequest
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 
 /**
  * Default reconnect-debounce window for [asScreenStream]. Suppresses transient
@@ -152,8 +152,6 @@ class ScreenDataStream<T> internal constructor(
 ) {
     private var lastRefreshMark: kotlin.time.TimeMark? = null
 
-
-
     /**
      * Trigger a network refresh. Preserves existing content while loading.
      *
@@ -260,7 +258,8 @@ fun <T> screenDataStreamForTesting(
     state: Flow<ScreenState<T>>,
     refreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
     forceFreshTrigger: MutableSharedFlow<Unit> = MutableSharedFlow(extraBufferCapacity = 1),
-    userRefreshDebounceMs: Long = 0L, // tests don't want debounce by default
+    // tests don't want debounce by default
+    userRefreshDebounceMs: Long = 0L,
     timeSource: kotlin.time.TimeSource = kotlin.time.TimeSource.Monotonic,
     freshness: Flow<FreshnessSignal> = emptyFlow(),
 ): ScreenDataStream<T> = ScreenDataStream(

@@ -14,7 +14,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import kpt.core.base.designsystem.core.KptThemeProvider
-import kpt.core.base.designsystem.theme.KptTheme
 import kpt.core.base.designsystem.theme.KptThemeProviderImpl
 import kpt.core.base.designsystem.theme.LocalKptColors
 import kpt.core.base.designsystem.theme.LocalKptElevation

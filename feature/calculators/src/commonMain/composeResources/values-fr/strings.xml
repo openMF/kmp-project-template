@@ -9,11 +9,11 @@
     See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->
 <resources>
-    <string name="screens_calc_affordability_title">Capacité d\'emprunt</string>
+    <string name="screens_calc_affordability_title">Capacité d'emprunt</string>
     <string name="screens_calc_affordability_back_cd">Retour</string>
     <string name="screens_calc_affordability_income_label">Revenu mensuel</string>
     <string name="screens_calc_affordability_obligations_label">Dettes mensuelles existantes</string>
-    <string name="screens_calc_affordability_dti_label">Plafond du taux d\'endettement (%)</string>
+    <string name="screens_calc_affordability_dti_label">Plafond du taux d'endettement (%)</string>
     <string name="screens_calc_affordability_rate_label">Taux annuel (%)</string>
     <string name="screens_calc_affordability_tenure_label">Durée (mois)</string>
     <string name="screens_calc_affordability_max_principal_label">Capital maximal empruntable</string>
@@ -44,8 +44,8 @@
     <string name="screens_calc_compare_result_emi">Mensualité</string>
     <string name="screens_calc_compare_result_interest">Intérêts</string>
     <string name="screens_calc_compare_result_total">Total</string>
-    <string name="screens_calc_wizard_resume_title">Reprendre l\'assistant inachevé ?</string>
-    <string name="screens_calc_wizard_resume_message">Vous avez un assistant de calcul de prêt à l\'étape %1$d. Reprendre où vous en étiez ou supprimer ?</string>
+    <string name="screens_calc_wizard_resume_title">Reprendre l'assistant inachevé ?</string>
+    <string name="screens_calc_wizard_resume_message">Vous avez un assistant de calcul de prêt à l'étape %1$d. Reprendre où vous en étiez ou supprimer ?</string>
     <string name="screens_calc_wizard_resume_continue">Continuer</string>
     <string name="screens_calc_wizard_resume_discard">Supprimer</string>
     <string name="screens_calc_wizard_title">Nouveau prêt · Étape %1$d/%2$d</string>

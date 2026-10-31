@@ -30,6 +30,7 @@ import io.github.mobilebytelabs.kmptoolkit.firebase.compose.rememberAnalyticsHel
 import kpt.core.designsystem.theme.spacing
 import kpt.feature.settings.DevMenuEntry
 import kpt.feature.settings.LanguageDialog
+import kpt.feature.settings.PrivacySheet
 import kpt.feature.settings.SettingsDialog
 import kpt.feature.settings.SettingsScreenContent
 import kpt.feature.settings.TestTags
@@ -57,6 +58,7 @@ fun SettingsDemoBody(
     val analyticsHelper = rememberAnalyticsHelper()
     var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
     var showLanguageDialog by rememberSaveable { mutableStateOf(false) }
+    var showPrivacySheet by rememberSaveable { mutableStateOf(false) }
     var showDevMenu by rememberSaveable { mutableStateOf(false) }
 
     if (showSettingsDialog) {
@@ -75,6 +77,10 @@ fun SettingsDemoBody(
                 showLanguageDialog = false
             },
         )
+    }
+
+    if (showPrivacySheet) {
+        PrivacySheet(onDismiss = { showPrivacySheet = false })
     }
 
     if (showDevMenu) {
@@ -107,6 +113,9 @@ fun SettingsDemoBody(
         },
         onSyncAndDraftsClick = onSyncAndDraftsClick,
         onFooterLongClick = onFooterLongClick,
+        // Not tracked as an analytics event: opening the place where consent is WITHDRAWN must not itself be
+        // something the app records.
+        onPrivacyCardClick = { showPrivacySheet = true },
         // Resolved by the CALLER, not injected here. This body is a pure-UI composable — its UI
         // test renders it directly with no Koin application started — so a `koinInject` inside it
         // turns every such render into "KoinApplication has not been started". cmp-navigation's

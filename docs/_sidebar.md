@@ -35,6 +35,7 @@
   - [legal/](/architecture/tree/legal.md)
   - [scripts/](/architecture/tree/scripts.md)
   - [secrets/](/architecture/tree/secrets.md)
+  - [supabase/](/architecture/tree/supabase.md)
   - [sync/](/architecture/tree/sync.md)
   - [tests/](/architecture/tree/tests.md)
   - [tools/](/architecture/tree/tools.md)

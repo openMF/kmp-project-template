@@ -20,6 +20,24 @@ object TestTags {
     object Settings {
         /** Root scaffold — always rendered regardless of dialog state. */
         const val SCREEN: String = "settings_screen"
+
+        /** The Privacy row that opens [PrivacySheet]. */
+        const val PRIVACY_ROW: String = "settings_privacy_row"
+    }
+
+    /** Tags for [PrivacySheet]. */
+    object Privacy {
+        /** The bottom sheet itself. */
+        const val SHEET: String = "privacy_sheet"
+
+        /** The usage-analytics consent switch row. */
+        const val ANALYTICS_SWITCH: String = "privacy_analytics_switch"
+
+        /** The crash-reporting consent switch row. */
+        const val CRASH_REPORTS_SWITCH: String = "privacy_crash_reports_switch"
+
+        /** The link that opens the privacy policy in the in-app browser. */
+        const val POLICY_LINK: String = "privacy_policy_link"
     }
 
     /** Tags for [NotificationScreen]. */
@@ -35,5 +53,8 @@ object TestTags {
 
         /** The manual "Prune expired" button (rendered only when there is content). */
         const val PRUNE: String = "sync_and_drafts_prune"
+
+        /** A draft row's "Open" button, which resumes the draft in its form. */
+        const val OPEN: String = "sync_and_drafts_open"
     }
 }

@@ -35,6 +35,8 @@ internal class FakeUserDataRepository(
     val darkThemeConfig = MutableStateFlow(DarkThemeConfig.FOLLOW_SYSTEM)
     val dynamicColor = MutableStateFlow(false)
     val screenCapture = MutableStateFlow(false)
+    val analyticsConsent = MutableStateFlow(false)
+    val crashReportingConsent = MutableStateFlow(false)
     val language = MutableStateFlow(LanguageConfig.DEFAULT)
 
     /** Languages written back through [setLanguage] — the app-specific-language action's sink. */
@@ -44,6 +46,14 @@ internal class FakeUserDataRepository(
     override val observeDarkThemeConfig: Flow<DarkThemeConfig> get() = darkThemeConfig
     override val observeDynamicColorPreference: Flow<Boolean> get() = dynamicColor
     override val observeScreenCapturePreference: Flow<Boolean> get() = screenCapture
+    override val observeAnalyticsConsent: Flow<Boolean> get() = analyticsConsent
+    override val observeCrashReportingConsent: Flow<Boolean> get() = crashReportingConsent
+    override suspend fun setAnalyticsConsent(granted: Boolean) {
+        analyticsConsent.value = granted
+    }
+    override suspend fun setCrashReportingConsent(granted: Boolean) {
+        crashReportingConsent.value = granted
+    }
     override val observeLanguage: Flow<LanguageConfig> get() = language
 
     override suspend fun setLanguage(language: LanguageConfig) {

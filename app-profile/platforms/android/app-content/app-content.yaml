@@ -5,7 +5,7 @@
 # App Toolkit posture: 100% offline, no login, no account, no ads, no tracking, no analytics,
 # no data collection or transmission of any kind.
 
-privacy_policy_url: https://raw.githubusercontent.com/openMF/kmp-project-template/main/legal/output/privacy-policy.md
+privacy_policy_url: https://mifos-products.pages.dev/mobile/kmp-project-template/privacy/
 
 # Whether the app shows ads. Play requires the declaration, and an incorrect answer is a
 # policy violation rather than a listing error.
@@ -169,5 +169,5 @@ questionnaire:
     where: Play Console → App content → Privacy policy
     steps:
       - q: Provide a link to your privacy policy.
-        a: https://raw.githubusercontent.com/openMF/kmp-project-template/main/legal/output/privacy-policy.md
+        a: https://mifos-products.pages.dev/mobile/kmp-project-template/privacy/
     outcome: Privacy policy URL on file

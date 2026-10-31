@@ -9,7 +9,7 @@
     See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
 -->
 <resources>
-    <string name="screens_showcase_state_gallery_intro">Test visuel de fumée pour chaque variante de ScreenState et chaque primitive d\'état à l\'échelle du composant fournie par core/designsystem.</string>
+    <string name="screens_showcase_state_gallery_intro">Test visuel de fumée pour chaque variante de ScreenState et chaque primitive d'état à l'échelle du composant fournie par core/designsystem.</string>
     <string name="screens_showcase_state_gallery_loading">Loading</string>
     <string name="screens_showcase_state_gallery_empty">Empty</string>
     <string name="screens_showcase_state_gallery_error">Error</string>

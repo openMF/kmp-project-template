@@ -12,6 +12,7 @@ package kpt.core.base.network.di
 import kpt.core.base.network.RuntimeHeaderStore
 import kpt.core.base.network.SupabaseClientFactory
 import kpt.core.base.network.SupabaseConfigClient
+import kpt.core.base.network.SupabaseExtrasProvider
 import org.koin.dsl.module
 
 /**
@@ -20,9 +21,10 @@ import org.koin.dsl.module
  * ## Why these bindings are here and not in `core/network`
  * A binding belongs in `core-base` when it touches nothing the fork generates. These two qualify:
  * `RuntimeHeaderStore` takes no arguments at all, and the client map is derived entirely through
- * `get()`. Everything still in `core/network`'s `NetworkModule` fails that test — `AccessPointRegistry`,
- * `MultiUrlConfigProvider` and `SupabaseClientFactory` each read an `App*` object that KSP generates
- * into `core/network` from `app-profile`, and `core-base` sits below that and cannot see it.
+ * `get()`. Everything still in `core/network`'s `NetworkModule` fails that test — `AccessPointRegistry`
+ * and `MultiUrlConfigProvider` read an `App*` object generated into `core/network` from `app-profile`,
+ * and `core-base` sits below that and cannot see it. Supabase passes it: each point's publishable key is
+ * ON its generated [kpt.core.base.network.AccessPoint], so the factory needs only the registry.
  *
  * ## Why relocating is safe without a graph test
  * `NetworkModule` includes this module unconditionally, and `KoinModules` includes `NetworkModule`
@@ -39,7 +41,18 @@ val NetworkBaseModule = module {
     // No arguments, no fork input — there was never a reason for this to sit a layer up.
     single { RuntimeHeaderStore() }
 
-    // Derived purely through `get()`: the factory it reads is bound in core/network because IT needs
-    // the generated anon keys, but this projection of it does not.
+    // Per-point Supabase clients, built from the registry alone: each generated AccessPoint carries its
+    // publishable key, so no fork wiring reaches this.
+    single {
+        SupabaseClientFactory(
+            registry = get(),
+            // The fork seam for Auth (kmp-supabase-auth) / Realtime / Storage. OPTIONAL: a fork binding
+            // nothing gets the no-op. If this lambda were not passed the default would win and a fork's
+            // SupabaseExtrasProvider would silently never run.
+            installExtrasFor = { id -> getOrNull<SupabaseExtrasProvider>()?.forId(id) ?: {} },
+            networkConfigs = getOrNull(),
+        )
+    }
+
     single<Map<String, SupabaseConfigClient>> { get<SupabaseClientFactory>().clients() }
 }

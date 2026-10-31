@@ -7,10 +7,10 @@
 
 | Path | Files |
 |---|---:|
-| `deployment/desktop/` | 47 |
+| `deployment/desktop/` | 46 |
 | `deployment/android/` | 31 |
 | `deployment/ios/` | 27 |
-| `deployment/_shared/` | 24 |
+| `deployment/_shared/` | 25 |
 | `deployment/web/` | 22 |
 | (files at the root) | 9 |
 | `deployment/linux/` | 4 |
@@ -52,9 +52,9 @@
 
 | Unit | Files | Page |
 |---|---:|---|
-| `deployment/_shared/` | 24 | [_shared](deployment/_shared.md) |
+| `deployment/_shared/` | 25 | [_shared](deployment/_shared.md) |
 | `deployment/android/` | 31 | [android](deployment/android.md) |
-| `deployment/desktop/` | 47 | [desktop](deployment/desktop.md) |
+| `deployment/desktop/` | 46 | [desktop](deployment/desktop.md) |
 | `deployment/fastlane/` | 3 | [fastlane](deployment/fastlane.md) |
 | `deployment/ios/` | 27 | [ios](deployment/ios.md) |
 | `deployment/web/` | 22 | [web](deployment/web.md) |

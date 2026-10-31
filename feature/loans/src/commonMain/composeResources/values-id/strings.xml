@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Kembali</string>
     <string name="screens_loans_list_new_fab_text">Pinjaman baru</string>
     <string name="screens_loans_list_delete_dialog_title">Hapus pinjaman?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' akan dihapus. Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' akan dihapus. Tindakan ini tidak dapat dibatalkan.</string>
     <string name="screens_loans_list_delete_confirm">Hapus</string>
     <string name="screens_loans_list_delete_cancel">Batal</string>
     <string name="screens_loans_list_total_outstanding_label">Total sisa</string>

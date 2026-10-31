@@ -289,8 +289,13 @@ if [ -f "$LEDGER" ]; then
   if [ "$APPLY" -eq 1 ]; then
     # `|| true`: grep exits 2 when the file is absent, and under `set -e` that killed the whole strip
     # silently — a fork that stripped the white-label machinery legitimately has no units file.
+    # Join with ',' THEN add the space. `paste -d', '` is a delimiter LIST that paste cycles through
+    # — comma, space, comma, space — so it produced `a,b c,d e`: every second pair of ids fused into
+    # one unknown id, syncForkConfig treated those units as unapplied, and the first real migration
+    # row made it append migrations for tables the fork already had (found in
+    # mifos-x-field-officer-app's ledger, 2026-10-23).
     units=$(grep -hoE 'id:[[:space:]]*[A-Za-z0-9_-]+' core/database/migration-units.yaml 2>/dev/null \
-              | sed 's/.*id:[[:space:]]*//' | paste -sd', ' - || true)
+              | sed 's/.*id:[[:space:]]*//' | paste -sd, - | sed 's/,/, /g' || true)
     sed -i.bak -e "s/^version:[[:space:]]*[0-9][0-9]*/version: 1/" \
                -e "s/^baseline_units:.*/baseline_units: [${units}]/" "$LEDGER"
     rm -f "$LEDGER.bak"
@@ -392,7 +397,7 @@ fi
 #     Stripping the demo fence removes the DECLARATION; the generated OUTPUT is committed source and
 #     must be rebuilt from what survives. `fork-init.sh` runs syncForkConfig BEFORE this script, which
 #     is the wrong side of the strip — so a cleaned fork kept AppAccessPoints / AppUrlTypes /
-#     AppSupabaseAnonKeys listing the 5 demo endpoints that app.yaml no longer declares (NAP-1 + NAP-3
+#     AppAccessPoints Supabase specs listing the 5 demo endpoints that app.yaml no longer declares (NAP-1 + NAP-3
 #     both fail on it).
 #
 #     The GENERATOR is the only thing that knows each file's correct empty form — notably these three

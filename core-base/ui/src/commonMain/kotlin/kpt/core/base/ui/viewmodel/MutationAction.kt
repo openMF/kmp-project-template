@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.ui.viewmodel
 
@@ -24,9 +24,9 @@ sealed interface MutationAction<out T> {
      * User confirmed the form — submit [payload] via the subclass's
      * [BaseMutationViewModel.performSubmit] implementation. While a submission is in flight,
      * additional Submit actions queued through the channel are processed sequentially.
-      *
-      * @property payload the value to submit. Must be serializable when the handler is draft-backed, since it has to
-      *   survive process death.
+     *
+     * @property payload the value to submit. Must be serializable when the handler is draft-backed, since it has to
+     *   survive process death.
      */
     data class Submit<T>(val payload: T) : MutationAction<T>
 

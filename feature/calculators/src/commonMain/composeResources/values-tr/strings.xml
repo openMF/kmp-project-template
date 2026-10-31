@@ -66,7 +66,7 @@
     <string name="screens_calc_wizard_step_review_total_interest_label">Toplam faiz</string>
     <string name="screens_calc_wizard_step_name_message">Kredilerinizde tekrar bulabilmek için bu senaryoya bir ad verin.</string>
     <string name="screens_calc_wizard_step_name_label">Senaryo adı</string>
-    <string name="screens_calc_wizard_step_name_required">Zorunlu — Kaydet\'i etkinleştirmek için bir ad yazın.</string>
+    <string name="screens_calc_wizard_step_name_required">Zorunlu — Kaydet'i etkinleştirmek için bir ad yazın.</string>
     <string name="screens_calc_wizard_button_back">Geri</string>
     <string name="screens_calc_wizard_button_next">İleri</string>
     <string name="screens_calc_wizard_button_save">Kredi olarak kaydet</string>

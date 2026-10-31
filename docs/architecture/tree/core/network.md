@@ -2,7 +2,7 @@
 
 > **Layer:** core — fork-owned; a codegen target
 > **Corpus surface:** `CORE_NETWORK.md`
-> **Measured:** 33 Kotlin files, 8 test files
+> **Measured:** 41 Kotlin files, 17 test files
 
 ## Codegen contracts owned here
 
@@ -14,7 +14,7 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 ## Principal types
 
-`AppAccessPoints`, `AppConfigApi`, `AppConfigApiImpl`, `AppMultiUrlConfigProvider`, `AppSupabaseAnonKeys`, `AppUrlTypes`, `CloudTodoDto`, `CoinDetailDto`, `CoinGeckoApi`, `CoinImageDto`, `CoinMarketDto`, `DescriptionDto`, `ExchangeRatesDto`, `FineractApi`  …and 18 more
+`AppAccessPoints`, `AppMultiUrlConfigProvider`, `AppUrlTypes`, `CloudTodoDto`, `CoinDetailDto`, `CoinGeckoApi`, `CoinImageDto`, `CoinMarketDto`, `DescriptionDto`, `ExchangeRatesDto`, `FineractApi`, `FineractAuthResponseDto`, `FineractOfficeDto`, `FrankfurterApi`  …and 18 more
 
 <!-- scaffold:end -->
 
@@ -22,10 +22,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=8dba0c4d90923b1c7635e7530074e40b03584b2a -->
+<!-- api-docs:begin module=core/network sha=14d58aaecaee0ecd6dbe929d53132e15e4969a3e -->
 ## API reference
 
-_Generated from `core/network` at tree `8dba0c4d9092` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `14d58aaecaee` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`
@@ -144,9 +144,9 @@ The per-fork list of network access points this app talks to — REST and Supaba
 <details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:76</code></summary>
 
 ```kotlin
-    // The fork's generated access points, wrapped by the framework registry mechanism (core-base/network).
     // The restApi("<id>") DSL and AppMultiUrlConfigProvider both resolve transports/base-URLs from this.
-    single { AccessPointRegistry(AppAccessPoints.points) }
+    // + the app-wide network privacy policy (logging per build type, query redaction, web CORS relay).
+    single { AccessPointRegistry(AppAccessPoints.points, AppAccessPoints.policy) }
 
     // Unified access-point provider — resolves every named UrlType to its REST base URL from the
     // AccessPointRegistry. Clients thread it via
@@ -155,7 +155,8 @@ The per-fork list of network access points this app talks to — REST and Supaba
 
 </details>
 
-- `val points: List<AccessPoint> = listOf(` — This project's declared access points. Generated from `app-profile#network.access_points` — add an endpoint there, not here.
+- `val points: List<AccessPoint> = listOf(` — This project's declared access points, in app-profile order.
+- `val policy: NetworkPolicy = NetworkPolicy(` — Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/config/AppMultiUrlConfigProvider.kt`
 
@@ -171,35 +172,12 @@ Concrete `MultiUrlConfigProvider` backed by the declarative `AccessPointRegistry
     // setupDefaultHttpClient(multiUrlProvider = get(), urlType = AppUrlTypes.<NAME>).
     single<MultiUrlConfigProvider> { AppMultiUrlConfigProvider(get()) }
 
-    // Per-point Supabase client factory — URL from AccessPointRegistry, anon key by id.
-    single {
-        SupabaseClientFactory(
+    // Supabase clients are bound in core-base NetworkBaseModule (included above): each point's publishable
+    // key is on its generated AccessPoint, so they need nothing from here.
+    // Map<id, client> — every declared Supabase access point materializes exactly one client.
 ```
 
 </details>
-
-### `core/network/src/commonMain/kotlin/kpt/core/network/config/AppSupabaseAnonKeys.kt`
-
-```kotlin
-object AppSupabaseAnonKeys
-```
-The per-fork map of Supabase access-point id → anon key. **SoT: `app-profile/app.yaml#network.access_points`** (rows) **+ the build environment** (values).
-
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:87</code></summary>
-
-```kotlin
-        SupabaseClientFactory(
-            registry = get(),
-            anonKeyFor = AppSupabaseAnonKeys::forId,
-            // THE LINK THAT MAKES THE SEAM REAL. SupabaseConfigClient and SupabaseClientFactory both
-            // accept the extras hook, but if nothing passes it here the default `{ {} }` wins and a
-            // fork's `single<SupabaseExtrasProvider>` is never called — Auth is silently not installed,
-            // sign-in and the table APIs stop sharing an authenticated client, and every RLS-gated call
-```
-
-</details>
-
-- `fun forId(id: String): String = byId[id].orEmpty()` — Anon key for `id`, or empty string if `id` is not registered.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/config/AppUrlTypes.kt`
 
@@ -242,7 +220,7 @@ object ProjectNetworkHeaders : DefaultHeaderProvider {
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:64</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/NetworkModule.kt:61</code></summary>
 
 ```kotlin
     // built by `restApi(...)` resolves this, so a fork adds an app-wide header without hand-building
@@ -291,12 +269,11 @@ single<MyApiConfig> { MyApiConfig(apiKey = BuildKonfig.MY_API_KEY.takeIf { it.is
 single<SupabaseExtrasProvider> {
     SupabaseExtrasProvider { id ->
         when (id) {
-            "<your-project-ref>" -> {
-                {
-                    install(Auth) { /* scheme/host for the OAuth redirect */ }
-                    install(ComposeAuth) { /* native Google/Apple sign-in */ }
-                }
-            }
+            // Social sign-in: kmp-supabase-auth (io.github.mobilebytelabs:cmp-supabase-auth[-compose])
+            // installs Auth + native Google/Apple onto this client. Never hand-write install(Auth).
+            // libs.cmp.supabase.auth.compose (0.3.3). secureStorage keeps the session + PKCE verifier
+            // in the encrypted named("secure") Settings instead of supabase-kt's plain default.
+            "<your-project-ref>" -> kmpSupabaseAuthInstall(authConfig) { secureStorage(get(named("secure"))) }
             // Several projects sharing a module — one branch, no repetition.
             "<project-b>", "<project-c>" -> {
                 { install(Realtime) }
@@ -307,6 +284,7 @@ single<SupabaseExtrasProvider> {
         }
     }
 }
+includes(kmpSupabaseAuthNetwork(authConfig) { get<SupabaseClientFactory>().requireClientFor("<ref>").client })
 ```
 
 </details>
@@ -468,7 +446,7 @@ single { FredApiConfig(apiKey = "deadbeef...") }
 <details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/ProjectNetworkModule.kt:114</code></summary>
 
 ```kotlin
-    // derived from the access-point declaration the way a base URL or an anon key can. Fenced, so
+    // derived from the access-point declaration the way a base URL or a publishable key can. Fenced, so
     // `remove-demo.sh` drops it together with the `fred` package and its access point.
     single<kpt.core.network.fred.config.FredApiConfig> {
         kpt.core.network.fred.config.FredApiConfig(
@@ -561,72 +539,73 @@ private class FakeJsonPlaceholderApi : JsonPlaceholderApi {
 
 </details>
 
-### `core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/AppConfigApi.kt`
+### `core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/api/ServerInstanceApi.kt`
 
 ```kotlin
-interface AppConfigApi
+interface ServerInstanceApi
 ```
-The `app_config` table's API — the CONTRACT, with no Supabase types in sight.
+The `app_server_config` table's API — one row per server instance. The CONTRACT, no Supabase types: a consumer is tested with a plain fake; `impl.ServerInstanceApiImpl` is the only Supabase-aware part.
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt:35</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/api/impl/ServerInstanceApiImpl.kt:26</code></summary>
 
 ```kotlin
-class AppConfigApiImpl(
+class ServerInstanceApiImpl(
     private val supabase: SupabaseConfigClient,
-) : AppConfigApi {
+) : ServerInstanceApi {
 
     override val isConfigured: Boolean get() = supabase.isConfigured
 
-    override suspend fun fetchConfig(): List<RemoteAppConfigDto> {
+    override suspend fun fetchInstances(app: String): List<RemoteServerInstanceDto> {
 ```
 
 </details>
 
-- `val isConfigured: Boolean` — True when a real project URL + anon key are configured; false on the neutral template.
-- `suspend fun fetchConfig(): List<RemoteAppConfigDto>` — Every `app_config` row, or an empty list when Supabase is not configured.
-- `suspend fun fetchValue(key: String): String?` — The value for `key`, or `null` when absent or unconfigured.
+- `val isConfigured: Boolean` — True when a real project URL + publishable key are configured.
+- `suspend fun fetchInstances(app: String): List<RemoteServerInstanceDto>` — The enabled instances whose `supported_apps` contains `app`, in `sort_order` — filtered BY THE SERVER, so one app never downloads another's servers. Empty when unconfigured.
 
-### `core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/impl/AppConfigApiImpl.kt`
+### `core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/api/impl/ServerInstanceApiImpl.kt`
 
 ```kotlin
-class AppConfigApiImpl(
+class ServerInstanceApiImpl(
 ```
-Supabase implementation of `AppConfigApi` — a typed facade over `client.postgrest`.
+Supabase implementation of `ServerInstanceApi`. Row-level security limits the publishable key (the `anon` role) to enabled rows, read-only; the `supported_apps` containment filter runs in Postgres (GIN-indexed).
 
-<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/config/SupabaseAccessPointTest.kt:92</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonTest/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/config/SupabaseAccessPointTest.kt:95</code></summary>
 
 ```kotlin
-        // uses (`supabaseApi<AppConfigApi>("project") { AppConfigApiImpl(it) }`), so this asserts
-        // against the contract a consumer injects rather than against the implementation.
-        val api: AppConfigApi = AppConfigApiImpl(factory().requireClientFor(point.id))
+        // (`supabaseApi<ServerInstanceApi>("<id>") { ServerInstanceApiImpl(it) }`), so this asserts against
+        // the contract a consumer injects rather than against the implementation.
+        val api: ServerInstanceApi = ServerInstanceApiImpl(factory().requireClientFor(point.id))
         assertFalse(api.isConfigured)
         // The guard matters: without it this would reach `client`, build a Supabase client on an empty
-        // URL, and fail at app start-up on every unconfigured fork.
-        assertTrue(api.fetchConfig().isEmpty())
+        // key, and fail at app start-up on every unconfigured fork.
+        assertTrue(api.fetchInstances("field-officer").isEmpty(), "an unconfigured client reads nothing")
 ```
 
 </details>
 
-### `core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/dto/RemoteAppConfigDto.kt`
+### `core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/dto/RemoteServerInstanceDto.kt`
 
 ```kotlin
-data class RemoteAppConfigDto(
+data class RemoteServerInstanceDto(
 ```
-One row of a Supabase `app_config` table — the canonical "runtime server config" shape a fork fetches at start-up (feature flags, a minimum supported version, a maintenance banner).
+One row of `public.app_server_config` — the Mifos server list, ONE ROW PER INSTANCE. It replaces the deprecated `app_config` table (a single row holding an `instances` blob).
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appconfig/api/AppConfigApi.kt:31</code></summary>
+<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/lwmswhoxvvoagzkqxiyd/appserverconfig/api/ServerInstanceApi.kt:26</code></summary>
 
 ```kotlin
-
-    /** Every `app_config` row, or an empty list when Supabase is not configured. */
-    suspend fun fetchConfig(): List<RemoteAppConfigDto>
-
-    /** The value for [key], or `null` when absent or unconfigured. */
-    suspend fun fetchValue(key: String): String?
+     * SERVER, so one app never downloads another's servers. Empty when unconfigured.
+     */
+    suspend fun fetchInstances(app: String): List<RemoteServerInstanceDto>
 }
 ```
 
 </details>
+
+```kotlin
+data class RemoteDemoAccountDto(val role: String, val username: String, val password: String)
+```
+A PUBLISHED demo sign-in of a public demo instance — public by design, not a credential to protect.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/worldbank/api/WorldBankApi.kt`
 
@@ -702,5 +681,5 @@ Custom serializer that destructures the World Bank's `[metadata, observations[]]
 
 ---
 
-_32 type(s), 38 function(s)/property(ies); 59 carry KDoc at source; 3 authored example(s); 26 live call site(s)._
+_32 type(s), 37 function(s)/property(ies); 58 carry KDoc at source; 3 authored example(s); 25 live call site(s)._
 <!-- api-docs:end -->

@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import kpt.core.base.database.infra.dao.DraftDao
+import kpt.core.base.database.infra.entity.DraftEntity
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.base.store.submit.SubmitOutboxEntry
 import kpt.core.base.store.submit.SubmitOutboxStatus
-import kpt.core.base.database.infra.dao.DraftDao
-import kpt.core.base.database.infra.entity.DraftEntity
 
 /**
  * Room-backed [SubmitOutbox] that persists form payloads across process death.
@@ -35,10 +35,15 @@ import kpt.core.base.database.infra.entity.DraftEntity
  * @param P Payload type. Must be annotated with `@Serializable`.
  * @param dao The Room DAO for the `framework_submit_drafts` table.
  * @param serializer Kotlinx serializer for [P]. Obtain via `P.serializer()`.
+ * @param ownsFormKey Which `formKey`s this outbox's [getAllPending] returns. The table is shared by
+ *   every form, and each form's `OfflineSubmitSyncer` replays [getAllPending] with ITS serializer —
+ *   so an app with two outboxes must scope them, or a row of one form that happens to decode as
+ *   the other's payload is replayed as the wrong thing. Default = all rows (one-outbox apps).
  */
 class RoomSubmitOutbox<P>(
     private val dao: DraftDao,
     private val serializer: KSerializer<P>,
+    private val ownsFormKey: (String) -> Boolean = { true },
 ) : SubmitOutbox<P> {
 
     private val json = Json { ignoreUnknownKeys = true }
@@ -97,7 +102,12 @@ class RoomSubmitOutbox<P>(
     override fun observeAllByFormKey(formKey: String): Flow<List<SubmitOutboxEntry<P>>> =
         dao.observeAllByFormKey(formKey).map { rows -> rows.mapNotNull { it.toEntry() } }
 
-    override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> = dao.getAllPending().mapNotNull { it.toEntry() }
+    override fun observePendingIds(): Flow<Set<Long>> = dao.observeAll().map { rows ->
+        rows.filter { it.status == SubmitOutboxStatus.PENDING.name && ownsFormKey(it.formKey) }.map { it.id }.toSet()
+    }
+
+    override suspend fun getAllPending(): List<SubmitOutboxEntry<P>> =
+        dao.getAllPending().filter { ownsFormKey(it.formKey) }.mapNotNull { it.toEntry() }
 
     override suspend fun markRetrying(id: Long) =
         dao.markRetrying(id, currentTimeMillis())
@@ -107,6 +117,9 @@ class RoomSubmitOutbox<P>(
 
     override suspend fun markFailed(id: Long, error: String?) =
         dao.markFailed(id, currentTimeMillis(), error)
+
+    override suspend fun requeue(id: Long, error: String?) =
+        dao.requeue(id, currentTimeMillis())
 
     override suspend fun deleteByFormKey(formKey: String) =
         dao.deleteByFormKey(formKey)

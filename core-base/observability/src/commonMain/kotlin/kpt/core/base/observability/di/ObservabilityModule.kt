@@ -5,15 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.observability.di
 
+import kpt.core.base.observability.ConsoleCrashReporter
+import kpt.core.base.observability.CrashReporter
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import kpt.core.base.observability.ConsoleCrashReporter
-import kpt.core.base.observability.CrashReporter
 
 /**
  * Koin module exposing the default [CrashReporter] binding (stdout console).

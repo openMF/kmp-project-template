@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.ui.submit
 
@@ -60,8 +60,8 @@ fun <R> SubmitResultHandler(
     LaunchedEffect(state) {
         when (state) {
             is SubmitState.Submitted -> onSubmitted(state.result)
-            is SubmitState.Failed    -> onFailed?.invoke(state.error, state.category)
-            else                     -> Unit
+            is SubmitState.Failed -> onFailed?.invoke(state.error, state.category)
+            else -> Unit
         }
     }
 }

@@ -604,7 +604,7 @@ cs_require_flip_preconditions() {
   # reclassification AND proves the generated-class row is present in the contract.
   _cs_expect "deployment/web/og-images/01_home.png"                generated
   _cs_expect "gradle.properties"                                   merge   # mixed fork-values + template-infra → key-level properties-3way (2026-08-20)
-  _cs_expect "secrets-manifest.yaml"                               fork
+  _cs_expect "secrets-manifest.yaml"                               generated
   _cs_expect "secrets/live/keystore.jks"                           fork
   _cs_expect "tests/anything.sh"                                   template
   # AppStoreRegistry.kt is GONE — stores are declared with @StoreProvider, and the generated

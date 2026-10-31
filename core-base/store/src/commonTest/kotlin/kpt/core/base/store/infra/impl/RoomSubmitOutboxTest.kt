@@ -5,13 +5,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.infra.impl
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.serializer
 import kpt.core.base.store.submit.SubmitOutboxStatus
 import kotlin.test.Test
@@ -162,5 +163,18 @@ class RoomSubmitOutboxTest {
         ob.deleteAll()
 
         assertTrue(ob.getAllPending().isEmpty())
+    }
+
+    @Test
+    fun aScopedOutboxReplaysOnlyItsOwnFormsRows() = runTest {
+        // One table, many forms: an unscoped outbox hands its syncer every form's pending rows.
+        val shared = FakeDraftDao()
+        val notes = RoomSubmitOutbox(shared, String.serializer(), ownsFormKey = { it == "note" })
+        val creates = RoomSubmitOutbox(shared, String.serializer(), ownsFormKey = { it.startsWith("create.") })
+        notes.save("note", "a note")
+        creates.save("create.group", "a group")
+
+        assertEquals(listOf("a note"), notes.getAllPending().map { it.payload })
+        assertEquals(listOf("a group"), creates.getAllPending().map { it.payload })
     }
 }

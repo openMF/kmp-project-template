@@ -56,7 +56,10 @@ need "$B/config/AppErrorMapper.kt" 'ProjectErrorMapper::message' "FS-1" \
 need "$B/config/AppScreenStateDefaults.kt" '\)\.let\(ProjectScreenStateDefaults::customize\)' "FS-2" \
   "AppScreenStateDefaults no longer applies the fork overrides — a fork's branding would be dropped"
 
-# FS-3 — template neutrality.
+# FS-3 — template neutrality. ONLY on the template itself: in a fork, overriding these seams is the
+# whole point of them (a fork's own error copy and branding), so asserting neutrality there would
+# forbid exactly what the seam exists for.
+if [ "${TEMPLATE_SELF_BUILD:-}" = "1" ]; then
 need "$B/config/ProjectErrorMapper.kt" '^object ProjectErrorMapper : ErrorMessageOverrides$' "FS-3" \
   "the template's ProjectErrorMapper is not the bare neutral implementation"
 deny "$B/config/ProjectErrorMapper.kt" '^[[:space:]]*override fun message' "FS-3" \
@@ -65,6 +68,7 @@ need "$B/config/ProjectScreenStateDefaults.kt" '^object ProjectScreenStateDefaul
   "the template's ProjectScreenStateDefaults is not the bare neutral implementation"
 deny "$B/config/ProjectScreenStateDefaults.kt" '^[[:space:]]*override fun customize' "FS-3" \
   "the template OVERRIDES customize — every fork would inherit the template's own branding"
+fi
 
 # FS-4 — the CONTRACT stays template-owned. If the interfaces ever migrate into the fork-owned
 # files, the defaults migrate with them and the whole reason for the interface disappears: a new

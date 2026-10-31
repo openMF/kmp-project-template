@@ -25,10 +25,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/data sha=656aa9d9a469a3b5dee1f7283ce404b73d91be39 -->
+<!-- api-docs:begin module=core/data sha=5e1ef45de0be538beab28a588fe05208c204f98b -->
 ## API reference
 
-_Generated from `core/data` at tree `656aa9d9a469` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/data` at tree `5e1ef45de0be` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt`
@@ -602,12 +602,12 @@ class SettingsViewModel(
 - `val observeDarkThemeConfig: Flow<DarkThemeConfig>` — Dark-mode preference as a stream.
 - `val observeDynamicColorPreference: Flow<Boolean>` — Whether to derive the palette from platform dynamic colour.
 - `val observeScreenCapturePreference: Flow<Boolean>` — Whether screenshots and screen recording are permitted.
+- `val observeAnalyticsConsent: Flow<Boolean>` — The user's consent to share usage analytics.
+- `val observeCrashReportingConsent: Flow<Boolean>` — The user's consent to send crash reports.
+- `suspend fun setAnalyticsConsent(granted: Boolean)` — Records the user's analytics consent — given or withdrawn.
+- `suspend fun setCrashReportingConsent(granted: Boolean)` — Records the user's crash-reporting consent — given or withdrawn.
 - `suspend fun setLanguage(language: LanguageConfig)` — Persists the app language.
 - `suspend fun setThemeBrand(themeBrand: ThemeBrand)` — Persists the colour brand.
-- `suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)` — Persists the dark-mode preference.
-- `suspend fun setDynamicColorPreference(useDynamicColor: Boolean)` — Persists whether to use platform dynamic colour.
-- `suspend fun setIsAuthenticated(isAuthenticated: Boolean)` — Persists session presence.
-- `suspend fun setIsUnlocked(isUnlocked: Boolean)` — Persists whether the app-lock is currently satisfied.
   _…more members; read the file._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/user/UserLogoutManager.kt`

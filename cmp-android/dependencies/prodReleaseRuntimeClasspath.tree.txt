@@ -1549,15 +1549,15 @@
 |    |    +--- project ':core-base:ui'
 |    |    |    +--- androidx.metrics:metrics-performance:1.0.0 (*)
 |    |    |    +--- androidx.compose.runtime:runtime -> 1.12.0 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-share-compose:3.5.28
-|    |    |    |    \--- io.github.mobilebytelabs:cmp-share-compose-android:3.5.28
-|    |    |    |         +--- io.github.mobilebytelabs:cmp-share:3.5.28
-|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-share-android:3.5.28
+|    |    |    +--- io.github.mobilebytelabs:cmp-share-compose:3.5.34
+|    |    |    |    \--- io.github.mobilebytelabs:cmp-share-compose-android:3.5.34
+|    |    |    |         +--- io.github.mobilebytelabs:cmp-share:3.5.34
+|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-share-android:3.5.34
 |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |         |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
-|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28
-|    |    |    |         |         |    \--- io.github.mobilebytelabs:cmp-observe-android:3.5.28
+|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34
+|    |    |    |         |         |    \--- io.github.mobilebytelabs:cmp-observe-android:3.5.34
 |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |         |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
@@ -1623,15 +1623,15 @@
 |    |    |    |         |    +--- org.jetbrains.compose.ui:ui:1.7.3 -> 1.12.0 (*)
 |    |    |    |         |    \--- org.jetbrains.compose.ui:ui-graphics:1.7.3 -> 1.12.0 (*)
 |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher-compose:3.5.28
-|    |    |    |    \--- io.github.mobilebytelabs:cmp-intent-launcher-compose-android:3.5.28
-|    |    |    |         +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.28
-|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-intent-launcher-android:3.5.28
+|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher-compose:3.5.34
+|    |    |    |    \--- io.github.mobilebytelabs:cmp-intent-launcher-compose-android:3.5.34
+|    |    |    |         +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.34
+|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-intent-launcher-android:3.5.34
 |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |         |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
 |    |    |    |         |         +--- androidx.activity:activity:1.10.1 -> 1.13.0 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
-|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |         |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
 |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
@@ -1641,14 +1641,14 @@
 |    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    |         +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-app-intents-compose:3.5.28
-|    |    |    |    \--- io.github.mobilebytelabs:cmp-app-intents-compose-android:3.5.28
-|    |    |    |         +--- io.github.mobilebytelabs:cmp-app-intents:3.5.28
-|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-app-intents-android:3.5.28
+|    |    |    +--- io.github.mobilebytelabs:cmp-app-intents-compose:3.5.34
+|    |    |    |    \--- io.github.mobilebytelabs:cmp-app-intents-compose-android:3.5.34
+|    |    |    |         +--- io.github.mobilebytelabs:cmp-app-intents:3.5.34
+|    |    |    |         |    \--- io.github.mobilebytelabs:cmp-app-intents-android:3.5.34
 |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |         |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
-|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    |    |         |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
@@ -1740,10 +1740,10 @@
 |    |    |    |    |                   +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
 |    |    |    |    |                   \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    +--- org.mobilenativefoundation.store:cache5:5.1.0-alpha10 -> 5.1.0-beta01 (*)
-|    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28
-|    |    |    |    |    \--- io.github.mobilebytelabs:cmp-network-monitor-android:3.5.28
+|    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.34
+|    |    |    |    |    \--- io.github.mobilebytelabs:cmp-network-monitor-android:3.5.34
 |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
@@ -1823,10 +1823,10 @@
 |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    +--- project ':core-base:designsystem'
 |    |    |    |    +--- androidx.compose.ui:ui-tooling -> 1.12.0 (*)
-|    |    |    |    +--- io.github.mobilebytelabs:cmp-toast:3.5.28
-|    |    |    |    |    \--- io.github.mobilebytelabs:cmp-toast-android:3.5.28
+|    |    |    |    +--- io.github.mobilebytelabs:cmp-toast:3.5.34
+|    |    |    |    |    \--- io.github.mobilebytelabs:cmp-toast-android:3.5.34
 |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
 |    |    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
 |    |    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
@@ -1930,16 +1930,16 @@
 |    |    |    |    +--- org.jetbrains.compose.material:material-icons-extended:1.7.3 (*)
 |    |    |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.11.0-beta01 (*)
 |    |    |    |    \--- org.jetbrains.compose.ui:ui-backhandler:1.11.1 -> 1.12.0 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor-compose:3.5.28
-|    |    |    |    \--- io.github.mobilebytelabs:cmp-network-monitor-compose-android:3.5.28
+|    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor-compose:3.5.34
+|    |    |    |    \--- io.github.mobilebytelabs:cmp-network-monitor-compose-android:3.5.34
 |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |         +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28 (*)
+|    |    |    |         +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.34 (*)
 |    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
 |    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
 |    |    |    |         +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    |         +--- org.jetbrains.compose.animation:animation:1.12.0 (*)
 |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.28 (*)
+|    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.34 (*)
 |    |    |    +--- org.jetbrains.compose.ui:ui:1.12.0 (*)
 |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
 |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
@@ -2127,10 +2127,10 @@
 |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    +--- project ':core:firebase'
 |    |    |    +--- project ':core-base:firebase'
-|    |    |    |    +--- io.github.mobilebytelabs:cmp-firebase:3.5.28
-|    |    |    |    |    \--- io.github.mobilebytelabs:cmp-firebase-android:3.5.28
+|    |    |    |    +--- io.github.mobilebytelabs:cmp-firebase:3.5.34
+|    |    |    |    |    \--- io.github.mobilebytelabs:cmp-firebase-android:3.5.34
 |    |    |    |    |         +--- com.google.firebase:firebase-bom:34.18.0 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.34 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |         +--- dev.gitlive:firebase-app:3.0.0-alpha02
 |    |    |    |    |         |    \--- dev.gitlive:firebase-app-android:3.0.0-alpha02
@@ -2250,7 +2250,7 @@
 |    |    |    |    |         |         |         +--- io.ktor:ktor-utils:3.2.1 -> 3.5.1 (*)
 |    |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.4.20 (*)
 |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.21 -> 2.4.20 (*)
-|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |         +--- co.touchlab:kermit:2.0.5 -> 2.2.0 (*)
@@ -2286,9 +2286,9 @@
 |    |    |    |    |         \--- com.russhwolf:multiplatform-settings:1.3.0
 |    |    |    |    |              \--- com.russhwolf:multiplatform-settings-android:1.3.0
 |    |    |    |    |                   \--- org.jetbrains.kotlin:kotlin-stdlib:2.1.0 -> 2.4.20 (*)
-|    |    |    |    +--- io.github.mobilebytelabs:cmp-firebase-compose:3.5.28
-|    |    |    |    |    \--- io.github.mobilebytelabs:cmp-firebase-compose-android:3.5.28
-|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-firebase:3.5.28 (*)
+|    |    |    |    +--- io.github.mobilebytelabs:cmp-firebase-compose:3.5.34
+|    |    |    |    |    \--- io.github.mobilebytelabs:cmp-firebase-compose-android:3.5.34
+|    |    |    |    |         +--- io.github.mobilebytelabs:cmp-firebase:3.5.34 (*)
 |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
 |    |    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
@@ -2317,12 +2317,13 @@
 |    |    |    |    |    +--- androidx.browser:browser:1.10.0 (*)
 |    |    |    |    |    +--- androidx.compose.runtime:runtime -> 1.12.0 (*)
 |    |    |    |    |    +--- org.jetbrains.compose.material3:material3:1.9.0 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-review:3.5.28
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-app-review-android:3.5.28
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-open-url:3.5.28
-|    |    |    |    |    |         |    \--- io.github.mobilebytelabs:cmp-open-url-android:3.5.28
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-review:3.5.34
+|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-app-review-android:3.5.34
+|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-open-url:3.5.34
+|    |    |    |    |    |         |    \--- io.github.mobilebytelabs:cmp-open-url-android:3.5.34
 |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |    |         |         +--- androidx.browser:browser:1.10.0 (*)
+|    |    |    |    |    |         |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |    |         |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    |         +--- com.google.android.play:review:2.0.2
@@ -2338,32 +2339,32 @@
 |    |    |    |    |    |         |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72 -> 1.8.22 (*)
 |    |    |    |    |    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0 -> 1.11.0 (*)
 |    |    |    |    |    |         |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0 -> 1.11.0 (*)
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-clipboard:3.5.28
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-clipboard-android:3.5.28
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-clipboard:3.5.34
+|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-clipboard-android:3.5.34
 |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    |         +--- androidx.lifecycle:lifecycle-process:2.8.7 -> 2.11.0-beta01 (*)
 |    |    |    |    |    |         +--- androidx.core:core-ktx:1.16.0 -> 1.19.0 (*)
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-intents:3.5.28 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-bubble:3.5.28
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-bubble-android:3.5.28
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-intents:3.5.34 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-bubble:3.5.34
+|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-bubble-android:3.5.34
 |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    |         +--- androidx.core:core-ktx:1.16.0 -> 1.19.0 (*)
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-pdf-generator:3.5.28
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-pdf-generator-android:3.5.28
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-pdf-generator:3.5.34
+|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-pdf-generator-android:3.5.34
 |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    |         +--- androidx.core:core-ktx:1.13.1 -> 1.19.0 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0 (*)
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-html:0.12.0
@@ -2428,11 +2429,11 @@
 |    |    |    |    |    |         |         +--- com.mohamedrejeb.calf:calf-permissions-core:0.12.0 (*)
 |    |    |    |    |    |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.20 (*)
 |    |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.20 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-share:3.5.28 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.28 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-open-url:3.5.28 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-in-app-update:3.5.28
-|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-in-app-update-android:3.5.28
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-share:3.5.34 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher:3.5.34 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-open-url:3.5.34 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-in-app-update:3.5.34
+|    |    |    |    |    |    \--- io.github.mobilebytelabs:cmp-in-app-update-android:3.5.34
 |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    |         +--- com.google.android.play:app-update:2.1.0
 |    |    |    |    |    |         |    +--- com.google.android.gms:play-services-basement:18.1.0 -> 18.9.0 (*)
@@ -2448,13 +2449,13 @@
 |    |    |    |    |    |         |    +--- org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72 -> 1.8.22 (*)
 |    |    |    |    |    |         |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0 -> 1.11.0 (*)
 |    |    |    |    |    |         |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0 -> 1.11.0 (*)
-|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |    |    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |         \--- io.insert-koin:koin-core:4.1.1 -> 4.2.2 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-toast:3.5.28 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-share-compose:3.5.28 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher-compose:3.5.28 (*)
-|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-intents-compose:3.5.28 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-toast:3.5.34 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-share-compose:3.5.34 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-intent-launcher-compose:3.5.34 (*)
+|    |    |    |    |    +--- io.github.mobilebytelabs:cmp-app-intents-compose:3.5.34 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-compose:4.2.2 (*)
 |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
@@ -2571,28 +2572,28 @@
 |    |    |    |    |    |    |         \--- io.ktor:ktor-client-okhttp:3.5.0 -> 3.5.1 (*)
 |    |    |    |    |    |    +--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
-|    |    |    |    |    |    +--- io.github.jan-tennert.supabase:postgrest-kt:3.6.0
-|    |    |    |    |    |    |    \--- io.github.jan-tennert.supabase:postgrest-kt-android:3.6.0
-|    |    |    |    |    |    |         +--- io.github.jan-tennert.supabase:auth-kt:3.6.0
-|    |    |    |    |    |    |         |    \--- io.github.jan-tennert.supabase:auth-kt-android:3.6.0
+|    |    |    |    |    |    +--- io.github.jan-tennert.supabase:postgrest-kt:3.8.0
+|    |    |    |    |    |    |    \--- io.github.jan-tennert.supabase:postgrest-kt-android:3.8.0
+|    |    |    |    |    |    |         +--- io.github.jan-tennert.supabase:auth-kt:3.8.0
+|    |    |    |    |    |    |         |    \--- io.github.jan-tennert.supabase:auth-kt-android:3.8.0
 |    |    |    |    |    |    |         |         +--- androidx.startup:startup-runtime:1.2.0 (*)
 |    |    |    |    |    |    |         |         +--- androidx.browser:browser:1.10.0 (*)
-|    |    |    |    |    |    |         |         +--- io.github.jan-tennert.supabase:supabase-kt:3.6.0
-|    |    |    |    |    |    |         |         |    \--- io.github.jan-tennert.supabase:supabase-kt-android:3.6.0
+|    |    |    |    |    |    |         |         +--- io.github.jan-tennert.supabase:supabase-kt:3.8.0
+|    |    |    |    |    |    |         |         |    \--- io.github.jan-tennert.supabase:supabase-kt-android:3.8.0
 |    |    |    |    |    |    |         |         |         +--- androidx.lifecycle:lifecycle-process:2.10.0 -> 2.11.0-beta01 (*)
-|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.7.1 -> 0.8.0 (*)
-|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2 -> 1.11.0 (*)
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |    |         |         |         +--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
-|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-client-core:3.4.3 -> 3.5.1 (*)
-|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-client-content-negotiation:3.4.3 -> 3.5.1 (*)
-|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-serialization-kotlinx-json:3.4.3 -> 3.5.1 (*)
+|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-client-core:3.5.1 (*)
+|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-client-content-negotiation:3.5.1 (*)
+|    |    |    |    |    |    |         |         |         +--- io.ktor:ktor-serialization-kotlinx-json:3.5.1 (*)
 |    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
-|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0 -> 0.5.1
+|    |    |    |    |    |    |         |         |         +--- org.jetbrains.kotlinx:kotlinx-collections-immutable:0.5.1
 |    |    |    |    |    |    |         |         |         |    \--- org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.5.1
 |    |    |    |    |    |    |         |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.0 -> 2.4.20 (*)
-|    |    |    |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |    |    |    |         |         |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 -> 2.4.20 (*)
 |    |    |    |    |    |    |         |         +--- com.squareup.okio:okio:3.17.0 (*)
-|    |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
+|    |    |    |    |    |    |         |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 -> 2.4.20 (*)
 |    |    |    |    |    |    |         |         +--- com.russhwolf:multiplatform-settings-no-arg:1.3.0
 |    |    |    |    |    |    |         |         |    \--- com.russhwolf:multiplatform-settings-no-arg-android:1.3.0
 |    |    |    |    |    |    |         |         |         +--- androidx.startup:startup-runtime:1.2.0 (*)
@@ -2657,42 +2658,35 @@
 |    |    |    |    |    |    |         |                                       |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.20 (*)
 |    |    |    |    |    |    |         |                                       +--- org.jetbrains.kotlin:kotlin-stdlib:2.3.20 -> 2.4.20 (*)
 |    |    |    |    |    |    |         |                                       \--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0 -> 1.11.0 (*)
-|    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-reflect:2.3.21
-|    |    |    |    |    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
-|    |    |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.3.21 -> 2.4.20 (*)
-|    |    |    |    |    |    +--- io.github.jan-tennert.supabase:auth-kt:3.6.0 (*)
+|    |    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-reflect:2.4.0
+|    |    |    |    |    |    |         |    \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 -> 2.4.20 (*)
+|    |    |    |    |    |    |         \--- org.jetbrains.kotlin:kotlin-stdlib:2.4.0 -> 2.4.20 (*)
+|    |    |    |    |    |    +--- io.github.jan-tennert.supabase:auth-kt:3.8.0 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
 |    |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
-|    |    |    |    |    |    \--- project ':core-base:security'
-|    |    |    |    |    |         +--- androidx.security:security-crypto:1.1.0 (*)
-|    |    |    |    |    |         +--- project ':core-base:crypto' (*)
-|    |    |    |    |    |         +--- io.insert-koin:koin-core:4.2.2 (*)
-|    |    |    |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |    |         +--- io.insert-koin:koin-bom:4.2.2 (*)
-|    |    |    |    |    |         +--- io.insert-koin:koin-annotations:4.2.2 (*)
-|    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
-|    |    |    |    |    |         +--- project ':core-base:common' (*)
-|    |    |    |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
-|    |    |    |    |    |         +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
-|    |    |    |    |    |         +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
-|    |    |    |    |    |         +--- org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.11.0-beta01 (*)
-|    |    |    |    |    |         \--- io.insert-koin:koin-compose:4.2.2 (*)
+|    |    |    |    |    |    +--- project ':core-base:security'
+|    |    |    |    |    |    |    +--- androidx.security:security-crypto:1.1.0 (*)
+|    |    |    |    |    |    |    +--- project ':core-base:crypto' (*)
+|    |    |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
+|    |    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
+|    |    |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
+|    |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
+|    |    |    |    |    |    |    +--- project ':core-base:common' (*)
+|    |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |    |    |    |    +--- org.jetbrains.compose.runtime:runtime:1.12.0 (*)
+|    |    |    |    |    |    |    +--- org.jetbrains.compose.foundation:foundation:1.12.0 (*)
+|    |    |    |    |    |    |    +--- org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.11.0-beta01 (*)
+|    |    |    |    |    |    |    \--- io.insert-koin:koin-compose:4.2.2 (*)
+|    |    |    |    |    |    \--- com.russhwolf:multiplatform-settings-no-arg:1.3.0 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
 |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
 |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    |    |    |    +--- project ':core:datastore'
-|    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
-|    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
-|    |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
-|    |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
-|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
-|    |    |    |    |    |    +--- project ':core:model' (*)
-|    |    |    |    |    |    +--- project ':core:common' (*)
-|    |    |    |    |    |    +--- project ':core-base:common' (*)
 |    |    |    |    |    |    +--- project ':core-base:datastore'
 |    |    |    |    |    |    |    +--- androidx.security:security-crypto:1.1.0 (*)
 |    |    |    |    |    |    |    +--- io.insert-koin:koin-android:4.2.2 (*)
@@ -2711,6 +2705,14 @@
 |    |    |    |    |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-serialization-core:1.7.3 -> 1.11.0 (*)
 |    |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-coroutines:1.3.0 (*)
 |    |    |    |    |    |    |    \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
+|    |    |    |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
+|    |    |    |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
+|    |    |    |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
+|    |    |    |    |    |    +--- io.insert-koin:koin-annotations:4.2.2 (*)
+|    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
+|    |    |    |    |    |    +--- project ':core:model' (*)
+|    |    |    |    |    |    +--- project ':core:common' (*)
+|    |    |    |    |    |    +--- project ':core-base:common' (*)
 |    |    |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-no-arg:1.3.0 (*)
 |    |    |    |    |    |    +--- com.russhwolf:multiplatform-settings-serialization:1.3.0 (*)
@@ -2736,7 +2738,7 @@
 |    |    |    |    |    +--- io.ktor:ktor-serialization-kotlinx-json:3.5.1 (*)
 |    |    |    |    |    +--- de.jensklingenberg.ktorfit:ktorfit-lib:2.7.5 (*)
 |    |    |    |    |    \--- com.squareup.okio:okio:3.17.0 (*)
-|    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28 (*)
+|    |    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.34 (*)
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    |    +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    |    |    \--- co.touchlab:kermit:2.1.0 -> 2.2.0 (*)
@@ -2774,7 +2776,7 @@
 |    |    +--- io.insert-koin:koin-android:4.2.2 (*)
 |    |    +--- project ':core-base:data'
 |    |    |    +--- androidx.tracing:tracing-ktx:1.3.0 (*)
-|    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28 (*)
+|    |    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.34 (*)
 |    |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
 |    |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
@@ -2785,7 +2787,7 @@
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
 |    |    +--- project ':core:store' (*)
-|    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.28 (*)
+|    |    +--- io.github.mobilebytelabs:cmp-network-monitor:3.5.34 (*)
 |    |    +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    +--- io.insert-koin:koin-bom:4.2.2 (*)
 |    |    +--- io.insert-koin:koin-core:4.2.2 (*)
@@ -3116,12 +3118,12 @@
 |    |    |    |         \--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |    \--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)
-|    |    +--- io.github.mobilebytelabs:cmp-deep-link:3.5.28
-|    |    |    \--- io.github.mobilebytelabs:cmp-deep-link-android:3.5.28
+|    |    +--- io.github.mobilebytelabs:cmp-deep-link:3.5.34
+|    |    |    \--- io.github.mobilebytelabs:cmp-deep-link-android:3.5.34
 |    |    |         +--- org.jetbrains.kotlin:kotlin-stdlib:2.4.20 (*)
 |    |    |         +--- androidx.activity:activity-compose:1.13.0 (*)
 |    |    |         +--- androidx.lifecycle:lifecycle-process:2.8.7 -> 2.11.0-beta01 (*)
-|    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.28 (*)
+|    |    |         +--- io.github.mobilebytelabs:cmp-observe:3.5.34 (*)
 |    |    |         +--- org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0 (*)
 |    |    |         +--- org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0 (*)
 |    |    |         +--- org.jetbrains.kotlinx:kotlinx-datetime:0.8.0 (*)

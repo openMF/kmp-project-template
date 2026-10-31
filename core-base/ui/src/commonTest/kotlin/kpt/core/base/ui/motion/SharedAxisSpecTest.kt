@@ -9,10 +9,10 @@
  */
 package kpt.core.base.ui.motion
 
+import kpt.core.base.designsystem.theme.Motion
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kpt.core.base.designsystem.theme.Motion
 
 /**
  * Asserts the duration-symmetry invariant for shared-axis-X transitions.

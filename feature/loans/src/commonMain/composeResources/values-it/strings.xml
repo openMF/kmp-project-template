@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">Indietro</string>
     <string name="screens_loans_list_new_fab_text">Nuovo prestito</string>
     <string name="screens_loans_list_delete_dialog_title">Eliminare il prestito?</string>
-    <string name="screens_loans_list_delete_dialog_message">\'%1$s\' verrà rimosso. Non è possibile annullare.</string>
+    <string name="screens_loans_list_delete_dialog_message">'%1$s' verrà rimosso. Non è possibile annullare.</string>
     <string name="screens_loans_list_delete_confirm">Elimina</string>
     <string name="screens_loans_list_delete_cancel">Annulla</string>
     <string name="screens_loans_list_total_outstanding_label">Totale residuo</string>

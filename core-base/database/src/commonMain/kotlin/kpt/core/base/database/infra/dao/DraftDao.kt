@@ -40,11 +40,11 @@ interface DraftDao {
     /** The PENDING draft for a form, if the user has an unsent edit for it. */
     suspend fun getPendingByFormKey(formKey: String): DraftEntity?
 
+    /** Observes the pending draft for a form, so a form screen re-opens with the user's unsent edit. */
     @Query(
         "SELECT * FROM framework_submit_drafts " +
             "WHERE formKey = :formKey AND uniqueKey IS NULL AND status = 'PENDING' LIMIT 1",
     )
-    /** Observes the pending draft for a form, so a form screen re-opens with the user's unsent edit. */
     fun observePendingByFormKey(formKey: String): Flow<DraftEntity?>
 
     /**

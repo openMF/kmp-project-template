@@ -32,6 +32,15 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../../../.." && pwd)"
+# The strip is exercised against the REAL demo files. A fork that already stripped them has nothing
+# to strip, so the fixture would be vacuous — skip, and say so, rather than fail on missing input.
+# shellcheck source=../../lib.sh
+. "$ROOT/scripts/product-health/lib.sh"
+if wl_demos_stripped "$ROOT"; then
+  echo "── demo strip vs generated bindings (remove-demo.sh) ──"
+  echo "   ⊘ skip — this checkout's demo is already stripped; the strip is verified on the template"
+  exit 0
+fi
 NET_PKGS="core/network/src/commonMain/kotlin/kpt/core/network"
 DB_PKGS="core/database/src/commonMain/kotlin/kpt/core/database"
 INFRA_SCHEMA_REL="core-base/database/module-schema.yaml"

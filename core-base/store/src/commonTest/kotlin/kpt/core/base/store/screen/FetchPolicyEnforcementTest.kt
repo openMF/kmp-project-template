@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.screen
 
@@ -14,11 +14,10 @@ import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkInfo
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkStatus
 import io.github.mobilebytelabs.kmptoolkit.networkmonitor.NetworkType
 import kotlinx.coroutines.test.runTest
-import org.mobilenativefoundation.store.store5.Fetcher
-import org.mobilenativefoundation.store.store5.StoreBuilder
-import kpt.core.base.store.freshness.FreshnessSignal
 import kpt.core.base.store.fixtures.FakeNetworkMonitor
 import kpt.core.base.store.infra.FakeFetchedAtRepository
+import org.mobilenativefoundation.store.store5.Fetcher
+import org.mobilenativefoundation.store.store5.StoreBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs

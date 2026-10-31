@@ -10,7 +10,7 @@
 -->
 <resources>
     <string name="screens_rates_back_cd">Retour</string>
-    <string name="screens_rates_list_title">Taux d\'intérêt</string>
+    <string name="screens_rates_list_title">Taux d'intérêt</string>
     <string name="screens_rates_refresh_all_cd">Tout actualiser</string>
     <string name="screens_rates_value_with_unit">%1$s%2$s</string>
     <string name="screens_rates_detail_refresh_cd">Actualiser</string>

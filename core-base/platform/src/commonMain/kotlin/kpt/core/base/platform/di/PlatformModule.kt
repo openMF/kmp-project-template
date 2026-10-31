@@ -9,18 +9,17 @@
  */
 package kpt.core.base.platform.di
 
-import com.mobilebytelabs.kmptoolkit.toast.di.toastModule
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import org.koin.dsl.module
-import kpt.core.base.platform.garbage.GarbageCollectionManager
-import kpt.core.base.platform.garbage.GarbageCollectionManagerImpl
 import com.mobilebytelabs.kmptoolkit.appintents.di.appIntentsModule
 import com.mobilebytelabs.kmptoolkit.bubble.di.bubbleModule
 import com.mobilebytelabs.kmptoolkit.clipboard.di.clipboardModule
 import com.mobilebytelabs.kmptoolkit.intentlauncher.di.intentLauncherModule
-import com.mobilebytelabs.kmptoolkit.share.di.shareModule
 import com.mobilebytelabs.kmptoolkit.pdfgenerator.di.pdfModule
+import com.mobilebytelabs.kmptoolkit.share.di.shareModule
+import com.mobilebytelabs.kmptoolkit.toast.di.toastModule
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kpt.core.base.platform.garbage.GarbageCollectionManager
+import kpt.core.base.platform.garbage.GarbageCollectionManagerImpl
 import kpt.core.base.platform.intent.IntentManager
 import kpt.core.base.platform.intent.IntentManagerImpl
 import kpt.core.base.platform.review.AppReviewManager
@@ -31,6 +30,7 @@ import kpt.core.base.platform.update.AppUpdateManager
 import kpt.core.base.platform.update.AppUpdateManagerImpl
 import kpt.core.base.platform.url.UrlLauncher
 import kpt.core.base.platform.url.UrlLauncherImpl
+import org.koin.dsl.module
 
 /**
  * Koin module binding every `core-base/platform` capability — toast, share, URL launch, app update,

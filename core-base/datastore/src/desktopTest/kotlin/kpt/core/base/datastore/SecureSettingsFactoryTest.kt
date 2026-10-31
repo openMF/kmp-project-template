@@ -34,7 +34,11 @@ class SecureSettingsFactoryTest {
     @BeforeTest
     fun setUp() {
         realHome = System.getProperty("user.home")
-        home = File.createTempFile("kpt-secure-", "").let { it.delete(); it.mkdirs(); it }
+        home = File.createTempFile("kpt-secure-", "").let {
+            it.delete()
+            it.mkdirs()
+            it
+        }
         System.setProperty("user.home", home.absolutePath)
     }
 

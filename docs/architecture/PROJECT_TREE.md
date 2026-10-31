@@ -12,27 +12,27 @@
 | `cmp-desktop/` | 12 | [`cmp-desktop/`](tree/cmp-desktop.md) |
 | `cmp-web/` | 17 | [`cmp-web/`](tree/cmp-web.md) |
 | `cmp-shared/` | 8 | [`cmp-shared/`](tree/cmp-shared.md) |
-| `cmp-navigation/` | 53 | [`cmp-navigation/`](tree/cmp-navigation.md) |
+| `cmp-navigation/` | 55 | [`cmp-navigation/`](tree/cmp-navigation.md) |
 
 ## Features
 
 | Area | Files | Page |
 |---|---:|---|
-| `feature/` | 656 | [`feature/`](tree/feature.md) |
+| `feature/` | 658 | [`feature/`](tree/feature.md) |
 
 ## Core layers
 
 | Area | Files | Page |
 |---|---:|---|
-| `core/` | 438 | [`core/`](tree/core.md) |
-| `core-base/` | 481 | [`core-base/`](tree/core-base.md) |
+| `core/` | 449 | [`core/`](tree/core.md) |
+| `core-base/` | 499 | [`core-base/`](tree/core-base.md) |
 
 ## Codegen
 
 | Area | Files | Page |
 |---|---:|---|
 | `tools/` | 12 | [`tools/`](tree/tools.md) |
-| `build-logic/` | 41 | [`build-logic/`](tree/build-logic.md) |
+| `build-logic/` | 40 | [`build-logic/`](tree/build-logic.md) |
 
 ## Configuration
 
@@ -56,9 +56,15 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 430 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 466 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
 | `tests/` | 9 | [`tests/`](tree/tests.md) |
+
+## Other
+
+| Area | Files | Page |
+|---|---:|---|
+| `supabase/` | 1 | [`supabase/`](tree/supabase.md) |
 
 ## No page, and why
 
@@ -72,6 +78,6 @@ oversight. A directory missing from a map reads the same as one nobody looked at
 | `.swiftpm-locks/` | 31 | generated SwiftPM resolution locks |
 | `META-INF/` | 1 | one service-registration file |
 | `config/` | 1 | the detekt config — documented where detekt is configured |
-| `docs/` | 129 | this documentation tree |
+| `docs/` | 130 | this documentation tree |
 | `kotlin-js-store/` | 2 | generated yarn.lock for Kotlin/JS |
 | `spotless/` | 3 | the license-header template applied by Spotless |

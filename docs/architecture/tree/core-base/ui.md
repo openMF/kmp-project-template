@@ -2,13 +2,13 @@
 
 > **Layer:** core-base — framework-shared; generators CONSUME, never write
 > **Corpus surface:** `CORE_BASE_UI.md`
-> **Measured:** 78 Kotlin files, 13 test files
+> **Measured:** 80 Kotlin files, 14 test files
 
 **Defines annotations:** `@FeatureDestination`
 
 ## Principal types
 
-`AppInfo`, `BackgroundEvent`, `BaseMutationViewModel`, `BaseViewModel`, `DashboardProgressState`, `DefaultLottieAnimations`, `DisplayState`, `DraftPickerItem`, `FeatureDestination`, `FreshnessTint`, `FreshnessVisual`, `KptFadeThrough`, `KptSharedAxis`, `ListItemEnterMath`  …and 15 more
+`AppInfo`, `BackgroundEvent`, `BaseMutationViewModel`, `BaseViewModel`, `DashboardProgressState`, `DefaultLottieAnimations`, `DisplayState`, `DraftPickerItem`, `FeatureDestination`, `FormDraftTestTags`, `FreshnessTint`, `FreshnessVisual`, `KptFadeThrough`, `KptSharedAxis`  …and 16 more
 
 <!-- scaffold:end -->
 
@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/ui sha=5d381c29101ef6c23307e388ed14dc03cd5e28b3 -->
+<!-- api-docs:begin module=core-base/ui sha=911d687eea520d8965480573f5d658b0e84fd108 -->
 ## API reference
 
-_Generated from `core-base/ui` at tree `5d381c29101e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/ui` at tree `911d687eea52` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -753,7 +753,7 @@ fun DataFreshnessIndicator(
 ```
 Compact updating banner shown above content when a background refresh is in flight.
 
-<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/paging/PagingScreenStreamOfflineTest.kt:187</code></summary>
+<details><summary>Used in the template — <code>core-base/store/src/commonTest/kotlin/kpt/core/base/store/paging/PagingScreenStreamOfflineTest.kt:188</code></summary>
 
 ```kotlin
         assertNotNull(
@@ -839,6 +839,20 @@ RefreshableScreenContent(stream = viewModel.rates) { rates, _ -> RatesList(rates
 
 </details>
 
+<details><summary>Used in the template — <code>core-base/ui/src/commonTest/kotlin/kpt/core/base/ui/screen/RefreshableScreenContentUiTest.kt:45</code></summary>
+
+```kotlin
+    fun aCallersEmptySlotIsRendered() = runComposeUiTest {
+        setContent {
+            RefreshableScreenContent(
+                state = ScreenState.Empty,
+                onRefresh = {},
+                empty = { Text("none yet", modifier = Modifier.testTag(CUSTOM)) },
+                content = content,
+```
+
+</details>
+
 ```kotlin
 fun <T> RefreshableScreenContent(
 ```
@@ -848,6 +862,20 @@ Non-stream (Store5-optional) overload — a caller with a plain `ScreenState` va
 
 ```kotlin
 RefreshableScreenContent(state = uiState, onRefresh = viewModel::onRefresh) { data, _ -> … }
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core-base/ui/src/commonTest/kotlin/kpt/core/base/ui/screen/RefreshableScreenContentUiTest.kt:45</code></summary>
+
+```kotlin
+    fun aCallersEmptySlotIsRendered() = runComposeUiTest {
+        setContent {
+            RefreshableScreenContent(
+                state = ScreenState.Empty,
+                onRefresh = {},
+                empty = { Text("none yet", modifier = Modifier.testTag(CUSTOM)) },
+                content = content,
 ```
 
 </details>
@@ -923,13 +951,13 @@ The framework's loading rendering — spinner, skeleton or branded animation, pe
 <details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/dashboard/IndependentCardLayout.kt:98</code></summary>
 
 ```kotlin
-                    { loading(index) }
-                } else {
-                    { DefaultLoadingContent() }
-                },
-                empty = if (empty != null) {
-                    { empty(index) }
-                } else {
+                        { loading(index) }
+                    } else {
+                        { DefaultLoadingContent() }
+                    },
+                    empty = if (empty != null) {
+                        { empty(index) }
+                    } else {
 ```
 
 </details>
@@ -942,13 +970,13 @@ The framework's empty rendering — for a successful read that returned nothing.
 <details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/dashboard/IndependentCardLayout.kt:103</code></summary>
 
 ```kotlin
-                    { empty(index) }
-                } else {
-                    { DefaultEmptyContent() }
-                },
-                noNetwork = if (noNetwork != null) {
-                    { captive -> noNetwork(index, captive) }
-                } else {
+                        { empty(index) }
+                    } else {
+                        { DefaultEmptyContent() }
+                    },
+                    noNetwork = if (noNetwork != null) {
+                        { captive -> noNetwork(index, captive) }
+                    } else {
 ```
 
 </details>
@@ -1280,6 +1308,29 @@ Box {
 ```
 
 </details>
+
+### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/FormDraftBanner.kt`
+
+```kotlin
+fun FormDraftBanner(
+```
+"You have a saved draft" with Resume / Discard — shown when a create form opens on a slot that holds one.
+
+```kotlin
+fun FormDraftFailure(
+```
+Under a create that did not land: what went wrong, the server's own reason, and then either the note that it was kept as a draft (`draftSaved`) or a "Save as draft" button.
+
+```kotlin
+object FormDraftTestTags
+```
+Test tags for `FormDraftBanner` and `FormDraftFailure`.
+
+- `const val SAVE = "form-draft:save"` — The "Save draft" button under a failed create.
+- `const val SAVED = "form-draft:saved"` — The "Draft saved" confirmation that replaces it.
+- `const val BANNER = "form-draft:banner"` — The Resume / Discard banner.
+- `const val RESUME = "form-draft:resume"` — The banner's Resume button.
+- `const val DISCARD = "form-draft:discard"` — The banner's Discard button.
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/submit/MutationScreenContent.kt`
 
@@ -1711,7 +1762,7 @@ object RootTransitionProviders
 ```
 Contains standard "transition providers" that may be used to specify the `EnterTransition` and `ExitTransition` used when building a root `NavHost`, which requires a non-null value.
 
-<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/nav/NavGraphBuilderExtensions.kt:54</code></summary>
+<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/nav/NavGraphBuilderExtensions.kt:53</code></summary>
 
 ```kotlin
         typeMap = typeMap,
@@ -1893,5 +1944,5 @@ How a `BaseMutationViewModel` handles its submit — the single knob that replac
 
 ---
 
-_26 type(s), 140 function(s)/property(ies); 161 carry KDoc at source; 32 authored example(s); 55 live call site(s)._
+_27 type(s), 147 function(s)/property(ies); 169 carry KDoc at source; 32 authored example(s); 57 live call site(s)._
 <!-- api-docs:end -->

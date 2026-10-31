@@ -1,3 +1,12 @@
+/*
+ * Copyright 2026 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ */
 import com.android.build.api.instrumentation.AsmClassVisitorFactory
 import com.android.build.api.instrumentation.ClassContext
 import com.android.build.api.instrumentation.ClassData
@@ -23,7 +32,7 @@ class FieldSkippingClassVisitor(
         name: String?,
         descriptor: String?,
         signature: String?,
-        value: Any?
+        value: Any?,
     ): FieldVisitor? = null
 
     /** Selects which classes [FieldSkippingClassVisitor] is applied to, from the names in [Parameters.classes]. */

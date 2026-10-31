@@ -136,6 +136,22 @@ wl_matches_example() {
   return 1
 }
 
+# wl_demos_stripped <repo_root> — return 0 when the template's demo showcase has been STRIPPED from this
+# checkout: core/store/module-packages.yaml declares demo rows and every one is `status: removed`.
+# That status is derived from disk and proven by core-package-ownership MP-7, so it is a fact, not a
+# flag a fork sets. On the template (and on a fork that kept the demos) the rows say `exists` and
+# this returns 1, so demo-showcase checks keep running there.
+wl_demos_stripped() {
+  local reg="${1:-.}/core/store/module-packages.yaml"
+  [ -f "$reg" ] || return 1
+  awk '
+    /^demo:[[:space:]]*$/ { in_demo=1; next }
+    /^[a-z_]+:/           { in_demo=0 }
+    in_demo && /id:/      { n++; if ($0 !~ /status:[[:space:]]*removed/) live++ }
+    END { exit (n > 0 && live == 0) ? 0 : 1 }
+  ' "$reg"
+}
+
 # Guard against direct execution — this is a library.
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
   echo "lib.sh is a library — source it, don't run it." >&2; exit 64

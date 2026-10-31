@@ -63,7 +63,7 @@
     <string name="screens_loans_list_back_cd">返回</string>
     <string name="screens_loans_list_new_fab_text">新增貸款</string>
     <string name="screens_loans_list_delete_dialog_title">刪除貸款？</string>
-    <string name="screens_loans_list_delete_dialog_message">將刪除\'%1$s\'。此操作無法復原。</string>
+    <string name="screens_loans_list_delete_dialog_message">將刪除'%1$s'。此操作無法復原。</string>
     <string name="screens_loans_list_delete_confirm">刪除</string>
     <string name="screens_loans_list_delete_cancel">取消</string>
     <string name="screens_loans_list_total_outstanding_label">未還總額</string>

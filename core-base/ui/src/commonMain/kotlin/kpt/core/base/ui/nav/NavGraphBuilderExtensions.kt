@@ -16,12 +16,11 @@ import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import kotlin.jvm.JvmSuppressWildcards
-import kotlin.reflect.KType
 import kpt.core.base.designsystem.theme.Motion
 import kpt.core.base.designsystem.theme.MotionSnapshot
 import kpt.core.base.ui.util.RootTransitionProviders
-import kpt.core.base.ui.util.TransitionProviders
+import kotlin.jvm.JvmSuppressWildcards
+import kotlin.reflect.KType
 
 /**
  * A wrapper around [NavGraphBuilder.composable] that supplies slide up/down transitions.

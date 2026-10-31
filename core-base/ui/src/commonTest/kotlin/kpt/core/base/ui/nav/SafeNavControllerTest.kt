@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.ui.nav
 
@@ -100,8 +100,10 @@ class SafeNavControllerTest {
         // Phase 08 set exit transition to 450ms. During that window the destination
         // is in STARTED state. Assert that only the first tap (RESUMED) goes through.
         val tapStates = listOf(
-            Lifecycle.State.RESUMED, // first tap — should pop
-            Lifecycle.State.STARTED, // second tap 300ms later — should be blocked
+            // first tap — should pop
+            Lifecycle.State.RESUMED,
+            // second tap 300ms later — should be blocked
+            Lifecycle.State.STARTED,
         )
         val popsAllowed = tapStates.count { shouldAllowPop(it) }
         assertEquals(1, popsAllowed, "exactly one pop should fire during a double-tap")

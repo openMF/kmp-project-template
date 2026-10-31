@@ -11,6 +11,7 @@ package cmp.navigation.di
 
 import cmp.navigation.AppViewModel
 import cmp.navigation.authenticatednavbar.AuthenticatedNavbarNavigationViewModel
+import cmp.navigation.privacy.PrivacyConsentApplier
 import cmp.navigation.registry.FeatureRegistry
 import cmp.navigation.rootnav.RootNavViewModel
 import kpt.core.base.common.di.CommonModule
@@ -22,6 +23,7 @@ import kpt.core.database.di.DatabaseModule
 import kpt.core.datastore.di.DatastoreModule
 import kpt.core.store.di.appStoreModule
 import kpt.sync.di.SyncModule
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -41,6 +43,9 @@ object KoinModules {
         viewModelOf(::AppViewModel)
         viewModelOf(::AuthenticatedNavbarNavigationViewModel)
         viewModelOf(::RootNavViewModel)
+
+        // Applies the stored analytics consent to the SDK; started once by initKoin.
+        singleOf(::PrivacyConsentApplier)
     }
 
     private val featureModule = module {

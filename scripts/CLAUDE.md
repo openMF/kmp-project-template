@@ -133,7 +133,6 @@ no CocoaPods toolchain.
 |---|---|
 | `setup-secrets.sh` | interactive, platform-wise secret setup |
 | `secrets-status.sh` | what is set up vs missing, per platform |
-| `generate-manifest.sh` | regenerate the root `secrets-manifest.yaml` |
 | `sync-secrets-to-github.sh` | push secrets to GitHub repository secrets |
 | `_lib.sh` | shared helpers |
 

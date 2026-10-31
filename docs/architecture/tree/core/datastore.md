@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/datastore sha=95e53d431d5198bce91fbab477abee42736a93c2 -->
+<!-- api-docs:begin module=core/datastore sha=eb67bda5141a7e2184a55e72ab045c11364aebbf -->
 ## API reference
 
-_Generated from `core/datastore` at tree `95e53d431d51` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/datastore` at tree `eb67bda5141a` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt`
@@ -199,12 +199,12 @@ Repository interface for managing user preferences with reactive capabilities. T
 - `val observeDarkThemeConfig: Flow<DarkThemeConfig>` — Dark-mode preference as a stream.
 - `val observeDynamicColorPreference: Flow<Boolean>` — Whether to derive the palette from platform dynamic colour.
 - `val observeScreenCapturePreference: Flow<Boolean>` — Whether screenshots and screen recording are permitted.
+- `val observeAnalyticsConsent: Flow<Boolean>` — The user's consent to share usage analytics.
+- `val observeCrashReportingConsent: Flow<Boolean>` — The user's consent to send crash reports.
 - `suspend fun setAuthToken(token: String?)` — Persist `token` into the ENCRYPTED store, or clear it when null. Call on sign-in with the value the auth endpoint returned (for Basic, the base64 of `user:password`; for OAuth, the access token) and on sign-out with null.
 - `suspend fun setLanguage(language: LanguageConfig)` — Persists the app language.
 - `suspend fun setThemeBrand(themeBrand: ThemeBrand)` — Persists the colour brand.
 - `suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig)` — Persists the dark-mode preference.
-- `suspend fun setDynamicColorPreference(useDynamicColor: Boolean)` — Persists whether to use platform dynamic colour.
-- `suspend fun setIsAuthenticated(isAuthenticated: Boolean)` — Persists session presence. Does not clear the token — use `setAuthToken` for that.
   _…more members; read the file._
 
 ### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/UserPreferencesRepositoryImpl.kt`

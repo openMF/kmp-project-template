@@ -10,7 +10,7 @@
 -->
 <resources>
     <string name="screens_cloudtodo_detail_title">Attività cloud</string>
-    <string name="screens_cloudtodo_detail_intro">È l\'unico consumatore di createMutableStore + MutationGateway. Disattiva la rete per vedere i rami offline.</string>
+    <string name="screens_cloudtodo_detail_intro">È l'unico consumatore di createMutableStore + MutationGateway. Disattiva la rete per vedere i rami offline.</string>
     <string name="screens_cloudtodo_toggle_optimistic_text">Alterna (ottimistico)</string>
     <string name="screens_cloudtodo_complete_online_text">Completa (richiede connessione)</string>
     <string name="screens_cloudtodo_outcome_resolve_text">Risolvi conflitto</string>

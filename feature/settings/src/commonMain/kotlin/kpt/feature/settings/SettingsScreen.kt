@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kpt.core.base.designsystem.component.AppCard
@@ -38,6 +39,8 @@ import kpt.feature.settings.generated.resources.feature_settings_change_language
 import kpt.feature.settings.generated.resources.feature_settings_change_language_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_placeholder_text
 import kpt.feature.settings.generated.resources.feature_settings_change_theme_text
+import kpt.feature.settings.generated.resources.feature_settings_privacy
+import kpt.feature.settings.generated.resources.feature_settings_privacy_row_description
 import kpt.feature.settings.generated.resources.feature_settings_rate_app_row
 import kpt.feature.settings.generated.resources.feature_settings_rate_app_row_description
 import kpt.feature.settings.generated.resources.feature_settings_sync_drafts_row
@@ -64,6 +67,7 @@ internal fun SettingsScreenContent(
     modifier: Modifier = Modifier,
     onFooterLongClick: (() -> Unit)? = null,
     onRateAppClick: (() -> Unit)? = null,
+    onPrivacyCardClick: () -> Unit = {},
 ) {
     val sp = MaterialTheme.spacing
     KptScaffold(
@@ -80,6 +84,7 @@ internal fun SettingsScreenContent(
         ) {
             ThemeCard(onClick = onThemeCardClick)
             LanguageCard(onClick = onLanguageCardClick)
+            PrivacyCard(onClick = onPrivacyCardClick)
             SyncAndDraftsCard(onClick = onSyncAndDraftsClick)
             // Absent, not disabled, when review is unreachable. `canRequestReview` is false on a
             // target with neither a native review flow nor a configured store listing, and a
@@ -171,6 +176,19 @@ internal fun LanguageCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
         accentColor = MaterialTheme.colorScheme.primary,
         onClick = onClick,
         modifier = modifier,
+    )
+}
+
+/** "Privacy" row — opens [PrivacySheet]: consent switches plus the link to the hosted privacy policy. */
+@Composable
+internal fun PrivacyCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    SettingsRowCard(
+        icon = AppIcons.OutlinedLock,
+        title = stringResource(Res.string.feature_settings_privacy),
+        contentDescription = stringResource(Res.string.feature_settings_privacy_row_description),
+        accentColor = MaterialTheme.colorScheme.secondary,
+        onClick = onClick,
+        modifier = modifier.testTag(TestTags.Settings.PRIVACY_ROW),
     )
 }
 

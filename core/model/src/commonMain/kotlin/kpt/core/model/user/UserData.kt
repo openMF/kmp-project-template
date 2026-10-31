@@ -10,6 +10,8 @@
 package kpt.core.model.user
 
 import kotlinx.serialization.Serializable
+import kpt.core.model.config.AppPrivacyConfig
+import kpt.core.model.config.AppSecurityConfig
 
 /**
  * Everything the app persists about the current user — theme, language, onboarding progress and the
@@ -53,6 +55,14 @@ data class UserData(
      * fallback.
      */
     val isBiometricsEnabled: Boolean,
+    /**
+     * The user's consent to share usage analytics (GDPR Art. 6(1)(a)). Defaulted, so a record saved by a build
+     * that predates consent decodes to the generated starting value ([AppPrivacyConfig]) — off unless a fork
+     * declares otherwise — rather than failing to load.
+     */
+    val analyticsConsent: Boolean = AppPrivacyConfig.ANALYTICS_ENABLED_BY_DEFAULT,
+    /** The user's consent to send crash reports. Defaulted for the same reason as [analyticsConsent]. */
+    val crashReportingConsent: Boolean = AppPrivacyConfig.CRASH_REPORTING_ENABLED_BY_DEFAULT,
 ) {
     /** Factory holder. */
     companion object {
@@ -70,7 +80,9 @@ data class UserData(
             isBiometricsEnabled = false,
             showOnboarding = false,
             firstTimeUser = false,
-            enableScreenCapture = false,
+            // app-profile/app.yaml#security.screen_capture_allowed_by_default (generated) — a fork
+            // decides; the user's later choice is persisted by core/datastore and wins.
+            enableScreenCapture = AppSecurityConfig.SCREEN_CAPTURE_ALLOWED_BY_DEFAULT,
         )
     }
 }

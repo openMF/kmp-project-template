@@ -46,6 +46,9 @@ object AppAccessPoints {
             kind = AccessPointKind.SUPABASE,
             baseUrl = "https://project.supabase.co",
             loggableHost = "project.supabase.co",
+            supabase = kpt.core.base.network.SupabaseSpec(
+                publishableKey = kpt.core.network.BuildKonfig.MY_SUPABASE_KEY,
+            ),
         ),
         AccessPoint(
             id = "jsonplaceholder",

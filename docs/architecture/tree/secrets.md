@@ -1,7 +1,7 @@
 # `secrets/`
 
 > **Kind:** Secret material (gitignored live values)  
-> **Measured:** 55 tracked files — 14× `.md`, 4× `.json`, 2× `.gitkeep`, 2× `.yaml`, 2× `.p8`
+> **Measured:** 55 tracked files — 14× `.md`, 3× `.json`, 2× `.gitkeep`, 2× `.yaml`, 2× `.p8`
 
 ## Shape
 

@@ -11,14 +11,18 @@ package kpt.core.base.common
 
 /** Non-Android targets implementation of `Parcelable`. */
 actual interface Parcelable
+
 /** No-op on non-Android targets — nothing is parcelled, so nothing needs excluding. */
 actual annotation class IgnoredOnParcel
+
 /** No-op on non-Android targets: there is no process boundary to cross. */
 actual annotation class Parcelize
+
 /** Non-Android targets implementation of `Parceler`. */
 actual interface Parceler<P> {
     /** `create` on Non-Android targets. */
     actual fun create(parcel: Parcel): P
+
     /** `P` on Non-Android targets. */
     actual fun P.write(parcel: Parcel, flags: Int)
 }
@@ -30,6 +34,7 @@ actual annotation class TypeParceler<T, P : Parceler<in T>>
 actual class Parcel {
     /** `readString` on Non-Android targets. */
     actual fun readString(): String? = null
+
     /** `readByte` on Non-Android targets. */
     actual fun readByte(): Byte = 1
 

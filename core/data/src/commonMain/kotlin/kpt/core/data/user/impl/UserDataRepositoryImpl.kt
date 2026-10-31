@@ -68,6 +68,17 @@ class UserDataRepositoryImpl(
     override val observeScreenCapturePreference: Flow<Boolean>
         get() = preferencesRepository.observeScreenCapturePreference
 
+    override val observeAnalyticsConsent: Flow<Boolean>
+        get() = preferencesRepository.observeAnalyticsConsent
+
+    override val observeCrashReportingConsent: Flow<Boolean>
+        get() = preferencesRepository.observeCrashReportingConsent
+
+    override suspend fun setAnalyticsConsent(granted: Boolean) = preferencesRepository.setAnalyticsConsent(granted)
+
+    override suspend fun setCrashReportingConsent(granted: Boolean) =
+        preferencesRepository.setCrashReportingConsent(granted)
+
     override suspend fun setLanguage(language: LanguageConfig) = preferencesRepository.setLanguage(language)
 
     override suspend fun setThemeBrand(themeBrand: ThemeBrand) = preferencesRepository.setThemeBrand(themeBrand)

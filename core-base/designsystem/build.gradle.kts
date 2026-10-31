@@ -14,7 +14,7 @@ plugins {
 }
 
 kotlin {
-    sourceSets{
+    sourceSets {
         androidMain.dependencies {
             implementation(libs.androidx.compose.ui.tooling)
         }
@@ -40,7 +40,6 @@ kotlin {
             implementation(libs.jb.lifecycleViewmodel)
             implementation(libs.ui.backhandler)
         }
-
     }
 }
 

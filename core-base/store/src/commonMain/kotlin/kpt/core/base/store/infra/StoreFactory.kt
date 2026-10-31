@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.infra
 
@@ -14,11 +14,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
+import kpt.core.base.store.combine.ScreenWithMutationStream
+import kpt.core.base.store.combine.internal.ScreenWithMutationStreamImpl
+import kpt.core.base.store.screen.FetchPolicy
+import kpt.core.base.store.screen.asScreenStream
+import kpt.core.base.store.submit.SubmitHandler
 import org.mobilenativefoundation.store.core5.ExperimentalStoreApi
-import org.mobilenativefoundation.store.store5.MemoryPolicy
 import org.mobilenativefoundation.store.store5.Bookkeeper
 import org.mobilenativefoundation.store.store5.Converter
 import org.mobilenativefoundation.store.store5.Fetcher
+import org.mobilenativefoundation.store.store5.MemoryPolicy
 import org.mobilenativefoundation.store.store5.MutableStore
 import org.mobilenativefoundation.store.store5.SourceOfTruth
 import org.mobilenativefoundation.store.store5.Store
@@ -26,11 +31,6 @@ import org.mobilenativefoundation.store.store5.StoreBuilder
 import org.mobilenativefoundation.store.store5.Updater
 import org.mobilenativefoundation.store.store5.UpdaterResult
 import org.mobilenativefoundation.store.store5.Validator
-import kpt.core.base.store.combine.ScreenWithMutationStream
-import kpt.core.base.store.combine.internal.ScreenWithMutationStreamImpl
-import kpt.core.base.store.screen.FetchPolicy
-import kpt.core.base.store.screen.asScreenStream
-import kpt.core.base.store.submit.SubmitHandler
 
 /**
  * Factory for creating [Store] and [MutableStore] instances with sensible defaults.

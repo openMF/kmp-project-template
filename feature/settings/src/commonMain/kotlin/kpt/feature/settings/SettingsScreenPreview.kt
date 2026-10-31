@@ -11,6 +11,7 @@ package kpt.feature.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import kpt.core.designsystem.icon.AppIcons
 import kpt.core.designsystem.theme.KptTheme
@@ -61,14 +62,39 @@ internal fun SettingsScreenContentWithRateAppPreview() {
 @Preview
 @Composable
 internal fun SettingsRowsPreview() {
-    // The three shipped rows side by side. Each passes its own accent colour into the shared
+    // The shipped rows side by side. Each passes its own accent colour into the shared
     // `SettingsRowCard`, so rendering them together is what shows the accents actually differ
     // rather than all falling back to one theme colour.
     KptTheme {
         Column {
             LanguageCard(onClick = {})
+            PrivacyCard(onClick = {})
             SyncAndDraftsCard(onClick = {})
             RateAppCard(onClick = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+internal fun PrivacyConsentRowsPreview() {
+    // The Privacy sheet body: one consent off (the default), one on — so the golden shows both switch states.
+    KptTheme {
+        Surface {
+            Column {
+                ConsentSwitchRow(
+                    title = "Share usage analytics",
+                    description = "Anonymous information about which features are used, to improve the app.",
+                    checked = false,
+                    onCheckedChange = {},
+                )
+                ConsentSwitchRow(
+                    title = "Send crash reports",
+                    description = "Technical details when the app crashes, so we can fix the problem.",
+                    checked = true,
+                    onCheckedChange = {},
+                )
+            }
         }
     }
 }

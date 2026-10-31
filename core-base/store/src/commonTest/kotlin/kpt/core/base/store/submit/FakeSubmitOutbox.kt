@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.submit
 
@@ -118,6 +118,16 @@ class FakeSubmitOutbox<P> : SubmitOutbox<P> {
             } else {
                 it
             }
+        }
+    }
+
+    override fun observePendingIds(): kotlinx.coroutines.flow.Flow<Set<Long>> =
+        _entries.map { rows -> rows.filter { it.status == SubmitOutboxStatus.PENDING }.map { it.id }.toSet() }
+
+    // Mirrors `DraftDao.requeue`: back to PENDING, attemptCount kept.
+    override suspend fun requeue(id: Long, error: String?) {
+        _entries.value = _entries.value.map {
+            if (it.id == id) it.copy(status = SubmitOutboxStatus.PENDING, errorMessage = null) else it
         }
     }
 

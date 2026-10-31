@@ -1,21 +1,21 @@
 # `core-base/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 481 tracked files — 399× `.kt`, 28× `.md`, 22× `.xml`, 13× `.kts`, 6× `.gitignore`
+> **Measured:** 499 tracked files — 417× `.kt`, 28× `.md`, 22× `.xml`, 13× `.kts`, 6× `.gitignore`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `core-base/store/` | 112 |
-| `core-base/ui/` | 108 |
+| `core-base/store/` | 116 |
+| `core-base/ui/` | 110 |
 | `core-base/security/` | 47 |
 | `core-base/designsystem/` | 45 |
+| `core-base/network/` | 37 |
 | `core-base/database/` | 29 |
 | `core-base/platform/` | 29 |
-| `core-base/network/` | 27 |
 | `core-base/crypto/` | 23 |
-| `core-base/datastore/` | 20 |
+| `core-base/datastore/` | 22 |
 | `core-base/common/` | 16 |
 | `core-base/data/` | 12 |
 | `core-base/observability/` | 8 |
@@ -30,15 +30,15 @@
 | `core-base:crypto` | 22 Kotlin files — [guide](core-base/crypto.md) |
 | `core-base:data` | 9 Kotlin files — [guide](core-base/data.md) |
 | `core-base:database` | 20 Kotlin files — [guide](core-base/database.md) |
-| `core-base:datastore` | 17 Kotlin files — [guide](core-base/datastore.md) |
+| `core-base:datastore` | 19 Kotlin files — [guide](core-base/datastore.md) |
 | `core-base:designsystem` | 41 Kotlin files — [guide](core-base/designsystem.md) |
 | `core-base:firebase` | 1 Kotlin files — [guide](core-base/firebase.md) |
-| `core-base:network` | 22 Kotlin files — [guide](core-base/network.md) |
+| `core-base:network` | 32 Kotlin files — [guide](core-base/network.md) |
 | `core-base:observability` | 4 Kotlin files — [guide](core-base/observability.md) |
 | `core-base:platform` | 24 Kotlin files — [guide](core-base/platform.md) |
 | `core-base:security` | 43 Kotlin files — [guide](core-base/security.md) |
-| `core-base:store` | 108 Kotlin files — [guide](core-base/store.md) |
-| `core-base:ui` | 78 Kotlin files — [guide](core-base/ui.md) |
+| `core-base:store` | 112 Kotlin files — [guide](core-base/store.md) |
+| `core-base:ui` | 80 Kotlin files — [guide](core-base/ui.md) |
 
 ## Docs in the tree
 

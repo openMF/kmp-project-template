@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.observability
 
@@ -97,12 +97,16 @@ interface CrashReporter {
 enum class CrashSeverity {
     /** Verbose detail, useful only while debugging. */
     Debug,
+
     /** Normal operational events. */
     Info,
+
     /** Something unexpected that the app recovered from. */
     Warning,
+
     /** A failure the user is likely to have noticed. */
     Error,
+
     /** A failure the app cannot continue past. */
     Fatal,
 }

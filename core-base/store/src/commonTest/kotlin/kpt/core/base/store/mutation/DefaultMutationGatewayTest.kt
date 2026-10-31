@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.base.store.mutation
 
@@ -48,7 +48,10 @@ class DefaultMutationGatewayTest {
     fun onlineRequired_offline_isBlocked_andRunsNoEndpoint() = runTest {
         var endpointRan = false
         val gw = DefaultMutationGateway(isOnline = { false }, conflictInbox = FakeConflictInbox())
-        val spec = CommandSpec<Int, String>(payload = 1, endpoint = { endpointRan = true; "ok" })
+        val spec = CommandSpec<Int, String>(payload = 1, endpoint = {
+            endpointRan = true
+            "ok"
+        })
         val r = gw.command(spec, MutationPolicy.OnlineRequired)
         assertIs<MutationResult.Blocked>(r)
         assertEquals(BlockReason.OFFLINE, r.reason)

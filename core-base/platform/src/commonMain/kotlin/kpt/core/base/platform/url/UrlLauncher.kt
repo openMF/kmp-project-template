@@ -47,6 +47,13 @@ interface UrlLauncher {
     /** Launch [url] in a browser specifically, bypassing any app that claims the link. */
     fun launchInBrowser(url: String): Boolean
 
+    /**
+     * Show [url] in a browser INSIDE the app — Custom Tabs on Android, SFSafariViewController on iOS, the system
+     * browser where the platform has no in-app one. For pages the user reads and returns from: a privacy
+     * policy, terms, help.
+     */
+    fun launchInApp(url: String): Boolean
+
     /** Whether [url] has a handler — check before offering the action, not after it fails. */
     fun canLaunch(url: String): Boolean
 }

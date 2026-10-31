@@ -84,6 +84,8 @@ class SettingsViewModelTest {
         val darkWrites = mutableListOf<DarkThemeConfig>()
         val dynamicColorWrites = mutableListOf<Boolean>()
         val languageWrites = mutableListOf<LanguageConfig>()
+        val analyticsConsentWrites = mutableListOf<Boolean>()
+        val crashConsentWrites = mutableListOf<Boolean>()
 
         override val userData: StateFlow<UserData> get() = current
 
@@ -106,6 +108,12 @@ class SettingsViewModelTest {
         override suspend fun setLanguage(language: LanguageConfig) {
             languageWrites += language
         }
+        override suspend fun setAnalyticsConsent(granted: Boolean) {
+            analyticsConsentWrites += granted
+        }
+        override suspend fun setCrashReportingConsent(granted: Boolean) {
+            crashConsentWrites += granted
+        }
 
         override val authToken: String? get() = unused()
         override val passcode: String get() = unused()
@@ -113,6 +121,8 @@ class SettingsViewModelTest {
         override val observeDarkThemeConfig: Flow<DarkThemeConfig> get() = unused()
         override val observeDynamicColorPreference: Flow<Boolean> get() = unused()
         override val observeScreenCapturePreference: Flow<Boolean> get() = unused()
+        override val observeAnalyticsConsent: Flow<Boolean> get() = unused()
+        override val observeCrashReportingConsent: Flow<Boolean> get() = unused()
         override suspend fun setIsAuthenticated(isAuthenticated: Boolean) = unused()
         override suspend fun setIsUnlocked(isUnlocked: Boolean) = unused()
         override suspend fun setIsPasscodeEnabled(isPasscodeEnabled: Boolean) = unused()
@@ -144,6 +154,8 @@ class SettingsViewModelTest {
         enableScreenCapture = false,
         isPasscodeEnabled = true,
         isBiometricsEnabled = true,
+        analyticsConsent = true,
+        crashReportingConsent = false,
     )
 
     @BeforeTest
@@ -163,6 +175,9 @@ class SettingsViewModelTest {
         assertEquals(DarkThemeConfig.DARK, settings.darkThemeConfig)
         assertEquals(true, settings.useDynamicColor)
         assertEquals(LanguageConfig.HINDI, settings.language)
+        // Distinct values, so swapping the two consents in the projection would fail.
+        assertEquals(true, settings.analyticsConsent)
+        assertEquals(false, settings.crashReportingConsent)
     }
 
     @Test
@@ -236,5 +251,21 @@ class SettingsViewModelTest {
             ),
             analytics.events,
         )
+    }
+
+    @Test
+    fun consentChangesPersistAndAreNeverThemselvesTracked() = runTest(dispatcher) {
+        // A withdrawal logged as an analytics event would be processing the user just refused.
+        val repo = FakeUserDataRepository(seed)
+        val analytics = RecordingAnalytics()
+        val vm = SettingsViewModel(repo, analytics)
+
+        vm.updateAnalyticsConsent(false)
+        vm.updateCrashReportingConsent(true)
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(listOf(false), repo.analyticsConsentWrites)
+        assertEquals(listOf(true), repo.crashConsentWrites)
+        assertEquals(emptyList(), analytics.events)
     }
 }

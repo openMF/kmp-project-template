@@ -37,6 +37,7 @@ Every top-level area of the repository — measured facts, plus authored signifi
 - [`legal/`](tree/legal.md)
 - [`scripts/`](tree/scripts.md)
 - [`secrets/`](tree/secrets.md)
+- [`supabase/`](tree/supabase.md)
 - [`sync/`](tree/sync.md)
 - [`tests/`](tree/tests.md)
 - [`tools/`](tree/tools.md)
@@ -107,13 +108,39 @@ Named recipes spanning two or more modules.
 
 ## Design Philosophy
 
-The architecture of this project is designed with the following principles in mind:
+Three module groups, three different jobs, three different owners. Everything else in this document
+follows from that split, and most questions about "where does this code go?" are answered by it.
 
-1. **Clean Architecture**: Separation of concerns with distinct layers
-2. **Multi-Module Design**: Modular, reusable components with clear boundaries
-3. **Feature-First Organization**: Independent feature modules that can evolve separately
-4. **Maximum Code Sharing**: Efficient reuse of code across platforms via Kotlin Multiplatform
-5. **Platform-Specific Optimizations**: Native capabilities are leveraged when appropriate
+| group | what it is | who owns it | changes how |
+|---|---|---|---|
+| **`core-base/`** | **the architecture itself** — the framework that decides state, offline behaviour and the write path | TEMPLATE | upstream PR; read-only in a fork |
+| **`core/`** | **the consumption seam** — re-exports `core-base` and holds fork-specific wiring, branding and stores | FORK | edit freely; this is where fork pressure goes |
+| **`feature/`** | **the showcase** — user-facing implementations that demonstrate the architecture | FORK | add, remove, rebrand per product |
+
+**`core-base/` is the architecture, not a utility bin.** `core-base/store` owns `ScreenState`,
+`FetchPolicy`, `StoreFactory` and the eight Store5 archetypes — it decides, once, every transition a
+screen can be in (loading / no-network / captive-portal / empty / error / content + freshness), so no
+screen re-derives them. `core-base/ui` owns `BaseViewModel`, `BaseMutationViewModel`,
+`ScreenContent` and `MutationScreenContent` — the MVI and render contracts every feature inherits.
+A fork that improves these sends an upstream PR (RULE-TEMPLATE-MODULE-FIX-UPSTREAM-001); it does not
+patch them locally, because a local patch is drift the next template sync must fight.
+
+**`core/` is the only door to `core-base/`.** A `feature/` or `cmp-*` module never depends on
+`core-base` directly — it depends on the matching `core/` module, which re-exports what it needs with
+`api(projects.coreBase.X)`. That single boundary is what keeps `core-base` swappable and a template
+sync tractable, and it is machine-enforced (`scripts/product-health` → `G-CORE-BASE-ENCAP`). The one
+documented exception is `cmp-navigation → core-base/security`, which the DI aggregator needs.
+
+**`feature/` is the trademark.** Every shipped feature is simultaneously a working tool and the
+canonical demonstration of one or more framework archetypes. That is a contract, not a convention:
+`core/store/STORE_ARCHETYPES.yaml` maps each of the eight archetypes to its showcase file, and
+`store-archetype-coverage.sh` fails the build when an archetype loses its last showcase. A reader can
+therefore pick any archetype and find working code for it — see
+[Toolkit feature showcase](../../CLAUDE.md#toolkit-feature-showcase).
+
+The usual principles still hold — Clean Architecture separation, multi-module boundaries,
+feature-first organisation, maximum `commonMain` sharing, platform specifics only where they earn
+their place — but they are the means, not the point. The point is the ownership split above.
 
 ## High-Level Architecture
 
@@ -164,35 +191,56 @@ These modules contain the platform-specific application entry points and UI impl
 - **cmp-shared**: Common code shared across all platforms
 - **cmp-navigation**: Navigation components and routing logic
 
-### Feature Modules
+### Feature Modules (17) — FORK-owned
 
-Feature modules encapsulate specific user-facing functionality:
+Each is a working tool AND the showcase for one or more archetypes. Three are template-supplied
+shells a fork keeps or strips (`home`, `profile`, `settings`); the rest are the demo suite.
 
-- **feature/home**: Home screen and related features
-- **feature/profile**: User profile management features
-- **feature/settings**: Application settings and configuration
+`add-to-watchlist` · `alerts` · `amortization` · `bills` · `calculators` · `cloudtodo` · `crypto` ·
+`currency-rates` · `emi-calculator` · `home` · `loans` · `macro` · `profile` · `rates` · `settings` ·
+`showcase` · `watchlist`
 
-### Core Modules
+Per-feature detail, and which archetype each demonstrates:
+[Toolkit feature showcase](../../CLAUDE.md#toolkit-feature-showcase).
 
-Core modules provide the essential infrastructure and shared functionality:
+### Core Modules (12) — FORK-owned, the consumption seam
 
-- **core/analytics**: Analytics and tracking capabilities
-- **core/common**: Common utilities, extensions, and helpers
-- **core/data**: Data repositories and sources
-- **core/datastore**: Local storage management
-- **core/domain**: Business logic and use cases
-- **core/model**: Data models and entities
-- **core/network**: Network communication
-- **core/ui**: Shared UI components
-- **core/designsystem**: Design system components
+Each re-exports its `core-base` counterpart where one exists and carries the fork's own code.
 
-### Core Base Modules
+| module | role |
+|---|---|
+| **core/store** | the fork's Store5 seam — `@StoreProvider` providers, `AppScreenStateDefaults` branding, `AppErrorMapper`, `ProjectStoreModule` |
+| **core/data** | repositories — `@RepositoryBinding` + `@FromStore`; no DAO calls, no store construction |
+| **core/database** | Room entities, DAOs and converters (`@DbEntity` / `@DbDao` / `@DbConverters`) |
+| **core/network** | Ktorfit/Supabase APIs, one package per access point (`@ApiBinding`) |
+| **core/model** | domain models and value objects shared by UI and network |
+| **core/domain** | pure use-cases / calculators — no Store, no platform APIs |
+| **core/designsystem** | brand theme, tokens, per-domain composables extending `core-base/designsystem` |
+| **core/ui** | cross-feature Compose primitives above `core-base/ui` |
+| **core/datastore** | fork preference surfaces over `core-base/datastore` |
+| **core/platform** | fork `expect`/`actual` bridges over `core-base/platform` |
+| **core/firebase** | per-feature analytics/crashlytics vocabulary |
+| **core/common** | KMP-safe utilities with no Compose, Ktor or Room dependency |
 
-Foundational components that provide essential infrastructure:
+### Core Base Modules (13) — TEMPLATE-owned, READ-ONLY in a fork
 
-- **core-base/database**: Shared database layer
-- **core-base/datastore**: Preference storage
-- **core-base/network**: API communication infrastructure
+This is the architecture. Fixes flow upstream, never locally.
+
+| module | what it decides |
+|---|---|
+| **core-base/store** | `ScreenState`, `FetchPolicy`, `StoreFactory`, the 8 archetypes, submit/draft/outbox, conflict resolution |
+| **core-base/ui** | `BaseViewModel`, `BaseMutationViewModel`, `MutationMode`, `ScreenContent`, `MutationScreenContent`, nav helpers |
+| **core-base/designsystem** | brand-neutral theme + adaptive layout primitives (`Kpt*`) |
+| **core-base/network** | `HttpClient` factory, `NetworkResult`, `DynamicBaseUrlPlugin`, `@ApiBinding`, `NetworkBaseModule` |
+| **core-base/database** | Room plumbing and the `@DbEntity` / `@DbDao` / `@DbConverters` annotations |
+| **core-base/data** | `Synchronizer` and shared data infrastructure |
+| **core-base/datastore** | preference primitives, plain and secure |
+| **core-base/platform** | `AppContext` and the platform capability interfaces |
+| **core-base/security** | biometrics, tamper detection, certificate pinning |
+| **core-base/crypto** | field encryption, secure key provision, secure random |
+| **core-base/observability** | logging / telemetry seams |
+| **core-base/firebase** | `AnalyticsHelper` / `CrashReporter` primitives |
+| **core-base/common** | framework-shared utilities below every `core/*` consumer |
 
 ### Build Logic
 
@@ -219,9 +267,14 @@ The project implements Clean Architecture with the following layers:
 ### 3. Data Layer
 
 - **Responsibility**: Data management, repositories, and data sources
-- **Location**: core/data, core/network, core/datastore modules
+- **Location**: core/store (the Store5 seam), core/data, core/database, core/network, core/datastore
 - **Dependencies**: Domain models, networking, and storage libraries
-- **Technologies**: Ktor, SQLDelight, Datastore
+- **Technologies**: Ktor + Ktorfit, **Room 3** (`androidx.room3`), multiplatform-settings, Store5
+
+> The read path is not a plain repository call. A screen consumes a `ScreenDataStream` whose
+> `ScreenState` the Store already resolved; the repository builds that stream and never returns raw
+> data. See [store-architecture](cross-cutting/store-architecture.md) and
+> [store-implementation](tree/core/store-implementation.md).
 
 ### 4. Model Layer
 

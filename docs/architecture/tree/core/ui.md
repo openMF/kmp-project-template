@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/ui sha=5a8bae9592739a3ddbb24373d915b41ad61c4335 -->
+<!-- api-docs:begin module=core/ui sha=b10496fd8c156be896c516c993c71d17c62ffbe5 -->
 ## API reference
 
-_Generated from `core/ui` at tree `5a8bae959273` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/ui` at tree `b10496fd8c15` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptBottomBar.kt`
@@ -36,7 +36,7 @@ fun RowScope.KptNavigationBarItem(
 ```
 One item in `KptBottomBar`: icon, label and selected state.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptBottomBar.kt:42</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptBottomBar.kt:44</code></summary>
 
 ```kotlin
     ) {
@@ -64,7 +64,7 @@ fun ColumnScope.KptNavigationRailItem(
 ```
 One item in `KptNavigationRail`.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptNavigationRail.kt:63</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptNavigationRail.kt:69</code></summary>
 
 ```kotlin
         ) {
@@ -155,7 +155,7 @@ fun KptBottomBar(
     selectedItem: NavigationItem?,
     onClick: (NavigationItem) -> Unit,
     modifier: Modifier = Modifier,
-    windowInsets: WindowInsets = BottomAppBarDefaults.windowInsets,
+    /** Show each tab's name under its icon. See `KptNavigationBarItem.labelRes`. */
 ```
 
 </details>

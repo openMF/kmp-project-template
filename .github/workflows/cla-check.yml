@@ -6,7 +6,7 @@ on:
 
 jobs:
   check-contributor-membership:
-    runs-on: ubuntu-26.04
+    runs-on: ${{ vars.CI_RUNNER_LINUX || 'ubuntu-26.04' }}
     permissions:
       pull-requests: write
       statuses: write

@@ -94,7 +94,7 @@ jobs:
   # matrix consumed by the `release` job's `strategy.matrix` below.
   resolve-variants:
     name: Resolve product flavors
-    runs-on: ubuntu-26.04
+    runs-on: ${{ vars.CI_RUNNER_LINUX || 'ubuntu-26.04' }}
     permissions:
       contents: read
     outputs:

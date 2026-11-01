@@ -30,10 +30,10 @@ It is a *tracker*, not a ledger: `principalRemaining`, `monthsRemaining` and `to
 user-maintained, not derived from a payment history. That is a deliberate scope line — a "log a payment"
 feature would recompute them, and until it exists the fields must not pretend to be computed.
 
-<!-- api-docs:begin module=feature/loans sha=7c71c2e8ba2faed33374590f6a53da670285bf66 -->
+<!-- api-docs:begin module=feature/loans sha=22c8da3f13f14a956a3c37ee33ae240728e17a72 -->
 ## API reference
 
-_Generated from `feature/loans` at tree `7c71c2e8ba2f` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/loans` at tree `22c8da3f13f1` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

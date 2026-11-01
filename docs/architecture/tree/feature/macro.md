@@ -29,10 +29,10 @@ Three cards, three independent states, and an aggregate freshness band so the To
 STALE badge without a caller folding the three by hand. The picker round-trips a country code through
 navigation rather than holding it in a shared singleton, which is what keeps the screen restorable.
 
-<!-- api-docs:begin module=feature/macro sha=d7b1b6ddffbe90d0db0b669e7c8cdeb84b80dacc -->
+<!-- api-docs:begin module=feature/macro sha=9e1afe9c00f837ba68eb0cf7eafd3f741d95912b -->
 ## API reference
 
-_Generated from `feature/macro` at tree `d7b1b6ddffbe` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/macro` at tree `9e1afe9c00f8` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

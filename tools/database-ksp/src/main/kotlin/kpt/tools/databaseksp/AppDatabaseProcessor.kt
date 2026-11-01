@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.tools.databaseksp
 
@@ -51,6 +51,10 @@ class AppDatabaseProcessor(
     private val options: Map<String, String>,
 ) : SymbolProcessor {
     private var emitted = false
+
+    /** Header from the build's one source (`kpt.licenseHeader`, set by the Koin convention); none if unset. */
+    private val licenseHeader: String =
+        options["kpt.licenseHeader"]?.replace("\\n", "\n")?.takeIf(String::isNotBlank)?.let { "$it\n" }.orEmpty()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         if (emitted) return emptyList()
@@ -123,7 +127,7 @@ class AppDatabaseProcessor(
         val migrations = opt(OPT_MIGRATIONS)
 
         return buildString {
-            append(LICENSE)
+            append(licenseHeader)
             append("package $PKG\n\n")
             append("import androidx.room3.AutoMigration\n")
             if (converters.isNotEmpty()) append("import androidx.room3.ColumnTypeConverters\n")
@@ -170,7 +174,7 @@ class AppDatabaseProcessor(
      * not compile.
      */
     private fun renderDaoBindings(daos: List<Pair<String, String>>): String = buildString {
-        append(LICENSE)
+        append(licenseHeader)
         append("package $BINDINGS_PKG\n\n")
         append("import $PKG.AppDatabase\n")
         append("import org.koin.core.module.Module\n")
@@ -221,7 +225,7 @@ class AppDatabaseProcessor(
     private fun renderConverterBindings(
         installs: List<Pair<String, Pair<String, String>>>,
     ): String = buildString {
-        append(LICENSE)
+        append(licenseHeader)
         append("package $BINDINGS_PKG\n\n")
         append("import org.koin.core.module.Module\n")
         append("import org.koin.dsl.module\n\n")
@@ -273,19 +277,6 @@ class AppDatabaseProcessor(
         const val OPT_INFRA_ENTITIES = "kpt.database.infraEntities"
         const val OPT_INFRA_DAOS = "kpt.database.infraDaos"
         const val OPT_MIGRATIONS = "kpt.database.migrations"
-
-        val LICENSE = """
-            |/*
-            | * Copyright 2026 Mifos Initiative
-            | *
-            | * This Source Code Form is subject to the terms of the Mozilla Public
-            | * License, v. 2.0. If a copy of the MPL was not distributed with this
-            | * file, You can obtain one at https://mozilla.org/MPL/2.0/.
-            | *
-            | * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
-            | */
-            |
-        """.trimMargin()
 
         val HEADER_KDOC = """
             |/**

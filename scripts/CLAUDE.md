@@ -219,8 +219,14 @@ will still pass in this state, by design — see `RT-8` above.
 `./gradlew syncForkConfig`; never hand-edit the bridge.
 
 **`customization-surface.sh resolve` disagrees with what a sync did** — the contract's default is
-**template-first** (`**` → `template`); fork territory is declared explicitly. A path resolving
-`template` unexpectedly means no rule claims it.
+**template-first** (`**` → `template`) but only for paths under a sync root (`sync-dirs.sh`
+`SYNC_DIRS` / `SYNC_FILES`); a path under no root resolves `fork`, because the template can only own
+what it ships. A path resolving `template` unexpectedly means no rule claims it inside a synced root.
+
+**`sync-dirs.sh --mirror`** turns template-owned roots into a strict mirror — fork-only files there
+are removed unless listed in `.template-sync-holds`. Never run it bare on an unclassified fork;
+`/kmp-project-template-sync` classifies the fork's extras (adopt upstream · move to a fork package ·
+delete) first.
 
 Deeper guides: [Troubleshooting](../docs/troubleshooting.md) ·
 [Deployment Playbook](../docs/architecture/tree/deployment/playbook.md) ·

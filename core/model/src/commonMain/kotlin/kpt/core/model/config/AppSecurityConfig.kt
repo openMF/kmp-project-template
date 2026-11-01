@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.model.config
 
@@ -23,5 +23,8 @@ object AppSecurityConfig {
     // syncForkConfig:app-security:begin — GENERATED from app-profile/app.yaml#security. Do not hand-edit.
     /** `security.screen_capture_allowed_by_default` — whether a fresh install allows screenshots + recording. */
     const val SCREEN_CAPTURE_ALLOWED_BY_DEFAULT: Boolean = false
+
+    /** `security.signed_in_by_default` — whether a fresh install starts signed in (false = the app has a login). */
+    const val SIGNED_IN_BY_DEFAULT: Boolean = true
     // syncForkConfig:app-security:end
 }

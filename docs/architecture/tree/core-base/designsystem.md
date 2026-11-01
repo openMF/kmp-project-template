@@ -18,10 +18,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/designsystem sha=dc9474dd6da262e5fcb6d683b68581746680a9fa -->
+<!-- api-docs:begin module=core-base/designsystem sha=09b77963fa63857fa6b9fefef89c25c33bc39c24 -->
 ## API reference
 
-_Generated from `core-base/designsystem` at tree `dc9474dd6da2` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/designsystem` at tree `09b77963fa63` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is

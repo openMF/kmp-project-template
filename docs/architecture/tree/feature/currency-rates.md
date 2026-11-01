@@ -29,10 +29,10 @@ The chart's window length is *part of the store key*, so widening it is a differ
 re-fetch rather than a page append. Getting that wrong produces a chart that silently shows a short
 window's data under a long window's axis.
 
-<!-- api-docs:begin module=feature/currency-rates sha=f53d99f6a682bdc0c4d2c90f50e6308818133778 -->
+<!-- api-docs:begin module=feature/currency-rates sha=b698160d84367c9cdcabfae0f98b8ff146341795 -->
 ## API reference
 
-_Generated from `feature/currency-rates` at tree `f53d99f6a682` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/currency-rates` at tree `b698160d8436` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

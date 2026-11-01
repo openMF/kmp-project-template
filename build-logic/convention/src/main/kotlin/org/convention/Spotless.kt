@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package org.convention
 
@@ -42,7 +42,8 @@ internal fun Project.configureSpotless(extension: SpotlessExtension) = extension
                 mapOf("android" to "true")
             },
         )
-        licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
+        // ONE header source for every format — spotless/license-header.txt (fork-owned). See LicenseHeader.
+        licenseHeader(LicenseHeader.kotlin(rootProject.rootDir))
     }
 
     kotlinGradle {
@@ -52,15 +53,20 @@ internal fun Project.configureSpotless(extension: SpotlessExtension) = extension
             mapOf("android" to "true"),
         )
         // Look for the first line that doesn't have a block comment (assumed to be the license)
-        licenseHeaderFile(rootProject.file("spotless/copyright.kts"), "(^(?![\\/ ]\\*).*$)")
+        licenseHeader(LicenseHeader.kotlin(rootProject.rootDir), "(^(?![\\/ ]\\*).*$)")
     }
 
-    if (!root) {
-        format("xml") {
+    format("xml") {
+        if (root) {
+            // app-profile/ is not a Gradle project, so no module's Spotless reaches it. Its icon XML is
+            // the SOURCE syncForkConfig copies into cmp-android/src/main/res — formatting only the copy
+            // would be undone by the next syncForkConfig, so the source is formatted here.
+            target("app-profile/icons/**/*.xml")
+        } else {
             target("**/*.xml")
-            targetExclude("**/build/**/*.xml")
-            // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
-            licenseHeaderFile(rootProject.file("spotless/copyright.xml"), "(<[^!?])")
         }
+        targetExclude("**/build/**/*.xml")
+        // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
+        licenseHeader(LicenseHeader.xml(rootProject.rootDir), "(<[^!?])")
     }
 }

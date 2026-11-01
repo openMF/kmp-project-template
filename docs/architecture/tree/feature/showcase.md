@@ -23,10 +23,10 @@ Their value is regression-catching. A state gallery makes a broken empty state v
 instead of requiring a specific data condition, and the transition gallery is how a motion change is
 reviewed before it ships across every navigation edge. `--clean` removes them with the rest of the demo.
 
-<!-- api-docs:begin module=feature/showcase sha=f7d983ad3953e0ecef9c80ea85c1fc99dd0b3445 -->
+<!-- api-docs:begin module=feature/showcase sha=eae345ada814d088de037eab5fd9c2d197a9ee16 -->
 ## API reference
 
-_Generated from `feature/showcase` at tree `f7d983ad3953` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/showcase` at tree `eae345ada814` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

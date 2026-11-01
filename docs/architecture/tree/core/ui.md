@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/ui sha=b10496fd8c156be896c516c993c71d17c62ffbe5 -->
+<!-- api-docs:begin module=core/ui sha=85afc92e30cf0bb9555ada7da748b0557ca78e7e -->
 ## API reference
 
-_Generated from `core/ui` at tree `b10496fd8c15` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/ui` at tree `85afc92e30cf` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptBottomBar.kt`

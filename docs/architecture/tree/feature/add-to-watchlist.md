@@ -24,10 +24,10 @@ The add-to-watchlist sheet, split out as its own module so the watchlist and the
 present it without depending on each other. Small on purpose: a shared UI surface that lives in one
 feature is a dependency the other feature cannot remove.
 
-<!-- api-docs:begin module=feature/add-to-watchlist sha=91ea2da5f2535961e3633d7562a4c3c642b41b71 -->
+<!-- api-docs:begin module=feature/add-to-watchlist sha=3937fd2762a94da8f67634cb9bc3e98cf9cfb049 -->
 ## API reference
 
-_Generated from `feature/add-to-watchlist` at tree `91ea2da5f253` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/add-to-watchlist` at tree `3937fd2762a9` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

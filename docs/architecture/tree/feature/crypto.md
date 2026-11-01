@@ -26,10 +26,10 @@ CoinGecko market list and coin detail — the **paging** showcase over a real re
 targeted refresh can evict one page rather than the whole list. The detail screen is reachable by deep
 link, which is why `CoinDetail` carries the market rank: a detail opened cold must not need the list.
 
-<!-- api-docs:begin module=feature/crypto sha=9806e9b7077aa1dcd391784fd6d29e7406952516 -->
+<!-- api-docs:begin module=feature/crypto sha=e15e64e71b34cfa7a075129d04da2214c1f91414 -->
 ## API reference
 
-_Generated from `feature/crypto` at tree `9806e9b7077a` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/crypto` at tree `e15e64e71b34` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

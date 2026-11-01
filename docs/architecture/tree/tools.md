@@ -1,15 +1,15 @@
 # `tools/`
 
 > **Kind:** KSP symbol processors  
-> **Measured:** 12 tracked files — 4× `.kts`, 4× `.kt`, 4× `.SymbolProcessorProvider`
+> **Measured:** 13 tracked files — 5× `.kt`, 4× `.kts`, 4× `.SymbolProcessorProvider`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
+| `tools/network-ksp/` | 4 |
 | `tools/data-ksp/` | 3 |
 | `tools/database-ksp/` | 3 |
-| `tools/network-ksp/` | 3 |
 | `tools/store-ksp/` | 3 |
 
 ## Processors
@@ -27,7 +27,7 @@
 |---|---:|---|
 | `tools/data-ksp/` | 3 | [data-ksp](tools/data-ksp.md) |
 | `tools/database-ksp/` | 3 | [database-ksp](tools/database-ksp.md) |
-| `tools/network-ksp/` | 3 | [network-ksp](tools/network-ksp.md) |
+| `tools/network-ksp/` | 4 | [network-ksp](tools/network-ksp.md) |
 | `tools/store-ksp/` | 3 | [store-ksp](tools/store-ksp.md) |
 
 <!-- tree-scaffold:end -->

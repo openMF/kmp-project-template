@@ -26,10 +26,10 @@ Price alerts — a **draft-backed create form** plus a local alert store. `targe
 text rather than a parsed number so a partially typed value survives recomposition; parsing happens
 once, on submit.
 
-<!-- api-docs:begin module=feature/alerts sha=f23672a6d3c31945f1b9cdfeb0ae4c231016f124 -->
+<!-- api-docs:begin module=feature/alerts sha=a6a1a0beb04c9822eb9022cea944c1af14863333 -->
 ## API reference
 
-_Generated from `feature/alerts` at tree `f23672a6d3c3` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/alerts` at tree `a6a1a0beb04c` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

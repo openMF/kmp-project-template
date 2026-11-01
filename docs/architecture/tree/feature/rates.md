@@ -29,10 +29,10 @@ The point is the **4-way fan-in**: one slow or failing series must not blank the
 series means extending `RateSeriesCatalog.kt`; no client change is needed, which is the seam a fork
 exercises when it points the feature at its own data.
 
-<!-- api-docs:begin module=feature/rates sha=ce61992839e576017db1876146e23e89279e7330 -->
+<!-- api-docs:begin module=feature/rates sha=82c1d6694a3adc301549235bdd3f7a92e150d8ee -->
 ## API reference
 
-_Generated from `feature/rates` at tree `ce61992839e5` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/rates` at tree `82c1d6694a3a` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

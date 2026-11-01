@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.model.config
 
@@ -22,5 +22,11 @@ class AppSecurityConfigTest {
     @Test
     fun freshInstallScreenCaptureFollowsAppProfile() {
         assertEquals(AppSecurityConfig.SCREEN_CAPTURE_ALLOWED_BY_DEFAULT, UserData.DEFAULT.enableScreenCapture)
+    }
+
+    @Test
+    fun freshInstallSignedInStateFollowsAppProfile() {
+        // Wiring only — the value is the fork's (`security.signed_in_by_default`); a login app sets false.
+        assertEquals(AppSecurityConfig.SIGNED_IN_BY_DEFAULT, UserData.DEFAULT.isAuthenticated)
     }
 }

@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/domain sha=4ab27ffef4981f38c01490ddab6b609aba5c53ef -->
+<!-- api-docs:begin module=core/domain sha=81758236b7dc4214a6ea78c2790f58727bd08bf8 -->
 ## API reference
 
-_Generated from `core/domain` at tree `4ab27ffef498` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/domain` at tree `81758236b7dc` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/domain/src/commonMain/kotlin/kpt/core/domain/calc/AffordabilityCalculator.kt`

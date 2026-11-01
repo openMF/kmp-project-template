@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.core.model.user
 
@@ -66,7 +66,11 @@ data class UserData(
 ) {
     /** Factory holder. */
     companion object {
-        /** What a first run sees: signed in to the demo, nothing locked, system theme and language. */
+        /**
+         * What a first run sees: nothing locked, system theme and language. Signed in or not comes from
+         * `app-profile/app.yaml#security.signed_in_by_default` (generated into [AppSecurityConfig]) —
+         * `true` for the no-login demo, `false` for a fork whose app has a login.
+         */
         val DEFAULT = UserData(
             activeUserId = "",
             passcode = "1234",
@@ -74,7 +78,7 @@ data class UserData(
             darkThemeConfig = DarkThemeConfig.FOLLOW_SYSTEM,
             useDynamicColor = false,
             appLanguage = LanguageConfig.DEFAULT,
-            isAuthenticated = true,
+            isAuthenticated = AppSecurityConfig.SIGNED_IN_BY_DEFAULT,
             isUnlocked = true,
             isPasscodeEnabled = false,
             isBiometricsEnabled = false,

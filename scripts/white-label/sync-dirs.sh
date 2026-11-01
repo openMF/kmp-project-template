@@ -86,6 +86,7 @@ DRY_RUN=false
 MIRROR=false   # --mirror: template-owned sync roots become a strict mirror (see mirror_template_owned)
 FORCE=false
 ONLY_ITEMS=""   # --only <a,b,c>: restrict the sync to this subset of SYNC_DIRS/SYNC_FILES
+TEMPLATE_REF_ARG="${SYNC_TEMPLATE_REF:-}"   # --template-ref <commit|ref>: sync from this template commit (dev mode), not the merged default branch
 LOG_FILE="sync-$(date +%d%m%Y-%H%M%S).log"
 
 # Directories and files to sync
@@ -249,6 +250,8 @@ show_help() {
     echo "  --mirror        Template-owned sync roots become a STRICT mirror: fork-only files there are"
     echo "                  removed unless held in .template-sync-holds (path<TAB>reason). Opt-in — run"
     echo "                  /kmp-project-template-sync, which classifies the fork's extras first."
+    echo "  --template-ref <ref>  Sync from this template commit or ref instead of the merged default branch"
+    echo "                  (dev mode: iterate on an unmerged template fix by its commit hash). Env: SYNC_TEMPLATE_REF."
     echo
     echo -e "${BOLD}Examples:${NC}"
     echo "  ./sync-dirs.sh              # Run with interactive prompts"
@@ -1159,6 +1162,11 @@ while [[ $# -gt 0 ]]; do
             MIRROR=true
             shift
             ;;
+        --template-ref)
+            TEMPLATE_REF_ARG="${2:-}"
+            [ -z "$TEMPLATE_REF_ARG" ] && handle_error "--template-ref requires a commit hash or ref"
+            shift 2
+            ;;
         -f|--force)
             FORCE=true
             shift
@@ -1272,6 +1280,23 @@ if ! git rev-parse --verify "origin/dev" >/dev/null 2>&1; then
     BASE_BRANCH="$DEFAULT_BRANCH"
 fi
 
+# TEMPLATE_REF — the template commit this run syncs FROM. Prod mode: the template's merged default
+# branch. Dev mode (--template-ref <sha>): an unmerged commit, e.g. a template PR's head, so a fix
+# found during a sync is tried by its hash without waiting for a merge. Fetched by hash when the
+# remote-tracking refs do not already carry it.
+if [ -n "$TEMPLATE_REF_ARG" ]; then
+    if ! git rev-parse --verify -q "${TEMPLATE_REF_ARG}^{commit}" >/dev/null; then
+        git fetch "$TEMPLATE_REMOTE" "$TEMPLATE_REF_ARG" >/dev/null 2>&1 \
+            || handle_error "--template-ref '$TEMPLATE_REF_ARG' is not reachable from $TEMPLATE_REMOTE"
+    fi
+    TEMPLATE_REF="$(git rev-parse --verify -q "${TEMPLATE_REF_ARG}^{commit}" 2>/dev/null || git rev-parse FETCH_HEAD)"
+    TEMPLATE_REF_LABEL="$TEMPLATE_REF_ARG"
+    print_warning "DEV MODE: syncing from template commit ${BOLD}${TEMPLATE_REF:0:12}${NC} (not the merged $BASE_BRANCH)"
+else
+    TEMPLATE_REF="$TEMPLATE_REMOTE/$BASE_BRANCH"
+    TEMPLATE_REF_LABEL="$BASE_BRANCH"
+fi
+
 # ── SELF-UPDATE + RE-EXEC — always run the LATEST engine (close the stale-engine chicken-and-egg) ──
 # sync-dirs.sh is template-owned + self-propagating, but a fork runs its OWN copy, which only updates
 # MID dir-loop (in `scripts/`) — too late for the current run. A fork carrying a stale engine (e.g. one
@@ -1283,8 +1308,8 @@ fi
 # against an infinite loop; requires a clean tree; skipped in --dry-run (warns instead of mutating).
 _self_rel="scripts/white-label/sync-dirs.sh"
 if [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] && [ "$DRY_RUN" = false ] \
-   && git cat-file -e "$TEMPLATE_REMOTE/$BASE_BRANCH:$_self_rel" 2>/dev/null; then
-    _tpl_engine="$(git rev-parse "$TEMPLATE_REMOTE/$BASE_BRANCH:$_self_rel" 2>/dev/null || echo "")"
+   && git cat-file -e "$TEMPLATE_REF:$_self_rel" 2>/dev/null; then
+    _tpl_engine="$(git rev-parse "$TEMPLATE_REF:$_self_rel" 2>/dev/null || echo "")"
     _loc_engine="$(git hash-object "$_self_rel" 2>/dev/null || echo "")"
     if [ -n "$_tpl_engine" ] && [ "$_tpl_engine" != "$_loc_engine" ]; then
         if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
@@ -1294,9 +1319,9 @@ if [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] && [ "$DRY_RUN" = false ] \
             print_step "Self-updating the sync engine from the template on ${BOLD}$_su_branch${NC}, then re-running on the latest…"
             if git checkout -b "$_su_branch" "$BASE_BRANCH" >/dev/null 2>&1; then
                 for _up in "$_self_rel" scripts/customization-surface.sh customization-surface.yaml; do
-                    git cat-file -e "$TEMPLATE_REMOTE/$BASE_BRANCH:$_up" 2>/dev/null || continue
+                    git cat-file -e "$TEMPLATE_REF:$_up" 2>/dev/null || continue
                     mkdir -p "$(dirname "$_up")"
-                    git show "$TEMPLATE_REMOTE/$BASE_BRANCH:$_up" > "$_up" 2>/dev/null
+                    git show "$TEMPLATE_REF:$_up" > "$_up" 2>/dev/null
                 done
                 chmod +x "$_self_rel" scripts/customization-surface.sh 2>/dev/null || true
                 git add "$_self_rel" scripts/customization-surface.sh customization-surface.yaml >/dev/null 2>&1
@@ -1347,7 +1372,7 @@ if [ "$DRY_RUN" = false ]; then
     # Create temporary branch for upstream changes
     TEMP_BRANCH="temp-${SYNC_BRANCH}"
     print_step "Creating temporary branch: ${BOLD}$TEMP_BRANCH${NC}"
-    if ! git checkout -b "$TEMP_BRANCH" "$TEMPLATE_REMOTE/$BASE_BRANCH"; then
+    if ! git checkout -b "$TEMP_BRANCH" "$TEMPLATE_REF"; then
         handle_error "Failed to create temporary branch"
     fi
     show_progress
@@ -1612,14 +1637,14 @@ if [ "$DRY_RUN" = false ]; then
         exit 1
     fi
     print_step "Recording template sync version (.template-version)..."
-    _tv_sha="$(git rev-parse "$TEMPLATE_REMOTE/$BASE_BRANCH" 2>/dev/null || echo "")"
+    _tv_sha="$(git rev-parse "$TEMPLATE_REF" 2>/dev/null || echo "")"
     _tv_tag="$(git describe --tags --exact-match "$_tv_sha" 2>/dev/null || echo "")"
     {
         echo "# .template-version — the openMF/kmp-project-template commit this tree last synced from."
         echo "# Managed by scripts/white-label/sync-dirs.sh — DO NOT hand-edit."
         echo "# Format: bash-parseable key=value (same convention as gradle/fork.properties)."
         echo "template_repo=openMF/kmp-project-template"
-        echo "template_ref=$BASE_BRANCH"
+        echo "template_ref=$TEMPLATE_REF_LABEL"
         echo "template_sha=$_tv_sha"
         echo "template_tag=$_tv_tag"
         echo "synced_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"

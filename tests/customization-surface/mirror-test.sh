@@ -54,7 +54,7 @@ fnsrc="$WORK/fns.sh"
 grep -q 'mirror_template_owned()' "$fnsrc" || { echo "  ❌ mirror_template_owned not found in engine"; exit 1; }
 
 run() {  # run <MIRROR>
-  ( cd "$F" && SCRIPT_DIR="$F/scripts/white-label" BASE_BRANCH=main MIRROR="$1" bash -c "
+  ( cd "$F" && SCRIPT_DIR="$F/scripts/white-label" BASE_BRANCH=main FORK_STATE=main MIRROR="$1" bash -c "
       $(cat "$fnsrc")
       mirror_template_owned core-base tpl" )
 }

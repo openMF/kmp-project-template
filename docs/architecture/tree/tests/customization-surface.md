@@ -1,9 +1,9 @@
 # `tests/customization-surface/`
 
 > Part of [`tests/`](../tests.md)  
-> **Measured:** 3 tracked files — 3× `.sh`
+> **Measured:** 4 tracked files — 4× `.sh`
 
-3 tracked files.
+4 tracked files.
 
 <!-- tree-scaffold:end -->
 ## Significance
@@ -15,7 +15,8 @@ repository, so a passing test proves the shipped code, not a copy of it.
 | Test | Proves |
 |---|---|
 | `merge-3way-test.sh` | `cs_merge_3way` keeps a fork's added `<uses-permission>` when the template updates the manifest |
-| `mirror-test.sh` | `--mirror` removes template-owned files the fork added, leaves fork-owned and held files alone, and never touches a file the template ships |
+| `mirror-test.sh` | `--mirror` removes template-owned files the fork added, leaves fork-owned and held files alone, and never touches a file the template ships; a held template file is also kept from the overlay |
+| `pinned-branch-test.sh` | a sync pinned to a caller's branch (`SYNC_PREBUILT_BRANCH`) reads the fork's state from that branch, so a held file that exists only there is kept with its content |
 | `sync-roots-test.sh` | a path outside every sync root resolves `fork`, so a fork's own top-level directory is never claimed by the template |
 
-`mirror-test.sh` needs bash 4: the engine's `EXCLUSIONS` map is an associative array.
+`mirror-test.sh` and `pinned-branch-test.sh` need bash 4: the engine's `EXCLUSIONS` map is an associative array.

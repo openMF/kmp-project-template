@@ -38,7 +38,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `app-profile/` | 162 | [`app-profile/`](tree/app-profile.md) |
+| `app-profile/` | 163 | [`app-profile/`](tree/app-profile.md) |
 | `gradle/` | 5 | [`gradle/`](tree/gradle.md) |
 | `secrets/` | 55 | [`secrets/`](tree/secrets.md) |
 
@@ -58,7 +58,7 @@
 |---|---:|---|
 | `scripts/` | 467 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
-| `tests/` | 13 | [`tests/`](tree/tests.md) |
+| `tests/` | 14 | [`tests/`](tree/tests.md) |
 
 ## Other
 

@@ -87,7 +87,12 @@ if [ "$KOTLIN_BUILD_TYPE" = "Debug" ] && [ "${KMP_FORCE_XCFRAMEWORK:-0}" != "1" 
   # the leftover `-x …` line as a command ("-x: command not found", exit 127). Under `set -e` that
   # failed the Xcode Run Script phase AFTER a full 7-minute link, with no Gradle error to show for it,
   # while ALSO discarding the very configuration cache these lines exist to preserve.
+  # The aggregate-resources task runs WITH the link: the raw framework has no composeResources, and the
+  # staging below takes them from this task's output. Linking alone left that output to whatever an
+  # earlier full XCFramework assembly happened to leave behind — on a machine that never ran one, the
+  # resources were absent and the guard below failed every fast-path build (measured 2026-10-25).
   "$GRADLEW" -p "$REPO_ROOT" ":cmp-shared:link${KOTLIN_BUILD_TYPE}Framework${KMP_ARCH_TARGET}" \
+    ":cmp-shared:${KMP_ARCH_DIR}AggregateResources" \
     -x :cmp-shared:workerKmpAppCodegenAll -x :cmp-shared:workerKmpAppCodegenAndroid \
     -x :cmp-shared:workerKmpAppCodegenAutoShim -x :cmp-shared:workerKmpAppCodegenDesktop \
     -x :cmp-shared:workerKmpAppCodegenIos -x :cmp-shared:workerKmpAppCodegenWeb \

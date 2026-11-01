@@ -152,6 +152,13 @@ done <<< "$MARKED_FILES"
 echo "remove dangling demo imports:"
 DEMO_PKGS=$(echo "$DEMO_FEATURES" | sed 's/-//g' | paste -sd'|' -)
 [ -z "$DEMO_PKGS" ] && DEMO_PKGS="__none__"
+# The per-module demo packages step 4b2 deletes (core/<module>/<id>, e.g. kpt.core.data.currency).
+# They are not under `demo/`, so the two `.demo.` patterns never matched them: a fenced template file
+# (sync's DataSyncWorker) kept `import kpt.core.data.currency.CurrencyRepository` after the strip and a
+# cleaned fork stopped compiling (2026-11-02). Imports cannot be fenced instead — ktlint refuses
+# comments inside an import list.
+DEMO_MOD_PKGS=$(printf '%s\n' "$TEMPLATE_MODULE_PKGS" | awk -F'\t' 'NF==2 && $2!=""{printf "%s%s\\.%s", sep, $1, $2; sep="|"}')
+[ -z "$DEMO_MOD_PKGS" ] && DEMO_MOD_PKGS="__none__"
 say "strip 'import kpt.core.*.demo.*' + demo-feature imports from surviving .kt files"
 if [ "$APPLY" -eq 1 ]; then
   find . -name '*.kt' -not -path '*/build/*' -not -path '*/product-health/tests/*' -print0 | while IFS= read -r -d '' f; do
@@ -160,6 +167,7 @@ if [ "$APPLY" -eq 1 ]; then
       -e '/^import kpt\.core\.[a-z]+\.demo\./d' \
       -e '/^import kpt\.feature\.[a-z]+\.demo\./d' \
       -e "/^import kpt\\.feature\\.(${DEMO_PKGS})[.]/d" \
+      -e "/^import kpt\\.core\\.(${DEMO_MOD_PKGS})[.]/d" \
       "$f"
     rm -f "$f.bak"
   done

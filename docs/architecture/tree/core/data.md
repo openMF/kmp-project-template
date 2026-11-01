@@ -25,10 +25,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/data sha=e887a2282b2290e57e8e01e9e5812d7ade1d38c9 -->
+<!-- api-docs:begin module=core/data sha=cd1e78a997f16d129b0a8fc1901d67e33ca7a5aa -->
 ## API reference
 
-_Generated from `core/data` at tree `e887a2282b22` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/data` at tree `cd1e78a997f1` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt`
@@ -331,7 +331,7 @@ val MyThing = named("outbox.myThing")
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/di/OutboxBindingVerifyTest.kt:86</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/banking/OutboxBindingVerifyTest.kt:88</code></summary>
 
 ```kotlin
             match,

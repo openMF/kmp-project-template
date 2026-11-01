@@ -1,14 +1,20 @@
 # `tests/`
 
 > **Kind:** Test fixtures  
-> **Measured:** 9 tracked files — 3× `.pbxproj`, 2× `.ours`, 2× `.theirs`, 1× `.sh`, 1× `.md`
+> **Measured:** 11 tracked files — 3× `.sh`, 3× `.pbxproj`, 2× `.ours`, 2× `.theirs`, 1× `.md`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
 | `tests/fixtures/` | 8 |
-| `tests/customization-surface/` | 1 |
+| `tests/customization-surface/` | 3 |
+
+## Subsections
+
+| Unit | Files | Page |
+|---|---:|---|
+| `tests/customization-surface/` | 3 | [customization-surface](tests/customization-surface.md) |
 
 <!-- tree-scaffold:end -->
 ## Significance

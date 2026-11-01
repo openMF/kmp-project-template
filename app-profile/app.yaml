@@ -255,6 +255,10 @@ org:
   marketing_url: https://mifos.org
   privacy_url: https://mifos-products.pages.dev/mobile/kmp-project-template/privacy/   # a fork points this at ITS OWN hosted policy
   support_url: https://github.com/openMF/kmp-project-template
+  # The fork's OWN named links (community chat, product site, status page …) for its own screens —
+  # `name: https://…`. syncForkConfig generates core/model/.../config/AppOrgLinks.kt, read as
+  # `AppOrgLinks["community"]`. The template reads none, so it ships none.
+  links: {}
   # Org-shared vault-alias prefix (`<ws>-<suffix>`): syncForkConfig maps the template's `mifos-x-*`
   # aliases to `<secrets_namespace>-*`. Keep `mifos-x` for any openMF/Mifos-family fork; a fork in
   # another org sets its own workspace slug (e.g. `mbs`).
@@ -326,6 +330,11 @@ security:
   # choice (Settings → "Allow screen capture") is persisted by core/datastore and wins from then on.
   # Debug builds always allow capture so QA / device-test tooling can screenshot.
   screen_capture_allowed_by_default: false
+  # Whether a FRESH install starts signed in. `true` for an app with no login (this template's demo);
+  # a fork whose app has a login sets `false` so a first run lands on sign-in. Only the starting value:
+  # sign-in / sign-out persist through core/datastore. ABSENT means `true` (unlike screen capture),
+  # so an older app.yaml without this key keeps today's behaviour instead of flipping to signed-out.
+  signed_in_by_default: true
 
 # Privacy consent (GDPR Art. 6(1)(a) / 7): analytics and crash reporting are CONSENT-based processing, so
 # they must start OFF and be as easy to withdraw as to give (Settings → Privacy). These are only the

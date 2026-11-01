@@ -26,10 +26,10 @@ A user-curated coin list — **`CACHE_ONLY`**, entirely local, no network of its
 `core/store/crypto` prices the market list does, so a watched coin never shows a different number than
 the list it was added from.
 
-<!-- api-docs:begin module=feature/watchlist sha=34ff1a554d9f5e2b4980e1a9c849a1a44b9aa7c9 -->
+<!-- api-docs:begin module=feature/watchlist sha=716e647a8c019f188ab15c189e12a59b5ae25806 -->
 ## API reference
 
-_Generated from `feature/watchlist` at tree `34ff1a554d9f` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/watchlist` at tree `716e647a8c01` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

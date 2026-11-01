@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# bash4-required: it runs the engine's own functions, which read the associative EXCLUSIONS map.
 # Functional test for sync-dirs.sh --mirror (mirror_template_owned). Runs the REAL function, extracted
 # from the engine, against a throwaway git repo and the REAL ownership reader.
 #

@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/datastore sha=7c2f8d0f5c79b296eb5e92248932c7b036c27436 -->
+<!-- api-docs:begin module=core-base/datastore sha=cad5bece825be7ce9289b46a296fdcda31031c51 -->
 ## API reference
 
-_Generated from `core-base/datastore` at tree `7c2f8d0f5c79` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/datastore` at tree `cad5bece825b` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is

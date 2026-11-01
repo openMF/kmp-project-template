@@ -28,10 +28,10 @@ memory. It also means the result reaches the screen as a `ScreenState` like ever
 so the calculator renders through the same wrapper as the rest of the app rather than a bespoke
 nullable `StateFlow`.
 
-<!-- api-docs:begin module=feature/emi-calculator sha=132862df578c2376bb66d5a9ac6177cb9ca4037b -->
+<!-- api-docs:begin module=feature/emi-calculator sha=ee268d2f3770320b5d39569aefe0f4c9f1f21030 -->
 ## API reference
 
-_Generated from `feature/emi-calculator` at tree `132862df578c` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/emi-calculator` at tree `ee268d2f3770` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

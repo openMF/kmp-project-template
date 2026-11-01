@@ -58,7 +58,7 @@
 |---|---:|---|
 | `scripts/` | 466 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
-| `tests/` | 9 | [`tests/`](tree/tests.md) |
+| `tests/` | 11 | [`tests/`](tree/tests.md) |
 
 ## Other
 
@@ -80,4 +80,3 @@ oversight. A directory missing from a map reads the same as one nobody looked at
 | `config/` | 1 | the detekt config — documented where detekt is configured |
 | `docs/` | 130 | this documentation tree |
 | `kotlin-js-store/` | 2 | generated yarn.lock for Kotlin/JS |
-| `spotless/` | 3 | the license-header template applied by Spotless |

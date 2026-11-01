@@ -156,6 +156,11 @@ rules:
     owner: template
   - glob: "app-profile/migration-ledger.yaml"
     owner: fork
+  # The fork's half of module-packages.yaml: what it did to the template's declared packages
+  # (removed / kept / absent). app.yaml documented it as `owner: fork, never synced`, but no rule
+  # claimed it, so it resolved `template` — a sync would replace it and a strict mirror delete it.
+  - glob: "app-profile/package-ledger.yaml"
+    owner: fork
   # WHOLE-FILE generated => owner:fork, the same call as GeneratedApiBindings. These are derived in
   # full from the fork's app-profile (DB filename from its appId; schema version from its ledger), so
   # a sync has nothing to contribute and blind-copying the template's values over a fork's is pure
@@ -890,6 +895,11 @@ rules:
     owner: template
   - glob: "fastlane-config/**"
     owner: template
+  # The license header every source file carries — ONE fork-owned source (LicenseHeader.kt renders it
+  # for Spotless, syncForkConfig and the KSP processors; the holder is app.yaml#org.name). Must precede
+  # spotless/** (first match wins) so a sync never resets a fork's header.
+  - glob: "spotless/license-header.txt"
+    owner: fork
   - glob: "spotless/**"
     owner: template
   - glob: "gradle/wrapper/**"

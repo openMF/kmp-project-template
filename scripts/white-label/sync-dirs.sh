@@ -636,6 +636,10 @@ merge_plist_union() {
     return 1
 }
 
+# merge_libs_catalog_3way <ours> <base> <theirs> [out] — key-level 3-way merge of a TOML version
+# catalog: a key the fork never changed takes the template's value (a major bump is reported), a key
+# only the fork changed keeps the fork's, both-changed keeps the fork's and is reported as a conflict,
+# and keys new in the template are appended to their section.
 merge_libs_catalog_3way() {
     local ours="$1" base="$2" theirs="$3" out="${4:-$1}"
     [ -f "$ours" ] && [ -f "$theirs" ] || { [ -f "$theirs" ] && cp "$theirs" "$out"; return 0; }

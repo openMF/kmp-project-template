@@ -29,10 +29,10 @@ Its cost scales with tenure: a 30-year loan is 360 rows. That is why the schedul
 despite being computed — a revisit is free, and `SCHEDULE_ROWS` is a crash key precisely because an
 out-of-memory failure here scales with that number.
 
-<!-- api-docs:begin module=feature/amortization sha=0a91fe6b9ad36e23d1b30472bb268bfdd084075a -->
+<!-- api-docs:begin module=feature/amortization sha=d45a2fe4984bc82319280e36a30e25bb8be34cad -->
 ## API reference
 
-_Generated from `feature/amortization` at tree `0a91fe6b9ad3` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/amortization` at tree `d45a2fe4984b` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

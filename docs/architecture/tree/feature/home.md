@@ -30,10 +30,10 @@ It is also a **fork seam**. `HomeDashboard` is public rather than internal becau
 package so `--clean` removes it together with that default. A fork replaces the body without touching
 the shell.
 
-<!-- api-docs:begin module=feature/home sha=07d6666679eb450f35ecf7483728c9a7d473a249 -->
+<!-- api-docs:begin module=feature/home sha=16f6cccec8c3487ab8c46a99e914a450b7f1419b -->
 ## API reference
 
-_Generated from `feature/home` at tree `07d6666679eb` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/home` at tree `16f6cccec8c3` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

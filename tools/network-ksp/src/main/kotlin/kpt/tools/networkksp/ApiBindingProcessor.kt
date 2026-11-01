@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
+ * See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
  */
 package kpt.tools.networkksp
 
@@ -39,6 +39,10 @@ class ApiBindingProcessor(
     private val options: Map<String, String>,
 ) : SymbolProcessor {
     private var emitted = false
+
+    /** Header from the build's one source (`kpt.licenseHeader`, set by the Koin convention); none if unset. */
+    private val LICENSE: String =
+        options["kpt.licenseHeader"]?.replace("\\n", "\n")?.takeIf(String::isNotBlank)?.let { "$it\n" }.orEmpty()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         if (emitted) return emptyList()
@@ -110,11 +114,8 @@ class ApiBindingProcessor(
             Triple(id, "$fqn|$bound", kind)
         }
 
-        // Two classes on one point would emit two `single` of different types for the same id: the
-        // second silently shadows the first everywhere it is injected by qualifier.
-        bindings.groupBy { it.first }.filterValues { it.size > 1 }.forEach { (id, rows) ->
-            logger.error("network-ksp: access point '$id' is bound by ${rows.joinToString { it.second }}")
-        }
+        duplicateBindingErrors(bindings.map { (id, packed, _) -> id to packed.substringAfter('|') })
+            .forEach(logger::error)
 
         // app-profile order, so the generated file reads like the declaration it mirrors — and is
         // stable, which KSP's own symbol order is not.
@@ -189,21 +190,30 @@ class ApiBindingProcessor(
         const val PKG = "kpt.core.network.di"
         const val ANN = "kpt.core.base.network.annotation.ApiBinding"
         const val OPT_KINDS = "kpt.network.accessPointKinds"
-
-        val LICENSE = """
-            |/*
-            | * Copyright 2026 Mifos Initiative
-            | *
-            | * This Source Code Form is subject to the terms of the Mozilla Public
-            | * License, v. 2.0. If a copy of the MPL was not distributed with this
-            | * file, You can obtain one at https://mozilla.org/MPL/2.0/.
-            | *
-            | * See See https://github.com/openMF/kmp-project-template/blob/main/LICENSE
-            | */
-            |
-        """.trimMargin()
     }
 }
+
+/**
+ * The one binding conflict that is real: the same bound TYPE registered twice.
+ *
+ * Every binding expands to an UNQUALIFIED `single<T>` (`restApi` / `supabaseApi` in
+ * `core-base/network/NetworkDsl.kt`), so Koin keys it by type alone. Two different types on one access
+ * point are two independent definitions — one point serves any number of APIs (a monolith backend binds
+ * ~22 to a single point). The same type bound twice, on one point or on two, is one key defined twice:
+ * the later definition silently wins for every injection site. This used to group by access point,
+ * which rejected the valid case and missed the cross-point one.
+ *
+ * @param bindings (access point id, bound type FQN) per `@ApiBinding`.
+ * @return one error message per type bound more than once; empty when the graph is sound.
+ */
+internal fun duplicateBindingErrors(bindings: List<Pair<String, String>>): List<String> =
+    bindings.groupBy({ it.second }, { it.first })
+        .filterValues { it.size > 1 }
+        .map { (type, points) ->
+            "network-ksp: $type is bound ${points.size} times (access points: ${points.joinToString()}) — " +
+                "each binding is an unqualified single<$type>, so all but the last are silently lost. " +
+                "Bind a type once; one access point may serve any number of different types."
+        }
 
 /**
  * KSP entry point — what the `META-INF/services` registration names, so Gradle can instantiate [ApiBindingProcessor].

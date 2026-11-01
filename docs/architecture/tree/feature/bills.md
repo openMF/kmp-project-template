@@ -29,10 +29,10 @@ seam, so the feature spans `core/data` and `core/platform` rather than staying i
 `dueDay` is a day-of-month clamped to the month's length at read time, so 31 is safe in February — the
 kind of detail a screen must not re-derive per render.
 
-<!-- api-docs:begin module=feature/bills sha=cc41e63fc99155ecaed2a1f67388fe5da09042fc -->
+<!-- api-docs:begin module=feature/bills sha=1f225a6dbb4b9f908a602baabbd64f6a9363814d -->
 ## API reference
 
-_Generated from `feature/bills` at tree `cc41e63fc991` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/bills` at tree `1f225a6dbb4b` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

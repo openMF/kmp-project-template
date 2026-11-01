@@ -30,10 +30,10 @@ wizard survives process death, and resumes with a Continue / Discard prompt. The
 local state with no Store at all, which is the other thing this module demonstrates — that the
 framework does not force a Store where there is no data to fetch.
 
-<!-- api-docs:begin module=feature/calculators sha=d085aa71c6f1dc9392a5a26ca79f882bed2aabde -->
+<!-- api-docs:begin module=feature/calculators sha=246828f8b7aa9946d05f5eb38137529145bdce0a -->
 ## API reference
 
-_Generated from `feature/calculators` at tree `d085aa71c6f1` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/calculators` at tree `246828f8b7aa` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published

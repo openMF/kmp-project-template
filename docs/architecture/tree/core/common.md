@@ -10,10 +10,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/common sha=963241eb79585cb1e9da407d5bfc63b4f341556a -->
+<!-- api-docs:begin module=core/common sha=c8f4f67d7cfac4680b9f33ef551d8a7c909a66d3 -->
 ## API reference
 
-_Generated from `core/common` at tree `963241eb7958` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/common` at tree `c8f4f67d7cfa` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/common/src/commonMain/kotlin/kpt/core/common/format/FormatDate.kt`

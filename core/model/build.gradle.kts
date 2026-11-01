@@ -9,7 +9,6 @@
  */
 plugins {
     alias(libs.plugins.kmp.library.convention)
-    alias(libs.plugins.kotlin.parcelize)
     id("kotlinx-serialization")
 }
 

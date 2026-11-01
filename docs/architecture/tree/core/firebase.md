@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/firebase sha=332e953a8f1ffda079c1ea2eba8d3d8a37ef2b54 -->
+<!-- api-docs:begin module=core/firebase sha=4c4830b57216abe615adf55db0896641735f84de -->
 ## API reference
 
-_Generated from `core/firebase` at tree `332e953a8f1f` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/firebase` at tree `4c4830b57216` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/firebase/src/commonMain/kotlin/kpt/core/firebase/config/analytics/KptAnalyticsEvents.kt`

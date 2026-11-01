@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/platform sha=792034bc2802f0e865d889229b933ca223d3d0dd -->
+<!-- api-docs:begin module=core/platform sha=e3ea7bf7772f8023c6ffc45471ec1f4a39fe1f5d -->
 ## API reference
 
-_Generated from `core/platform` at tree `792034bc2802` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/platform` at tree `e3ea7bf7772f` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/platform/src/commonMain/kotlin/kpt/core/platform/config/AppReviewConfig.kt`

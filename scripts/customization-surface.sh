@@ -171,6 +171,8 @@ cs_under_root() {
   return 1
 }
 
+# cs_match_g <path> — first-match-wins ownership lookup. Sets CS_M_OWNER / CS_M_STRAT / CS_M_DEFAULT;
+# a default-rule match outside every sync root resolves `fork`.
 cs_match_g() {
   cs_load_rules
   local path="$1" i

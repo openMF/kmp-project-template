@@ -1,7 +1,7 @@
 # `scripts/product-health/`
 
 > Part of [`scripts/`](../scripts.md)  
-> **Measured:** 407 tracked files — 134× `.kt`, 83× `.sh`, 52× `.md`, 50× `.yaml`, 12× `.gitkeep`
+> **Measured:** 408 tracked files — 134× `.kt`, 84× `.sh`, 52× `.md`, 50× `.yaml`, 12× `.gitkeep`
 
 ### Scripts
 
@@ -38,7 +38,7 @@
 | `store-fork-seam-wiring.sh` | the template actually CONSULTS its fork seams. |
 | `store-listing.sh` | DIRECTIONAL, placeholder-aware store-copy guard. |
 
-_…and 53 more._
+_…and 54 more._
 
 <!-- tree-scaffold:end -->
 ## Significance

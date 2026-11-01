@@ -53,6 +53,8 @@ dependencies {
     // runtime classpath, letting CMPFeatureConventionPlugin apply it via pluginManager.apply(id)
     // to give every feature module the device-free verifyRoborazziDesktop render tier.
     implementation(libs.roborazzi.gradlePlugin)
+
+    testImplementation(libs.kotlin.test)
 }
 
 tasks {

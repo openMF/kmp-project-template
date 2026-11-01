@@ -20,6 +20,24 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 
 /**
+ * `app.yaml#security.screen_capture_allowed_by_default` → `AppSecurityConfig.SCREEN_CAPTURE_ALLOWED_BY_DEFAULT`.
+ * Absent or unparseable keeps the secure default, `false`: only an explicit `true` allows capture.
+ */
+internal fun screenCaptureAllowedByDefault(security: Map<*, *>?): Boolean =
+    security?.get("screen_capture_allowed_by_default")?.toString()?.trim()?.lowercase() == "true"
+
+/**
+ * `app.yaml#security.signed_in_by_default` → `AppSecurityConfig.SIGNED_IN_BY_DEFAULT`.
+ *
+ * The OPPOSITE missing-key rule from [screenCaptureAllowedByDefault], on purpose: absent means signed
+ * in. The template has no login, so `true` is its behaviour, and a fork whose `app.yaml` predates the
+ * key must keep it — reading absent as `false` would land a no-login app on a login screen. Only an
+ * explicit `false` opts a fork with real auth into a signed-out first launch.
+ */
+internal fun signedInByDefault(security: Map<*, *>?): Boolean =
+    security?.get("signed_in_by_default")?.toString()?.trim()?.lowercase() != "false"
+
+/**
  * Registers the `syncForkConfig` task on whichever project applies this plugin.
  *
  * Single source of truth:
@@ -1246,12 +1264,8 @@ abstract class SyncForkConfigTask : DefaultTask() {
         if (appProfile.isEmpty()) return
         val file = File(root, "core/model/src/commonMain/kotlin/kpt/core/model/config/AppSecurityConfig.kt")
         val security = appProfile["security"] as? Map<*, *>
-        val allowCapture = security?.get("screen_capture_allowed_by_default")?.toString()?.trim()?.lowercase() == "true"
-        // The OPPOSITE missing-key rule from screen capture, on purpose: absent means SIGNED IN. The
-        // template has no login, so `true` is today's behaviour; a missing key reading `false` would flip
-        // every fork whose app.yaml predates the key to signed-out on its next sync — a no-login app
-        // landing on a login screen. Only an explicit `false` opts a fork with real auth into it.
-        val signedIn = security?.get("signed_in_by_default")?.toString()?.trim()?.lowercase() != "false"
+        val allowCapture = screenCaptureAllowedByDefault(security)
+        val signedIn = signedInByDefault(security)
 
         val sb = StringBuilder()
         sb.append("// syncForkConfig:app-security:begin — GENERATED from app-profile/app.yaml#security. Do not hand-edit.\n")

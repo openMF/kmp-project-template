@@ -53,7 +53,7 @@ class AppDatabaseProcessor(
     private var emitted = false
 
     /** Header from the build's one source (`kpt.licenseHeader`, set by the Koin convention); none if unset. */
-    private val LICENSE: String =
+    private val licenseHeader: String =
         options["kpt.licenseHeader"]?.replace("\\n", "\n")?.takeIf(String::isNotBlank)?.let { "$it\n" }.orEmpty()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -127,7 +127,7 @@ class AppDatabaseProcessor(
         val migrations = opt(OPT_MIGRATIONS)
 
         return buildString {
-            append(LICENSE)
+            append(licenseHeader)
             append("package $PKG\n\n")
             append("import androidx.room3.AutoMigration\n")
             if (converters.isNotEmpty()) append("import androidx.room3.ColumnTypeConverters\n")
@@ -174,7 +174,7 @@ class AppDatabaseProcessor(
      * not compile.
      */
     private fun renderDaoBindings(daos: List<Pair<String, String>>): String = buildString {
-        append(LICENSE)
+        append(licenseHeader)
         append("package $BINDINGS_PKG\n\n")
         append("import $PKG.AppDatabase\n")
         append("import org.koin.core.module.Module\n")
@@ -225,7 +225,7 @@ class AppDatabaseProcessor(
     private fun renderConverterBindings(
         installs: List<Pair<String, Pair<String, String>>>,
     ): String = buildString {
-        append(LICENSE)
+        append(licenseHeader)
         append("package $BINDINGS_PKG\n\n")
         append("import org.koin.core.module.Module\n")
         append("import org.koin.dsl.module\n\n")

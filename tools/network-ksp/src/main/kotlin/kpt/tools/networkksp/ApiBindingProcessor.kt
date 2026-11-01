@@ -41,7 +41,7 @@ class ApiBindingProcessor(
     private var emitted = false
 
     /** Header from the build's one source (`kpt.licenseHeader`, set by the Koin convention); none if unset. */
-    private val LICENSE: String =
+    private val licenseHeader: String =
         options["kpt.licenseHeader"]?.replace("\\n", "\n")?.takeIf(String::isNotBlank)?.let { "$it\n" }.orEmpty()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -158,7 +158,7 @@ class ApiBindingProcessor(
             }
         }
         return buildString {
-            append(LICENSE)
+            append(licenseHeader)
             append("package $PKG\n\n")
             imports.forEach { append("import ").append(it).append('\n') }
             append("\n/**\n")

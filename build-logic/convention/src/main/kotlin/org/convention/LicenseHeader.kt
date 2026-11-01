@@ -31,6 +31,7 @@ import java.io.File
  * three template-owned files that the next sync overwrote.
  */
 object LicenseHeader {
+    /** Repo-relative path of the one header source; fork-owned, never overwritten by a template sync. */
     const val SOURCE = "spotless/license-header.txt"
 
     /** KSP option carrying the rendered Kotlin header to `tools/<name>-ksp` (newlines escaped as `\n`). */

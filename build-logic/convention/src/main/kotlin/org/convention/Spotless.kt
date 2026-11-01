@@ -56,12 +56,17 @@ internal fun Project.configureSpotless(extension: SpotlessExtension) = extension
         licenseHeader(LicenseHeader.kotlin(rootProject.rootDir), "(^(?![\\/ ]\\*).*$)")
     }
 
-    if (!root) {
-        format("xml") {
+    format("xml") {
+        if (root) {
+            // app-profile/ is not a Gradle project, so no module's Spotless reaches it. Its icon XML is
+            // the SOURCE syncForkConfig copies into cmp-android/src/main/res — formatting only the copy
+            // would be undone by the next syncForkConfig, so the source is formatted here.
+            target("app-profile/icons/**/*.xml")
+        } else {
             target("**/*.xml")
-            targetExclude("**/build/**/*.xml")
-            // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
-            licenseHeader(LicenseHeader.xml(rootProject.rootDir), "(<[^!?])")
         }
+        targetExclude("**/build/**/*.xml")
+        // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
+        licenseHeader(LicenseHeader.xml(rootProject.rootDir), "(<[^!?])")
     }
 }

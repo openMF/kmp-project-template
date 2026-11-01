@@ -1,7 +1,7 @@
 # `tools/network-ksp/`
 
 > Part of [`tools/`](../tools.md)  
-> **Measured:** 3 tracked files — 1× `.kts`, 1× `.kt`, 1× `.SymbolProcessorProvider`
+> **Measured:** 4 tracked files — 2× `.kt`, 1× `.kts`, 1× `.SymbolProcessorProvider`
 
 **Processes:** `@ApiBinding` (`kpt.core.base.network.annotation.ApiBinding`)
 

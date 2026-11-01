@@ -45,7 +45,7 @@ class RepositoryBindingProcessor(
     private var emitted = false
 
     /** Header from the build's one source (`kpt.licenseHeader`, set by the Koin convention); none if unset. */
-    private val LICENSE: String =
+    private val licenseHeader: String =
         options["kpt.licenseHeader"]?.replace("\\n", "\n")?.takeIf(String::isNotBlank)?.let { "$it\n" }.orEmpty()
 
     /** `@StoreProvider` id → the Koin qualifier symbol store-ksp generates for it. */
@@ -230,7 +230,7 @@ class RepositoryBindingProcessor(
         val named = providers.filter { it.qualifier.isNotBlank() }.sortedBy { it.qualifier }
         if (named.isEmpty()) return
         val text = buildString {
-            append(LICENSE)
+            append(licenseHeader)
             append("package $CONFIG_PKG\n\n")
             append("import org.koin.core.qualifier.named\n\n")
             append("/**\n")
@@ -339,7 +339,7 @@ class RepositoryBindingProcessor(
         rows.forEach { imports += it.iface; imports += it.impl }
 
         return buildString {
-            append(LICENSE)
+            append(licenseHeader)
             append("package $PKG\n\n")
             imports.forEach { append("import ").append(it).append('\n') }
             append("\n/**\n")

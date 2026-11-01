@@ -24,21 +24,21 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `core/` | 449 | [`core/`](tree/core.md) |
+| `core/` | 451 | [`core/`](tree/core.md) |
 | `core-base/` | 499 | [`core-base/`](tree/core-base.md) |
 
 ## Codegen
 
 | Area | Files | Page |
 |---|---:|---|
-| `tools/` | 12 | [`tools/`](tree/tools.md) |
-| `build-logic/` | 40 | [`build-logic/`](tree/build-logic.md) |
+| `tools/` | 13 | [`tools/`](tree/tools.md) |
+| `build-logic/` | 42 | [`build-logic/`](tree/build-logic.md) |
 
 ## Configuration
 
 | Area | Files | Page |
 |---|---:|---|
-| `app-profile/` | 161 | [`app-profile/`](tree/app-profile.md) |
+| `app-profile/` | 162 | [`app-profile/`](tree/app-profile.md) |
 | `gradle/` | 5 | [`gradle/`](tree/gradle.md) |
 | `secrets/` | 55 | [`secrets/`](tree/secrets.md) |
 
@@ -56,7 +56,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 466 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 467 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
 | `tests/` | 11 | [`tests/`](tree/tests.md) |
 
@@ -78,5 +78,6 @@ oversight. A directory missing from a map reads the same as one nobody looked at
 | `.swiftpm-locks/` | 31 | generated SwiftPM resolution locks |
 | `META-INF/` | 1 | one service-registration file |
 | `config/` | 1 | the detekt config — documented where detekt is configured |
-| `docs/` | 130 | this documentation tree |
+| `docs/` | 131 | this documentation tree |
 | `kotlin-js-store/` | 2 | generated yarn.lock for Kotlin/JS |
+| `spotless/` | 1 | the license-header template applied by Spotless |

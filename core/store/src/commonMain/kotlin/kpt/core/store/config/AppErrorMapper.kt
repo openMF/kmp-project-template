@@ -119,8 +119,13 @@ fun rememberAppErrorMessageFor(): (Throwable) -> String {
                 ErrorCategory.RateLimit -> rateLimitCopy
                 ErrorCategory.QuotaExceeded -> quotaCopy
                 is ErrorCategory.Server -> serverCopy
-                is ErrorCategory.ClientError -> error.message ?: clientCopy
-                ErrorCategory.Generic -> error.message ?: genericCopy
+                // Never `error.message`: a transport exception's message is a diagnostic, not user
+                // copy — Ktor builds it from the whole exchange (request URL with host, tenant and
+                // query, then the raw response body), so echoing it shows users server JSON and can
+                // grow tall enough to push the retry button off screen. Copy that an exception
+                // genuinely carries for users belongs in ProjectErrorMapper, consulted first above.
+                is ErrorCategory.ClientError -> clientCopy
+                ErrorCategory.Generic -> genericCopy
             }
         }
     }

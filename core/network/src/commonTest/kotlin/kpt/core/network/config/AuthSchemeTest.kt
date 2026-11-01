@@ -90,14 +90,15 @@ class AuthSchemeTest {
     }
 
     @Test
-    fun the_declared_scheme_drives_the_generated_header() {
-        val fineract = AppAccessPoints.points.first { it.id == "fineract" }
-
-        assertEquals(AuthScheme.BASIC, fineract.auth, "declared as auth: basic in app-profile")
-        // The Authorization spec is DERIVED from `auth:` — nobody wrote that row by hand.
-        val auth = fineract.headers.first { it.name == "Authorization" }
-        assertEquals(AuthScheme.runtimeKeyFor("fineract"), auth.runtimeKey)
-        assertNull(auth.value, "no credential may be baked into the binary")
+    fun every_auth_bearing_point_gets_a_derived_runtime_authorization_header() {
+        // Over EVERY generated point, so it holds in a fork whatever its point ids are. The demo
+        // point's declared values are pinned in kpt.core.network.fineract.FineractPointTest.
+        AppAccessPoints.points.filter { it.auth != AuthScheme.NONE }.forEach { point ->
+            // The Authorization spec is DERIVED from `auth:` — nobody wrote that row by hand.
+            val auth = point.headers.first { it.name == "Authorization" }
+            assertEquals(AuthScheme.runtimeKeyFor(point.id), auth.runtimeKey, point.id)
+            assertNull(auth.value, "${point.id}: no credential may be baked into the binary")
+        }
     }
 
     @Test

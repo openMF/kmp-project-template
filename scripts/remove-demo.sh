@@ -284,7 +284,22 @@ done <<< "$DEMO_FEATURES"
 #     migration for them — it records every declared unit in `baseline_units` instead. Without that,
 #     the next syncForkConfig would append all of them as migrations the fork's v1 already contains.
 LEDGER="app-profile/migration-ledger.yaml"
+# …but ONLY when the lineage is still the template's. A ledger that records a migration unit which is
+# neither a declared framework unit (core/database/migration-units.yaml) nor a `demo-*` unit belongs
+# to a fork that has shipped its own schema changes — it has installed users on that version, and
+# resetting it to v1 (plus dropping its exported schemas below) would destroy the upgrade path for
+# every one of them. That fork keeps its version, migrations and schema JSONs; only the demo code goes.
+FORK_UNITS=""
 if [ -f "$LEDGER" ]; then
+  FORK_UNITS=$(grep -oE 'unit:[[:space:]]*[A-Za-z0-9_-]+' "$LEDGER" | sed 's/.*unit:[[:space:]]*//' \
+    | while read -r u; do
+        case "$u" in demo-*) continue ;; esac
+        grep -qE "id:[[:space:]]*${u}([[:space:],}]|\$)" core/database/migration-units.yaml 2>/dev/null || echo "$u"
+      done | paste -sd' ' - || true)
+fi
+if [ -n "$FORK_UNITS" ]; then
+  say "keep $LEDGER + core/database/schemas/ — the fork's own lineage (units: $FORK_UNITS)"
+elif [ -f "$LEDGER" ]; then
   say "reset $LEDGER → version 1, empty migrations, baseline = every declared unit"
   if [ "$APPLY" -eq 1 ]; then
     # `|| true`: grep exits 2 when the file is absent, and under `set -e` that killed the whole strip
@@ -382,7 +397,7 @@ else
 fi
 
 SCHEMAS="core/database/schemas"
-if [ -d "$SCHEMAS" ]; then
+if [ -d "$SCHEMAS" ] && [ -z "$FORK_UNITS" ]; then
   n_schema=$(find "$SCHEMAS" -name '*.json' 2>/dev/null | wc -l | tr -d ' ')
   say "drop $n_schema exported schema JSON(s) under $SCHEMAS/ (template lineage — regenerated on first build)"
   if [ "$APPLY" -eq 1 ]; then

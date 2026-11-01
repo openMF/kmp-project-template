@@ -2,7 +2,7 @@
 
 > **Layer:** core — fork-owned; a codegen target
 > **Corpus surface:** `CORE_DATABASE.md`
-> **Measured:** 53 Kotlin files, 10 test files
+> **Measured:** 54 Kotlin files, 11 test files
 
 ## Codegen contracts owned here
 
@@ -24,10 +24,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/database sha=ceba4b7b09389184462871fdaec53471762a5f64 -->
+<!-- api-docs:begin module=core/database sha=689148d1787588dfab291a843f7e2a06087345c2 -->
 ## API reference
 
-_Generated from `core/database` at tree `ceba4b7b0938` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/database` at tree `689148d17875` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/alerts/AlertDao.kt`
@@ -291,6 +291,20 @@ internal val appDatabaseNaming = DatabaseNaming(
 object ForkDatabaseConfig
 ```
 The fork's Room schema version. `owner: fork` — PRESERVED across `/kmp-project-template-sync`. GENERATED from `app-profile/migration-ledger.yaml#version` by `./gradlew syncForkConfig`; do not hand-edit.
+
+<details><summary>Used in the template — <code>core/database/src/nonWebTest/kotlin/kpt/core/database/config/AppDatabaseTest.kt:48</code></summary>
+
+```kotlin
+        // ForkDatabaseConfig.VERSION, the one constant a fork bumps. The template's own v13 schema is
+        // pinned in alerts/DemoDatabaseTest.
+        assertEquals(ForkDatabaseConfig.VERSION, AppDatabase.VERSION)
+    }
+
+    @Test
+    fun databaseNameIsCorrect() {
+```
+
+</details>
 
 - `const val VERSION = 13` — The fork's Room schema version — kept equal to `app-profile/migration-ledger.yaml#version` by product-health check LG-5.
 
@@ -728,5 +742,5 @@ internal class FakeWatchlistDao : WatchlistDao {
 
 ---
 
-_27 type(s), 76 function(s)/property(ies); 103 carry KDoc at source; 1 authored example(s); 25 live call site(s)._
+_27 type(s), 76 function(s)/property(ies); 103 carry KDoc at source; 1 authored example(s); 26 live call site(s)._
 <!-- api-docs:end -->

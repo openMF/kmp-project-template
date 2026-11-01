@@ -2,7 +2,7 @@
 
 > **Layer:** core — fork-owned; a codegen target
 > **Corpus surface:** `CORE_NETWORK.md`
-> **Measured:** 41 Kotlin files, 17 test files
+> **Measured:** 42 Kotlin files, 18 test files
 
 ## Codegen contracts owned here
 
@@ -22,10 +22,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=38dcbe6cc487afc46137104cc352375b18044861 -->
+<!-- api-docs:begin module=core/network sha=5c8a219c9287a029b7aa39f405505ec47127c556 -->
 ## API reference
 
-_Generated from `core/network` at tree `38dcbe6cc487` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `5c8a219c9287` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`

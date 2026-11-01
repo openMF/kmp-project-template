@@ -19,7 +19,6 @@ import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kpt.core.base.network.AccessPoint
 import kpt.core.base.network.AccessPointKind
-import kpt.core.base.network.AuthScheme
 import kpt.core.base.network.HeaderSpec
 import kpt.core.base.network.RuntimeHeaderStore
 import kpt.core.base.network.setupDefaultHttpClient
@@ -103,52 +102,15 @@ class RuntimeHeaderTest {
     }
 
     @Test
-    fun the_real_declared_point_sends_its_static_header_with_no_manual_step() = runTest {
-        // The REAL generated point, not a synthetic spec list: this is what production builds from.
-        val fineract = AppAccessPoints.points.first { it.id == "fineract" }
-        val store = RuntimeHeaderStore()
-        val seen = mutableListOf<Map<String, String?>>()
-
-        val client = HttpClient(
-            MockEngine { request ->
-                seen += mapOf(
-                    "tenant" to request.headers["Fineract-Platform-TenantId"],
-                    "auth" to request.headers[HttpHeaders.Authorization],
-                )
-                respond("[]", HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
-            },
-        ) {
-            setupDefaultHttpClient(
-                baseUrl = fineract.effectiveUrl,
-                // Exactly what ktorfitFor passes — nothing added by hand.
-                dynamicHeaders = { store.resolve(fineract.headers) },
-            )()
+    fun every_generated_rest_point_joins_to_a_slash_terminated_url() {
+        // Over EVERY generated REST point, so it holds in a fork whatever its point ids are. The
+        // trailing slash is load-bearing: Ktor resolves a relative request path against the effective
+        // URL, so without it `offices` would REPLACE the last segment. Supabase points are excluded —
+        // supabase-kt takes the project origin and builds its own paths. The demo point's declared
+        // origin and path are pinned in kpt.core.network.fineract.FineractPointTest.
+        AppAccessPoints.points.filter { it.kind == AccessPointKind.REST }.forEach { point ->
+            assertTrue(point.effectiveUrl.endsWith("/"), "${point.id}: ${point.effectiveUrl}")
         }
-
-        client.get("offices")
-        // Declared `value:` in app.yaml -> on the wire, with no code touching it anywhere.
-        assertEquals("default", seen[0]["tenant"])
-        // …while the credential half stays absent until a token exists.
-        assertNull(seen[0]["auth"])
-
-        store[AuthScheme.runtimeKeyFor("fineract")] = "Basic dG9rZW4="
-        client.get("offices")
-        assertEquals("default", seen[1]["tenant"], "the static header is unaffected by sign-in")
-        assertEquals("Basic dG9rZW4=", seen[1]["auth"])
-    }
-
-    @Test
-    fun origin_and_path_join_into_one_effective_url() {
-        val fineract = AppAccessPoints.points.first { it.id == "fineract" }
-
-        assertEquals("https://sandbox.mifos.community/", fineract.baseUrl, "base_url is the ORIGIN only")
-        assertEquals("fineract-provider/api/v1/", fineract.basePath)
-        // The trailing slash is load-bearing: Ktor resolves a relative request path against this, so
-        // without it `offices` would REPLACE the last segment and hit /api/offices.
-        assertEquals(
-            "https://sandbox.mifos.community/fineract-provider/api/v1/",
-            fineract.effectiveUrl,
-        )
     }
 
     @Test
@@ -162,15 +124,5 @@ class RuntimeHeaderTest {
         assertEquals("https://h/a/b/", ap("https://h/", "/a/b/").effectiveUrl)
         // No path: the origin is used as-is rather than gaining a stray slash.
         assertEquals("https://h/", ap("https://h/", "").effectiveUrl)
-    }
-
-    @Test
-    fun the_fineract_point_declares_both_header_kinds() {
-        val fineract = AppAccessPoints.points.first { it.id == "fineract" }
-        val byName = fineract.headers.associateBy { it.name }
-
-        assertEquals("default", byName["Fineract-Platform-TenantId"]?.value, "tenant is a build-time constant")
-        assertEquals("fineract.auth", byName[HttpHeaders.Authorization]?.runtimeKey, "auth is runtime-valued")
-        assertNull(byName[HttpHeaders.Authorization]?.value, "no credential may be baked into the binary")
     }
 }

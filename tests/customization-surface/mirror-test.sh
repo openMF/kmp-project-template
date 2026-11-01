@@ -71,5 +71,18 @@ run true
 [ -f "$F/core-base/a/demo/Demo.kt" ]   && pass "demo convention path kept"            || bad "demo removed"
 [ -f "$F/core-base/a/Shared.kt" ]      && pass "file the template has is not touched" || bad "shared file removed"
 
+echo "── a hold also protects a template file from the OVERLAY ──"
+# The directory sync restores every path is_excluded flags. A held file the template also ships (a
+# fork fix proposed upstream) must be flagged, or the overlay overwrites the fix it is waiting on.
+excluded() {  # excluded <path> → 0 when is_excluded preserves it
+  ( cd "$F" && SCRIPT_DIR="$F/scripts/white-label" bash -c "$(cat "$fnsrc")
+      is_excluded core-base '$1' file" )
+}
+printf 'core-base/a/Shared.kt\tproposed upstream: openMF/kmp-project-template#998\n' >> "$F/.template-sync-holds"
+excluded core-base/a/Shared.kt && pass "held template file is preserved from the overlay" \
+                               || bad "held template file would be overwritten"
+excluded core-base/a/Other.kt  && bad "an unheld template path was preserved" \
+                               || pass "an unheld template path is still synced"
+
 [ "$fail" = 0 ] && echo "mirror-test: PASS" || echo "mirror-test: FAIL"
 exit "$fail"

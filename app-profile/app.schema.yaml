@@ -6,7 +6,8 @@
 #                   the fork never changed to a new template default
 #   template        the template's value always wins — a fork edit or deletion is replaced on sync
 #   union:<field>   a list merged row by row on that identity field: the fork's rows stay, new template
-#                   rows are added (`union:a|b` for rows identified by either field)
+#                   rows are added (`union:a|b` for rows identified by either field). A row the
+#                   template marks `owner: template` replaces the fork's copy of that row.
 # A path matches its longest declared prefix; `default:` covers the rest.
 #
 # A key the template REMOVES from app.yaml is removed from every fork on the next sync, whatever the

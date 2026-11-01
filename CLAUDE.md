@@ -425,8 +425,8 @@ re-deriving it:
 
 **`/kmp-project-template-sync`** (engine: `scripts/white-label/sync-dirs.sh`, `SYNC_DIRS` / `SYNC_FILES`)
 pulls upstream template updates without clobbering fork work AND without missing updates. The
-sync-reachable surface now covers `feature/{home,profile,settings}`, `customization-surface.yaml`,
-root `build.gradle.kts`, and `kotlin-js-store`. Anti-clobber is preserved via `is_excluded` carve-outs
+sync-reachable surface covers `customization-surface.yaml`, root `build.gradle.kts` and `kotlin-js-store`;
+the `feature/{home,profile,settings}` starters are the fork's foundation, shipped once and never synced. Anti-clobber is preserved via `is_excluded` carve-outs
 declared in `customization-surface.yaml` — fork-owned paths (e.g. `app-profile/**`) are never rewritten.
 
 ---

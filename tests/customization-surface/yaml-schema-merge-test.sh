@@ -17,6 +17,7 @@
 #   Y-11 a template-owned key takes the template value over a fork edit
 #   Y-12 a retired key the fork CHANGED is still removed, and the removal is reported
 #   Y-13 a key the fork added itself is never removed
+#   Y-14 a list row the template owns (`owner: template`) follows the template; a fork row stays
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
@@ -110,6 +111,40 @@ grep -qF 'log_tag: Toolkit' "$WORK/out11.yaml" && ! grep -qF 'log_tag: FieldApp'
 ! grep -q community_url "$WORK/out11.yaml" && grep -q 'retired key org.community_url removed (fork had: community_url: https://forum.example.org)' "$WORK/err11" \
   && pass "Y-12 retired key removed even though the fork changed it, and reported" || bad "Y-12 retired key kept or removed silently"
 grep -qF 'fork_extra: kept' "$WORK/out11.yaml" && pass "Y-13 a key the fork added itself stays" || bad "Y-13 fork extension removed"
+
+# ── row-level ownership in a union list ──
+cat > "$WORK/ap-base.yaml" <<'YAML'
+network:
+  access_points:
+    - id: shared
+      owner: template
+      anon_key_env: OLD_KEY
+YAML
+cat > "$WORK/ap-ours.yaml" <<'YAML'
+network:
+  access_points:
+    - id: shared
+      owner: template
+      anon_key_env: OLD_KEY
+    - id: main
+      owner: fork
+      base_url: https://fork.example.org/
+YAML
+cat > "$WORK/ap-theirs.yaml" <<'YAML'
+network:
+  access_points:
+    - id: shared
+      owner: template
+      publishable_key_env: NEW_KEY
+    - id: main
+      owner: fork
+      base_url: https://template.example.org/
+YAML
+( CS_ROOT="$REPO" cs_merge_yaml_schema "$WORK/ap-ours.yaml" "$WORK/ap-base.yaml" "$WORK/ap-theirs.yaml" "$WORK/ap-out.yaml" )
+grep -qF 'publishable_key_env: NEW_KEY' "$WORK/ap-out.yaml" && ! grep -qF OLD_KEY "$WORK/ap-out.yaml" \
+  && grep -qF 'fork.example.org' "$WORK/ap-out.yaml" && ! grep -qF 'template.example.org' "$WORK/ap-out.yaml" \
+  && [ "$(grep -c 'id: shared' "$WORK/ap-out.yaml")" = 1 ] \
+  && pass "Y-14 template-owned row follows the template; the fork row stays" || bad "Y-14 row-level ownership wrong"
 
 [ "$fail" = 0 ] && echo "yaml-schema-merge-test: PASS" || echo "yaml-schema-merge-test: FAIL"
 exit "$fail"

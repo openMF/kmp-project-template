@@ -48,7 +48,7 @@ KptMaterialTheme {
 
 </details>
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:62</code></summary>
 
 ```kotlin
     val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
@@ -78,7 +78,7 @@ KptMaterialTheme(
 
 </details>
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:62</code></summary>
 
 ```kotlin
     val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
@@ -107,7 +107,7 @@ KptMaterialTheme(themeBuilder = { isDark ->
 
 </details>
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:144</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:62</code></summary>
 
 ```kotlin
     val financeColors = if (darkTheme) darkFinanceColors() else lightFinanceColors()
@@ -647,7 +647,7 @@ fun KptTopAppBar(
 ```
 Top app bar built from a declarative `KptTopAppBarConfiguration`. The DSL form — prefer it when a screen's bar is assembled from data or varies by state; the parameter overloads below are shorthands over this.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -666,7 +666,7 @@ fun KptTopAppBar(
 ```
 Title-only bar with no navigation icon — a tab root. `variant` selects the Material 3 size.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -685,7 +685,7 @@ fun KptTopAppBar(
 ```
 Title plus a back affordance, always shown — a pushed detail screen.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -704,7 +704,7 @@ fun KptTopAppBar(
 ```
 Title with a CONDITIONAL back affordance, for a screen reachable both as a tab root and as a pushed destination.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -723,7 +723,7 @@ fun KptTopAppBar(
 ```
 Two-line bar: title over a subtitle, for a screen whose context needs naming (an account, a date range) without stealing the title.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -742,7 +742,7 @@ fun KptTopAppBar(
 ```
 Title plus ONE trailing action. For more than one, use the configuration overload rather than growing the parameter list.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:69</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt:69</code></summary>
 
 ```kotlin
         topBar = {
@@ -1163,7 +1163,7 @@ interface KptColorScheme
 ```
 The full Material 3 color role set. Roles, not literal colors — a component asks for `onSurfaceVariant`, never a hex value, so light and dark themes and a fork's palette all work without touching the component.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:132</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:50</code></summary>
 
 ```kotlin
         androidTheme -> if (darkTheme) darkColorScheme() else lightColorScheme()
@@ -1198,7 +1198,7 @@ interface KptTypography
 ```
 The Material 3 type scale — display through label, each in three sizes.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:134</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:52</code></summary>
 
 ```kotlin
     }.toKptColorScheme()
@@ -1409,7 +1409,7 @@ data class TopAppBarAction(
 ```
 Represents an action button in the top app bar. Action buttons are displayed on the right side of the top app bar and provide quick access to common functions like search, menu, or other contextual actions.
 
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:63</code></summary>
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt:63</code></summary>
 
 ```kotlin
         .only(WindowInsetsSides.Horizontal),
@@ -1832,7 +1832,7 @@ data class KptThemeProviderImpl(
 ```
 Default `KptThemeProvider`, composing the five default scales into one design language.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:136</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:54</code></summary>
 
 ```kotlin
     val mifosTypography = Typography().toKptTypography(fontFamily)
@@ -2015,7 +2015,7 @@ data class Motion(
 ```
 Shared motion specs — durations, easings, and motion-pattern parameters. Values align with Material 3 motion guidance (https://m3.material.io/styles/motion/easing-and-duration). All durations in milliseconds.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:157</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:75</code></summary>
 
 ```kotlin
         CompositionLocalProvider(
@@ -2034,7 +2034,7 @@ val LocalMotion = staticCompositionLocalOf { Motion() }
 ```
 CompositionLocal carrying the app's motion scale — the shared durations and easings. Read this rather than hardcoding a duration: symmetric enter/exit timings are what make transitions feel like one system instead of per-screen choices.
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:157</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:75</code></summary>
 
 ```kotlin
         CompositionLocalProvider(

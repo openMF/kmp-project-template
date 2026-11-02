@@ -37,8 +37,8 @@ import org.koin.compose.viewmodel.koinNavViewModel as retainedKoinViewModel
 /**
  * The profile tab's fork-owned INNER content (the default demo body). `ProfileScreen` (the
  * template-owned shell) renders this opaque body inside its framework-owned [kpt.core.ui.scaffold.KptScaffold];
- * the fork owns what renders here via `cmp-navigation`'s `BackboneRegistry.profileBody`, mirroring the
- * shipped `homeBody` → `HomeDashboard` seam. A `customizer --clean` fork strips the `BackboneRegistry`
+ * the fork owns what renders here via `cmp-navigation`'s `ForkBackboneRegistry.profileBody`, mirroring the
+ * shipped `homeBody` → `HomeDashboard` seam. A `customizer --clean` fork strips the `ForkBackboneRegistry`
  * fenced block, leaving an empty body for the fork to fill — the shell chrome survives unchanged.
  */
 @Composable

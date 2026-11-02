@@ -4,9 +4,9 @@
 # module-packages.yaml it expands), with no name patterns of its own. Runs the REAL sync_directory with
 # the REAL reader against a throwaway repo.
 #
-#   a template-owned file the engine used to hard-code as fork (AppErrorMapper.kt) → updated
+#   a template-owned file the engine used to hard-code as fork (KptErrorMapper.kt) → updated
 #   a demo package declared in module-packages.yaml that the fork stripped         → not re-added
-#   a fork-owned seam (ProjectErrorMapper.kt)                                      → kept
+#   a fork-owned seam (ForkErrorMapper.kt)                                      → kept
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
@@ -19,7 +19,7 @@ cp "$REPO/scripts/customization-surface.sh" "$F/scripts/"
 cat > "$F/customization-surface.yaml" <<'YAML'
 version: 1
 rules:
-  - glob: "core/store/**/Project*.kt"
+  - glob: "core/store/**/Fork*.kt"
     owner: fork
   - packages: module-packages
   - glob: "core/**"
@@ -35,11 +35,11 @@ P="core/store/src/commonMain/kotlin/kpt/core/store"
 mk() { mkdir -p "$(dirname "$F/$1")"; echo "$2" > "$F/$1"; }
 # git, run in the fixture repo with a fixed identity.
 g() { git -C "$F" -c user.email=t@t -c user.name=t "$@"; }
-mk "$P/config/AppErrorMapper.kt" v1; mk "$P/config/ProjectErrorMapper.kt" seam-v1
+mk "$P/config/KptErrorMapper.kt" v1; mk "$P/config/ForkErrorMapper.kt" seam-v1
 g init -q -b main; g add -A; g commit -q -m "last sync"; BASE="$(g rev-parse HEAD)"
-g checkout -q -b fork; mk "$P/config/ProjectErrorMapper.kt" fork-seam; g add -A; g commit -q -m "fork seam"
+g checkout -q -b fork; mk "$P/config/ForkErrorMapper.kt" fork-seam; g add -A; g commit -q -m "fork seam"
 g checkout -q -b tpl main
-mk "$P/config/AppErrorMapper.kt" v2; mk "$P/banking/impl/LoanStore.kt" demo; g add -A; g commit -q -m "template v2 + demo"
+mk "$P/config/KptErrorMapper.kt" v2; mk "$P/banking/impl/LoanStore.kt" demo; g add -A; g commit -q -m "template v2 + demo"
 g checkout -q fork
 
 fnsrc="$WORK/fns.sh"
@@ -55,13 +55,13 @@ grep -q 'sync_directory()' "$fnsrc" || { echo "  ❌ sync_directory not found in
     DRY_RUN=false MIRROR=true bash -c "$(cat "$fnsrc")
     sync_directory core tpl" ) >/dev/null 2>&1
 
-[ "$(cat "$F/$P/config/AppErrorMapper.kt")" = v2 ] && pass "template-owned AppErrorMapper.kt receives the template update" \
-  || bad "AppErrorMapper.kt not updated: $(cat "$F/$P/config/AppErrorMapper.kt")"
+[ "$(cat "$F/$P/config/KptErrorMapper.kt")" = v2 ] && pass "template-owned KptErrorMapper.kt receives the template update" \
+  || bad "KptErrorMapper.kt not updated: $(cat "$F/$P/config/KptErrorMapper.kt")"
 [ ! -e "$F/$P/banking/impl/LoanStore.kt" ] && pass "a demo package the fork stripped is not re-added (module-packages.yaml)" \
   || bad "the stripped demo package was re-added"
-[ "$(cat "$F/$P/config/ProjectErrorMapper.kt")" = fork-seam ] && pass "the fork-owned seam is kept" \
-  || bad "the fork seam was overwritten: $(cat "$F/$P/config/ProjectErrorMapper.kt")"
-grep -q '\*/demo/\*\|AppErrorMapper' <(sed -n '/^is_excluded() {/,/^}/p' "$ENGINE") \
+[ "$(cat "$F/$P/config/ForkErrorMapper.kt")" = fork-seam ] && pass "the fork-owned seam is kept" \
+  || bad "the fork seam was overwritten: $(cat "$F/$P/config/ForkErrorMapper.kt")"
+grep -q '\*/demo/\*\|KptErrorMapper' <(sed -n '/^is_excluded() {/,/^}/p' "$ENGINE") \
   && bad "is_excluded still carries hard-coded name patterns" || pass "is_excluded carries no ownership patterns of its own"
 
 [ "$fail" = 0 ] && echo "single-reader-test: PASS" || echo "single-reader-test: FAIL"

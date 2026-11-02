@@ -27,8 +27,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
-import cmp.navigation.registry.BackboneRegistry
-import cmp.navigation.registry.TabRegistry
+import cmp.navigation.registry.ForkBackboneRegistry
+import cmp.navigation.registry.ForkTabRegistry
 import cmp.navigation.ui.KptRootScaffold
 import cmp.navigation.ui.ScaffoldNavigationData
 import cmp.navigation.ui.logDestinationChanged
@@ -51,7 +51,7 @@ internal fun AuthenticatedNavbarNavigationScreen(
     homeBody: @Composable () -> Unit,
     // The OUTER authenticated-graph controller. Used to (a) push a FULL-SCREEN tab (inlineTab = false,
     // e.g. an immersive focus modal) above the scaffold, and (b) hand INLINE fork tabs a controller for
-    // their drill-downs via TabRegistry.extraInlineTabDestinations. Threaded from authenticatedGraph so
+    // their drill-downs via ForkTabRegistry.extraInlineTabDestinations. Threaded from authenticatedGraph so
     // this merge-owned shell stays free of feature imports.
     outerNavController: NavController,
     modifier: Modifier = Modifier,
@@ -105,9 +105,9 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
     onAction: (AuthenticatedNavBarAction) -> Unit,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    // Tabs from the fork-owned TabRegistry seam (backbone Home/Profile + fork extraTabs) — the
+    // Tabs from the fork-owned ForkTabRegistry seam (backbone Home/Profile + fork extraTabs) — the
     // navbar renders the list generically instead of a hardcoded item list (S6 heal, T7).
-    val navigationItems = TabRegistry.tabs.toImmutableList()
+    val navigationItems = ForkTabRegistry.tabs.toImmutableList()
 
     KptRootScaffold(
         contentWindowInsets = WindowInsets(0.dp),
@@ -128,7 +128,7 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
 
                     // Fork extra tabs. INLINE tabs (inlineTab = true — the default) swap content inside
                     // THIS inner NavHost so the bottom bar persists and the tab keeps its own back stack
-                    // (their top screen is registered by TabRegistry.extraInlineTabDestinations below).
+                    // (their top screen is registered by ForkTabRegistry.extraInlineTabDestinations below).
                     // FULL-SCREEN tabs (inlineTab = false, e.g. an immersive focus modal that declares
                     // bottom_navigation_visible: false) push their route on the OUTER graph, hiding the bar.
                     else -> if (navigationItem.inlineTab) {
@@ -171,23 +171,23 @@ internal fun AuthenticatedNavbarNavigationScreenContent(
                 homeBody = homeBody,
             )
 
-            // Profile inner content from the fork-owned BackboneRegistry.profileBody seam (default: demo
-            // body). The template shell forwards this opaque body — a fork edits BackboneRegistry, not this
+            // Profile inner content from the fork-owned ForkBackboneRegistry.profileBody seam (default: demo
+            // body). The template shell forwards this opaque body — a fork edits ForkBackboneRegistry, not this
             // file. (WS01 base-feature seam, epic AC7 — mirrors the homeBody wiring.)
-            profileDestination(profileBody = { BackboneRegistry.profileBody(navController) })
+            profileDestination(profileBody = { ForkBackboneRegistry.profileBody(navController) })
 
-            // Fork INLINE extra-tab top screens (TabRegistry.extraInlineTabDestinations). Registered in
+            // Fork INLINE extra-tab top screens (ForkTabRegistry.extraInlineTabDestinations). Registered in
             // THIS inner NavHost so tapping the tab swaps content inside the scaffold (bottom bar stays)
             // — the fork wires each screen's drill-downs on outerNavController (full-screen). Template
             // default = no-op. Keeps the merge-owned shell feature-import-free (the seam lives in the fork).
-            TabRegistry.extraInlineTabDestinations.invoke(this, navController, outerNavController)
+            ForkTabRegistry.extraInlineTabDestinations.invoke(this, navController, outerNavController)
         }
     }
 }
 
 /**
  * Switch to an INLINE extra tab (its top screen registered in the inner NavHost via
- * [TabRegistry.extraInlineTabDestinations]). Mirrors [navigateToTabOrRoot]'s bottom-nav semantics for a
+ * [ForkTabRegistry.extraInlineTabDestinations]). Mirrors [navigateToTabOrRoot]'s bottom-nav semantics for a
  * plain route string: no-op if already on the tab; otherwise pop up to the graph start saving state,
  * single-top, and restore the tab's saved back stack — so each tab keeps its own state across switches.
  */

@@ -50,7 +50,7 @@ class HomeScreenUiTest {
                 HomeScreen(
                     onSettingsClick = {},
                     // The fork-owned home body — here the demo dashboard wired to fake repos, mirroring
-                    // production where cmp-navigation's BackboneRegistry.homeBody supplies it.
+                    // production where cmp-navigation's ForkBackboneRegistry.homeBody supplies it.
                     homeBody = {
                         HomeDashboard(
                             onNavigateToLoans = {},

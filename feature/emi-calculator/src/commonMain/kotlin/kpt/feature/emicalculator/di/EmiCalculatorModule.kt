@@ -16,7 +16,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 /**
- * Koin bindings for the EMI calculator. Listed in `FeatureRegistry`'s generated bindings, so a fork that removes this
+ * Koin bindings for the EMI calculator. Listed in `ForkFeatureRegistry`'s generated bindings, so a fork that removes this
  * feature drops the module with it.
  */
 val EmiCalculatorModule = module {

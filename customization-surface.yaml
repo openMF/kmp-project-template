@@ -196,7 +196,7 @@ rules:
     strategy: kotlin-3way
   # Android Application class: template ships the base Application; forks wire app-init/SDK
   # hooks (Koin start, crash reporting, deep-link handlers). Merge so a template update never
-  # drops them. S4 classification gap — was owner GAP (AppInitializers seam lands in E1).
+  # drops them. S4 classification gap — was owner GAP (ForkInitializers seam lands in E1).
   - glob: "**/AndroidApp.kt"
     owner: merge
     strategy: kotlin-3way
@@ -213,7 +213,7 @@ rules:
     owner: fork
   # Authenticated bottom-nav ViewModel: template ships the base tab graph; forks add tabs.
   # Merge so a template update never drops fork-added tabs. S6 classification gap — was owner
-  # GAP (TabRegistry seam lands in E1). Matches AuthenticatedNavbarNavigationViewModel.kt.
+  # GAP (ForkTabRegistry seam lands in E1). Matches AuthenticatedNavbarNavigationViewModel.kt.
   - glob: "cmp-navigation/**/*NavbarNavigationViewModel.kt"
     owner: merge
     strategy: kotlin-3way
@@ -263,7 +263,7 @@ rules:
   # feature backbone (E1 / F1) — home/profile/settings are the TEMPLATE-owned minimal SHELL every fork
   # keeps and receives upstream fixes for. Declared ABOVE the blanket `feature/** → fork` (first-match
   # wins). Their INNER content is fork-owned via two distinct seams: (a) the `*Body` vals in the
-  # fork-owned BackboneRegistry (cmp-navigation/**/registry — home/settings/profile inner content), and
+  # fork-owned ForkBackboneRegistry (cmp-navigation/**/registry — home/settings/profile inner content), and
   # (b) demo showcases under `feature/**/demo/**` which are the DISTINCT `demo-showcase` class below.
   #
   # DEMO-SHOWCASE vs FORK (WS01 / epic AC8, LD3a): a demo showcase is template-SHIPPED (demo-only,
@@ -277,7 +277,7 @@ rules:
   # ── BACKBONE STARTERS — fork-owned, so a fork can redesign them freely ────────────────────────
   # home / profile / settings ship as a WORKING starting point and the fork owns them outright: it
   # redesigns the screens in place, using the shipped code as the base, and a sync never overwrites
-  # that work. (They were `owner: template` with `BackboneRegistry`'s homeBody/settingsBody/
+  # that work. (They were `owner: template` with `ForkBackboneRegistry`'s homeBody/settingsBody/
   # profileBody as the only sanctioned edit point. That kept upstream fixes flowing, but it meant a
   # fork editing HomeScreen.kt directly — the obvious thing to do — silently lost the change on the
   # next sync. Ownership now matches what a fork actually does.)
@@ -303,19 +303,19 @@ rules:
   # The demo showcase stores NO LONGER live under core/store/**/demo/**: they are per-domain packages
   # declared in app-profile/app.yaml#core_store.packages[], so they need explicit globs below rather
   # than falling through to the generic `**/demo/**` rule.
-  # core/store fork seams — the `Project*` files a fork edits. The sync never touches them, so a
+  # core/store fork seams — the `Fork*` files a fork edits. The sync never touches them, so a
   # fork's error copy and branding survive; everything they extend lives in config/ and IS synced.
-  # These were previously the template files themselves (AppErrorMapper / AppScreenStateDefaults
+  # These were previously the template files themselves (KptErrorMapper / KptScreenStateDefaults
   # marked owner:fork because each carried a `TODO(fork)` extension point inside it), which meant a
   # fork that customised one branch stopped receiving upstream fixes to the whole file.
-  - glob: "core/store/**/ProjectErrorMapper.kt"
+  - glob: "core/store/**/ForkErrorMapper.kt"
     owner: fork
-  - glob: "core/store/**/ProjectScreenStateDefaults.kt"
+  - glob: "core/store/**/ForkScreenStateDefaults.kt"
     owner: fork
   # The template's definition surface — full-copied on a sync so forks get upstream improvements.
-  - glob: "core/store/**/config/AppErrorMapper.kt"
+  - glob: "core/store/**/config/KptErrorMapper.kt"
     owner: template
-  - glob: "core/store/**/config/AppScreenStateDefaults.kt"
+  - glob: "core/store/**/config/KptScreenStateDefaults.kt"
     owner: template
   # AppStoreRegistry.kt / AppCacheKeys.kt / GeneratedStoreBindings.kt have NO row — deliberately.
   # They were `owner: fork` while syncForkConfig wrote them into committed source. They are now KSP
@@ -327,7 +327,7 @@ rules:
   # bindings lived in it, which meant a fork never received upstream fixes to the framework wiring
   # it also contains (CoreBaseStoreModule, StoreCacheManager, DraftInventory). With the bindings
   # generated into GeneratedStoreBindings, nothing fork-specific is left and a sync can full-copy it.
-  - glob: "core/store/**/di/StoreModule.kt"
+  - glob: "core/store/**/di/KptStoreModule.kt"
     owner: template
   # core/store demo showcases — the DISTINCT `demo-showcase` class: template-SHIPPED, demo-only,
   # updatable on sync, and deleted by `remove-demo.sh --clean` per their `owner: template` row in
@@ -344,11 +344,11 @@ rules:
   # template infra (KoinModules, AuthenticatedNavigation, the navbar screen, cmp-shared's initKoin,
   # feature/home's HomeScreen shell) READS these seams; a fork adds/removes features, tabs, the home
   # body, and startup hooks by editing ONLY files here, so the infra modules stay full-copy
-  # `owner: template`. Covers FeatureRegistry (routes+DI), BackboneRegistry (home body, S5),
-  # TabRegistry (bottom-nav tabs, S6), AppInitializers (startup hooks, S3/S4) + the package README.
+  # `owner: template`. Covers ForkFeatureRegistry (routes+DI), ForkBackboneRegistry (home body, S5),
+  # ForkTabRegistry (bottom-nav tabs, S6), ForkInitializers (startup hooks, S3/S4) + the package README.
   # The whole package is the seam — same pattern as the core/store block above. (E1/T7, 2026-08-11)
   #
-  # Base-feature INNER-content seam (WS01 / epic AC7): BackboneRegistry carries the fork-owned
+  # Base-feature INNER-content seam (WS01 / epic AC7): ForkBackboneRegistry carries the fork-owned
   # `homeBody` / `settingsBody` / `profileBody` `val`s. These remain a supported way to supply the
   # backbone's inner content WITHOUT touching the module — useful when a fork wants the shipped shell
   # to keep evolving around its own body.
@@ -356,7 +356,7 @@ rules:
   # It is no longer the ONLY way in: `feature/{home,profile,settings}/**` is now `owner: fork`, so a
   # fork may equally redesign those screens in place. The seam suits a fork that wants to swap content
   # and leave the shell alone; direct ownership suits a fork that wants the whole surface.
-  - glob: "cmp-navigation/**/registry/BackboneRegistry.kt"
+  - glob: "cmp-navigation/**/registry/ForkBackboneRegistry.kt"
     owner: fork
   - glob: "cmp-navigation/**/registry/**"
     owner: fork
@@ -379,24 +379,24 @@ rules:
   # for any cleaned fork.)
   - glob: "**/demo/**"
     owner: demo-showcase
-  # The fork's preferences EXTEND the framework's: ProjectPreferencesRepository inherits
+  # The fork's preferences EXTEND the framework's: ForkPreferencesRepository inherits
   # UserPreferencesRepository and its impl delegates to the template's, so a fork gets every
   # framework preference for free, adds its own, and overrides any it needs to alter. The template's
   # two files stay hand-managed and full-copy; these two are never synced. No declaration drives it —
   # inheritance makes "a framework preference cannot be removed" a compile error rather than a rule.
-  - glob: "**/core/datastore/**/ProjectPreferencesRepository.kt"
+  - glob: "**/core/datastore/**/ForkPreferencesRepository.kt"
     owner: fork
-  - glob: "**/core/datastore/**/ProjectPreferencesRepositoryImpl.kt"
+  - glob: "**/core/datastore/**/ForkPreferencesRepositoryImpl.kt"
     owner: fork
-  # Fork DI seams — `di/Project<X>Module.kt` is the "yours to fill" per-layer seam (network, store,
+  # Fork DI seams — `di/Fork<X>Module.kt` is the "yours to fill" per-layer seam (network, store,
   # data, database). WLS-1..4 keep it alive through `remove-demo.sh`; ownership is what keeps it alive
   # through a SYNC. As owner:template the template's EMPTY seam blind-copies over a fork's filled-in
   # one on every sync — the same silent-loss class as AndroidManifest, and it defeats the entire point
   # of the seam. Symmetric with `cmp-shared/**/ForkWorkerDeclarations.kt` above. Enforced by WLS-5
   # (`scripts/product-health/checks/white-label-di-seams.sh`).
-  # Declared AFTER `**/demo/**` on purpose: a Project*Module stranded under demo/ is a WLS-2
+  # Declared AFTER `**/demo/**` on purpose: a Fork*Module stranded under demo/ is a WLS-2
   # violation and must keep classifying as demo-showcase, not silently become fork-owned.
-  - glob: "core/*/src/**/di/Project*Module.kt"
+  - glob: "core/*/src/**/di/Fork*Module.kt"
     owner: fork
   - glob: "build-logic/**/kotlin/local/**"   # LocalFlavors.kt fork flavor extensions
     owner: fork
@@ -496,6 +496,10 @@ rules:
   # legal customizations survive a sync full-copy. Without these carve-outs each falls through to
   # `owner: template` and a blind copy clobbers it (the exact loss class this contract exists to close).
   #
+  # The theme WIRING — KptTheme() applying the brand schemes, screen-state defaults and token locals —
+  # is template code: forks receive its updates. The brand values it applies live in ForkTheme.kt.
+  - glob: "core/designsystem/**/theme/KptTheme.kt"
+    owner: template
   # Brand theme — a fork fully replaces the reference palette + type ramp; owner:fork (blind preserve).
   # The SHARED design primitives live in core-base/designsystem (stays template-owned).
   - glob: "**/core/designsystem/**/theme/**"
@@ -505,9 +509,10 @@ rules:
   - glob: "**/core/designsystem/**/icon/**"
     owner: merge
     strategy: kotlin-3way
-  # App scaffold — the template ships KptScaffold; a fork overrides its top-bar/FAB/branding. 3-way so a
-  # template scaffold update never drops the fork's overrides.
-  - glob: "**/core/ui/**/scaffold/**"
+  # App scaffold — the template ships KptScaffold (in KptForkScaffold.kt); a fork overrides its
+  # top-bar/FAB/branding. 3-way so a template scaffold update never drops the fork's overrides. The rest
+  # of scaffold/ (KptPullToRefreshState) is plain template code — no fork ever edited it.
+  - glob: "**/core/ui/**/scaffold/KptFork*"
     owner: merge
     strategy: kotlin-3way
   # Root scaffold + nav controller — a fork tweaks root theming (dark-mode-aware colors) + analytics
@@ -651,6 +656,8 @@ rules:
     owner: template
   - glob: "core/ui/**/kpt/core/ui/utils/**"
     owner: template
+  - glob: "core/ui/**/kpt/core/ui/scaffold/**"   # KptPullToRefreshState; KptForkScaffold is merge (above)
+    owner: template
   # The fork-extension seam — template-owned so a sync keeps delivering upstream fixes.
   # MUST stay above the module catch-all below, which resolves `fork`.
   - glob: "core/ui/**/kpt/core/ui/config/**"
@@ -743,7 +750,7 @@ rules:
   # silently stop reaching forks on sync. The template's own packages stay enumerable (`user`,
   # `demo`) and anything the template adds later still resolves `template` by default.
   # FRAMEWORK models — read by framework code, so a fork extends behaviour via
-  # ProjectPreferencesRepository (core/datastore) rather than editing these.
+  # ForkPreferencesRepository (core/datastore) rather than editing these.
   - glob: "core/model/**/kpt/core/model/user/**"
     owner: template
   # The showcase's models — the DISTINCT `demo-showcase` class: template-SHIPPED, updated on sync,

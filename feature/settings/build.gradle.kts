@@ -51,7 +51,7 @@ compose {
 // `gradle/fork.properties#app.display.name` — the build-bridge that syncForkConfig generates from the
 // SoT `app-profile/app.yaml#identity.app_name`. SettingsScreen's footer renders this instead of a
 // hardcoded string resource, so a fork rebrands in app-profile, not 7 locale strings.xml files (S9/T10).
-// Read through the ONE Gradle-side reader (org.convention.ForkProperties) rather than a local
+// Read through the ONE Gradle-side reader (org.convention.KptAppProfileProperties) rather than a local
 // Properties().load() — see that file for why independent parsers are the defect class.
 val settingsAppDisplayName = forkProp("app.display.name", "App")
 

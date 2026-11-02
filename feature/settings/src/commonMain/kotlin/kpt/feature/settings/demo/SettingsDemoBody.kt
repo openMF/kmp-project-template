@@ -42,9 +42,9 @@ import org.jetbrains.compose.resources.stringResource
 /**
  * The settings tab's fork-owned INNER content (the default demo body). `SettingsScreen` (the
  * template-owned shell) forwards this opaque body; the fork owns what renders here via
- * `cmp-navigation`'s `BackboneRegistry.settingsBody`, mirroring the shipped `homeBody` seam. It owns the
+ * `cmp-navigation`'s `ForkBackboneRegistry.settingsBody`, mirroring the shipped `homeBody` seam. It owns the
  * dialog state (theme / language / dev-menu) and renders the golden-locked [SettingsScreenContent]; a
- * `customizer --clean` fork strips the `BackboneRegistry` fenced block, so the shell keeps its chrome and
+ * `customizer --clean` fork strips the `ForkBackboneRegistry` fenced block, so the shell keeps its chrome and
  * this demo body drops out. (WS01 base-feature seam, epic AC7.)
  */
 @Composable
@@ -119,7 +119,7 @@ fun SettingsDemoBody(
         // Resolved by the CALLER, not injected here. This body is a pure-UI composable — its UI
         // test renders it directly with no Koin application started — so a `koinInject` inside it
         // turns every such render into "KoinApplication has not been started". cmp-navigation's
-        // BackboneRegistry supplies this, where the app shell already resolves managers.
+        // ForkBackboneRegistry supplies this, where the app shell already resolves managers.
         onRateAppClick = onRateAppClick?.let { rate ->
             {
                 analyticsHelper.logRateAppRequested()
@@ -133,7 +133,7 @@ fun SettingsDemoBody(
 
 /**
  * Dev-menu dialog surfaced by long-pressing the settings version footer. Renders one row per
- * [DevMenuEntry] supplied by the caller (`cmp-navigation`'s `ShowcaseRegistry.devSettingsEntries`).
+ * [DevMenuEntry] supplied by the caller (`cmp-navigation`'s `ForkShowcaseRegistry.devSettingsEntries`).
  * Reachable only when the list is non-empty — release builds / neutralized forks pass an empty list
  * and the footer long-press handler is `null`.
  */

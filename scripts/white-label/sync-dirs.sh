@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# bash4-required: EXCLUSIONS is an associative array load-bearing across 23 sites; see the guard below.
+# bash4-required: associative arrays (EXCLUSIONS, kept empty) and the contract reader; see the guard below.
 
 # scripts/white-label/sync-dirs.sh
 # Script to sync directories and files from upstream repository
 
 # ── bash 4+ REQUIRED — fail loudly rather than silently overwrite a fork's branding ──────────────
 #
-# This script's EXCLUSIONS map is what PRESERVES fork-owned files across a sync (branded Android
-# res/, google-services.json, the iOS asset catalog, deployment config, secrets, …). It is an
-# associative array, and bash 3.2 — still /bin/bash on macOS — does not have those.
+# This script uses associative arrays, and bash 3.2 — still /bin/bash on macOS — does not have them.
+# What it preserves for the fork is now decided by the ownership contract alone (is_excluded); the
+# EXCLUSIONS map below is kept EMPTY, but the failure mode recorded next is why the guard stays.
 #
 # The old `#!/bin/bash` shebang pinned this script to 3.2 there, and the failure was SILENT and
 # DESTRUCTIVE rather than loud: `declare -A` is rejected, but the `=( [k]=v … )` initializer still
@@ -279,6 +279,39 @@ print_items() {
     echo
 }
 
+# apply_template_migrations — follow the template's renames BEFORE anything is merged.
+# The ledger (template-migrations.yaml) and its applier come from the commit being synced (a fork's
+# copies may predate a rename). The result is COMMITTED onto the sync branch and FORK_STATE moves to
+# that commit: every merge reads "ours" from FORK_STATE, so it must already carry the new names —
+# otherwise a renamed merge-owned file looks fork-deleted and a renamed fork seam keeps the old name
+# the template no longer calls. Writes MIGRATED_FROM (new<TAB>old) for migrated_from().
+MIGRATED_FROM=""
+apply_template_migrations() {
+    MIGRATED_FROM="$(mktemp)"
+    git cat-file -e "$TEMPLATE_REF:template-migrations.yaml" 2>/dev/null \
+        && git cat-file -e "$TEMPLATE_REF:scripts/white-label/template-migrations.sh" 2>/dev/null || return 0
+    local _mig _c _n; _mig="$(mktemp -d)"
+    git show "$TEMPLATE_REF:template-migrations.yaml" > "$_mig/ledger.yaml"
+    git show "$TEMPLATE_REF:scripts/white-label/template-migrations.sh" > "$_mig/apply.sh"
+    bash "$_mig/apply.sh" --ledger "$_mig/ledger.yaml" > "$_mig/out" || handle_error "template migrations failed"
+    awk -F'\t' '/^R /{sub(/^R /,"",$1); print $2"\t"$1}' "$_mig/out" > "$MIGRATED_FROM"
+    while IFS=$'\t' read -r _c _n; do
+        print_warning "migration rename ${BOLD}${_c#C }${NC} → $_n skipped: the new path already exists — reconcile by hand"
+    done < <(grep '^C ' "$_mig/out")
+    awk -F'\t' '/^[RE] /{sub(/^[RE] /,"",$1); print $1; if ($2!="") print $2}' "$_mig/out" | sort -u > "$_mig/paths"
+    if [ -s "$_mig/paths" ]; then
+        git add -A --pathspec-from-file="$_mig/paths" >/dev/null 2>&1
+        git commit -q -m "chore(sync): apply template migrations (renames)" --pathspec-from-file="$_mig/paths" \
+            || handle_error "could not commit the template migrations"
+        FORK_STATE="$(git rev-parse HEAD)"
+        print_step "Applied template migrations: $(grep -c '^R ' "$_mig/out") rename(s), $(grep -c '^E ' "$_mig/out") file(s) rewritten"
+    fi
+    rm -rf "$_mig"
+}
+
+# migrated_from <path> — the old path a template migration renamed <path> from, if any.
+migrated_from() { [ -n "$MIGRATED_FROM" ] && awk -F'\t' -v p="$1" '$1==p{print $2; exit}' "$MIGRATED_FROM" 2>/dev/null; }
+
 # is_excluded <dir> <path> <type> — 0 when the sync must leave <path> in the FORK's state.
 # ONE source decides: the ownership contract, read through scripts/customization-surface.sh (its rules,
 # the per-module module-packages.yaml manifests it loads, the sync roots). A path is kept when it is
@@ -287,7 +320,7 @@ print_items() {
 #   · owned `demo-showcase` (a demo package — a fork that stripped the demo stays stripped; one that
 #     kept it keeps its copy).
 # The engine has no ownership knowledge of its own. It used to: an EXCLUSIONS map and nine hard-coded
-# name patterns, which disagreed with the contract — AppErrorMapper.kt, AppScreenStateDefaults.kt and
+# name patterns, which disagreed with the contract — KptErrorMapper.kt, KptScreenStateDefaults.kt and
 # StoreModule.kt were preserved as fork files while the contract said template, so template updates to
 # them never reached a fork. Invoked as a SUBPROCESS so the reader's bash-4 syntax runs under its own
 # `bash` regardless of this script's interpreter.
@@ -867,8 +900,10 @@ sync_directory() {
                         # An EMPTY base states the truth: no common ancestor. A union strategy then
                         # unions (correct), and a line 3-way conflicts (honest, and visible) instead
                         # of quietly handing the file to the template.
-                        if [ -n "$_mbase" ] && git show "${_mbase}:$_mf" > "$_b" 2>/dev/null; then
-                            :
+                        local _mold=""; declare -F migrated_from >/dev/null 2>&1 && _mold="$(migrated_from "$_mf")"
+                        if [ -n "$_mbase" ] && { git show "${_mbase}:$_mf" > "$_b" 2>/dev/null \
+                             || { [ -n "$_mold" ] && git show "${_mbase}:$_mold" > "$_b" 2>/dev/null; }; }; then
+                            :   # the base — under the file's old path when a template migration renamed it
                         else
                             : > "$_b"
                             print_warning "No common ancestor for ${BOLD}$_mf${NC} (added on both sides) — merging as add/add"
@@ -1277,6 +1312,8 @@ if [ "$DRY_RUN" = false ]; then
     fi
     show_progress
 
+    apply_template_migrations
+
     # Preserve root-level excluded files
     preserve_root_files
 
@@ -1336,7 +1373,7 @@ fi
 
 # ── customization-surface advisory (fork-ownership contract) ──────────────────
 # Non-breaking: reports which about-to-be-synced paths are `merge`-owned per
-# customization-surface.yaml, so a maintainer can confirm the EXCLUSIONS map
+# customization-surface.yaml, so a maintainer can see which fork edits
 # preserves fork edits (e.g. AndroidManifest permissions). The mechanical sync
 # below is UNCHANGED — the contract is the declared source of truth the merge
 # engine adopts next. Fully guarded so it can never abort a sync.
@@ -1354,7 +1391,7 @@ if [ -f "$CS_READER" ] && [ -f "$SCRIPT_DIR/../../customization-surface.yaml" ];
                 cs_merge_hits=$((cs_merge_hits + 1))
             fi
         done < <(git ls-files -- "${SYNC_DIRS[@]}" 2>/dev/null)
-        [ "$cs_merge_hits" -gt 0 ] && echo -e "  ${YELLOW}⚠ $cs_merge_hits merge-owned path(s) — verify EXCLUSIONS preserves fork edits (permissions, catalog, nav).${NC}"
+        [ "$cs_merge_hits" -gt 0 ] && echo -e "  ${YELLOW}⚠ $cs_merge_hits merge-owned path(s) — each is 3-way merged so fork edits survive (permissions, catalog, nav).${NC}"
     fi
 fi
 

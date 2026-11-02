@@ -11,6 +11,8 @@
 #       base was found under the old path
 #   M-5 the renames are committed before the merge (the sync branch's HEAD) and FORK_STATE is that commit
 #   M-6 the applier is idempotent
+#   M-7 a merge-owned file the template did NOT rename, whose identifier rename sits next to a fork
+#       edit, merges cleanly — the base went through the same renames, so a rename is not a template edit
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
@@ -28,6 +30,9 @@ rules:
   - glob: "core/ui/**/KptFork*"
     owner: merge
     strategy: kotlin-3way
+  - glob: "core/ui/**/Nav.kt"
+    owner: merge
+    strategy: kotlin-3way
   - glob: "core/**"
     owner: template
   - glob: "**"
@@ -42,17 +47,20 @@ mk() { mkdir -p "$(dirname "$F/$1")"; printf '%s\n' "$2" > "$F/$1"; }
 g() { git -C "$F" -c user.email=t@t -c user.name=t "$@"; }
 mk "$S/ProjectStoreModule.kt" "val ProjectStoreModule = empty"
 mk "$S/Wiring.kt" "uses ProjectStoreModule v1"
+mk "$U/Nav.kt" "$(printf 'import ProjectStoreModule\nL2\nL3')"
 mk "$U/KptScaffold.kt" "$(printf 'L1\nL2\nL3\nL4\nL5')"
 g init -q -b main; g add -A; g commit -q -m "last sync"; BASE="$(g rev-parse HEAD)"
 
 g checkout -q -b fork
 mk "$S/ProjectStoreModule.kt" "val ProjectStoreModule = filled-by-fork"
 mk "$U/KptScaffold.kt" "$(printf 'L1\nL2\nL3\nL4\nL5-fork')"
+mk "$U/Nav.kt" "$(printf 'import ProjectStoreModule\nimport ForkExtra\nL2\nL3')"
 g add -A; g commit -q -m "fork work"
 
 g checkout -q -b tpl main
 g mv "$S/ProjectStoreModule.kt" "$S/ForkStoreModule.kt"; mk "$S/ForkStoreModule.kt" "val ForkStoreModule = empty"
 mk "$S/Wiring.kt" "uses ForkStoreModule v2"
+mk "$U/Nav.kt" "$(printf 'import ForkStoreModule\nL2\nL3')"
 g mv "$U/KptScaffold.kt" "$U/KptForkScaffold.kt"; mk "$U/KptForkScaffold.kt" "$(printf 'L1-tpl\nL2\nL3\nL4\nL5')"
 cp "$REPO/scripts/white-label/template-migrations.sh" "$F/scripts/white-label/"
 cat > "$F/template-migrations.yaml" <<'YAML'
@@ -70,7 +78,7 @@ fnsrc="$WORK/fns.sh"
 {
   echo 'print_step(){ :; }; print_warning(){ :; }; print_error(){ :; }; show_progress(){ :; }; handle_error(){ echo "HALT $*" >&2; exit 1; }'
   echo 'declare -A EXCLUSIONS=(); SYNC_CONFLICTS=(); SYNC_FAILED=()'
-  for fn in is_excluded apply_template_migrations migrated_from resolve_merge_base remove_stale_path \
+  for fn in is_excluded apply_template_migrations migrated_from migrate_base resolve_merge_base remove_stale_path \
             propagate_template_deletions mirror_template_owned sync_directory; do
     awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{" {p=1} p{print} p&&/^}/{p=0}' "$ENGINE"
   done
@@ -99,6 +107,9 @@ else bad "M-4 KptForkScaffold.kt: $(echo "$sc" | tr '\n' '|')"; fi
 head_msg="$(g log -1 --format=%s)"
 [ "$head_msg" = "chore(sync): apply template migrations (renames)" ] && [ "$(cat "$WORK/fork-state")" = "$(g rev-parse HEAD)" ] \
   && pass "M-5 renames committed before the merge; FORK_STATE is that commit" || bad "M-5 HEAD '$head_msg', FORK_STATE $(cat "$WORK/fork-state" 2>&1)"
+nav="$(cat "$F/$U/Nav.kt" 2>/dev/null)"
+[ "$nav" = "$(printf 'import ForkStoreModule\nimport ForkExtra\nL2\nL3')" ] \
+  && pass "M-7 a rename next to a fork edit is not a conflict (base migrated)" || bad "M-7 Nav.kt: $(echo "$nav" | tr '\n' '|')"
 g show tpl:template-migrations.yaml > "$WORK/ledger.yaml"
 [ -z "$(cd "$F" && bash "$REPO/scripts/white-label/template-migrations.sh" --ledger "$WORK/ledger.yaml" 2>&1)" ] \
   && pass "M-6 a second run changes nothing" || bad "M-6 the applier is not idempotent"

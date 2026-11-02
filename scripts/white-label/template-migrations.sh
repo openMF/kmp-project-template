@@ -21,13 +21,21 @@
 #             `C <old>\t<new>` (both exist — left alone, needs a human)
 #     Only tracked text files are touched (pathspec narrows them). The ledger itself is never rewritten.
 #     Idempotent: an applied migration finds nothing left to change.
+#   template-migrations.sh --ledger <file> --file <path>
+#     rewrite ONE file's content (words + path strings; no renames, no git) — the sync runs a 3-way
+#     merge's BASE through it, so the template's renames do not show up as template edits.
+#   template-migrations.sh --ledger <file> --old-path <path>
+#     print the path <path> had before the ledger renamed it (nothing if no row renames it) — where a
+#     3-way merge finds the base of a renamed file in an older template commit.
 # ponytail: no applied-id ledger — idempotence covers re-runs; add one if a fork must re-introduce an old name.
 set -uo pipefail
-LEDGER="template-migrations.yaml"; DRY=0; SPEC=()
+LEDGER="template-migrations.yaml"; DRY=0; SPEC=(); ONE=""; OLDOF=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --ledger) LEDGER="$2"; shift 2 ;;
     --dry-run) DRY=1; shift ;;
+    --file) ONE="$2"; shift 2 ;;
+    --old-path) OLDOF="$2"; shift 2 ;;
     --) shift; SPEC=("$@"); break ;;
     *) echo "usage: $0 [--ledger <file>] [--dry-run] [-- <pathspec>…]" >&2; exit 2 ;;
   esac
@@ -43,6 +51,26 @@ rows="$(awk '
   k!="" && /->/ { s=$0; sub(/^[[:space:]]*-[[:space:]]*/,"",s); gsub(/"/,"",s); sub(/[[:space:]]*#.*/,"",s)
                   n=index(s,"->"); a=substr(s,1,n-1); b=substr(s,n+2); gsub(/[[:space:]]/,"",a); gsub(/[[:space:]]/,"",b)
                   if (a!="" && b!="") print k"\t"a"\t"b }' "$LEDGER")"
+
+if [ -n "$OLDOF" ]; then
+  while IFS=$'\t' read -r kind a b; do
+    if [ "$kind" = files ]; then [ "$OLDOF" = "$b" ] && { echo "$a"; exit 0; }
+    elif [ "$kind" = words ]; then
+      f="${OLDOF##*/}"
+      case "$f" in "$b".kt|"$b".kts|"$b".swift) echo "${OLDOF%/*}/$a.${f##*.}"; exit 0 ;; esac
+    fi
+  done <<< "$rows"
+  exit 0
+fi
+
+if [ -n "$ONE" ]; then
+  while IFS=$'\t' read -r kind a b; do
+    [ -n "$kind" ] || continue
+    if [ "$kind" = words ]; then A="$a" B="$b" perl -pi -e 's/\b\Q$ENV{A}\E\b/$ENV{B}/g' -- "$ONE"
+    else A="$a" B="$b" perl -pi -e 's/\Q$ENV{A}\E/$ENV{B}/g' -- "$ONE"; fi
+  done <<< "$rows"
+  exit 0
+fi
 
 # mv_path <old> <new> — git-mv a tracked file; a target that already exists is reported (C), never overwritten.
 mv_path() {

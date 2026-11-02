@@ -12,7 +12,7 @@ Everything here is **commonMain**. A fork wires its app once, here, and every pl
 [ownership contract](../../../../../../../docs/architecture/cross-cutting/customization-surface.md) for how these
 files are classified `owner: fork`.
 
-## The four seams
+## The seams
 
 | Registry | What a fork controls | Read by (template infra) |
 |---|---|---|
@@ -20,6 +20,7 @@ files are classified `owner: fork`.
 | [`ForkBackboneRegistry`](ForkBackboneRegistry.kt) | The **home-tab body** (default: the demo dashboard) | `feature/home`'s `HomeScreen` shell (via the navbar graph) |
 | [`ForkTabRegistry`](ForkTabRegistry.kt) | The **bottom-nav tabs** (backbone Home/Profile + extras) | `authenticatednavbar/AuthenticatedNavbarNavigationScreen.kt` |
 | [`ForkInitializers`](ForkInitializers.kt) | **App-startup hooks** run after Koin init | `cmp-shared/.../KoinExt.kt#initKoin` (commonMain, every platform) |
+| [`ForkAppShell`](ForkAppShell.kt) | The **app root**: forced theme mode, an app-wide wrapper (SDK init, `CompositionLocalProvider`s), the root content | `ComposeApp.kt` |
 
 ## How each seam works
 
@@ -84,6 +85,13 @@ object ForkInitializers {
 
 `cmp-shared`'s commonMain `initKoin` calls `ForkInitializers.runAll()` once, after Koin starts — on **every**
 platform. Koin is already started, so a hook may resolve dependencies.
+
+### `ForkAppShell` — the app root
+
+What 9 of 21 forks used to change by editing the template's `ComposeApp.kt` / `SharedApp.kt`:
+`darkThemeOverride` / `dynamicColorOverride` (`null` follows the user's setting), `wrap` (runs around the
+whole app, outside the theme) and `root` (default: `RootNavScreen`). Brand colours are not here — they
+live in `core/designsystem/.../theme/ForkTheme.kt`.
 
 ## The `demo:begin` / `demo:end` fences and `--clean`
 

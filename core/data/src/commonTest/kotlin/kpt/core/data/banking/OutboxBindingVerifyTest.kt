@@ -9,10 +9,11 @@
  */
 @file:OptIn(org.koin.core.annotation.KoinInternalApi::class)
 
-package kpt.core.data.di
+package kpt.core.data.banking
 
 import kpt.core.base.store.submit.SubmitOutbox
 import kpt.core.data.config.AppOutboxQualifiers
+import kpt.core.data.di.GeneratedRepositoryBindings
 import org.koin.core.qualifier.Qualifier
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -25,17 +26,18 @@ import kotlin.test.assertTrue
  * `single<>` registration is missing — or vice versa.
  *
  * NOTE (E1 / C1): the demo `SubmitOutbox<*>` bindings were relocated out of the infra
- * aggregator [DataModule] (`RepositoryModule.kt`) into the fork-owned
+ * aggregator [kpt.core.data.di.DataModule] (`RepositoryModule.kt`) into the fork-owned
  * the GENERATED [GeneratedRepositoryBindings]; this test
  * introspects that module's mappings now. The demo qualifiers themselves were relocated to
  * [AppOutboxQualifiers] in `config/`, generated from the same annotation that binds each outbox, so THIS test lives
- * under `demo/` too and `remove-demo.sh` deletes it with the showcase it verifies. The
+ * in the `banking` demo package and `remove-demo.sh` deletes it with the showcase it verifies (it sat in
+ * `di/` until 2026-11-02, outlived the strip, and stopped a cleaned fork's tests compiling). The
  * template-owned [kpt.core.data.di.OutboxQualifiers] seam stays empty and demo-free.
  *
  * Failure mode if not caught: `ClassCastException` at first
  * `.saveByUniqueKey(payload)` call on the mis-registered outbox.
  *
- * Implementation note: we introspect [DataModule]'s `mappings` table (the
+ * Implementation note: we introspect [kpt.core.data.di.DataModule]'s `mappings` table (the
  * static registration map) rather than calling `koinApplication { modules(DataModule) }
  * .koin.get<...>()`. Eager-instantiation of the full DataModule graph requires
  * platform actuals (`platformModule`, `platformSecurityModule`, `AppDatabase`)

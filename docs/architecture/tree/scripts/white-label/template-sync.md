@@ -5,9 +5,9 @@ the KMP Multi-Module Project Generator. These tools help maintain consistency wi
 template repository while allowing for project-specific customizations.
 
 > **Sync-reachable surface.** The canonical surface (`SYNC_DIRS` / `SYNC_FILES` in
-> `scripts/white-label/sync-dirs.sh`) now covers `feature/{home,profile,settings}`,
-> `customization-surface.yaml`, root `build.gradle.kts`, and `kotlin-js-store`, so backbone +
-> customization-surface improvements reach forks. Anti-clobber is preserved via `is_excluded`
+> `scripts/white-label/sync-dirs.sh`) covers `customization-surface.yaml`, root `build.gradle.kts` and
+> `kotlin-js-store`, so customization-surface improvements reach forks. The `feature/{home,profile,settings}`
+> starters are the fork's foundation: shipped once, never synced. Anti-clobber is preserved via `is_excluded`
 > carve-outs in `customization-surface.yaml` — fork-owned paths (e.g. `app-profile/**`) are never
 > rewritten. Run `scripts/white-label/sync-dirs.sh --list` to print the live surface.
 

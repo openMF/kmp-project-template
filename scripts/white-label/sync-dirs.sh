@@ -86,6 +86,7 @@ DRY_RUN=false
 MIRROR=false   # --mirror: template-owned sync roots become a strict mirror (see mirror_template_owned)
 FORCE=false
 ONLY_ITEMS=""   # --only <a,b,c>: restrict the sync to this subset of SYNC_DIRS/SYNC_FILES
+TEMPLATE_REF_ARG="${SYNC_TEMPLATE_REF:-}"   # --template-ref <commit|ref>: sync from this template commit (dev mode), not the merged default branch
 LOG_FILE="sync-$(date +%d%m%Y-%H%M%S).log"
 
 # Directories and files to sync
@@ -111,9 +112,6 @@ SYNC_DIRS=(
     "docs"           # blueprint documentation — architecture patterns, claude pattern guides, deploy/ios/secrets/setup references; fork-ADDED docs survive (checkout never deletes fork-only files), template docs refresh
     ".github"
     ".run"
-    "feature/home"          # backbone (owner: template) — demo/** + generated/** excluded below (WS4/T5)
-    "feature/profile"       # backbone (owner: template) — demo/** excluded below (WS4/T5)
-    "feature/settings"      # backbone (owner: template) — demo/** excluded below (WS4/T5)
     "kotlin-js-store"       # JS lockfile tree (owner: template) — full copy (WS4/T5)
     "tools"                 # KSP processors (store/database/network/data) — the codegen engine
                             # the @StoreProvider / @DbEntity / @ApiBinding annotations depend on.
@@ -220,14 +218,6 @@ declare -A EXCLUSIONS=(
     # their own flavors / dimensions / overrides on top of the synced base.
     # See docs/architecture/cross-cutting/flavors-extension.md for the pattern.
     ["build-logic"]="convention/src/main/kotlin/local:dir"
-    # Feature backbone (WS4/T5) — home/profile/settings are owner:template and now sync,
-    # but their demo/** showcases (and feature/home's generated/**) stay fork-owned. These
-    # carve-outs preserve the fork's demo customizations when the backbone is widened into
-    # the sync surface (RESEARCH.md Area 4 sync-widening risk: widening SYNC_DIRS must
-    # preserve the demo/fork is_excluded carve-outs).
-    ["feature/home"]="demo:dir generated:dir"
-    ["feature/profile"]="demo:dir"
-    ["feature/settings"]="demo:dir"
 )
 
 # Display help information
@@ -249,6 +239,8 @@ show_help() {
     echo "  --mirror        Template-owned sync roots become a STRICT mirror: fork-only files there are"
     echo "                  removed unless held in .template-sync-holds (path<TAB>reason). Opt-in — run"
     echo "                  /kmp-project-template-sync, which classifies the fork's extras first."
+    echo "  --template-ref <ref>  Sync from this template commit or ref instead of the merged default branch"
+    echo "                  (dev mode: iterate on an unmerged template fix by its commit hash). Env: SYNC_TEMPLATE_REF."
     echo
     echo -e "${BOLD}Examples:${NC}"
     echo "  ./sync-dirs.sh              # Run with interactive prompts"
@@ -355,6 +347,9 @@ is_excluded() {
     # (**/demo/**) or the per-fork core/store seam files (D8). These are matched
     # by convention (pattern), not the exact-path EXCLUSIONS map above.
     case "$full_path" in
+        # Test fixtures mimic real trees (a fixture's `feature/demo/` is not a demo package), so the
+        # path conventions below must never reach them — customization-surface.yaml declares them template.
+        scripts/product-health/tests/*) return 1 ;;
         */demo/*)                       return 0 ;;  # demo showcase packages
         */demo)                         return 0 ;;  # a demo/ dir itself
         core/store/*AppScreenStateDefaults.kt) return 0 ;;  # fork seam (D8)
@@ -732,7 +727,7 @@ merge_contract_root_files() {
     # Anchor via resolve_merge_base, NOT `git merge-base` alone — a copied (non-forked) fork has no
     # shared history and the bare call returns empty, which silently degrades every merge below into
     # a full-copy. See resolve_merge_base().
-    local mbase; mbase="$(resolve_merge_base "$BASE_BRANCH" "$TEMP_BRANCH")" || mbase=""
+    local mbase; mbase="$(resolve_merge_base "$FORK_STATE" "$TEMP_BRANCH")" || mbase=""
     local f strat o b t rc
     # gradle.properties joins these rather than SYNC_FILES: it is `owner: merge` and carries the
       # fork's own `fork.project.name`, so a full checkout would clobber it. A 3-way takes the
@@ -743,7 +738,7 @@ merge_contract_root_files() {
         git show "$TEMP_BRANCH:$f" >/dev/null 2>&1 || { print_warning "Template has no $f — skipping."; continue; }
         strat="${CS_M_STRAT:-3way}"
         o="$(mktemp)"; b="$(mktemp)"; t="$(mktemp)"
-        git show "$BASE_BRANCH:$f" > "$o" 2>/dev/null || cp "$f" "$o" 2>/dev/null || : > "$o"
+        git show "$FORK_STATE:$f" > "$o" 2>/dev/null || cp "$f" "$o" 2>/dev/null || : > "$o"
         git show "$TEMP_BRANCH:$f" > "$t" 2>/dev/null
         git show "${mbase}:$f"     > "$b" 2>/dev/null || cp "$o" "$b"
         mkdir -p "$(dirname "$f")"
@@ -797,6 +792,23 @@ resolve_merge_base() {
     return 1
 }
 
+# Remove $1, a path the template at $2 no longer ships under that exact name.
+# A CASE-ONLY rename (encodeImageAsPng.kt → EncodeImageAsPng.kt) is one file on a case-insensitive
+# filesystem — macOS by default. The overlay has already written the new name into that file, so
+# deleting the old name deletes the new one with it: a sync on 2026-11-02 lost both
+# EncodeImageAsPng actuals this way and the fork stopped compiling. When the template ships the path
+# under another case, only the old index entry goes; the file on disk is the template's new one.
+remove_stale_path() {
+    local f=$1 tb=$2 lc
+    lc="$(printf '%s' "$f" | tr '[:upper:]' '[:lower:]')"
+    if git ls-tree -r --name-only "$tb" -- "$(dirname "$f")/" 2>/dev/null \
+         | tr '[:upper:]' '[:lower:]' | grep -qxF -- "$lc"; then
+        git rm --cached -r --quiet -- "$f" 2>/dev/null || true
+        return 0
+    fi
+    git rm -rf --quiet -- "$f" 2>/dev/null || rm -f -- "$f"
+}
+
 # Function to sync directory with exclusions
 # Propagate the template's OWN deletions into a fork that inherited the now-removed file from
 # a previous sync (the `core/platform/notification/bill/**` class: the template consolidated its
@@ -829,7 +841,7 @@ propagate_template_deletions() {
         is_excluded "$dir" "$deleted_f" "file" && continue                # fork-owned/convention path
 
         if git diff --quiet "$PREV_TEMPLATE_SHA" -- "$deleted_f" 2>/dev/null; then
-            git rm -rf --quiet "$deleted_f" 2>/dev/null || rm -f "$deleted_f"
+            remove_stale_path "$deleted_f" "$temp_branch"
             print_step "Dropped template-removed ${BOLD}$deleted_f${NC} (unmodified since last sync)"
         else
             print_warning "Template removed ${BOLD}$deleted_f${NC} but your fork customized it — review manually (kept)."
@@ -862,9 +874,9 @@ mirror_template_owned() {
             print_step "Mirror: HELD ${BOLD}$f${NC} ($(grep -F -- "$f" "$holds" | head -1 | cut -f2))"
             continue
         fi
-        git rm -f --quiet -- "$f" 2>/dev/null || rm -f -- "$f"
+        remove_stale_path "$f" "$temp_branch"
         print_step "Mirror: removed fork-only ${BOLD}$f${NC} from template-owned $dir"
-    done < <(git ls-tree -r --name-only "$BASE_BRANCH" -- "$dir" 2>/dev/null)
+    done < <(git ls-tree -r --name-only "$FORK_STATE" -- "$dir" 2>/dev/null)
 }
 
 # Sync one directory $1 from the upstream branch checked out at $2.
@@ -924,15 +936,28 @@ sync_directory() {
             while IFS= read -r conv_f; do
                 [ -z "$conv_f" ] && continue
                 if is_excluded "$dir" "$conv_f" "file"; then
-                    if git cat-file -e "${BASE_BRANCH}:${conv_f}" 2>/dev/null; then
-                        git checkout "$BASE_BRANCH" -- "$conv_f" 2>/dev/null \
+                    if git cat-file -e "${FORK_STATE}:${conv_f}" 2>/dev/null; then
+                        git checkout "$FORK_STATE" -- "$conv_f" 2>/dev/null \
                             && print_step "Preserved fork's ${BOLD}$conv_f${NC} (convention)"
+                    elif [ -n "${PREV_TEMPLATE_SHA:-}" ] \
+                         && ! git cat-file -e "${PREV_TEMPLATE_SHA}:${conv_f}" 2>/dev/null \
+                         && case "$conv_f" in */schemas/*|*/demo/*|*/demo) false ;; *) true ;; esac \
+                         && [ -n "$(git ls-tree --name-only "$FORK_STATE" -- "$(dirname "$conv_f")/" 2>/dev/null | head -1)" ] \
+                         && [ "$(bash "$SCRIPT_DIR/../customization-surface.sh" resolve "$conv_f" 2>/dev/null | awk 'NR==1{print $2}')" = "fork" ]; then
+                        # A fork-owned file the template ships for the FIRST time (absent at the last
+                        # sync), beside code the fork already has, is a new SEAM the fork has never had —
+                        # not one it removed: keep the template's copy as the seed. Dropping it cost a
+                        # fork its spotless/license-header.txt (2026-11-02), after which spotlessApply
+                        # stripped the license header from ~2,500 files. Not seeded: a file in a
+                        # directory the fork lacks (a sample package's scaffold, e.g. network/main/), a
+                        # Room schema (the fork's own lineage) or demo code.
+                        print_step "Seeded new fork-owned ${BOLD}$conv_f${NC} from the template"
                     else
                         git rm -f --quiet "$conv_f" 2>/dev/null || rm -f "$conv_f"
                         print_step "Dropped upstream-added ${BOLD}$conv_f${NC} (fork removed it)"
                     fi
                 fi
-            done < <(git diff --name-only "$BASE_BRANCH" -- "$dir" 2>/dev/null)
+            done < <(git diff --name-only "$FORK_STATE" -- "$dir" 2>/dev/null)
 
             # ── Deletion propagation (template-side removals the fork inherited) ──
             propagate_template_deletions "$dir" "$temp_branch"
@@ -946,7 +971,7 @@ sync_directory() {
             # (BASE_BRANCH), theirs=upstream (temp_branch), base=merge-base. Guarded:
             # no-op on forks that don't ship the reader.
             if declare -F cs_match_g >/dev/null 2>&1 && declare -F cs_merge >/dev/null 2>&1; then
-                local _mbase; _mbase="$(resolve_merge_base "$BASE_BRANCH" "$temp_branch")" || _mbase=""
+                local _mbase; _mbase="$(resolve_merge_base "$FORK_STATE" "$temp_branch")" || _mbase=""
                 while IFS= read -r _mf; do
                     [ -z "$_mf" ] && continue
                     cs_match_g "$_mf"; [ "${CS_M_OWNER:-}" = "merge" ] || continue
@@ -960,7 +985,7 @@ sync_directory() {
                         continue
                     fi
                     local _o _b _t; _o="$(mktemp)"; _b="$(mktemp)"; _t="$(mktemp)"
-                    if git show "$BASE_BRANCH:$_mf" > "$_o" 2>/dev/null \
+                    if git show "$FORK_STATE:$_mf" > "$_o" 2>/dev/null \
                        && git show "$temp_branch:$_mf" > "$_t" 2>/dev/null; then
                         # ── The per-FILE ancestor, which is not the same as the repo having one ──
                         # A file ADDED on both sides since the last sync (add/add) has a valid repo
@@ -995,6 +1020,13 @@ sync_directory() {
                             catalog-3way)  merge_libs_catalog_3way      "$_o" "$_b" "$_t" "$_mf"; _mrc=$? ;;
                             pbxproj-3way)  merge_pbxproj_3way          "$_o" "$_b" "$_t" "$_mf"; _mrc=$? ;;
                             plist-union)   merge_plist_union           "$_o" "$_b" "$_t" "$_mf"; _mrc=$? ;;
+                            yaml-schema-merge)
+                                # The TEMPLATE's key-ownership schema for this file (`<file>.schema.yaml`),
+                                # read from the commit being synced so a newly retired key is honoured.
+                                local _sch; _sch="$(mktemp)"
+                                git show "$temp_branch:${_mf%.yaml}.schema.yaml" > "$_sch" 2>/dev/null || : > "$_sch"
+                                CS_YAML_SCHEMA="$_sch" cs_merge "$_ms" "$_o" "$_b" "$_t" "$_mf"; _mrc=$?
+                                rm -f "$_sch" ;;
                             *)             cs_merge "$_ms" "$_o" "$_b" "$_t" "$_mf"; _mrc=$? ;;
                         esac
                         # THREE outcomes, not two. A strategy that could not run keeps the fork's
@@ -1010,7 +1042,7 @@ sync_directory() {
                         esac
                     fi
                     rm -f "$_o" "$_b" "$_t"
-                done < <(git diff --name-only "$BASE_BRANCH" "$temp_branch" -- "$dir" 2>/dev/null)
+                done < <(git diff --name-only "$FORK_STATE" "$temp_branch" -- "$dir" 2>/dev/null)
             fi
 
             # Restore excluded files and directories
@@ -1159,6 +1191,11 @@ while [[ $# -gt 0 ]]; do
             MIRROR=true
             shift
             ;;
+        --template-ref)
+            TEMPLATE_REF_ARG="${2:-}"
+            [ -z "$TEMPLATE_REF_ARG" ] && handle_error "--template-ref requires a commit hash or ref"
+            shift 2
+            ;;
         -f|--force)
             FORCE=true
             shift
@@ -1272,6 +1309,23 @@ if ! git rev-parse --verify "origin/dev" >/dev/null 2>&1; then
     BASE_BRANCH="$DEFAULT_BRANCH"
 fi
 
+# TEMPLATE_REF — the template commit this run syncs FROM. Prod mode: the template's merged default
+# branch. Dev mode (--template-ref <sha>): an unmerged commit, e.g. a template PR's head, so a fix
+# found during a sync is tried by its hash without waiting for a merge. Fetched by hash when the
+# remote-tracking refs do not already carry it.
+if [ -n "$TEMPLATE_REF_ARG" ]; then
+    if ! git rev-parse --verify -q "${TEMPLATE_REF_ARG}^{commit}" >/dev/null; then
+        git fetch "$TEMPLATE_REMOTE" "$TEMPLATE_REF_ARG" >/dev/null 2>&1 \
+            || handle_error "--template-ref '$TEMPLATE_REF_ARG' is not reachable from $TEMPLATE_REMOTE"
+    fi
+    TEMPLATE_REF="$(git rev-parse --verify -q "${TEMPLATE_REF_ARG}^{commit}" 2>/dev/null || git rev-parse FETCH_HEAD)"
+    TEMPLATE_REF_LABEL="$TEMPLATE_REF_ARG"
+    print_warning "DEV MODE: syncing from template commit ${BOLD}${TEMPLATE_REF:0:12}${NC} (not the merged $BASE_BRANCH)"
+else
+    TEMPLATE_REF="$TEMPLATE_REMOTE/$BASE_BRANCH"
+    TEMPLATE_REF_LABEL="$BASE_BRANCH"
+fi
+
 # ── SELF-UPDATE + RE-EXEC — always run the LATEST engine (close the stale-engine chicken-and-egg) ──
 # sync-dirs.sh is template-owned + self-propagating, but a fork runs its OWN copy, which only updates
 # MID dir-loop (in `scripts/`) — too late for the current run. A fork carrying a stale engine (e.g. one
@@ -1283,8 +1337,8 @@ fi
 # against an infinite loop; requires a clean tree; skipped in --dry-run (warns instead of mutating).
 _self_rel="scripts/white-label/sync-dirs.sh"
 if [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] && [ "$DRY_RUN" = false ] \
-   && git cat-file -e "$TEMPLATE_REMOTE/$BASE_BRANCH:$_self_rel" 2>/dev/null; then
-    _tpl_engine="$(git rev-parse "$TEMPLATE_REMOTE/$BASE_BRANCH:$_self_rel" 2>/dev/null || echo "")"
+   && git cat-file -e "$TEMPLATE_REF:$_self_rel" 2>/dev/null; then
+    _tpl_engine="$(git rev-parse "$TEMPLATE_REF:$_self_rel" 2>/dev/null || echo "")"
     _loc_engine="$(git hash-object "$_self_rel" 2>/dev/null || echo "")"
     if [ -n "$_tpl_engine" ] && [ "$_tpl_engine" != "$_loc_engine" ]; then
         if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
@@ -1294,9 +1348,9 @@ if [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] && [ "$DRY_RUN" = false ] \
             print_step "Self-updating the sync engine from the template on ${BOLD}$_su_branch${NC}, then re-running on the latest…"
             if git checkout -b "$_su_branch" "$BASE_BRANCH" >/dev/null 2>&1; then
                 for _up in "$_self_rel" scripts/customization-surface.sh customization-surface.yaml; do
-                    git cat-file -e "$TEMPLATE_REMOTE/$BASE_BRANCH:$_up" 2>/dev/null || continue
+                    git cat-file -e "$TEMPLATE_REF:$_up" 2>/dev/null || continue
                     mkdir -p "$(dirname "$_up")"
-                    git show "$TEMPLATE_REMOTE/$BASE_BRANCH:$_up" > "$_up" 2>/dev/null
+                    git show "$TEMPLATE_REF:$_up" > "$_up" 2>/dev/null
                 done
                 chmod +x "$_self_rel" scripts/customization-surface.sh 2>/dev/null || true
                 git add "$_self_rel" scripts/customization-surface.sh customization-surface.yaml >/dev/null 2>&1
@@ -1317,6 +1371,25 @@ else
     print_step "Creating sync branch: ${BOLD}$SYNC_BRANCH${NC}"
 fi
 
+# FORK_STATE — the fork's own pre-sync state: "ours" in every 3-way merge, and the source a preserved
+# (excluded or held) path is restored from. It is the branch the sync lands on, captured before the
+# engine writes anything. That is the default branch only when the engine cuts a fresh sync branch from
+# it; a branch the CALLER pins (SYNC_PREBUILT_BRANCH, e.g. a session branch carrying unmerged fork
+# work) IS the fork's state. Reading the default branch there treated the fork's older default as
+# "the fork": held files absent from it were dropped and preserved files restored from it.
+if [ -n "${SYNC_PREBUILT_BRANCH:-}" ]; then
+    FORK_STATE="$(git rev-parse --verify -q "${SYNC_PREBUILT_BRANCH}^{commit}")" \
+        || handle_error "SYNC_PREBUILT_BRANCH '$SYNC_PREBUILT_BRANCH' does not resolve to a commit"
+else
+    FORK_STATE="$BASE_BRANCH"
+fi
+# The engine deletes a sync branch only when it created it: a fresh one, or the self-update branch.
+# A caller-pinned branch is never deleted.
+SYNC_BRANCH_OWNED=true
+if [ -n "${SYNC_PREBUILT_BRANCH:-}" ] && [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ]; then
+    SYNC_BRANCH_OWNED=false
+fi
+
 if [ "$DRY_RUN" = false ]; then
     # Create sync branch from base branch — SKIP when the self-update already created + checked it out
     # (we are already on it, with the fresh engine committed and the tree clean).
@@ -1328,7 +1401,7 @@ if [ "$DRY_RUN" = false ]; then
     # Create temporary branch for upstream changes
     TEMP_BRANCH="temp-${SYNC_BRANCH}"
     print_step "Creating temporary branch: ${BOLD}$TEMP_BRANCH${NC}"
-    if ! git checkout -b "$TEMP_BRANCH" "$TEMPLATE_REMOTE/$BASE_BRANCH"; then
+    if ! git checkout -b "$TEMP_BRANCH" "$TEMPLATE_REF"; then
         handle_error "Failed to create temporary branch"
     fi
     show_progress
@@ -1593,14 +1666,14 @@ if [ "$DRY_RUN" = false ]; then
         exit 1
     fi
     print_step "Recording template sync version (.template-version)..."
-    _tv_sha="$(git rev-parse "$TEMPLATE_REMOTE/$BASE_BRANCH" 2>/dev/null || echo "")"
+    _tv_sha="$(git rev-parse "$TEMPLATE_REF" 2>/dev/null || echo "")"
     _tv_tag="$(git describe --tags --exact-match "$_tv_sha" 2>/dev/null || echo "")"
     {
         echo "# .template-version — the openMF/kmp-project-template commit this tree last synced from."
         echo "# Managed by scripts/white-label/sync-dirs.sh — DO NOT hand-edit."
         echo "# Format: bash-parseable key=value (same convention as gradle/fork.properties)."
         echo "template_repo=openMF/kmp-project-template"
-        echo "template_ref=$BASE_BRANCH"
+        echo "template_ref=$TEMPLATE_REF_LABEL"
         echo "template_sha=$_tv_sha"
         echo "template_tag=$_tv_tag"
         echo "synced_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -1657,8 +1730,10 @@ This PR syncs the following items with upstream:
         fi
     else
         print_warning "No changes to commit"
-        git checkout "$BASE_BRANCH"
-        git branch -D "$SYNC_BRANCH"
+        if [ "$SYNC_BRANCH_OWNED" = true ]; then
+            git checkout "$BASE_BRANCH"
+            git branch -D "$SYNC_BRANCH"
+        fi
     fi
 else
     echo -e "\n${YELLOW}${BOLD}Dry run completed. No changes were made.${NC}\n"

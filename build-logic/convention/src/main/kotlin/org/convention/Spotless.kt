@@ -43,7 +43,10 @@ internal fun Project.configureSpotless(extension: SpotlessExtension) = extension
             },
         )
         // ONE header source for every format — spotless/license-header.txt (fork-owned). See LicenseHeader.
-        licenseHeader(LicenseHeader.kotlin(rootProject.rootDir))
+        // An EMPTY header is not configured at all: Spotless applies `licenseHeader("")` by DELETING every
+        // existing header, so a missing header file (a fork that never received it) stripped the header from
+        // ~2,500 files on 2026-11-02. No header source means "leave headers alone", never "remove them".
+        LicenseHeader.kotlin(rootProject.rootDir).takeIf(String::isNotEmpty)?.let { licenseHeader(it) }
     }
 
     kotlinGradle {
@@ -53,7 +56,8 @@ internal fun Project.configureSpotless(extension: SpotlessExtension) = extension
             mapOf("android" to "true"),
         )
         // Look for the first line that doesn't have a block comment (assumed to be the license)
-        licenseHeader(LicenseHeader.kotlin(rootProject.rootDir), "(^(?![\\/ ]\\*).*$)")
+        LicenseHeader.kotlin(rootProject.rootDir).takeIf(String::isNotEmpty)
+            ?.let { licenseHeader(it, "(^(?![\\/ ]\\*).*$)") }
     }
 
     format("xml") {
@@ -67,6 +71,6 @@ internal fun Project.configureSpotless(extension: SpotlessExtension) = extension
         }
         targetExclude("**/build/**/*.xml")
         // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
-        licenseHeader(LicenseHeader.xml(rootProject.rootDir), "(<[^!?])")
+        LicenseHeader.xml(rootProject.rootDir).takeIf(String::isNotEmpty)?.let { licenseHeader(it, "(<[^!?])") }
     }
 }

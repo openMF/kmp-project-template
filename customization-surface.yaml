@@ -335,28 +335,9 @@ rules:
   # `demo/` (an earlier revision removed globs like `core/store/economic/**` as dead — they matched
   # nothing while the stores sat under demo/; the move makes them live again, and demo-showcase is
   # the correct class for them, not `template`).
-  - glob: "core/store/**/kpt/core/store/alerts/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/banking/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/calc/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/cloudtodo/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/crypto/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/currency/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/economic/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/emi/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/exchange/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/profile/**"
-    owner: demo-showcase
-  - glob: "core/store/**/kpt/core/store/watchlist/**"
-    owner: demo-showcase
+  # Demo packages per module — read from core/<module>/module-packages.yaml (`demo:` ids), not
+  # restated here. Each id becomes core/<module>/**/kpt/core/<module>/<id>/** → demo-showcase.
+  - packages: module-packages
   # Demo-showcase cache keys — split out of the template-owned AppCacheKeys (E1/C5) and declared
   # for deletion via app.yaml#core_store.template_files[].
   # White-label registry seams — the fork-owned extension package (cmp.navigation.registry). The
@@ -472,7 +453,8 @@ rules:
   - glob: "cmp-desktop/build.gradle.kts"
     owner: merge
     strategy: kotlin-3way
-  - glob: "fastlane-config/project_config.rb"
+  # project_config.rb + the legacy extract_config.rb some forks still carry — fork config, never synced.
+  - glob: "fastlane-config/*_config.rb"
     owner: fork
   # Store-listing text + media are DERIVED from app-profile/ by syncForkConfig — the SoT is
   # app-profile/app.yaml + platforms/<p>/*.yaml (text) and app-profile/platforms/<p>/media (media).
@@ -607,18 +589,6 @@ rules:
   # Each module's template packages are enumerated in its module-packages.yaml and (where they are
   # showcase) given a demo-showcase rule; everything else under the module is the FORK's own and must
   # not be claimed by the `core/**` blanket. More-specific rules above still win.
-  - glob: "core/network/**/kpt/core/network/coingecko/**"
-    owner: demo-showcase
-  - glob: "core/network/**/kpt/core/network/fineract/**"
-    owner: demo-showcase
-  - glob: "core/network/**/kpt/core/network/frankfurter/**"
-    owner: demo-showcase
-  - glob: "core/network/**/kpt/core/network/fred/**"
-    owner: demo-showcase
-  - glob: "core/network/**/kpt/core/network/jsonplaceholder/**"
-    owner: demo-showcase
-  - glob: "core/network/**/kpt/core/network/worldbank/**"
-    owner: demo-showcase
   - glob: "core/network/**/kpt/core/network/lwmswhoxvvoagzkqxiyd/**"
     owner: template
   - glob: "core/network/**/kpt/core/network/config/**"
@@ -647,8 +617,6 @@ rules:
   # never contains demo code. A fork's own feature package is undeclared and falls to the module
   # catch-all below (`fork`), so adding `payments/` needs no rule and no row. `loans/` is the
   # template's showcase of that layout, hence demo-showcase: shipped, synced, deleted by `--clean`.
-  - glob: "core/firebase/**/kpt/core/firebase/loans/**"
-    owner: demo-showcase
   - glob: "core/firebase/**/kpt/core/firebase/config/**"
     owner: template
   - glob: "core/firebase/**/kpt/core/firebase/di/**"
@@ -694,22 +662,6 @@ rules:
   # These had NO rows at all and fell to the `core/**` blanket as `template`, which is the wrong
   # class for showcase code: a fork keeping the demo would stop receiving updates to it. Caught by
   # G-CORE-PKG (MP-1) the moment core/database was folded into the audit.
-  - glob: "core/database/**/kpt/core/database/alerts/**"
-    owner: demo-showcase
-  - glob: "core/database/**/kpt/core/database/banking/**"
-    owner: demo-showcase
-  - glob: "core/database/**/kpt/core/database/cloudtodo/**"
-    owner: demo-showcase
-  - glob: "core/database/**/kpt/core/database/crypto/**"
-    owner: demo-showcase
-  - glob: "core/database/**/kpt/core/database/currency/**"
-    owner: demo-showcase
-  - glob: "core/database/**/kpt/core/database/economic/**"
-    owner: demo-showcase
-  - glob: "core/database/**/kpt/core/database/migrations/**"
-    owner: demo-showcase
-  - glob: "core/database/**/kpt/core/database/watchlist/**"
-    owner: demo-showcase
   # FRAMEWORK packages — template-authored, full-copied. `config` holds the generated DatabaseConfig
   # + the fork-owned ForkDatabaseConfig (which has its own more-specific rule above).
   - glob: "core/database/**/kpt/core/database/config/**"
@@ -734,10 +686,6 @@ rules:
     owner: fork
 
   # ── core/domain — declared packages; both are showcase, so a cleaned fork gets an empty module ──
-  - glob: "core/domain/**/kpt/core/domain/calc/**"
-    owner: demo-showcase
-  - glob: "core/domain/**/kpt/core/domain/emi/**"
-    owner: demo-showcase
   # A fork's own calculators. Everything the template owns is enumerated above.
   # The fork-extension seam — template-owned so a sync keeps delivering upstream fixes.
   # MUST stay above the module catch-all below, which resolves `fork`.
@@ -763,26 +711,6 @@ rules:
   # app-profile#data.packages[]. Each needs a rule here or it falls to the `core/**` blanket and
   # resolves `template`, which is the wrong class: a fork keeping the demo would stop receiving
   # updates to it. G-DATA-PKG (DP-1) fails if a declared template package has no rule.
-  - glob: "core/data/**/kpt/core/data/alerts/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/banking/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/calc/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/cloudtodo/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/crypto/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/currency/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/economic/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/emi/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/profile/**"
-    owner: demo-showcase
-  - glob: "core/data/**/kpt/core/data/watchlist/**"
-    owner: demo-showcase
   # FRAMEWORK packages — template-authored, full-copied by the sync. `infra` is test-only support.
   - glob: "core/data/**/kpt/core/data/user/**"
     owner: template
@@ -825,26 +753,6 @@ rules:
   # decides the lifecycle. Without these rows they would fall to the `core/**` blanket and resolve
   # `template`, which is the wrong class — a fork that keeps the demo would stop receiving updates
   # to it, and `--verify`'s coverage audit would not notice because the blanket matches.
-  - glob: "core/model/**/kpt/core/model/alerts/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/banking/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/calc/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/cloudtodo/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/crypto/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/currency/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/economic/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/emi/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/profile/**"
-    owner: demo-showcase
-  - glob: "core/model/**/kpt/core/model/watchlist/**"
-    owner: demo-showcase
 
   # A FORK's own model packages. Declared as the module's catch-all rather than a named seam: the
   # TEMPLATE's packages are enumerated above and in app-profile#model.packages[], so "everything else

@@ -43,6 +43,8 @@ cs_parse_rules() {
       if (line ~ /default:[[:space:]]*true/) def="1"
       emit(); next
     }
+    # package-manifest directive — expanded by cs_expand_packages at this position
+    /^[[:space:]]*-[[:space:]]*packages:/ { emit(); print "@packages|"; next }
     # block form start — extract the QUOTED value (drops any trailing # comment)
     /^[[:space:]]*-[[:space:]]*glob:/ {
       emit()
@@ -84,8 +86,34 @@ cs_load_rules() {
     [ -z "$glob" ] && continue
     CS_RX+=("$(cs_glob_to_regex "$glob")")
     CS_OWNER+=("$owner"); CS_STRAT+=("$strat"); CS_DEF+=("$def"); CS_GLOB+=("$glob")
-  done < <(cs_parse_rules)
+  done < <(cs_parse_rules | cs_expand_packages)
   CS_LOADED=1
+}
+
+# Package-level ownership lives BESIDE each module, in its module-packages.yaml — the contract does
+# not restate it. A `- packages: module-packages` entry in the contract marks WHERE (in first-match
+# order) those rows apply; it expands into one `demo-showcase` rule per `demo:` id of each
+# core/<module>/module-packages.yaml → core/<module>/**/kpt/core/<module>/<id>/**.
+# (feature/module-packages.yaml lists whole demo MODULES, which are fork territory and never synced;
+# `feature/**` already owns them.) Manifests are found next to the contract being evaluated, so a
+# fork, a fixture and a scratch copy (ownership audit, surface report) each read their own.
+cs_expand_packages() {
+  local base line f mod id
+  base="$(dirname "$CS_CONTRACT")"
+  while IFS= read -r line; do
+    case "$line" in
+      "@packages|"*)
+        for f in "$base"/core/*/module-packages.yaml; do
+          [ -f "$f" ] || continue
+          mod="$(basename "$(dirname "$f")")"
+          while IFS= read -r id; do
+            [ -n "$id" ] && printf 'core/%s/**/kpt/core/%s/%s/**|demo-showcase||0\n' "$mod" "$mod" "$id"
+          done < <(awk '/^demo:[[:space:]]*$/{s=1; next} /^[a-z_]+:/{s=0}
+                        s && /id:/ {v=$0; sub(/.*id:[[:space:]]*/,"",v); sub(/[,}[:space:]].*/,"",v); print v}' "$f")
+        done ;;
+      *) printf '%s\n' "$line" ;;
+    esac
+  done
 }
 
 # ── --verify zero-match-rule guard (pure-white-label-store5-network E0/T2) ────────

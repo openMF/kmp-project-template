@@ -380,6 +380,8 @@ is_held() {
     [ -n "${_HELD[$1]:-}" ]
 }
 
+# is_excluded <dir> <path> <type> — 0 when the sync must leave <path> in the fork's state: held, or
+# owned `fork` / `demo-showcase` (see the ownership note above owner_of).
 is_excluded() {
     local full_path="${2#./}"
     is_held "$full_path" && return 0

@@ -87,7 +87,7 @@ migrations:
       template could never deliver anything new into it. Template-first inverts that: the template
       owns what is not claimed. The flip is only safe once every fork-owned path has an EXPLICIT rule,
       which is why it ships with the contract rather than as a fork-side edit.
-    detect: grep -q 'CS_M_OWNER="fork"' "$SRC/scripts/customization-surface.sh"
+    detect: awk '/glob: "\*\*"$/{getline; print; exit}' "$SRC/customization-surface.yaml" | grep -q "owner: fork"   # the catch-all still fork
     migrate: >
       Adopt the template's customization-surface.yaml AND scripts/customization-surface.sh together —
       they are one atomic pair and the engine's STEP 0 self-guard HALTs on a mismatched pair

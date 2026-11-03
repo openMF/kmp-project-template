@@ -322,6 +322,34 @@ in_app_review:
   min_days_since_install: 3
   cooldown_days: 90                          # after a prompt, do not ask again inside this window
 
+# The repository's community files. The org's devops and security teams set them up per repository —
+# not the template and not this repo's tooling — so a template sync never writes them
+# (`strategy: repo-files` in customization-surface.yaml). Each file declares who may EDIT it:
+#   access: read            locked (default; also when a file or this block is absent)
+#   access: write           editable — optionally `writers: [github-login, …]` to name who
+# The framework workspace's `_org/company.yaml#repo_files.<file>` overrides a file's entry here.
+# Other spellings share an entry: Contributing.md → CONTRIBUTING.md; LICENCE / LICENSE.md → LICENSE.
+# A file outside the repo root is keyed by its repo-relative path (.github/workflows/cla-check.yml).
+repo_files:
+  managed_by: org
+  files:
+    CODE_OF_CONDUCT.md: { access: read }
+    CONTRIBUTING.md:    { access: read }
+    LICENSE:            { access: read }
+    SECURITY.md:        { access: read }
+    .github/workflows/cla-check.yml: { access: read }   # the org's CLA bot workflow
+
+# Where this repository's work is tracked — read by /idea-jira (the ticket ↔ code audit) and the
+# /flow-to-tickets-* commands. Fork-owned: a fork sets ITS OWN board here. `repo` names the repository
+# the board belongs to, so a fork that inherited the template's block is refused instead of auditing
+# the template's tickets against the fork's code.
+tracking:
+  jira:
+    site: mifosforge.jira.com           # Jira Cloud site (no scheme)
+    project_key: KMPPT                  # the project whose issues are audited
+    board_id: 63                        # https://mifosforge.jira.com/jira/software/c/projects/KMPPT/boards/63
+    repo: openMF/kmp-project-template   # the repository this board tracks
+
 # App security defaults. `./gradlew syncForkConfig` projects this block into
 # core/model/.../config/AppSecurityConfig.kt, which UserData.DEFAULT reads.
 security:

@@ -492,6 +492,14 @@ rules:
     owner: fork
   - glob: ".github/workflows/sync-dirs.yaml"  # fork's own sync workflow
     owner: fork
+  # The org's CLA contributor check — pushed into every repo by the org's automation
+  # (`chore: update CLA contributor check workflow (enforce mode) [skip ci]`), never authored by the
+  # template. A repository community file like CODE_OF_CONDUCT.md (see `strategy: repo-files` below):
+  # a sync never writes it; who may edit it is declared per file in app.yaml / _org/company.yaml.
+  # Must sit ABOVE the `.github/**` template rule — the first matching rule wins.
+  - glob: ".github/workflows/cla-check.yml"
+    owner: fork
+    strategy: repo-files
   - glob: "gradle/fork.properties"            # derived build-bridge from app-profile/app.yaml (do not hand-edit); gitignored
     owner: fork
   - glob: "local.properties"
@@ -899,10 +907,27 @@ rules:
   # story: no rule, so it defaulted to fork and never reached a consumer.
   - { glob: ".bundle/**",                    owner: template }
   - { glob: "META-INF/**",                   owner: template }
-  - { glob: "CODE_OF_CONDUCT.md",            owner: template }
-  - { glob: "CONTRIBUTING.md",               owner: template }
-  - { glob: "LICENSE",                       owner: template }
-  - { glob: "SECURITY.md",                   owner: template }
+  # Repository community files — the code of conduct, contributing guide, licence and security
+  # policy. They belong to the REPOSITORY (often its org: the CLA bot and org-wide SECURITY.md
+  # commits land straight in each repo), never to the template, so a sync never writes them. They
+  # were `owner: template`, and the field-officer sync replaced the app's own Contributing.md and
+  # LICENCE (MPL-2.0 + "Copyright 2024 Mifos Initiative") with the template's (2026-11-03).
+  # The org's devops/security teams set them up per repository. Who may EDIT each one is declared per
+  # file — app-profile/app.yaml#repo_files.files.<file> (access: read|write, writers: [logins]),
+  # overridden by the framework workspace's _org/company.yaml#repo_files.<file>. Absent → read (locked).
+  # The globs match both spellings a repo may already use (Contributing.md, LICENCE, LICENSE.md).
+  - glob: "CODE_OF_CONDUCT.md"
+    owner: fork
+    strategy: repo-files
+  - glob: "C[Oo][Nn][Tt][Rr][Ii][Bb][Uu][Tt][Ii][Nn][Gg].md"
+    owner: fork
+    strategy: repo-files
+  - glob: "LICEN[CS]E*"
+    owner: fork
+    strategy: repo-files
+  - glob: "SECURITY.md"
+    owner: fork
+    strategy: repo-files
   # The structural-migration record forks consult. Declared owner: template in its own header but
   # was in no SYNC list, so no fork ever received it (2026-10-31 ownership audit).
   - { glob: "template-migrations.yaml",      owner: template }

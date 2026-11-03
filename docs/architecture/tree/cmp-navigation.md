@@ -1,20 +1,20 @@
 # `cmp-navigation/`
 
 > **Kind:** Kotlin Multiplatform module  
-> **Measured:** 55 tracked files — 31× `.kt`, 20× `.xml`, 3× `.md`, 1× `.kts`
+> **Measured:** 56 tracked files — 32× `.kt`, 20× `.xml`, 3× `.md`, 1× `.kts`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `cmp-navigation/src/` | 52 |
+| `cmp-navigation/src/` | 53 |
 | (files at the root) | 3 |
 
 ## Modules
 
 | | |
 |---|---|
-| `cmp-navigation:src` | 31 Kotlin files |
+| `cmp-navigation:src` | 32 Kotlin files |
 
 ## Docs in the tree
 
@@ -36,7 +36,7 @@ root `LayoutDirection`, and no single screen owns either.
 **`RootNavViewModel` makes one decision in one place:** splash → onboarding → auth → lock → app. Two
 screens re-deriving that order is how an app ends up showing onboarding to a signed-in user.
 
-**The registries are fork seams.** `BackboneRegistry`, `FeatureRegistry` and `TabRegistry` are where a
+**The registries are fork seams.** `ForkBackboneRegistry`, `ForkFeatureRegistry` and `ForkTabRegistry` are where a
 fork contributes its own body, modules, destinations and tabs. The feature halves are DERIVED by
-`build-logic`'s generators; the `Project*Module` seams stay listed by hand because they are core-layer
+`build-logic`'s generators; the `Fork*Module` seams stay listed by hand because they are core-layer
 seams, not features, and nothing under `feature/` declares them.

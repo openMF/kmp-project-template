@@ -16,7 +16,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.core.data)
             implementation(projects.core.model)
-            // core/store carries AppScreenStateDefaults + AppErrorMapper; core-base/store carries the
+            // core/store carries KptScreenStateDefaults + KptErrorMapper; core-base/store carries the
             // MutationResult / BlockReason types this screen renders exhaustively.
             implementation(projects.core.store)
 

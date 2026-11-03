@@ -107,7 +107,7 @@ network:
   #                  `/secrets pull`, else the empty secrets/sample/ fake) → local.properties (legacy). No
   #                  key is ever committed. Omit and the client stays inert (isConfigured == false).
   #                  Social sign-in (Google, Apple, guest) is NOT configured here: add the
-  #                  kmp-supabase-auth library through core/network ProjectNetworkModule's
+  #                  kmp-supabase-auth library through core/network ForkNetworkModule's
   #                  SupabaseExtrasProvider (see its KDoc; mbs/cappy is the reference). Without it the
   #                  app talks to Supabase under the publishable key alone, as the template does.
   #

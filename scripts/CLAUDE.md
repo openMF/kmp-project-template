@@ -119,7 +119,9 @@ no CocoaPods toolchain.
 
 | Script | Purpose |
 |---|---|
-| `pre-commit.sh` · `pre-push.sh` | branch guard + Spotless / Detekt / Dependency Guard |
+| `pre-commit.sh` · `pre-push.sh` | thin git hooks (installed by `./gradlew installGitHooks`) — both run `kotlin-checks.sh` |
+| `kotlin-checks.sh` | branch guard + the style checks on the CHANGED Kotlin files only (pre-commit formats and re-stages; pre-push checks); dependencyGuard only when a build file changed; a tree that passed is not re-checked |
+| `kotlin-conform.sh` | the style rules without Gradle, in seconds: licence header + ktlint at Spotless's pinned version + Detekt with `config/detekt/detekt.yml`. Used by the git hooks, the sync engine (on its 3-way merge results) and the framework's write-time hook — one implementation everywhere. `--check` reports instead of fixing |
 | `ci-equivalent-check.sh` | local CI parity for the consumer |
 | `check-secrets-resolver.sh` | Phase-7 guard: the build-secrets resolver stays the single reader |
 | `verify-dynamic-flavor-propagation.sh` | AC-9 canary — a flavor added via `LocalFlavors` auto-derives everywhere |
@@ -192,7 +194,7 @@ secrets) and Path B (vault mode).
 scripts/white-label/doctor.sh
 
 # who owns a path (sync ownership)
-scripts/customization-surface.sh resolve core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt
+scripts/customization-surface.sh resolve core/store/src/commonMain/kotlin/kpt/core/store/di/KptStoreModule.kt
 
 # health suite (30 checks)
 bash scripts/product-health/product-health.sh

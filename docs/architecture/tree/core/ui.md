@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/ui sha=85afc92e30cf0bb9555ada7da748b0557ca78e7e -->
+<!-- api-docs:begin module=core/ui sha=ee58cb194e7b09cfb99f066c4dcd1b36fff87749 -->
 ## API reference
 
-_Generated from `core/ui` at tree `85afc92e30cf` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/ui` at tree `ee58cb194e7b` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/ui/src/commonMain/kotlin/kpt/core/ui/bottombar/KptBottomBar.kt`
@@ -167,76 +167,9 @@ fun KptBottomBar(
 - `val graphRoute: String` — Route of the tab's graph.
 - `val startDestinationRoute: String` — Route of the tab's start destination.
 - `val testTag: String` — The test tag of the tab.
-- `val inlineTab: Boolean get() = true` — Whether this tab renders INLINE inside the navbar scaffold — its content swaps within the inner NavHost so the bottom bar stays visible and the tab keeps its own back stack (exactly like the backbone Home/Profile tabs) — versus a FULL-SCREEN destination pushed on the outer authenticated graph (the bottom bar is hidden; e.g. an immersive focus-timer that declares `bottom_navigation_visible: false`). Default `true` (inline). A full-screen tab overrides to `false`. An inline extra tab (beyond Home/Profile) MUST also register its start destination via `TabRegistry.extraInlineTabDestinations` so the inner NavHost can host it; otherwise the tab has nothing to render inline.
+- `val inlineTab: Boolean get() = true` — Whether this tab renders INLINE inside the navbar scaffold — its content swaps within the inner NavHost so the bottom bar stays visible and the tab keeps its own back stack (exactly like the backbone Home/Profile tabs) — versus a FULL-SCREEN destination pushed on the outer authenticated graph (the bottom bar is hidden; e.g. an immersive focus-timer that declares `bottom_navigation_visible: false`). Default `true` (inline). A full-screen tab overrides to `false`. An inline extra tab (beyond Home/Profile) MUST also register its start destination via `ForkTabRegistry.extraInlineTabDestinations` so the inner NavHost can host it; otherwise the tab has nothing to render inline.
 
-### `core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptPullToRefreshState.kt`
-
-```kotlin
-data class KptPullToRefreshState(
-```
-Data class representing the pull-to-refresh state and behavior.
-
-<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt:57</code></summary>
-
-```kotlin
-    containerColor: Color = KptTheme.colorScheme.background,
-    floatingActionButtonContent: FloatingActionButtonContent? = null,
-    pullToRefreshState: KptPullToRefreshState = rememberKptPullToRefreshState(),
-    contentWindowInsets: WindowInsets = ScaffoldDefaults
-        .contentWindowInsets
-//        .union(WindowInsets.displayCutout)
-        .only(WindowInsetsSides.Horizontal),
-```
-
-</details>
-
-```kotlin
-fun rememberKptPullToRefreshState(
-```
-Remembers and returns a `KptPullToRefreshState` instance.
-
-```kotlin
-fun rememberKptPullToRefreshState(
-```
-Bridge: derive a `KptPullToRefreshState` from a `PagingScreenStream` so `KptScaffold` / `KptRootScaffold` can drive pull-to-refresh on paginated screens without the consumer wiring isRefreshing/onRefresh manually.
-
-<details><summary>Example</summary>
-
-```kotlin
-KptScaffold(
-    pullToRefreshState = rememberKptPullToRefreshState(viewModel.pagingStream),
-    ...
-) { ... }
-// and disable PagingScreenContent's built-in pull-to-refresh:
-PagingScreenContent(
-    pagingStream = viewModel.pagingStream,
-    onRetry = viewModel::onRetry,
-    enablePullToRefresh = false,   // scaffold owns the gesture
-) { items(coins) { ... } }
-```
-
-</details>
-
-```kotlin
-fun <T> rememberKptPullToRefreshState(
-```
-Bridge for non-paginated single-key screens driven by `ScreenDataStream`. Use with `KptScaffold` for detail pages that benefit from pull-to-refresh.
-
-<details><summary>Example</summary>
-
-```kotlin
-KptScaffold(
-    pullToRefreshState = rememberKptPullToRefreshState(
-        stream = viewModel.stream,
-        currentState = uiState,  // your collectAsStateWithLifecycle value
-    ),
-    ...
-) { ... }
-```
-
-</details>
-
-### `core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt`
+### `core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt`
 
 ```kotlin
 fun KptScaffold(
@@ -299,6 +232,73 @@ Fully slot-based scaffold: the caller supplies `topBar`, `bottomBar` and the FAB
 data class FloatingActionButtonContent(
 ```
 Declarative FAB spec — icon, description and click — so a caller configures the FAB without passing a composable slot.
+
+### `core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptPullToRefreshState.kt`
+
+```kotlin
+data class KptPullToRefreshState(
+```
+Data class representing the pull-to-refresh state and behavior.
+
+<details><summary>Used in the template — <code>core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt:57</code></summary>
+
+```kotlin
+    containerColor: Color = KptTheme.colorScheme.background,
+    floatingActionButtonContent: FloatingActionButtonContent? = null,
+    pullToRefreshState: KptPullToRefreshState = rememberKptPullToRefreshState(),
+    contentWindowInsets: WindowInsets = ScaffoldDefaults
+        .contentWindowInsets
+//        .union(WindowInsets.displayCutout)
+        .only(WindowInsetsSides.Horizontal),
+```
+
+</details>
+
+```kotlin
+fun rememberKptPullToRefreshState(
+```
+Remembers and returns a `KptPullToRefreshState` instance.
+
+```kotlin
+fun rememberKptPullToRefreshState(
+```
+Bridge: derive a `KptPullToRefreshState` from a `PagingScreenStream` so `KptScaffold` / `KptRootScaffold` can drive pull-to-refresh on paginated screens without the consumer wiring isRefreshing/onRefresh manually.
+
+<details><summary>Example</summary>
+
+```kotlin
+KptScaffold(
+    pullToRefreshState = rememberKptPullToRefreshState(viewModel.pagingStream),
+    ...
+) { ... }
+// and disable PagingScreenContent's built-in pull-to-refresh:
+PagingScreenContent(
+    pagingStream = viewModel.pagingStream,
+    onRetry = viewModel::onRetry,
+    enablePullToRefresh = false,   // scaffold owns the gesture
+) { items(coins) { ... } }
+```
+
+</details>
+
+```kotlin
+fun <T> rememberKptPullToRefreshState(
+```
+Bridge for non-paginated single-key screens driven by `ScreenDataStream`. Use with `KptScaffold` for detail pages that benefit from pull-to-refresh.
+
+<details><summary>Example</summary>
+
+```kotlin
+KptScaffold(
+    pullToRefreshState = rememberKptPullToRefreshState(
+        stream = viewModel.stream,
+        currentState = uiState,  // your collectAsStateWithLifecycle value
+    ),
+    ...
+) { ... }
+```
+
+</details>
 
 ### `core/ui/src/commonMain/kotlin/kpt/core/ui/utils/PasswordChecker.kt`
 

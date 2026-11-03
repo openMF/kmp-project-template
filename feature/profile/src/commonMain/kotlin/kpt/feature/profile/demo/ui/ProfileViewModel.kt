@@ -27,8 +27,8 @@ import kpt.core.model.profile.ProfileInfo
  * already holds. Same shape as `feature/watchlist` and `feature/macro`'s detail VM.
  *
  * Lives under `demo/` on purpose: `ProfileScreen` stays the opaque shell that renders whatever
- * `BackboneRegistry.profileBody` supplies (the WS01 shell/seam split), and only the default demo
- * body is store-backed. The two seams are orthogonal — `BackboneRegistry` decides WHICH composable
+ * `ForkBackboneRegistry.profileBody` supplies (the WS01 shell/seam split), and only the default demo
+ * body is store-backed. The two seams are orthogonal — `ForkBackboneRegistry` decides WHICH composable
  * renders, the store decides WHERE its data comes from — so a fork can replace the body wholesale,
  * or keep it and swap the store's fetcher for a real signed-in user. This mirrors `feature/home`,
  * whose shell is likewise opaque while `demo/HomeDashboard` carries a ViewModel.

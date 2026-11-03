@@ -32,7 +32,7 @@ fun NavController.navigateToCloudTodo() = navigate(CloudTodoRoute)
  * Dev-only destination for the Store5 write-path demo.
  *
  * @param onResolveConflict hoisted so this module does NOT depend on feature/settings. The caller
- *   (ShowcaseRegistry) supplies `navController.navigateToSyncAndDrafts()` — the shipped conflict
+ *   (ForkShowcaseRegistry) supplies `navController.navigateToSyncAndDrafts()` — the shipped conflict
  *   surface. Keeping the dependency at the registry rather than inside the feature is what stops
  *   this demo from either duplicating that screen or coupling two feature modules together.
  */

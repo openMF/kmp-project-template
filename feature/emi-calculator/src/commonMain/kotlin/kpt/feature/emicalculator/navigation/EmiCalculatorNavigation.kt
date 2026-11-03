@@ -43,7 +43,7 @@ fun NavGraphBuilder.emiCalculatorDestination(navController: NavController) {
     composableWithPushTransitions<EmiCalculatorRoute> {
         // Takes the NavController like every other top-level destination, rather than an
         // `onBackClick` lambda: the aggregate invokes one uniform shape, and a bespoke signature
-        // is exactly what kept this entry hand-wired in FeatureRegistry.
+        // is exactly what kept this entry hand-wired in ForkFeatureRegistry.
         EmiCalculatorScreen(onBackClick = { navController.popBackStackSafely() })
     }
 }

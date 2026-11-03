@@ -6,7 +6,7 @@
 
 ## Principal types
 
-`AppReviewPromptState`, `AppReviewPromptStore`, `ProjectPreferencesRepository`, `ProjectPreferencesRepositoryImpl`, `SettingsAppReviewPromptStore`, `UserPreferencesRepository`, `UserPreferencesRepositoryImpl`
+`AppReviewPromptState`, `AppReviewPromptStore`, `ForkPreferencesRepository`, `ForkPreferencesRepositoryImpl`, `SettingsAppReviewPromptStore`, `UserPreferencesRepository`, `UserPreferencesRepositoryImpl`
 
 <!-- scaffold:end -->
 
@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/datastore sha=f5d457e22548edb0f42d00d0b5d27631538c81a5 -->
+<!-- api-docs:begin module=core/datastore sha=3294924c84475b0114d48b6dd8ca35d0fa5aad63 -->
 ## API reference
 
-_Generated from `core/datastore` at tree `f5d457e22548` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/datastore` at tree `3294924c8447` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/DatastoreModule.kt`
@@ -41,10 +41,10 @@ val DataModule = module {
 
 </details>
 
-### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ProjectDatastoreModule.kt`
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ForkDatastoreModule.kt`
 
 ```kotlin
-val ProjectDatastoreModule = module
+val ForkDatastoreModule = module
 ```
 THE FORK'S datastore DI seam. Empty on the neutral template — this is yours to fill. `DatastoreModule` beside it is `owner: template` and FULL-COPIES on a sync, so a binding added there is replaced on the next adopt.
 
@@ -96,17 +96,17 @@ class SettingsAppReviewPromptStore(
 
 </details>
 
-### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepository.kt`
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ForkPreferencesRepository.kt`
 
 ```kotlin
-interface ProjectPreferencesRepository : UserPreferencesRepository
+interface ForkPreferencesRepository : UserPreferencesRepository
 ```
 THE FORK'S preferences. Extends the framework's — this is yours to fill.
 
 <details><summary>Example</summary>
 
 ```kotlin
-interface ProjectPreferencesRepository : UserPreferencesRepository {
+interface ForkPreferencesRepository : UserPreferencesRepository {
     val observeMyFlag: Flow<Boolean>
     suspend fun setMyFlag(enabled: Boolean)
 }
@@ -118,13 +118,13 @@ override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ProjectDatastoreModule.kt:31</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ForkDatastoreModule.kt:31</code></summary>
 
 ```kotlin
  */
-val ProjectDatastoreModule = module {
-    single<ProjectPreferencesRepository> {
-        ProjectPreferencesRepositoryImpl(
+val ForkDatastoreModule = module {
+    single<ForkPreferencesRepository> {
+        ForkPreferencesRepositoryImpl(
             delegate = get<UserPreferencesRepository>(),
             // The SAME instances the framework's impl uses — an ownership boundary, not a second
             // store. Namespace fork keys so they cannot collide with a future framework preference.
@@ -132,12 +132,12 @@ val ProjectDatastoreModule = module {
 
 </details>
 
-### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ProjectPreferencesRepositoryImpl.kt`
+### `core/datastore/src/commonMain/kotlin/kpt/core/datastore/prefs/ForkPreferencesRepositoryImpl.kt`
 
 ```kotlin
-class ProjectPreferencesRepositoryImpl(
+class ForkPreferencesRepositoryImpl(
 ```
-Fork implementation of `ProjectPreferencesRepository`. `owner: fork` — never synced.
+Fork implementation of `ForkPreferencesRepository`. `owner: fork` — never synced.
 
 <details><summary>Example</summary>
 
@@ -156,12 +156,12 @@ override suspend fun setDarkThemeConfig(darkThemeConfig: DarkThemeConfig) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ProjectDatastoreModule.kt:32</code></summary>
+<details><summary>Used in the template — <code>core/datastore/src/commonMain/kotlin/kpt/core/datastore/di/ForkDatastoreModule.kt:32</code></summary>
 
 ```kotlin
-val ProjectDatastoreModule = module {
-    single<ProjectPreferencesRepository> {
-        ProjectPreferencesRepositoryImpl(
+val ForkDatastoreModule = module {
+    single<ForkPreferencesRepository> {
+        ForkPreferencesRepositoryImpl(
             delegate = get<UserPreferencesRepository>(),
             // The SAME instances the framework's impl uses — an ownership boundary, not a second
             // store. Namespace fork keys so they cannot collide with a future framework preference.

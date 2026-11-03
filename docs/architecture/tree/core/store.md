@@ -15,7 +15,7 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 ## Principal types
 
-`AmortizationCalcParams`, `AmortizationCompute`, `CloudTodoConflictResolver`, `CloudTodoKey`, `CloudTodoSyncOrchestrator`, `EmiCompute`, `EmiParams`, `ErrorMessageOverrides`, `InterestRateSeriesKey`, `MacroIndicatorKey`, `ProfileInfoSource`, `ProjectErrorMapper`, `ProjectScreenStateDefaults`, `ScreenStateOverrides`  …and 1 more
+`AmortizationCalcParams`, `AmortizationCompute`, `CloudTodoConflictResolver`, `CloudTodoKey`, `CloudTodoSyncOrchestrator`, `EmiCompute`, `EmiParams`, `ErrorMessageOverrides`, `ForkErrorMapper`, `ForkScreenStateDefaults`, `InterestRateSeriesKey`, `MacroIndicatorKey`, `ProfileInfoSource`, `ScreenStateOverrides`  …and 1 more
 
 <!-- scaffold:end -->
 
@@ -23,10 +23,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/store sha=77a6e48e8dd64277120e6a49c735a34e9ca0d3fb -->
+<!-- api-docs:begin module=core/store sha=bd77bde270cfb61c4b4270af47adbc79646362e1 -->
 ## API reference
 
-_Generated from `core/store` at tree `77a6e48e8dd6` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/store` at tree `bd77bde270cf` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/alerts/impl/AlertMappers.kt`
@@ -222,7 +222,76 @@ fun String.toCloudTodoKeyOrNull(): CloudTodoKey? =
 ```
 Parse a bookkeeper key back into a `CloudTodoKey`, or `null` when it belongs to a different store.
 
-### `core/store/src/commonMain/kotlin/kpt/core/store/config/AppErrorMapper.kt`
+### `core/store/src/commonMain/kotlin/kpt/core/store/config/ForkErrorMapper.kt`
+
+```kotlin
+object ForkErrorMapper : ErrorMessageOverrides
+```
+THE FORK'S domain-error copy. Neutral on the template — this is yours to fill.
+
+<details><summary>Example</summary>
+
+```kotlin
+object ForkErrorMapper : ErrorMessageOverrides {
+    override fun message(error: Throwable): String? = when (error) {
+        is InsufficientFundsException -> "Not enough balance for this transfer."
+        is CardDeclinedException -> "That card was declined. Try another payment method."
+        else -> null
+    }
+}
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptErrorMapper.kt:101</code></summary>
+
+```kotlin
+    val clientCopy = stringResource(Res.string.error_category_client)
+    val genericCopy = stringResource(Res.string.error_category_generic)
+    val projectCopy = ForkErrorMapper::message
+    return remember(
+        networkCopy,
+        connectTimeoutCopy,
+        readTimeoutCopy,
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/config/ForkScreenStateDefaults.kt`
+
+```kotlin
+object ForkScreenStateDefaults : ScreenStateOverrides
+```
+THE FORK'S branding for the shared empty / error / no-network / loading visuals. Neutral on the template — this is yours to fill. Implements the TEMPLATE-owned `ScreenStateOverrides`.
+
+<details><summary>Example</summary>
+
+```kotlin
+object ForkScreenStateDefaults : ScreenStateOverrides {
+    override fun customize(defaults: ScreenStateDefaults): ScreenStateDefaults = defaults.copy(
+        empty = defaults.empty.copy(visual = ScreenStateVisual.Lottie(spec = MyBrandAnimations.empty)),
+        error = defaults.error.copy(onShown = { e -> AppTelemetry.recordError("screen_state_error", e) }),
+    )
+}
+```
+
+</details>
+
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt:102</code></summary>
+
+```kotlin
+                retryText = nonetRetry,
+            ),
+        ).let(ForkScreenStateDefaults::customize)
+    }
+}
+
+/**
+```
+
+</details>
+
+### `core/store/src/commonMain/kotlin/kpt/core/store/config/KptErrorMapper.kt`
 
 ```kotlin
 fun errorCategoryToken(error: Throwable): String = when (val cat = categorize(error))
@@ -232,14 +301,14 @@ Application-level error → user-facing message mapper. ONE source of user-facin
 ```kotlin
 interface ErrorMessageOverrides
 ```
-The fork's error-copy extension point, declared HERE so it is TEMPLATE-owned and full-copied by every sync. `ProjectErrorMapper` implements it and is the only fork-owned half.
+The fork's error-copy extension point, declared HERE so it is TEMPLATE-owned and full-copied by every sync. `ForkErrorMapper` implements it and is the only fork-owned half.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/ProjectErrorMapper.kt:50</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/ForkErrorMapper.kt:50</code></summary>
 
 ```kotlin
  * stop refetching. Declare the key on its store instead.
  */
-object ProjectErrorMapper : ErrorMessageOverrides
+object ForkErrorMapper : ErrorMessageOverrides
 ```
 
 </details>
@@ -251,98 +320,29 @@ fun rememberAppErrorMessageFor(): (Throwable) -> String
 ```
 Composable factory that resolves per-category copy via `stringResource(...)`, returning a pure-Kotlin `(Throwable) -> String` lambda safe to pass through to `kpt.core.base.ui.screen.ScreenStateError.messageFor` (which is invoked from inside composition where these strings are already memoised). Reuses `categorize` to bucket the error, then picks the localized string.
 
-### `core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt`
+### `core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt`
 
 ```kotlin
 fun appScreenStateDefaults(): ScreenStateDefaults
 ```
-TEMPLATE-OWNED framework defaults. Brand your app in `ProjectScreenStateDefaults` instead — do NOT edit this file. It used to say "!!
+TEMPLATE-OWNED framework defaults. Brand your app in `ForkScreenStateDefaults` instead — do NOT edit this file. It used to say "!!
 
 ```kotlin
 interface ScreenStateOverrides
 ```
-The fork's screen-state branding extension point, declared HERE so it is TEMPLATE-owned and full-copied by every sync. `ProjectScreenStateDefaults` implements it and is the only fork-owned half.
+The fork's screen-state branding extension point, declared HERE so it is TEMPLATE-owned and full-copied by every sync. `ForkScreenStateDefaults` implements it and is the only fork-owned half.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/ProjectScreenStateDefaults.kt:39</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/ForkScreenStateDefaults.kt:39</code></summary>
 
 ```kotlin
  * that introduces it.
  */
-object ProjectScreenStateDefaults : ScreenStateOverrides
+object ForkScreenStateDefaults : ScreenStateOverrides
 ```
 
 </details>
 
 - `fun customize(defaults: ScreenStateDefaults): ScreenStateDefaults = defaults` — Return `defaults` with the fork's branding applied, or `defaults` unchanged.
-
-### `core/store/src/commonMain/kotlin/kpt/core/store/config/ProjectErrorMapper.kt`
-
-```kotlin
-object ProjectErrorMapper : ErrorMessageOverrides
-```
-THE FORK'S domain-error copy. Neutral on the template — this is yours to fill.
-
-<details><summary>Example</summary>
-
-```kotlin
-object ProjectErrorMapper : ErrorMessageOverrides {
-    override fun message(error: Throwable): String? = when (error) {
-        is InsufficientFundsException -> "Not enough balance for this transfer."
-        is CardDeclinedException -> "That card was declined. Try another payment method."
-        else -> null
-    }
-}
-```
-
-</details>
-
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppErrorMapper.kt:101</code></summary>
-
-```kotlin
-    val clientCopy = stringResource(Res.string.error_category_client)
-    val genericCopy = stringResource(Res.string.error_category_generic)
-    val projectCopy = ProjectErrorMapper::message
-    return remember(
-        networkCopy,
-        connectTimeoutCopy,
-        readTimeoutCopy,
-```
-
-</details>
-
-### `core/store/src/commonMain/kotlin/kpt/core/store/config/ProjectScreenStateDefaults.kt`
-
-```kotlin
-object ProjectScreenStateDefaults : ScreenStateOverrides
-```
-THE FORK'S branding for the shared empty / error / no-network / loading visuals. Neutral on the template — this is yours to fill. Implements the TEMPLATE-owned `ScreenStateOverrides`.
-
-<details><summary>Example</summary>
-
-```kotlin
-object ProjectScreenStateDefaults : ScreenStateOverrides {
-    override fun customize(defaults: ScreenStateDefaults): ScreenStateDefaults = defaults.copy(
-        empty = defaults.empty.copy(visual = ScreenStateVisual.Lottie(spec = MyBrandAnimations.empty)),
-        error = defaults.error.copy(onShown = { e -> AppTelemetry.recordError("screen_state_error", e) }),
-    )
-}
-```
-
-</details>
-
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt:102</code></summary>
-
-```kotlin
-                retryText = nonetRetry,
-            ),
-        ).let(ProjectScreenStateDefaults::customize)
-    }
-}
-
-/**
-```
-
-</details>
 
 ### `core/store/src/commonMain/kotlin/kpt/core/store/crypto/impl/CoinDetailStore.kt`
 
@@ -372,10 +372,10 @@ fun provideRateHistoryStore(
 ```
 Historical FX series for a (from, to, window) key — `NETWORK_WITH_CACHE`. Widening the window is a NEW key and therefore a full re-fetch, not a page append: the series is windowed, never paged.
 
-### `core/store/src/commonMain/kotlin/kpt/core/store/di/ProjectStoreModule.kt`
+### `core/store/src/commonMain/kotlin/kpt/core/store/di/ForkStoreModule.kt`
 
 ```kotlin
-val ProjectStoreModule = module
+val ForkStoreModule = module
 ```
 THE FORK'S store-layer DI seam. Empty on the neutral template — this is yours to fill.
 
@@ -385,14 +385,14 @@ THE FORK'S store-layer DI seam. Empty on the neutral template — this is yours 
 @StoreProvider(id = "myThing", ttl = "5m")
 @CacheKey(name = "LIST", key = "myThing")
 fun provideMyThingStore(api: MyApi, dao: MyDao): Store<Unit, List<MyThing>> = …
-val ProjectStoreModule = module {
+val ForkStoreModule = module {
     single<DraftInventory> { MyForkDraftInventory(draftDao = get(), audit = get()) }
 }
 ```
 
 </details>
 
-### `core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt`
+### `core/store/src/commonMain/kotlin/kpt/core/store/di/KptStoreModule.kt`
 
 ```kotlin
 val appStoreModule: Module = module

@@ -25,10 +25,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/data sha=e887a2282b2290e57e8e01e9e5812d7ade1d38c9 -->
+<!-- api-docs:begin module=core/data sha=63e5cf79bd293b10dbdccf5d98284ac2fe013d4a -->
 ## API reference
 
-_Generated from `core/data` at tree `e887a2282b22` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/data` at tree `63e5cf79bd29` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/data/src/commonMain/kotlin/kpt/core/data/alerts/AlertsDataProviders.kt`
@@ -316,6 +316,21 @@ Default `CurrencyRepository` over the Frankfurter-backed exchange-rate and histo
 
 </details>
 
+### `core/data/src/commonMain/kotlin/kpt/core/data/di/ForkRepositoryModule.kt`
+
+```kotlin
+val ForkRepositoryModule = module
+```
+THE FORK'S repository DI seam. Empty on the neutral template — this is yours to fill.
+
+<details><summary>Example</summary>
+
+```kotlin
+single<MyRepository> { MyRepositoryImpl(get(), get()) }
+```
+
+</details>
+
 ### `core/data/src/commonMain/kotlin/kpt/core/data/di/OutboxQualifiers.kt`
 
 ```kotlin
@@ -331,7 +346,7 @@ val MyThing = named("outbox.myThing")
 
 </details>
 
-<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/di/OutboxBindingVerifyTest.kt:86</code></summary>
+<details><summary>Used in the template — <code>core/data/src/commonTest/kotlin/kpt/core/data/banking/OutboxBindingVerifyTest.kt:88</code></summary>
 
 ```kotlin
             match,
@@ -341,21 +356,6 @@ val MyThing = named("outbox.myThing")
         // Sanity — the qualifier value matches what callers use (e.g. `get(qualifier = X)`).
         assertTrue(
             match.beanDefinition.qualifier == expected,
-```
-
-</details>
-
-### `core/data/src/commonMain/kotlin/kpt/core/data/di/ProjectRepositoryModule.kt`
-
-```kotlin
-val ProjectRepositoryModule = module
-```
-THE FORK'S repository DI seam. Empty on the neutral template — this is yours to fill.
-
-<details><summary>Example</summary>
-
-```kotlin
-single<MyRepository> { MyRepositoryImpl(get(), get()) }
 ```
 
 </details>

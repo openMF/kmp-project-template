@@ -43,7 +43,12 @@ MARK = "<!-- tree-scaffold:end -->"
 def git(*a):
     return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True).stdout.splitlines()
 
-FILES = git("ls-files")
+# The tree AS THE NEXT COMMIT WILL HOLD IT: tracked + untracked-not-ignored files that exist on disk.
+# Plain `git ls-files` lists the INDEX, so a refresh run before committing a new file (or after
+# deleting one) wrote pages that went stale the moment the commit landed, and CI then failed the
+# docs check on a tree that had been "refreshed". On a clean checkout this is exactly `git ls-files`.
+FILES = sorted({f for f in git("ls-files", "-co", "--exclude-standard")
+                if os.path.lexists(os.path.join(ROOT, f))})
 
 # Areas with no page, each with the REASON — published on PROJECT_TREE.md rather than left implicit. An
 # area silently missing from the map is indistinguishable from one nobody has considered, which is the
@@ -486,12 +491,14 @@ def render(area, kind, files):
     return "\n".join(L)
 
 changed = []
+produced = set()   # every page this run writes — see the PROJECT_TREE count below
 os.makedirs(os.path.join(ROOT, OUT), exist_ok=True)
 for area in areas:
     files = by_area[area]
     kind = classify(area, files)
     for child, cfiles in subsections(area, files):
         spage = os.path.join(OUT, area.lstrip("."), f"{child}.md")
+        produced.add(spage)
         sfull = os.path.join(ROOT, spage)
         os.makedirs(os.path.dirname(sfull), exist_ok=True)
         sgen = render_sub(area, child, cfiles)
@@ -510,6 +517,7 @@ for area in areas:
             if WRITE:
                 io.open(sfull, "w", encoding="utf-8").write(snew)
     page = os.path.join(OUT, f"{area.lstrip('.')}.md")
+    produced.add(page)
     full = os.path.join(ROOT, page)
     generated = render(area, kind, files)
     tail = ""
@@ -587,6 +595,12 @@ def tree_page():
     return "\n".join(L)
 
 tp = "docs/architecture/PROJECT_TREE.md"
+# The `docs/` row counts this script's OWN output, so count the pages this run produces whether or not
+# they existed when FILES was listed. Otherwise the count depends on what was on disk beforehand: right
+# after a sync's strict mirror removed the fork's generated pages, the first refresh wrote 131 where the
+# committed tree holds 150, and only a second run converged — a non-idempotent generator.
+produced.add(tp)
+by_area["docs"] = sorted(set(by_area.get("docs", [])) | produced)
 tfull = os.path.join(ROOT, tp)
 new_tree = tree_page()
 old_tree = open(tfull, encoding="utf-8").read() if os.path.isfile(tfull) else None

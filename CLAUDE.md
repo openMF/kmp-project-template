@@ -279,16 +279,23 @@ See `.github/CLAUDE.md` for the full rung-ladder + environment-gate model.
 When forking this template, your app is **offline-first by default** — `core-base/store`
 decides every state transition (loading / no-network / captive-portal / empty / error /
 content + freshness) so screens never have to. Your fork's only job is to brand the
-visuals via `core/store/AppScreenStateDefaults.kt`.
+visuals via `core/store/ForkScreenStateDefaults.kt`.
 
-`KptTheme` (`core/designsystem/.../theme/KptTheme.kt`) already wires
+**A file's name says who owns it:** `Kpt*` is template code (a sync replaces it — never edit it in a
+fork), `KptFork*` is template code with fork pieces (3-way merged), `Fork*` is yours (a sync never
+touches it). `scripts/product-health/checks/ownership-naming.sh` keeps the names honest.
+
+`KptTheme` (`core/designsystem/.../theme/KptTheme.kt`, template) already wires
 `LocalScreenStateDefaults provides appScreenStateDefaults()`, so every screen wrapped by the theme
-picks up your branded defaults — zero per-screen wiring.
+picks up your branded defaults — zero per-screen wiring. Your brand colour schemes live beside it in
+`ForkTheme.kt`.
 
 Customize in **`core/store`** (the single discoverable seam):
 
-- **`AppScreenStateDefaults`** — brand visuals, copy, Lottie animations, telemetry hooks
-- **`AppErrorMapper`** — domain-error → user-message mapping (extends `categorize()`)
+- **`ForkScreenStateDefaults`** — brand visuals, copy, Lottie animations, telemetry hooks
+  (overrides of the template's `KptScreenStateDefaults`)
+- **`ForkErrorMapper`** — domain-error → user-message mapping (extends the template's
+  `KptErrorMapper` / `categorize()`)
 - **`@StoreProvider` on your provider fn** — qualifier, TTL, cache keys, binding and logout purge,
   all generated. There is no registry to edit and no DI module to add it to.
 
@@ -425,8 +432,8 @@ re-deriving it:
 
 **`/kmp-project-template-sync`** (engine: `scripts/white-label/sync-dirs.sh`, `SYNC_DIRS` / `SYNC_FILES`)
 pulls upstream template updates without clobbering fork work AND without missing updates. The
-sync-reachable surface now covers `feature/{home,profile,settings}`, `customization-surface.yaml`,
-root `build.gradle.kts`, and `kotlin-js-store`. Anti-clobber is preserved via `is_excluded` carve-outs
+sync-reachable surface covers `customization-surface.yaml`, root `build.gradle.kts` and `kotlin-js-store`;
+the `feature/{home,profile,settings}` starters are the fork's foundation, shipped once and never synced. Anti-clobber is preserved via `is_excluded` carve-outs
 declared in `customization-surface.yaml` — fork-owned paths (e.g. `app-profile/**`) are never rewritten.
 
 ---

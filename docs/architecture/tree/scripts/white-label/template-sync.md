@@ -5,9 +5,9 @@ the KMP Multi-Module Project Generator. These tools help maintain consistency wi
 template repository while allowing for project-specific customizations.
 
 > **Sync-reachable surface.** The canonical surface (`SYNC_DIRS` / `SYNC_FILES` in
-> `scripts/white-label/sync-dirs.sh`) now covers `feature/{home,profile,settings}`,
-> `customization-surface.yaml`, root `build.gradle.kts`, and `kotlin-js-store`, so backbone +
-> customization-surface improvements reach forks. Anti-clobber is preserved via `is_excluded`
+> `scripts/white-label/sync-dirs.sh`) covers `customization-surface.yaml`, root `build.gradle.kts` and
+> `kotlin-js-store`, so customization-surface improvements reach forks. The `feature/{home,profile,settings}`
+> starters are the fork's foundation: shipped once, never synced. Anti-clobber is preserved via `is_excluded`
 > carve-outs in `customization-surface.yaml` — fork-owned paths (e.g. `app-profile/**`) are never
 > rewritten. Run `scripts/white-label/sync-dirs.sh --list` to print the live surface.
 
@@ -179,8 +179,8 @@ demo/sample code or your fork's customization seam**:
   `demo/` segment (`kpt.core.<module>.demo.<domain>`). Excluding the glob means the
   template's demo never lands in your fork via sync, and your own `demo/` code is
   never clobbered. This is the same `**/demo/**` glob `scripts/white-label/fork-init.sh --clean` deletes.
-- **The `core/store` customization seam** — `AppScreenStateDefaults.kt`,
-  `config/AppErrorMapper.kt` and `config/AppScreenStateDefaults.kt` are the files a
+- **The `core/store` customization seam** — `KptScreenStateDefaults.kt`,
+  `config/KptErrorMapper.kt` and `config/KptScreenStateDefaults.kt` are the files a
   fork edits to brand state visuals and register its own stores (see
   `core/store/README.md`). They are excluded so template updates to `core/` don't
   revert your branding.

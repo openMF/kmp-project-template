@@ -19,7 +19,7 @@ import kotlin.test.Test
 
 /**
  * Compose Multiplatform UI test for the settings inner body [SettingsDemoBody] (the fork-owned seam
- * rendered by `cmp-navigation`'s `BackboneRegistry.settingsBody` inside the template `SettingsScreen`
+ * rendered by `cmp-navigation`'s `ForkBackboneRegistry.settingsBody` inside the template `SettingsScreen`
  * shell).
  *
  * It is a pure-UI body — all dialog state is managed internally; no ViewModel is needed. The test
@@ -33,7 +33,7 @@ class SettingsScreenUiTest {
     fun screenIsDisplayed() = runComposeUiTest {
         setContent {
             KptTheme {
-                // In production cmp-navigation's BackboneRegistry.settingsBody supplies this body.
+                // In production cmp-navigation's ForkBackboneRegistry.settingsBody supplies this body.
                 SettingsDemoBody(
                     onBackClick = {},
                     onSyncAndDraftsClick = {},

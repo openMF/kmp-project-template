@@ -24,10 +24,10 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/database sha=689148d1787588dfab291a843f7e2a06087345c2 -->
+<!-- api-docs:begin module=core/database sha=17084de506870c1d5c39b9895bbc76928de48b73 -->
 ## API reference
 
-_Generated from `core/database` at tree `689148d17875` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/database` at tree `17084de50687` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/database/src/commonMain/kotlin/kpt/core/database/alerts/AlertDao.kt`
@@ -621,10 +621,10 @@ expect val platformModule: Module
 ```
 Platform-specific Koin module that provides the `AppDatabase` singleton.
 
-### `core/database/src/commonMain/kotlin/kpt/core/database/di/ProjectDatabaseModule.kt`
+### `core/database/src/commonMain/kotlin/kpt/core/database/di/ForkDatabaseModule.kt`
 
 ```kotlin
-val ProjectDatabaseModule = module
+val ForkDatabaseModule = module
 ```
 THE FORK'S database DI seam. Empty on the neutral template — this is yours to fill.
 

@@ -87,7 +87,7 @@ migrations:
       template could never deliver anything new into it. Template-first inverts that: the template
       owns what is not claimed. The flip is only safe once every fork-owned path has an EXPLICIT rule,
       which is why it ships with the contract rather than as a fork-side edit.
-    detect: grep -q 'CS_M_OWNER="fork"' "$SRC/scripts/customization-surface.sh"
+    detect: awk '/glob: "\*\*"$/{getline; print; exit}' "$SRC/customization-surface.yaml" | grep -q "owner: fork"   # the catch-all still fork
     migrate: >
       Adopt the template's customization-surface.yaml AND scripts/customization-surface.sh together —
       they are one atomic pair and the engine's STEP 0 self-guard HALTs on a mismatched pair
@@ -108,3 +108,54 @@ migrations:
       sync's bootstrap; verify afterwards that the fork's platform targets still exist (open the
       Xcode project, confirm every target and its build phases).
     blocking: false
+
+  - id: ownership-naming-2026-11
+    order: 60
+    title: ownership readable from file names — Kpt* template · KptFork* merge · Fork* fork
+    why: >
+      A fork developer could not tell from a file whether an edit there survives the next sync. The
+      seams and template files were renamed so the name says the owner (ownership-naming.sh holds the
+      name and the contract together). A fork still on the old names breaks: template-owned files now
+      call ForkStoreModule, ForkFeatureRegistry, … and a renamed merge-owned file loses its 3-way base.
+    detect: test -f "$SRC/core/store/src/commonMain/kotlin/kpt/core/store/di/ProjectStoreModule.kt"
+    migrate: >
+      No fork-side pre-work: the sync applies the `words:` / `files:` rows below itself
+      (scripts/white-label/template-migrations.sh), before any merge — identifiers rewritten, files
+      renamed, the fork's content kept, and a renamed merge file merged against its base under the old
+      path. `words: "Old -> New"` rewrites the whole-word identifier in tracked text files and renames
+      a file named Old.<ext>; `files: "a -> b"` moves a path and rewrites the path string. A file
+      carrying the marker `template-migrations: keep` (a fixture that needs the OLD names) is skipped.
+    blocking: false   # the sync applies it
+    words:
+      # fork-owned seams
+      - "ProjectRepositoryModule -> ForkRepositoryModule"
+      - "ProjectNetworkModule -> ForkNetworkModule"
+      - "ProjectDatabaseModule -> ForkDatabaseModule"
+      - "ProjectDatastoreModule -> ForkDatastoreModule"
+      - "ProjectStoreModule -> ForkStoreModule"
+      - "ProjectErrorMapper -> ForkErrorMapper"
+      - "ProjectScreenStateDefaults -> ForkScreenStateDefaults"
+      - "ProjectPreferencesRepository -> ForkPreferencesRepository"
+      - "ProjectPreferencesRepositoryImpl -> ForkPreferencesRepositoryImpl"
+      - "AppInitializers -> ForkInitializers"
+      - "BackboneRegistry -> ForkBackboneRegistry"
+      - "TabRegistry -> ForkTabRegistry"
+      - "ShowcaseRegistry -> ForkShowcaseRegistry"
+      - "FeatureRegistry -> ForkFeatureRegistry"
+      - "DeepLinkRegistry -> ForkDeepLinkRegistry"
+      # template-owned
+      - "AppErrorMapper -> KptErrorMapper"
+      - "AppScreenStateDefaults -> KptScreenStateDefaults"
+      - "ProjectExtensions -> KptGradleExtensions"
+      - "ProjectNetworkHeaders -> KptNetworkHeaders"
+      - "ForkProperties -> KptAppProfileProperties"
+      - "ForkSeamTest -> KptSeamContractTest"
+      - "AppErrorMapperSeamTest -> KptErrorMapperSeamTest"
+    files:
+      # template-owned (the file declares appStoreModule; `StoreModule` is core-base's identifier)
+      - "core/store/src/commonMain/kotlin/kpt/core/store/di/StoreModule.kt -> core/store/src/commonMain/kotlin/kpt/core/store/di/KptStoreModule.kt"
+      # merge-owned — forks edit them (cappy, healld-health, status-saver, reels-downloader, field officer)
+      - "core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptScaffold.kt -> core/ui/src/commonMain/kotlin/kpt/core/ui/scaffold/KptForkScaffold.kt"
+      - "cmp-navigation/src/commonMain/kotlin/cmp/navigation/ui/KptRootScaffold.kt -> cmp-navigation/src/commonMain/kotlin/cmp/navigation/ui/KptForkRootScaffold.kt"
+      # ktlint file-name rule (PascalCase); the facade class stays MainKt, so mainClass is unchanged
+      - "cmp-desktop/src/jvmMain/kotlin/main.kt -> cmp-desktop/src/jvmMain/kotlin/Main.kt"

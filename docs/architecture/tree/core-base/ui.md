@@ -16,10 +16,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/ui sha=7f169fa43ef11b7d68b4c753981b1177146719b8 -->
+<!-- api-docs:begin module=core-base/ui sha=401a8d9b378807f018895a5926c5a38863e1701c -->
 ## API reference
 
-_Generated from `core-base/ui` at tree `7f169fa43ef1` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/ui` at tree `401a8d9b3788` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -411,7 +411,7 @@ Short (≤ 20 chars) message per `ErrorCategory` variant — used by `FreshnessI
 ```kotlin
 fun ErrorCategory.toLongMessage(): String = when (this)
 ```
-Longer descriptive message per `ErrorCategory` variant — used by `FreshnessIndicator` `RichTooltip` body text. `AppErrorMapper.mapErrorToUserMessage` delegates here so the message catalogue lives in one place.
+Longer descriptive message per `ErrorCategory` variant — used by `FreshnessIndicator` `RichTooltip` body text. `KptErrorMapper.mapErrorToUserMessage` delegates here so the message catalogue lives in one place.
 
 ### `core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/freshness/FreshnessIndicator.kt`
 
@@ -805,7 +805,7 @@ ScreenStateVisual.Lottie(spec = {
 
 </details>
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt:86</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt:86</code></summary>
 
 ```kotlin
             loading = ScreenStateLoading.Skeleton(rowCount = 5),
@@ -1052,7 +1052,7 @@ fun KptTheme(content: @Composable () -> Unit) {
 
 </details>
 
-<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:141</code></summary>
+<details><summary>Used in the template — <code>core/designsystem/src/commonMain/kotlin/kpt/core/designsystem/theme/KptTheme.kt:59</code></summary>
 
 ```kotlin
     )
@@ -1071,7 +1071,7 @@ data class ScreenStateEmpty(
 ```
 Configuration for the empty state.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt:85</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt:85</code></summary>
 
 ```kotlin
         ScreenStateDefaults(
@@ -1090,7 +1090,7 @@ data class ScreenStateError(
 ```
 Configuration for the error state.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt:90</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt:90</code></summary>
 
 ```kotlin
                 message = emptyMessage,
@@ -1119,7 +1119,7 @@ data class ScreenStateNoNetwork(
 ```
 Configuration for the no-network state, including captive-portal variant. When the rendered state is `isCaptivePortal == true`, `DefaultNoNetworkContent` surfaces a primary CTA button labelled `captivePortalActionText`.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt:96</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt:96</code></summary>
 
 ```kotlin
                 retryText = errorRetry,
@@ -1156,7 +1156,7 @@ sealed interface ScreenStateLoading
 ```
 Loading-state strategy. Library ships `Spinner` and `Skeleton`; consumers can supply `Custom`.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt:84</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt:84</code></summary>
 
 ```kotlin
     ) {
@@ -1175,7 +1175,7 @@ sealed interface ScreenStateVisual
 ```
 Visual element for empty/error/no-network states. Sealed: extend by adding a new variant here and a branch in `ScreenStateVisualRenderer`.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt:86</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt:86</code></summary>
 
 ```kotlin
             loading = ScreenStateLoading.Skeleton(rowCount = 5),

@@ -25,7 +25,7 @@ here rather than re-deriving it:
    `createMutableStore`) + `FetchPolicy`, annotated `@StoreProvider`. The unified
    `BaseMutationViewModel` + `MutationMode` (InSession / Draft) drives every write screen.
 5. **Build / run**, then periodically run **`/kmp-project-template-sync`** to pull future white-label
-   improvements (backbone + `customization-surface.yaml` are sync-reachable) without losing fork work.
+   improvements without losing fork work (the home/profile/settings starters are yours and never synced).
 
 ---
 

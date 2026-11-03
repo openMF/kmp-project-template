@@ -1,7 +1,7 @@
 # `core/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 453 tracked files — 304× `.kt`, 40× `.md`, 29× `.xml`, 24× `.kts`, 14× `.yaml`
+> **Measured:** 454 tracked files — 305× `.kt`, 40× `.md`, 29× `.xml`, 24× `.kts`, 14× `.yaml`
 
 ## Shape
 
@@ -11,7 +11,7 @@
 | `core/data/` | 71 |
 | `core/store/` | 62 |
 | `core/network/` | 59 |
-| `core/designsystem/` | 55 |
+| `core/designsystem/` | 56 |
 | `core/model/` | 38 |
 | `core/ui/` | 23 |
 | `core/firebase/` | 19 |
@@ -28,7 +28,7 @@
 | `core:data` | 62 Kotlin files — [guide](core/data.md) |
 | `core:database` | 54 Kotlin files — [guide](core/database.md) |
 | `core:datastore` | 9 Kotlin files — [guide](core/datastore.md) |
-| `core:designsystem` | 37 Kotlin files — [guide](core/designsystem.md) |
+| `core:designsystem` | 38 Kotlin files — [guide](core/designsystem.md) |
 | `core:domain` | 5 Kotlin files — [guide](core/domain.md) |
 | `core:firebase` | 11 Kotlin files — [guide](core/firebase.md) |
 | `core:model` | 29 Kotlin files — [guide](core/model.md) |
@@ -94,8 +94,8 @@ repositories a feature consumes, `core/designsystem` for brand tokens.
 DAO directly while its writes go through the store is the split-read defect product-health's Store5
 checks exist to catch — the layers are not stylistic.
 
-**What a fork touches:** all of it. `core/store/src/commonMain/kotlin/kpt/core/store/config/AppScreenStateDefaults.kt` brands every empty and
-error state in one place, `AppErrorMapper` maps domain errors to copy, and a `@StoreProvider`
+**What a fork touches:** all of it. `core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt` brands every empty and
+error state in one place, `KptErrorMapper` maps domain errors to copy, and a `@StoreProvider`
 annotation is the whole registration — the KSP processors in `tools/` generate the registry, ids,
 cache keys, Koin binding and logout purge, so there is no registry to edit and no DI module to
 remember.

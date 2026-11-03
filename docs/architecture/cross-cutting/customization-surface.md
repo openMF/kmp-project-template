@@ -33,6 +33,31 @@ that whole class of silent loss becomes impossible.
 > documented in
 > [`cmp-navigation/.../registry/README.md`](../README.md).
 
+## Ownership you can read from a file name
+
+| prefix | owner | for a fork developer |
+|---|---|---|
+| `Kpt*` | `template` | template code — a sync replaces it; never edit it in a fork |
+| `KptFork*` | `merge` | template code with fork pieces (`KptForkScaffold.kt`, `KptForkRootScaffold.kt`) — 3-way merged |
+| `Fork*` | `fork` | yours — the seams (`ForkStoreModule`, `ForkErrorMapper`, `ForkScreenStateDefaults`, `ForkTheme.kt`, the `Fork*Registry` objects); a sync never touches them |
+
+The rule runs one way: a prefixed file must resolve to the owner its prefix names
+(`scripts/product-health/checks/ownership-naming.sh`, `ON-1`), while fork code at large needs no prefix.
+Generated `App*` projections of `app-profile/` (`AppAccessPoints`, `AppOrgLinks`, …) keep their names.
+
+**Demo packages are owned beside the module, not in this file.** A `- packages: module-packages` entry
+marks where, in first-match order, each `core/<module>/module-packages.yaml` `demo:` id becomes a
+`core/<module>/**/kpt/core/<module>/<id>/**` → `demo-showcase` rule. The sync engine holds no ownership
+knowledge of its own: `is_excluded` keeps a path in the fork's state exactly when it is held
+(`.template-sync-holds`) or resolves `fork` / `demo-showcase`.
+
+**Renames reach forks through `template-migrations.yaml`.** When the template renames a file or an
+identifier, the row goes there (`words: "Old -> New"` rewrites the identifier and renames `Old.kt`;
+`files: "a -> b"` moves a path). The sync engine applies the ledger from the commit being synced
+(`scripts/white-label/template-migrations.sh`), commits the result before any merge, and merges a
+renamed `merge`-owned file against its base under the old path — so a fork's seams follow the names
+the template calls and keep their content. Pinned by `tests/customization-surface/template-migrations-test.sh`.
+
 ## Precedence
 
 Rules are ordered **most-specific → most-general**, and the **first matching rule
@@ -124,16 +149,17 @@ cs_resolve_strategy "gradle/libs.versions.toml"   # → catalog-3way
    **only on a true overlap** — surfaced with a `CONFLICT` warning for review, never
    silently shipped.
 
-### The platform shells are `merge`, not `template`
+### The shells are `template`, except the files that carry fork wiring
 
-`build-logic/**` and the four platform **application shells** — `cmp-android/**`, `cmp-ios/**`,
-`cmp-desktop/**`, `cmp-web/**` — are mostly template content, which makes `template` + full-copy the
-tempting classification. It is the wrong one: a platform shell is the one place where fork-specific
-**platform wiring** has nowhere else to live. `core/<mod>/module-deps.gradle.kts` gives a fork a seam
+`build-logic/**` and the application shells — `cmp-android`, `cmp-ios`, `cmp-desktop`, `cmp-web`,
+`cmp-shared`, `cmp-navigation` — are template code and resolve `template`: a sync replaces each file in
+full. A fork edit to one of them is overwritten; fork build hooks go in `build-logic/**/kotlin/local/**`
+(fork). The exception is the handful of shell files that carry fork-specific **platform wiring**, which
+has nowhere else to live. `core/<mod>/module-deps.gradle.kts` gives a fork a seam
 for dependencies; there is no equivalent seam for an Xcode target, an entitlement, or a plist key.
 
-Measured on a real consumer (2026-09-10), every one of these sat under the old `template` blanket and
-would have been destroyed silently by a full-copy:
+Measured on a real consumer (2026-09-10), before these files had rows of their own, a full-copy would
+have destroyed every one of them silently:
 
 | Path | Fork content a full-copy deletes |
 |---|---|
@@ -142,20 +168,19 @@ would have been destroyed silently by a full-copy:
 | `cmp-ios/iosApp.xcodeproj/project.pbxproj` | an entire app-extension target the template has no concept of |
 | `cmp-ios/iosApp/iOSApp.swift` | scene-phase `AppBackground` / `AppForeground` hooks |
 
-A 3-way takes the template's evolution — the SwiftPM migration landed 5 `XCLocalSwiftPackageReference`
+Those files — and every `cmp-*/build.gradle.kts`, `MainActivity.kt`, `AndroidManifest.xml`, the
+cmp-navigation seams (`*Navigation*`, `RootNav*`, `di/`, `*TabItem*`, `ui/`) and its `strings.xml` —
+resolve `merge`, by name. A 3-way takes the template's evolution — the SwiftPM migration landed 5 `XCLocalSwiftPackageReference`
 entries plus the `KotlinMultiplatformLinkedPackage` tree this way — while the fork's additions survive,
 and a genuine overlap surfaces as a conflict marker rather than a silent loss.
 
-These blankets carry **no `strategy:`**: they span `.kts` / `.swift` / `.plist` / `.xml` / `.pbxproj` /
-`.xcconfig` / `.js` / `.html`, and `cs_merge`'s default `git merge-file` is the only strategy that
-handles all of them. Structure-aware strategies stay on the specific rows that name one filetype
-(`AndroidManifest.xml` still resolves `merge (strategy: manifest-union)`). Binaries under these
+Rows without a `strategy:` use `cs_merge`'s default `git merge-file`; structure-aware strategies sit on
+the rows that name one filetype (`plist-union`, `pbxproj-3way`, `manifest-union`, `kotlin-3way`). Binaries under these
 directories are carved out `fork` (`res/**`, `Assets.xcassets/**`, `cmp-desktop/icons/**`, the
 `cmp-web` resources), and the engine additionally refuses to line-merge a binary.
 
-`cmp-shared/**` and `cmp-navigation/**` stay `template` — they carry no platform project files, and
-their fork surface is already served by named seams (`ForkWorkerDeclarations.kt`, `registry/**`,
-`di/*.kt`, `RootNav*.kt`).
+The fork-owned seams inside the shells are `ForkWorkerDeclarations.kt` (cmp-shared) and `registry/**`
+(cmp-navigation).
 
 The `template`/`fork` mechanical behaviour (`SYNC_DIRS` + `EXCLUSIONS`) is unchanged;
 the contract adds the `merge` path handling that previously didn't exist. Guarded so

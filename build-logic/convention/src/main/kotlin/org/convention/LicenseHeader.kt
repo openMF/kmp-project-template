@@ -39,7 +39,7 @@ object LicenseHeader {
 
     /**
      * The header lines with `$ORG_NAME` resolved, trailing blank lines dropped. Missing file → no header
-     * (never a hardcoded one).
+     * (never a hardcoded one): nothing writes one, and Spotless leaves existing headers alone.
      */
     fun lines(root: File): List<String> {
         val org = orgName(root)

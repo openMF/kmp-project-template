@@ -515,12 +515,15 @@ rules:
   - glob: "**/core/designsystem/**/theme/**"
     owner: fork
   # Brand icons — a fork adds glyphs to the shared AppIcons object; 3-way so template icon additions
-  # AND fork icons both survive. Only AppIcons.kt: it is the one file the template ships here. A fork's own
-  # icon files beside it (ForkIcons.kt, vector sets) fall to the module catch-all and stay the fork's — under
-  # a directory-wide row they resolved `merge`, so their names could never say who owns them.
+  # AND fork icons both survive. The rest of icon/ is a template package (module-packages.yaml), so a
+  # fork's own icon files there take the `Fork*` name (ForkIcons.kt) — the name says who owns them.
   - glob: "**/core/designsystem/**/icon/AppIcons.kt"
     owner: merge
     strategy: kotlin-3way
+  - glob: "**/core/designsystem/**/icon/Fork*"
+    owner: fork
+  - glob: "core/designsystem/**/kpt/core/designsystem/icon/**"
+    owner: template
   # App scaffold — the template ships KptScaffold (in KptForkScaffold.kt); a fork overrides its
   # top-bar/FAB/branding. 3-way so a template scaffold update never drops the fork's overrides. The rest
   # of scaffold/ (KptPullToRefreshState) is plain template code — no fork ever edited it.

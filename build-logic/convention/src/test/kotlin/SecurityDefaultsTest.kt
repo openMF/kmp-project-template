@@ -39,4 +39,14 @@ class SecurityDefaultsTest {
         assertEquals(false, screenCaptureAllowedByDefault(mapOf("screen_capture_allowed_by_default" to "yes")))
         assertEquals(true, screenCaptureAllowedByDefault(mapOf("screen_capture_allowed_by_default" to true)))
     }
+
+    @Test
+    fun firstRunOnboardingMissingKeyIsFalse() {
+        // The template has no onboarding destination: an app.yaml without the key must not route to one.
+        assertEquals(false, firstRunOnboarding(mapOf<String, Any?>()))
+        assertEquals(false, firstRunOnboarding(null))
+        assertEquals(false, firstRunOnboarding(mapOf("first_run_onboarding" to "yes")))
+        assertEquals(true, firstRunOnboarding(mapOf("first_run_onboarding" to true)))
+        assertEquals(true, firstRunOnboarding(mapOf("first_run_onboarding" to " TRUE ")))
+    }
 }

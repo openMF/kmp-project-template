@@ -320,6 +320,7 @@ Security defaults a fresh install starts with. **SoT: `app-profile/app.yaml#secu
 
 - `const val SCREEN_CAPTURE_ALLOWED_BY_DEFAULT: Boolean = false` — `security.screen_capture_allowed_by_default` — whether a fresh install allows screenshots + recording.
 - `const val SIGNED_IN_BY_DEFAULT: Boolean = true` — `security.signed_in_by_default` — whether a fresh install starts signed in (false = the app has a login).
+- `const val FIRST_RUN_ONBOARDING: Boolean = false` — `security.first_run_onboarding` — whether a fresh install shows onboarding once (false = the app has none). `UserData.DEFAULT.firstTimeUser` reads it; absent means `false`.
 
 ### `core/model/src/commonMain/kotlin/kpt/core/model/crypto/CoinMarket.kt`
 

@@ -38,6 +38,15 @@ internal fun signedInByDefault(security: Map<*, *>?): Boolean =
     security?.get("signed_in_by_default")?.toString()?.trim()?.lowercase() != "false"
 
 /**
+ * `app.yaml#security.first_run_onboarding` → `AppSecurityConfig.FIRST_RUN_ONBOARDING`, the starting value of
+ * `UserData.firstTimeUser`. Absent means `false`: the template ships no onboarding destination, so a fresh
+ * install must not be routed to one. A fork that ships onboarding sets `true`, and `RootNavViewModel` then
+ * emits `ShowOnboarding` once, until the onboarding screen calls `setFirstTimeState(false)`.
+ */
+internal fun firstRunOnboarding(security: Map<*, *>?): Boolean =
+    security?.get("first_run_onboarding")?.toString()?.trim()?.lowercase() == "true"
+
+/**
  * Makes [target]'s parent dir exist when its platform's `metadata/` root does, and reports whether it
  * may be written. Every `deployment/.../metadata` tree is gitignored and the template tracks only some of its
  * sub-dirs, so a fresh clone has no `review_information/` or `changelogs/` — skipping on a missing
@@ -1278,17 +1287,20 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val security = appProfile["security"] as? Map<*, *>
         val allowCapture = screenCaptureAllowedByDefault(security)
         val signedIn = signedInByDefault(security)
+        val onboarding = firstRunOnboarding(security)
 
         val sb = StringBuilder()
         sb.append("// syncForkConfig:app-security:begin — GENERATED from app-profile/app.yaml#security. Do not hand-edit.\n")
         sb.append("    /** `security.screen_capture_allowed_by_default` — whether a fresh install allows screenshots + recording. */\n")
         sb.append("    const val SCREEN_CAPTURE_ALLOWED_BY_DEFAULT: Boolean = ").append(allowCapture).append("\n\n")
         sb.append("    /** `security.signed_in_by_default` — whether a fresh install starts signed in (false = the app has a login). */\n")
-        sb.append("    const val SIGNED_IN_BY_DEFAULT: Boolean = ").append(signedIn).append("\n")
+        sb.append("    const val SIGNED_IN_BY_DEFAULT: Boolean = ").append(signedIn).append("\n\n")
+        sb.append("    /** `security.first_run_onboarding` — whether a fresh install shows onboarding once (false = the app has none). */\n")
+        sb.append("    const val FIRST_RUN_ONBOARDING: Boolean = ").append(onboarding).append("\n")
         sb.append("    // syncForkConfig:app-security:end")
 
         if (patchSentinel(file, "// syncForkConfig:app-security:begin", "// syncForkConfig:app-security:end", sb.toString())) {
-            logger.lifecycle("syncForkConfig: regenerated AppSecurityConfig (screenCaptureAllowedByDefault=$allowCapture, signedInByDefault=$signedIn)")
+            logger.lifecycle("syncForkConfig: regenerated AppSecurityConfig (screenCaptureAllowedByDefault=$allowCapture, signedInByDefault=$signedIn, firstRunOnboarding=$onboarding)")
         }
     }
 

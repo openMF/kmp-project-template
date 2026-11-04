@@ -366,6 +366,11 @@ security:
   # sign-in / sign-out persist through core/datastore. ABSENT means `true` (unlike screen capture),
   # so an older app.yaml without this key keeps today's behaviour instead of flipping to signed-out.
   signed_in_by_default: true
+  # Whether a FRESH install starts with UserData.firstTimeUser = true, so RootNavViewModel shows onboarding
+  # once before anything else (until the onboarding screen calls setFirstTimeState(false)). The template
+  # ships no onboarding destination, so it stays false; set `true` only in a fork that adds one.
+  # ABSENT means `false`.
+  first_run_onboarding: false
 
 # Privacy consent (GDPR Art. 6(1)(a) / 7): analytics and crash reporting are CONSENT-based processing, so
 # they must start OFF and be as easy to withdraw as to give (Settings → Privacy). These are only the

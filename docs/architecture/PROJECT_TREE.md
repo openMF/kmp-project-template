@@ -7,11 +7,11 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `cmp-android/` | 33 | [`cmp-android/`](tree/cmp-android.md) |
+| `cmp-android/` | 35 | [`cmp-android/`](tree/cmp-android.md) |
 | `cmp-ios/` | 45 | [`cmp-ios/`](tree/cmp-ios.md) |
 | `cmp-desktop/` | 12 | [`cmp-desktop/`](tree/cmp-desktop.md) |
 | `cmp-web/` | 17 | [`cmp-web/`](tree/cmp-web.md) |
-| `cmp-shared/` | 8 | [`cmp-shared/`](tree/cmp-shared.md) |
+| `cmp-shared/` | 9 | [`cmp-shared/`](tree/cmp-shared.md) |
 | `cmp-navigation/` | 56 | [`cmp-navigation/`](tree/cmp-navigation.md) |
 
 ## Features
@@ -24,15 +24,15 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `core/` | 454 | [`core/`](tree/core.md) |
-| `core-base/` | 499 | [`core-base/`](tree/core-base.md) |
+| `core/` | 455 | [`core/`](tree/core.md) |
+| `core-base/` | 506 | [`core-base/`](tree/core-base.md) |
 
 ## Codegen
 
 | Area | Files | Page |
 |---|---:|---|
 | `tools/` | 13 | [`tools/`](tree/tools.md) |
-| `build-logic/` | 42 | [`build-logic/`](tree/build-logic.md) |
+| `build-logic/` | 44 | [`build-logic/`](tree/build-logic.md) |
 
 ## Configuration
 
@@ -56,9 +56,9 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 475 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 476 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
-| `tests/` | 21 | [`tests/`](tree/tests.md) |
+| `tests/` | 22 | [`tests/`](tree/tests.md) |
 
 ## Other
 

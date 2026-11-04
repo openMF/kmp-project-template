@@ -1,7 +1,7 @@
 # `core-base/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 499 tracked files — 417× `.kt`, 28× `.md`, 22× `.xml`, 13× `.kts`, 6× `.gitignore`
+> **Measured:** 506 tracked files — 424× `.kt`, 28× `.md`, 22× `.xml`, 13× `.kts`, 6× `.gitignore`
 
 ## Shape
 
@@ -12,7 +12,7 @@
 | `core-base/security/` | 47 |
 | `core-base/designsystem/` | 45 |
 | `core-base/network/` | 37 |
-| `core-base/database/` | 29 |
+| `core-base/database/` | 36 |
 | `core-base/platform/` | 29 |
 | `core-base/crypto/` | 23 |
 | `core-base/datastore/` | 22 |
@@ -29,7 +29,7 @@
 | `core-base:common` | 10 Kotlin files — [guide](core-base/common.md) |
 | `core-base:crypto` | 22 Kotlin files — [guide](core-base/crypto.md) |
 | `core-base:data` | 9 Kotlin files — [guide](core-base/data.md) |
-| `core-base:database` | 20 Kotlin files — [guide](core-base/database.md) |
+| `core-base:database` | 27 Kotlin files — [guide](core-base/database.md) |
 | `core-base:datastore` | 19 Kotlin files — [guide](core-base/datastore.md) |
 | `core-base:designsystem` | 41 Kotlin files — [guide](core-base/designsystem.md) |
 | `core-base:firebase` | 1 Kotlin files — [guide](core-base/firebase.md) |

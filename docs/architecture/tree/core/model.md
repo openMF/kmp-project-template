@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/model sha=78206772b94d6d434b91bd24821e153eb2cbe5ac -->
+<!-- api-docs:begin module=core/model sha=09d68dfd00924d797f63c8eb4a7fb1e6d6e84162 -->
 ## API reference
 
-_Generated from `core/model` at tree `78206772b94d` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/model` at tree `09d68dfd0092` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/model/src/commonMain/kotlin/kpt/core/model/alerts/PriceAlert.kt`
@@ -320,7 +320,7 @@ Security defaults a fresh install starts with. **SoT: `app-profile/app.yaml#secu
 
 - `const val SCREEN_CAPTURE_ALLOWED_BY_DEFAULT: Boolean = false` — `security.screen_capture_allowed_by_default` — whether a fresh install allows screenshots + recording.
 - `const val SIGNED_IN_BY_DEFAULT: Boolean = true` — `security.signed_in_by_default` — whether a fresh install starts signed in (false = the app has a login).
-- `const val FIRST_RUN_ONBOARDING: Boolean = false` — `security.first_run_onboarding` — whether a fresh install shows onboarding once (false = the app has none). `UserData.DEFAULT.firstTimeUser` reads it; absent means `false`.
+- `const val FIRST_RUN_ONBOARDING: Boolean = false` — `security.first_run_onboarding` — whether a fresh install shows onboarding once (false = the app has none).
 
 ### `core/model/src/commonMain/kotlin/kpt/core/model/crypto/CoinMarket.kt`
 
@@ -764,5 +764,5 @@ Domain model for a personal-watchlist row (the `read_local_list` demo).
 
 ---
 
-_37 type(s), 21 function(s)/property(ies); 50 carry KDoc at source; 1 authored example(s); 34 live call site(s)._
+_37 type(s), 22 function(s)/property(ies); 51 carry KDoc at source; 1 authored example(s); 34 live call site(s)._
 <!-- api-docs:end -->

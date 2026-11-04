@@ -159,3 +159,21 @@ migrations:
       - "cmp-navigation/src/commonMain/kotlin/cmp/navigation/ui/KptRootScaffold.kt -> cmp-navigation/src/commonMain/kotlin/cmp/navigation/ui/KptForkRootScaffold.kt"
       # ktlint file-name rule (PascalCase); the facade class stays MainKt, so mainClass is unchanged
       - "cmp-desktop/src/jvmMain/kotlin/main.kt -> cmp-desktop/src/jvmMain/kotlin/Main.kt"
+
+  - id: ios-platform-bridges-seam
+    order: 70
+    title: Swift-only platform bridges reach the fork through viewController(platformBridges:)
+    why: >
+      The template-owned ViewController.kt took no parameter, so a fork that needed an object only Swift
+      can create (PayCraft's StoreKit 2 shim) edited the template file — `viewController(storeKit2Bridge:)`
+      in reels-downloader and steady — and every sync overwrote it. The template now takes
+      `platformBridges: List<Any>` and hands it to the fork-owned `List<Any>.onForkIosConfigure()`
+      (cmp-shared kpt/shared/fork/ForkIosHooks.kt, seeded once); ContentView.swift is merge-owned so the
+      fork's argument survives. A fork still on its own parameter fails to compile after the sync.
+    detect: grep -q 'fun viewController(storeKit2Bridge' "$SRC/cmp-shared/src/nativeMain/kotlin/kpt/shared/ViewController.kt"
+    migrate: >
+      Before the sync, move the fork's bridge handling into kpt/shared/fork/ForkIosHooks.kt
+      (`filterIsInstance<StoreKit2Bridge>().firstOrNull()?.let { loadKoinModules(paycraftStoreKit2BillingModule(it)) }`),
+      change ContentView.swift to `viewController(platformBridges: [PayCraftStoreKit2()])` (iOS 15+, `[]`
+      otherwise), and drop ViewController.kt from .template-sync-holds so the template copy lands.
+    blocking: true    # the sync replaces ViewController.kt; the fork's call site must already use the seam

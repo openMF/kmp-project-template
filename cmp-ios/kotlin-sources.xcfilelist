@@ -3,6 +3,7 @@ $(SRCROOT)/../cmp-shared/src/commonMain/kotlin/cmp/shared/SharedApp.kt
 $(SRCROOT)/../cmp-shared/src/commonMain/kotlin/cmp/shared/WorkerDeclarations.kt
 $(SRCROOT)/../cmp-shared/src/commonMain/kotlin/cmp/shared/utils/KoinExt.kt
 $(SRCROOT)/../cmp-shared/src/nativeMain/kotlin/kpt/shared/ViewController.kt
+$(SRCROOT)/../cmp-shared/src/nativeMain/kotlin/kpt/shared/fork/ForkIosHooks.kt
 $(SRCROOT)/../core-base/common/src/androidMain/kotlin/kpt/core/base/common/Parcelize.android.kt
 $(SRCROOT)/../core-base/common/src/androidMain/kotlin/kpt/core/base/common/di/CommonModule.android.kt
 $(SRCROOT)/../core-base/common/src/androidMain/kotlin/kpt/core/base/common/manager/DispatchManagerImpl.kt

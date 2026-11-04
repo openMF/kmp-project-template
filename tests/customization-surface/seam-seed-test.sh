@@ -72,6 +72,14 @@ own() { (cd "$REPO" && bash scripts/customization-surface.sh resolve "$1") | cut
   && grep -q '^        onForkCreate()' "$REPO/cmp-android/src/main/kotlin/cmp/android/app/AndroidApp.kt" \
   && pass "Android startup seam: ForkAndroidHooks is fork-owned, seeded, called from AndroidApp.onCreate" \
   || bad "Android startup seam missing"
+# The iOS platform-bridge seam: Swift-only objects (a StoreKit 2 shim) reach the fork's Kotlin hook, and
+# the Swift call site is merged, so a fork's argument survives a sync.
+[ "$(own cmp-shared/src/nativeMain/kotlin/kpt/shared/fork/ForkIosHooks.kt)" = fork ] \
+  && [ "$(own cmp-ios/iosApp/ContentView.swift)" = merge ] \
+  && grep -q 'platformBridges.onForkIosConfigure()' "$REPO/cmp-shared/src/nativeMain/kotlin/kpt/shared/ViewController.kt" \
+  && grep -q 'viewController(platformBridges:' "$REPO/cmp-ios/iosApp/ContentView.swift" \
+  && pass "iOS bridge seam: ForkIosHooks fork-owned, called by viewController, ContentView merge-owned" \
+  || bad "iOS bridge seam missing"
 
 [ "$fail" = 0 ] && echo "seam-seed-test: PASS" || echo "seam-seed-test: FAIL"
 exit "$fail"

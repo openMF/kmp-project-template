@@ -595,6 +595,14 @@ rules:
   # via .template-version#template_sha (resolve_merge_base() in sync-dirs.sh).
   - glob: "cmp-ios/iosApp/iOSApp.swift"
     owner: merge
+  # ContentView.swift is where Swift hands platform bridges (a StoreKit 2 shim, …) to
+  # `viewController(platformBridges:)`, so a fork's argument there must survive a sync.
+  - glob: "cmp-ios/iosApp/ContentView.swift"
+    owner: merge
+  # The Kotlin half of that seam: the fork picks its bridges out of the list and loads its own Koin
+  # modules. Seeded once, never touched by a sync.
+  - glob: "cmp-shared/src/nativeMain/kotlin/kpt/shared/fork/**"
+    owner: fork
   - glob: "cmp-*/build.gradle.kts"
     owner: merge
   # build-logic IS template code, unlike the platform shells: every fork-specific build hook has a seam —

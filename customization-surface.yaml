@@ -601,7 +601,7 @@ rules:
     owner: merge
   # The fork's Firebase iOS client config — fork-owned like cmp-android's google-services.json. The
   # template ships none; copy-compose-resources.sh bundles it when present.
-  - glob: "cmp-ios/iosApp/GoogleService-Info.plist"
+  - glob: "cmp-ios/iosApp/firebase/**"
     owner: fork
   # The Kotlin half of that seam: the fork picks its bridges out of the list and loads its own Koin
   # modules. Seeded once, never touched by a sync.
@@ -862,6 +862,10 @@ rules:
     owner: template
   - glob: "secrets/sample/**"
     owner: template
+  # The fork's own secret rows (its client keys) — read by build_secrets.rb on top of LAYOUT.yaml, which is
+  # template-owned and replaced every sync. Add-only: a key LAYOUT.yaml declares is ignored.
+  - glob: "secrets/fork-layout.yaml"
+    owner: fork
   - glob: "secrets/**"                        # LAYOUT.yaml + scaffold (live/ is fork above)
     owner: template
   - glob: "docs/**"

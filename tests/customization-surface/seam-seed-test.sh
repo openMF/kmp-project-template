@@ -81,8 +81,8 @@ own() { (cd "$REPO" && bash scripts/customization-surface.sh resolve "$1") | cut
   && pass "iOS bridge seam: ForkIosHooks fork-owned, called by viewController, ContentView merge-owned" \
   || bad "iOS bridge seam missing"
 # Firebase on iOS: the fork's plist is fork-owned, bundled when present, and configured only then.
-[ "$(own cmp-ios/iosApp/GoogleService-Info.plist)" = fork ] \
-  && grep -q 'GoogleService-Info.plist' "$REPO/cmp-ios/scripts/copy-compose-resources.sh" \
+[ "$(own cmp-ios/iosApp/firebase/GoogleService-Info.plist)" = fork ] \
+  && grep -q 'iosApp/firebase/GoogleService-Info.plist' "$REPO/cmp-ios/scripts/copy-compose-resources.sh" \
   && grep -q 'FirebaseApp.configure()' "$REPO/cmp-ios/iosApp/iOSApp.swift" \
   && pass "iOS Firebase seam: fork plist bundled when present, FirebaseApp.configure() guarded" \
   || bad "iOS Firebase seam missing"

@@ -10,6 +10,7 @@
 package kpt.core.database.alerts
 
 import kpt.core.database.AppDatabase
+import kpt.core.database.config.ForkDatabaseConfig
 import kpt.core.database.di.TestDatabaseModule
 import kpt.core.database.di.testPlatformModule
 import org.koin.core.context.startKoin
@@ -62,8 +63,9 @@ class DemoDatabaseTest {
         // The template's schema is at v13: the v12→v13 change added `framework_submit_drafts.attemptCount`
         // so OfflineSubmitSyncer can apply RetryPolicy backoff + the maxAttempts cap across restarts,
         // with AutoMigration(12→13) + the 13.json export. Every hop up to 13 has an AutoMigration
-        // (incl. 10→11 `cloud_todos`), so a v10 device upgrades cleanly. Update this with
-        // ForkDatabaseConfig.VERSION.
-        assertEquals(13, AppDatabase.VERSION)
+        // (incl. 10→11 `cloud_todos`), so a v10 device upgrades cleanly.
+        // The version is fork-owned (app-profile/migration-ledger.yaml → ForkDatabaseConfig.VERSION): a fork
+        // that adds its own table bumps it, so assert the wiring, never the template's literal.
+        assertEquals(ForkDatabaseConfig.VERSION, AppDatabase.VERSION)
     }
 }

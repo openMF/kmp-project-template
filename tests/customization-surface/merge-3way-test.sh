@@ -56,6 +56,18 @@ rc=$?
 [ "$rc" -eq 1 ] && pass "conflict returned rc=1 (surfaced, not silently shipped)" || bad "conflict rc=$rc (expected 1)"
 grep -q '<<<<<<<' "$WORK/out2.xml" && pass "conflict markers present for review" || bad "conflict markers missing"
 
+echo "── Case C: lib-integrate.properties keeps the fork's local links (properties-3way) ──"
+# /lib-integrate flips `<lib>.local=true` and adds the fork's own libraries; the template adds rows.
+printf 'a.local=false\na.path=../a\n'                    > "$WORK/b3.properties"
+printf 'a.local=true\na.path=../a\nmine.local=true\n'    > "$WORK/o3.properties"
+printf 'a.local=false\na.path=../a\nnewlib.local=false\n' > "$WORK/t3.properties"
+cs_merge_properties "$WORK/o3.properties" "$WORK/b3.properties" "$WORK/t3.properties" "$WORK/out3.properties"
+grep -qx 'a.local=true' "$WORK/out3.properties"       && pass "fork's local-source link kept"       || bad "fork's a.local=true reset"
+grep -qx 'mine.local=true' "$WORK/out3.properties"    && pass "fork-added library kept"             || bad "fork-added library dropped"
+grep -qx 'newlib.local=false' "$WORK/out3.properties" && pass "template's new library row added"    || bad "template row missing"
+[ "$( (cd "$HERE/../.." && bash "$READER" resolve lib-integrate.properties) | cut -f2)" = merge ] \
+  && pass "contract: lib-integrate.properties is merge-owned" || bad "contract: lib-integrate.properties not merge-owned"
+
 echo
 if [ "$fail" -eq 0 ]; then echo "✅ merge-3way: all assertions passed"; exit 0
 else echo "❌ merge-3way: failures above"; exit 1; fi

@@ -136,7 +136,6 @@ SYNC_FILES=(
     "LICENSE"
     "CONTRIBUTING.md"
     "CODE_OF_CONDUCT.md"
-    "lib-integrate.properties"
     "Gemfile"
     "Gemfile.lock"
     "ci-prepush.bat"
@@ -717,10 +716,13 @@ merge_contract_root_files() {
     local f strat o b t rc
     # gradle.properties joins these rather than SYNC_FILES: it is `owner: merge` and carries the
       # fork's own `fork.project.name`, so a full checkout would clobber it. A 3-way takes the
-      # template's added build-tuning keys while the fork's values win.
-      for f in "settings.gradle.kts" "gradle/libs.versions.toml" "gradle.properties"; do
+      # template's added build-tuning keys while the fork's values win. lib-integrate.properties joins for
+      # the same reason: /lib-integrate writes per-fork `<lib>.local=true` links into it, and a full copy
+      # reset every fork's local-source links; a 3-way takes the template's new library rows.
+      for f in "settings.gradle.kts" "gradle/libs.versions.toml" "gradle.properties" "lib-integrate.properties"; do
         cs_match_g "$f"
         [ "${CS_M_OWNER:-}" = "merge" ] || continue
+        is_held "$f" && { print_step "Held ${BOLD}$f${NC} — kept the fork's copy (.template-sync-holds)"; continue; }
         git show "$TEMP_BRANCH:$f" >/dev/null 2>&1 || { print_warning "Template has no $f — skipping."; continue; }
         strat="${CS_M_STRAT:-3way}"
         o="$(mktemp)"; b="$(mktemp)"; t="$(mktemp)"
@@ -962,6 +964,13 @@ sync_directory() {
                 while IFS= read -r _mf; do
                     [ -z "$_mf" ] && continue
                     cs_match_g "$_mf"; [ "${CS_M_OWNER:-}" = "merge" ] || continue
+                    # A HELD path keeps the fork's copy on the merge path too, not only on the overlay and
+                    # the mirror: a held project.pbxproj was 3-way merged against a stale base and lost the
+                    # fork's SwiftPM packages (mbs/reels-downloader, 2026-11-03).
+                    if is_held "$_mf"; then
+                        print_step "Held ${BOLD}$_mf${NC} — kept the fork's copy (.template-sync-holds)"
+                        continue
+                    fi
                     # A line-based 3-way on a binary produces corruption that still LOOKS like a
                     # successful merge. The blanket `merge` rows cover whole platform shells, so a
                     # binary reaching here is expected (icons, .webp, .ico) rather than exceptional —

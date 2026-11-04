@@ -294,7 +294,7 @@ cs_merge_manifest() {
     mv "$tw" "$out"; return 0
   fi
   cs_merge_manifest_union "$ours" "$theirs" "$out"
-  if ! cs_manifest_fork_lines_kept "$ours" "$base" "$out"; then
+  if ! cs_fork_lines_kept "$ours" "$base" "$out"; then
     git merge-file -p -L "fork (ours)" -L "last-synced template (base)" -L "template (theirs)" \
       "$ours" "$base" "$theirs" > "$tw" 2>/dev/null
     mv "$tw" "$out"; return 1
@@ -302,8 +302,8 @@ cs_merge_manifest() {
   rm -f "$tw"; return 0
 }
 
-# cs_manifest_fork_lines_kept <ours> <base> <out> — every non-blank line the fork added survives in <out>.
-cs_manifest_fork_lines_kept() {
+# cs_fork_lines_kept <ours> <base> <out> — every non-blank line the fork added survives in <out>.
+cs_fork_lines_kept() {
   local l
   while IFS= read -r l; do
     [ -n "${l//[[:space:]]/}" ] || continue

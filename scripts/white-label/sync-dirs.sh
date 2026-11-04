@@ -1028,6 +1028,20 @@ sync_directory() {
                                 rm -f "$_sch" ;;
                             *)             cs_merge "$_ms" "$_o" "$_b" "$_t" "$_mf"; _mrc=$? ;;
                         esac
+                        # A "clean" line merge must still keep every line the FORK added (in ours, not in
+                        # base). A stale base (.template-version older than the fork's content) made
+                        # pbxproj-3way and manifest-union report success while dropping the fork's
+                        # SwiftPM packages and 61 manifest lines. Losing a template change is visible on
+                        # the next sync; losing fork work is not — so keep the fork's copy and surface it.
+                        case "$_ms" in
+                            3way|kotlin-3way|pbxproj-3way|plist-union|manifest-union)
+                                if [ "${_mrc:-0}" = 0 ] && declare -F cs_fork_lines_kept >/dev/null 2>&1 \
+                                   && ! cs_fork_lines_kept "$_o" "$_b" "$_mf"; then
+                                    cp "$_o" "$_mf"
+                                    print_warning "Merge of ${BOLD}$_mf${NC} (${_ms}) would DROP lines the fork added — kept the fork's copy; apply the template's change by hand"
+                                    _mrc=4
+                                fi ;;
+                        esac
                         # THREE outcomes, not two. A strategy that could not run keeps the fork's
                         # copy and returns 3; reporting that as "Merged — fork edits preserved" is
                         # true about the file and false about what happened, and it is exactly the

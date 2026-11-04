@@ -82,6 +82,18 @@ cs_merge manifest-union "$WORK/o5.xml" "$WORK/b4.xml" "$WORK/t5.xml" "$WORK/out5
 grep -q '<<<<<<<' "$WORK/out5.xml" && grep -q 'com.whatsapp' "$WORK/out5.xml" \
   && pass "conflict markers + fork lines present for review" || bad "fork lines lost or no markers"
 
+echo "── Case F: the engine refuses a 'clean' merge that drops a line the fork added ──"
+printf 'a\nb\n'            > "$WORK/b6.txt"
+printf 'a\nFORK\nb\n'      > "$WORK/o6.txt"
+printf 'a\nb\nTPL\n'       > "$WORK/kept6.txt";  printf 'a\nFORK\nb\nTPL\n' >> "$WORK/kept6.txt"
+printf 'a\nb\nTPL\n'       > "$WORK/lost6.txt"
+cs_fork_lines_kept "$WORK/o6.txt" "$WORK/b6.txt" "$WORK/kept6.txt" && pass "fork line present → invariant holds" || bad "false alarm"
+cs_fork_lines_kept "$WORK/o6.txt" "$WORK/b6.txt" "$WORK/lost6.txt" && bad "dropped fork line not detected" || pass "dropped fork line detected"
+ENGINE="$HERE/../../scripts/white-label/sync-dirs.sh"
+awk '/cs_match_g "\$_mf"/{p=1} p{print} p && /THREE outcomes, not two/{exit}' "$ENGINE" | grep -q 'cs_fork_lines_kept "\$_o" "\$_b" "\$_mf"' \
+  && pass "engine checks the fork-line invariant after every per-file line merge" \
+  || bad "engine ships line merges without the fork-line invariant"
+
 echo "── Case C: lib-integrate.properties keeps the fork's local links (properties-3way) ──"
 # /lib-integrate flips `<lib>.local=true` and adds the fork's own libraries; the template adds rows.
 printf 'a.local=false\na.path=../a\n'                    > "$WORK/b3.properties"

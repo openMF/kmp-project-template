@@ -186,6 +186,12 @@ dependencyGuard {
     }
 }
 
+// ── Fork-owned seam (white-label, mirrors core/<mod>/module-deps.gradle.kts) ────────────────────
+// A fork's own Android-app dependencies, manifest placeholders and BuildConfig fields go in
+// `cmp-android/module-deps.gradle.kts` — a file a template sync never touches. String configuration
+// names (`"implementation"(...)`) there: type-safe `libs.` accessors are not generated for script plugins.
+project.file("module-deps.gradle.kts").takeIf { it.exists() }?.let { apply(from = it) }
+
 baselineProfile {
     // Don't build on every iteration of a full assemble.
     // Instead enable generation directly for the release build variant.

@@ -60,5 +60,18 @@ grep -q 'sync_directory()' "$fnsrc" || { echo "  ❌ sync_directory not found in
   && pass "R8 seam: fork-proguard-rules.pro is fork-owned, shipped as a seed, applied by staging + release" \
   || bad "R8 seam missing — a fork's keep rules have nowhere to live that a sync keeps"
 
+# The Android app-shell seam: a fork's deps/placeholders and its Application startup have fork-owned homes
+# that the template-owned shell actually reaches.
+own() { (cd "$REPO" && bash scripts/customization-surface.sh resolve "$1") | cut -f2; }
+[ "$(own cmp-android/module-deps.gradle.kts)" = fork ] \
+  && grep -q 'file("module-deps.gradle.kts").takeIf { it.exists() }?.let { apply(from = it) }' "$REPO/cmp-android/build.gradle.kts" \
+  && pass "Android deps seam: cmp-android/module-deps.gradle.kts is fork-owned and applied" \
+  || bad "Android deps seam missing"
+[ "$(own cmp-android/src/main/kotlin/cmp/android/app/fork/ForkAndroidHooks.kt)" = fork ] \
+  && grep -q '^fun Application.onForkCreate()' "$REPO/cmp-android/src/main/kotlin/cmp/android/app/fork/ForkAndroidHooks.kt" \
+  && grep -q '^        onForkCreate()' "$REPO/cmp-android/src/main/kotlin/cmp/android/app/AndroidApp.kt" \
+  && pass "Android startup seam: ForkAndroidHooks is fork-owned, seeded, called from AndroidApp.onCreate" \
+  || bad "Android startup seam missing"
+
 [ "$fail" = 0 ] && echo "seam-seed-test: PASS" || echo "seam-seed-test: FAIL"
 exit "$fail"

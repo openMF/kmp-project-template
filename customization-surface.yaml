@@ -553,6 +553,13 @@ rules:
   # wins (first match).
   - glob: "**/core/*/module-deps.gradle.kts"
     owner: fork
+  # The same seam for the Android app shell: deps, manifest placeholders and BuildConfig fields of the
+  # fork (cmp-android/build.gradle.kts applies it), plus its Application/Activity hooks. Before these a
+  # fork with Android-only startup work (ads SDK init, app-open ads, consent) had to edit template files.
+  - glob: "cmp-android/module-deps.gradle.kts"
+    owner: fork
+  - glob: "cmp-android/src/main/kotlin/cmp/android/app/fork/**"
+    owner: fork
   # Core-module build files — `template` FULL-COPY (was `merge`/kotlin-3way).
   # The 3-way existed for ONE reason: "a fork adds module dependencies its own code compiles
   # against". Those now live in the fork-owned `core/<mod>/module-deps.gradle.kts` seam above, which

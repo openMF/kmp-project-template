@@ -250,7 +250,10 @@ org:
   email: team@mifos.org
   first_name: Mifos
   last_name: Initiative
-  phone: "+19078675309"
+  # App Store review / TestFlight contact phone, E.164 (`+<countrycode>…`). Deliberately EMPTY: a
+  # made-up number here (it used to be +1 907-867-5309) went to Apple as every fork's review contact.
+  # A fork sets its real number; left empty, the review phone file is simply not written.
+  phone: ""
   copyright: "© 2026 Mifos Initiative. All rights reserved."   # desktop / Mac App Store packaging copyright (org.copyright)
   marketing_url: https://mifos.org
   privacy_url: https://mifos-products.pages.dev/mobile/kmp-project-template/privacy/   # a fork points this at ITS OWN hosted policy

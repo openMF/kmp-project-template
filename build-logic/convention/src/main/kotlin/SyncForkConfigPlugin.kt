@@ -38,6 +38,21 @@ internal fun signedInByDefault(security: Map<*, *>?): Boolean =
     security?.get("signed_in_by_default")?.toString()?.trim()?.lowercase() != "false"
 
 /**
+ * Makes [target]'s parent dir exist when its platform's `metadata/` root does, and reports whether it
+ * may be written. Every `deployment/.../metadata` tree is gitignored and the template tracks only some of its
+ * sub-dirs, so a fresh clone has no `review_information/` or `changelogs/` — skipping on a missing
+ * PARENT silently dropped the App Review contact and the Play changelog on every CI run. A missing
+ * metadata ROOT still skips: that platform is not shipped by this fork.
+ */
+internal fun ensureMetadataParent(target: File): Boolean {
+    val parent = target.parentFile ?: return false
+    if (parent.isDirectory) return true
+    var root: File? = parent
+    while (root != null && root.name != "metadata") root = root.parentFile
+    return root != null && root.isDirectory && parent.mkdirs()
+}
+
+/**
  * Registers the `syncForkConfig` task on whichever project applies this plugin.
  *
  * Single source of truth:
@@ -436,7 +451,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         fun writeIfPresent(rel: String, value: String) {
             if (value.isBlank()) return
             val f = File(root, rel)
-            if (!f.parentFile.exists()) return
+            if (!ensureMetadataParent(f)) return
             f.writeText(nl(value))
             logger.lifecycle("syncForkConfig: wrote $rel")
             written++
@@ -446,7 +461,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // that must exist so Fastlane / Deliver don't fall back to stale content)
         fun writeAlways(rel: String, value: String) {
             val f = File(root, rel)
-            if (!f.parentFile.exists()) return
+            if (!ensureMetadataParent(f)) return
             f.writeText(nl(value))
             logger.lifecycle("syncForkConfig: wrote $rel")
             written++
@@ -455,12 +470,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // Locale-scoped metadata writer (G5). Writes `<metaRoot>/<primaryLocale>/<name>` (the fresh,
         // authoritative copy) and ALSO refreshes a pre-existing legacy `<metaRoot>/en-GB/<name>` when
         // it is on disk and differs from the primary locale — back-compat for forks whose Deliver
-        // config still points at en-GB. writeIfPresent already skips a missing parent dir.
+        // config still points at en-GB. The primary-locale dir is created by ensureMetadataParent
+        // (e.g. mac-app-store/metadata ships en-GB but no en-US).
         fun writeLocalized(metaRoot: String, name: String, value: String) {
-            // Ensure the primary-locale dir exists so the listing derives even when the template ships
-            // only a legacy locale (e.g. mac-app-store/metadata has en-GB but no en-US) — otherwise
-            // writeIfPresent skips (parent-dir-missing) and the fork's macOS store name/desc stays blank.
-            if (value.isNotBlank()) File(root, "$metaRoot/$primaryLocale").mkdirs()
             writeIfPresent("$metaRoot/$primaryLocale/$name", value)
             if (primaryLocale != "en-GB" && File(root, "$metaRoot/en-GB").isDirectory) {
                 writeIfPresent("$metaRoot/en-GB/$name", value)
@@ -470,7 +482,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // Generate App Store / Mac App Store age-rating JSON from store.ios.age.rating
         fun writeRatingConfig(rel: String) {
             val f = File(root, rel)
-            if (!f.parentFile.exists()) return
+            if (!ensureMetadataParent(f)) return
             f.writeText(
                 """{
   "v1_0": {

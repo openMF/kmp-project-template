@@ -56,6 +56,32 @@ rc=$?
 [ "$rc" -eq 1 ] && pass "conflict returned rc=1 (surfaced, not silently shipped)" || bad "conflict rc=$rc (expected 1)"
 grep -q '<<<<<<<' "$WORK/out2.xml" && pass "conflict markers present for review" || bad "conflict markers missing"
 
+echo "── Case D: manifest-union keeps fork additions that are NOT permissions ──"
+# The permission-only union used to drop every <queries>, <meta-data> and intent filter the fork added.
+cat > "$WORK/b4.xml" <<'XML'
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <application android:label="@string/app_name">
+        <activity android:name=".MainActivity" />
+    </application>
+</manifest>
+XML
+sed 's#    <application#    <queries><package android:name="com.whatsapp" /></queries>\n    <application#; s#        <activity android:name=".MainActivity" />#        <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="x" />\n        <activity android:name=".MainActivity" />#' "$WORK/b4.xml" > "$WORK/o4.xml"
+sed 's#    <uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />#' "$WORK/b4.xml" > "$WORK/t4.xml"
+cs_merge manifest-union "$WORK/o4.xml" "$WORK/b4.xml" "$WORK/t4.xml" "$WORK/out4.xml"; rc=$?
+[ "$rc" -eq 0 ] && pass "clean merge (rc 0)" || bad "rc=$rc"
+grep -q 'com.whatsapp' "$WORK/out4.xml"           && pass "fork <queries> kept"            || bad "fork <queries> dropped"
+grep -q 'ads.APPLICATION_ID' "$WORK/out4.xml"     && pass "fork <meta-data> kept"          || bad "fork <meta-data> dropped"
+grep -q 'POST_NOTIFICATIONS' "$WORK/out4.xml"     && pass "template permission picked up"  || bad "template permission missing"
+
+echo "── Case E: a conflict that would lose a fork line is surfaced, never shipped ──"
+sed 's#android:label="@string/app_name"#android:label="FORK"#' "$WORK/o4.xml" > "$WORK/o5.xml"
+sed 's#android:label="@string/app_name"#android:label="UPSTREAM"#' "$WORK/t4.xml" > "$WORK/t5.xml"
+cs_merge manifest-union "$WORK/o5.xml" "$WORK/b4.xml" "$WORK/t5.xml" "$WORK/out5.xml"; rc=$?
+[ "$rc" -eq 1 ] && pass "rc=1 — the conflict is reported" || bad "rc=$rc (a fork line was silently dropped)"
+grep -q '<<<<<<<' "$WORK/out5.xml" && grep -q 'com.whatsapp' "$WORK/out5.xml" \
+  && pass "conflict markers + fork lines present for review" || bad "fork lines lost or no markers"
+
 echo "── Case C: lib-integrate.properties keeps the fork's local links (properties-3way) ──"
 # /lib-integrate flips `<lib>.local=true` and adds the fork's own libraries; the template adds rows.
 printf 'a.local=false\na.path=../a\n'                    > "$WORK/b3.properties"

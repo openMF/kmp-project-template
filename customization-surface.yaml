@@ -418,6 +418,10 @@ rules:
     owner: fork
   - glob: "cmp-android/dependencies/**"       # dependency-guard baseline
     owner: fork
+  # The fork's own R8 keep rules (AdMob, Tink, its own models). proguard-rules.pro is template-owned and
+  # replaced on every sync, so app rules there were deleted; release/staging apply this file after it.
+  - glob: "cmp-android/proguard-rules.fork.pro"
+    owner: fork
   - glob: "cmp-ios/iosApp/Assets.xcassets/**" # app icon + colors
     owner: fork
   - glob: "cmp-ios/Configuration/Config.xcconfig"  # syncForkConfig-generated identity

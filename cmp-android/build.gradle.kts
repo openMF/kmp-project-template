@@ -90,13 +90,13 @@ android {
         getByName("staging") {
             isJniDebuggable = false
             signingConfig = if (releaseSigningReady) signingConfigs.getByName("release") else null
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "proguard-rules.fork.pro")
         }
         release {
             isShrinkResources = true
             isJniDebuggable = false
             signingConfig = if (releaseSigningReady) signingConfigs.getByName("release") else null
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro", "proguard-rules.fork.pro")
         }
     }
 

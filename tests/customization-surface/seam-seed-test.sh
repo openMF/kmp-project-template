@@ -80,6 +80,12 @@ own() { (cd "$REPO" && bash scripts/customization-surface.sh resolve "$1") | cut
   && grep -q 'viewController(platformBridges:' "$REPO/cmp-ios/iosApp/ContentView.swift" \
   && pass "iOS bridge seam: ForkIosHooks fork-owned, called by viewController, ContentView merge-owned" \
   || bad "iOS bridge seam missing"
+# Firebase on iOS: the fork's plist is fork-owned, bundled when present, and configured only then.
+[ "$(own cmp-ios/iosApp/GoogleService-Info.plist)" = fork ] \
+  && grep -q 'GoogleService-Info.plist' "$REPO/cmp-ios/scripts/copy-compose-resources.sh" \
+  && grep -q 'FirebaseApp.configure()' "$REPO/cmp-ios/iosApp/iOSApp.swift" \
+  && pass "iOS Firebase seam: fork plist bundled when present, FirebaseApp.configure() guarded" \
+  || bad "iOS Firebase seam missing"
 
 [ "$fail" = 0 ] && echo "seam-seed-test: PASS" || echo "seam-seed-test: FAIL"
 exit "$fail"

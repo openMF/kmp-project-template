@@ -54,10 +54,10 @@ grep -q 'sync_directory()' "$fnsrc" || { echo "  ❌ sync_directory not found in
 
 # The R8 rules seam: proguard-rules.pro is template-owned (replaced every sync), so the fork's own keep
 # rules need a fork-owned file the release build actually applies.
-[ "$( (cd "$REPO" && bash scripts/customization-surface.sh resolve cmp-android/proguard-rules.fork.pro) | cut -f2)" = fork ] \
-  && [ -f "$REPO/cmp-android/proguard-rules.fork.pro" ] \
-  && [ "$(grep -c '"proguard-rules.fork.pro"' "$REPO/cmp-android/build.gradle.kts")" -ge 2 ] \
-  && pass "R8 seam: proguard-rules.fork.pro is fork-owned, shipped as a seed, applied by staging + release" \
+[ "$( (cd "$REPO" && bash scripts/customization-surface.sh resolve cmp-android/fork-proguard-rules.pro) | cut -f2)" = fork ] \
+  && [ -f "$REPO/cmp-android/fork-proguard-rules.pro" ] \
+  && [ "$(grep -c '"fork-proguard-rules.pro"' "$REPO/cmp-android/build.gradle.kts")" -ge 2 ] \
+  && pass "R8 seam: fork-proguard-rules.pro is fork-owned, shipped as a seed, applied by staging + release" \
   || bad "R8 seam missing — a fork's keep rules have nowhere to live that a sync keeps"
 
 [ "$fail" = 0 ] && echo "seam-seed-test: PASS" || echo "seam-seed-test: FAIL"

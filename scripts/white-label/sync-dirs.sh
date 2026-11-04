@@ -364,6 +364,18 @@ post_sync_fork_steps() {
     fi
 }
 
+# dirty_paths — every modified/untracked path, one per line, sorted (a snapshot for stage_new_dirty).
+dirty_paths() { git status --porcelain --untracked-files=all | cut -c4- | sort; }
+
+# stage_new_dirty <snapshot> — stage every path that became dirty since <snapshot>. post_sync_fork_steps
+# writes fork-owned paths OUTSIDE the synced roots (module-packages.yaml status stamps, app-profile
+# projections, generated docs); staging only the roots left those uncommitted after "Sync committed".
+# A path that was already dirty before the steps ran (the operator's own work) is left alone.
+stage_new_dirty() {
+    comm -13 <(printf '%s\n' "$1") <(dirty_paths) \
+        | while IFS= read -r _p; do [ -n "$_p" ] && git add -A -- "$_p" 2>/dev/null; done || true
+}
+
 # is_excluded <dir> <path> <type> — 0 when the sync must leave <path> in the FORK's state.
 # ONE source decides: the ownership contract, read through scripts/customization-surface.sh (its rules,
 # the per-module module-packages.yaml manifests it loads, the sync roots). A path is kept when it is
@@ -1699,8 +1711,10 @@ if [ "$DRY_RUN" = false ]; then
         if [ -f "gradle/libs.versions.toml" ]; then
             git add "gradle/libs.versions.toml"
         fi
+        _pre_post="$(dirty_paths)"
         post_sync_fork_steps
         git add -A -- "${SYNC_DIRS[@]}" "${SYNC_FILES[@]}" 2>/dev/null || true   # the strip deletes files
+        stage_new_dirty "$_pre_post"
 
         # Lint only what the sync WROTE — its 3-way merge results. Template-owned files were checked in
         # the template and fork-owned files are untouched, so running the commit hook over the whole

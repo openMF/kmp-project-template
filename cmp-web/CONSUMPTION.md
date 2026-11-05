@@ -14,8 +14,11 @@ that both call `initKoin()` and render `cmp-shared`'s `SharedApp` into the page.
   under the wasm target.
 - **`webpack.config.d/dev-server-headers.js`** — sets COOP/COEP headers on the local dev server so
   `crossOriginIsolated` is `true`, enabling `WebWorkerSQLiteDriver` + OPFS-backed Room storage
-  locally (GitHub Pages doesn't send these headers, so production falls back to
-  `Room.inMemoryDatabaseBuilder`).
+  locally.
+- **`src/{js,wasmJs}Main/resources/_headers`** — the same COOP/COEP headers for hosts that read a
+  `_headers` file (Cloudflare Pages, Netlify), so deployed data persists there too. GitHub Pages
+  cannot send headers, so a GitHub Pages deploy falls back to `Room.inMemoryDatabaseBuilder`
+  (data lasts one page session).
 
 ## What a fork touches
 
@@ -24,7 +27,8 @@ that both call `initKoin()` and render `cmp-shared`'s `SharedApp` into the page.
   `build.gradle.kts`) from `gradle/fork.properties` — `APP_DISPLAY_NAME`, `APP_DESCRIPTION`
   (`store.android.short.description` / `store.subtitle`), `APP_KEYWORDS`, `APP_COPYRIGHT`,
   `APP_AUTHOR`, `APP_URL`, `OG_IMAGE`. Set these via `app-profile/` (store listing + org fields),
-  not by hand-editing `index.html`.
+  not by hand-editing `index.html`. The substitution is scoped to `index.html` — it is a text
+  filter, and running it over the binaries in the same task (`skiko.wasm`, icons) corrupts them.
 - **App behavior/UI** — add features via the `cmp-navigation` registries, not by editing
   `Application.kt`/`Main.kt`.
 

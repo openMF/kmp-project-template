@@ -69,6 +69,8 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.client.js)
+                // installWebNetworkMonitor() configures the monitor before Koin first touches it.
+                implementation(libs.cmp.network.monitor)
             }
         }
 

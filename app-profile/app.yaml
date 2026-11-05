@@ -48,10 +48,12 @@ network:
     # Query parameters masked in logged URLs, on top of the built-in credential names
     # (api_key, token, access_token, password, secret, signature, code, …).
     redact_query_params: []
-  # CORS relay that WEB builds route `proxied_host` calls through. A relay sees every request it
-  # forwards, so it is a third-party processor: declare it here (and in the privacy policy) or omit it
-  # for none. The template's FRED demo needs one on web; a fork should self-host or drop it.
-  web_cors_proxy: https://corsproxy.io
+  # CORS relay that WEB builds route `proxied_host` calls through. `/cors` is the site's OWN relay —
+  # cmp-web's _worker.js on Cloudflare Pages, which forwards only to the declared proxied hosts — so no
+  # third party sees the traffic. An https:// URL names an external relay instead, which is a
+  # third-party processor (declare it in the privacy policy). Omit for none. Hosts without a relay
+  # (GitHub Pages) cannot serve `/cors`, so proxied calls fail there and the screen shows its error.
+  web_cors_proxy: /cors
   # Declarative access-point topology — every REST + Supabase endpoint the app talks to, in ONE place.
   # This is the SoT for core/network's AccessPointRegistry AND for the generated DI wiring: declare an
   # endpoint here, run `./gradlew syncForkConfig`, and the only thing left to write is the API type.

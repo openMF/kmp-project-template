@@ -1093,8 +1093,13 @@ abstract class SyncForkConfigTask : DefaultTask() {
             throw org.gradle.api.GradleException("syncForkConfig: network.logging.redact_query_params entry '$it' is not a query-parameter name.")
         }
         val proxy = network["web_cors_proxy"]?.toString()?.trim()?.takeIf { it.isNotEmpty() && it != "none" }
-        if (proxy != null && !proxy.startsWith("https://")) {
-            throw org.gradle.api.GradleException("syncForkConfig: network.web_cors_proxy '$proxy' must be an https:// URL (or omitted for no relay).")
+        // A path ("/cors") is a same-origin relay the site serves itself (cmp-web's _worker.js on
+        // Cloudflare Pages), so it is as private as the site; anything else must be https.
+        if (proxy != null && !proxy.startsWith("https://") && !Regex("^/[A-Za-z0-9_-]+$").matches(proxy)) {
+            throw org.gradle.api.GradleException(
+                "syncForkConfig: network.web_cors_proxy '$proxy' must be an https:// URL, a same-origin path like /cors, " +
+                    "or omitted for no relay.",
+            )
         }
         fun esc(v: String) = v.replace("\\", "\\\\").replace("\"", "\\\"")
         sb.append("\n    /** Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`. */\n")

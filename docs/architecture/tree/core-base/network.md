@@ -56,10 +56,10 @@ Changing the server usually invalidates the session, so sign out on a change.
 
 Tests: `core/network/src/commonTest/.../config/{NetworkConfigRepositoryTest,NetworkConfigRequestTest,DynamicBaseUrlTest}.kt`.
 
-<!-- api-docs:begin module=core-base/network sha=9d54b55829bd1924539869ada63b908a7156fa54 -->
+<!-- api-docs:begin module=core-base/network sha=a7112889dc8d9eabe44ed1b46e3a06857ae7d445 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `9d54b55829bd` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `a7112889dc8d` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -617,7 +617,7 @@ How much of an HTTP exchange may be written to the device log. Ordered least to 
     val policy: NetworkPolicy = NetworkPolicy(
         releaseLogging = HttpLogDetail.NONE,
         debugLogging = HttpLogDetail.BODY,
-        webCorsProxy = "https://corsproxy.io",
+        webCorsProxy = "/cors",
     )
     // syncForkConfig:access-points:end
 ```
@@ -637,7 +637,7 @@ App-wide network privacy policy — GENERATED from `app-profile/app.yaml#network
     val policy: NetworkPolicy = NetworkPolicy(
         releaseLogging = HttpLogDetail.NONE,
         debugLogging = HttpLogDetail.BODY,
-        webCorsProxy = "https://corsproxy.io",
+        webCorsProxy = "/cors",
     )
 ```
 

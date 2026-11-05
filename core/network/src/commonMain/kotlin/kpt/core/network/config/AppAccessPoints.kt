@@ -105,7 +105,7 @@ object AppAccessPoints {
     val policy: NetworkPolicy = NetworkPolicy(
         releaseLogging = HttpLogDetail.NONE,
         debugLogging = HttpLogDetail.BODY,
-        webCorsProxy = "https://corsproxy.io",
+        webCorsProxy = "/cors",
     )
     // syncForkConfig:access-points:end
 }

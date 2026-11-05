@@ -15,10 +15,26 @@ that both call `initKoin()` and render `cmp-shared`'s `SharedApp` into the page.
 - **`webpack.config.d/dev-server-headers.js`** — sets COOP/COEP headers on the local dev server so
   `crossOriginIsolated` is `true`, enabling `WebWorkerSQLiteDriver` + OPFS-backed Room storage
   locally.
-- **`src/{js,wasmJs}Main/resources/_headers`** — the same COOP/COEP headers for hosts that read a
-  `_headers` file (Cloudflare Pages, Netlify), so deployed data persists there too. GitHub Pages
-  cannot send headers, so a GitHub Pages deploy falls back to `Room.inMemoryDatabaseBuilder`
-  (data lasts one page session).
+- **`src/jsWasmMain/kotlin/WebNetworkMonitor.kt`** — installs the network monitor with the browser's
+  own online signal before `initKoin()`. The default HTTP probe (google `generate_204`) is a
+  CORS-blocked request from a page, so it would report offline on every network.
+- **`src/{js,wasmJs}Main/resources/_worker.js`** — the Cloudflare Pages worker (the recommended web
+  host). It serves the site with COOP/COEP, so the page is cross-origin isolated and the app's
+  OPFS-backed database persists, and it runs the site's own CORS relay at `/cors/?<https-url>`
+  (`app-profile/app.yaml#network.web_cors_proxy: /cors`). The relay forwards GET/HEAD to allowlisted
+  hosts only: the `PROXY_ALLOWED_HOSTS` Pages environment variable (comma-separated) or the worker's
+  default list. Keep it in sync with `proxied_host` entries.
+- **`src/{js,wasmJs}Main/resources/_headers`** — the same COOP/COEP headers for Netlify, which reads
+  `_headers`. GitHub Pages can neither send headers nor run the relay: there the database is
+  in-memory (one page session) and `proxied_host` calls fail, so screens show their error state.
+
+## Hosting
+
+Deploy with the release workflow's `web_host: cloudflare-pages` (needs the `CLOUDFLARE_API_TOKEN`
+and `CLOUDFLARE_ACCOUNT_ID` repository secrets; the Pages project defaults to the repository name).
+To deploy by hand: `./gradlew :cmp-web:jsBrowserDistribution`, then
+`wrangler pages deploy cmp-web/build/dist/js/productionExecutable --project-name=<project> --branch=main`.
+`wrangler pages dev <same dir>` serves it locally with the worker, exactly as Cloudflare runs it.
 
 ## What a fork touches
 

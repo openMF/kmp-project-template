@@ -19,6 +19,7 @@ cp "$REPO/secrets/LAYOUT.yaml" "$WORK/secrets/"
 probe='require "yaml"; require ARGV[0]; a = BuildSecrets.for
        puts "fork_rel=#{(a.rel("fork_client_key") rescue "missing")}"
        puts "tpl_rel=#{a.rel("upload_keystore")}"'
+# Runs the probe against the copied resolver in $WORK and prints its fork_rel= / tpl_rel= lines.
 run() { (cd "$WORK" && ruby_exec -e "$probe" "$WORK/deployment/_shared/lib/build_secrets.rb" 2>/dev/null); }
 
 base="$(run)"

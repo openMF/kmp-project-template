@@ -123,7 +123,7 @@ if [ "${#xml_files[@]}" -gt 0 ] && [ -s "$hdr" ]; then
     if [ "$CHECK" = 1 ]; then bad+=("$f"); else cp "$want" "$f"; fi
   done
   rm -f "$xml_hdr" "$want"
-  [ "${#bad[@]}" -gt 0 ] && { printf 'xml licence header (Spotless) — run without --check to fix:\n'; printf '  %s\n' "${bad[@]}"; } >&2 && rc=1
+  [ "${#bad[@]}" -gt 0 ] && { printf 'xml licence header (Spotless) — run without --check to fix:\n'; printf '  %s\n' ${bad[@]+"${bad[@]}"}; } >&2 && rc=1
 fi
 
 [ "${#kt_files[@]}" -gt 0 ] || exit "$rc"

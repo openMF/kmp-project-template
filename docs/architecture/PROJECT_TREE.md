@@ -58,7 +58,7 @@
 |---|---:|---|
 | `scripts/` | 478 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
-| `tests/` | 25 | [`tests/`](tree/tests.md) |
+| `tests/` | 27 | [`tests/`](tree/tests.md) |
 
 ## Other
 

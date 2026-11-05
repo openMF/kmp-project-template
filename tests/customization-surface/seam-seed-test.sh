@@ -7,7 +7,8 @@
 #
 #   new fork-owned seam (absent at the last sync)         → seeded with the template's copy
 #   fork-owned file present at the last sync, fork deleted → stays deleted
-#   fork-owned file in a directory the fork lacks (a sample package scaffold) → not seeded
+#   new fork-owned seam in a directory that is new upstream too              → seeded
+#   new fork-owned file in a package the fork deleted (shipped at the last sync) → not seeded
 #   fork-owned Room schema (the fork's own lineage)                        → not seeded
 set -uo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -18,21 +19,24 @@ fail=0; pass() { echo "  ✅ $1"; }; bad() { echo "  ❌ $1"; fail=1; }
 
 F="$WORK/fork"; mkdir -p "$F/scripts/white-label"
 cp "$REPO/scripts/customization-surface.sh" "$F/scripts/"
-printf 'version: 1\nrules:\n  - glob: "spotless/license-header.txt"\n    owner: fork\n  - glob: "spotless/old-seam.txt"\n    owner: fork\n  - glob: "spotless/samplepkg/**"\n    owner: fork\n  - glob: "spotless/schemas/**"\n    owner: fork\n  - glob: "**"\n    owner: template\n    default: true\n' > "$F/customization-surface.yaml"
+printf 'version: 1\nrules:\n  - glob: "spotless/license-header.txt"\n    owner: fork\n  - glob: "spotless/old-seam.txt"\n    owner: fork\n  - glob: "spotless/samplepkg/**"\n    owner: fork\n  - glob: "spotless/app/fork/**"\n    owner: fork\n  - glob: "spotless/schemas/**"\n    owner: fork\n  - glob: "**"\n    owner: template\n    default: true\n' > "$F/customization-surface.yaml"
 printf 'SYNC_DIRS=(\n    "spotless"\n)\nSYNC_FILES=(\n)\n' > "$F/scripts/white-label/sync-dirs.sh"
 
 # git, run in the fixture repo with a fixed identity.
 g() { git -C "$F" -c user.email=t@t -c user.name=t "$@"; }
-mkdir -p "$F/spotless"; echo keep > "$F/spotless/copyright.kt"; echo seam > "$F/spotless/old-seam.txt"
+mkdir -p "$F/spotless/samplepkg"; echo keep > "$F/spotless/copyright.kt"; echo seam > "$F/spotless/old-seam.txt"; echo old > "$F/spotless/samplepkg/Old.kt"
 g init -q -b main; g add -A; g commit -q -m "last sync"; BASE="$(g rev-parse HEAD)"
-g checkout -q -b fork; g rm -q spotless/old-seam.txt; g commit -q -m "fork deletes its old seam"
-g checkout -q -b tpl main; mkdir -p "$F/spotless/samplepkg" "$F/spotless/schemas"; echo doc > "$F/spotless/samplepkg/README.md"; echo {} > "$F/spotless/schemas/12.json"; echo 'Copyright $YEAR $ORG_NAME' > "$F/spotless/license-header.txt"; g add -A; g commit -q -m "template: new fork seam"
+g checkout -q -b fork; g rm -q spotless/old-seam.txt; g rm -rq spotless/samplepkg; g commit -q -m "fork deletes its old seam + the sample package"
+g checkout -q -b tpl main; mkdir -p "$F/spotless/samplepkg/sub" "$F/spotless/schemas" "$F/spotless/app/fork"
+echo doc > "$F/spotless/samplepkg/README.md"; echo new > "$F/spotless/samplepkg/sub/New.kt"; echo {} > "$F/spotless/schemas/12.json"
+echo 'Copyright $YEAR $ORG_NAME' > "$F/spotless/license-header.txt"; echo 'fun onForkCreate() {}' > "$F/spotless/app/fork/Hooks.kt"
+g add -A; g commit -q -m "template: new fork seams"
 g checkout -q fork
 
 fnsrc="$WORK/fns.sh"
 {
   echo 'print_step(){ :; }; print_warning(){ :; }; print_error(){ :; }; show_progress(){ :; }; declare -A EXCLUSIONS=(); SYNC_CONFLICTS=(); SYNC_FAILED=()'
-  for fn in owner_of is_held is_excluded resolve_merge_base remove_stale_path propagate_template_deletions mirror_template_owned sync_directory; do
+  for fn in owner_of is_held is_excluded fork_deleted_dir resolve_merge_base remove_stale_path propagate_template_deletions mirror_template_owned sync_directory; do
     awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{" {p=1} p{print} p&&/^}/{p=0}' "$ENGINE"
   done
 } > "$fnsrc"
@@ -47,8 +51,13 @@ grep -q 'sync_directory()' "$fnsrc" || { echo "  ❌ sync_directory not found in
 [ ! -f "$F/spotless/old-seam.txt" ] && pass "fork-owned file the fork deleted stays deleted" \
   || bad "the fork's deletion was undone (spotless/old-seam.txt came back)"
 
-[ ! -e "$F/spotless/samplepkg/README.md" ] && pass "sample package in a directory the fork lacks is not seeded" \
-  || bad "a sample package scaffold was seeded (spotless/samplepkg/README.md)"
+# A seam template-owned code calls (AndroidApp.onCreate -> onForkCreate) ships in a directory that is
+# new upstream; dropping it left the fork unable to compile.
+[ -f "$F/spotless/app/fork/Hooks.kt" ] && pass "new fork-owned seam in a new directory seeded" \
+  || bad "new seam in a new directory dropped (spotless/app/fork/Hooks.kt)"
+[ ! -e "$F/spotless/samplepkg/README.md" ] && [ ! -e "$F/spotless/samplepkg/sub/New.kt" ] \
+  && pass "new file in a package the fork deleted is not seeded" \
+  || bad "a package the fork deleted was re-seeded (spotless/samplepkg/)"
 [ ! -e "$F/spotless/schemas/12.json" ] && pass "a Room schema is not seeded into the fork's lineage" \
   || bad "a template schema was seeded (spotless/schemas/12.json)"
 

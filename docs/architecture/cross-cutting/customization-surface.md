@@ -220,6 +220,24 @@ the rows that name one filetype (`plist-union`, `pbxproj-3way`, `manifest-union`
 directories are carved out `fork` (`res/**`, `Assets.xcassets/**`, `cmp-desktop/icons/**`, the
 `cmp-web` resources), and the engine additionally refuses to line-merge a binary.
 
+Every merge goes through one dispatcher, `merge_by_strategy`, and a file the template did not change
+since the base (`BASE == THEIRS`) comes back as the fork's copy, untouched, whatever the strategy. A
+re-serializing merger would otherwise rebuild it around the template's comments and report the
+fork's own lines as dropped. Proof: `tests/customization-surface/template-unchanged-test.sh`.
+
+Four root files are merged but never checked out: `settings.gradle.kts`, `gradle/libs.versions.toml`,
+`gradle.properties` and `lib-integrate.properties` (`CONTRACT_ROOT_MERGES` in `sync-dirs.sh`). A full
+checkout would clobber the fork's half first. `tests/customization-surface/sync-reach-test.sh` fails
+when a `template`/`merge` path is reachable by none of `SYNC_DIRS`, `SYNC_FILES` or
+`CONTRACT_ROOT_MERGES`. Feature modules are not sync roots, so their manifests and strings resolve
+`fork` like the rest of the module.
+
+**New fork-owned seams are seeded.** A fork-owned file absent at the last-synced template commit is one
+the fork never had, so the template's copy lands as its seed, even in a directory that is new too
+(`cmp/android/app/fork/ForkAndroidHooks.kt`, which `AndroidApp.onCreate` calls). It is dropped only
+when the fork deleted the package it sits in, the nearest directory the template already shipped.
+Room schemas and demo code are never seeded. Proof: `tests/customization-surface/seam-seed-test.sh`.
+
 The fork-owned seams inside the shells are `ForkWorkerDeclarations.kt` (cmp-shared) and `registry/**`
 (cmp-navigation).
 

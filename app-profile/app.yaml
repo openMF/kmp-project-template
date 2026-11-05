@@ -370,8 +370,8 @@ security:
   signed_in_by_default: true
   # Whether a FRESH install starts with UserData.firstTimeUser = true, so RootNavViewModel shows onboarding
   # once before anything else (until the onboarding screen calls setFirstTimeState(false)). The template
-  # ships no onboarding destination, so it stays false; set `true` only in a fork that adds one.
-  # ABSENT means `false`.
+  # ships feature/onboarding (three intro pages + the analytics / crash-report consent page) but keeps it
+  # off by default; set `true` to show it on first run. ABSENT means `false`.
   first_run_onboarding: false
 
 # Privacy consent (GDPR Art. 6(1)(a) / 7): analytics and crash reporting are CONSENT-based processing, so

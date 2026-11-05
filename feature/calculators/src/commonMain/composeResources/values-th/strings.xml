@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">ระยะเวลา</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d เดือน</string>
     <string name="screens_calc_wizard_step_review_rate_label">อัตรา</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">ดอกเบี้ยรวม</string>
     <string name="screens_calc_wizard_step_name_message">ตั้งชื่อสถานการณ์นี้เพื่อให้กลับมาหาได้ในรายการสินเชื่อของคุณ</string>
     <string name="screens_calc_wizard_step_name_label">ชื่อสถานการณ์</string>

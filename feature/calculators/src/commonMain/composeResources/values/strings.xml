@@ -76,7 +76,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Tenure</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d months</string>
     <string name="screens_calc_wizard_step_review_rate_label">Rate</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Total interest</string>
     <string name="screens_calc_wizard_step_name_message">Name this scenario so you can find it again in your loans.</string>
     <string name="screens_calc_wizard_step_name_label">Scenario Name</string>

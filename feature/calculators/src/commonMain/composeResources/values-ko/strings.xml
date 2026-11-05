@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">기간</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d개월</string>
     <string name="screens_calc_wizard_step_review_rate_label">이율</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">총 이자</string>
     <string name="screens_calc_wizard_step_name_message">나중에 대출 목록에서 찾을 수 있도록 이 시나리오에 이름을 지정하세요.</string>
     <string name="screens_calc_wizard_step_name_label">시나리오 이름</string>

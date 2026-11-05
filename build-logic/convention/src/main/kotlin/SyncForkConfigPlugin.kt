@@ -39,9 +39,9 @@ internal fun signedInByDefault(security: Map<*, *>?): Boolean =
 
 /**
  * `app.yaml#security.first_run_onboarding` → `AppSecurityConfig.FIRST_RUN_ONBOARDING`, the starting value of
- * `UserData.firstTimeUser`. Absent means `false`: the template ships no onboarding destination, so a fresh
- * install must not be routed to one. A fork that ships onboarding sets `true`, and `RootNavViewModel` then
- * emits `ShowOnboarding` once, until the onboarding screen calls `setFirstTimeState(false)`.
+ * `UserData.firstTimeUser`. Absent means `false`: onboarding (feature/onboarding) is opt-in, so a fresh
+ * install is not routed to it unless app.yaml asks. With `true`, `RootNavViewModel` emits `ShowOnboarding`
+ * once, until the onboarding screen calls `setFirstTimeState(false)`.
  */
 internal fun firstRunOnboarding(security: Map<*, *>?): Boolean =
     security?.get("first_run_onboarding")?.toString()?.trim()?.lowercase() == "true"
@@ -1300,7 +1300,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         sb.append("    const val SCREEN_CAPTURE_ALLOWED_BY_DEFAULT: Boolean = ").append(allowCapture).append("\n\n")
         sb.append("    /** `security.signed_in_by_default` — whether a fresh install starts signed in (false = the app has a login). */\n")
         sb.append("    const val SIGNED_IN_BY_DEFAULT: Boolean = ").append(signedIn).append("\n\n")
-        sb.append("    /** `security.first_run_onboarding` — whether a fresh install shows onboarding once (false = the app has none). */\n")
+        sb.append("    /** `security.first_run_onboarding` — whether a fresh install shows onboarding once (false = skip it). */\n")
         sb.append("    const val FIRST_RUN_ONBOARDING: Boolean = ").append(onboarding).append("\n")
         sb.append("    // syncForkConfig:app-security:end")
 

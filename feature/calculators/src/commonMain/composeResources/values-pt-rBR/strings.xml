@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Prazo</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d meses</string>
     <string name="screens_calc_wizard_step_review_rate_label">Taxa</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Juros totais</string>
     <string name="screens_calc_wizard_step_name_message">Dê um nome a este cenário para encontrá-lo depois nos seus empréstimos.</string>
     <string name="screens_calc_wizard_step_name_label">Nome do cenário</string>

@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">期限</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d 個月</string>
     <string name="screens_calc_wizard_step_review_rate_label">利率</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">利息總額</string>
     <string name="screens_calc_wizard_step_name_message">為這個方案命名，方便日後在貸款中找到它。</string>
     <string name="screens_calc_wizard_step_name_label">方案名稱</string>

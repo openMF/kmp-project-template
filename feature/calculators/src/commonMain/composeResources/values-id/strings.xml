@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Tenor</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d bulan</string>
     <string name="screens_calc_wizard_step_review_rate_label">Suku bunga</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Total bunga</string>
     <string name="screens_calc_wizard_step_name_message">Beri nama skenario ini agar mudah ditemukan lagi di daftar pinjaman Anda.</string>
     <string name="screens_calc_wizard_step_name_label">Nama skenario</string>

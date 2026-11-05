@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">Ежемесячный платёж</string>
     <string name="screens_loans_detail_total_paid_label">Выплачено на сегодня</string>
     <string name="screens_loans_detail_annual_rate_label">Годовая ставка</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">Следующий платёж</string>
     <string name="screens_loans_detail_tenure_label">Срок</string>
     <string name="screens_loans_detail_tenure_value">%1$d мес.</string>
     <string name="screens_loans_detail_tenure_progress_label">Прогресс по сроку</string>
-    <string name="screens_loans_detail_tenure_progress_value">выполнено %1$d%%</string>
+    <string name="screens_loans_detail_tenure_progress_value">выполнено %1$d%</string>
     <string name="screens_loans_detail_edit_button">Изменить</string>
     <string name="screens_loans_detail_schedule_button">График</string>
     <string name="screens_loans_detail_delete_button">Удалить</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">Ежемесячный платёж</string>
     <string name="screens_loans_row_remaining_label">Осталось</string>
     <string name="screens_loans_row_monthly_emi_label">Ежемесячный платёж</string>
-    <string name="screens_loans_row_progress_value">погашено %1$d%%</string>
+    <string name="screens_loans_row_progress_value">погашено %1$d%</string>
     <string name="screens_loans_row_next_due_value">Далее: %1$s</string>
 </resources>

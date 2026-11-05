@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">ยอดชำระรายเดือน (ค่างวด)</string>
     <string name="screens_loans_detail_total_paid_label">ยอดชำระสะสม</string>
     <string name="screens_loans_detail_annual_rate_label">อัตราต่อปี</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">วันครบกำหนดถัดไป</string>
     <string name="screens_loans_detail_tenure_label">ระยะเวลา</string>
     <string name="screens_loans_detail_tenure_value">%1$d เดือน</string>
     <string name="screens_loans_detail_tenure_progress_label">ความคืบหน้าของระยะเวลา</string>
-    <string name="screens_loans_detail_tenure_progress_value">เสร็จ %1$d%%</string>
+    <string name="screens_loans_detail_tenure_progress_value">เสร็จ %1$d%</string>
     <string name="screens_loans_detail_edit_button">แก้ไข</string>
     <string name="screens_loans_detail_schedule_button">ตารางชำระ</string>
     <string name="screens_loans_detail_delete_button">ลบ</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">ค่างวดรายเดือน</string>
     <string name="screens_loans_row_remaining_label">คงเหลือ</string>
     <string name="screens_loans_row_monthly_emi_label">ค่างวดรายเดือน</string>
-    <string name="screens_loans_row_progress_value">ชำระแล้ว %1$d%%</string>
+    <string name="screens_loans_row_progress_value">ชำระแล้ว %1$d%</string>
     <string name="screens_loans_row_next_due_value">ถัดไป: %1$s</string>
 </resources>

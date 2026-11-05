@@ -42,7 +42,7 @@ class SecurityDefaultsTest {
 
     @Test
     fun firstRunOnboardingMissingKeyIsFalse() {
-        // The template has no onboarding destination: an app.yaml without the key must not route to one.
+        // Onboarding is opt-in: an app.yaml without the key must not route a fresh install to it.
         assertEquals(false, firstRunOnboarding(mapOf<String, Any?>()))
         assertEquals(false, firstRunOnboarding(null))
         assertEquals(false, firstRunOnboarding(mapOf("first_run_onboarding" to "yes")))

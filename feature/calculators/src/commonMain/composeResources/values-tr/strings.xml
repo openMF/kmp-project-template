@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Vade</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d ay</string>
     <string name="screens_calc_wizard_step_review_rate_label">Oran</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Toplam faiz</string>
     <string name="screens_calc_wizard_step_name_message">Kredilerinizde tekrar bulabilmek için bu senaryoya bir ad verin.</string>
     <string name="screens_calc_wizard_step_name_label">Senaryo adı</string>

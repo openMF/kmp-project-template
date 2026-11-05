@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">المدة</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d شهرًا</string>
     <string name="screens_calc_wizard_step_review_rate_label">المعدل</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">إجمالي الفائدة</string>
     <string name="screens_calc_wizard_step_name_message">سمِّ هذا السيناريو لتجده لاحقًا ضمن قروضك.</string>
     <string name="screens_calc_wizard_step_name_label">اسم السيناريو</string>

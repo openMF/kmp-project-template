@@ -18,7 +18,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `feature/` | 658 | [`feature/`](tree/feature.md) |
+| `feature/` | 699 | [`feature/`](tree/feature.md) |
 
 ## Core layers
 
@@ -78,6 +78,6 @@ oversight. A directory missing from a map reads the same as one nobody looked at
 | `.swiftpm-locks/` | 31 | generated SwiftPM resolution locks |
 | `META-INF/` | 1 | one service-registration file |
 | `config/` | 1 | the detekt config — documented where detekt is configured |
-| `docs/` | 131 | this documentation tree |
+| `docs/` | 132 | this documentation tree |
 | `kotlin-js-store/` | 2 | generated yarn.lock for Kotlin/JS |
 | `spotless/` | 1 | the license-header template applied by Spotless |

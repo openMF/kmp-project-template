@@ -47,16 +47,16 @@ val LocalUrlLauncher: ProvidableCompositionLocal<UrlLauncher> =
 ```
 Opens URLs, email, maps, phone and SMS. Provided by `LocalManagerProvider`.
 
-<details><summary>Used in the template — <code>feature/settings/src/commonMain/kotlin/kpt/feature/settings/PrivacySheet.kt:71</code></summary>
+<details><summary>Used in the template — <code>feature/onboarding/src/commonMain/kotlin/kpt/feature/onboarding/ui/OnboardingScreen.kt:138</code></summary>
 
 ```kotlin
-fun PrivacySheet(onDismiss: () -> Unit, viewModel: SettingsViewModel = koinViewModel()) {
-    val settingsState by viewModel.settingsState.collectAsStateWithLifecycle()
+) {
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     val urlLauncher = LocalUrlLauncher.current
-    PrivacySheet(
-        settingsState = settingsState,
-        onDismiss = onDismiss,
-        onRetry = viewModel::onRetry,
+
+    // System back steps to the previous page; on the first page it falls through to the system, which leaves
+    // without saving — both choices stay off and onboarding shows again next launch.
+    BackHandler(enabled = state.page != OnboardingPage.Overview) {
 ```
 
 </details>

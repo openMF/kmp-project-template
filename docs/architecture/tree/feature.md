@@ -1,7 +1,7 @@
 # `feature/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 658 tracked files — 342× `.xml`, 255× `.kt`, 21× `.png`, 17× `.kts`, 16× `.md`
+> **Measured:** 699 tracked files — 363× `.xml`, 264× `.kt`, 31× `.png`, 18× `.kts`, 16× `.md`
 
 ## Shape
 
@@ -12,6 +12,7 @@
 | `feature/loans/` | 48 |
 | `feature/macro/` | 44 |
 | `feature/bills/` | 42 |
+| `feature/onboarding/` | 41 |
 | `feature/rates/` | 38 |
 | `feature/currency-rates/` | 37 |
 | `feature/crypto/` | 36 |
@@ -42,6 +43,7 @@
 | `feature:home` | 11 Kotlin files — [guide](feature/home.md) |
 | `feature:loans` | 26 Kotlin files — [guide](feature/loans.md) |
 | `feature:macro` | 22 Kotlin files — [guide](feature/macro.md) |
+| `feature:onboarding` | 9 Kotlin files — [guide](feature/onboarding.md) |
 | `feature:profile` | 10 Kotlin files — [guide](feature/profile.md) |
 | `feature:rates` | 16 Kotlin files — [guide](feature/rates.md) |
 | `feature:settings` | 31 Kotlin files — [guide](feature/settings.md) |
@@ -64,6 +66,7 @@
 | `feature/home/` | 36 | [home](feature/home.md) |
 | `feature/loans/` | 48 | [loans](feature/loans.md) |
 | `feature/macro/` | 44 | [macro](feature/macro.md) |
+| `feature/onboarding/` | 41 | [onboarding](feature/onboarding.md) |
 | `feature/profile/` | 35 | [profile](feature/profile.md) |
 | `feature/rates/` | 38 | [rates](feature/rates.md) |
 | `feature/settings/` | 76 | [settings](feature/settings.md) |

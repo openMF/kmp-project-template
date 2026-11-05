@@ -462,16 +462,16 @@ object AppIcons
 ```
 The app's icon set, named by ROLE rather than by glyph.
 
-<details><summary>Used in the template — <code>feature/profile/src/commonMain/kotlin/kpt/feature/profile/demo/ProfileDemoBody.kt:84</code></summary>
+<details><summary>Used in the template — <code>feature/onboarding/src/commonMain/kotlin/kpt/feature/onboarding/ui/OnboardingScreen.kt:557</code></summary>
 
 ```kotlin
-            ) {
-                Icon(
-                    imageVector = AppIcons.AccountCircle,
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                )
-                Text(
+        ) {
+            Icon(
+                imageVector = AppIcons.OutlinedLock,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
+            Text(
 ```
 
 </details>

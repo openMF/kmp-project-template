@@ -47,6 +47,9 @@ import kpt.core.base.ui.KptConnectivityBanner
 import kpt.core.base.ui.util.NonNullEnterTransitionProvider
 import kpt.core.base.ui.util.NonNullExitTransitionProvider
 import kpt.core.base.ui.util.RootTransitionProviders
+import kpt.feature.onboarding.OnboardingRoute
+import kpt.feature.onboarding.navigateToOnboarding
+import kpt.feature.onboarding.onboardingDestination
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
@@ -101,7 +104,9 @@ fun RootNavScreen(
                 popExitTransition = { pickExit(fadeThroughExit, noExit)(this) },
             ) {
                 splashDestination()
-//            onboardingDestination()
+                // First-run onboarding (feature/onboarding). Only reached when app-profile/app.yaml
+                // sets security.first_run_onboarding: true; a fork with a server-setup screen passes it here.
+                onboardingDestination()
 //            authNavGraph(navController)
                 authenticatedGraph(navController)
 //            userUnlockDestination()
@@ -130,8 +135,7 @@ fun RootNavScreen(
     }
 
     val targetRoute = when (state) {
-        // SetLanguageRoute
-        RootNavState.ShowOnboarding -> ""
+        RootNavState.ShowOnboarding -> OnboardingRoute
         // AuthGraphRoute
         RootNavState.Auth -> ""
         RootNavState.Splash -> SplashRoute
@@ -176,8 +180,7 @@ fun RootNavScreen(
             RootNavState.Splash -> navController.navigateToSplash(rootNavOptions)
             // navController.navigateToAuthGraph(rootNavOptions)
             RootNavState.Auth -> {}
-            // navController.navigateToSetLanguage(rootNavOptions)
-            RootNavState.ShowOnboarding -> {}
+            RootNavState.ShowOnboarding -> navController.navigateToOnboarding(rootNavOptions)
             // navController.navigateToUserUnlock(rootNavOptions)
             RootNavState.UserLocked -> {}
             is RootNavState.UserUnlocked -> navController.navigateToAuthenticatedGraph(

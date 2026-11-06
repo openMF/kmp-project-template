@@ -77,6 +77,7 @@ YAML
 ( CS_ROOT="$REPO" cs_merge_yaml_schema "$WORK/ours.yaml" "$WORK/base.yaml" "$WORK/theirs.yaml" "$WORK/out.yaml" ) \
   || { echo "  ❌ merge failed"; exit 1; }
 O="$WORK/out.yaml"
+# True when the merged output contains the literal text.
 has() { grep -qF -- "$1" "$O"; }
 
 has 'Field operations for loan officers.' && has 'Works offline.' && ! has 'demo copy' \

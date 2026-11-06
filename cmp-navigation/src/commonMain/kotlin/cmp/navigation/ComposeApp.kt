@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
@@ -21,6 +22,13 @@ import cmp.navigation.registry.ForkAppShell
 import kpt.core.base.ui.effects.EventsEffect
 import kpt.core.designsystem.theme.KptTheme
 import org.koin.compose.viewmodel.koinViewModel
+
+/**
+ * The platform's locale switch, as passed to [ComposeApp]. Provided around [ForkAppShell.root] so a
+ * fork root with its own language picker can apply a locale the template's `LanguageConfig` does not
+ * list; the default does nothing.
+ */
+val LocalAppLocaleHandler = staticCompositionLocalOf<(locale: String?) -> Unit> { {} }
 
 /**
  * The application root: installs the theme, the locale's layout direction and the nav graph. Every platform entry
@@ -72,7 +80,10 @@ fun ComposeApp(
         LayoutDirection.Ltr
     }
 
-    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+    CompositionLocalProvider(
+        LocalLayoutDirection provides layoutDirection,
+        LocalAppLocaleHandler provides handleAppLocale,
+    ) {
         // Theme mode and root content come from the fork-owned ForkAppShell seam — a fork changes them
         // there, never here (this file is template-owned and replaced by every sync).
         ForkAppShell.wrap {

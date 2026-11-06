@@ -22,10 +22,16 @@ Declared in [`../../CONTRACT.yaml`](../../CONTRACT.yaml); that file is the machi
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/network sha=6c2a24043a0ee2def1113c0f4de95f682039f2da -->
+`AppAccessPoints.policy` carries the web CORS policy generated from `app-profile/app.yaml#network.web_cors`
+(`webCorsMode`, `webCorsProxy`, `webCorsAllowlist`); the same allowlist is written to
+`cmp-web/src/{js,wasmJs}Main/resources/relay-allowlist.json` for the deployed relay. Declaring an access
+point is enough to put its host on the web relay allowlist. How the relay works and when to choose
+`direct`: [`core-base/network`](../core-base/network.md#web-cors--relay-by-default-direct-as-an-opt-in).
+
+<!-- api-docs:begin module=core/network sha=3a33978370b302f42ca647dd49bc6260fab82985 -->
 ## API reference
 
-_Generated from `core/network` at tree `6c2a24043a0e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `3a33978370b3` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`
@@ -156,7 +162,7 @@ The per-fork list of network access points this app talks to — REST and Supaba
 </details>
 
 - `val points: List<AccessPoint> = listOf(` — This project's declared access points, in app-profile order.
-- `val policy: NetworkPolicy = NetworkPolicy(` — Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`.
+- `val policy: NetworkPolicy = NetworkPolicy(` — Network privacy policy — app-profile `network.logging` / `network.web_cors`.
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/config/AppMultiUrlConfigProvider.kt`
 

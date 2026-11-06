@@ -101,11 +101,23 @@ object AppAccessPoints {
         ),
     )
 
-    /** Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`. */
+    /** Network privacy policy — app-profile `network.logging` / `network.web_cors`. */
     val policy: NetworkPolicy = NetworkPolicy(
         releaseLogging = HttpLogDetail.NONE,
         debugLogging = HttpLogDetail.BODY,
         webCorsProxy = "/cors",
+        webCorsMode = kpt.core.base.network.WebCorsMode.RELAY,
+        webCorsAllowlist = listOf(
+            "api.example.com",
+            "staging.example.com",
+            "lwmswhoxvvoagzkqxiyd.supabase.co",
+            "jsonplaceholder.typicode.com",
+            "api.frankfurter.dev",
+            "api.coingecko.com",
+            "api.stlouisfed.org",
+            "sandbox.mifos.community",
+            "api.worldbank.org",
+        ),
     )
     // syncForkConfig:access-points:end
 }

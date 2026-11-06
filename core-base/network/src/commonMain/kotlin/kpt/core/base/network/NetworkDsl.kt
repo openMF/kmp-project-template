@@ -75,7 +75,7 @@ fun AccessPointRegistry.ktorfitFor(
 /**
  * The client configuration [ktorfitFor] builds an access point's shared client with — public so it can
  * be exercised on a test engine exactly as the app runs it. [policy] + [debugBuild] decide what is logged
- * and whether web routes [AccessPoint.proxiedHost] through a CORS relay.
+ * and which hosts a web build routes through the CORS relay ([NetworkPolicy.webCorsHostsFor]).
  */
 fun restClientConfig(
     ap: AccessPoint,
@@ -93,9 +93,9 @@ fun restClientConfig(
         isReleaseBuild = !debugBuild,
         httpLogLevel = policy.logDetail(debugBuild).level,
         redactQueryParams = policy.allRedactedQueryParams,
-        corsProxyBaseUrl = policy.webCorsProxy,
+        corsProxyBaseUrl = policy.activeWebCorsRelay,
         loggableHosts = listOf(ap.loggableHost),
-        proxiedHosts = ap.proxiedHost?.let { listOf(it) } ?: emptyList(),
+        proxiedHosts = policy.webCorsHostsFor(ap),
         // Per access point: a key belongs to ONE endpoint, and sending it to the others leaks a
         // credential to hosts that never needed it.
         defaultHeaders = headerProvider.headersFor(ap.id),

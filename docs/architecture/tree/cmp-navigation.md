@@ -40,3 +40,8 @@ screens re-deriving that order is how an app ends up showing onboarding to a sig
 fork contributes its own body, modules, destinations and tabs. The feature halves are DERIVED by
 `build-logic`'s generators; the `Fork*Module` seams stay listed by hand because they are core-layer
 seams, not features, and nothing under `feature/` declares them.
+
+**`ForkAppShell` owns the root.** `ComposeApp` renders `ForkAppShell.root` inside the theme; a fork with
+its own root (its own login, lock and tab shell) renders it there instead of editing `ComposeApp`. The
+platform locale switch reaches that root through `LocalAppLocaleHandler`, provided around it — so a fork
+language picker can apply a locale the template's `LanguageConfig` does not list.

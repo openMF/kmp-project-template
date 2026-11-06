@@ -11,6 +11,7 @@
 #   AppAccessPoints.kt `supabase =`  each Supabase point's publishable key (NAP-5 spec · NAP-6 no committed key)
 #   core/network/build.gradle.kts  the BuildKonfig fields (NAP-8 every referenced field is declared)
 #   core/network/<id>/             the per-endpoint package  (NAP-9 exists · NAP-10 supabase id=ref)
+#   cmp-web/src/*Main/resources/relay-allowlist.json  the web CORS relay allowlist (NAP-14)
 #
 # WHY a gate and not just codegen: the generated files are COMMITTED (the build must work on a fresh
 # clone with no Gradle run), so nothing forces them to still match app.yaml. Whoever edits app.yaml
@@ -30,14 +31,17 @@ set -uo pipefail
 
 YAML="${NAP_YAML:-$HEALTH_ROOT/app-profile/app.yaml}"
 NET="${NAP_NET_DIR:-$HEALTH_ROOT/core/network/src/commonMain/kotlin/kpt/core/network}"
+WEB="${NAP_WEB_DIR:-$HEALTH_ROOT/cmp-web/src}"
 
 # A fork that stripped the white-label machinery has nothing to compare. PASS.
 [ -f "$YAML" ] || { echo "no app-profile/app.yaml — nothing to compare (ok)"; exit 0; }
 command -v ruby >/dev/null 2>&1 || { echo "ruby not available — cannot audit access points"; exit 1; }
 
-ruby - "$YAML" "$NET" <<'RUBY'
+ruby - "$YAML" "$NET" "$WEB" <<'RUBY'
 require 'yaml'
-yaml_path, net_dir = ARGV
+require 'json'
+require 'uri'
+yaml_path, net_dir, web_dir = ARGV
 profile = begin
   YAML.respond_to?(:unsafe_load) ? YAML.unsafe_load(File.read(yaml_path)) : YAML.load(File.read(yaml_path))
 rescue StandardError
@@ -369,6 +373,45 @@ elsif dsl !~ /defaultHeaders\s*=\s*headerProvider\.headersFor\(/
 elsif dsl !~ /getOrNull<DefaultHeaderProvider>\(\)/
   fail = bad("❌ NAP-11 restApi no longer resolves DefaultHeaderProvider from Koin\n" \
              "     → the seam exists but nothing supplies it")
+end
+
+# ── NAP-14 — the web CORS relay allowlist matches app-profile ────────────────
+# The deployed _worker.js relays ONLY the hosts in relay-allowlist.json, and the app routes through the
+# relay the hosts in AppAccessPoints.policy — both generated from the same app.yaml. A stale JSON is the
+# silent half: the app sends a newly declared host to the relay, the relay answers 403, and the screen
+# shows a network error in production only. Same derivation as syncForkConfig's parseWebCors.
+net = profile["network"] || {}
+cors = net["web_cors"].is_a?(Hash) ? net["web_cors"] : nil
+legacy = net["web_cors_proxy"].to_s.strip
+mode = if cors
+         m = cors["mode"].to_s.strip.downcase
+         m.empty? ? "relay" : m
+       elsif net.key?("web_cors_proxy") && (legacy.empty? || legacy == "none")
+         "direct"  # the retired key's `none`, still honoured until the fork migrates
+       else
+         "relay"
+       end
+want_hosts = []
+if mode == "relay"
+  want_hosts += points.map { |p| (URI.parse(p["base_url"].to_s.strip).host rescue nil) }.compact.map(&:downcase)
+  want_hosts += points.map { |p| p["proxied_host"].to_s.strip.downcase }.reject(&:empty?)
+  want_hosts += Array(cors && cors["hosts"]).map { |h| h.to_s.strip.downcase }
+  want_hosts.uniq!
+end
+Dir.glob(File.join(web_dir, "{js,wasmJs}Main/resources")).sort.each do |dir|
+  f = File.join(dir, "relay-allowlist.json")
+  rel = f.sub(%r{\A.*/cmp-web/}, "cmp-web/")
+  unless File.exist?(f)
+    fail = bad("❌ NAP-14 #{rel} missing — the deployed relay would forward nothing\n     → run `./gradlew syncForkConfig`")
+    next
+  end
+  have = (JSON.parse(File.read(f)) rescue nil)
+  if !have.is_a?(Hash)
+    fail = bad("❌ NAP-14 #{rel} is not valid JSON — run `./gradlew syncForkConfig`")
+  elsif have["mode"] != mode || Array(have["hosts"]) != want_hosts
+    fail = bad("❌ NAP-14 #{rel} stale: mode #{have['mode'].inspect} hosts #{Array(have['hosts']).inspect}\n" \
+               "     want mode #{mode.inspect} hosts #{want_hosts.inspect}\n     → run `./gradlew syncForkConfig`")
+  end
 end
 
 # ── NAP-7 — no hand-rolled wiring ────────────────────────────────────────────

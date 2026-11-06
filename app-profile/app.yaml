@@ -48,12 +48,27 @@ network:
     # Query parameters masked in logged URLs, on top of the built-in credential names
     # (api_key, token, access_token, password, secret, signature, code, …).
     redact_query_params: []
-  # CORS relay that WEB builds route `proxied_host` calls through. `/cors` is the site's OWN relay —
-  # cmp-web's _worker.js on Cloudflare Pages, which forwards only to the declared proxied hosts — so no
-  # third party sees the traffic. An https:// URL names an external relay instead, which is a
-  # third-party processor (declare it in the privacy policy). Omit for none. Hosts without a relay
-  # (GitHub Pages) cannot serve `/cors`, so proxied calls fail there and the screen shows its error.
-  web_cors_proxy: /cors
+  # How WEB builds reach servers that do not answer CORS for this site's origin (most bank and
+  # government APIs). Absent = the default below. syncForkConfig projects it onto
+  # AppAccessPoints.policy AND cmp-web's relay-allowlist.json, so the app and the relay share ONE list.
+  web_cors:
+    # relay  (default) — every request to an allowlisted host goes through `relay`, so the browser only
+    #          ever talks to its own origin and the server's CORS policy never applies. The allowlist is
+    #          the host of EVERY access point below plus `hosts`; the relay forwards to nothing else.
+    # direct — no rewriting: the browser calls each server itself. No relay sees the traffic (the extra-
+    #          security option), but EVERY server must allow this site's origin, or the browser blocks
+    #          the call. Choose it only when you control the servers' CORS configuration.
+    mode: relay
+    # `/cors` is the site's OWN relay — cmp-web's _worker.js on Cloudflare Pages — so no third party sees
+    # the traffic. An https:// URL names an external relay instead: a third-party processor (declare it
+    # in the privacy policy). On a host that cannot run the worker (GitHub Pages) relay mode degrades to
+    # direct: the app sees `/cors` answer without the relay's X-Kpt-Relay tag, repeats that call
+    # directly and calls directly for the rest of the session — so only servers that allow the site's
+    # origin work there. Deploy to Cloudflare Pages for the relay.
+    relay: /cors
+    # Extra hosts to relay beyond the access points — e.g. a host a user can switch to at runtime.
+    # `api.example.com`, or `*.example.com` for its subdomains (not example.com itself). No scheme/path/port.
+    hosts: []
   # Declarative access-point topology — every REST + Supabase endpoint the app talks to, in ONE place.
   # This is the SoT for core/network's AccessPointRegistry AND for the generated DI wiring: declare an
   # endpoint here, run `./gradlew syncForkConfig`, and the only thing left to write is the API type.
@@ -69,7 +84,8 @@ network:
   #                  DynamicBaseUrlPlugin rewrites at runtime, while the PATH belongs to the API and
   #                  travels with the endpoint. Joined as origin + "/" + path + "/".
   #   loggable_host  host enabled for HTTP logging.
-  #   proxied_host   optional — route via the platform proxy (CORS-blocked hosts).
+  #   proxied_host   optional, legacy — adds a host to the web CORS relay allowlist. Redundant in relay
+  #                  mode (every point's host is already on it); kept so older app.yaml files still work.
   #   main           optional, at most ONE point — `main: true`. Its clients follow the RUNTIME main
   #                  network config (core-base NetworkConfigRepository): the app can edit any config,
   #                  add one at runtime, disable it, or switch which is main, persisted across restarts.
@@ -181,7 +197,7 @@ network:
       base_url: https://api.stlouisfed.org/
       auth: none                    # keys off a request-time @Query api_key, not a header
       loggable_host: api.stlouisfed.org
-      proxied_host: api.stlouisfed.org   # blocks direct CORS calls → route via platform proxy
+      proxied_host: api.stlouisfed.org   # legacy, redundant in web_cors relay mode — kept as the compat example
       secret_alias: mifos-x-fred-api-key # request-time API key — from the vault (secrets-manifest.yaml),
                                          # materialized to local.properties → BuildKonfig.FRED_API_KEY
     - id: fineract                   # Mifos Fineract — the auth-bearing REST showcase

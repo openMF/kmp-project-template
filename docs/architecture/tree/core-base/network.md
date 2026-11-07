@@ -117,10 +117,10 @@ network-failure retry rules), `build-logic/convention/src/test/kotlin/WebCorsCon
 (parsing, validation, migration, generated JSON), `scripts/product-health/tests/web-cors-relay-canary/`
 (the worker itself).
 
-<!-- api-docs:begin module=core-base/network sha=bef1013916420b28e742e8a14a52e89d426d5ca0 -->
+<!-- api-docs:begin module=core-base/network sha=0be0d19bca4e573ce7ae0629d3d63dfcbd6f3395 -->
 ## API reference
 
-_Generated from `core-base/network` at tree `bef101391642` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `0be0d19bca4e` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -917,7 +917,7 @@ A relay given as a path (`/cors`) is served by the site itself — resolved agai
 ### `core-base/network/src/commonMain/kotlin/kpt/core/base/network/annotation/ApiBinding.kt`
 
 ```kotlin
-annotation class ApiBinding(val accessPoint: String)
+annotation class ApiBinding(vararg val accessPoints: String)
 ```
 Binds this API type to a declared access point, so its Koin binding is derived rather than written.
 
@@ -926,6 +926,8 @@ Binds this API type to a declared access point, so its Koin binding is derived r
 ```kotlin
 @ApiBinding("coingecko")
 interface CoinGeckoApi { ... }
+@ApiBinding("main", "selfservice")
+interface ClientService { ... }
 ```
 
 </details>

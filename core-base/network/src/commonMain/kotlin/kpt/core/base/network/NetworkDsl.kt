@@ -12,6 +12,7 @@ package kpt.core.base.network
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClientConfig
 import org.koin.core.module.Module
+import org.koin.core.qualifier.Qualifier
 
 /**
  * core-base/network transport DSL — the streamlined, template-owned way to wire a REST API interface.
@@ -127,12 +128,16 @@ fun restClientConfig(
  *     restApi("jsonplaceholder") { it.createJsonPlaceholderApi() }
  * }
  * ```
+ *
+ * [qualifier] binds the API under a Koin qualifier — what network-ksp emits for each access point
+ * after the first of a multi-point `@ApiBinding("a", "b")`; null (the default) binds it unqualified.
  */
 inline fun <reified T : Any> Module.restApi(
     accessPointId: String,
+    qualifier: Qualifier? = null,
     crossinline create: (Ktorfit) -> T,
 ) {
-    single<T> {
+    single<T>(qualifier) {
         create(
             get<AccessPointRegistry>().ktorfitFor(
                 accessPointId = accessPointId,
@@ -166,10 +171,14 @@ inline fun <reified T : Any> Module.restApi(
  *     supabaseApi("project") { ServerInstanceApi(it) }
  * }
  * ```
+ *
+ * [qualifier] binds the API under a Koin qualifier — what network-ksp emits for each access point
+ * after the first of a multi-point `@ApiBinding("a", "b")`; null (the default) binds it unqualified.
  */
 inline fun <reified T : Any> Module.supabaseApi(
     accessPointId: String,
+    qualifier: Qualifier? = null,
     crossinline create: (SupabaseConfigClient) -> T,
 ) {
-    single<T> { create(get<SupabaseClientFactory>().requireClientFor(accessPointId)) }
+    single<T>(qualifier) { create(get<SupabaseClientFactory>().requireClientFor(accessPointId)) }
 }

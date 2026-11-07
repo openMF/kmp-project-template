@@ -1,13 +1,13 @@
 # `scripts/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 482 tracked files — 138× `.sh`, 135× `.kt`, 56× `.md`, 50× `.yaml`, 12× `.gitkeep`
+> **Measured:** 500 tracked files — 145× `.kt`, 138× `.sh`, 64× `.md`, 50× `.yaml`, 12× `.gitkeep`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `scripts/product-health/` | 420 |
+| `scripts/product-health/` | 438 |
 | `scripts/docs/` | 18 |
 | `scripts/white-label/` | 11 |
 | (files at the root) | 9 |
@@ -21,7 +21,7 @@
 
 | | |
 |---|---|
-| `scripts:product-health` | 134 Kotlin files — [guide](scripts/product-health.md) |
+| `scripts:product-health` | 144 Kotlin files — [guide](scripts/product-health.md) |
 
 ## Subsections
 
@@ -30,7 +30,7 @@
 | `scripts/ci/` | 9 | [ci](scripts/ci.md) |
 | `scripts/docs/` | 18 | [docs](scripts/docs.md) |
 | `scripts/ios/` | 5 | [ios](scripts/ios.md) |
-| `scripts/product-health/` | 420 | [product-health](scripts/product-health.md) |
+| `scripts/product-health/` | 438 | [product-health](scripts/product-health.md) |
 | `scripts/secrets/` | 5 | [secrets](scripts/secrets.md) |
 | `scripts/store/` | 4 | [store](scripts/store.md) |
 | `scripts/white-label/` | 11 | [white-label](scripts/white-label.md) |

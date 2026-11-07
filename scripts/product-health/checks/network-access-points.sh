@@ -163,8 +163,9 @@ Dir.glob(File.join(net_dir, "**", "*.kt")).each do |f|
   rescue StandardError
     next
   end
-  src.scan(/@ApiBinding\(\s*"([^"]+)"\s*\)\s*(?:@[\w.]+(?:\([^\n]*\))?\s*)*(?:public\s+|internal\s+|abstract\s+|open\s+|data\s+)*(?:class|interface|object)\s+(\w+)/m).each do |id, cls|
-    annotated_simple[id] = cls
+  # `@ApiBinding("a")` or a multi-point `@ApiBinding("a", "b")` — one type served by several endpoints.
+  src.scan(/@ApiBinding\(\s*((?:"[^"]+"\s*,?\s*)+)\)\s*(?:@[\w.]+(?:\([^\n]*\))?\s*)*(?:public\s+|internal\s+|abstract\s+|open\s+|data\s+)*(?:class|interface|object)\s+(\w+)/m).each do |ids, cls|
+    ids.scan(/"([^"]+)"/).flatten.each { |id| annotated_simple[id] = cls }
   end
 end
 annotated = annotated_simple.keys
@@ -187,7 +188,8 @@ else
   # (`single<T>` infers T from the factory lambda, so without the explicit type argument every
   # `get<Interface>()` would miss). Matching only the bare form reported that correct binding as
   # MISSING and then as "does not use supabaseApi(...)" — two failures for working code.
-  bound = bind_src.scan(/(?:restApi|supabaseApi)(?:<[^>]+>)?\("([^"]+)"\)/).flatten
+  # A further point of a multi-point binding carries `, qualifier = named("<id>")` after the id.
+  bound = bind_src.scan(/(?:restApi|supabaseApi)(?:<[^>]+>)?\("([^"]+)"[,)]/).flatten
   missing = want_bind.map { |p| p["id"].to_s } - bound
   extra   = bound - points.map { |p| p["id"].to_s }
   fail = bad("❌ NAP-4 @ApiBinding declared but no generated binding: #{missing.join(', ')}\n     → rebuild core/network") if missing.any?
@@ -198,7 +200,7 @@ else
     dsl    = p["type"].to_s.strip.downcase == "supabase" ? "supabaseApi" : "restApi"
     # Regex, not include? — the DSL call may carry an explicit type argument
     # (`supabaseApi<ServerInstanceApi>("project")`) when the API is split interface + impl.
-    unless bind_src =~ /#{Regexp.escape(dsl)}(?:<[^>]+>)?\(#{Regexp.escape(%Q{"#{id}"})}\)/
+    unless bind_src =~ /#{Regexp.escape(dsl)}(?:<[^>]+>)?\(#{Regexp.escape(%Q{"#{id}"})}(?:, qualifier = named\(#{Regexp.escape(%Q{"#{id}"})}\))?\)/
       fail = bad("❌ NAP-4 '#{id}' is #{p['type']} but its binding does not use #{dsl}(...)")
       next
     end

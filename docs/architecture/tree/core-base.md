@@ -1,13 +1,13 @@
 # `core-base/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 509 tracked files — 427× `.kt`, 28× `.md`, 22× `.xml`, 13× `.kts`, 6× `.gitignore`
+> **Measured:** 510 tracked files — 428× `.kt`, 28× `.md`, 22× `.xml`, 13× `.kts`, 6× `.gitignore`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `core-base/store/` | 116 |
+| `core-base/store/` | 117 |
 | `core-base/ui/` | 110 |
 | `core-base/security/` | 47 |
 | `core-base/designsystem/` | 45 |
@@ -37,7 +37,7 @@
 | `core-base:observability` | 4 Kotlin files — [guide](core-base/observability.md) |
 | `core-base:platform` | 25 Kotlin files — [guide](core-base/platform.md) |
 | `core-base:security` | 43 Kotlin files — [guide](core-base/security.md) |
-| `core-base:store` | 112 Kotlin files — [guide](core-base/store.md) |
+| `core-base:store` | 113 Kotlin files — [guide](core-base/store.md) |
 | `core-base:ui` | 80 Kotlin files — [guide](core-base/ui.md) |
 
 ## Docs in the tree

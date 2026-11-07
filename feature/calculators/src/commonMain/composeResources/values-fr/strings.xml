@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Durée</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d mois</string>
     <string name="screens_calc_wizard_step_review_rate_label">Taux</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Intérêts totaux</string>
     <string name="screens_calc_wizard_step_name_message">Nommez ce scénario pour le retrouver ensuite dans vos prêts.</string>
     <string name="screens_calc_wizard_step_name_label">Nom du scénario</string>

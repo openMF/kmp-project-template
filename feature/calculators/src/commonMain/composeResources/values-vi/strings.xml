@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Kỳ hạn</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d tháng</string>
     <string name="screens_calc_wizard_step_review_rate_label">Lãi suất</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Tổng lãi</string>
     <string name="screens_calc_wizard_step_name_message">Đặt tên cho kịch bản này để sau tìm lại trong danh sách khoản vay.</string>
     <string name="screens_calc_wizard_step_name_label">Tên kịch bản</string>

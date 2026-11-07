@@ -1,15 +1,15 @@
 # `cmp-web/`
 
 > **Kind:** Project area  
-> **Measured:** 17 tracked files — 3× `.js`, 2× `.md`, 2× `.kt`, 2× `.ico`, 2× `.html`
+> **Measured:** 25 tracked files — 6× `.js`, 3× `.kt`, 2× `.md`, 2× `.ico`, 2× `.html`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `cmp-web/src/` | 12 |
+| `cmp-web/src/` | 19 |
 | (files at the root) | 4 |
-| `cmp-web/webpack.config.d/` | 1 |
+| `cmp-web/webpack.config.d/` | 2 |
 
 ## Docs in the tree
 

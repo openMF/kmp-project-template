@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Laufzeit</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d Monate</string>
     <string name="screens_calc_wizard_step_review_rate_label">Zins</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Zinsen gesamt</string>
     <string name="screens_calc_wizard_step_name_message">Benenne dieses Szenario, damit du es später in deinen Darlehen wiederfindest.</string>
     <string name="screens_calc_wizard_step_name_label">Szenarioname</string>

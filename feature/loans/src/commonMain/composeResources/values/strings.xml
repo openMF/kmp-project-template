@@ -60,12 +60,12 @@
     <string name="screens_loans_detail_monthly_payment_label">Monthly payment (EMI)</string>
     <string name="screens_loans_detail_total_paid_label">Total paid to date</string>
     <string name="screens_loans_detail_annual_rate_label">Annual rate</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">Next due date</string>
     <string name="screens_loans_detail_tenure_label">Tenure</string>
     <string name="screens_loans_detail_tenure_value">%1$d months</string>
     <string name="screens_loans_detail_tenure_progress_label">Tenure progress</string>
-    <string name="screens_loans_detail_tenure_progress_value">%1$d%% complete</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d% complete</string>
     <string name="screens_loans_detail_edit_button">Edit</string>
     <string name="screens_loans_detail_schedule_button">Schedule</string>
     <string name="screens_loans_detail_delete_button">Delete</string>
@@ -86,6 +86,6 @@
     <!-- ===== LoanRowCard ===== -->
     <string name="screens_loans_row_remaining_label">Remaining</string>
     <string name="screens_loans_row_monthly_emi_label">Monthly EMI</string>
-    <string name="screens_loans_row_progress_value">%1$d%% paid</string>
+    <string name="screens_loans_row_progress_value">%1$d% paid</string>
     <string name="screens_loans_row_next_due_value">Next: %1$s</string>
 </resources>

@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Строк</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d місяців</string>
     <string name="screens_calc_wizard_step_review_rate_label">Ставка</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Усього відсотків</string>
     <string name="screens_calc_wizard_step_name_message">Назвіть цей сценарій, щоб згодом знайти його серед своїх кредитів.</string>
     <string name="screens_calc_wizard_step_name_label">Назва сценарію</string>

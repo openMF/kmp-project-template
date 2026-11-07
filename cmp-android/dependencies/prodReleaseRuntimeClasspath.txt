@@ -37,6 +37,7 @@
 :feature:home
 :feature:loans
 :feature:macro
+:feature:onboarding
 :feature:profile
 :feature:rates
 :feature:settings

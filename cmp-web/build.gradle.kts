@@ -69,6 +69,8 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.client.js)
+                // installWebNetworkMonitor() configures the monitor before Koin first touches it.
+                implementation(libs.cmp.network.monitor)
             }
         }
 
@@ -104,20 +106,24 @@ val webAuthor = forkPropFirst("org.name", "store.copyright").ifBlank { appDispla
 val webUrl = forkPropFirst("web.custom.domain", "org.marketing.url", "org.support.url")
 val webOgImage = "./og-image.png" // materialized by syncForkConfig from app-profile/platforms/web/media
 
+// Only index.html carries @TOKEN@s. ReplaceTokens is a text filter: applied to the whole task it
+// re-encodes every binary in it as UTF-8 — including the skiko.wasm Compose copies in, which then
+// fails to compile and the app never renders (and favicon.ico / og-image.png are corrupted too).
 tasks.matching { it.name == "jsProcessResources" || it.name == "wasmJsProcessResources" }
     .configureEach {
-        (this as Copy).filter(
-            mapOf(
-                "tokens" to mapOf(
-                    "APP_DISPLAY_NAME" to "$appDisplayName$webTitleSuffix",
-                    "APP_DESCRIPTION" to webDescription,
-                    "APP_KEYWORDS" to webKeywords,
-                    "APP_COPYRIGHT" to webCopyright,
-                    "APP_AUTHOR" to webAuthor,
-                    "APP_URL" to webUrl,
-                    "OG_IMAGE" to webOgImage,
-                ),
-            ),
-            ReplaceTokens::class.java,
+        // Resolved HERE, at configuration time, into a local: the filesMatching action runs at
+        // execution, and reading the script's vals from it fails a configuration-cache run with
+        // "Build_gradle.getAppDisplayName() … this$0 is null" (the cached task has no script).
+        val tokens = mapOf(
+            "APP_DISPLAY_NAME" to "$appDisplayName$webTitleSuffix",
+            "APP_DESCRIPTION" to webDescription,
+            "APP_KEYWORDS" to webKeywords,
+            "APP_COPYRIGHT" to webCopyright,
+            "APP_AUTHOR" to webAuthor,
+            "APP_URL" to webUrl,
+            "OG_IMAGE" to webOgImage,
         )
+        (this as Copy).filesMatching("index.html") {
+            filter(mapOf("tokens" to tokens), ReplaceTokens::class.java)
+        }
     }

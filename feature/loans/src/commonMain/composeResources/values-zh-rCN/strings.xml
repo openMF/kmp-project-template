@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">每月还款额</string>
     <string name="screens_loans_detail_total_paid_label">累计已还</string>
     <string name="screens_loans_detail_annual_rate_label">年利率</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">下次还款日</string>
     <string name="screens_loans_detail_tenure_label">期限</string>
     <string name="screens_loans_detail_tenure_value">%1$d 个月</string>
     <string name="screens_loans_detail_tenure_progress_label">期限进度</string>
-    <string name="screens_loans_detail_tenure_progress_value">已完成 %1$d%%</string>
+    <string name="screens_loans_detail_tenure_progress_value">已完成 %1$d%</string>
     <string name="screens_loans_detail_edit_button">编辑</string>
     <string name="screens_loans_detail_schedule_button">还款计划</string>
     <string name="screens_loans_detail_delete_button">删除</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">每月还款额</string>
     <string name="screens_loans_row_remaining_label">剩余</string>
     <string name="screens_loans_row_monthly_emi_label">每月还款额</string>
-    <string name="screens_loans_row_progress_value">已还 %1$d%%</string>
+    <string name="screens_loans_row_progress_value">已还 %1$d%</string>
     <string name="screens_loans_row_next_due_value">下次：%1$s</string>
 </resources>

@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">Khoản trả hằng tháng</string>
     <string name="screens_loans_detail_total_paid_label">Tổng đã trả đến nay</string>
     <string name="screens_loans_detail_annual_rate_label">Lãi suất năm</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">Ngày đến hạn kế tiếp</string>
     <string name="screens_loans_detail_tenure_label">Kỳ hạn</string>
     <string name="screens_loans_detail_tenure_value">%1$d tháng</string>
     <string name="screens_loans_detail_tenure_progress_label">Tiến độ kỳ hạn</string>
-    <string name="screens_loans_detail_tenure_progress_value">Hoàn tất %1$d%%</string>
+    <string name="screens_loans_detail_tenure_progress_value">Hoàn tất %1$d%</string>
     <string name="screens_loans_detail_edit_button">Sửa</string>
     <string name="screens_loans_detail_schedule_button">Lịch trả</string>
     <string name="screens_loans_detail_delete_button">Xóa</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">Trả góp hằng tháng</string>
     <string name="screens_loans_row_remaining_label">Còn lại</string>
     <string name="screens_loans_row_monthly_emi_label">Trả góp hằng tháng</string>
-    <string name="screens_loans_row_progress_value">Đã trả %1$d%%</string>
+    <string name="screens_loans_row_progress_value">Đã trả %1$d%</string>
     <string name="screens_loans_row_next_due_value">Kế tiếp: %1$s</string>
 </resources>

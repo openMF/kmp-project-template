@@ -12,6 +12,7 @@ package kpt.core.base.network
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClientConfig
 import org.koin.core.module.Module
+import org.koin.core.qualifier.Qualifier
 
 /**
  * core-base/network transport DSL — the streamlined, template-owned way to wire a REST API interface.
@@ -75,7 +76,7 @@ fun AccessPointRegistry.ktorfitFor(
 /**
  * The client configuration [ktorfitFor] builds an access point's shared client with — public so it can
  * be exercised on a test engine exactly as the app runs it. [policy] + [debugBuild] decide what is logged
- * and whether web routes [AccessPoint.proxiedHost] through a CORS relay.
+ * and which hosts a web build routes through the CORS relay ([NetworkPolicy.webCorsHostsFor]).
  */
 fun restClientConfig(
     ap: AccessPoint,
@@ -93,9 +94,9 @@ fun restClientConfig(
         isReleaseBuild = !debugBuild,
         httpLogLevel = policy.logDetail(debugBuild).level,
         redactQueryParams = policy.allRedactedQueryParams,
-        corsProxyBaseUrl = policy.webCorsProxy,
+        corsProxyBaseUrl = policy.activeWebCorsRelay,
         loggableHosts = listOf(ap.loggableHost),
-        proxiedHosts = ap.proxiedHost?.let { listOf(it) } ?: emptyList(),
+        proxiedHosts = policy.webCorsHostsFor(ap),
         // Per access point: a key belongs to ONE endpoint, and sending it to the others leaks a
         // credential to hosts that never needed it.
         defaultHeaders = headerProvider.headersFor(ap.id),
@@ -127,12 +128,16 @@ fun restClientConfig(
  *     restApi("jsonplaceholder") { it.createJsonPlaceholderApi() }
  * }
  * ```
+ *
+ * [qualifier] binds the API under a Koin qualifier — what network-ksp emits for each access point
+ * after the first of a multi-point `@ApiBinding("a", "b")`; null (the default) binds it unqualified.
  */
 inline fun <reified T : Any> Module.restApi(
     accessPointId: String,
+    qualifier: Qualifier? = null,
     crossinline create: (Ktorfit) -> T,
 ) {
-    single<T> {
+    single<T>(qualifier) {
         create(
             get<AccessPointRegistry>().ktorfitFor(
                 accessPointId = accessPointId,
@@ -166,10 +171,14 @@ inline fun <reified T : Any> Module.restApi(
  *     supabaseApi("project") { ServerInstanceApi(it) }
  * }
  * ```
+ *
+ * [qualifier] binds the API under a Koin qualifier — what network-ksp emits for each access point
+ * after the first of a multi-point `@ApiBinding("a", "b")`; null (the default) binds it unqualified.
  */
 inline fun <reified T : Any> Module.supabaseApi(
     accessPointId: String,
+    qualifier: Qualifier? = null,
     crossinline create: (SupabaseConfigClient) -> T,
 ) {
-    single<T> { create(get<SupabaseClientFactory>().requireClientFor(accessPointId)) }
+    single<T>(qualifier) { create(get<SupabaseClientFactory>().requireClientFor(accessPointId)) }
 }

@@ -9,8 +9,11 @@
  */
 package kpt.feature.crypto.ui
 
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.job
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -55,9 +58,10 @@ class CoinMarketsViewModelTest {
     @Test
     fun requestsAWholePageNotASingleRow() = runTest(dispatcher) {
         val repo = FakeCryptoRepository()
-        CoinMarketsViewModel(repo)
+        val vm = CoinMarketsViewModel(repo)
 
         assertEquals(20, repo.lastPageSize)
+        vm.stop()
     }
 
     @Test
@@ -69,7 +73,14 @@ class CoinMarketsViewModelTest {
         val vm = CoinMarketsViewModel(repo)
 
         assertSame(repo.lastMarketsStream, vm.pagingStream)
+        vm.stop()
     }
+
+    // Cancel the ViewModel's collection and WAIT for it — including the part running on Store5's own
+    // dispatcher — so nothing can still touch Dispatchers.Main when tearDown() resets it. Draining the
+    // test scheduler alone left that off-scheduler work racing resetMain() ("Dispatchers.Main is used
+    // concurrently with setting it"), roughly one CI run in three.
+    private suspend fun CoinMarketsViewModel.stop() = viewModelScope.coroutineContext.job.cancelAndJoin()
 
     // NOTE: there is deliberately no "retry() re-fetches" test here. `retry()` delegates straight
     // to `PagingScreenStream.refresh()`, whose fetch runs on Store5's own dispatcher rather than

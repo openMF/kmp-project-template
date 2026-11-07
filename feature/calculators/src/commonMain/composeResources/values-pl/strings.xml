@@ -62,7 +62,7 @@
     <string name="screens_calc_wizard_step_review_tenure_label">Okres</string>
     <string name="screens_calc_wizard_step_review_tenure_value">%1$d mies.</string>
     <string name="screens_calc_wizard_step_review_rate_label">Stopa</string>
-    <string name="screens_calc_wizard_step_review_rate_value">%1$s%%</string>
+    <string name="screens_calc_wizard_step_review_rate_value">%1$s%</string>
     <string name="screens_calc_wizard_step_review_total_interest_label">Łączne odsetki</string>
     <string name="screens_calc_wizard_step_name_message">Nazwij ten wariant, aby później odnaleźć go wśród swoich kredytów.</string>
     <string name="screens_calc_wizard_step_name_label">Nazwa wariantu</string>

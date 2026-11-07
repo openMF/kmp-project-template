@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">Płatność miesięczna (rata)</string>
     <string name="screens_loans_detail_total_paid_label">Zapłacono do tej pory</string>
     <string name="screens_loans_detail_annual_rate_label">Stopa roczna</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">Następny termin</string>
     <string name="screens_loans_detail_tenure_label">Okres</string>
     <string name="screens_loans_detail_tenure_value">%1$d mies.</string>
     <string name="screens_loans_detail_tenure_progress_label">Postęp okresu</string>
-    <string name="screens_loans_detail_tenure_progress_value">ukończono %1$d%%</string>
+    <string name="screens_loans_detail_tenure_progress_value">ukończono %1$d%</string>
     <string name="screens_loans_detail_edit_button">Edytuj</string>
     <string name="screens_loans_detail_schedule_button">Harmonogram</string>
     <string name="screens_loans_detail_delete_button">Usuń</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">Rata miesięczna</string>
     <string name="screens_loans_row_remaining_label">Pozostało</string>
     <string name="screens_loans_row_monthly_emi_label">Rata miesięczna</string>
-    <string name="screens_loans_row_progress_value">spłacono %1$d%%</string>
+    <string name="screens_loans_row_progress_value">spłacono %1$d%</string>
     <string name="screens_loans_row_next_due_value">Następna: %1$s</string>
 </resources>

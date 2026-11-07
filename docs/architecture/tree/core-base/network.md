@@ -117,10 +117,10 @@ network-failure retry rules), `build-logic/convention/src/test/kotlin/WebCorsCon
 (parsing, validation, migration, generated JSON), `scripts/product-health/tests/web-cors-relay-canary/`
 (the worker itself).
 
-<!-- api-docs:begin module=core-base/network sha=0be0d19bca4e573ce7ae0629d3d63dfcbd6f3395 -->
+<!-- api-docs:begin module=core-base/network sha=56b30a146326df7e75bdb0fe7f093027025999cc -->
 ## API reference
 
-_Generated from `core-base/network` at tree `0be0d19bca4e` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/network` at tree `56b30a146326` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is

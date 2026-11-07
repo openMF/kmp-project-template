@@ -28,10 +28,10 @@ _Authored prose below this marker is preserved by the scaffolder._
 point is enough to put its host on the web relay allowlist. How the relay works and when to choose
 `direct`: [`core-base/network`](../core-base/network.md#web-cors--relay-by-default-direct-as-an-opt-in).
 
-<!-- api-docs:begin module=core/network sha=54cb72f09e89d9b075b46f5cf9e170ae5cf8150b -->
+<!-- api-docs:begin module=core/network sha=97a6f6fb388682e47299c8dc523db880f568bf6a -->
 ## API reference
 
-_Generated from `core/network` at tree `54cb72f09e89` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/network` at tree `97a6f6fb3886` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/network/src/commonMain/kotlin/kpt/core/network/coingecko/api/CoinGeckoApi.kt`

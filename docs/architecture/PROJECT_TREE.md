@@ -31,7 +31,7 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `tools/` | 13 | [`tools/`](tree/tools.md) |
+| `tools/` | 14 | [`tools/`](tree/tools.md) |
 | `build-logic/` | 46 | [`build-logic/`](tree/build-logic.md) |
 
 ## Configuration

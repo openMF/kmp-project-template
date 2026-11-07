@@ -74,7 +74,9 @@ class ApiBindingProcessor(
                 return@flatMap emptyList()
             }
             if (ids.toSet().size != ids.size) {
-                logger.error("network-ksp: @ApiBinding on ${decl.simpleName.asString()} lists an access point twice: $ids")
+                logger.error(
+                    "network-ksp: @ApiBinding on ${decl.simpleName.asString()} lists an access point twice: $ids",
+                )
                 return@flatMap emptyList()
             }
             ids.mapIndexedNotNull { index, id -> bindingFor(decl, id, kinds, qualified = index > 0) }
@@ -108,48 +110,49 @@ class ApiBindingProcessor(
         qualified: Boolean,
     ): Binding? {
         val kind = kinds[id]
-        if (kind == null) {
-            logger.error(
-                "network-ksp: @ApiBinding(\"$id\") on ${decl.simpleName.asString()} names an access point " +
-                    "that app-profile does not declare (declared: ${kinds.keys.joinToString(", ")})",
-            )
+        val fqn = decl.qualifiedName?.asString()
+        if (kind == null || fqn == null) {
+            if (kind == null) {
+                logger.error(
+                    "network-ksp: @ApiBinding(\"$id\") on ${decl.simpleName.asString()} names an access point " +
+                        "that app-profile does not declare (declared: ${kinds.keys.joinToString(", ")})",
+                )
+            }
             return null
         }
-        val fqn = decl.qualifiedName?.asString() ?: return null
+        return boundTypeFor(decl, id, fqn, kind)
+            ?.let { bound -> Binding(id = id, impl = fqn, bound = bound, kind = kind, qualified = qualified) }
+    }
 
-        // SUPABASE: bind the INTERFACE, not the concrete class.
-        //
-        // `supabaseApi<T>` is `single<T> { … }` with T inferred from the factory lambda, so
-        // `{ ServerInstanceApiImpl(it) }` would register the IMPL type and `get<ServerInstanceApi>()` would
-        // fail at runtime — after compiling cleanly, which is the worst place to find it. The
-        // annotation stays on the impl (that is what gets constructed); the processor resolves
-        // its single directly-implemented interface and binds that instead.
-        //
-        // Exactly one supertype interface is required: zero means there is no seam to bind
-        // against (the old one-concrete-class shape — still valid, bind the class itself), and
-        // more than one is ambiguous, which is an author error rather than something to guess at.
-        val bound = if (kind == "supabase") {
-            val ifaces = decl.superTypes
-                .mapNotNull { it.resolve().declaration as? KSClassDeclaration }
-                .filter { it.classKind == ClassKind.INTERFACE }
-                .mapNotNull { it.qualifiedName?.asString() }
-                .toList()
-            when (ifaces.size) {
-                0 -> fqn
-                1 -> ifaces.single()
-                else -> {
-                    logger.error(
-                        "network-ksp: @ApiBinding(\"$id\") on ${decl.simpleName.asString()} implements " +
-                            "${ifaces.size} interfaces (${ifaces.joinToString()}) — cannot decide which to " +
-                            "bind. Give the API type exactly one interface.",
-                    )
-                    return null
-                }
+    /**
+     * The type [decl] is bound as on a point of [kind]: itself for REST, its single interface for Supabase.
+     *
+     * SUPABASE binds the INTERFACE, not the concrete class. `supabaseApi<T>` is `single<T> { … }` with T
+     * inferred from the factory lambda, so `{ ServerInstanceApiImpl(it) }` would register the IMPL type and
+     * `get<ServerInstanceApi>()` would fail at runtime — after compiling cleanly, which is the worst place to
+     * find it. The annotation stays on the impl (that is what gets constructed); this resolves its single
+     * directly-implemented interface. Zero interfaces means there is no seam (bind the class itself); more
+     * than one is ambiguous — an author error, logged, null.
+     */
+    private fun boundTypeFor(decl: KSClassDeclaration, id: String, fqn: String, kind: String): String? {
+        if (kind != "supabase") return fqn
+        val ifaces = decl.superTypes
+            .mapNotNull { it.resolve().declaration as? KSClassDeclaration }
+            .filter { it.classKind == ClassKind.INTERFACE }
+            .mapNotNull { it.qualifiedName?.asString() }
+            .toList()
+        return when (ifaces.size) {
+            0 -> fqn
+            1 -> ifaces.single()
+            else -> {
+                logger.error(
+                    "network-ksp: @ApiBinding(\"$id\") on ${decl.simpleName.asString()} implements " +
+                        "${ifaces.size} interfaces (${ifaces.joinToString()}) — cannot decide which to " +
+                        "bind. Give the API type exactly one interface.",
+                )
+                null
             }
-        } else {
-            fqn
         }
-        return Binding(id = id, impl = fqn, bound = bound, kind = kind, qualified = qualified)
     }
 
     private fun render(bindings: List<Binding>): String {
@@ -201,9 +204,9 @@ class ApiBindingProcessor(
             append(" *\n")
             append(" * To add an API: declare the endpoint in `app-profile/app.yaml#network.access_points`\n")
             append(" * (its URL, kind and owner are deployment config, not a property of the class), then write\n")
-            append(" * the API type and annotate it `@ApiBinding(\"<id>\")`. There is no wiring step. One type served by\n")
-            append(" * several endpoints lists them all — `@ApiBinding(\"main\", \"selfservice\")`: the first is the\n")
-            append(" * default binding, the others are qualified by their id.\n")
+            append(" * the API type and annotate it `@ApiBinding(\"<id>\")`. There is no wiring step.\n")
+            append(" * One type served by several endpoints lists them all — `@ApiBinding(\"main\", \"self\")`:\n")
+            append(" * the first is the default binding, the others are qualified by their id.\n")
             append(" *\n")
             append(" * $rest REST + $supa Supabase binding(s).\n")
             append(" *\n")
@@ -255,7 +258,8 @@ internal fun duplicateBindingErrors(bindings: List<ApiBindingKey>): List<String>
         .map { (type, points) ->
             "network-ksp: $type is bound ${points.size} times (access points: ${points.joinToString()}) — " +
                 "each is an unqualified single<$type>, so all but the last are silently lost. " +
-                "Bind a type once; to serve it from several endpoints list them in ONE @ApiBinding(\"a\", \"b\")."
+                "Bind a type once; to serve it from several endpoints list them in ONE " +
+                "@ApiBinding(\"a\", \"b\")."
         }
 
 /**

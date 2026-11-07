@@ -61,6 +61,19 @@ class WebCorsConfigTest {
     }
 
     @Test
+    fun allowedOriginsLetAnotherSiteUseThisRelay() {
+        // The app is also served from a static host (GitHub Pages) that cannot run the worker, so that
+        // copy uses this site's relay cross-origin — the worker must answer CORS for exactly that origin.
+        val c = parseWebCors(net("web_cors" to mapOf("allowed_origins" to listOf("https://Org.GitHub.io/"))))
+        assertEquals(listOf("https://org.github.io"), c.allowedOrigins)
+        assertTrue(relayAllowlistJson(c).contains("\"allowedOrigins\": [\n    \"https://org.github.io\"\n  ]"))
+        assertTrue(relayAllowlistJson(parseWebCors(net())).contains("\"allowedOrigins\": []"))
+        listOf("http://org.github.io", "org.github.io", "https://*.github.io", "https://org.github.io/app").forEach {
+            assertFailsWith<GradleException> { parseWebCors(net("web_cors" to mapOf("allowed_origins" to listOf(it)))) }
+        }
+    }
+
+    @Test
     fun legacyKeyIsMigratedWithAWarning() {
         val c = parseWebCors(net("web_cors_proxy" to "https://old.relay.io"))
         assertEquals("relay", c.mode)

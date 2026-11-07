@@ -34,13 +34,20 @@ export default {
     if (url.pathname === config.relayPath || url.pathname === config.relayPath + "/") {
       // EVERY relay answer is tagged — errors included — so the app can tell "the worker refused" (final)
       // from "no worker here" (a static host's 404 page: the app falls back to calling directly).
+      // A page this site serves from elsewhere (allowedOrigins — e.g. a GitHub Pages copy, which cannot
+      // run this worker) calls the relay cross-origin: answer its preflight and let it read the reply.
+      const cors = corsHeaders(request, config);
       let response;
       try {
-        response = await relay(request, config, url);
+        response = request.method === "OPTIONS" && cors ? new Response(null, { status: 204 }) : await relay(request, config, url);
       } catch {
         response = new Response("Upstream unreachable", { status: 502 });
       }
       response.headers.set(RELAY_HEADER, "1");
+      if (cors) {
+        for (const [name, value] of Object.entries(cors)) response.headers.set(name, value);
+        response.headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+      }
       return response;
     }
     const asset = await env.ASSETS.fetch(request);
@@ -65,10 +72,25 @@ function loadConfig(request, env) {
       const hosts = [...(Array.isArray(file.hosts) ? file.hosts : []), ...fromEnv].map((h) => String(h).toLowerCase());
       // An external relay (https://…) or direct mode leaves this site's own relay path at the default.
       const relayPath = typeof file.relay === "string" && /^\/[A-Za-z0-9_-]+$/.test(file.relay) ? file.relay : "/cors";
-      return { hosts, relayPath };
+      const origins = (Array.isArray(file.allowedOrigins) ? file.allowedOrigins : []).map((o) => String(o).toLowerCase());
+      return { hosts, relayPath, origins };
     })();
   }
   return configPromise;
+}
+
+// CORS for a page served from one of config.origins, or null for any other (incl. same-origin) caller.
+function corsHeaders(request, config) {
+  const origin = (request.headers.get("Origin") || "").toLowerCase();
+  if (!origin || !config.origins.includes(origin)) return null;
+  return {
+    "Access-Control-Allow-Origin": request.headers.get("Origin"),
+    "Access-Control-Allow-Methods": METHODS.join(", "),
+    "Access-Control-Allow-Headers": request.headers.get("Access-Control-Request-Headers") || "*",
+    "Access-Control-Expose-Headers": RELAY_HEADER, // the app reads the tag to know the relay answered
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  };
 }
 
 function allowed(hostname, hosts) {

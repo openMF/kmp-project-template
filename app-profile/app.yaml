@@ -69,6 +69,11 @@ network:
     # Extra hosts to relay beyond the access points — e.g. a host a user can switch to at runtime.
     # `api.example.com`, or `*.example.com` for its subdomains (not example.com itself). No scheme/path/port.
     hosts: []
+    # Page origins that serve the app from ANOTHER site and use this relay cross-origin — e.g. a GitHub
+    # Pages copy (`relay: https://<this-site>/cors` in that build), since Pages cannot run the worker. The
+    # worker answers their CORS preflight and lets them read the reply; every other origin still gets no
+    # CORS. `https://org.github.io` — an https origin, no path, no wildcard.
+    allowed_origins: []
   # Declarative access-point topology — every REST + Supabase endpoint the app talks to, in ONE place.
   # This is the SoT for core/network's AccessPointRegistry AND for the generated DI wiring: declare an
   # endpoint here, run `./gradlew syncForkConfig`, and the only thing left to write is the API type.

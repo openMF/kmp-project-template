@@ -8,6 +8,7 @@
 #   WCR-2 off-allowlist host 403   WCR-3 *.wildcard = subdomains only   WCR-4 http/port refused
 #   WCR-5 Set-Cookie stripped, no-store when authed   WCR-7 redirects re-checked per hop
 #   WCR-8 PROXY_ALLOWED_HOSTS union   WCR-9 no allowlist file = relay nothing   WCR-10 COOP/COEP kept
+#   WCR-13/14 allowedOrigins: a listed origin gets preflight + readable reply + exposed tag; others get none
 #   WCR-12 every relay answer (incl. 400/403/405/502) carries X-Kpt-Relay; static assets do not — the app
 #          falls back to a direct call only when that tag is missing (no worker on the host)
 # Plus WCR-11: both resource dirs ship the same worker and the same generated relay-allowlist.json.
@@ -21,7 +22,7 @@ command -v node >/dev/null 2>&1 || { echo "   ❌ node not found — the web rel
 rc=0
 
 out="$(node "$HERE/worker.test.mjs" "$JS/_worker.js" 2>&1)"
-for i in 1 2 3 4 5 6 7 8 9 10 12; do
+for i in 1 2 3 4 5 6 7 8 9 10 12 13 14; do
   if printf '%s\n' "$out" | grep -q "^ok WCR-$i "; then
     echo "   ✅ $(printf '%s\n' "$out" | grep "^ok WCR-$i " | sed 's/^ok //')"
   else

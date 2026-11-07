@@ -12,5 +12,6 @@
     "api.stlouisfed.org",
     "sandbox.mifos.community",
     "api.worldbank.org"
-  ]
+  ],
+  "allowedOrigins": []
 }

@@ -83,7 +83,9 @@ codegen_contracts:
     notes: >-
       Declares qualifier, TTL and the logout purge in one place. `logout` drives BOTH the binding
       and the purge, so they cannot disagree; `logout = false` only for a MutableStore, which
-      Store5 5.1 cannot register.
+      Store5 5.1 cannot register. Provider parameters resolve by type; one annotated
+      @FromQualifier("<name>") resolves by name — e.g. the self-service binding of an API served by
+      several access points.
 
   - annotation: CacheKey
     defined_in: core-base/store

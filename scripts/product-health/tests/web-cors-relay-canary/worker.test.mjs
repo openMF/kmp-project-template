@@ -169,4 +169,26 @@ await check("WCR-12 every relay answer is tagged X-Kpt-Relay — worker errors a
   assert(!tagged(asset), "a static asset must not look like a relay answer");
 });
 
+await check("WCR-13 an allowed origin gets its preflight answered and can read the relayed reply + tag", async () => {
+  const w = await freshWorker();
+  const list = { ...LIST, allowedOrigins: ["https://org.github.io"] };
+  const origin = { Origin: "https://org.github.io" };
+  const pre = await w.fetch(req("https://bank.mifos.community/x", { method: "OPTIONS", headers: { ...origin, "Access-Control-Request-Headers": "authorization" } }), env(list));
+  assert(pre.status === 204 && calls.length === 0, `preflight status ${pre.status}, upstream calls ${calls.length}`);
+  assert(pre.headers.get("access-control-allow-origin") === "https://org.github.io", "preflight not allowed");
+  assert(pre.headers.get("access-control-allow-headers") === "authorization", "requested headers not allowed");
+  const res = await w.fetch(req("https://bank.mifos.community/x", { headers: origin }), env(list));
+  assert(res.status === 200 && res.headers.get("access-control-allow-origin") === "https://org.github.io", "reply not readable cross-origin");
+  assert(res.headers.get("access-control-expose-headers") === "X-Kpt-Relay" && tagged(res), "tag not exposed to the page");
+  assert(res.headers.get("cross-origin-resource-policy") === "cross-origin", "CORP blocks the cross-origin page");
+});
+
+await check("WCR-14 any other origin gets no CORS — not a relay for arbitrary sites", async () => {
+  const w = await freshWorker();
+  const list = { ...LIST, allowedOrigins: ["https://org.github.io"] };
+  const res = await w.fetch(req("https://bank.mifos.community/x", { headers: { Origin: "https://evil.test" } }), env(list));
+  assert(res.headers.get("access-control-allow-origin") === null, "CORS granted to an unlisted origin");
+  assert(res.headers.get("cross-origin-resource-policy") === "same-origin", "CORP relaxed for an unlisted origin");
+});
+
 process.exit(failed ? 1 : 0);

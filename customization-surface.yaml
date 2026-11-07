@@ -126,6 +126,12 @@ rules:
   # never overwrite a fork's own last-synced pointer with the template's.
   - glob: ".template-version"
     owner: fork
+  # The fork's navigation seam package (see the registry block further down for what it holds). It has to
+  # come BEFORE the cmp-navigation merge rules: rules are first-match-wins, so a fork file such as
+  # registry/app/navigation/RootNavGraph.kt otherwise matched `RootNav*.kt` / `*Navigation*.kt` below and
+  # a sync tried to 3-way merge code the template never shipped.
+  - glob: "cmp-navigation/**/registry/**"
+    owner: fork
   # Root navigation host: template owns the scaffold; forks wire feature routes in.
   - glob: "cmp-navigation/**/*Navigation*.kt"
     owner: merge

@@ -69,6 +69,7 @@ F2="$WORK/fork2"; mkdir -p "$F2/scripts/white-label"
 cp "$REPO/scripts/customization-surface.sh" "$F2/scripts/"
 printf 'version: 1\nrules:\n  - glob: "shared/ForkWorkers.kt"\n    owner: fork\n  - glob: "**"\n    owner: template\n    default: true\n' > "$F2/customization-surface.yaml"
 printf 'SYNC_DIRS=(\n    "shared"\n)\nSYNC_FILES=(\n)\n' > "$F2/scripts/white-label/sync-dirs.sh"
+# git, run in the second fixture repo with a fixed identity.
 g2() { git -C "$F2" -c user.email=t@t -c user.name=t "$@"; }
 mkdir -p "$F2/shared"; echo base > "$F2/shared/Workers.kt"
 g2 init -q -b fork; g2 add -A; g2 commit -q -m "fork, older than the seam"

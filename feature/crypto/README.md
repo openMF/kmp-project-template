@@ -9,9 +9,9 @@ Paginated crypto coin-markets list — the `PagingScreenStream` showcase.
   Scroll position is a pure Compose concern (`rememberLazyListState`), not VM state.
 - **Route:** `CryptoGraphRoute` (start = `CoinMarketsListRoute`). Entry point:
   `NavController.navigateToCrypto()`.
-- Each row hosts `feature/add-to-watchlist`'s embedded `AddToWatchlistStar` toggle
-  (`implementation(projects.feature.addToWatchlist)`); coin-tap currently no-ops pending a
-  future coin-detail destination.
+- Each row ends in a `coinAction` slot; the app shell fills it with `feature/add-to-watchlist`'s
+  `AddToWatchlistStar` in `ForkFeatureRegistry`, so this module does not depend on that one. A
+  coin tap opens `CoinDetailRoute`.
 - **DI:** `CryptoFeatureModule`.
 
 See `FEATURE_AUTHORING.md` for the paginated-list archetype chain.

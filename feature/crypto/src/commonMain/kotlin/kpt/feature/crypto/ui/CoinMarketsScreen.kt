@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kpt.core.base.ui.paging.PagingScreenContent
 import kpt.core.model.crypto.CoinMarket
-import kpt.feature.addtowatchlist.ui.AddToWatchlistStar
 import kpt.feature.crypto.generated.resources.Res
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_back_cd
 import kpt.feature.crypto.generated.resources.screens_crypto_coin_markets_load_more_end
@@ -53,6 +52,9 @@ import kotlin.math.round
  * (which uses `rememberSaveable` with `LazyListState.Saver`), so scroll position
  * survives tab-switch and config-change via Navigation's state-holder and Android's
  * saved-instance-state Bundle — no per-screen retention code required.
+ *
+ * @param coinAction trailing content of each row, keyed by coin id — the app shell puts another
+ *   feature's widget here (the demo puts the watchlist star), since a feature never depends on another.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +62,7 @@ fun CoinMarketsScreen(
     onBackClick: () -> Unit,
     onCoinClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    coinAction: @Composable (coinId: String) -> Unit = {},
     viewModel: CoinMarketsViewModel = koinViewModel(),
 ) {
     val loadingLabel = stringResource(Res.string.screens_crypto_coin_markets_load_more_loading)
@@ -108,6 +111,7 @@ fun CoinMarketsScreen(
                     coin = coin,
                     modifier = Modifier.testTag(TestTags.ROW),
                     onClick = { onCoinClick(coin.id) },
+                    action = { coinAction(coin.id) },
                 )
             }
         }
@@ -115,7 +119,12 @@ fun CoinMarketsScreen(
 }
 
 @Composable
-internal fun CoinMarketRow(coin: CoinMarket, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun CoinMarketRow(
+    coin: CoinMarket,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    action: @Composable () -> Unit = {},
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -155,9 +164,9 @@ internal fun CoinMarketRow(coin: CoinMarket, onClick: () -> Unit, modifier: Modi
                     },
                 )
             }
-            // Embedded write-side widget — toggles this coin's watchlist membership.
-            // The IconButton consumes its own tap, so it does NOT trigger the row's nav onClick.
-            AddToWatchlistStar(coinId = coin.id)
+            // Embedded widget from the app shell (the demo's watchlist star). A clickable widget consumes
+            // its own tap, so it does NOT trigger the row's nav onClick.
+            action()
         }
     }
 }

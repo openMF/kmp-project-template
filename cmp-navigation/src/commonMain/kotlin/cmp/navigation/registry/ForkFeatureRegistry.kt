@@ -16,6 +16,10 @@ import kpt.core.database.di.ForkDatabaseModule
 import kpt.core.datastore.di.ForkDatastoreModule
 import kpt.core.network.di.ForkNetworkModule
 import kpt.core.store.di.ForkStoreModule
+import kpt.feature.addtowatchlist.ui.AddToWatchlistStar
+import kpt.feature.amortization.navigation.navigateToAmortizationSchedule
+import kpt.feature.crypto.navigation.cryptoGraph
+import kpt.feature.loans.navigation.loansGraph
 import org.koin.core.module.Module
 
 /**
@@ -64,12 +68,25 @@ object ForkFeatureRegistry {
      * annotating it where it is declared, rather than editing this file — which previously took an
      * import AND a call, and where a missed call meant a route that silently did not exist.
      *
-     * Nested and non-feature-graph entries are left unannotated on purpose:
-     * `amortizationScheduleDestination` is registered inside `loansGraph`, and `cloudTodoGraph`
+     * A graph that opens ANOTHER feature's screen, or shows another feature's widget, cannot be
+     * annotated: features never depend on each other, so it takes that link as a callback or slot and
+     * is wired below, the one place features meet. `cloudTodoGraph` is left unannotated too — it
      * belongs to ForkShowcaseRegistry.
      *
      * Feature nav destinations — registered into the authenticated graph. The shell destinations
      * (settings, notification) stay in [cmp.navigation.authenticated] template; this is the fork's routes.
      */
-    val featureDestinations: NavGraphBuilder.(NavController) -> Unit = GeneratedFeatureDestinations
+    val featureDestinations: NavGraphBuilder.(NavController) -> Unit = { navController ->
+        GeneratedFeatureDestinations(navController)
+        // demo:begin — the demo graphs that link to another feature. customizer --clean strips this block.
+        loansGraph(
+            navController = navController,
+            onAmortizationClick = { loanId -> navController.navigateToAmortizationSchedule(loanId) },
+        )
+        cryptoGraph(
+            navController = navController,
+            coinAction = { coinId -> AddToWatchlistStar(coinId = coinId) },
+        )
+        // demo:end
+    }
 }

@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
+import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.amortization.ui.AmortizationScheduleScreen
@@ -37,10 +38,12 @@ fun NavController.navigateToAmortizationSchedule(loanId: String) {
 }
 
 /**
- * Registers the amortization-schedule destination.
+ * Registers the amortization-schedule destination. Other features open it through
+ * [navigateToAmortizationSchedule], wired by the app shell.
  *
  * @param navController used for back navigation.
  */
+@FeatureDestination
 fun NavGraphBuilder.amortizationScheduleDestination(navController: NavController) {
     composableWithPushTransitions<AmortizationScheduleRoute> { entry ->
         val route = entry.toRoute<AmortizationScheduleRoute>()

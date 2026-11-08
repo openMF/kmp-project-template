@@ -11,8 +11,9 @@ archetype showcase.
   multi-formKey `BaseMutationViewModel` (`MutationMode.Draft`) showcase**, draft-persisted via
   `SubmitOutbox<Loan>` (`DemoOutboxQualifiers.Loan`).
 - **Routes:** `LoansGraphRoute` → `PersonalLoansListRoute` (start), `LoanDetailRoute(loanId)`,
-  `AddOrEditLoanRoute(loanId?)`; the graph also mounts `feature/amortization`'s
-  `amortizationScheduleDestination`. Entry point: `NavController.navigateToLoans()`.
+  `AddOrEditLoanRoute(loanId?)`. Entry point: `NavController.navigateToLoans()`. The detail's
+  "view amortization" action is the `onAmortizationClick` callback of `loansGraph`, which the app
+  shell wires to `feature/amortization` in `ForkFeatureRegistry` — features never depend on each other.
 - `LoanReminderUseCase` is the cross-module proof-of-concept consuming `sync`'s
   `WorkScheduler` to schedule due-date notifications.
 - **DI:** `LoansModule` — VMs stay factory-bound (`viewModel {}`, never `single`) per the

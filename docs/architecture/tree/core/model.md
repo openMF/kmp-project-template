@@ -328,16 +328,16 @@ data class CoinMarket(
 ```
 One row of the coin market list — the fields a list item renders, nothing more.
 
-<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinMarketsScreen.kt:118</code></summary>
+<details><summary>Used in the template — <code>feature/crypto/src/commonMain/kotlin/kpt/feature/crypto/ui/CoinMarketsScreen.kt:123</code></summary>
 
 ```kotlin
-
 @Composable
-internal fun CoinMarketRow(coin: CoinMarket, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
+internal fun CoinMarketRow(
+    coin: CoinMarket,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    action: @Composable () -> Unit = {},
+) {
 ```
 
 </details>

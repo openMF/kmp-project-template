@@ -17,11 +17,8 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
-import kpt.feature.amortization.navigation.AmortizationScheduleRoute
-import kpt.feature.amortization.navigation.amortizationScheduleDestination
 import kpt.feature.loans.ui.AddOrEditLoanScreen
 import kpt.feature.loans.ui.LoanDetailScreen
 import kpt.feature.loans.ui.PersonalLoansListScreen
@@ -62,10 +59,13 @@ fun NavController.navigateToLoans(navOptions: NavOptions? = null) {
 /**
  * Registers the loans nested graph.
  *
+ * Not `@FeatureDestination`: a loan's detail opens the amortization schedule, another feature, so the app
+ * shell registers this graph in `ForkFeatureRegistry` and supplies [onAmortizationClick].
+ *
  * @param navController used for back navigation and for moving between list, detail and form.
+ * @param onAmortizationClick opens the amortization schedule for a loan id.
  */
-@FeatureDestination
-fun NavGraphBuilder.loansGraph(navController: NavController) {
+fun NavGraphBuilder.loansGraph(navController: NavController, onAmortizationClick: (loanId: String) -> Unit) {
     navigation<LoansGraphRoute>(startDestination = PersonalLoansListRoute) {
         composableWithPushTransitions<PersonalLoansListRoute> {
             PersonalLoansListScreen(
@@ -82,9 +82,7 @@ fun NavGraphBuilder.loansGraph(navController: NavController) {
                 onEditClick = { loanId ->
                     navController.navigate(AddOrEditLoanRoute(loanId = loanId))
                 },
-                onAmortizationClick = { loanId ->
-                    navController.navigate(AmortizationScheduleRoute(loanId))
-                },
+                onAmortizationClick = onAmortizationClick,
             )
         }
         composableWithPushTransitions<AddOrEditLoanRoute> { entry ->
@@ -95,6 +93,5 @@ fun NavGraphBuilder.loansGraph(navController: NavController) {
                 onSaved = { navController.popBackStackSafely() },
             )
         }
-        amortizationScheduleDestination(navController)
     }
 }

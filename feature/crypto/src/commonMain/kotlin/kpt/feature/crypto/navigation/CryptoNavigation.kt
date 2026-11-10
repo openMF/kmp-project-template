@@ -11,13 +11,13 @@
 
 package kpt.feature.crypto.navigation
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import kpt.core.base.ui.nav.FeatureDestination
 import kpt.core.base.ui.nav.composableWithPushTransitions
 import kpt.core.base.ui.nav.popBackStackSafely
 import kpt.feature.crypto.ui.CoinDetailScreen
@@ -74,9 +74,16 @@ fun NavController.navigateToCoinDetail(coinId: String, navOptions: NavOptions? =
  * renders [CoinDetailScreen] — consuming the `coinDetailStream` / `CoinDetailStore`
  * read path that was already wired at HEAD (turning the former dead click +
  * orphan store into a real drill-down).
+ *
+ * Not `@FeatureDestination`: each row carries another feature's widget, so the app shell registers this
+ * graph in `ForkFeatureRegistry` and passes that widget as [coinAction].
+ *
+ * @param coinAction trailing content of each coin row, keyed by coin id.
  */
-@FeatureDestination
-fun NavGraphBuilder.cryptoGraph(navController: NavController) {
+fun NavGraphBuilder.cryptoGraph(
+    navController: NavController,
+    coinAction: @Composable (coinId: String) -> Unit = {},
+) {
     navigation<CryptoGraphRoute>(startDestination = CoinMarketsListRoute) {
         composableWithPushTransitions<CoinMarketsListRoute> {
             CoinMarketsRoute(
@@ -84,6 +91,7 @@ fun NavGraphBuilder.cryptoGraph(navController: NavController) {
                 onCoinClick = { coinId ->
                     navController.navigateToCoinDetail(coinId = coinId)
                 },
+                coinAction = coinAction,
             )
         }
         composableWithPushTransitions<CoinDetailRoute> { backStackEntry ->

@@ -32,21 +32,20 @@ import kpt.feature.showcase.transitions.transitionGalleryGraph
  */
 object ForkShowcaseRegistry {
     /**
-     * Dev-menu entries surfaced in `SettingsScreen`'s Developer section. Returns an
-     * empty list on release builds (dev menu hidden) and, on a `--clean` fork where the
-     * fenced block is stripped, the trailing `return emptyList()` is the whole body.
+     * Dev-menu entries surfaced in `SettingsScreen`'s Developer section; none on release builds.
+     * A lambda, like [devDestinations], so a `--clean` fork whose fenced entries are stripped is left
+     * with an empty list and no unused parameter.
      */
-    fun devSettingsEntries(navController: NavController): List<DevMenuEntry> {
-        // demo:begin
-        if (!isReleaseBuild()) {
-            return listOf(
-                DevMenuEntry("Transition Gallery") { navController.navigate(TransitionGalleryRoute) },
-                DevMenuEntry("State Gallery") { navController.navigate(StateGalleryRoute) },
-                DevMenuEntry("Cloud Todo (write path)") { navController.navigate(CloudTodoRoute) },
-            )
+    val devSettingsEntries: (NavController) -> List<DevMenuEntry> = { navController ->
+        buildList {
+            // demo:begin
+            if (!isReleaseBuild()) {
+                add(DevMenuEntry("Transition Gallery") { navController.navigate(TransitionGalleryRoute) })
+                add(DevMenuEntry("State Gallery") { navController.navigate(StateGalleryRoute) })
+                add(DevMenuEntry("Cloud Todo (write path)") { navController.navigate(CloudTodoRoute) })
+            }
+            // demo:end
         }
-        // demo:end
-        return emptyList()
     }
 
     /** Dev-only nav destinations registered inside the authenticated graph. */

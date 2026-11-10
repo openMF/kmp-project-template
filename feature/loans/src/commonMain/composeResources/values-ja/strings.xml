@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">月々の返済額</string>
     <string name="screens_loans_detail_total_paid_label">これまでの返済総額</string>
     <string name="screens_loans_detail_annual_rate_label">年利</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">次回返済日</string>
     <string name="screens_loans_detail_tenure_label">期間</string>
     <string name="screens_loans_detail_tenure_value">%1$d か月</string>
     <string name="screens_loans_detail_tenure_progress_label">返済期間の進捗</string>
-    <string name="screens_loans_detail_tenure_progress_value">%1$d%% 完了</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d% 完了</string>
     <string name="screens_loans_detail_edit_button">編集</string>
     <string name="screens_loans_detail_schedule_button">返済計画</string>
     <string name="screens_loans_detail_delete_button">削除</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">月々の返済額</string>
     <string name="screens_loans_row_remaining_label">残り</string>
     <string name="screens_loans_row_monthly_emi_label">月々の返済額</string>
-    <string name="screens_loans_row_progress_value">%1$d%% 返済済み</string>
+    <string name="screens_loans_row_progress_value">%1$d% 返済済み</string>
     <string name="screens_loans_row_next_due_value">次回: %1$s</string>
 </resources>

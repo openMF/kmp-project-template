@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">Maandelijkse betaling (maandlast)</string>
     <string name="screens_loans_detail_total_paid_label">Tot nu toe betaald</string>
     <string name="screens_loans_detail_annual_rate_label">Jaarrente</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">Volgende vervaldatum</string>
     <string name="screens_loans_detail_tenure_label">Looptijd</string>
     <string name="screens_loans_detail_tenure_value">%1$d maanden</string>
     <string name="screens_loans_detail_tenure_progress_label">Voortgang looptijd</string>
-    <string name="screens_loans_detail_tenure_progress_value">%1$d%% voltooid</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d% voltooid</string>
     <string name="screens_loans_detail_edit_button">Bewerken</string>
     <string name="screens_loans_detail_schedule_button">Schema</string>
     <string name="screens_loans_detail_delete_button">Verwijderen</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">Maandlast</string>
     <string name="screens_loans_row_remaining_label">Resterend</string>
     <string name="screens_loans_row_monthly_emi_label">Maandlast</string>
-    <string name="screens_loans_row_progress_value">%1$d%% afgelost</string>
+    <string name="screens_loans_row_progress_value">%1$d% afgelost</string>
     <string name="screens_loans_row_next_due_value">Volgende: %1$s</string>
 </resources>

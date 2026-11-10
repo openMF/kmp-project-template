@@ -1,8 +1,9 @@
 # :feature:add-to-watchlist
 
 Embedded write-side widget — a single star icon-button (`AddToWatchlistStar`) that toggles
-a coin's membership in the personal crypto watchlist. Not a navigable screen: it is hosted
-inline on `feature/crypto`'s CoinMarkets rows via `implementation(projects.feature.addToWatchlist)`.
+a coin's membership in the personal crypto watchlist. Not a navigable screen: the app shell hosts
+it inline on `feature/crypto`'s CoinMarkets rows through that screen's `coinAction` slot
+(`ForkFeatureRegistry`).
 
 - **Composable:** `AddToWatchlistStar(coinId)` — filled `Star` when tracked, outline
   `StarBorder` otherwise.

@@ -17,6 +17,8 @@ plugins {
     alias(libs.plugins.buildkonfig)
     id("kotlinx-serialization")
     id("com.google.devtools.ksp")
+    alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.compose.compiler)
 }
 
 val localProps = Properties().apply {
@@ -62,6 +64,8 @@ buildkonfig {
 kotlin {
     sourceSets {
         commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.components.resources)
             api(projects.core.common)
             api(projects.core.model)
             api(projects.coreBase.network)
@@ -114,6 +118,13 @@ dependencies {
     add("kspDesktop", libs.ktorfit.ksp)
     add("kspIosArm64", libs.ktorfit.ksp)
     add("kspIosSimulatorArm64", libs.ktorfit.ksp)
+}
+
+// Bundled files (`composeResources/files/…`, read with `Res.readBytes`): a fork ships its own data here.
+compose.resources {
+    publicResClass = true
+    generateResClass = always
+    packageOfResClass = "kpt.core.network.generated.resources"
 }
 
 // ── Fork-owned dependency seam (white-label, mirrors `feature-deps.gradle.kts`) ────────────────

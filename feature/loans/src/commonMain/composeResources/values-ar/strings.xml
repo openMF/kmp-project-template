@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">الدفعة الشهرية (القسط)</string>
     <string name="screens_loans_detail_total_paid_label">إجمالي المسدّد حتى الآن</string>
     <string name="screens_loans_detail_annual_rate_label">المعدل السنوي</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">تاريخ الاستحقاق التالي</string>
     <string name="screens_loans_detail_tenure_label">المدة</string>
     <string name="screens_loans_detail_tenure_value">%1$d شهرًا</string>
     <string name="screens_loans_detail_tenure_progress_label">تقدّم المدة</string>
-    <string name="screens_loans_detail_tenure_progress_value">%1$d%% مكتمل</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d% مكتمل</string>
     <string name="screens_loans_detail_edit_button">تعديل</string>
     <string name="screens_loans_detail_schedule_button">الجدول</string>
     <string name="screens_loans_detail_delete_button">حذف</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">القسط الشهري</string>
     <string name="screens_loans_row_remaining_label">المتبقي</string>
     <string name="screens_loans_row_monthly_emi_label">القسط الشهري</string>
-    <string name="screens_loans_row_progress_value">تم سداد %1$d%%</string>
+    <string name="screens_loans_row_progress_value">تم سداد %1$d%</string>
     <string name="screens_loans_row_next_due_value">التالي: %1$s</string>
 </resources>

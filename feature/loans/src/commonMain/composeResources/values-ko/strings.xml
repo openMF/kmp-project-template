@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">월 납입금(상환금)</string>
     <string name="screens_loans_detail_total_paid_label">지금까지 상환 총액</string>
     <string name="screens_loans_detail_annual_rate_label">연이율</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">다음 상환일</string>
     <string name="screens_loans_detail_tenure_label">기간</string>
     <string name="screens_loans_detail_tenure_value">%1$d개월</string>
     <string name="screens_loans_detail_tenure_progress_label">기간 진행률</string>
-    <string name="screens_loans_detail_tenure_progress_value">%1$d%% 완료</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d% 완료</string>
     <string name="screens_loans_detail_edit_button">편집</string>
     <string name="screens_loans_detail_schedule_button">상환 일정</string>
     <string name="screens_loans_detail_delete_button">삭제</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">월 상환금</string>
     <string name="screens_loans_row_remaining_label">남음</string>
     <string name="screens_loans_row_monthly_emi_label">월 상환금</string>
-    <string name="screens_loans_row_progress_value">%1$d%% 상환</string>
+    <string name="screens_loans_row_progress_value">%1$d% 상환</string>
     <string name="screens_loans_row_next_due_value">다음: %1$s</string>
 </resources>

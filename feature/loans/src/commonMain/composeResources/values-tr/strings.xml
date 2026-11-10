@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">Aylık ödeme (taksit)</string>
     <string name="screens_loans_detail_total_paid_label">Bugüne kadar ödenen</string>
     <string name="screens_loans_detail_annual_rate_label">Yıllık oran</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">Sonraki ödeme tarihi</string>
     <string name="screens_loans_detail_tenure_label">Vade</string>
     <string name="screens_loans_detail_tenure_value">%1$d ay</string>
     <string name="screens_loans_detail_tenure_progress_label">Vade ilerlemesi</string>
-    <string name="screens_loans_detail_tenure_progress_value">%%%1$d tamamlandı</string>
+    <string name="screens_loans_detail_tenure_progress_value">%%1$d tamamlandı</string>
     <string name="screens_loans_detail_edit_button">Düzenle</string>
     <string name="screens_loans_detail_schedule_button">Ödeme planı</string>
     <string name="screens_loans_detail_delete_button">Sil</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">Aylık taksit</string>
     <string name="screens_loans_row_remaining_label">Kalan</string>
     <string name="screens_loans_row_monthly_emi_label">Aylık taksit</string>
-    <string name="screens_loans_row_progress_value">%%%1$d ödendi</string>
+    <string name="screens_loans_row_progress_value">%%1$d ödendi</string>
     <string name="screens_loans_row_next_due_value">Sonraki: %1$s</string>
 </resources>

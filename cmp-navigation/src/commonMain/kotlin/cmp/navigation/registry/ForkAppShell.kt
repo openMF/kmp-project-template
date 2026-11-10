@@ -11,6 +11,8 @@ package cmp.navigation.registry
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
 import cmp.navigation.rootnav.RootNavScreen
 
 /**
@@ -47,4 +49,12 @@ object ForkAppShell {
         { modifier, onSplashScreenRemoved ->
             RootNavScreen(modifier = modifier, onSplashScreenRemoved = onSplashScreenRemoved)
         }
+
+    /**
+     * Destinations installed on the ROOT graph, beside splash and onboarding and outside the signed-in
+     * graph: a sign-in screen, a server-setup screen a signed-out user must reach. `@FeatureDestination`
+     * registers onto the signed-in graph — exactly where a gate in front of it must not be — so a fork
+     * with a login wires it here instead of editing `RootNavScreen`. The template has none.
+     */
+    val rootDestinations: NavGraphBuilder.(NavController) -> Unit = {}
 }

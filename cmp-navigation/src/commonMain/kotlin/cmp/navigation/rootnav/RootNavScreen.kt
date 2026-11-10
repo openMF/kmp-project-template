@@ -35,6 +35,7 @@ import androidx.navigation.navOptions
 import cmp.navigation.authenticated.AuthenticatedGraphRoute
 import cmp.navigation.authenticated.authenticatedGraph
 import cmp.navigation.authenticated.navigateToAuthenticatedGraph
+import cmp.navigation.registry.ForkAppShell
 import cmp.navigation.registry.ForkDeepLinkRegistry
 import cmp.navigation.splash.SplashRoute
 import cmp.navigation.splash.navigateToSplash
@@ -47,6 +48,9 @@ import kpt.core.base.ui.KptConnectivityBanner
 import kpt.core.base.ui.util.NonNullEnterTransitionProvider
 import kpt.core.base.ui.util.NonNullExitTransitionProvider
 import kpt.core.base.ui.util.RootTransitionProviders
+import kpt.feature.onboarding.OnboardingRoute
+import kpt.feature.onboarding.navigateToOnboarding
+import kpt.feature.onboarding.onboardingDestination
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.ExperimentalAtomicApi
@@ -101,8 +105,11 @@ fun RootNavScreen(
                 popExitTransition = { pickExit(fadeThroughExit, noExit)(this) },
             ) {
                 splashDestination()
-//            onboardingDestination()
-//            authNavGraph(navController)
+                // First-run onboarding (feature/onboarding). Only reached when app-profile/app.yaml
+                // sets security.first_run_onboarding: true; a fork with a server-setup screen passes it here.
+                onboardingDestination()
+                // A fork's root-graph destinations (sign-in, server setup) — ForkAppShell.rootDestinations.
+                ForkAppShell.rootDestinations(this, navController)
                 authenticatedGraph(navController)
 //            userUnlockDestination()
             }
@@ -130,8 +137,7 @@ fun RootNavScreen(
     }
 
     val targetRoute = when (state) {
-        // SetLanguageRoute
-        RootNavState.ShowOnboarding -> ""
+        RootNavState.ShowOnboarding -> OnboardingRoute
         // AuthGraphRoute
         RootNavState.Auth -> ""
         RootNavState.Splash -> SplashRoute
@@ -176,8 +182,7 @@ fun RootNavScreen(
             RootNavState.Splash -> navController.navigateToSplash(rootNavOptions)
             // navController.navigateToAuthGraph(rootNavOptions)
             RootNavState.Auth -> {}
-            // navController.navigateToSetLanguage(rootNavOptions)
-            RootNavState.ShowOnboarding -> {}
+            RootNavState.ShowOnboarding -> navController.navigateToOnboarding(rootNavOptions)
             // navController.navigateToUserUnlock(rootNavOptions)
             RootNavState.UserLocked -> {}
             is RootNavState.UserUnlocked -> navController.navigateToAuthenticatedGraph(

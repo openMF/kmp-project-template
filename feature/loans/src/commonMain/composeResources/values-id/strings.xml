@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">Pembayaran bulanan (angsuran)</string>
     <string name="screens_loans_detail_total_paid_label">Total dibayar sampai kini</string>
     <string name="screens_loans_detail_annual_rate_label">Suku bunga tahunan</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">Jatuh tempo berikutnya</string>
     <string name="screens_loans_detail_tenure_label">Tenor</string>
     <string name="screens_loans_detail_tenure_value">%1$d bulan</string>
     <string name="screens_loans_detail_tenure_progress_label">Kemajuan tenor</string>
-    <string name="screens_loans_detail_tenure_progress_value">%1$d%% selesai</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d% selesai</string>
     <string name="screens_loans_detail_edit_button">Edit</string>
     <string name="screens_loans_detail_schedule_button">Jadwal</string>
     <string name="screens_loans_detail_delete_button">Hapus</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">Angsuran bulanan</string>
     <string name="screens_loans_row_remaining_label">Sisa</string>
     <string name="screens_loans_row_monthly_emi_label">Angsuran bulanan</string>
-    <string name="screens_loans_row_progress_value">%1$d%% lunas</string>
+    <string name="screens_loans_row_progress_value">%1$d% lunas</string>
     <string name="screens_loans_row_next_due_value">Berikutnya: %1$s</string>
 </resources>

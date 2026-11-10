@@ -50,12 +50,12 @@
     <string name="screens_loans_detail_monthly_payment_label">मासिक भुगतान (ईएमआई)</string>
     <string name="screens_loans_detail_total_paid_label">अब तक कुल भुगतान</string>
     <string name="screens_loans_detail_annual_rate_label">वार्षिक दर</string>
-    <string name="screens_loans_detail_annual_rate_value">%1$s%%</string>
+    <string name="screens_loans_detail_annual_rate_value">%1$s%</string>
     <string name="screens_loans_detail_next_due_label">अगली देय तिथि</string>
     <string name="screens_loans_detail_tenure_label">अवधि</string>
     <string name="screens_loans_detail_tenure_value">%1$d महीने</string>
     <string name="screens_loans_detail_tenure_progress_label">अवधि की प्रगति</string>
-    <string name="screens_loans_detail_tenure_progress_value">%1$d%% पूर्ण</string>
+    <string name="screens_loans_detail_tenure_progress_value">%1$d% पूर्ण</string>
     <string name="screens_loans_detail_edit_button">संपादित करें</string>
     <string name="screens_loans_detail_schedule_button">अनुसूची</string>
     <string name="screens_loans_detail_delete_button">हटाएँ</string>
@@ -72,6 +72,6 @@
     <string name="screens_loans_list_monthly_emi_label">मासिक ईएमआई</string>
     <string name="screens_loans_row_remaining_label">शेष</string>
     <string name="screens_loans_row_monthly_emi_label">मासिक ईएमआई</string>
-    <string name="screens_loans_row_progress_value">%1$d%% चुकाया</string>
+    <string name="screens_loans_row_progress_value">%1$d% चुकाया</string>
     <string name="screens_loans_row_next_due_value">अगला: %1$s</string>
 </resources>

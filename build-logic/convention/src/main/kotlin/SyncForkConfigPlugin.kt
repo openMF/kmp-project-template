@@ -38,6 +38,30 @@ internal fun signedInByDefault(security: Map<*, *>?): Boolean =
     security?.get("signed_in_by_default")?.toString()?.trim()?.lowercase() != "false"
 
 /**
+ * `app.yaml#security.first_run_onboarding` → `AppSecurityConfig.FIRST_RUN_ONBOARDING`, the starting value of
+ * `UserData.firstTimeUser`. Absent means `false`: onboarding (feature/onboarding) is opt-in, so a fresh
+ * install is not routed to it unless app.yaml asks. With `true`, `RootNavViewModel` emits `ShowOnboarding`
+ * once, until the onboarding screen calls `setFirstTimeState(false)`.
+ */
+internal fun firstRunOnboarding(security: Map<*, *>?): Boolean =
+    security?.get("first_run_onboarding")?.toString()?.trim()?.lowercase() == "true"
+
+/**
+ * Makes [target]'s parent dir exist when its platform's `metadata/` root does, and reports whether it
+ * may be written. Every `deployment/.../metadata` tree is gitignored and the template tracks only some of its
+ * sub-dirs, so a fresh clone has no `review_information/` or `changelogs/` — skipping on a missing
+ * PARENT silently dropped the App Review contact and the Play changelog on every CI run. A missing
+ * metadata ROOT still skips: that platform is not shipped by this fork.
+ */
+internal fun ensureMetadataParent(target: File): Boolean {
+    val parent = target.parentFile ?: return false
+    if (parent.isDirectory) return true
+    var root: File? = parent
+    while (root != null && root.name != "metadata") root = root.parentFile
+    return root != null && root.isDirectory && parent.mkdirs()
+}
+
+/**
  * Registers the `syncForkConfig` task on whichever project applies this plugin.
  *
  * Single source of truth:
@@ -413,6 +437,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
             // registry (incl. each Supabase point's publishable key) and the UrlType vocabulary in one
             // run — the reason a fork only writes the API type.
             regenerateAccessPoints(root, appProfile)
+            regenerateRelayAllowlist(appProfile)
             regenerateUrlTypes(root, appProfile)
             regenerateAppReviewConfig(root, appProfile)
             regenerateAppSecurityConfig(root, appProfile)
@@ -436,7 +461,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         fun writeIfPresent(rel: String, value: String) {
             if (value.isBlank()) return
             val f = File(root, rel)
-            if (!f.parentFile.exists()) return
+            if (!ensureMetadataParent(f)) return
             f.writeText(nl(value))
             logger.lifecycle("syncForkConfig: wrote $rel")
             written++
@@ -446,7 +471,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // that must exist so Fastlane / Deliver don't fall back to stale content)
         fun writeAlways(rel: String, value: String) {
             val f = File(root, rel)
-            if (!f.parentFile.exists()) return
+            if (!ensureMetadataParent(f)) return
             f.writeText(nl(value))
             logger.lifecycle("syncForkConfig: wrote $rel")
             written++
@@ -455,12 +480,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // Locale-scoped metadata writer (G5). Writes `<metaRoot>/<primaryLocale>/<name>` (the fresh,
         // authoritative copy) and ALSO refreshes a pre-existing legacy `<metaRoot>/en-GB/<name>` when
         // it is on disk and differs from the primary locale — back-compat for forks whose Deliver
-        // config still points at en-GB. writeIfPresent already skips a missing parent dir.
+        // config still points at en-GB. The primary-locale dir is created by ensureMetadataParent
+        // (e.g. mac-app-store/metadata ships en-GB but no en-US).
         fun writeLocalized(metaRoot: String, name: String, value: String) {
-            // Ensure the primary-locale dir exists so the listing derives even when the template ships
-            // only a legacy locale (e.g. mac-app-store/metadata has en-GB but no en-US) — otherwise
-            // writeIfPresent skips (parent-dir-missing) and the fork's macOS store name/desc stays blank.
-            if (value.isNotBlank()) File(root, "$metaRoot/$primaryLocale").mkdirs()
             writeIfPresent("$metaRoot/$primaryLocale/$name", value)
             if (primaryLocale != "en-GB" && File(root, "$metaRoot/en-GB").isDirectory) {
                 writeIfPresent("$metaRoot/en-GB/$name", value)
@@ -470,7 +492,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
         // Generate App Store / Mac App Store age-rating JSON from store.ios.age.rating
         fun writeRatingConfig(rel: String) {
             val f = File(root, rel)
-            if (!f.parentFile.exists()) return
+            if (!ensureMetadataParent(f)) return
             f.writeText(
                 """{
   "v1_0": {
@@ -1043,10 +1065,10 @@ abstract class SyncForkConfigTask : DefaultTask() {
 
     /**
      * Emit `AppAccessPoints.policy` — the app-wide network privacy policy — from `network.logging` and
-     * `network.web_cors_proxy`. Every key is optional and absent means the SECURE default (release logs
-     * nothing, no CORS relay), so a fork whose app.yaml predates these keys becomes safer on sync, never
-     * louder. A value that would ship personal data fails the sync instead: release `body` logging, or a
-     * relay that is not https.
+     * `network.web_cors` ([parseWebCors]). Every key is optional: logging defaults to the SECURE choice
+     * (release logs nothing), and web CORS defaults to the site's own same-origin relay `/cors`, which no
+     * third party sees. A value that would ship personal data fails the sync instead: release `body`
+     * logging, or a relay that is neither a same-origin path nor https.
      */
     private fun appendNetworkPolicy(sb: StringBuilder, network: Map<*, *>) {
         val logging = (network["logging"] as? Map<*, *>).orEmpty()
@@ -1071,20 +1093,39 @@ abstract class SyncForkConfigTask : DefaultTask() {
         redact.firstOrNull { !identifier.matches(it) }?.let {
             throw org.gradle.api.GradleException("syncForkConfig: network.logging.redact_query_params entry '$it' is not a query-parameter name.")
         }
-        val proxy = network["web_cors_proxy"]?.toString()?.trim()?.takeIf { it.isNotEmpty() && it != "none" }
-        if (proxy != null && !proxy.startsWith("https://")) {
-            throw org.gradle.api.GradleException("syncForkConfig: network.web_cors_proxy '$proxy' must be an https:// URL (or omitted for no relay).")
-        }
+        val cors = parseWebCors(network)
         fun esc(v: String) = v.replace("\\", "\\\\").replace("\"", "\\\"")
-        sb.append("\n    /** Network privacy policy — app-profile `network.logging` / `network.web_cors_proxy`. */\n")
+        sb.append("\n    /** Network privacy policy — app-profile `network.logging` / `network.web_cors`. */\n")
         sb.append("    val policy: NetworkPolicy = NetworkPolicy(\n")
         sb.append("        releaseLogging = HttpLogDetail.${release.uppercase()},\n")
         sb.append("        debugLogging = HttpLogDetail.${debug.uppercase()},\n")
         if (redact.isNotEmpty()) {
             sb.append("        redactQueryParams = listOf(").append(redact.joinToString(", ") { "\"${esc(it)}\"" }).append("),\n")
         }
-        proxy?.let { sb.append("        webCorsProxy = \"${esc(it)}\",\n") }
+        cors.relay?.let { sb.append("        webCorsProxy = \"${esc(it)}\",\n") }
+        sb.append("        webCorsMode = kpt.core.base.network.WebCorsMode.${cors.mode.uppercase()},\n")
+        if (cors.allowlist.isNotEmpty()) {
+            sb.append("        webCorsAllowlist = listOf(\n")
+            cors.allowlist.forEach { sb.append("            \"${esc(it)}\",\n") }
+            sb.append("        ),\n")
+        }
         sb.append("    )\n")
+    }
+
+    /**
+     * Write `relay-allowlist.json` into both web resource dirs — the hosts the deployed `_worker.js` relays,
+     * the same list [appendNetworkPolicy] gives the app. Written in `direct` mode too (as an empty list), so
+     * a stale file can never keep a relay open. Skipped for a dir that does not exist (no web target).
+     */
+    private fun regenerateRelayAllowlist(appProfile: Map<String, Any?>) {
+        val network = appProfile["network"] as? Map<*, *> ?: return
+        val cors = parseWebCors(network)
+        cors.warnings.forEach { logger.warn("syncForkConfig: $it") }
+        val json = relayAllowlistJson(cors)
+        listOf(jsResourcesDir.get().asFile, wasmJsResourcesDir.get().asFile).filter { it.isDirectory }.forEach {
+            File(it, "relay-allowlist.json").writeText(json)
+        }
+        logger.lifecycle("syncForkConfig: regenerated relay-allowlist.json (mode=${cors.mode}, ${cors.allowlist.size} host(s))")
     }
 
     /** The `network.access_points` list, normalized to maps with a non-blank `id`. Empty when absent. */
@@ -1266,17 +1307,20 @@ abstract class SyncForkConfigTask : DefaultTask() {
         val security = appProfile["security"] as? Map<*, *>
         val allowCapture = screenCaptureAllowedByDefault(security)
         val signedIn = signedInByDefault(security)
+        val onboarding = firstRunOnboarding(security)
 
         val sb = StringBuilder()
         sb.append("// syncForkConfig:app-security:begin — GENERATED from app-profile/app.yaml#security. Do not hand-edit.\n")
         sb.append("    /** `security.screen_capture_allowed_by_default` — whether a fresh install allows screenshots + recording. */\n")
         sb.append("    const val SCREEN_CAPTURE_ALLOWED_BY_DEFAULT: Boolean = ").append(allowCapture).append("\n\n")
         sb.append("    /** `security.signed_in_by_default` — whether a fresh install starts signed in (false = the app has a login). */\n")
-        sb.append("    const val SIGNED_IN_BY_DEFAULT: Boolean = ").append(signedIn).append("\n")
+        sb.append("    const val SIGNED_IN_BY_DEFAULT: Boolean = ").append(signedIn).append("\n\n")
+        sb.append("    /** `security.first_run_onboarding` — whether a fresh install shows onboarding once (false = skip it). */\n")
+        sb.append("    const val FIRST_RUN_ONBOARDING: Boolean = ").append(onboarding).append("\n")
         sb.append("    // syncForkConfig:app-security:end")
 
         if (patchSentinel(file, "// syncForkConfig:app-security:begin", "// syncForkConfig:app-security:end", sb.toString())) {
-            logger.lifecycle("syncForkConfig: regenerated AppSecurityConfig (screenCaptureAllowedByDefault=$allowCapture, signedInByDefault=$signedIn)")
+            logger.lifecycle("syncForkConfig: regenerated AppSecurityConfig (screenCaptureAllowedByDefault=$allowCapture, signedInByDefault=$signedIn, firstRunOnboarding=$onboarding)")
         }
     }
 

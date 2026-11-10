@@ -52,4 +52,7 @@ and `cryptoGraph(navController, coinAction)` are the pattern).
 **`ForkAppShell` owns the root.** `ComposeApp` renders `ForkAppShell.root` inside the theme; a fork with
 its own root (its own login, lock and tab shell) renders it there instead of editing `ComposeApp`. The
 platform locale switch reaches that root through `LocalAppLocaleHandler`, provided around it — so a fork
-language picker can apply a locale the template's `LanguageConfig` does not list.
+language picker can apply a locale the template's `LanguageConfig` does not list. A fork that keeps the
+template's root but needs signed-out screens (sign-in, server setup) installs them through
+`ForkAppShell.rootDestinations`, which `RootNavScreen` adds beside splash and onboarding — outside the
+signed-in graph that `@FeatureDestination` registers onto.

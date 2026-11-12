@@ -959,7 +959,8 @@ sync_directory() {
                     elif { { [ -n "${PREV_TEMPLATE_SHA:-}" ] \
                              && ! git cat-file -e "${PREV_TEMPLATE_SHA}:${conv_f}" 2>/dev/null; } \
                            || [ -z "$(git log -1 --format=%h "$FORK_STATE" -- "$conv_f" 2>/dev/null)" ]; } \
-                         && case "$conv_f" in */schemas/*|*/demo/*|*/demo) false ;; *) true ;; esac \
+                         && case "$conv_f" in */schemas/*|*/demo/*|*/demo) false ;;
+                                *.png|*.webp|*.jpg|*.jpeg|*.gif|*.ico|*.icns) false ;; *) true ;; esac \
                          && ! fork_deleted_dir "$conv_f" \
                          && { owner_of "$conv_f"; [ "$OWNER" = fork ]; }; then
                         # A fork-owned file the template ships for the FIRST time (absent at the last
@@ -973,7 +974,9 @@ sync_directory() {
                         # (mifos-pay synced after ForkWorkerDeclarations.kt shipped, was told it "removed"
                         # it, and never had one). Only a file the fork once had and then deleted is a removal.
                         # Not seeded: a file in a package the fork deleted (fork_deleted_dir), a Room
-                        # schema (the fork's own lineage) or demo code.
+                        # schema (the fork's own lineage), demo code, or an image: a fork-owned image is the
+                        # fork's branding (launcher icons, store screenshots, web preview cards), and seeding
+                        # the template's copy would ship the template's look under the fork's name.
                         print_step "Seeded new fork-owned ${BOLD}$conv_f${NC} from the template"
                     else
                         git rm -f --quiet "$conv_f" 2>/dev/null || rm -f "$conv_f"

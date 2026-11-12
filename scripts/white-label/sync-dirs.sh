@@ -1397,9 +1397,19 @@ if [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] && [ "$DRY_RUN" = false ] \
         if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
             print_warning "sync engine is stale but the tree is dirty — skipping self-update; running the CURRENT engine (commit/clean the tree to auto-update next run)."
         else
-            _su_branch="$(get_sync_branch_name)"
+            # A branch the caller pinned (SYNC_PREBUILT_BRANCH, e.g. a session branch carrying unmerged fork
+            # work) IS the fork's state: the fresh engine is committed onto it and the run stays there.
+            # Cutting a new branch from BASE_BRANCH instead synced the fork's older default branch and
+            # left the caller's work out of the result.
+            if [ -n "${SYNC_PREBUILT_BRANCH:-}" ]; then
+                _su_branch="$SYNC_PREBUILT_BRANCH"; _su_pinned=1
+                _su_checkout=(git checkout "$_su_branch")
+            else
+                _su_branch="$(get_sync_branch_name)"; _su_pinned=0
+                _su_checkout=(git checkout -b "$_su_branch" "$BASE_BRANCH")
+            fi
             print_step "Self-updating the sync engine from the template on ${BOLD}$_su_branch${NC}, then re-running on the latest…"
-            if git checkout -b "$_su_branch" "$BASE_BRANCH" >/dev/null 2>&1; then
+            if "${_su_checkout[@]}" >/dev/null 2>&1; then
                 for _up in "$_self_rel" scripts/customization-surface.sh customization-surface.yaml; do
                     git cat-file -e "$TEMPLATE_REF:$_up" 2>/dev/null || continue
                     mkdir -p "$(dirname "$_up")"
@@ -1408,7 +1418,7 @@ if [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] && [ "$DRY_RUN" = false ] \
                 chmod +x "$_self_rel" scripts/customization-surface.sh 2>/dev/null || true
                 git add "$_self_rel" scripts/customization-surface.sh customization-surface.yaml >/dev/null 2>&1
                 git commit -q -m "chore(sync): self-update engine + merge-protection contract from template" >/dev/null 2>&1 || true
-                SYNC_DIRS_SELF_UPDATED=1 SYNC_PREBUILT_BRANCH="$_su_branch" exec bash "$_self_rel" ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"}
+                SYNC_DIRS_SELF_UPDATED=1 SYNC_BRANCH_PINNED="$_su_pinned" SYNC_PREBUILT_BRANCH="$_su_branch" exec bash "$_self_rel" ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"}
             fi
             print_warning "self-update could not create its branch — proceeding on the CURRENT engine."
         fi
@@ -1437,9 +1447,10 @@ else
     FORK_STATE="$BASE_BRANCH"
 fi
 # The engine deletes a sync branch only when it created it: a fresh one, or the self-update branch.
-# A caller-pinned branch is never deleted.
+# A caller-pinned branch is never deleted, including one the self-update committed the engine onto.
 SYNC_BRANCH_OWNED=true
-if [ -n "${SYNC_PREBUILT_BRANCH:-}" ] && [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ]; then
+if [ -n "${SYNC_PREBUILT_BRANCH:-}" ] \
+   && { [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] || [ "${SYNC_BRANCH_PINNED:-0}" = "1" ]; }; then
     SYNC_BRANCH_OWNED=false
 fi
 

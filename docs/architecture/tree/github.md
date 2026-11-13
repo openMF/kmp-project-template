@@ -1,13 +1,13 @@
 # `.github/`
 
 > **Kind:** GitHub Actions  
-> **Measured:** 16 tracked files — 12× `.yml`, 2× `.yaml`, 1× `.md`, 1× `.properties`
+> **Measured:** 15 tracked files — 11× `.yml`, 2× `.yaml`, 1× `.md`, 1× `.properties`
 
 ## Shape
 
 | Path | Files |
 |---|---:|
-| `.github/workflows/` | 14 |
+| `.github/workflows/` | 13 |
 | (files at the root) | 2 |
 
 ## Workflows
@@ -22,7 +22,6 @@
 | `pr-check.yml` | PR Check |
 | `quality-gate.yml` | Quality Gate |
 | `release-android-only.yml` | Release · Android Only |
-| `release-multi-platform-local.yml` | Release · Multi-Platform (Local Dev · self-hosted) |
 | `release-multi-platform.yml` | Release · Multi-Platform |
 | `rollback.yml` | Rollback |
 | `sync-dirs.yaml` | Sync CMP Directories |
@@ -33,7 +32,7 @@
 
 | Unit | Files | Page |
 |---|---:|---|
-| `.github/workflows/` | 14 | [workflows](github/workflows.md) |
+| `.github/workflows/` | 13 | [workflows](github/workflows.md) |
 
 ## Docs in the tree
 

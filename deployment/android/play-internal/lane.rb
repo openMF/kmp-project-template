@@ -49,6 +49,9 @@ platform :android do
     # highest code live on any Play track + 1). deployInternal is the only Play lane that builds a
     # fresh AAB; promoteToBeta / promote_to_production reuse the uploaded code.
     play_aware_version_code!(variant: variant)
+    # Secrets: `variant.secrets.path(:play_service_account)` resolves through `BuildSecrets`
+    # (live-wins-else-sample); the resolver contains no literal `secrets/` path (D6).
+    play_json_key = File.join(DEPLOYMENT_REPO_ROOT, variant.secrets.path(:play_service_account))
 
     generateVersion(platform: "playstore")
     releaseNotes = generateReleaseNote()

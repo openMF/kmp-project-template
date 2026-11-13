@@ -31,12 +31,16 @@ def google_play_track_version_codes(track:, **)
   raise "boom" if v == :fail
   v
 end
-class File; class << self; alias_method :__orig_exist?, :exist?; def exist?(p) = p.end_with?("play.json") ? $key : __orig_exist?(p); end; end
+$key_body = '{"private_key": "x"}'
+class File; class << self
+  alias_method :__orig_exist?, :exist?; def exist?(p) = p.end_with?("play.json") ? $key : __orig_exist?(p)
+  alias_method :__orig_read, :read;     def read(p, *a) = p.to_s.end_with?("play.json") ? $key_body : __orig_read(p, *a)
+end; end
 eval(method_src)
 
 $fail = 0
-def check(name, want, commits:, tracks: {}, key: true, preset: nil)
-  $commits, $tracks, $key = commits, tracks, key
+def check(name, want, commits:, tracks: {}, key: true, preset: nil, key_body: '{"private_key": "x"}')
+  $commits, $tracks, $key, $key_body = commits, tracks, key, key_body
   ENV["VERSION_CODE_OVERRIDE"] = preset.to_s
   play_aware_version_code!(variant: Variant.new(Secrets.new("play.json")))
   got = ENV["VERSION_CODE_OVERRIDE"].to_i
@@ -49,7 +53,18 @@ check "highest code on closed testing still counts", 507, commits: 10, tracks: {
 check "a failed track query does not stop the others", 214, commits: 1, tracks: { "beta" => :fail, "internal" => [213] }
 check "no Play service account: commit count", 298, commits: 298, key: false
 check "a pre-set VERSION_CODE_OVERRIDE wins", 999, commits: 298, tracks: { "production" => [213] }, preset: 999
+# The Firebase job has no Play credentials: the resolver hands back the sample file, which has no
+# private key. Querying Play with it fails on every track, so it must not be used at all.
+check "sample key without a private key: commit count", 298, commits: 298, tracks: { "production" => [500] }, key_body: '{"type": "service_account"}'
+
+# Each lane must still define every local its Play upload passes. Removing the inline version-code
+# block once dropped `play_json_key`, and the lane died at upload ("Could not find ... play_json_key").
+lane = File.read(ARGV[1])
+used = lane.scan(/json_key:\s+(\w+)/).flatten.uniq
+undefined = used.reject { |v| lane.match?(/^\s*#{v}\s*=/) }
+if undefined.empty? then puts "  ✅ play-internal lane defines every json_key it passes (#{used.join(', ')})"
+else puts "  ❌ play-internal lane passes undefined json_key: #{undefined.join(', ')}"; $fail = 1 end
 puts($fail.zero? ? "version-code-test: PASS" : "version-code-test: FAIL")
 exit $fail
 RUBY
-ruby_exec "$TEST_RB" "$REPO/deployment/_shared/config.rb"
+ruby_exec "$TEST_RB" "$REPO/deployment/_shared/config.rb" "$REPO/deployment/android/play-internal/lane.rb"

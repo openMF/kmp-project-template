@@ -388,7 +388,7 @@ versionCode = max(number of commits in HEAD, highest code live on any Play track
 |---|---|
 | live Play maximum + 1 | the upload is always above what users already have; Play rejects a code that does not let existing users upgrade |
 | every track (production, beta, closed testing, internal) | a higher code on any track blocks an upload just as well |
-| number of commits | Firebase and Play builds of one release get the same code, so a tester's Firebase build can be replaced by the store one |
+| number of commits | both lanes share it, so the Play build of a release is never below its Firebase build and a tester's Firebase install can be replaced by the store one. The Firebase job has no Play credentials, so it uses this number alone. The history is fetched first: the CI checkout holds one commit |
 | `VERSION_CODE_OVERRIDE` set beforehand | wins over both, for iteration runs |
 
 Promotions (internal → closed → beta → production) reuse the uploaded bundle and its code. Promoting a

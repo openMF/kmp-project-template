@@ -280,6 +280,15 @@ jobs:
             echo "✅ Selected Xcode: $LATEST_XCODE ($(xcodebuild -version 2>/dev/null | head -1))"
           fi
         fi
+        # ── Store listing for the listing preflight ──
+        # The listing text is DERIVED from app-profile/ (deployment/**/metadata/**/*.txt is gitignored);
+        # every Fastlane lane regenerates it in before_all with `./gradlew syncForkConfig`. The chain's
+        # listing preflight (job `validate-store-listing`, Play and App Store) runs before any lane, on a
+        # bare checkout, so without this it finds no listing and stops the release. Same task as the
+        # lanes, so the preflight checks exactly what they upload.
+        if [ "${GITHUB_JOB:-}" = validate-store-listing ]; then
+          ./gradlew syncForkConfig -q && echo "✅ Store listing derived from app-profile"
+        fi
         # ── Secrets are materialized into PLATFORM-NAMESPACED dirs (2026-06-22) ──
         #   secrets/live/android/  secrets/live/apple/  secrets/live/apple/  secrets/web/  secrets/shared/
         # Apple ASC key + Match are SHARED by iOS and macOS-desktop → secrets/live/apple/.

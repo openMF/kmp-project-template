@@ -1,7 +1,7 @@
 # `tests/`
 
 > **Kind:** Test fixtures  
-> **Measured:** 29 tracked files — 21× `.sh`, 3× `.pbxproj`, 2× `.ours`, 2× `.theirs`, 1× `.md`
+> **Measured:** 30 tracked files — 22× `.sh`, 3× `.pbxproj`, 2× `.ours`, 2× `.theirs`, 1× `.md`
 
 ## Shape
 
@@ -9,6 +9,7 @@
 |---|---:|
 | `tests/customization-surface/` | 21 |
 | `tests/fixtures/` | 8 |
+| `tests/deployment/` | 1 |
 
 ## Subsections
 

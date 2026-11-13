@@ -1504,6 +1504,39 @@ rescue => e
   UI.important("⚠️ Firebase latest release fetch failed: #{e.message}. Using current build number.")
 end
 
+# ONE Android versionCode per release, shared by every lane that builds an artifact (the Firebase
+# APK and the Play AAB): the larger of the commit count and the highest code live on ANY Play track
+# + 1. Sets VERSION_CODE_OVERRIDE, which generateVersion honors.
+#
+# Both halves matter. The live Play maximum keeps an upload above what users already have (a fork's
+# commit count can sit below the real app's accumulated codes → "existing users can't upgrade").
+# The commit count keeps Firebase and Play on the same number: Firebase alone used the commit count
+# (298) while Play used live max + 1 (214), so a tester holding the Firebase build could not install
+# the Play one. Every track is read, closed testing (alpha) included — a higher code there blocks an
+# upload just as well. A pre-set VERSION_CODE_OVERRIDE still wins (iteration runs, act --env-file).
+def play_aware_version_code!(variant:)
+  preset = ENV["VERSION_CODE_OVERRIDE"].to_s.strip
+  return UI.message("📈 versionCode: VERSION_CODE_OVERRIDE=#{preset} (pre-set)") unless preset.empty?
+
+  commit_count = (sh("git rev-list --count HEAD", log: false).strip.to_i rescue 0)
+  key = File.join(DEPLOYMENT_REPO_ROOT, variant.secrets.path(:play_service_account))
+  live_max = 0
+  if File.exist?(key)
+    pkg = FastlaneConfig::ProjectConfig.android_package_name
+    live_max = %w[production beta alpha internal].flat_map do |track|
+      google_play_track_version_codes(package_name: pkg, track: track, json_key: key)
+    rescue => e
+      UI.important("⚠️ Play track '#{track}' version-code query failed (#{e.message.to_s.lines.first&.strip}); skipping it.")
+      []
+    end.map(&:to_i).max || 0
+  else
+    UI.important("⚠️ No Play service account — versionCode from the commit count only.")
+  end
+  code = [commit_count, live_max + 1].max
+  ENV["VERSION_CODE_OVERRIDE"] = code.to_s if code > 0
+  UI.message("📈 versionCode #{code} = max(commit count #{commit_count}, live Play max #{live_max} + 1)")
+end
+
 # Compute and export VERSION_NAME / VERSION_CODE for Android builds.
 # Must be called before buildAndSignApp so Gradle picks up the injected values.
 def generateVersion(platform: "firebase", **config)

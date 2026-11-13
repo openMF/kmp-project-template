@@ -26,16 +26,19 @@ kotlin {
             implementation(libs.cmp.intent.launcher)
             implementation(libs.cmp.open.url)
             implementation(libs.cmp.inapp.update)
-            // Review, clipboard, app-intents, bubble and PDF. Each resolves the target itself, so
-            // none needs an expect/actual here. All but review are bound in platformModule as the
-            // toolkit's own types rather than behind a template wrapper — see the note there.
+            // Review, app-intents, bubble and PDF. Each resolves the target itself, so none needs an
+            // expect/actual here. All but review are bound in platformModule as the toolkit's own
+            // types rather than behind a template wrapper — see the note there.
             // `api`, not `implementation`: these types appear in this module's PUBLIC signatures —
-            // LocalClipboardManager / LocalBubbleManager / LocalPdfManager / LocalAppIntentsManager
-            // are typed with them, and AppReviewManager.capabilities returns AppReviewCapabilities.
-            // Declared `implementation` they compile here but a consumer reading
-            // `LocalClipboardManager.current` cannot name the type it gets back.
+            // LocalBubbleManager / LocalPdfManager / LocalAppIntentsManager are typed with them, and
+            // AppReviewManager.capabilities returns AppReviewCapabilities. Declared `implementation`
+            // they compile here but a consumer reading `LocalPdfManager.current` cannot name the
+            // type it gets back.
+            // cmp-clipboard is NOT here: its Android manifest ships a `specialUse` foreground service
+            // and a boot receiver (the clipboard monitor) into every app that depends on it, which
+            // Google Play then asks every store release to declare. A fork that wants it adds
+            // `libs.cmp.clipboard` and `clipboardModule()` in its own module.
             api(libs.cmp.app.review)
-            api(libs.cmp.clipboard)
             api(libs.cmp.app.intents)
             api(libs.cmp.bubble)
             api(libs.cmp.pdf.generator)

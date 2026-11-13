@@ -15,7 +15,6 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import com.mobilebytelabs.kmptoolkit.appintents.compose.LocalAppIntentsManager
 import com.mobilebytelabs.kmptoolkit.bubble.Bubble
-import com.mobilebytelabs.kmptoolkit.clipboard.ClipboardManager
 import com.mobilebytelabs.kmptoolkit.pdfgenerator.PdfManager
 import kpt.core.base.platform.context.AppContext
 import kpt.core.base.platform.di.ToolkitQualifier
@@ -62,7 +61,6 @@ fun LocalManagerProvider(
         LocalUrlLauncher provides koinInject(),
         LocalShareManager provides koinInject(),
         LocalAppUpdateManager provides koinInject(),
-        LocalClipboardManager provides koinInject(),
         LocalBubbleManager provides koinInject(),
         LocalPdfManager provides koinInject(),
         // The toolkit's own locals, provided from the SAME graph. They default to constructing a
@@ -156,16 +154,6 @@ val LocalShareManager: ProvidableCompositionLocal<ShareManager> =
 /** Checks for and starts app updates. Provided by [LocalManagerProvider]. */
 val LocalAppUpdateManager: ProvidableCompositionLocal<AppUpdateManager> =
     managerCompositionLocal("LocalAppUpdateManager")
-
-/**
- * Reads and writes the system clipboard, plus history, change observation and URL detection.
- *
- * Typed as the toolkit's `ClipboardManager` rather than a template wrapper — see the note in
- * `platformModule`. The same instance is bound under `Clipboard` for code that wants the
- * substitutable interface instead. Provided by [LocalManagerProvider].
- */
-val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager> =
-    managerCompositionLocal("LocalClipboardManager")
 
 /** Shows floating bubbles, overlays and heads-up UI. Provided by [LocalManagerProvider]. */
 val LocalBubbleManager: ProvidableCompositionLocal<Bubble> =

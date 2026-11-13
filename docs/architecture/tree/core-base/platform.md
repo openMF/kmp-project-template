@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core-base/platform sha=958153c7f9ee4f423cc8ad64396279cc0b79a488 -->
+<!-- api-docs:begin module=core-base/platform sha=3a6afef6a573dfb511a5f6f7a1a9a4bf8ee952aa -->
 ## API reference
 
-_Generated from `core-base/platform` at tree `958153c7f9ee` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core-base/platform` at tree `3a6afef6a573` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **framework-shared and read-only to generators** (D9). Everything below is
@@ -70,11 +70,6 @@ Shares text, URLs, files and images to other apps. Provided by `LocalManagerProv
 val LocalAppUpdateManager: ProvidableCompositionLocal<AppUpdateManager> =
 ```
 Checks for and starts app updates. Provided by `LocalManagerProvider`.
-
-```kotlin
-val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager> =
-```
-Reads and writes the system clipboard, plus history, change observation and URL detection. Typed as the toolkit's `ClipboardManager` rather than a template wrapper — see the note in `platformModule`.
 
 ```kotlin
 val LocalBubbleManager: ProvidableCompositionLocal<Bubble> =
@@ -138,7 +133,7 @@ val ToolkitQualifier = named("kmptoolkit")
 ```
 Qualifier for the toolkit bindings whose simple names collide with the template's own (`ShareManager`, `IntentManager`). Inject them with `koinInject<…>(ToolkitQualifier)`.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:74</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:72</code></summary>
 
 ```kotlin
         // it exists so `rememberShareManager()` and `rememberAppIntentsManager()` resolve to the
@@ -164,7 +159,7 @@ interface GarbageCollectionManager
 ```
 A hint to the platform that now is a reasonable moment to reclaim memory. A HINT, never a guarantee — no runtime here promises to collect on request.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:58</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:57</code></summary>
 
 ```kotlin
 
@@ -192,7 +187,7 @@ class GarbageCollectionManagerImpl(
 ```
 Default `GarbageCollectionManager`: forwards to the platform `garbageCollector` on `dispatcher`, keeping a single in-flight job so repeated calls coalesce instead of queueing pauses.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:58</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:57</code></summary>
 
 ```kotlin
 
@@ -213,7 +208,7 @@ interface IntentManager
 ```
 Asks the OS for a specific system screen or document flow, and reports what came back. ## Scope — system intents ONLY This interface used to also carry `launchUri` and the `share*` family, which conflated three different acts.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:145</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:143</code></summary>
 
 ```kotlin
 
@@ -237,7 +232,7 @@ class IntentManagerImpl : IntentManager
 ```
 The one `IntentManager`, for every target. `cmp-intent-launcher` carries the per-target `actual`s, so there is no source-set split here.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:66</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:65</code></summary>
 
 ```kotlin
     single<UrlLauncher> { UrlLauncherImpl() }
@@ -278,7 +273,7 @@ interface AppReviewManager
 ```
 Manages application review requests across platforms. This interface abstracts the platform-specific implementations for requesting user reviews of the application.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:141</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:139</code></summary>
 
 ```kotlin
 
@@ -304,7 +299,7 @@ class AppReviewManagerImpl : AppReviewManager
 ```
 The single implementation of `AppReviewManager`, for every target. Replaces the previous androidMain/nonAndroidMain pair.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:82</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:81</code></summary>
 
 ```kotlin
     // the global `AppReview` object directly, so nothing needs the toolkit's binding. A fork that
@@ -325,7 +320,7 @@ interface ShareManager
 ```
 Hands content to the platform share chooser.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:153</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:151</code></summary>
 
 ```kotlin
 
@@ -352,7 +347,7 @@ class ShareManagerImpl : ShareManager
 ```
 The one `ShareManager`, for every target. `cmp-share` carries the per-target `actual`s.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:65</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:64</code></summary>
 
 ```kotlin
     // in the toolkit engines they delegate to — so `single` is safe.
@@ -373,7 +368,7 @@ interface AppUpdateManager
 ```
 In-app update check, with real behaviour on every target.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:157</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:155</code></summary>
 
 ```kotlin
 
@@ -381,8 +376,8 @@ In-app update check, with real behaviour on every target.
 val LocalAppUpdateManager: ProvidableCompositionLocal<AppUpdateManager> =
     managerCompositionLocal("LocalAppUpdateManager")
 
-/**
- * Reads and writes the system clipboard, plus history, change observation and URL detection.
+/** Shows floating bubbles, overlays and heads-up UI. Provided by [LocalManagerProvider]. */
+val LocalBubbleManager: ProvidableCompositionLocal<Bubble> =
 ```
 
 </details>
@@ -417,7 +412,7 @@ class AppUpdateManagerImpl(
 ```
 The one `AppUpdateManager`, for every target. There is deliberately no `androidMain` / `nonAndroidMain` split: `cmp-in-app-update` carries the per-target `actual`s.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:71</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:70</code></summary>
 
 ```kotlin
     // resolves the target itself, so there is no Activity to hold and nothing per-platform
@@ -438,7 +433,7 @@ interface UrlLauncher
 ```
 Opens a URL in whatever the platform considers the right handler.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:149</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/LocalManagerProviders.kt:147</code></summary>
 
 ```kotlin
 
@@ -464,7 +459,7 @@ class UrlLauncherImpl : UrlLauncher
 ```
 The one `UrlLauncher`, for every target. `cmp-open-url` carries the per-target `actual`s, so there is no source-set split here.
 
-<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:64</code></summary>
+<details><summary>Used in the template — <code>core-base/platform/src/commonMain/kotlin/kpt/core/base/platform/di/PlatformModule.kt:63</code></summary>
 
 ```kotlin
     // without reaching into composition. All three are stateless — the per-target behaviour lives
@@ -480,5 +475,5 @@ The one `UrlLauncher`, for every target. `cmp-open-url` carries the per-target `
 
 ---
 
-_15 type(s), 33 function(s)/property(ies); 48 carry KDoc at source; 0 authored example(s); 18 live call site(s)._
+_15 type(s), 32 function(s)/property(ies); 47 carry KDoc at source; 0 authored example(s); 18 live call site(s)._
 <!-- api-docs:end -->

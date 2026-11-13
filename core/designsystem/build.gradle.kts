@@ -26,7 +26,7 @@ kotlin {
             // `api`, and deliberately from here: core:platform api-exposes core-base:platform, and
             // every feature module already receives core:designsystem from CMPFeatureConventionPlugin.
             // Routing it through this module means a feature can read the platform CompositionLocals
-            // — LocalShareManager, LocalUrlLauncher, LocalClipboardManager, LocalPdfManager and the
+            // — LocalShareManager, LocalUrlLauncher, LocalPdfManager, LocalBubbleManager and the
             // rest — without declaring anything, and without adding another line to the convention
             // plugin for every capability the toolkit grows.
             //

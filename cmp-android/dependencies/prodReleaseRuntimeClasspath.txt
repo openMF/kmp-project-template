@@ -388,8 +388,6 @@ io.github.mobilebytelabs:cmp-app-review-android:3.5.34
 io.github.mobilebytelabs:cmp-app-review:3.5.34
 io.github.mobilebytelabs:cmp-bubble-android:3.5.34
 io.github.mobilebytelabs:cmp-bubble:3.5.34
-io.github.mobilebytelabs:cmp-clipboard-android:3.5.34
-io.github.mobilebytelabs:cmp-clipboard:3.5.34
 io.github.mobilebytelabs:cmp-deep-link-android:3.5.34
 io.github.mobilebytelabs:cmp-deep-link:3.5.34
 io.github.mobilebytelabs:cmp-firebase-android:3.5.34

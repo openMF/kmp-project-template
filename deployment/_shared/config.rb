@@ -1033,11 +1033,17 @@ def ensure_testflight_store_config(app_identifier:, config: nil, locale: nil)
   UI.user_error!("No ASC API token — call load_api_key before ensure_testflight_store_config") unless Spaceship::ConnectAPI.token
 
   # ── 1. Verify the app record exists (fail-fast, clear guidance) ──
+  # A lookup that FAILS is not an app that is missing: report Apple's own message. Folding the two
+  # together sent a "required agreement is missing or has expired" account block to "create the app
+  # record", which is the wrong fix.
   app = begin
     Spaceship::ConnectAPI::App.find(app_identifier)
   rescue => e
-    UI.important("⚠️  ASC app lookup flaked: #{e.message.to_s.lines.first&.strip}")
-    nil
+    UI.user_error!(
+      "App Store Connect lookup for '#{app_identifier}' failed: #{e.message.to_s.lines.first&.strip}. " \
+      "If it names an agreement, the account holder must accept it in App Store Connect → Business " \
+      "(or developer.apple.com → Account), then re-run.",
+    )
   end
   UI.user_error!(
     "App '#{app_identifier}' not found on App Store Connect. Create the app record " \

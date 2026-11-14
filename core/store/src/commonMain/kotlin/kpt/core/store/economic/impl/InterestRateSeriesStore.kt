@@ -24,6 +24,7 @@ import kpt.core.base.store.infra.DefaultValidator
 import kpt.core.base.store.infra.StoreFactory
 import kpt.core.database.economic.InterestRateSeriesDao
 import kpt.core.database.economic.InterestRateSeriesEntity
+import kpt.core.model.economic.FredApiKeyMissingException
 import kpt.core.model.economic.InterestRateSeries
 import kpt.core.model.economic.RateObservation
 import kpt.core.network.fred.api.FredApi
@@ -57,12 +58,8 @@ fun provideInterestRateSeriesStore(
     val validator = DefaultValidator.withTtl<InterestRateSeries>(AppStoreRegistry.Ttl.INTEREST_RATE_SERIES)
     return StoreFactory.createStore(
         fetcher = Fetcher.of { key: InterestRateSeriesKey ->
-            val apiKey = config.apiKey
-                ?: error(
-                    "FRED_API_KEY is not configured — supply a key via FredApiConfig " +
-                        "before requesting interest-rate data. See CLAUDE.md " +
-                        "→ \"First-time fork setup\".",
-                )
+            // Typed so screens can show "not configured" instead of a retry that cannot succeed.
+            val apiKey = config.apiKey ?: throw FredApiKeyMissingException()
             val today = Clock.System.todayIn(TimeZone.UTC)
             val start = today.minus(key.days, DateTimeUnit.DAY)
             networkMonitor.executeWithRetry(

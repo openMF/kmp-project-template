@@ -173,6 +173,7 @@ internal fun RateRowCard(
                 state = state,
                 onRetry = onRetry,
                 modifier = Modifier.fillMaxSize(),
+                error = { FredErrorContent(it, onRetry) },
             ) { series, _ ->
                 RateRowContent(
                     series = series,

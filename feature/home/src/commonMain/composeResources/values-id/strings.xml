@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">Pasar koin</string>
     <string name="screens_home_tool_crypto_subtitle">Harga kripto langsung dan daftar pantau</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">Kunci API FRED belum dikonfigurasi</string>
 </resources>

@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">目前</string>
     <string name="screens_rates_detail_source_label">來源：%1$s</string>
     <string name="screens_rates_detail_observations_label">觀測值</string>
+    <string name="screens_rates_fred_key_missing">未設定 FRED API 金鑰</string>
 </resources>

@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">Marchés des cryptos</string>
     <string name="screens_home_tool_crypto_subtitle">Cours crypto en direct et liste de suivi</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">Clé API FRED non configurée</string>
 </resources>

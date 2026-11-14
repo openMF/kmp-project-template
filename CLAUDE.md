@@ -172,20 +172,18 @@ the path that matches your team:
 B7 Interest Rate Tracker + B8 Country Macro Snapshot screens:
 
 1. Sign up: https://fred.stlouisfed.org/docs/api/api_key.html (30 seconds)
-2. Provide the key one of two ways:
-   - **Path A:** add `FRED_API_KEY=<your-key>` to `local.properties` (gitignored,
-     matches the KMP ecosystem convention) — no shared env bundle needed.
-   - **Path B:** run `/secrets request mifos_x_fred_api_key` from a
-     project-bound session; the framework opens a vault PR proposing the
-     new alias row. After it merges, `/secrets pull` materializes it.
-3. Wire it into Koin in your fork's app module:
-   ```kotlin
-   single { FredApiConfig(apiKey = System.getenv("FRED_API_KEY")) }
-   ```
-   (Or load via BuildKonfig / Gradle property — whichever your fork prefers.)
+2. The key is already declared: the `fred` access point in `app-profile/app.yaml`
+   carries `api_key_env: FRED_API_KEY`, and `syncForkConfig` generates
+   `BuildKonfig.FRED_API_KEY` in `core/network` (already wired into `FredApiConfig`).
+   At build time it is read from, in order:
+   - the `FRED_API_KEY` env var (CI),
+   - `secrets/live/fred/api_key` (`secrets/LAYOUT.yaml#fred_api_key` — CI decrypts the
+     vault there; **Path B:** `/secrets pull` materializes it locally),
+   - `FRED_API_KEY=<your-key>` in `local.properties` (**Path A**, gitignored).
 
-Leave the key unset and the FRED-backed screens render an explicit "FRED key
-not configured" empty state rather than crashing.
+Leave the key unset (the committed `secrets/sample/fred/api_key` is empty) and the
+FRED-backed screens render an explicit "FRED API key not configured" notice — no retry
+button, since retrying cannot succeed — rather than a generic error.
 
 **World Bank Open Data** — no setup. Fully open API.
 

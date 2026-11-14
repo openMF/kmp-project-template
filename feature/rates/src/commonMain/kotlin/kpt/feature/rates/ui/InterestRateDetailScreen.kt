@@ -113,6 +113,7 @@ internal fun InterestRateDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
+            error = { FredErrorContent(it, viewModel::onRetry) },
         ) { series, _ ->
             val sp = MaterialTheme.spacing
             Column(

@@ -1478,8 +1478,8 @@ abstract class SyncForkConfigTask : DefaultTask() {
      * SoT as the reference, so the two cannot drift.
      *
      * Sources: every access point's `publishable_key_env:` / `api_key_env:`, plus `network.build_config_fields`
-     * for keys not tied to an endpoint. Names already declared OUTSIDE the region (the demo
-     * `FRED_API_KEY`) are skipped — a duplicate `buildConfigField` fails the buildkonfig plugin.
+     * for keys not tied to an endpoint. Names already declared OUTSIDE the region are skipped — a
+     * duplicate `buildConfigField` fails the buildkonfig plugin.
      */
     private fun regenerateBuildKonfigFields(root: File, appProfile: Map<String, Any?>) {
         val file = File(root, "core/network/build.gradle.kts")

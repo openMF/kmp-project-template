@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">幣種行情</string>
     <string name="screens_home_tool_crypto_subtitle">即時加密貨幣價格與自選</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">未設定 FRED API 金鑰</string>
 </resources>

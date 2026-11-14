@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">الحالي</string>
     <string name="screens_rates_detail_source_label">المصدر: %1$s</string>
     <string name="screens_rates_detail_observations_label">الملاحظات</string>
+    <string name="screens_rates_fred_key_missing">لم يتم تكوين مفتاح FRED API</string>
 </resources>

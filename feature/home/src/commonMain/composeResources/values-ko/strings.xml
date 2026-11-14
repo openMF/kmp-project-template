@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">코인 시장</string>
     <string name="screens_home_tool_crypto_subtitle">실시간 암호화폐 시세와 관심 목록</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">FRED API 키가 구성되지 않았습니다</string>
 </resources>

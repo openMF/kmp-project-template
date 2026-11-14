@@ -165,6 +165,10 @@ TEMPLATE_MODULE_FILES=$(for pair in database:database data:data model:model core
 done)
 
 # ── 3. Strip every `// demo:begin … // demo:end` block ────────────────────────────────
+# A demo-fenced secrets/LAYOUT.yaml row has a committed secrets/sample/<rel> fake; read the rels before
+# the fence goes, or the fork keeps an orphan sample for a secret it no longer declares.
+DEMO_SAMPLES=$(awk '/demo:begin/{s=1} /demo:end/{s=0} s && /^[[:space:]]*rel:/{sub(/.*rel:[[:space:]]*/,""); sub(/[[:space:]].*$/,""); print}' \
+  secrets/LAYOUT.yaml 2>/dev/null || true)
 echo "strip marked blocks:"
 while IFS= read -r f; do
   [ -z "$f" ] && continue
@@ -173,6 +177,11 @@ while IFS= read -r f; do
     awk '/demo:begin/{skip=1} /demo:end/{skip=0; next} !skip' "$f" > "$f.tmp" && mv "$f.tmp" "$f"
   fi
 done <<< "$MARKED_FILES"
+while IFS= read -r rel; do
+  [ -z "$rel" ] || [ ! -e "secrets/sample/$rel" ] && continue
+  say "rm secrets/sample/$rel  (demo secret)"
+  [ "$APPLY" -eq 1 ] && rm -f "secrets/sample/$rel" && rmdir -p "$(dirname "secrets/sample/$rel")" 2>/dev/null || true
+done <<< "$DEMO_SAMPLES"
 
 # ── 3b. Remove dangling demo imports left in surviving files by the block strip ───────
 #     (an `import kpt.core.<m>.demo.…` or `import kpt.feature.<demoFeature>.…` whose target

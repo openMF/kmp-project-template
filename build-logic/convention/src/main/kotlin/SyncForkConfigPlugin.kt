@@ -1472,40 +1472,36 @@ abstract class SyncForkConfigTask : DefaultTask() {
 
     /**
      * Project every `network.build_config_fields` row that names a `secret_alias:` into the
-     * `syncForkConfig:fork-secrets` region of `secrets/LAYOUT.yaml`, as a `kind: value` row.
+     * `syncForkConfig:fork-secrets` region of `secrets/fork-layout.yaml`, as a `kind: value` row.
      *
-     * WHY. LAYOUT is template-owned, so a fork could not add a row — and without one a fork's
-     * build_config_fields value was read from env / local.properties ONLY: never in the generated
-     * secrets-manifest, so `/secrets pull` never materialized it and the release workflow (which
-     * decrypts LAYOUT's `vault_alias` rows into secrets/live/) never delivered it, so a CI release
-     * compiled the field as "" with nothing reporting it. One row here
-     * and every downstream reader already works: `vault_plan` materializes it, `needs-generate` lists
-     * its alias (rows carry `fork_build_config: true`), and [regenerateBuildKonfigFields] emits the
-     * `readSecretValue()` read for it.
+     * WHY. Without a LAYOUT row a fork's build_config_fields value was read from env / local.properties
+     * ONLY: never in the generated secrets-manifest, so `/secrets pull` never materialized it and the
+     * release workflow (which decrypts `vault_alias` rows into secrets/live/) never delivered it, so a
+     * CI release compiled the field as "" with nothing reporting it. The row goes in fork-layout.yaml —
+     * FORK-owned, so a sync never touches it — not LAYOUT.yaml, which is template-owned and replaced on
+     * every sync. Every reader merges the two: `BuildSecrets.load_layout` (vault_plan, export_paths),
+     * `needs-generate` (rows carry `fork_build_config: true`), and [layoutValueKeysByEnv], so
+     * [regenerateBuildKonfigFields] emits the `readSecretValue()` read for it.
      *
-     * A source_env a TEMPLATE row already declares is skipped — the template row wins (FRED).
+     * A source_env LAYOUT.yaml already declares is skipped — the template row wins (FRED) — as is one
+     * the fork hand-declared outside the region. A fork with no such row gets no region: the file is
+     * the fork's, so it is only touched when there is something to write.
      */
     private fun regenerateForkSecretRows(root: File, appProfile: Map<String, Any?>) {
-        val file = File(root, "secrets/LAYOUT.yaml")
-        if (!file.isFile) return
+        val file = File(root, "secrets/fork-layout.yaml")
+        val layout = File(root, "secrets/LAYOUT.yaml")
         val begin = "  # syncForkConfig:fork-secrets:begin"
         val end = "  # syncForkConfig:fork-secrets:end"
-        // A fork synced before the region existed has no sentinels yet; open them at the top of `secrets:`.
-        if (!file.readText().contains(begin)) {
-            val text = file.readText()
-            val at = Regex("(?m)^secrets:[ \\t]*\\n").find(text) ?: return
-            file.writeText(text.substring(0, at.range.last + 1) + "$begin\n$end\n" + text.substring(at.range.last + 1))
-        }
-        val text = file.readText()
-        val outside = text.substringBefore(begin) + text.substringAfter(end)
-        val templateEnvs = Regex("""source_env:\s*([A-Z0-9_]+)""").findAll(outside).map { it.groupValues[1] }.toSet()
+        val envRe = Regex("""source_env:\s*([A-Z0-9_]+)""")
+        val current = if (file.isFile) file.readText() else ""
+        val handWritten = if (current.contains(begin)) current.substringBefore(begin) + current.substringAfter(end) else current
+        val declaredEnvs = (envRe.findAll(handWritten) + envRe.findAll(if (layout.isFile) layout.readText() else ""))
+            .map { it.groupValues[1] }.toSet()
 
         val valid = Regex("^[A-Z][A-Z0-9_]*$")
         val alias = Regex("^[a-z0-9][a-z0-9-]*$")
         val network = (appProfile["network"] as? Map<*, *>).orEmpty()
-        val body = buildString {
-            append(begin).append(" — GENERATED from app-profile `network.build_config_fields[].secret_alias`.\n")
-            append("  # DO NOT HAND-EDIT — declare the alias in app-profile and re-run `./gradlew syncForkConfig`.\n")
+        val rows = buildString {
             for (row in (network["build_config_fields"] as? List<*>) ?: emptyList<Any?>()) {
                 val m = row as? Map<*, *> ?: continue
                 val name = m["name"]?.toString()?.trim()?.takeIf { valid.matches(it) } ?: continue
@@ -1516,7 +1512,7 @@ abstract class SyncForkConfigTask : DefaultTask() {
                         "syncForkConfig: network.build_config_fields '$name' has secret_alias '$a' — a vault alias is kebab-case.",
                     )
                 }
-                if (env in templateEnvs) continue
+                if (env in declaredEnvs) continue
                 val key = env.lowercase()
                 append("  ").append(key).append(":\n")
                 append("    hint: \"app-profile network.build_config_fields → ").append(name).append("\"\n")
@@ -1527,11 +1523,24 @@ abstract class SyncForkConfigTask : DefaultTask() {
                 append("    rel: build-config/").append(key).append('\n')
                 append("    fork_build_config: true\n")
             }
+        }
+        if (!current.contains(begin)) {
+            if (rows.isEmpty()) return
+            // Open the region at the top of `secrets:` — turning the shipped empty `secrets: {}` into a block map.
+            val base = current.ifEmpty { "secrets: {}\n" }.replace(Regex("(?m)^secrets:[ \\t]*\\{\\s*\\}[ \\t]*$"), "secrets:")
+            val at = Regex("(?m)^secrets:[ \\t]*\\n").find(base) ?: return
+            file.parentFile.mkdirs()
+            file.writeText(base.substring(0, at.range.last + 1) + "$begin\n$end\n" + base.substring(at.range.last + 1))
+        }
+        val body = buildString {
+            append(begin).append(" — GENERATED from app-profile `network.build_config_fields[].secret_alias`.\n")
+            append("  # DO NOT HAND-EDIT — declare the alias in app-profile and re-run `./gradlew syncForkConfig`.\n")
+            append(rows)
             append(end)
         }
         val before = file.readText()
         patchSentinel(file, begin, end, body)
-        if (file.readText() != before) logger.lifecycle("syncForkConfig: regenerated secrets/LAYOUT.yaml fork-secrets rows")
+        if (file.readText() != before) logger.lifecycle("syncForkConfig: regenerated secrets/fork-layout.yaml fork-secrets rows")
     }
 
     /**
@@ -1793,21 +1802,26 @@ abstract class SyncForkConfigTask : DefaultTask() {
      * carry — the code never hardcodes either value. Null (no block / no file) disables the rewrite.
      */
     /**
-     * `source_env -> key` for every `kind: value` secret in `secrets/LAYOUT.yaml` that has a `rel:` and no
-     * `by_flavor` — the rows the resolver's `export-paths` map resolves to a single file. Empty when the
-     * file is missing or unparsable, so the generated fields fall back to env + local.properties.
+     * `source_env -> key` for every `kind: value` secret in `secrets/LAYOUT.yaml` plus the fork's
+     * `secrets/fork-layout.yaml` that has a `rel:` and no `by_flavor` — the rows the resolver's
+     * `export-paths` map resolves to a single file. LAYOUT is read first, so a template row wins, as in
+     * `BuildSecrets.load_layout`. Empty when neither file parses, so the generated fields fall back to
+     * env + local.properties.
      */
     private fun layoutValueKeysByEnv(root: File): Map<String, String> {
-        val f = File(root, "secrets/LAYOUT.yaml")
-        if (!f.isFile) return emptyMap()
-        val doc = runCatching { f.inputStream().use { Yaml().load<Any?>(it) } }.getOrNull() as? Map<*, *>
-            ?: return emptyMap()
         val out = LinkedHashMap<String, String>()
-        for ((key, spec) in (doc["secrets"] as? Map<*, *>).orEmpty()) {
-            val s = spec as? Map<*, *> ?: continue
-            if (s["kind"] != "value" || s["rel"] == null || s["by_flavor"] != null) continue
-            val env = s["source_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
-            out.putIfAbsent(env, key.toString())
+        val keys = HashSet<String>()
+        for (path in listOf("secrets/LAYOUT.yaml", "secrets/fork-layout.yaml")) {
+            val f = File(root, path)
+            if (!f.isFile) continue
+            val doc = runCatching { f.inputStream().use { Yaml().load<Any?>(it) } }.getOrNull() as? Map<*, *> ?: continue
+            for ((key, spec) in (doc["secrets"] as? Map<*, *>).orEmpty()) {
+                if (!keys.add(key.toString())) continue
+                val s = spec as? Map<*, *> ?: continue
+                if (s["kind"] != "value" || s["rel"] == null || s["by_flavor"] != null) continue
+                val env = s["source_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
+                out.putIfAbsent(env, key.toString())
+            }
         }
         return out
     }

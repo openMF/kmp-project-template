@@ -47,7 +47,8 @@ build — resolves through that layout rather than hardcoding a path, so moving 
 **A fork's own build-time keys still go through the layout — via app-profile, not a hand edit.**
 `LAYOUT.yaml` is template-owned, so a fork never edits it. A `network.build_config_fields` row that
 names a `secret_alias:` is projected by `syncForkConfig` into the generated `syncForkConfig:fork-secrets`
-region as a `kind: value` row (`fork_build_config: true`). That one row is what every reader needs:
+region of the fork-owned `secrets/fork-layout.yaml` as a `kind: value` row (`fork_build_config: true`),
+which every reader merges on top of `LAYOUT.yaml`. That one row is what every reader needs:
 `needs-generate` lists the alias in `secrets-manifest.yaml` (so `/secrets pull` materialises it), the
 release workflow's `vault_plan` decrypts it into `secrets/live/build-config/`, and the generated
 `BuildKonfig` field reads it with `readSecretValue()`. Without `secret_alias:` the field is read from

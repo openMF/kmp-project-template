@@ -23,17 +23,17 @@ module BuildSecrets
   # <repo>/deployment/_shared/lib/build_secrets.rb → three dirs up to the repo root.
   REPO_ROOT = File.expand_path("../../..", __dir__)
   LAYOUT    = File.join(REPO_ROOT, "secrets", "LAYOUT.yaml")
-  # The fork's own secret rows (its client keys, its extra service files) — FORK-owned, so a sync never
-  # touches it. LAYOUT.yaml is template-owned and replaced on every sync, which deleted any row a fork
-  # added there. Rows here are ADDED to the template's; a key the template already declares is ignored
-  # (with a warning) so a fork cannot silently redirect a template secret.
-  FORK_LAYOUT = File.join(REPO_ROOT, "secrets", "fork-layout.yaml")
-
-  # LAYOUT.yaml with the fork's rows from fork-layout.yaml added.
-  def self.load_layout
-    doc = YAML.load_file(LAYOUT)
-    return doc unless File.exist?(FORK_LAYOUT)
-    fork_rows = (YAML.load_file(FORK_LAYOUT) || {})["secrets"] || {}
+  # LAYOUT.yaml with the fork's rows from secrets/fork-layout.yaml added. That file holds the fork's own
+  # secret rows (its client keys, its extra service files, syncForkConfig's generated build-config rows) —
+  # FORK-owned, so a sync never touches it. LAYOUT.yaml is template-owned and replaced on every sync, which
+  # deleted any row a fork added there. Rows here are ADDED to the template's; a key the template already
+  # declares is ignored (with a warning) so a fork cannot silently redirect a template secret.
+  def self.load_layout(root = REPO_ROOT)
+    doc = YAML.load_file(File.join(root, "secrets", "LAYOUT.yaml"))
+    fork = File.join(root, "secrets", "fork-layout.yaml")
+    return doc unless File.exist?(fork)
+    doc["secrets"] ||= {}
+    fork_rows = (YAML.load_file(fork) || {})["secrets"] || {}
     fork_rows.each do |key, row|
       if doc["secrets"].key?(key)
         warn "build_secrets: secrets/fork-layout.yaml '#{key}' ignored — LAYOUT.yaml already declares it"
@@ -489,7 +489,7 @@ module BuildSecrets
         end
       end
       # Fork build-config secrets: syncForkConfig projects app-profile `network.build_config_fields[].secret_alias`
-      # into LAYOUT as `fork_build_config: true` rows. No target's secrets-needs.yaml can name them (those files
+      # into secrets/fork-layout.yaml (merged into +doc+ by load_layout) as `fork_build_config: true` rows. No target's secrets-needs.yaml can name them (those files
       # are template-owned), so they are needed by declaration — without this the alias never reached the
       # manifest, `/secrets pull` never materialized it, and a release build compiled the field as "".
       (doc["secrets"] || {}).each_value do |s|
@@ -510,7 +510,7 @@ module BuildSecrets
     # Validate every target and write — or with check: true, only compare — the root manifest. Returns
     # the repo-relative paths that are out of date; legacy (v1) targets are collected into +legacy+.
     def run(check: false, root: REPO_ROOT, legacy: [])
-      doc = YAML.load_file(File.join(root, "secrets", "LAYOUT.yaml"))
+      doc = BuildSecrets.load_layout(root)
       want = manifest(doc, root, legacy)
       path = File.join(root, MANIFEST)
       return [] if want.nil? || (File.exist?(path) && File.read(path) == want)
@@ -521,7 +521,7 @@ module BuildSecrets
     # TSV for scripts/secrets/_lib.sh — one target's manual inputs (canonical, hint, gha, placeholder) or
     # vault rows (alias, canonical): the columns its awk parsers emitted from stored blocks. nil = v1 file.
     def expand_tsv(path, kind, root = REPO_ROOT)
-      doc = YAML.load_file(File.join(root, "secrets", "LAYOUT.yaml"))
+      doc = BuildSecrets.load_layout(root)
       a = authored(path, root) or return nil
       rows, manual = expand(doc, a["needs"], path.sub("#{root}/", ""))
       un = lambda { |v| v.to_s.sub(/\A"(.*)"\z/m, '\1') }

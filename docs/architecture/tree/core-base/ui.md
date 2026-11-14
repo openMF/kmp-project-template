@@ -215,7 +215,7 @@ fun DashboardProgressBar(
 ```
 Top-of-dashboard **freshness** strip: shows *when* the data was last loaded — "Updated 5m ago" — NOT a "2 of 4 loaded" count.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:184</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:191</code></summary>
 
 ```kotlin
         // It shows a subtle "Loading…" bar until the first card has data and hides once
@@ -236,7 +236,7 @@ data class DashboardProgressState(
 ```
 Aggregate progress snapshot for a multi-card dashboard.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:190</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:197</code></summary>
 
 ```kotlin
                 state.rates,
@@ -967,16 +967,16 @@ fun DefaultEmptyContent(
 ```
 The framework's empty rendering — for a successful read that returned nothing. Distinct from error on purpose: "no results" is a valid outcome, and showing a retry affordance for it invites the user to retry something that already worked.
 
-<details><summary>Used in the template — <code>core-base/ui/src/commonMain/kotlin/kpt/core/base/ui/dashboard/IndependentCardLayout.kt:103</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:566</code></summary>
 
 ```kotlin
-                        { empty(index) }
-                    } else {
-                        { DefaultEmptyContent() }
-                    },
-                    noNetwork = if (noNetwork != null) {
-                        { captive -> noNetwork(index, captive) }
-                    } else {
+                // No FRED key is a setup gap, not a failure: a retry button here could never succeed.
+                if (error is FredApiKeyMissingException) {
+                    DefaultEmptyContent(
+                        modifier = Modifier.testTag(TestTags.Home.RATES_FRED_KEY_MISSING),
+                        config = LocalScreenStateDefaults.current.empty.copy(
+                            visual = ScreenStateVisual.Vector(Icons.Default.Key),
+                            message = stringResource(Res.string.screens_home_rates_fred_key_missing),
 ```
 
 </details>
@@ -1005,16 +1005,16 @@ fun DefaultErrorContent(
 ```
 The framework's error rendering, with the retry affordance wired to the screen's stream.
 
-<details><summary>Used in the template — <code>feature/showcase/src/commonMain/kotlin/kpt/feature/showcase/stategallery/StateGalleryScreen.kt:183</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:574</code></summary>
 
 ```kotlin
-
-            PreviewBox(label = stringResource(Res.string.screens_showcase_state_gallery_preview_error)) {
-                DefaultErrorContent(
-                    error = RuntimeException("Demo error: server unreachable"),
-                    onRetry = {},
-                    modifier = Modifier.fillMaxWidth().height(280.dp),
-                )
+                    )
+                } else {
+                    DefaultErrorContent(error, onRetry)
+                }
+            },
+        ) { rates, _ ->
+            Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
 ```
 
 </details>
@@ -1175,16 +1175,16 @@ sealed interface ScreenStateVisual
 ```
 Visual element for empty/error/no-network states. Sealed: extend by adding a new variant here and a branch in `ScreenStateVisualRenderer`.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/config/KptScreenStateDefaults.kt:86</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:569</code></summary>
 
 ```kotlin
-            loading = ScreenStateLoading.Skeleton(rowCount = 5),
-            empty = ScreenStateEmpty(
-                visual = ScreenStateVisual.Lottie(spec = DefaultLottieAnimations.empty),
-                title = emptyTitle,
-                message = emptyMessage,
-            ),
-            error = ScreenStateError(
+                        modifier = Modifier.testTag(TestTags.Home.RATES_FRED_KEY_MISSING),
+                        config = LocalScreenStateDefaults.current.empty.copy(
+                            visual = ScreenStateVisual.Vector(Icons.Default.Key),
+                            message = stringResource(Res.string.screens_home_rates_fred_key_missing),
+                        ),
+                    )
+                } else {
 ```
 
 </details>
@@ -1202,16 +1202,16 @@ CompositionLocalProvider(LocalScreenStateDefaults provides myDefaults) { App() }
 
 </details>
 
-<details><summary>Used in the template — <code>feature/showcase/src/commonMain/kotlin/kpt/feature/showcase/stategallery/StateGalleryScreen.kt:70</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:568</code></summary>
 
 ```kotlin
-fun StateGalleryScreen(onBackClick: () -> Unit, modifier: Modifier = Modifier) {
-    val sp = MaterialTheme.spacing
-    val defaults = LocalScreenStateDefaults.current
-    KptScaffold(
-        onNavigationIconClick = onBackClick,
-        title = "State Gallery (dev)",
-        modifier = modifier.testTag(TestTags.StateGallery.SCREEN),
+                    DefaultEmptyContent(
+                        modifier = Modifier.testTag(TestTags.Home.RATES_FRED_KEY_MISSING),
+                        config = LocalScreenStateDefaults.current.empty.copy(
+                            visual = ScreenStateVisual.Vector(Icons.Default.Key),
+                            message = stringResource(Res.string.screens_home_rates_fred_key_missing),
+                        ),
+                    )
 ```
 
 </details>

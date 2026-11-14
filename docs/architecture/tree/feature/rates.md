@@ -1,9 +1,9 @@
 # `feature/rates/`
 
 > Part of [`feature/`](../feature.md)  
-> **Measured:** 38 tracked files — 20× `.xml`, 16× `.kt`, 1× `.md`, 1× `.kts`
+> **Measured:** 39 tracked files — 20× `.xml`, 17× `.kt`, 1× `.md`, 1× `.kts`
 
-**16 Kotlin files** — 2 screen(s), 2 ViewModel(s).
+**17 Kotlin files** — 2 screen(s), 2 ViewModel(s).
 
 Screens: `InterestRateDetailScreen`, `InterestRatesScreen`
 
@@ -29,10 +29,10 @@ The point is the **4-way fan-in**: one slow or failing series must not blank the
 series means extending `RateSeriesCatalog.kt`; no client change is needed, which is the seam a fork
 exercises when it points the feature at its own data.
 
-<!-- api-docs:begin module=feature/rates sha=82c1d6694a3adc301549235bdd3f7a92e150d8ee -->
+<!-- api-docs:begin module=feature/rates sha=681d39f05c53be0813c73b5fef9923c6ba7a6579 -->
 ## API reference
 
-_Generated from `feature/rates` at tree `82c1d6694a3a` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/rates` at tree `681d39f05c53` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published
@@ -135,8 +135,9 @@ Append-only test-tag registry for the interest-rates feature. Consumed by: - Com
 
 - `const val RATES_SCROLL: String = "rates_scroll"` — The root vertically-scrollable `Column` that hosts the four rate-row cards. Always rendered regardless of per-row `ScreenState` — suitable as the stable root assertion node in Compose UI tests.
 - `const val DETAIL_ROOT: String = "rate_detail_root"` — The root `Scaffold` surface of the detail screen. Tagged via the `modifier` parameter so it is always in the composition tree irrespective of the current `ScreenState` (Loading / Error / Content).
+- `const val FRED_KEY_MISSING: String = "rates_fred_key_missing"` — Shown in place of a rate when the build has no FRED key — a setup gap, not a failure to retry.
 
 ---
 
-_7 type(s), 6 function(s)/property(ies); 13 carry KDoc at source; 0 authored example(s); 2 live call site(s)._
+_7 type(s), 7 function(s)/property(ies); 14 carry KDoc at source; 0 authored example(s); 2 live call site(s)._
 <!-- api-docs:end -->

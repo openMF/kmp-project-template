@@ -1,7 +1,7 @@
 # `feature/`
 
 > **Kind:** Kotlin Multiplatform module group  
-> **Measured:** 699 tracked files — 363× `.xml`, 264× `.kt`, 31× `.png`, 18× `.kts`, 16× `.md`
+> **Measured:** 700 tracked files — 363× `.xml`, 265× `.kt`, 31× `.png`, 18× `.kts`, 16× `.md`
 
 ## Shape
 
@@ -13,7 +13,7 @@
 | `feature/macro/` | 44 |
 | `feature/bills/` | 42 |
 | `feature/onboarding/` | 41 |
-| `feature/rates/` | 38 |
+| `feature/rates/` | 39 |
 | `feature/currency-rates/` | 37 |
 | `feature/crypto/` | 36 |
 | `feature/home/` | 36 |
@@ -45,7 +45,7 @@
 | `feature:macro` | 22 Kotlin files — [guide](feature/macro.md) |
 | `feature:onboarding` | 9 Kotlin files — [guide](feature/onboarding.md) |
 | `feature:profile` | 10 Kotlin files — [guide](feature/profile.md) |
-| `feature:rates` | 16 Kotlin files — [guide](feature/rates.md) |
+| `feature:rates` | 17 Kotlin files — [guide](feature/rates.md) |
 | `feature:settings` | 31 Kotlin files — [guide](feature/settings.md) |
 | `feature:showcase` | 9 Kotlin files — [guide](feature/showcase.md) |
 | `feature:watchlist` | 9 Kotlin files — [guide](feature/watchlist.md) |
@@ -68,7 +68,7 @@
 | `feature/macro/` | 44 | [macro](feature/macro.md) |
 | `feature/onboarding/` | 41 | [onboarding](feature/onboarding.md) |
 | `feature/profile/` | 35 | [profile](feature/profile.md) |
-| `feature/rates/` | 38 | [rates](feature/rates.md) |
+| `feature/rates/` | 39 | [rates](feature/rates.md) |
 | `feature/settings/` | 76 | [settings](feature/settings.md) |
 | `feature/showcase/` | 31 | [showcase](feature/showcase.md) |
 | `feature/watchlist/` | 31 | [watchlist](feature/watchlist.md) |

@@ -56,7 +56,7 @@ fun KptAreaChart(
 ```
 Filled area chart for the detail-screen Hero. Same geometry contract as `KptSparkline` but adds a gradient fill under the line via `ChartTokens.areaFillBrush`.
 
-<details><summary>Used in the template — <code>feature/rates/src/commonMain/kotlin/kpt/feature/rates/ui/InterestRateDetailScreen.kt:182</code></summary>
+<details><summary>Used in the template — <code>feature/rates/src/commonMain/kotlin/kpt/feature/rates/ui/InterestRateDetailScreen.kt:183</code></summary>
 
 ```kotlin
     AppCard {
@@ -127,7 +127,7 @@ fun KptSparkline(
 ```
 Minimal Canvas-based sparkline — a one-pass connected polyline whose y-axis is normalized to the series's own `[min, max]` range. No external chart dependency.
 
-<details><summary>Used in the template — <code>feature/rates/src/commonMain/kotlin/kpt/feature/rates/ui/InterestRatesScreen.kt:231</code></summary>
+<details><summary>Used in the template — <code>feature/rates/src/commonMain/kotlin/kpt/feature/rates/ui/InterestRatesScreen.kt:232</code></summary>
 
 ```kotlin
         }
@@ -210,7 +210,7 @@ fun RateBadge(delta: String, direction: RateDirection, modifier: Modifier = Modi
 ```
 Compact rate-change indicator — directional icon + percentage / delta text, both colored from `MaterialTheme.finance` (rateUp / rateDown / rateFlat). Renders inside a tinted container so it reads as a single visual unit.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:721</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:742</code></summary>
 
 ```kotlin
         )
@@ -231,7 +231,7 @@ enum class RateDirection
 ```
 Direction of a rate / price / metric change relative to the prior period.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:564</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:585</code></summary>
 
 ```kotlin
                         rates.fedFundsPercent.formatDecimal(2),
@@ -252,7 +252,7 @@ fun SectionHeader(
 ```
 Section header — title (+ optional supporting text) + optional trailing action button. Use to break dashboards into scannable groups (Loans, Bills, Rates, Currencies).
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:200</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:207</code></summary>
 
 ```kotlin
 

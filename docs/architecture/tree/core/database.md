@@ -641,7 +641,7 @@ interface InterestRateSeriesDao
 ```
 Data-access object for the `interest_rate_series` table. All reads return reactive `Flow`s; all writes are `suspend` one-shots.
 
-<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/economic/impl/InterestRateSeriesStore.kt:55</code></summary>
+<details><summary>Used in the template — <code>core/store/src/commonMain/kotlin/kpt/core/store/economic/impl/InterestRateSeriesStore.kt:56</code></summary>
 
 ```kotlin
     config: FredApiConfig,

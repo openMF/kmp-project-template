@@ -2,11 +2,11 @@
 
 > **Layer:** core — fork-owned; a codegen target
 > **Corpus surface:** `CORE_MODEL.md`
-> **Measured:** 29 Kotlin files, 3 test files
+> **Measured:** 30 Kotlin files, 3 test files
 
 ## Principal types
 
-`AlertDirection`, `AmortizationBreakdown`, `AmortizationRow`, `AppOrgLinks`, `AppPrivacyConfig`, `AppSecurityConfig`, `AuthState`, `BillCategory`, `BillReminder`, `CloudTodo`, `CoinDetail`, `CoinMarket`, `Country`, `CountryFlagUtils`  …and 22 more
+`AlertDirection`, `AmortizationBreakdown`, `AmortizationRow`, `AppOrgLinks`, `AppPrivacyConfig`, `AppSecurityConfig`, `AuthState`, `BillCategory`, `BillReminder`, `CloudTodo`, `CoinDetail`, `CoinMarket`, `Country`, `CountryFlagUtils`  …and 23 more
 
 <!-- scaffold:end -->
 
@@ -14,10 +14,10 @@
 
 _Authored prose below this marker is preserved by the scaffolder._
 
-<!-- api-docs:begin module=core/model sha=850b7bd3b6c0898018df172cc0b65621769c2496 -->
+<!-- api-docs:begin module=core/model sha=650afa053037bfc91610cd586850a0d4fd1478b2 -->
 ## API reference
 
-_Generated from `core/model` at tree `850b7bd3b6c0` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `core/model` at tree `650afa053037` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 ### `core/model/src/commonMain/kotlin/kpt/core/model/alerts/PriceAlert.kt`
@@ -504,6 +504,27 @@ internal fun CountryRow(country: Country, onClick: () -> Unit) {
 
 </details>
 
+### `core/model/src/commonMain/kotlin/kpt/core/model/economic/FredApiKeyMissingException.kt`
+
+```kotlin
+class FredApiKeyMissingException : IllegalStateException(
+```
+The build has no FRED developer key, so no interest-rate series can be fetched. A setup gap, not a failure: retrying cannot succeed, so screens render it as an explicit "not configured" notice rather than a generic error with a retry button.
+
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:565</code></summary>
+
+```kotlin
+            error = { error ->
+                // No FRED key is a setup gap, not a failure: a retry button here could never succeed.
+                if (error is FredApiKeyMissingException) {
+                    DefaultEmptyContent(
+                        modifier = Modifier.testTag(TestTags.Home.RATES_FRED_KEY_MISSING),
+                        config = LocalScreenStateDefaults.current.empty.copy(
+                            visual = ScreenStateVisual.Vector(Icons.Default.Key),
+```
+
+</details>
+
 ### `core/model/src/commonMain/kotlin/kpt/core/model/economic/InterestRateSeries.kt`
 
 ```kotlin
@@ -511,15 +532,14 @@ data class InterestRateSeries(
 ```
 Domain representation of an interest-rate time series sourced from FRED (Federal Reserve Economic Data). The default consumer is the Banking Utility Toolkit's "B7 Interest Rate Tracker" screen.
 
-<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeDashboardViewModelTest.kt:227</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonTest/kotlin/kpt/feature/home/demo/ui/HomeDashboardUiTest.kt:91</code></summary>
 
 ```kotlin
         key: InterestRateSeriesKey,
         scope: CoroutineScope,
     ): ScreenDataStream<InterestRateSeries> = screenDataStreamForTesting(
-        state = MutableStateFlow(ScreenState.Loading),
-        refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 64)
-            .also { trigger -> trigger.onEach {}.launchIn(scope) },
+        state = MutableStateFlow(ScreenState.Error(FredApiKeyMissingException())),
+        refreshTrigger = MutableSharedFlow(extraBufferCapacity = 64),
     )
 ```
 
@@ -763,5 +783,5 @@ Domain model for a personal-watchlist row (the `read_local_list` demo).
 
 ---
 
-_37 type(s), 22 function(s)/property(ies); 51 carry KDoc at source; 1 authored example(s); 34 live call site(s)._
+_38 type(s), 22 function(s)/property(ies); 52 carry KDoc at source; 1 authored example(s); 35 live call site(s)._
 <!-- api-docs:end -->

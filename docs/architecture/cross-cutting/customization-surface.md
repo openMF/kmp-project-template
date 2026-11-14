@@ -278,6 +278,15 @@ recorded the latest base while hundreds of their `core-base` files matched OLDER
 Every failure is now recorded, and if any occurred the engine names them, leaves the previous marker,
 and exits before committing.
 
+### `--only` stays inside its items
+
+A targeted sync (`--only deployment`) is partial by definition, so it never stamps `.template-version`
+and never runs the demo strip — the strip sweeps the whole fork and runs the fork's own
+`scripts/remove-demo.sh`, which is stale unless `scripts` was among the items. On mbs/reels-downloader
+a `--only deployment` run did both: a pre-lineage-guard strip deleted 153 files, including the entities
+and migration spec of tables its live database still held. A full sync (or `--post-sync`) re-applies the
+strip with the current script. Proof: `scripts/product-health/tests/sync-dirs-only-scope-canary/`.
+
 ### A conflicted merge never reaches a commit
 
 A `merge`-owned file whose 3-way merge left markers used to be reported ("resolve markers before

@@ -338,8 +338,14 @@ migrate_base() {
 #   2. `./gradlew syncForkConfig` — every app-profile projection (access points, BuildKonfig fields,
 #      identity, icons) regenerated from the fork's app-profile/
 # Either failing stops the sync before it commits: the tree would not be the fork's.
+# Under --only the strip is SKIPPED: it sweeps the whole fork, not the synced items, and it runs the fork's
+# own scripts/remove-demo.sh — stale unless `scripts` was synced. mbs/reels-downloader `--only deployment`
+# (2026-11-14) ran a pre-lineage-guard copy and deleted 153 files, incl. the entities and migration spec of
+# tables its live v15 database still held. A full sync (or --post-sync) re-applies the strip.
 post_sync_fork_steps() {
-    if [ -f app-profile/package-ledger.yaml ] && grep -q 'status: removed' app-profile/package-ledger.yaml \
+    if [ -n "$ONLY_ITEMS" ]; then
+        print_warning "--only: demo strip skipped (it sweeps the whole fork); a full sync re-applies it"
+    elif [ -f app-profile/package-ledger.yaml ] && grep -q 'status: removed' app-profile/package-ledger.yaml \
        && [ -f scripts/remove-demo.sh ]; then
         print_step "Re-applying the fork's demo strip (app-profile/package-ledger.yaml records it)"
         bash scripts/remove-demo.sh --apply --no-format --no-regen >/dev/null \
@@ -1739,6 +1745,11 @@ if [ "$DRY_RUN" = false ]; then
         print_error ".template-version NOT advanced (still the last COMPLETE sync). Fix the failures and re-run; nothing was committed."
         exit 1
     fi
+    # --only is partial by definition: the tree holds the new ref for the named items only, so stamping it
+    # would make the next full sync's 3-way base claim template changes the fork never received.
+    if [ -n "$ONLY_ITEMS" ]; then
+        print_warning "--only: .template-version NOT advanced (the tree only holds ${SYNC_DIRS[*]} ${SYNC_FILES[*]} at the new ref)"
+    else
     print_step "Recording template sync version (.template-version)..."
     _tv_sha="$(git rev-parse "$TEMPLATE_REF" 2>/dev/null || echo "")"
     _tv_tag="$(git describe --tags --exact-match "$_tv_sha" 2>/dev/null || echo "")"
@@ -1753,6 +1764,7 @@ if [ "$DRY_RUN" = false ]; then
         echo "synced_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     } > .template-version
     git add .template-version 2>/dev/null || true
+    fi
     show_progress
 
     # Conflicts: every path DID sync, so the stamp above is right for the tree once the markers are

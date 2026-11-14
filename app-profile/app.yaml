@@ -33,6 +33,11 @@ network:
   #   build_config_fields:
   #     - name: MY_ANALYTICS_KEY      # the BuildKonfig constant
   #       from_env: MY_ANALYTICS_KEY  # env var / local.properties key (defaults to `name`)
+  #       secret_alias: <proj>-my-analytics-key  # vault alias — syncForkConfig adds a secrets/LAYOUT.yaml row, so
+  #                                   #   /secrets pull + the release workflow materialize it (without one, only
+  #                                   #   env / local.properties are read and a CI release compiles "")
+  #       required_in_release: true   # fail a RELEASE build when the value is blank …
+  #       required_prefix: pk_        # … or does not start with this (optional)
   build_config_fields: []
   demo_base_url: https://demo.example.com   # PLACEHOLDER — fork sets its demo endpoint
   prod_base_url: https://api.example.com     # PLACEHOLDER — fork sets its prod endpoint

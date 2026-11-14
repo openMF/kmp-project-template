@@ -488,6 +488,17 @@ module BuildSecrets
           rows << "  - alias: #{al}"
         end
       end
+      # Fork build-config secrets: syncForkConfig projects app-profile `network.build_config_fields[].secret_alias`
+      # into LAYOUT as `fork_build_config: true` rows. No target's secrets-needs.yaml can name them (those files
+      # are template-owned), so they are needed by declaration — without this the alias never reached the
+      # manifest, `/secrets pull` never materialized it, and a release build compiled the field as "".
+      (doc["secrets"] || {}).each_value do |s|
+        next unless s.is_a?(Hash) && s["fork_build_config"] == true
+        al = s["vault_alias"].to_s
+        next if al.empty? || seen[al]
+        seen[al] = true
+        rows << "  - alias: #{al}"
+      end
       return nil if rows.empty?
       pid = project_id(doc, root)
       # default_vault is the ORG namespace (one vault per org). /secrets-sync refuses a manifest without it

@@ -44,5 +44,16 @@ framework-managed project runs `/secrets pull`, which materialises from a SOPS+a
 canonical paths declared in `secrets/LAYOUT.yaml`. Every consumer — Fastlane, the workflows, the dev
 build — resolves through that layout rather than hardcoding a path, so moving a secret is one edit.
 
+**A fork's own build-time keys still go through the layout — via app-profile, not a hand edit.**
+`LAYOUT.yaml` is template-owned, so a fork never edits it. A `network.build_config_fields` row that
+names a `secret_alias:` is projected by `syncForkConfig` into the generated `syncForkConfig:fork-secrets`
+region as a `kind: value` row (`fork_build_config: true`). That one row is what every reader needs:
+`needs-generate` lists the alias in `secrets-manifest.yaml` (so `/secrets pull` materialises it), the
+release workflow's `vault_plan` decrypts it into `secrets/live/build-config/`, and the generated
+`BuildKonfig` field reads it with `readSecretValue()`. Without `secret_alias:` the field is read from
+the env var / `local.properties` only, and a CI release compiles it as `""`. Add
+`required_in_release: true` (and optionally `required_prefix:`) to make a release build fail instead;
+`product-health` NAP-15 checks all of this stays generated.
+
 **A value must never reach a transcript or a log.** Metadata always suffices to prove materialisation:
 `test -f`, `wc -c`, `shasum`. If a check appears to need the value itself, the check is wrong.

@@ -1545,6 +1545,13 @@ end
 # Compute and export VERSION_NAME / VERSION_CODE for Android builds.
 # Must be called before buildAndSignApp so Gradle picks up the injected values.
 def generateVersion(platform: "firebase", **config)
+  # An explicit release version wins. cmp-android reads `versionName = System.getenv("VERSION") ?:
+  # project.dynamicVersion` — so when the caller pinned VERSION (the release's tag), reckon must not
+  # second-guess it: on a just-tagged HEAD with a dirty tree it reckons the NEXT pre-release
+  # (2026.11.15-beta.0.0 for a 2026.11.14 release), and versionFile overwrites version.txt with it.
+  pinned = ENV["VERSION"].to_s.strip
+  return export_android_version!(pinned, "VERSION (pinned)") unless pinned.empty?
+
   # Give reckon the full tag history. The CI checkout is shallow, so without this reckon can't
   # see the release tags and versionFile falls back to 0.0.1 / 1.0.0 inconsistently. Best-effort:
   # a fresh clone may already be complete (--unshallow then errors → tolerated). (2026-06-22 fix)
@@ -1561,6 +1568,13 @@ def generateVersion(platform: "firebase", **config)
   end
   version_name = VersionHelpers.gradle_version
   UI.important("⚠️ versionName fell back to '#{version_name}' — reckon/versionFile did not produce version.txt; check git tag history in CI.") if %w[1.0.0 0.0.0].include?(version_name)
+  export_android_version!(version_name, "reckon")
+end
+
+# Exports the versionName/versionCode for the Gradle build. VERSION is the one the build READS
+# (cmp-android `System.getenv("VERSION")`); `-PVERSION_NAME` is not consulted, so exporting only
+# VERSION_NAME let the lane log one name while the AAB carried another.
+def export_android_version!(version_name, source)
   # VERSION_CODE_OVERRIDE: pre-set ENV (e.g. by act --env-file) wins over
   # git-rev-list. Lets iteration runs bump past the last successful upload
   # without a real git commit on the source repo each time.
@@ -1571,10 +1585,11 @@ def generateVersion(platform: "firebase", **config)
                    sh("git rev-list --count HEAD 2>/dev/null || echo 1").strip.to_i rescue 1
                  end
 
+  ENV["VERSION"] = version_name
   ENV["VERSION_NAME"] = version_name
   ENV["VERSION_CODE"] = version_code.to_s
 
-  UI.message("📦 Version: #{version_name} (#{version_code})")
+  UI.message("📦 Version: #{version_name} (#{version_code}) — from #{source}")
   { version_name: version_name, version_code: version_code }
 end
 

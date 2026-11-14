@@ -11,6 +11,9 @@ import com.android.build.api.instrumentation.InstrumentationScope
 import org.convention.dynamicVersion
 import org.convention.resolveSecretPath
 import java.util.Properties
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 plugins {
     alias(libs.plugins.android.application.convention)
@@ -177,6 +180,39 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
 
     testImplementation(libs.koin.test.junit4)
+}
+
+// INTERIM — AGP 9.4.0 rejects app-bundle entries containing ':' ("Entry name contains invalid
+// characters: root/META-INF/<group>:<artifact>.kotlin_module" at buildPreBundle). Kotlin 2.4 records a
+// library's module name as "group:artifact", and R8 writes a .kotlin_module under that name for every
+// library whose Kotlin metadata it KEEPS — so a fork that keeps a library wholesale in
+// proguard-rules.pro (`-keep class pkg.** { *; }`) breaks its Play bundle; the template, which keeps
+// none, does not. Rename ':' → '_' in R8's output, the exact name Kotlin itself publishes.
+// Remove when R8 sanitizes the name (https://issuetracker.google.com/issues/543685256) or every
+// wholesale-kept library publishes a colon-free module name.
+tasks.matching { it.name.startsWith("minify") && it.name.endsWith("WithR8") }.configureEach {
+    doLast {
+        outputs.files.asFileTree.matching { include("**/*.jar") }.forEach { jar ->
+            val needsFix = ZipFile(jar).use { zip ->
+                zip.entries().asSequence().any { it.name.endsWith(".kotlin_module") && ':' in it.name }
+            }
+            if (!needsFix) return@forEach
+            val tmp = File(jar.parentFile, "${jar.name}.tmp")
+            ZipFile(jar).use { zip ->
+                ZipOutputStream(tmp.outputStream()).use { out ->
+                    val seen = mutableSetOf<String>()
+                    zip.entries().asSequence().forEach { entry ->
+                        val name = if (entry.name.endsWith(".kotlin_module")) entry.name.replace(':', '_') else entry.name
+                        if (!seen.add(name)) return@forEach
+                        out.putNextEntry(ZipEntry(name))
+                        zip.getInputStream(entry).use { it.copyTo(out) }
+                        out.closeEntry()
+                    }
+                }
+            }
+            check(jar.delete() && tmp.renameTo(jar)) { "kotlin_module rename failed for $jar" }
+        }
+    }
 }
 
 dependencyGuard {

@@ -54,12 +54,18 @@ platform :android do
     play_json_key = File.join(DEPLOYMENT_REPO_ROOT, variant.secrets.path(:play_service_account))
 
     generateVersion(platform: "playstore")
-    releaseNotes = generateReleaseNote()
-
-    # Write release notes into Play Store metadata before upload.
-    buildConfigPath = "metadata/android/en-US/changelogs/default.txt"
-    FileUtils.mkdir_p(File.dirname(buildConfigPath))
-    File.write(buildConfigPath, releaseNotes)
+    # Release notes: the AUTHORED changelog (app-profile android.changelog → syncForkConfig →
+    # metadata/<locale>/changelogs/default.txt) is what Play shows, so it wins. Git-derived notes are
+    # only a fallback, written to the SAME metadata_path upload_to_play_store reads below. (The old
+    # relative path resolved under deployment/fastlane/metadata/ — a file nothing uploaded — so a
+    # fork's unedited 'YOUR_APP_CHANGELOG …' placeholder went to the store instead.)
+    changelogPath = File.join(DEPLOYMENT_REPO_ROOT, "deployment/android/metadata/en-US/changelogs/default.txt")
+    authored = File.exist?(changelogPath) ? File.read(changelogPath).strip : ""
+    if authored.empty? || authored.match?(/YOUR_APP_CHANGELOG|See store\.release_notes/i)
+      UI.important("⚠️ No authored Play changelog (app-profile android.changelog is empty or a placeholder) — using git-derived notes.")
+      FileUtils.mkdir_p(File.dirname(changelogPath))
+      File.write(changelogPath, generateReleaseNote())
+    end
 
     # AC32 FIX — Play needs AAB, not APK. `variant.bundle_task` = `bundle{Flavor}{BuildType}`.
     # Empty `buildType` because the task name is already fully resolved.

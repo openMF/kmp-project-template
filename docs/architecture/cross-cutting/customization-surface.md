@@ -236,7 +236,9 @@ when a `template`/`merge` path is reachable by none of `SYNC_DIRS`, `SYNC_FILES`
 the fork never had, so the template's copy lands as its seed, even in a directory that is new too
 (`cmp/android/app/fork/ForkAndroidHooks.kt`, which `AndroidApp.onCreate` calls). It is dropped only
 when the fork deleted the package it sits in, the nearest directory the template already shipped.
-Room schemas and demo code are never seeded. Proof: `tests/customization-surface/seam-seed-test.sh`.
+Room schemas, demo code and images are never seeded: a fork-owned image is the fork's branding (launcher
+icons, store screenshots, web preview cards), and the template's copy would ship the template's look under
+the fork's name. Proof: `tests/customization-surface/seam-seed-test.sh`.
 
 The fork-owned seams inside the shells are `ForkWorkerDeclarations.kt` (cmp-shared) and `registry/**`
 (cmp-navigation).
@@ -275,6 +277,15 @@ The marker is the 3-way base for the next sync, so it must state what the tree f
 recorded the latest base while hundreds of their `core-base` files matched OLDER template versions.
 Every failure is now recorded, and if any occurred the engine names them, leaves the previous marker,
 and exits before committing.
+
+### `--only` stays inside its items
+
+A targeted sync (`--only deployment`) is partial by definition, so it never stamps `.template-version`
+and never runs the demo strip — the strip sweeps the whole fork and runs the fork's own
+`scripts/remove-demo.sh`, which is stale unless `scripts` was among the items. On mbs/reels-downloader
+a `--only deployment` run did both: a pre-lineage-guard strip deleted 153 files, including the entities
+and migration spec of tables its live database still held. A full sync (or `--post-sync`) re-applies the
+strip with the current script. Proof: `scripts/product-health/tests/sync-dirs-only-scope-canary/`.
 
 ### A conflicted merge never reaches a commit
 

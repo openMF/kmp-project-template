@@ -9,7 +9,8 @@
 #   AppUrlTypes.kt            the UrlType vocabulary     (NAP-3)
 #   di/GeneratedApiBindings.kt the Koin bindings         (NAP-4)
 #   AppAccessPoints.kt `supabase =`  each Supabase point's publishable key (NAP-5 spec · NAP-6 no committed key)
-#   core/network/build.gradle.kts  the BuildKonfig fields (NAP-8 every referenced field is declared)
+#   core/network/build.gradle.kts  the BuildKonfig fields (NAP-8 every referenced field is declared ·
+#                                  NAP-15 a `secret_alias` field has its fork-layout row + read + release check)
 #   core/network/<id>/             the per-endpoint package  (NAP-9 exists · NAP-10 supabase id=ref)
 #   cmp-web/src/*Main/resources/relay-allowlist.json  the web CORS relay allowlist (NAP-14)
 #
@@ -426,6 +427,48 @@ Dir.glob(File.join(net_dir, "**/*.kt")).sort.each do |f|
   hits = src.scan(/^\s*(restApi|supabaseApi)(?:<[^>]+>)?\("([^"]+)"\)/)
   hits.each do |dsl, id|
     fail = bad("❌ NAP-7 hand-wired #{dsl}(\"#{id}\") in #{f.sub(net_dir + '/', '')}\n     → annotate the API type `@ApiBinding(\"#{id}\")`; the binding is generated")
+  end
+end
+
+# ── NAP-15 — a build_config_fields secret reaches the build, and a release cannot ship it blank ──
+# A field with `secret_alias:` must have its generated secrets/fork-layout.yaml row (else /secrets pull and
+# the release workflow never deliver it) and a readSecretValue() read in the buildkonfig region (else
+# only env / local.properties are consulted). `required_in_release: true` must have its generated
+# release check. Missing any of the three, a CI release build compiles the field as "" silently.
+# LAYOUT.yaml plus the fork's secrets/fork-layout.yaml (where syncForkConfig writes the rows), merged
+# template-first exactly as BuildSecrets.load_layout does.
+read_layout = lambda do |path|
+  doc = File.exist?(path) ? (YAML.respond_to?(:unsafe_load) ? YAML.unsafe_load(File.read(path)) : YAML.load(File.read(path))) : nil
+  doc.is_a?(Hash) && doc["secrets"].is_a?(Hash) ? doc["secrets"] : {}
+rescue StandardError
+  {}
+end
+secrets_dir = File.join(ENV["HEALTH_ROOT"].to_s, "secrets")
+layout_rows = read_layout.call(ENV["NAP_LAYOUT"].to_s.empty? ? File.join(secrets_dir, "LAYOUT.yaml") : ENV["NAP_LAYOUT"])
+# A generated fork row inside LAYOUT.yaml is a fork value in a template-owned file: the next sync deletes it.
+layout_rows.each do |k, v|
+  next unless v.is_a?(Hash) && v["fork_build_config"] == true
+  fail = bad("❌ NAP-15 secrets/LAYOUT.yaml carries the fork's generated row #{k} — it belongs in secrets/fork-layout.yaml (LAYOUT is template-owned)")
+end
+read_layout.call(ENV["NAP_FORK_LAYOUT"].to_s.empty? ? File.join(secrets_dir, "fork-layout.yaml") : ENV["NAP_FORK_LAYOUT"])
+  .each { |k, v| layout_rows[k] = v unless layout_rows.key?(k) }
+Array(profile.dig("network", "build_config_fields")).each do |f|
+  next unless f.is_a?(Hash) && f["name"].to_s.strip != ""
+  name = f["name"].to_s.strip
+  env = f["from_env"].to_s.strip.empty? ? name : f["from_env"].to_s.strip
+  al = f["secret_alias"].to_s.strip
+  unless al.empty?
+    key, row = layout_rows.find { |_k, s| s.is_a?(Hash) && s["source_env"].to_s == env }
+    if row.nil? || row["vault_alias"].to_s.empty?
+      fail = bad("❌ NAP-15 build_config_fields #{name} names secret_alias #{al} but neither secrets/LAYOUT.yaml nor secrets/fork-layout.yaml has a row for #{env}")
+    elsif row["fork_build_config"] == true && row["vault_alias"].to_s != al
+      fail = bad("❌ NAP-15 secrets/fork-layout.yaml row for #{env} carries vault_alias #{row['vault_alias']}, app-profile says #{al}")
+    elsif bk_src && !bk_src.include?("readSecretValue(\"#{key}\")")
+      fail = bad("❌ NAP-15 #{name} has a LAYOUT row (#{key}) but core/network/build.gradle.kts never reads it (readSecretValue)")
+    end
+  end
+  if f["required_in_release"] == true && bk_src && !bk_src.match?(/check\([^\n]*\)\s*\{\s*\n\s*"#{Regexp.escape(name)} is blank/)
+    fail = bad("❌ NAP-15 #{name} is required_in_release but core/network/build.gradle.kts has no release check for it")
   end
 end
 

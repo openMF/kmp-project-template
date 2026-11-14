@@ -18,13 +18,13 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `feature/` | 699 | [`feature/`](tree/feature.md) |
+| `feature/` | 700 | [`feature/`](tree/feature.md) |
 
 ## Core layers
 
 | Area | Files | Page |
 |---|---:|---|
-| `core/` | 455 | [`core/`](tree/core.md) |
+| `core/` | 456 | [`core/`](tree/core.md) |
 | `core-base/` | 510 | [`core-base/`](tree/core-base.md) |
 
 ## Codegen
@@ -40,14 +40,14 @@
 |---|---:|---|
 | `app-profile/` | 163 | [`app-profile/`](tree/app-profile.md) |
 | `gradle/` | 5 | [`gradle/`](tree/gradle.md) |
-| `secrets/` | 55 | [`secrets/`](tree/secrets.md) |
+| `secrets/` | 56 | [`secrets/`](tree/secrets.md) |
 
 ## Build, release, CI
 
 | Area | Files | Page |
 |---|---:|---|
 | `deployment/` | 174 | [`deployment/`](tree/deployment.md) |
-| `.github/` | 16 | [`.github/`](tree/github.md) |
+| `.github/` | 15 | [`.github/`](tree/github.md) |
 | `fastlane/` | 4 | [`fastlane/`](tree/fastlane.md) |
 | `fastlane-config/` | 1 | [`fastlane-config/`](tree/fastlane-config.md) |
 | `legal/` | 6 | [`legal/`](tree/legal.md) |
@@ -56,9 +56,9 @@
 
 | Area | Files | Page |
 |---|---:|---|
-| `scripts/` | 500 | [`scripts/`](tree/scripts.md) |
+| `scripts/` | 566 | [`scripts/`](tree/scripts.md) |
 | `sync/` | 16 | [`sync/`](tree/sync.md) |
-| `tests/` | 27 | [`tests/`](tree/tests.md) |
+| `tests/` | 30 | [`tests/`](tree/tests.md) |
 
 ## Other
 

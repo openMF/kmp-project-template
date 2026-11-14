@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">ปัจจุบัน</string>
     <string name="screens_rates_detail_source_label">แหล่งที่มา: %1$s</string>
     <string name="screens_rates_detail_observations_label">ค่าที่สังเกตได้</string>
+    <string name="screens_rates_fred_key_missing">ยังไม่ได้กำหนดค่าคีย์ FRED API</string>
 </resources>

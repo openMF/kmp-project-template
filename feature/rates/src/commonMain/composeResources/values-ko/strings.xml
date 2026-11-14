@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">현재</string>
     <string name="screens_rates_detail_source_label">출처: %1$s</string>
     <string name="screens_rates_detail_observations_label">관측값</string>
+    <string name="screens_rates_fred_key_missing">FRED API 키가 구성되지 않았습니다</string>
 </resources>

@@ -338,8 +338,14 @@ migrate_base() {
 #   2. `./gradlew syncForkConfig` — every app-profile projection (access points, BuildKonfig fields,
 #      identity, icons) regenerated from the fork's app-profile/
 # Either failing stops the sync before it commits: the tree would not be the fork's.
+# Under --only the strip is SKIPPED: it sweeps the whole fork, not the synced items, and it runs the fork's
+# own scripts/remove-demo.sh — stale unless `scripts` was synced. mbs/reels-downloader `--only deployment`
+# (2026-11-14) ran a pre-lineage-guard copy and deleted 153 files, incl. the entities and migration spec of
+# tables its live v15 database still held. A full sync (or --post-sync) re-applies the strip.
 post_sync_fork_steps() {
-    if [ -f app-profile/package-ledger.yaml ] && grep -q 'status: removed' app-profile/package-ledger.yaml \
+    if [ -n "$ONLY_ITEMS" ]; then
+        print_warning "--only: demo strip skipped (it sweeps the whole fork); a full sync re-applies it"
+    elif [ -f app-profile/package-ledger.yaml ] && grep -q 'status: removed' app-profile/package-ledger.yaml \
        && [ -f scripts/remove-demo.sh ]; then
         print_step "Re-applying the fork's demo strip (app-profile/package-ledger.yaml records it)"
         bash scripts/remove-demo.sh --apply --no-format --no-regen >/dev/null \
@@ -959,7 +965,8 @@ sync_directory() {
                     elif { { [ -n "${PREV_TEMPLATE_SHA:-}" ] \
                              && ! git cat-file -e "${PREV_TEMPLATE_SHA}:${conv_f}" 2>/dev/null; } \
                            || [ -z "$(git log -1 --format=%h "$FORK_STATE" -- "$conv_f" 2>/dev/null)" ]; } \
-                         && case "$conv_f" in */schemas/*|*/demo/*|*/demo) false ;; *) true ;; esac \
+                         && case "$conv_f" in */schemas/*|*/demo/*|*/demo) false ;;
+                                *.png|*.webp|*.jpg|*.jpeg|*.gif|*.ico|*.icns) false ;; *) true ;; esac \
                          && ! fork_deleted_dir "$conv_f" \
                          && { owner_of "$conv_f"; [ "$OWNER" = fork ]; }; then
                         # A fork-owned file the template ships for the FIRST time (absent at the last
@@ -973,7 +980,9 @@ sync_directory() {
                         # (mifos-pay synced after ForkWorkerDeclarations.kt shipped, was told it "removed"
                         # it, and never had one). Only a file the fork once had and then deleted is a removal.
                         # Not seeded: a file in a package the fork deleted (fork_deleted_dir), a Room
-                        # schema (the fork's own lineage) or demo code.
+                        # schema (the fork's own lineage), demo code, or an image: a fork-owned image is the
+                        # fork's branding (launcher icons, store screenshots, web preview cards), and seeding
+                        # the template's copy would ship the template's look under the fork's name.
                         print_step "Seeded new fork-owned ${BOLD}$conv_f${NC} from the template"
                     else
                         git rm -f --quiet "$conv_f" 2>/dev/null || rm -f "$conv_f"
@@ -1394,9 +1403,19 @@ if [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] && [ "$DRY_RUN" = false ] \
         if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
             print_warning "sync engine is stale but the tree is dirty — skipping self-update; running the CURRENT engine (commit/clean the tree to auto-update next run)."
         else
-            _su_branch="$(get_sync_branch_name)"
+            # A branch the caller pinned (SYNC_PREBUILT_BRANCH, e.g. a session branch carrying unmerged fork
+            # work) IS the fork's state: the fresh engine is committed onto it and the run stays there.
+            # Cutting a new branch from BASE_BRANCH instead synced the fork's older default branch and
+            # left the caller's work out of the result.
+            if [ -n "${SYNC_PREBUILT_BRANCH:-}" ]; then
+                _su_branch="$SYNC_PREBUILT_BRANCH"; _su_pinned=1
+                _su_checkout=(git checkout "$_su_branch")
+            else
+                _su_branch="$(get_sync_branch_name)"; _su_pinned=0
+                _su_checkout=(git checkout -b "$_su_branch" "$BASE_BRANCH")
+            fi
             print_step "Self-updating the sync engine from the template on ${BOLD}$_su_branch${NC}, then re-running on the latest…"
-            if git checkout -b "$_su_branch" "$BASE_BRANCH" >/dev/null 2>&1; then
+            if "${_su_checkout[@]}" >/dev/null 2>&1; then
                 for _up in "$_self_rel" scripts/customization-surface.sh customization-surface.yaml; do
                     git cat-file -e "$TEMPLATE_REF:$_up" 2>/dev/null || continue
                     mkdir -p "$(dirname "$_up")"
@@ -1405,7 +1424,7 @@ if [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] && [ "$DRY_RUN" = false ] \
                 chmod +x "$_self_rel" scripts/customization-surface.sh 2>/dev/null || true
                 git add "$_self_rel" scripts/customization-surface.sh customization-surface.yaml >/dev/null 2>&1
                 git commit -q -m "chore(sync): self-update engine + merge-protection contract from template" >/dev/null 2>&1 || true
-                SYNC_DIRS_SELF_UPDATED=1 SYNC_PREBUILT_BRANCH="$_su_branch" exec bash "$_self_rel" ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"}
+                SYNC_DIRS_SELF_UPDATED=1 SYNC_BRANCH_PINNED="$_su_pinned" SYNC_PREBUILT_BRANCH="$_su_branch" exec bash "$_self_rel" ${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"}
             fi
             print_warning "self-update could not create its branch — proceeding on the CURRENT engine."
         fi
@@ -1434,9 +1453,10 @@ else
     FORK_STATE="$BASE_BRANCH"
 fi
 # The engine deletes a sync branch only when it created it: a fresh one, or the self-update branch.
-# A caller-pinned branch is never deleted.
+# A caller-pinned branch is never deleted, including one the self-update committed the engine onto.
 SYNC_BRANCH_OWNED=true
-if [ -n "${SYNC_PREBUILT_BRANCH:-}" ] && [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ]; then
+if [ -n "${SYNC_PREBUILT_BRANCH:-}" ] \
+   && { [ "${SYNC_DIRS_SELF_UPDATED:-0}" != "1" ] || [ "${SYNC_BRANCH_PINNED:-0}" = "1" ]; }; then
     SYNC_BRANCH_OWNED=false
 fi
 
@@ -1725,6 +1745,11 @@ if [ "$DRY_RUN" = false ]; then
         print_error ".template-version NOT advanced (still the last COMPLETE sync). Fix the failures and re-run; nothing was committed."
         exit 1
     fi
+    # --only is partial by definition: the tree holds the new ref for the named items only, so stamping it
+    # would make the next full sync's 3-way base claim template changes the fork never received.
+    if [ -n "$ONLY_ITEMS" ]; then
+        print_warning "--only: .template-version NOT advanced (the tree only holds ${SYNC_DIRS[*]} ${SYNC_FILES[*]} at the new ref)"
+    else
     print_step "Recording template sync version (.template-version)..."
     _tv_sha="$(git rev-parse "$TEMPLATE_REF" 2>/dev/null || echo "")"
     _tv_tag="$(git describe --tags --exact-match "$_tv_sha" 2>/dev/null || echo "")"
@@ -1739,6 +1764,7 @@ if [ "$DRY_RUN" = false ]; then
         echo "synced_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     } > .template-version
     git add .template-version 2>/dev/null || true
+    fi
     show_progress
 
     # Conflicts: every path DID sync, so the stamp above is right for the tree once the markers are

@@ -109,7 +109,7 @@ platform :ios do
       code_sign_identity:    "Apple Distribution",
       targets:               ["iosApp"],  # Xcode TARGET name (fixed in KMP template), NOT the scheme (prodRelease/…) — a scheme here matches no target → update is a silent no-op → archive hunts a Development profile
       bundle_identifier:     ios_config[:app_identifier],
-      profile_name:          "match AppStore #{ios_config[:app_identifier]}",
+      profile_name:          match_profile_name(ios_config[:app_identifier]),
     )
 
     # EVERY app-extension target needs its OWN profile (its bundle id is a distinct App ID).
@@ -127,7 +127,7 @@ platform :ios do
         code_sign_identity:    "Apple Distribution",
         targets:               [ext[:name]],
         bundle_identifier:     ext[:bundle_id],
-        profile_name:          "match AppStore #{ext[:bundle_id]}",
+        profile_name:          match_profile_name(ext[:bundle_id]),
       )
     end
 
@@ -152,7 +152,7 @@ platform :ios do
       options.merge(
         scheme:                    variant.ios_scheme,
         configuration:             build_ty.to_s.capitalize,
-        provisioning_profile_name: ios_config[:provisioning_profile_appstore],
+        provisioning_profile_name: match_profile_name(ios_config[:app_identifier]),
       ),
     )
 

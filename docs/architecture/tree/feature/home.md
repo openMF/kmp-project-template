@@ -30,10 +30,10 @@ It is also a **fork seam**. `HomeDashboard` is public rather than internal becau
 package so `--clean` removes it together with that default. A fork replaces the body without touching
 the shell.
 
-<!-- api-docs:begin module=feature/home sha=0290d03de4a25f64579fbcfe48e98b081852f18c -->
+<!-- api-docs:begin module=feature/home sha=00fda340cf66ea61c4824eb5c3b70fbf059f8733 -->
 ## API reference
 
-_Generated from `feature/home` at tree `0290d03de4a2` by `scripts/docs/api-docs-gen.sh`._
+_Generated from `feature/home` at tree `00fda340cf66` by `scripts/docs/api-docs-gen.sh`._
 _Do not hand-edit inside this block — re-run the generator. Authored prose belongs outside it._
 
 This module is **fork-owned and writable** — the opposite of `core-base/**`. It is published
@@ -91,7 +91,7 @@ class HomeViewModel(
 ```
 **Home dashboard ViewModel.** Composes four independent reactive sources into a single UI state with per-widget loading/empty/error/content slots.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:155</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:162</code></summary>
 
 ```kotlin
     onNavigateToCrypto: () -> Unit,
@@ -128,7 +128,7 @@ data class LoansSummary(
 ```
 Compact projection of the user's loan portfolio for the home dashboard. Only the dashboard's summary surface needs these aggregates; the full list lives on the Loans screen.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:290</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:297</code></summary>
 
 ```kotlin
  */
@@ -147,7 +147,7 @@ data class RatesQuickView(
 ```
 Compact projection of the two headline rate series for the home dashboard.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:536</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:543</code></summary>
 
 ```kotlin
 @Composable
@@ -166,7 +166,7 @@ sealed interface HomeAction
 ```
 What the dashboard can be asked to do.
 
-<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:210</code></summary>
+<details><summary>Used in the template — <code>feature/home/src/commonMain/kotlin/kpt/feature/home/demo/HomeDashboard.kt:217</code></summary>
 
 ```kotlin
             state = state.rates,
@@ -210,8 +210,9 @@ Test-tag registry for the home / bottom-nav dashboard. Consumed by: - `HomeScree
 
 - `const val SCREEN: String = "home.screen"` — Root `Scaffold` surface of `HomeScreen` — always rendered regardless of dashboard loading state. Stable target for Compose UI tests.
 - `const val DASHBOARD_SCROLL: String = "home_dashboard_scroll"` — The vertically-scrollable dashboard `Column`.
+- `const val RATES_FRED_KEY_MISSING: String = "home_rates_fred_key_missing"` — The rates card's setup notice when the build has no FRED key — shown instead of a retryable error.
 
 ---
 
-_8 type(s), 6 function(s)/property(ies); 14 carry KDoc at source; 0 authored example(s); 7 live call site(s)._
+_8 type(s), 7 function(s)/property(ies); 15 carry KDoc at source; 0 authored example(s); 7 live call site(s)._
 <!-- api-docs:end -->

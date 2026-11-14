@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">Güncel</string>
     <string name="screens_rates_detail_source_label">Kaynak: %1$s</string>
     <string name="screens_rates_detail_observations_label">Gözlemler</string>
+    <string name="screens_rates_fred_key_missing">FRED API anahtarı yapılandırılmamış</string>
 </resources>

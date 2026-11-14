@@ -83,4 +83,5 @@
 
     <!-- ===== HomeScreen — Empty state ===== -->
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">FRED API key not configured</string>
 </resources>

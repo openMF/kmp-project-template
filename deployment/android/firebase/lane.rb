@@ -36,6 +36,8 @@ platform :android do
     signing_config  = FastlaneConfig.get_android_signing_config(options)
     firebase_config = FastlaneConfig.get_firebase_config(:android, flavor)
 
+    # The same versionCode the Play lane uses, so a tester on this build can install the store one.
+    play_aware_version_code!(variant: variant)
     generateVersion(platform: "firebase", **firebase_config)
     releaseNotes = generateReleaseNote()
 

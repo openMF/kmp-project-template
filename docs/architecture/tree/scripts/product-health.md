@@ -1,7 +1,7 @@
 # `scripts/product-health/`
 
 > Part of [`scripts/`](../scripts.md)  
-> **Measured:** 438 tracked files — 144× `.kt`, 91× `.sh`, 60× `.md`, 50× `.yaml`, 12× `.gitkeep`
+> **Measured:** 504 tracked files — 186× `.kt`, 92× `.sh`, 76× `.md`, 55× `.yaml`, 12× `.gitkeep`
 
 ### Scripts
 
@@ -38,7 +38,7 @@
 | `store-archetype-coverage.sh` | the 8 Store5 archetypes each keep a real showcase. |
 | `store-fork-seam-wiring.sh` | the template actually CONSULTS its fork seams. |
 
-_…and 61 more._
+_…and 62 more._
 
 <!-- tree-scaffold:end -->
 ## Significance

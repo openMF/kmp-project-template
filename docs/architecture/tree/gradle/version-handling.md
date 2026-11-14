@@ -20,7 +20,7 @@ This guide explains how versions are generated and why they differ across platfo
 2. [Gradle Version Generation](#gradle-version-generation)
 3. [Firebase Version Requirements](#firebase-version-requirements)
 4. [App Store Version Sanitization](#app-store-version-sanitization)
-5. [Version Code Calculation](#version-code-calculation)
+5. [Version Code](#version-code)
 6. [Platform Comparison](#platform-comparison)
 7. [Troubleshooting](#troubleshooting)
 
@@ -149,65 +149,26 @@ val gitSha = getGitSha()  // e.g., "abc1234"
 **File:** `build.gradle.kts`
 
 ```kotlin
-// Line 56-60
 tasks.register("versionFile") {
-    doLast {
-        val version = generateVersion()
-        val versionCode = calculateVersionCode(version)
+    val file = File(projectDir, "version.txt")
 
-        println("Version: $version")
-        println("Version code: $versionCode")
-
-        // Write to version.properties
-        file("version.properties").writeText(
-            """
-            version=$version
-            versionCode=$versionCode
-            """.trimIndent()
-        )
-    }
-}
-
-fun generateVersion(): String {
-    val year = LocalDate.now().year
-    val month = LocalDate.now().monthValue
-    val day = LocalDate.now().dayOfMonth
-
-    val branch = getCurrentBranch()
-    val preRelease = getPreRelease(branch)
-    val commitCount = getCommitCountToday()
-    val gitSha = getGitSha()
-
-    return buildString {
-        append("$year.$month.$day")
-        if (preRelease != null) {
-            append("-$preRelease.$commitCount")
-        }
-        if (gitSha != null) {
-            append("+$gitSha")
-        }
-    }
+    DynamicVersion.setDynamicVersion(file, project.version.toString())
 }
 ```
+
+`project.version` comes from the reckon settings plugin (`settings.gradle.kts`), which infers it from
+the repository's tags. `versionFile` writes it to `version.txt`, which `Project.dynamicVersion`
+(`build-logic/convention/.../KptGradleExtensions.kt`) prefers over reckon on the next read. The task
+produces the version **name** only; the Android version **code** is decided by the release lanes —
+see [Version Code](#version-code).
 
 ---
 
 ### Running Version Generation
 
 ```bash
-# Generate version
 ./gradlew versionFile
-
-# Output:
-# Version: 2026.1.1-beta.0.9+abc1234
-# Version code: 20260109
-```
-
-**Output file:** `version.properties`
-
-```properties
-version=2026.1.1-beta.0.9+abc1234
-versionCode=20260109
+cat version.txt          # e.g. 2026.11.14-beta.0.13+abc1234
 ```
 
 ---
@@ -403,88 +364,38 @@ end
 
 ---
 
-## Version Code Calculation
+## Version Code
 
-### What is Version Code?
+**Version code** (Android only): the monotonically increasing integer Google Play uses to order builds
+and to decide whether a user can upgrade.
 
-**Version code** (Android only): Monotonically increasing integer
-
-**Used for:**
-- Determining which version is newer
-- Play Store release ordering
-- In-app update logic
-
----
-
-### Calculation Algorithm
-
-**File:** `build.gradle.kts`
+`cmp-android/build.gradle.kts` reads it from the environment:
 
 ```kotlin
-fun calculateVersionCode(version: String): Int {
-    // Extract base version (remove pre-release and build metadata)
-    val baseVersion = version.split('-').first().split('+').first()
-
-    // Split into parts
-    val parts = baseVersion.split('.')
-
-    return when (parts.size) {
-        // YYYY.M.D or YYYY.M.CommitCount
-        3 -> {
-            val year = parts[0].toInt()
-            val month = parts[1].toInt()
-            val dayOrCount = parts[2].toInt()
-
-            // Format: YYYYMMDD or YYYYMMCC
-            (year * 10000) + (month * 100) + dayOrCount
-        }
-        // YYYY.M
-        2 -> {
-            val year = parts[0].toInt()
-            val month = parts[1].toInt()
-
-            (year * 10000) + (month * 100)
-        }
-        // YYYY
-        1 -> {
-            parts[0].toInt() * 10000
-        }
-        else -> 1  // Fallback
-    }
-}
+versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
 ```
 
-**Examples:**
-
-| Version | Calculation | Version Code |
-|---------|-------------|--------------|
-| `2026.1.1` | (2026 × 10000) + (1 × 100) + 1 | `20260101` |
-| `2026.1.9` | (2026 × 10000) + (1 × 100) + 9 | `20260109` |
-| `2026.2.15` | (2026 × 10000) + (2 × 100) + 15 | `20260215` |
-| `2026.12.31` | (2026 × 10000) + (12 × 100) + 31 | `20261231` |
-
----
-
-### Version Code Properties
-
-**Monotonically increasing:** ✅
+so a local build is always `1`. A release build gets it from Fastlane: every Android lane that builds
+an artifact — Firebase (`deployment/android/firebase/lane.rb`) and Play internal
+(`deployment/android/play-internal/lane.rb`) — calls `play_aware_version_code!`
+(`deployment/_shared/config.rb`) before `generateVersion`, which exports `VERSION_CODE`:
 
 ```
-20260101  (2026-01-01)
-20260102  (2026-01-02)
-...
-20260109  (2026-01-09)
-...
-20260201  (2026-02-01)  # Always > previous month
-...
-20270101  (2027-01-01)  # Always > previous year
+versionCode = max(number of commits in HEAD, highest code live on any Play track + 1)
 ```
 
-**Max value:** `99999999` (year 9999, month 99, day 99)
+| Part | Why |
+|---|---|
+| live Play maximum + 1 | the upload is always above what users already have; Play rejects a code that does not let existing users upgrade |
+| every track (production, beta, closed testing, internal) | a higher code on any track blocks an upload just as well |
+| number of commits | both lanes share it, so the Play build of a release is never below its Firebase build and a tester's Firebase install can be replaced by the store one. The Firebase job has no Play credentials, so it uses this number alone. The history is fetched first: the CI checkout holds one commit |
+| `VERSION_CODE_OVERRIDE` set beforehand | wins over both, for iteration runs |
 
-**Android max:** `2,147,483,647` (32-bit signed integer)
+Promotions (internal → closed → beta → production) reuse the uploaded bundle and its code. Promoting a
+bundle that the target track already serves fails with *"This release does not add or remove any app
+bundles"*; ship a new build through Play internal first.
 
-**Safe:** ✅ (`99999999` < `2,147,483,647`)
+Test: `tests/deployment/version-code-test.sh`.
 
 ---
 

@@ -35,6 +35,7 @@ import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Compare
 import androidx.compose.material.icons.filled.CurrencyExchange
+import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Savings
@@ -58,7 +59,11 @@ import kpt.core.base.store.screen.ScreenState
 import kpt.core.base.ui.dashboard.DashboardProgressBar
 import kpt.core.base.ui.dashboard.toDashboardProgressState
 import kpt.core.base.ui.freshness.FreshnessIndicator
+import kpt.core.base.ui.screen.DefaultEmptyContent
+import kpt.core.base.ui.screen.DefaultErrorContent
+import kpt.core.base.ui.screen.LocalScreenStateDefaults
 import kpt.core.base.ui.screen.ScreenContent
+import kpt.core.base.ui.screen.ScreenStateVisual
 import kpt.core.common.format.formatDecimal
 import kpt.core.common.format.formatGrouped
 import kpt.core.designsystem.component.AmountDisplay
@@ -71,6 +76,7 @@ import kpt.core.designsystem.component.Urgency
 import kpt.core.designsystem.component.UrgencyDot
 import kpt.core.designsystem.theme.spacing
 import kpt.core.model.banking.BillReminder
+import kpt.core.model.economic.FredApiKeyMissingException
 import kpt.feature.home.demo.ui.HomeAction
 import kpt.feature.home.demo.ui.HomeViewModel
 import kpt.feature.home.demo.ui.LoansSummary
@@ -95,6 +101,7 @@ import kpt.feature.home.generated.resources.screens_home_rates_card_title
 import kpt.feature.home.generated.resources.screens_home_rates_delta_flat
 import kpt.feature.home.generated.resources.screens_home_rates_delta_mortgage
 import kpt.feature.home.generated.resources.screens_home_rates_fed_funds_label
+import kpt.feature.home.generated.resources.screens_home_rates_fred_key_missing
 import kpt.feature.home.generated.resources.screens_home_rates_mortgage_30y_label
 import kpt.feature.home.generated.resources.screens_home_rates_value_format
 import kpt.feature.home.generated.resources.screens_home_remaining_label
@@ -553,6 +560,20 @@ private fun RatesQuickCard(
             state = state,
             onRetry = onRetry,
             modifier = Modifier.fillMaxWidth(),
+            error = { error ->
+                // No FRED key is a setup gap, not a failure: a retry button here could never succeed.
+                if (error is FredApiKeyMissingException) {
+                    DefaultEmptyContent(
+                        modifier = Modifier.testTag(TestTags.Home.RATES_FRED_KEY_MISSING),
+                        config = LocalScreenStateDefaults.current.empty.copy(
+                            visual = ScreenStateVisual.Vector(Icons.Default.Key),
+                            message = stringResource(Res.string.screens_home_rates_fred_key_missing),
+                        ),
+                    )
+                } else {
+                    DefaultErrorContent(error, onRetry)
+                }
+            },
         ) { rates, _ ->
             Column(verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.sm)) {
                 RateRow(

@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">Rynki monet</string>
     <string name="screens_home_tool_crypto_subtitle">Kursy krypto na żywo i lista obserwowanych</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">Klucz API FRED nie jest skonfigurowany</string>
 </resources>

@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">वर्तमान</string>
     <string name="screens_rates_detail_source_label">स्रोत: %1$s</string>
     <string name="screens_rates_detail_observations_label">प्रेक्षण</string>
+    <string name="screens_rates_fred_key_missing">FRED API कुंजी कॉन्फ़िगर नहीं है</string>
 </resources>

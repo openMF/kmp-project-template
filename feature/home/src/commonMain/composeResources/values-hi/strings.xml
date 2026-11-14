@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">कॉइन मार्केट</string>
     <string name="screens_home_tool_crypto_subtitle">लाइव क्रिप्टो मूल्य और वॉचलिस्ट</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">FRED API कुंजी कॉन्फ़िगर नहीं है</string>
 </resources>

@@ -13,7 +13,9 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.v2.runComposeUiTest
+import kpt.core.base.store.screen.ScreenState
 import kpt.core.designsystem.theme.KptTheme
+import kpt.core.model.economic.FredApiKeyMissingException
 import kotlin.test.Test
 
 /**
@@ -48,5 +50,19 @@ class InterestRateDetailScreenUiTest {
             }
         }
         onNodeWithTag(TestTags.RateDetail.DETAIL_ROOT).assertIsDisplayed()
+    }
+
+    @Test
+    fun missingFredKeyShowsSetupNoticeNotRetryableError() = runComposeUiTest {
+        val repository = FakeEconomicRatesRepository().apply {
+            state.value = ScreenState.Error(FredApiKeyMissingException())
+        }
+        val viewModel = InterestRateDetailViewModel(seriesId = "DFF", repository = repository)
+        setContent {
+            KptTheme {
+                InterestRateDetailScreen(seriesId = "DFF", onBackClick = {}, viewModel = viewModel)
+            }
+        }
+        onNodeWithTag(TestTags.FRED_KEY_MISSING).assertIsDisplayed()
     }
 }

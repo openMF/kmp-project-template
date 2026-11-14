@@ -45,48 +45,27 @@ platform :android do
       )
     end
 
-    # --- Track-aware versionCode (Option B, epic multi-platform-release-completion D15, 2026-06-22) ---
-    # Query the LIVE Play tracks and set VERSION_CODE_OVERRIDE = global_max + 1 so the upload
-    # always clears the live ceiling, regardless of which repo builds. A fork's commit count is
-    # below the real app's accumulated live codes, which triggers Play's
-    #   "cannot rollout: existing users can't upgrade to the newly added APKs".
-    # We query production + beta + internal and take the GLOBAL max (a higher track can carry a
-    # higher code than internal). Reuses generateVersion's existing VERSION_CODE_OVERRIDE hook,
-    # so generateVersion stays generic. deployInternal is the ONLY lane that builds a fresh AAB;
-    # promoteToBeta / promote_to_production reuse the uploaded code and need no change.
-    #
-    # Secrets: `variant.secrets.path(:play_service_account)` resolves through
-    # `BuildSecrets` (live-wins-else-sample); the resolver contains no literal
-    # `secrets/` path (D6).
+    # One versionCode per release, the same one the Firebase lane builds with: max(commit count,
+    # highest code live on any Play track + 1). deployInternal is the only Play lane that builds a
+    # fresh AAB; promoteToBeta / promote_to_production reuse the uploaded code.
+    play_aware_version_code!(variant: variant)
+    # Secrets: `variant.secrets.path(:play_service_account)` resolves through `BuildSecrets`
+    # (live-wins-else-sample); the resolver contains no literal `secrets/` path (D6).
     play_json_key = File.join(DEPLOYMENT_REPO_ROOT, variant.secrets.path(:play_service_account))
-    play_pkg      = FastlaneConfig::ProjectConfig.android_package_name
-    live_max = %w[production beta internal].flat_map do |t|
-      begin
-        google_play_track_version_codes(package_name: play_pkg, track: t, json_key: play_json_key)
-      rescue => e
-        UI.important("⚠️ Play track '#{t}' version-code query failed (#{e.message}); skipping it.")
-        []
-      end
-    end.map(&:to_i).max || 0
-    if live_max > 0
-      ENV["VERSION_CODE_OVERRIDE"] = (live_max + 1).to_s
-      UI.message("📈 Track-aware versionCode: live global max=#{live_max} → override=#{ENV['VERSION_CODE_OVERRIDE']}")
-    else
-      # New app (empty tracks) or API unreachable — fall back to commit_count × 10 (the legacy
-      # headroom scheme from multi-platform-build-and-publish.yaml). Logged loudly, never silent.
-      fallback = (sh("git rev-list --count HEAD", log: false).strip.to_i rescue 0) * 10
-      ENV["VERSION_CODE_OVERRIDE"] = fallback.to_s if fallback > 0
-      UI.important("⚠️ No live Play track codes (new app / API unreachable); fallback versionCode=commit_count×10=#{fallback}.")
-    end
-    # --- end track-aware versionCode ---
 
     generateVersion(platform: "playstore")
-    releaseNotes = generateReleaseNote()
-
-    # Write release notes into Play Store metadata before upload.
-    buildConfigPath = "metadata/android/en-US/changelogs/default.txt"
-    FileUtils.mkdir_p(File.dirname(buildConfigPath))
-    File.write(buildConfigPath, releaseNotes)
+    # Release notes: the AUTHORED changelog (app-profile android.changelog → syncForkConfig →
+    # metadata/<locale>/changelogs/default.txt) is what Play shows, so it wins. Git-derived notes are
+    # only a fallback, written to the SAME metadata_path upload_to_play_store reads below. (The old
+    # relative path resolved under deployment/fastlane/metadata/ — a file nothing uploaded — so a
+    # fork's unedited 'YOUR_APP_CHANGELOG …' placeholder went to the store instead.)
+    changelogPath = File.join(DEPLOYMENT_REPO_ROOT, "deployment/android/metadata/en-US/changelogs/default.txt")
+    authored = File.exist?(changelogPath) ? File.read(changelogPath).strip : ""
+    if authored.empty? || authored.match?(/YOUR_APP_CHANGELOG|See store\.release_notes/i)
+      UI.important("⚠️ No authored Play changelog (app-profile android.changelog is empty or a placeholder) — using git-derived notes.")
+      FileUtils.mkdir_p(File.dirname(changelogPath))
+      File.write(changelogPath, generateReleaseNote())
+    end
 
     # AC32 FIX — Play needs AAB, not APK. `variant.bundle_task` = `bundle{Flavor}{BuildType}`.
     # Empty `buildType` because the task name is already fully resolved.

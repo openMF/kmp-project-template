@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">Поточна</string>
     <string name="screens_rates_detail_source_label">Джерело: %1$s</string>
     <string name="screens_rates_detail_observations_label">Спостереження</string>
+    <string name="screens_rates_fred_key_missing">Ключ API FRED не налаштовано</string>
 </resources>

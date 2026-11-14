@@ -47,4 +47,7 @@ object TestTags {
          */
         const val DETAIL_ROOT: String = "rate_detail_root"
     }
+
+    /** Shown in place of a rate when the build has no FRED key — a setup gap, not a failure to retry. */
+    const val FRED_KEY_MISSING: String = "rates_fred_key_missing"
 }

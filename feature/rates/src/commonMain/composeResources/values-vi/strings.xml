@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">Hiện tại</string>
     <string name="screens_rates_detail_source_label">Nguồn: %1$s</string>
     <string name="screens_rates_detail_observations_label">Quan sát</string>
+    <string name="screens_rates_fred_key_missing">Chưa cấu hình khóa API FRED</string>
 </resources>

@@ -444,6 +444,9 @@ abstract class SyncForkConfigTask : DefaultTask() {
             regenerateAppPrivacyConfig(root, appProfile)
             regenerateAppOrgLinks(root, appProfile)
             reconcileMigrationLedger(root, appProfile)
+            // BEFORE the buildkonfig pass: it reads LAYOUT's `kind: value` rows to decide which fields
+            // get a readSecretValue() read, and the fork rows written here are among them.
+            regenerateForkSecretRows(root, appProfile)
             regenerateBuildKonfigFields(root, appProfile)
             scaffoldAccessPointPackages(root, appProfile)
         }
@@ -1468,6 +1471,79 @@ abstract class SyncForkConfigTask : DefaultTask() {
     }
 
     /**
+     * Project every `network.build_config_fields` row that names a `secret_alias:` into the
+     * `syncForkConfig:fork-secrets` region of `secrets/fork-layout.yaml`, as a `kind: value` row.
+     *
+     * WHY. Without a LAYOUT row a fork's build_config_fields value was read from env / local.properties
+     * ONLY: never in the generated secrets-manifest, so `/secrets pull` never materialized it and the
+     * release workflow (which decrypts `vault_alias` rows into secrets/live/) never delivered it, so a
+     * CI release compiled the field as "" with nothing reporting it. The row goes in fork-layout.yaml —
+     * FORK-owned, so a sync never touches it — not LAYOUT.yaml, which is template-owned and replaced on
+     * every sync. Every reader merges the two: `BuildSecrets.load_layout` (vault_plan, export_paths),
+     * `needs-generate` (rows carry `fork_build_config: true`), and [layoutValueKeysByEnv], so
+     * [regenerateBuildKonfigFields] emits the `readSecretValue()` read for it.
+     *
+     * A source_env LAYOUT.yaml already declares is skipped — the template row wins (FRED) — as is one
+     * the fork hand-declared outside the region. A fork with no such row gets no region: the file is
+     * the fork's, so it is only touched when there is something to write.
+     */
+    private fun regenerateForkSecretRows(root: File, appProfile: Map<String, Any?>) {
+        val file = File(root, "secrets/fork-layout.yaml")
+        val layout = File(root, "secrets/LAYOUT.yaml")
+        val begin = "  # syncForkConfig:fork-secrets:begin"
+        val end = "  # syncForkConfig:fork-secrets:end"
+        val envRe = Regex("""source_env:\s*([A-Z0-9_]+)""")
+        val current = if (file.isFile) file.readText() else ""
+        val handWritten = if (current.contains(begin)) current.substringBefore(begin) + current.substringAfter(end) else current
+        val declaredEnvs = (envRe.findAll(handWritten) + envRe.findAll(if (layout.isFile) layout.readText() else ""))
+            .map { it.groupValues[1] }.toSet()
+
+        val valid = Regex("^[A-Z][A-Z0-9_]*$")
+        val alias = Regex("^[a-z0-9][a-z0-9-]*$")
+        val network = (appProfile["network"] as? Map<*, *>).orEmpty()
+        val rows = buildString {
+            for (row in (network["build_config_fields"] as? List<*>) ?: emptyList<Any?>()) {
+                val m = row as? Map<*, *> ?: continue
+                val name = m["name"]?.toString()?.trim()?.takeIf { valid.matches(it) } ?: continue
+                val env = m["from_env"]?.toString()?.trim()?.takeIf { valid.matches(it) } ?: name
+                val a = m["secret_alias"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
+                if (!alias.matches(a)) {
+                    throw org.gradle.api.GradleException(
+                        "syncForkConfig: network.build_config_fields '$name' has secret_alias '$a' — a vault alias is kebab-case.",
+                    )
+                }
+                if (env in declaredEnvs) continue
+                val key = env.lowercase()
+                append("  ").append(key).append(":\n")
+                append("    hint: \"app-profile network.build_config_fields → ").append(name).append("\"\n")
+                append("    placeholder: \"<").append(key.replace('_', '-')).append(">\"\n")
+                append("    vault_alias: ").append(a).append('\n')
+                append("    kind: value\n")
+                append("    source_env: ").append(env).append('\n')
+                append("    rel: build-config/").append(key).append('\n')
+                append("    fork_build_config: true\n")
+            }
+        }
+        if (!current.contains(begin)) {
+            if (rows.isEmpty()) return
+            // Open the region at the top of `secrets:` — turning the shipped empty `secrets: {}` into a block map.
+            val base = current.ifEmpty { "secrets: {}\n" }.replace(Regex("(?m)^secrets:[ \\t]*\\{\\s*\\}[ \\t]*$"), "secrets:")
+            val at = Regex("(?m)^secrets:[ \\t]*\\n").find(base) ?: return
+            file.parentFile.mkdirs()
+            file.writeText(base.substring(0, at.range.last + 1) + "$begin\n$end\n" + base.substring(at.range.last + 1))
+        }
+        val body = buildString {
+            append(begin).append(" — GENERATED from app-profile `network.build_config_fields[].secret_alias`.\n")
+            append("  # DO NOT HAND-EDIT — declare the alias in app-profile and re-run `./gradlew syncForkConfig`.\n")
+            append(rows)
+            append(end)
+        }
+        val before = file.readText()
+        patchSentinel(file, begin, end, body)
+        if (file.readText() != before) logger.lifecycle("syncForkConfig: regenerated secrets/fork-layout.yaml fork-secrets rows")
+    }
+
+    /**
      * Refill the `syncForkConfig:buildkonfig` region of `core/network/build.gradle.kts` — one
      * `buildConfigField` per key a fork declares in app-profile.
      *
@@ -1478,8 +1554,8 @@ abstract class SyncForkConfigTask : DefaultTask() {
      * SoT as the reference, so the two cannot drift.
      *
      * Sources: every access point's `publishable_key_env:` / `api_key_env:`, plus `network.build_config_fields`
-     * for keys not tied to an endpoint. Names already declared OUTSIDE the region (the demo
-     * `FRED_API_KEY`) are skipped — a duplicate `buildConfigField` fails the buildkonfig plugin.
+     * for keys not tied to an endpoint. Names already declared OUTSIDE the region are skipped — a
+     * duplicate `buildConfigField` fails the buildkonfig plugin.
      */
     private fun regenerateBuildKonfigFields(root: File, appProfile: Map<String, Any?>) {
         val file = File(root, "core/network/build.gradle.kts")
@@ -1503,12 +1579,17 @@ abstract class SyncForkConfigTask : DefaultTask() {
             }
         }
         val network = (appProfile["network"] as? Map<*, *>).orEmpty()
+        // name -> required prefix ("" = non-blank only), for rows declaring `required_in_release: true`.
+        val releaseRequired = LinkedHashMap<String, String>()
         for (row in (network["build_config_fields"] as? List<*>) ?: emptyList<Any?>()) {
             val m = row as? Map<*, *> ?: continue
             val name = m["name"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
             if (!valid.matches(name)) continue
             val env = m["from_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: name
             if (valid.matches(env)) fields.putIfAbsent(name, env)
+            if (m["required_in_release"] == true) {
+                releaseRequired[name] = m["required_prefix"]?.toString()?.trim().orEmpty()
+            }
         }
 
         // A BuildKonfig field is compiled INTO the app binary, where anyone can extract it. Only
@@ -1545,16 +1626,35 @@ abstract class SyncForkConfigTask : DefaultTask() {
             append("        // Values are read at BUILD time — the env var (CI), then the secrets/LAYOUT.yaml `kind: value` row whose\n")
             append("        // source_env matches (secrets/live/ else the secrets/sample/ fake), then local.properties (legacy).\n")
             append("        // No secret is committed.\n")
+            fun read(env: String) = buildString {
+                append("System.getenv(\"").append(env).append("\")")
+                secretKeys[env]?.let { append(" ?: project.readSecretValue(\"").append(it).append("\")") }
+                append(" ?: localProps.getProperty(\"").append(env).append("\", \"\")")
+            }
             for ((name, env) in fields) {
                 if (name in existing) continue
                 append("        buildConfigField(\n")
                 // One argument per line: ktlint (spotlessKotlinGradle) rejects a multi-line call that puts two on one.
                 append("            STRING,\n")
                 append("            \"").append(name).append("\",\n")
-                append("            System.getenv(\"").append(env).append("\")")
-                secretKeys[env]?.let { append(" ?: project.readSecretValue(\"").append(it).append("\")") }
-                append(" ?: localProps.getProperty(\"").append(env).append("\", \"\"),\n")
+                append("            ").append(read(env)).append(",\n")
                 append("        )\n")
+            }
+            // `required_in_release: true` — fail a RELEASE build whose value is blank (or lacks
+            // `required_prefix`). Debug builds often run on a second key, so a missing release value is
+            // invisible until users have the binary.
+            for ((name, prefix) in releaseRequired) {
+                val env = fields[name] ?: continue
+                val cond = if (prefix.isEmpty()) "value.isNotBlank()" else "value.startsWith(\"$prefix\")"
+                append("        if (gradle.startParameter.taskNames.any { it.contains(\"Release\") }) {\n")
+                append("            val value = ").append(read(env)).append('\n')
+                append("            check(").append(cond).append(") {\n")
+                append("                \"").append(name).append(" is ")
+                append(if (prefix.isEmpty()) "blank" else "blank or not $prefix…")
+                append(" for a release build — materialize its secret_alias (/secrets pull) or set the ")
+                append(env).append(" env var\"\n")
+                append("            }\n")
+                append("        }\n")
             }
             append(end)
         }
@@ -1702,21 +1802,26 @@ abstract class SyncForkConfigTask : DefaultTask() {
      * carry — the code never hardcodes either value. Null (no block / no file) disables the rewrite.
      */
     /**
-     * `source_env -> key` for every `kind: value` secret in `secrets/LAYOUT.yaml` that has a `rel:` and no
-     * `by_flavor` — the rows the resolver's `export-paths` map resolves to a single file. Empty when the
-     * file is missing or unparsable, so the generated fields fall back to env + local.properties.
+     * `source_env -> key` for every `kind: value` secret in `secrets/LAYOUT.yaml` plus the fork's
+     * `secrets/fork-layout.yaml` that has a `rel:` and no `by_flavor` — the rows the resolver's
+     * `export-paths` map resolves to a single file. LAYOUT is read first, so a template row wins, as in
+     * `BuildSecrets.load_layout`. Empty when neither file parses, so the generated fields fall back to
+     * env + local.properties.
      */
     private fun layoutValueKeysByEnv(root: File): Map<String, String> {
-        val f = File(root, "secrets/LAYOUT.yaml")
-        if (!f.isFile) return emptyMap()
-        val doc = runCatching { f.inputStream().use { Yaml().load<Any?>(it) } }.getOrNull() as? Map<*, *>
-            ?: return emptyMap()
         val out = LinkedHashMap<String, String>()
-        for ((key, spec) in (doc["secrets"] as? Map<*, *>).orEmpty()) {
-            val s = spec as? Map<*, *> ?: continue
-            if (s["kind"] != "value" || s["rel"] == null || s["by_flavor"] != null) continue
-            val env = s["source_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
-            out.putIfAbsent(env, key.toString())
+        val keys = HashSet<String>()
+        for (path in listOf("secrets/LAYOUT.yaml", "secrets/fork-layout.yaml")) {
+            val f = File(root, path)
+            if (!f.isFile) continue
+            val doc = runCatching { f.inputStream().use { Yaml().load<Any?>(it) } }.getOrNull() as? Map<*, *> ?: continue
+            for ((key, spec) in (doc["secrets"] as? Map<*, *>).orEmpty()) {
+                if (!keys.add(key.toString())) continue
+                val s = spec as? Map<*, *> ?: continue
+                if (s["kind"] != "value" || s["rel"] == null || s["by_flavor"] != null) continue
+                val env = s["source_env"]?.toString()?.trim()?.takeIf { it.isNotEmpty() } ?: continue
+                out.putIfAbsent(env, key.toString())
+            }
         }
         return out
     }

@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">Atual</string>
     <string name="screens_rates_detail_source_label">Fonte: %1$s</string>
     <string name="screens_rates_detail_observations_label">Observações</string>
+    <string name="screens_rates_fred_key_missing">Chave de API do FRED não configurada</string>
 </resources>

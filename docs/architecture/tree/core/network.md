@@ -449,16 +449,13 @@ single { FredApiConfig(apiKey = "deadbeef...") }
 
 </details>
 
-<details><summary>Used in the template — <code>core/network/src/commonMain/kotlin/kpt/core/network/di/ForkNetworkModule.kt:114</code></summary>
+<details><summary>Used in the template — <code>core/model/src/commonMain/kotlin/kpt/core/model/economic/FredApiKeyMissingException.kt:20</code></summary>
 
 ```kotlin
-    // derived from the access-point declaration the way a base URL or a publishable key can. Fenced, so
-    // `remove-demo.sh` drops it together with the `fred` package and its access point.
-    single<kpt.core.network.fred.config.FredApiConfig> {
-        kpt.core.network.fred.config.FredApiConfig(
-            apiKey = BuildKonfig.FRED_API_KEY.takeIf { it.isNotBlank() },
-        )
-    }
+ */
+class FredApiKeyMissingException : IllegalStateException(
+    "FRED_API_KEY is not configured — supply a key via FredApiConfig before requesting interest-rate data.",
+)
 ```
 
 </details>

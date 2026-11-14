@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">Mercati delle monete</string>
     <string name="screens_home_tool_crypto_subtitle">Prezzi cripto in tempo reale e watchlist</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">Chiave API FRED non configurata</string>
 </resources>

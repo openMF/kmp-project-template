@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">Coin-Märkte</string>
     <string name="screens_home_tool_crypto_subtitle">Live-Kryptopreise und Merkliste</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">FRED-API-Schlüssel nicht konfiguriert</string>
 </resources>

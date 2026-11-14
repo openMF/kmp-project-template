@@ -11,7 +11,6 @@ package kpt.core.base.platform.di
 
 import com.mobilebytelabs.kmptoolkit.appintents.di.appIntentsModule
 import com.mobilebytelabs.kmptoolkit.bubble.di.bubbleModule
-import com.mobilebytelabs.kmptoolkit.clipboard.di.clipboardModule
 import com.mobilebytelabs.kmptoolkit.pdfgenerator.di.pdfModule
 import com.mobilebytelabs.kmptoolkit.toast.di.toastModule
 import kotlinx.coroutines.CoroutineDispatcher
@@ -85,17 +84,15 @@ val platformModule = module {
     // they are INCLUDED rather than re-declared here — the toolkit owns what its bindings are, and
     // hand-rolling them is the same duplication-that-drifts problem as wrapping the libraries.
     //
-    // Two of these were re-derived by hand in the first draft and got it wrong:
-    //   • clipboardModule already binds ClipboardManager AND the same instance as `Clipboard` —
-    //     the rich reactive members (history, changes, urlDetections) live only on the final class,
-    //     while FakeClipboard implements the interface, so both are needed and must share one
-    //     object. Re-declaring that by hand reproduced the logic; including it reuses it.
-    //   • bubbleModule binds BubblePermission alongside Bubble. The hand-rolled version bound only
-    //     Bubble, silently dropping the runtime permission gate a fork needs to request overlay
-    //     access at all.
+    // bubbleModule binds BubblePermission alongside Bubble. A hand-rolled version once bound only
+    // Bubble, silently dropping the runtime permission gate a fork needs to request overlay access.
+    //
+    // The clipboard is not included: cmp-clipboard's manifest ships a `specialUse` foreground
+    // service and boot receiver into every app, which Google Play makes each release declare. A
+    // fork that wants it adds the dependency and `includes(clipboardModule())` in its own module.
     //
     // No wrapper interfaces: each library ships a public Fake* in its main artifact
-    // (FakeClipboard, FakeAppIntentsManager, FakeBubble, FakePdfManager, FakeAppReviewManager), so
+    // (FakeAppIntentsManager, FakeBubble, FakePdfManager, FakeAppReviewManager), so
     // substitution in tests never needed a template-owned type, and insulation was already gone
     // once these types appeared in this module's public API.
     // The TOOLKIT's ShareManager and IntentManager, bound under [ToolkitQualifier] instead of
@@ -115,7 +112,6 @@ val platformModule = module {
     // `ProvideIntentManager(manager)`, which overrides the local.
     single<ToolkitShareManager>(ToolkitQualifier) { ToolkitShareManagerImpl() }
     single<ToolkitIntentManager>(ToolkitQualifier) { ToolkitIntentManagerImpl() }
-    includes(clipboardModule())
     includes(bubbleModule())
     includes(appIntentsModule)
     includes(pdfModule)

@@ -1,9 +1,9 @@
 # `secrets/sample/`
 
 > Part of [`secrets/`](../secrets.md)  
-> **Measured:** 53 tracked files — 14× `.md`, 3× `.json`, 2× `.p8`, 2× `.p12`, 1× `.gitkeep`
+> **Measured:** 54 tracked files — 14× `.md`, 3× `.json`, 2× `.p8`, 2× `.p12`, 1× `.gitkeep`
 
-53 tracked files.
+54 tracked files.
 
 ### Docs in the tree
 

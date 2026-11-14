@@ -17,4 +17,5 @@
     <string name="screens_rates_detail_current_label">Saat ini</string>
     <string name="screens_rates_detail_source_label">Sumber: %1$s</string>
     <string name="screens_rates_detail_observations_label">Observasi</string>
+    <string name="screens_rates_fred_key_missing">Kunci API FRED belum dikonfigurasi</string>
 </resources>

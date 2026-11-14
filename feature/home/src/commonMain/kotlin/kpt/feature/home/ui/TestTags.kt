@@ -29,5 +29,8 @@ object TestTags {
 
         /** The vertically-scrollable dashboard `Column`. */
         const val DASHBOARD_SCROLL: String = "home_dashboard_scroll"
+
+        /** The rates card's setup notice when the build has no FRED key — shown instead of a retryable error. */
+        const val RATES_FRED_KEY_MISSING: String = "home_rates_fred_key_missing"
     }
 }

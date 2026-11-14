@@ -57,4 +57,5 @@
     <string name="screens_home_tool_crypto_title">Coin piyasaları</string>
     <string name="screens_home_tool_crypto_subtitle">Canlı kripto fiyatları ve izleme listesi</string>
     <string name="screens_home_money_zero">$0.00</string>
+    <string name="screens_home_rates_fred_key_missing">FRED API anahtarı yapılandırılmamış</string>
 </resources>

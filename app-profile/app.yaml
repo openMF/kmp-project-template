@@ -33,6 +33,11 @@ network:
   #   build_config_fields:
   #     - name: MY_ANALYTICS_KEY      # the BuildKonfig constant
   #       from_env: MY_ANALYTICS_KEY  # env var / local.properties key (defaults to `name`)
+  #       secret_alias: <proj>-my-analytics-key  # vault alias — syncForkConfig adds a row to the fork-owned
+  #                                   #   secrets/fork-layout.yaml, so /secrets pull + the release workflow materialize it (without one, only
+  #                                   #   env / local.properties are read and a CI release compiles "")
+  #       required_in_release: true   # fail a RELEASE build when the value is blank …
+  #       required_prefix: pk_        # … or does not start with this (optional)
   build_config_fields: []
   demo_base_url: https://demo.example.com   # PLACEHOLDER — fork sets its demo endpoint
   prod_base_url: https://api.example.com     # PLACEHOLDER — fork sets its prod endpoint
@@ -96,7 +101,10 @@ network:
   #                  add one at runtime, disable it, or switch which is main, persisted across restarts.
   #                  The values declared here are the defaults that `reset` returns to. Any kind may
   #                  be main (REST or Supabase); the main switches only between configs of its kind.
-  #   secret_alias   optional — vault alias for a REQUEST-time key (e.g. FRED's @Query api_key).
+  #   api_key_env    optional — the env var holding a client-safe API key (e.g. FRED's @Query api_key).
+  #                  Generates `BuildKonfig.<env>` in core/network, read at build time from the env var,
+  #                  then the secrets/LAYOUT.yaml `kind: value` row whose source_env matches, then
+  #                  local.properties — the same path as `publishable_key_env`.
   #   (no `api:` field) — the class<->point link lives on the CLASS, as `@ApiBinding("<id>")`, which
   #                  generates the Koin binding into core/network/.../di/GeneratedApiBindings.kt:
   #                    rest      → `restApi("<id>") { it.create<Simple>() }`  (Ktorfit factory by convention)
@@ -203,8 +211,8 @@ network:
       auth: none                    # keys off a request-time @Query api_key, not a header
       loggable_host: api.stlouisfed.org
       proxied_host: api.stlouisfed.org   # legacy, redundant in web_cors relay mode — kept as the compat example
-      secret_alias: mifos-x-fred-api-key # request-time API key — from the vault (secrets-manifest.yaml),
-                                         # materialized to local.properties → BuildKonfig.FRED_API_KEY
+      api_key_env: FRED_API_KEY          # request-time @Query key → generated BuildKonfig.FRED_API_KEY;
+                                         # secrets/LAYOUT.yaml#fred_api_key; empty sample → "" → "not configured"
     - id: fineract                   # Mifos Fineract — the auth-bearing REST showcase
       type: rest
       owner: demo
